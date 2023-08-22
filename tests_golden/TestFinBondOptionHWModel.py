@@ -397,7 +397,7 @@ def test_BondOptionZEROVOLConvergence():
     dfExpiry = discount_curve.df(expiry_date)
     fwdCleanValue = bond.clean_price_from_discount_curve(
         expiry_date, discount_curve)
-#    fwdFullValue = bond.full_price_from_discount_curve(expiry_date, discount_curve)
+#    fwdFullValue = bond.dirty_price_from_discount_curve(expiry_date, discount_curve)
 #    print("BOND FwdCleanBondPx", fwdCleanValue)
 #    print("BOND FwdFullBondPx", fwdFullValue)
 #    print("BOND Accrued:", bond._accrued_interest)
@@ -478,7 +478,7 @@ def test_BondOptionDerivaGem():
     europeanCallBondOption = BondOption(bond, expiry_date, strike_price, face,
                                         OptionTypes.EUROPEAN_CALL)
     cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
-    fp = bond.full_price_from_discount_curve(expiry_date, discount_curve)
+    fp = bond.dirty_price_from_discount_curve(expiry_date, discount_curve)
 #    print("Fixed Income Clean Price: %9.3f"% cp)
 #    print("Fixed Income Full  Price: %9.3f"% fp)
 

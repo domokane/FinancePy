@@ -41,7 +41,7 @@ def test_bond_zero():
     ytm = bond.yield_to_maturity(settlement_date,
                                  clean_price,
                                  YTMCalcType.ZERO)
-    accrued_interest = bond.calc_accrued_interest(settlement_date)
+    accrued_interest = bond.accrued_interest(settlement_date, 1.0)
 
     testCases.header('YTM', 'accrued')
     testCases.print(ytm, accrued_interest)
@@ -61,8 +61,8 @@ def test_bond_zero_ror():
     for row in df.itertuples(index=False):
         buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
         sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
-        buy_price = bond.full_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.ZERO)
-        sell_price = bond.full_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.ZERO)
+        buy_price = bond.dirty_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.ZERO)
+        sell_price = bond.dirty_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.ZERO)
         simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
         testCases.print(row.bond_code, buy_date, row.buy_ytm, buy_price, sell_date, row.sell_ytm, sell_price,
                         simple, irr)

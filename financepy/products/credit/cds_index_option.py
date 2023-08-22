@@ -291,7 +291,7 @@ class CDSIndexOption:
         dz = 0.2
         numZSteps = int(2.0 * abs(z) / dz)
 
-        flow_dates = self._cds_contract._adjusted_dates
+        flow_dates = self._cds_contract._payment_dates
         num_flows = len(flow_dates)
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         dfToExpiry = libor_curve.df(self._expiry_date)
@@ -300,16 +300,21 @@ class CDSIndexOption:
         fwdDfs = [1.0] * (num_flows)
         expiryToFlowTimes = [1.0] * (num_flows)
 
-        for iFlow in range(1, num_flows):
-            expiryToFlowTimes[iFlow] = (
-                flow_dates[iFlow] - self._expiry_date) / gDaysInYear
+        for iFlow in range(0, num_flows):
+            expiryToFlowTimes[iFlow] = (flow_dates[iFlow] - self._expiry_date) / gDaysInYear
             fwdDfs[iFlow] = libor_curve.df(flow_dates[iFlow]) / dfToExpiry
 
         intH = 0.0
         intMaxH = 0.0
 
         day_count = DayCount(self._day_count_type)
-        pcd = flow_dates[0]  # PCD
+
+        #  Previous coupon date is last coupon date before valuation date
+        for dt in flow_dates:
+            pcd = dt
+            if dt > valuation_date:
+                break
+
         eff = self._expiry_date
         accrual_factorPCDToExpiry = day_count.year_frac(pcd, eff)[0]
 

@@ -68,12 +68,14 @@ class BondEmbeddedOption:
         self._freq_type = freq_type
         self._accrual_type = accrual_type
 
+        ex_div_days= 0
+        
         self._bond = Bond(issue_date,
                           maturity_date,
                           coupon,
                           freq_type,
                           accrual_type,
-                          face_amount)
+                          ex_div_days)
 
         # Validate call and put schedules
         for dt in call_dates:
@@ -168,7 +170,7 @@ class BondEmbeddedOption:
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
-        face_amount = self._bond._face_amount
+        face_amount = 100.0
 
         if isinstance(model, HWTree):
 
@@ -228,7 +230,7 @@ class BondEmbeddedOption:
         s += label_to_string("COUPON", self._coupon)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount)
+        s += label_to_string("EX-DIV DAYS", self._ex_div_days)
 
         s += label_to_string("NUM CALL DATES", len(self._call_dates))
         for i in range(0, len(self._call_dates)):

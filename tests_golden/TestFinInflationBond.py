@@ -38,13 +38,14 @@ def test_FinInflationBondBBG():
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     face = 100.0
     baseCPIValue = 218.08532
-
+    ex_div_days = 0
+    
     bond = FinInflationBond(issue_date,
                             maturity_date,
                             coupon,
                             freq_type,
                             accrual_type,
-                            face,
+                            ex_div_days,
                             baseCPIValue)
 
     testCases.header("FIELD", "VALUE")
@@ -75,8 +76,8 @@ def test_FinInflationBondBBG():
 
     testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    testCases.print("Full Price from REAL YTM = ", full_price)
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm)
+    testCases.print("Dirty Price from REAL YTM = ", dirty_price)
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)
@@ -98,8 +99,9 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calc_inflation_accrued_interest(settlement_date,
-                                                         refCPIValue)
+    inflationAccd = bond.inflation_accrued_interest(settlement_date,
+                                                    face,
+                                                    refCPIValue)
 
     testCases.print("Inflation Accrued = ", inflationAccd)
 
@@ -111,7 +113,10 @@ def test_FinInflationBondBBG():
 
     testCases.print("Flat Price from Real YTM = ", clean_price)
 
+    face = 100.0
+    
     principal = bond.inflation_principal(settlement_date,
+                                         face,
                                          ytm,
                                          refCPIValue,
                                          YTMCalcType.US_TREASURY)
@@ -247,12 +252,14 @@ def test_FinInflationBondStack():
 
     ###########################################################################
 
+    ex_div_days = 0
+    
     bond = FinInflationBond(issue_date,
                             maturity_date,
                             coupon,
                             freq_type,
                             accrual_type,
-                            face,
+                            ex_div_days,
                             baseCPIValue)
 
     testCases.header("FIELD", "VALUE")
@@ -285,8 +292,8 @@ def test_FinInflationBondStack():
 
     testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    testCases.print("Full Price from REAL YTM = ", full_price)
+    dirty_price = bond.dirty_price_from_discount_curve(settlement_date, ytm)
+    testCases.print("Dirty Price from REAL YTM = ", dirty_price)
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price from Real YTM = ", clean_price)

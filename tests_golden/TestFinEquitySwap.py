@@ -21,6 +21,8 @@ from financepy.products.equity.equity_swap_leg import EquitySwapLeg
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
+testCases = FinTestCases(__file__, globalTestCaseMode)
+
 def test_equity_swap_at_inception():
 
     effective_date = Date(13, 2, 2018)

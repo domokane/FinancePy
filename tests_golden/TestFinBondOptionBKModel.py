@@ -56,7 +56,7 @@ def test_BondOption():
 
     testCases.header("LABEL", "VALUE")
 
-    price = bond.full_price_from_discount_curve(
+    price = bond.dirty_price_from_discount_curve(
         settlement_date, discount_curve)
     testCases.print("Fixed Income Price:", price)
 
@@ -90,7 +90,7 @@ def test_BondOption():
 
     option_type = OptionTypes.AMERICAN_CALL
 
-    price = bond.full_price_from_discount_curve(
+    price = bond.dirty_price_from_discount_curve(
         settlement_date, discount_curve)
     testCases.header("LABEL", "VALUE")
     testCases.print("Fixed Income Price:", price)
@@ -123,7 +123,7 @@ def test_BondOption():
 
     option_type = OptionTypes.EUROPEAN_PUT
 
-    price = bond.full_price_from_discount_curve(
+    price = bond.dirty_price_from_discount_curve(
         settlement_date, discount_curve)
 
     for strike_price in strikes:
@@ -152,7 +152,7 @@ def test_BondOption():
 
     option_type = OptionTypes.AMERICAN_PUT
 
-    price = bond.full_price_from_discount_curve(
+    price = bond.dirty_price_from_discount_curve(
         settlement_date, discount_curve)
 
     for strike_price in strikes:
@@ -262,7 +262,7 @@ def test_BondOptionAmericanConvergenceTWO():
     expiry_date = settlement_date.add_tenor("18m")
     face = 100.0
 
-    spotValue = bond.full_price_from_discount_curve(
+    spotValue = bond.dirty_price_from_discount_curve(
         settlement_date, discount_curve)
     testCases.header("LABEL", "VALUE")
     testCases.print("BOND PRICE", spotValue)
@@ -373,7 +373,7 @@ def test_BondOptionZEROVOLConvergence():
     dfExpiry = discount_curve.df(expiry_date)
     fwdCleanValue = bond.clean_price_from_discount_curve(
         expiry_date, discount_curve)
-    fwdFullValue = bond.full_price_from_discount_curve(
+    fwdFullValue = bond.dirty_price_from_discount_curve(
         expiry_date, discount_curve)
 #    print("BOND FwdCleanBondPx", fwdCleanValue)
 #    print("BOND FwdFullBondPx", fwdFullValue)

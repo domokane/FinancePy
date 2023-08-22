@@ -29,7 +29,7 @@ def test_bondtutor_example():
     bond = Bond(issue_date, maturity_date,
                 coupon, freq_type, accrualConvention, face)
 
-    full_price = bond.full_price_from_ytm(settlement_date, y)
+    full_price = bond.dirty_price_from_ytm(settlement_date, y)
     assert round(full_price, 4) == 108.7696
     clean_price = bond.clean_price_from_ytm(settlement_date, y)
     assert round(clean_price, 4) == 106.5625

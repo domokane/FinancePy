@@ -50,7 +50,8 @@ class BondFuture:
         roundedTmatInMonths = int(tmat * 4.0) * 3
         newMat = self._first_delivery_date.add_months(roundedTmatInMonths)
         face = 1.0
-
+        ex_div_days = 0
+        
         issue_date = Date(newMat._d, newMat._m, 2000)
 
         newBond = Bond(issue_date,
@@ -58,7 +59,7 @@ class BondFuture:
                        bond._coupon,
                        bond._freq_type,
                        bond._accrual_type,
-                       face)
+                       ex_div_days)
 
         p = newBond.clean_price_from_ytm(self._first_delivery_date,
                                          self._coupon)

@@ -726,10 +726,10 @@ def test_CDSDateGeneration():
                        DateGenRuleTypes.BACKWARD)
 
     testCases.header("Flow Date", "AccrualFactor", "Flow")
-    num_flows = len(cds_contract._adjusted_dates)
+    num_flows = len(cds_contract._payment_dates)
     for n in range(0, num_flows):
         testCases.print(str(
-            cds_contract._adjusted_dates[n]), cds_contract._accrual_factors[n],
+            cds_contract._payment_dates[n]), cds_contract._accrual_factors[n],
             cds_contract._flows[n])
 
 ##########################################################################

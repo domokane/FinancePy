@@ -64,7 +64,8 @@ def get_bond_market_conventions(country):
     semi_annual = FrequencyTypes.SEMI_ANNUAL
     act_act = DayCountTypes.ACT_ACT_ICMA
     thirtye360 = DayCountTypes.THIRTY_E_360
-
+    thirty360 = DayCountTypes.THIRTY_360_BOND
+    
     # TODO: CHECK CONVENTIONS
 
     # RETURNS
@@ -105,6 +106,10 @@ def get_bond_market_conventions(country):
         return (act_act, semi_annual, 2, 0, None)
     elif country == BondMarkets.NETHERLANDS:
         return (act_act, annual, 2, 0, None)
+    elif country == BondMarkets.NEW_ZEALAND:
+        return (act_act, annual, 2, 0, None)
+    elif country == BondMarkets.NORWAY:
+        return (thirty360, annual, 2, 2, None)
     elif country == BondMarkets.PORTUGAL:
         return (act_act, annual, 2, 0, None)
     elif country == BondMarkets.SLOVAKIA:

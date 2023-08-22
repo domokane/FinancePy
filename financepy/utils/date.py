@@ -313,13 +313,23 @@ class Date():
     ###########################################################################
 
     @classmethod
-    def from_date(cls, date: datetime.date):
-        """  Create a Date from a python datetime.date object.
+    def from_date(cls, date: [datetime.date, np.datetime64]):
+        """  Create a Date from a python datetime.date object or from a 
+        Numpy datetime64 object. 
         Example Input:
         start_date = Date.from_date(datetime.date(2022, 11, 8)) """
 
-        d, m, y = date.day, date.month, date.year
-        return cls(d, m, y)
+        if isinstance(date, datetime.date):
+            d, m, y = date.day, date.month, date.year
+            return cls(d, m, y)
+        
+        if isinstance(date, np.datetime64):
+            timestamp = ((date - np.datetime64('1970-01-01T00:00:00'))
+                 / np.timedelta64(1, 's'))
+            
+            date = datetime.datetime.utcfromtimestamp(timestamp)
+            d, m, y = date.day, date.month, date.year
+            return cls(d, m, y)
 
     ###########################################################################
     def _refresh(self):

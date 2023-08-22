@@ -197,23 +197,30 @@ def test_full_priceCDSIndexOption():
         "ABPAY",
         "ABREC")
 
-    for index in [20, 60]:
+    for index in [20, 40, 60]:
 
         #######################################################################
 
+        print("Index", index)
+
         cds_contracts = []
+
         for dt in indexMaturityDates:
+
             cds = CDS(valuation_date, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(valuation_date, cds_contracts,
-                               libor_curve, indexRecovery)
+        index_curve = CDSCurve(valuation_date, 
+                               cds_contracts,
+                               libor_curve, 
+                               indexRecovery)
 
         if 1 == 1:
 
             indexSpreads = [index / 10000.0] * 4
 
             indexPortfolio = CDSIndexPortfolio()
+
             adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
                 valuation_date,
                 issuer_curves,
@@ -222,9 +229,11 @@ def test_full_priceCDSIndexOption():
                 indexMaturityDates,
                 indexRecovery,
                 tolerance)
+
         else:
 
             indexSpread = index / 10000.0
+
             issuer_curve = buildFlatIssuerCurve(tradeDate,
                                                 libor_curve,
                                                 indexSpread,
@@ -234,6 +243,8 @@ def test_full_priceCDSIndexOption():
             for iCredit in range(0, 125):
                 adjustedIssuerCurves.append(issuer_curve)
 
+        #######################################################################
+        # Now loop over strikes
         #######################################################################
 
         for strike in [20, 60]:

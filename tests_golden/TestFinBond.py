@@ -234,7 +234,8 @@ def test_Bond():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     settlement_date = Date(19, 9, 2012)
     face = ONE_MILLION
-
+    ex_div_days = 0
+    
     for accrual_type in DayCountTypes:
         if accrual_type == DayCountTypes.ZERO:
             continue
@@ -250,7 +251,7 @@ def test_Bond():
             coupon = bond['coupon'] / 100.0
             clean_price = bond['mid']
             bond = Bond(issueDt, maturityDt,
-                        coupon, freq_type, accrual_type, 100)
+                        coupon, freq_type, accrual_type, ex_div_days)
 
             ytm = bond.yield_to_maturity(settlement_date, clean_price)
             accrued_interest = bond._accrued_interest
@@ -269,29 +270,35 @@ def test_Bond():
     issue_date = Date(15, 7, 1990)
     maturity_date = Date(15, 7, 1997)
     coupon = 0.085
-    face = ONE_MILLION
+    ex_div_days = 0
+    face = 100.0
+    
     freq_type = FrequencyTypes.SEMI_ANNUAL
+
     bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrualConvention, face)
+                coupon, freq_type, accrualConvention, ex_div_days)
 
     testCases.header("FIELD", "VALUE")
-    full_price = bond.full_price_from_ytm(settlement_date, y)
-    testCases.print("Full Price = ", full_price)
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, y)
+    testCases.print("Dirty Price = ", dirty_price)
+
     clean_price = bond.clean_price_from_ytm(settlement_date, y)
     testCases.print("Clean Price = ", clean_price)
-    accrued_interest = bond._accrued_interest
+
+    accrued_interest = bond.accrued_interest(settlement_date, face)
     testCases.print("Accrued = ", accrued_interest)
+
     ytm = bond.yield_to_maturity(settlement_date, clean_price)
     testCases.print("Yield to Maturity = ", ytm)
-
+    
     bump = 1e-4
-    priceBumpedUp = bond.full_price_from_ytm(settlement_date, y + bump)
+    priceBumpedUp = bond.dirty_price_from_ytm(settlement_date, y + bump)
     testCases.print("Price Bumped Up:", priceBumpedUp)
 
-    priceBumpedDn = bond.full_price_from_ytm(settlement_date, y - bump)
+    priceBumpedDn = bond.dirty_price_from_ytm(settlement_date, y - bump)
     testCases.print("Price Bumped Dn:", priceBumpedDn)
 
-    durationByBump = -(priceBumpedUp - full_price) / bump
+    durationByBump = -(priceBumpedUp - dirty_price) / bump
     testCases.print("Duration by Bump = ", durationByBump)
 
     duration = bond.dollar_duration(settlement_date, y)
@@ -359,14 +366,15 @@ def test_Bond():
     coupon = 0.02375
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
+    ex_div_days = 0
     face = 1000000.0
-
+    
     bond = Bond(issue_date,
                 maturity_date,
                 coupon,
                 freq_type,
                 accrual_type,
-                face, 
+                ex_div_days, 
                 CalendarTypes.UNITED_STATES)
 
     testCases.header("FIELD", "VALUE")
@@ -387,15 +395,15 @@ def test_Bond():
                                  YTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm, 
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm, 
                                           YTMCalcType.US_TREASURY)
-    testCases.print("Full Price = ", full_price)
+    testCases.print("Dirty Price = ", dirty_price)
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm,
                                             YTMCalcType.US_TREASURY)
     testCases.print("Clean Price = ", clean_price)
 
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_interest(settlement_date, face)
     testCases.print("Accrued = ", accrued_interest)
 
     accddays = bond._accrued_days
@@ -424,10 +432,11 @@ def test_Bond():
     coupon = 0.027
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
-    face = 100.0
-
+    ex_div_days = 0
+    face = 1000000.0
+    
     bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrual_type, face)
+                coupon, freq_type, accrual_type, ex_div_days)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 101.581564
@@ -447,8 +456,8 @@ def test_Bond():
                                  YTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity", ytm)
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    testCases.print("Full Price", full_price)
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm)
+    testCases.print("Dirty Price", dirty_price)
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     testCases.print("Clean Price", clean_price)
@@ -456,9 +465,9 @@ def test_Bond():
     accddays = bond._accrued_days
     testCases.print("Accrued Days", accddays)
 
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_interest(settlement_date, face)
     testCases.print("Accrued", accrued_interest)
-
+    
     duration = bond.dollar_duration(settlement_date, ytm)
     testCases.print("Dollar Duration", duration)
 
@@ -482,15 +491,15 @@ def test_BondExDividend():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     face = 100.0
-    exDivDays = 7
+    ex_div_days = 7
     testCases.header("LABEL", "VALUE")
 
     calendar_type = CalendarTypes.UNITED_KINGDOM
     bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
+                freq_type, accrual_type, ex_div_days)
     settlement_date = Date(7, 9, 2003)
-    accrued = bond.calc_accrued_interest(
-        settlement_date, exDivDays, calendar_type)
+    accrued = bond.accrued_interest(settlement_date, face)
+
     testCases.print("SettlementDate:", settlement_date)
     testCases.print("Accrued:", accrued)
 
@@ -508,14 +517,14 @@ def test_BondExDividend():
 
     calendar_type = CalendarTypes.UNITED_KINGDOM
     bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
+                freq_type, accrual_type, exDivDays)
 
     settlement_date = Date(25, 8, 2010)
 
     for _ in range(0, 13):
         settlement_date = settlement_date.add_days(1)
-        accrued = bond.calc_accrued_interest(
-            settlement_date, exDivDays, calendar_type)
+        accrued = bond.accrued_interest(
+            settlement_date, exDivDays)
         testCases.print(settlement_date, accrued)
 
 ###############################################################################
@@ -556,8 +565,8 @@ def test_Bond_ror():
     for row in df.itertuples(index=False):
         buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
         sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
-        buy_price = bond.full_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.US_STREET)
-        sell_price = bond.full_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.US_STREET)
+        buy_price = bond.dirty_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.US_STREET)
+        sell_price = bond.dirty_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.US_STREET)
         simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
         testCases.print(row.bond_code, buy_date, row.buy_ytm, buy_price, sell_date, row.sell_ytm, sell_price,
                         simple, irr)
@@ -574,11 +583,11 @@ def test_Bond_eom():
     coupon = 0.045
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
-    face = ONE_MILLION
+    ex_div_days = 0
 
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type, face)
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type, ex_div_days)
 
-    ai = bond.calc_accrued_interest(settle_date) # should be 8406.593406
+    ai = bond.accrued_interest(settle_date) # should be 8406.593406
     
 ###############################################################################
 
@@ -589,13 +598,13 @@ def test_key_rate_durations():
     issue_date = Date(31, 7, 2022)
     maturity_date = Date(31, 7, 2027)
     coupon = 0.0275
-    face = 100.0
+    ex_div_days = 0
 
     accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
     BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
+                freq_type, accrual_type, ex_div_days)
 
     settlement_date = Date(24, 4, 2023)
 
@@ -619,12 +628,13 @@ def test_key_rate_durations_Bloomberg_example():
     maturity_date = Date(31, 7, 2027)
     coupon = 2.75/100.0
     face = 100.0
-
+    ex_div_days = 0
+    
     accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
     BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
+                freq_type, accrual_type, ex_div_days)
 
     settlement_date = Date(24, 4, 2023)
 

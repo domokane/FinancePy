@@ -30,7 +30,7 @@ class FinInflationBond(Bond):
                  coupon: float,  # Annualised bond coupon before inflation
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 face_amount: float,
+                 ex_div_days: int,
                  base_cpi_value: float,
                  num_ex_dividend_days: int = 0, 
                  calendar_type: CalendarTypes = CalendarTypes.NONE):  # Value of CPI index at bond issue date
@@ -39,7 +39,7 @@ class FinInflationBond(Bond):
         the base CPI used for all coupon and principal related calculations. 
         The class inherits from Bond so has many similar functions. The YTM"""
 
-        Bond.__init__(self,issue_date, maturity_date, coupon, freq_type, accrual_type, face_amount, calendar_type)
+        Bond.__init__(self,issue_date, maturity_date, coupon, freq_type, accrual_type, ex_div_days, calendar_type)
         check_argument_types(self.__init__, locals())
 
         
@@ -58,7 +58,7 @@ class FinInflationBond(Bond):
         self._freq_type = freq_type
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
-        self._face_amount = face_amount  # This is the bond holding size
+        self._ex_div_days = ex_div_days  # This is the bond holding size
         self._baseCPIValue = base_cpi_value  # CPI value at issue date of bond
         self._par = 100.0  # This is how price is quoted
         self._redemption = 1.0  # Amount paid at maturity
@@ -80,6 +80,7 @@ class FinInflationBond(Bond):
 
     def inflation_principal(self,
                             settlement_date: Date,
+                            face: (float),
                             ytm: float,
                             reference_cpi: float,
                             convention: YTMCalcType):
@@ -87,8 +88,8 @@ class FinInflationBond(Bond):
         amount and the CPI growth. """
 
         index_ratio = reference_cpi / self._baseCPIValue
-        full_price = self.full_price_from_ytm(settlement_date, ytm, convention)
-        principal = full_price * self._face_amount / self._par
+        full_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        principal = full_price * face / self._par
         principal = principal - self._accrued_interest
         principal *= index_ratio
         return principal
@@ -106,13 +107,14 @@ class FinInflationBond(Bond):
         index_ratio = last_cpn_cpi / self._baseCPIValue
         clean_price = self.clean_price_from_ytm(
             settlement_date, ytm, convention)
-        flat_price = clean_price * self._face_amount / self._par
+        flat_price = clean_price 
         flat_price *= index_ratio
         return flat_price
 
 ###############################################################################
 
-    def calc_inflation_accrued_interest(self, settlement_date: Date,
+    def inflation_accrued_interest(self, settlement_date: Date,
+                                   face: (float),
                                         reference_cpi):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. This is adjusted by the
@@ -120,8 +122,8 @@ class FinInflationBond(Bond):
         We assume no ex-dividend period.
         """
 
-        self.calc_accrued_interest(settlement_date)
-        index_ratio = reference_cpi/self._baseCPIValue
+        self.accrued_interest(settlement_date, face)
+        index_ratio = reference_cpi / self._baseCPIValue
         self._inflation_accrued_interest = self._accrued_interest * index_ratio
         return self._inflation_accrued_interest
 
@@ -134,7 +136,7 @@ class FinInflationBond(Bond):
         s += label_to_string("COUPON", self._coupon)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount)
+        s += label_to_string("EX-DIV DAYS", self._ex_div_days)
         s += label_to_string("BASE CPI VALUE", self._baseCPIValue, "")
         return s
 

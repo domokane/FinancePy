@@ -89,23 +89,25 @@ class CDSBasket:
         num_credits = default_times.shape[0]
         num_trials = default_times.shape[1]
 
-        adjusted_dates = self._cds_contract._adjusted_dates
-        num_flows = len(adjusted_dates)
+        payment_dates = self._cds_contract._payment_dates
+        num_payments = len(payment_dates)
         day_count = DayCount(self._day_count_type)
 
         averageAccrualFactor = 0.0
 
-        rpv01ToTimes = np.zeros(num_flows)
-        for iTime in range(1, num_flows):
-            t = (adjusted_dates[iTime] - valuation_date) / gDaysInYear
-            dt0 = adjusted_dates[iTime - 1]
-            dt1 = adjusted_dates[iTime]
+        rpv01ToTimes = np.zeros(num_payments)
+
+        for iTime in range(1, num_payments):
+
+            t = (payment_dates[iTime] - valuation_date) / gDaysInYear
+            dt0 = payment_dates[iTime - 1]
+            dt1 = payment_dates[iTime]
             accrual_factor = day_count.year_frac(dt0, dt1)[0]
             averageAccrualFactor += accrual_factor
             rpv01ToTimes[iTime] = rpv01ToTimes[iTime - 1] + \
                 accrual_factor * libor_curve._df(t)
 
-        averageAccrualFactor /= num_flows
+        averageAccrualFactor /= num_payments
 
         tmat = (self._maturity_date - valuation_date) / gDaysInYear
 
@@ -115,7 +117,9 @@ class CDSBasket:
         assetTau = np.zeros(num_credits)
 
         for iTrial in range(0, num_trials):
+
             for iCredit in range(0, num_credits):
+
                 assetTau[iCredit] = default_times[iCredit, iTrial]
 
             # ORDER THE DEFAULT TIMES
@@ -125,6 +129,7 @@ class CDSBasket:
             minTau = assetTau[nToDefault - 1]
 
             if minTau < tmat:
+
                 numPaymentsIndex = int(minTau / averageAccrualFactor)
                 rpv01Trial = rpv01ToTimes[numPaymentsIndex]
                 rpv01Trial += (minTau - numPaymentsIndex *
@@ -143,7 +148,7 @@ class CDSBasket:
             else:
 
                 numPaymentsIndex = int(tmat / averageAccrualFactor)
-                rpv01Trial = rpv01ToTimes[numPaymentsIndex]
+                rpv01Trial = rpv01ToTimes[-1]
                 protTrial = 0.0
 
             rpv01 += rpv01Trial
@@ -255,7 +260,7 @@ class CDSBasket:
         if tmat < 0.0:
             raise FinError("Value date is after maturity date")
 
-        payment_dates = self._cds_contract._adjusted_dates
+        payment_dates = self._cds_contract._payment_dates
         num_times = len(payment_dates)
 
         issuerSurvivalProbabilities = np.zeros(num_credits)
@@ -266,7 +271,7 @@ class CDSBasket:
         basketTimes[0] = 0.0
         basketSurvivalCurve[0] = 1.0
 
-        for iTime in range(1, num_times):
+        for iTime in range(0, num_times):
 
             t = (payment_dates[iTime] - valuation_date) / gDaysInYear
 
@@ -331,7 +336,7 @@ class CDSBasket:
         s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
 
 #       header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
-#       valueTable = [self._adjusted_dates, self._accrual_factors, self._flows]
+#       valueTable = [self._payment_dates, self._accrual_factors, self._flows]
 #       precision = "12.6f"
 #       s += tableToString(header, valueTable, precision)
 

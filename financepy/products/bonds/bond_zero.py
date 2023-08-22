@@ -26,7 +26,7 @@ def _f(y, *args):
     settlement_date = args[1]
     price = args[2]
     convention = args[3]
-    px = bond.full_price_from_ytm(settlement_date, y, convention)
+    px = bond.dirty_price_from_ytm(settlement_date, y, convention)
     obj_fn = px - price
     return obj_fn
 
@@ -40,7 +40,7 @@ def _g(oas, *args):
     settlement_date = args[1]
     price = args[2]
     discount_curve = args[3]
-    px = bond.full_price_from_oas(settlement_date, discount_curve, oas)
+    px = bond.dirty_price_from_oas(settlement_date, discount_curve, oas)
     obj_fn = px - price
     return obj_fn
 
@@ -75,22 +75,22 @@ class BondZero:
         self._issue_date = issue_date
         self._maturity_date = maturity_date
         self._accrual_type = DayCountTypes.ZERO
-        self._face_amount = face_amount  # This is the bond holding size
         self._issue_price = issue_price  # Price of issue, usually discounted
         self._par = 100.0  # This is how price is quoted and amount at maturity
-        self._redemption = 1.0  # This is amount paid at maturity
         self._freq_type = FrequencyTypes.ZERO
         self._coupon_dates = [issue_date, maturity_date]
         self._payment_dates = [issue_date, maturity_date]
         self._flow_amounts = [0.0, 0.0]  # coupon payments are zero
-
+        self._calendar_type = CalendarTypes.WEEKEND
+        self._ex_div_days = 0
+        
         self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
 
     ###########################################################################
 
-    def full_price_from_ytm(self,
+    def dirty_price_from_ytm(self,
                             settlement_date: Date,
                             ytm: float,
                             convention: YTMCalcType = YTMCalcType.ZERO):
@@ -101,7 +101,7 @@ class BondZero:
         if convention != YTMCalcType.ZERO:
             raise FinError("Need to use YTMCalcType.ZERO for zero coupon bond")
 
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
         ytm = np.array(ytm)  # VECTORIZED
         ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
@@ -134,15 +134,16 @@ class BondZero:
 
     def principal(self,
                   settlement_date: Date,
-                  y: float,
+                  ytm: float,
+                  face: (float),
                   convention: YTMCalcType = YTMCalcType.ZERO):
         """ Calculate the principal value of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
 
-        full_price = self.full_price_from_ytm(settlement_date, y, convention)
+        full_price = self.dirty_price_from_ytm(settlement_date, y, convention)
 
-        principal = full_price * self._face_amount / self._par
+        principal = dirty_price * face / self._par
         principal = principal - self._accrued_interest
         return principal
 
@@ -156,8 +157,8 @@ class BondZero:
         known as the DV01 in Bloomberg. """
 
         dy = 0.0001  # 1 basis point
-        p0 = self.full_price_from_ytm(settlement_date, ytm - dy, convention)
-        p2 = self.full_price_from_ytm(settlement_date, ytm + dy, convention)
+        p0 = self.dirty_price_from_ytm(settlement_date, ytm - dy, convention)
+        p2 = self.dirty_price_from_ytm(settlement_date, ytm + dy, convention)
         durn = -(p2 - p0) / dy / 2.0
         return durn
 
@@ -171,7 +172,7 @@ class BondZero:
         given its yield to maturity. """
 
         dd = self.dollar_duration(settlement_date, ytm, convention)
-        fp = self.full_price_from_ytm(settlement_date, ytm, convention)
+        fp = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         md = dd * (1.0 + ytm) / fp
         return md
 
@@ -185,7 +186,7 @@ class BondZero:
         given its yield to maturity. """
 
         dd = self.dollar_duration(settlement_date, ytm, convention)
-        fp = self.full_price_from_ytm(settlement_date, ytm, convention)
+        fp = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         md = dd / fp
         return md
 
@@ -199,9 +200,9 @@ class BondZero:
         function is vectorised with respect to the yield input. """
 
         dy = 0.0001
-        p0 = self.full_price_from_ytm(settlement_date, ytm - dy, convention)
-        p1 = self.full_price_from_ytm(settlement_date, ytm, convention)
-        p2 = self.full_price_from_ytm(settlement_date, ytm + dy, convention)
+        p0 = self.dirty_price_from_ytm(settlement_date, ytm - dy, convention)
+        p1 = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        p2 = self.dirty_price_from_ytm(settlement_date, ytm + dy, convention)
         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
         return conv
 
@@ -214,9 +215,9 @@ class BondZero:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        full_price = self.full_price_from_ytm(settlement_date, ytm, convention)
-        accrued_amount = self._accrued_interest * self._par / self._face_amount
-        clean_price = full_price - accrued_amount
+        full_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        accrued = self.accrued_interest(settlement_date, self._par)
+        clean_price = full_price - accrued
         return clean_price
 
     ###########################################################################
@@ -229,16 +230,16 @@ class BondZero:
         not to the settlement date. """
 
         self.calc_accrued_interest(settlement_date)
-        full_price = self.full_price_from_discount_curve(settlement_date,
+        full_price = self.dirty_price_from_discount_curve(settlement_date,
                                                          discount_curve)
 
-        accrued = self._accrued_interest * self._par / self._face_amount
+        accrued = self.accrued_interest(settlement_date, self._par)
         clean_price = full_price - accrued
         return clean_price
 
     ###########################################################################
 
-    def full_price_from_discount_curve(self,
+    def dirty_price_from_discount_curve(self,
                                        settlement_date: Date,
                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using a provided discount curve to PV the
@@ -304,13 +305,17 @@ class BondZero:
             raise FinError("Unknown type for clean_price "
                            + str(type(clean_price)))
 
-        self.calc_accrued_interest(settlement_date)
-        accrued_amount = self._accrued_interest * self._par / self._face_amount
-        full_prices = (clean_prices + accrued_amount)
+        self.accrued_interest(settlement_date, 1.0)
+        
+        accrued_amount = self._accrued_interest * self._par
+
+        dirty_prices = (clean_prices + accrued_amount)
+
         ytms = []
 
-        for full_price in full_prices:
-            argtuple = (self, settlement_date, full_price, convention)
+        for dirty_price in dirty_prices:
+
+            argtuple = (self, settlement_date, dirty_price, convention)
 
             ytm = optimize.newton(_f,
                                   x0=0.05,  # guess initial value of 5%
@@ -329,10 +334,9 @@ class BondZero:
 
     ###########################################################################
 
-    def calc_accrued_interest(self,
-                              settlement_date: Date,
-                              num_ex_dividend_days: int = 0,
-                              calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
+    def accrued_interest(self,
+                         settlement_date: Date,
+                         face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
@@ -355,9 +359,9 @@ class BondZero:
                 break
 
         dc = DayCount(self._accrual_type)
-        cal = Calendar(calendar_type)
+        cal = Calendar(self._calendar_type)
         exDividend_date = cal.add_business_days(
-            self._ncd, -num_ex_dividend_days)
+            self._ncd, -self._ex_div_days)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
                                             settlement_date,
@@ -370,7 +374,7 @@ class BondZero:
         self._alpha = 1.0 - acc_factor
         interest = (self._par - self._issue_price) * (settlement_date - self._issue_date) / \
                    (self._maturity_date - self._issue_date)
-        self._accrued_interest = interest * self._face_amount / self._par
+        self._accrued_interest = interest 
         self._accrued_days = num
 
         return self._accrued_interest
@@ -612,8 +616,8 @@ class BondZero:
         IRR and the PnL.
         """
 
-        buy_price = self.full_price_from_ytm(begin_date, begin_ytm, convention)
-        sell_price = self.full_price_from_ytm(end_date, end_ytm, convention)
+        buy_price = self.dirty_price_from_ytm(begin_date, begin_ytm, convention)
+        sell_price = self.dirty_price_from_ytm(end_date, end_ytm, convention)
 
         dates_cfs = zip(self._coupon_dates, self._flow_amounts)
 
@@ -652,7 +656,6 @@ class BondZero:
         s += label_to_string("Issue Price ", self._issue_price)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount, "")
         return s
 
     ###########################################################################

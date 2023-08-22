@@ -126,8 +126,9 @@ class CDSTranche:
 
         recovery_rates = np.zeros(num_credits)
 
-        payment_dates = self._cds_contract._adjusted_dates
-        num_times = len(payment_dates)
+        payment_dates = self._cds_contract._payment_dates
+        num_payments = len(payment_dates)
+        num_times = num_payments + 1
 
         beta1 = sqrt(corr1)
         beta2 = sqrt(corr2)
@@ -140,8 +141,9 @@ class CDSTranche:
             beta_vector2[bb] = beta2
 
         qVector = np.zeros(num_credits)
-        qt1 = np.zeros(num_times)
-        qt2 = np.zeros(num_times)
+        qt1 = np.zeros(num_times) # include 1.0
+        qt2 = np.zeros(num_times) # include 1.0
+
         trancheTimes = np.zeros(num_times)
         trancheSurvivalCurve = np.zeros(num_times)
 
@@ -152,9 +154,10 @@ class CDSTranche:
 
         for i in range(1, num_times):
 
-            t = (payment_dates[i] - valuation_date) / gDaysInYear
+            t = (payment_dates[i-1] - valuation_date) / gDaysInYear
 
             for j in range(0, num_credits):
+
                 issuer_curve = issuer_curves[j]
                 vTimes = issuer_curve._times
                 qRow = issuer_curve._values
@@ -163,20 +166,25 @@ class CDSTranche:
                     t, vTimes, qRow, InterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
+
                 qt1[i] = tranche_surv_prob_recursion(
                     0.0, k1, num_credits, qVector, recovery_rates,
                     beta_vector1, num_points)
                 qt2[i] = tranche_surv_prob_recursion(
                     0.0, k2, num_credits, qVector, recovery_rates,
                     beta_vector2, num_points)
+
             elif model == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
+
                 qt1[i] = tranche_surv_prob_adj_binomial(
                     0.0, k1, num_credits, qVector, recovery_rates,
                     beta_vector1, num_points)
                 qt2[i] = tranche_surv_prob_adj_binomial(
                     0.0, k2, num_credits, qVector, recovery_rates,
                     beta_vector2, num_points)
+
             elif model == FinLossDistributionBuilder.GAUSSIAN:
+
                 qt1[i] = tranch_surv_prob_gaussian(
                     0.0,
                     k1,
@@ -193,11 +201,15 @@ class CDSTranche:
                     recovery_rates,
                     beta_vector2,
                     num_points)
+
             elif model == FinLossDistributionBuilder.LHP:
+
                 qt1[i] = tr_surv_prob_lhp(
                     0.0, k1, num_credits, qVector, recovery_rates, beta1)
+
                 qt2[i] = tr_surv_prob_lhp(
                     0.0, k2, num_credits, qVector, recovery_rates, beta2)
+
             else:
                 raise FinError(
                     "Unknown model type only full and AdjBinomial allowed")

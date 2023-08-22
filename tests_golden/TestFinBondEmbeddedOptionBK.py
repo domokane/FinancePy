@@ -72,7 +72,7 @@ def test_BondEmbeddedOptionMATLAB():
         putDate = putDate.add_months(1)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.clean_price_from_discount_curve(settlement_date, discount_curve)
+    v = bond.dirty_price_from_discount_curve(settlement_date, discount_curve)
     testCases.print("Bond Pure Price:", v)
 
     sigma = 0.01  # This volatility is very small for a BK process
@@ -156,7 +156,7 @@ def test_BondEmbeddedOptionQUANTLIB():
                                       put_dates, put_prices)
 
     testCases.header("BOND PRICE", "PRICE")
-    v = bond.clean_price_from_discount_curve(settlement_date, discount_curve)
+    v = bond.dirty_price_from_discount_curve(settlement_date, discount_curve)
     testCases.print("Bond Pure Price:", v)
 
     testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
