@@ -88,8 +88,8 @@ class FinInflationBond(Bond):
         amount and the CPI growth. """
 
         index_ratio = reference_cpi / self._baseCPIValue
-        full_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
-        principal = full_price * face / self._par
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        principal = dirty_price * face / self._par
         principal = principal - self._accrued_interest
         principal *= index_ratio
         return principal

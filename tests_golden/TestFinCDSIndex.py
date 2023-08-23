@@ -148,7 +148,7 @@ def test_valueCDSIndex():
     testCases.print("PAR SPREAD", spd)
 
     v = cdsIndexContract.value(valuation_date, issuer_curve, cdsRecovery)
-    testCases.print("FULL VALUE", v['full_pv'])
+    testCases.print("DIRTY VALUE", v['dirty_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
     p = cdsIndexContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
@@ -168,9 +168,9 @@ def test_valueCDSIndex():
         valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cdsIndexContract.risky_pv01(
+    dirtyRPV01, cleanRPV01 = cdsIndexContract.risky_pv01(
         valuation_date, issuer_curve)
-    testCases.print("FULL  RPV01", fullRPV01)
+    testCases.print("DIRTY RPV01", dirtyRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
 #    cdsIndexContract.print_flows(issuer_curve)

@@ -122,7 +122,7 @@ def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
 ##########################################################################
 
 
-def test_full_priceCDSIndexOption():
+def test_dirty_priceCDSIndexOption():
 
     tradeDate = Date(1, 8, 2007)
     step_in_date = tradeDate.add_days(1)
@@ -287,5 +287,5 @@ def test_full_priceCDSIndexOption():
 ##########################################################################
 
 
-test_full_priceCDSIndexOption()
+test_dirty_priceCDSIndexOption()
 testCases.compareTestCases()

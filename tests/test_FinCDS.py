@@ -404,11 +404,11 @@ def test_par_spread():
 
 def test_value():
     v = cds_contract1.value(valuation_date1, issuer_curve1, cdsRecovery)
-    assert round(v['full_pv'], 4) == 168552.827
+    assert round(v['dirty_pv'], 4) == 168552.827
     assert round(v['clean_pv'], 4) == 170677.827
 
     v = cds_contract2.value(valuation_date2, issuer_curve2, cdsRecovery)
-    assert round(v['full_pv'], 4) == -200111.1901
+    assert round(v['dirty_pv'], 4) == -200111.1901
     assert round(v['clean_pv'], 4) == -191777.8568
 
 

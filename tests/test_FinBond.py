@@ -29,8 +29,8 @@ def test_bondtutor_example():
     bond = Bond(issue_date, maturity_date,
                 coupon, freq_type, accrualConvention, face)
 
-    full_price = bond.dirty_price_from_ytm(settlement_date, y)
-    assert round(full_price, 4) == 108.7696
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, y)
+    assert round(dirty_price, 4) == 108.7696
     clean_price = bond.clean_price_from_ytm(settlement_date, y)
     assert round(clean_price, 4) == 106.5625
     accrued_interest = bond._accrued_interest
@@ -39,13 +39,13 @@ def test_bondtutor_example():
     assert round(ytm, 4) == 0.0622
 
     bump = 1e-4
-    priceBumpedUp = bond.full_price_from_ytm(settlement_date, y + bump)
+    priceBumpedUp = bond.dirty_price_from_ytm(settlement_date, y + bump)
     assert round(priceBumpedUp, 4) == 108.7395
 
-    priceBumpedDn = bond.full_price_from_ytm(settlement_date, y - bump)
+    priceBumpedDn = bond.dirty_price_from_ytm(settlement_date, y - bump)
     assert round(priceBumpedDn, 4) == 108.7998
 
-    durationByBump = -(priceBumpedUp - full_price) / bump
+    durationByBump = -(priceBumpedUp - dirty_price) / bump
     assert round(durationByBump, 4) == 301.1932
 
     duration = bond.dollar_duration(settlement_date, y)
@@ -97,8 +97,8 @@ def test_bloomberg_us_treasury_example():
                                  YTMCalcType.US_TREASURY)
     assert round(ytm, 4) == 0.0240
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    assert round(full_price, 4) == 100.2149
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm)
+    assert round(dirty_price, 4) == 100.2149
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     assert round(clean_price, 4) == 99.7825
@@ -151,8 +151,8 @@ def test_bloomberg_apple_corp_example():
                                  YTMCalcType.US_TREASURY)
     assert round(ytm, 4) == 0.0235
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    assert round(full_price, 4) == 102.0932
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm)
+    assert round(dirty_price, 4) == 102.0932
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     assert round(clean_price, 4) == 101.5832
@@ -259,7 +259,7 @@ def test_bond_cfets():
         settlement_date = Date(
             row.settlement_date.day, row.settlement_date.month, row.settlement_date.year)
         accrued_interest = bond.calc_accrued_interest(settlement_date)
-        clean_price = row.full_price - accrued_interest
+        clean_price = row.dirty_price - accrued_interest
         calc_ytm = bond.yield_to_maturity(
             settlement_date, clean_price, YTMCalcType.CFETS) * 100
         try:

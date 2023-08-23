@@ -43,13 +43,13 @@ def test_bond_frn_1():
 
     assert round(dm * 10000, 4) == 103.1985
 
-    full_price = bond.full_price_from_dm(settlement_date,
+    dirty_price = bond.dirty_price_from_dm(settlement_date,
                                          resetIbor,
                                          current_ibor,
                                          future_ibors,
                                          dm)
 
-    assert round(full_price, 4) == 97.0266
+    assert round(dirty_price, 4) == 97.0266
 
     lastCouponDt = bond._pcd
     assert lastCouponDt == Date(10, 5, 2017)
@@ -147,13 +147,13 @@ def test_bond_frn_2():
 
     assert round(dm * 10000, 4) == 123.0623
 
-    full_price = bond.full_price_from_dm(settlement_date,
+    dirty_price = bond.dirty_price_from_dm(settlement_date,
                                          resetIbor,
                                          current_ibor,
                                          future_ibors,
                                          dm)
 
-    assert round(full_price, 4) == 93.1315
+    assert round(dirty_price, 4) == 93.1315
 
     lastCouponDt = bond._pcd
     assert lastCouponDt == Date(3, 2, 2014)

@@ -44,10 +44,9 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._coupon_dates)
@@ -75,10 +74,9 @@ def test_BondAnnuity():
         calendar_type,
         bus_day_adjust_type,
         date_gen_rule_type,
-        basis_type,
-        face)
+        basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._coupon_dates)
@@ -105,10 +103,9 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._coupon_dates)
@@ -135,10 +132,9 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._coupon_dates)
@@ -165,10 +161,9 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._coupon_dates)
@@ -195,10 +190,9 @@ def test_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     testCases.header("Date", "Flow")
     num_flows = len(annuity._coupon_dates)

@@ -212,7 +212,7 @@ def buildFullIssuerCurve(valuation_date):
 ##########################################################################
 
 
-def test_full_priceCDSwaption():
+def test_dirty_priceCDSwaption():
 
     # This reproduces example on page 38 of Open Gamma note on CDS Option
     tradeDate = Date(5, 2, 2014)
@@ -245,7 +245,7 @@ def test_full_priceCDSwaption():
     testCases.print("PAR SPREAD:", spd)
 
     v = cds_contract.value(valuation_date, issuer_curve, cdsRecovery)
-    testCases.print("FULL VALUE", v['full_pv'])
+    testCases.print("DIRTY VALUE", v['dirty_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
     p = cds_contract.clean_price(valuation_date, issuer_curve, cdsRecovery)
@@ -290,7 +290,7 @@ def test_full_priceCDSwaption():
     testCases.print("PAR SPREAD", spd)
 
     v = cds_contract.value(valuation_date, issuer_curve, cdsRecovery)
-    testCases.print("FULL VALUE", v['full_pv'])
+    testCases.print("DIRTY VALUE", v['dirty_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
     prot_pv = cds_contract.protection_leg_pv(
@@ -301,9 +301,9 @@ def test_full_priceCDSwaption():
         valuation_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
-    fullRPV01, cleanRPV01 = cds_contract.risky_pv01(
+    dirtyRPV01, cleanRPV01 = cds_contract.risky_pv01(
         valuation_date, issuer_curve)
-    testCases.print("FULL  RPV01", fullRPV01)
+    testCases.print("DIRTY RPV01", dirtyRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
 #    cds_contract.print_flows(issuer_curve)
@@ -317,7 +317,7 @@ def test_full_priceCDSwaption():
     testCases.print("Maturity Date:", str(maturity_date))
     testCases.print("CDS Coupon:", cdsCoupon)
 
-    testCases.header("STRIKE", "FULL VALUE", "IMPLIED VOL")
+    testCases.header("STRIKE", "DIRTY VALUE", "IMPLIED VOL")
 
     for strike in np.linspace(100, 300, 41):
 
@@ -339,5 +339,5 @@ def test_full_priceCDSwaption():
 ##########################################################################
 
 
-test_full_priceCDSwaption()
+test_dirty_priceCDSwaption()
 testCases.compareTestCases()

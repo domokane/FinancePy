@@ -141,7 +141,7 @@ class BondZero:
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
 
-        full_price = self.dirty_price_from_ytm(settlement_date, y, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, y, convention)
 
         principal = dirty_price * face / self._par
         principal = principal - self._accrued_interest
@@ -215,9 +215,9 @@ class BondZero:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        full_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         accrued = self.accrued_interest(settlement_date, self._par)
-        clean_price = full_price - accrued
+        clean_price = dirty_price - accrued
         return clean_price
 
     ###########################################################################
@@ -230,11 +230,11 @@ class BondZero:
         not to the settlement date. """
 
         self.calc_accrued_interest(settlement_date)
-        full_price = self.dirty_price_from_discount_curve(settlement_date,
+        dirty_price = self.dirty_price_from_discount_curve(settlement_date,
                                                          discount_curve)
 
         accrued = self.accrued_interest(settlement_date, self._par)
-        clean_price = full_price - accrued
+        clean_price = dirty_price - accrued
         return clean_price
 
     ###########################################################################
@@ -437,7 +437,7 @@ class BondZero:
 
     ###########################################################################
 
-    def full_price_from_oas(self,
+    def dirty_price_from_oas(self,
                             settlement_date: Date,
                             discount_curve: DiscountCurve,
                             oas: float):
@@ -485,12 +485,12 @@ class BondZero:
         self.calc_accrued_interest(settlement_date)
 
         accrued_amount = self._accrued_interest * self._par / self._face_amount
-        full_prices = clean_prices + accrued_amount
+        dirty_prices = clean_prices + accrued_amount
 
         oass = []
 
-        for full_price in full_prices:
-            argtuple = (self, settlement_date, full_price, discount_curve)
+        for dirty_price in dirty_prices:
+            argtuple = (self, settlement_date, dirty_price, discount_curve)
 
             oas = optimize.newton(_g,
                                   x0=0.01,  # initial value of 1%
@@ -530,7 +530,7 @@ class BondZero:
 
     ###########################################################################
 
-    def full_price_from_survival_curve(self,
+    def dirty_price_from_survival_curve(self,
                                        settlement_date: Date,
                                        discount_curve: DiscountCurve,
                                        survival_curve: DiscountCurve,
@@ -587,14 +587,14 @@ class BondZero:
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. """
 
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
-        full_price = self.full_price_from_survival_curve(settlement_date,
-                                                         discount_curve,
-                                                         survival_curve,
-                                                         recovery_rate)
+        dirty_price = self.dirty_price_from_survival_curve(settlement_date,
+                                                           discount_curve,
+                                                           survival_curve,
+                                                           recovery_rate)
 
-        clean_price = full_price - self._accrued_interest
+        clean_price = dirty_price - self._accrued_interest
         return clean_price
 
     ###########################################################################
@@ -653,7 +653,7 @@ class BondZero:
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
         s += label_to_string("COUPON (%)", 0)
-        s += label_to_string("Issue Price ", self._issue_price)
+        s += label_to_string("ISSUE PRICE", self._issue_price)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         return s

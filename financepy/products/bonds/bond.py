@@ -278,10 +278,14 @@ class Bond:
         elif convention == YTMCalcType.CFETS:
             if n == 0:
                 last_year = self._maturity_date.add_tenor("-12M")
-                alpha = 1 - (DayCount(DayCountTypes.ACT_365L).year_frac(last_year,
-                                                                        settlement_date,
-                                                                        self._maturity_date,
-                                                                        freq_type=FrequencyTypes.ANNUAL)[0])
+                
+                dc = DayCount(DayCountTypes.ACT_365L)
+
+                alpha = (1 - dc.year_frac(last_year,
+                                         settlement_date,
+                                         self._maturity_date,
+                                         freq_type=FrequencyTypes.ANNUAL)[0])
+
                 vw = 1.0 / (1.0 + alpha * ytm)
                 dp = vw * (1.0 + c / f)
             else:
@@ -306,7 +310,9 @@ class Bond:
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
 
-        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, 
+                                                ytm, 
+                                                convention)
 
         principal = dirty_price * face / self._par
         principal = principal - self._accrued_interest

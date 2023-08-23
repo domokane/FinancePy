@@ -57,8 +57,8 @@ def test_FinInflationBondBBG():
 
     assert round(ytm, 4) == -0.0010
 
-    full_price = bond.full_price_from_ytm(settlement_date, ytm)
-    assert round(full_price, 4) == 104.0554
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm)
+    assert round(dirty_price, 4) == 104.0554
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     assert round(clean_price, 4) == 104.0350

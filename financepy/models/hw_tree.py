@@ -291,8 +291,8 @@ def american_bond_option_tree_fast(texp,
     nm = min(expiryStep, jmax)
     for k in range(-nm, nm+1):
         kN = k + jmax
-        full_price = bond_values[expiryStep, kN]
-        clean_price = full_price - accrued[expiryStep]
+        dirty_price = bond_values[expiryStep, kN]
+        clean_price = dirty_price - accrued[expiryStep]
         callExercise = max(clean_price - strike_price, 0.0)
         putExercise = max(strike_price - clean_price, 0.0)
         call_option_values[expiryStep, kN] = callExercise
@@ -302,7 +302,7 @@ def american_bond_option_tree_fast(texp,
 
     if DEBUG:
         print("-----------------------------------------")
-        print("EXP", _tree_times[m], accrued[m], full_price, clean_price,
+        print("EXP", _tree_times[m], accrued[m], dirty_price, clean_price,
               callExercise, putExercise)
 
 #        print(kN, bond_values[expiryStep, kN], "CLEAN", clean_price)
@@ -382,8 +382,8 @@ def american_bond_option_tree_fast(texp,
 
             put_option_values[m, kN] = vput
 
-            full_price = bond_values[m, kN]
-            clean_price = full_price - accrued[m]
+            dirty_price = bond_values[m, kN]
+            clean_price = dirty_price - accrued[m]
             callExercise = max(clean_price - strike_price, 0.0)
             putExercise = max(strike_price - clean_price, 0.0)
 
@@ -401,7 +401,7 @@ def american_bond_option_tree_fast(texp,
                 put_option_values[m, kN] = max(putExercise, holdPut)
 
         if DEBUG:
-            print(m, _tree_times[m], accrued[m], full_price, clean_price,
+            print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
                   callExercise, putExercise)
 
     return call_option_values[0, jmax], put_option_values[0, jmax]
@@ -781,7 +781,7 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
 ###############################################################################
 
 
-def fwd_full_bond_price(rt, *args):
+def fwd_dirty_bond_price(rt, *args):
     """ Price a coupon bearing bond on the option expiry date and return
     the difference from a strike price. This is used in a root search to
     find the future expiry time short rate that makes the bond price equal
@@ -936,7 +936,7 @@ class HWTree():
         # Can I improve on this initial guess ?
         x0 = 0.05
 
-        rstar = optimize.newton(fwd_full_bond_price, x0=x0, fprime=None,
+        rstar = optimize.newton(fwd_dirty_bond_price, x0=x0, fprime=None,
                                 args=argtuple, tol=1e-10, maxiter=50,
                                 fprime2=None)
 

@@ -234,13 +234,13 @@ def test_BondFRN():
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
-    full_price = bond.full_price_from_dm(settlement_date,
+    dirty_price = bond.dirty_price_from_dm(settlement_date,
                                          resetIbor,
                                          current_ibor,
                                          future_ibors,
                                          dm)
 
-    testCases.print("Full Price = ", full_price)
+    testCases.print("Dirty Price = ", dirty_price)
 
     lastCouponDt = bond._pcd
     testCases.print("Last Coupon Date = ", str(lastCouponDt))
@@ -342,13 +342,13 @@ def test_BondFRN():
 
     testCases.print("Discount Margin (bp) = ", dm * 10000)
 
-    full_price = bond.full_price_from_dm(settlement_date,
+    dirty_price = bond.dirty_price_from_dm(settlement_date,
                                          resetIbor,
                                          current_ibor,
                                          future_ibors,
                                          dm)
 
-    testCases.print("Full Price = ", full_price)
+    testCases.print("Dirty Price = ", dirty_price)
 
     lastCouponDt = bond._pcd
     testCases.print("Last Coupon Date = ", str(lastCouponDt))

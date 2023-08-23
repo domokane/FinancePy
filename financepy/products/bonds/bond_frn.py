@@ -28,17 +28,16 @@ def _f(dm, *args):
     next_coupon = args[2]
     current_ibor = args[3]
     future_ibor = args[4]
-    full_price = args[5]
+    dirty_price = args[5]
 
-    px = self.full_price_from_dm(settlement_date,
+    px = self.dirty_price_from_dm(settlement_date,
                                  next_coupon,
                                  current_ibor,
                                  future_ibor,
                                  dm)
 
-    obj_fn = px - full_price
+    obj_fn = px - dirty_price
     return obj_fn
-
 
 ###############################################################################
 
@@ -100,7 +99,7 @@ class BondFRN:
 
     ###############################################################################
 
-    def full_price_from_dm(self,
+    def dirty_price_from_dm(self,
                            settlement_date: Date,
                            next_coupon: float,  # The total reset coupon on NCD
                            current_ibor: float,  # Ibor discount to NCD
@@ -156,14 +155,14 @@ class BondFRN:
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
 
-        full_price = self.full_price_from_dm(settlement_date,
+        dirty_price = self.dirty_price_from_dm(settlement_date,
                                              next_coupon,
                                              current_ibor,
                                              future_ibor,
                                              dm)
 
         accrued = self._accrued_interest
-        principal = full_price * self._face_amount / self._par - accrued
+        principal = dirty_price * self._par - accrued
         return principal
 
     ###############################################################################
@@ -179,13 +178,13 @@ class BondFRN:
 
         dy = 0.0001  # 1 basis point
 
-        p0 = self.full_price_from_dm(settlement_date,
+        p0 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor + dy,
                                      future_ibor,
                                      dm)
 
-        p2 = self.full_price_from_dm(settlement_date,
+        p2 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor - dy,
                                      future_ibor,
@@ -210,13 +209,13 @@ class BondFRN:
         self.calc_accrued_interest(settlement_date, next_coupon)
         dy = 0.0001
 
-        p0 = self.full_price_from_dm(settlement_date,
+        p0 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor,
                                      future_ibor,
                                      dm + dy)
 
-        p2 = self.full_price_from_dm(settlement_date,
+        p2 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor,
                                      future_ibor,
@@ -242,7 +241,7 @@ class BondFRN:
                                   future_ibor,
                                   dm)
 
-        fp = self.full_price_from_dm(settlement_date,
+        fp = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor,
                                      future_ibor,
@@ -272,7 +271,7 @@ class BondFRN:
                                   future_ibor,
                                   dm)
 
-        fp = self.full_price_from_dm(settlement_date,
+        fp = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor,
                                      future_ibor,
@@ -301,7 +300,7 @@ class BondFRN:
                                          future_ibor,
                                          dm)
 
-        fp = self.full_price_from_dm(settlement_date,
+        fp = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor,
                                      future_ibor,
@@ -326,19 +325,19 @@ class BondFRN:
 
         dy = 0.0001
 
-        p0 = self.full_price_from_dm(settlement_date,
+        p0 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor - dy,
                                      future_ibor,
                                      dm)
 
-        p1 = self.full_price_from_dm(settlement_date,
+        p1 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor,
                                      future_ibor,
                                      dm)
 
-        p2 = self.full_price_from_dm(settlement_date,
+        p2 = self.dirty_price_from_dm(settlement_date,
                                      next_coupon,
                                      current_ibor + dy,
                                      future_ibor,
@@ -365,16 +364,16 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        full_price = self.full_price_from_dm(settlement_date,
+        dirty_price = self.dirty_price_from_dm(settlement_date,
                                              next_coupon,
                                              current_ibor,
                                              future_ibor,
                                              dm)
 
         accrued = self._accrued_interest(settlement_date, next_coupon)
-        accrued = accrued * self._par / self._face_amount
+        accrued = accrued * self._par
 
-        clean_price = full_price - accrued
+        clean_price = dirty_price - accrued
         return clean_price
 
     ###############################################################################
@@ -393,10 +392,10 @@ class BondFRN:
         # Needs to be adjusted to par notional
         accrued = self._accrued_interest * self._par / self._face_amount
 
-        full_price = clean_price + accrued
+        dirty_price = clean_price + accrued
 
         argtuple = (self, settlement_date, next_coupon, current_ibor,
-                    future_ibor, full_price)
+                    future_ibor, dirty_price)
 
         dm = optimize.newton(_f,
                              x0=0.01,  # initial value of 10%

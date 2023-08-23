@@ -271,7 +271,7 @@ def test_Bond():
     maturity_date = Date(15, 7, 1997)
     coupon = 0.085
     ex_div_days = 0
-    face = 100.0
+    face = 1000000.0
     
     freq_type = FrequencyTypes.SEMI_ANNUAL
 
@@ -433,7 +433,7 @@ def test_Bond():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
     ex_div_days = 0
-    face = 1000000.0
+    face = 100.0
     
     bond = Bond(issue_date, maturity_date,
                 coupon, freq_type, accrual_type, ex_div_days)
@@ -513,18 +513,18 @@ def test_BondExDividend():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     face = 100.0
-    exDivDays = 7
+    ex_div_days = 7
 
     calendar_type = CalendarTypes.UNITED_KINGDOM
     bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, exDivDays)
+                freq_type, accrual_type, ex_div_days)
 
     settlement_date = Date(25, 8, 2010)
 
     for _ in range(0, 13):
         settlement_date = settlement_date.add_days(1)
         accrued = bond.accrued_interest(
-            settlement_date, exDivDays)
+            settlement_date, face)
         testCases.print(settlement_date, accrued)
 
 ###############################################################################

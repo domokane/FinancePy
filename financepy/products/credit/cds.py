@@ -361,7 +361,7 @@ class CDS:
                                 issuer_curve,
                                 pv01_method)
 
-        fullRPV01 = rpv01['full_rpv01']
+        dirtyRPV01 = rpv01['dirty_rpv01']
         cleanRPV01 = rpv01['clean_rpv01']
 
         prot_pv = self.protection_leg_pv(valuation_date,
@@ -377,14 +377,14 @@ class CDS:
         else:
             longProt = -1
 
-        fullPV = fwdDf * longProt * \
-            (prot_pv - self._running_coupon * fullRPV01 * self._notional)
+        dirtyPV = fwdDf * longProt * \
+            (prot_pv - self._running_coupon * dirtyRPV01 * self._notional)
         cleanPV = fwdDf * longProt * \
             (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
 
 #        print("protLeg", prot_pv, "cleanRPV01", cleanRPV01, "value", cleanPV)
 
-        return {'full_pv': fullPV, 'clean_pv': cleanPV}
+        return {'dirty_pv': dirtyPV, 'clean_pv': cleanPV}
 
     ###############################################################################
 
@@ -421,7 +421,7 @@ class CDS:
                         prot_method,
                         num_steps_per_year)
 
-        credit_dv01 = (v1['full_pv'] - v0['full_pv'])
+        credit_dv01 = (v1['dirty_pv'] - v0['dirty_pv'])
         return credit_dv01
 
     ###############################################################################
@@ -477,7 +477,7 @@ class CDS:
                         prot_method,
                         num_steps_per_year)
 
-        interest_dv01 = (v1['full_pv'] - v0['full_pv'])
+        interest_dv01 = (v1['dirty_pv'] - v0['dirty_pv'])
         return interest_dv01
 
     ###############################################################################
@@ -622,7 +622,7 @@ class CDS:
 
         #        print("OLD PV01",fullRPV01, cleanRPV01)
 
-        return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
+        return {'dirty_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
     ###############################################################################
 
@@ -722,7 +722,7 @@ class CDS:
         cleanRPV01 = valueRPV01[1]
 
         #        print("NEW PV01",fullRPV01, cleanRPV01)
-        return {'full_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
+        return {'dirty_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
     ###############################################################################
 
@@ -734,7 +734,7 @@ class CDS:
 
         fullRPV01 = self.risky_pv01(valuation_date,
                                     issuer_curve,
-                                    pv01_method)['full_rpv01']
+                                    pv01_method)['dirty_rpv01']
 
         v = fullRPV01 * self._notional * self._running_coupon
         return v

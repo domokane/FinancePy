@@ -68,54 +68,76 @@ def test_BondFuture():
 
     bonds = []
     prices = []
+
     bond = Bond(issue_date, Date(15, 8, 2027), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(99 + 1 / 32)
+
     bond = Bond(issue_date, Date(15, 5, 2027), 0.02375, freq, basis)
     bonds.append(bond)
     prices.append(100 + 5 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 2, 2027), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(99 + 5 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 11, 2026), 0.02, freq, basis)
     bonds.append(bond)
     prices.append(97 + 7 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 8, 2026), 0.015, freq, basis)
     bonds.append(bond)
     prices.append(93 + 14 / 32)
+
     bond = Bond(issue_date, Date(15, 5, 2026), 0.01625, freq, basis)
     bonds.append(bond)
     prices.append(94 + 21 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 2, 2026), 0.01625, freq, basis)
     bonds.append(bond)
     prices.append(94 + 29 / 32)
+
     bond = Bond(issue_date, Date(15, 11, 2025), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(99 + 25 / 32)
+
     bond = Bond(issue_date, Date(15, 8, 2025), 0.02, freq, basis)
     bonds.append(bond)
     prices.append(98 + 3 / 32)
+
     bond = Bond(issue_date, Date(15, 5, 2025), 0.02125, freq, basis)
     bonds.append(bond)
     prices.append(99 + 5 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 2, 2025), 0.02, freq, basis)
     bonds.append(bond)
     prices.append(98 + 14 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 11, 2024), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(100 + 9 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 8, 2024), 0.02375, freq, basis)
     bonds.append(bond)
     prices.append(101 + 7 / 32 + 1 / 64)
+
     bond = Bond(issue_date, Date(15, 8, 2024), 0.01875, freq, basis)
     bonds.append(bond)
     # There may be an error in the document says 98-01+
     prices.append(98 + 1 / 32)
 
-    testCases.header("BOND MATURITY", "YIELD")
+    bonds.reverse()
+    prices.reverse()
+    
+    testCases.header("BOND MATURITY", "COUPON", "PRICE")
+    for bond, clean_price in zip(bonds, prices):
+        testCases.print(str(bond._maturity_date), str(bond._coupon), clean_price)
+
+
+    testCases.header("BOND MATURITY", "COUPON", "YIELD")
     for bond, clean_price in zip(bonds, prices):
         yld = bond.yield_to_maturity(settlement_date, clean_price)
-        testCases.print(str(bond._maturity_date), yld)
+        testCases.print(str(bond._maturity_date), str(bond._coupon), yld)
 
     first_delivery_date = Date(1, 12, 2017)
     last_delivery_date = Date(28, 12, 2017)
@@ -129,10 +151,10 @@ def test_BondFuture():
                                     contract_size,
                                     contractCoupon)
 
-    testCases.header("BOND MATURITY", "CF")
+    testCases.header("BOND MATURITY", "COUPON", "CF")
     for bond in bonds:
         cf = bondFutureContract.conversion_factor(bond)
-        testCases.print(str(bond._maturity_date), cf)
+        testCases.print(str(bond._maturity_date), str(bond._coupon), cf)
 
     # Get the Invoice Prices
     futures_price = 125.265625

@@ -48,8 +48,8 @@ class BondPortfolio:
         known as the DV01 in Bloomberg. """
 
         dy = 0.0001  # 1 basis point
-        p0 = self.full_priceFromYTM(settlement_date, ytm - dy, convention)
-        p2 = self.full_priceFromYTM(settlement_date, ytm + dy, convention)
+        p0 = self.dirty_price_from_ytm(settlement_date, ytm - dy, convention)
+        p2 = self.dirty_price_from_ytm(settlement_date, ytm + dy, convention)
         durn = -(p2 - p0) / dy / 2.0
         return durn
 
@@ -63,7 +63,7 @@ class BondPortfolio:
         given its yield to maturity. """
 
         dd = self.dollar_duration(settlement_date, ytm, convention)
-        fp = self.full_priceFromYTM(settlement_date, ytm, convention)
+        fp = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         md = dd * (1.0 + ytm / self._frequency) / fp
         return md
 
@@ -77,7 +77,7 @@ class BondPortfolio:
         given its yield to maturity. """
 
         dd = self.dollar_duration(settlement_date, ytm, convention)
-        fp = self.full_priceFromYTM(settlement_date, ytm, convention)
+        fp = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         md = dd / fp
         return md
 
@@ -91,9 +91,9 @@ class BondPortfolio:
         function is vectorised with respect to the yield input. """
 
         dy = 0.0001
-        p0 = self.full_priceFromYTM(settlement_date, ytm - dy, convention)
-        p1 = self.full_priceFromYTM(settlement_date, ytm, convention)
-        p2 = self.full_priceFromYTM(settlement_date, ytm + dy, convention)
+        p0 = self.dirty_price_from_ytm(settlement_date, ytm - dy, convention)
+        p1 = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        p2 = self.dirty_price_from_ytm(settlement_date, ytm + dy, convention)
         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
         return conv
 
@@ -106,9 +106,9 @@ class BondPortfolio:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        full_price = self.full_priceFromYTM(settlement_date, ytm, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         accrued_amount = self._accrued_interest * self._par / self._face_amount
-        clean_price = full_price - accrued_amount
+        clean_price = dirty_price - accrued_amount
         return clean_price
 
 ###############################################################################
@@ -123,7 +123,7 @@ class BondPortfolio:
 
 ##############################################################################
 
-    def full_price_from_discount_curve(self,
+    def dirty_price_from_discount_curve(self,
                                        settlement_date: Date,
                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using a provided discount curve to PV the
@@ -153,7 +153,7 @@ class BondPortfolio:
 
 ###############################################################################
 
-    def calc_accrued_interest(self,
+    def accrued_interest(self,
                               settlement_date: Date,
                               num_ex_dividend_days: int = 0,
                               calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
@@ -179,7 +179,7 @@ class BondPortfolio:
 
 ###############################################################################
 
-    def full_price_from_survival_curve(self,
+    def dirty_price_from_survival_curve(self,
                                        settlement_date: Date,
                                        discount_curve: DiscountCurve,
                                        survival_curve: DiscountCurve,
@@ -243,12 +243,12 @@ class BondPortfolio:
 
         self.calc_accrued_interest(settlement_date)
 
-        full_price = self.full_price_from_survival_curve(settlement_date,
+        dirty_price = self.dirty_price_from_survival_curve(settlement_date,
                                                          discount_curve,
                                                          survival_curve,
                                                          recovery_rate)
 
-        clean_price = full_price - self._accrued_interest
+        clean_price = dirty_price - self._accrued_interest
         return clean_price
 
 ###############################################################################

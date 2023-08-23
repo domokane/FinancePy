@@ -338,9 +338,9 @@ def american_bond_option_tree_fast(texp, tmat,
             * face_amount
 
     if DEBUG:
-        full_price = bond_values[maturityStep, 0]
-        clean_price = full_price - accrued[maturityStep]
-        print(m, _tree_times[m], accrued[m], full_price, clean_price, 0, 0)
+        dirty_price = bond_values[maturityStep, 0]
+        clean_price = dirty_price - accrued[maturityStep]
+        print(m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0)
 
     # Step back from maturity to expiry date but with no exercise allowed.
     for m in range(maturityStep-1, expiryStep, -1):
@@ -359,11 +359,11 @@ def american_bond_option_tree_fast(texp, tmat,
 
             bond_values[m, k] = v
             bond_values[m, k] += flow
-            full_price = bond_values[m, k]
-            clean_price = full_price - accrued[m]
+            dirty_price = bond_values[m, k]
+            clean_price = dirty_price - accrued[m]
 
         if DEBUG:
-            print(m, _tree_times[m], accrued[m], full_price, clean_price, 0, 0)
+            print(m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0)
 
     # Now step back to today from the expiry date considering early exercise
     for m in range(expiryStep, -1, -1):
@@ -397,8 +397,8 @@ def american_bond_option_tree_fast(texp, tmat,
 
             put_option_values[m, k] = vput
 
-            full_price = bond_values[m, k]
-            clean_price = full_price - accrued[m]
+            dirty_price = bond_values[m, k]
+            clean_price = dirty_price - accrued[m]
             callExercise = max(clean_price - strike_price, 0.0)
             putExercise = max(strike_price - clean_price, 0.0)
 
@@ -416,7 +416,7 @@ def american_bond_option_tree_fast(texp, tmat,
                 put_option_values[m, k] = max(putExercise, holdPut)
 
         if DEBUG:
-            print(m, _tree_times[m], accrued[m], full_price, clean_price,
+            print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
                   callExercise, putExercise)
 
     return call_option_values[0, 0], put_option_values[0, 0]
