@@ -441,7 +441,7 @@ class CDSIndexPortfolio:
 
                 numIterations += 1
 
-                if numIterations == maxIterations:
+                if numIterations > maxIterations:
                     raise FinError("Max Iterations exceeded")
 
                 sumRPV01 = 0.0
