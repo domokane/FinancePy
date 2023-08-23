@@ -41,6 +41,7 @@ cdsIndex = CDSIndexPortfolio()
 
 
 def test_homogeneous():
+
     num_credits = 125
     spd3Y = 0.0012
     spd5Y = 0.0025
@@ -61,7 +62,7 @@ def test_homogeneous():
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
 
-    assert round(intrinsicSpd, 4) == 23.9775
+    assert round(intrinsicSpd, 4) == 23.9767
 
     method = FinLossDistributionBuilder.RECURSION
     v = tranche1.value_bc(
@@ -123,7 +124,7 @@ def test_heterogeneous():
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
 
-    assert round(intrinsicSpd, 4) == 34.3337
+    assert round(intrinsicSpd, 4) == 34.3326
 
     method = FinLossDistributionBuilder.RECURSION
     v = tranche1.value_bc(

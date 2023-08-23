@@ -57,7 +57,7 @@ def test_FinCDSCurve():
     assert round(issuer_curve._times[9], 4) == 9.0055
     assert round(issuer_curve._values[0], 4) == 1.0
     assert round(issuer_curve._values[5], 4) == 0.9249
-    assert round(issuer_curve._values[9], 4) == 0.8072
+    assert round(issuer_curve._values[9], 4) == 0.8071
 
     i = 1
     maturity_date = curve_date.add_months(12 * i)

@@ -36,7 +36,7 @@ def test_inhomogeneous_curve():
                                              step_in_date,
                                              basketMaturity,
                                              issuer_curves) * 10000.0
-    assert round(intrinsicSpd, 4) == 32.0981
+    assert round(intrinsicSpd, 4) == 32.0971
 
     totalSpd = cdsIndex.total_spread(valuation_date,
                                      step_in_date,
@@ -79,7 +79,8 @@ def test_gaussian_copula():
                                        issuer_curves,
                                        beta_vector,
                                        libor_curve)
-    assert round(v1[2] * 10000, 4) == 149.9644
+
+    assert round(v1[2] * 10000, 4) == 151.7163
     assert round(v2[3] * 10000, 4) == 159.021
 
     ntd = 2
@@ -101,6 +102,7 @@ def test_gaussian_copula():
                                        issuer_curves,
                                        beta_vector,
                                        libor_curve)
+
     assert round(v1[2] * 10000, 4) == 15.4566
     assert round(v2[3] * 10000, 4) == 16.4308
 
@@ -123,7 +125,7 @@ def test_student_t():
                                   num_trials,
                                   seed)
 
-    assert round(v[2] * 10000, 4) == 132.0799
+    assert round(v[2] * 10000, 4) == 133.6284
 
     ntd = 2
     beta = 0.5

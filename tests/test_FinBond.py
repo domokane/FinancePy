@@ -24,16 +24,18 @@ def test_bondtutor_example():
     issue_date = Date(15, 7, 1990)
     maturity_date = Date(15, 7, 1997)
     coupon = 0.085
-    face = ONE_MILLION
+    ex_div_days = 0
+    face = 1000000
+
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrualConvention, face)
+                coupon, freq_type, accrualConvention, ex_div_days)
 
     dirty_price = bond.dirty_price_from_ytm(settlement_date, y)
     assert round(dirty_price, 4) == 108.7696
     clean_price = bond.clean_price_from_ytm(settlement_date, y)
     assert round(clean_price, 4) == 106.5625
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_interest(settlement_date, face)
     assert round(accrued_interest, 4) == 22071.8232
     ytm = bond.yield_to_maturity(settlement_date, clean_price)
     assert round(ytm, 4) == 0.0622
@@ -72,13 +74,14 @@ def test_bloomberg_us_treasury_example():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     face = 100.0
+    ex_div_days = 0
 
     bond = Bond(issue_date,
                 maturity_date,
                 coupon,
                 freq_type,
                 accrual_type,
-                face)
+                ex_div_days)
 
     clean_price = 99.7808417
 
@@ -103,7 +106,7 @@ def test_bloomberg_us_treasury_example():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     assert round(clean_price, 4) == 99.7825
 
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_interest(settlement_date, face)
     assert round(accrued_interest, 4) == 0.4324
 
     accddays = bond._accrued_days
@@ -130,9 +133,10 @@ def test_bloomberg_apple_corp_example():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
     face = 100.0
+    ex_div_days = 0
 
     bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrual_type, face)
+                coupon, freq_type, accrual_type, ex_div_days)
 
     clean_price = 101.581564
 
@@ -160,7 +164,7 @@ def test_bloomberg_apple_corp_example():
     accddays = bond._accrued_days
     assert accddays == 68
 
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_interest(settlement_date, face)
     assert round(accrued_interest, 4) == 0.51
 
     duration = bond.dollar_duration(settlement_date, ytm)
@@ -243,6 +247,7 @@ def test_bond_cfets():
     Test ytms of bonds in CFETS convention, especially for those in last coupon period and
     have 2 or more coupon payments per year.
     """
+    face = 100.0 
     test_case_file = 'test_cases_bond_cfets.csv'
     df = pd.read_csv('./tests/data/' + test_case_file,
                      parse_dates=['settlement_date', 'issue_date', 'maturity_date'])
@@ -258,7 +263,7 @@ def test_bond_cfets():
         )
         settlement_date = Date(
             row.settlement_date.day, row.settlement_date.month, row.settlement_date.year)
-        accrued_interest = bond.calc_accrued_interest(settlement_date)
+        accrued_interest = bond.accrued_interest(settlement_date, face)
         clean_price = row.dirty_price - accrued_interest
         calc_ytm = bond.yield_to_maturity(
             settlement_date, clean_price, YTMCalcType.CFETS) * 100
@@ -283,12 +288,13 @@ def test_key_rate_durations_Bloomberg_example():
     maturity_date = Date(31, 7, 2027)
     coupon = 2.75/100.0
     face = 100.0
-
+    ex_div_days = 0
+    
     accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
     BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_date, maturity_date, coupon,
-                freq_type, accrual_type, face)
+                freq_type, accrual_type, ex_div_days)
 
     settlement_date = Date(24, 4, 2023)
 

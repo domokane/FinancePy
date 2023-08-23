@@ -31,8 +31,7 @@ def test_SemiAnnual_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
     annuity.calculate_payments(settlement_date)
 
@@ -45,7 +44,7 @@ def test_SemiAnnual_BondAnnuity():
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 25278.0
 
-    assert annuity.calc_accrued_interest(settlement_date) == 0.0
+    assert annuity.accrued_interest(settlement_date, face) == 0.0
 
 
 def test_Quarterly_BondAnnuity():
@@ -69,8 +68,7 @@ def test_Quarterly_BondAnnuity():
         calendar_type,
         bus_day_adjust_type,
         date_gen_rule_type,
-        basis_type,
-        face)
+        basis_type)
 
     annuity.calculate_payments(settlement_date)
 
@@ -83,7 +81,7 @@ def test_Quarterly_BondAnnuity():
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 12778.0
 
-    assert annuity.calc_accrued_interest(settlement_date) == 0.0
+    assert annuity.accrued_interest(settlement_date, face) == 0.0
 
 
 def test_Monthly_BondAnnuity():
@@ -106,10 +104,9 @@ def test_Monthly_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     assert len(annuity._flow_amounts) == 10*12 + 1
     assert len(annuity._coupon_dates) == 10*12 + 1
@@ -120,7 +117,7 @@ def test_Monthly_BondAnnuity():
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 4028.0
 
-    assert annuity.calc_accrued_interest(settlement_date) == 0.0
+    assert annuity.accrued_interest(settlement_date, face) == 0.0
 
 
 def test_ForwardGen_BondAnnuity():
@@ -142,10 +139,9 @@ def test_ForwardGen_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     assert len(annuity._flow_amounts) == 10 * 1 + 1
     assert len(annuity._coupon_dates) == 10 * 1 + 1
@@ -156,7 +152,7 @@ def test_ForwardGen_BondAnnuity():
     assert round(annuity._flow_amounts[0]) == 0.0
     assert round(annuity._flow_amounts[-1]) == 50694.0
 
-    assert annuity.calc_accrued_interest(settlement_date) == 0.0
+    assert annuity.accrued_interest(settlement_date, face) == 0.0
 
 
 def test_ForwardGenWithLongEndStub_BondAnnuity():
@@ -178,10 +174,9 @@ def test_ForwardGenWithLongEndStub_BondAnnuity():
                           calendar_type,
                           bus_day_adjust_type,
                           date_gen_rule_type,
-                          basis_type,
-                          face)
+                          basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     assert len(annuity._flow_amounts) == 10 * 2 + 1
     assert len(annuity._coupon_dates) == 10 * 2 + 1
@@ -192,4 +187,4 @@ def test_ForwardGenWithLongEndStub_BondAnnuity():
     assert round(annuity._flow_amounts[0]) == 0.0
     assert round(annuity._flow_amounts[-1]) == 25417.0
 
-    assert annuity.calc_accrued_interest(settlement_date) == 0.0
+    assert annuity.accrued_interest(settlement_date, face) == 0.0

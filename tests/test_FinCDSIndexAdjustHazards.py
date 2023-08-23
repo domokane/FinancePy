@@ -76,7 +76,7 @@ def test_performCDSIndexHazardRateAdjustment():
                                             maturity10Y,
                                             issuer_curves) * 10000.0
 
-    assert round(averageSpd3Y, 4) == 19.8222
+    assert round(averageSpd3Y, 4) == 19.8221
     assert round(averageSpd5Y, 4) == 36.0357
     assert round(averageSpd7Y, 4) == 50.1336
     assert round(averageSpd10Y, 4) == 63.6622

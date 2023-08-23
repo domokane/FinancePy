@@ -25,8 +25,7 @@ def test_bond_frn_1():
                    maturity_date,
                    quoted_margin,
                    freq_type,
-                   accrual_type,
-                   face)
+                   accrual_type)
 
     clean_price = 96.793
     resetIbor = 0.0143456 - quoted_margin
@@ -131,8 +130,7 @@ def test_bond_frn_2():
                    maturity_date,
                    quoted_margin,
                    freq_type,
-                   accrual_type,
-                   face)
+                   accrual_type)
 
     clean_price = 93.08
     resetIbor = 0.00537 - quoted_margin
