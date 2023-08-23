@@ -20,16 +20,15 @@ from ...products.bonds.bond import YTMCalcType
 # TO DO - THIS CLASS NEEDS TO INHERIT FROM BOND CLASS
 ###############################################################################
 
-def _f(y, *args):
+def _f(ytm, *args):
     """ Function used to do root search in price to yield calculation. """
     bond = args[0]
     settlement_date = args[1]
     price = args[2]
     convention = args[3]
-    px = bond.dirty_price_from_ytm(settlement_date, y, convention)
+    px = bond.dirty_price_from_ytm(settlement_date, ytm, convention)
     obj_fn = px - price
     return obj_fn
-
 
 ###############################################################################
 
@@ -61,8 +60,7 @@ class BondZero:
     def __init__(self,
                  issue_date: Date,
                  maturity_date: Date,
-                 issue_price: float,          # Issue price usually discounted
-                 face_amount: float = 100.0   # Amount repaid at maturity.
+                 issue_price: float          # Issue price usually discounted
                  ):
         """ Create BondZero object by providing the issue date, maturity Date,
         face amount and issue price. """
@@ -127,7 +125,7 @@ class BondZero:
             pv = self._par / (1.0 + ytm * acc_factor)
         else:
             pv = self._par / (1.0 + ytm) ** acc_factor
-
+        
         return pv
 
     ###########################################################################
@@ -228,8 +226,7 @@ class BondZero:
         """ Calculate the clean bond value using some discount curve to
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date. """
-
-        self.calc_accrued_interest(settlement_date)
+ 
         dirty_price = self.dirty_price_from_discount_curve(settlement_date,
                                                          discount_curve)
 
@@ -305,12 +302,10 @@ class BondZero:
             raise FinError("Unknown type for clean_price "
                            + str(type(clean_price)))
 
-        self.accrued_interest(settlement_date, 1.0)
+        accrued_amount = self.accrued_interest(settlement_date, self._par)
         
-        accrued_amount = self._accrued_interest * self._par
-
         dirty_prices = (clean_prices + accrued_amount)
-
+        
         ytms = []
 
         for dirty_price in dirty_prices:
@@ -372,9 +367,14 @@ class BondZero:
             acc_factor = acc_factor - 1.0
 
         self._alpha = 1.0 - acc_factor
-        interest = (self._par - self._issue_price) * (settlement_date - self._issue_date) / \
-                   (self._maturity_date - self._issue_date)
-        self._accrued_interest = interest 
+
+        num = (settlement_date - self._issue_date)
+        den = (self._maturity_date - self._issue_date)
+
+        f = num / den        
+        g = ((self._par - self._issue_price)) / self._par
+        
+        self._accrued_interest = f * g * face
         self._accrued_days = num
 
         return self._accrued_interest
@@ -396,8 +396,8 @@ class BondZero:
         respect to the clean price. """
 
         clean_price = np.array(clean_price)
-        self.calc_accrued_interest(settlement_date)
-        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        self.accrued_interest(settlement_date, 1.0)
+        accrued_amount = self._accrued_interest * self._par
         bondPrice = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pvIbor = 0.0
@@ -444,7 +444,7 @@ class BondZero:
         """ Calculate the full price of the bond from its OAS given the bond
         settlement date, a discount curve and the oas as a number. """
 
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
         pv = 0.0
         for dt in self._coupon_dates[1:]:
@@ -482,9 +482,9 @@ class BondZero:
             raise FinError("Unknown type for clean_price "
                            + str(type(clean_price)))
 
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
-        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        accrued_amount = self._accrued_interest * self._par
         dirty_prices = clean_prices + accrued_amount
 
         oass = []
@@ -509,24 +509,26 @@ class BondZero:
 
     ###########################################################################
 
-    def coupon_dates(self,
-                     settlement_date: Date):
+    def bond_payments(self,
+                      settlement_date: Date, 
+                      face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
         flow_str = ''
         flow_str += ("%12s %12.2f \n"
-                     % (self._coupon_dates[-1], self._face_amount))
+                     % (self._coupon_dates[-1], face))
 
         return flow_str
 
     ###########################################################################
 
-    def print_coupon_dates(self,
-                           settlement_date: Date):
+    def print_bond_payments(self,
+                           settlement_date: Date, 
+                           face: (float) = 100.0):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        print(self.coupon_dates(settlement_date))
+        print(self.bond_payments(settlement_date, face))
 
     ###########################################################################
 

@@ -2,22 +2,24 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import numpy as np
-from financepy.products.bonds.bond import YTMCalcType, Bond
-from financepy.products.bonds.bond_zero import BondZero
-from financepy.products.bonds.bond_market import *
+import sys
+sys.path.append("..")
+
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-import pandas as pd
-import sys
-sys.path.append("..")
+from financepy.products.bonds.bond import YTMCalcType, Bond
+from financepy.products.bonds.bond_zero import BondZero
+from financepy.products.bonds.bond_market import *
 
+import datetime as dt
+import pandas as pd
+import numpy as np
 
 def test_bondtutor_example():
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
-
+    
     accrualConvention = DayCountTypes.ACT_ACT_ICMA
     y = 0.062267
     settlement_date = Date(19, 4, 1994)
@@ -185,7 +187,6 @@ def test_zero_bond():
     bill = BondZero(
         issue_date=Date(25, 7, 2022),
         maturity_date=Date(24, 10, 2022),
-        face_amount=ONE_MILLION,
         issue_price=99.6410
     )
     settlement_date = Date(8, 8, 2022)
@@ -193,9 +194,14 @@ def test_zero_bond():
     clean_price = 99.6504
     calc_ytm = bill.yield_to_maturity(
         settlement_date, clean_price, YTMCalcType.ZERO) * 100
-    accrued_interest = bill.calc_accrued_interest(settlement_date)
+
+    accrued_interest = bill.accrued_interest(settlement_date, ONE_MILLION)
+    
+    print(calc_ytm)
+    print(accrued_interest)
+    
     assert abs(calc_ytm - 1.3997) < 0.0002
-    assert abs(accrued_interest - ONE_MILLION * 0.055231 / 100) < 0.01
+    assert abs(accrued_interest - ONE_MILLION * 0.05523077 / 100) < 0.01
 
 
 def test_bond_ror():
@@ -273,7 +279,7 @@ def test_bond_cfets():
             print(bond)
             print(clean_price)
             print(settlement_date)
-            print(bond.coupon_dates(settlement_date))
+            print(bond.bond_payments(settlement_date, 100.0))
             print(f'calc_ytm:{calc_ytm}, correct_ytm:{row.ytm}')
             continue
 
@@ -319,3 +325,7 @@ def test_key_rate_durations_Bloomberg_example():
 
     for i in range(len(key_rate_durations)):
         assert round(key_rate_durations[i], 3) == bbg_key_rate_durations[i]
+
+
+test_zero_bond()
+

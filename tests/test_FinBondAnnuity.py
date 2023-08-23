@@ -33,7 +33,7 @@ def test_SemiAnnual_BondAnnuity():
                           date_gen_rule_type,
                           basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     assert len(annuity._flow_amounts) == 2 * 1 + 1
     assert len(annuity._coupon_dates) == 2 * 1 + 1
@@ -70,7 +70,7 @@ def test_Quarterly_BondAnnuity():
         date_gen_rule_type,
         basis_type)
 
-    annuity.calculate_payments(settlement_date)
+    annuity.calculate_payments(settlement_date, face)
 
     assert len(annuity._flow_amounts) == 10 * 4 + 1
     assert len(annuity._coupon_dates) == 10 * 4 + 1

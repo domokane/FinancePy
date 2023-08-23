@@ -26,6 +26,7 @@ class BondPortfolio:
         check_argument_types(self.__init__, locals())
 
         self.calculateFlows()
+        self._par = 100.0
 
 ###############################################################################
 
@@ -107,7 +108,7 @@ class BondPortfolio:
         function is vectorised with respect to the yield input. """
 
         dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
-        accrued_amount = self._accrued_interest * self._par / self._face_amount
+        accrued_amount = self._accrued_interest * self._par
         clean_price = dirty_price - accrued_amount
         return clean_price
 
@@ -163,18 +164,20 @@ class BondPortfolio:
 ###############################################################################
 
     def print_flows(self,
-                    settlement_date: Date):
+                    settlement_date: Date, 
+                    face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        flow = self._face_amount * self._coupon / self._frequency
+        flow = self._coupon / self._frequency
 
         for dt in self._coupon_dates[1:-1]:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
                 print("%12s" % dt, " %12.2f " % flow)
 
-        redemption_amount = self._face_amount + flow
+        redemption_amount = face * ( 1.0 + flow) 
+
         print("%12s" % self._coupon_dates[-1], " %12.2f " % redemption_amount)
 
 ###############################################################################
@@ -226,7 +229,7 @@ class BondPortfolio:
 
         pv = pv + 0.50 * defaultingPrincipalPVPayStart
         pv = pv + 0.50 * defaultingPrincipalPVPayEnd
-        pv = pv + df * q * self._redemption
+        pv = pv + df * q * self._par
         pv *= self._par
         return pv
 
@@ -241,7 +244,7 @@ class BondPortfolio:
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. """
 
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
         dirty_price = self.dirty_price_from_survival_curve(settlement_date,
                                                          discount_curve,
@@ -261,7 +264,6 @@ class BondPortfolio:
         s += label_to_string("COUPON", self._coupon)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount, "")
         return s
 
 ###############################################################################

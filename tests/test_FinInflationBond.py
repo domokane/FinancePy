@@ -30,7 +30,6 @@ def test_FinInflationBondBBG():
                             coupon,
                             freq_type,
                             accrual_type,
-                            face,
                             baseCPIValue)
 
     clean_price = 104.03502

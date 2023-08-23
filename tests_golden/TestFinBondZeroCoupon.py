@@ -32,7 +32,6 @@ def test_bond_zero():
 
     bond = BondZero(issue_date=issue_date,
                     maturity_date=maturity_date,
-                    face_amount=face_amount,
                     issue_price=issue_price)
 
     settlement_date = Date(8, 8, 2022)

@@ -393,19 +393,19 @@ def test_par_spread():
         valuation_date1,
         issuer_curve1,
         cdsRecovery) * 10000.0
-    assert round(spd, 4) == 399.9992
+    assert round(spd, 4) == 399.9996
 
     spd = cds_contract2.par_spread(
         valuation_date2,
         issuer_curve2,
         cdsRecovery) * 10000.0
-    assert round(spd, 4) == 98.5268
+    assert round(spd, 4) == 98.7148
 
 
 def test_value():
     v = cds_contract1.value(valuation_date1, issuer_curve1, cdsRecovery)
-    assert round(v['dirty_pv'], 4) == 168514.596
-    assert round(v['clean_pv'], 4) == 170677.827
+    assert round(v['dirty_pv'], 4) == 168514.5961
+    assert round(v['clean_pv'], 4) == 170639.5961
 
     v = cds_contract2.value(valuation_date2, issuer_curve2, cdsRecovery)
     assert round(v['dirty_pv'], 4) == -200111.1901
@@ -417,7 +417,7 @@ def test_clean_price():
     assert round(p, 4) == 82.936
 
     p = cds_contract2.clean_price(valuation_date2, issuer_curve2, cdsRecovery)
-    assert round(p, 4) == 119.0221
+    assert round(p, 4) == 119.1926
 
 
 def test_accrued_days():
@@ -443,7 +443,7 @@ def test_protection_leg_pv():
 
     prot_pv = cds_contract2.protection_leg_pv(
         valuation_date2, issuer_curve2, cdsRecovery)
-    assert round(prot_pv, 4) == 47064.832
+    assert round(prot_pv, 4) == 47213.1783
 
 
 def test_premium_leg_pv():
@@ -453,7 +453,7 @@ def test_premium_leg_pv():
 
     premPV = cds_contract2.premium_leg_pv(
         valuation_date2, issuer_curve2, cdsRecovery)
-    assert round(premPV, 4) == 247176.0221
+    assert round(premPV, 4) == 247472.5265
 
 
 def test_value_approx():

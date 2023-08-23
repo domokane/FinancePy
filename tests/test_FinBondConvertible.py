@@ -20,7 +20,6 @@ coupon = 0.0575
 freq_type = FrequencyTypes.SEMI_ANNUAL
 start_convert_date = Date(31, 12, 2003)
 conversion_ratio = 38.4615  # adjust for face
-face = 1000.0
 
 call_dates = [Date(20, 3, 2007),
               Date(15, 3, 2012),
@@ -44,8 +43,7 @@ bond = BondConvertible(maturity_date,
                        call_prices,
                        put_dates,
                        put_prices,
-                       accrualBasis,
-                       face)
+                       accrualBasis)
 
 settlement_date = Date(31, 12, 2003)
 stock_price = 28.5

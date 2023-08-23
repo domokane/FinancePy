@@ -55,8 +55,7 @@ class BondEmbeddedOption:
                  call_dates: List[Date],
                  call_prices: List[float],
                  put_dates: List[Date],
-                 put_prices: List[float],
-                 face_amount: float = 100.0):
+                 put_prices: List[float]):
         """ Create a BondEmbeddedOption object with a maturity date, coupon
         and all of the bond inputs. """
 
@@ -120,7 +119,7 @@ class BondEmbeddedOption:
         self._call_prices = call_prices
         self._put_dates = put_dates
         self._put_prices = put_prices
-        self._face_amount = face_amount
+        self._par = 100.0
         self._bond._calculate_coupon_dates()
 
 ###############################################################################
@@ -170,7 +169,7 @@ class BondEmbeddedOption:
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
-        face_amount = 100.0
+        face_amount = self._par
 
         if isinstance(model, HWTree):
 

@@ -63,7 +63,7 @@ class BondAnnuity:
 
         dirty_price = self.dirty_price_from_discount_curve(settlement_date,
                                                          discount_curve)
-        accrued = self._accrued_interest * self._par / self._face
+        accrued = self._accrued_interest * self._par
         clean_price = dirty_price - accrued
         return clean_price
 
@@ -75,7 +75,7 @@ class BondAnnuity:
         """ Calculate the bond price using some discount curve to present-value
         the bond's cash flows. """
 
-        self.calculate_payments(settlement_date)
+        self.calculate_payments(settlement_date, 1.0)
         pv = 0.0
 
         num_flows = len(self._coupon_dates)
@@ -136,7 +136,7 @@ class BondAnnuity:
         previous coupon date and the settlement date. """
 
         if settlement_date != self._settlement_date:
-            self.calculate_payments(settlement_date)
+            self.calculate_payments(settlement_date, 1.0)
 
         if len(self._coupon_dates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")

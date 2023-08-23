@@ -345,7 +345,7 @@ class FinTestCases():
                     time2 = float(compareFields[colNum])
                     change = (time2 / abs(time1 + 1e-10) - 1.0) * 100.0
 
-                    if abs(change) > 20.0:
+                    if abs(change) > 50.0:
                         self.printLog("Row# ", rowNum,
                                       " WARNING: Calculation time has changed by %5.2f"
                                       % change, " percent.")

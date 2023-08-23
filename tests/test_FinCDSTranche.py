@@ -74,7 +74,7 @@ def test_homogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 582.5015
+    assert round(v[3] * 10000, 4) == 582.3189
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(
@@ -136,7 +136,7 @@ def test_heterogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 868.4220
+    assert round(v[3] * 10000, 4) == 868.1327
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(

@@ -54,8 +54,7 @@ def test_BondConvertible():
                            call_prices,
                            put_dates,
                            put_prices,
-                           accrualBasis,
-                           face)
+                           accrualBasis)
 #    print(bond)
 
     dividend_dates = [Date(20, 3, 2007),

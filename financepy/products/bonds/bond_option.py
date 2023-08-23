@@ -40,7 +40,6 @@ class BondOption():
                  bond: Bond,
                  expiry_date: Date,
                  strike_price: float,
-                 face_amount: float,
                  option_type: OptionTypes):
 
         check_argument_types(self.__init__, locals())
@@ -49,7 +48,7 @@ class BondOption():
         self._strike_price = strike_price
         self._bond = bond
         self._option_type = option_type
-        self._face_amount = face_amount
+        self._par = 100.0
 
 ###############################################################################
 
@@ -115,7 +114,7 @@ class BondOption():
         # This is wasteful if model is Jamshidian but how to do neat design
         model.build_tree(tmat, df_times, df_values)
 
-        v = model.bond_option(texp, self._strike_price, self._face_amount,
+        v = model.bond_option(texp, self._strike_price, self._par,
                               coupon_times, coupon_flows, exercise_type)
 
         if self._option_type == OptionTypes.EUROPEAN_CALL \
@@ -135,7 +134,6 @@ class BondOption():
         s += label_to_string("EXPIRY DATE", self._expiry_date)
         s += label_to_string("STRIKE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount, "")
         s += "Underlying Bond\n"
         s += str(self._bond)
         return s

@@ -394,12 +394,10 @@ class CDSIndexPortfolio:
                                      index_maturity_dates,
                                      index_recovery_rate,
                                      tolerance=1e-6,
-                                     maxIterations=100):
+                                     maxIterations=200):
         """ Adjust individual CDS discount to reprice CDS index prices.
         This approach adjusts the hazard rates and so avoids the slowish
         CDS curve bootstrap required when a spread adjustment is made."""
-
-        raise FinError("This Function is being repaired. Do not use.")
 
         print("=========================================")
         print(valuation_date)
@@ -454,15 +452,16 @@ class CDSIndexPortfolio:
                     q1 = adjusted_issuer_curves[iCredit]._values[iMaturity]
                     q2 = adjusted_issuer_curves[iCredit]._values[iMaturity + 1]
                     q12 = q2 / q1
+
                     q12NEW = pow(q12, ratio)
                     q2NEW = q1 * q12NEW
-
+                    
                     adjusted_issuer_curves[iCredit]._values[iMaturity + 1] = q2NEW
 
                     index_maturity_date = index_maturity_dates[iMaturity]
 
                     # the CDS spreads we extract here 
-                    # should be the index maturity dates
+                    # should be to the index maturity dates
                     cdsIndex = CDS(valuation_date, 
                                    index_maturity_date, 
                                    0, 1.0)

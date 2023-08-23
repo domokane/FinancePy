@@ -52,7 +52,6 @@ class BondFRN:
                  quoted_margin: float,  # Fixed spread paid on top of index
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 face_amount: float = 100.0, 
                  calendar_type:CalendarTypes = CalendarTypes.WEEKEND):
         """ Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, accrual type. Face is the size of
@@ -67,9 +66,7 @@ class BondFRN:
         self._accrual_type = accrual_type
         self._coupon_dates = []
         self._frequency = annual_frequency(freq_type)
-        self._face_amount = face_amount  # This is the position size
         self._par = 100.0  # This is how price is quoted
-        self._redemption = 1.0  # This is amount paid at maturity TODO NOT USED
         self._calendar_type = calendar_type
         self._coupon_dates = []
         self._flow_amounts = []
@@ -112,7 +109,7 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
-        self.calc_accrued_interest(settlement_date, next_coupon)
+        self.accrued_interest(settlement_date, next_coupon, 1.0)
 
         day_counter = DayCount(self._accrual_type)
 
@@ -206,7 +203,7 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.calc_accrued_interest(settlement_date, next_coupon)
+        self.accrued_interest(settlement_date, next_coupon, 1.0)
         dy = 0.0001
 
         p0 = self.dirty_price_from_dm(settlement_date,
@@ -370,7 +367,7 @@ class BondFRN:
                                              future_ibor,
                                              dm)
 
-        accrued = self._accrued_interest(settlement_date, next_coupon)
+        accrued = self._accrued_interest(settlement_date, next_coupon, 1.0)
         accrued = accrued * self._par
 
         clean_price = dirty_price - accrued
@@ -387,10 +384,10 @@ class BondFRN:
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
-        self.calc_accrued_interest(settlement_date, next_coupon)
+        self.accrued_interest(settlement_date, next_coupon, 1.0)
 
         # Needs to be adjusted to par notional
-        accrued = self._accrued_interest * self._par / self._face_amount
+        accrued = self._accrued_interest * self._par
 
         dirty_price = clean_price + accrued
 
@@ -409,9 +406,10 @@ class BondFRN:
 
     ###############################################################################
 
-    def calc_accrued_interest(self,
-                              settlement_date: Date,
-                              next_coupon: float):
+    def accrued_interest(self,
+                         settlement_date: Date,
+                         next_coupon: float, 
+                         face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Ex-dividend dates are 
         not handled. Contact me if you need this functionality. """
@@ -436,7 +434,7 @@ class BondFRN:
 
         self._alpha = 1.0 - acc_factor * self._frequency
 
-        self._accrued_interest = acc_factor * self._face_amount * next_coupon
+        self._accrued_interest = acc_factor * face * next_coupon
         self._accrued_days = num
         return self._accrued_interest
 
@@ -462,7 +460,6 @@ class BondFRN:
                              self._quoted_margin * 10000.0)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount)
         return s
 
     ###############################################################################

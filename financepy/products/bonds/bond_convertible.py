@@ -53,7 +53,7 @@ def _value_convertible(tmat,
                        num_steps_per_year):
 
     interp = InterpTypes.FLAT_FWD_RATES.value
-
+    
     if len(coupon_times) > 0:
         if coupon_times[-1] > tmat:
             raise FinError("Coupon after maturity")
@@ -271,7 +271,6 @@ class BondConvertible:
                  put_dates: List[Date],  # list of put dates
                  put_prices: List[float],  # list of put prices
                  accrual_type: DayCountTypes,  # day count type for accrued
-                 face_amount: float = 100.0, 
                  calendar_types:CalendarTypes = CalendarTypes.WEEKEND):  # face amount
         """ Create BondConvertible object by providing the bond Maturity
         date, coupon, frequency type, accrual convention type and then all of
@@ -317,7 +316,7 @@ class BondConvertible:
             raise FinError("Conversion ratio is negative.")
 
         self._conversion_ratio = conversion_ratio
-        self._face_amount = face_amount
+        self._par = 100.0
 
         self._settlement_date = Date(1, 1, 1900)
         """ I do not determine cashflow dates as I do not want to require
@@ -351,7 +350,7 @@ class BondConvertible:
 
         self._pcd = self._coupon_dates[0]
         self._ncd = self._coupon_dates[1]
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
     ###############################################################################
 
@@ -479,7 +478,7 @@ class BondConvertible:
             raise FinError("Coupon times not monotonic")
 
         v1 = _value_convertible(tmat,
-                                self._face_amount,
+                                self._par,
                                 coupon_times,
                                 coupon_flows,
                                 call_times,
@@ -501,7 +500,7 @@ class BondConvertible:
                                 num_steps_per_year)
 
         v2 = _value_convertible(tmat,
-                                self._face_amount,
+                                self._par,
                                 coupon_times,
                                 coupon_flows,
                                 call_times,
@@ -547,8 +546,9 @@ class BondConvertible:
 
     ###############################################################################
 
-    def calc_accrued_interest(self,
-                              settlement_date: Date):
+    def accrued_interest(self,
+                         settlement_date: Date, 
+                         face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
 
@@ -567,7 +567,7 @@ class BondConvertible:
 
         self._alpha = 1.0 - acc_factor * self._frequency
 
-        self._accrued = acc_factor * self._face_amount * self._coupon
+        self._accrued = acc_factor * face * self._coupon
         self._accrued_days = num
         return self._accrued_interest
 
@@ -578,7 +578,7 @@ class BondConvertible:
         """ Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)"""
 
-        y = self._coupon * self._face_amount / clean_price
+        y = self._coupon * self._par / clean_price
         return y
 
     ###############################################################################
@@ -591,7 +591,6 @@ class BondConvertible:
         s += label_to_string("COUPON", self._coupon)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
-        s += label_to_string("FACE AMOUNT", self._face_amount)
         s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
         s += label_to_string("START CONVERT DATE", self._start_convert_date)
         s += label_to_string("CALL", "DATES")

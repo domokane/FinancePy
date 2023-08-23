@@ -70,7 +70,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a, num_time_steps)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN CALL - BK", strike_price, v)
@@ -81,7 +81,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a, num_time_steps)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN CALL - BK", strike_price, v)
@@ -103,7 +103,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN CALL - BK", strike_price, v)
@@ -114,7 +114,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN CALL - BK", strike_price, v)
@@ -132,7 +132,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN PUT - BK", strike_price, v)
@@ -143,7 +143,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("EUROPEAN PUT - BK", strike_price, v)
@@ -161,7 +161,7 @@ def test_BondOption():
         a = 0.1
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN PUT - BK", strike_price, v)
@@ -172,7 +172,7 @@ def test_BondOption():
         a = 0.05
 
         bond_option = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model = BKTree(sigma, a)
         v = bond_option.value(settlement_date, discount_curve, model)
         testCases.print("AMERICAN PUT - BK", strike_price, v)
@@ -213,25 +213,25 @@ def test_BondOptionAmericanConvergenceONE():
 
         option_type = OptionTypes.AMERICAN_PUT
         bond_option1 = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model1 = BKTree(sigma, a, num_time_steps)
         v1put = bond_option1.value(settlement_date, discount_curve, model1)
 
         option_type = OptionTypes.EUROPEAN_PUT
         bond_option2 = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model2 = BKTree(sigma, a, num_time_steps)
         v2put = bond_option2.value(settlement_date, discount_curve, model2)
 
         option_type = OptionTypes.AMERICAN_CALL
         bond_option1 = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model1 = BKTree(sigma, a, num_time_steps)
         v1call = bond_option1.value(settlement_date, discount_curve, model1)
 
         option_type = OptionTypes.EUROPEAN_CALL
         bond_option2 = BondOption(
-            bond, expiry_date, strike_price, face, option_type)
+            bond, expiry_date, strike_price, option_type)
         model2 = BKTree(sigma, a, num_time_steps)
         v2call = bond_option2.value(settlement_date, discount_curve, model2)
 
@@ -283,7 +283,7 @@ def test_BondOptionAmericanConvergenceTWO():
     if 1 == 1:
         K = 100.0
         bkModel = BKTree(sigma, a, 100)
-        europeanCallBondOption = BondOption(bond, expiry_date, K, face,
+        europeanCallBondOption = BondOption(bond, expiry_date, K,
                                             OptionTypes.EUROPEAN_CALL)
 
         v_ec = europeanCallBondOption.value(settlement_date, discount_curve,
@@ -299,22 +299,22 @@ def test_BondOptionAmericanConvergenceTWO():
 
         start = time.time()
 
-        europeanCallBondOption = BondOption(bond, expiry_date, K, face,
+        europeanCallBondOption = BondOption(bond, expiry_date, K,
                                             OptionTypes.EUROPEAN_CALL)
         v_ec = europeanCallBondOption.value(settlement_date, discount_curve,
                                             bkModel)
 
-        americanCallBondOption = BondOption(bond, expiry_date, K, face,
+        americanCallBondOption = BondOption(bond, expiry_date, K,
                                             OptionTypes.AMERICAN_CALL)
         v_ac = americanCallBondOption.value(settlement_date, discount_curve,
                                             bkModel)
 
-        europeanPutBondOption = BondOption(bond, expiry_date, K, face,
+        europeanPutBondOption = BondOption(bond, expiry_date, K,
                                            OptionTypes.EUROPEAN_PUT)
         v_ep = europeanPutBondOption.value(settlement_date, discount_curve,
                                            bkModel)
 
-        americanPutBondOption = BondOption(bond, expiry_date, K, face,
+        americanPutBondOption = BondOption(bond, expiry_date, K,
                                            OptionTypes.AMERICAN_PUT)
         v_ap = americanPutBondOption.value(settlement_date, discount_curve,
                                            bkModel)
@@ -404,22 +404,22 @@ def test_BondOptionZEROVOLConvergence():
 
             option_type = OptionTypes.EUROPEAN_CALL
             bond_option1 = BondOption(
-                bond, expiry_date, strike_price, face, option_type)
+                bond, expiry_date, strike_price, option_type)
             v1 = bond_option1.value(settlement_date, discount_curve, model)
 
             option_type = OptionTypes.AMERICAN_CALL
             bond_option2 = BondOption(
-                bond, expiry_date, strike_price, face, option_type)
+                bond, expiry_date, strike_price, option_type)
             v2 = bond_option2.value(settlement_date, discount_curve, model)
 
             option_type = OptionTypes.EUROPEAN_PUT
             bond_option3 = BondOption(
-                bond, expiry_date, strike_price, face, option_type)
+                bond, expiry_date, strike_price, option_type)
             v3 = bond_option3.value(settlement_date, discount_curve, model)
 
             option_type = OptionTypes.AMERICAN_PUT
             bond_option4 = BondOption(
-                bond, expiry_date, strike_price, face, option_type)
+                bond, expiry_date, strike_price, option_type)
             v4 = bond_option4.value(settlement_date, discount_curve, model)
 
             testCases.print(strike_price, num_steps,

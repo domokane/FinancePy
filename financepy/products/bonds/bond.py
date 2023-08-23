@@ -809,12 +809,11 @@ class Bond:
 
     ###########################################################################
 
-    def coupon_dates(self,
-        settlement_date: Date):
+    def bond_payments(self, settlement_date: Date, face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        flow = self._face_amount * self._coupon / self._frequency
+        flow = face * self._coupon / self._frequency
 
         flow_str = ""
 
@@ -823,7 +822,7 @@ class Bond:
             if dt > settlement_date:
                 flow_str += ("%12s %12.5f \n" % (dt, flow))
 
-        redemption_amount = self._face_amount + flow
+        redemption_amount = face + flow
         flow_str += ("%12s %12.5f \n"
                      % (self._coupon_dates[-1], redemption_amount))
 
@@ -831,12 +830,13 @@ class Bond:
 
     ###########################################################################
 
-    def print_coupon_dates(self,
-                    settlement_date: Date):
+    def print_bond_payments(self,
+                            settlement_date: Date, 
+                            face: (float) = 100.0):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        print(self.coupon_dates(settlement_date))
+        print(self.bond_payments(settlement_date, face))
 
     ###########################################################################
 
@@ -901,7 +901,7 @@ class Bond:
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. """
 
-        self.calc_accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
         dirty_price = self.dirty_price_from_survival_curve(settlement_date,
                                                          discount_curve,

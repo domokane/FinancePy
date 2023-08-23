@@ -24,7 +24,7 @@ from ...utils.helpers import check_argument_types
 useFlatHazardRateIntegral = True
 standard_recovery_rate = 0.40
 
-glob_num_steps_per_year = 25
+glob_num_steps_per_year = 52
 
 ###############################################################################
 # TODO: Perform protection leg pv analytically using fact that hazard rate and
@@ -150,7 +150,7 @@ def _protection_leg_pv_numba(teff,
 
     method = InterpTypes.FLAT_FWD_RATES.value
     dt = 1.0 / num_steps_per_year
-    num_steps = int((tmat-teff) * num_steps_per_year)
+    num_steps = int((tmat-teff) * num_steps_per_year + 0.50)
     dt = (tmat - teff) / num_steps
 
     t = teff
@@ -449,12 +449,15 @@ class CDS:
         bump = 0.0001  # 1 basis point
 
         for depo in new_issuer_curve._libor_curve._usedDeposits:
+
             depo._deposit_rate += bump
 
         for fra in new_issuer_curve._libor_curve._usedFRAs:
+
             fra._fraRate += bump
 
         for swap in new_issuer_curve._libor_curve._usedSwaps:
+
             cpn = swap._fixed_leg._coupon
             swap._fixed_leg._coupon = cpn + bump
 
@@ -530,7 +533,9 @@ class CDS:
 
         cleanPV = fwdDf * (prot_pv - self._running_coupon * cleanRPV01
                            * self._notional)
+
         clean_price = (self._notional - cleanPV) / self._notional * 100.0
+
         return clean_price
 
     ###############################################################################

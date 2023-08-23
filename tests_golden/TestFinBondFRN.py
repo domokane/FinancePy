@@ -215,8 +215,7 @@ def test_BondFRN():
                    maturity_date,
                    quoted_margin,
                    freq_type,
-                   accrual_type,
-                   face)
+                   accrual_type)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 96.793
@@ -325,8 +324,7 @@ def test_BondFRN():
                    maturity_date,
                    quoted_margin,
                    freq_type,
-                   accrual_type,
-                   face)
+                   accrual_type)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 93.08
