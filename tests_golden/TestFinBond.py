@@ -505,7 +505,7 @@ def test_BondExDividend():
 
     ###########################################################################
     testCases.banner("=======================================================")
-    testCases.header("SETTLEMENT", "ACCRUED")
+    testCases.header("SETTLEMENT", "DIRTY PRICE", "ACCRUED", "CLEAN PRICE")
 
     issue_date = Date(7, 9, 2000)
     maturity_date = Date(7, 9, 2020)
@@ -521,11 +521,16 @@ def test_BondExDividend():
 
     settlement_date = Date(25, 8, 2010)
 
+    ytm = 0.05
+    
     for _ in range(0, 13):
         settlement_date = settlement_date.add_days(1)
         accrued = bond.accrued_interest(
             settlement_date, face)
-        testCases.print(settlement_date, accrued)
+        dirty_price = bond.dirty_price_from_ytm(
+            settlement_date, ytm)
+        clean_price = dirty_price - accrued
+        testCases.print(settlement_date, dirty_price, accrued, clean_price)
 
 ###############################################################################
 

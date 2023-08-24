@@ -399,12 +399,13 @@ class CDSIndexPortfolio:
         This approach adjusts the hazard rates and so avoids the slowish
         CDS curve bootstrap required when a spread adjustment is made."""
 
-        print("=========================================")
-        print(valuation_date)
-        print(index_coupons)
-        print(index_up_fronts)
-        print(index_maturity_dates)
-        print(index_recovery_rate)
+        if 1==0:
+            print("=========================================")
+            print(valuation_date)
+            print(index_coupons)
+            print(index_up_fronts)
+            print(index_maturity_dates)
+            print(index_recovery_rate)
 
         num_credits = len(issuer_curves)
 
@@ -458,6 +459,9 @@ class CDSIndexPortfolio:
                     
                     adjusted_issuer_curves[iCredit]._values[iMaturity + 1] = q2NEW
 
+#                    if iMaturity == 0 and index_coupons[0] == 0.006:
+#                        print(iCredit, q1, q2NEW)
+
                     index_maturity_date = index_maturity_dates[iMaturity]
 
                     # the CDS spreads we extract here 
@@ -481,6 +485,8 @@ class CDSIndexPortfolio:
                 sumRPV01 /= num_credits
                 sumProt /= num_credits
 
+                spd = sumProt/sumRPV01
+
                 sumPrem = sumRPV01 * index_coupons[iMaturity]
 
                 numerator = index_up_fronts[iMaturity] + sumPrem
@@ -489,9 +495,8 @@ class CDSIndexPortfolio:
                 ratio = numerator / denominator
                 alpha *= ratio
 
-                print("Maturity:", iMaturity, "Num:", numerator, "Den:", denominator, "Ratio:", ratio, "Alpha:", alpha)
-
-            print("")
+#                print("Maturity:", iMaturity, "Num:", numerator, "Den:", denominator, "Ratio:", ratio, "Alpha:", alpha)
+#           print("")
 
         return adjusted_issuer_curves
 

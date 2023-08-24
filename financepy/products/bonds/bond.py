@@ -134,8 +134,8 @@ class Bond:
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._calendar_type = calendar_type
 
-        self._coupon_dates = []
-        self._payment_dates = []  # Actual payment dates are adjusted
+        self._coupon_dates = [] # can be holidays or weekend
+        self._payment_dates = []  # Actual payment dates are adjusted to bus days
         self._flow_amounts = []
 
         self._accrued_interest = None
@@ -223,7 +223,18 @@ class Bond:
         if convention not in YTMCalcType:
             raise FinError("Yield convention unknown." + str(convention))
 
-        self.accrued_interest(settlement_date)
+        # TODO check that no unneccesary calculations are being done
+        self.accrued_interest(settlement_date, 1.0)
+
+        #######################################################################
+        # HANDLE EX_DIVIDEND DATES
+        #######################################################################
+
+        pay_first_coupon = 1.0
+        if settlement_date > self._ex_div_date:
+            pay_first_coupon = 0.0
+        
+        #######################################################################
 
         ytm = np.array(ytm)  # VECTORIZED
         ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
@@ -248,18 +259,19 @@ class Bond:
 
         if convention == YTMCalcType.UK_DMO:
             if n == 0:
-                dp = (v ** (self._alpha)) * (1.0 + c / f)
+                dp = (v ** (self._alpha)) * (1.0 + pay_first_coupon * c / f)
             else:
-                term1 = (c / f)
+                term1 = (c / f) * pay_first_coupon
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
                 dp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
+#                print(term1, term2, term3, term4, v, self._alpha, dp)
         elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
                 dp = (v ** (self._alpha)) * (1.0 + c / f)
             else:
-                term1 = (c / f)
+                term1 = (c / f) * pay_first_coupon
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
@@ -270,7 +282,7 @@ class Bond:
                 vw = 1.0 / (1.0 + self._alpha * ytm / f)
                 dp = vw * (1.0 + c / f)
             else:
-                term1 = (c / f)
+                term1 = (c / f) * pay_first_coupon
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
@@ -289,7 +301,7 @@ class Bond:
                 vw = 1.0 / (1.0 + alpha * ytm)
                 dp = vw * (1.0 + c / f)
             else:
-                term1 = (c / f)
+                term1 = (c / f) * pay_first_coupon
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
@@ -504,7 +516,7 @@ class Bond:
         """ Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        dy = 0.0001
+        dy = 0.0001 # 1 basis point
         p0 = self.dirty_price_from_ytm(settlement_date, ytm - dy, convention)
         p1 = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         p2 = self.dirty_price_from_ytm(settlement_date, ytm + dy, convention)
@@ -558,11 +570,29 @@ class Bond:
         if settlement_date > self._maturity_date:
             raise FinError("Bond settles after it matures.")
 
+        self._calc_pcd_ncd(settlement_date)
+
+        cal = Calendar(self._calendar_type)
+
+        self._ex_div_date = cal.add_business_days(self._ncd, 
+                                                  -self._ex_div_days)
+
+        pay_first_coupon = 1.0
+        if settlement_date > self._ex_div_date:
+            pay_first_coupon = 0.0
+
         px = 0.0
         df = 1.0
         dfSettle = discount_curve.df(settlement_date)
 
-        for dt in self._coupon_dates[1:]:
+        dt = self._coupon_dates[1]
+        if dt > settlement_date:
+            df = discount_curve.df(dt)
+            flow = self._coupon / self._frequency
+            pv = flow * df 
+            px += pv * pay_first_coupon
+
+        for dt in self._coupon_dates[2:]:
 
             # coupons paid on a settlement date are paid to the seller
             if dt > settlement_date:
@@ -629,18 +659,8 @@ class Bond:
 
     ###########################################################################
 
-    def accrued_interest(self,
-                         settlement_date: Date,
-                         face:float = 100.0):
-        """ Calculate the amount of coupon that has accrued between the
-        previous coupon date and the settlement date. Note that for some day
-        count schemes (such as 30E/360) this is not actually the number of days
-        between the previous coupon payment date and settlement date. If the
-        bond trades with ex-coupon dates then you need to supply the number of
-        days before the coupon date the ex-coupon date is. You can specify the
-        calendar to be used in the bond constructor - NONE means only calendar 
-        days, WEEKEND is only weekends or you can specify a country calendar 
-        for business days."""
+    def _calc_pcd_ncd(self,
+                      settlement_date: Date):
 
         num_flows = len(self._coupon_dates)
 
@@ -654,22 +674,43 @@ class Bond:
                 self._ncd = self._coupon_dates[iFlow]
                 break
 
+    ###########################################################################
+    
+    def accrued_interest(self,
+                         settlement_date: Date,
+                         face:float = 100.0):
+        """ Calculate the amount of coupon that has accrued between the
+        previous coupon date and the settlement date. Note that for some day
+        count schemes (such as 30E/360) this is not actually the number of days
+        between the previous coupon payment date and settlement date. If the
+        bond trades with ex-coupon dates then you need to use the number of
+        days before the coupon date the ex-coupon date is. You can specify the
+        calendar to be used in the bond constructor - NONE means only calendar 
+        days, WEEKEND is only weekends or you can specify a country calendar 
+        for business days."""
+
+        self._calc_pcd_ncd(settlement_date)
+
         dc = DayCount(self._accrual_type)
         cal = Calendar(self._calendar_type)
 
-        ex_div_date = cal.add_business_days(
-            self._ncd, -self._ex_div_days)
+        self._ex_div_date = cal.add_business_days(self._ncd, 
+                                                  -self._ex_div_days)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
                                             settlement_date,
                                             self._ncd,
                                             self._freq_type)
 
-        if settlement_date > ex_div_date:
-            acc_factor = acc_factor - 1.0 / self._frequency
-
         self._alpha = 1.0 - acc_factor * self._frequency
-        self._accrued_interest = acc_factor * self._coupon * face
+
+        if settlement_date > self._ex_div_date:
+            self._accrued_interest = acc_factor - 1.0 / self._frequency
+        else:
+            self._accrued_interest = acc_factor
+
+        self._accrued_interest *= self._coupon * face
+            
         self._accrued_days = num
         
         return self._accrued_interest

@@ -24,7 +24,7 @@ from ...utils.helpers import check_argument_types
 useFlatHazardRateIntegral = True
 standard_recovery_rate = 0.40
 
-glob_num_steps_per_year = 52
+glob_num_steps_per_year = 25
 
 ###############################################################################
 # TODO: Perform protection leg pv analytically using fact that hazard rate and
@@ -190,9 +190,7 @@ def _protection_leg_pv_numba(teff,
 
     prot_pv = prot_pv * (1.0 - contract_recovery_rate)
 
-#    print("ProtPV", teff, tmat, prot_pv)
     return prot_pv
-
 
 ###############################################################################
 ###############################################################################
@@ -248,6 +246,7 @@ class CDS:
 
     def _generate_adjusted_cds_payment_dates(self):
         """ Generate CDS payment dates which have been holiday adjusted."""
+
         frequency = annual_frequency(self._freq_type)
         calendar = Calendar(self._calendar_type)
         start_date = self._step_in_date
@@ -540,97 +539,6 @@ class CDS:
 
     ###############################################################################
 
-    def risky_pv01_old(self,
-                       valuation_date,
-                       issuer_curve,
-                       pv01_method=0):
-        """ RiskyPV01 of the contract using the OLD method. """
-
-        payment_dates = self._payment_dates
-        day_count = DayCount(self._day_count_type)
-
-        couponAccruedIndicator = 1
-
-        # Method 0 : This is the market standard which assumes that the coupon
-        # accrued is treated as though on average default occurs roughly midway
-        # through a coupon period.
-
-        teff = self._step_in_date
-        # TODO: Is this correct when FORWARD?
-        pcd = self._accrual_start_dates[0]  # PCD
-        ncd = self._accrual_start_dates[1]  # NCD
-
-        # The first coupon is a special case which must be handled carefully
-        # taking into account what coupon has already accrued and what has not
-        qeff = issuer_curve.survivalProbability(teff)
-        q1 = issuer_curve.survivalProbability(ncd)
-        z1 = issuer_curve.df(ncd)
-
-        # this is the part of the coupon accrued from the previous coupon date
-        # to now
-        accrual_factorPCDToNow = day_count.year_frac(pcd, teff)[0]
-
-        # full first coupon is paid at the end of the current period if the
-        year_frac = day_count.year_frac(pcd, ncd)[0]
-
-        # reference credit survives to the premium payment date
-        fullRPV01 = q1 * z1 * year_frac
-
-        # coupon accrued from previous coupon to today paid in full at default
-        # before coupon payment
-        fullRPV01 = fullRPV01 + z1 * \
-            (qeff - q1) * accrual_factorPCDToNow * couponAccruedIndicator
-
-        # future accrued from now to coupon payment date assuming default
-        # roughly midway
-        fullRPV01 = fullRPV01 + 0.5 * z1 * \
-            (qeff - q1) * (year_frac - accrual_factorPCDToNow) \
-            * couponAccruedIndicator
-
-        for it in range(2, len(payment_dates)):
-
-            t1 = payment_dates[it - 1]
-            t2 = payment_dates[it]
-            q2 = issuer_curve.survivalProbability(t2)
-            z2 = issuer_curve.df(t2)
-
-            accrual_factor = day_count.year_frac(t1, t2)[0]
-
-            # full coupon is paid at the end of the current period if survives
-            # to payment date
-            fullRPV01 += q2 * z2 * accrual_factor
-
-            ###################################################################
-
-            if couponAccruedIndicator == 1:
-
-                if useFlatHazardRateIntegral:
-                    # This needs to be updated to handle small h+r
-                    tau = accrual_factor
-                    h12 = -log(q2 / q1) / tau
-                    r12 = -log(z2 / z1) / tau
-                    alpha = h12 + r12
-                    expTerm = 1.0 - exp(-alpha * tau) - \
-                        alpha * tau * exp(-alpha * tau)
-                    dfullRPV01 = q1 * z1 * h12 * \
-                        expTerm / abs(alpha * alpha + 1e-20)
-                else:
-                    dfullRPV01 = 0.50 * (q1 - q2) * z2 * accrual_factor
-
-                fullRPV01 = fullRPV01 + dfullRPV01
-
-            ###################################################################
-
-            q1 = q2
-
-        cleanRPV01 = fullRPV01 - accrual_factorPCDToNow
-
-        #        print("OLD PV01",fullRPV01, cleanRPV01)
-
-        return {'dirty_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
-
-    ###############################################################################
-
     def accrued_days(self):
         """ Number of days between the previous coupon and the currrent step
         in date. """
@@ -726,7 +634,6 @@ class CDS:
         fullRPV01 = valueRPV01[0]
         cleanRPV01 = valueRPV01[1]
 
-        #        print("NEW PV01",fullRPV01, cleanRPV01)
         return {'dirty_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
     ###############################################################################
