@@ -1,4 +1,15 @@
 # Latest News and Versions
+24 August 2023 - Version 0.31 released
+
+Schedule 
+- Corrected bug in schedule generation
+- Corrected bug in CDS protection leg integral
+Bond Classes have been amended
+- Changed full price to dirty price in functions UPDATE YOUR CODE PLEASE
+- Removed face amount from bond class - how much you buy is not intrinsic to a bond
+- Made number of ex-dividend days a member of bond class
+- Revised acccrued and principal functions to take face amount as input
+
 29 May 2023 - Version 0.30 released
 - Added PrettyPrint to required dependencies
 

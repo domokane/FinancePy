@@ -269,13 +269,11 @@ class SwapFloatLeg:
         print("FREQUENCY:", str(self._freq_type))
         print("DAY COUNT:", str(self._day_count_type))
 
-        self.print_payments()
-
         if len(self._payments) == 0:
             print("Payments not calculated.")
             return
 
-        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL", 
+        header = [ "PAY_NUM", "PAY_DATE",  "NOTIONAL",
                   "IBOR", "PMNT", "DF", "PV", "CUM_PV"]
 
         rows = []          
