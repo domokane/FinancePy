@@ -1,5 +1,6 @@
 # Latest News and Versions
 24 August 2023 - Version 0.31 released
+
 Schedule 
 - Corrected bug in schedule generation
 - Corrected bug in CDS protection leg integral
