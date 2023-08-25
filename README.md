@@ -4,11 +4,13 @@
 Schedule 
 - Corrected bug in schedule generation
 - Corrected bug in CDS protection leg integral
-Bond Classes have been amended
-- Changed full price to dirty price in functions UPDATE YOUR CODE PLEASE
+Many Bond Classes have been amended
+- Changed FULL price to DIRTY price in functions UPDATE YOUR CODE PLEASE. APOLS for inconvenience.
 - Removed face amount from bond class - how much you buy is not intrinsic to a bond
 - Made number of ex-dividend days a member of bond class
+- Added adjustment for ex-dividend dates to yield calculations
 - Revised acccrued and principal functions to take face amount as input
+- Updated document
 
 29 May 2023 - Version 0.30 released
 - Added PrettyPrint to required dependencies
