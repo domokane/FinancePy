@@ -5,7 +5,7 @@ Schedule
 - Corrected bug in schedule generation
 - Corrected bug in CDS protection leg integral
 Many Bond Classes have been amended
-- Changed full price to dirty price in functions UPDATE YOUR CODE PLEASE
+- Changed FULL price to DIRTY price in functions UPDATE YOUR CODE PLEASE. APOLS for inconvenience.
 - Removed face amount from bond class - how much you buy is not intrinsic to a bond
 - Made number of ex-dividend days a member of bond class
 - Added adjustment for ex-dividend dates to yield calculations
