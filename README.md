@@ -7,6 +7,7 @@
 Schedule 
 - Corrected bug in schedule generation
 - Corrected bug in CDS protection leg integral
+
 Many Bond Classes have been amended
 - Changed FULL price to DIRTY price in functions UPDATE YOUR CODE PLEASE. APOLS for inconvenience.
 - Removed face amount from bond class - how much you buy is not intrinsic to a bond
