@@ -663,7 +663,35 @@ def test_key_rate_durations_Bloomberg_example():
 
 ###############################################################################
 
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+
+def test_oas():
+    
+    issue_date = Date(15, 5, 2010)
+    maturity_date = Date(15, 5, 2027)
+    coupon = 0.02375
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    face = 100.0 # By setting the face to 100 we expect a price of par to be 100.0
+
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+
+    liborFlatRate = 0.0275
+    settlement_date = Date(21, 7, 2017)
+
+    liborFlatCurve = DiscountCurveFlat(settlement_date, liborFlatRate, FrequencyTypes.SEMI_ANNUAL)
+    
+    clean_price = 99.780842  # I specified face to be 100 - if face is 1 then this must be 0.99780842
+    
+    oas = bond.option_adjusted_spread(settlement_date, clean_price, liborFlatCurve) * 10000
+    
+    if (oas - (-34.95)) > 0.01:
+        print("OAS incorrect")
+    
+###############################################################################
+
 test_Bond()
+test_oas()
 test_BondExDividend()
 test_BondPaymentDates()
 test_Bond_ror()

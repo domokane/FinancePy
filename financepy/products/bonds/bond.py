@@ -546,7 +546,7 @@ class Bond:
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date. """
 
-        self.accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, self._par)
         dirty_price = self.dirty_price_from_discount_curve(settlement_date,
                                                          discount_curve)
 
@@ -732,7 +732,7 @@ class Bond:
         respect to the clean price. """
 
         clean_price = np.array(clean_price)
-        self.accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
         accrued_amount = self._accrued_interest * self._par
         bondPrice = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
@@ -780,7 +780,7 @@ class Bond:
         """ Calculate the full price of the bond from its OAS given the bond
         settlement date, a discount curve and the oas as a number. """
 
-        self.accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
         f = self._frequency
         c = self._coupon
 
@@ -823,11 +823,11 @@ class Bond:
             raise FinError("Unknown type for clean_price "
                            + str(type(clean_price)))
 
-        self.accrued_interest(settlement_date)
+        self.accrued_interest(settlement_date, 1.0)
 
         accrued_amount = self._accrued_interest * self._par
         dirty_prices = clean_prices + accrued_amount
-
+       
         oass = []
 
         for dirty_price in dirty_prices:
