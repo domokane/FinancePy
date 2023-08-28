@@ -1,4 +1,7 @@
 # Latest News and Versions
+28 August 2023 - version 0.32 released
+- Fixed bug in Bond OAS and ASW
+
 24 August 2023 - Version 0.31 released
 
 Schedule 
