@@ -27,7 +27,7 @@ plotGraphs = False
 def test_bond_zero():
     issue_date = Date(25, 7, 2022)
     maturity_date = Date(24, 10, 2022)
-    face_amount = ONE_MILLION
+    face_amount = 100.0
     issue_price = 99.6410
 
     bond = BondZero(issue_date=issue_date,
@@ -37,10 +37,12 @@ def test_bond_zero():
     settlement_date = Date(8, 8, 2022)
 
     clean_price = 99.6504
+
     ytm = bond.yield_to_maturity(settlement_date,
                                  clean_price,
                                  YTMCalcType.ZERO)
-    accrued_interest = bond.accrued_interest(settlement_date, 1.0)
+
+    accrued_interest = bond.accrued_interest(settlement_date, face_amount)
 
     testCases.header('YTM', 'accrued')
     testCases.print(ytm, accrued_interest)
