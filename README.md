@@ -1,9 +1,13 @@
 # Latest News and Versions
+28 August 2023 - version 0.32 released
+- Fixed bug in Bond OAS and ASW
+
 24 August 2023 - Version 0.31 released
 
 Schedule 
 - Corrected bug in schedule generation
 - Corrected bug in CDS protection leg integral
+
 Many Bond Classes have been amended
 - Changed FULL price to DIRTY price in functions UPDATE YOUR CODE PLEASE. APOLS for inconvenience.
 - Removed face amount from bond class - how much you buy is not intrinsic to a bond
