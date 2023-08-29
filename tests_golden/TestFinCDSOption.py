@@ -317,14 +317,17 @@ def test_dirty_priceCDSwaption():
     testCases.print("Maturity Date:", str(maturity_date))
     testCases.print("CDS Coupon:", cdsCoupon)
 
-    testCases.header("STRIKE", "DIRTY VALUE", "IMPLIED VOL")
+    testCases.header("STRIKE", "LONG PROTECTION", "DIRTY VALUE", "IMPLIED VOL")
 
     for strike in np.linspace(100, 300, 41):
 
+        long_protection = True # long protection
+        
         cdsOption = CDSOption(expiry_date,
                               maturity_date,
                               strike / 10000.0,
-                              notional)
+                              notional, 
+                              long_protection)
 
         v = cdsOption.value(valuation_date,
                             issuer_curve,
@@ -334,7 +337,27 @@ def test_dirty_priceCDSwaption():
                                            issuer_curve,
                                            v)
 
-        testCases.print(strike, v, vol)
+        testCases.print(strike, long_protection, v, vol)
+
+    for strike in np.linspace(100, 300, 41):
+
+        long_protection = False # long protection
+        
+        cdsOption = CDSOption(expiry_date,
+                              maturity_date,
+                              strike / 10000.0,
+                              notional, 
+                              long_protection)
+
+        v = cdsOption.value(valuation_date,
+                            issuer_curve,
+                            volatility)
+
+        vol = cdsOption.implied_volatility(valuation_date,
+                                           issuer_curve,
+                                           v)
+
+        testCases.print(strike, long_protection, v, vol)
 
 ##########################################################################
 
