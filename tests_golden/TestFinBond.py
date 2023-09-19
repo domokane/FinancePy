@@ -235,7 +235,7 @@ def test_Bond():
     settlement_date = Date(19, 9, 2012)
     face = ONE_MILLION
     ex_div_days = 0
-    
+
     for accrual_type in DayCountTypes:
         if accrual_type == DayCountTypes.ZERO:
             continue
@@ -272,7 +272,7 @@ def test_Bond():
     coupon = 0.085
     ex_div_days = 0
     face = 1000000.0
-    
+
     freq_type = FrequencyTypes.SEMI_ANNUAL
 
     bond = Bond(issue_date, maturity_date,
@@ -290,7 +290,7 @@ def test_Bond():
 
     ytm = bond.yield_to_maturity(settlement_date, clean_price)
     testCases.print("Yield to Maturity = ", ytm)
-    
+
     bump = 1e-4
     priceBumpedUp = bond.dirty_price_from_ytm(settlement_date, y + bump)
     testCases.print("Price Bumped Up:", priceBumpedUp)
@@ -368,18 +368,18 @@ def test_Bond():
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     ex_div_days = 0
     face = 1000000.0
-    
+
     bond = Bond(issue_date,
                 maturity_date,
                 coupon,
                 freq_type,
                 accrual_type,
-                ex_div_days, 
+                ex_div_days,
                 CalendarTypes.UNITED_STATES)
 
     testCases.header("FIELD", "VALUE")
     clean_price = 99.7808417
-        
+
     yld = bond.current_yield(clean_price)
     testCases.print("Current Yield = ", yld)
 
@@ -395,7 +395,7 @@ def test_Bond():
                                  YTMCalcType.US_TREASURY)
     testCases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm, 
+    dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm,
                                           YTMCalcType.US_TREASURY)
     testCases.print("Dirty Price = ", dirty_price)
 
@@ -409,9 +409,9 @@ def test_Bond():
     accddays = bond._accrued_days
     testCases.print("Accrued Days = ", accddays)
 
-    duration = bond.dollar_duration(settlement_date, ytm, YTMCalcType.US_STREET) 
+    duration = bond.dollar_duration(settlement_date, ytm, YTMCalcType.US_STREET)
     testCases.print("Dollar Duration = ", duration)
-    
+
     modified_duration = bond.modified_duration(settlement_date, ytm)
     testCases.print("Modified Duration = ", modified_duration)
 
@@ -434,7 +434,7 @@ def test_Bond():
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
     ex_div_days = 0
     face = 100.0
-    
+
     bond = Bond(issue_date, maturity_date,
                 coupon, freq_type, accrual_type, ex_div_days)
 
@@ -467,7 +467,7 @@ def test_Bond():
 
     accrued_interest = bond.accrued_interest(settlement_date, face)
     testCases.print("Accrued", accrued_interest)
-    
+
     duration = bond.dollar_duration(settlement_date, ytm)
     testCases.print("Dollar Duration", duration)
 
@@ -522,7 +522,7 @@ def test_BondExDividend():
     settlement_date = Date(25, 8, 2010)
 
     ytm = 0.05
-    
+
     for _ in range(0, 13):
         settlement_date = settlement_date.add_days(1)
         accrued = bond.accrued_interest(
@@ -537,7 +537,7 @@ def test_BondExDividend():
 def test_BondPaymentDates():
     from financepy.products.bonds.bond import Bond
     from financepy.utils import Date, DayCountTypes, FrequencyTypes
-    
+
     bond = Bond(
             issue_date=Date(7, 6, 2021),
             maturity_date=Date(7, 6, 2031),
@@ -581,7 +581,7 @@ def test_Bond_ror():
 
 def test_Bond_eom():
 
-    # Bonds that mature on an EOM date have flows on EOM dates    
+    # Bonds that mature on an EOM date have flows on EOM dates
     issue_date = Date(30, 11, 2022)
     settle_date = Date(6, 2, 2023)
     maturity_date = Date(30, 11, 2024)
@@ -593,7 +593,7 @@ def test_Bond_eom():
     bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type, ex_div_days)
 
     ai = bond.accrued_interest(settle_date) # should be 8406.593406
-    
+
 ###############################################################################
 
 def test_key_rate_durations():
@@ -634,7 +634,7 @@ def test_key_rate_durations_Bloomberg_example():
     coupon = 2.75/100.0
     face = 100.0
     ex_div_days = 0
-    
+
     accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
     BondMarkets.UNITED_STATES)
 
@@ -646,14 +646,14 @@ def test_key_rate_durations_Bloomberg_example():
     # US Street yield on Bloomberg as of 20 April 2023
     # with settle date 24 April 2023
     ytm = 3.725060/100
-    
+
     # Details of yields of market bonds at KRD maturity points
     my_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10])
     my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272,  3.5825,  3.5347])/100
 
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date, 
-                                                                  ytm, 
-                                                                  key_rate_tenors = my_tenors, 
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date,
+                                                                  ytm,
+                                                                  key_rate_tenors = my_tenors,
                                                                   rates = my_rates)
 
 #    print(key_rate_tenors)
@@ -666,7 +666,7 @@ def test_key_rate_durations_Bloomberg_example():
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 def test_oas():
-    
+
     issue_date = Date(15, 5, 2010)
     maturity_date = Date(15, 5, 2027)
     coupon = 0.02375
@@ -680,14 +680,40 @@ def test_oas():
     settlement_date = Date(21, 7, 2017)
 
     liborFlatCurve = DiscountCurveFlat(settlement_date, liborFlatRate, FrequencyTypes.SEMI_ANNUAL)
-    
+
     clean_price = 99.780842  # I specified face to be 100 - if face is 1 then this must be 0.99780842
-    
+
     oas = bond.option_adjusted_spread(settlement_date, clean_price, liborFlatCurve) * 10000
-    
+
     if (oas - (-34.95)) > 0.01:
         print("OAS incorrect")
-    
+
+###############################################################################
+
+# def test_div_dates():
+
+issueDate = Date(15, 5, 2020)
+maturityDate = Date(15, 5, 2035)
+coupon = 0.02375
+freqType = FrequencyTypes.SEMI_ANNUAL
+accrualType = DayCountTypes.ACT_ACT_ICMA
+face = 125000
+
+bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType, face)
+
+print(bond)
+
+cleanPrice = 99.7808417 # if face is 1 then this must be 0.99780842
+
+settlementDate = Date(15, 5, 2023)
+print(bond.bond_payments(settlementDate, face))
+
+current_yield = bond.current_yield(cleanPrice)*100
+print("Current Yield %12.7f %%" % (current_yield))
+
+ytm = bond.yield_to_maturity(settlementDate, cleanPrice)
+print("Yield to maturity %12.7f %%" % (ytm))
+
 ###############################################################################
 
 test_Bond()
