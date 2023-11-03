@@ -154,7 +154,8 @@ class CDSIndexOption:
             self._strike_coupon,
             1.0)
 
-        strikeCurve = CDSCurve(valuation_date, [strikeCDS], libor_curve, index_recovery)
+        strikeCurve = CDSCurve(valuation_date, [strikeCDS], libor_curve,
+                               index_recovery)
         strikeRPV01s = strikeCDS.risky_pv01(valuation_date, strikeCurve)
         qToExpiry = strikeCurve.survival_prob(time_to_expiry)
         strikeValue = (k - c) * strikeRPV01s['clean_rpv01']

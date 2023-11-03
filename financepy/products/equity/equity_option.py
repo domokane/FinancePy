@@ -53,8 +53,10 @@ class EquityOption:
         v = self.value(valuation_date, stock_price, discount_curve,
                        dividend_curve, model)
 
-        vBumped = self.value(valuation_date, stock_price + bump, discount_curve,
-                             dividend_curve, model)
+        vBumped = self.value(valuation_date, stock_price + bump,
+                             discount_curve,
+                             dividend_curve,
+                             model)
 
         delta = (vBumped - v) / bump
         return delta
@@ -73,10 +75,12 @@ class EquityOption:
         v = self.value(valuation_date, stock_price, discount_curve,
                        dividend_curve, model)
 
-        vBumpedDn = self.value(valuation_date, stock_price - bump, discount_curve,
+        vBumpedDn = self.value(valuation_date, stock_price - bump,
+                               discount_curve,
                                dividend_curve, model)
 
-        vBumpedUp = self.value(valuation_date, stock_price + bump, discount_curve,
+        vBumpedUp = self.value(valuation_date, stock_price + bump,
+                               discount_curve,
                                dividend_curve, model)
 
         gamma = (vBumpedUp - 2.0 * v + vBumpedDn) / bump / bump
@@ -93,7 +97,7 @@ class EquityOption:
         """ Calculation of option vega by perturbing vol and revaluation. """
 
         bump = 0.01
-        
+
         v = self.value(valuation_date, stock_price, discount_curve,
                        dividend_curve, model)
 
@@ -102,7 +106,7 @@ class EquityOption:
         vBumped = self.value(valuation_date, stock_price, discount_curve,
                              dividend_curve, model)
 
-        vega = (vBumped - v) # / bump
+        vega = (vBumped - v)
         return vega
 
 ##############################################################################
@@ -141,8 +145,8 @@ class EquityOption:
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
               model):
-        """ Calculation of option theta by perturbing value date by one 
-        calendar date (not a business date) and then doing revaluation and 
+        """ Calculation of option theta by perturbing value date by one
+        calendar date (not a business date) and then doing revaluation and
         calculating the difference divided by dt = 1 / gDaysInYear. """
 
         v = self.value(valuation_date, stock_price,

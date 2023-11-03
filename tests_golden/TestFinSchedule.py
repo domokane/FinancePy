@@ -459,7 +459,7 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
 
     compare = (
         sched1._adjusted_dates[-1] == sched2._adjusted_dates[len(sched1._adjusted_dates)-1])
-    assert(compare == True)
+    assert( compare == True )
 
 ###############################################################################
 

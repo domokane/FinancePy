@@ -106,7 +106,7 @@ class EquityVanillaOption():
                   dividend_curve: DiscountCurve):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if isinstance(self._expiry_date, Date):
@@ -149,22 +149,22 @@ class EquityVanillaOption():
               model: Model):
         """ Equity Vanilla Option valuation using Black-Scholes model. """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if isinstance(self._expiry_date, list):
             if any(valuation_date > self._expiry_date):
-                raise FinError(f"Valuation date after one or more expiry dates.")
+                raise FinError("Valuation date after expiry dates.")
         elif valuation_date > self._expiry_date:
-            raise FinError(f"Valuation date after expiry date.")
+            raise FinError("Valuation date after expiry date.")
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         if isinstance(self._expiry_date, Date):
             texp = (self._expiry_date - valuation_date) / gDaysInYear
@@ -189,7 +189,7 @@ class EquityVanillaOption():
 
         texp = np.maximum(texp, 1e-10)
 
-        # Extract the discount. Adjust if the value date is not same as curve date
+        # Extract the discount. Adjust if tvalue date is not same as curve date
         # I decided to put an error message - may reconsider
         df_expiry = discount_curve.df(self._expiry_date)
         # df_value = discount_curve.df(valuation_date)
@@ -469,7 +469,7 @@ class EquityVanillaOption():
                            discount_curve: DiscountCurve,
                            dividend_curve: DiscountCurve,
                            price):
-        """ Calculate the Black-Scholes implied volatility of a European 
+        """ Calculate the Black-Scholes implied volatility of a European
         vanilla option. """
 
         texp = (self._expiry_date - valuation_date) / gDaysInYear

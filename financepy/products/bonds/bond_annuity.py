@@ -62,7 +62,7 @@ class BondAnnuity:
         the bond's cash flows. """
 
         dirty_price = self.dirty_price_from_discount_curve(settlement_date,
-                                                         discount_curve)
+                                                           discount_curve)
         accrued = self._accrued_interest * self._par
         clean_price = dirty_price - accrued
         return clean_price
@@ -70,8 +70,8 @@ class BondAnnuity:
     ###########################################################################
 
     def dirty_price_from_discount_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using some discount curve to present-value
         the bond's cash flows. """
 
@@ -91,7 +91,7 @@ class BondAnnuity:
     ###########################################################################
 
     def calculate_payments(self,
-                           settlement_date: Date, 
+                           settlement_date: Date,
                            face: (float)):
 
         # No need to generate flows if settlement date has not changed
@@ -106,11 +106,11 @@ class BondAnnuity:
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._coupon_dates = Schedule(settlement_date,
-                                    self._maturity_date,
-                                    self._freq_type,
-                                    self._calendar_type,
-                                    bus_day_rule_type,
-                                    date_gen_rule_type)._generate()
+                                      self._maturity_date,
+                                      self._freq_type,
+                                      self._calendar_type,
+                                      bus_day_rule_type,
+                                      date_gen_rule_type)._generate()
 
         self._pcd = self._coupon_dates[0]
         self._ncd = self._coupon_dates[1]
@@ -130,7 +130,7 @@ class BondAnnuity:
     ###########################################################################
 
     def accrued_interest(self,
-                         settlement_date: Date, 
+                         settlement_date: Date,
                          face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """

@@ -51,8 +51,8 @@ def _f(s0, *args):
 ###############################################################################
 
 
-@njit(fastmath=True, cache=True, nogil=True)
-def _value_once(stock_price,
+@njit(fastmath=True, cache=True)
+def _value_once(s,
                 r,
                 q,
                 volatility,
@@ -100,8 +100,8 @@ def _value_once(stock_price,
         periodDiscountFactors[iTime] = np.exp(-r * dt2)
 
     stock_values = np.zeros(num_nodes)
-    stock_values[0] = stock_price
-    sLow = stock_price
+    stock_values[0] = s
+    sLow = s
 
     for iTime in range(1, num_steps1 + 1):
         sLow *= d1
@@ -283,7 +283,7 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132. """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._cExpiryDate:
@@ -294,11 +294,11 @@ class EquityCompoundOption(EquityOption):
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         # If the option has any American feature then use the tree
         if self._cOptionType == OptionTypes.AMERICAN_CALL or\

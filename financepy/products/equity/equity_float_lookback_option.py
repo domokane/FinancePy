@@ -66,7 +66,7 @@ class EquityFloatLookbackOption(EquityOption):
         """ Valuation of the Floating Lookback option using Black-Scholes using
         the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -74,11 +74,11 @@ class EquityFloatLookbackOption(EquityOption):
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
         df = discount_curve.df(self._expiry_date)

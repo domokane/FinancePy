@@ -91,7 +91,7 @@ class CDSTranche:
                                  self._bus_day_adjust_type,
                                  self._date_gen_rule_type)
 
-    ###############################################################################
+    ###########################################################################
 
     def value_bc(self,
                  valuation_date,
@@ -141,8 +141,8 @@ class CDSTranche:
             beta_vector2[bb] = beta2
 
         qVector = np.zeros(num_credits)
-        qt1 = np.zeros(num_times) # include 1.0
-        qt2 = np.zeros(num_times) # include 1.0
+        qt1 = np.zeros(num_times)  # include 1.0
+        qt2 = np.zeros(num_times)  # include 1.0
 
         trancheTimes = np.zeros(num_times)
         trancheSurvivalCurve = np.zeros(num_times)

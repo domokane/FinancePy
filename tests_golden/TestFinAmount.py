@@ -2,19 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.utils.currency import CurrencyTypes
 from financepy.utils.amount import Amount
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 import sys
 sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
 
-def test_Amount():
+def test_amount():
 
     testCases.header("LABEL", "AMOUNT")
     x = Amount(101000.232)
@@ -28,6 +29,6 @@ def test_Amount():
 ###############################################################################
 
 
-test_Amount()
+test_amount()
 
 testCases.compareTestCases()

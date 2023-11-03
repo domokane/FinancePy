@@ -67,8 +67,8 @@ class BondEmbeddedOption:
         self._freq_type = freq_type
         self._accrual_type = accrual_type
 
-        ex_div_days= 0
-        
+        ex_div_days = 0
+
         self._bond = Bond(issue_date,
                           maturity_date,
                           coupon,

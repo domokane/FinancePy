@@ -88,8 +88,8 @@ class CDSIndexPortfolio:
         intrinsic_prot_pv = 0.0
 
         # All contracts have same flows so only need one object
-        cds_contract = CDS(step_in_date, 
-                           maturity_date, 
+        cds_contract = CDS(step_in_date,
+                           maturity_date,
                            0.0,
                            1.0)
 
@@ -189,7 +189,8 @@ class CDSIndexPortfolio:
 
         if num_credits < 1:
             raise FinError(
-                "Number of credits in index must be > 1 and not" + str(num_credits))
+                "Number of credits in index must be > 1 and not"
+                + str(num_credits))
 
         cds_contract = CDS(step_in_date,
                            maturity_date,
@@ -218,7 +219,8 @@ class CDSIndexPortfolio:
 
         if num_credits < 1:
             raise FinError(
-                "Number of credits in index must be > 1 and not " + str(num_credits))
+                "Number of credits in index must be > 1 and not "
+                + str(num_credits))
 
         cds_contract = CDS(step_in_date,
                            maturity_date,
@@ -252,7 +254,8 @@ class CDSIndexPortfolio:
 
         if num_credits < 1:
             raise FinError(
-                "Number of credits in index must be > 1 and not " + str(num_credits))
+                "Number of credits in index must be > 1 and not "
+                + str(num_credits))
 
         libor_curve = issuer_curves[0]._libor_curve
         numIndexMaturityPoints = len(index_coupons)
@@ -268,7 +271,7 @@ class CDSIndexPortfolio:
             n = len(issuer_curve._cds_contracts)
             if n != len(cdsMaturityDates):
                 raise FinError(
-                    "All issuer discount must be built from same cds maturities")
+                    "All issuer discount must be from same cds maturities")
 
         cdsSpreadMultipliers = [1.0] * numCDSMaturityPoints
 
@@ -305,8 +308,7 @@ class CDSIndexPortfolio:
                 numIterations += 1
 
                 if numIterations > 20:
-                    raise FinError(
-                        "Num iterations > 20. Increase limit or reduce tolerance or check inputs.")
+                    raise FinError("Num iterations > 20.")
 
                 sumRPV01 = 0.0
                 sumProt = 0.0
@@ -399,7 +401,7 @@ class CDSIndexPortfolio:
         This approach adjusts the hazard rates and so avoids the slowish
         CDS curve bootstrap required when a spread adjustment is made."""
 
-        if 1==0:
+        if 1 == 0:
             print("=========================================")
             print(valuation_date)
             print(index_coupons)
@@ -456,7 +458,7 @@ class CDSIndexPortfolio:
 
                     q12NEW = pow(q12, ratio)
                     q2NEW = q1 * q12NEW
-                    
+
                     adjusted_issuer_curves[iCredit]._values[iMaturity + 1] = q2NEW
 
 #                    if iMaturity == 0 and index_coupons[0] == 0.006:
@@ -464,17 +466,18 @@ class CDSIndexPortfolio:
 
                     index_maturity_date = index_maturity_dates[iMaturity]
 
-                    # the CDS spreads we extract here 
+                    # the CDS spreads we extract here
                     # should be to the index maturity dates
-                    cdsIndex = CDS(valuation_date, 
-                                   index_maturity_date, 
-                                   0, 1.0)
+                    cdsIndex = CDS(valuation_date,
+                                   index_maturity_date,
+                                   0,
+                                   1.0)
 
                     indexProtPV = cdsIndex.protection_leg_pv(valuation_date,
                                                              adjusted_issuer_curves[iCredit],
                                                              index_recovery_rate)
 
-                    rpv01Ret = cdsIndex.risky_pv01(valuation_date, 
+                    rpv01Ret = cdsIndex.risky_pv01(valuation_date,
                                                    adjusted_issuer_curves[iCredit])
 
                     cleanRPV01 = rpv01Ret['clean_rpv01']

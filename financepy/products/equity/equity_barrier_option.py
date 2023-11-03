@@ -31,7 +31,7 @@ class EquityBarrierOption(EquityOption):
                  strike_price: float,
                  option_type: EquityBarrierTypes,
                  barrier_level: float,
-                 num_observations_per_year: (int, float) = 252,
+                 num_obs_per_year: (int, float) = 252,
                  notional: float = 1.0):
         """ Create the EquityBarrierOption by specifying the expiry date,
         strike price, option type, barrier level, the number of observations
@@ -42,7 +42,7 @@ class EquityBarrierOption(EquityOption):
         self._expiry_date = expiry_date
         self._strike_price = float(strike_price)
         self._barrier_level = float(barrier_level)
-        self._num_observations_per_year = int(num_observations_per_year)
+        self._num_obs_per_year = int(num_obs_per_year)
 
         if option_type not in EquityBarrierTypes:
             raise FinError("Option Type " + str(option_type) + " unknown.")
@@ -65,7 +65,7 @@ class EquityBarrierOption(EquityOption):
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -73,11 +73,11 @@ class EquityBarrierOption(EquityOption):
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         if isinstance(stock_price, int):
             stock_price = float(stock_price)
@@ -95,17 +95,17 @@ class EquityBarrierOption(EquityOption):
             raise FinError("Option expires before value date.")
 
         values = value_bs(t_exp,
-                      self._strike_price, 
-                      self._barrier_level,
-                      stock_prices,
-                      discount_curve.cc_rate(self._expiry_date),
-                      dividend_curve.cc_rate(self._expiry_date), 
-                      model._volatility,
-                      self._option_type.value, 
-                      self._num_observations_per_year)
+                          self._strike_price,
+                          self._barrier_level,
+                          stock_prices,
+                          discount_curve.cc_rate(self._expiry_date),
+                          dividend_curve.cc_rate(self._expiry_date),
+                          model._volatility,
+                          self._option_type.value,
+                          self._num_obs_per_year)
 
         values = values * self._notional
-        
+
         if isinstance(stock_price, float):
             return values[0]
         else:
@@ -113,17 +113,17 @@ class EquityBarrierOption(EquityOption):
 
 ###############################################################################
 
-    def value_mc(self, 
-                 time_to_expiry: float,
-                 strike_price,
+    def value_mc(self,
+                 t: float,
+                 k,
                  option_type: int,
-                 barrier_level,
+                 b,
                  notional,
-                 stock_price: float,
-                 rf_rate: float,
+                 s: float,
+                 r: float,
                  process_type,
                  model_params,
-                 numAnnObs: int = 252,
+                 num_ann_obs: int = 252,
                  num_paths: int = 10000,
                  seed: int = 4242):
         """ A Monte-Carlo based valuation of the barrier option which simulates
@@ -131,113 +131,110 @@ class EquityBarrierOption(EquityOption):
         observation times until expiry to examine if the barrier has been
         crossed and the corresponding value of the final payoff, if any. It
         assumes a GBM model for the stock price. """
-        texp = max(time_to_expiry, 1e-6)
-        num_time_steps = int(texp * numAnnObs)
-        K = strike_price
-        B = barrier_level
+        t = max(t, 1e-6)
+        num_time_steps = int(t * num_ann_obs)
         option_type = option_type
-    
         process = FinProcessSimulator()
-    
-        # TODO - NEED TO DECIDE IF THIS IS PART OF MODEL PARAMS OR NOT ??????????????
-    
-        r = rf_rate
-    
+
         #######################################################################
-    
-        if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and stock_price <= B:
+
+        if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and s <= b:
             return 0.0
-        elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and stock_price >= B:
+        elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and s >= b:
             return 0.0
-        elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and stock_price <= B:
+        elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and s <= b:
             return 0.0
-        elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and stock_price >= B:
+        elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and s >= b:
             return 0.0
-    
+
         #######################################################################
-    
+
         simple_call = False
         simple_put = False
-    
-        if option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and stock_price <= B:
+
+        if option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and s <= b:
             simple_call = True
-        elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value and stock_price >= B:
+        elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value and s >= b:
             simple_call = True
-        elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value and stock_price >= B:
+        elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value and s >= b:
             simple_put = True
-        elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and stock_price <= B:
+        elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= b:
             simple_put = True
-    
+
         if simple_put or simple_call:
             Sall = process.get_process(
-                process_type, texp, model_params, 1, num_paths, seed)
-    
+                process_type, t, model_params, 1, num_paths, seed)
+
         if simple_call:
-            c = (np.maximum(Sall[:, -1] - K, 0.0)).mean()
-            c = c * np.exp(-r * texp)
+            c = (np.maximum(Sall[:, -1] - k, 0.0)).mean()
+            c = c * np.exp(-r * t)
             return c
-    
+
         if simple_put:
-            p = (np.maximum(K - Sall[:, -1], 0.0)).mean()
-            p = p * np.exp(-r * texp)
+            p = (np.maximum(k - Sall[:, -1], 0.0)).mean()
+            p = p * np.exp(-r * t)
             return p
-    
+
         # Get full set of paths
-        Sall = process.get_process(process_type, texp, model_params, num_time_steps,
+        Sall = process.get_process(process_type, t, model_params, num_time_steps,
                                    num_paths, seed)
-    
+
         (num_paths, num_time_steps) = Sall.shape
-    
+
         if option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value or \
                 option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value or \
                 option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value or \
                 option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
-    
+
             barrier_crossed_from_above = [False] * num_paths
-    
+
             for p in range(0, num_paths):
-                barrier_crossed_from_above[p] = np.any(Sall[p] <= B)
-    
+                barrier_crossed_from_above[p] = np.any(Sall[p] <= b)
+
         if option_type == EquityBarrierTypes.UP_AND_IN_CALL.value or \
                 option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value or \
                 option_type == EquityBarrierTypes.UP_AND_IN_PUT.value or \
                 option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
-    
+
             barrier_crossed_from_below = [False] * num_paths
             for p in range(0, num_paths):
-                barrier_crossed_from_below[p] = np.any(Sall[p] >= B)
-    
+                barrier_crossed_from_below[p] = np.any(Sall[p] >= b)
+
         payoff = np.zeros(num_paths)
         ones = np.ones(num_paths)
-    
+
         if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
+            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
                      (ones - barrier_crossed_from_above)
         elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrier_crossed_from_above
+            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
+                barrier_crossed_from_above
         elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - K, 0.0) * barrier_crossed_from_below
+            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
+                barrier_crossed_from_below
         elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - K, 0.0) * \
+            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
                      (ones - barrier_crossed_from_below)
         elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
-            payoff = np.maximum(K - Sall[:, -1], 0.0) * barrier_crossed_from_below
+            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
+                barrier_crossed_from_below
         elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
-            payoff = np.maximum(K - Sall[:, -1], 0.0) * \
+            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
                      (ones - barrier_crossed_from_below)
         elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
-            payoff = np.maximum(K - Sall[:, -1], 0.0) * \
+            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
                      (ones - barrier_crossed_from_above)
         elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
-            payoff = np.maximum(K - Sall[:, -1], 0.0) * barrier_crossed_from_above
+            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
+                barrier_crossed_from_above
         else:
             raise FinError("Unknown barrier option type." +
                            str(option_type))
-    
-        v = payoff.mean() * np.exp(- r * texp)
-    
+
+        v = payoff.mean() * np.exp(- r * t)
+
         return v * notional
-    
+
 ###############################################################################
 
     def __repr__(self):
@@ -246,8 +243,7 @@ class EquityBarrierOption(EquityOption):
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("BARRIER LEVEL", self._barrier_level)
-        s += label_to_string("NUM OBSERVATIONS",
-                             self._num_observations_per_year)
+        s += label_to_string("NUM OBSERVATIONS", self._num_obs_per_year)
         s += label_to_string("NOTIONAL", self._notional, "")
         return s
 

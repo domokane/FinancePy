@@ -95,7 +95,8 @@ def value_mc_fast(t,
 
     num_time_steps = 2
     Sall = model.get_paths_assets(num_assets, num_paths, num_time_steps,
-                                  t, mus, stock_prices, volatilities, betas, seed)
+                                  t, mus, stock_prices, volatilities, betas,
+                                  seed)
 
     payoff = payoff_value(Sall, payoff_type.value, payoff_params)
     payoff = np.mean(payoff)
@@ -193,7 +194,7 @@ class EquityRainbowOption(EquityOption):
               volatilities: np.ndarray,
               corr_matrix: np.ndarray):
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -201,7 +202,7 @@ class EquityRainbowOption(EquityOption):
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")

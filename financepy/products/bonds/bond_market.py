@@ -65,9 +65,8 @@ def get_bond_market_conventions(country):
     act_act = DayCountTypes.ACT_ACT_ICMA
     thirtye360 = DayCountTypes.THIRTY_E_360
     thirty360 = DayCountTypes.THIRTY_360_BOND
-    
-    # TODO: CHECK CONVENTIONS
 
+    # TODO: CHECK CONVENTIONS
     # RETURNS
     # ACCRUAL CONVENTION
     # COUPON FREQUENCY

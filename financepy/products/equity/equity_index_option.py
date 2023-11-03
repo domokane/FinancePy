@@ -52,13 +52,13 @@ class EquityIndexOption:
               model: Model,
               ):
         """ Equity Index Option valuation using Black model. """
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
         if valuation_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
         if isinstance(self._expiry_date, Date):
             texp = (self._expiry_date - valuation_date) / gDaysInYear
         elif isinstance(self._expiry_date, list):
@@ -206,7 +206,7 @@ class EquityIndexOption:
                            model: Model,
                            price: float,
                            ):
-        """ Calculate the Black implied volatility of a European/American 
+        """ Calculate the Black implied volatility of a European/American
         Index option. """
         texp = (self._expiry_date - valuation_date) / gDaysInYear
         if texp < 1.0 / 365.0:
@@ -217,12 +217,15 @@ class EquityIndexOption:
         r = -np.log(df)/texp
         if isinstance(model, Black):
             sigma = implied_volatility(
-                forward_price, texp, r, self._strike_price, price, self._option_type)
+                forward_price, texp, r,
+                self._strike_price, price,
+                self._option_type)
         else:
             raise FinError("Unknown Model Type")
         return sigma
 
 ###############################################################################
+
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)

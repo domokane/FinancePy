@@ -65,7 +65,7 @@ class EquityFixedLookbackOption(EquityOption):
         is the minimum of maximum of the stock price since the start of the
         option depending on whether the option is a call or a put. """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -73,11 +73,11 @@ class EquityFixedLookbackOption(EquityOption):
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
 
@@ -134,6 +134,7 @@ class EquityFixedLookbackOption(EquityOption):
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
             else:
+
                 e1 = (np.log(s0/smax) + (r - q + v*v/2) * t) / v / sqrtT
                 e2 = e1 - v * sqrtT
 
@@ -151,6 +152,7 @@ class EquityFixedLookbackOption(EquityOption):
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
             if k >= smin:
+
                 f1 = (np.log(s0/smin) + (b + v * v / 2.0) * t) / v / sqrtT
                 f2 = f1 - v * sqrtT
 
@@ -166,6 +168,7 @@ class EquityFixedLookbackOption(EquityOption):
                     smin * df * N(-f2) + s0 * df * u * term
 
             else:
+
                 d1 = (np.log(s0 / k) + (b + v * v / 2) * t) / v / sqrtT
                 d2 = d1 - v * sqrtT
 

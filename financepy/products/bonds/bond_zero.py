@@ -45,16 +45,17 @@ def _g(oas, *args):
 
 ###############################################################################
 
+
 class BondZero:
-    """ A zero coupon bond is a bond which doesn't pay any periodic payments. 
-    Instead, it is issued at a discount. The entire face value of the bond is 
-    paid out at maturity. It is issued as a deep discount bond. 
-    
-    There is a special convention for accrued interest in which 
-    
+    """ A zero coupon bond is a bond which doesn't pay any periodic payments.
+    Instead, it is issued at a discount. The entire face value of the bond is
+    paid out at maturity. It is issued as a deep discount bond.
+
+    There is a special convention for accrued interest in which
+
         Accrued_interest = (par - issue price) * D
-    
-    where D = (settlement_date - issue_date)/(maturity_date - issue_date).    
+
+    where D = (settlement_date - issue_date)/(maturity_date - issue_date).
     """
 
     def __init__(self,
@@ -81,7 +82,7 @@ class BondZero:
         self._flow_amounts = [0.0, 0.0]  # coupon payments are zero
         self._calendar_type = CalendarTypes.WEEKEND
         self._ex_div_days = 0
-        
+
         self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
@@ -89,9 +90,9 @@ class BondZero:
     ###########################################################################
 
     def dirty_price_from_ytm(self,
-                            settlement_date: Date,
-                            ytm: float,
-                            convention: YTMCalcType = YTMCalcType.ZERO):
+                             settlement_date: Date,
+                             ytm: float,
+                             convention: YTMCalcType = YTMCalcType.ZERO):
         """ Calculate the full price of bond from its yield to maturity. This
         function is vectorised with respect to the yield input. It implements
         a number of standard conventions for calculating the YTM. """
@@ -125,7 +126,7 @@ class BondZero:
             pv = self._par / (1.0 + ytm * acc_factor)
         else:
             pv = self._par / (1.0 + ytm) ** acc_factor
-        
+
         return pv
 
     ###########################################################################
@@ -139,7 +140,8 @@ class BondZero:
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
 
-        dirty_price = self.dirty_price_from_ytm(settlement_date, y, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm,
+                                                convention)
 
         principal = dirty_price * face / self._par
         principal = principal - self._accrued_interest
@@ -213,7 +215,8 @@ class BondZero:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, 
+                                                convention)
         accrued = self.accrued_interest(settlement_date, self._par)
         clean_price = dirty_price - accrued
         return clean_price
@@ -226,9 +229,9 @@ class BondZero:
         """ Calculate the clean bond value using some discount curve to
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date. """
- 
+
         dirty_price = self.dirty_price_from_discount_curve(settlement_date,
-                                                         discount_curve)
+                                                           discount_curve)
 
         accrued = self.accrued_interest(settlement_date, self._par)
         clean_price = dirty_price - accrued
@@ -237,8 +240,8 @@ class BondZero:
     ###########################################################################
 
     def dirty_price_from_discount_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using a provided discount curve to PV the
         bond's cash flows to the settlement date. As such it is effectively a
         forward bond price if the settlement date is after the valuation date.
@@ -273,7 +276,8 @@ class BondZero:
     def current_yield(self, clean_price):
         """
         Calculate the current yield of the bond which is the
-        coupon divided by the clean price (not the full price). The coupon of a zero coupon bond is defined as:
+        coupon divided by the clean price (not the full price).
+        The coupon of a zero coupon bond is defined as:
         (par - issue_price) / tenor
         """
         dc = DayCount(self._accrual_type)
@@ -303,9 +307,8 @@ class BondZero:
                            + str(type(clean_price)))
 
         accrued_amount = self.accrued_interest(settlement_date, self._par)
-        
         dirty_prices = (clean_prices + accrued_amount)
-        
+
         ytms = []
 
         for dirty_price in dirty_prices:
@@ -371,9 +374,9 @@ class BondZero:
         num = (settlement_date - self._issue_date)
         den = (self._maturity_date - self._issue_date)
 
-        f = num / den        
+        f = num / den
         g = ((self._par - self._issue_price)) / self._par
-        
+
         self._accrued_interest = f * g * face
         self._accrued_days = num
 
@@ -438,9 +441,9 @@ class BondZero:
     ###########################################################################
 
     def dirty_price_from_oas(self,
-                            settlement_date: Date,
-                            discount_curve: DiscountCurve,
-                            oas: float):
+                             settlement_date: Date,
+                             discount_curve: DiscountCurve,
+                             oas: float):
         """ Calculate the full price of the bond from its OAS given the bond
         settlement date, a discount curve and the oas as a number. """
 
@@ -510,7 +513,7 @@ class BondZero:
     ###########################################################################
 
     def bond_payments(self,
-                      settlement_date: Date, 
+                      settlement_date: Date,
                       face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
@@ -523,8 +526,8 @@ class BondZero:
     ###########################################################################
 
     def print_bond_payments(self,
-                           settlement_date: Date, 
-                           face: (float) = 100.0):
+                            settlement_date: Date,
+                            face: (float) = 100.0):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -533,10 +536,10 @@ class BondZero:
     ###########################################################################
 
     def dirty_price_from_survival_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve,
-                                       survival_curve: DiscountCurve,
-                                       recovery_rate: float):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve,
+                                        survival_curve: DiscountCurve,
+                                        recovery_rate: float):
         """ Calculate discounted present value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. For the
@@ -602,18 +605,19 @@ class BondZero:
     ###########################################################################
 
     def calc_ror(self,
-                       begin_date: Date,
-                       end_date: Date,
-                       begin_ytm: float,
-                       end_ytm: float,
-                       convention: YTMCalcType = YTMCalcType.ZERO):
-        """
-        Calculates the rate of total return (capital return and interest) given 
+                 begin_date: Date,
+                 end_date: Date,
+                 begin_ytm: float,
+                 end_ytm: float,
+                 convention: YTMCalcType = YTMCalcType.ZERO):
+        """ TODO: TIDY THIS UP !!!!!!!!!!!!!!!!!
+
+        Calculates the rate of total return (capital return and interest) given
         a BUY YTM and a SELL YTM of this bond.
-        
+
         This function computes the full prices at buying and selling, plus the 
         coupon payments during the period.
-        
+
         It returns a tuple which includes a simple rate of return, a compounded 
         IRR and the PnL.
         """
@@ -624,7 +628,7 @@ class BondZero:
         dates_cfs = zip(self._coupon_dates, self._flow_amounts)
 
         # The coupon or par payments on buying date belong to the buyer.
-        # The coupon or par payments on selling date are given to the new buyer.
+        # The coupon or par payments on selling date are given to the new buyer
         dates_cfs = [(d, c * self._par) for (d, c) in dates_cfs if (d >= begin_date) and (d < end_date)]
         dates_cfs.append((begin_date, -buy_price))
         dates_cfs.append((end_date, sell_price))
@@ -634,9 +638,13 @@ class BondZero:
         simple_return = (pnl / buy_price) * 365 / (end_date - begin_date)
         brentq_up_bound = 5
         brentq_down_bound = -0.9999
+
         # in case brentq cannot find the irr root
+
         if simple_return > brentq_up_bound or simple_return < brentq_down_bound:
+
             irr = simple_return
+
         else:
             irr = optimize.brentq(npv,
                                   a=brentq_down_bound,  # f(a) and f(b) must have opposite signs

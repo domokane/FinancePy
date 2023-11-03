@@ -16,9 +16,10 @@ from ...products.equity.equity_swap_leg import EquitySwapLeg
 
 ###############################################################################
 
+
 class EquitySwap:
-    """ Class for managing a standard Equity vs Float leg swap. This is a 
-    contract in which an equity payment leg is exchanged for a series of 
+    """ Class for managing a standard Equity vs Float leg swap. This is a
+    contract in which an equity payment leg is exchanged for a series of
     floating rates payments. There is no exchange of principal. The contract 
     is entered into at zero initial cost when spreads are zero. The contract 
     lasts from an effective date to a specified maturity date.
@@ -126,26 +127,26 @@ class EquitySwap:
                                                         discount_curve,
                                                         index_curve,
                                                         dividend_curve,
-                                                        current_price)   
+                                                        current_price)
         self._fill_rate_notional_array()
 
         self._rate_leg_value = self._rate_leg.value(valuation_date,
                                                     discount_curve,
                                                     index_curve,
                                                     firstFixingRate)
-        
+
         return self._equity_leg_value + self._rate_leg_value
 
     ###########################################################################
-    
+
     def _fill_rate_notional_array(self):
         """ In an equity swap, at every equity reset, the notional
-        of the contract is updated to reflect the new underlying 
-        price. 
-        
+        of the contract is updated to reflect the new underlying
+        price.
+
         This is a helper function that takes the Equity Notional list
-        from Equity Leg and convert it to a Notional array that fits 
-        the payment schedule defined for the rate leg. 
+        from Equity Leg and convert it to a Notional array that fits
+        the payment schedule defined for the rate leg.
         """
 
         # Assumption: Rate frequency type is a multiple of Equity's
@@ -157,14 +158,14 @@ class EquitySwap:
 
         if (eq_freq is None or rate_freq is None) or (not isMultiple):
             raise FinError("Invalid frequency type assigned!")
-        
+
         self._rate_leg._notional_array = []
         for lastNotional in self._equity_leg._last_notionals:
             for _ in range(multiple):
                 self._rate_leg._notional_array.append(lastNotional)
 
     ###########################################################################
-    
+
     def __repr__(self):
         s = "EQUITY LEG:\n"
         s += self._equity_leg.__repr__()
@@ -174,4 +175,3 @@ class EquitySwap:
         return s
 
     ###########################################################################
-        

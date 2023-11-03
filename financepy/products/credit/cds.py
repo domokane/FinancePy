@@ -23,7 +23,6 @@ from ...utils.helpers import check_argument_types
 
 useFlatHazardRateIntegral = True
 standard_recovery_rate = 0.40
-
 glob_num_steps_per_year = 25
 
 ###############################################################################
@@ -51,7 +50,7 @@ def _risky_pv01_numba(teff,
 
     method = InterpTypes.FLAT_FWD_RATES.value
 
-    if 1==0:
+    if 1 == 0:
         print("===================")
         print("Teff", teff)
         print("Acc", accrual_factorPCDToNow)
@@ -123,16 +122,14 @@ def _risky_pv01_numba(teff,
 
             fullRPV01 = fullRPV01 + dfullRPV01
 
-        #######################################################################
-
         q1 = q2
 
     cleanRPV01 = fullRPV01 - accrual_factorPCDToNow
 
     return np.array([fullRPV01, cleanRPV01])
 
-
 ###############################################################################
+
 
 @njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
               float64, int64, int64), fastmath=True, cache=True)
@@ -242,7 +239,7 @@ class CDS:
         self._generate_adjusted_cds_payment_dates()
         self._calc_flows()
 
-    ###############################################################################
+    ###########################################################################
 
     def _generate_adjusted_cds_payment_dates(self):
         """ Generate CDS payment dates which have been holiday adjusted."""
@@ -267,63 +264,70 @@ class CDS:
 
             unadjusted_schedule_dates.append(next_date)
 
-            # the unadjusted dates start at end date and end at previous coupon date
+            # the unadjusted dates start at end date and end at previous 
+            # coupon date
             while next_date > start_date:
                 next_date = next_date.add_months(-num_months)
                 unadjusted_schedule_dates.append(next_date)
 
-            # now we adjust for holiday using business day adjustment convention specified
+            # now we adjust for holiday using business day adjustment 
+            # convention specified
             adjusted_dates = []
 
             for date in reversed(unadjusted_schedule_dates):
                 adjusted = calendar.adjust(date, self._bus_day_adjust_type)
                 adjusted_dates.append(adjusted)
 
-            # eg: https://www.cdsmodel.com/assets/cds-model/docs/Standard%20CDS%20Examples.pdf
-            # Payment       = [20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009, 22-MAR-2010]
-            # Accrual Start = [22-DEC-2008, 20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009]
-            # Accrual End   = [19-MAR-2009, 21-JUN-2009, 20-SEP-2009, 20-DEC-2009, 20-MAR-2010]
-            
+# eg: https://www.cdsmodel.com/assets/cds-model/docs/Standard%20CDS%20Examples.pdf
+# Payment       = [20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009, 22-MAR-2010]
+# Accrual Start = [22-DEC-2008, 20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009]
+# Accrual End   = [19-MAR-2009, 21-JUN-2009, 20-SEP-2009, 20-DEC-2009, 20-MAR-2010]
+
         elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
 
             # We start at start date and step forwards
 
             next_date = start_date
 
-            # the unadjusted dates start at start date and end at last date before maturity date
+            # the unadjusted dates start at start date and end at last date
+            # before maturity date
             while next_date < self._maturity_date:
                 unadjusted_schedule_dates.append(next_date)
                 next_date = next_date.add_months(num_months)
 
             # We then append the maturity date
             unadjusted_schedule_dates.append(self._maturity_date)
-            
+
             adjusted_dates = []
             for date in unadjusted_schedule_dates:
                 adjusted = calendar.adjust(date, self._bus_day_adjust_type)
                 adjusted_dates.append(adjusted)
 
-            # eg. Date(20, 2, 2009) to Date(20, 3, 2010) with DateGenRuleTypes.FORWARD
-            # Payment       = [20-MAY-2009, 20-AUG-2009, 20-NOV-2009, 22-FEB-2010]
-            # Accrual Start = [20-FEB-2009, 20-MAY-2009, 20-AUG-2009, 20-NOV-2009]
-            # Accrual End   = [19-MAY-2009, 19-AUG-2009, 19-NOV-2009, 20-MAR-2010]
+    # eg. Date(20, 2, 2009) to Date(20, 3, 2010) with DateGenRuleTypes.FORWARD
+    # Payment       = [20-MAY-2009, 20-AUG-2009, 20-NOV-2009, 22-FEB-2010]
+    # Accrual Start = [20-FEB-2009, 20-MAY-2009, 20-AUG-2009, 20-NOV-2009]
+    # Accrual End   = [19-MAY-2009, 19-AUG-2009, 19-NOV-2009, 20-MAR-2010]
 
         else:
-            raise FinError("Unknown DateGenRuleType:" + str(self._date_gen_rule_type))
+
+            raise FinError("Unknown DateGenRuleType:"
+                           + str(self._date_gen_rule_type))
 
         # We only include dates which fall after the CDS start date
         self._payment_dates = adjusted_dates[1:]
 
-        # Accrual start dates run from previous coupon date to penultimate coupon date
+        # Accrual start dates run from previous coupon date to penultimate
+        # coupon date
         self._accrual_start_dates = adjusted_dates[:-1]
 
-        # Accrual end dates are one day before the start of the next accrual period
+        # Accrual end dates are one day before the start of the next
+        # accrual period
         self._accrual_end_dates = [date.add_days(-1) for date in self._accrual_start_dates[1:]]
 
         # Final accrual end date is the maturity date
         self._accrual_end_dates.append(self._maturity_date)
 
-    ###############################################################################
+    ###########################################################################
 
     def _calc_flows(self):
         """ Calculate cash flow amounts on premium leg. """
@@ -344,12 +348,12 @@ class CDS:
             self._accrual_factors.append(accrual_factor)
             self._flows.append(flow)
 
-    ###############################################################################
+    ###########################################################################
 
     def value(self,
               valuation_date,
               issuer_curve,
-              contract_recovery_rate, 
+              contract_recovery_rate,
               pv01_method=0,
               prot_method=0,
               num_steps_per_year=glob_num_steps_per_year):
@@ -381,11 +385,9 @@ class CDS:
         cleanPV = fwdDf * longProt * \
             (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
 
-#        print("protLeg", prot_pv, "cleanRPV01", cleanRPV01, "value", cleanPV)
-
         return {'dirty_pv': dirtyPV, 'clean_pv': cleanPV}
 
-    ###############################################################################
+    ###########################################################################
 
     def credit_dv01(self,
                     valuation_date,
@@ -423,7 +425,7 @@ class CDS:
         credit_dv01 = (v1['dirty_pv'] - v0['dirty_pv'])
         return credit_dv01
 
-    ###############################################################################
+    ###########################################################################
 
     def interest_dv01(self,
                       valuation_date: Date,
@@ -482,7 +484,7 @@ class CDS:
         interest_dv01 = (v1['dirty_pv'] - v0['dirty_pv'])
         return interest_dv01
 
-    ###############################################################################
+    ###########################################################################
 
     def cash_settlement_amount(self,
                                valuation_date,
@@ -507,7 +509,7 @@ class CDS:
         v = v / df
         return v
 
-    ###############################################################################
+    ###########################################################################
 
     def clean_price(self,
                     valuation_date,
@@ -537,7 +539,7 @@ class CDS:
 
         return clean_price
 
-    ###############################################################################
+    ###########################################################################
 
     def accrued_days(self):
         """ Number of days between the previous coupon and the currrent step
@@ -548,7 +550,7 @@ class CDS:
         accrued_days = (self._step_in_date - pcd)
         return accrued_days
 
-    ###############################################################################
+    ###########################################################################
 
     def accrued_interest(self):
         """ Calculate the amount of accrued interest that has accrued from the
@@ -557,14 +559,15 @@ class CDS:
         day_count = DayCount(self._day_count_type)
         pcd = self._accrual_start_dates[0]
         accrual_factor = day_count.year_frac(pcd, self._step_in_date)[0]
-        accrued_interest = accrual_factor * self._notional * self._running_coupon
+        accrued_interest = accrual_factor * self._notional \
+            * self._running_coupon
 
         if self._long_protection:
             accrued_interest *= -1.0
 
         return accrued_interest
 
-    ###############################################################################
+    ###########################################################################
 
     def protection_leg_pv(self,
                           valuation_date,
@@ -592,7 +595,7 @@ class CDS:
 
         return v * self._notional
 
-    ###############################################################################
+    ###########################################################################
 
     def risky_pv01(self,
                    valuation_date,
@@ -636,7 +639,7 @@ class CDS:
 
         return {'dirty_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
 
-    ###############################################################################
+    ###########################################################################
 
     def premium_leg_pv(self,
                        valuation_date,
@@ -651,7 +654,7 @@ class CDS:
         v = fullRPV01 * self._notional * self._running_coupon
         return v
 
-    ###############################################################################
+    ###########################################################################
 
     def par_spread(self,
                    valuation_date,
@@ -677,7 +680,7 @@ class CDS:
         spd = prot / cleanRPV01 / self._notional
         return spd
 
-    ###############################################################################
+    ###########################################################################
 
     def value_fast_approx(self,
                           valuation_date,
@@ -754,7 +757,7 @@ class CDS:
 
         return (fullPV, cleanPV, credit01, ir01)
 
-    ###############################################################################
+    ###########################################################################
 
     def print_flows(self, valuation_date, issuer_curve):
         ''' We only print flows after the current valuation date '''
@@ -773,7 +776,7 @@ class CDS:
                 print("%15s %10.6f %12.2f %12.6f %12.6f %12.2f" %
                       (dt, acc_factor, flow, z, q, flow * z * q))
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
@@ -805,7 +808,7 @@ class CDS:
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

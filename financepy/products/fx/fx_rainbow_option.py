@@ -175,7 +175,7 @@ class FXRainbowOption(EquityOption):
             if n < 1 or n > num_assets:
                 raise FinError("Nth parameter must be 1 to " + str(num_assets))
 
-    ###############################################################################
+    ###########################################################################
 
     def value(self,
               valuation_date,
@@ -185,7 +185,7 @@ class FXRainbowOption(EquityOption):
               volatilities,
               betas):
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -193,11 +193,11 @@ class FXRainbowOption(EquityOption):
 
         if dom_discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Domestic Curve valuation date not same as option valuation date")
+                "Domestic Curve valuation date not same as option value date")
 
         if for_discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Foreign Curve valuation date not same as option valuation date")
+                "Foreign Curve valuation date not same as option value date")
 
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")

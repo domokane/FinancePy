@@ -227,7 +227,8 @@ def build_Ibor_Curve(valuation_date):
 ##########################################################################
 
 
-def test_Bond():
+def test_bond():
+
     import pandas as pd
     path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
@@ -399,6 +400,7 @@ def test_Bond():
 
     dirty_price = bond.dirty_price_from_ytm(settlement_date, ytm,
                                           YTMCalcType.US_TREASURY)
+
     testCases.print("Dirty Price = ", dirty_price)
 
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm,
@@ -487,6 +489,7 @@ def test_Bond():
 
 
 def test_BondExDividend():
+
     issue_date = Date(7, 9, 2000)
     maturity_date = Date(7, 9, 2020)
     coupon = 0.05
@@ -496,7 +499,6 @@ def test_BondExDividend():
     ex_div_days = 7
     testCases.header("LABEL", "VALUE")
 
-    calendar_type = CalendarTypes.UNITED_KINGDOM
     bond = Bond(issue_date, maturity_date, coupon,
                 freq_type, accrual_type, ex_div_days)
     settlement_date = Date(7, 9, 2003)
@@ -517,7 +519,6 @@ def test_BondExDividend():
     face = 100.0
     ex_div_days = 7
 
-    calendar_type = CalendarTypes.UNITED_KINGDOM
     bond = Bond(issue_date, maturity_date, coupon,
                 freq_type, accrual_type, ex_div_days)
 
@@ -536,7 +537,9 @@ def test_BondExDividend():
 
 ###############################################################################
 
+
 def test_BondPaymentDates():
+
     from financepy.products.bonds.bond import Bond
     from financepy.utils import Date, DayCountTypes, FrequencyTypes
 
@@ -549,14 +552,16 @@ def test_BondPaymentDates():
     )
     bond._calculate_payment_dates()
 
-    if 1==0:
+    if 1 == 0:
         print(bond._flow_amounts)
         print(bond._coupon_dates)
         print(bond._payment_dates)
 
 ###############################################################################
 
+
 def test_Bond_ror():
+
     test_case_file = 'test_cases_bond_ror.csv'
     df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
     # A 10-year bond with 1 coupon per year. code: 210215
@@ -623,7 +628,8 @@ def test_key_rate_durations():
 #    print(key_rate_tenors)
 #    print(key_rate_durations)
 
-################################################################################
+###############################################################################
+
 
 def test_key_rate_durations_Bloomberg_example():
 
@@ -692,34 +698,34 @@ def test_oas():
 
 ###############################################################################
 
-# def test_div_dates():
+def test_div_dates():
 
-issueDate = Date(15, 5, 2020)
-maturityDate = Date(15, 5, 2035)
-coupon = 0.02375
-freqType = FrequencyTypes.SEMI_ANNUAL
-accrualType = DayCountTypes.ACT_ACT_ICMA
-face = 125000
-ex_div_days = 10
+    issueDate = Date(15, 5, 2020)
+    maturityDate = Date(15, 5, 2035)
+    coupon = 0.02375
+    freqType = FrequencyTypes.SEMI_ANNUAL
+    accrualType = DayCountTypes.ACT_ACT_ICMA
+    face = 125000
+    ex_div_days = 10
 
-bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType, ex_div_days)
+    bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType, ex_div_days)
 
-#print(bond)
+    print(bond)
 
-cleanPrice = 99.7808417 # if face is 1 then this must be 0.99780842
+    cleanPrice = 99.7808417  # if face is 1 then this must be 0.99780842
 
-settlementDate = Date(15, 5, 2023)
-#print(bond.bond_payments(settlementDate, face))
+    settlementDate = Date(15, 5, 2023)
+    print(bond.bond_payments(settlementDate, face))
 
-current_yield = bond.current_yield(cleanPrice)*100
-#print("Currnt Yield: %10.5f %%" % (current_yield))
+    current_yield = bond.current_yield(cleanPrice)*100
+    print("Currnt Yield: %10.5f %%" % (current_yield))
 
-ytm = bond.yield_to_maturity(settlementDate, cleanPrice) * 100.0
-#print("Yield to Mat: %10.5f %%" % (ytm))
+    ytm = bond.yield_to_maturity(settlementDate, cleanPrice) * 100.0
+    print("Yield to Mat: %10.5f %%" % (ytm))
 
 ###############################################################################
 
-test_Bond()
+test_bond()
 test_oas()
 test_BondExDividend()
 test_BondPaymentDates()

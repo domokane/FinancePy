@@ -63,7 +63,7 @@ class FinFXVarianceSwap:
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve. """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -71,7 +71,7 @@ class FinFXVarianceSwap:
 
         if libor_curve._valuation_date != valuation_date:
             raise FinError(
-                "Domestic Curve valuation date not same as option valuation date")
+                "Domestic Curve valuation date not same as option value date")
 
         t1 = (valuation_date - self._effective_date) / gDaysInYear
         t2 = (self._maturity_date - self._effective_date) / gDaysInYear

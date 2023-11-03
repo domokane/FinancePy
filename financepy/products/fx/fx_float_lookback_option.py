@@ -58,7 +58,7 @@ class FXFloatLookbackOption(FXOption):
         """ Valuation of the Floating Lookback option using Black-Scholes
         using the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._expiry_date:
@@ -66,11 +66,11 @@ class FXFloatLookbackOption(FXOption):
 
         if domestic_curve._valuation_date != valuation_date:
             raise FinError(
-                "Domestic Curve valuation date not same as option valuation date")
+                "Domestic Curve valuation date not same as option value date")
 
         if foreign_curve._valuation_date != valuation_date:
             raise FinError(
-                "Foreign Curve valuation date not same as option valuation date")
+                "Foreign Curve valuation date not same as option value date")
 
         t = (self._expiry_date - valuation_date) / gDaysInYear
 

@@ -107,7 +107,8 @@ class BondPortfolio:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm,
+                                                convention)
         accrued_amount = self._accrued_interest * self._par
         clean_price = dirty_price - accrued_amount
         return clean_price
@@ -125,8 +126,8 @@ class BondPortfolio:
 ##############################################################################
 
     def dirty_price_from_discount_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using a provided discount curve to PV the
         bond's cash flows to the settlement date. As such it is effectively a
         forward bond price if the settlement date is after the valuation date.
@@ -155,16 +156,16 @@ class BondPortfolio:
 ###############################################################################
 
     def accrued_interest(self,
-                              settlement_date: Date,
-                              num_ex_dividend_days: int = 0,
-                              calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
+                         settlement_date: Date,
+                         num_ex_dividend_days: int = 0,
+                         calendar_type: CalendarTypes = CalendarTypes.WEEKEND):
 
         return self._accrued_interest
 
 ###############################################################################
 
     def print_flows(self,
-                    settlement_date: Date, 
+                    settlement_date: Date,
                     face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
@@ -176,20 +177,20 @@ class BondPortfolio:
             if dt >= settlement_date:
                 print("%12s" % dt, " %12.2f " % flow)
 
-        redemption_amount = face * ( 1.0 + flow) 
+        redemption_amount = face * (1.0 + flow)
 
         print("%12s" % self._coupon_dates[-1], " %12.2f " % redemption_amount)
 
 ###############################################################################
 
     def dirty_price_from_survival_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve,
-                                       survival_curve: DiscountCurve,
-                                       recovery_rate: float):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve,
+                                        survival_curve: DiscountCurve,
+                                        recovery_rate: float):
         """ Calculate discounted present value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
-        the recovery fraction of the par amount is paid at default. For the 
+        the recovery fraction of the par amount is paid at default. For the
         defaulting principal we discretise the time steps using the coupon
         payment times. A finer discretisation may handle the time value with
         more accuracy. I reduce any error by averaging period start and period
@@ -247,9 +248,9 @@ class BondPortfolio:
         self.accrued_interest(settlement_date, 1.0)
 
         dirty_price = self.dirty_price_from_survival_curve(settlement_date,
-                                                         discount_curve,
-                                                         survival_curve,
-                                                         recovery_rate)
+                                                           discount_curve,
+                                                           survival_curve,
+                                                           recovery_rate)
 
         clean_price = dirty_price - self._accrued_interest
         return clean_price

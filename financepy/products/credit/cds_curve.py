@@ -40,7 +40,7 @@ def f(q, *args):
 
 class CDSCurve:
     """ Generate a survival probability curve implied by the value of CDS
-    contracts given a Ibor curve and an assumed recovery rate. The recovery 
+    contracts given a Ibor curve and an assumed recovery rate. The recovery
     rate corresponds to the seniority of the debt for these CDS. A scheme for
     the interpolation of the survival probabilities is also required. """
 
@@ -159,7 +159,8 @@ class CDSCurve:
 
             maturity_date = self._cds_contracts[i]._maturity_date
 
-            argtuple = (self, self._valuation_date, 
+            argtuple = (self, 
+                        self._valuation_date,
                         self._cds_contracts[i],
                         self._recovery_rate)
 

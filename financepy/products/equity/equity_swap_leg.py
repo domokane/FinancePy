@@ -19,50 +19,51 @@ from ...market.curves.discount_curve_flat import DiscountCurveFlat
 
 
 class EquitySwapLeg:
-    """ Class for managing the equity leg of an equity swap. An equity leg is 
-    a leg with a sequence of flows calculated according to an ISDA schedule 
-    and follows the economics of a collection of equity forward contracts. 
+    """ Class for managing the equity leg of an equity swap. An equity leg is
+    a leg with a sequence of flows calculated according to an ISDA schedule
+    and follows the economics of a collection of equity forward contracts.
     """
+
     def __init__(self,
-                 effective_date: Date, # Date contract starts or last Equity Reset
-                 termination_date_or_tenor: (Date, str), # Date contract ends
+                 effective_date: Date,  # Contract starts or last equity reset
+                 term_date_or_tenor: (Date, str),  # Date contract ends
                  leg_type: SwapTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes,
-                 strike: float, # Price at effective date
-                 quantity: float = 1.0, # Quantity at effective date
+                 strike: float,  # Price at effective date
+                 quantity: float = 1.0,  # Quantity at effective date
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
-        
         """ Create the equity leg of a swap contract giving the contract start
-        date, its maturity, underlying strike price and quantity, payment frequency, 
-        day count convention, return type, and other details """
+        date, its maturity, underlying strike price and quantity, payment
+        frequency, day count convention, return type, and other details """
 
         check_argument_types(self.__init__, locals())
 
-        if type(termination_date_or_tenor) == Date:
-            termination_date = termination_date_or_tenor
+        if type(term_date_or_tenor) == Date:
+            termination_date = term_date_or_tenor
         else:
-            termination_date = effective_date.add_tenor(termination_date_or_tenor)
+            termination_date = effective_date.add_tenor(term_date_or_tenor)
 
         calendar = Calendar(calendar_type)
-        self._maturity_date = calendar.adjust(termination_date, bus_day_adjust_type)
+        self._maturity_date = calendar.adjust(termination_date,
+                                              bus_day_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
-        
+
         if quantity < 0:
             # Long/Short is defined by leg_type
             raise FinError("Quantity must be non-negative")
-        
+
         if return_type != ReturnTypes.TOTAL_RETURN:
             raise NotImplementedError("Return Type still not implemented")
 
-        # To generate ISDA pmnt schedule properly we can't use these types 
+        # To generate ISDA pmnt schedule properly we can't use these types
         if freq_type in (FrequencyTypes.CONTINUOUS, FrequencyTypes, FrequencyTypes.SIMPLE):
             raise FinError("Cannot generate payment schedule for this frequency!")
 
@@ -75,7 +76,7 @@ class EquitySwapLeg:
         self._quantity = quantity
         self._notional = strike * quantity
         self._return_type = return_type
-        
+
         self._day_count_type = day_count_type
         self._calendar_type = calendar_type
         self._bus_day_adjust_type = bus_day_adjust_type
@@ -96,7 +97,7 @@ class EquitySwapLeg:
 
     def generate_payment_dates(self):
         """ Generate the Equity leg payment dates and accrual factors. Similar
-        to swap float leg, payment values can't be generated, as we do not have 
+        to swap float leg, payment values can't be generated, as we do not have
         index curve, dividend curve and equity price. """
 
         schedule = Schedule(self._effective_date,
@@ -148,26 +149,26 @@ class EquitySwapLeg:
 ###############################################################################
 
     def value(self,
-              valuation_date: Date, 
+              valuation_date: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve,
               dividend_curve: DiscountCurve = None,
-              current_price: float = None ):
-        """ Value the equity leg with payments from an equity price and quantity, 
-        an index curve and an [optional] dividend curve. Discounting is based on 
-        a supplied discount curve as of the valuation date supplied. 
+              current_price: float = None):
+        """ Value the equity leg with payments from an equity price, quantity,
+        an index curve and an [optional] dividend curve. Discounting is based
+        on a supplied discount curve as of the valuation date supplied.
         """
 
         if discount_curve is None:
             raise FinError("Discount curve not provided!")
-        
+
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if index_curve is None:
             index_curve = discount_curve
-        
+
         # Assume a naive dividend curve if nothing provided
         if dividend_curve is None:
             dividend_curve = DiscountCurveFlat(valuation_date, 0)
@@ -200,21 +201,22 @@ class EquitySwapLeg:
             pmntDate = self._payment_dates[iPmnt]
 
             if pmntDate > valuation_date:
-                
+
                 startAccruedDt = self._startAccruedDates[iPmnt]
                 endAccruedDt = self._endAccruedDates[iPmnt]
-                index_alpha = index_day_counter.year_frac(startAccruedDt, endAccruedDt)[0]
+                index_alpha = index_day_counter.year_frac(startAccruedDt,
+                                                          endAccruedDt)[0]
 
                 dfStart = index_curve.df(startAccruedDt)
                 dfEnd = index_curve.df(endAccruedDt)
-                fwd_rate  = (dfStart / dfEnd - 1.0) / index_alpha
+                fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
 
                 divStart = dividend_curve.df(startAccruedDt)
                 divEnd = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
                 # Equity discount derived from index and div curves
-                eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0 ) / index_alpha
+                eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0) / index_alpha
 
                 self._fwd_rates.append(fwd_rate)
                 self._div_fwd_rates.append(div_fwd_rate)
@@ -222,15 +224,15 @@ class EquitySwapLeg:
 
                 # Iterative update of the term rate
                 eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) * (1 + eq_term_rate)  - 1
-                
+
                 nextPrice = self._current_price * (1 + eq_term_rate)
-                nextNotional = nextPrice * self._quantity                    
+                nextNotional = nextPrice * self._quantity
                 pmntAmount = nextNotional - lastNotional
-    
+
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
                 legPV += pmntPV
-                
+
                 self._last_notionals.append(lastNotional)
                 self._payments.append(pmntAmount)
                 self._paymentDfs.append(dfPmnt)
@@ -271,8 +273,9 @@ class EquitySwapLeg:
             print("Payments Dates not calculated.")
             return
 
-        header = ["PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", "DAYS", "YEARFRAC"]
-        
+        header = ["PAY_NUM", "PAY_DATE", "ACCR_START", "ACCR_END", "DAYS",
+                  "YEARFRAC"]
+
         rows = []
         num_flows = len(self._payment_dates)
         for iFlow in range(0, num_flows):
@@ -284,7 +287,7 @@ class EquitySwapLeg:
                 self._accrued_days[iFlow],
                 round(self._year_fracs[iFlow], 4),
             ])
-            
+
         table = format_table(header, rows)
         print("\nPAYMENTS SCHEDULE:")
         print(table)
@@ -301,11 +304,12 @@ class EquitySwapLeg:
         if len(self._payments) == 0:
             print("Payments not calculated.")
             return
-        
-        header = ["PAY_NUM", "PAY_DATE",  "NOTIONAL", 
-                  "FWD_RATE", "PMNT", "DF", "PV", "CUM_PV"]
 
-        rows = []          
+        header = ["PAY_NUM", "PAY_DATE",  "NOTIONAL",
+                  "FWD_RATE", "PMNT", "DF",
+                  "PV", "CUM_PV"]
+
+        rows = []
         num_flows = len(self._payment_dates)
         for iFlow in range(0, num_flows):
             rows.append([

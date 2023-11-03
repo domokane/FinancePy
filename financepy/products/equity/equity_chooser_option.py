@@ -101,7 +101,7 @@ class EquityChooserOption(EquityOption):
         if valuation_date > self._chooseDate:
             raise FinError("Value date after choose date.")
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if valuation_date > self._call_expiry_date:
@@ -112,11 +112,11 @@ class EquityChooserOption(EquityOption):
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         DEBUG_MODE = False
 

@@ -53,7 +53,7 @@ def _value_convertible(tmat,
                        num_steps_per_year):
 
     interp = InterpTypes.FLAT_FWD_RATES.value
-    
+
     if len(coupon_times) > 0:
         if coupon_times[-1] > tmat:
             raise FinError("Coupon after maturity")
@@ -275,7 +275,7 @@ class BondConvertible:
         """ Create BondConvertible object by providing the bond Maturity
         date, coupon, frequency type, accrual convention type and then all of
         the details regarding the conversion option including the list of the
-        call and put dates and the corresponding list of call and put prices. 
+        call and put dates and the corresponding list of call and put prices.
         """
 
         check_argument_types(self.__init__, locals())
@@ -327,10 +327,10 @@ class BondConvertible:
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-    ###############################################################################
+    ###########################################################################
 
     def _calculate_coupon_dates(self,
-                              settlement_date: Date):
+                                settlement_date: Date):
         """ Determine the convertible bond cash flow payment dates. """
 
         # No need to generate flows if settlement date has not changed
@@ -342,17 +342,17 @@ class BondConvertible:
         date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._coupon_dates = Schedule(settlement_date,
-                                    self._maturity_date,
-                                    self._freq_type,
-                                    self._calendar_type,
-                                    bus_day_rule_type,
-                                    date_gen_rule_type)._generate()
+                                      self._maturity_date,
+                                      self._freq_type,
+                                      self._calendar_type,
+                                      bus_day_rule_type,
+                                      date_gen_rule_type)._generate()
 
         self._pcd = self._coupon_dates[0]
         self._ncd = self._coupon_dates[1]
         self.accrued_interest(settlement_date, 1.0)
 
-    ###############################################################################
+    ###########################################################################
 
     def value(self,
               settlement_date: Date,
@@ -532,7 +532,7 @@ class BondConvertible:
 
         return results
 
-    ###############################################################################
+    ###########################################################################
 
     def accrued_days(self,
                      settlement_date: Date):
@@ -544,10 +544,10 @@ class BondConvertible:
 
         return settlement_date - self._pcd
 
-    ###############################################################################
+    ###########################################################################
 
     def accrued_interest(self,
-                         settlement_date: Date, 
+                         settlement_date: Date,
                          face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
@@ -571,7 +571,7 @@ class BondConvertible:
         self._accrued_days = num
         return self._accrued_interest
 
-    ###############################################################################
+    ###########################################################################
 
     def current_yield(self,
                       clean_price: float):
@@ -581,7 +581,7 @@ class BondConvertible:
         y = self._coupon * self._par / clean_price
         return y
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         """ Print a list of the unadjusted coupon payment dates used in
@@ -607,7 +607,7 @@ class BondConvertible:
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

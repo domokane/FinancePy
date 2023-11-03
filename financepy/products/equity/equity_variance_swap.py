@@ -246,7 +246,6 @@ class EquityVarianceSwap:
         var = cumX2 * 252.0 / num_observations
         return var
 
-
 ###############################################################################
 
     def print_weights(self):

@@ -147,8 +147,8 @@ def _value_once(stock_price,
 
     for iNode in range(0, iTime + 1):
         s = stock_values[index + iNode]
-        option_values[index +
-                      iNode] = _payoff_value(s, payoff_typeValue, payoff_params)
+        option_values[index + iNode] =\
+            _payoff_value(s, payoff_typeValue, payoff_params)
 
     # begin backward steps from expiry
     for iTime in range(num_steps - 1, -1, -1):

@@ -256,52 +256,52 @@ def test_IntraDay():
 def test_DateEOM():
 
     dt = Date(29, 2, 2000)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(28, 2, 2001)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(29, 2, 2004)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(28, 2, 2005)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(31, 3, 2003)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(30, 4, 2004)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(31, 5, 2004)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(31, 12, 2010)
-    assert dt.is_eom() == True
+    assert dt.is_eom() is True
 
     dt = Date(2, 2, 2000)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(24, 2, 2001)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(22, 2, 2004)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(1, 2, 2005)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(1, 3, 2003)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(3, 4, 2004)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(5, 5, 2004)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
     dt = Date(7, 12, 2010)
-    assert dt.eom().is_eom() == True
+    assert dt.eom().is_eom() is True
 
 
 def test_datetime():

@@ -83,16 +83,16 @@ class EquityCliquetOption(EquityOption):
         """ Value the cliquet option as a sequence of options using the Black-
         Scholes model. """
 
-        if isinstance(valuation_date, Date) == False:
+        if isinstance(valuation_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
         if discount_curve._valuation_date != valuation_date:
             raise FinError(
-                "Discount Curve valuation date not same as option valuation date")
+                "Discount Curve valuation date not same as option value date")
 
         if dividend_curve._valuation_date != valuation_date:
             raise FinError(
-                "Dividend Curve valuation date not same as option valuation date")
+                "Dividend Curve valuation date not same as option value date")
 
         if valuation_date > self._final_expiry_date:
             raise FinError("Value date after final expiry date.")

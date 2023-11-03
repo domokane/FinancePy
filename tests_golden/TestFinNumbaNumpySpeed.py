@@ -234,7 +234,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     plt.plot(num_paths_list, NUMBA_ONLY_t, 'o-', label="NUMBA ONLY")
     plt.plot(num_paths_list, NUMBA_PARALLEL_t, 'o-', label="NUMBA PARALLEL")
 
-    if useSobol == False:
+    if useSobol is False:
         plt.plot(num_paths_list, CPP_t, 'o-', label="C++")
 
     plt.xlabel("Number of Paths")
