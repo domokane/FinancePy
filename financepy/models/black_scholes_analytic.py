@@ -39,7 +39,6 @@ def bs_value(s, t, k, r, q, v, option_type_value):
     d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
     d2 = d1 - vsqrtT
 
-#    value = phi * ss * n_vect(phi * d1) - phi * kk * n_vect(phi * d2)
     value = phi * ss * N(phi * d1) - phi * kk * N(phi * d2)
     return value
 

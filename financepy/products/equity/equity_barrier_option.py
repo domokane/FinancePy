@@ -94,20 +94,18 @@ class EquityBarrierOption(EquityOption):
         if t_exp < 0:
             raise FinError("Option expires before value date.")
 
-        for stock_price in stock_prices:
+        values = value_bs(t_exp,
+                      self._strike_price, 
+                      self._barrier_level,
+                      stock_prices,
+                      discount_curve.cc_rate(self._expiry_date),
+                      dividend_curve.cc_rate(self._expiry_date), 
+                      model._volatility,
+                      self._option_type.value, 
+                      self._num_observations_per_year)
 
-            v = value_bs(t_exp,
-                          self._strike_price, 
-                          self._option_type.value, 
-                          self._barrier_level,
-                          self._num_observations_per_year, 
-                          self._notional,
-                          stock_price,
-                          discount_curve.cc_rate(self._expiry_date),
-                          dividend_curve.cc_rate(self._expiry_date), model)
-
-            values.append(v)
-
+        values = values * self._notional
+        
         if isinstance(stock_price, float):
             return values[0]
         else:

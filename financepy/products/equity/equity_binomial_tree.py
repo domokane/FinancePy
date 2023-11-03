@@ -33,7 +33,7 @@ class EquityTreeExerciseTypes(Enum):
 ###############################################################################
 
 
-@jit
+@njit
 def _validate_payoff(payoff_type, payoff_params):
 
     num_params = 0

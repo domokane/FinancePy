@@ -3,8 +3,8 @@
 ##############################################################################
 
 import numpy as np
+from numba import float64, int64, vectorize
 
-from ..market.curves.discount_curve import DiscountCurve
 from ..utils.error import FinError
 from ..utils.global_types import EquityBarrierTypes
 from ..utils.math import N
@@ -12,38 +12,23 @@ from ..utils.math import N
 
 # Calculates the Barrier option price using an Analytical Approach
 # and the Black Scholes Model
-def value_bs(time_to_expiry: float,  # time in years
-              strike_price: float,
-              option_type: int,
-              barrier_level: float,
-              num_observations,  # number of observations per year
-              notional: float,
-              stock_price: (float, np.ndarray),
-              rf_rate: float,
-              div_rate: float,
-              model):
+@vectorize([float64(float64, float64, float64, float64, float64, float64,
+                    float64, int64, int64)], fastmath=True, cache=True)
+def value_bs(t, k, h, s, r, q, v, option_type, nobs):  
     """ This values a single option. Because of its structure it cannot
-    easily be vectorised which is why it has been wrapped. """
-    t_exp = max(time_to_expiry, 1e-6)
+    easily be vectorised which is why it has been wrapped. 
+    # number of observations per year
+    """
+    lnS0k = np.log(s / k)
+    sqrtT = np.sqrt(t)
 
-    lnS0k = np.log(stock_price / strike_price)
-    sqrtT = np.sqrt(t_exp)
-
-    r = rf_rate
-    q = div_rate
-
-    k = strike_price
-    s = stock_price
-    h = barrier_level
-
-    volatility = model._volatility
-    sigma_root_t = volatility * sqrtT
-    v2 = volatility * volatility
+    sigma_root_t = v * sqrtT
+    v2 = v * v
     mu = r - q
-    d1 = (lnS0k + (mu + v2 / 2.0) * t_exp) / sigma_root_t
-    d2 = (lnS0k + (mu - v2 / 2.0) * t_exp) / sigma_root_t
-    df = np.exp(-r * t_exp)
-    dq = np.exp(-q * t_exp)
+    d1 = (lnS0k + (mu + v2 / 2.0) * t) / sigma_root_t
+    d2 = (lnS0k + (mu - v2 / 2.0) * t) / sigma_root_t
+    df = np.exp(-r * t)
+    dq = np.exp(-q * t)
 
     c = s * dq * N(d1) - k * df * N(d2)
     p = k * df * N(-d2) - s * dq * N(-d1)
@@ -65,37 +50,37 @@ def value_bs(time_to_expiry: float,  # time in years
     elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= h:
         return p
 
-    num_observations = 1 + t_exp * num_observations
+    num_observations = 1 + t * nobs
 
     # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
     # Adjusts the barrier for discrete and not continuous observations
     h_adj = h
-    t = t_exp / num_observations
+    t = t / num_observations
 
     if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
-        h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
-        h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
-        h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
-        h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
-        h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
-        h_adj = h * np.exp(0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
-        h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
     elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
-        h_adj = h * np.exp(-0.5826 * volatility * np.sqrt(t))
+        h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
     else:
         raise FinError("Unknown barrier option type." +
                        str(option_type))
 
     h = h_adj
 
-    if abs(volatility) < 1e-5:
-        volatility = 1e-5
+    if abs(v) < 1e-5:
+        v = 1e-5
 
     l = (mu + v2 / 2.0) / v2
     y = np.log(h * h / (s * k)) / sigma_root_t + l * sigma_root_t
@@ -190,8 +175,7 @@ def value_bs(time_to_expiry: float,  # time in years
         raise FinError("Unknown barrier option type." +
                        str(option_type))
 
-    v = price * notional
-    return v
+    return price
 
 
 ###############################################################################

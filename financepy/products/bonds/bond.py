@@ -132,7 +132,7 @@ class Bond:
         self._frequency = annual_frequency(freq_type)
 
         if ex_div_days > 90:
-            raise FinError("Ex dividend days cannot be more than 90")
+            raise FinError("Ex dividend days cannot be more than 90", ex_div_days)
 
         self._ex_div_days = ex_div_days
 

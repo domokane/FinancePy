@@ -3,10 +3,9 @@
 ###############################################################################
 
 import sys
+sys.path.append("..")
 
 from financepy.utils import gDaysInYear
-
-sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -198,6 +197,22 @@ def test_EquityBarrierOption():
                 vega,
                 theta)
 
+###############################################################################
+
+    stock_prices = [80, 100, 120]
+    B = 105.0
+
+    testCases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
+
+    barrier_option = EquityBarrierOption(
+        expiry_date, 100.0, option_type, B, num_observations_per_year)
+
+    values = barrier_option.value(valuation_date, 
+                                  stock_prices,
+                                  discount_curve,
+                                  dividend_curve,
+                                  model)
+        
 ###############################################################################
 
 
