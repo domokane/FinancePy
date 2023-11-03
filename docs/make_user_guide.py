@@ -340,8 +340,8 @@ def parse_module(moduleName):
 
     for c in range(0, numClasses):
         newLines = parse_class(lines,
-                              startClassLines[c],
-                              startClassLines[c + 1])
+                               startClassLines[c],
+                               startClassLines[c + 1])
 
         for newLine in newLines:
             f.writelines(newLine)
@@ -458,7 +458,7 @@ def parse_class(lines, startLine, endLine):
                 dataMember = dataMember.strip(" ")
                 dataMember = dataMember.strip(")")
                 dataMember = dataMember.replace("self.", "")
-                dataMembers = addToList(dataMembers, dataMember)
+                dataMembers = add_to_list(dataMembers, dataMember)
 
         if len(dataMembers) > 0:
             newLines.append("\\begin{itemize}\n")
@@ -498,9 +498,9 @@ def parse_class(lines, startLine, endLine):
 
     for c in range(0, numClassFunctions):
         newLines += parse_function(lines,
-                                  startClassFunctionLines[c],
-                                  startClassFunctionLines[c + 1],
-                                  className)
+                                   startClassFunctionLines[c],
+                                   startClassFunctionLines[c + 1],
+                                   className)
         newLines += "\n"
 
     return newLines
@@ -635,7 +635,8 @@ def parse_function(lines, startLine, endLine, className=""):
 
     paramDescription = extract_params(functionSignature)
 
-    # Inside lstlisting, backslashes used for escaping are interpreted as backslashes
+    # Inside lstlisting, backslashes used for escaping are interpreted as 
+    # backslashes
     # However, must be after `extract_params` where escaping is required
     functionSignature = functionSignature.replace("\\_", "_")
 

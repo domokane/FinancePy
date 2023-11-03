@@ -5,7 +5,6 @@
 import sys
 sys.path.append("..")
 
-
 import time
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.utils.global_types import OptionTypes

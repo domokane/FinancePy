@@ -87,6 +87,7 @@ def _g(oas, *args):
 
 ###############################################################################
 
+
 class Bond:
     """ Class for fixed coupon bonds and performing related analytics. These
     are bullet bonds which means they have regular coupon payments of a known
@@ -99,9 +100,9 @@ class Bond:
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  ex_div_days: int = 0,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_rule_type = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type = DateGenRuleTypes.BACKWARD):
+                 calendar_type: CalendarTypes=CalendarTypes.WEEKEND,
+                 bus_day_rule_type=BusDayAdjustTypes.FOLLOWING,
+                 date_gen_rule_type=DateGenRuleTypes.BACKWARD):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
         amount and the number of ex-dividend days. A calendar type is used
@@ -132,15 +133,16 @@ class Bond:
         self._frequency = annual_frequency(freq_type)
 
         if ex_div_days > 90:
-            raise FinError("Ex dividend days cannot be more than 90", ex_div_days)
+            raise FinError("Ex dividend days cannot be more than 90"
+                           + str(ex_div_days))
 
         self._ex_div_days = ex_div_days
 
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._calendar_type = calendar_type
 
-        self._coupon_dates = [] # can be holidays or weekend
-        self._payment_dates = []  # Actual payment dates are adjusted to bus days
+        self._coupon_dates = []  # can be holidays or weekend
+        self._payment_dates = []  # Actual pay dates are adjusted to bus days
         self._flow_amounts = []
 
         self._accrued_interest = None
@@ -162,16 +164,16 @@ class Bond:
         """
 
         # This should only be called once from init
-        #bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
-        #date_gen_rule_type = DateGenRuleTypes.BACKWARD
+        # bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
+        # date_gen_rule_type = DateGenRuleTypes.BACKWARD
 
         self._coupon_dates = Schedule(self._issue_date,
-                                    self._maturity_date,
-                                    self._freq_type,
-                                    CalendarTypes.NONE,
-                                    self.bus_day_rule_type,
-                                    self.date_gen_rule_type,
-                                    end_of_month = self._end_of_month)._generate()
+                                      self._maturity_date,
+                                      self._freq_type,
+                                      CalendarTypes.NONE,
+                                      self.bus_day_rule_type,
+                                      self.date_gen_rule_type,
+                                      end_of_month=self._end_of_month)._generate()
 
     ###########################################################################
 
@@ -192,7 +194,7 @@ class Bond:
 
         # Expect at least an issue date and a maturity date - if not - problem
         if len(self._coupon_dates) < 2:
-            raise FinError("Unable to calculate payment dates with only one payment")
+            raise FinError("Unable to calculate pmnt dates with only one pmnt")
 
         # I do not adjust the first date as it is the issue date
         self._payment_dates.append(self._coupon_dates[0])
@@ -218,9 +220,9 @@ class Bond:
     ###########################################################################
 
     def dirty_price_from_ytm(self,
-                            settlement_date: Date,
-                            ytm: float,
-                            convention: YTMCalcType = YTMCalcType.UK_DMO):
+                             settlement_date: Date,
+                             ytm: float,
+                             convention: YTMCalcType = YTMCalcType.UK_DMO):
         """ Calculate the dirty price of bond from its yield to maturity. This
         function is vectorised with respect to the yield input. It implements
         a number of standard conventions for calculating the YTM. """
@@ -299,9 +301,9 @@ class Bond:
                 dc = DayCount(DayCountTypes.ACT_365L)
 
                 alpha = (1 - dc.year_frac(last_year,
-                                         settlement_date,
-                                         self._maturity_date,
-                                         freq_type=FrequencyTypes.ANNUAL)[0])
+                                          settlement_date,
+                                          self._maturity_date,
+                                          freq_type=FrequencyTypes.ANNUAL)[0])
 
                 vw = 1.0 / (1.0 + alpha * ytm)
                 dp = vw * (1.0 + c / f)
@@ -416,7 +418,7 @@ class Bond:
 
         # check if key_rate_tenors is None
         if key_rate_tenors is None:
-        # if it is None, create an array of key rates ranging from 0.5 to 30 years
+        # if it is None, create an array of key rates from 0.5 to 30 years
             key_rate_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10, 20, 30])
 
         # set the shift to a small value if not give
@@ -426,14 +428,14 @@ class Bond:
         # initialize an empty list for the key rate durations
         key_rate_durations = []
 
-        # iterate over each key rate (tenor) and calculate the key rate duration
+        # iterate over each key rate (tenor) and calculate key rate duration
         for ind, _ in enumerate(key_rate_tenors):
             # if rates not given
-            # create an array of rates where each rate is equal to the ytm value
+            # create an array of rates where each rate is equal to ytm value
             if rates is None:
                 rates = np.ones(len(key_rate_tenors)) * ytm
 
-            #Create set of par bonds to be used in BondZeroCurve
+            # Create set of par bonds to be used in BondZeroCurve
             # ytm and coupons are equal
             par_bonds = []
             for tenor, cpn in zip(key_rate_tenors, rates):
@@ -521,7 +523,7 @@ class Bond:
         """ Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        dy = 0.0001 # 1 basis point
+        dy = 0.0001  # 1 basis point
         p0 = self.dirty_price_from_ytm(settlement_date, ytm - dy, convention)
         p1 = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         p2 = self.dirty_price_from_ytm(settlement_date, ytm + dy, convention)
@@ -537,10 +539,10 @@ class Bond:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        dp = self.dirty_price_from_ytm(settlement_date, ytm, convention)
         accrued = self.accrued_interest(settlement_date, self._par)
-        clean_price = dirty_price - accrued
-        return clean_price
+        cp = dp - accrued
+        return cp
 
     ###########################################################################
 
@@ -553,7 +555,7 @@ class Bond:
 
         self.accrued_interest(settlement_date, self._par)
         dirty_price = self.dirty_price_from_discount_curve(settlement_date,
-                                                         discount_curve)
+                                                           discount_curve)
 
         accrued = self.accrued_interest(settlement_date, self._par)
         clean_price = dirty_price - accrued
@@ -562,8 +564,8 @@ class Bond:
     ###########################################################################
 
     def dirty_price_from_discount_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve):
         """ Calculate the bond price using a provided discount curve to PV the
         bond's cash flows to the settlement date. As such it is effectively a
         forward bond price if the settlement date is after the valuation date.
@@ -683,8 +685,8 @@ class Bond:
 
     def accrued_interest(self,
                          settlement_date: Date,
-                         face:float = 100.0):
-        """ Calculate the amount of coupon that has accrued between the
+                         face: float = 100.0):
+        ''' Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
         between the previous coupon payment date and settlement date. If the
@@ -692,7 +694,7 @@ class Bond:
         days before the coupon date the ex-coupon date is. You can specify the
         calendar to be used in the bond constructor - NONE means only calendar
         days, WEEKEND is only weekends or you can specify a country calendar
-        for business days."""
+        for business days.'''
 
         self._calc_pcd_ncd(settlement_date)
 
@@ -779,9 +781,9 @@ class Bond:
     ###########################################################################
 
     def dirty_price_from_oas(self,
-                            settlement_date: Date,
-                            discount_curve: DiscountCurve,
-                            oas: float):
+                             settlement_date: Date,
+                             discount_curve: DiscountCurve,
+                             oas: float):
         """ Calculate the full price of the bond from its OAS given the bond
         settlement date, a discount curve and the oas as a number. """
 
@@ -811,7 +813,7 @@ class Bond:
         pv *= self._par
         return pv
 
-    ############################################################################
+    ###########################################################################
 
     def option_adjusted_spread(self,
                                settlement_date: Date,
@@ -887,10 +889,10 @@ class Bond:
     ###########################################################################
 
     def dirty_price_from_survival_curve(self,
-                                       settlement_date: Date,
-                                       discount_curve: DiscountCurve,
-                                       survival_curve: DiscountCurve,
-                                       recovery_rate: float):
+                                        settlement_date: Date,
+                                        discount_curve: DiscountCurve,
+                                        survival_curve: DiscountCurve,
+                                        recovery_rate: float):
         """ Calculate discounted present value of flows assuming default model.
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default. For the
@@ -950,9 +952,9 @@ class Bond:
         self.accrued_interest(settlement_date, 1.0)
 
         dirty_price = self.dirty_price_from_survival_curve(settlement_date,
-                                                         discount_curve,
-                                                         survival_curve,
-                                                         recovery_rate)
+                                                           discount_curve,
+                                                           survival_curve,
+                                                           recovery_rate)
 
         clean_price = dirty_price - self._accrued_interest
         return clean_price
@@ -983,6 +985,7 @@ class Bond:
         simple_return = (pnl / buy_price) * 365 / (end_date - begin_date)
         brentq_up_bound = 5
         brentq_down_bound = -0.9999
+
         # in case brentq cannot find the irr root
         if simple_return > brentq_up_bound or simple_return < brentq_down_bound:
             irr = simple_return

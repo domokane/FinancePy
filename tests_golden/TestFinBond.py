@@ -2,8 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import sys
-sys.path.append("..")
+
+import os
+import datetime as dt
+import pandas as pd
+import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -15,14 +18,13 @@ from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.bonds.bond_market import *
+from financepy.products.bonds.bond_market import get_bond_market_conventions
+from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
 
-import os
-import datetime as dt
-import pandas as pd
-import numpy as np
+import sys
+sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -698,21 +700,22 @@ coupon = 0.02375
 freqType = FrequencyTypes.SEMI_ANNUAL
 accrualType = DayCountTypes.ACT_ACT_ICMA
 face = 125000
+ex_div_days = 10
 
-bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType, face)
+bond = Bond(issueDate, maturityDate, coupon, freqType, accrualType, ex_div_days)
 
-print(bond)
+#print(bond)
 
 cleanPrice = 99.7808417 # if face is 1 then this must be 0.99780842
 
 settlementDate = Date(15, 5, 2023)
-print(bond.bond_payments(settlementDate, face))
+#print(bond.bond_payments(settlementDate, face))
 
 current_yield = bond.current_yield(cleanPrice)*100
-print("Current Yield %12.7f %%" % (current_yield))
+#print("Currnt Yield: %10.5f %%" % (current_yield))
 
-ytm = bond.yield_to_maturity(settlementDate, cleanPrice)
-print("Yield to maturity %12.7f %%" % (ytm))
+ytm = bond.yield_to_maturity(settlementDate, cleanPrice) * 100.0
+#print("Yield to Mat: %10.5f %%" % (ytm))
 
 ###############################################################################
 

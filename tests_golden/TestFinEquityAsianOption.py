@@ -6,6 +6,7 @@ import sys
 sys.path.append("..")
 
 import time
+
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

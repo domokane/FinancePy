@@ -162,10 +162,10 @@ class MertonFirmMkt(MertonFirm):
         self._A = np.array(self._A)
         self._vA = np.array(self._vA)
 
-
 ###############################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EQUITY VALUE", self._E)
         s += label_to_string("BOND FACE", self._L)

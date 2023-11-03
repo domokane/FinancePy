@@ -23,9 +23,9 @@ from ...utils.helpers import label_to_string
 
 
 class DiscountCurve:
-    """ This is a base discount curve which has an internal representation of
+    ''' This is a base discount curve which has an internal representation of
     a vector of times and discount factors and an interpolation scheme for
-    interpolating between these fixed points. """
+    interpolating between these fixed points. '''
 
     ###############################################################################
 
@@ -82,7 +82,7 @@ class DiscountCurve:
         self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
-    ###############################################################################
+    ###########################################################################
 
     def _zero_to_df(self,
                     valuation_date: Date,
@@ -115,7 +115,7 @@ class DiscountCurve:
 
         return df
 
-    ###############################################################################
+    ###########################################################################
 
     def _df_to_zero(self,
                     dfs: (float, np.ndarray),
@@ -166,7 +166,7 @@ class DiscountCurve:
 
         return np.array(zero_rates)
 
-    ###############################################################################
+    ###########################################################################
 
     def zero_rate(self,
                   dts: (list, Date),
@@ -193,7 +193,7 @@ class DiscountCurve:
 
         return zero_rates
 
-    ###############################################################################
+    ###########################################################################
 
     def cc_rate(self,
                 dts: (list, Date),
@@ -206,7 +206,7 @@ class DiscountCurve:
             dts, FrequencyTypes.CONTINUOUS, day_count_type)
         return cc_rates
 
-    ###############################################################################
+    ###########################################################################
 
     def swap_rate(self,
                   effective_date: Date,
@@ -280,14 +280,14 @@ class DiscountCurve:
         else:
             return parRates
 
-    ###############################################################################
+    ###########################################################################
 
     def df(self,
            dt: (list, Date),
            day_count=DayCountTypes.ACT_ACT_ISDA):
-        """ Function to calculate a discount factor from a date or a
-        vector of dates. The day count determines how dates get converted to 
-        years. I allow this to default to ACT_ACT_ISDA unless specified. """
+        ''' Function to calculate a discount factor from a date or a
+        vector of dates. The day count determines how dates get converted to
+        years. I allow this to default to ACT_ACT_ISDA unless specified. '''
 
         times = times_from_dates(dt, self._valuation_date, day_count)
         dfs = self._df(times)
@@ -297,7 +297,7 @@ class DiscountCurve:
         else:
             return np.array(dfs)
 
-    ###############################################################################
+    ###########################################################################
 
     def _df(self,
             t: (float, np.ndarray)):
@@ -319,7 +319,7 @@ class DiscountCurve:
 
         return df
 
-    ###############################################################################
+    ###########################################################################
 
     def survival_prob(self,
                       dt: Date):
@@ -331,7 +331,7 @@ class DiscountCurve:
         q = self.df(dt)
         return q
 
-    ###############################################################################
+    ###########################################################################
 
     def fwd(self,
             dts: Date):
@@ -359,7 +359,7 @@ class DiscountCurve:
         else:
             return np.array(fwd)
 
-    ###############################################################################
+    ###########################################################################
 
     def _fwd(self,
              times: (np.ndarray, float)):
@@ -376,7 +376,7 @@ class DiscountCurve:
         fwd = np.log(df1 / df2) / (2.0 * dt)
         return fwd
 
-    ###############################################################################
+    ###########################################################################
 
     def bump(self,
              bump_size: float):
@@ -399,7 +399,7 @@ class DiscountCurve:
 
         return discCurve
 
-    ###############################################################################
+    ###########################################################################
 
     def fwd_rate(self,
                  start_date: (list, Date),
@@ -443,7 +443,7 @@ class DiscountCurve:
         else:
             return np.array(fwd_rates)
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -456,7 +456,7 @@ class DiscountCurve:
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """
