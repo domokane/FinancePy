@@ -33,7 +33,8 @@ for moduleFileName in modules[n:m+1]:
 
         moduleTextName = basename(moduleFileName[:-3])
         print("TEST: %3d out of %3d: MODULE: %-35s " % (n+1, numModules,
-                                                        moduleTextName), end="")
+                                                        moduleTextName),
+              end="")
         moduleName = __import__(moduleTextName)
         numErrors = moduleName.testCases._globalNumErrors
         numWarnings = moduleName.testCases._globalNumWarnings
@@ -68,7 +69,7 @@ for moduleFileName in modules[n:m+1]:
         print("Base error:", e)
         n = n + 1
         pass
-    except:
+    except Exception:
         print("Unexpected error:", sys.exc_info()[0])
         n = n + 1
         pass

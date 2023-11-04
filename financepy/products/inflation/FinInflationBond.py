@@ -30,19 +30,18 @@ class FinInflationBond(Bond):
                  coupon: float,  # Annualised bond coupon before inflation
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
-                 ex_div_days: int,
-                 base_cpi_value: float,
-                 num_ex_dividend_days: int = 0, 
-                 calendar_type: CalendarTypes = CalendarTypes.NONE):  # Value of CPI index at bond issue date
+                 ex_div_days: int,  # Value of CPI index at bond issue date
+                 num_ex_dividend_days: int = 0,
+                 calendar_type: CalendarTypes = CalendarTypes.NONE):
         """ Create FinInflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
-        the base CPI used for all coupon and principal related calculations. 
+        the base CPI used for all coupon and principal related calculations.
         The class inherits from Bond so has many similar functions. The YTM"""
 
-        Bond.__init__(self,issue_date, maturity_date, coupon, freq_type, accrual_type, ex_div_days, calendar_type)
+        Bond.__init__(self, issue_date, maturity_date, coupon, freq_type,
+                      accrual_type, ex_div_days, calendar_type)
         check_argument_types(self.__init__, locals())
 
-        
         if issue_date >= maturity_date:
             raise FinError("Issue Date must preceded maturity date.")
 
@@ -88,7 +87,8 @@ class FinInflationBond(Bond):
         amount and the CPI growth. """
 
         index_ratio = reference_cpi / self._baseCPIValue
-        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, convention)
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm,
+                                                convention)
         principal = dirty_price * face / self._par
         principal = principal - self._accrued_interest
         principal *= index_ratio
@@ -107,7 +107,7 @@ class FinInflationBond(Bond):
         index_ratio = last_cpn_cpi / self._baseCPIValue
         clean_price = self.clean_price_from_ytm(
             settlement_date, ytm, convention)
-        flat_price = clean_price 
+        flat_price = clean_price
         flat_price *= index_ratio
         return flat_price
 
@@ -115,7 +115,7 @@ class FinInflationBond(Bond):
 
     def inflation_accrued_interest(self, settlement_date: Date,
                                    face: (float),
-                                        reference_cpi):
+                                   reference_cpi):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. This is adjusted by the
         index ratio in line with the CPI growth since the bond base CPI date.
@@ -146,6 +146,5 @@ class FinInflationBond(Bond):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
         print(self)
-
 
 ###############################################################################
