@@ -5,6 +5,9 @@
 import sys
 sys.path.append("..")
 
+import pandas as pd
+import numpy as np
+
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -14,14 +17,12 @@ from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond_market import get_bond_market_conventions
 
-import pandas as pd
-import numpy as np
-
 import os
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 
 ###############################################################################
+
 
 def test_bondtutor_example():
 
@@ -284,17 +285,30 @@ def test_bond_cfets():
                                   'maturity_date'])
 
     for row in df.itertuples(index=False):
-        bond = Bond(
-            issue_date=Date(row.issue_date.day,
-                            row.issue_date.month, row.issue_date.year),
-            maturity_date=Date(row.maturity_date.day,
-                               row.maturity_date.month, row.maturity_date.year),
-            coupon=row.coupon / 100,
-            freq_type=FrequencyTypes.ANNUAL if row.freq == 1 else FrequencyTypes.SEMI_ANNUAL,
-            accrual_type=DayCountTypes.ACT_ACT_ICMA
-        )
-        settlement_date = Date(
-            row.settlement_date.day, row.settlement_date.month, row.settlement_date.year)
+
+        issue_date = Date(row.issue_date.day,
+                          row.issue_date.month,
+                          row.issue_date.year)
+
+        maturity_date = Date(row.maturity_date.day,
+                             row.maturity_date.month,
+                             row.maturity_date.year)
+
+        if row.freq == 1:
+            freq_type = FrequencyTypes.ANNUAL
+        else:
+            freq_type = FrequencyTypes.SEMI_ANNUAL
+
+        bond = Bond(issue_date,
+                    maturity_date,
+                    row.coupon / 100,
+                    freq_type,
+                    accrual_type=DayCountTypes.ACT_ACT_ICMA)
+
+        settlement_date = Date(row.settlement_date.day,
+                               row.settlement_date.month,
+                               row.settlement_date.year)
+
         accrued_interest = bond.accrued_interest(settlement_date, face)
         clean_price = row.dirty_price - accrued_interest
         calc_ytm = bond.yield_to_maturity(
@@ -311,10 +325,11 @@ def test_bond_cfets():
 
 ###############################################################################
 
+
 def test_key_rate_durations_Bloomberg_example():
 
     accrual_type, frequencyType, settlementDays, exDiv, calendar = \
-    get_bond_market_conventions(BondMarkets.UNITED_STATES)
+        get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     # interest accrues on this date. Issue date is 01/08/2022
     issue_date = Date(31, 7, 2022)
@@ -322,8 +337,8 @@ def test_key_rate_durations_Bloomberg_example():
     coupon = 2.75/100.0
     ex_div_days = 0
 
-    accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
-    BondMarkets.UNITED_STATES)
+    accrual_type, freq_type, settlementDays, exDiv, calendar =\
+        get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_date, maturity_date, coupon,
                 freq_type, accrual_type, ex_div_days)
@@ -339,13 +354,11 @@ def test_key_rate_durations_Bloomberg_example():
     my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575,
                          3.6272,  3.5825,  3.5347]) / 100.0
 
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date,
-                                                                  ytm,
-                                                                  key_rate_tenors = my_tenors,
-                                                                  rates = my_rates)
-
-    print(key_rate_tenors)
-    print(key_rate_durations)
+    key_rate_tenors, key_rate_durations =\
+        bond.key_rate_durations(settlement_date,
+                                ytm,
+                                key_rate_tenors=my_tenors,
+                                rates=my_rates)
 
     bbg_key_rate_durations = [-0.001, -.009, -0.022, 1.432,
                               2.527, 0.00, 0.00, 0.00, 0.00]
@@ -354,5 +367,3 @@ def test_key_rate_durations_Bloomberg_example():
         assert round(key_rate_durations[i], 3) == bbg_key_rate_durations[i]
 
 ###############################################################################
-
-test_zero_bond()

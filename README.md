@@ -1,10 +1,16 @@
 # Latest News and Versions
+10 November 2023  version 0.33 released
+- Tidied up key rate code
+- Fixed unit tests for pytest
+- Fixed vectorisation of barrier options
+- Various pep8 fixes
+
 28 August 2023 - version 0.32 released
 - Fixed bug in Bond OAS and ASW
 
 24 August 2023 - Version 0.31 released
 
-Schedule 
+Schedule
 - Corrected bug in schedule generation
 - Corrected bug in CDS protection leg integral
 
@@ -28,17 +34,17 @@ Version 0.260 has been released and pushed to PyPI
 31-Aug-2022
 Version 0.240 has just been released and pushed to PyPI with changes
 - Negative terms in date class
-- Recovery rates do not default to standard value for CDS curves 
+- Recovery rates do not default to standard value for CDS curves
 
 # DISCLAIMER
 
-This software is distributed FREE AND WITHOUT ANY WARRANTY. 
+This software is distributed FREE AND WITHOUT ANY WARRANTY.
 
-Report any bugs or suggestions here as an issue. 
+Report any bugs or suggestions here as an issue.
 
 # CONTRIBUTORS WANTED !
 
-If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. 
+If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu.
 
 If you are a user and require some additional functionality, then please add it as an issue.
 
