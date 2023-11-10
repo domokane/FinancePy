@@ -31,6 +31,7 @@ class FinInflationBond(Bond):
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  ex_div_days: int,  # Value of CPI index at bond issue date
+                 base_cpi_value: float, # CPI value at issue
                  num_ex_dividend_days: int = 0,
                  calendar_type: CalendarTypes = CalendarTypes.NONE):
         """ Create FinInflationBond object by providing Maturity, Frequency,
@@ -40,6 +41,7 @@ class FinInflationBond(Bond):
 
         Bond.__init__(self, issue_date, maturity_date, coupon, freq_type,
                       accrual_type, ex_div_days, calendar_type)
+
         check_argument_types(self.__init__, locals())
 
         if issue_date >= maturity_date:

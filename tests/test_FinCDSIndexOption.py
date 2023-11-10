@@ -40,7 +40,6 @@ def test_dirty_priceCDSIndexOption():
     for row in data[1:]:
 
         splitRow = row.split(",")
-        creditName = splitRow[0]
         spd3Y = float(splitRow[1]) / 10000.0
         spd5Y = float(splitRow[2]) / 10000.0
         spd7Y = float(splitRow[3]) / 10000.0

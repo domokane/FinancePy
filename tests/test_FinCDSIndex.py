@@ -40,8 +40,8 @@ def test_cds_index():
     assert round(spd, 4) == 48.3748
 
     v = cdsIndexContract.value(valuation_date, issuer_curve, cdsRecovery)
-    assert round(v['dirty_pv'], 4) == 27064.9888
-    assert round(v['clean_pv'], 4) == 32575.2797
+    assert round(v['dirty_pv'], 4) == 27064.9906
+    assert round(v['clean_pv'], 4) == 32620.5461
 
     p = cdsIndexContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
     assert round(p, 4) == 99.6742

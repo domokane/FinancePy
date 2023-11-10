@@ -22,14 +22,15 @@ def test_FinInflationBondBBG():
     coupon = 0.0125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
-    face = 100.0
     baseCPIValue = 218.08532
+    ex_dividend_days = 0
 
     bond = FinInflationBond(issue_date,
                             maturity_date,
                             coupon,
                             freq_type,
                             accrual_type,
+                            ex_dividend_days,
                             baseCPIValue)
 
     clean_price = 104.03502
@@ -74,8 +75,10 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settlement_date, ytm)
     assert round(clean_price, 4) == 104.0350
 
-    inflationAccd = bond.calc_inflation_accrued_interest(settlement_date,
-                                                         refCPIValue)
+    face = 100.0
+    inflationAccd = bond.inflation_accrued_interest(settlement_date,
+                                                    face,
+                                                    refCPIValue)
 
     assert round(inflationAccd * 100, 4) == 2.2864
 
@@ -88,11 +91,12 @@ def test_FinInflationBondBBG():
     assert round(clean_price, 4) == 116.6923
 
     principal = bond.inflation_principal(settlement_date,
+                                         face,
                                          ytm,
                                          refCPIValue,
                                          YTMCalcType.US_TREASURY)
 
-    assert round(principal, 4) == 116.7116
+    assert round(principal, 4) == 116.7342
 
     duration = bond.dollar_duration(settlement_date, ytm)
     assert round(duration, 4) == 305.9297
@@ -115,15 +119,15 @@ def test_FinInflationBondStack():
     coupon = 0.00125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
-    face = 100.0
     baseCPIValue = 249.70
+    ex_dividend_days = 0
 
     bond = FinInflationBond(issue_date,
                             maturity_date,
                             coupon,
                             freq_type,
                             accrual_type,
-                            face,
+                            ex_dividend_days,
                             baseCPIValue)
 
     clean_price = 104.03502

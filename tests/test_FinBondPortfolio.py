@@ -2,12 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import os
+import datetime as dt
+
+from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
-from financepy.utils.date import Date, from_datetime
-import os
-import datetime as dt
 
 settlement = Date(19, 9, 2012)
 
@@ -24,7 +25,7 @@ def test_1():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.1500
+    assert round(bond._accrued_interest, 4) == 0.001500
     assert round(ytm * 100, 4) == 0.2203
 
 
@@ -40,7 +41,7 @@ def test_2():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.1500
+    assert round(bond._accrued_interest, 4) == 0.001500
     assert round(ytm * 100, 4) == 0.2203
 
 
@@ -56,7 +57,7 @@ def test_3():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 3.8222
+    assert round(bond._accrued_interest, 4) == 0.0382
     assert round(ytm * 100, 4) == 0.2380
 
 
@@ -72,7 +73,7 @@ def test_4():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0750
+    assert round(bond._accrued_interest, 4) == 0.0008
     assert round(ytm * 100, 4) == 0.2172
 
 
@@ -88,7 +89,7 @@ def test_5():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.1667
+    assert round(bond._accrued_interest, 4) == 0.0017
     assert round(ytm * 100, 4) == 0.2297
 
 
@@ -104,7 +105,7 @@ def test_6():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.4433
+    assert round(bond._accrued_interest, 4) == 0.0044
     assert round(ytm * 100, 4) == 0.3334
 
 
@@ -120,7 +121,7 @@ def test_7():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.1575
+    assert round(bond._accrued_interest, 4) == 0.0016
     assert round(ytm * 100, 4) == 0.3485
 
 
@@ -136,7 +137,7 @@ def test_8():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 2.2795
+    assert round(bond._accrued_interest, 4) == 0.0228
     assert round(ytm * 100, 4) == 0.3405
 
 
@@ -152,7 +153,7 @@ def test_9():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.3278
+    assert round(bond._accrued_interest, 4) == 0.0033
     assert round(ytm * 100, 4) == 0.4930
 
 
@@ -168,7 +169,7 @@ def test_10():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.1315
+    assert round(bond._accrued_interest, 4) == 0.0013
     assert round(ytm * 100, 4) == 0.5559
 
 
@@ -184,5 +185,5 @@ def test_11():
                 coupon, freq_type, accrual_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.5993
+    assert round(bond._accrued_interest, 4) == 0.0060
     assert round(ytm * 100, 4) == 0.7652

@@ -415,8 +415,6 @@ class Bond:
             A tuple containing the key rate tenors and the key rate durations.
         """
 
-        print("TIDY THSI CODE ASAP")
-        
         # check if key_rate_tenors is None
         # if it is None, create an array of key rates from 0.5 to 30 years
 
@@ -435,14 +433,16 @@ class Bond:
 
         # iterate over each key rate (tenor) and calculate key rate duration
         for ind, _ in enumerate(key_rate_tenors):
-            # if rates not given
-            # create an array of rates where each rate is equal to ytm value
+
+            # if rates are not given create an array of rates where each
+            # rate is equal to the ytm value
             if rates is None:
                 rates = np.ones(len(key_rate_tenors)) * ytm
 
             # Create set of par bonds to be used in BondZeroCurve
             # ytm and coupons are equal
             par_bonds = []
+
             for tenor, cpn in zip(key_rate_tenors, rates):
 
                 mat_date = settlement_date.add_years(tenor)
@@ -452,12 +452,19 @@ class Bond:
 
                 par_bonds.append(par_bond)
 
-            clean_prices = [par_bond.clean_price_from_ytm(
-                settlement_date, ytm, us_street) for par_bond, ytm
-                in zip(par_bonds, rates)]
+            clean_prices = []
 
-            par_crv = BondZeroCurve(settlement_date, par_bonds,
-                                    clean_prices, lin_zero_interp)
+            for par_bond, ytm in zip(par_bonds, rates):
+
+                clean_price = par_bond.clean_price_from_ytm(settlement_date,
+                                                            ytm,
+                                                            us_street)
+                clean_prices.append(clean_price)
+
+            par_crv = BondZeroCurve(settlement_date,
+                                    par_bonds,
+                                    clean_prices,
+                                    lin_zero_interp)
 
             # calculate the dirty price of the bond using the discount curve
             p_zero = bond.dirty_price_from_discount_curve(settlement_date, par_crv)
@@ -466,6 +473,7 @@ class Bond:
             rates[ind] += shift
 
             par_bonds = []
+
             for tenor, cpn in zip(key_rate_tenors, rates):
 
                 mat = settlement_date.add_years(tenor)
@@ -475,12 +483,19 @@ class Bond:
 
                 par_bonds.append(par_bond)
 
-            clean_prices = [par_bond.clean_price_from_ytm(
-                settlement_date, ytm, us_street) for par_bond, ytm
-                in zip(par_bonds, rates)]
+            clean_prices = []
 
-            par_crv_up = BondZeroCurve(
-                settlement_date, par_bonds, clean_prices, lin_zero_interp)
+            for par_bond, ytm in zip(par_bonds, rates):
+
+                clean_price = par_bond.clean_price_from_ytm(settlement_date,
+                                                            ytm,
+                                                            us_street)
+                clean_prices.append(clean_price)
+
+            par_crv_up = BondZeroCurve(settlement_date,
+                                       par_bonds,
+                                       clean_prices,
+                                       lin_zero_interp)
 
             # calculate the full price of the bond
             # using the discount curve with the key rate shifted up
@@ -491,6 +506,7 @@ class Bond:
             rates[ind] -= shift * 2
 
             par_bonds = []
+
             for tenor, cpn in zip(key_rate_tenors, rates):
 
                 mat = settlement_date.add_years(tenor)
@@ -500,9 +516,14 @@ class Bond:
 
                 par_bonds.append(par_bond)
 
-            clean_prices = [par_bond.clean_price_from_ytm(settlement_date,
-                                                          ytm,
-                                                          us_street) for par_bond, ytm in zip(par_bonds, rates)]
+            clean_prices = []
+
+            for par_bond, ytm in zip(par_bonds, rates):
+
+                clean_price = par_bond.clean_price_from_ytm(settlement_date,
+                                                            ytm,
+                                                            us_street)
+                clean_prices.append(clean_price)
 
             par_crv_down = BondZeroCurve(settlement_date,
                                          par_bonds,

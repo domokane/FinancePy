@@ -3,13 +3,9 @@
 ###############################################################################
 
 from financepy.utils.date import Date
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.bonds.bond_frn import BondFRN
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.utils.global_types import SwapTypes
 
 
 def test_bond_frn_1():
@@ -19,7 +15,6 @@ def test_bond_frn_1():
     quoted_margin = 0.0025
     freq_type = FrequencyTypes.QUARTERLY
     accrual_type = DayCountTypes.THIRTY_E_360
-    face = 1000000
 
     bond = BondFRN(issue_date,
                    maturity_date,
@@ -43,10 +38,10 @@ def test_bond_frn_1():
     assert round(dm * 10000, 4) == 103.1985
 
     dirty_price = bond.dirty_price_from_dm(settlement_date,
-                                         resetIbor,
-                                         current_ibor,
-                                         future_ibors,
-                                         dm)
+                                           resetIbor,
+                                           current_ibor,
+                                           future_ibors,
+                                           dm)
 
     assert round(dirty_price, 4) == 97.0266
 
@@ -57,7 +52,7 @@ def test_bond_frn_1():
     assert accddays == 71
 
     accdAmount = bond._accrued_interest
-    assert round(accdAmount, 4) == 2336.2156
+    assert round(accdAmount, 4) == 0.0023
 
     principal = bond.principal(settlement_date,
                                resetIbor,
@@ -65,7 +60,7 @@ def test_bond_frn_1():
                                future_ibors,
                                dm)
 
-    assert round(principal, 4) == 967930.0000
+    assert round(principal, 4) == 9702.6598
 
     duration = bond.dollar_duration(settlement_date,
                                     resetIbor,
@@ -124,7 +119,6 @@ def test_bond_frn_2():
     quoted_margin = 0.0020
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
-    face = 1000000.0
 
     bond = BondFRN(issue_date,
                    maturity_date,
@@ -146,10 +140,10 @@ def test_bond_frn_2():
     assert round(dm * 10000, 4) == 123.0623
 
     dirty_price = bond.dirty_price_from_dm(settlement_date,
-                                         resetIbor,
-                                         current_ibor,
-                                         future_ibors,
-                                         dm)
+                                           resetIbor,
+                                           current_ibor,
+                                           future_ibors,
+                                           dm)
 
     assert round(dirty_price, 4) == 93.1315
 
@@ -160,7 +154,7 @@ def test_bond_frn_2():
     assert accddays == 55
 
     accdAmount = bond._accrued_interest
-    assert round(accdAmount, 4) == 514.8611
+    assert round(accdAmount, 4) == 0.0005
 
     principal = bond.principal(settlement_date,
                                resetIbor,

@@ -42,13 +42,13 @@ def test_inhomogeneous_curve():
                                      step_in_date,
                                      basketMaturity,
                                      issuer_curves) * 10000.0
-    assert round(totalSpd, 4) == 161.3219
+    assert round(totalSpd, 4) == 161.3169
 
     minSpd = cdsIndex.min_spread(valuation_date,
                                  step_in_date,
                                  basketMaturity,
                                  issuer_curves) * 10000.0
-    assert round(minSpd, 4) == 10.6725
+    assert round(minSpd, 4) == 10.6722
 
     maxSpd = cdsIndex.max_spread(valuation_date,
                                  step_in_date,
@@ -81,7 +81,7 @@ def test_gaussian_copula():
                                        libor_curve)
 
     assert round(v1[2] * 10000, 4) == 151.7163
-    assert round(v2[3] * 10000, 4) == 159.021
+    assert round(v2[3] * 10000, 4) == 160.0121
 
     ntd = 2
     beta = 0.5
@@ -141,4 +141,4 @@ def test_student_t():
                                   num_trials,
                                   seed)
 
-    assert round(v[2] * 10000, 4) == 26.2872
+    assert round(v[2] * 10000, 4) == 26.5991

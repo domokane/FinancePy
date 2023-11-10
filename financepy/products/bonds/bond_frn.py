@@ -147,7 +147,8 @@ class BondFRN:
                   next_coupon: float,
                   current_ibor: float,
                   future_ibor: float,
-                  dm: float):
+                  dm: float,
+                  face: float = 100.0):
         """ Calculate the clean trade price of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
@@ -159,7 +160,7 @@ class BondFRN:
                                              dm)
 
         accrued = self._accrued_interest
-        principal = dirty_price * self._par - accrued
+        principal = dirty_price * face / self._par - accrued
         return principal
 
     ###############################################################################
@@ -408,10 +409,10 @@ class BondFRN:
 
     def accrued_interest(self,
                          settlement_date: Date,
-                         next_coupon: float, 
+                         next_coupon: float,
                          face: (float)):
         """ Calculate the amount of coupon that has accrued between the
-        previous coupon date and the settlement date. Ex-dividend dates are 
+        previous coupon date and the settlement date. Ex-dividend dates are
         not handled. Contact me if you need this functionality. """
 
         num_flows = len(self._coupon_dates)

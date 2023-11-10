@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 import sys
 sys.path.append("..")
@@ -11,15 +11,22 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.products.bonds.bond_zero import BondZero
-from financepy.products.bonds.bond_market import *
+from financepy.products.bonds.bond_market import BondMarkets
+from financepy.products.bonds.bond_market import get_bond_market_conventions
 
-import datetime as dt
 import pandas as pd
 import numpy as np
 
+import os
+
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+
+###############################################################################
+
 def test_bondtutor_example():
+
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
-    
+
     accrualConvention = DayCountTypes.ACT_ACT_ICMA
     y = 0.062267
     settlement_date = Date(19, 4, 1994)
@@ -181,9 +188,13 @@ def test_bloomberg_apple_corp_example():
     conv = bond.convexity_from_ytm(settlement_date, ytm)
     assert round(conv, 4) == 0.2302
 
+###############################################################################
+
 
 def test_zero_bond():
+
     # A 3 months treasure with 0 coupon per year.
+
     bill = BondZero(
         issue_date=Date(25, 7, 2022),
         maturity_date=Date(24, 10, 2022),
@@ -196,18 +207,22 @@ def test_zero_bond():
         settlement_date, clean_price, YTMCalcType.ZERO) * 100
 
     accrued_interest = bill.accrued_interest(settlement_date, ONE_MILLION)
-    
-    print(calc_ytm)
-    print(accrued_interest)
-    
+
     assert abs(calc_ytm - 1.3997) < 0.0002
     assert abs(accrued_interest - ONE_MILLION * 0.05523077 / 100) < 0.01
 
+###############################################################################
+
 
 def test_bond_ror():
+
     test_case_file = 'test_cases_bond_ror.csv'
-    df = pd.read_csv('./tests/data/' + test_case_file,
+    data_file_name = BASE_PATH + '\\data\\' + test_case_file
+    print(data_file_name)
+    
+    df = pd.read_csv(data_file_name,
                      parse_dates=['buy_date', 'sell_date'])
+
     # A 10-year bond with 1 coupon per year. code: 210215
     bond = Bond(
         issue_date=Date(13, 9, 2021),
@@ -226,10 +241,13 @@ def test_bond_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
+###############################################################################
+
 
 def test_bond_zero_ror():
-    test_case_file = 'test_cases_bond_zero_ror.csv'
-    df = pd.read_csv('./tests/data/' + test_case_file,
+
+    test_case_file = "test_cases_bond_zero_ror.csv"
+    df = pd.read_csv("./data/" + test_case_file,
                      parse_dates=['buy_date', 'sell_date'])
     # A 1-year bond with zero coupon per year. code: 092103011
     bond = BondZero(
@@ -247,15 +265,18 @@ def test_bond_zero_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
+###############################################################################
+
 
 def test_bond_cfets():
     """
-    Test ytms of bonds in CFETS convention, especially for those in last coupon period and
+    Test ytms of bonds in CFETS convention, especially for those in last 
+    coupon period and
     have 2 or more coupon payments per year.
     """
-    face = 100.0 
-    test_case_file = 'test_cases_bond_cfets.csv'
-    df = pd.read_csv('./tests/data/' + test_case_file,
+    face = 100.0
+    test_case_file = r"test_cases_bond_cfets.csv"
+    df = pd.read_csv("./data/" + test_case_file,
                      parse_dates=['settlement_date', 'issue_date', 'maturity_date'])
     for row in df.itertuples(index=False):
         bond = Bond(
@@ -275,7 +296,7 @@ def test_bond_cfets():
             settlement_date, clean_price, YTMCalcType.CFETS) * 100
         try:
             assert abs(calc_ytm - row.ytm) < 0.0001
-        except:
+        except Exception:
             print(bond)
             print(clean_price)
             print(settlement_date)
@@ -283,6 +304,7 @@ def test_bond_cfets():
             print(f'calc_ytm:{calc_ytm}, correct_ytm:{row.ytm}')
             continue
 
+###############################################################################
 
 def test_key_rate_durations_Bloomberg_example():
 
@@ -293,9 +315,8 @@ def test_key_rate_durations_Bloomberg_example():
     issue_date = Date(31, 7, 2022)
     maturity_date = Date(31, 7, 2027)
     coupon = 2.75/100.0
-    face = 100.0
     ex_div_days = 0
-    
+
     accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
     BondMarkets.UNITED_STATES)
 
@@ -307,7 +328,7 @@ def test_key_rate_durations_Bloomberg_example():
     # US Street yield on Bloomberg as of 20 April 2023
     # with settle date 24 April 2023
     ytm = 3.725060/100
-    
+
     # Details of yields of market bonds at KRD maturity points
     my_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10])
     my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272,  3.5825,  3.5347])/100
@@ -326,6 +347,7 @@ def test_key_rate_durations_Bloomberg_example():
     for i in range(len(key_rate_durations)):
         assert round(key_rate_durations[i], 3) == bbg_key_rate_durations[i]
 
+###############################################################################
 
 test_zero_bond()
 

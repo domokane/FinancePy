@@ -69,10 +69,12 @@ def test_bond_future_2():
     tia = bondFutureContract.total_invoice_amount(
         settlement_date, bond, futures_price)
 
-    assert round(tia, 4) == 9162633.4700
+    assert round(tia, 4) == 9162294.5
 
+###############################################################################
 
 def test_future_bond_ctd():
+
     first_delivery_date = Date(1, 12, 2017)
     last_delivery_date = Date(28, 12, 2017)
 

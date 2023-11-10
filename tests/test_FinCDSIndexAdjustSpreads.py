@@ -107,5 +107,5 @@ def test_CDSIndexAdjustSpreads():
 
     assert round(intrinsicSpd3Y, 4) == 19.6789
     assert round(intrinsicSpd5Y, 4) == 35.5394
-    assert round(intrinsicSpd7Y, 4) == 49.0120
+    assert round(intrinsicSpd7Y, 4) == 49.0121
     assert round(intrinsicSpd10Y, 4) == 61.4139

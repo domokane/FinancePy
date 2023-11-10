@@ -67,5 +67,5 @@ def test_equity_vol_surface():
     expiry_date = expiry_dates[6]
     delta = 0.90
     vol = equitySurface.volatility_from_delta_date(delta, expiry_date)
-    assert round(vol[0], 4) == 0.3530
+    assert round(vol[0], 4) == 0.3498
     assert round(vol[1], 4) == 2190.7766

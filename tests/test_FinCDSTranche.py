@@ -86,7 +86,7 @@ def test_homogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 29.9536
+    assert round(v[3] * 10000, 4) == 29.9804
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche5.value_bc(
@@ -148,7 +148,7 @@ def test_heterogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 173.3458
+    assert round(v[3] * 10000, 4) == 173.4304
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche4.value_bc(

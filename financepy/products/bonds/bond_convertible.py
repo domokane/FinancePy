@@ -25,9 +25,7 @@ from ...utils.calendar import DateGenRuleTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
-
 ###############################################################################
-
 
 @njit(fastmath=True, cache=True)
 def _value_convertible(tmat,
@@ -392,14 +390,18 @@ class BondConvertible:
             stock_volatility = 1e-10  # Avoid overflows in delta calc
 
         self._calculate_coupon_dates(settlement_date)
+
         tmat = (self._maturity_date - settlement_date) / gDaysInYear
+
         if tmat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
 
         # We include time zero in the coupon times and flows
         coupon_times = [0.0]
         coupon_flows = [0.0]
+
         cpn = self._coupon / self._frequency
+
         for dt in self._coupon_dates[1:]:
             flow_time = (dt - settlement_date) / gDaysInYear
             coupon_times.append(flow_time)
@@ -415,9 +417,11 @@ class BondConvertible:
             raise FinError("No coupon times can be after the maturity date.")
 
         call_times = []
+
         for dt in self._call_dates:
             call_time = (dt - settlement_date) / gDaysInYear
             call_times.append(call_time)
+
         call_times = np.array(call_times)
         call_prices = np.array(self._call_prices)
 
@@ -428,9 +432,11 @@ class BondConvertible:
             raise FinError("No call times can be after the maturity date.")
 
         put_times = []
+
         for dt in self._put_dates:
             put_time = (dt - settlement_date) / gDaysInYear
             put_times.append(put_time)
+
         put_times = np.array(put_times)
         put_prices = np.array(self._put_prices)
 
@@ -527,8 +533,11 @@ class BondConvertible:
         gamma = (v1[3] + v2[3]) / 2.0
         theta = (v1[4] + v2[4]) / 2.0
 
-        results = {"cbprice": cbprice, "bond": bond, "delta": delta,
-                   "gamma": gamma, "theta": theta}
+        results = {"cbprice": cbprice,
+                   "bond": bond,
+                   "delta": delta,
+                   "gamma": gamma,
+                   "theta": theta}
 
         return results
 
@@ -616,8 +625,6 @@ class BondConvertible:
 
 ###############################################################################
 ###############################################################################
-###############################################################################
-###############################################################################
 # TEST PV OF CASHFLOW MAPPING
 #    if 1==0:
 #        pv = 0.0
@@ -642,10 +649,6 @@ class BondConvertible:
 ###############################################################################
 ###############################################################################
 ###############################################################################
-
-
-###############################################################################
-
 
 def print_tree(array):
     n1, n2 = array.shape

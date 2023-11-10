@@ -640,7 +640,6 @@ def test_key_rate_durations_Bloomberg_example():
     issue_date = Date(31, 7, 2022)
     maturity_date = Date(31, 7, 2027)
     coupon = 2.75/100.0
-    face = 100.0
     ex_div_days = 0
 
     accrual_type, freq_type, settlementDays, exDiv, calendar = get_bond_market_conventions(
