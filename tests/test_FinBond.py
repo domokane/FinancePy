@@ -216,11 +216,10 @@ def test_zero_bond():
 
 def test_bond_ror():
 
-    test_case_file = 'test_cases_bond_ror.csv'
-    data_file_name = BASE_PATH + '\\data\\' + test_case_file
-    print(data_file_name)
-    
-    df = pd.read_csv(data_file_name,
+    test_case_file = './data/test_cases_bond_ror.csv'
+    path = os.path.join(os.path.dirname(__file__), test_case_file)
+
+    df = pd.read_csv(path,
                      parse_dates=['buy_date', 'sell_date'])
 
     # A 10-year bond with 1 coupon per year. code: 210215
@@ -246,9 +245,12 @@ def test_bond_ror():
 
 def test_bond_zero_ror():
 
-    test_case_file = "test_cases_bond_zero_ror.csv"
-    df = pd.read_csv("./data/" + test_case_file,
+    test_case_file = './data/test_cases_bond_zero_ror.csv'
+    path = os.path.join(os.path.dirname(__file__), test_case_file)
+
+    df = pd.read_csv(path,
                      parse_dates=['buy_date', 'sell_date'])
+
     # A 1-year bond with zero coupon per year. code: 092103011
     bond = BondZero(
         issue_date=Date(23, 7, 2021),
@@ -270,14 +272,17 @@ def test_bond_zero_ror():
 
 def test_bond_cfets():
     """
-    Test ytms of bonds in CFETS convention, especially for those in last 
-    coupon period and
-    have 2 or more coupon payments per year.
+    Test ytms of bonds in CFETS convention, especially for those in last
+    coupon period and have 2 or more coupon payments per year.
     """
     face = 100.0
-    test_case_file = r"test_cases_bond_cfets.csv"
-    df = pd.read_csv("./data/" + test_case_file,
-                     parse_dates=['settlement_date', 'issue_date', 'maturity_date'])
+    test_case_file = './data/test_cases_bond_cfets.csv'
+    path = os.path.join(os.path.dirname(__file__), test_case_file)
+
+    df = pd.read_csv(path,
+                     parse_dates=['settlement_date', 'issue_date',
+                                  'maturity_date'])
+
     for row in df.itertuples(index=False):
         bond = Bond(
             issue_date=Date(row.issue_date.day,
@@ -331,17 +336,18 @@ def test_key_rate_durations_Bloomberg_example():
 
     # Details of yields of market bonds at KRD maturity points
     my_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10])
-    my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272,  3.5825,  3.5347])/100
+    my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575,
+                         3.6272,  3.5825,  3.5347]) / 100.0
 
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date, 
-                                                                  ytm, 
-                                                                  key_rate_tenors = my_tenors, 
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settlement_date,
+                                                                  ytm,
+                                                                  key_rate_tenors = my_tenors,
                                                                   rates = my_rates)
 
     print(key_rate_tenors)
     print(key_rate_durations)
 
-    bbg_key_rate_durations = [-0.001, -.009, -0.022, 1.432, 
+    bbg_key_rate_durations = [-0.001, -.009, -0.022, 1.432,
                               2.527, 0.00, 0.00, 0.00, 0.00]
 
     for i in range(len(key_rate_durations)):
@@ -350,4 +356,3 @@ def test_key_rate_durations_Bloomberg_example():
 ###############################################################################
 
 test_zero_bond()
-
