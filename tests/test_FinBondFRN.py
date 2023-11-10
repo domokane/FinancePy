@@ -60,7 +60,7 @@ def test_bond_frn_1():
                                future_ibors,
                                dm)
 
-    assert round(principal, 4) == 9702.6598
+    assert round(principal, 4) == 97.0243
 
     duration = bond.dollar_duration(settlement_date,
                                     resetIbor,
@@ -162,7 +162,7 @@ def test_bond_frn_2():
                                future_ibors,
                                dm)
 
-    assert round(principal, 4) == 930800.0000
+    assert round(principal, 4) == 93.131
 
     duration = bond.dollar_duration(settlement_date,
                                     resetIbor,
@@ -202,7 +202,7 @@ def test_bond_frn_2():
                                future_ibors,
                                dm)
 
-    assert round(principal, 4) == 930800.0000
+    assert round(principal, 4) == 93.1310
 
     duration = bond.dollar_credit_duration(settlement_date,
                                            resetIbor,

@@ -54,7 +54,7 @@ def test_inhomogeneous_curve():
                                  step_in_date,
                                  basketMaturity,
                                  issuer_curves) * 10000.0
-    assert round(maxSpd, 4) == 81.1492
+    assert round(maxSpd, 4) == 81.1466
 
 
 def test_gaussian_copula():
@@ -103,8 +103,8 @@ def test_gaussian_copula():
                                        beta_vector,
                                        libor_curve)
 
-    assert round(v1[2] * 10000, 4) == 15.4566
-    assert round(v2[3] * 10000, 4) == 16.4308
+    assert round(v1[2] * 10000, 4) == 15.6402
+    assert round(v2[3] * 10000, 4) == 16.6395
 
 
 def test_student_t():

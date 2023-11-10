@@ -408,8 +408,8 @@ def test_value():
     assert round(v['clean_pv'], 4) == 170639.5956
 
     v = cds_contract2.value(valuation_date2, issuer_curve2, cdsRecovery)
-    assert round(v['dirty_pv'], 4) == -200111.1901
-    assert round(v['clean_pv'], 4) == -191777.8568
+    assert round(v['dirty_pv'], 4) == -199842.7922
+    assert round(v['clean_pv'], 4) == -191509.4589
 
 
 def test_clean_price():

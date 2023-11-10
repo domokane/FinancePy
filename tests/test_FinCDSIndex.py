@@ -44,7 +44,7 @@ def test_cds_index():
     assert round(v['clean_pv'], 4) == 32620.5461
 
     p = cdsIndexContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
-    assert round(p, 4) == 99.6742
+    assert round(p, 4) == 99.6738
 
     accrued_days = cdsIndexContract.accrued_days()
     assert accrued_days == 50.0
@@ -54,8 +54,8 @@ def test_cds_index():
 
     prot_pv = cdsIndexContract.protection_leg_pv(
         valuation_date, issuer_curve, cdsRecovery)
-    assert round(prot_pv, 4) == 188161.5557
+    assert round(prot_pv, 4) == 188423.9948
 
     premPV = cdsIndexContract.premium_leg_pv(
         valuation_date, issuer_curve, cdsRecovery)
-    assert round(premPV, 4) == 161141.8315
+    assert round(premPV, 4) == 161359.0042

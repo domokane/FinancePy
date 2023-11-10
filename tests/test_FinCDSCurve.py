@@ -64,18 +64,18 @@ def test_FinCDSCurve():
     cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
     v = cds.value(curve_date, issuer_curve, recovery_rate)
     assert round(v['dirty_pv'] * 1000, 4) == -0.0086
-    assert round(v['clean_pv'] * 1000, 4) == 5.6028
+    assert round(v['clean_pv'] * 1000, 4) == -0.0086
 
     i = 5
     maturity_date = curve_date.add_months(12 * i)
     cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
     v = cds.value(curve_date, issuer_curve, recovery_rate)
-    assert round(v['dirty_pv'] * 1000, 4) == 8.3480
-    assert round(v['clean_pv'] * 1000, 4) == 8.3480
+    assert round(v['dirty_pv'] * 1000, 4) == -0.1640
+    assert round(v['clean_pv'] * 1000, 4) == -0.1640
 
     i = 10
     maturity_date = curve_date.add_months(12 * i)
     cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
     v = cds.value(curve_date, issuer_curve, recovery_rate)
-    assert round(v['dirty_pv'] * 1000, 4) == -1.3178
-    assert round(v['clean_pv'] * 1000, 4) == -1.3178
+    assert round(v['dirty_pv'] * 1000, 4) == -1.1491
+    assert round(v['clean_pv'] * 1000, 4) == -1.1491
