@@ -90,7 +90,7 @@ class IborBermudanSwaption:
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               discount_curve,
               model):
         """ Value the Bermudan swaption using the specified model and a
@@ -115,16 +115,16 @@ class IborBermudanSwaption:
                                         self._date_gen_rule_type)
 
         #  I need to do this to generate the fixed leg flows
-        self._pv01 = self._underlyingSwap.pv01(valuation_date, discount_curve)
+        self._pv01 = self._underlyingSwap.pv01(value_date, discount_curve)
 
-        texp = (self._exercise_date - valuation_date) / gDaysInYear
-        tmat = (self._maturity_date - valuation_date) / gDaysInYear
+        t_exp = (self._exercise_date - value_date) / gDaysInYear
+        tmat = (self._maturity_date - value_date) / gDaysInYear
 
         #######################################################################
         # For the tree models we need to generate a vector of the coupons
         #######################################################################
 
-        cpn_times = [texp]
+        cpn_times = [t_exp]
         cpn_flows = [0.0]
 
         # The first flow is the expiry date
@@ -137,7 +137,7 @@ class IborBermudanSwaption:
             flow_date = self._underlyingSwap._fixed_leg._payment_dates[iFlow]
 
             if flow_date > self._exercise_date:
-                cpn_time = (flow_date - valuation_date) / gDaysInYear
+                cpn_time = (flow_date - value_date) / gDaysInYear
                 cpn_flow = swap._fixed_leg._payments[iFlow-1] / self._notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
@@ -166,7 +166,7 @@ class IborBermudanSwaption:
 
             model.build_tree(tmat, df_times, df_values)
 
-            v = model.bermudan_swaption(texp,
+            v = model.bermudan_swaption(t_exp,
                                         tmat,
                                         strike_price,
                                         face_amount,

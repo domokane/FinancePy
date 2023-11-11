@@ -255,7 +255,7 @@
 
 #         s = label_to_string("MATURITY DATE", self._maturity_date)
 #         s += label_to_string("EXERCISE DATE", self._exercise_date)
-#         s += label_to_string("COUPON", self._coupon)
+#         s += label_to_string("COUPON", self._cpn)
 #         s += label_to_string("FREQUENCY", self._freq_type)
 #         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
 #         s += label_to_string("FACE AMOUNT", self._face)

@@ -554,7 +554,7 @@ def test_BondPaymentDates():
 
     if 1 == 0:
         print(bond._flow_amounts)
-        print(bond._coupon_dates)
+        print(bond._cpn_dates)
         print(bond._payment_dates)
 
 ###############################################################################

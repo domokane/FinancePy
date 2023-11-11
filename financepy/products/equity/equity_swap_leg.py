@@ -149,7 +149,7 @@ class EquitySwapLeg:
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve,
               dividend_curve: DiscountCurve = None,
@@ -162,7 +162,7 @@ class EquitySwapLeg:
         if discount_curve is None:
             raise FinError("Discount curve not provided!")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
@@ -171,7 +171,7 @@ class EquitySwapLeg:
 
         # Assume a naive dividend curve if nothing provided
         if dividend_curve is None:
-            dividend_curve = DiscountCurveFlat(valuation_date, 0)
+            dividend_curve = DiscountCurveFlat(value_date, 0)
 
         # Current price can't be different than strike at effective date
         if current_price is not None:
@@ -188,7 +188,7 @@ class EquitySwapLeg:
         self._paymentPVs = []
         self._cumulativePVs = []
 
-        dfValue = discount_curve.df(valuation_date)
+        dfValue = discount_curve.df(value_date)
         legPV, eq_term_rate = 0.0, 0.0
         lastNotional = self._notional
         numPayments = len(self._payment_dates)
@@ -200,7 +200,7 @@ class EquitySwapLeg:
 
             pmntDate = self._payment_dates[iPmnt]
 
-            if pmntDate > valuation_date:
+            if pmntDate > value_date:
 
                 startAccruedDt = self._startAccruedDates[iPmnt]
                 endAccruedDt = self._endAccruedDates[iPmnt]

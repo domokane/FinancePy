@@ -63,7 +63,7 @@ class BondEmbeddedOption:
 
         self._issue_date = issue_date
         self._maturity_date = maturity_date
-        self._coupon = coupon
+        self._cpn = coupon
         self._freq_type = freq_type
         self._accrual_type = accrual_type
 
@@ -120,7 +120,7 @@ class BondEmbeddedOption:
         self._put_dates = put_dates
         self._put_prices = put_prices
         self._par = 100.0
-        self._bond._calculate_coupon_dates()
+        self._bond._calculate_cpn_dates()
 
 ###############################################################################
 
@@ -133,11 +133,11 @@ class BondEmbeddedOption:
         model and a discount curve. """
 
         # Generate bond coupon flow schedule
-        cpn = self._bond._coupon/self._bond._frequency
+        cpn = self._bond._cpn/self._bond._frequency
         cpn_times = []
         cpn_amounts = []
 
-        for flow_date in self._bond._coupon_dates[1:]:
+        for flow_date in self._bond._cpn_dates[1:]:
             if flow_date > settlement_date:
                 cpn_time = (flow_date - settlement_date) / gDaysInYear
                 cpn_times.append(cpn_time)
@@ -226,7 +226,7 @@ class BondEmbeddedOption:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("COUPON", self._cpn)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         s += label_to_string("EX-DIV DAYS", self._ex_div_days)

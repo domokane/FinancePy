@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from financepy.models.volatility_fns import VolFunctionTypes
+from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
@@ -38,8 +38,8 @@ def test_FinFXMktVolSurface1(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-    vol_functionType = VolFunctionTypes.CLARK
+    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    vol_functionType = VolFuncTypes.CLARK
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -52,7 +52,7 @@ def test_FinFXMktVolSurface1(capsys):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod,
+                            delta_method,
                             vol_functionType)
 
     fxMarket.check_calibration(verboseCalibration, tol=1e-5)
@@ -85,7 +85,7 @@ def test_FinFXMktVolSurface2(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -98,7 +98,7 @@ def test_FinFXMktVolSurface2(capsys):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod)
+                            delta_method)
 
     fxMarket.check_calibration(verboseCalibration, tol=0.0005)
     captured = capsys.readouterr()
@@ -130,7 +130,7 @@ def test_FinFXMktVolSurface3(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+    delta_method = FinFXDeltaMethod.SPOT_DELTA
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -143,7 +143,7 @@ def test_FinFXMktVolSurface3(capsys):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod)
+                            delta_method)
 
     fxMarket.check_calibration(verboseCalibration)
     captured = capsys.readouterr()
@@ -174,7 +174,7 @@ def test_FinFXMktVolSurface4(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -187,7 +187,7 @@ def test_FinFXMktVolSurface4(capsys):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod)
+                            delta_method)
 
     fxMarket.check_calibration(verboseCalibration)
     captured = capsys.readouterr()

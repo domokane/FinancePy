@@ -13,7 +13,7 @@ def test_FinLossDbnBuilder():
     num_credits = 125
     defaultProb = 0.30
     loss_ratio = np.ones(num_credits)
-    lossUnits = np.ones(num_credits)
+    loss_units = np.ones(num_credits)
 
     beta_results = [
         (0.0, [0.0, 0.0, 0.0, 0.0]),
@@ -34,7 +34,7 @@ def test_FinLossDbnBuilder():
 
         dbn1 = loss_dbn_recursion_gcd(num_credits,
                                       default_probs,
-                                      lossUnits,
+                                      loss_units,
                                       beta_vector,
                                       num_steps)
         assert [round(x * 1000, 4) for x in dbn1[:4]] == results

@@ -22,7 +22,7 @@ class BondFuture:
                  first_delivery_date: Date,
                  last_delivery_date: Date,
                  contract_size: int,
-                 coupon: float):
+                 cpn: float):
 
         check_argument_types(self.__init__, locals())
 
@@ -30,7 +30,7 @@ class BondFuture:
         self._first_delivery_date = first_delivery_date  # This is the IMM date
         self._last_delivery_date = last_delivery_date
         self._contract_size = contract_size
-        self._coupon = coupon
+        self._cpn = cpn
 
 ###############################################################################
 
@@ -55,13 +55,13 @@ class BondFuture:
 
         newBond = Bond(issue_date,
                        new_mat,
-                       bond._coupon,
+                       bond._cpn,
                        bond._freq_type,
                        bond._accrual_type,
                        ex_div_days)
 
         p = newBond.clean_price_from_ytm(self._first_delivery_date,
-                                         self._coupon)
+                                         self._cpn)
 
         # Convention is to round the conversion factor to 4dp
         p = round(p, 4)
@@ -87,7 +87,7 @@ class BondFuture:
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accrued_interest is None:
-            bond.calculate_coupon_dates(settlement_date)
+            bond.calculate_cpn_dates(settlement_date)
 
         accrued_interest = bond._accrued_interest
 
@@ -137,7 +137,7 @@ class BondFuture:
         s += label_to_string("FIRST DELIVERY DATE", self._first_delivery_date)
         s += label_to_string("LAST DELIVERY DATE", self._last_delivery_date)
         s += label_to_string("CONTRACT SIZE", self._contract_size)
-        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("COUPON", self._cpn)
         return s
 
 ###############################################################################

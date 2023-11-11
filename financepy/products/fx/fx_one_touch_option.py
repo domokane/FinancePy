@@ -149,7 +149,7 @@ class FXOneTouchOption(FXOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               spot_fx_rate: (float, np.ndarray),
               dom_discount_curve: DiscountCurve,
               for_discount_curve: DiscountCurve,
@@ -158,26 +158,26 @@ class FXOneTouchOption(FXOption):
         assuming a continuous (American) barrier from value date to expiry.
         Handles both cash-or-nothing and asset-or-nothing options."""
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._valuation_date != valuation_date:
+        if dom_discount_curve._value_date != value_date:
             raise FinError("Domestic Curve date not same as valuation date")
 
-        if for_discount_curve._valuation_date != valuation_date:
+        if for_discount_curve._value_date != value_date:
             raise FinError("Foreign Curve date not same as valuation date")
 
         DEBUG_MODE = False
 
         print("USE WITH CAUTION. MORE TESTING REQUIRED.")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
         t = max(t, 1e-6)
 
         s0 = spot_fx_rate
@@ -415,7 +415,7 @@ class FXOneTouchOption(FXOption):
 ###############################################################################
 
     def value_mc(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  stock_price: float,
                  domCurve: DiscountCurve,
                  forCurve: DiscountCurve,
@@ -430,7 +430,7 @@ class FXOneTouchOption(FXOption):
 
         print("THIS NEEDS TO BE CHECKED")
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
 
         df_d = domCurve.df(self._expiry_date)
         rd = -np.log(df_d)/t

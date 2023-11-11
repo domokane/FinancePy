@@ -47,8 +47,6 @@ class Bachelier():
         else:
             raise FinError("Option type must be a European Call(C) or Put(P)")
 
-        return 999
-
 ###############################################################################
 
     def __repr__(self):

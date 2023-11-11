@@ -22,29 +22,29 @@ ONE_BILLION = 1000000000
 
 @njit(fastmath=True, cache=True)
 def accrued_interpolator(tset: float,  # Settlement time in years
-                         coupon_times: np.ndarray,
-                         couponAmounts: np.ndarray):
+                         cpn_times: np.ndarray,
+                         cpn_amounts: np.ndarray):
     """ Fast calculation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
-    num_coupons = len(coupon_times)
+    num_cpns = len(cpn_times)
 
-    for i in range(1, num_coupons):
+    for i in range(1, num_cpns):
 
-        pct = coupon_times[i - 1]
-        nct = coupon_times[i]
+        pct = cpn_times[i - 1]
+        nct = cpn_times[i]
         denom = (nct-pct)
 
         if tset >= pct and tset < nct:
             accdFrac = (tset-pct) / denom
-            accdCpn = accdFrac * couponAmounts[i]
+            accdCpn = accdFrac * cpn_amounts[i]
             return accdCpn
 
     # TODO: NEED TO REVISIT THIS TODO
     return 0.0
     print("t", tset)
-    print("CPN TIMES", coupon_times)
-    print("CPN AMNTS", couponAmounts)
+    print("CPN TIMES", cpn_times)
+    print("CPN AMNTS", cpn_amounts)
 
     raise FinError("Failed to calculate accrued")
 

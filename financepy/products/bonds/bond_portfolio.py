@@ -35,8 +35,8 @@ class BondPortfolio:
 
         self._flow_amounts = [0.0]
 
-        for _ in self._coupon_dates[1:]:
-            cpn = self._coupon / self._frequency
+        for _ in self._cpn_dates[1:]:
+            cpn = self._cpn / self._frequency
             self._flow_amounts.append(cpn)
 
 ###############################################################################
@@ -140,7 +140,7 @@ class BondPortfolio:
         """ Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)"""
 
-        y = self._coupon * self._par / clean_price
+        y = self._cpn * self._par / clean_price
         return y
 
 ###############################################################################
@@ -170,16 +170,16 @@ class BondPortfolio:
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        flow = self._coupon / self._frequency
+        flow = self._cpn / self._frequency
 
-        for dt in self._coupon_dates[1:-1]:
+        for dt in self._cpn_dates[1:-1]:
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
                 print("%12s" % dt, " %12.2f " % flow)
 
         redemption_amount = face * (1.0 + flow)
 
-        print("%12s" % self._coupon_dates[-1], " %12.2f " % redemption_amount)
+        print("%12s" % self._cpn_dates[-1], " %12.2f " % redemption_amount)
 
 ###############################################################################
 
@@ -197,7 +197,7 @@ class BondPortfolio:
         end payment present values. """
 
         f = self._frequency
-        c = self._coupon
+        c = cpcoupon
 
         pv = 0.0
         prevQ = 1.0
@@ -206,7 +206,7 @@ class BondPortfolio:
         defaultingPrincipalPVPayStart = 0.0
         defaultingPrincipalPVPayEnd = 0.0
 
-        for dt in self._coupon_dates[1:]:
+        for dt in self._cpn_dates[1:]:
 
             # coupons paid on a settlement date are included
             if dt >= settlement_date:
@@ -262,7 +262,7 @@ class BondPortfolio:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("COUPON", self._cpn)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         return s

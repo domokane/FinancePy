@@ -26,7 +26,7 @@ class DiscountCurveNS(DiscountCurve):
     correct time in years. The class inherits methods from FinDiscountCurve."""
 
     def __init__(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  beta0: float,
                  beta1: float,
                  beta2: float,
@@ -43,7 +43,7 @@ class DiscountCurveNS(DiscountCurve):
         if tau <= 0:
             raise FinError("Tau must be positive")
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
         self._beta0 = beta0
         self._beta1 = beta1
         self._beta2 = beta2
@@ -51,7 +51,7 @@ class DiscountCurveNS(DiscountCurve):
         self._freq_type = freq_type
         self._day_count_type = day_count_type
 
-    ###############################################################################
+    ###########################################################################
 
     def zero_rate(self,
                   dates: (list, Date),
@@ -73,14 +73,14 @@ class DiscountCurveNS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(self._valuation_date,
+        dfs = self._zero_to_df(self._value_date,
                                zero_rates,
                                dc_times,
                                self._freq_type,
@@ -122,12 +122,12 @@ class DiscountCurveNS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._valuation_date,
+        df = self._zero_to_df(self._value_date,
                               zero_rates,
                               dc_times,
                               self._freq_type,

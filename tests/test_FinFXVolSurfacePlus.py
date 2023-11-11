@@ -3,7 +3,7 @@
 ###############################################################################
 import matplotlib.pyplot as plt
 
-from financepy.models.volatility_fns import VolFunctionTypes
+from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
@@ -44,8 +44,8 @@ def test_FinFXMktVolSurface1(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-    vol_functionType = VolFunctionTypes.CLARK5
+    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    vol_functionType = VolFuncTypes.CLARK5
     alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
     fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -62,7 +62,7 @@ def test_FinFXMktVolSurface1(capsys):
                                     riskReversal10DeltaVols,
                                     alpha,
                                     atmMethod,
-                                    deltaMethod,
+                                    delta_method,
                                     vol_functionType)
 
     fxMarketPlus.check_calibration(verboseCalibration)
@@ -99,8 +99,8 @@ def test_FinFXMktVolSurface2(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
-    vol_functionType = VolFunctionTypes.CLARK5
+    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    vol_functionType = VolFuncTypes.CLARK5
 
     fxMarketPlus = FXVolSurfacePlus(valuation_date,
                                     spot_fx_rate,
@@ -116,7 +116,7 @@ def test_FinFXMktVolSurface2(capsys):
                                     riskReversal10DeltaVols,
                                     alpha,
                                     atmMethod,
-                                    deltaMethod,
+                                    delta_method,
                                     vol_functionType)
 
     # Fails with default stricter tolerance
@@ -155,8 +155,8 @@ def test_FinFXMktVolSurface3(capsys):
     # NEED TO DO AS DESCRIBED IN CLARK PAGE 70
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.FORWARD_DELTA  # THIS IS DIFFERENT
-    vol_functionType = VolFunctionTypes.CLARK5
+    delta_method = FinFXDeltaMethod.FORWARD_DELTA  # THIS IS DIFFERENT
+    vol_functionType = VolFuncTypes.CLARK5
     alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
     fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -173,7 +173,7 @@ def test_FinFXMktVolSurface3(capsys):
                                     riskReversal10DeltaVols,
                                     alpha,
                                     atmMethod,
-                                    deltaMethod,
+                                    delta_method,
                                     vol_functionType)
 
     fxMarketPlus.check_calibration(verboseCalibration)
@@ -216,8 +216,8 @@ def test_FinFXMktVolSurface4(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-    vol_functionType = VolFunctionTypes.CLARK
+    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    vol_functionType = VolFuncTypes.CLARK
     alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
     fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -234,7 +234,7 @@ def test_FinFXMktVolSurface4(capsys):
                                     riskReversal10DeltaVols,
                                     alpha,
                                     atmMethod,
-                                    deltaMethod,
+                                    delta_method,
                                     vol_functionType)
 
     fxMarketPlus.check_calibration(verboseCalibration)
@@ -277,8 +277,8 @@ def test_FinFXMktVolSurface5(capsys):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-    vol_functionType = VolFunctionTypes.CLARK
+    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    vol_functionType = VolFuncTypes.CLARK
     alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
     fxMarketPlus = FXVolSurfacePlus(valuation_date,
@@ -295,7 +295,7 @@ def test_FinFXMktVolSurface5(capsys):
                                     riskReversal10DeltaVols,
                                     alpha,
                                     atmMethod,
-                                    deltaMethod,
+                                    delta_method,
                                     vol_functionType)
 
     fxMarketPlus.check_calibration(verboseCalibration)

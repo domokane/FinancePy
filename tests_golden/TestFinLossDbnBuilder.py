@@ -26,7 +26,7 @@ def test_FinLossDbnBuilder():
     x = np.linspace(0, num_credits, num_credits + 1)
     defaultProb = 0.30
     num_steps = 25
-    lossUnits = np.ones(num_credits)
+    loss_units = np.ones(num_credits)
     loss_ratio = np.ones(num_credits)
 
     testCases.header(
@@ -47,7 +47,7 @@ def test_FinLossDbnBuilder():
 
         dbn1 = loss_dbn_recursion_gcd(num_credits,
                                       default_probs,
-                                      lossUnits,
+                                      loss_units,
                                       beta_vector,
                                       num_steps)
 
@@ -105,12 +105,12 @@ def test_FinLossDbnBuilder():
 
     default_probs = np.random.randint(3, 4, size=(num_credits)) / 10.0
     beta_vector = np.random.randint(5, 6, size=(num_credits)) / 10.0
-    lossUnits = np.random.randint(1, 3, size=(num_credits)) / 1.0
+    loss_units = np.random.randint(1, 3, size=(num_credits)) / 1.0
 
     start = time.time()
     dbn1 = loss_dbn_recursion_gcd(num_credits,
                                   default_probs,
-                                  lossUnits,
+                                  loss_units,
                                   beta_vector,
                                   num_steps)
     end = time.time()

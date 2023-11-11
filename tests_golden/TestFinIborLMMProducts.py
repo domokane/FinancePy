@@ -56,9 +56,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     v_BLK = liborSwaption.value(valuation_date, discount_curve, model)
 
 #     dt = 0.5
-#     texp = 3.0
+#     t_exp = 3.0
 #     tmat = 10.0
-#     a = int(2*texp)
+#     a = int(2*t_exp)
 #     b = int(2*tmat)
 #     numFwds = 20
 #     taus = np.array([dt] * numFwds)
@@ -84,8 +84,8 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     for iExp in range(1, 10):
 
-#         texp = float(iExp)
-#         a = int(2*texp)
+#         t_exp = float(iExp)
+#         a = int(2*t_exp)
 #         print(a, b)
 
 #         swaption_price1F = LMMSwaptionPricer(strike, a, b, num_paths,
@@ -129,9 +129,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #         model = Black(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
 
-#         testCases.print("K:%6.5f texp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
+#         testCases.print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
 #                         " SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
-#               % (strike, texp, fwd_rateVol, swapVolSim1F, swapVolSimNF,
+#               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF,
 #                  swaptionVol, swaption_price1F, swaption_priceNF,
 #                  blackSwaptionPrice))
 

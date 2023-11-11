@@ -30,7 +30,7 @@ class DiscountCurve:
     ###############################################################################
 
     def __init__(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  df_dates: list,
                  df_values: np.ndarray,
                  interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
@@ -58,12 +58,12 @@ class DiscountCurve:
 
         start_index = 0
         if num_points > 0:
-            if df_dates[0] == valuation_date:
+            if df_dates[0] == value_date:
                 self._dfs[0] = df_values[0]
                 start_index = 1
 
         for i in range(start_index, num_points):
-            t = (df_dates[i] - valuation_date) / gDaysInYear
+            t = (df_dates[i] - value_date) / gDaysInYear
             self._times.append(t)
             self._dfs.append(df_values[i])
 
@@ -73,7 +73,7 @@ class DiscountCurve:
             print(self._times)
             raise FinError("Times are not sorted in increasing order")
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
         self._dfs = np.array(self._dfs)
         self._interp_type = interp_type
         self._freq_type = FrequencyTypes.CONTINUOUS
@@ -85,7 +85,7 @@ class DiscountCurve:
     ###########################################################################
 
     def _zero_to_df(self,
-                    valuation_date: Date,
+                    value_date: Date,
                     rates: (float, np.ndarray),
                     times: (float, np.ndarray),
                     freq_type: FrequencyTypes,
@@ -147,7 +147,7 @@ class DiscountCurve:
         zero_rates = []
 
         times = times_from_dates(
-            dateList, self._valuation_date, day_count_type)
+            dateList, self._value_date, day_count_type)
 
         for i in range(0, num_dates):
 
@@ -221,7 +221,7 @@ class DiscountCurve:
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 
-        if effective_date < self._valuation_date:
+        if effective_date < self._value_date:
             raise FinError("Swap starts before the curve valuation date.")
 
         if isinstance(freq_type, FrequencyTypes) is False:
@@ -289,7 +289,7 @@ class DiscountCurve:
         vector of dates. The day count determines how dates get converted to
         years. I allow this to default to ACT_ACT_ISDA unless specified. '''
 
-        times = times_from_dates(dt, self._valuation_date, day_count)
+        times = times_from_dates(dt, self._value_date, day_count)
         dfs = self._df(times)
 
         if isinstance(dfs, float):
@@ -392,7 +392,7 @@ class DiscountCurve:
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        discCurve = DiscountCurve(self._valuation_date,
+        discCurve = DiscountCurve(self._value_date,
                                   times,
                                   values,
                                   self._interp_type)

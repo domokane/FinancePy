@@ -12,6 +12,7 @@ from ..utils.math import N
 
 # Calculates the Barrier option price using an Analytical Approach
 # and the Black Scholes Model
+
 @vectorize([float64(float64, float64, float64, float64, float64, float64,
                     float64, int64, int64)], fastmath=True, cache=True)
 def value_bs(t, k, h, s, r, q, v, option_type, nobs):

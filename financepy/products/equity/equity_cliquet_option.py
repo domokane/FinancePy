@@ -75,7 +75,7 @@ class EquityCliquetOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -83,18 +83,18 @@ class EquityCliquetOption(EquityOption):
         """ Value the cliquet option as a sequence of options using the Black-
         Scholes model. """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if valuation_date > self._final_expiry_date:
+        if value_date > self._final_expiry_date:
             raise FinError("Value date after final expiry date.")
 
         s = stock_price
@@ -115,20 +115,20 @@ class EquityCliquetOption(EquityOption):
 
             for dt in self._expiry_dates:
 
-                if dt > valuation_date:
+                if dt > value_date:
 
                     df = discount_curve.df(dt)
-                    texp = (dt - valuation_date) / gDaysInYear
-                    r = -np.log(df) / texp
+                    t_exp = (dt - value_date) / gDaysInYear
+                    r = -np.log(df) / t_exp
 
                     # option life
-                    tau = texp - tprev
+                    tau = t_exp - tprev
 
                     # The deflator is out to the option reset time
                     dq = dividend_curve._df(tprev)
 
                     # The option dividend is over the option life
-                    dqMat = dividend_curve._df(texp)
+                    dqMat = dividend_curve._df(t_exp)
 
                     q = -np.log(dqMat/dq)/tau
 
@@ -148,7 +148,7 @@ class EquityCliquetOption(EquityOption):
                     self._dfs.append(df)
                     self._v_options.append(v)
                     self._actualDates.append(dt)
-                    tprev = texp
+                    tprev = t_exp
         else:
             raise FinError("Unknown Model Type")
 

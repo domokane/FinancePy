@@ -8,7 +8,7 @@ sys.path.append("..")
 import time
 import matplotlib.pyplot as plt
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.models.volatility_fns import VolFunctionTypes
+from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -58,7 +58,7 @@ def test_equity_vol_surface(verboseCalibration):
     q = 0.010  # USD
     dividend_curve = DiscountCurveFlat(valuation_date, q)
 
-    vol_functionType = VolFunctionTypes.SVI
+    vol_functionType = VolFuncTypes.SVI
 
     equitySurface = EquityVolSurface(valuation_date,
                                      stock_price,

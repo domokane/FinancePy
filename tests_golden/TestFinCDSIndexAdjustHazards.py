@@ -236,7 +236,7 @@ def test_performCDSIndexHazardRateAdjustment():
     ##########################################################################
     ##########################################################################
 
-    index_coupons = [0.002, 0.0037, 0.0050, 0.0063]
+    index_cpns = [0.002, 0.0037, 0.0050, 0.0063]
     indexUpfronts = [0.0, 0.0, 0.0, 0.0]
 
     indexMaturityDates = [Date(20, 12, 2009),
@@ -246,7 +246,7 @@ def test_performCDSIndexHazardRateAdjustment():
 
     indexRecoveryRate = 0.40
 
-    tolerance = 1e-4 # should be smaller
+    tolerance = 1e-4  # should be smaller
 
     import time
     start = time.time()
@@ -255,7 +255,7 @@ def test_performCDSIndexHazardRateAdjustment():
     adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
         valuation_date,
         issuer_curves,
-        index_coupons,
+        index_cpns,
         indexUpfronts,
         indexMaturityDates,
         indexRecoveryRate,

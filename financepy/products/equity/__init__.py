@@ -19,4 +19,4 @@ from .equity_forward import *
 from .equity_swap_leg import *
 from .equity_swap import *
 
-# dividend_curve = FinDiscountCurveFlat(valuation_date, dividend_yield)
+# dividend_curve = FinDiscountCurveFlat(value_date, dividend_yield)

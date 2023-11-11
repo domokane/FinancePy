@@ -27,7 +27,6 @@ def bs_value(s, t, k, r, q, v, option_type_value):
         phi = -1.0
     else:
         raise FinError("Unknown option type value")
-        return 0.0
 
     k = np.maximum(k, gSmall)
     t = np.maximum(t, gSmall)

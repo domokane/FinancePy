@@ -53,7 +53,7 @@ class EquityBarrierOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: (float, np.ndarray),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -65,17 +65,17 @@ class EquityBarrierOption(EquityOption):
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
@@ -89,7 +89,7 @@ class EquityBarrierOption(EquityOption):
 
         values = []
 
-        t_exp = (self._expiry_date - valuation_date) / gDaysInYear
+        t_exp = (self._expiry_date - value_date) / gDaysInYear
 
         if t_exp < 0:
             raise FinError("Option expires before value date.")

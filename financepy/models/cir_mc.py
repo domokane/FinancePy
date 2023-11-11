@@ -87,7 +87,7 @@ def zero_price(r0, a, b, sigma, t):
     h = np.sqrt(a * a + 2.0 * sigma * sigma)
     denom = 2.0 * h + (a + h) * (np.exp(h * t) - 1.0)
     aa = (2.0 * h * np.exp((a + h) * t / 2.0) /
-         denom) ** (2.0 * a * b / sigma / sigma)
+          denom) ** (2.0 * a * b / sigma / sigma)
     bb = 2.0 * (np.exp(h * t) - 1.0) / denom
     zcb = aa * np.exp(-r0 * bb)
     return zcb
@@ -292,7 +292,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         sigmasqrt_dt = sigma * np.sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             rsum = r
@@ -301,8 +301,8 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
             for i_step in range(1, num_steps):
                 r_prev = r
                 r = r + a * (b - r) * dt + \
-                    z[iStep - 1] * sigmasqrt_dt * np.sqrt(max(0.0, r))
-                r = r + sigma2dt * (z[iStep - 1] ** 2 - 1.0)
+                    z[i_step - 1] * sigmasqrt_dt * np.sqrt(max(0.0, r))
+                r = r + sigma2dt * (z[i_step - 1] ** 2 - 1.0)
                 rsum += (r + r_prev)
 
             zcb += np.exp(-0.50 * rsum * dt)
@@ -319,7 +319,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
             for i_step in range(1, num_steps):
-                beta = z[iStep - 1] / sqrt_dt
+                beta = z[i_step - 1] / sqrt_dt
                 rootr = np.sqrt(max(r, 1e-8))
                 c = 1.0 + (sigma * beta - 2.0 * a * rootr) * dt / 4.0 / rootr
                 r_prev = r

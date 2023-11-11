@@ -163,11 +163,11 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
 
 
 @njit(fastmath=True, cache=True)
-def american_bond_option_tree_fast(texp,
+def american_bond_option_tree_fast(t_exp,
                                    strike_price,
                                    face_amount,
-                                   coupon_times,
-                                   couponAmounts,
+                                   cpn_times,
+                                   cpn_amounts,
                                    exercise_typeInt,
                                    _sigma,
                                    _a,
@@ -184,31 +184,31 @@ def american_bond_option_tree_fast(texp,
     DEBUG = False
     if DEBUG:
         print("Entering AmerBondOption")
-        print("coupon Times", coupon_times)
-        print("Coupon Amounts", couponAmounts)
+        print("coupon Times", cpn_times)
+        print("Coupon Amounts", cpn_amounts)
 
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
     jmax = ceil(0.1835/(_a * dt))
-    expiryStep = int(texp/dt + 0.50)
+    expiryStep = int(t_exp/dt + 0.50)
 
     ###########################################################################
 
     # Want to add coupons before expiry to the grid so that we can value
     # their impact on the decision to exercise the option early
     treeFlows = np.zeros(num_time_steps)
-    num_coupons = len(coupon_times)
+    num_cpns = len(cpn_times)
 
     # Flows that fall on the expiry date included. The tree only goes out to
     # the expiry date so coupons after this date do not go onto the tree.
-    for i in range(0, num_coupons):
-        tcpn = coupon_times[i]
-        if tcpn <= texp:
+    for i in range(0, num_cpns):
+        tcpn = cpn_times[i]
+        if tcpn <= t_exp:
             n = int(tcpn/dt + 0.50)
             ttree = _tree_times[n]
             df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
             df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
-            treeFlows[n] += couponAmounts[i] * 1.0 * df_flow / df_tree
+            treeFlows[n] += cpn_amounts[i] * 1.0 * df_flow / df_tree
 
     ###########################################################################
     # Mapped times stores the mapped times and flows and is used to calculate
@@ -216,7 +216,8 @@ def american_bond_option_tree_fast(texp,
     # result in some convergence noise issues as it is inconsistent
     ###########################################################################
 
-    # I start the tree with the previous coupon time and amount (does not matter)
+    # I start the tree with the previous coupon time and amount
+    # (does not matter)
     mapped_times = np.zeros(0)   # CHANGE
     mapped_amounts = np.zeros(0)  # CHANGE
     for n in range(0, len(_tree_times)):
@@ -224,11 +225,11 @@ def american_bond_option_tree_fast(texp,
             mapped_times = np.append(mapped_times, _tree_times[n])
             mapped_amounts = np.append(mapped_amounts, treeFlows[n])
 
-    # Need future cash flows which are exact time and size for accrued at texp
-    for n in range(0, num_coupons):
-        if coupon_times[n] > texp:
-            mapped_times = np.append(mapped_times, coupon_times[n])
-            mapped_amounts = np.append(mapped_amounts, couponAmounts[n])
+    # Need future cash flows which are exact time and size for accrued at t_exp
+    for n in range(0, num_cpns):
+        if cpn_times[n] > t_exp:
+            mapped_times = np.append(mapped_times, cpn_times[n])
+            mapped_amounts = np.append(mapped_amounts, cpn_amounts[n])
 
     if DEBUG:
         print("MAPPED TIMES", mapped_times)
@@ -239,7 +240,7 @@ def american_bond_option_tree_fast(texp,
     accrued = np.zeros(num_time_steps)
     for m in range(0, expiryStep+1):
         ttree = _tree_times[m]
-        accrued[m] = accrued_interpolator(ttree, coupon_times, couponAmounts)
+        accrued[m] = accrued_interpolator(ttree, cpn_times, cpn_amounts)
         accrued[m] *= face_amount
 
         # This is a bit of a hack for when the interpolation does not put the
@@ -257,8 +258,8 @@ def american_bond_option_tree_fast(texp,
     put_option_values = np.zeros(shape=(num_time_steps, num_nodes))
     bond_values = np.zeros(shape=(num_time_steps, num_nodes))
 
-    ptexp = _uinterpolate(texp, _df_times, _df_values, interp)
-    ptdelta = _uinterpolate(texp+dt, _df_times, _df_values, interp)
+    pt_exp = _uinterpolate(t_exp, _df_times, _df_values, interp)
+    ptdelta = _uinterpolate(t_exp+dt, _df_times, _df_values, interp)
 
     cpn = 0.0
     zcb = 0.0
@@ -273,13 +274,13 @@ def american_bond_option_tree_fast(texp,
         kN = k + jmax
         rt = _rt[expiryStep, kN]
         bondPrice = 0.0
-        for i in range(0, num_coupons):
-            tflow = coupon_times[i]
-            if tflow >= texp:
+        for i in range(0, num_cpns):
+            tflow = cpn_times[i]
+            if tflow >= t_exp:
                 ptflow = _uinterpolate(tflow, _df_times, _df_values, interp)
-                zcb = p_fast(texp, tflow, rt, dt, ptexp, ptdelta, ptflow,
+                zcb = p_fast(t_exp, tflow, rt, dt, pt_exp, ptdelta, ptflow,
                              _sigma, _a)
-                cpn = couponAmounts[i]
+                cpn = cpn_amounts[i]
                 bondPrice += cpn * face_amount * zcb
 
         bondPrice += zcb * face_amount
@@ -410,8 +411,8 @@ def american_bond_option_tree_fast(texp,
 
 
 @njit(fastmath=True, cache=True)
-def bermudan_swaption_tree_fast(texp, tmat, strike_price, face_amount,
-                                coupon_times, coupon_flows,
+def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
+                                cpn_times, cpn_flows,
                                 exercise_typeInt,
                                 _df_times, _df_values,
                                 _tree_times, _Q, _pu, _pm, _pd, _rt, _dt, _a):
@@ -422,23 +423,23 @@ def bermudan_swaption_tree_fast(texp, tmat, strike_price, face_amount,
 
     num_time_steps, num_nodes = _Q.shape
     jmax = ceil(0.1835/(_a * _dt))
-    expiryStep = int(texp/_dt + 0.50)
+    expiryStep = int(t_exp/_dt + 0.50)
     maturityStep = int(tmat/_dt + 0.50)
 
     ###########################################################################
 
     fixed_legFlows = np.zeros(num_time_steps)
     float_leg_values = np.zeros(num_time_steps)
-    num_coupons = len(coupon_times)
+    num_cpns = len(cpn_times)
 
     # Tree flows go all the way out to the bond maturity date
-    for i in range(0, num_coupons):
-        tcpn = coupon_times[i]
+    for i in range(0, num_cpns):
+        tcpn = cpn_times[i]
         n = int(round(tcpn/_dt, 0))
         ttree = _tree_times[n]
         df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
-        fixed_legFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
+        fixed_legFlows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
         float_leg_values[n] = strike_price * df_flow / df_tree
 
     ###########################################################################
@@ -453,8 +454,8 @@ def bermudan_swaption_tree_fast(texp, tmat, strike_price, face_amount,
     for n in range(1, len(_tree_times)):
 
         accdAtExpiry = 0.0
-        if _tree_times[n-1] < texp and _tree_times[n] >= texp:
-            mapped_times = np.append(mapped_times, texp)
+        if _tree_times[n-1] < t_exp and _tree_times[n] >= t_exp:
+            mapped_times = np.append(mapped_times, t_exp)
             mapped_amounts = np.append(mapped_amounts, accdAtExpiry)
 
         if fixed_legFlows[n] > 0.0:
@@ -599,7 +600,7 @@ def bermudan_swaption_tree_fast(texp, tmat, strike_price, face_amount,
 
 
 @njit(fastmath=True, cache=True)
-def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
+def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
                                      call_times, call_prices,
                                      put_times, put_prices, face,
                                      _sigma, _a, _Q,  # IS SIGMA USED ?
@@ -609,19 +610,19 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
     American exercise. Some minor issues to do with handling coupons on
     the option expiry date need to be solved. """
 
-#    print("Coupon Times:", coupon_times)
-#    print("Coupon Flows:", coupon_flows)
+#    print("Coupon Times:", cpn_times)
+#    print("Coupon Flows:", cpn_flows)
 
 #    print("DF Times:", _df_times)
 #    print("DF Values:", _df_values)
 
-    if np.any(coupon_times < 0.0):
+    if np.any(cpn_times < 0.0):
         raise FinError("No coupon times can be before the value date.")
 
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
     jmax = ceil(0.1835/(_a * dt))
-    tmat = coupon_times[-1]
+    tmat = cpn_times[-1]
     maturityStep = int(tmat/dt + 0.50)
 
     ###########################################################################
@@ -630,14 +631,14 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
 
     treeFlows = np.zeros(num_time_steps)
 
-    num_coupons = len(coupon_times)
-    for i in range(0, num_coupons):
-        tcpn = coupon_times[i]
+    num_cpns = len(cpn_times)
+    for i in range(0, num_cpns):
+        tcpn = cpn_times[i]
         n = int(round(tcpn/dt, 0))
         ttree = _tree_times[n]
         df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
-        treeFlows[n] += coupon_flows[i] * 1.0 * df_flow / df_tree
+        treeFlows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
 #    print("Tree flows:", treeFlows)
 
@@ -678,12 +679,12 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
         tree_call_value[n] = call_prices[i]
 
     # map puts onto tree
-    treePutValue = np.zeros(num_time_steps)
+    tree_put_value = np.zeros(num_time_steps)
     num_puts = len(put_times)
     for i in range(0, num_puts):
         put_time = put_times[i]
         n = int(round(put_time/dt, 0))
-        treePutValue[n] = put_prices[i]
+        tree_put_value[n] = put_prices[i]
 
     ###########################################################################
     # Value the bond by backward induction starting at bond maturity
@@ -714,7 +715,7 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
     m = maturityStep
     nm = min(maturityStep, jmax)
     vcall = tree_call_value[m]
-    vput = treePutValue[m]
+    vput = tree_put_value[m]
     vhold = (1.0 + treeFlows[m]) * face
     vclean = vhold - accrued[m]
     value = min(max(vclean, vput), vcall) + accrued[m]
@@ -729,7 +730,7 @@ def callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
         nm = min(m, jmax)
         flow = treeFlows[m] * face
         vcall = tree_call_value[m]
-        vput = treePutValue[m]
+        vput = tree_put_value[m]
 
         for k in range(-nm, nm+1):
             kN = k + jmax
@@ -789,7 +790,7 @@ def fwd_dirty_bond_price(rt, *args):
     decomposition approach. The strike is a clean price. """
 
     self = args[0]
-    texp = args[1]
+    t_exp = args[1]
     cpn_times = args[2]
     cpn_amounts = args[3]
     df_times = args[4]
@@ -798,11 +799,11 @@ def fwd_dirty_bond_price(rt, *args):
     face = args[7]
 
     dt = 0.001
-    tdelta = texp + dt
-    ptexp = _uinterpolate(texp, df_times, df_values, interp)
+    tdelta = t_exp + dt
+    pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
     ptdelta = _uinterpolate(tdelta, df_times, df_values, interp)
 
-#    print("TEXP", texp, ptexp)
+#    print("TEXP", t_exp, pt_exp)
 
     num_flows = len(cpn_times)
     pv = 0.0
@@ -812,21 +813,21 @@ def fwd_dirty_bond_price(rt, *args):
         tcpn = cpn_times[i]
         cpn = cpn_amounts[i]
 
-        if tcpn > texp:
+        if tcpn > t_exp:
             ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
-            zcb = p_fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
+            zcb = p_fast(t_exp, tcpn, rt, dt, pt_exp, ptdelta, ptcpn,
                          self._sigma, self._a)
             pv = pv + zcb * cpn
 #            print("TCPN", tcpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
 
-    if tcpn >= texp:
+    if tcpn >= t_exp:
         pv = pv + zcb
 
 #    print("TCPN", tcpn, "ZCB", zcb, "PRI", 1.0, "PV", pv)
 
-    accd = accrued_interpolator(texp, cpn_times, cpn_amounts)
+    accd = accrued_interpolator(t_exp, cpn_times, cpn_amounts)
 #    print("Accrued:", accd)
-#    print("texp:", texp)
+#    print("t_exp:", t_exp)
 #    print("cpn_times:", cpn_times)
 #    print("cpn_amounts:", cpn_amounts)
 
@@ -875,20 +876,20 @@ class HWTree():
 ###############################################################################
 
     def option_on_zcb(self,
-                      texp, tmat,
+                      t_exp, tmat,
                       strike, face_amount,
                       df_times, df_values):
         """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
 
-        if texp > tmat:
+        if t_exp > tmat:
             raise FinError("Option expiry after bond matures.")
 
-        if texp < 0.0:
+        if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        ptexp = _uinterpolate(texp, df_times, df_values, interp)
+        pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
         ptmat = _uinterpolate(tmat, df_times, df_values, interp)
 
         sigma = self._sigma
@@ -897,24 +898,24 @@ class HWTree():
         if abs(a) < small:
             a = small
 
-        sigmap = (sigma/a) * (1.0 - np.exp(-a*(tmat-texp)))
-        sigmap *= np.sqrt((1.0-np.exp(-2.0*a*texp))/2.0/a)
+        sigmap = (sigma/a) * (1.0 - np.exp(-a*(tmat-t_exp)))
+        sigmap *= np.sqrt((1.0-np.exp(-2.0*a*t_exp))/2.0/a)
 
         if abs(sigmap) < small:
             sigmap = small
 
-        h = np.log((face_amount*ptmat)/(strike * ptexp)) / \
+        h = np.log((face_amount*ptmat)/(strike * pt_exp)) / \
             sigmap + sigmap / 2.0
-        callValue = face_amount * ptmat * N(h) - strike * ptexp * N(h - sigmap)
-        putValue = strike * ptexp * \
+        call_value = face_amount * ptmat * N(h) - strike * pt_exp * N(h - sigmap)
+        put_value = strike * pt_exp * \
             N(-h + sigmap) - face_amount * ptmat * N(-h)
 
-        return {'call': callValue, 'put': putValue}
+        return {'call': call_value, 'put': put_value}
 
 ###############################################################################
 
     def european_bond_option_jamshidian(self,
-                                        texp,
+                                        t_exp,
                                         strike_price,
                                         face,
                                         cpn_times,
@@ -928,9 +929,9 @@ class HWTree():
 #        print(df_times)
 #        print(df_values)
 
-        num_coupons = len(cpn_times)
+        num_cpns = len(cpn_times)
 
-        argtuple = (self, texp, cpn_times, cpn_amounts,
+        argtuple = (self, t_exp, cpn_times, cpn_amounts,
                     df_times, df_values, strike_price, face)
 
         # Can I improve on this initial guess ?
@@ -943,43 +944,43 @@ class HWTree():
         # Now we price a series of zero coupon bonds using this short rate
         dt = 1e-6
 
-        ptexp = _uinterpolate(texp, df_times, df_values, interp)
-        ptdelta = _uinterpolate(texp+dt, df_times, df_values, interp)
+        pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
+        ptdelta = _uinterpolate(t_exp+dt, df_times, df_values, interp)
 
-        callValue = 0.0
-        putValue = 0.0
+        call_value = 0.0
+        put_value = 0.0
 
         # Adjust strike to handle
-        for i in range(0, num_coupons):
+        for i in range(0, num_cpns):
 
             tcpn = cpn_times[i]
             cpn = cpn_amounts[i]
 
-            if tcpn >= texp:  # coupons on the expiry date are included
+            if tcpn >= t_exp:  # coupons on the expiry date are included
 
                 ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
 
-                strike = p_fast(texp, tcpn, rstar, dt, ptexp, ptdelta,
+                strike = p_fast(t_exp, tcpn, rstar, dt, pt_exp, ptdelta,
                                 ptcpn, self._sigma, self._a)
 
-                v = self.option_on_zcb(texp, tcpn, strike, 1.0,
+                v = self.option_on_zcb(t_exp, tcpn, strike, 1.0,
                                        df_times, df_values)
 
                 call = v['call']
                 put = v['put']
 
-                callValue += call * cpn * face
-                putValue += put * cpn * face
+                call_value += call * cpn * face
+                put_value += put * cpn * face
 
-        callValue += call * face
-        putValue += put * face
+        call_value += call * face
+        put_value += put * face
 
-        return {'call': callValue, 'put': putValue}
+        return {'call': call_value, 'put': put_value}
 
 ###############################################################################
 
     def european_bond_option_expiry_only(self,
-                                         texp,
+                                         t_exp,
                                          strike_price,
                                          face_amount,
                                          cpn_times,
@@ -991,17 +992,17 @@ class HWTree():
         """
 
         dt = self._dt
-        tdelta = texp + dt
+        tdelta = t_exp + dt
 
-        ptexp = _uinterpolate(texp, self._df_times, self._dfs, interp)
+        pt_exp = _uinterpolate(t_exp, self._df_times, self._dfs, interp)
         ptdelta = _uinterpolate(tdelta, self._df_times, self._dfs, interp)
 
         _, num_nodes = self._Q.shape
-        expiryStep = int(texp/dt+0.50)
+        expiryStep = int(t_exp/dt+0.50)
 
-        callValue = 0.0
-        putValue = 0.0
-        num_coupons = len(cpn_times)
+        call_value = 0.0
+        put_value = 0.0
+        num_cpns = len(cpn_times)
 
         #######################################################################
 
@@ -1012,28 +1013,28 @@ class HWTree():
 
             pv = 0.0
 
-            for i in range(0, num_coupons):
+            for i in range(0, num_cpns):
 
                 tcpn = cpn_times[i]
                 cpn = cpn_amounts[i]
 
-                if tcpn >= texp:
+                if tcpn >= t_exp:
 
                     ptcpn = _uinterpolate(tcpn, self._df_times, self._dfs,
                                           interp)
 
-                    zcb = p_fast(texp, tcpn, rt, dt, ptexp, ptdelta, ptcpn,
+                    zcb = p_fast(t_exp, tcpn, rt, dt, pt_exp, ptdelta, ptcpn,
                                  self._sigma, self._a)
 
                     pv += cpn * zcb
 
             pv += zcb
 
-#            print(texp)
+#            print(t_exp)
 #            print(cpn_times)
 #            print(cpn_amounts)
 
-            accrued = accrued_interpolator(texp, cpn_times, cpn_amounts)
+            accrued = accrued_interpolator(t_exp, cpn_times, cpn_amounts)
 
             pv = pv - accrued
 #            print(accrued)
@@ -1041,87 +1042,87 @@ class HWTree():
             putPayoff = max(strike_price - pv * face_amount, 0.0)
             callPayoff = max(pv * face_amount - strike_price, 0.0)
 
-            putValue += q * putPayoff
-            callValue += q * callPayoff
+            put_value += q * putPayoff
+            call_value += q * callPayoff
 
         #######################################################################
 
-        return {'call': callValue, 'put': putValue}
+        return {'call': call_value, 'put': put_value}
 
 ###############################################################################
 
     def option_on_zero_coupon_bond_tree(self,
-                                        texp,
+                                        t_exp,
                                         tmat,
                                         strike_price,
                                         face_amount):
         """ Price an option on a zero coupon bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build. """
 
-        if texp > tmat:
+        if t_exp > tmat:
             raise FinError("Option expiry after bond matures.")
 
-        if texp < 0.0:
+        if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
         if self._tree_times is None:
             raise FinError("Tree has not been constructed.")
 
-        if self._tree_times[-1] < texp:
+        if self._tree_times[-1] < t_exp:
             raise FinError("Tree expiry must be >= option expiry date.")
 
         dt = self._dt
-        tdelta = texp + dt
+        tdelta = t_exp + dt
 
-        ptexp = _uinterpolate(texp, self._df_times, self._dfs, interp)
+        pt_exp = _uinterpolate(t_exp, self._df_times, self._dfs, interp)
         ptdelta = _uinterpolate(tdelta, self._df_times, self._dfs, interp)
         ptmat = _uinterpolate(tmat, self._df_times, self._dfs, interp)
 
         _, num_nodes = self._Q.shape
-        expiryStep = int(texp/dt+0.50)
+        expiryStep = int(t_exp/dt+0.50)
 
-        callValue = 0.0
-        putValue = 0.0
+        call_value = 0.0
+        put_value = 0.0
 
         for k in range(0, num_nodes):
 
             q = self._Q[expiryStep, k]
             rt = self._rt[expiryStep, k]
 
-            zcb = p_fast(texp, tmat,
-                         rt, dt, ptexp, ptdelta, ptmat,
+            zcb = p_fast(t_exp, tmat,
+                         rt, dt, pt_exp, ptdelta, ptmat,
                          self._sigma, self._a)
 
             putPayoff = max(strike_price - zcb * face_amount, 0.0)
             callPayoff = max(zcb * face_amount - strike_price, 0.0)
-            putValue += q * putPayoff
-            callValue += q * callPayoff
+            put_value += q * putPayoff
+            call_value += q * callPayoff
 
-        return {'call': callValue, 'put': putValue}
+        return {'call': call_value, 'put': put_value}
 
 ###############################################################################
 
-    def bermudan_swaption(self, texp, tmat, strike, face,
-                          coupon_times, coupon_flows, exercise_type):
+    def bermudan_swaption(self, t_exp, tmat, strike, face,
+                          cpn_times, cpn_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. """
 
         exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
-        tmat = coupon_times[-1]
+        tmat = cpn_times[-1]
 
-        if texp > tmat:
+        if t_exp > tmat:
             raise FinError("Option expiry after bond matures.")
 
-        if texp < 0.0:
+        if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
         #######################################################################
 
         payValue, recValue \
-            = bermudan_swaption_tree_fast(texp, tmat, strike, face,
-                                          coupon_times, coupon_flows,
+            = bermudan_swaption_tree_fast(t_exp, tmat, strike, face,
+                                          cpn_times, cpn_flows,
                                           exercise_typeInt,
                                           self._df_times, self._dfs,
                                           self._tree_times, self._Q,
@@ -1133,10 +1134,10 @@ class HWTree():
 
 ###############################################################################
 
-    def bond_option(self, texp, strike_price, face_amount,
-                    coupon_times, coupon_flows, exercise_type):
+    def bond_option(self, t_exp, strike_price, face_amount,
+                    cpn_times, cpn_flows, exercise_type):
         """ Value a bond option that can have European or American exercise.
-        This is done using a trinomial tree that we extend out to bond 
+        This is done using a trinomial tree that we extend out to bond
         maturity. For European bond options, Jamshidian's model is
         faster and is used instead i.e. not this function. """
 
@@ -1146,34 +1147,34 @@ class HWTree():
 
             if self._europeanCalcType == FinHWEuropeanCalcType.JAMSHIDIAN:
 
-                v = self.european_bond_option_jamshidian(texp,
+                v = self.european_bond_option_jamshidian(t_exp,
                                                          strike_price,
                                                          face_amount,
-                                                         coupon_times,
-                                                         coupon_flows,
+                                                         cpn_times,
+                                                         cpn_flows,
                                                          self._df_times,
                                                          self._dfs)
 
-                callValue = v['call']
-                putValue = v['put']
+                call_value = v['call']
+                put_value = v['put']
 
             elif self._europeanCalcType == FinHWEuropeanCalcType.EXPIRY_ONLY:
 
-                v = self.european_bond_option_expiry_only(texp,
+                v = self.european_bond_option_expiry_only(t_exp,
                                                           strike_price,
                                                           face_amount,
-                                                          coupon_times,
-                                                          coupon_flows)
+                                                          cpn_times,
+                                                          cpn_flows)
 
-                callValue = v['call']
-                putValue = v['put']
+                call_value = v['call']
+                put_value = v['put']
 
             elif self._europeanCalcType == FinHWEuropeanCalcType.EXPIRY_TREE:
 
-                callValue, putValue \
-                    = american_bond_option_tree_fast(texp,
+                call_value, put_value \
+                    = american_bond_option_tree_fast(t_exp,
                                                      strike_price, face_amount,
-                                                     coupon_times, coupon_flows,
+                                                     cpn_times, cpn_flows,
                                                      exercise_typeInt,
                                                      self._sigma, self._a,
                                                      self._Q,
@@ -1187,10 +1188,10 @@ class HWTree():
 
         else:
 
-            callValue, putValue \
-                = american_bond_option_tree_fast(texp,
+            call_value, put_value \
+                = american_bond_option_tree_fast(t_exp,
                                                  strike_price, face_amount,
-                                                 coupon_times, coupon_flows,
+                                                 cpn_times, cpn_flows,
                                                  exercise_typeInt,
                                                  self._sigma, self._a,
                                                  self._Q,
@@ -1199,13 +1200,13 @@ class HWTree():
                                                  self._tree_times,
                                                  self._df_times, self._dfs)
 
-        return {'call': callValue, 'put': putValue}
+        return {'call': call_value, 'put': put_value}
 
 ###############################################################################
 
     def callable_puttable_bond_tree(self,
-                                    coupon_times,
-                                    coupon_flows,
+                                    cpn_times,
+                                    cpn_flows,
                                     call_times,
                                     call_prices,
                                     put_times,
@@ -1216,8 +1217,8 @@ class HWTree():
         the option expiry date need to be solved. Also this function should be
         moved out of the class so it can be sped up using NUMBA. """
 
-        coupon_times = np.array(coupon_times)
-        coupon_flows = np.array(coupon_flows)
+        cpn_times = np.array(cpn_times)
+        cpn_flows = np.array(cpn_flows)
 
         call_times = np.array(call_times)
         put_times = np.array(put_times)
@@ -1225,7 +1226,7 @@ class HWTree():
         call_prices = np.array(call_prices)
         put_prices = np.array(put_prices)
 
-        v = callable_puttable_bond_tree_fast(coupon_times, coupon_flows,
+        v = callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
                                              call_times, call_prices,
                                              put_times, put_prices,
                                              face_amount,

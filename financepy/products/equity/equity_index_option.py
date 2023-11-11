@@ -41,45 +41,45 @@ class EquityIndexOption:
         self._expiry_date = expiry_date
         self._strike_price = strike_price
         self._num_options = num_options
-        self._texp = None
+        self._t_exp = None
 
 ###############################################################################
 
     def value(self,
-              valuation_date: Union[Date, list],
+              value_date: Union[Date, list],
               forward_price: float,
               discount_curve: DiscountCurve,
               model: Model,
               ):
         """ Equity Index Option valuation using Black model. """
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
         if isinstance(self._expiry_date, Date):
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         elif isinstance(self._expiry_date, list):
-            texp = []
+            t_exp = []
             for expDate in self._expiry_date:
-                t = (expDate - valuation_date) / gDaysInYear
-            texp.append(t)
-            texp = np.array(texp)
+                t = (expDate - value_date) / gDaysInYear
+            t_exp.append(t)
+            t_exp = np.array(t_exp)
         else:
             raise FinError("Valuation date must be Date or list of Date")
-        self._texp = texp
+        self._t_exp = t_exp
         if np.any(forward_price <= 0.0):
             raise FinError("Forward price must be greater than zero.")
-        if np.any(texp < 0.0):
+        if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
-        texp = np.maximum(texp, 1e-10)
+        t_exp = np.maximum(t_exp, 1e-10)
         df = discount_curve.df(self._expiry_date) / \
-            discount_curve.df(valuation_date)
+            discount_curve.df(value_date)
         k = self._strike_price
         if isinstance(model, Black):
-            value = model.value(forward_price, k, texp,
+            value = model.value(forward_price, k, t_exp,
                                 df, self._option_type)
         else:
             raise FinError("Unknown Model Type")
@@ -89,26 +89,26 @@ class EquityIndexOption:
 ###############################################################################
 
     def delta(self,
-              valuation_date: Date,
+              value_date: Date,
               forward_price: float,
               discount_curve: DiscountCurve,
               model):
         """ Calculate delta of a European/American Index option. """
-        if type(valuation_date) == Date:
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
-            texp = valuation_date
-        self._texp = texp
+            t_exp = value_date
+        self._t_exp = t_exp
         if np.any(forward_price <= 0.0):
             raise FinError("Forward price must be greater than zero.")
-        if np.any(texp < 0.0):
+        if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
-        texp = np.maximum(texp, 1e-10)
+        t_exp = np.maximum(t_exp, 1e-10)
         df = discount_curve.df(self._expiry_date) / \
-            discount_curve.df(valuation_date)
+            discount_curve.df(value_date)
         k = self._strike_price
         if isinstance(model, Black):
-            delta = model.delta(forward_price, k, texp,
+            delta = model.delta(forward_price, k, t_exp,
                                 df, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
@@ -117,26 +117,26 @@ class EquityIndexOption:
 ###############################################################################
 
     def gamma(self,
-              valuation_date: Date,
+              value_date: Date,
               forward_price: float,
               discount_curve: DiscountCurve,
               model: Model):
         """ Calculate gamma of a European/American Index option. """
 
-        if type(valuation_date) == Date:
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
-            texp = valuation_date
+            t_exp = value_date
         if np.any(forward_price <= 0.0):
             raise FinError("Forward price must be greater than zero.")
-        if np.any(texp < 0.0):
+        if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
-        texp = np.maximum(texp, 1e-10)
+        t_exp = np.maximum(t_exp, 1e-10)
         df = discount_curve.df(self._expiry_date) / \
-            discount_curve.df(valuation_date)
+            discount_curve.df(value_date)
         k = self._strike_price
         if isinstance(model, Black):
-            gamma = model.gamma(forward_price, k, texp,
+            gamma = model.gamma(forward_price, k, t_exp,
                                 df, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
@@ -145,26 +145,26 @@ class EquityIndexOption:
 ###############################################################################
 
     def vega(self,
-             valuation_date: Date,
+             value_date: Date,
              forward_price: float,
              discount_curve: DiscountCurve,
              model: Model):
         """ Calculate vega of a European/American Index option. """
 
-        if type(valuation_date) == Date:
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
-            texp = valuation_date
+            t_exp = value_date
         if np.any(forward_price <= 0.0):
             raise FinError("Forward price must be greater than zero.")
-        if np.any(texp < 0.0):
+        if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
-        texp = np.maximum(texp, 1e-10)
+        t_exp = np.maximum(t_exp, 1e-10)
         df = discount_curve.df(self._expiry_date) / \
-            discount_curve.df(valuation_date)
+            discount_curve.df(value_date)
         k = self._strike_price
         if isinstance(model, Black):
-            vega = model.vega(forward_price, k, texp,
+            vega = model.vega(forward_price, k, t_exp,
                               df, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
@@ -173,25 +173,25 @@ class EquityIndexOption:
 ###############################################################################
 
     def theta(self,
-              valuation_date: Date,
+              value_date: Date,
               forward_price: float,
               discount_curve: DiscountCurve,
               model: Model):
         """ Calculate theta of a European/American Index option. """
-        if type(valuation_date) == Date:
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
-            texp = valuation_date
+            t_exp = value_date
         if np.any(forward_price <= 0.0):
             raise FinError("Forward price must be greater than zero.")
-        if np.any(texp < 0.0):
+        if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
-        texp = np.maximum(texp, 1e-10)
+        t_exp = np.maximum(t_exp, 1e-10)
         df = discount_curve.df(self._expiry_date) / \
-            discount_curve.df(valuation_date)
+            discount_curve.df(value_date)
         k = self._strike_price
         if isinstance(model, Black):
-            theta = model.theta(forward_price, k, texp,
+            theta = model.theta(forward_price, k, t_exp,
                                 df, self._option_type_value)
         else:
             raise FinError("Unknown Model Type")
@@ -200,7 +200,7 @@ class EquityIndexOption:
 ###############################################################################
 
     def implied_volatility(self,
-                           valuation_date: Date,
+                           value_date: Date,
                            forward_price: Union[float, list, np.ndarray],
                            discount_curve: DiscountCurve,
                            model: Model,
@@ -208,16 +208,16 @@ class EquityIndexOption:
                            ):
         """ Calculate the Black implied volatility of a European/American
         Index option. """
-        texp = (self._expiry_date - valuation_date) / gDaysInYear
-        if texp < 1.0 / 365.0:
+        t_exp = (self._expiry_date - value_date) / gDaysInYear
+        if t_exp < 1.0 / 365.0:
             print("Expiry time is too close to zero.")
             return -999
         df = discount_curve.df(self._expiry_date) / \
-            discount_curve.df(valuation_date)
-        r = -np.log(df)/texp
+            discount_curve.df(value_date)
+        r = -np.log(df)/t_exp
         if isinstance(model, Black):
             sigma = implied_volatility(
-                forward_price, texp, r,
+                forward_price, t_exp, r,
                 self._strike_price, price,
                 self._option_type)
         else:

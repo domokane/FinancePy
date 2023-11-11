@@ -1,5 +1,5 @@
 from financepy.models.finite_difference import (
-    black_scholes_finite_difference, dx, dxx, solve_tridiagonal_matrix, band_matrix_multiplication)
+    black_scholes_fd, dx, dxx, solve_tridiagonal_matrix, band_matrix_multiplication)
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -12,7 +12,7 @@ import numpy as np
 from pytest import approx
 
 
-def test_black_scholes_finite_difference():
+def test_black_scholes_fd():
     """
     Compare the output of black_schole_finite_difference to kBlack::fdRunner from
     https://github.com/domokane/CompFin/blob/main/Week%204/xladdin/Utility/kBlack.cpp
@@ -38,7 +38,7 @@ def test_black_scholes_finite_difference():
     update = False
 
     option_type = OptionTypes.EUROPEAN_CALL
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -46,7 +46,7 @@ def test_black_scholes_finite_difference():
     assert v == approx(0.07939664662902503, abs=1e-3)
 
     smooth = True
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -55,7 +55,7 @@ def test_black_scholes_finite_difference():
     smooth = 0
 
     dig = 1
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -64,7 +64,7 @@ def test_black_scholes_finite_difference():
 
     #smooth dig
     smooth = 1
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -74,7 +74,7 @@ def test_black_scholes_finite_difference():
     dig = 0
 
     option_type = OptionTypes.EUROPEAN_PUT
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -82,7 +82,7 @@ def test_black_scholes_finite_difference():
     assert v == approx(0.2139059947533305, abs=1e-3)
 
     option_type = OptionTypes.AMERICAN_PUT
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -90,7 +90,7 @@ def test_black_scholes_finite_difference():
     assert v == approx(0.2165916613669189, abs=1e-3)
 
     option_type = OptionTypes.AMERICAN_CALL
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -99,7 +99,7 @@ def test_black_scholes_finite_difference():
     option_type = OptionTypes.EUROPEAN_CALL
 
     wind = 1
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -107,7 +107,7 @@ def test_black_scholes_finite_difference():
     assert v == approx(0.07834108133101789, abs=1e-3)
 
     wind = 2
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -115,7 +115,7 @@ def test_black_scholes_finite_difference():
     assert v == approx(0.08042112779963827, abs=1e-3)
 
     wind = -1
-    v = black_scholes_finite_difference(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
+    v = black_scholes_fd(spot_price=s0, volatility=volatility, time_to_expiry=time_to_expiry,
                                         strike_price=strike, risk_free_rate=r,
                                         dividend_yield=dividend_yield, digital=dig, option_type=option_type,
                                         smooth=smooth, theta=theta, wind=wind,
@@ -140,7 +140,7 @@ def test_european_call():
     strike_price = 50.0
     option_type = OptionTypes.EUROPEAN_CALL
 
-    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+    v = black_scholes_fd(spot_price=spot_price, volatility=volatility,
                                         time_to_expiry=time_to_expiry,
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
@@ -173,7 +173,7 @@ def test_european_put():
     strike_price = 50.0
     option_type = OptionTypes.EUROPEAN_PUT
 
-    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+    v = black_scholes_fd(spot_price=spot_price, volatility=volatility,
                                         time_to_expiry=time_to_expiry,
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
@@ -206,7 +206,7 @@ def test_american_call():
     strike_price = 50.0
     option_type = OptionTypes.AMERICAN_CALL
 
-    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+    v = black_scholes_fd(spot_price=spot_price, volatility=volatility,
                                         time_to_expiry=time_to_expiry,
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
@@ -240,7 +240,7 @@ def test_american_put():
     strike_price = 50.0
     option_type = OptionTypes.AMERICAN_PUT
 
-    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+    v = black_scholes_fd(spot_price=spot_price, volatility=volatility,
                                         time_to_expiry=time_to_expiry,
                                         strike_price=strike_price, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
@@ -281,7 +281,7 @@ def test_call_option():
     v0 = call_option.value(valuation_date, spot_price,
                            discount_curve, dividend_curve, model)
 
-    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+    v = black_scholes_fd(spot_price=spot_price, volatility=volatility,
                                         time_to_expiry=time_to_expiry,
                                         strike_price=100.0, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,
@@ -314,7 +314,7 @@ def test_put_option():
     v0 = put_option.value(valuation_date, spot_price,
                           discount_curve, dividend_curve, model)
 
-    v = black_scholes_finite_difference(spot_price=spot_price, volatility=volatility,
+    v = black_scholes_fd(spot_price=spot_price, volatility=volatility,
                                         time_to_expiry=time_to_expiry,
                                         strike_price=100.0, risk_free_rate=risk_free_rate,
                                         dividend_yield=dividend_yield, digital=0,

@@ -16,7 +16,6 @@ import time
 import numpy as np
 
 
-
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################

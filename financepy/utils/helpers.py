@@ -79,14 +79,14 @@ def pv01_times(t: float,
 
 
 def times_from_dates(dt: (Date, list),
-                     valuation_date: Date,
+                     value_date: Date,
                      day_count_type: DayCountTypes = None):
     """ If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
     times from the valuation date. The output is always a numpy vector of times
     which has only one element if the input is only one date. """
 
-    if isinstance(valuation_date, Date) is False:
+    if isinstance(value_date, Date) is False:
         raise FinError("Valuation date is not a Date")
 
     if day_count_type is None:
@@ -98,9 +98,9 @@ def times_from_dates(dt: (Date, list),
         num_dates = 1
         times = [None]
         if dcCounter is None:
-            times[0] = (dt - valuation_date) / gDaysInYear
+            times[0] = (dt - value_date) / gDaysInYear
         else:
-            times[0] = dcCounter.year_frac(valuation_date, dt)[0]
+            times[0] = dcCounter.year_frac(value_date, dt)[0]
 
         return times[0]
 
@@ -109,9 +109,9 @@ def times_from_dates(dt: (Date, list),
         times = []
         for i in range(0, num_dates):
             if dcCounter is None:
-                t = (dt[i] - valuation_date) / gDaysInYear
+                t = (dt[i] - value_date) / gDaysInYear
             else:
-                t = dcCounter.year_frac(valuation_date, dt[i])[0]
+                t = dcCounter.year_frac(value_date, dt[i])[0]
             times.append(t)
 
         return np.array(times)
@@ -230,7 +230,7 @@ def input_time(dt: Date,
         t = dt
         return check(t)
     elif isinstance(dt, Date):
-        t = (dt - curve._valuation_date) / gDaysInYear
+        t = (dt - curve._value_date) / gDaysInYear
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt
@@ -364,10 +364,10 @@ def table_to_string(header: str,
 
 def format_table(header: (list, tuple),
                  rows: (list, tuple)):
-    """ Format a 2D array into a table-like string. 
+    """ Format a 2D array into a table-like string.
     Similar to "table_to_string", but using a wrapper
     around PrettyTable to get a nice formatting. """
-    
+
     t = PrettyTable(header)
     numRows = len(header)
 
@@ -464,8 +464,8 @@ def accrued_tree(gridTimes: np.ndarray,
 
     # When the grid time is before the first coupon we have to extrapolate back
 
-    coupon_times = np.zeros(0)
-    coupon_flows = np.zeros(0)
+    cpn_times = np.zeros(0)
+    cpn_flows = np.zeros(0)
 
     for iGrid in range(1, numGridTimes):
 
@@ -473,19 +473,19 @@ def accrued_tree(gridTimes: np.ndarray,
         cpn_flow = gridFlows[iGrid]
 
         if gridFlows[iGrid] > gSmall:
-            coupon_times = np.append(coupon_times, cpn_time)
-            coupon_flows = np.append(coupon_flows, cpn_flow)
+            cpn_times = np.append(cpn_times, cpn_time)
+            cpn_flows = np.append(cpn_flows, cpn_flow)
 
-    num_coupons = len(coupon_times)
+    num_cpns = len(cpn_times)
 
     # interpolate between coupons
     for iGrid in range(0, numGridTimes):
         t = gridTimes[iGrid]
-        for i in range(0, num_coupons):
-            if t > coupon_times[i - 1] and t <= coupon_times[i]:
-                den = coupon_times[i] - coupon_times[i - 1]
-                num = (t - coupon_times[i - 1])
-                accrued[iGrid] = face * num * coupon_flows[i] / den
+        for i in range(0, num_cpns):
+            if t > cpn_times[i - 1] and t <= cpn_times[i]:
+                den = cpn_times[i] - cpn_times[i - 1]
+                num = (t - cpn_times[i - 1])
+                accrued[iGrid] = face * num * cpn_flows[i] / den
                 break
 
     return accrued
@@ -503,7 +503,7 @@ def check_argument_types(func, values):
         if valueName in values:
             value = values[valueName]
             usableType = to_usable_type(annotationType)
-        
+
         if (not isinstance(value, usableType)):
 
             print("ERROR with function arguments for", func.__name__)

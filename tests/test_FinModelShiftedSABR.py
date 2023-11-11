@@ -19,19 +19,19 @@ def test_ShiftedSABR():
     f = 0.043
     k = 0.050
     r = 0.03
-    texp = 2.0
+    t_exp = 2.0
 
     call_optionType = OptionTypes.EUROPEAN_CALL
     put_optionType = OptionTypes.EUROPEAN_PUT
 
-    df = np.exp(-r * texp)
+    df = np.exp(-r * t_exp)
 
     # SABR equivalent to lognormal (Black) model (i.e. beta = 1, rho = 0, nu = 0, shift = 0)
     modelSABR_01 = SABRShifted(0.0, 1.0, 0.0, 0.0, 0.0)
-    modelSABR_01.set_alpha_from_black_vol(strikeVol, f, k, texp)
+    modelSABR_01.set_alpha_from_black_vol(strikeVol, f, k, t_exp)
 
-    impliedLognormalVol = modelSABR_01.black_vol(f, k, texp)
-    impliedATMLognormalVol = modelSABR_01.black_vol(k, k, texp)
+    impliedLognormalVol = modelSABR_01.black_vol(f, k, t_exp)
+    impliedATMLognormalVol = modelSABR_01.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
 
     assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
@@ -40,17 +40,17 @@ def test_ShiftedSABR():
 
     # Volatility: pure SABR dynamics
     modelSABR_02 = SABRShifted(alpha, beta, rho, nu, shift)
-    modelSABR_02.set_alpha_from_black_vol(strikeVol, f, k, texp)
+    modelSABR_02.set_alpha_from_black_vol(strikeVol, f, k, t_exp)
 
-    impliedLognormalVol = modelSABR_02.black_vol(f, k, texp)
-    impliedATMLognormalVol = modelSABR_02.black_vol(k, k, texp)
+    impliedLognormalVol = modelSABR_02.black_vol(f, k, t_exp)
+    impliedATMLognormalVol = modelSABR_02.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
     calibrationError = round(strikeVol - impliedLognormalVol, 6)
     assert calibrationError == 0.0
 
     # Valuation: pure SABR dynamics
-    valueCall = modelSABR_02.value(f, k, texp, df, call_optionType)
-    valuePut = modelSABR_02.value(f, k, texp, df, put_optionType)
+    valueCall = modelSABR_02.value(f, k, t_exp, df, call_optionType)
+    valuePut = modelSABR_02.value(f, k, t_exp, df, put_optionType)
     assert round((valueCall - valuePut), 12) == round(df*(f - k), 12), \
         "The method called 'value()' doesn't comply with Call-Put parity"
 

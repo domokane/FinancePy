@@ -2,10 +2,9 @@
 # Copyright (C) 2022 Dominic O'Kane
 ###############################################################################
 
+import sys
 
 # https://people.math.ethz.ch/~hjfurrer/teaching/LongstaffSchwartzAmericanOptionsLeastSquareMonteCarlo.pdf
-
-import sys
 
 import numpy as np
 from numba import jit, njit, float64, int64
@@ -13,7 +12,6 @@ from numba import jit, njit, float64, int64
 from enum import Enum, auto
 
 from ..utils.global_types import OptionTypes
-from ..utils.error import FinError
 from ..utils.polyfit import fit_poly, eval_polynomial
 from ..models.finite_difference import option_payoff
 

@@ -51,7 +51,7 @@ class EquityAmericanOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: (np.ndarray, float),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -59,18 +59,18 @@ class EquityAmericanOption(EquityOption):
         """ Valuation of an American option using a CRR tree to take into
         account the value of early exercise. """
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if type(valuation_date) == Date:
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
-            texp = valuation_date
+            t_exp = value_date
 
         if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
@@ -78,10 +78,10 @@ class EquityAmericanOption(EquityOption):
         if isinstance(model, Model) is False:
             raise FinError("Model is not inherited off type FinModel.")
 
-        if np.any(texp < 0.0):
+        if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        texp = np.maximum(texp, 1e-10)
+        t_exp = np.maximum(t_exp, 1e-10)
 
         r = discount_curve.cc_rate(self._expiry_date)
         q = dividend_curve.cc_rate(self._expiry_date)
@@ -89,7 +89,7 @@ class EquityAmericanOption(EquityOption):
         s = stock_price
         k = self._strike_price
 
-        v = model.value(s, texp, k, r, q, self._option_type)
+        v = model.value(s, t_exp, k, r, q, self._option_type)
         v = v * self._num_options
 
         if isinstance(s, float):

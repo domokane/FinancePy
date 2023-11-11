@@ -31,7 +31,7 @@ class DiscountCurveFlat(DiscountCurve):
 ###############################################################################
 
     def __init__(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  flat_rate: (float, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
@@ -44,7 +44,7 @@ class DiscountCurveFlat(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
         self._flat_rate = flat_rate
         self._freq_type = freq_type
         self._day_count_type = day_count_type
@@ -54,12 +54,12 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
-        dates = self._valuation_date.add_years(years)
+        dates = self._value_date.add_years(years)
 
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dates)
         self._times = times_from_dates(
-            dates, self._valuation_date, day_count_type)
+            dates, self._value_date, day_count_type)
 
 ###############################################################################
 
@@ -69,7 +69,7 @@ class DiscountCurveFlat(DiscountCurve):
         bumped up by the bumpsize. All other parameters are preserved."""
 
         rBumped = self._flat_rate + bump_size
-        discCurve = DiscountCurveFlat(self._valuation_date,
+        discCurve = DiscountCurveFlat(self._value_date,
                                       rBumped,
                                       freq_type=self._freq_type,
                                       day_count_type=self._day_count_type)
@@ -87,10 +87,10 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
-        dfs = self._zero_to_df(self._valuation_date,
+        dfs = self._zero_to_df(self._value_date,
                                self._flat_rate,
                                dc_times,
                                self._freq_type,

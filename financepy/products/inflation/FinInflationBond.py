@@ -27,11 +27,11 @@ class FinInflationBond(Bond):
     def __init__(self,
                  issue_date: Date,
                  maturity_date: Date,
-                 coupon: float,  # Annualised bond coupon before inflation
+                 cpn: float,  # Annualised bond coupon before inflation
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  ex_div_days: int,  # Value of CPI index at bond issue date
-                 base_cpi_value: float, # CPI value at issue
+                 base_cpi_value: float,  # CPI value at issue
                  num_ex_dividend_days: int = 0,
                  calendar_type: CalendarTypes = CalendarTypes.NONE):
         """ Create FinInflationBond object by providing Maturity, Frequency,
@@ -39,7 +39,7 @@ class FinInflationBond(Bond):
         the base CPI used for all coupon and principal related calculations.
         The class inherits from Bond so has many similar functions. The YTM"""
 
-        Bond.__init__(self, issue_date, maturity_date, coupon, freq_type,
+        Bond.__init__(self, issue_date, maturity_date, cpn, freq_type,
                       accrual_type, ex_div_days, calendar_type)
 
         check_argument_types(self.__init__, locals())
@@ -55,7 +55,7 @@ class FinInflationBond(Bond):
 
         self._issue_date = issue_date
         self._maturity_date = maturity_date
-        self._coupon = coupon
+        self._cpn = cpn
         self._freq_type = freq_type
         self._accrual_type = accrual_type
         self._frequency = annual_frequency(freq_type)
@@ -66,7 +66,7 @@ class FinInflationBond(Bond):
         self._num_ex_dividend_days = num_ex_dividend_days
         self._inflation_accrued_interest = 0.0
         self._calendar_type = calendar_type
-        self._coupon_dates = []
+        self._cpn_dates = []
         self._flow_amounts = []
 
         self._settlement_date = Date(1, 1, 1900)
@@ -74,7 +74,7 @@ class FinInflationBond(Bond):
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-        self._calculate_coupon_dates()
+        self._calculate_cpn_dates()
         self._calculate_flows()
 
 ###############################################################################
@@ -135,7 +135,7 @@ class FinInflationBond(Bond):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("COUPON", self._coupon)
+        s += label_to_string("COUPON", self._cpn)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
         s += label_to_string("EX-DIV DAYS", self._ex_div_days)

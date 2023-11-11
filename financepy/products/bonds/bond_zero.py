@@ -78,7 +78,7 @@ class BondZero:
         self._issue_price = issue_price  # Price of issue, usually discounted
         self._par = 100.0  # This is how price is quoted and amount at maturity
         self._freq_type = FrequencyTypes.ZERO
-        self._coupon_dates = [issue_date, maturity_date]
+        self._cpn_dates = [issue_date, maturity_date]
         self._payment_dates = [issue_date, maturity_date]
         self._flow_amounts = [0.0, 0.0]  # coupon payments are zero
         self._calendar_type = CalendarTypes.WEEKEND
@@ -108,7 +108,7 @@ class BondZero:
 
         # n is the number of flows after the next coupon
         n = 0
-        for dt in self._coupon_dates:
+        for dt in self._cpn_dates:
             if dt > settlement_date:
                 n += 1
         n = n - 1
@@ -248,7 +248,7 @@ class BondZero:
         forward bond price if the settlement date is after the valuation date.
         """
 
-        if settlement_date < discount_curve._valuation_date:
+        if settlement_date < discount_curve._value_date:
             raise FinError("Bond settles before Discount curve date")
 
         if settlement_date > self._maturity_date:
@@ -258,7 +258,7 @@ class BondZero:
         df = 1.0
         df_settle = discount_curve.df(settlement_date, )
 
-        for dt in self._coupon_dates[1:]:
+        for dt in self._cpn_dates[1:]:
 
             # coupons paid on the settlement date are paid to the seller
             if dt > settlement_date:
@@ -345,16 +345,16 @@ class BondZero:
         calendar to be used - NONE means only calendar days, WEEKEND is only
         weekends or you can specify a country calendar for business days."""
 
-        num_flows = len(self._coupon_dates)
+        num_flows = len(self._cpn_dates)
 
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
         for iFlow in range(1, num_flows):
             # coupons paid on the settlement date are paid to the seller
-            if self._coupon_dates[iFlow] > settlement_date:
-                self._pcd = self._coupon_dates[iFlow - 1]
-                self._ncd = self._coupon_dates[iFlow]
+            if self._cpn_dates[iFlow] > settlement_date:
+                self._pcd = self._cpn_dates[iFlow - 1]
+                self._ncd = self._cpn_dates[iFlow]
                 break
 
         dc = DayCount(self._accrual_type)
@@ -407,12 +407,12 @@ class BondZero:
         pvIbor = 0.0
         prev_date = self._pcd
 
-        for dt in self._coupon_dates[1:]:
+        for dt in self._cpn_dates[1:]:
 
             # coupons paid on the settlement date are paid to the seller
             if dt > settlement_date:
                 df = discount_curve.df(dt)
-                # pvIbor += df * self._coupon / self._frequency
+                # pvIbor += df * self._cpn / self._frequency
 
         pvIbor += df * self._par
 
@@ -451,7 +451,7 @@ class BondZero:
         self.accrued_interest(settlement_date, 1.0)
 
         pv = 0.0
-        for dt in self._coupon_dates[1:]:
+        for dt in self._cpn_dates[1:]:
 
             # coupons paid on the settlement date are paid to the seller
             if dt > settlement_date:
@@ -520,7 +520,7 @@ class BondZero:
         analytic calculations for the bond. """
         flow_str = ''
         flow_str += ("%12s %12.2f \n"
-                     % (self._coupon_dates[-1], face))
+                     % (self._cpn_dates[-1], face))
 
         return flow_str
 
@@ -556,7 +556,7 @@ class BondZero:
         defaultingPrincipalPVPayStart = 0.0
         defaultingPrincipalPVPayEnd = 0.0
 
-        for dt in self._coupon_dates[1:]:
+        for dt in self._cpn_dates[1:]:
 
             # coupons paid on the settlement date are paid to the seller
             if dt > settlement_date:
@@ -627,7 +627,7 @@ class BondZero:
             begin_date, begin_ytm, convention)
         sell_price = self.dirty_price_from_ytm(end_date, end_ytm, convention)
 
-        dates_cfs = zip(self._coupon_dates, self._flow_amounts)
+        dates_cfs = zip(self._cpn_dates, self._flow_amounts)
 
         # The coupon or par payments on buying date belong to the buyer.
         # The coupon or par payments on selling date are given to the new buyer

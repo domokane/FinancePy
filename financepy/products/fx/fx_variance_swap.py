@@ -55,7 +55,7 @@ class FinFXVarianceSwap:
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               realisedVar,
               fair_strikeVar,
               libor_curve):
@@ -63,17 +63,17 @@ class FinFXVarianceSwap:
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve. """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if libor_curve._valuation_date != valuation_date:
+        if libor_curve._value_date != value_date:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        t1 = (valuation_date - self._effective_date) / gDaysInYear
+        t1 = (value_date - self._effective_date) / gDaysInYear
         t2 = (self._maturity_date - self._effective_date) / gDaysInYear
 
         expectedVariance = t1 * realisedVar/t2
@@ -88,7 +88,7 @@ class FinFXVarianceSwap:
 ###############################################################################
 
     def fair_strike_approx(self,
-                           valuation_date,
+                           value_date,
                            fwdStockPrice,
                            strikes,
                            volatilities):
@@ -100,7 +100,7 @@ class FinFXVarianceSwap:
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
-        tmat = (self._maturity_date - valuation_date)/gDaysInYear
+        tmat = (self._maturity_date - value_date)/gDaysInYear
 
         """ Calculate the slope of the volatility curve by taking the end
         points in the volatilities and strikes to calculate the gradient."""
@@ -114,7 +114,7 @@ class FinFXVarianceSwap:
 ###############################################################################
 
     def fair_strike(self,
-                    valuation_date,
+                    value_date,
                     stock_price,
                     dividend_curve,
                     volatility_curve,
@@ -134,7 +134,7 @@ class FinFXVarianceSwap:
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        tmat = (self._maturity_date - valuation_date)/gDaysInYear
+        tmat = (self._maturity_date - value_date)/gDaysInYear
 
         df = discount_curve.df(tmat)
         r = - np.log(df)/tmat
@@ -209,7 +209,7 @@ class FinFXVarianceSwap:
             vol = volatility_curve.volatility(k)
             opt = FXVanillaOption(self._maturity_date, k, put_type)
             model = BlackScholes(vol)
-            v = opt.value(valuation_date, s0, discount_curve,
+            v = opt.value(value_date, s0, discount_curve,
                           dividend_curve, model)
             piPut += v * self._putWts[n]
 
@@ -219,7 +219,7 @@ class FinFXVarianceSwap:
             vol = volatility_curve.volatility(k)
             opt = FXVanillaOption(self._maturity_date, k, call_type)
             model = BlackScholes(vol)
-            v = opt.value(valuation_date, s0, discount_curve,
+            v = opt.value(value_date, s0, discount_curve,
                           dividend_curve, model)
             piCall += v * self._callWts[n]
 

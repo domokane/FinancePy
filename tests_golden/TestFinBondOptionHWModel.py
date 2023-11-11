@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..\\")
+
 import matplotlib.pyplot as plt
 import time
 import numpy as np
@@ -17,8 +20,6 @@ from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..\\")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -493,13 +494,13 @@ def test_BondOptionDerivaGem():
 
     couponTimes = []
     couponFlows = []
-    cpn = bond._coupon/bond._frequency
+    cpn = bond._cpn/bond._frequency
 
-    numFlows = len(bond._coupon_dates)
+    numFlows = len(bond._cpn_dates)
     for i in range(0, numFlows):
 
-        pcd = bond._coupon_dates[i-1]
-        ncd = bond._coupon_dates[i]
+        pcd = bond._cpn_dates[i-1]
+        ncd = bond._cpn_dates[i]
 
         if ncd > settlement_date:
 
@@ -524,11 +525,11 @@ def test_BondOptionDerivaGem():
     model = HWTree(sigma, a, None)
 
     #  Test convergence
-    texp = (expiry_date - settlement_date)/gDaysInYear
+    t_exp = (expiry_date - settlement_date)/gDaysInYear
     tmat = (maturity_date - settlement_date)/gDaysInYear
 
     # Jamshidian approach
-    vjam = model.european_bond_option_jamshidian(texp, strike_price, face,
+    vjam = model.european_bond_option_jamshidian(t_exp, strike_price, face,
                                                  couponTimes, couponFlows,
                                                  times, dfs)
     # print("Jamshidian:", vjam)
@@ -537,7 +538,7 @@ def test_BondOptionDerivaGem():
     model.build_tree(tmat, times, dfs)
     exerciseType = FinExerciseTypes.EUROPEAN
 
-    vHW = model.bond_option(texp, strike_price, face,
+    vHW = model.bond_option(t_exp, strike_price, face,
                             couponTimes, couponFlows, exerciseType)
 
     # print("Full Tree:", vHW)

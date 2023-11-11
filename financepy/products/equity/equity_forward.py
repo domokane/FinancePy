@@ -37,31 +37,31 @@ class EquityForward():
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               stock_price,  # Current stock price
               discount_curve,
               dividend_curve):
         """ Calculate the value of an equity forward contract from the stock
         price and discount and dividend discount. """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if type(valuation_date) == Date:
-            t = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t = (self._expiry_date - value_date) / gDaysInYear
         else:
-            t = valuation_date
+            t = value_date
 
         if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
@@ -71,7 +71,7 @@ class EquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        fwdStockPrice = self.forward(valuation_date,
+        fwdStockPrice = self.forward(value_date,
                                      stock_price,
                                      discount_curve,
                                      dividend_curve)
@@ -89,16 +89,16 @@ class EquityForward():
 ###############################################################################
 
     def forward(self,
-                valuation_date,
+                value_date,
                 stock_price,  # Current stock price
                 discount_curve,
                 dividend_curve):
         """ Calculate the forward price of the equity forward contract. """
 
-        if type(valuation_date) == Date:
-            t = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t = (self._expiry_date - value_date) / gDaysInYear
         else:
-            t = valuation_date
+            t = value_date
 
         if np.any(stock_price <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")

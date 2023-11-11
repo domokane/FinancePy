@@ -174,7 +174,7 @@ class LHPlusModel():
 
         dk = 0.00001
         el_k2 = self.exp_min_lk_integral(k2, dk)
-        el_K1 = self.exp_min_lk_integral(k1, dk)
+        el_k1 = self.exp_min_lk_integral(k1, dk)
         q = 1.0 - (el_k2 - el_k1) / (k2 - k1)
         return q
 

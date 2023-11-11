@@ -96,7 +96,7 @@ class EquityBasketOption:
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_prices: np.ndarray,
               discount_curve: DiscountCurve,
               dividend_curves: (list),
@@ -107,9 +107,9 @@ class EquityBasketOption:
         able to handle a full rank correlation structure between the individual
         assets. """
 
-        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        t_exp = (self._expiry_date - value_date) / gDaysInYear
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
         qs = []
@@ -134,44 +134,44 @@ class EquityBasketOption:
             smean = smean + s[ia] * a[ia]
 
         lnS0k = np.log(smean / self._strike_price)
-        sqrtT = np.sqrt(texp)
+        sqrtT = np.sqrt(t_exp)
 
         # Moment matching - starting with dividend
         qnum = 0.0
         qden = 0.0
         for ia in range(0, self._num_assets):
-            qnum = qnum + a[ia] * s[ia] * np.exp(-qs[ia] * texp)
+            qnum = qnum + a[ia] * s[ia] * np.exp(-qs[ia] * t_exp)
             qden = qden + a[ia] * s[ia]
-        qhat = -np.log(qnum / qden) / texp
+        qhat = -np.log(qnum / qden) / t_exp
 
         # Moment matching - matching volatility
         vnum = 0.0
         for ia in range(0, self._num_assets):
             for ja in range(0, ia):
                 rhoSigmaSigma = v[ia] * v[ja] * correlations[ia, ja]
-                expTerm = (qs[ia] + qs[ja] - rhoSigmaSigma) * texp
+                expTerm = (qs[ia] + qs[ja] - rhoSigmaSigma) * t_exp
                 vnum = vnum + a[ia] * a[ja] * s[ia] * s[ja] * np.exp(-expTerm)
 
         vnum *= 2.0
 
         for ia in range(0, self._num_assets):
             rhoSigmaSigma = v[ia] ** 2
-            expTerm = (2.0 * qs[ia] - rhoSigmaSigma) * texp
+            expTerm = (2.0 * qs[ia] - rhoSigmaSigma) * t_exp
             vnum = vnum + ((a[ia] * s[ia]) ** 2) * np.exp(-expTerm)
 
-        vhat2 = np.log(vnum / qnum / qnum) / texp
+        vhat2 = np.log(vnum / qnum / qnum) / t_exp
 
         den = np.sqrt(vhat2) * sqrtT
         mu = r - qhat
-        d1 = (lnS0k + (mu + vhat2 / 2.0) * texp) / den
-        d2 = (lnS0k + (mu - vhat2 / 2.0) * texp) / den
+        d1 = (lnS0k + (mu + vhat2 / 2.0) * t_exp) / den
+        d2 = (lnS0k + (mu - vhat2 / 2.0) * t_exp) / den
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
-            v = smean * np.exp(-qhat * texp) * N(d1)
-            v = v - self._strike_price * np.exp(-r * texp) * N(d2)
+            v = smean * np.exp(-qhat * t_exp) * N(d1)
+            v = v - self._strike_price * np.exp(-r * t_exp) * N(d2)
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
-            v = self._strike_price * np.exp(-r * texp) * N(-d2)
-            v = v - smean * np.exp(-qhat * texp) * N(-d1)
+            v = self._strike_price * np.exp(-r * t_exp) * N(-d2)
+            v = v - smean * np.exp(-qhat * t_exp) * N(-d1)
         else:
             raise FinError("Unknown option type")
 
@@ -180,7 +180,7 @@ class EquityBasketOption:
 ###############################################################################
 
     def value_mc(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  stock_prices: np.ndarray,
                  discount_curve: DiscountCurve,
                  dividend_curves: (list),
@@ -196,15 +196,15 @@ class EquityBasketOption:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        texp = (self._expiry_date - valuation_date) / gDaysInYear
+        t_exp = (self._expiry_date - value_date) / gDaysInYear
 
         dividend_yields = []
         for curve in dividend_curves:
             dq = curve.df(self._expiry_date)
-            q = -np.log(dq) / texp
+            q = -np.log(dq) / t_exp
             dividend_yields.append(q)
 
         self._validate(stock_prices,
@@ -215,7 +215,7 @@ class EquityBasketOption:
         num_assets = len(stock_prices)
 
         df = discount_curve.df(self._expiry_date)
-        r = -np.log(df)/texp
+        r = -np.log(df)/t_exp
 
         mus = r - dividend_yields
         k = self._strike_price
@@ -228,7 +228,7 @@ class EquityBasketOption:
         Sall = model.get_paths_assets(num_assets,
                                       num_paths,
                                       num_time_steps,
-                                      texp,
+                                      t_exp,
                                       mus,
                                       stock_prices,
                                       volatilities,
@@ -243,7 +243,7 @@ class EquityBasketOption:
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff)
-        v = payoff * np.exp(-r * texp)
+        v = payoff * np.exp(-r * t_exp)
         return v
 
 ###############################################################################

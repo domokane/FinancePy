@@ -212,9 +212,9 @@ def test_dirty_priceCDSIndexOption():
             cds = CDS(valuation_date, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(valuation_date, 
+        index_curve = CDSCurve(valuation_date,
                                cds_contracts,
-                               libor_curve, 
+                               libor_curve,
                                indexRecovery)
 
         if 1 == 1:
@@ -242,7 +242,7 @@ def test_dirty_priceCDSIndexOption():
                                                 indexRecovery)
 
             adjustedIssuerCurves = []
-            for iCredit in range(0, 125):
+            for i_credit in range(0, 125):
                 adjustedIssuerCurves.append(issuer_curve)
 
         #######################################################################
@@ -259,7 +259,7 @@ def test_dirty_priceCDSIndexOption():
                                     strike / 10000.0,
                                     notional)
 
-            v_pay_1, v_rec_1, strikeValue, mu, expH = option.value_anderson(
+            v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
                 valuation_date, adjustedIssuerCurves, indexRecovery, volatility)
             end = time.time()
             elapsed = end - start
@@ -280,7 +280,7 @@ def test_dirty_priceCDSIndexOption():
                 index,
                 v_pay_1,
                 v_rec_1,
-                strikeValue,
+                strike_value,
                 mu,
                 expH,
                 v_pay_2,

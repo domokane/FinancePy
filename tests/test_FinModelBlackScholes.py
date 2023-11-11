@@ -118,7 +118,7 @@ def test_bjerksund_stensland():
     assert values == [20.53, 12.91, 7.42, 3.93, 1.93]
 
 
-def test_black_scholes_finite_difference():
+def test_black_scholes_fd():
     """
     Assert finite difference model matches tree model to at least 1 dp
     """
@@ -127,7 +127,7 @@ def test_black_scholes_finite_difference():
         'theta': 0.5
     }
     model = BlackScholes(volatility,
-                         implementationType=BlackScholesTypes.FINITE_DIFFERENCE,
+                         bsType=BlackScholesTypes.FINITE_DIFFERENCE,
                          params=params)
 
     v = amOption.value(valuation_date, stock_price, discount_curve,

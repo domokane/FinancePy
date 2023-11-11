@@ -81,7 +81,7 @@ class IborFRA:
     ###########################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve = None):
         """ Determine mark to market value of a FRA contract based on the
@@ -104,8 +104,8 @@ class IborFRA:
         v = acc_factor * (liborFwd - self._fraRate) * dfDiscount2
 
         # Forward value the FRA to the value date
-        df_to_valuation_date = discount_curve.df(valuation_date)
-        v = v * self._notional / df_to_valuation_date
+        df_to_value_date = discount_curve.df(value_date)
+        v = v * self._notional / df_to_value_date
 
         if self._payFixedRate is True:
             v *= -1.0
@@ -126,7 +126,7 @@ class IborFRA:
 
     ###########################################################################
 
-    def print_payments(self, valuation_date):
+    def print_payments(self, value_date):
         """ Determine the value of the Deposit given a Ibor curve. """
 
         flow_settle = self._notional

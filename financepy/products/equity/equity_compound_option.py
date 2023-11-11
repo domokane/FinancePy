@@ -31,7 +31,7 @@ from ...utils.date import Date
 def _f(s0, *args):
 
     self = args[0]
-    valuation_date = args[1]
+    value_date = args[1]
     discount_curve = args[2]
     dividend_curve = args[3]
     model = args[4]
@@ -40,7 +40,7 @@ def _f(s0, *args):
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits K1")
 
-    obj_fn = self.value(valuation_date,
+    obj_fn = self.value(value_date,
                         s0,
                         discount_curve,
                         dividend_curve,
@@ -272,7 +272,7 @@ class EquityCompoundOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -283,20 +283,20 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132. """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._cExpiryDate:
+        if value_date > self._cExpiryDate:
             raise FinError("Valuation date after underlying expiry date.")
 
-        if valuation_date > self._uExpiryDate:
+        if value_date > self._uExpiryDate:
             raise FinError("Valuation date after compound expiry date.")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
@@ -306,7 +306,7 @@ class EquityCompoundOption(EquityOption):
             self._cOptionType == OptionTypes.AMERICAN_PUT or\
                 self._uOptionType == OptionTypes.AMERICAN_PUT:
 
-            v = self._value_tree(valuation_date,
+            v = self._value_tree(value_date,
                                  stock_price,
                                  discount_curve,
                                  dividend_curve,
@@ -315,8 +315,8 @@ class EquityCompoundOption(EquityOption):
 
             return v[0]
 
-        tc = (self._cExpiryDate - valuation_date) / gDaysInYear
-        tu = (self._uExpiryDate - valuation_date) / gDaysInYear
+        tc = (self._cExpiryDate - value_date) / gDaysInYear
+        tu = (self._uExpiryDate - value_date) / gDaysInYear
 
         s0 = stock_price
 
@@ -378,7 +378,7 @@ class EquityCompoundOption(EquityOption):
 ###############################################################################
 
     def _value_tree(self,
-                    valuation_date,
+                    value_date,
                     stock_price,
                     discount_curve,
                     dividend_curve,
@@ -386,11 +386,11 @@ class EquityCompoundOption(EquityOption):
                     num_steps=200):
         """ This function is called if the option has American features. """
 
-        if valuation_date > self._cExpiryDate:
+        if value_date > self._cExpiryDate:
             raise FinError("Value date is after expiry date.")
 
-        tc = (self._cExpiryDate - valuation_date) / gDaysInYear
-        tu = (self._uExpiryDate - valuation_date) / gDaysInYear
+        tc = (self._cExpiryDate - value_date) / gDaysInYear
+        tu = (self._uExpiryDate - value_date) / gDaysInYear
 
         df = discount_curve.df(self._uExpiryDate)
         r = -np.log(df)/tu

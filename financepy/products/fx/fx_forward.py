@@ -63,31 +63,31 @@ class FXForward:
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               spot_fx_rate,  # 1 unit of foreign in domestic
               dom_discount_curve,
               for_discount_curve):
         """ Calculate the value of an FX forward contract where the current
         FX rate is the spot_fx_rate. """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._valuation_date != valuation_date:
+        if dom_discount_curve._value_date != value_date:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if for_discount_curve._valuation_date != valuation_date:
+        if for_discount_curve._value_date != value_date:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
-        if type(valuation_date) == Date:
-            t = (self._expiry_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t = (self._expiry_date - value_date) / gDaysInYear
         else:
-            t = valuation_date
+            t = value_date
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")
@@ -97,7 +97,7 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        newFwdFXRate = self.forward(valuation_date,
+        newFwdFXRate = self.forward(value_date,
                                     spot_fx_rate,
                                     dom_discount_curve,
                                     for_discount_curve)
@@ -134,17 +134,17 @@ class FXForward:
 ###############################################################################
 
     def forward(self,
-                valuation_date,
+                value_date,
                 spot_fx_rate,  # 1 unit of foreign in domestic
                 dom_discount_curve,
                 for_discount_curve):
         """ Calculate the FX Forward rate that makes the value of the FX
         contract equal to zero. """
 
-        if type(valuation_date) == Date:
-            t = (self._delivery_date - valuation_date) / gDaysInYear
+        if type(value_date) == Date:
+            t = (self._delivery_date - value_date) / gDaysInYear
         else:
-            t = valuation_date
+            t = value_date
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")

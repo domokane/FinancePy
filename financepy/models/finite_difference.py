@@ -186,7 +186,8 @@ def option_payoff(s, strike, smooth, dig, option_type):
     if isinstance(option_type, OptionTypes):
         option_type = option_type.value
 
-    # Generate middle values (i.e. not first or last, which are overwritten later)
+    # Generate middle values (i.e. not first or last, which are
+    # overwritten later)
     if not smooth:
         if dig:
             res = digital(s, strike)
@@ -211,7 +212,8 @@ def option_payoff(s, strike, smooth, dig, option_type):
     res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
 
     # Invert for put options
-    if option_type in {OptionTypes.AMERICAN_PUT.value, OptionTypes.EUROPEAN_PUT.value}:
+    if option_type in {OptionTypes.AMERICAN_PUT.value,
+                       OptionTypes.EUROPEAN_PUT.value}:
         res = 1 - res if dig else res - (s - strike)
 
     return np.atleast_2d(res)
@@ -219,10 +221,13 @@ def option_payoff(s, strike, smooth, dig, option_type):
 
 ###############################################################################
 
-def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
-                                    strike_price, risk_free_rate, dividend_yield, option_type,
-                                    num_time_steps=None, num_samples=2000, num_std=5, theta=0.5, wind=0, digital=False,
-                                    smooth=False, update=False):
+def black_scholes_fd(spot_price, volatility, time_to_expiry,
+                     strike_price, risk_free_rate,
+                     dividend_yield, option_type,
+                     num_time_steps=None, num_samples=2000,
+                     num_std=5, theta=0.5, wind=0,
+                     digital=False,
+                     smooth=False, update=False):
     if isinstance(option_type, OptionTypes):
         option_type = option_type.value
 
@@ -251,7 +256,6 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
     mu_ = mu * s
     var_ = (s * volatility) ** 2
 
-
     # Initialise implicit and explicit matricies
     Ai = np.array([])
     Ae = np.array([])
@@ -270,8 +274,8 @@ def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
 
         res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
 
-
-        if option_type in {OptionTypes.AMERICAN_CALL.value, OptionTypes.AMERICAN_PUT.value}:
+        if option_type in {OptionTypes.AMERICAN_CALL.value,
+                           OptionTypes.AMERICAN_PUT.value}:
             idx = res[0] < payoff[0]
             res[0][idx] = payoff[0][idx]
 

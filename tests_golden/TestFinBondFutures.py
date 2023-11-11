@@ -57,7 +57,7 @@ def test_BondFuture():
     testCases.header("Bond Maturity", "Coupon", "Conversion Factor")
     for bond in bonds:
         cf = bondFutureContract.conversion_factor(bond)
-        testCases.print(bond._maturity_date, bond._coupon * 100, cf)
+        testCases.print(bond._maturity_date, bond._cpn * 100, cf)
 
     # Example from
     # https://www.cmegroup.com/education/files/understanding-treasury-futures.pdf
@@ -128,16 +128,15 @@ def test_BondFuture():
 
     bonds.reverse()
     prices.reverse()
-    
+
     testCases.header("BOND MATURITY", "COUPON", "PRICE")
     for bond, clean_price in zip(bonds, prices):
-        testCases.print(str(bond._maturity_date), str(bond._coupon), clean_price)
-
+        testCases.print(str(bond._maturity_date), str(bond._cpn), clean_price)
 
     testCases.header("BOND MATURITY", "COUPON", "YIELD")
     for bond, clean_price in zip(bonds, prices):
         yld = bond.yield_to_maturity(settlement_date, clean_price)
-        testCases.print(str(bond._maturity_date), str(bond._coupon), yld)
+        testCases.print(str(bond._maturity_date), str(bond._cpn), yld)
 
     first_delivery_date = Date(1, 12, 2017)
     last_delivery_date = Date(28, 12, 2017)

@@ -352,7 +352,7 @@ class CDS:
     ###########################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               issuer_curve,
               contract_recovery_rate,
               pv01_method=0,
@@ -361,14 +361,14 @@ class CDS:
         """ Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate."""
 
-        rpv01 = self.risky_pv01(valuation_date,
+        rpv01 = self.risky_pv01(value_date,
                                 issuer_curve,
                                 pv01_method)
 
         dirtyRPV01 = rpv01['dirty_rpv01']
         cleanRPV01 = rpv01['clean_rpv01']
 
-        prot_pv = self.protection_leg_pv(valuation_date,
+        prot_pv = self.protection_leg_pv(value_date,
                                          issuer_curve,
                                          contract_recovery_rate,
                                          num_steps_per_year,
@@ -391,7 +391,7 @@ class CDS:
     ###########################################################################
 
     def credit_dv01(self,
-                    valuation_date,
+                    value_date,
                     issuer_curve,
                     contract_recovery_rate,
                     pv01_method=0,
@@ -400,7 +400,7 @@ class CDS:
         """ Calculation of the change in the value of the CDS contract for a
         one basis point change in the level of the CDS curve."""
 
-        v0 = self.value(valuation_date,
+        v0 = self.value(value_date,
                         issuer_curve,
                         contract_recovery_rate,
                         pv01_method,
@@ -416,7 +416,7 @@ class CDS:
 
         bumpedIssuerCurve._build_curve()
 
-        v1 = self.value(valuation_date,
+        v1 = self.value(value_date,
                         bumpedIssuerCurve,
                         contract_recovery_rate,
                         pv01_method,
@@ -429,7 +429,7 @@ class CDS:
     ###########################################################################
 
     def interest_dv01(self,
-                      valuation_date: Date,
+                      value_date: Date,
                       issuer_curve,
                       contract_recovery_rate,
                       pv01_method: int = 0,
@@ -438,7 +438,7 @@ class CDS:
         """ Calculation of the interest DV01 based on a simple bump of
         the discount factors and reconstruction of the CDS curve. """
 
-        v0 = self.value(valuation_date,
+        v0 = self.value(value_date,
                         issuer_curve,
                         contract_recovery_rate,
                         pv01_method,
@@ -460,7 +460,7 @@ class CDS:
 
         for swap in new_issuer_curve._libor_curve._usedSwaps:
 
-            cpn = swap._fixed_leg._coupon
+            cpn = swap._fixed_leg._cpn
             swap._fixed_leg._coupon = cpn + bump
 
             # Need to regenerate fixed leg payments with bumped coupon
@@ -475,7 +475,7 @@ class CDS:
         new_issuer_curve._libor_curve._build_curve()
         new_issuer_curve._build_curve()
 
-        v1 = self.value(valuation_date,
+        v1 = self.value(value_date,
                         new_issuer_curve,
                         contract_recovery_rate,
                         pv01_method,
@@ -488,7 +488,7 @@ class CDS:
     ###########################################################################
 
     def cash_settlement_amount(self,
-                               valuation_date,
+                               value_date,
                                settlement_date,
                                issuer_curve,
                                contract_recovery_rate,
@@ -498,7 +498,7 @@ class CDS:
         """ Value of the contract on the settlement date including accrued
         interest. """
 
-        v = self.value(valuation_date,
+        v = self.value(value_date,
                        issuer_curve,
                        contract_recovery_rate,
                        pv01_method,
@@ -513,7 +513,7 @@ class CDS:
     ###########################################################################
 
     def clean_price(self,
-                    valuation_date,
+                    value_date,
                     issuer_curve,
                     contract_recovery_rate,
                     pv01_method=0,
@@ -521,11 +521,11 @@ class CDS:
                     num_steps_per_year=glob_num_steps_per_year):
         """ Value of the CDS contract excluding accrued interest. """
 
-        risky_pv01 = self.risky_pv01(valuation_date, issuer_curve, pv01_method)
+        risky_pv01 = self.risky_pv01(value_date, issuer_curve, pv01_method)
 
         cleanRPV01 = risky_pv01['clean_rpv01']
 
-        prot_pv = self.protection_leg_pv(valuation_date,
+        prot_pv = self.protection_leg_pv(value_date,
                                          issuer_curve,
                                          contract_recovery_rate,
                                          num_steps_per_year,
@@ -571,7 +571,7 @@ class CDS:
     ###########################################################################
 
     def protection_leg_pv(self,
-                          valuation_date,
+                          value_date,
                           issuer_curve,
                           contract_recovery_rate=standard_recovery_rate,
                           num_steps_per_year=glob_num_steps_per_year,
@@ -579,8 +579,8 @@ class CDS:
         """ Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above. """
 
-        teff = (self._step_in_date - valuation_date) / gDaysInYear
-        tmat = (self._maturity_date - valuation_date) / gDaysInYear
+        teff = (self._step_in_date - value_date) / gDaysInYear
+        tmat = (self._maturity_date - value_date) / gDaysInYear
 
         libor_curve = issuer_curve._libor_curve
 
@@ -599,7 +599,7 @@ class CDS:
     ###########################################################################
 
     def risky_pv01(self,
-                   valuation_date,
+                   value_date,
                    issuer_curve,
                    pv01_method=0):
         """ The risky_pv01 is the present value of a risky one dollar paid on
@@ -609,7 +609,7 @@ class CDS:
 
         paymentTimes = []
         for date in self._payment_dates:
-            t = (date - valuation_date) / gDaysInYear
+            t = (date - value_date) / gDaysInYear
 
             if t > 0.0:
                 paymentTimes.append(t)
@@ -623,7 +623,7 @@ class CDS:
         accrual_factorPCDToNow = day_count.year_frac(pcd, eff)[0]
 
         year_fracs = self._accrual_factors
-        teff = (eff - valuation_date) / gDaysInYear
+        teff = (eff - value_date) / gDaysInYear
 
         valueRPV01 = _risky_pv01_numba(teff,
                                        accrual_factorPCDToNow,
@@ -643,12 +643,12 @@ class CDS:
     ###########################################################################
 
     def premium_leg_pv(self,
-                       valuation_date,
+                       value_date,
                        issuer_curve,
                        pv01_method=0):
         """ Value of the premium leg of a CDS. """
 
-        fullRPV01 = self.risky_pv01(valuation_date,
+        fullRPV01 = self.risky_pv01(value_date,
                                     issuer_curve,
                                     pv01_method)['dirty_rpv01']
 
@@ -658,7 +658,7 @@ class CDS:
     ###########################################################################
 
     def par_spread(self,
-                   valuation_date,
+                   value_date,
                    issuer_curve,
                    contract_recovery_rate=standard_recovery_rate,
                    num_steps_per_year=glob_num_steps_per_year,
@@ -667,11 +667,11 @@ class CDS:
         """ Breakeven CDS coupon that would make the value of the CDS contract
         equal to zero. """
 
-        cleanRPV01 = self.risky_pv01(valuation_date,
+        cleanRPV01 = self.risky_pv01(value_date,
                                      issuer_curve,
                                      pv01_method)['clean_rpv01']
 
-        prot = self.protection_leg_pv(valuation_date,
+        prot = self.protection_leg_pv(value_date,
                                       issuer_curve,
                                       contract_recovery_rate,
                                       num_steps_per_year,
@@ -684,7 +684,7 @@ class CDS:
     ###########################################################################
 
     def value_fast_approx(self,
-                          valuation_date,
+                          value_date,
                           flatContinuousInterestRate,
                           flatCDSCurveSpread,
                           curveRecovery=standard_recovery_rate,
@@ -692,12 +692,12 @@ class CDS:
         """ Implementation of fast valuation of the CDS contract using an
         accurate approximation that avoids curve building. """
 
-        if type(valuation_date) is not Date:
+        if type(value_date) is not Date:
             raise FinError("Valuation date must be a Date and not " +
-                           str(valuation_date))
+                           str(value_date))
 
-        t_mat = (self._maturity_date - valuation_date) / gDaysInYear
-        t_eff = (self._step_in_date - valuation_date) / gDaysInYear
+        t_mat = (self._maturity_date - value_date) / gDaysInYear
+        t_eff = (self._step_in_date - value_date) / gDaysInYear
 
         h = flatCDSCurveSpread / (1.0 - curveRecovery)
         r = flatContinuousInterestRate
@@ -765,7 +765,7 @@ class CDS:
 
     ###########################################################################
 
-    def print_payments(self, valuation_date, issuer_curve):
+    def print_payments(self, value_date, issuer_curve):
         ''' We only print payments after the current valuation date '''
         num_flows = len(self._payment_dates)
 
@@ -774,7 +774,7 @@ class CDS:
         for it in range(0, num_flows):
             dt = self._payment_dates[it]
 
-            if dt > valuation_date:
+            if dt > value_date:
                 acc_factor = self._accrual_factors[it]
                 flow = self._flows[it]
                 z = issuer_curve.df(dt)

@@ -25,7 +25,7 @@ class DiscountCurvePWL(DiscountCurve):
     from FinDiscountCurve. """
 
     def __init__(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  zero_dates: (Date, list),
                  zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
@@ -34,7 +34,7 @@ class DiscountCurvePWL(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
 
         if len(zero_dates) != len(zero_rates):
             raise FinError("Dates and rates vectors must have same length")
@@ -48,7 +48,7 @@ class DiscountCurvePWL(DiscountCurve):
         self._day_count_type = day_count_type
 
         dc_times = times_from_dates(zero_dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
         self._times = np.array(dc_times)
@@ -111,12 +111,12 @@ class DiscountCurvePWL(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._valuation_date,
+        df = self._zero_to_df(self._value_date,
                               zero_rates,
                               dc_times,
                               self._freq_type,

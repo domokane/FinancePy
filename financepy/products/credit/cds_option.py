@@ -25,10 +25,10 @@ def fvol(volatility, *args):
     volatility. """
 
     self = args[0]
-    valuation_date = args[1]
+    value_date = args[1]
     issuer_curve = args[2]
     option_value = args[3]
-    value = self.value(valuation_date, issuer_curve, volatility)
+    value = self.value(value_date, issuer_curve, volatility)
     obj_fn = value - option_value
     return obj_fn
 
@@ -85,14 +85,14 @@ class CDSOption:
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               issuer_curve,
               volatility):
         """ Value the CDS option using Black's model with an adjustment for any
         Front End Protection.
         TODO - Should the CDS be created in the init method ? """
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Expiry date is now or in the past")
 
         if volatility < 0.0:
@@ -113,11 +113,11 @@ class CDSOption:
                   self._date_gen_rule_type)
 
         strike = self._strike_coupon
-        forward_spread = cds.par_spread(valuation_date, issuer_curve)
+        forward_spread = cds.par_spread(value_date, issuer_curve)
         forward_rpv01 = cds.risky_pv01(
-            valuation_date, issuer_curve)['dirty_rpv01']
+            value_date, issuer_curve)['dirty_rpv01']
 
-        time_to_expiry = (self._expiry_date - valuation_date) / gDaysInYear
+        time_to_expiry = (self._expiry_date - value_date) / gDaysInYear
         logMoneyness = log(forward_spread / strike)
 
         halfVolSquaredT = 0.5 * volatility * volatility * time_to_expiry
@@ -149,11 +149,11 @@ class CDSOption:
 ###############################################################################
 
     def implied_volatility(self,
-                           valuation_date,
+                           value_date,
                            issuer_curve,
                            option_value):
         """ Calculate the implied CDS option volatility from a price. """
-        arg_tuple = (self, valuation_date, issuer_curve, option_value)
+        arg_tuple = (self, value_date, issuer_curve, option_value)
         sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6,
                                 maxiter=50)
         return sigma

@@ -187,20 +187,20 @@ class EquityRainbowOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_prices: np.ndarray,
               discount_curve: DiscountCurve,
               dividend_curves: (list),
               volatilities: np.ndarray,
               corr_matrix: np.ndarray):
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
@@ -216,11 +216,11 @@ class EquityRainbowOption(EquityOption):
         if corr_matrix.shape[1] != 2:
             raise FinError("Corr matrix must be of size 2x2")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
         r = discount_curve.zero_rate(self._expiry_date)
 
         q1 = dividend_curves[0].zero_rate(self._expiry_date)
@@ -281,7 +281,7 @@ class EquityRainbowOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                 valuation_date,
+                 value_date,
                  stock_prices,
                  discount_curve,
                  dividend_curves,
@@ -295,10 +295,10 @@ class EquityRainbowOption(EquityOption):
                        volatilities,
                        corr_matrix)
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
 
         v = value_mc_fast(t,
                           stock_prices,

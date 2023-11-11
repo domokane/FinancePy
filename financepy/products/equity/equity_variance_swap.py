@@ -56,7 +56,7 @@ class EquityVarianceSwap:
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               realisedVar,
               fair_strikeVar,
               libor_curve):
@@ -64,7 +64,7 @@ class EquityVarianceSwap:
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve. """
 
-        t1 = (valuation_date - self._start_date) / gDaysInYear
+        t1 = (value_date - self._start_date) / gDaysInYear
         t2 = (self._maturity_date - self._start_date) / gDaysInYear
 
         expectedVariance = t1 * realisedVar/t2
@@ -79,7 +79,7 @@ class EquityVarianceSwap:
 ###############################################################################
 
     def fair_strike_approx(self,
-                           valuation_date,
+                           value_date,
                            fwdStockPrice,
                            strikes,
                            volatilities):
@@ -91,7 +91,7 @@ class EquityVarianceSwap:
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
-        tmat = (self._maturity_date - valuation_date)/gDaysInYear
+        tmat = (self._maturity_date - value_date)/gDaysInYear
 
         """ Calculate the slope of the volatility curve by taking the end
         points in the volatilities and strikes to calculate the gradient."""
@@ -105,7 +105,7 @@ class EquityVarianceSwap:
 ###############################################################################
 
     def fair_strike(self,
-                    valuation_date,
+                    value_date,
                     stock_price,
                     dividend_curve,
                     volatility_curve,
@@ -125,7 +125,7 @@ class EquityVarianceSwap:
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        tmat = (self._maturity_date - valuation_date)/gDaysInYear
+        tmat = (self._maturity_date - value_date)/gDaysInYear
 
         df = discount_curve._df(tmat)
         r = - np.log(df)/tmat
@@ -200,7 +200,7 @@ class EquityVarianceSwap:
             vol = volatility_curve.volatility(k)
             opt = EquityVanillaOption(self._maturity_date, k, put_type)
             model = BlackScholes(vol)
-            v = opt.value(valuation_date, s0, discount_curve,
+            v = opt.value(value_date, s0, discount_curve,
                           dividend_curve, model)
             piPut += v * self._putWts[n]
 
@@ -210,7 +210,7 @@ class EquityVarianceSwap:
             vol = volatility_curve.volatility(k)
             opt = EquityVanillaOption(self._maturity_date, k, call_type)
             model = BlackScholes(vol)
-            v = opt.value(valuation_date, s0, discount_curve,
+            v = opt.value(value_date, s0, discount_curve,
                           dividend_curve, model)
             piCall += v * self._callWts[n]
 

@@ -24,7 +24,7 @@ def f(q, *args):
     zero value of the CDS has been determined. """
 
     curve = args[0]
-    valuation_date = args[1]
+    value_date = args[1]
     cds = args[2]
     recovery_rate = args[3]
 
@@ -32,7 +32,7 @@ def f(q, *args):
     curve._values[num_points - 1] = q
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    obj_fn = cds.value(valuation_date, curve, recovery_rate)['clean_pv']
+    obj_fn = cds.value(value_date, curve, recovery_rate)['clean_pv']
     return obj_fn
 
 ###############################################################################
@@ -45,7 +45,7 @@ class CDSCurve:
     the interpolation of the survival probabilities is also required. """
 
     def __init__(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  cds_contracts: list,
                  libor_curve,
                  recovery_rate,
@@ -57,11 +57,11 @@ class CDSCurve:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if valuation_date != libor_curve._valuation_date:
+        if value_date != libor_curve._value_date:
             raise FinError(
                 "Curve does not have same valuation date as Issuer curve.")
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
         self._cds_contracts = cds_contracts
         self._recovery_rate = recovery_rate
         self._libor_curve = libor_curve
@@ -101,7 +101,7 @@ class CDSCurve:
         supports vectorisation. """
 
         if isinstance(dt, Date):
-            t = (dt - self._valuation_date) / gDaysInYear
+            t = (dt - self._value_date) / gDaysInYear
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -135,7 +135,7 @@ class CDSCurve:
         function supports vectorisation. """
 
         if isinstance(dt, Date):
-            t = (dt - self._valuation_date) / gDaysInYear
+            t = (dt - self._value_date) / gDaysInYear
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -160,11 +160,11 @@ class CDSCurve:
             maturity_date = self._cds_contracts[i]._maturity_date
 
             argtuple = (self,
-                        self._valuation_date,
+                        self._value_date,
                         self._cds_contracts[i],
                         self._recovery_rate)
 
-            tmat = (maturity_date - self._valuation_date) / gDaysInYear
+            tmat = (maturity_date - self._value_date) / gDaysInYear
             q = self._values[i]
 
             self._times = np.append(self._times, tmat)
@@ -192,7 +192,7 @@ class CDSCurve:
         """ Calculate the forward rate according between dates date1 and date2
         according to the specified day count convention. """
 
-        if date1 < self._valuation_date:
+        if date1 < self._value_date:
             raise FinError("Date1 before curve value date.")
 
         if date2 < date1:

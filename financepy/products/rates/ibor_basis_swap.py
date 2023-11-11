@@ -103,7 +103,7 @@ class IborBasisSwap:
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               discount_curve: DiscountCurve,
               index_curveLeg1: DiscountCurve = None,
               index_curveLeg2: DiscountCurve = None,
@@ -118,12 +118,12 @@ class IborBasisSwap:
         if index_curveLeg2 is None:
             index_curveLeg2 = discount_curve
 
-        floatLeg1Value = self._floatLeg1.value(valuation_date,
+        floatLeg1Value = self._floatLeg1.value(value_date,
                                                discount_curve,
                                                index_curveLeg1,
                                                firstFixingRateLeg1)
 
-        floatLeg2Value = self._floatLeg2.value(valuation_date,
+        floatLeg2Value = self._floatLeg2.value(value_date,
                                                discount_curve,
                                                index_curveLeg2,
                                                firstFixingRateLeg2)

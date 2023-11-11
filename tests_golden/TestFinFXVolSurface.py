@@ -10,7 +10,7 @@ from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.utils.date import Date
-from financepy.models.volatility_fns import VolFunctionTypes
+from financepy.models.volatility_fns import VolFuncTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 import matplotlib.pyplot as plt
 import time
@@ -56,8 +56,8 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-        deltaMethod = FinFXDeltaMethod.SPOT_DELTA
-        vol_functionType = VolFunctionTypes.CLARK
+        delta_method = FinFXDeltaMethod.SPOT_DELTA
+        vol_functionType = VolFuncTypes.CLARK
 
         fxMarket = FXVolSurface(valuation_date,
                                 spot_fx_rate,
@@ -70,15 +70,15 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                 marketStrangle25DeltaVols,
                                 riskReversal25DeltaVols,
                                 atmMethod,
-                                deltaMethod,
+                                delta_method,
                                 vol_functionType)
 
         fxMarket.check_calibration(verboseCalibration)
 
         # EXPLORE AND TEST DIFFERENT CATEGORICAL PARAMETERS
         # for atmMethod in FinFXATMMethod:
-        #     for deltaMethod in FinFXDeltaMethod:
-        #         for vol_functionType in VolFunctionTypes:
+        #     for delta_method in FinFXDeltaMethod:
+        #         for vol_functionType in VolFuncTypes:
 
         #             fxMarket = FinFXVolSurface(valuation_date,
         #                                        spot_fx_rate,
@@ -91,7 +91,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         #                                        marketStrangle25DeltaVols,
         #                                        riskReversal25DeltaVols,
         #                                        atmMethod,
-        #                                        deltaMethod,
+        #                                        delta_method,
         #                                        vol_functionType)
 
         #             fxMarket.check_calibration(verboseCalibration)
@@ -138,7 +138,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -151,7 +151,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod)
+                            delta_method)
 
     fxMarket.check_calibration(verboseCalibration)
 
@@ -189,7 +189,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+    delta_method = FinFXDeltaMethod.SPOT_DELTA
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -202,7 +202,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod)
+                            delta_method)
 
     fxMarket.check_calibration(verboseCalibration)
 
@@ -238,7 +238,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
     notional_currency = forName
 
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    deltaMethod = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
     fxMarket = FXVolSurface(valuation_date,
                             spot_fx_rate,
@@ -251,7 +251,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
                             atmMethod,
-                            deltaMethod)
+                            delta_method)
 
     fxMarket.check_calibration(verboseCalibration)
 

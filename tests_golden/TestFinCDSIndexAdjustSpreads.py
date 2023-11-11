@@ -231,7 +231,7 @@ def test_CDSIndexAdjustSpreads():
     ##########################################################################
     ##########################################################################
 
-    index_coupons = [0.002, 0.0037, 0.0050, 0.0063]
+    index_cpns = [0.002, 0.0037, 0.0050, 0.0063]
     indexUpfronts = [0.0, 0.0, 0.0, 0.0]
     indexMaturityDates = [Date(20, 12, 2009),
                           Date(20, 12, 2011),
@@ -239,7 +239,7 @@ def test_CDSIndexAdjustSpreads():
                           Date(20, 12, 2016)]
     indexRecoveryRate = 0.40
 
-    tolerance = 1e-4 # should be smaller
+    tolerance = 1e-4  # should be smaller
 
     import time
     start = time.time()
@@ -248,7 +248,7 @@ def test_CDSIndexAdjustSpreads():
     adjustedIssuerCurves = indexPortfolio.spread_adjust_intrinsic(
         valuation_date,
         issuer_curves,
-        index_coupons,
+        index_cpns,
         indexUpfronts,
         indexMaturityDates,
         indexRecoveryRate,

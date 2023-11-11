@@ -49,7 +49,7 @@ class FXFloatLookbackOption(FXOption):
     ##########################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: float,
               domestic_curve: DiscountCurve,
               foreign_curve: DiscountCurve,
@@ -58,21 +58,21 @@ class FXFloatLookbackOption(FXOption):
         """ Valuation of the Floating Lookback option using Black-Scholes
         using the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve._valuation_date != valuation_date:
+        if domestic_curve._value_date != value_date:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if foreign_curve._valuation_date != valuation_date:
+        if foreign_curve._value_date != value_date:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
 
         df = domestic_curve._df(t)
         r = -np.log(df) / t
@@ -146,7 +146,7 @@ class FXFloatLookbackOption(FXOption):
     ##########################################################################
 
     def value_mc(self,
-                 valuation_date,
+                 value_date,
                  stock_price,
                  domestic_curve,
                  foreign_curve,
@@ -156,7 +156,7 @@ class FXFloatLookbackOption(FXOption):
                  num_steps_per_year=252,
                  seed=4242):
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
         df = domestic_curve._df(t)
         r = -np.log(df) / t
 

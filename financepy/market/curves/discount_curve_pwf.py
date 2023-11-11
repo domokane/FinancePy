@@ -25,7 +25,7 @@ class DiscountCurvePWF(DiscountCurve):
     continuous. The class inherits methods from FinDiscountCurve. """
 
     def __init__(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  zero_dates: list,
                  zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
@@ -35,7 +35,7 @@ class DiscountCurvePWF(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
 
         if len(zero_dates) != len(zero_rates):
             raise FinError("Dates and rates vectors must have same length")
@@ -49,7 +49,7 @@ class DiscountCurvePWF(DiscountCurve):
         self._day_count_type = day_count_type
 
         dc_times = times_from_dates(zero_dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
         self._times = np.array(dc_times)
@@ -118,7 +118,7 @@ class DiscountCurvePWF(DiscountCurve):
 
         return fwd
 
-    ###############################################################################
+    ###########################################################################
 
     def df(self,
            dates: (Date, list)):
@@ -130,12 +130,12 @@ class DiscountCurvePWF(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._valuation_date,
+                                    self._value_date,
                                     self._day_count_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._valuation_date,
+        df = self._zero_to_df(self._value_date,
                               zero_rates,
                               dc_times,
                               self._freq_type,
@@ -143,7 +143,7 @@ class DiscountCurvePWF(DiscountCurve):
 
         return df
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -154,7 +154,7 @@ class DiscountCurvePWF(DiscountCurve):
         s += label_to_string("FREQUENCY", (self._freq_type))
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

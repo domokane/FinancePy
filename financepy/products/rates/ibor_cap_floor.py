@@ -96,7 +96,7 @@ class IborCapFloor():
         self._capFloorLetDiscountFactors = []
         self._capFloorPV = []
 
-        self._valuation_date = None
+        self._value_date = None
         self._day_counter = None
 
 ###############################################################################
@@ -114,11 +114,11 @@ class IborCapFloor():
 
 ##########################################################################
 
-    def value(self, valuation_date, libor_curve, model):
+    def value(self, value_date, libor_curve, model):
         """ Value the cap or floor using the chosen model which specifies
         the volatility of the Ibor rate to the cap start date. """
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
         self._generate_dates()
 
         self._day_counter = DayCount(self._day_count_type)
@@ -186,7 +186,7 @@ class IborCapFloor():
 
             intrinsic_value *= self._notional
 
-            capFloorLetValue = self.value_caplet_floor_let(valuation_date,
+            capFloorLetValue = self.value_caplet_floor_let(value_date,
                                                            start_date,
                                                            end_date,
                                                            libor_curve,
@@ -206,14 +206,14 @@ class IborCapFloor():
 ###############################################################################
 
     def value_caplet_floor_let(self,
-                               valuation_date,
+                               value_date,
                                capletStartDate,
                                capletEndDate,
                                libor_curve,
                                model):
         """ Value the caplet or floorlet using a specific model. """
 
-        texp = (capletStartDate - self._start_date) / gDaysInYear
+        t_exp = (capletStartDate - self._start_date) / gDaysInYear
 
         alpha = self._day_counter.year_frac(capletStartDate, capletEndDate)[0]
 
@@ -229,51 +229,51 @@ class IborCapFloor():
         if isinstance(model, Black):
 
             if self._option_type == FinCapFloorTypes.CAP:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, BlackShifted):
 
             if self._option_type == FinCapFloorTypes.CAP:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, Bachelier):
 
             if self._option_type == FinCapFloorTypes.CAP:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABR):
 
             if self._option_type == FinCapFloorTypes.CAP:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABRShifted):
 
             if self._option_type == FinCapFloorTypes.CAP:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_CALL)
             elif self._option_type == FinCapFloorTypes.FLOOR:
-                capFloorLetValue = model.value(f, k, texp, df,
+                capFloorLetValue = model.value(f, k, t_exp, df,
                                                OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, HWTree):
 
-            tmat = (capletEndDate - valuation_date) / gDaysInYear
+            tmat = (capletEndDate - value_date) / gDaysInYear
             alpha = self._day_counter.year_frac(capletStartDate,
                                                 capletEndDate)[0]
             strike_price = 1.0/(1.0 + alpha * self._strike_rate)
@@ -282,7 +282,7 @@ class IborCapFloor():
             df_times = libor_curve._times
             df_values = libor_curve._dfs
 
-            v = model.option_on_zcb(texp, tmat, strike_price, face_amount,
+            v = model.option_on_zcb(t_exp, tmat, strike_price, face_amount,
                                     df_times, df_values)
 
             # we divide by alpha to offset the multiplication above
@@ -309,7 +309,7 @@ class IborCapFloor():
         print("STRIKE (%):", self._strike_rate * 100)
         print("FREQUENCY:", str(self._freq_type))
         print("DAY COUNT:", str(self._day_count_type))
-        print("VALUATION DATE", self._valuation_date)
+        print("VALUATION DATE", self._value_date)
 
         if len(self._capFloorLetValues) == 0:
             print("Caplets not calculated.")

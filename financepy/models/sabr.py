@@ -13,7 +13,6 @@ from ..utils.error import FinError
 from ..utils.helpers import label_to_string
 
 ###############################################################################
-###############################################################################
 
 
 @njit
@@ -25,8 +24,8 @@ def _x(rho, z):
 
 ##############################################################################
 
-@njit(float64(float64[:], float64, float64, float64),
-      fastmath=True, cache=True)
+
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def vol_function_sabr(params, f, k, t):
     """ Black volatility implied by SABR model. """
 
@@ -247,12 +246,16 @@ class SABR():
 
 ###############################################################################
 
-    def set_alpha_from_black_vol(self, blackVol, forward, strike, time_to_expiry):
+    def set_alpha_from_black_vol(self,
+                                 blackVol,
+                                 forward,
+                                 strike,
+                                 time_to_expiry):
         """ Estimate the value of the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
         to the input black vol. This uses a numerical 1D solver. """
 
-        texp = time_to_expiry
+        t_exp = time_to_expiry
         f = forward
         K = strike
 
@@ -264,7 +267,7 @@ class SABR():
         if initAlpha != blackVol:
             # Objective function
             def fn(x): return np.sqrt(
-                (blackVol - self.black_vol_with_alpha(x, f, K, texp)) ** 2)
+                (blackVol - self.black_vol_with_alpha(x, f, K, t_exp)) ** 2)
             bnds = ((0.0, None),)
             x0 = initAlpha
             results = minimize(fn, x0, method="L-BFGS-B",
@@ -287,13 +290,13 @@ class SABR():
         beta = self._beta
         rho = self._rho
         nu = self._nu
-        texp = time_to_expiry
+        t_exp = time_to_expiry
         K = atmStrike
 
         coeff0 = -blackVol * (K**(1.0 - self._beta))
-        coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * texp
-        coeff2 = (rho * beta * nu * texp) / (4.0 * (K**(1.0 - beta)))
-        coeff3 = (((1.0 - beta)**2) * texp) / (24.0 * (K**(2.0 - 2.0 * beta)))
+        coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
+        coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K**(1.0 - beta)))
+        coeff3 = (((1.0 - beta)**2) * t_exp) / (24.0 * (K**(2.0 - 2.0 * beta)))
         coeffs = [coeff3, coeff2, coeff1, coeff0]
         roots = np.roots(coeffs)
 

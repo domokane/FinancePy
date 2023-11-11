@@ -59,33 +59,33 @@ def test_BKExampleTwo():
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
 
-    coupon_times = []
-    coupon_flows = []
+    cpn_times = []
+    cpn_flows = []
     cpn = bond._coupon/bond._frequency
-    num_flows = len(bond._coupon_dates)
+    num_flows = len(bond._cpn_dates)
 
     for i in range(1, num_flows):
-        pcd = bond._coupon_dates[i-1]
-        ncd = bond._coupon_dates[i]
+        pcd = bond._cpn_dates[i-1]
+        ncd = bond._cpn_dates[i]
         if pcd < settlement_date and ncd > settlement_date:
             flow_time = (pcd - settlement_date) / gDaysInYear
-            coupon_times.append(flow_time)
-            coupon_flows.append(cpn)
+            cpn_times.append(flow_time)
+            cpn_flows.append(cpn)
 
-    for flow_date in bond._coupon_dates:
+    for flow_date in bond._cpn_dates:
         if flow_date > settlement_date:
             flow_time = (flow_date - settlement_date) / gDaysInYear
-            coupon_times.append(flow_time)
-            coupon_flows.append(cpn)
+            cpn_times.append(flow_time)
+            cpn_flows.append(cpn)
 
-    coupon_times = np.array(coupon_times)
-    coupon_flows = np.array(coupon_flows)
+    cpn_times = np.array(cpn_times)
+    cpn_flows = np.array(cpn_flows)
 
     strike_price = 105.0
     face = 100.0
 
     tmat = (maturity_date - settlement_date) / gDaysInYear
-    texp = (expiry_date - settlement_date) / gDaysInYear
+    t_exp = (expiry_date - settlement_date) / gDaysInYear
     times = np.linspace(0, tmat, 11)
     dates = settlement_date.add_years(times)
     dfs = np.exp(-0.05*times)
@@ -101,8 +101,8 @@ def test_BKExampleTwo():
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(tmat, times, dfs)
     exercise_type = FinExerciseTypes.AMERICAN
-    v = model.bond_option(texp, strike_price, face, coupon_times,
-                          coupon_flows, exercise_type)
+    v = model.bond_option(t_exp, strike_price, face, cpn_times,
+                          cpn_flows, exercise_type)
 
     # Test convergence
     num_time_steps = 200
@@ -111,8 +111,8 @@ def test_BKExampleTwo():
     treeVector = []
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(tmat, times, dfs)
-    v = model.bond_option(texp, strike_price,
-                          face, coupon_times, coupon_flows, exercise_type)
+    v = model.bond_option(t_exp, strike_price,
+                          face, cpn_times, cpn_flows, exercise_type)
     treeVector.append(v)
 
     assert round(v['call'], 4) == 0.6998

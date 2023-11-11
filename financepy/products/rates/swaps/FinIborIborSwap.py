@@ -92,7 +92,7 @@ class IborIborSwap:
         self._payFirstFixingRate = None
         self._recFirstFixingRate = None
 
-        self._valuation_date = None
+        self._value_date = None
 
 ##########################################################################
 
@@ -112,7 +112,7 @@ class IborIborSwap:
 ##########################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               discount_curve,
               payIndexCurve,
               recIndexCurve,
@@ -123,13 +123,13 @@ class IborIborSwap:
         discount curve and each of the index discount for the two floating legs
         of the swap. """
 
-        payFloatLegValue = self.float_leg_value(valuation_date,
+        payFloatLegValue = self.float_leg_value(value_date,
                                                 discount_curve,
                                                 payIndexCurve,
                                                 payFirstFixingRate,
                                                 principal)
 
-        recFloatLegValue = self.float_leg_value(valuation_date,
+        recFloatLegValue = self.float_leg_value(value_date,
                                                 discount_curve,
                                                 recIndexCurve,
                                                 recFirstFixingRate,
@@ -141,7 +141,7 @@ class IborIborSwap:
 ##########################################################################
 
     def float_leg_value(self,
-                        valuation_date,  # This should be the settlement date
+                        value_date,  # This should be the settlement date
                         discount_curve,
                         index_curve,
                         firstFixingRate=None,
@@ -153,7 +153,7 @@ class IborIborSwap:
         case if we set the valuation date to be the swap's actual settlement
         date. """
 
-        self._valuation_date = valuation_date
+        self._value_date = value_date
         self._floatYearFracs = []
         self._floatFlows = []
         self._floatRates = []
@@ -167,18 +167,18 @@ class IborIborSwap:
         """ The swap may have started in the past but we can only value
         payments that have occurred after the start date. """
         start_index = 0
-        while self._adjustedFloatDates[start_index] < valuation_date:
+        while self._adjustedFloatDates[start_index] < value_date:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
-        if valuation_date <= self._effective_date:
+        if value_date <= self._effective_date:
             start_index = 1
 
         self._floatStartIndex = start_index
 
         # Forward price to settlement date (if valuation is settlement date)
-        self._dfValuationDate = discount_curve.df(valuation_date)
+        self._dfValuationDate = discount_curve.df(value_date)
 
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
@@ -255,7 +255,7 @@ class IborIborSwap:
         print("SPREAD COUPON (%):", self._float_spread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._float_frequency_type))
         print("FLOAT LEG DAY COUNT:", str(self._float_day_count_type))
-        print("VALUATION DATE", self._valuation_date)
+        print("VALUATION DATE", self._value_date)
 
         if len(self._floatFlows) == 0:
             print("Floating Flows not calculated.")
@@ -273,7 +273,7 @@ class IborIborSwap:
         # By definition the discount factor is 1.0 on the valuation date
 
         print("%15s %10s %10s %12s %12.8f %12s %12s" %
-              (self._valuation_date,
+              (self._value_date,
                "-",
                "-",
                "-",

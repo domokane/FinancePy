@@ -72,14 +72,14 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
     sigmasqrt_dt = sigma * sqrt(dt)
 
-    for iPath in range(0, num_paths):
+    for i_path in range(0, num_paths):
 
         r = r0
         z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-        for iStep in range(1, num_steps):
-            r = r + a * (b - r) * dt + z[iStep - 1] * sigmasqrt_dt
-            rate_path[iStep] = r
+        for i_step in range(1, num_steps):
+            r = r + a * (b - r) * dt + z[i_step - 1] * sigmasqrt_dt
+            rate_path[i_step] = r
 
     return rate_path
 
@@ -94,12 +94,12 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
     num_steps = int(t / dt)
     sigmasqrt_dt = sigma * sqrt(dt)
     zcb = 0.0
-    for iPath in range(0, num_paths):
+    for i_path in range(0, num_paths):
         z = np.random.normal(0.0, 1.0, size=(num_steps))
         rsum = 0.0
         r = r0
-        for iStep in range(0, num_steps):
-            r += a * (b - r) * dt + z[iStep] * sigmasqrt_dt
+        for i_step in range(0, num_steps):
+            r += a * (b - r) * dt + z[i_step] * sigmasqrt_dt
             rsum += r * dt
         zcb += exp(-rsum)
     zcb /= num_paths

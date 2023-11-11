@@ -76,7 +76,7 @@ class FXDigitalOption:
 ###############################################################################
 
     def value(self,
-              valuation_date,
+              value_date,
               spot_fx_rate,  # 1 unit of foreign in domestic
               dom_discount_curve,
               for_discount_curve,
@@ -87,27 +87,27 @@ class FXDigitalOption:
         cash payout (puts) PLUS the fact that the cash payment can be in
         domestic or foreign currency. """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._valuation_date != valuation_date:
+        if dom_discount_curve._value_date != value_date:
             raise FinError(
                 "Domestic Curve valuation date not same as valuation date")
 
-        if for_discount_curve._valuation_date != valuation_date:
+        if for_discount_curve._value_date != value_date:
             raise FinError(
                 "Foreign Curve valuation date not same as valuation date")
 
-        if type(valuation_date) == Date:
-            spot_date = valuation_date.add_weekdays(self._spot_days)
+        if type(value_date) == Date:
+            spot_date = value_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spot_date) / gDaysInYear
-            texp = (self._expiry_date - valuation_date) / gDaysInYear
+            t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
-            tdel = valuation_date
-            texp = tdel
+            tdel = value_date
+            t_exp = tdel
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")
@@ -131,7 +131,7 @@ class FXDigitalOption:
 
             volatility = model._volatility
             lnS0k = np.log(S0 / K)
-            den = volatility * np.sqrt(texp)
+            den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = rd - rf
             d2 = (lnS0k + (mu - v2 / 2.0) * tdel) / den

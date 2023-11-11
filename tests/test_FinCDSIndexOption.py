@@ -114,7 +114,7 @@ def test_dirty_priceCDSIndexOption():
                                 strike / 10000.0,
                                 notional)
 
-        v_pay_1, v_rec_1, strikeValue, mu, expH = option.value_anderson(
+        v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
             valuation_date, adjustedIssuerCurves, indexRecovery, volatility)
 
         v_pay_2, v_rec_2 = option.value_adjusted_black(valuation_date,
@@ -125,7 +125,7 @@ def test_dirty_priceCDSIndexOption():
 
         assert round(v_pay_1, 1) == results[0]
         assert round(v_rec_1, 1) == results[1]
-        assert round(strikeValue, 1) == results[2]
+        assert round(strike_value, 1) == results[2]
         assert round(mu, 1) == results[3]
         assert round(expH, 1) == results[4]
         assert round(v_pay_2, 1) == results[5]

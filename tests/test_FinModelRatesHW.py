@@ -37,22 +37,22 @@ def test_HullWhiteExampleTwo():
     expiry_date = start_date.add_tenor("3Y")
     maturity_date = start_date.add_tenor("9Y")
 
-    texp = (expiry_date - start_date)/gDaysInYear
+    t_exp = (expiry_date - start_date)/gDaysInYear
     tmat = (maturity_date - start_date)/gDaysInYear
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)
-    vAnal = model.option_on_zcb(texp, tmat, strike, face, times, dfs)
+    vAnal = model.option_on_zcb(t_exp, tmat, strike, face, times, dfs)
 
     num_time_steps = 200
 
     model = HWTree(sigma, a, num_time_steps)
-    model.build_tree(texp, times, dfs)
-    vTree1 = model.option_on_zero_coupon_bond_tree(texp, tmat, strike, face)
+    model.build_tree(t_exp, times, dfs)
+    vTree1 = model.option_on_zero_coupon_bond_tree(t_exp, tmat, strike, face)
 
     model = HWTree(sigma, a, num_time_steps+1)
-    model.build_tree(texp, times, dfs)
-    vTree2 = model.option_on_zero_coupon_bond_tree(texp, tmat, strike, face)
+    model.build_tree(t_exp, times, dfs)
+    vTree2 = model.option_on_zero_coupon_bond_tree(t_exp, tmat, strike, face)
 
     vTreeCall = (vTree1['call'] + vTree2['call']) / 2.0
     vTreePut = (vTree1['put'] + vTree2['put']) / 2.0

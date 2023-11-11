@@ -8,7 +8,7 @@ import numpy as np
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import freq_types
+from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond_market import BondMarkets
@@ -34,7 +34,7 @@ def test_bondtutor_example():
     ex_div_days = 0
     face = 1000000
 
-    freq_type = freq_types.SEMI_ANNUAL
+    freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_date, maturity_date,
                 coupon, freq_type, accrualConvention, ex_div_days)
 
@@ -78,7 +78,7 @@ def test_bloomberg_us_treasury_example():
     issue_date = Date(15, 5, 2010)
     maturity_date = Date(15, 5, 2027)
     coupon = 0.02375
-    freq_type = freq_types.SEMI_ANNUAL
+    freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
     face = 100.0
     ex_div_days = 0
@@ -137,7 +137,7 @@ def test_bloomberg_apple_corp_example():
     issue_date = Date(13, 5, 2012)
     maturity_date = Date(13, 5, 2022)
     coupon = 0.027
-    freq_type = freq_types.SEMI_ANNUAL
+    freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.THIRTY_E_360_ISDA
     face = 100.0
     ex_div_days = 0
@@ -225,7 +225,7 @@ def test_bond_ror():
         issue_date=Date(13, 9, 2021),
         maturity_date=Date(13, 9, 2031),
         coupon=0.0312,
-        freq_type=freq_types.ANNUAL,
+        freq_type=FrequencyTypes.ANNUAL,
         accrual_type=DayCountTypes.ACT_ACT_ICMA
     )
     for row in df.itertuples(index=False):
@@ -292,9 +292,9 @@ def test_bond_cfets():
                              row.maturity_date.year)
 
         if row.freq == 1:
-            freq_type = freq_types.ANNUAL
+            freq_type = FrequencyTypes.ANNUAL
         else:
-            freq_type = freq_types.SEMI_ANNUAL
+            freq_type = FrequencyTypes.SEMI_ANNUAL
 
         bond = Bond(issue_date,
                     maturity_date,

@@ -90,7 +90,7 @@ class EquityChooserOption(EquityOption):
     ###########################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -98,31 +98,31 @@ class EquityChooserOption(EquityOption):
         """ Value the complex chooser option using an approach by Rubinstein
         (1991). See also Haug page 129 for complex chooser options. """
 
-        if valuation_date > self._chooseDate:
+        if value_date > self._chooseDate:
             raise FinError("Value date after choose date.")
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._call_expiry_date:
+        if value_date > self._call_expiry_date:
             raise FinError("Valuation date after call expiry date.")
 
-        if valuation_date > self._put_expiry_date:
+        if value_date > self._put_expiry_date:
             raise FinError("Valuation date after put expiry date.")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
         DEBUG_MODE = False
 
-        t = (self._chooseDate - valuation_date) / gDaysInYear
-        tc = (self._call_expiry_date - valuation_date) / gDaysInYear
-        tp = (self._put_expiry_date - valuation_date) / gDaysInYear
+        t = (self._chooseDate - value_date) / gDaysInYear
+        tc = (self._call_expiry_date - value_date) / gDaysInYear
+        tp = (self._put_expiry_date - value_date) / gDaysInYear
 
         rt = discount_curve.cc_rate(self._chooseDate)
         rtc = discount_curve.cc_rate(self._call_expiry_date)
@@ -184,7 +184,7 @@ class EquityChooserOption(EquityOption):
     ###########################################################################
 
     def value_mc(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  stock_price: float,
                  discount_curve: DiscountCurve,
                  dividend_curve: DiscountCurve,
@@ -197,9 +197,9 @@ class EquityChooserOption(EquityOption):
         dftc = discount_curve.df(self._call_expiry_date)
         dftp = discount_curve.df(self._put_expiry_date)
 
-        t = (self._chooseDate - valuation_date) / gDaysInYear
-        tc = (self._call_expiry_date - valuation_date) / gDaysInYear
-        tp = (self._put_expiry_date - valuation_date) / gDaysInYear
+        t = (self._chooseDate - value_date) / gDaysInYear
+        tc = (self._call_expiry_date - value_date) / gDaysInYear
+        tp = (self._put_expiry_date - value_date) / gDaysInYear
 
         rt = -np.log(dft) / t
         rtc = -np.log(dftc) / tc

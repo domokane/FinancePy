@@ -79,7 +79,7 @@ class FinInflationSwap():
 
     ###########################################################################
 
-    def value(self, valuation_date, libor_curve):
+    def value(self, value_date, libor_curve):
         """ Determine mark to market value of a FRA contract based on the
         market FRA rate. The same curve is used for calculating the forward
         Ibor and for doing discounting on the expected forward payment. """
@@ -93,8 +93,8 @@ class FinInflationSwap():
 
 #        print(df1, df2, acc_factor, libor_fwd, v)
         # Forward value the FRA to the value date
-        df_to_valuation_date = libor_curve.df(valuation_date)
-        v = v * self._notional / df_to_valuation_date
+        df_to_value_date = libor_curve.df(value_date)
+        v = v * self._notional / df_to_value_date
 
         if self._payFixedRate:
             v *= -1.0
@@ -114,7 +114,7 @@ class FinInflationSwap():
 
     ###########################################################################
 
-    def print_payments(self, valuation_date):
+    def print_payments(self, value_date):
         """ Determine the value of the Deposit given a Ibor curve. """
 
         flow_settle = self._notional

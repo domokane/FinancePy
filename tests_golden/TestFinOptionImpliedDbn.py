@@ -48,7 +48,7 @@ def test_FinOptionImpliedDbn():
         notional_currency = forName
 
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
-        deltaMethod = FinFXDeltaMethod.SPOT_DELTA
+        delta_method = FinFXDeltaMethod.SPOT_DELTA
 
         fxMarket = FXVolSurface(valuation_date,
                                 spot_fx_rate,
@@ -61,7 +61,7 @@ def test_FinOptionImpliedDbn():
                                 marketStrangle25DeltaVols,
                                 riskReversal25DeltaVols,
                                 atmMethod,
-                                deltaMethod)
+                                delta_method)
 
 #        fxMarket.check_calibration(True)
 
@@ -72,7 +72,7 @@ def test_FinOptionImpliedDbn():
         for iTenor in range(0, len(fxMarket._tenors)):
 
             F = fxMarket._F0T[iTenor]
-            texp = fxMarket._texp[iTenor]
+            t_exp = fxMarket._t_exp[iTenor]
 
             startFX = F * 0.05
             endFX = F * 5.0
@@ -80,11 +80,11 @@ def test_FinOptionImpliedDbn():
             num_steps = 10000
             dFX = (endFX - startFX) / num_steps
 
-            domDF = dom_discount_curve._df(texp)
-            forDF = for_discount_curve._df(texp)
+            domDF = dom_discount_curve._df(t_exp)
+            forDF = for_discount_curve._df(t_exp)
 
-            rd = -np.log(domDF) / texp
-            rf = -np.log(forDF) / texp
+            rd = -np.log(domDF) / t_exp
+            rf = -np.log(forDF) / t_exp
 
             params = fxMarket._parameters[iTenor]
 
@@ -93,14 +93,14 @@ def test_FinOptionImpliedDbn():
 
             for iK in range(0, num_steps):
                 strike = startFX + iK*dFX
-                vol = vol_function_clark(params, F, strike, texp)
+                vol = vol_function_clark(params, F, strike, t_exp)
                 strikes.append(strike)
                 vols.append(vol)
 
             strikes = np.array(strikes)
             vols = np.array(vols)
 
-#            dbn = optionImpliedDbn(spot_fx_rate, texp, rd, rf, strikes, vols)
+#            dbn = optionImpliedDbn(spot_fx_rate, t_exp, rd, rf, strikes, vols)
 #            print("SUM:", dbn.sum())
 #            plt.figure()
 #            plt.plot(dbn._x, dbn._densitydx)

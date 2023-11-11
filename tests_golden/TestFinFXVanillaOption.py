@@ -476,7 +476,7 @@ def test_FinFXVanillaOptionSABRExample():
     forName = "USD"
     domName = "JPY"
     forCCRate = 0.0381  # USD
-    domCCRate = 0.000396 # JPY
+    domCCRate = 0.000396  # JPY
     dom_discount_curve = DiscountCurveFlat(valuation_date, domCCRate)
     for_discount_curve = DiscountCurveFlat(valuation_date, forCCRate)
     currency_pair = forName + domName
@@ -484,27 +484,43 @@ def test_FinFXVanillaOptionSABRExample():
     strike_price = 130
     expiry_date = valuation_date.add_tenor("10M")
     notional = 70000000
-    
-    call_option = FXVanillaOption(expiry_date, 
-                                  strike_price, 
-                                  currency_pair, 
-                                  OptionTypes.EUROPEAN_CALL, 
+
+    call_option = FXVanillaOption(expiry_date,
+                                  strike_price,
+                                  currency_pair,
+                                  OptionTypes.EUROPEAN_CALL,
                                   notional, "USD")
-    
+
     volatility = 0.1043
     # set the params of SABR
-    alpha = 0.174; beta = 0.5; rho = -0.50; nu = 0.5
-    model = SABR(alpha,beta,rho,nu)
+
+    alpha = 0.174
+    beta = 0.5
+    rho = -0.50
+    nu = 0.5
+
+    model = SABR(alpha, beta, rho, nu)
     blackVol = volatility
-    texp = 0.8444 #10M
-    model.set_alpha_from_black_vol(blackVol,spot_fx_rate,strike_price, texp)
-    
-    spot_fx_rate = np.linspace(80,300,1000)
-    callValue = [call_option.value(valuation_date,f,dom_discount_curve,for_discount_curve,model)['cash_dom'] for f in spot_fx_rate]
+    t_exp = 0.8444  # 10M
+    model.set_alpha_from_black_vol(blackVol,
+                                   spot_fx_rate,
+                                   strike_price,
+                                   t_exp)
+
+    spot_fx_rate = np.linspace(80, 300, 1000)
+
+    call_values = []
+
+    for f in spot_fx_rate:
+
+        call_value = call_option.value(valuation_date, f, dom_discount_curve,
+                                       for_discount_curve, model)['cash_dom']
+
+        call_values.append(call_value)
 
     testCases.header("spot fx rate", "value")
-    testCases.print(spot_fx_rate,callValue)
-    
+    testCases.print(spot_fx_rate, call_value)
+
 ###############################################################################
 
 

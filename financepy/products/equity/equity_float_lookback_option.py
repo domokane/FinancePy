@@ -57,7 +57,7 @@ class EquityFloatLookbackOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -66,21 +66,21 @@ class EquityFloatLookbackOption(EquityOption):
         """ Valuation of the Floating Lookback option using Black-Scholes using
         the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        if isinstance(valuation_date, Date) is False:
+        if isinstance(value_date, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if valuation_date > self._expiry_date:
+        if value_date > self._expiry_date:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._valuation_date != valuation_date:
+        if discount_curve._value_date != value_date:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._valuation_date != valuation_date:
+        if dividend_curve._value_date != value_date:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
         df = discount_curve.df(self._expiry_date)
 
         r = discount_curve.cc_rate(self._expiry_date)
@@ -152,7 +152,7 @@ class EquityFloatLookbackOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                 valuation_date: Date,
+                 value_date: Date,
                  stock_price: float,
                  discount_curve: DiscountCurve,
                  dividend_curve: DiscountCurve,
@@ -164,7 +164,7 @@ class EquityFloatLookbackOption(EquityOption):
         """ Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process. """
 
-        t = (self._expiry_date - valuation_date) / gDaysInYear
+        t = (self._expiry_date - value_date) / gDaysInYear
         num_time_steps = int(t * num_steps_per_year)
 
         df = discount_curve.df(self._expiry_date)
