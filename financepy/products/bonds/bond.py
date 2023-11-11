@@ -149,8 +149,8 @@ class Bond:
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-        self.bus_day_rule_type = bus_day_rule_type
-        self.date_gen_rule_type = date_gen_rule_type
+        self._bus_day_rule_type = bus_day_rule_type
+        self._date_gen_rule_type = date_gen_rule_type
 
         self._calculate_coupon_dates()
         self._calculate_flows()
@@ -171,8 +171,8 @@ class Bond:
                                       self._maturity_date,
                                       self._freq_type,
                                       CalendarTypes.NONE,
-                                      self.bus_day_rule_type,
-                                      self.date_gen_rule_type,
+                                      self._bus_day_rule_type,
+                                      self._date_gen_rule_type,
                                       end_of_month=self._end_of_month)._generate()
 
     ###########################################################################
@@ -936,11 +936,11 @@ class Bond:
         c = self._coupon
 
         pv = 0.0
-        prevQ = 1.0
-        prevDf = 1.0
+        prev_q = 1.0
+        prev_df = 1.0
 
-        defaultingPrincipalPVPayStart = 0.0
-        defaultingPrincipalPVPayEnd = 0.0
+        defaulting_pv_pay_start = 0.0
+        defaulting_pv_pay_end = 0.0
 
         for dt in self._coupon_dates[1:]:
 
@@ -954,18 +954,18 @@ class Bond:
                 # with zero recovery
 
                 pv = pv + (c / f) * df * q
-                dq = q - prevQ
+                dq = q - prev_q
 
-                defaultingPrincipalPVPayStart += -dq * recovery_rate * prevDf
-                defaultingPrincipalPVPayStart += -dq * recovery_rate * df
+                defaulting_pv_pay_start += -dq * recovery_rate * prev_df
+                defaulting_pv_pay_end += -dq * recovery_rate * df
 
                 # Add on PV of principal if default occurs in coupon period
-                prevQ = q
-                prevDf = df
+                prev_q = q
+                prev_df = df
 
-        pv = pv + 0.50 * defaultingPrincipalPVPayStart
-        pv = pv + 0.50 * defaultingPrincipalPVPayEnd
-        pv = pv + df * q * self._redemption
+        pv = pv + 0.50 * defaulting_pv_pay_start
+        pv = pv + 0.50 * defaulting_pv_pay_end
+        pv = pv + df * q
         pv *= self._par
         return pv
 
