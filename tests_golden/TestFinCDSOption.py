@@ -270,7 +270,7 @@ def test_dirty_priceCDSwaption():
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
-#    cds_contract.print_flows(issuer_curve)
+#    cds_contract.print_payments(issuer_curve)
 
     testCases.banner(
         "=========================== FORWARD CDS ===========================")
@@ -306,7 +306,7 @@ def test_dirty_priceCDSwaption():
     testCases.print("DIRTY RPV01", dirtyRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
-#    cds_contract.print_flows(issuer_curve)
+#    cds_contract.print_payments(issuer_curve)
 
     testCases.banner(
         "========================== CDS OPTIONS ============================")
@@ -321,12 +321,12 @@ def test_dirty_priceCDSwaption():
 
     for strike in np.linspace(100, 300, 41):
 
-        long_protection = True # long protection
-        
+        long_protection = True  # long protection
+
         cdsOption = CDSOption(expiry_date,
                               maturity_date,
                               strike / 10000.0,
-                              notional, 
+                              notional,
                               long_protection)
 
         v = cdsOption.value(valuation_date,
@@ -341,12 +341,12 @@ def test_dirty_priceCDSwaption():
 
     for strike in np.linspace(100, 300, 41):
 
-        long_protection = False # long protection
-        
+        long_protection = False  # long protection
+
         cdsOption = CDSOption(expiry_date,
                               maturity_date,
                               strike / 10000.0,
-                              notional, 
+                              notional,
                               long_protection)
 
         v = cdsOption.value(valuation_date,

@@ -100,7 +100,7 @@ class Bond:
                  freq_type: FrequencyTypes,
                  accrual_type: DayCountTypes,
                  ex_div_days: int = 0,
-                 calendar_type: CalendarTypes=CalendarTypes.WEEKEND,
+                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bus_day_rule_type=BusDayAdjustTypes.FOLLOWING,
                  date_gen_rule_type=DateGenRuleTypes.BACKWARD):
         """ Create Bond object by providing the issue date, maturity Date,
@@ -467,7 +467,8 @@ class Bond:
                                     lin_zero_interp)
 
             # calculate the dirty price of the bond using the discount curve
-            p_zero = bond.dirty_price_from_discount_curve(settlement_date, par_crv)
+            p_zero = bond.dirty_price_from_discount_curve(settlement_date,
+                                                          par_crv)
 
             # shift up by the yield of corresponding par bond
             rates[ind] += shift
@@ -499,7 +500,8 @@ class Bond:
 
             # calculate the full price of the bond
             # using the discount curve with the key rate shifted up
-            p_up = bond.dirty_price_from_discount_curve(settlement_date, par_crv_up)
+            p_up = bond.dirty_price_from_discount_curve(
+                settlement_date, par_crv_up)
 
             # create a curve again with the key rate shifted down
             # by twice the shift value.
@@ -531,7 +533,8 @@ class Bond:
                                          lin_zero_interp)
 
             # calculate the full price of the bond using
-            p_down = bond.dirty_price_from_discount_curve(settlement_date, par_crv_down)
+            p_down = bond.dirty_price_from_discount_curve(
+                settlement_date, par_crv_down)
 
             # calculate the key rate duration
             # using the formula (P_down - P_up) / (2 * shift * P_zero)
@@ -906,9 +909,9 @@ class Bond:
 
     ###########################################################################
 
-    def print_bond_payments(self,
-                            settlement_date: Date,
-                            face: (float) = 100.0):
+    def print_payments(self,
+                       settlement_date: Date,
+                       face: (float) = 100.0):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -1000,12 +1003,14 @@ class Bond:
         This function computes the full prices at buying and selling, plus the coupon payments during the period.
         It returns a tuple which includes a simple rate of return, a compounded IRR and the PnL.
         """
-        buy_price = self.dirty_price_from_ytm(begin_date, begin_ytm, convention)
+        buy_price = self.dirty_price_from_ytm(
+            begin_date, begin_ytm, convention)
         sell_price = self.dirty_price_from_ytm(end_date, end_ytm, convention)
         dates_cfs = zip(self._coupon_dates, self._flow_amounts)
         # The coupon or par payments on buying date belong to the buyer.
         # The coupon or par payments on selling date are given to the new buyer.
-        dates_cfs = [(d, c * self._par) for (d, c) in dates_cfs if (d >= begin_date) and (d < end_date)]
+        dates_cfs = [(d, c * self._par)
+                     for (d, c) in dates_cfs if (d >= begin_date) and (d < end_date)]
         dates_cfs.append((begin_date, -buy_price))
         dates_cfs.append((end_date, sell_price))
         times_cfs = [((d - begin_date)/365, c) for (d, c) in dates_cfs]
@@ -1019,7 +1024,8 @@ class Bond:
             irr = simple_return
         else:
             irr = optimize.brentq(npv,
-                                  a=brentq_down_bound,  # f(a) and f(b) must have opposite signs
+                                  # f(a) and f(b) must have opposite signs
+                                  a=brentq_down_bound,
                                   b=brentq_up_bound,
                                   xtol=1e-8,
                                   args=(np.array(times_cfs),)

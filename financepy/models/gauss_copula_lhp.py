@@ -55,7 +55,8 @@ def tr_surv_prob_lhp(k1,
 
 
 @njit(fastmath=True, cache=True)
-def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta, num_points):
+def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates,
+                      beta, num_points):
 
     p = 0.0
     portfolioEL = 0.0

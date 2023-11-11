@@ -164,9 +164,9 @@ class BondPortfolio:
 
 ###############################################################################
 
-    def print_flows(self,
-                    settlement_date: Date,
-                    face: (float)):
+    def print_payments(self,
+                       settlement_date: Date,
+                       face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 

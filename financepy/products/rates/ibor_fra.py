@@ -126,7 +126,7 @@ class IborFRA:
 
     ###########################################################################
 
-    def print_flows(self, valuation_date):
+    def print_payments(self, valuation_date):
         """ Determine the value of the Deposit given a Ibor curve. """
 
         flow_settle = self._notional

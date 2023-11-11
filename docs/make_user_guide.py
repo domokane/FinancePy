@@ -635,7 +635,7 @@ def parse_function(lines, startLine, endLine, className=""):
 
     paramDescription = extract_params(functionSignature)
 
-    # Inside lstlisting, backslashes used for escaping are interpreted as 
+    # Inside lstlisting, backslashes used for escaping are interpreted as
     # backslashes
     # However, must be after `extract_params` where escaping is required
     functionSignature = functionSignature.replace("\\_", "_")
@@ -868,11 +868,13 @@ if 1 == 1:
 #    os.remove(fileName + ".tex")
     os.remove(fileName + ".toc")
     os.remove(fileName + ".aux")
+    os.remove(fileName + ".fls")
+    os.remove(fileName + ".fdb_latexmk")
     os.remove(fileName + ".log")
     os.remove(newHeadFile)
     os.remove(newHeadFile + ".bak")
 
-#    print("Moving ", pdfFileName1, " to ", pdfFileName2)
-#    shutil.move(pdfFileName1, pdfFileName2)
-#    print(pdfFileName2)
+    print("Moving ", pdfFileName1, " to ", pdfFileName2)
+    shutil.move(pdfFileName1, pdfFileName2)
+    print(pdfFileName2)
     open_file(pdfFileName1)

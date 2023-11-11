@@ -54,10 +54,7 @@ def dxx(x):
     dxl = (x - np.roll(x, 1))
     dxu = (np.roll(x, -1) - x)
     intermediate_rows = np.array(
-        [2 / dxl,
-        -(2 / dxl + 2 / dxu),
-        2 / dxu]
-    ) / (dxu + dxl)
+        [2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (dxu + dxl)
     out = intermediate_rows.T
 
     # First row

@@ -2,8 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-# TODO Fix this
-
 import numpy as np
 
 from ..utils.helpers import label_to_string
@@ -48,12 +46,12 @@ class BlackShifted():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        sqrtT = np.sqrt(t)
+        sqrt_t = np.sqrt(t)
         vol = self._volatility
 
         d1 = np.log((f+s)/(k+s)) + vol * vol * t / 2
-        d1 = d1 / (vol * sqrtT)
-        d2 = d1 - vol * sqrtT
+        d1 = d1 / (vol * sqrt_t)
+        d2 = d1 - vol * sqrt_t
 
         if call_or_put == OptionTypes.EUROPEAN_CALL:
             return df * ((f+s) * N(d1) - (k + s) * N(d2))

@@ -264,13 +264,13 @@ class CDS:
 
             unadjusted_schedule_dates.append(next_date)
 
-            # the unadjusted dates start at end date and end at previous 
+            # the unadjusted dates start at end date and end at previous
             # coupon date
             while next_date > start_date:
                 next_date = next_date.add_months(-num_months)
                 unadjusted_schedule_dates.append(next_date)
 
-            # now we adjust for holiday using business day adjustment 
+            # now we adjust for holiday using business day adjustment
             # convention specified
             adjusted_dates = []
 
@@ -322,7 +322,8 @@ class CDS:
 
         # Accrual end dates are one day before the start of the next
         # accrual period
-        self._accrual_end_dates = [date.add_days(-1) for date in self._accrual_start_dates[1:]]
+        self._accrual_end_dates = [
+            date.add_days(-1) for date in self._accrual_start_dates[1:]]
 
         # Final accrual end date is the maturity date
         self._accrual_end_dates.append(self._maturity_date)
@@ -748,19 +749,24 @@ class CDS:
 
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
+
         cleanRPV01 = (z / w) * 365.0 / 360.0
+
         prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self._notional
+
         cleanPV_ir_bumped = fwdDf * long_protection * \
             (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
+
         fullPV_ir_bumped = cleanPV_ir_bumped + fwdDf * long_protection * accrued
+
         ir01 = fullPV_ir_bumped - fullPV
 
         return (fullPV, cleanPV, credit01, ir01)
 
     ###########################################################################
 
-    def print_flows(self, valuation_date, issuer_curve):
-        ''' We only print flows after the current valuation date '''
+    def print_payments(self, valuation_date, issuer_curve):
+        ''' We only print payments after the current valuation date '''
         num_flows = len(self._payment_dates)
 
         print("PAYMENT_DATE      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")

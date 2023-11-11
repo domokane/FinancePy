@@ -243,7 +243,7 @@ class IborSwap:
 
     ###########################################################################
 
-    def print_flows(self):
+    def print_payments(self):
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 

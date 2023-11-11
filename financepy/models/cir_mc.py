@@ -86,12 +86,11 @@ def zero_price(r0, a, b, sigma, t):
     """ Price of a zero coupon bond in CIR model. """
     h = np.sqrt(a * a + 2.0 * sigma * sigma)
     denom = 2.0 * h + (a + h) * (np.exp(h * t) - 1.0)
-    A = (2.0 * h * np.exp((a + h) * t / 2.0) /
+    aa = (2.0 * h * np.exp((a + h) * t / 2.0) /
          denom) ** (2.0 * a * b / sigma / sigma)
-    B = 2.0 * (np.exp(h * t) - 1.0) / denom
-    zcb = A * np.exp(-r0 * B)
+    bb = 2.0 * (np.exp(h * t) - 1.0) / denom
+    zcb = aa * np.exp(-r0 * bb)
     return zcb
-
 
 ###############################################################################
 
@@ -113,13 +112,13 @@ def draw(rt, a, b, sigma, dt):
     c = sigma2 * (1.0 - np.exp(-a * dt)) / 4.0 / a
 
     if d > 1:
-        Z = np.random.normal()
-        X = np.random.chisquare(d - 1)
-        r = c * (X + (Z + np.sqrt(ll)) ** 2)
+        z = np.random.normal()
+        x = np.random.chisquare(d - 1)
+        r = c * (x + (z + np.sqrt(ll)) ** 2)
     else:
-        N = np.random.poisson(ll / 2.0)
-        X = np.random.chisquare(d + 2 * N)
-        r = c * X
+        n = np.random.poisson(ll / 2.0)
+        x = np.random.chisquare(d + 2 * n)
+        r = c * x
 
     return r
 
@@ -150,75 +149,75 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 r = r + a * (b - r) * dt + \
-                    z[iStep - 1] * sigmasqrt_dt * np.sqrt(max(r, 0.0))
-                rate_path[iStep] = r
+                    z[i_step - 1] * sigmasqrt_dt * np.sqrt(max(r, 0.0))
+                rate_path[i_step] = r
 
     elif scheme == CIRNumericalScheme.LOGNORMAL.value:
 
         x = np.exp(-a * dt)
         y = 1.0 - x
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 mean = x * r + b * y
                 var = sigma * sigma * y * (x * r + 0.50 * b * y) / a
                 sig = np.sqrt(np.log(1.0 + var / (mean * mean)))
-                r = mean * np.exp(-0.5 * sig * sig + sig * z[iStep - 1])
-                rate_path[iStep] = r
+                r = mean * np.exp(-0.5 * sig * sig + sig * z[i_step - 1])
+                rate_path[i_step] = r
 
     elif scheme == CIRNumericalScheme.MILSTEIN.value:
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 r = r + a * (b - r) * dt + \
-                    z[iStep - 1] * sigmasqrt_dt * np.sqrt(max(0.0, r))
-                r = r + sigma2dt * (z[iStep - 1] ** 2 - 1.0)
-                rate_path[iStep] = r
+                    z[i_step - 1] * sigmasqrt_dt * np.sqrt(max(0.0, r))
+                r = r + sigma2dt * (z[i_step - 1] ** 2 - 1.0)
+                rate_path[i_step] = r
 
     elif scheme == CIRNumericalScheme.KAHLJACKEL.value:
 
         bhat = b - sigma * sigma / 4.0 / a
         sqrt_dt = np.sqrt(dt)
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
-                beta = z[iStep - 1] / sqrt_dt
+            for i_step in range(1, num_steps):
+                beta = z[i_step - 1] / sqrt_dt
                 rootr = np.sqrt(max(r, 1e-8))
                 c = 1.0 + (sigma * beta - 2.0 * a * rootr) * dt / 4.0 / rootr
                 r = r + (a * (bhat - r) + sigma * beta * rootr) * c * dt
-                rate_path[iStep] = r
+                rate_path[i_step] = r
 
     elif scheme == CIRNumericalScheme.EXACT.value:
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 r = draw(r, a, b, sigma, dt)
-                rate_path[iStep] = r
+                rate_path[i_step] = r
 
     return rate_path
 
@@ -252,16 +251,16 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             rsum = r
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 r_prev = r
                 r = r + a * (b - r) * dt + \
-                    z[iStep - 1] * sigmasqrt_dt * np.sqrt(max(r, 0.0))
+                    z[i_step - 1] * sigmasqrt_dt * np.sqrt(max(r, 0.0))
                 rsum += (r + r_prev)
 
             zcb += np.exp(-0.50 * rsum * dt)
@@ -271,19 +270,19 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         x = np.exp(-a * dt)
         y = 1.0 - x
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             rsum = r0
 
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 mean = x * r + b * y
                 var = sigma * sigma * y * (x * r + 0.50 * b * y) / a
                 sig = np.sqrt(np.log(1.0 + var / (mean * mean)))
                 r_prev = r
-                r = mean * np.exp(-0.5 * sig * sig + sig * z[iStep - 1])
+                r = mean * np.exp(-0.5 * sig * sig + sig * z[i_step - 1])
                 rsum += (r + r_prev)
 
             zcb += np.exp(-0.5 * rsum * dt)
@@ -299,7 +298,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
             rsum = r
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 r_prev = r
                 r = r + a * (b - r) * dt + \
                     z[iStep - 1] * sigmasqrt_dt * np.sqrt(max(0.0, r))
@@ -313,13 +312,13 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         bhat = b - sigma * sigma / 4.0 / a
         sqrt_dt = np.sqrt(dt)
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             rsum = r
             z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 beta = z[iStep - 1] / sqrt_dt
                 rootr = np.sqrt(max(r, 1e-8))
                 c = 1.0 + (sigma * beta - 2.0 * a * rootr) * dt / 4.0 / rootr
@@ -331,12 +330,12 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
     elif scheme == CIRNumericalScheme.EXACT.value:
 
-        for iPath in range(0, num_paths):
+        for i_path in range(0, num_paths):
 
             r = r0
             rsum = r
 
-            for iStep in range(1, num_steps):
+            for i_step in range(1, num_steps):
                 r_prev = r
                 r = draw(r, a, b, sigma, dt)
                 rsum += (r + r_prev)

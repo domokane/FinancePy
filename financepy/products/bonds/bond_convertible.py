@@ -27,6 +27,7 @@ from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
 ###############################################################################
 
+
 @njit(fastmath=True, cache=True)
 def _value_convertible(tmat,
                        face_amount,
@@ -269,7 +270,7 @@ class BondConvertible:
                  put_dates: List[Date],  # list of put dates
                  put_prices: List[float],  # list of put prices
                  accrual_type: DayCountTypes,  # day count type for accrued
-                 calendar_types:CalendarTypes = CalendarTypes.WEEKEND):  # face amount
+                 calendar_types: CalendarTypes = CalendarTypes.WEEKEND):
         """ Create BondConvertible object by providing the bond Maturity
         date, coupon, frequency type, accrual convention type and then all of
         the details regarding the conversion option including the list of the

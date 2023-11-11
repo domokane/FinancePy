@@ -13,12 +13,13 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
-from ...utils.frequency import FrequencyTypes, annual_frequency
+from ...utils.frequency import FrequencyTypes
 from ...products.bonds.bond import YTMCalcType
 
 ###############################################################################
 # TO DO - THIS CLASS NEEDS TO INHERIT FROM BOND CLASS
 ###############################################################################
+
 
 def _f(ytm, *args):
     """ Function used to do root search in price to yield calculation. """
@@ -215,7 +216,7 @@ class BondZero:
         """ Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input. """
 
-        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm, 
+        dirty_price = self.dirty_price_from_ytm(settlement_date, ytm,
                                                 convention)
         accrued = self.accrued_interest(settlement_date, self._par)
         clean_price = dirty_price - accrued
@@ -255,7 +256,7 @@ class BondZero:
 
         px = 0.0
         df = 1.0
-        dfSettle = discount_curve.df(settlement_date, )
+        df_settle = discount_curve.df(settlement_date, )
 
         for dt in self._coupon_dates[1:]:
 
@@ -266,8 +267,8 @@ class BondZero:
                 pv = flow * df
                 px += pv
 
-        px += df * self._redemption
-        px = px / dfSettle
+        px += df * self._par
+        px = px / df_settle
 
         return px * self._par
 
@@ -413,7 +414,7 @@ class BondZero:
                 df = discount_curve.df(dt)
                 # pvIbor += df * self._coupon / self._frequency
 
-        pvIbor += df * self._redemption
+        pvIbor += df * self._par
 
         # Calculate the PV01 of the floating leg of the asset swap
         # I assume here that the coupon starts accruing on the settlement date
@@ -464,7 +465,7 @@ class BondZero:
                 # determine the OAS adjusted zero rate
                 df_adjusted = np.power(1.0 + (r + oas), -t)
 
-        pv = pv + df_adjusted * self._redemption
+        pv = pv + df_adjusted * self._par
         pv *= self._par
         return pv
 
@@ -577,7 +578,7 @@ class BondZero:
 
         pv = pv + 0.50 * defaultingPrincipalPVPayStart
         pv = pv + 0.50 * defaultingPrincipalPVPayEnd
-        pv = pv + df * q * self._redemption
+        pv = pv + df * q * self._par
         pv *= self._par
         return pv
 
@@ -615,45 +616,51 @@ class BondZero:
         Calculates the rate of total return (capital return and interest) given
         a BUY YTM and a SELL YTM of this bond.
 
-        This function computes the full prices at buying and selling, plus the 
+        This function computes the full prices at buying and selling, plus the
         coupon payments during the period.
 
-        It returns a tuple which includes a simple rate of return, a compounded 
+        It returns a tuple which includes a simple rate of return, a compounded
         IRR and the PnL.
         """
 
-        buy_price = self.dirty_price_from_ytm(begin_date, begin_ytm, convention)
+        buy_price = self.dirty_price_from_ytm(
+            begin_date, begin_ytm, convention)
         sell_price = self.dirty_price_from_ytm(end_date, end_ytm, convention)
 
         dates_cfs = zip(self._coupon_dates, self._flow_amounts)
 
         # The coupon or par payments on buying date belong to the buyer.
         # The coupon or par payments on selling date are given to the new buyer
-        dates_cfs = [(d, c * self._par) for (d, c) in dates_cfs if (d >= begin_date) and (d < end_date)]
+        dates_cfs = [(d, c * self._par)
+                     for (d, c) in dates_cfs if (d >= begin_date) and (d < end_date)]
+
         dates_cfs.append((begin_date, -buy_price))
+
         dates_cfs.append((end_date, sell_price))
         times_cfs = [((d - begin_date)/365, c) for (d, c) in dates_cfs]
 
         pnl = sum(c for (t, c) in times_cfs)
-        simple_return = (pnl / buy_price) * 365 / (end_date - begin_date)
+        simple_rtn = (pnl / buy_price) * 365 / (end_date - begin_date)
         brentq_up_bound = 5
         brentq_down_bound = -0.9999
 
         # in case brentq cannot find the irr root
 
-        if simple_return > brentq_up_bound or simple_return < brentq_down_bound:
+        if simple_rtn > brentq_up_bound or simple_rtn < brentq_down_bound:
 
-            irr = simple_return
+            irr = simple_rtn
 
         else:
+
             irr = optimize.brentq(npv,
-                                  a=brentq_down_bound,  # f(a) and f(b) must have opposite signs
+                                  # f(a) and f(b) must have opposite signs
+                                  a=brentq_down_bound,
                                   b=brentq_up_bound,
                                   xtol=1e-8,
                                   args=(np.array(times_cfs),)
                                   )
 
-        return simple_return, irr, pnl
+        return simple_rtn, irr, pnl
 
 ##############################################################################
 

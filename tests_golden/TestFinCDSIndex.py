@@ -173,7 +173,7 @@ def test_valueCDSIndex():
     testCases.print("DIRTY RPV01", dirtyRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
-#    cdsIndexContract.print_flows(issuer_curve)
+#    cdsIndexContract.print_payments(issuer_curve)
 
 
 test_valueCDSIndex()

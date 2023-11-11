@@ -173,9 +173,9 @@ class LHPlusModel():
             raise FinError("tranche_survival_prob: Same strikes")
 
         dk = 0.00001
-        elK2 = self.exp_min_lk_integral(k2, dk)
-        elK1 = self.exp_min_lk_integral(k1, dk)
-        q = 1.0 - (elK2 - elK1) / (k2 - k1)
+        el_k2 = self.exp_min_lk_integral(k2, dk)
+        el_K1 = self.exp_min_lk_integral(k1, dk)
+        q = 1.0 - (el_k2 - el_k1) / (k2 - k1)
         return q
 
 ###############################################################################

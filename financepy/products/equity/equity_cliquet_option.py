@@ -156,7 +156,7 @@ class EquityCliquetOption(EquityOption):
 
 ###############################################################################
 
-    def print_flows(self):
+    def print_payments(self):
         num_options = len(self._v_options)
         for i in range(0, num_options):
             print(self._actualDates[i], self._dfs[i], self._v_options[i])

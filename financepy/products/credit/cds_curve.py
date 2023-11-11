@@ -159,7 +159,7 @@ class CDSCurve:
 
             maturity_date = self._cds_contracts[i]._maturity_date
 
-            argtuple = (self, 
+            argtuple = (self,
                         self._valuation_date,
                         self._cds_contracts[i],
                         self._recovery_rate)

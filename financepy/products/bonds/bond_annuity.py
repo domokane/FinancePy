@@ -156,12 +156,13 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def print_flows(self,
-                    settlement_date: Date):
+    def print_payments(self,
+                       settlement_date: Date,
+                       face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        self.calculate_payments(settlement_date)
+        self.calculate_payments(settlement_date, face)
 
         num_flows = len(self._coupon_dates)
         for i in range(1, num_flows):

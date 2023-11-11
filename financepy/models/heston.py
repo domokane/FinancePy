@@ -5,7 +5,7 @@
 from numba import njit, float64, int64
 from scipy import integrate
 from math import exp, log, pi
-import numpy as np  # I USE NUMPY FOR EXP, LOG AND SQRT AS THEY HANDLE IMAGINARY PARTS
+import numpy as np
 
 from ..utils.global_vars import gDaysInYear
 from ..utils.global_types import OptionTypes
@@ -243,15 +243,15 @@ class Heston():
             return phi
 
         def phi_transform(x):
-            def integrand(k): return 2.0 * np.real(np.exp(-1j *
-                                                          k * x) * phi(k)) / (k**2 + 1.0 / 4.0)
+            def integrand(k): return 2.0 * np.real(np.exp(-1j * k * x)
+                                                   * phi(k)) / (k**2 + 1.0 / 4.0)
             return integrate.quad(integrand, 0, np.inf)[0]
 
         x = log(F / K)
         I1 = phi_transform(x) / (2.0 * pi)
         v1 = F * exp(-r * tau) - np.sqrt(K * F) * exp(-r * tau) * I1
 #        v2 = S0 * exp(-q*tau) - K * exp(-r*tau) * I1
-        return(v1)
+        return v1
 
 ###############################################################################
 
@@ -338,7 +338,8 @@ class Heston():
 
         v = S0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - \
             exp(-r * tau) * K * f(-1.0, kappa)
-        return(v)
+
+        return v
 
 ###############################################################################
 # Gatheral book page 19 with definition of x given on page 16 and noting
@@ -388,6 +389,6 @@ class Heston():
             return area
 
         v = S0 * exp(-q * tau) * ff(1) - K * exp(-r * tau) * ff(0)
-        return(v)
+        return v
 
 ###############################################################################

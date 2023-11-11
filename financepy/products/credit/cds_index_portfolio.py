@@ -326,7 +326,8 @@ class CDSIndexPortfolio:
                     for j in range(0, numCDSMaturityPoints):
 
                         cdsSpread = cds_contracts[j]._running_coupon
-                        adjustedCDSSpreads[j] = cdsSpread * cdsSpreadMultipliers[j]
+                        adjustedCDSSpreads[j] = cdsSpread * \
+                            cdsSpreadMultipliers[j]
                         curveCDSContracts[j]._running_coupon = adjustedCDSSpreads[j]
 
                     adjustedIssuerCurve = CDSCurve(valuation_date,
@@ -426,7 +427,7 @@ class CDSIndexPortfolio:
 
             adjusted_issuer_curve = CDSCurve(valuation_date,
                                              [],
-                                             libor_curve, 
+                                             libor_curve,
                                              index_recovery_rate)
 
             adjusted_issuer_curve._times = issuer_curve._times.copy()
@@ -488,7 +489,7 @@ class CDSIndexPortfolio:
                 sumRPV01 /= num_credits
                 sumProt /= num_credits
 
-                spd = sumProt/sumRPV01
+                spd = sumProt / sumRPV01
 
                 sumPrem = sumRPV01 * index_coupons[iMaturity]
 
