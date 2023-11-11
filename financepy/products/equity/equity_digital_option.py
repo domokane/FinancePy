@@ -182,7 +182,7 @@ class EquityDigitalOption(EquityOption):
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self._expiry_date)
-        s += label_to_string("BARRIER LEVEL", self._barrier_price)
+        s += label_to_string("BARRIER LEVEL", self._barrier)
         s += label_to_string("CALL-PUT TYPE", self._call_put_type)
         s += label_to_string("DIGITAL TYPE", self._digital_type, "")
         return s
