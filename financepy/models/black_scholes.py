@@ -128,9 +128,9 @@ class BlackScholes(Model):
                 return v
             elif self._implementationType == BlackScholesTypes.LSMC:
 
-                print("LSMC Model", model)
-                poly_degree = model._poly_degree
-                fit_type = model._fit_type
+                print("LSMC Model", self)
+                poly_degree = self._poly_degree
+                fit_type = self._fit_type
 
                 v = equity_lsmc(spot_price=spot_price,
                                 risk_free_rate=risk_free_rate,
@@ -197,16 +197,15 @@ class BlackScholes(Model):
                                 risk_free_rate=risk_free_rate,
                                 dividend_yield=dividend_rate,
                                 sigma=self._volatility,
-                                num_steps_per_year=self._num_steps_per_year,
                                 num_paths=self._num_paths,
+                                num_steps_per_year=self._num_steps_per_year,
                                 time_to_expiry=time_to_expiry,
                                 option_type_value=option_type.value,
                                 strike_price=strike_price,
                                 poly_degree=poly_degree,
                                 fit_type_value=fit_type.value,
                                 use_sobol=self._use_sobol,
-                                seed=self._seed,
-                                **self._params)
+                                seed=self._seed)
 
                 return v
             elif self._implementationType == BlackScholesTypes.Bjerksund_Stensland:

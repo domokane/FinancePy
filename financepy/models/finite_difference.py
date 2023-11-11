@@ -2,11 +2,15 @@ from copy import deepcopy
 from functools import partial
 
 import numpy as np
+from numba import njit
 
-from ..utils.math import band_matrix_multiplication, solve_tridiagonal_matrix, transpose_tridiagonal_matrix
+from ..utils.math import band_matrix_multiplication
+from ..utils.math import solve_tridiagonal_matrix
+from ..utils.math import transpose_tridiagonal_matrix
 from financepy.utils.global_types import OptionTypes
 
 
+@njit
 def dx(x, wind=0):
     # Intermediate rows
     # Note: As first and last rows are handled separately
@@ -174,8 +178,11 @@ def smooth_call(xl, xu, strike):
     else:
         return 0.5 * (xu - strike) ** 2 / (xu - xl)
 
+###############################################################################
+
 
 def option_payoff(s, strike, smooth, dig, option_type):
+
     if isinstance(option_type, OptionTypes):
         option_type = option_type.value
 
@@ -199,7 +206,6 @@ def option_payoff(s, strike, smooth, dig, option_type):
         func = partial(func, strike=strike)
         res = list(map(func, sl, su))
 
-
     # Handle first and last values separately
     res[0] = digital(s[0], strike) if dig else max(0, s[0] - strike)
     res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
@@ -210,6 +216,8 @@ def option_payoff(s, strike, smooth, dig, option_type):
 
     return np.atleast_2d(res)
 
+
+###############################################################################
 
 def black_scholes_finite_difference(spot_price, volatility, time_to_expiry,
                                     strike_price, risk_free_rate, dividend_yield, option_type,

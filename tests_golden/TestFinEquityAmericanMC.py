@@ -2,17 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
 from financepy.models.equity_lsmc import equity_lsmc, FIT_TYPES
 from financepy.models.equity_crr_tree import crr_tree_val
 from financepy.models.black_scholes_analytic import bs_value
-from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
-
-import time
 
 import sys
 sys.path.append("..")
@@ -218,7 +220,7 @@ def testEquityAmericanOption():
         testCases.print("AMERICAN_TREE_PUT", num_steps, results, duration)
 #        print("PUT Tree Results", results)
 
-        # NO DO IT USING AMERICAN MONTE CARLO
+        # NOW DO IT USING AMERICAN MONTE CARLO
 
         model = BlackScholes(volatility,
                              BlackScholesTypes.LSMC,
@@ -233,7 +235,7 @@ def testEquityAmericanOption():
         end = time.time()
         duration = end - start
         testCases.print("AMERICAN_PUT", num_steps, results, duration)
-#        print("PUT LSMC Results", results)
+        print("PUT LSMC Results", results)
 
 #    FinTest.TestReport(filename)
 
@@ -252,7 +254,7 @@ def replicateLSPaper():
     times_to_expiry = [1.0, 2.0]
 
     num_paths = 50000
-    num_steps_per_year = 10
+    num_steps_per_year = 50
 
     r = 0.06
     q = 0.0
@@ -274,7 +276,7 @@ def replicateLSPaper():
                                        q,  # continuously compounded
                                        v,  # Black scholes volatility
                                        num_paths,
-                                       50,  # Steps per year
+                                       num_steps_per_year,
                                        t,
                                        option_type_value,
                                        k,

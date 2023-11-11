@@ -31,8 +31,10 @@ class FIT_TYPES(Enum):
     POLYNOMIAL = auto()
 
 
-# @njit(float64(float64, float64, float64, float64, int64, int64, float64, int64,
-#                 float64, int64, int64, int64, int64), fastmath=True, cache=False)
+# TODO: FIX NUMBA
+#@njit(float64(float64, float64, float64, float64, int64, int64, float64, int64,
+#              float64, float64, int64, int64, int64), fastmath=True, cache=False)
+# @jit
 def equity_lsmc(spot_price,
                 risk_free_rate,
                 dividend_yield,
@@ -42,15 +44,10 @@ def equity_lsmc(spot_price,
                 time_to_expiry,
                 option_type_value,
                 strike_price,
-                poly_deg,
+                poly_degree,
                 fit_type_value,
                 use_sobol,
                 seed):
-
-    if num_paths == 0:
-        raise FinError("Num Paths is zero")
-    if not fit_type_value:
-        fit_type_value = FIT_TYPES.LAGUERRE.value
 
     np.random.seed(seed)
 
@@ -86,7 +83,8 @@ def equity_lsmc(spot_price,
     exercise_matrix = np.zeros_like(st)
     for i in range(exercise_matrix.shape[0]):
         exercise_matrix[i] = option_payoff(
-            st[i], strike_price, smooth=False, dig=False, option_type=option_type_value)
+            st[i], strike_price, smooth=False, dig=False,
+            option_type=option_type_value)
 
     # Set final values for value_matrix and stopping matrix
     value_matrix = np.zeros((exercise_matrix.shape))
@@ -98,26 +96,26 @@ def equity_lsmc(spot_price,
     for it in range(num_times-2, 0, -1):
         if fit_type_value == FIT_TYPES.HERMITE_E.value:
             regression2 = np.polynomial.hermite_e.hermefit(
-                st[it], value_matrix[it + 1] * df, poly_deg)
+                st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.hermite_e.hermeval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.LAGUERRE.value:
             regression2 = np.polynomial.laguerre.lagfit(
-                st[it], value_matrix[it + 1] * df, poly_deg)
+                st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.laguerre.lagval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.HERMITE.value:
             regression2 = np.polynomial.hermite.hermfit(
-                st[it], value_matrix[it + 1] * df, poly_deg)
+                st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.hermite.hermval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.LEGENDRE.value:
             regression2 = np.polynomial.legendre.legfit(
-                st[it], value_matrix[it + 1] * df, poly_deg)
+                st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.legendre.legval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.CHEBYCHEV.value:
             regression2 = np.polynomial.chebyshev.chebfit(
-                st[it], value_matrix[it + 1] * df, poly_deg)
+                st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.chebyshev.chebval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.POLYNOMIAL.value:
-            regression2 = fit_poly(st[it], value_matrix[it + 1] * df, poly_deg)
+            regression2 = fit_poly(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = eval_polynomial(regression2, st[it])
         else:
             raise ValueError(f"Unknown FitType: {fit_type_value}")
@@ -134,7 +132,8 @@ def equity_lsmc(spot_price,
     values = np.zeros(value_matrix.shape[1])
 
     for i in range(value_matrix.shape[1]):
-        if option_type_value in {OptionTypes.AMERICAN_PUT.value, OptionTypes.AMERICAN_CALL.value}:
+        if option_type_value in {OptionTypes.AMERICAN_PUT.value,
+                                 OptionTypes.AMERICAN_CALL.value}:
             # first value in row of stopping matrix that is greater than zero
             s = np.argmax(stopping.T[i])
         else:
@@ -142,6 +141,7 @@ def equity_lsmc(spot_price,
 
         # This is the value of the path discounted to present value
         values[i] = value_matrix[s, i] * np.exp(-risk_free_rate * times[s])
+
     value = np.mean(values)
 
     return value
