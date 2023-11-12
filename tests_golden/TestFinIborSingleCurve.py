@@ -38,7 +38,7 @@ def test_ibor_depositsOnly():
     valuation_date = Date(23, 2, 2018)
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
@@ -47,29 +47,29 @@ def test_ibor_depositsOnly():
 
     # 1 month
     deposit_rate = 0.04
-    maturity_date = settlement_date.add_months(1)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    maturity_date = settle_date.add_months(1)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        depoDCCType, notional, calendar_type)
     depos.append(depo)
 
     # 2 months
     deposit_rate = 0.04
-    maturity_date = settlement_date.add_months(2)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    maturity_date = settle_date.add_months(2)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        depoDCCType, notional, calendar_type)
     depos.append(depo)
 
     # 6 months
     deposit_rate = 0.04
-    maturity_date = settlement_date.add_months(6)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    maturity_date = settle_date.add_months(6)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        depoDCCType, notional, calendar_type)
     depos.append(depo)
 
     # 1 year
     deposit_rate = 0.04
-    maturity_date = settlement_date.add_months(12)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    maturity_date = settle_date.add_months(12)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        depoDCCType, notional, calendar_type)
     depos.append(depo)
 
@@ -85,7 +85,7 @@ def test_ibor_depositsOnly():
 
     """ Check calibration """
     for depo in depos:
-        v = depo.value(settlement_date, libor_curve)
+        v = depo.value(settle_date, libor_curve)
         testCases.print("DEPO", depo._maturity_date, v)
 
 ###############################################################################
@@ -97,7 +97,7 @@ def test_FinIborFRAsOnly():
     valuation_date = Date(23, 2, 2018)
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
@@ -109,16 +109,16 @@ def test_FinIborFRAsOnly():
 
     # 1 x 4 FRA
     fraRate = 0.04
-    fraSettlementDate = settlement_date.add_months(1)
-    fraMaturityDate = settlement_date.add_months(4)
+    fraSettlementDate = settle_date.add_months(1)
+    fraMaturityDate = settle_date.add_months(4)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate,
                   depoDCCType, notional, payFixed, calendar_type)
     fras.append(fra)
 
     # 4 x 7 FRA
     fraRate = 0.08
-    fraSettlementDate = settlement_date.add_months(4)
-    fraMaturityDate = settlement_date.add_months(7)
+    fraSettlementDate = settle_date.add_months(4)
+    fraMaturityDate = settle_date.add_months(7)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate,
                   depoDCCType, notional, payFixed, calendar_type)
     fras.append(fra)
@@ -135,7 +135,7 @@ def test_FinIborFRAsOnly():
 
     """ Check calibration """
     for fra in fras:
-        v = fra.value(settlement_date, libor_curve)
+        v = fra.value(settle_date, libor_curve)
         testCases.print("FRA:", fra._maturity_date, v)
 
 ###############################################################################
@@ -149,147 +149,147 @@ def test_ibor_depositsFRAsSwaps():
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
 
     deposit_rate = 0.050
-    maturity_date = settlement_date.add_months(1)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate, dccType)
+    maturity_date = settle_date.add_months(1)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate, dccType)
     depos.append(depo)
 
-    maturity_date = settlement_date.add_months(2)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate, dccType)
+    maturity_date = settle_date.add_months(2)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate, dccType)
     depos.append(depo)
 
-    maturity_date = settlement_date.add_months(3)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate, dccType)
+    maturity_date = settle_date.add_months(3)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate, dccType)
     depos.append(depo)
 
-    maturity_date = settlement_date.add_months(6)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate, dccType)
+    maturity_date = settle_date.add_months(6)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate, dccType)
     depos.append(depo)
 
-    maturity_date = settlement_date.add_months(9)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate, dccType)
+    maturity_date = settle_date.add_months(9)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate, dccType)
     depos.append(depo)
 
-    maturity_date = settlement_date.add_months(12)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate, dccType)
+    maturity_date = settle_date.add_months(12)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate, dccType)
     depos.append(depo)
 
     fras = []
     # 1 x 4 FRA
     fraRate = 0.04
-    fraSettlementDate = settlement_date.add_months(9)
-    fraMaturityDate = settlement_date.add_months(13)
+    fraSettlementDate = settle_date.add_months(9)
+    fraMaturityDate = settle_date.add_months(13)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
     fras.append(fra)
 
     # 4 x 7 FRA
     fraRate = 0.03
-    fraSettlementDate = settlement_date.add_months(13)
-    fraMaturityDate = settlement_date.add_months(17)
+    fraSettlementDate = settle_date.add_months(13)
+    fraMaturityDate = settle_date.add_months(17)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
     fras.append(fra)
 
     # 4 x 7 FRA
     fraRate = 0.07
-    fraSettlementDate = settlement_date.add_months(17)
-    fraMaturityDate = settlement_date.add_months(21)
+    fraSettlementDate = settle_date.add_months(17)
+    fraMaturityDate = settle_date.add_months(21)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate, dccType)
     fras.append(fra)
 
     swaps = []
     fixedDCCType = DayCountTypes.ACT_365F
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap_rate = 0.05
-#    maturity_date = settlement_date.add_months(24)
-#    swap = IborSwap(settlement_date, maturity_date, swap_rate, fixedFreqType,
+#    maturity_date = settle_date.add_months(24)
+#    swap = IborSwap(settle_date, maturity_date, swap_rate, fixed_freq_type,
 #                        fixedDCCType)
 #    swaps.append(swap)
 
     fixed_leg_type = SwapTypes.PAY
-    maturity_date = settlement_date.add_months(36)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(36)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(48)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(48)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(60)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(60)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(72)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(72)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(84)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(84)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(96)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(96)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(108)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(108)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(120)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(120)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(132)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(132)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(144)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(144)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(180)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(180)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(240)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(240)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(300)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(300)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
-    maturity_date = settlement_date.add_months(360)
-    swap = IborSwap(settlement_date, maturity_date, fixed_leg_type, swap_rate,
-                    fixedFreqType,
+    maturity_date = settle_date.add_months(360)
+    swap = IborSwap(settle_date, maturity_date, fixed_leg_type, swap_rate,
+                    fixed_freq_type,
                     fixedDCCType)
     swaps.append(swap)
 
@@ -298,10 +298,10 @@ def test_ibor_depositsFRAsSwaps():
                                   fras,
                                   swaps)
 
-    df = libor_curve.df(settlement_date)
+    df = libor_curve.df(settle_date)
 
     testCases.header("SETTLEMENT DATE", "DF")
-    testCases.print(str(settlement_date), df)
+    testCases.print(str(settle_date), df)
     testCases.header("DATE", "DF")
 
     for deposit in depos:
@@ -337,23 +337,23 @@ def test_ibor_depositsFuturesSwaps():
 
     spot_date = Date(6, 6, 2018)
     spot_days = 0
-    settlement_date = spot_date.add_weekdays(spot_days)
+    settle_date = spot_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
-    depo = IborDeposit(settlement_date, "3M", deposit_rate, depoDCCType)
+    depo = IborDeposit(settle_date, "3M", deposit_rate, depoDCCType)
     depos.append(depo)
 
     deposit_rate = 0.027
-    depo = IborDeposit(settlement_date, "3M", deposit_rate, depoDCCType)
+    depo = IborDeposit(settle_date, "3M", deposit_rate, depoDCCType)
     depos.append(depo)
 
     depos = []
-    depo = IborDeposit(settlement_date, "1M", 0.0230, depoDCCType)
+    depo = IborDeposit(settle_date, "1M", 0.0230, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "2M", 0.0235, depoDCCType)
+    depo = IborDeposit(settle_date, "2M", 0.0235, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "3M", 0.0240, depoDCCType)
+    depo = IborDeposit(settle_date, "3M", 0.0240, depoDCCType)
     depos.append(depo)
 
     fras = []
@@ -402,8 +402,8 @@ def test_ibor_depositsFuturesSwaps():
     swaps = []
     fixed_leg_type = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
-    floatFreqType = FrequencyTypes.QUARTERLY
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
+    float_freq_type = FrequencyTypes.QUARTERLY
     notional = 1000000
     principal = 0.0
     float_spread = 0.0
@@ -414,8 +414,8 @@ def test_ibor_depositsFuturesSwaps():
     swap_rate = 0.02776305
 
     swap = IborSwap(start_date, "2Y", fixed_leg_type, swap_rate,
-                    fixedFreqType, fixedDCCType, notional,
-                    float_spread, floatFreqType, floatDCCType,
+                    fixed_freq_type, fixedDCCType, notional,
+                    float_spread, float_freq_type, floatDCCType,
                     calendar_type, busDayAdjustRule)
 
     swaps.append(swap)
@@ -444,7 +444,7 @@ def test_ibor_depositsFuturesSwaps():
         df = libor_curve.df(end_date)
         print(end_date, df)
 
-        end_date = settlement_date
+        end_date = settle_date
         df = libor_curve.df(end_date)
         print(end_date, df)
 
@@ -484,120 +484,120 @@ def test_derivativePricingExample():
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
 
     deposit_rate = 0.001410
-    depo = IborDeposit(settlement_date, "ON", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "ON", deposit_rate, dccType)
     depos.append(depo)
 
     spot_days = 1
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
 
     deposit_rate = 0.001410
-    depo = IborDeposit(settlement_date, "TN", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "TN", deposit_rate, dccType)
     depos.append(depo)
 
     spot_days = 2
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
 
     deposit_rate = 0.001910
-    depo = IborDeposit(settlement_date, "1W", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "1W", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.002090
-    depo = IborDeposit(settlement_date, "2W", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "2W", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.002490
-    depo = IborDeposit(settlement_date, "1M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "1M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.003450
-    depo = IborDeposit(settlement_date, "2M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "2M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.004570
-    depo = IborDeposit(settlement_date, "3M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "3M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.005230
-    depo = IborDeposit(settlement_date, "4M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "4M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.005860
-    depo = IborDeposit(settlement_date, "5M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "5M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.006540
-    depo = IborDeposit(settlement_date, "6M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "6M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.007080
-    depo = IborDeposit(settlement_date, "7M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "7M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.007540
-    depo = IborDeposit(settlement_date, "8M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "8M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.008080
-    depo = IborDeposit(settlement_date, "9M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "9M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.008570
-    depo = IborDeposit(settlement_date, "10M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "10M", deposit_rate, dccType)
     depos.append(depo)
 
     deposit_rate = 0.009130
-    depo = IborDeposit(settlement_date, "11M", deposit_rate, dccType)
+    depo = IborDeposit(settle_date, "11M", deposit_rate, dccType)
     depos.append(depo)
 
     fras = []
 
     swaps = []
-    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
-#    day_count_type = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
+#    dc_type = DayCountTypes.ACT_360
     freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.0058
-    swap = IborSwap(settlement_date, "1Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "1Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0060
-    swap = IborSwap(settlement_date, "2Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "2Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0072
-    swap = IborSwap(settlement_date, "3Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "3Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0096
-    swap = IborSwap(settlement_date, "4Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "4Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0124
-    swap = IborSwap(settlement_date, "5Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "5Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0173
-    swap = IborSwap(settlement_date, "7Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "7Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0219
-    swap = IborSwap(settlement_date, "10Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "10Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0283
-    swap = IborSwap(settlement_date, "30Y", fixed_leg_type,
-                    swap_rate, freq_type, day_count_type)
+    swap = IborSwap(settle_date, "30Y", fixed_leg_type,
+                    swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     numRepeats = 10
@@ -635,12 +635,12 @@ def test_bloombergPricingExample(interp_type):
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
-    maturity_date = settlement_date.add_months(3)
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    maturity_date = settle_date.add_months(3)
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        depoDCCType)
     depos.append(depo)
 
@@ -670,60 +670,60 @@ def test_bloombergPricingExample(interp_type):
     freq = FrequencyTypes.SEMI_ANNUAL
 
     spot_days = 2
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
     notional = ONE_MILLION
     fixed_leg_type = SwapTypes.PAY
 
     swaps = []
-    swap = IborSwap(settlement_date, "2Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "2Y", fixed_leg_type,
                     (2.77417 + 2.77844) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "3Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "3Y", fixed_leg_type,
                     (2.86098 + 2.86582) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "4Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "4Y", fixed_leg_type,
                     (2.90240 + 2.90620) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "5Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "5Y", fixed_leg_type,
                     (2.92944 + 2.92906) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "6Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "6Y", fixed_leg_type,
                     (2.94001 + 2.94499) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "7Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "7Y", fixed_leg_type,
                     (2.95352 + 2.95998) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "8Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "8Y", fixed_leg_type,
                     (2.96830 + 2.97400) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "9Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "9Y", fixed_leg_type,
                     (2.98403 + 2.98817) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "10Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "10Y", fixed_leg_type,
                     (2.99716 + 3.00394) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "11Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "11Y", fixed_leg_type,
                     (3.01344 + 3.01596) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "12Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "12Y", fixed_leg_type,
                     (3.02276 + 3.02684) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "15Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "15Y", fixed_leg_type,
                     (3.04092 + 3.04508) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "20Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "20Y", fixed_leg_type,
                     (3.04417 + 3.05183) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "25Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "25Y", fixed_leg_type,
                     (3.03219 + 3.03621) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "30Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "30Y", fixed_leg_type,
                     (3.01030 + 3.01370) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "40Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "40Y", fixed_leg_type,
                     (2.96946 + 2.97354) / 200, freq, accrual)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "50Y", fixed_leg_type,
+    swap = IborSwap(settle_date, "50Y", fixed_leg_type,
                     (2.91552 + 2.93748) / 200, freq, accrual)
     swaps.append(swap)
 
@@ -745,11 +745,11 @@ def test_bloombergPricingExample(interp_type):
     # Pay fixed so make fixed leg value negative
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
     testCases.print("VALUE:", swaps[0].value(
-        settlement_date, libor_curve, libor_curve, None))
+        settle_date, libor_curve, libor_curve, None))
     testCases.print(
-        "FIXED:", -swaps[0]._fixed_leg.value(settlement_date, libor_curve))
+        "FIXED:", -swaps[0]._fixed_leg.value(settle_date, libor_curve))
     testCases.print("FLOAT:", swaps[0]._float_leg.value(
-        settlement_date, libor_curve, libor_curve, None))
+        settle_date, libor_curve, libor_curve, None))
 
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()
@@ -758,7 +758,7 @@ def test_bloombergPricingExample(interp_type):
         plt.figure()
 
         years = np.linspace(0, 50, 500)
-        dates = settlement_date.add_years(years)
+        dates = settle_date.add_years(years)
         fwds = libor_curve.fwd(dates)
         plt.plot(years, fwds, label="Fwd Rate")
         plt.title(interp_type)
@@ -766,7 +766,7 @@ def test_bloombergPricingExample(interp_type):
         plt.legend()
 
         years = np.linspace(0, 50, 500)
-        dates = settlement_date.add_years(years)
+        dates = settle_date.add_years(years)
         fwds = libor_curve.zero_rate(dates)
         plt.plot(years, fwds, label="Zero Rate")
         plt.title(interp_type)

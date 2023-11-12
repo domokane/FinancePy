@@ -29,7 +29,7 @@ class DiscountCurvePWL(DiscountCurve):
                  zero_dates: (Date, list),
                  zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
+                 dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Curve is defined by a vector of increasing times and zero rates."""
 
         check_argument_types(self.__init__, locals())
@@ -45,11 +45,11 @@ class DiscountCurvePWL(DiscountCurve):
         self._zero_rates = np.array(zero_rates)
         self._zero_dates = zero_dates
         self._freq_type = freq_type
-        self._day_count_type = day_count_type
+        self._dc_type = dc_type
 
         dc_times = times_from_dates(zero_dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         self._times = np.array(dc_times)
 
@@ -112,7 +112,7 @@ class DiscountCurvePWL(DiscountCurve):
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
@@ -120,7 +120,7 @@ class DiscountCurvePWL(DiscountCurve):
                               zero_rates,
                               dc_times,
                               self._freq_type,
-                              self._day_count_type)
+                              self._dc_type)
 
         return df
 

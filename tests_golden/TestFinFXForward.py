@@ -38,8 +38,8 @@ def test_FinFXForward():
     ###########################################################################
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
-    maturity_date = settlement_date.add_months(12)
+    settle_date = valuation_date.add_weekdays(spot_days)
+    maturity_date = settle_date.add_months(12)
     notional = 100.0
     calendar_type = CalendarTypes.TARGET
 
@@ -47,7 +47,7 @@ def test_FinFXForward():
     fras = []
     swaps = []
     deposit_rate = ccy1InterestRate
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
     for_discount_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
@@ -56,7 +56,7 @@ def test_FinFXForward():
     fras = []
     swaps = []
     deposit_rate = ccy2InterestRate
-    depo = IborDeposit(settlement_date, maturity_date, deposit_rate,
+    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
                        DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
     dom_discount_curve = IborSingleCurve(valuation_date, depos, fras, swaps)

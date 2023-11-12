@@ -18,7 +18,7 @@ from os.path import dirname, join
 
 def build_Ibor_Curve(tradeDate):
 
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
     dcType = DayCountTypes.ACT_360
 
     depos = []
@@ -27,11 +27,11 @@ def build_Ibor_Curve(tradeDate):
 
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    settlement_date = valuation_date
+    settle_date = value_date
 
-    maturity_date = settlement_date.add_months(12)
+    maturity_date = settle_date.add_months(12)
     swap1 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0502,
@@ -39,9 +39,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settlement_date.add_months(24)
+    maturity_date = settle_date.add_months(24)
     swap2 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0502,
@@ -49,9 +49,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settlement_date.add_months(36)
+    maturity_date = settle_date.add_months(36)
     swap3 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0501,
@@ -59,9 +59,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settlement_date.add_months(48)
+    maturity_date = settle_date.add_months(48)
     swap4 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0502,
@@ -69,9 +69,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settlement_date.add_months(60)
+    maturity_date = settle_date.add_months(60)
     swap5 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0501,
@@ -79,25 +79,25 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     return libor_curve
 
 
 def buildIssuerCurve(tradeDate, libor_curve):
 
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
 
     cdsMarketContracts = []
 
-    cdsCoupon = 0.0048375
+    cds_coupon = 0.0048375
     maturity_date = Date(29, 6, 2010)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -107,15 +107,15 @@ def buildIssuerCurve(tradeDate, libor_curve):
 
 def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
 
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
 
     cdsMarketContracts = []
 
     maturity_date = Date(29, 6, 2010)
-    cds = CDS(valuation_date, maturity_date, spread)
+    cds = CDS(value_date, maturity_date, spread)
     cdsMarketContracts.append(cds)
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -123,7 +123,7 @@ def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
     return issuer_curve
 
 
-def buildFullIssuerCurve(valuation_date):
+def buildFullIssuerCurve(value_date):
 
     dcType = DayCountTypes.ACT_360
     depos = []
@@ -132,22 +132,22 @@ def buildFullIssuerCurve(valuation_date):
     m = 1.0  # 0.00000000000
 
     spot_days = 0
-    settlement_date = valuation_date.add_days(spot_days)
+    settle_date = value_date.add_days(spot_days)
 
-    maturity_date = settlement_date.add_months(1)
-    depo1 = IborDeposit(settlement_date, maturity_date, m * 0.0016, dcType)
+    maturity_date = settle_date.add_months(1)
+    depo1 = IborDeposit(settle_date, maturity_date, m * 0.0016, dcType)
 
-    maturity_date = settlement_date.add_months(2)
-    depo2 = IborDeposit(settlement_date, maturity_date, m * 0.0020, dcType)
+    maturity_date = settle_date.add_months(2)
+    depo2 = IborDeposit(settle_date, maturity_date, m * 0.0020, dcType)
 
-    maturity_date = settlement_date.add_months(3)
-    depo3 = IborDeposit(settlement_date, maturity_date, m * 0.0024, dcType)
+    maturity_date = settle_date.add_months(3)
+    depo3 = IborDeposit(settle_date, maturity_date, m * 0.0024, dcType)
 
-    maturity_date = settlement_date.add_months(6)
-    depo4 = IborDeposit(settlement_date, maturity_date, m * 0.0033, dcType)
+    maturity_date = settle_date.add_months(6)
+    depo4 = IborDeposit(settle_date, maturity_date, m * 0.0033, dcType)
 
-    maturity_date = settlement_date.add_months(12)
-    depo5 = IborDeposit(settlement_date, maturity_date, m * 0.0056, dcType)
+    maturity_date = settle_date.add_months(12)
+    depo5 = IborDeposit(settle_date, maturity_date, m * 0.0056, dcType)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -158,15 +158,15 @@ def buildFullIssuerCurve(valuation_date):
     fras = []
 
     spot_days = 2
-    settlement_date = valuation_date.add_days(spot_days)
+    settle_date = value_date.add_days(spot_days)
 
     swaps = []
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
 
-    maturity_date = settlement_date.add_months(24)
+    maturity_date = settle_date.add_months(24)
     swap1 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0044 + irBump,
@@ -174,9 +174,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settlement_date.add_months(36)
+    maturity_date = settle_date.add_months(36)
     swap2 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0078 + irBump,
@@ -184,9 +184,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settlement_date.add_months(48)
+    maturity_date = settle_date.add_months(48)
     swap3 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0119 + irBump,
@@ -194,9 +194,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settlement_date.add_months(60)
+    maturity_date = settle_date.add_months(60)
     swap4 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0158 + irBump,
@@ -204,9 +204,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settlement_date.add_months(72)
+    maturity_date = settle_date.add_months(72)
     swap5 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0192 + irBump,
@@ -214,9 +214,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap5)
 
-    maturity_date = settlement_date.add_months(84)
+    maturity_date = settle_date.add_months(84)
     swap6 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0219 + irBump,
@@ -224,9 +224,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap6)
 
-    maturity_date = settlement_date.add_months(96)
+    maturity_date = settle_date.add_months(96)
     swap7 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0242 + irBump,
@@ -234,9 +234,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap7)
 
-    maturity_date = settlement_date.add_months(108)
+    maturity_date = settle_date.add_months(108)
     swap8 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0261 + irBump,
@@ -244,9 +244,9 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap8)
 
-    maturity_date = settlement_date.add_months(120)
+    maturity_date = settle_date.add_months(120)
     swap9 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         m * 0.0276 + irBump,
@@ -254,52 +254,52 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap9)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     cdsMarketContracts = []
-    cdsCoupon = 0.005743
-    maturity_date = valuation_date.next_cds_date(6)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.005743
+    maturity_date = value_date.next_cds_date(6)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.007497
-    maturity_date = valuation_date.next_cds_date(12)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.007497
+    maturity_date = value_date.next_cds_date(12)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.011132
-    maturity_date = valuation_date.next_cds_date(24)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.011132
+    maturity_date = value_date.next_cds_date(24)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.013932
-    maturity_date = valuation_date.next_cds_date(36)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.013932
+    maturity_date = value_date.next_cds_date(36)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.015764
-    maturity_date = valuation_date.next_cds_date(48)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.015764
+    maturity_date = value_date.next_cds_date(48)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.017366
-    maturity_date = valuation_date.next_cds_date(60)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.017366
+    maturity_date = value_date.next_cds_date(60)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.020928
-    maturity_date = valuation_date.next_cds_date(84)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.020928
+    maturity_date = value_date.next_cds_date(84)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cdsCoupon = 0.022835
-    maturity_date = valuation_date.next_cds_date(120)
-    cds = CDS(valuation_date, maturity_date, cdsCoupon)
+    cds_coupon = 0.022835
+    maturity_date = value_date.next_cds_date(120)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -307,7 +307,7 @@ def buildFullIssuerCurve(valuation_date):
     return libor_curve, issuer_curve
 
 
-def loadHomogeneousSpreadCurves(valuation_date,
+def loadHomogeneousSpreadCurves(value_date,
                                 libor_curve,
                                 cdsSpread3Y,
                                 cdsSpread5Y,
@@ -315,21 +315,21 @@ def loadHomogeneousSpreadCurves(valuation_date,
                                 cdsSpread10Y,
                                 num_credits):
 
-    maturity3Y = valuation_date.next_cds_date(36)
-    maturity5Y = valuation_date.next_cds_date(60)
-    maturity7Y = valuation_date.next_cds_date(84)
-    maturity10Y = valuation_date.next_cds_date(120)
+    maturity3Y = value_date.next_cds_date(36)
+    maturity5Y = value_date.next_cds_date(60)
+    maturity7Y = value_date.next_cds_date(84)
+    maturity10Y = value_date.next_cds_date(120)
 
     recovery_rate = 0.40
 
-    cds3Y = CDS(valuation_date, maturity3Y, cdsSpread3Y)
-    cds5Y = CDS(valuation_date, maturity5Y, cdsSpread5Y)
-    cds7Y = CDS(valuation_date, maturity7Y, cdsSpread7Y)
-    cds10Y = CDS(valuation_date, maturity10Y, cdsSpread10Y)
+    cds3Y = CDS(value_date, maturity3Y, cdsSpread3Y)
+    cds5Y = CDS(value_date, maturity5Y, cdsSpread5Y)
+    cds7Y = CDS(value_date, maturity7Y, cdsSpread7Y)
+    cds10Y = CDS(value_date, maturity10Y, cdsSpread10Y)
 
     contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             contracts,
                             libor_curve,
                             recovery_rate)
@@ -341,12 +341,12 @@ def loadHomogeneousSpreadCurves(valuation_date,
     return issuer_curves
 
 
-def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
+def loadHeterogeneousSpreadCurves(value_date, libor_curve):
 
-    maturity3Y = valuation_date.next_cds_date(36)
-    maturity5Y = valuation_date.next_cds_date(60)
-    maturity7Y = valuation_date.next_cds_date(84)
-    maturity10Y = valuation_date.next_cds_date(120)
+    maturity3Y = value_date.next_cds_date(36)
+    maturity5Y = value_date.next_cds_date(60)
+    maturity7Y = value_date.next_cds_date(84)
+    maturity10Y = value_date.next_cds_date(120)
 
     path = dirname(__file__)
     filename = "CDX_NA_IG_S7_SPREADS.csv"
@@ -365,13 +365,13 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(valuation_date, maturity3Y, spd3Y)
-        cds5Y = CDS(valuation_date, maturity5Y, spd5Y)
-        cds7Y = CDS(valuation_date, maturity7Y, spd7Y)
-        cds10Y = CDS(valuation_date, maturity10Y, spd10Y)
+        cds3Y = CDS(value_date, maturity3Y, spd3Y)
+        cds5Y = CDS(value_date, maturity5Y, spd5Y)
+        cds7Y = CDS(value_date, maturity7Y, spd7Y)
+        cds10Y = CDS(value_date, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(valuation_date,
+        issuer_curve = CDSCurve(value_date,
                                 cds_contracts,
                                 libor_curve,
                                 recovery_rate)
@@ -381,7 +381,7 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
     return issuer_curves
 
 
-def loadHomogeneousCDSCurves(valuation_date,
+def loadHomogeneousCDSCurves(value_date,
                              libor_curve,
                              cdsSpread3Y,
                              cdsSpread5Y,
@@ -389,21 +389,21 @@ def loadHomogeneousCDSCurves(valuation_date,
                              cdsSpread10Y,
                              num_credits):
 
-    maturity3Y = valuation_date.next_cds_date(36)
-    maturity5Y = valuation_date.next_cds_date(60)
-    maturity7Y = valuation_date.next_cds_date(84)
-    maturity10Y = valuation_date.next_cds_date(120)
+    maturity3Y = value_date.next_cds_date(36)
+    maturity5Y = value_date.next_cds_date(60)
+    maturity7Y = value_date.next_cds_date(84)
+    maturity10Y = value_date.next_cds_date(120)
 
     recovery_rate = 0.40
 
-    cds3Y = CDS(valuation_date, maturity3Y, cdsSpread3Y)
-    cds5Y = CDS(valuation_date, maturity5Y, cdsSpread5Y)
-    cds7Y = CDS(valuation_date, maturity7Y, cdsSpread7Y)
-    cds10Y = CDS(valuation_date, maturity10Y, cdsSpread10Y)
+    cds3Y = CDS(value_date, maturity3Y, cdsSpread3Y)
+    cds5Y = CDS(value_date, maturity5Y, cdsSpread5Y)
+    cds7Y = CDS(value_date, maturity7Y, cdsSpread7Y)
+    cds10Y = CDS(value_date, maturity10Y, cdsSpread10Y)
 
     contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             contracts,
                             libor_curve,
                             recovery_rate)
@@ -415,21 +415,21 @@ def loadHomogeneousCDSCurves(valuation_date,
     return issuer_curves
 
 
-def buildIborSingleCurve(valuation_date):
+def buildIborSingleCurve(value_date):
 
-    settlement_date = valuation_date.add_days(2)
+    settle_date = value_date.add_days(2)
     dcType = DayCountTypes.ACT_360
 
     depos = []
     fras = []
     swaps = []
 
-    maturity_date = settlement_date.add_months(1)
-    depo1 = IborDeposit(valuation_date, maturity_date, -0.00251, dcType)
+    maturity_date = settle_date.add_months(1)
+    depo1 = IborDeposit(value_date, maturity_date, -0.00251, dcType)
     depos.append(depo1)
 
     # Series of 1M futures
-    start_date = settlement_date.next_imm_date()
+    start_date = settle_date.next_imm_date()
     end_date = start_date.add_months(1)
     fra = IborFRA(start_date, end_date, -0.0023, dcType)
     fras.append(fra)
@@ -499,140 +499,140 @@ def buildIborSingleCurve(valuation_date):
     fixed_leg_type = SwapTypes.PAY
 
     #######################################
-    maturity_date = settlement_date.add_months(24)
+    maturity_date = settle_date.add_months(24)
     swap_rate = -0.001506
-    swap1 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap1 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap1)
 
     #######################################
-    maturity_date = settlement_date.add_months(36)
+    maturity_date = settle_date.add_months(36)
     swap_rate = -0.000185
-    swap2 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap2 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap2)
 
     #######################################
-    maturity_date = settlement_date.add_months(48)
+    maturity_date = settle_date.add_months(48)
     swap_rate = 0.001358
-    swap3 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap3 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap3)
 
     #######################################
-    maturity_date = settlement_date.add_months(60)
+    maturity_date = settle_date.add_months(60)
     swap_rate = 0.0027652
-    swap4 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap4 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap4)
 
     #######################################
-    maturity_date = settlement_date.add_months(72)
+    maturity_date = settle_date.add_months(72)
     swap_rate = 0.0041539
-    swap5 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap5 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap5)
 
     #######################################
-    maturity_date = settlement_date.add_months(84)
+    maturity_date = settle_date.add_months(84)
     swap_rate = 0.0054604
-    swap6 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap6 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap6)
 
     #######################################
-    maturity_date = settlement_date.add_months(96)
+    maturity_date = settle_date.add_months(96)
     swap_rate = 0.006674
-    swap7 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap7 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap7)
 
     #######################################
-    maturity_date = settlement_date.add_months(108)
+    maturity_date = settle_date.add_months(108)
     swap_rate = 0.007826
-    swap8 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap8 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap8)
 
     #######################################
-    maturity_date = settlement_date.add_months(120)
+    maturity_date = settle_date.add_months(120)
     swap_rate = 0.008821
-    swap9 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap9 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                      swap_rate, fixedFreq, dcType)
     swaps.append(swap9)
 
     #######################################
-    maturity_date = settlement_date.add_months(132)
+    maturity_date = settle_date.add_months(132)
     swap_rate = 0.0097379
-    swap10 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap10 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap10)
 
     #######################################
-    maturity_date = settlement_date.add_months(144)
+    maturity_date = settle_date.add_months(144)
     swap_rate = 0.0105406
-    swap11 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap11 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap11)
 
     #######################################
-    maturity_date = settlement_date.add_months(180)
+    maturity_date = settle_date.add_months(180)
     swap_rate = 0.0123927
-    swap12 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap12 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap12)
 
     #######################################
-    maturity_date = settlement_date.add_months(240)
+    maturity_date = settle_date.add_months(240)
     swap_rate = 0.0139882
-    swap13 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap13 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap13)
 
     #######################################
-    maturity_date = settlement_date.add_months(300)
+    maturity_date = settle_date.add_months(300)
     swap_rate = 0.0144972
-    swap14 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap14 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap14)
 
     #######################################
-    maturity_date = settlement_date.add_months(360)
+    maturity_date = settle_date.add_months(360)
     swap_rate = 0.0146081
-    swap15 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap15 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap15)
 
     #######################################
-    maturity_date = settlement_date.add_months(420)
+    maturity_date = settle_date.add_months(420)
     swap_rate = 0.01461897
-    swap16 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap16 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap16)
 
     #######################################
-    maturity_date = settlement_date.add_months(480)
+    maturity_date = settle_date.add_months(480)
     swap_rate = 0.014567455
-    swap17 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap17 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap17)
 
     #######################################
-    maturity_date = settlement_date.add_months(540)
+    maturity_date = settle_date.add_months(540)
     swap_rate = 0.0140826
-    swap18 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap18 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap18)
 
     #######################################
-    maturity_date = settlement_date.add_months(600)
+    maturity_date = settle_date.add_months(600)
     swap_rate = 0.01436822
-    swap19 = IborSwap(settlement_date, maturity_date, fixed_leg_type,
+    swap19 = IborSwap(settle_date, maturity_date, fixed_leg_type,
                       swap_rate, fixedFreq, dcType)
     swaps.append(swap19)
 
     ########################################
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     return libor_curve

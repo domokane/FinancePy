@@ -56,25 +56,25 @@ class IborCapFloor():
                  strike_rate: float,
                  lastFixing: Optional[float] = None,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
+                 dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
                  notional: float = ONE_MILLION,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Initialise IborCapFloor object. """
 
         check_argument_types(self.__init__, locals())
 
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
 
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
         else:
             maturity_date = start_date.add_tenor(maturity_date_or_tenor)
-            calendar = Calendar(self._calendar_type)
+            calendar = Calendar(self._cal_type)
             maturity_date = calendar.adjust(maturity_date,
-                                            self._bus_day_adjust_type)
+                                            self._bd_adjust_type)
 
         if start_date > maturity_date:
             raise FinError("Start date must be before maturity date")
@@ -85,9 +85,9 @@ class IborCapFloor():
         self._strike_rate = strike_rate
         self._lastFixing = lastFixing
         self._freq_type = freq_type
-        self._day_count_type = day_count_type
+        self._dc_type = dc_type
         self._notional = notional
-        self._date_gen_rule_type = date_gen_rule_type
+        self._dg_rule_type = dg_rule_type
 
         self._capFloorLetValues = []
         self._capFloorLetAlphas = []
@@ -106,9 +106,9 @@ class IborCapFloor():
         schedule = Schedule(self._start_date,
                             self._maturity_date,
                             self._freq_type,
-                            self._calendar_type,
-                            self._bus_day_adjust_type,
-                            self._date_gen_rule_type)
+                            self._cal_type,
+                            self._bd_adjust_type,
+                            self._dg_rule_type)
 
         self._capFloorLetDates = schedule._adjusted_dates
 
@@ -121,7 +121,7 @@ class IborCapFloor():
         self._value_date = value_date
         self._generate_dates()
 
-        self._day_counter = DayCount(self._day_count_type)
+        self._day_counter = DayCount(self._dc_type)
         num_options = len(self._capFloorLetDates)
         strike_rate = self._strike_rate
 
@@ -147,7 +147,7 @@ class IborCapFloor():
 
         if self._lastFixing is None:
             fwd_rate = libor_curve.fwd_rate(start_date, end_date,
-                                            self._day_count_type)
+                                            self._dc_type)
         else:
             fwd_rate = self._lastFixing
 
@@ -177,7 +177,7 @@ class IborCapFloor():
 
             df = libor_curve.df(end_date)
             fwd_rate = libor_curve.fwd_rate(start_date, end_date,
-                                            self._day_count_type)
+                                            self._dc_type)
 
             if self._option_type == FinCapFloorTypes.CAP:
                 intrinsic_value = df * alpha * max(fwd_rate - strike_rate, 0.0)
@@ -218,7 +218,7 @@ class IborCapFloor():
         alpha = self._day_counter.year_frac(capletStartDate, capletEndDate)[0]
 
         f = libor_curve.fwd_rate(capletStartDate, capletEndDate,
-                                 self._day_count_type)
+                                 self._dc_type)
 
         k = self._strike_rate
         df = libor_curve.df(capletEndDate)
@@ -308,7 +308,7 @@ class IborCapFloor():
         print("OPTION TYPE", str(self._option_type))
         print("STRIKE (%):", self._strike_rate * 100)
         print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._day_count_type))
+        print("DAY COUNT:", str(self._dc_type))
         print("VALUATION DATE", self._value_date)
 
         if len(self._capFloorLetValues) == 0:
@@ -352,7 +352,7 @@ class IborCapFloor():
         s += label_to_string("STRIKE COUPON", self._strike_rate * 100)
         s += label_to_string("OPTION TYPE", str(self._option_type))
         s += label_to_string("FREQUENCY", str(self._freq_type))
-        s += label_to_string("DAY COUNT", str(self._day_count_type), "")
+        s += label_to_string("DAY COUNT", str(self._dc_type), "")
         return s
 
 ###############################################################################

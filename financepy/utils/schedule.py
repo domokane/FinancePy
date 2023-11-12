@@ -29,41 +29,41 @@ class Schedule:
                  # This is UNADJUSTED (set flag to adjust it)
                  termination_date: Date,
                  freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  adjust_termination_date: bool = True,  # Default is to adjust
                  end_of_month: bool = False,  # All flow dates are EOM if True
                  first_date=None,  # First coupon date
                  next_to_last_date=None):  # Penultimate coupon date
         """ Create Schedule object which calculates a sequence of dates
-        following the ISDA convention for fixed income products, mainly swaps. 
+        following the ISDA convention for fixed income products, mainly swaps.
 
-        If the date gen rule type is FORWARD we get the unadjusted dates by stepping 
+        If the date gen rule type is FORWARD we get the unadjusted dates by stepping
         forward from the effective date in steps of months determined by the period
         tenor - i.e. the number of months between payments. We stop before we go past the
-        termination date. 
+        termination date.
 
-        If the date gen rule type is BACKWARD we get the unadjusted dates by 
-        stepping backward from the termination date in steps of months determined by 
-        the period tenor - i.e. the number of months between payments. We stop 
-        before we go past the effective date. 
+        If the date gen rule type is BACKWARD we get the unadjusted dates by
+        stepping backward from the termination date in steps of months determined by
+        the period tenor - i.e. the number of months between payments. We stop
+        before we go past the effective date.
 
         - If the EOM flag is false, and the start date is on the 31st then the
-        the unadjusted dates will fall on the 30 if a 30 is a previous date. 
-        - If the EOM flag is false and the start date is 28 Feb then all 
-        unadjusted dates will fall on the 28th. 
-        - If the EOM flag is false and the start date is 28 Feb then all 
+        the unadjusted dates will fall on the 30 if a 30 is a previous date.
+        - If the EOM flag is false and the start date is 28 Feb then all
+        unadjusted dates will fall on the 28th.
+        - If the EOM flag is false and the start date is 28 Feb then all
         unadjusted dates will fall on their respective EOM.
 
-        We then adjust all of the flow dates if they fall on a weekend or holiday 
-        according to the calendar specified. These dates are adjusted in 
+        We then adjust all of the flow dates if they fall on a weekend or holiday
+        according to the calendar specified. These dates are adjusted in
         accordance with the business date adjustment.
 
         The effective date is never adjusted as it is not a payment date.
-        The termination date is not automatically business day adjusted in a 
+        The termination date is not automatically business day adjusted in a
         swap - assuming it is a holiday date. This must be explicitly stated in
-        the trade confirm. However, it is adjusted in a CDS contract as standard. 
+        the trade confirm. However, it is adjusted in a CDS contract as standard.
 
         Inputs first_date and next_to_last_date are for managing long payment stubs
         at the start and end of the swap but *have not yet been implemented*. All
@@ -98,9 +98,9 @@ class Schedule:
                                " before termination date")
 
         self._freq_type = freq_type
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
 
         self._adjust_termination_date = adjust_termination_date
 
@@ -130,14 +130,14 @@ class Schedule:
         rules and also adjust these dates for holidays according to the
         specified business day convention and the specified calendar. """
 
-        calendar = Calendar(self._calendar_type)
+        calendar = Calendar(self._cal_type)
         frequency = annual_frequency(self._freq_type)
         num_months = int(12 / frequency)
 
         unadjusted_schedule_dates = []
         self._adjusted_dates = []
 
-        if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
+        if self._dg_rule_type == DateGenRuleTypes.BACKWARD:
 
             next_date = self._termination_date
             flow_num = 0
@@ -166,13 +166,13 @@ class Schedule:
             # termination date to fall on business days according to their cal
             for i in range(1, flow_num - 1):
                 dt = calendar.adjust(unadjusted_schedule_dates[flow_num - i - 1],
-                                     self._bus_day_adjust_type)
+                                     self._bd_adjust_type)
 
                 self._adjusted_dates.append(dt)
 
             self._adjusted_dates.append(self._termination_date)
 
-        elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
+        elif self._dg_rule_type == DateGenRuleTypes.FORWARD:
 
             # This needs checking
             next_date = self._effective_date
@@ -190,7 +190,7 @@ class Schedule:
             # The effective date is not adjusted as it is given
             for i in range(1, flow_num):
                 dt = calendar.adjust(unadjusted_schedule_dates[i],
-                                     self._bus_day_adjust_type)
+                                     self._bd_adjust_type)
 
                 self._adjusted_dates.append(dt)
 
@@ -205,13 +205,13 @@ class Schedule:
         if self._adjust_termination_date is True:
 
             self._termination_date = calendar.adjust(self._termination_date,
-                                                     self._bus_day_adjust_type)
+                                                     self._bd_adjust_type)
 
             self._adjusted_dates[-1] = self._termination_date
 
         #######################################################################
         # Check the resulting schedule to ensure that no two dates are the
-        # same in which case we remove the duplicate and that they are  
+        # same in which case we remove the duplicate and that they are
         # monotonic - this should never happen but ...
         #######################################################################
 
@@ -244,9 +244,9 @@ class Schedule:
         s += label_to_string("EFFECTIVE DATE", self._effective_date)
         s += label_to_string("END DATE", self._termination_date)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
-        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
+        s += label_to_string("DATEGENRULE", self._dg_rule_type)
         s += label_to_string("ADJUST TERM DATE", self._adjust_termination_date)
         s += label_to_string("END OF MONTH", self._end_of_month, "")
 

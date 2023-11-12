@@ -50,14 +50,14 @@ def test_BKExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book but does not
     # have the exact same dt so there are some differences
 
-    settlement_date = Date(1, 12, 2019)
+    settle_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    expiry_date = settlement_date.add_tenor("18m")
-    maturity_date = settlement_date.add_tenor("10Y")
+    expiry_date = settle_date.add_tenor("18m")
+    maturity_date = settle_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    dc_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
@@ -67,14 +67,14 @@ def test_BKExampleTwo():
     for i in range(1, num_flows):
         pcd = bond._cpn_dates[i-1]
         ncd = bond._cpn_dates[i]
-        if pcd < settlement_date and ncd > settlement_date:
-            flow_time = (pcd - settlement_date) / gDaysInYear
+        if pcd < settle_date and ncd > settle_date:
+            flow_time = (pcd - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
     for flow_date in bond._cpn_dates:
-        if flow_date > settlement_date:
-            flow_time = (flow_date - settlement_date) / gDaysInYear
+        if flow_date > settle_date:
+            flow_time = (flow_date - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -84,14 +84,14 @@ def test_BKExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_date - settlement_date) / gDaysInYear
-    t_exp = (expiry_date - settlement_date) / gDaysInYear
+    tmat = (maturity_date - settle_date) / gDaysInYear
+    t_exp = (expiry_date - settle_date) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settlement_date.add_years(times)
+    dates = settle_date.add_years(times)
     dfs = np.exp(-0.05*times)
-    curve = DiscountCurve(settlement_date, dates, dfs)
+    curve = DiscountCurve(settle_date, dates, dfs)
 
-    price = bond.clean_price_from_discount_curve(settlement_date, curve)
+    price = bond.clean_price_from_discount_curve(settle_date, curve)
     assert round(price, 4) == 99.5420
 
     sigma = 0.20

@@ -38,10 +38,10 @@ def test_bond_future_2():
     bond = Bond(issue_date, Date(15, 8, 2027), 0.0225, freq, basis)
     assert bond._maturity_date == Date(15, 8, 2027)
 
-    settlement_date = Date(10, 10, 2017)
+    settle_date = Date(10, 10, 2017)
     price = 99 + 1 / 32
 
-    yld = bond.yield_to_maturity(settlement_date, price)
+    yld = bond.yield_to_maturity(settle_date, price)
 
     assert round(yld, 4) == 0.0236
 
@@ -67,7 +67,7 @@ def test_bond_future_2():
     assert round(pip, 4) == 9162291.0800
 
     tia = bondFutureContract.total_invoice_amount(
-        settlement_date, bond, futures_price)
+        settle_date, bond, futures_price)
 
     assert round(tia, 4) == 9162294.5
 

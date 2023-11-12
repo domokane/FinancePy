@@ -46,13 +46,13 @@ class IborLMMProducts():
     """ This is the class for pricing Ibor products using the LMM. """
 
     def __init__(self,
-                 settlement_date: Date,
+                 settle_date: Date,
                  maturity_date: Date,
                  float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
@@ -60,25 +60,25 @@ class IborLMMProducts():
 
         check_argument_types(self.__init__, locals())
 
-        if settlement_date > maturity_date:
+        if settle_date > maturity_date:
             raise FinError("Settlement date must be before maturity date")
 
         """ Set up the grid for the Ibor rates that are to be simulated. These
         must be consistent with the floating rate leg of the product that is to
         be priced. """
 
-        self._start_date = settlement_date
-        self._gridDates = Schedule(settlement_date,
+        self._start_date = settle_date
+        self._gridDates = Schedule(settle_date,
                                    maturity_date,
                                    float_frequency_type,
                                    calendar_type,
-                                   bus_day_adjust_type,
-                                   date_gen_rule_type)._generate()
+                                   bd_adjust_type,
+                                   dg_rule_type)._generate()
 
         self._accrual_factors = []
-        self._float_day_count_type = float_day_count_type
+        self._float_dc_type = float_dc_type
 
-        basis = DayCount(self._float_day_count_type)
+        basis = DayCount(self._float_dc_type)
         prev_dt = self._gridDates[0]
 
         self._gridTimes = [0.0]
@@ -112,7 +112,7 @@ class IborLMMProducts():
         if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discount_curve._valuation_date != self._start_date:
+        if discount_curve._value_date != self._start_date:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         self._num_paths = num_paths
@@ -129,7 +129,7 @@ class IborLMMProducts():
             end_date = self._gridDates[i]
             fwd_rate = discount_curve.fwd_rate(start_date,
                                                end_date,
-                                               self._float_day_count_type)
+                                               self._float_dc_type)
             self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
@@ -193,7 +193,7 @@ class IborLMMProducts():
             start_date = self._gridDates[i-1]
             end_date = self._gridDates[i]
             fwd_rate = discount_curve.fwd_rate(start_date, end_date,
-                                               self._float_day_count_type)
+                                               self._float_dc_type)
             self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
@@ -251,7 +251,7 @@ class IborLMMProducts():
             end_date = self._gridDates[i]
             fwd_rate = discount_curve.forward_rate(start_date,
                                                    end_date,
-                                                   self._float_day_count_type)
+                                                   self._float_dc_type)
             self._forwardCurve.append(fwd_rate)
 
         self._forwardCurve = np.array(self._forwardCurve)
@@ -273,19 +273,19 @@ class IborLMMProducts():
 ###############################################################################
 
     def value_swaption(self,
-                       settlement_date: Date,
+                       settle_date: Date,
                        exercise_date: Date,
                        maturity_date: Date,
                        swaptionType: SwapTypes,
                        fixed_coupon: float,
                        fixed_frequency_type: FrequencyTypes,
-                       fixed_day_count_type: DayCountTypes,
+                       fixed_dc_type: DayCountTypes,
                        notional: float = ONE_MILLION,
                        float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                       float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                       calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                       bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                       date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                       float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                       cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                       bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                       dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Value a swaption in the LMM model using simulated paths of the
         forward curve. This relies on pricing the fixed leg of the swap and
         assuming that the floating leg will be worth par. As a result we only
@@ -299,12 +299,12 @@ class IborLMMProducts():
         # generated, the speed of pricing is not affected so this is not
         # strictly an urgent issue.
 
-        swaptionFloatDates = Schedule(settlement_date,
+        swaptionFloatDates = Schedule(settle_date,
                                       maturity_date,
                                       float_frequency_type,
                                       calendar_type,
-                                      bus_day_adjust_type,
-                                      date_gen_rule_type)._generate()
+                                      bd_adjust_type,
+                                      dg_rule_type)._generate()
 
         for swaptionDt in swaptionFloatDates:
             foundDt = False
@@ -315,12 +315,12 @@ class IborLMMProducts():
             if foundDt is False:
                 raise FinError("Swaption float leg not on grid.")
 
-        swaptionFixedDates = Schedule(settlement_date,
+        swaptionFixedDates = Schedule(settle_date,
                                       maturity_date,
                                       fixed_frequency_type,
                                       calendar_type,
-                                      bus_day_adjust_type,
-                                      date_gen_rule_type)._generate()
+                                      bd_adjust_type,
+                                      dg_rule_type)._generate()
 
         for swaptionDt in swaptionFixedDates:
             foundDt = False
@@ -358,24 +358,24 @@ class IborLMMProducts():
 ###############################################################################
 
     def value_cap_floor(self,
-                        settlement_date: Date,
+                        settle_date: Date,
                         maturity_date: Date,
                         capFloorType: FinCapFloorTypes,
                         capFloorRate: float,
                         frequencyType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                        day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+                        dc_type: DayCountTypes = DayCountTypes.ACT_360,
                         notional: float = ONE_MILLION,
-                        calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                        bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                        date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                        bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                        dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Value a cap or floor in the LMM. """
 
-        capFloorDates = Schedule(settlement_date,
+        capFloorDates = Schedule(settle_date,
                                  maturity_date,
                                  frequencyType,
                                  calendar_type,
-                                 bus_day_adjust_type,
-                                 date_gen_rule_type)._generate()
+                                 bd_adjust_type,
+                                 dg_rule_type)._generate()
 
         for capFloorletDt in capFloorDates:
             foundDt = False

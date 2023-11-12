@@ -27,9 +27,9 @@ class BondAnnuity:
                  maturity_date: Date,
                  cpn: float,
                  freq_type: FrequencyTypes,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360):
 
         check_argument_types(self.__init__, locals())
@@ -37,18 +37,18 @@ class BondAnnuity:
         self._maturity_date = maturity_date
         self._cpn = cpn
         self._freq_type = freq_type
-        self._frequency = annual_frequency(freq_type)
+        self._freq = annual_frequency(freq_type)
 
         # ISDA Style conventions
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
         self._day_count_convention_type = day_count_convention_type
 
         self._par = 100.0
 
         self._cpn_dates = []
-        self._settlement_date = Date(1, 1, 1900)
+        self._settle_date = Date(1, 1, 1900)
         self._accrued_interest = None
         self._accrued_days = 0.0
         self._alpha = 0.0
@@ -56,12 +56,12 @@ class BondAnnuity:
     ###########################################################################
 
     def clean_price_from_discount_curve(self,
-                                        settlement_date: Date,
+                                        settle_date: Date,
                                         discount_curve: DiscountCurve):
         """ Calculate the bond price using some discount curve to present-value
         the bond's cash flows. """
 
-        dirty_price = self.dirty_price_from_discount_curve(settlement_date,
+        dirty_price = self.dirty_price_from_discount_curve(settle_date,
                                                            discount_curve)
         accrued = self._accrued_interest * self._par
         clean_price = dirty_price - accrued
@@ -70,12 +70,12 @@ class BondAnnuity:
     ###########################################################################
 
     def dirty_price_from_discount_curve(self,
-                                        settlement_date: Date,
+                                        settle_date: Date,
                                         discount_curve: DiscountCurve):
         """ Calculate the bond price using some discount curve to present-value
         the bond's cash flows. """
 
-        self.calculate_payments(settlement_date, 1.0)
+        self.calculate_payments(settle_date, 1.0)
         pv = 0.0
 
         num_flows = len(self._cpn_dates)
@@ -91,30 +91,30 @@ class BondAnnuity:
     ###########################################################################
 
     def calculate_payments(self,
-                           settlement_date: Date,
+                           settle_date: Date,
                            face: (float)):
 
         # No need to generate flows if settlement date has not changed
-        if settlement_date == self._settlement_date:
+        if settle_date == self._settle_date:
             return
 
-        if settlement_date == self._maturity_date:
+        if settle_date == self._maturity_date:
             raise FinError("Settlement date is maturity date.")
 
-        self._settlement_date = settlement_date
-        bus_day_rule_type = BusDayAdjustTypes.FOLLOWING
-        date_gen_rule_type = DateGenRuleTypes.BACKWARD
+        self._settle_date = settle_date
+        bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+        dg_rule_type = DateGenRuleTypes.BACKWARD
 
-        self._cpn_dates = Schedule(settlement_date,
+        self._cpn_dates = Schedule(settle_date,
                                    self._maturity_date,
                                    self._freq_type,
-                                   self._calendar_type,
-                                   bus_day_rule_type,
-                                   date_gen_rule_type)._generate()
+                                   self._cal_type,
+                                   bd_adjust_type,
+                                   dg_rule_type)._generate()
 
         self._pcd = self._cpn_dates[0]
         self._ncd = self._cpn_dates[1]
-        self.accrued_interest(settlement_date, 1.0)
+        self.accrued_interest(settle_date, 1.0)
 
         self._flow_amounts = [0.0]
         basis = DayCount(self._day_count_convention_type)
@@ -130,13 +130,13 @@ class BondAnnuity:
     ###########################################################################
 
     def accrued_interest(self,
-                         settlement_date: Date,
+                         settle_date: Date,
                          face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
 
-        if settlement_date != self._settlement_date:
-            self.calculate_payments(settlement_date, 1.0)
+        if settle_date != self._settle_date:
+            self.calculate_payments(settle_date, 1.0)
 
         if len(self._cpn_dates) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -144,11 +144,11 @@ class BondAnnuity:
         dc = DayCount(self._day_count_convention_type)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
-                                            settlement_date,
+                                            settle_date,
                                             self._ncd,
-                                            self._frequency)
+                                            self._freq)
 
-        self._alpha = 1.0 - acc_factor * self._frequency
+        self._alpha = 1.0 - acc_factor * self._freq
 
         self._accrued_interest = acc_factor * face * self._cpn
         self._accrued_days = num
@@ -157,12 +157,12 @@ class BondAnnuity:
     ###########################################################################
 
     def print_payments(self,
-                       settlement_date: Date,
+                       settle_date: Date,
                        face: (float)):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
-        self.calculate_payments(settlement_date, face)
+        self.calculate_payments(settle_date, face)
 
         num_flows = len(self._cpn_dates)
         for i in range(1, num_flows):
@@ -179,9 +179,9 @@ class BondAnnuity:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("MATURITY DATE", self._maturity_date)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUS_DAY_RULE", self._bus_day_adjust_type)
-        s += label_to_string("DATE_GEN_RULE", self._date_gen_rule_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUS_DAY_RULE", self._bd_adjust_type)
+        s += label_to_string("DATE_GEN_RULE", self._dg_rule_type)
 
         return s
 

@@ -17,12 +17,12 @@ risk_free_rate = 0.06
 dividend_yield = 0.04
 volatility = 0.40
 
-valuation_date = Date(1, 1, 2016)
+value_date = Date(1, 1, 2016)
 expiry_date = Date(1, 1, 2017)
 
 model = BlackScholes(volatility)
-discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
+dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
 num_steps = 100
 
@@ -42,7 +42,7 @@ def test_european_put():
         dividend_curve,
         volatility,
         num_steps,
-        valuation_date,
+        value_date,
         payoff,
         expiry_date,
         payoff,
@@ -63,7 +63,7 @@ def test_american_put():
         dividend_curve,
         volatility,
         num_steps,
-        valuation_date,
+        value_date,
         payoff,
         expiry_date,
         payoff,
@@ -84,7 +84,7 @@ def test_european_call():
         dividend_curve,
         volatility,
         num_steps,
-        valuation_date,
+        value_date,
         payoff,
         expiry_date,
         payoff,
@@ -105,7 +105,7 @@ def test_american_call():
         dividend_curve,
         volatility,
         num_steps,
-        valuation_date,
+        value_date,
         payoff,
         expiry_date,
         payoff,

@@ -61,13 +61,13 @@
 #                  swaptionType,
 #                  fixed_coupon,
 #                  fixed_frequency_type,
-#                  fixed_day_count_type,
+#                  fixed_dc_type,
 #                  notional=ONE_MILLION,
 #                  float_frequency_type=FrequencyTypes.QUARTERLY,
-#                  float_day_count_type=DayCountTypes.THIRTY_E_360,
+#                  float_dc_type=DayCountTypes.THIRTY_E_360,
 #                  calendar_type=CalendarTypes.WEEKEND,
-#                  bus_day_adjust_type=BusDayAdjustTypes.FOLLOWING,
-#                  date_gen_rule_type=DateGenRuleTypes.BACKWARD):
+#                  bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
+#                  dg_rule_type=DateGenRuleTypes.BACKWARD):
 #         """ Create a Bermudan swaption contract. This is an option to enter
 #         into a swap at a fixed coupon on all of the fixed leg coupon dates
 #         until the exercise date. """
@@ -78,20 +78,20 @@
 #         if exercise_type not in FinSwaptionExerciseTypes:
 #             raise FinError("Exercise type must be a FinSwaptionExerciseTypes")
 
-#         if fixed_day_count_type not in DayCountTypes:
+#         if fixed_dc_type not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Fixed Day Count Rule type " +
-#                 str(fixed_day_count_type))
+#                 str(fixed_dc_type))
 
 #         if fixed_frequency_type not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Fixed Frequency type " +
 #                 str(fixed_frequency_type))
 
-#         if float_day_count_type not in DayCountTypes:
+#         if float_dc_type not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Float Day Count Rule type " +
-#                 str(float_day_count_type))
+#                 str(float_dc_type))
 
 #         if float_frequency_type not in FrequencyTypes:
 #             raise FinError(
@@ -101,28 +101,28 @@
 #         if calendar_type not in CalendarTypes:
 #             raise FinError("Unknown Calendar type " + str(calendar_type))
 
-#         if bus_day_adjust_type not in BusDayAdjustTypes:
+#         if bd_adjust_type not in BusDayAdjustTypes:
 #             raise FinError(
 #                 "Unknown Business Day Adjust type " +
-#                 str(bus_day_adjust_type))
+#                 str(bd_adjust_type))
 
-#         if date_gen_rule_type not in DateGenRuleTypes:
+#         if dg_rule_type not in DateGenRuleTypes:
 #             raise FinError(
 #                 "Unknown Date Gen Rule type " +
-#                 str(date_gen_rule_type))
+#                 str(dg_rule_type))
 
 #         self._exercise_date = exercise_date
 #         self._maturity_date = maturity_date
 #         self._fixed_coupon = fixed_coupon
-#         self._fixed_frequency_type = fixed_frequency_type
-#         self._fixed_day_count_type = fixed_day_count_type
+#         self._fixed_freq_type = fixed_frequency_type
+#         self._fixed_dc_type = fixed_dc_type
 #         self._notional = notional
-#         self._float_frequency_type = float_frequency_type
-#         self._float_day_count_type = float_day_count_type
+#         self._float_freq_type = float_frequency_type
+#         self._float_dc_type = float_dc_type
 
-#         self._calendar_type = calendar_type
-#         self._bus_day_adjust_type = bus_day_adjust_type
-#         self._date_gen_rule_type = date_gen_rule_type
+#         self._cal_type = cal_type
+#         self._bd_adjust_type = bd_adjust_type
+#         self._dg_rule_type = dg_rule_type
 
 #         self._pv01 = None
 #         self._fwdSwapRate = None
@@ -132,7 +132,7 @@
 # ###############################################################################
 
 #     def value(self,
-#               valuation_date,
+#               value_date,
 #               discount_curve,
 #               model):
 #         """ Value the bermuda swaption. This is done using the specified
@@ -145,24 +145,24 @@
 #         swap = IborSwap(self._exercise_date,
 #                             self._maturity_date,
 #                             self._fixed_coupon,
-#                             self._fixed_frequency_type,
-#                             self._fixed_day_count_type,
+#                             self._fixed_freq_type,
+#                             self._fixed_dc_type,
 #                             self._notional,
 #                             float_spread,
-#                             self._float_frequency_type,
-#                             self._float_day_count_type,
+#                             self._float_freq_type,
+#                             self._float_dc_type,
 #                             payFixedFlag,
-#                             self._calendar_type,
-#                             self._bus_day_adjust_type,
-#                             self._date_gen_rule_type)
+#                             self._cal_type,
+#                             self._bd_adjust_type,
+#                             self._dg_rule_type)
 
 #         swap.generate_flows()
 #         cpn_times = []
 #         cpn_amounts = []
 
-#         for iFlow in range(1, len(self._swap._adjustedFixedDates)):
-#             flow_date= swap._adjustedFixedDates[iFlow]
-#             cpn_time = (flow_date - settlement_date) / gDaysInYear
+#         for iFlow in range(1, len(self._swap._adjusted_fixed_dates)):
+#             flow_date= swap._adjusted_fixed_dates[iFlow]
+#             cpn_time = (flow_date - settle_date) / gDaysInYear
 #             cpn_flow = swap._fixedFlows[iFlow-1] / self._notional
 #             cpn_times.append(cpn_time)
 #             cpn_amounts.append(cpn_flow)
@@ -173,7 +173,7 @@
 #         # Generate bond call times and prices
 #         call_times = []
 #         for dt in self._call_dates:
-#             call_time = (dt - settlement_date) / gDaysInYear
+#             call_time = (dt - settle_date) / gDaysInYear
 #             call_times.append(call_time)
 #         call_times = np.array(call_times)
 #         call_prices = np.array(self._call_prices)
@@ -187,16 +187,16 @@
 #             putPrice = 100.0
 
 #         put_times = []
-#         for putDate in swap._adjustedFixedDates[1:]:
+#         for putDate in swap._adjusted_fixed_dates[1:]:
 #             if putDate <= self._exercise_date:
-#                 put_time = (putDate - settlement_date) / gDaysInYear
+#                 put_time = (putDate - settle_date) / gDaysInYear
 #                 put_times.append(put_time)
 
 #         put_times = np.array(put_times)
 #         put_prices = np.array(self._put_prices)
 
 #         maturity_date = self._bond._maturity_date
-#         tmat = (maturity_date - settlement_date) / gDaysInYear
+#         tmat = (maturity_date - settle_date) / gDaysInYear
 #         df_times = discount_curve._times
 #         df_values = discount_curve._values
 
@@ -257,7 +257,7 @@
 #         s += label_to_string("EXERCISE DATE", self._exercise_date)
 #         s += label_to_string("COUPON", self._cpn)
 #         s += label_to_string("FREQUENCY", self._freq_type)
-#         s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+#         s += label_to_string("DAY COUNT TYPE", self._dc_type)
 #         s += label_to_string("FACE AMOUNT", self._face)
 #         s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
 #         s += label_to_string("START CONVERT DATE", self._start_convert_date)

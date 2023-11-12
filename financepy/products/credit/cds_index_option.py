@@ -37,10 +37,10 @@ class CDSIndexOption:
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract."""
 
@@ -62,11 +62,11 @@ class CDSIndexOption:
         self._notional = notional
         self._long_protection = long_protection
 
-        self._day_count_type = day_count_type
-        self._date_gen_rule_type = date_gen_rule_type
-        self._calendar_type = calendar_type
+        self._dc_type = dc_type
+        self._dg_rule_type = dg_rule_type
+        self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bus_day_adjust_type = bus_day_adjust_type
+        self._bd_adjust_type = bd_adjust_type
 
         self._cds_contract = CDS(self._expiry_date,
                                  self._maturity_date,
@@ -74,10 +74,10 @@ class CDSIndexOption:
                                  1.0,
                                  self._long_protection,
                                  self._freq_type,
-                                 self._day_count_type,
-                                 self._calendar_type,
-                                 self._bus_day_adjust_type,
-                                 self._date_gen_rule_type)
+                                 self._dc_type,
+                                 self._cal_type,
+                                 self._bd_adjust_type,
+                                 self._dg_rule_type)
 
 ###############################################################################
 
@@ -308,7 +308,7 @@ class CDSIndexOption:
         intH = 0.0
         intMaxH = 0.0
 
-        day_count = DayCount(self._day_count_type)
+        day_count = DayCount(self._dc_type)
 
         #  Previous coupon date is last coupon date before valuation date
         for dt in flow_dates:
@@ -355,10 +355,10 @@ class CDSIndexOption:
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("LONG PROTECTION", self._long_protection)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAYCOUNT", self._day_count_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
-        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("DAYCOUNT", self._dc_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
+        s += label_to_string("DATEGENRULE", self._dg_rule_type)
         return s
 
 ###############################################################################

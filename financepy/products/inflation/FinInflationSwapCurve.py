@@ -192,9 +192,9 @@ class InflationSwapCurve(DiscountCurve):
 
             # Swaps must have same cash flows for bootstrap to work
             longestSwap = ibor_swaps[-1]
-            longestSwapCpnDates = longestSwap._adjustedFixedDates
+            longestSwapCpnDates = longestSwap._adjusted_fixed_dates
             for swap in ibor_swaps[0:-1]:
-                swapCpnDates = swap._adjustedFixedDates
+                swapCpnDates = swap._adjusted_fixed_dates
                 num_flows = len(swapCpnDates)
                 for iFlow in range(0, num_flows):
                     if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:
@@ -233,7 +233,7 @@ class InflationSwapCurve(DiscountCurve):
         self._usedDeposits = ibor_deposits
         self._usedFRAs = ibor_fras
         self._usedSwaps = ibor_swaps
-        self._day_count_type = None
+        self._dc_type = None
 
 ###############################################################################
 
@@ -248,16 +248,16 @@ class InflationSwapCurve(DiscountCurve):
 
         # time zero is now.
         tmat = 0.0
-        dfMat = 1.0
+        df_mat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, dfMat)
+        self._dfs = np.append(self._dfs, df_mat)
 
         for depo in self._usedDeposits:
-            dfSettle = self.df(depo._start_date)
-            dfMat = depo._maturity_df() * dfSettle
+            df_settle = self.df(depo._start_date)
+            df_mat = depo._maturity_df() * df_settle
             tmat = (depo._maturity_date - self._value_date) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfs = np.append(self._dfs, dfMat)
+            self._dfs = np.append(self._dfs, df_mat)
 
         oldtmat = tmat
 
@@ -270,15 +270,15 @@ class InflationSwapCurve(DiscountCurve):
             # solve for 2 discount factors simultaneously using root search
 
             if tset < oldtmat and tmat > oldtmat:
-                dfMat = fra.maturity_df(self)
+                df_mat = fra.maturity_df(self)
                 self._times = np.append(self._times, tmat)
-                self._dfs = np.append(self._dfs, dfMat)
+                self._dfs = np.append(self._dfs, df_mat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfs = np.append(self._dfs, dfMat)
+                self._dfs = np.append(self._dfs, df_mat)
 
                 argtuple = (self, self._value_date, fra)
-                dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
+                df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
                                         args=argtuple, tol=swaptol,
                                         maxiter=50, fprime2=None)
 
@@ -289,11 +289,11 @@ class InflationSwapCurve(DiscountCurve):
             tmat = (maturity_date - self._value_date) / gDaysInYear
 
             self._times = np.append(self._times, tmat)
-            self._dfs = np.append(self._dfs, dfMat)
+            self._dfs = np.append(self._dfs, df_mat)
 
             argtuple = (self, self._value_date, swap)
 
-            dfMat = optimize.newton(_f, x0=dfMat, fprime=None, args=argtuple,
+            df_mat = optimize.newton(_f, x0=df_mat, fprime=None, args=argtuple,
                                     tol=swaptol, maxiter=50, fprime2=None,
                                     full_output=False)
 
@@ -312,16 +312,16 @@ class InflationSwapCurve(DiscountCurve):
 
         # time zero is now.
         tmat = 0.0
-        dfMat = 1.0
+        df_mat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, dfMat)
+        self._dfs = np.append(self._dfs, df_mat)
 
         for depo in self._usedDeposits:
-            dfSettle = self.df(depo._start_date)
-            dfMat = depo._maturity_df() * dfSettle
+            df_settle = self.df(depo._start_date)
+            df_mat = depo._maturity_df() * df_settle
             tmat = (depo._maturity_date - self._value_date) / gDaysInYear
             self._times = np.append(self._times, tmat)
-            self._dfs = np.append(self._dfs, dfMat)
+            self._dfs = np.append(self._dfs, df_mat)
 
         oldtmat = tmat
 
@@ -334,15 +334,15 @@ class InflationSwapCurve(DiscountCurve):
             # solve for 2 discount factors simultaneously using root search
 
             if tset < oldtmat and tmat > oldtmat:
-                dfMat = fra.maturity_df(self)
+                df_mat = fra.maturity_df(self)
                 self._times = np.append(self._times, tmat)
-                self._dfs = np.append(self._dfs, dfMat)
+                self._dfs = np.append(self._dfs, df_mat)
             else:
                 self._times = np.append(self._times, tmat)
-                self._dfs = np.append(self._dfs, dfMat)
+                self._dfs = np.append(self._dfs, df_mat)
 
                 argtuple = (self, self._value_date, fra)
-                dfMat = optimize.newton(_g, x0=dfMat, fprime=None,
+                df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
                                         args=argtuple, tol=swaptol,
                                         maxiter=50, fprime2=None)
 
@@ -371,7 +371,7 @@ class InflationSwapCurve(DiscountCurve):
         # We use the longest swap assuming it has a superset of ALL of the
         # swap flow dates used in the curve construction
         longestSwap = self._usedSwaps[-1]
-        couponDates = longestSwap._adjustedFixedDates
+        couponDates = longestSwap._adjusted_fixed_dates
         num_flows = len(couponDates)
 
         # Find where first coupon without discount factor starts
@@ -386,31 +386,31 @@ class InflationSwapCurve(DiscountCurve):
             raise FinError("Found start is false. Swaps payments inside FRAs")
 
         swap_rates = []
-        swapTimes = []
+        swap_times = []
 
         # I use the last coupon date for the swap rate interpolation as this
         # may be different from the maturity date due to a holiday adjustment
         # and the swap rates need to align with the coupon payment dates
         for swap in self._usedSwaps:
             swap_rate = swap._fixed_coupon
-            maturity_date = swap._adjustedFixedDates[-1]
+            maturity_date = swap._adjusted_fixed_dates[-1]
             tswap = (maturity_date - self._value_date) / gDaysInYear
-            swapTimes.append(tswap)
+            swap_times.append(tswap)
             swap_rates.append(swap_rate)
 
         interpolatedSwapRates = [0.0]
-        interpolatedSwapTimes = [0.0]
+        interpolatedswap_times = [0.0]
 
         for dt in couponDates[1:]:
             swapTime = (dt - self._value_date) / gDaysInYear
-            swap_rate = np.interp(swapTime, swapTimes, swap_rates)
+            swap_rate = np.interp(swapTime, swap_times, swap_rates)
             interpolatedSwapRates.append(swap_rate)
-            interpolatedSwapTimes.append(swapTime)
+            interpolatedswap_times.append(swapTime)
 
         # Do I need this line ?
         interpolatedSwapRates[0] = interpolatedSwapRates[1]
 
-#        print("Interpolated swap times:", interpolatedSwapTimes)
+#        print("Interpolated swap times:", interpolatedswap_times)
 #        print("Interpolated swap rates:", interpolatedSwapRates)
 
         accrual_factors = longestSwap._fixed_year_fracs
@@ -418,8 +418,8 @@ class InflationSwapCurve(DiscountCurve):
         acc = 0.0
         df = 1.0
         pv01 = 0.0
-        dfSettle = self.df(longestSwap._start_date)
-#        print("SETTLE", dfSettle)
+        df_settle = self.df(longestSwap._start_date)
+#        print("SETTLE", df_settle)
 
         for i in range(1, start_index):
             dt = couponDates[i]
@@ -436,15 +436,15 @@ class InflationSwapCurve(DiscountCurve):
             acc = accrual_factors[i-1]
             pv01End = (acc * swap_rate + 1.0)
 
-            dfMat = (dfSettle - swap_rate * pv01) / pv01End
+            df_mat = (df_settle - swap_rate * pv01) / pv01End
 
 #            print("IN: %12s %12.10f %12.10f %12.10f %12.10f OUT: %14.12f" %
-#                  (dt, swap_rate, acc, pv01, pv01End, dfMat))
+#                  (dt, swap_rate, acc, pv01, pv01End, df_mat))
 
             self._times = np.append(self._times, tmat)
-            self._dfs = np.append(self._dfs, dfMat)
+            self._dfs = np.append(self._dfs, df_mat)
 
-            pv01 += acc * dfMat
+            pv01 += acc * df_mat
 
 #        print(self._times)
 #        print(self._dfs)

@@ -46,11 +46,11 @@ class DiscountCurvePWF(DiscountCurve):
         self._zero_dates = zero_dates
         self._zero_rates = np.array(zero_rates)
         self._freq_type = freq_type
-        self._day_count_type = day_count_type
+        self._dc_type = day_count_type
 
         dc_times = times_from_dates(zero_dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         self._times = np.array(dc_times)
 
@@ -131,7 +131,7 @@ class DiscountCurvePWF(DiscountCurve):
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
@@ -139,7 +139,7 @@ class DiscountCurvePWF(DiscountCurve):
                               zero_rates,
                               dc_times,
                               self._freq_type,
-                              self._day_count_type)
+                              self._dc_type)
 
         return df
 

@@ -34,14 +34,14 @@ class FinFixedFixedXCcySwap
                  fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
                  fixed_freq_type: FrequencyTypes,
-                 fixed_day_count_type: DayCountTypes,
+                 fixed_dc_type: DayCountTypes,
                  float_spread: float = 0.0,
                  float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  notional: float = ONE_MILLION,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -61,7 +61,7 @@ class FinFixedFixedXCcySwap
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -72,17 +72,17 @@ class FinFixedFixedXCcySwap
         self._fixed_coupon = fixed_coupon
         self._float_spread = float_spread
 
-        self._fixed_frequency_type = fixed_freq_type
-        self._float_frequency_type = float_freq_type
+        self._fixed_freq_type = fixed_freq_type
+        self._float_freq_type = float_freq_type
 
-        self._fixed_day_count_type = fixed_day_count_type
-        self._float_day_count_type = float_day_count_type
+        self._fixed_dc_type = fixed_dc_type
+        self._float_dc_type = float_dc_type
 
         self._fixed_leg_type = fixed_leg_type
 
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
 
         # These are generated immediately as they are for the entire
         # life of the swap. Given a valuation date we can determine
@@ -90,12 +90,12 @@ class FinFixedFixedXCcySwap
         self._generate_fixed_leg_payment_dates()
         self._generate_float_leg_payment_dates()
 
-        self._adjustedMaturityDate = self._adjustedFixedDates[-1]
+        self._adjustedMaturityDate = self._adjusted_fixed_dates[-1]
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
         self._lastPaymentDate = self._maturity_date
-        if self._adjustedFixedDates[-1] > self._lastPaymentDate:
-            self._lastPaymentDate = self._adjustedFixedDates[-1]
+        if self._adjusted_fixed_dates[-1] > self._lastPaymentDate:
+            self._lastPaymentDate = self._adjusted_fixed_dates[-1]
 
         if self._adjustedFloatDates[-1] > self._lastPaymentDate:
             self._lastPaymentDate = self._adjustedFloatDates[-1]
@@ -150,13 +150,13 @@ class FinFixedFixedXCcySwap
     def _generate_fixed_leg_payment_dates(self):
         """ Generate the fixed leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
-        self._adjustedFixedDates = FinSchedule(
+        self._adjusted_fixed_dates = FinSchedule(
             self._effective_date,
             self._termination_date,
-            self._fixed_frequency_type,
-            self._calendar_type,
-            self._bus_day_adjust_type,
-            self._date_gen_rule_type)._generate()
+            self._fixed_freq_type,
+            self._cal_type,
+            self._bd_adjust_type,
+            self._dg_rule_type)._generate()
 
 ##########################################################################
 
@@ -166,19 +166,19 @@ class FinFixedFixedXCcySwap
         self._adjustedFloatDates = FinSchedule(
             self._effective_date,
             self._termination_date,
-            self._float_frequency_type,
-            self._calendar_type,
-            self._bus_day_adjust_type,
-            self._date_gen_rule_type)._generate()
+            self._float_freq_type,
+            self._cal_type,
+            self._bd_adjust_type,
+            self._dg_rule_type)._generate()
 
 ##########################################################################
 
     def fixed_dates(self):
         """ return a vector of the fixed leg payment dates """
-        if self._adjustedFixedDates is None:
+        if self._adjusted_fixed_dates is None:
             raise FinError("Fixed dates have not been generated")
 
-        return self._adjustedFixedDates[1:]
+        return self._adjusted_fixed_dates[1:]
 
 ##########################################################################
 
@@ -235,12 +235,12 @@ class FinFixedFixedXCcySwap
         self._fixedFlowPVs = []
         self._fixed_total_pv = []
 
-        day_counter = FinDayCount(self._fixed_day_count_type)
+        day_counter = FinDayCount(self._fixed_dc_type)
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. """
         start_index = 0
-        while self._adjustedFixedDates[start_index] < value_date:
+        while self._adjusted_fixed_dates[start_index] < value_date:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
@@ -254,12 +254,12 @@ class FinFixedFixedXCcySwap
         self._dfValuationDate = discount_curve.df(value_date)
 
         pv = 0.0
-        prev_dt = self._adjustedFixedDates[start_index - 1]
+        prev_dt = self._adjusted_fixed_dates[start_index - 1]
         df_discount = 1.0
-        if len(self._adjustedFixedDates) == 1:
+        if len(self._adjusted_fixed_dates) == 1:
             return 0.0
 
-        for next_dt in self._adjustedFixedDates[start_index:]:
+        for next_dt in self._adjusted_fixed_dates[start_index:]:
             alpha = day_counter.year_frac(prev_dt, next_dt)[0]
             df_discount = discount_curve.df(next_dt) / self._dfValuationDate
             flow = self._fixed_coupon * alpha * self._notional
@@ -287,12 +287,12 @@ class FinFixedFixedXCcySwap
         self._fixed_year_fracs = []
         self._fixedFlows = []
 
-        day_counter = FinDayCount(self._fixed_day_count_type)
+        day_counter = FinDayCount(self._fixed_dc_type)
 
         """ Now PV fixed leg flows. """
-        prev_dt = self._adjustedFixedDates[0]
+        prev_dt = self._adjusted_fixed_dates[0]
 
-        for next_dt in self._adjustedFixedDates[1:]:
+        for next_dt in self._adjusted_fixed_dates[1:]:
             alpha = day_counter.year_frac(prev_dt, next_dt)[0]
             flow = self._fixed_coupon * alpha * self._notional
             prev_dt = next_dt
@@ -318,7 +318,7 @@ class FinFixedFixedXCcySwap
         """ The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. """
         start_index = 0
-        while self._adjustedFixedDates[start_index] < value_date:
+        while self._adjusted_fixed_dates[start_index] < value_date:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
@@ -331,7 +331,7 @@ class FinFixedFixedXCcySwap
         df = 1.0
         alpha = 1.0 / m
 
-        for _ in self._adjustedFixedDates[start_index:]:
+        for _ in self._adjusted_fixed_dates[start_index:]:
             df = df / (1.0 + alpha * flat_swap_rate)
             flatPV01 += df * alpha
 
@@ -361,7 +361,7 @@ class FinFixedFixedXCcySwap
         self._floatTotalPV = []
         self._firstFixingRate = first_fixing_rate
 
-        basis = FinDayCount(self._float_day_count_type)
+        basis = FinDayCount(self._float_dc_type)
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the start date. """
@@ -452,8 +452,8 @@ class FinFixedFixedXCcySwap
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
         print("COUPON (%):", self._fixed_coupon * 100)
-        print("FIXED LEG FREQUENCY:", str(self._fixed_frequency_type))
-        print("FIXED LEG DAY COUNT:", str(self._fixed_day_count_type))
+        print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
+        print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
         print("VALUATION DATE", self._value_date)
 
         if len(self._fixedFlows) == 0:
@@ -479,7 +479,7 @@ class FinFixedFixedXCcySwap
                "-"))
 
         iFlow = 0
-        for payment_date in self._adjustedFixedDates[start_index:]:
+        for payment_date in self._adjusted_fixed_dates[start_index:]:
             print("%15s %10.7f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_date,
                    self._fixed_year_fracs[iFlow],
@@ -499,8 +499,8 @@ class FinFixedFixedXCcySwap
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
         print("COUPON (%):", self._fixed_coupon * 100)
-        print("FIXED LEG FREQUENCY:", str(self._fixed_frequency_type))
-        print("FIXED LEG DAY COUNT:", str(self._fixed_day_count_type))
+        print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
+        print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
 
         if len(self._fixedFlows) == 0:
             print("Fixed Flows not calculated.")
@@ -512,7 +512,7 @@ class FinFixedFixedXCcySwap
         start_index = 1
 
         iFlow = 0
-        for payment_date in self._adjustedFixedDates[start_index:]:
+        for payment_date in self._adjusted_fixed_dates[start_index:]:
             print("%15s %12.8f %12.2f" %
                   (payment_date,
                    self._fixed_year_fracs[iFlow],
@@ -530,8 +530,8 @@ class FinFixedFixedXCcySwap
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
         print("SPREAD COUPON (%):", self._float_spread * 100)
-        print("FLOAT LEG FREQUENCY:", str(self._float_frequency_type))
-        print("FLOAT LEG DAY COUNT:", str(self._float_day_count_type))
+        print("FLOAT LEG FREQUENCY:", str(self._float_freq_type))
+        print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
         print("VALUATION DATE", self._value_date)
 
         if len(self._floatFlows) == 0:
@@ -582,13 +582,13 @@ class FinFixedFixedXCcySwap
         s += label_to_string("SWAP TYPE", self._swapType)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)
         s += label_to_string("FLOAT SPREAD", self._float_spread)
-        s += label_to_string("FIXED FREQUENCY", self._fixed_frequency_type)
-        s += label_to_string("FLOAT FREQUENCY", self._float_frequency_type)
-        s += label_to_string("FIXED DAY COUNT", self._fixed_day_count_type)
-        s += label_to_string("FLOAT DAY COUNT", self._float_day_count_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUS DAY ADJUST", self._bus_day_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._date_gen_rule_type)
+        s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)
+        s += label_to_string("FLOAT FREQUENCY", self._float_freq_type)
+        s += label_to_string("FIXED DAY COUNT", self._fixed_dc_type)
+        s += label_to_string("FLOAT DAY COUNT", self._float_dc_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
         return s
 
 ###############################################################################

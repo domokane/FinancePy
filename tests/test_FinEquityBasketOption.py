@@ -10,11 +10,11 @@ from financepy.products.equity.equity_basket_option import EquityBasketOption
 import numpy as np
 
 
-valuation_date = Date(1, 1, 2015)
+value_date = Date(1, 1, 2015)
 expiry_date = Date(1, 1, 2016)
 volatility = 0.30
 interest_rate = 0.05
-discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
+discount_curve = DiscountCurveFlat(value_date, interest_rate)
 num_assets = 5
 beta = 0.999999
 betas = np.ones(num_assets) * beta
@@ -29,13 +29,13 @@ def test_homogeneous_call():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
     value = call_option.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -45,7 +45,7 @@ def test_homogeneous_call():
     assert round(value, 4) == 13.6164
 
     value_mc = call_option.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -63,13 +63,13 @@ def test_homogeneous_put():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
     value = call_option.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -79,7 +79,7 @@ def test_homogeneous_put():
     assert round(value, 4) == 9.7344
 
     value_mc = call_option.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -97,13 +97,13 @@ def test_inhomogeneous_call():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
     value = call_option.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -113,7 +113,7 @@ def test_inhomogeneous_call():
     assert round(value, 4) == 13.6783
 
     value_mc = call_option.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -131,13 +131,13 @@ def test_inhomogeneous_put():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
     value = call_option.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -147,7 +147,7 @@ def test_inhomogeneous_put():
     assert round(value, 4) == 7.9126
 
     value_mc = call_option.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,

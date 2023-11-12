@@ -36,9 +36,9 @@ class BondMortgage:
                  end_date: Date,
                  principal: float,
                  freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Create the mortgage using start and end dates and principal. """
 
@@ -51,17 +51,17 @@ class BondMortgage:
         self._end_date = end_date
         self._principal = principal
         self._freq_type = freq_type
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
         self._day_count_convention_type = day_count_convention_type
 
         self._schedule = Schedule(start_date,
                                   end_date,
                                   self._freq_type,
-                                  self._calendar_type,
-                                  self._bus_day_adjust_type,
-                                  self._date_gen_rule_type)
+                                  self._cal_type,
+                                  self._bd_adjust_type,
+                                  self._dg_rule_type)
 
 ###############################################################################
 
@@ -117,9 +117,9 @@ class BondMortgage:
         print("MATURITY DATE:", self._end_date)
         print("MORTGAGE TYPE:", self._mortgage_type)
         print("FREQUENCY:", self._freq_type)
-        print("CALENDAR:", self._calendar_type)
-        print("BUSDAYRULE:", self._bus_day_adjust_type)
-        print("DATEGENRULE:", self._date_gen_rule_type)
+        print("CALENDAR:", self._cal_type)
+        print("BUSDAYRULE:", self._bd_adjust_type)
+        print("DATEGENRULE:", self._dg_rule_type)
 
         num_flows = len(self._schedule._adjusted_dates)
 
@@ -144,9 +144,9 @@ class BondMortgage:
         s += label_to_string("MATURITY DATE", self._end_date)
         s += label_to_string("MORTGAGE TYPE", self._mortgage_type)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
-        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
+        s += label_to_string("DATEGENRULE", self._dg_rule_type)
         return s
 
 ###############################################################################

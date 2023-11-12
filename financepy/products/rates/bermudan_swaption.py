@@ -34,27 +34,27 @@ class IborBermudanSwaption:
     exercise date. """
 
     def __init__(self,
-                 settlement_date: Date,
+                 settle_date: Date,
                  exercise_date: Date,
                  maturity_date: Date,
                  fixed_leg_type: SwapTypes,
                  exercise_type: FinExerciseTypes,
                  fixed_coupon: float,
                  fixed_frequency_type: FrequencyTypes,
-                 fixed_day_count_type: DayCountTypes,
+                 fixed_dc_type: DayCountTypes,
                  notional=ONE_MILLION,
                  float_frequency_type=FrequencyTypes.QUARTERLY,
-                 float_day_count_type=DayCountTypes.THIRTY_E_360,
+                 float_dc_type=DayCountTypes.THIRTY_E_360,
                  calendar_type=CalendarTypes.WEEKEND,
-                 bus_day_adjust_type=BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type=DateGenRuleTypes.BACKWARD):
+                 bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type=DateGenRuleTypes.BACKWARD):
         """ Create a Bermudan swaption contract. This is an option to enter
         into a payer or receiver swap at a fixed coupon on all of the fixed
         # leg coupon dates until the exercise date inclusive. """
 
         check_argument_types(self.__init__, locals())
 
-        if settlement_date > exercise_date:
+        if settle_date > exercise_date:
             raise FinError("Settlement date must be before expiry date")
 
         if exercise_date > maturity_date:
@@ -63,22 +63,22 @@ class IborBermudanSwaption:
         if exercise_type == FinExerciseTypes.AMERICAN:
             raise FinError("American optionality not supported.")
 
-        self._settlement_date = settlement_date
+        self._settle_date = settle_date
         self._exercise_date = exercise_date
         self._maturity_date = maturity_date
         self._fixed_leg_type = fixed_leg_type
         self._exercise_type = exercise_type
 
         self._fixed_coupon = fixed_coupon
-        self._fixed_frequency_type = fixed_frequency_type
-        self._fixed_day_count_type = fixed_day_count_type
+        self._fixed_freq_type = fixed_frequency_type
+        self._fixed_dc_type = fixed_dc_type
         self._notional = notional
-        self._float_frequency_type = float_frequency_type
-        self._float_day_count_type = float_day_count_type
+        self._float_freq_type = float_frequency_type
+        self._float_dc_type = float_dc_type
 
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
 
         self._pv01 = None
         self._fwdSwapRate = None
@@ -94,7 +94,7 @@ class IborBermudanSwaption:
               discount_curve,
               model):
         """ Value the Bermudan swaption using the specified model and a
-        discount curve. The choices of model are the Hull-White model, the 
+        discount curve. The choices of model are the Hull-White model, the
         Black-Karasinski model and the Black-Derman-Toy model. """
 
         float_spread = 0.0
@@ -104,15 +104,15 @@ class IborBermudanSwaption:
                                         self._maturity_date,
                                         self._fixed_leg_type,
                                         self._fixed_coupon,
-                                        self._fixed_frequency_type,
-                                        self._fixed_day_count_type,
+                                        self._fixed_freq_type,
+                                        self._fixed_dc_type,
                                         self._notional,
                                         float_spread,
-                                        self._float_frequency_type,
-                                        self._float_day_count_type,
-                                        self._calendar_type,
-                                        self._bus_day_adjust_type,
-                                        self._date_gen_rule_type)
+                                        self._float_freq_type,
+                                        self._float_dc_type,
+                                        self._cal_type,
+                                        self._bd_adjust_type,
+                                        self._dg_rule_type)
 
         #  I need to do this to generate the fixed leg flows
         self._pv01 = self._underlyingSwap.pv01(value_date, discount_curve)
@@ -209,10 +209,10 @@ class IborBermudanSwaption:
         s += label_to_string("SWAP FIXED LEG TYPE", self._fixed_leg_type)
         s += label_to_string("EXERCISE TYPE", self._exercise_type)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)
-        s += label_to_string("FIXED FREQUENCY", self._fixed_frequency_type)
-        s += label_to_string("FIXED DAYCOUNT TYPE", self._fixed_day_count_type)
-        s += label_to_string("FLOAT FREQUENCY", self._float_frequency_type)
-        s += label_to_string("FLOAT DAYCOUNT TYPE", self._float_day_count_type)
+        s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)
+        s += label_to_string("FIXED DAYCOUNT TYPE", self._fixed_dc_type)
+        s += label_to_string("FLOAT FREQUENCY", self._float_freq_type)
+        s += label_to_string("FLOAT DAYCOUNT TYPE", self._float_dc_type)
         s += label_to_string("NOTIONAL", self._notional)
         return s
 

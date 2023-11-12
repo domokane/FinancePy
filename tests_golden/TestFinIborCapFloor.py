@@ -45,12 +45,12 @@ def test_ibor_depositsAndSwaps(valuation_date):
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_date, "1M", deposit_rate, depoBasis)
+    depo2 = IborDeposit(settle_date, "3M", deposit_rate, depoBasis)
+    depo3 = IborDeposit(settle_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -64,11 +64,11 @@ def test_ibor_depositsAndSwaps(valuation_date):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type,
+    swap1 = IborSwap(settle_date, "1Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type,
+    swap2 = IborSwap(settle_date, "3Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type,
+    swap3 = IborSwap(settle_date, "5Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
@@ -183,7 +183,7 @@ def test_IborCapFloorVolCurve():
     todayDate = Date(20, 6, 2019)
     valuation_date = todayDate
     maturity_date = valuation_date.add_tenor("3Y")
-    day_count_type = DayCountTypes.THIRTY_E_360
+    dc_type = DayCountTypes.THIRTY_E_360
     frequency = FrequencyTypes.ANNUAL
 
     k = 0.04
@@ -194,7 +194,7 @@ def test_IborCapFloorVolCurve():
                             k,
                             None,
                             frequency,
-                            day_count_type)
+                            dc_type)
 
     capVolDates = Schedule(valuation_date,
                            valuation_date.add_tenor("10Y"),
@@ -204,7 +204,7 @@ def test_IborCapFloorVolCurve():
     libor_curve = DiscountCurveFlat(valuation_date,
                                     flat_rate,
                                     frequency,
-                                    day_count_type)
+                                    dc_type)
 
     flat = False
     if flat is True:
@@ -220,7 +220,7 @@ def test_IborCapFloorVolCurve():
     volCurve = IborCapVolCurve(valuation_date,
                                capVolDates,
                                capVolatilities,
-                               day_count_type)
+                               dc_type)
 
 #    print(volCurve._capletGammas)
 
@@ -316,30 +316,30 @@ def test_IborCapFloorQLExample():
              0.018998, 0.020080]
 
     freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.ACT_ACT_ISDA
+    dc_type = DayCountTypes.ACT_ACT_ISDA
 
     discount_curve = DiscountCurveZeros(valuation_date,
                                         dates,
                                         rates,
                                         freq_type,
-                                        day_count_type,
+                                        dc_type,
                                         InterpTypes.LINEAR_ZERO_RATES)
 
     start_date = Date(14, 6, 2016)
     end_date = Date(14, 6, 2026)
     calendar_type = CalendarTypes.UNITED_STATES
-    bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     freq_type = FrequencyTypes.QUARTERLY
-    date_gen_rule_type = DateGenRuleTypes.FORWARD
+    dg_rule_type = DateGenRuleTypes.FORWARD
     lastFixing = 0.0065560
     notional = 1000000
-    day_count_type = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.ACT_360
     option_type = FinCapFloorTypes.CAP
     strike_rate = 0.02
 
     cap = IborCapFloor(start_date, end_date, option_type, strike_rate,
-                       lastFixing, freq_type, day_count_type, notional,
-                       calendar_type, bus_day_adjust_type, date_gen_rule_type)
+                       lastFixing, freq_type, dc_type, notional,
+                       calendar_type, bd_adjust_type, dg_rule_type)
 
     blackVol = 0.547295
     model = Black(blackVol)

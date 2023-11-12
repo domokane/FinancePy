@@ -22,16 +22,16 @@ def test_EquityCliquetOption():
                                         option_type,
                                         freq_type)
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.05
     dividend_yield = 0.02
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
-    v = cliquetOption.value(valuation_date,
+    v = cliquetOption.value(value_date,
                             stock_price,
                             discount_curve,
                             dividend_curve,

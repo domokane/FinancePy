@@ -25,16 +25,16 @@ def test_date_adjust():
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     calendar_type = CalendarTypes.NONE
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
 
     testCases.header("NO ADJUSTMENTS", "DATE")
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         calendar_type,
-                        bus_day_adjust_type,
-                        date_gen_rule_type)
+                        bd_adjust_type,
+                        dg_rule_type)
 
     for dt in schedule._adjusted_dates:
         testCases.print("Date:", dt)
@@ -43,15 +43,15 @@ def test_date_adjust():
     testCases.header("NO WEEKENDS AND FOLLOWING", "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     calendar_type = CalendarTypes.WEEKEND
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         calendar_type,
-                        bus_day_adjust_type,
-                        date_gen_rule_type)
+                        bd_adjust_type,
+                        dg_rule_type)
 
     for dt in schedule._adjusted_dates:
         testCases.print("Date:", dt)
@@ -60,15 +60,15 @@ def test_date_adjust():
     testCases.header("NO WEEKENDS AND MODIFIED FOLLOWING", "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     calendar_type = CalendarTypes.WEEKEND
-    bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         calendar_type,
-                        bus_day_adjust_type,
-                        date_gen_rule_type)
+                        bd_adjust_type,
+                        dg_rule_type)
 
     for dt in schedule._adjusted_dates:
         testCases.print("Date:", dt)
@@ -78,8 +78,8 @@ def test_date_adjust():
                      "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     calendar_type = CalendarTypes.UNITED_STATES
-    bus_day_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
 
     start_date = Date(4, 7, 2008)
     end_date = Date(4, 7, 2011)
@@ -88,8 +88,8 @@ def test_date_adjust():
                         end_date,
                         freq_type,
                         calendar_type,
-                        bus_day_adjust_type,
-                        date_gen_rule_type)
+                        bd_adjust_type,
+                        dg_rule_type)
 
     for dt in schedule._adjusted_dates:
         testCases.print("Date:", dt)

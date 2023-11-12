@@ -14,7 +14,7 @@ settlement = Date(19, 9, 2012)
 
 
 def test_1():
-    accrual_type = DayCountTypes.THIRTY_360_BOND
+    dc_type = DayCountTypes.THIRTY_360_BOND
     maturityDt = Date(7, 3, 2013)
     coupon = 0.045
     clean_price = 101.99500000
@@ -22,7 +22,7 @@ def test_1():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.001500
@@ -30,7 +30,7 @@ def test_1():
 
 
 def test_2():
-    accrual_type = DayCountTypes.THIRTY_360_BOND
+    dc_type = DayCountTypes.THIRTY_360_BOND
     maturityDt = Date(7, 3, 2013)
     coupon = 0.045
     clean_price = 101.99500000
@@ -38,7 +38,7 @@ def test_2():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.001500
@@ -46,7 +46,7 @@ def test_2():
 
 
 def test_3():
-    accrual_type = DayCountTypes.THIRTY_E_360
+    dc_type = DayCountTypes.THIRTY_E_360
     maturityDt = Date(27, 9, 2013)
     coupon = 0.080000
     clean_price = 107.92000000
@@ -54,7 +54,7 @@ def test_3():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0382
@@ -62,7 +62,7 @@ def test_3():
 
 
 def test_4():
-    accrual_type = DayCountTypes.THIRTY_E_360_ISDA
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
     maturityDt = Date(7, 3, 2014)
     coupon = 0.022500
     clean_price = 102.9750
@@ -70,7 +70,7 @@ def test_4():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0008
@@ -78,7 +78,7 @@ def test_4():
 
 
 def test_5():
-    accrual_type = DayCountTypes.THIRTY_E_PLUS_360
+    dc_type = DayCountTypes.THIRTY_E_PLUS_360
     maturityDt = Date(7, 9, 2014)
     coupon = 0.0500000000
     clean_price = 109.35500000
@@ -86,7 +86,7 @@ def test_5():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0017
@@ -94,7 +94,7 @@ def test_5():
 
 
 def test_6():
-    accrual_type = DayCountTypes.ACT_ACT_ISDA
+    dc_type = DayCountTypes.ACT_ACT_ISDA
     maturityDt = Date(22, 1, 2015)
     coupon = 0.0275000000
     clean_price = 105.62500000
@@ -102,7 +102,7 @@ def test_6():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0044
@@ -110,7 +110,7 @@ def test_6():
 
 
 def test_7():
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    dc_type = DayCountTypes.ACT_ACT_ICMA
     maturityDt = Date(7, 9, 2015)
     coupon = 0.0475000000
     clean_price = 112.98000000
@@ -118,7 +118,7 @@ def test_7():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0016
@@ -126,7 +126,7 @@ def test_7():
 
 
 def test_8():
-    accrual_type = DayCountTypes.ACT_365F
+    dc_type = DayCountTypes.ACT_365F
     maturityDt = Date(7, 12, 2015)
     coupon = 0.0800000000
     clean_price = 124.47000000
@@ -134,7 +134,7 @@ def test_8():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0228
@@ -142,7 +142,7 @@ def test_8():
 
 
 def test_9():
-    accrual_type = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.ACT_360
     maturityDt = Date(22, 1, 2016)
     coupon = 0.0200000000
     clean_price = 104.98000000
@@ -150,7 +150,7 @@ def test_9():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0033
@@ -158,7 +158,7 @@ def test_9():
 
 
 def test_10():
-    accrual_type = DayCountTypes.ACT_365L
+    dc_type = DayCountTypes.ACT_365L
     maturityDt = Date(7, 9, 2016)
     coupon = 0.0400000000
     clean_price = 113.49500000
@@ -166,7 +166,7 @@ def test_10():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0013
@@ -174,7 +174,7 @@ def test_10():
 
 
 def test_11():
-    accrual_type = DayCountTypes.SIMPLE
+    dc_type = DayCountTypes.SIMPLE
     maturityDt = Date(25, 8, 2017)
     coupon = 0.0875000000
     clean_price = 138.57000000
@@ -182,7 +182,7 @@ def test_11():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issueDt, maturityDt,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
     assert round(bond._accrued_interest, 4) == 0.0060

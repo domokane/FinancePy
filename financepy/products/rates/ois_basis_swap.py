@@ -20,7 +20,7 @@ from .swap_float_leg import SwapFloatLeg
 
 class OISBasisSwap:
     """ Class for managing an Ibor-OIS basis swap contract. This is a
-    contract in which a floating leg with one LIBOR tenor is exchanged for a 
+    contract in which a floating leg with one LIBOR tenor is exchanged for a
     floating leg payment of an overnight index swap. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
     from a start date to a specified maturity date.
@@ -42,10 +42,10 @@ class OISBasisSwap:
                  oisPaymentLag: int = 0,
                  notional: float = ONE_MILLION,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a Ibor basis swap contract giving the contract start
-        date, its maturity, frequency and day counts on the two floating 
+        date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
@@ -63,7 +63,7 @@ class OISBasisSwap:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -84,8 +84,8 @@ class OISBasisSwap:
                                           principal,
                                           0,
                                           calendar_type,
-                                          bus_day_adjust_type,
-                                          date_gen_rule_type)
+                                          bd_adjust_type,
+                                          dg_rule_type)
 
         self._floatOISLeg = SwapFloatLeg(effective_date,
                                          self._termination_date,
@@ -97,13 +97,13 @@ class OISBasisSwap:
                                          principal,
                                          oisPaymentLag,
                                          calendar_type,
-                                         bus_day_adjust_type,
-                                         date_gen_rule_type)
+                                         bd_adjust_type,
+                                         dg_rule_type)
 
 ###############################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               discount_curve: DiscountCurve,
               indexIborCurve: DiscountCurve = None,
               indexOISCurve: DiscountCurve = None,
@@ -118,12 +118,12 @@ class OISBasisSwap:
         if indexOISCurve is None:
             indexOISCurve = discount_curve
 
-        floatIborLegValue = self._floatIborLeg.value(valuation_date,
+        floatIborLegValue = self._floatIborLeg.value(value_date,
                                                      discount_curve,
                                                      indexIborCurve,
                                                      firstFixingRateLeg1)
 
-        floatOISLegValue = self._floatOISLeg.value(valuation_date,
+        floatOISLegValue = self._floatOISLeg.value(value_date,
                                                    discount_curve,
                                                    indexOISCurve,
                                                    firstFixingRateLeg2)

@@ -29,14 +29,14 @@ class EquitySwapLeg:
                  term_date_or_tenor: (Date, str),  # Date contract ends
                  leg_type: SwapTypes,
                  freq_type: FrequencyTypes,
-                 day_count_type: DayCountTypes,
+                 dc_type: DayCountTypes,
                  strike: float,  # Price at effective date
                  quantity: float = 1.0,  # Quantity at effective date
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create the equity leg of a swap contract giving the contract start
         date, its maturity, underlying strike price and quantity, payment
@@ -51,7 +51,7 @@ class EquitySwapLeg:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
@@ -77,10 +77,10 @@ class EquitySwapLeg:
         self._notional = strike * quantity
         self._return_type = return_type
 
-        self._day_count_type = day_count_type
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._dc_type = dc_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
         self._end_of_month = end_of_month
 
         self._startAccruedDates = []
@@ -103,9 +103,9 @@ class EquitySwapLeg:
         schedule = Schedule(self._effective_date,
                             self._maturity_date,
                             self._freq_type,
-                            self._calendar_type,
-                            self._bus_day_adjust_type,
-                            self._date_gen_rule_type,
+                            self._cal_type,
+                            self._bd_adjust_type,
+                            self._dg_rule_type,
                             end_of_month=self._end_of_month)
 
         scheduleDates = schedule._adjusted_dates
@@ -121,8 +121,8 @@ class EquitySwapLeg:
 
         prev_dt = scheduleDates[0]
 
-        day_counter = DayCount(self._day_count_type)
-        calendar = Calendar(self._calendar_type)
+        day_counter = DayCount(self._dc_type)
+        calendar = Calendar(self._cal_type)
 
         # All of the lists end up with the same length
         for next_dt in scheduleDates[1:]:
@@ -193,7 +193,7 @@ class EquitySwapLeg:
         lastNotional = self._notional
         numPayments = len(self._payment_dates)
 
-        index_basis = index_curve._day_count_type
+        index_basis = index_curve._dc_type
         index_day_counter = DayCount(index_basis)
 
         for iPmnt in range(0, numPayments):
@@ -267,7 +267,7 @@ class EquitySwapLeg:
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
         print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._day_count_type))
+        print("DAY COUNT:", str(self._dc_type))
 
         if len(self._payment_dates) == 0:
             print("Payments Dates not calculated.")
@@ -337,10 +337,10 @@ class EquitySwapLeg:
         s += label_to_string("SWAP TYPE", self._leg_type)
         s += label_to_string("RETURN TYPE", self._return_type)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT", self._day_count_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUS DAY ADJUST", self._bus_day_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._date_gen_rule_type)
+        s += label_to_string("DAY COUNT", self._dc_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
         return s
 
 

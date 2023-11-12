@@ -205,10 +205,10 @@ class CDS:
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a CDS from the step-in date, maturity date and coupon """
 
         check_argument_types(self.__init__, locals())
@@ -230,11 +230,11 @@ class CDS:
         self._running_coupon = running_coupon
         self._notional = notional
         self._long_protection = long_protection
-        self._day_count_type = day_count_type
-        self._date_gen_rule_type = date_gen_rule_type
-        self._calendar_type = calendar_type
+        self._dc_type = dc_type
+        self._dg_rule_type = dg_rule_type
+        self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bus_day_adjust_type = bus_day_adjust_type
+        self._bd_adjust_type = bd_adjust_type
 
         self._generate_adjusted_cds_payment_dates()
         self._calc_flows()
@@ -245,7 +245,7 @@ class CDS:
         """ Generate CDS payment dates which have been holiday adjusted."""
 
         frequency = annual_frequency(self._freq_type)
-        calendar = Calendar(self._calendar_type)
+        calendar = Calendar(self._cal_type)
         start_date = self._step_in_date
 
         self._payment_dates = []
@@ -256,7 +256,7 @@ class CDS:
         # We generate unadjusted dates - not adjusted for weekends or holidays
         unadjusted_schedule_dates = []
 
-        if self._date_gen_rule_type == DateGenRuleTypes.BACKWARD:
+        if self._dg_rule_type == DateGenRuleTypes.BACKWARD:
 
             # We start at end date and step backwards
 
@@ -275,7 +275,7 @@ class CDS:
             adjusted_dates = []
 
             for date in reversed(unadjusted_schedule_dates):
-                adjusted = calendar.adjust(date, self._bus_day_adjust_type)
+                adjusted = calendar.adjust(date, self._bd_adjust_type)
                 adjusted_dates.append(adjusted)
 
 # eg: https://www.cdsmodel.com/assets/cds-model/docs/Standard%20CDS%20Examples.pdf
@@ -283,7 +283,7 @@ class CDS:
 # Accrual Start = [22-DEC-2008, 20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009]
 # Accrual End   = [19-MAR-2009, 21-JUN-2009, 20-SEP-2009, 20-DEC-2009, 20-MAR-2010]
 
-        elif self._date_gen_rule_type == DateGenRuleTypes.FORWARD:
+        elif self._dg_rule_type == DateGenRuleTypes.FORWARD:
 
             # We start at start date and step forwards
 
@@ -300,7 +300,7 @@ class CDS:
 
             adjusted_dates = []
             for date in unadjusted_schedule_dates:
-                adjusted = calendar.adjust(date, self._bus_day_adjust_type)
+                adjusted = calendar.adjust(date, self._bd_adjust_type)
                 adjusted_dates.append(adjusted)
 
     # eg. Date(20, 2, 2009) to Date(20, 3, 2010) with DateGenRuleTypes.FORWARD
@@ -311,7 +311,7 @@ class CDS:
         else:
 
             raise FinError("Unknown DateGenRuleType:"
-                           + str(self._date_gen_rule_type))
+                           + str(self._dg_rule_type))
 
         # We only include dates which fall after the CDS start date
         self._payment_dates = adjusted_dates[1:]
@@ -332,7 +332,7 @@ class CDS:
 
     def _calc_flows(self):
         """ Calculate cash flow amounts on premium leg. """
-        day_count = DayCount(self._day_count_type)
+        day_count = DayCount(self._dc_type)
 
         self._accrual_factors = []
         self._flows = []
@@ -489,7 +489,7 @@ class CDS:
 
     def cash_settlement_amount(self,
                                value_date,
-                               settlement_date,
+                               settle_date,
                                issuer_curve,
                                contract_recovery_rate,
                                pv01_method=0,
@@ -506,7 +506,7 @@ class CDS:
                        num_steps_per_year)
 
         libor_curve = issuer_curve._libor_curve
-        df = libor_curve.df(settlement_date)
+        df = libor_curve.df(settle_date)
         v = v / df
         return v
 
@@ -557,7 +557,7 @@ class CDS:
         """ Calculate the amount of accrued interest that has accrued from the
         previous coupon date (PCD) to the step_in_date of the CDS contract. """
 
-        day_count = DayCount(self._day_count_type)
+        day_count = DayCount(self._dc_type)
         pcd = self._accrual_start_dates[0]
         accrual_factor = day_count.year_frac(pcd, self._step_in_date)[0]
         accrued_interest = accrual_factor * self._notional \
@@ -618,7 +618,7 @@ class CDS:
         # to now
         pcd = self._accrual_start_dates[0]
         eff = self._step_in_date
-        day_count = DayCount(self._day_count_type)
+        day_count = DayCount(self._dc_type)
 
         accrual_factorPCDToNow = day_count.year_frac(pcd, eff)[0]
 
@@ -793,11 +793,11 @@ class CDS:
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("RUNNING COUPON",
                              self._running_coupon * 10000, "bp\n")
-        s += label_to_string("DAYCOUNT", self._day_count_type)
+        s += label_to_string("DAYCOUNT", self._dc_type)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
-        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
+        s += label_to_string("DATEGENRULE", self._dg_rule_type)
         s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
         header = "PAYMENT_DATE, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"

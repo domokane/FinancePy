@@ -62,11 +62,11 @@ def test_dirty_priceCDSIndexOption():
     ##########################################################################
     ##########################################################################
 
-    indexUpfronts = [0.0, 0.0, 0.0, 0.0]
-    indexMaturityDates = [Date(20, 12, 2009),
-                          Date(20, 12, 2011),
-                          Date(20, 12, 2013),
-                          Date(20, 12, 2016)]
+    index_upfronts = [0.0, 0.0, 0.0, 0.0]
+    index_maturity_dates = [Date(20, 12, 2009),
+                            Date(20, 12, 2011),
+                            Date(20, 12, 2013),
+                            Date(20, 12, 2016)]
     indexRecovery = 0.40
 
     index_coupon = 0.004
@@ -87,7 +87,7 @@ def test_dirty_priceCDSIndexOption():
         #######################################################################
 
         cds_contracts = []
-        for dt in indexMaturityDates:
+        for dt in index_maturity_dates:
             cds = CDS(valuation_date, dt, index / 10000.0)
             cds_contracts.append(cds)
 
@@ -101,8 +101,8 @@ def test_dirty_priceCDSIndexOption():
             valuation_date,
             issuer_curves,
             indexSpreads,
-            indexUpfronts,
-            indexMaturityDates,
+            index_upfronts,
+            index_maturity_dates,
             indexRecovery,
             tolerance)
 

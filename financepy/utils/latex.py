@@ -18,16 +18,16 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
     for i in range(0, num_header_cols):
         col_str += "r"
     col_str += "}"
-    
-    table_str = "\\begin{table}[htbp]\n"    
-    table_str += "\\begin{center}\n"       
-    table_str += "\\begin{tabular} " + col_str + "\n"    
+
+    table_str = "\\begin{table}[htbp]\n"
+    table_str += "\\begin{center}\n"
+    table_str += "\\begin{tabular} " + col_str + "\n"
 
     if header_list != []:
         header_str = header_list[0]
         for i in range(1, num_header_cols):
             header_str += " & " + header_list[i]
-        header_str += "\\\ \n"    
+        header_str += "\\\ \n"
         table_str += header_str
 
     rows = txt.split("\n")
@@ -35,12 +35,12 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
     num_rows= len(rows)
 
     for i in range(0, num_rows):
-        
+
         row_str = rows[i]
         cols = row_str.split(sep)
-        
+
         num_cols = len(cols)
-        
+
         if num_header_cols > 0:
             if num_cols != num_header_cols:
                 print("Num row cols " + str(num_cols) + \
@@ -51,12 +51,12 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
         col_str = cols[0]
         for i in range(1, num_cols):
             col_str += " & " + cols[i]
-        
+
         table_str += col_str + "\\\ \n"
 
     table_str += "\end{tabular}\n"
-    table_str += "\end{center}\n"    
-    table_str += "\end{table}\n"    
+    table_str += "\end{center}\n"
+    table_str += "\end{table}\n"
 
     return table_str
 
@@ -86,13 +86,13 @@ MAY-15-2027    1011875.00"
 latex_str = convertToLatexTable(txt, " ", ["Dates","Flows"])
 print(latex_str)
 
- 
+
 txt="OBJECT TYPE: Bond\n\
 ISSUE DATE: MAY-15-2010\n\
 MATURITY DATE: MAY-15-2027\n\
 COUPON: 0.02375\n\
 FREQUENCY: FrequencyTypes.SEMI_ANNUAL\n\
-ACCRUAL TYPE: DayCountTypes.ACT_ACT_ICMA\n\
+DAY COUNT TYPE: DayCountTypes.ACT_ACT_ICMA\n\
 FACE AMOUNT: 1000000"
 
 latex_str = convertToLatexTable(txt, ":", ["FIELD", "VALUE"])

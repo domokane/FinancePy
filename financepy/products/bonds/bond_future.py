@@ -57,7 +57,7 @@ class BondFuture:
                        new_mat,
                        bond._cpn,
                        bond._freq_type,
-                       bond._accrual_type,
+                       bond._dc_type,
                        ex_div_days)
 
         p = newBond.clean_price_from_ytm(self._first_delivery_date,
@@ -81,13 +81,13 @@ class BondFuture:
 ###############################################################################
 
     def total_invoice_amount(self,
-                             settlement_date: Date,
+                             settle_date: Date,
                              bond: Bond,
                              futures_price: float):
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accrued_interest is None:
-            bond.calculate_cpn_dates(settlement_date)
+            bond.calculate_cpn_dates(settle_date)
 
         accrued_interest = bond._accrued_interest
 

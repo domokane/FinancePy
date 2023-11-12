@@ -71,11 +71,11 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities = np.array(capVolatilities)
         capVolatilities[0] = 0.0
 
-    day_count_type = DayCountTypes.ACT_ACT_ISDA
+    dc_type = DayCountTypes.ACT_ACT_ISDA
     volCurve = IborCapVolCurve(valuation_date,
                                    capVolDates,
                                    capVolatilities,
-                                   day_count_type)
+                                   dc_type)
 
     zetas = np.zeros(numFwds)
     t = 0.0
@@ -151,29 +151,29 @@ def getForwardCurve(numFwds, r):
 #         libor_curve = FinDiscountCurveFlat(valuation_date, r,
 #                                           FrequencyTypes.QUARTERLY)
 
-#         settlement_date = valuation_date
-#         exercise_date = settlement_date.add_months(a*3)
-#         maturity_date = settlement_date.add_months(b*3)
+#         settle_date = valuation_date
+#         exercise_date = settle_date.add_months(a*3)
+#         maturity_date = settle_date.add_months(b*3)
 
 #         fixed_coupon = strike
 #         fixed_frequency_type = FrequencyTypes.QUARTERLY
-#         fixed_day_count_type = DayCountTypes.ACT_ACT_ISDA
+#         fixed_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         float_frequency_type = FrequencyTypes.QUARTERLY
-#         float_day_count_type = DayCountTypes.ACT_ACT_ISDA
+#         float_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         notional = 1.0
 
 #         # Pricing a PAY
 #         swaptionType = IborSwaptionTypes.PAY
-#         swaption = IborSwaption(settlement_date,
+#         swaption = IborSwaption(settle_date,
 #                                     exercise_date,
 #                                     maturity_date,
 #                                     swaptionType,
 #                                     fixed_coupon,
 #                                     fixed_frequency_type,
-#                                     fixed_day_count_type,
+#                                     fixed_dc_type,
 #                                     notional,
 #                                     float_frequency_type,
-#                                     float_day_count_type)
+#                                     float_dc_type)
 
 #         model = Black(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)

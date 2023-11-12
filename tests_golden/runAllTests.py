@@ -3,13 +3,13 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("./..")
 
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 import glob
 from os.path import dirname, basename, join
-
 
 # This only works if I have an init.py in the parent folder
 
@@ -27,12 +27,12 @@ m = numModules
 
 ###############################################################################
 
-for moduleFileName in modules[n:m+1]:
+for moduleFileName in modules[n:m + 1]:
 
     try:
 
         moduleTextName = basename(moduleFileName[:-3])
-        print("TEST: %3d out of %3d: MODULE: %-35s " % (n+1, numModules,
+        print("TEST: %3d out of %3d: MODULE: %-35s " % (n + 1, numModules,
                                                         moduleTextName),
               end="")
         moduleName = __import__(moduleTextName)

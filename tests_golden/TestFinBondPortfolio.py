@@ -27,14 +27,14 @@ def test_BondPortfolio():
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    dc_type = DayCountTypes.ACT_ACT_ICMA
 
-    settlement_date = Date(19, 9, 2012)
+    settle_date = Date(19, 9, 2012)
 
     testCases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
 
-    for accrual_type in DayCountTypes:
-        if accrual_type == DayCountTypes.ZERO:
+    for dc_type in DayCountTypes:
+        if dc_type == DayCountTypes.ZERO:
             continue
         for _, bond in bondDataFrame.iterrows():
 
@@ -46,12 +46,12 @@ def test_BondPortfolio():
             clean_price = bond['mid']
 
             bond = Bond(issueDt, maturityDt,
-                        coupon, freq_type, accrual_type)
+                        coupon, freq_type, dc_type)
 
-            ytm = bond.yield_to_maturity(settlement_date, clean_price)
-            accrued_interest = bond.accrued_interest(settlement_date, 100.0)
+            ytm = bond.yield_to_maturity(settle_date, clean_price)
+            accrued_interest = bond.accrued_interest(settle_date, 100.0)
 
-            testCases.print(accrual_type, maturityDt, coupon*100.0,
+            testCases.print(dc_type, maturityDt, coupon*100.0,
                             clean_price, accrued_interest, ytm*100.0)
 
 ##########################################################################

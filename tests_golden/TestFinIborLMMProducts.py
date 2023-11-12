@@ -33,7 +33,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     endYear = 2030
 #     valuation_date = Date(1, 1, startYear)
 #     exercise_date = Date(1, 1, 2023)
-#     settlement_date = valuation_date
+#     settle_date = valuation_date
 #     maturity_date = Date(1, 1, endYear)
 #     fixed_coupon = 0.04
 
@@ -44,7 +44,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     swaptionVol = 15.54
 
-#     liborSwaption = IborSwaption(settlement_date,
+#     liborSwaption = IborSwaption(settle_date,
 #                                      exercise_date,
 #                                      maturity_date,
 #                                      IborSwaptionTypes.PAY,
@@ -102,29 +102,29 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #         valuation_date = Date(1, 1, 2010)
 #         libor_curve = FinDiscountCurveFlat(valuation_date, r,
 #                                           FrequencyTypes.QUARTERLY)
-#         settlement_date = valuation_date
-#         exercise_date = settlement_date.add_months(a*3)
-#         maturity_date = settlement_date.add_months(b*3)
+#         settle_date = valuation_date
+#         exercise_date = settle_date.add_months(a*3)
+#         maturity_date = settle_date.add_months(b*3)
 
 #         fixed_coupon = strike
 #         fixed_frequency_type = FrequencyTypes.QUARTERLY
-#         fixed_day_count_type = DayCountTypes.ACT_ACT_ISDA
+#         fixed_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         float_frequency_type = FrequencyTypes.QUARTERLY
-#         float_day_count_type = DayCountTypes.ACT_ACT_ISDA
+#         float_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         notional = 1.0
 
 #         # Pricing a PAY
 #         swaptionType = IborSwaptionTypes.PAY
-#         swaption = IborSwaption(settlement_date,
+#         swaption = IborSwaption(settle_date,
 #                                     exercise_date,
 #                                     maturity_date,
 #                                     swaptionType,
 #                                     fixed_coupon,
 #                                     fixed_frequency_type,
-#                                     fixed_day_count_type,
+#                                     fixed_dc_type,
 #                                     notional,
 #                                     float_frequency_type,
-#                                     float_day_count_type)
+#                                     float_dc_type)
 
 #         model = Black(swaptionVol)
 #         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
@@ -146,10 +146,10 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     startYear = 2020
 #     endYear = 2030
 #     valuation_date = Date(1, 1, startYear)
-#     settlement_date = valuation_date
+#     settle_date = valuation_date
 #     capMaturityDate = Date(1, 1, endYear)
 #     freq_type = FrequencyTypes.ANNUAL
-#     day_count_type = DayCountTypes.ACT_360
+#     dc_type = DayCountTypes.ACT_360
 #     capFloorRate = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
@@ -159,7 +159,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     capVol = 15.54
 
-#     liborCap = IborCapFloor(settlement_date,
+#     liborCap = IborCapFloor(settle_date,
 #                                 capMaturityDate,
 #                                 IborCapFloorTypes.CAP,
 #                                 capFloorRate,
@@ -174,10 +174,10 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # LMM VALUATION
 #     ###########################################################################
 
-#     lmmProducts = IborLMMProducts(settlement_date,
+#     lmmProducts = IborLMMProducts(settle_date,
 #                                       capMaturityDate,
 #                                       freq_type,
-#                                       day_count_type)
+#                                       dc_type)
 
 #     # Set up forward rate vol structure
 #     capVolDates = []
@@ -196,11 +196,11 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     capVolatilities[0] = 0.0
 #     capVolatilities = np.array(capVolatilities)/100.0
 
-#     day_count_type = DayCountTypes.ACT_ACT_ISDA
+#     dc_type = DayCountTypes.ACT_ACT_ISDA
 #     volCurve = IborCapVolCurve(valuation_date,
 #                                    capVolDates,
 #                                    capVolatilities,
-#                                    day_count_type)
+#                                    dc_type)
 
 #     lambdas2FList = [[0.00, 0.1410, 0.1952, 0.1678, 0.1711, 0.1525,
 #                       0.1406, 0.1265, 0.1306, 0.1236],
@@ -221,7 +221,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #             lmmProducts.simulateMF(discount_curve, numFactors, lambdas2F,
 #                                    num_paths, 0, True)
 
-#         v_lmm = lmmProducts.valueCapFloor(settlement_date,
+#         v_lmm = lmmProducts.valueCapFloor(settle_date,
 #                                           capMaturityDate,
 #                                           IborCapFloorTypes.CAP,
 #                                           capFloorRate,

@@ -40,11 +40,11 @@ class IborBasisSwap:
                  leg2DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  leg2Spread: float = 0.0,
                  notional: float = ONE_MILLION,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a Ibor basis swap contract giving the contract start
-        date, its maturity, frequency and day counts on the two floating 
+        date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
@@ -62,7 +62,7 @@ class IborBasisSwap:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -84,8 +84,8 @@ class IborBasisSwap:
                                        principal,
                                        payment_lag,
                                        calendar_type,
-                                       bus_day_adjust_type,
-                                       date_gen_rule_type)
+                                       bd_adjust_type,
+                                       dg_rule_type)
 
         self._floatLeg2 = SwapFloatLeg(effective_date,
                                        self._termination_date,
@@ -97,8 +97,8 @@ class IborBasisSwap:
                                        principal,
                                        payment_lag,
                                        calendar_type,
-                                       bus_day_adjust_type,
-                                       date_gen_rule_type)
+                                       bd_adjust_type,
+                                       dg_rule_type)
 
 ###############################################################################
 

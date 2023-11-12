@@ -51,7 +51,7 @@ def test_BondFuture():
                                     contract_size,
                                     contractCoupon)
 
-    settlement_date = Date(10, 12, 2001)
+    settle_date = Date(10, 12, 2001)
 
     # Get the Conversion Factors
     testCases.header("Bond Maturity", "Coupon", "Conversion Factor")
@@ -64,7 +64,7 @@ def test_BondFuture():
 
     testCases.banner("EXAMPLE FROM CME")
     testCases.banner("================")
-    settlement_date = Date(10, 10, 2017)
+    settle_date = Date(10, 10, 2017)
 
     bonds = []
     prices = []
@@ -135,7 +135,7 @@ def test_BondFuture():
 
     testCases.header("BOND MATURITY", "COUPON", "YIELD")
     for bond, clean_price in zip(bonds, prices):
-        yld = bond.yield_to_maturity(settlement_date, clean_price)
+        yld = bond.yield_to_maturity(settle_date, clean_price)
         testCases.print(str(bond._maturity_date), str(bond._cpn), yld)
 
     first_delivery_date = Date(1, 12, 2017)
@@ -153,7 +153,7 @@ def test_BondFuture():
     testCases.header("BOND MATURITY", "COUPON", "CF")
     for bond in bonds:
         cf = bondFutureContract.conversion_factor(bond)
-        testCases.print(str(bond._maturity_date), str(bond._coupon), cf)
+        testCases.print(str(bond._maturity_date), str(bond._cpn), cf)
 
     # Get the Invoice Prices
     futures_price = 125.265625
@@ -166,7 +166,7 @@ def test_BondFuture():
     testCases.header("BOND MATURITY", "TOTAL INVOICE AMOUNT")
     for bond in bonds:
         tia = bondFutureContract.total_invoice_amount(
-            settlement_date, bond, futures_price)
+            settle_date, bond, futures_price)
         testCases.print(str(bond._maturity_date), tia)
 
     ctd = bondFutureContract.cheapest_to_deliver(bonds,
@@ -174,7 +174,7 @@ def test_BondFuture():
                                                  futures_price)
 
     testCases.header("CTD MATURITY", "CTD COUPON")
-    testCases.print(str(ctd._maturity_date), ctd._coupon)
+    testCases.print(str(ctd._maturity_date), ctd._cpn)
 
 ##########################################################################
 

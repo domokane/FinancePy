@@ -25,12 +25,12 @@ def build_curve(valuation_date):
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_date, "1M", deposit_rate, depoBasis)
+    depo2 = IborDeposit(settle_date, "3M", deposit_rate, depoBasis)
+    depo3 = IborDeposit(settle_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -44,11 +44,11 @@ def build_curve(valuation_date):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type,
+    swap1 = IborSwap(settle_date, "1Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type,
+    swap2 = IborSwap(settle_date, "3Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type,
+    swap3 = IborSwap(settle_date, "5Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)

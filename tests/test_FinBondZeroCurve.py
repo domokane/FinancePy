@@ -17,7 +17,7 @@ bondDataFrame = pd.read_csv(path, sep='\t')
 bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 
 freq_type = FrequencyTypes.SEMI_ANNUAL
-accrual_type = DayCountTypes.ACT_ACT_ICMA
+dc_type = DayCountTypes.ACT_ACT_ICMA
 settlement = Date(19, 9, 2012)
 
 bonds = []
@@ -30,7 +30,7 @@ for _, bondRow in bondDataFrame.iterrows():
     issueDt = Date(maturityDt._d, maturityDt._m, 2000)
     coupon = bondRow['coupon']/100.0
     clean_price = bondRow['mid']
-    bond = Bond(issueDt, maturityDt, coupon, freq_type, accrual_type)
+    bond = Bond(issueDt, maturityDt, coupon, freq_type, dc_type)
     bonds.append(bond)
     clean_prices.append(clean_price)
 

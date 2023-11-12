@@ -30,7 +30,7 @@ class IborFuture:
                  todayDate: Date,
                  futureNumber: int,  # The number of the future after todayDate
                  futureTenor: str = "3M",  # '1M', '2M', '3M'
-                 accrual_type: DayCountTypes = DayCountTypes.ACT_360,
+                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  contract_size: float = ONE_MILLION):
         """ Create an interest rate futures contract which has the same
         conventions as those traded on the CME. The current date, the tenor of
@@ -53,7 +53,7 @@ class IborFuture:
         self._endOfInterestPeriod = self._delivery_date.next_imm_date()
 
         self._lastTradingDate = self._delivery_date.add_days(-2)
-        self._accrual_type = accrual_type
+        self._dc_type = dc_type
         self._contract_size = contract_size
 
 ###############################################################################
@@ -68,7 +68,7 @@ class IborFuture:
         fra = IborFRA(self._delivery_date,
                       self._endOfInterestPeriod,
                       fraRate,
-                      self._accrual_type,
+                      self._dc_type,
                       notional=self._contract_size,
                       payFixedRate=False)
 
@@ -99,7 +99,7 @@ class IborFuture:
 
 ###############################################################################
 
-    def convexity(self, valuation_date, volatility, mean_reversion):
+    def convexity(self, value_date, volatility, mean_reversion):
         """ Calculation of the convexity adjustment between FRAs and interest
         rate futures using the Hull-White model as described in technical note
         in link below:
@@ -110,8 +110,8 @@ class IborFuture:
 
         a = mean_reversion
         t0 = 0.0
-        t1 = (self._lastTradingDate - valuation_date) / gDaysInYear
-        t2 = (self._endOfInterestPeriod - valuation_date) / gDaysInYear
+        t1 = (self._lastTradingDate - value_date) / gDaysInYear
+        t2 = (self._endOfInterestPeriod - value_date) / gDaysInYear
 
         # Hull White model for short rate dr = (theta(t)-ar) dt + sigma * dz
         # This reduces to Ho-Lee when a = 0 so to avoid divergences I provide
@@ -138,7 +138,7 @@ class IborFuture:
         s += label_to_string("LAST TRADING DATE", self._lastTradingDate)
         s += label_to_string("DELIVERY DATE", self._delivery_date)
         s += label_to_string("END INTEREST PERIOD", self._endOfInterestPeriod)
-        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("CONTRACT SIZE", self._contract_size)
         return s
 

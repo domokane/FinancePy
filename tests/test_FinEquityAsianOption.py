@@ -10,7 +10,7 @@ from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 
 
-valuation_date = Date(1, 1, 2014)
+value_date = Date(1, 1, 2014)
 startAveragingDate = Date(1, 6, 2014)
 expiry_date = Date(1, 1, 2015)
 stock_price = 100.0
@@ -24,8 +24,8 @@ seed = 1976
 num_paths = 5000
 
 model = BlackScholes(volatility)
-discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+discount_curve = DiscountCurveFlat(value_date, interest_rate)
+dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
 asianOption = EquityAsianOption(startAveragingDate,
                                 expiry_date,
@@ -35,7 +35,7 @@ asianOption = EquityAsianOption(startAveragingDate,
 
 
 def test_geometric():
-    valueGeometric = asianOption.value(valuation_date,
+    valueGeometric = asianOption.value(value_date,
                                        stock_price,
                                        discount_curve,
                                        dividend_curve,
@@ -47,7 +47,7 @@ def test_geometric():
 
 
 def test_turnbull_wakeman():
-    valueTurnbullWakeman = asianOption.value(valuation_date,
+    valueTurnbullWakeman = asianOption.value(value_date,
                                              stock_price,
                                              discount_curve,
                                              dividend_curve,
@@ -59,7 +59,7 @@ def test_turnbull_wakeman():
 
 
 def test_curran():
-    valueCurran = asianOption.value(valuation_date,
+    valueCurran = asianOption.value(value_date,
                                     stock_price,
                                     discount_curve,
                                     dividend_curve,
@@ -71,7 +71,7 @@ def test_curran():
 
 
 def test_mc():
-    value_mc = asianOption.value_mc(valuation_date,
+    value_mc = asianOption.value_mc(value_date,
                                     stock_price,
                                     discount_curve,
                                     dividend_curve,

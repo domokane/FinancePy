@@ -41,11 +41,11 @@ def build_Ibor_Curve(tradeDate):
 
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    settlement_date = valuation_date
+    settle_date = valuation_date
 
-    maturity_date = settlement_date.add_months(12)
+    maturity_date = settle_date.add_months(12)
     swap1 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0502,
@@ -53,9 +53,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settlement_date.add_months(24)
+    maturity_date = settle_date.add_months(24)
     swap2 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0502,
@@ -63,9 +63,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settlement_date.add_months(36)
+    maturity_date = settle_date.add_months(36)
     swap3 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0501,
@@ -73,9 +73,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settlement_date.add_months(48)
+    maturity_date = settle_date.add_months(48)
     swap4 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0502,
@@ -83,9 +83,9 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settlement_date.add_months(60)
+    maturity_date = settle_date.add_months(60)
     swap5 = IborSwap(
-        settlement_date,
+        settle_date,
         maturity_date,
         SwapTypes.PAY,
         0.0501,

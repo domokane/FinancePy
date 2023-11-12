@@ -123,96 +123,96 @@ def test_OISDepositsFRAsSwaps():
 
     swaps = []
     fixedDCCType = DayCountTypes.ACT_365F
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap_rate = 0.05
 #    maturity_date = settleDt.add_months(24)
-#    swap = IborSwap(settleDt, maturity_date, swap_rate, fixedFreqType,
+#    swap = IborSwap(settleDt, maturity_date, swap_rate, fixed_freq_type,
 #                        fixedDCCType)
 #    swaps.append(swap)
 
     fixed_leg_type = SwapTypes.PAY
     maturity_date = settleDt.add_months(36)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(48)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(60)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(72)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(84)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(96)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(108)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(120)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(132)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(144)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(180)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(240)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(300)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
     maturity_date = settleDt.add_months(360)
     swap = OIS(settleDt, maturity_date, fixed_leg_type, swap_rate,
-               fixedFreqType,
+               fixed_freq_type,
                fixedDCCType)
     swaps.append(swap)
 
@@ -312,8 +312,8 @@ def test_OISDepositsFuturesSwaps():
     swaps = []
     fixed_leg_type = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
-    floatFreqType = FrequencyTypes.QUARTERLY
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
+    float_freq_type = FrequencyTypes.QUARTERLY
     notional = 1000000
     float_spread = 0.0
     floatDCCType = DayCountTypes.ACT_360
@@ -324,8 +324,8 @@ def test_OISDepositsFuturesSwaps():
     payment_lag = 1
 
     swap = OIS(start_date, "2Y", fixed_leg_type,
-               swap_rate, fixedFreqType, fixedDCCType, notional,
-               payment_lag, float_spread, floatFreqType, floatDCCType,
+               swap_rate, fixed_freq_type, fixedDCCType, notional,
+               payment_lag, float_spread, float_freq_type, floatDCCType,
                calendar_type, busDayAdjustRule)
 
     swaps.append(swap)
@@ -391,49 +391,49 @@ def test_derivativePricingExample():
     fras = []
 
     swaps = []
-    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
-#    day_count_type = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
+#    dc_type = DayCountTypes.ACT_360
     freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.0058
     swap = OIS(settleDt, "1Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0060
     swap = OIS(settleDt, "2Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0072
     swap = OIS(settleDt, "3Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0096
     swap = OIS(settleDt, "4Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0124
     swap = OIS(settleDt, "5Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0173
     swap = OIS(settleDt, "7Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0219
     swap = OIS(settleDt, "10Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0283
     swap = OIS(settleDt, "30Y", fixed_leg_type,
-               swap_rate, freq_type, day_count_type)
+               swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     numRepeats = 10

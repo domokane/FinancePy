@@ -43,14 +43,14 @@ class IborSwap:
                  fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
                  fixed_freq_type: FrequencyTypes,
-                 fixed_day_count_type: DayCountTypes,
+                 fixed_dc_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  float_spread: float = 0.0,
                  float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 float_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -70,7 +70,7 @@ class IborSwap:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -89,26 +89,26 @@ class IborSwap:
                                        fixed_leg_type,
                                        fixed_coupon,
                                        fixed_freq_type,
-                                       fixed_day_count_type,
+                                       fixed_dc_type,
                                        notional,
                                        principal,
                                        payment_lag,
                                        calendar_type,
-                                       bus_day_adjust_type,
-                                       date_gen_rule_type)
+                                       bd_adjust_type,
+                                       dg_rule_type)
 
         self._float_leg = SwapFloatLeg(effective_date,
                                        self._termination_date,
                                        float_leg_type,
                                        float_spread,
                                        float_freq_type,
-                                       float_day_count_type,
+                                       float_dc_type,
                                        notional,
                                        principal,
                                        payment_lag,
                                        calendar_type,
-                                       bus_day_adjust_type,
-                                       date_gen_rule_type)
+                                       bd_adjust_type,
+                                       dg_rule_type)
 
     ###########################################################################
 

@@ -196,8 +196,8 @@ def test_FinFXVanillaOptionBloombergExample():
     volatility = 0.20
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
-    maturity_date = settlement_date.add_months(12)
+    settle_date = valuation_date.add_weekdays(spot_days)
+    maturity_date = settle_date.add_months(12)
     notional = 1000000.0
     notional_currency = "EUR"
     calendar_type = CalendarTypes.TARGET
@@ -205,7 +205,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depos = []
     fras = []
     swaps = []
-    depo = IborDeposit(settlement_date, maturity_date, domDepoRate,
+    depo = IborDeposit(settle_date, maturity_date, domDepoRate,
                        DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
     dom_discount_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
@@ -213,7 +213,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depos = []
     fras = []
     swaps = []
-    depo = IborDeposit(settlement_date, maturity_date, forDepoRate,
+    depo = IborDeposit(settle_date, maturity_date, forDepoRate,
                        DayCountTypes.ACT_360, notional, calendar_type)
     depos.append(depo)
     for_discount_curve = IborSingleCurve(valuation_date, depos, fras, swaps)

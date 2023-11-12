@@ -56,8 +56,8 @@ class CDSTranche:
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_360,
                  calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
 
         check_argument_types(self.__init__, locals())
 
@@ -72,11 +72,11 @@ class CDSTranche:
         self._notional = notional
         self._running_coupon = running_coupon
         self._long_protection = long_protection
-        self._day_count_type = day_count_type
-        self._date_gen_rule_type = date_gen_rule_type
-        self._calendar_type = calendar_type
+        self._dc_type = day_count_type
+        self._dg_rule_type = dg_rule_type
+        self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bus_day_adjust_type = bus_day_adjust_type
+        self._bd_adjust_type = bd_adjust_type
 
         notional = 1.0
 
@@ -86,15 +86,15 @@ class CDSTranche:
                                  notional,
                                  self._long_protection,
                                  self._freq_type,
-                                 self._day_count_type,
-                                 self._calendar_type,
-                                 self._bus_day_adjust_type,
-                                 self._date_gen_rule_type)
+                                 self._dc_type,
+                                 self._cal_type,
+                                 self._bd_adjust_type,
+                                 self._dg_rule_type)
 
     ###########################################################################
 
     def value_bc(self,
-                 valuation_date,
+                 value_date,
                  issuer_curves,
                  upfront,
                  running_coupon,
@@ -106,7 +106,7 @@ class CDSTranche:
         num_credits = len(issuer_curves)
         k1 = self._k1
         k2 = self._k2
-        tmat = (self._maturity_date - valuation_date) / gDaysInYear
+        tmat = (self._maturity_date - value_date) / gDaysInYear
 
         if tmat < 0.0:
             raise FinError("Value date is after maturity date")
@@ -154,7 +154,7 @@ class CDSTranche:
 
         for i in range(1, num_times):
 
-            t = (payment_dates[i-1] - valuation_date) / gDaysInYear
+            t = (payment_dates[i-1] - value_date) / gDaysInYear
 
             for j in range(0, num_credits):
 
@@ -228,14 +228,14 @@ class CDSTranche:
         curveRecovery = 0.0  # For tranches only
         libor_curve = issuer_curves[0]._libor_curve
         trancheCurve = CDSCurve(
-            valuation_date, [], libor_curve, curveRecovery)
+            value_date, [], libor_curve, curveRecovery)
         trancheCurve._times = trancheTimes
         trancheCurve._values = trancheSurvivalCurve
 
         protLegPV = self._cds_contract.protection_leg_pv(
-            valuation_date, trancheCurve, curveRecovery)
+            value_date, trancheCurve, curveRecovery)
         risky_pv01 = self._cds_contract.risky_pv01(
-            valuation_date, trancheCurve)['clean_rpv01']
+            value_date, trancheCurve)['clean_rpv01']
 
         mtm = self._notional * (protLegPV - upfront -
                                 risky_pv01 * running_coupon)

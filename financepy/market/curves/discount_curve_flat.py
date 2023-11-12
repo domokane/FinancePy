@@ -34,7 +34,7 @@ class DiscountCurveFlat(DiscountCurve):
                  value_date: Date,
                  flat_rate: (float, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
+                 dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create a discount curve which is flat. This is very useful for
         quick testing and simply requires a curve date a rate and a compound
         frequency. As we have entered a rate, a corresponding day count
@@ -47,7 +47,7 @@ class DiscountCurveFlat(DiscountCurve):
         self._value_date = value_date
         self._flat_rate = flat_rate
         self._freq_type = freq_type
-        self._day_count_type = day_count_type
+        self._dc_type = dc_type
 
         # This is used by some inherited functions so we choose the simplest
         self._interp_type = InterpTypes.FLAT_FWD_RATES
@@ -59,7 +59,7 @@ class DiscountCurveFlat(DiscountCurve):
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dates)
         self._times = times_from_dates(
-            dates, self._value_date, day_count_type)
+            dates, self._value_date, dc_type)
 
 ###############################################################################
 
@@ -72,7 +72,7 @@ class DiscountCurveFlat(DiscountCurve):
         discCurve = DiscountCurveFlat(self._value_date,
                                       rBumped,
                                       freq_type=self._freq_type,
-                                      day_count_type=self._day_count_type)
+                                      dc_type=self._dc_type)
         return discCurve
 
 ###############################################################################
@@ -88,13 +88,13 @@ class DiscountCurveFlat(DiscountCurve):
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         dfs = self._zero_to_df(self._value_date,
                                self._flat_rate,
                                dc_times,
                                self._freq_type,
-                               self._day_count_type)
+                               self._dc_type)
 
         if isinstance(dates, Date):
             return dfs[0]
@@ -107,7 +107,7 @@ class DiscountCurveFlat(DiscountCurve):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("FLAT RATE", (self._flat_rate))
         s += label_to_string("FREQUENCY", (self._freq_type))
-        s += label_to_string("DAY COUNT", (self._day_count_type))
+        s += label_to_string("DAY COUNT", (self._dc_type))
         return s
 
 ###############################################################################

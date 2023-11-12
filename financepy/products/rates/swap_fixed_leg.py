@@ -28,13 +28,13 @@ class SwapFixedLeg:
                  leg_type: SwapTypes,
                  coupon: (float),
                  freq_type: FrequencyTypes,
-                 day_count_type: DayCountTypes,
+                 dc_type: DayCountTypes,
                  notional: float = ONE_MILLION,
                  principal: float = 0.0,
                  payment_lag: int = 0,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create the fixed leg of a swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
@@ -47,10 +47,10 @@ class SwapFixedLeg:
         else:
             self._termination_date = effective_date.add_tenor(end_date)
 
-        calendar = Calendar(calendar_type)
+        calendar = Calendar(cal_type)
 
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
@@ -64,10 +64,10 @@ class SwapFixedLeg:
         self._principal = principal
         self._cpn = coupon
 
-        self._day_count_type = day_count_type
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._dc_type = dc_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
         self._end_of_month = end_of_month
 
         self._startAccruedDates = []
@@ -93,9 +93,9 @@ class SwapFixedLeg:
         schedule = Schedule(self._effective_date,
                             self._termination_date,
                             self._freq_type,
-                            self._calendar_type,
-                            self._bus_day_adjust_type,
-                            self._date_gen_rule_type,
+                            self._cal_type,
+                            self._bd_adjust_type,
+                            self._dg_rule_type,
                             end_of_month=self._end_of_month)
 
         scheduleDates = schedule._adjusted_dates
@@ -113,8 +113,8 @@ class SwapFixedLeg:
 
         prev_dt = scheduleDates[0]
 
-        day_counter = DayCount(self._day_count_type)
-        calendar = Calendar(self._calendar_type)
+        day_counter = DayCount(self._dc_type)
+        calendar = Calendar(self._cal_type)
 
         for next_dt in scheduleDates[1:]:
 
@@ -202,7 +202,7 @@ class SwapFixedLeg:
         print("MATURITY DATE:", self._maturity_date)
         print("COUPON (%):", self._cpn * 100)
         print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._day_count_type))
+        print("DAY COUNT:", str(self._dc_type))
 
         if len(self._payments) == 0:
             print("Payments not calculated.")
@@ -220,7 +220,7 @@ class SwapFixedLeg:
                 self._startAccruedDates[iFlow],
                 self._endAccruedDates[iFlow],
                 self._accrued_days[iFlow],
-                round(self._year_fracs[iFlow],4),
+                round(self._year_fracs[iFlow], 4),
                 round(self._rates[iFlow] * 100.0, 4),
                 round(self._payments[iFlow], 2),
             ])
@@ -240,7 +240,7 @@ class SwapFixedLeg:
         print("MATURITY DATE:", self._maturity_date)
         print("COUPON (%):", self._cpn * 100)
         print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._day_count_type))
+        print("DAY COUNT:", str(self._dc_type))
 
         if len(self._payments) == 0:
             print("Payments not calculated.")
@@ -279,10 +279,10 @@ class SwapFixedLeg:
         s += label_to_string("LEG TYPE", self._leg_type)
         s += label_to_string("COUPON", self._cpn)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT", self._day_count_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUS DAY ADJUST", self._bus_day_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._date_gen_rule_type)
+        s += label_to_string("DAY COUNT", self._dc_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
         return s
 
 ###############################################################################

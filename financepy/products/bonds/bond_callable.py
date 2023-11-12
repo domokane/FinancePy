@@ -51,7 +51,7 @@ class BondEmbeddedOption:
                  maturity_date: Date,  # Date
                  coupon: float,  # Annualised coupon - 0.03 = 3.00%
                  freq_type: FrequencyTypes,
-                 accrual_type: DayCountTypes,
+                 dc_type: DayCountTypes,
                  call_dates: List[Date],
                  call_prices: List[float],
                  put_dates: List[Date],
@@ -65,7 +65,7 @@ class BondEmbeddedOption:
         self._maturity_date = maturity_date
         self._cpn = coupon
         self._freq_type = freq_type
-        self._accrual_type = accrual_type
+        self._dc_type = dc_type
 
         ex_div_days = 0
 
@@ -73,7 +73,7 @@ class BondEmbeddedOption:
                           maturity_date,
                           coupon,
                           freq_type,
-                          accrual_type,
+                          dc_type,
                           ex_div_days)
 
         # Validate call and put schedules
@@ -125,7 +125,7 @@ class BondEmbeddedOption:
 ###############################################################################
 
     def value(self,
-              settlement_date: Date,
+              settle_date: Date,
               discount_curve: DiscountCurve,
               model):
         """ Value the bond that settles on the specified date that can have
@@ -138,8 +138,8 @@ class BondEmbeddedOption:
         cpn_amounts = []
 
         for flow_date in self._bond._cpn_dates[1:]:
-            if flow_date > settlement_date:
-                cpn_time = (flow_date - settlement_date) / gDaysInYear
+            if flow_date > settle_date:
+                cpn_time = (flow_date - settle_date) / gDaysInYear
                 cpn_times.append(cpn_time)
                 cpn_amounts.append(cpn)
 
@@ -149,8 +149,8 @@ class BondEmbeddedOption:
         # Generate bond call times and prices
         call_times = []
         for dt in self._call_dates:
-            if dt > settlement_date:
-                call_time = (dt - settlement_date) / gDaysInYear
+            if dt > settle_date:
+                call_time = (dt - settle_date) / gDaysInYear
                 call_times.append(call_time)
         call_times = np.array(call_times)
         call_prices = np.array(self._call_prices)
@@ -158,14 +158,14 @@ class BondEmbeddedOption:
         # Generate bond put times and prices
         put_times = []
         for dt in self._put_dates:
-            if dt > settlement_date:
-                put_time = (dt - settlement_date) / gDaysInYear
+            if dt > settle_date:
+                put_time = (dt - settle_date) / gDaysInYear
                 put_times.append(put_time)
         put_times = np.array(put_times)
         put_prices = np.array(self._put_prices)
 
         maturity_date = self._bond._maturity_date
-        tmat = (maturity_date - settlement_date) / gDaysInYear
+        tmat = (maturity_date - settle_date) / gDaysInYear
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
@@ -223,12 +223,13 @@ class BondEmbeddedOption:
 ###############################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_date)
         s += label_to_string("MATURITY DATE", self._maturity_date)
         s += label_to_string("COUPON", self._cpn)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("ACCRUAL TYPE", self._accrual_type)
+        s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("EX-DIV DAYS", self._ex_div_days)
 
         s += label_to_string("NUM CALL DATES", len(self._call_dates))

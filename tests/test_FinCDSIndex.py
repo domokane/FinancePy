@@ -19,7 +19,7 @@ tradeDate = Date(7, 2, 2006)
 libor_curve = build_Ibor_Curve(tradeDate)
 issuer_curve = buildIssuerCurve(tradeDate, libor_curve)
 step_in_date = tradeDate.add_days(1)
-valuation_date = step_in_date
+value_date = step_in_date
 maturity_date = Date(20, 6, 2010)
 
 cdsRecovery = 0.40
@@ -36,14 +36,14 @@ cdsIndexContract = CDS(step_in_date,
 
 def test_cds_index():
     spd = cdsIndexContract.par_spread(
-        valuation_date, issuer_curve, cdsRecovery) * 10000.0
+        value_date, issuer_curve, cdsRecovery) * 10000.0
     assert round(spd, 4) == 48.3748
 
-    v = cdsIndexContract.value(valuation_date, issuer_curve, cdsRecovery)
+    v = cdsIndexContract.value(value_date, issuer_curve, cdsRecovery)
     assert round(v['dirty_pv'], 4) == 27064.9906
     assert round(v['clean_pv'], 4) == 32620.5461
 
-    p = cdsIndexContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
+    p = cdsIndexContract.clean_price(value_date, issuer_curve, cdsRecovery)
     assert round(p, 4) == 99.6738
 
     accrued_days = cdsIndexContract.accrued_days()
@@ -53,9 +53,9 @@ def test_cds_index():
     assert round(accrued_interest, 4) == -5555.5556
 
     prot_pv = cdsIndexContract.protection_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     assert round(prot_pv, 4) == 188423.9948
 
     premPV = cdsIndexContract.premium_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     assert round(premPV, 4) == 161359.0042

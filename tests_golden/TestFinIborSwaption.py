@@ -38,12 +38,12 @@ def test_ibor_depositsAndSwaps(valuation_date):
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_date, "1M", deposit_rate, depoBasis)
+    depo2 = IborDeposit(settle_date, "3M", deposit_rate, depoBasis)
+    depo3 = IborDeposit(settle_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -57,11 +57,11 @@ def test_ibor_depositsAndSwaps(valuation_date):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type,
+    swap1 = IborSwap(settle_date, "1Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type,
+    swap2 = IborSwap(settle_date, "3Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type,
+    swap3 = IborSwap(settle_date, "5Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
@@ -102,11 +102,11 @@ def testIborSwaptionModels():
     model5 = HWTree(0.00001, 0.00001)
     model6 = BKTree(0.01, 0.01)
 
-    settlement_date = valuation_date.add_weekdays(2)
+    settle_date = valuation_date.add_weekdays(2)
 
     for k in strikes:
         swaptionType = SwapTypes.PAY
-        swaption = IborSwaption(settlement_date,
+        swaption = IborSwaption(settle_date,
                                 exercise_date,
                                 swapMaturityDate,
                                 swaptionType,
@@ -127,7 +127,7 @@ def testIborSwaptionModels():
 
     for k in strikes:
         swaptionType = SwapTypes.RECEIVE
-        swaption = IborSwaption(settlement_date,
+        swaption = IborSwaption(settle_date,
                                 exercise_date,
                                 swapMaturityDate,
                                 swaptionType,
@@ -149,67 +149,67 @@ def testIborSwaptionModels():
 def test_IborSwaptionQLExample():
 
     valuation_date = Date(4, 3, 2014)
-    settlement_date = Date(4, 3, 2014)
+    settle_date = Date(4, 3, 2014)
 
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
-    depo = IborDeposit(settlement_date, "1W", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "1W", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "1M", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "1M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "3M", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "3M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "6M", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "6M", 0.0023, depoDCCType)
     depos.append(depo)
 
     # No convexity correction provided so I omit interest rate futures
 
     swaps = []
     accType = DayCountTypes.ACT_365F
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
-    swap = IborSwap(settlement_date, "3Y", fixed_leg_type,
-                    0.00790, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "3Y", fixed_leg_type,
+                    0.00790, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "4Y", fixed_leg_type,
-                    0.01200, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "4Y", fixed_leg_type,
+                    0.01200, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "5Y", fixed_leg_type,
-                    0.01570, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "5Y", fixed_leg_type,
+                    0.01570, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "6Y", fixed_leg_type,
-                    0.01865, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "6Y", fixed_leg_type,
+                    0.01865, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "7Y", fixed_leg_type,
-                    0.02160, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "7Y", fixed_leg_type,
+                    0.02160, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "8Y", fixed_leg_type,
-                    0.02350, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "8Y", fixed_leg_type,
+                    0.02350, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "9Y", fixed_leg_type,
-                    0.02540, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "9Y", fixed_leg_type,
+                    0.02540, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "10Y", fixed_leg_type,
-                    0.0273, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "10Y", fixed_leg_type,
+                    0.0273, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "15Y", fixed_leg_type,
-                    0.0297, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "15Y", fixed_leg_type,
+                    0.0297, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "20Y", fixed_leg_type,
-                    0.0316, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "20Y", fixed_leg_type,
+                    0.0316, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "25Y", fixed_leg_type,
-                    0.0335, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "25Y", fixed_leg_type,
+                    0.0335, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "30Y", fixed_leg_type,
-                    0.0354, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "30Y", fixed_leg_type,
+                    0.0354, fixed_freq_type, accType)
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(valuation_date, depos, [], swaps,
                                   InterpTypes.LINEAR_ZERO_RATES)
 
-    exercise_date = settlement_date.add_tenor("5Y")
+    exercise_date = settle_date.add_tenor("5Y")
     swapMaturityDate = exercise_date.add_tenor("5Y")
     swapFixedCoupon = 0.040852
     swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
@@ -219,7 +219,7 @@ def test_IborSwaptionQLExample():
     swapNotional = 1000000
     swaptionType = SwapTypes.PAY
 
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,
@@ -233,23 +233,23 @@ def test_IborSwaptionQLExample():
     testCases.header("MODEL", "VALUE")
 
     model = Black(0.1533)
-    v = swaption.value(settlement_date, libor_curve, model)
+    v = swaption.value(settle_date, libor_curve, model)
     testCases.print(model.__class__, v)
 
     model = BlackShifted(0.1533, -0.008)
-    v = swaption.value(settlement_date, libor_curve, model)
+    v = swaption.value(settle_date, libor_curve, model)
     testCases.print(model.__class__, v)
 
     model = SABR(0.132, 0.5, 0.5, 0.5)
-    v = swaption.value(settlement_date, libor_curve, model)
+    v = swaption.value(settle_date, libor_curve, model)
     testCases.print(model.__class__, v)
 
     model = SABRShifted(0.352, 0.5, 0.15, 0.15, -0.005)
-    v = swaption.value(settlement_date, libor_curve, model)
+    v = swaption.value(settle_date, libor_curve, model)
     testCases.print(model.__class__, v)
 
     model = HWTree(0.010000000, 0.00000000001)
-    v = swaption.value(settlement_date, libor_curve, model)
+    v = swaption.value(settle_date, libor_curve, model)
     testCases.print(model.__class__, v)
 
 ###############################################################################
@@ -260,69 +260,69 @@ def testFinIborCashSettledSwaption():
     testCases.header("LABEL", "VALUE")
 
     valuation_date = Date(1, 1, 2020)
-    settlement_date = Date(1, 1, 2020)
+    settle_date = Date(1, 1, 2020)
 
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
-    depo = IborDeposit(settlement_date, "1W", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "1W", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "1M", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "1M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "3M", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "3M", 0.0023, depoDCCType)
     depos.append(depo)
-    depo = IborDeposit(settlement_date, "6M", 0.0023, depoDCCType)
+    depo = IborDeposit(settle_date, "6M", 0.0023, depoDCCType)
     depos.append(depo)
 
     # No convexity correction provided so I omit interest rate futures
 
-    settlement_date = Date(2, 1, 2020)
+    settle_date = Date(2, 1, 2020)
 
     swaps = []
     accType = DayCountTypes.ACT_365F
-    fixedFreqType = FrequencyTypes.SEMI_ANNUAL
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
-    swap = IborSwap(settlement_date, "3Y", fixed_leg_type,
-                    0.00790, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "3Y", fixed_leg_type,
+                    0.00790, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "4Y", fixed_leg_type,
-                    0.01200, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "4Y", fixed_leg_type,
+                    0.01200, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "5Y", fixed_leg_type,
-                    0.01570, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "5Y", fixed_leg_type,
+                    0.01570, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "6Y", fixed_leg_type,
-                    0.01865, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "6Y", fixed_leg_type,
+                    0.01865, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "7Y", fixed_leg_type,
-                    0.02160, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "7Y", fixed_leg_type,
+                    0.02160, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "8Y", fixed_leg_type,
-                    0.02350, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "8Y", fixed_leg_type,
+                    0.02350, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "9Y", fixed_leg_type,
-                    0.02540, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "9Y", fixed_leg_type,
+                    0.02540, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "10Y", fixed_leg_type,
-                    0.0273, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "10Y", fixed_leg_type,
+                    0.0273, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "15Y", fixed_leg_type,
-                    0.0297, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "15Y", fixed_leg_type,
+                    0.0297, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "20Y", fixed_leg_type,
-                    0.0316, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "20Y", fixed_leg_type,
+                    0.0316, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "25Y", fixed_leg_type,
-                    0.0335, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "25Y", fixed_leg_type,
+                    0.0335, fixed_freq_type, accType)
     swaps.append(swap)
-    swap = IborSwap(settlement_date, "30Y", fixed_leg_type,
-                    0.0354, fixedFreqType, accType)
+    swap = IborSwap(settle_date, "30Y", fixed_leg_type,
+                    0.0354, fixed_freq_type, accType)
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(valuation_date, depos, [], swaps,
                                   InterpTypes.LINEAR_ZERO_RATES)
 
-    exercise_date = settlement_date.add_tenor("5Y")
+    exercise_date = settle_date.add_tenor("5Y")
     swapMaturityDate = exercise_date.add_tenor("5Y")
     swapFixedCoupon = 0.040852
     swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
@@ -332,7 +332,7 @@ def testFinIborCashSettledSwaption():
     swapNotional = 1000000
     fixed_leg_type = SwapTypes.PAY
 
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             fixed_leg_type,
@@ -344,7 +344,7 @@ def testFinIborCashSettledSwaption():
                             swapFloatDayCountType)
 
     model = Black(0.1533)
-    v = swaption.value(settlement_date, libor_curve, model)
+    v = swaption.value(settle_date, libor_curve, model)
     testCases.print("Swaption No-Arb Value:", v)
 
     fwdSwapRate1 = libor_curve.swap_rate(exercise_date,
@@ -361,7 +361,7 @@ def testFinIborCashSettledSwaption():
                        swapFixedFrequencyType,
                        swapFixedDayCountType)
 
-    fwdSwapRate2 = fwdSwap.swap_rate(settlement_date, libor_curve)
+    fwdSwapRate2 = fwdSwap.swap_rate(settle_date, libor_curve)
     testCases.print("Fwd Swap Swap Rate:", fwdSwapRate2)
 
     model = Black(0.1533)
@@ -390,24 +390,24 @@ def testIborSwaptionMatlabExamples():
                                     FrequencyTypes.CONTINUOUS,
                                     DayCountTypes.THIRTY_E_360)
 
-    settlement_date = Date(1, 1, 2011)
+    settle_date = Date(1, 1, 2011)
     exercise_date = Date(1, 1, 2016)
     maturity_date = Date(1, 1, 2019)
 
     fixed_coupon = 0.062
     fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     # Pricing a PAY
     swaptionType = SwapTypes.PAY
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional)
 
     model = Black(0.20)
@@ -434,35 +434,35 @@ def testIborSwaptionMatlabExamples():
 
     contFreq = FrequencyTypes.CONTINUOUS
     interp_type = InterpTypes.LINEAR_ZERO_RATES
-    day_count_type = DayCountTypes.THIRTY_E_360
+    dc_type = DayCountTypes.THIRTY_E_360
 
     libor_curve = DiscountCurveZeros(valuation_date, dates,
                                      zero_rates, contFreq,
-                                     day_count_type, interp_type)
+                                     dc_type, interp_type)
 
-    settlement_date = Date(1, 1, 2011)
+    settle_date = Date(1, 1, 2011)
     exercise_date = Date(1, 1, 2012)
     maturity_date = Date(1, 1, 2017)
     fixed_coupon = 0.03
 
     fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360
+    fixed_dc_type = DayCountTypes.THIRTY_E_360
     float_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    float_day_count_type = DayCountTypes.THIRTY_E_360
+    float_dc_type = DayCountTypes.THIRTY_E_360
     notional = 1000.0
 
     # Pricing a put
     swaptionType = SwapTypes.RECEIVE
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional,
                             float_frequency_type,
-                            float_day_count_type)
+                            float_dc_type)
 
     model = Black(0.21)
     v_finpy = swaption.value(valuation_date, libor_curve, model)
@@ -488,34 +488,34 @@ def testIborSwaptionMatlabExamples():
 
     contFreq = FrequencyTypes.ANNUAL
     interp_type = InterpTypes.LINEAR_ZERO_RATES
-    day_count_type = DayCountTypes.THIRTY_E_360
+    dc_type = DayCountTypes.THIRTY_E_360
 
     libor_curve = DiscountCurveZeros(valuation_date, dates, zero_rates,
-                                     contFreq, day_count_type, interp_type)
+                                     contFreq, dc_type, interp_type)
 
-    settlement_date = Date(1, 1, 2016)
+    settle_date = Date(1, 1, 2016)
     exercise_date = Date(1, 1, 2017)
     maturity_date = Date(1, 1, 2020)
     fixed_coupon = -0.003
 
     fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     float_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    float_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    float_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 1000.0
 
     # Pricing a PAY
     swaptionType = SwapTypes.PAY
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional,
                             float_frequency_type,
-                            float_day_count_type)
+                            float_dc_type)
 
     model = BlackShifted(0.31, 0.008)
     v_finpy = swaption.value(valuation_date, libor_curve, model)
@@ -543,30 +543,30 @@ def testIborSwaptionMatlabExamples():
 
     zero_rates = np.array([0.075] * 11)
     interp_type = InterpTypes.FLAT_FWD_RATES
-    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
     contFreq = FrequencyTypes.SEMI_ANNUAL
 
     libor_curve = DiscountCurveZeros(valuation_date, dates, zero_rates,
                                      contFreq,
-                                     day_count_type, interp_type)
+                                     dc_type, interp_type)
 
-    settlement_date = valuation_date
+    settle_date = valuation_date
     exercise_date = Date(1, 1, 2010)
     maturity_date = Date(1, 1, 2012)
     fixed_coupon = 0.04
 
     fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     swaptionType = SwapTypes.RECEIVE
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional)
 
     model = HWTree(0.05, 0.01)
@@ -595,31 +595,31 @@ def testIborSwaptionMatlabExamples():
     zero_rates = np.array([0.07] * 11)
 
     interp_type = InterpTypes.FLAT_FWD_RATES
-    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
     contFreq = FrequencyTypes.SEMI_ANNUAL
 
     libor_curve = DiscountCurveZeros(valuation_date, dates, zero_rates,
-                                     contFreq, day_count_type, interp_type)
+                                     contFreq, dc_type, interp_type)
 
-    settlement_date = valuation_date
+    settle_date = valuation_date
     exercise_date = Date(1, 1, 2011)
     maturity_date = Date(1, 1, 2012)
 
     fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     model = BKTree(0.1, 0.05, 200)
 
     fixed_coupon = 0.07
     swaptionType = SwapTypes.PAY
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional)
 
     v_finpy = swaption.value(valuation_date, libor_curve, model)
@@ -632,13 +632,13 @@ def testIborSwaptionMatlabExamples():
 
     fixed_coupon = 0.0725
     swaptionType = SwapTypes.RECEIVE
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional)
 
     v_finpy = swaption.value(valuation_date, libor_curve, model)
@@ -667,29 +667,29 @@ def testIborSwaptionMatlabExamples():
     zero_rates = np.array([0.06] * 11)
 
     interp_type = InterpTypes.FLAT_FWD_RATES
-    day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
     contFreq = FrequencyTypes.ANNUAL
 
     libor_curve = DiscountCurveZeros(valuation_date, dates, zero_rates,
-                                     contFreq, day_count_type, interp_type)
+                                     contFreq, dc_type, interp_type)
 
-    settlement_date = valuation_date
+    settle_date = valuation_date
     exercise_date = Date(1, 1, 2012)
     maturity_date = Date(1, 1, 2015)
 
     fixed_frequency_type = FrequencyTypes.ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
     fixed_coupon = 0.062
     swaptionType = SwapTypes.PAY
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             maturity_date,
                             swaptionType,
                             fixed_coupon,
                             fixed_frequency_type,
-                            fixed_day_count_type,
+                            fixed_dc_type,
                             notional)
 
     model = BDTTree(0.20, 200)

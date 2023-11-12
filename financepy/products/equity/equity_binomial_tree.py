@@ -208,7 +208,7 @@ class EquityBinomialTree():
               dividend_curve,
               volatility,
               num_steps,
-              valuation_date,
+              value_date,
               payoff,
               expiry_date,
               payoff_type,
@@ -216,7 +216,7 @@ class EquityBinomialTree():
               payoff_params):
 
         # do some validation
-        t_exp = (expiry_date - valuation_date) / gDaysInYear
+        t_exp = (expiry_date - value_date) / gDaysInYear
         r = discount_curve.zero_rate(expiry_date)
 
         dq = dividend_curve.df(expiry_date)

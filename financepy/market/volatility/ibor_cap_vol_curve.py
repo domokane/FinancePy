@@ -29,7 +29,7 @@ class IborCapVolCurve():
                  curve_date,  # Valuation date for cap volatility
                  capMaturityDates,  # curve date + maturity dates for caps
                  capSigmas,  # Flat cap volatility for cap maturity dates
-                 day_count_type):
+                 dc_type):
         """ Create a cap/floor volatility curve given a curve date, a list of
         cap maturity dates and a vector of cap volatilities. To avoid confusion
         first date of the capDates must be equal to the curve date and first
@@ -71,10 +71,10 @@ class IborCapVolCurve():
 
         self._capMaturityDates = capMaturityDates
 
-        if isinstance(day_count_type, DayCountTypes) is False:
+        if isinstance(dc_type, DayCountTypes) is False:
             raise FinError("DayCountType must be of type DayCountTypes.")
 
-        self._day_count_type = day_count_type
+        self._dc_type = dc_type
 
         self.generate_caplet_vols()
 
@@ -88,7 +88,7 @@ class IborCapVolCurve():
         self._times = []
         self._taus = []
 
-        day_counter = DayCount(self._day_count_type)
+        day_counter = DayCount(self._dc_type)
         prev_dt = self._curve_date
         numCaps = len(self._capMaturityDates)
 

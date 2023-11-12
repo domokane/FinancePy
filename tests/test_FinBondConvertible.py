@@ -44,7 +44,7 @@ bond = BondConvertible(maturity_date,
                        put_prices,
                        accrualBasis)
 
-settlement_date = Date(31, 12, 2003)
+settle_date = Date(31, 12, 2003)
 stock_price = 28.5
 stock_volatility = 0.370
 dividend_dates = [Date(20, 3, 2007),
@@ -65,7 +65,7 @@ dividend_dates = [Date(20, 3, 2007),
                   Date(15, 3, 2022)]
 rate = 0.04
 
-discount_curve = DiscountCurveFlat(settlement_date,
+discount_curve = DiscountCurveFlat(settle_date,
                                    rate,
                                    FrequencyTypes.CONTINUOUS)
 credit_spread = 0.00
@@ -78,7 +78,7 @@ def test_calls_or_puts():
 
     num_steps_per_year = 5
 
-    res = bond.value(settlement_date,
+    res = bond.value(settle_date,
                      stock_price,
                      stock_volatility,
                      dividend_dates,
@@ -95,7 +95,7 @@ def test_calls_or_puts():
     assert round(res['theta'], 4) == 39.6423
 
     num_steps_per_year = 20
-    res = bond.value(settlement_date,
+    res = bond.value(settle_date,
                      stock_price,
                      stock_volatility,
                      dividend_dates,
@@ -116,7 +116,7 @@ def test_dividends():
     dividend_yields = [0.02] * 16
 
     num_steps_per_year = 5
-    res = bond.value(settlement_date,
+    res = bond.value(settle_date,
                      stock_price,
                      stock_volatility,
                      dividend_dates,
@@ -133,7 +133,7 @@ def test_dividends():
     assert round(res['theta'], 4) == 37.8822
 
     num_steps_per_year = 20
-    res = bond.value(settlement_date,
+    res = bond.value(settle_date,
                      stock_price,
                      stock_volatility,
                      dividend_dates,

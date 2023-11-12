@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import BusDayAdjustTypes
@@ -14,9 +17,6 @@ from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
 from financepy.products.rates.swap_float_leg import SwapFloatLeg
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -30,12 +30,12 @@ def test_FinFixedIborSwapLeg():
 
     coupon = -0.44970/100.0
     freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.THIRTY_360_BOND
+    dc_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     principal = 0.0
 
@@ -44,13 +44,13 @@ def test_FinFixedIborSwapLeg():
                                 legPayRecType,
                                 coupon,
                                 freq_type,
-                                day_count_type,
+                                dc_type,
                                 notional,
                                 principal,
                                 payment_lag,
                                 calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                                bd_adjust_type,
+                                dg_rule_type)
 
 ###############################################################################
 
@@ -62,12 +62,12 @@ def test_FinFixedOISSwapLeg():
 
     coupon = -0.515039/100.0
     freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
     principal = 0.0
 
@@ -76,13 +76,13 @@ def test_FinFixedOISSwapLeg():
                                 legPayRecType,
                                 coupon,
                                 freq_type,
-                                day_count_type,
+                                dc_type,
                                 notional,
                                 principal,
                                 payment_lag,
                                 calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                                bd_adjust_type,
+                                dg_rule_type)
 
 ###############################################################################
 
@@ -94,12 +94,12 @@ def test_FinFloatIborLeg():
 
     spread = 0.0
     freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.THIRTY_360_BOND
+    dc_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     principal = 0.0
 
@@ -108,13 +108,13 @@ def test_FinFloatIborLeg():
                                 legPayRecType,
                                 spread,
                                 freq_type,
-                                day_count_type,
+                                dc_type,
                                 notional,
                                 principal,
                                 payment_lag,
                                 calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                                bd_adjust_type,
+                                dg_rule_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
@@ -133,12 +133,12 @@ def test_FinFloatOISLeg():
 
     spread = 0.0
     freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     calendar_type = CalendarTypes.TARGET
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
+    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
     principal = 0.0
 
@@ -147,13 +147,13 @@ def test_FinFloatOISLeg():
                                 legPayRecType,
                                 spread,
                                 freq_type,
-                                day_count_type,
+                                dc_type,
                                 notional,
                                 principal,
                                 payment_lag,
                                 calendar_type,
-                                bus_day_adjust_type,
-                                date_gen_rule_type)
+                                bd_adjust_type,
+                                dg_rule_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
@@ -173,7 +173,7 @@ def swapFixedLegMonthEnds():
                               end_date='2Y',
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
-                              day_count_type=DayCountTypes.THIRTY_E_360,
+                              dc_type=DayCountTypes.THIRTY_E_360,
                               calendar_type=CalendarTypes.UNITED_STATES,
                               coupon=0.0,
                               end_of_month=False)
@@ -182,7 +182,7 @@ def swapFixedLegMonthEnds():
                               end_date='3Y',
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
-                              day_count_type=DayCountTypes.THIRTY_E_360,
+                              dc_type=DayCountTypes.THIRTY_E_360,
                               calendar_type=CalendarTypes.UNITED_STATES,
                               coupon=0.0,
                               end_of_month=False)
@@ -202,23 +202,29 @@ def test_swapFloatLeg():
 
     effective_date = Date(1, 9, 2021)
 
-    fixedleg_2 = SwapFixedLeg(effective_date, end_date='3y',
-                              leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
-                              day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
+    fixedleg_2 = SwapFixedLeg(effective_date,
+                              end_date='3Y',
+                              leg_type=SwapTypes.PAY,
+                              freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              dc_type=DayCountTypes.THIRTY_E_360,
+                              cal_type=CalendarTypes.UNITED_STATES,
                               coupon=0)
 
-    floatleg_2 = SwapFloatLeg(effective_date, end_date='3y',
-                              leg_type=SwapTypes.PAY, freq_type=FrequencyTypes.SEMI_ANNUAL,
-                              day_count_type=DayCountTypes.THIRTY_E_360, calendar_type=CalendarTypes.UNITED_STATES,
+    floatleg_2 = SwapFloatLeg(effective_date,
+                              end_date='3Y',
+                              leg_type=SwapTypes.PAY,
+                              freq_type=FrequencyTypes.SEMI_ANNUAL,
+                              dc_type=DayCountTypes.THIRTY_E_360,
+                              cal_type=CalendarTypes.UNITED_STATES,
                               spread=0)
 
     fixedleg_2.generate_payments()
     floatleg_2.generate_payment_dates()
 
     discount_curve = DiscountCurveFlat(
-        effective_date, 0.05, day_count_type=DayCountTypes.THIRTY_E_360)
+        effective_date, 0.05, dc_type=DayCountTypes.THIRTY_E_360)
     index_curve = DiscountCurveFlat(
-        effective_date, 0.05, day_count_type=DayCountTypes.ACT_ACT_ISDA)
+        effective_date, 0.05, dc_type=DayCountTypes.ACT_ACT_ISDA)
 
     floatleg_2.value(effective_date, discount_curve, index_curve)
     # print("leg_2")

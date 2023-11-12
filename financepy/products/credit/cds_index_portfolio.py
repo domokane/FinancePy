@@ -29,19 +29,19 @@ class CDSIndexPortfolio:
     def __init__(self,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_360,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create FinCDSIndexPortfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard. """
 
         check_argument_types(self.__init__, locals())
 
-        self._day_count_type = day_count_type
-        self._date_gen_rule_type = date_gen_rule_type
-        self._calendar_type = calendar_type
+        self._dc_type = day_count_type
+        self._dg_rule_type = dg_rule_type
+        self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bus_day_adjust_type = bus_day_adjust_type
+        self._bd_adjust_type = bd_adjust_type
 
     ###########################################################################
 
@@ -241,8 +241,8 @@ class CDSIndexPortfolio:
                                 value_date,
                                 issuer_curves,
                                 index_cpns,
-                                indexUpfronts,
-                                indexMaturityDates,
+                                index_upfronts,
+                                index_maturity_dates,
                                 indexRecoveryRate,
                                 tolerance=1e-6):
         """ Adjust individual CDS discount to reprice CDS index prices.
@@ -286,11 +286,12 @@ class CDSIndexPortfolio:
         curveCDSContracts = []
 
         for j in range(0, numCDSMaturityPoints):
-            cdsCoupon = 1.0
+
+            cds_coupon = 1.0
 
             cds_contract = CDS(value_date,
                                cdsMaturityDates[j],
-                               cdsCoupon)
+                               cds_coupon)
 
             curveCDSContracts.append(cds_contract)
 
@@ -314,7 +315,7 @@ class CDSIndexPortfolio:
                 sumProt = 0.0
 
                 # This is for the specific index maturity date
-                indexMaturityDate = indexMaturityDates[i_maturity]
+                indexMaturityDate = index_maturity_dates[i_maturity]
                 cdsIndex = CDS(value_date, indexMaturityDate, 0.0, 1.0)
 
                 for i_credit in range(0, num_credits):
@@ -350,7 +351,7 @@ class CDSIndexPortfolio:
 
                 sumPrem = sumRPV01 * index_cpns[i_maturity]
 
-                numerator = indexUpfronts[i_maturity] + sumPrem
+                numerator = index_upfronts[i_maturity] + sumPrem
                 denominator = sumProt
 
                 alpha = numerator / denominator
@@ -510,10 +511,10 @@ class CDSIndexPortfolio:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAYCOUNT", self._day_count_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUSDAYRULE", self._bus_day_adjust_type)
-        s += label_to_string("DATEGENRULE", self._date_gen_rule_type)
+        s += label_to_string("DAYCOUNT", self._dc_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
+        s += label_to_string("DATEGENRULE", self._dg_rule_type)
         return s
 
     ###########################################################################

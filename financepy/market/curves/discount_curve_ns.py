@@ -32,7 +32,7 @@ class DiscountCurveNS(DiscountCurve):
                  beta2: float,
                  tau: float,
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
+                 dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Creation of a FinDiscountCurveNS object. Parameters are provided
         individually for beta0, beta1, beta2 and tau. The zero rates produced
         by this parametrisation have an implicit compounding convention that
@@ -49,14 +49,14 @@ class DiscountCurveNS(DiscountCurve):
         self._beta2 = beta2
         self._tau = tau
         self._freq_type = freq_type
-        self._day_count_type = day_count_type
+        self._dc_type = dc_type
 
     ###########################################################################
 
     def zero_rate(self,
                   dates: (list, Date),
                   freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                  day_count_type: DayCountTypes = DayCountTypes.ACT_360):
+                  dc_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Calculation of zero rates with specified frequency according to
         NS parametrisation. This method overrides that in FinDiscountCurve.
         The parametrisation is not strictly in terms of continuously compounded
@@ -68,13 +68,13 @@ class DiscountCurveNS(DiscountCurve):
         if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(day_count_type, DayCountTypes) is False:
+        if isinstance(dc_type, DayCountTypes) is False:
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
@@ -84,13 +84,13 @@ class DiscountCurveNS(DiscountCurve):
                                zero_rates,
                                dc_times,
                                self._freq_type,
-                               self._day_count_type)
+                               self._dc_type)
 
         # Convert these to zero rates in the required frequency and day count
         zero_rates = self._df_to_zero(dfs,
                                       dates,
                                       freq_type,
-                                      day_count_type)
+                                      dc_type)
 
         return zero_rates
 
@@ -123,7 +123,7 @@ class DiscountCurveNS(DiscountCurve):
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
                                     self._value_date,
-                                    self._day_count_type)
+                                    self._dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
@@ -131,7 +131,7 @@ class DiscountCurveNS(DiscountCurve):
                               zero_rates,
                               dc_times,
                               self._freq_type,
-                              self._day_count_type)
+                              self._dc_type)
 
         if isinstance(dates, Date):
             return df[0]
@@ -149,7 +149,7 @@ class DiscountCurveNS(DiscountCurve):
         s += label_to_string("BETA2", self._beta2)
         s += label_to_string("TAU", self._tau)
         s += label_to_string("FREQUENCY", (self._freq_type))
-        s += label_to_string("DAY_COUNT", (self._day_count_type))
+        s += label_to_string("DAY_COUNT", (self._dc_type))
         return s
 
     ###############################################################################

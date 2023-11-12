@@ -125,14 +125,14 @@ def test_HullWhiteExampleTwo():
 def test_HullWhiteBondOption():
     # Valuation of a European option on a coupon bearing bond
 
-    settlement_date = Date(1, 12, 2019)
+    settle_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    expiry_date = settlement_date.add_tenor("18m")
-    maturity_date = settlement_date.add_tenor("10Y")
+    expiry_date = settle_date.add_tenor("18m")
+    maturity_date = settle_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    dc_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
@@ -145,14 +145,14 @@ def test_HullWhiteBondOption():
         pcd = bond._cpn_dates[i-1]
         ncd = bond._cpn_dates[i]
 
-        if ncd > settlement_date:
+        if ncd > settle_date:
 
             if len(cpn_times) == 0:
-                flow_time = (pcd - settlement_date) / gDaysInYear
+                flow_time = (pcd - settle_date) / gDaysInYear
                 cpn_times.append(flow_time)
                 cpn_flows.append(cpn)
 
-            flow_time = (ncd - settlement_date) / gDaysInYear
+            flow_time = (ncd - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -171,7 +171,7 @@ def test_HullWhiteBondOption():
 
     #  Test convergence
     num_steps_list = range(50, 500, 50)
-    t_exp = (expiry_date - settlement_date)/gDaysInYear
+    t_exp = (expiry_date - settle_date)/gDaysInYear
 
     vJam = model.european_bond_option_jamshidian(t_exp, strike_price, face,
                                                  cpn_times, cpn_flows,
@@ -224,13 +224,13 @@ def test_HullWhiteBondOption():
 def test_HullWhiteCallableBond():
     # Valuation of a European option on a coupon bearing bond
 
-    settlement_date = Date(1, 12, 2019)
+    settle_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2018)
-    maturity_date = settlement_date.add_tenor("10Y")
+    maturity_date = settle_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    dc_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
@@ -238,8 +238,8 @@ def test_HullWhiteCallableBond():
 
     for flow_date in bond._cpn_dates[1:]:
 
-        if flow_date > settlement_date:
-            flow_time = (flow_date - settlement_date) / gDaysInYear
+        if flow_date > settle_date:
+            flow_time = (flow_date - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -253,60 +253,60 @@ def test_HullWhiteCallableBond():
     call_dates = []
     call_prices = []
     callPx = 120.0
-    call_dates.append(settlement_date.add_tenor("2Y"))
+    call_dates.append(settle_date.add_tenor("2Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.add_tenor("3Y"))
+    call_dates.append(settle_date.add_tenor("3Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.add_tenor("4Y"))
+    call_dates.append(settle_date.add_tenor("4Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.add_tenor("5Y"))
+    call_dates.append(settle_date.add_tenor("5Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.add_tenor("6Y"))
+    call_dates.append(settle_date.add_tenor("6Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.add_tenor("7Y"))
+    call_dates.append(settle_date.add_tenor("7Y"))
     call_prices.append(callPx)
-    call_dates.append(settlement_date.add_tenor("8Y"))
+    call_dates.append(settle_date.add_tenor("8Y"))
     call_prices.append(callPx)
 
     call_times = []
     for dt in call_dates:
-        t = (dt - settlement_date) / gDaysInYear
+        t = (dt - settle_date) / gDaysInYear
         call_times.append(t)
 
     put_dates = []
     put_prices = []
     putPx = 98.0
-    put_dates.append(settlement_date.add_tenor("2Y"))
+    put_dates.append(settle_date.add_tenor("2Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.add_tenor("3Y"))
+    put_dates.append(settle_date.add_tenor("3Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.add_tenor("4Y"))
+    put_dates.append(settle_date.add_tenor("4Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.add_tenor("5Y"))
+    put_dates.append(settle_date.add_tenor("5Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.add_tenor("6Y"))
+    put_dates.append(settle_date.add_tenor("6Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.add_tenor("7Y"))
+    put_dates.append(settle_date.add_tenor("7Y"))
     put_prices.append(putPx)
-    put_dates.append(settlement_date.add_tenor("8Y"))
+    put_dates.append(settle_date.add_tenor("8Y"))
     put_prices.append(putPx)
 
     put_times = []
     for dt in put_dates:
-        t = (dt - settlement_date) / gDaysInYear
+        t = (dt - settle_date) / gDaysInYear
         put_times.append(t)
 
     ###########################################################################
 
-    tmat = (maturity_date - settlement_date) / gDaysInYear
-    curve = DiscountCurveFlat(settlement_date, 0.05, FrequencyTypes.CONTINUOUS)
+    tmat = (maturity_date - settle_date) / gDaysInYear
+    curve = DiscountCurveFlat(settle_date, 0.05, FrequencyTypes.CONTINUOUS)
 
     dfs = []
     times = []
 
     for dt in bond._cpn_dates:
-        if dt > settlement_date:
-            t = (dt - settlement_date) / gDaysInYear
+        if dt > settle_date:
+            t = (dt - settle_date) / gDaysInYear
             df = curve.df(dt)
             times.append(t)
             dfs.append(df)
@@ -316,14 +316,14 @@ def test_HullWhiteCallableBond():
 
     ###########################################################################
 
-    v1 = bond.clean_price_from_discount_curve(settlement_date, curve)
+    v1 = bond.clean_price_from_discount_curve(settle_date, curve)
 
     sigma = 0.02  # basis point volatility
     a = 0.01
 
     # Test convergence
     num_steps_list = [100, 200, 500, 1000]
-    tmat = (maturity_date - settlement_date)/gDaysInYear
+    tmat = (maturity_date - settle_date)/gDaysInYear
 
     testCases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")
 

@@ -24,12 +24,12 @@ def build_curve(valuation_date):
     depos = []
 
     spot_days = 0
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_date = valuation_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settlement_date, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settlement_date, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settlement_date, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_date, "1M", deposit_rate, depoBasis)
+    depo2 = IborDeposit(settle_date, "3M", deposit_rate, depoBasis)
+    depo3 = IborDeposit(settle_date, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -43,11 +43,11 @@ def build_curve(valuation_date):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settlement_date, "1Y", fixed_leg_type,
+    swap1 = IborSwap(settle_date, "1Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap2 = IborSwap(settlement_date, "3Y", fixed_leg_type,
+    swap2 = IborSwap(settle_date, "3Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap3 = IborSwap(settlement_date, "5Y", fixed_leg_type,
+    swap3 = IborSwap(settle_date, "5Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
@@ -75,7 +75,7 @@ model4 = SABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
 model5 = HWTree(0.00001, 0.00001)
 model6 = BKTree(0.01, 0.01)
 
-settlement_date = valuation_date.add_weekdays(2)
+settle_date = valuation_date.add_weekdays(2)
 
 libor_curve = build_curve(valuation_date)
 
@@ -85,7 +85,7 @@ def test_pay():
     swaptionType = SwapTypes.PAY
 
     k = 0.02
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,
@@ -107,7 +107,7 @@ def test_pay():
     assert round(swap6, 0) == 124501
 
     k = 0.035
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,
@@ -129,7 +129,7 @@ def test_pay():
     assert round(swap6, 1) == 62307.2
 
     k = 0.065
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,
@@ -155,7 +155,7 @@ def test_receive():
     swaptionType = SwapTypes.RECEIVE
 
     k = 0.02
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,
@@ -177,7 +177,7 @@ def test_receive():
     assert round(swap6, 4) == 0.0
 
     k = 0.05
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,
@@ -199,7 +199,7 @@ def test_receive():
     assert round(swap6, 1) == 762.5
 
     k = 0.08
-    swaption = IborSwaption(settlement_date,
+    swaption = IborSwaption(settle_date,
                             exercise_date,
                             swapMaturityDate,
                             swaptionType,

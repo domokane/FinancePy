@@ -23,7 +23,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_BondConvertible():
 
-    settlement_date = Date(31, 12, 2003)
+    settle_date = Date(31, 12, 2003)
     start_convert_date = Date(31, 12, 2003)
     maturity_date = Date(15, 3, 2022)
     conversion_ratio = 38.4615  # adjust for face
@@ -77,7 +77,7 @@ def test_BondConvertible():
     stock_price = 28.5
     stock_volatility = 0.370
     rate = 0.04
-    discount_curve = DiscountCurveFlat(settlement_date,
+    discount_curve = DiscountCurveFlat(settle_date,
                                        rate,
                                        FrequencyTypes.CONTINUOUS)
     credit_spread = 0.00
@@ -90,8 +90,10 @@ def test_BondConvertible():
     testCases.header("TIME", "NUMSTEPS", "PRICE")
 
     for num_steps_per_year in [5, 10, 20]:
+
         start = time.time()
-        res = bond.value(settlement_date,
+
+        res = bond.value(settle_date,
                          stock_price,
                          stock_volatility,
                          dividend_dates,
@@ -112,7 +114,7 @@ def test_BondConvertible():
     testCases.header("TIME", "NUMSTEPS", "PRICE")
     for num_steps_per_year in [5, 20, 80]:
         start = time.time()
-        res = bond.value(settlement_date,
+        res = bond.value(settle_date,
                          stock_price,
                          stock_volatility,
                          dividend_dates,
@@ -121,6 +123,7 @@ def test_BondConvertible():
                          credit_spread,
                          recovery_rate,
                          num_steps_per_year)
+
         end = time.time()
         period = end - start
         testCases.print(period, num_steps_per_year, res)

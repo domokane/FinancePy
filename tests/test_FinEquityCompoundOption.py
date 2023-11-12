@@ -11,7 +11,7 @@ import sys
 sys.path.append("./..")
 
 
-valuation_date = Date(1, 1, 2015)
+value_date = Date(1, 1, 2015)
 expiry_date1 = Date(1, 1, 2017)
 expiry_date2 = Date(1, 1, 2018)
 k1 = 5.0
@@ -22,8 +22,8 @@ interest_rate = 0.035
 dividend_yield = 0.01
 
 model = BlackScholes(volatility)
-discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+discount_curve = DiscountCurveFlat(value_date, interest_rate)
+dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
 num_steps = 200
 
@@ -36,9 +36,9 @@ def test_european():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 4.6039
@@ -49,9 +49,9 @@ def test_european():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 6.7176
@@ -62,9 +62,9 @@ def test_european():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 2.0165
@@ -75,9 +75,9 @@ def test_european():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 1.0873
@@ -92,9 +92,9 @@ def test_american():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 4.5587
@@ -105,9 +105,9 @@ def test_american():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 12.8630
@@ -118,9 +118,9 @@ def test_american():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 4.6697
@@ -131,9 +131,9 @@ def test_american():
 
     cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
                                       expiry_date2, option_type2, k2)
-    value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+    value = cmpdOption.value(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-    values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+    values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                     dividend_curve, model, num_steps)
 
     assert round(value, 4) == 4.3034
@@ -149,19 +149,19 @@ def test_greeks():
         expiry_date2, option_type2, k2)
 
     delta = cmpdOption.delta(
-        valuation_date,
+        value_date,
         stock_price,
         discount_curve,
         dividend_curve,
         model)
     vega = cmpdOption.vega(
-        valuation_date,
+        value_date,
         stock_price,
         discount_curve,
         dividend_curve,
         model)
     theta = cmpdOption.theta(
-        valuation_date,
+        value_date,
         stock_price,
         discount_curve,
         dividend_curve,

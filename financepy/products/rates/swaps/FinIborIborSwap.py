@@ -19,7 +19,7 @@ from ...utils.FinGlobalTypes import SwapTypes
 
 class IborIborSwap:
     """ Class for managing an interest rate basis swap contract. This is a
-    contract in which a floating leg with one LIBOR tenor is exchanged for a 
+    contract in which a floating leg with one LIBOR tenor is exchanged for a
     floating leg payment in a different LIBOR tenor. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
     from a start date to a specified maturity date.
@@ -37,11 +37,11 @@ class IborIborSwap:
                  recDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  basisSwapSpread: float = 0.0,
                  notional: float = ONE_MILLION,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a Ibor basis swap contract giving the contract start
-        date, its maturity, frequency and day counts on the two floating 
+        date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
@@ -57,9 +57,9 @@ class IborIborSwap:
             self._termination_date = effective_date.add_tenor(
                 termination_date_or_tenor)
 
-        calendar = Calendar(calendar_type)
+        calendar = CalendarTypes(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -71,14 +71,14 @@ class IborIborSwap:
         self._recFreqType = recFreqType
         self._payDayCountType = payDayCountType
         self._recDayCountType = recDayCountType
-        self._calendar_type = calendar_type
-        self._bus_day_adjust_type = bus_day_adjust_type
-        self._date_gen_rule_type = date_gen_rule_type
+        self._cal_type = cal_type
+        self._bd_adjust_type = bd_adjust_type
+        self._dg_rule_type = dg_rule_type
 
         self._payFloatDates = self._generateFloatLegDates(self._payFreqType)
         self._recFloatDates = self._generateFloatLegDates(self._recFreqType)
 
-        self._adjustedMaturityDate = self._adjustedFixedDates[-1]
+        self._adjustedMaturityDate = self._adjusted_fixed_dates[-1]
 
         self._payFloatYearFracs = []
         self._recFloatYearFracs = []
@@ -103,9 +103,9 @@ class IborIborSwap:
         floatDates = FinSchedule(self._effective_date,
                                  self._termination_date,
                                  freq_type,
-                                 self._calendar_type,
-                                 self._bus_day_adjust_type,
-                                 self._date_gen_rule_type)._generate()
+                                 self._cal_type,
+                                 self._bd_adjust_type,
+                                 self._dg_rule_type)._generate()
 
         return floatDates
 
@@ -162,7 +162,7 @@ class IborIborSwap:
         self._floatTotalPV = []
         self._firstFixingRate = firstFixingRate
 
-        basis = FinDayCount(self._float_day_count_type)
+        basis = FinDayCount(self._float_dc_type)
 
         """ The swap may have started in the past but we can only value
         payments that have occurred after the start date. """
@@ -253,8 +253,8 @@ class IborIborSwap:
         print("START DATE:", self._effective_date)
         print("MATURITY DATE:", self._maturity_date)
         print("SPREAD COUPON (%):", self._float_spread * 100)
-        print("FLOAT LEG FREQUENCY:", str(self._float_frequency_type))
-        print("FLOAT LEG DAY COUNT:", str(self._float_day_count_type))
+        print("FLOAT LEG FREQUENCY:", str(self._float_freq_type))
+        print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
         print("VALUATION DATE", self._value_date)
 
         if len(self._floatFlows) == 0:
@@ -305,13 +305,13 @@ class IborIborSwap:
         s += label_to_string("SWAP TYPE", self._swapType)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)
         s += label_to_string("FLOAT SPREAD", self._float_spread)
-        s += label_to_string("FIXED FREQUENCY", self._fixed_frequency_type)
-        s += label_to_string("FLOAT FREQUENCY", self._float_frequency_type)
-        s += label_to_string("FIXED DAY COUNT", self._fixed_day_count_type)
-        s += label_to_string("FLOAT DAY COUNT", self._float_day_count_type)
-        s += label_to_string("CALENDAR", self._calendar_type)
-        s += label_to_string("BUS DAY ADJUST", self._bus_day_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._date_gen_rule_type)
+        s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)
+        s += label_to_string("FLOAT FREQUENCY", self._float_freq_type)
+        s += label_to_string("FIXED DAY COUNT", self._fixed_dc_type)
+        s += label_to_string("FLOAT DAY COUNT", self._float_dc_type)
+        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
         return s
 
 ###############################################################################

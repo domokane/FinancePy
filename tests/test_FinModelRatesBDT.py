@@ -24,14 +24,14 @@ def test_BDTExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
 
-    settlement_date = Date(1, 12, 2019)
+    settle_date = Date(1, 12, 2019)
     issue_date = Date(1, 12, 2015)
-    expiry_date = settlement_date.add_tenor("18m")
-    maturity_date = settlement_date.add_tenor("10Y")
+    expiry_date = settle_date.add_tenor("18m")
+    maturity_date = settle_date.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, accrual_type)
+    dc_type = DayCountTypes.ACT_ACT_ICMA
+    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
@@ -41,14 +41,14 @@ def test_BDTExampleTwo():
     for i in range(1, num_flows):
         pcd = bond._cpn_dates[i-1]
         ncd = bond._cpn_dates[i]
-        if pcd < settlement_date and ncd > settlement_date:
-            flow_time = (pcd - settlement_date) / gDaysInYear
+        if pcd < settle_date and ncd > settle_date:
+            flow_time = (pcd - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
     for flow_date in bond._cpn_dates:
-        if flow_date > settlement_date:
-            flow_time = (flow_date - settlement_date) / gDaysInYear
+        if flow_date > settle_date:
+            flow_time = (flow_date - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -58,15 +58,15 @@ def test_BDTExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_date - settlement_date) / gDaysInYear
-    t_exp = (expiry_date - settlement_date) / gDaysInYear
+    tmat = (maturity_date - settle_date) / gDaysInYear
+    t_exp = (expiry_date - settle_date) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settlement_date.add_years(times)
+    dates = settle_date.add_years(times)
     dfs = np.exp(-0.05*times)
 
-    curve = DiscountCurve(settlement_date, dates, dfs)
+    curve = DiscountCurve(settle_date, dates, dfs)
 
-    price = bond.clean_price_from_discount_curve(settlement_date, curve)
+    price = bond.clean_price_from_discount_curve(settle_date, curve)
     assert round(price, 4) == 99.5420
 
     sigma = 0.20
@@ -88,16 +88,16 @@ def test_BDTExampleThree():
     # Valuation of a swaption as in Leif Andersen's paper - see Table 1 on
     # SSRN-id155208.pdf
 
-    settlement_date = Date(1, 1, 2020)
+    settle_date = Date(1, 1, 2020)
     times = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-    dates = settlement_date.add_years(times)
+    dates = settle_date.add_years(times)
     rate = 0.06
     dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
-    curve = DiscountCurve(settlement_date, dates, dfs)
+    curve = DiscountCurve(settle_date, dates, dfs)
 
     coupon = 0.06
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
+    dc_type = DayCountTypes.ACT_ACT_ICMA
     strike_price = 100.0
     face = 100.0
     # Andersen paper
@@ -107,25 +107,25 @@ def test_BDTExampleThree():
     years_to_maturity = 4.0
     expiryYears = 2.0
 
-    maturity_date = settlement_date.add_years(years_to_maturity)
+    maturity_date = settle_date.add_years(years_to_maturity)
     issue_date = Date(maturity_date._d, maturity_date._m, 2000)
 
     sigma = 0.2012
 
-    expiry_date = settlement_date.add_years(expiryYears)
+    expiry_date = settle_date.add_years(expiryYears)
 
-    tmat = (maturity_date - settlement_date) / gDaysInYear
-    t_exp = (expiry_date - settlement_date) / gDaysInYear
+    tmat = (maturity_date - settle_date) / gDaysInYear
+    t_exp = (expiry_date - settle_date) / gDaysInYear
 
     bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
     cpn = bond._coupon/bond._frequency
     for flow_date in bond._cpn_dates:
         if flow_date > expiry_date:
-            flow_time = (flow_date - settlement_date) / gDaysInYear
+            flow_time = (flow_date - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -133,7 +133,7 @@ def test_BDTExampleThree():
     cpn_flows = np.array(cpn_flows)
 
     price = bond.clean_price_from_discount_curve(
-        settlement_date, curve)
+        settle_date, curve)
 
     model = BDTTree(sigma, num_time_steps)
     model.build_tree(tmat, times, dfs)
@@ -154,25 +154,25 @@ def test_BDTExampleThree():
     years_to_maturity = 10.0
     expiryYears = 5.0
 
-    maturity_date = settlement_date.add_years(years_to_maturity)
+    maturity_date = settle_date.add_years(years_to_maturity)
     issue_date = Date(maturity_date._d, maturity_date._m, 2000)
 
     sigma = 0.1522
 
-    expiry_date = settlement_date.add_years(expiryYears)
+    expiry_date = settle_date.add_years(expiryYears)
 
-    tmat = (maturity_date - settlement_date) / gDaysInYear
-    t_exp = (expiry_date - settlement_date) / gDaysInYear
+    tmat = (maturity_date - settle_date) / gDaysInYear
+    t_exp = (expiry_date - settle_date) / gDaysInYear
 
     bond = Bond(issue_date, maturity_date,
-                coupon, freq_type, accrual_type)
+                coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
     cpn = bond._coupon/bond._frequency
     for flow_date in bond._cpn_dates:
         if flow_date > expiry_date:
-            flow_time = (flow_date - settlement_date) / gDaysInYear
+            flow_time = (flow_date - settle_date) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -180,7 +180,7 @@ def test_BDTExampleThree():
     cpn_flows = np.array(cpn_flows)
 
     price = bond.clean_price_from_discount_curve(
-        settlement_date, curve)
+        settle_date, curve)
 
     model = BDTTree(sigma, num_time_steps)
     model.build_tree(tmat, times, dfs)

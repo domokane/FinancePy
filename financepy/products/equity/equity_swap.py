@@ -20,14 +20,14 @@ from ...products.equity.equity_swap_leg import EquitySwapLeg
 class EquitySwap:
     """ Class for managing a standard Equity vs Float leg swap. This is a
     contract in which an equity payment leg is exchanged for a series of
-    floating rates payments. There is no exchange of principal. The contract 
-    is entered into at zero initial cost when spreads are zero. The contract 
+    floating rates payments. There is no exchange of principal. The contract
+    is entered into at zero initial cost when spreads are zero. The contract
     lasts from an effective date to a specified maturity date.
 
     The equity payments are not known fully until the end of the payment period.
 
     The floating rate is not known fully until the end of the preceding payment
-    period. It is set in advance and paid in arrears. 
+    period. It is set in advance and paid in arrears.
 
     The value of the contract is the NPV of the two coupon streams. Discounting
     is done on a supplied discount curve which is separate from the curve from
@@ -38,25 +38,25 @@ class EquitySwap:
                  termination_date_or_tenor: (Date, str), # Date contract ends
                  eq_leg_type: SwapTypes,
                  eq_freq_type: FrequencyTypes,
-                 eq_day_count_type: DayCountTypes,
+                 eq_dc_type: DayCountTypes,
                  strike: float, # Price at effective date
                  quantity: float = 1.0, # Quantity at effective date
                  eq_payment_lag: int = 0,
                  eq_return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
-                 rate_freq_type: FrequencyTypes = FrequencyTypes.MONTHLY, 
-                 rate_day_count_type: DayCountTypes = DayCountTypes.ACT_360,
-                 rate_spread: float = 0.0, 
+                 rate_freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
+                 rate_dc_type: DayCountTypes = DayCountTypes.ACT_360,
+                 rate_spread: float = 0.0,
                  rate_payment_lag: int = 0,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bus_day_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 date_gen_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
-        """ Create an equity swap contract given the contract effective date, its maturity, 
-        underlying price and quantity, day count convention and return type and other details. 
-        The equity leg parameters have default values that can be overwritten if needed. 
-        The start date is contractual and is the same as the settlement date for a new swap. 
-        It is the date on which interest starts to accrue. The end of the contract is the 
-        termination date. This is not adjusted for business days. The adjusted termination 
+        """ Create an equity swap contract given the contract effective date, its maturity,
+        underlying price and quantity, day count convention and return type and other details.
+        The equity leg parameters have default values that can be overwritten if needed.
+        The start date is contractual and is the same as the settlement date for a new swap.
+        It is the date on which interest starts to accrue. The end of the contract is the
+        termination date. This is not adjusted for business days. The adjusted termination
         date is called the maturity date. This is calculated. """
 
         check_argument_types(self.__init__, locals())
@@ -69,7 +69,7 @@ class EquitySwap:
 
         calendar = Calendar(calendar_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bus_day_adjust_type)
+                                              bd_adjust_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -87,14 +87,14 @@ class EquitySwap:
                                          self._maturity_date,
                                          eq_leg_type,
                                          eq_freq_type,
-                                         eq_day_count_type,
+                                         eq_dc_type,
                                          strike,
                                          quantity,
                                          eq_payment_lag,
                                          eq_return_type,
                                          calendar_type,
-                                         bus_day_adjust_type,
-                                         date_gen_rule_type,
+                                         bd_adjust_type,
+                                         dg_rule_type,
                                          end_of_month)
 
         # Fixed Rate Leg not implemented yet
@@ -103,19 +103,19 @@ class EquitySwap:
                                       rate_leg_type,
                                       rate_spread,
                                       rate_freq_type,
-                                      rate_day_count_type,
+                                      rate_dc_type,
                                       self._equity_leg._notional,
                                       self._principal,
                                       rate_payment_lag,
                                       calendar_type,
-                                      bus_day_adjust_type,
-                                      date_gen_rule_type,
+                                      bd_adjust_type,
+                                      dg_rule_type,
                                       end_of_month)
 
     ###########################################################################
 
     def value(self,
-              valuation_date: Date,
+              value_date: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve = None,
               dividend_curve: DiscountCurve = None,
@@ -123,14 +123,14 @@ class EquitySwap:
               firstFixingRate=None):
         """ Value the Equity swap on a valuation date. """
 
-        self._equity_leg_value = self._equity_leg.value(valuation_date,
+        self._equity_leg_value = self._equity_leg.value(value_date,
                                                         discount_curve,
                                                         index_curve,
                                                         dividend_curve,
                                                         current_price)
         self._fill_rate_notional_array()
 
-        self._rate_leg_value = self._rate_leg.value(valuation_date,
+        self._rate_leg_value = self._rate_leg.value(value_date,
                                                     discount_curve,
                                                     index_curve,
                                                     firstFixingRate)
