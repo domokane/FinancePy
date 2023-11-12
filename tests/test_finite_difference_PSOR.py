@@ -101,9 +101,9 @@ def test_european_call():
     dividend_yield = 0.00
     volatility = 0.40
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
     strike_price = 50.0
     option_type = OptionTypes.EUROPEAN_CALL
     num_steps_per_year = 2000
@@ -134,9 +134,9 @@ def test_european_put():
     dividend_yield = 0.00
     volatility = 0.40
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
     num_steps_per_year = 2000
     strike_price = 50.0
     option_type = OptionTypes.EUROPEAN_PUT
@@ -167,9 +167,9 @@ def test_american_call():
     dividend_yield = 0.05
     volatility = 0.40
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
     num_steps_per_year = 2000
     strike_price = 50.0
     option_type = OptionTypes.AMERICAN_CALL
@@ -201,9 +201,9 @@ def test_american_put():
     dividend_yield = 0.05
     volatility = 0.40
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
     num_steps_per_year = 2000
     strike_price = 50.0
     option_type = OptionTypes.AMERICAN_PUT
@@ -236,18 +236,18 @@ def test_call_option():
     call_option = EquityVanillaOption(
         expiry_date, strike_price, option_type)
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     spot_price = 100
     volatility = 0.30
     risk_free_rate = 0.05
     dividend_yield = 0.01
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     # Call option
-    v0 = call_option.value(valuation_date, spot_price,
+    v0 = call_option.value(value_date, spot_price,
                            discount_curve, dividend_curve, model)
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,
@@ -269,18 +269,18 @@ def test_put_option():
     put_option = EquityVanillaOption(
         expiry_date, strike_price, option_type)
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     spot_price = 100
     volatility = 0.30
     risk_free_rate = 0.05
     dividend_yield = 0.1
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     # Call option
-    v0 = put_option.value(valuation_date, spot_price,
+    v0 = put_option.value(value_date, spot_price,
                           discount_curve, dividend_curve, model)
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,

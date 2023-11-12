@@ -64,16 +64,16 @@ class BondFRN:
         self._quoted_margin = quoted_margin
         self._freq_type = freq_type
         self._dc_type = dc_type
-        self._cpn_dates = []
         self._freq = annual_frequency(freq_type)
-        self._par = 100.0  # This is how price is quoted
         self._cal_type = cal_type
-        self._cpn_dates = []
-        self._flow_amounts = []
 
         self._settle_date = Date(1, 1, 1900)
         self._accrued_interest = None
         self._accrued_days = 0.0
+
+        self._cpn_dates = []
+        self._flow_amounts = []
+        self._par = 100.0  # This is how price is quoted
 
         self._calculate_cpn_dates()
 
@@ -88,11 +88,11 @@ class BondFRN:
         dg_rule_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dates = Schedule(self._issue_date,
-                                      self._maturity_date,
-                                      self._freq_type,
-                                      self._cal_type,
-                                      bd_adjust_type,
-                                      dg_rule_type)._generate()
+                                   self._maturity_date,
+                                   self._freq_type,
+                                   self._cal_type,
+                                   bd_adjust_type,
+                                   dg_rule_type)._generate()
 
     ###########################################################################
 

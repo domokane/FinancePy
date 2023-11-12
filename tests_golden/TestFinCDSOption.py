@@ -2,6 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -13,9 +17,6 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_option import CDSOption
-import numpy as np
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -26,7 +27,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def buildFullIssuerCurve(valuation_date):
+def buildFullIssuerCurve(value_date):
 
     dcType = DayCountTypes.ACT_360
     depos = []
@@ -35,7 +36,7 @@ def buildFullIssuerCurve(valuation_date):
     m = 1.0  # 0.00000000000
 
     spot_days = 0
-    settle_date = valuation_date.add_days(spot_days)
+    settle_date = value_date.add_days(spot_days)
 
     maturity_date = settle_date.add_months(1)
     depo1 = IborDeposit(settle_date, maturity_date, m * 0.0016, dcType)
@@ -61,7 +62,7 @@ def buildFullIssuerCurve(valuation_date):
     fras = []
 
     spot_days = 2
-    settle_date = valuation_date.add_days(spot_days)
+    settle_date = value_date.add_days(spot_days)
 
     swaps = []
     dcType = DayCountTypes.THIRTY_E_360_ISDA
@@ -157,52 +158,52 @@ def buildFullIssuerCurve(valuation_date):
         dcType)
     swaps.append(swap9)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     cdsMarketContracts = []
     cds_coupon = 0.005743
-    maturity_date = valuation_date.next_cds_date(6)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(6)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.007497
-    maturity_date = valuation_date.next_cds_date(12)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(12)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.011132
-    maturity_date = valuation_date.next_cds_date(24)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(24)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.013932
-    maturity_date = valuation_date.next_cds_date(36)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(36)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.015764
-    maturity_date = valuation_date.next_cds_date(48)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(48)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.017366
-    maturity_date = valuation_date.next_cds_date(60)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(60)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.020928
-    maturity_date = valuation_date.next_cds_date(84)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(84)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     cds_coupon = 0.022835
-    maturity_date = valuation_date.next_cds_date(120)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    maturity_date = value_date.next_cds_date(120)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -218,7 +219,7 @@ def test_dirty_priceCDSwaption():
     tradeDate = Date(5, 2, 2014)
     _, issuer_curve = buildFullIssuerCurve(tradeDate)
     step_in_date = tradeDate.add_days(1)
-    valuation_date = step_in_date
+    value_date = step_in_date
     expiry_date = Date(20, 3, 2014)
     maturity_date = Date(20, 6, 2019)
 
@@ -235,20 +236,20 @@ def test_dirty_priceCDSwaption():
 
     testCases.banner(
         "=============================== CDS ===============================")
-#    cds_contract.print(valuation_date)
+#    cds_contract.print(value_date)
 
     testCases.header("LABEL", "VALUE")
     spd = cds_contract.par_spread(
-        valuation_date,
+        value_date,
         issuer_curve,
         cdsRecovery) * 10000.0
     testCases.print("PAR SPREAD:", spd)
 
-    v = cds_contract.value(valuation_date, issuer_curve, cdsRecovery)
+    v = cds_contract.value(value_date, issuer_curve, cdsRecovery)
     testCases.print("DIRTY VALUE", v['dirty_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
-    p = cds_contract.clean_price(valuation_date, issuer_curve, cdsRecovery)
+    p = cds_contract.clean_price(value_date, issuer_curve, cdsRecovery)
     testCases.print("CLEAN PRICE", p)
 
     accrued_days = cds_contract.accrued_days()
@@ -258,15 +259,15 @@ def test_dirty_priceCDSwaption():
     testCases.print("ACCRUED COUPON", accrued_interest)
 
     prot_pv = cds_contract.protection_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", prot_pv)
 
     premPV = cds_contract.premium_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
     fullRPV01, cleanRPV01 = cds_contract.risky_pv01(
-        valuation_date, issuer_curve)
+        value_date, issuer_curve)
     testCases.print("FULL  RPV01", fullRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
@@ -281,28 +282,28 @@ def test_dirty_priceCDSwaption():
                        notional,
                        long_protection)
 
-#    cds_contract.print(valuation_date)
+#    cds_contract.print(value_date)
 
     spd = cds_contract.par_spread(
-        valuation_date,
+        value_date,
         issuer_curve,
         cdsRecovery) * 10000.0
     testCases.print("PAR SPREAD", spd)
 
-    v = cds_contract.value(valuation_date, issuer_curve, cdsRecovery)
+    v = cds_contract.value(value_date, issuer_curve, cdsRecovery)
     testCases.print("DIRTY VALUE", v['dirty_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
     prot_pv = cds_contract.protection_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", prot_pv)
 
     premPV = cds_contract.premium_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
     dirtyRPV01, cleanRPV01 = cds_contract.risky_pv01(
-        valuation_date, issuer_curve)
+        value_date, issuer_curve)
     testCases.print("DIRTY RPV01", dirtyRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 
@@ -329,11 +330,11 @@ def test_dirty_priceCDSwaption():
                               notional,
                               long_protection)
 
-        v = cdsOption.value(valuation_date,
+        v = cdsOption.value(value_date,
                             issuer_curve,
                             volatility)
 
-        vol = cdsOption.implied_volatility(valuation_date,
+        vol = cdsOption.implied_volatility(value_date,
                                            issuer_curve,
                                            v)
 
@@ -349,11 +350,11 @@ def test_dirty_priceCDSwaption():
                               notional,
                               long_protection)
 
-        v = cdsOption.value(valuation_date,
+        v = cdsOption.value(value_date,
                             issuer_curve,
                             volatility)
 
-        vol = cdsOption.implied_volatility(valuation_date,
+        vol = cdsOption.implied_volatility(value_date,
                                            issuer_curve,
                                            v)
 

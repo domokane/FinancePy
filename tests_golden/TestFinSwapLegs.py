@@ -33,7 +33,7 @@ def test_FinFixedIborSwapLeg():
     dc_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
@@ -48,7 +48,7 @@ def test_FinFixedIborSwapLeg():
                                 notional,
                                 principal,
                                 payment_lag,
-                                calendar_type,
+                                cal_type,
                                 bd_adjust_type,
                                 dg_rule_type)
 
@@ -65,7 +65,7 @@ def test_FinFixedOISSwapLeg():
     dc_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
@@ -80,7 +80,7 @@ def test_FinFixedOISSwapLeg():
                                 notional,
                                 principal,
                                 payment_lag,
-                                calendar_type,
+                                cal_type,
                                 bd_adjust_type,
                                 dg_rule_type)
 
@@ -97,7 +97,7 @@ def test_FinFloatIborLeg():
     dc_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
@@ -112,7 +112,7 @@ def test_FinFloatIborLeg():
                                 notional,
                                 principal,
                                 payment_lag,
-                                calendar_type,
+                                cal_type,
                                 bd_adjust_type,
                                 dg_rule_type)
 
@@ -136,7 +136,7 @@ def test_FinFloatOISLeg():
     dc_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
@@ -151,7 +151,7 @@ def test_FinFloatOISLeg():
                                 notional,
                                 principal,
                                 payment_lag,
-                                calendar_type,
+                                cal_type,
                                 bd_adjust_type,
                                 dg_rule_type)
 
@@ -174,7 +174,7 @@ def swapFixedLegMonthEnds():
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               dc_type=DayCountTypes.THIRTY_E_360,
-                              calendar_type=CalendarTypes.UNITED_STATES,
+                              cal_type=CalendarTypes.UNITED_STATES,
                               coupon=0.0,
                               end_of_month=False)
 
@@ -183,7 +183,7 @@ def swapFixedLegMonthEnds():
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               dc_type=DayCountTypes.THIRTY_E_360,
-                              calendar_type=CalendarTypes.UNITED_STATES,
+                              cal_type=CalendarTypes.UNITED_STATES,
                               coupon=0.0,
                               end_of_month=False)
 

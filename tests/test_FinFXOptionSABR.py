@@ -14,7 +14,7 @@ import numpy as np
 # There is no FXAmericanOption class. It is embedded in the FXVanillaOption
 # class. This test just compares it to the European
 
-valuation_date = Date(13, 2, 2018)
+value_date = Date(13, 2, 2018)
 expiry_date = Date(13, 2, 2019)
 
 # In BS the FX rate is the price in domestic of one unit of foreign
@@ -28,8 +28,8 @@ volatility = 0.10
 
 notional = 1000000.0
 
-dom_discount_curve = DiscountCurveFlat(valuation_date, ccy2CCRate)
-for_discount_curve = DiscountCurveFlat(valuation_date, ccy1CCRate)
+dom_discount_curve = DiscountCurveFlat(value_date, ccy2CCRate)
+for_discount_curve = DiscountCurveFlat(value_date, ccy1CCRate)
 
 model = BlackScholes(volatility)
 
@@ -49,7 +49,7 @@ def test_european_call():
                                   OptionTypes.EUROPEAN_CALL,
                                   notional,
                                   "USD")
-    valueEuropean = call_option.value(valuation_date,
+    valueEuropean = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -65,7 +65,7 @@ def test_european_call():
                                   OptionTypes.EUROPEAN_CALL,
                                   notional,
                                   "USD")
-    valueEuropean = call_option.value(valuation_date,
+    valueEuropean = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -83,7 +83,7 @@ def test_american_call():
                                   OptionTypes.AMERICAN_CALL,
                                   1000000,
                                   "USD")
-    valueAmerican = call_option.value(valuation_date,
+    valueAmerican = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -99,7 +99,7 @@ def test_american_call():
                                   OptionTypes.AMERICAN_CALL,
                                   1000000,
                                   "USD")
-    valueAmerican = call_option.value(valuation_date,
+    valueAmerican = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -117,7 +117,7 @@ def test_european_put():
                                   OptionTypes.EUROPEAN_PUT,
                                   notional,
                                   "USD")
-    valueEuropean = call_option.value(valuation_date,
+    valueEuropean = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -133,7 +133,7 @@ def test_european_put():
                                   OptionTypes.EUROPEAN_PUT,
                                   notional,
                                   "USD")
-    valueEuropean = call_option.value(valuation_date,
+    valueEuropean = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -151,7 +151,7 @@ def test_american_put():
                                   OptionTypes.AMERICAN_PUT,
                                   1000000,
                                   "USD")
-    valueAmerican = call_option.value(valuation_date,
+    valueAmerican = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,
@@ -167,7 +167,7 @@ def test_american_put():
                                   OptionTypes.AMERICAN_PUT,
                                   1000000,
                                   "USD")
-    valueAmerican = call_option.value(valuation_date,
+    valueAmerican = call_option.value(value_date,
                                       spot_fx_rate,
                                       dom_discount_curve,
                                       for_discount_curve,

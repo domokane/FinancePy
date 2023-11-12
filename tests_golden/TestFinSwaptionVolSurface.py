@@ -33,7 +33,7 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
 
         # https://fr.mathworks.com/help/fininst/pricing-a-swaption-using-the-sabr-model.html
 
-        valuation_date = Date(12, 6, 2013)
+        value_date = Date(12, 6, 2013)
 
         # These are 3M, 1Y, 2Y, 3Y, 4Y, 5Y, 7Y, 10Y
         exercise_dates = [Date(12, 9, 2013), Date(12, 6, 2014),
@@ -67,14 +67,14 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         atm_vols = marketVolatilities[3]
 
         rfrRate = 0.020  # USD
-        discount_curve = DiscountCurveFlat(valuation_date, rfrRate)
+        discount_curve = DiscountCurveFlat(value_date, rfrRate)
 
         divRate = 0.010  # USD
-        dividend_curve = DiscountCurveFlat(valuation_date, divRate)
+        dividend_curve = DiscountCurveFlat(value_date, divRate)
 
         vol_functionType = VolFuncTypes.SABR_BETA_HALF
 
-        swaptionSurface = SwaptionVolSurface(valuation_date,
+        swaptionSurface = SwaptionVolSurface(value_date,
                                              exercise_dates,
                                              fwd_swap_rates,
                                              marketStrikes,

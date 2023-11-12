@@ -19,12 +19,12 @@ from financepy.utils.date import Date
 import numpy as np
 
 
-def build_curve(valuation_date):
+def build_curve(value_date):
     depoBasis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     deposit_rate = 0.05
 
     depo1 = IborDeposit(settle_date, "1M", deposit_rate, depoBasis)
@@ -54,18 +54,18 @@ def build_curve(valuation_date):
     swaps.append(swap2)
     swaps.append(swap3)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     return libor_curve
 
 
-valuation_date = Date(1, 1, 2011)
+value_date = Date(1, 1, 2011)
 
 
 exercise_date = Date(1, 1, 2012)
-swapMaturityDate = Date(1, 1, 2017)
+swap_maturity_date = Date(1, 1, 2017)
 
-swapFixedFrequencyType = FrequencyTypes.SEMI_ANNUAL
+swap_fixed_frequency_type = FrequencyTypes.SEMI_ANNUAL
 swapFixedDayCountType = DayCountTypes.ACT_365F
 
 model1 = Black(0.00001)
@@ -75,30 +75,30 @@ model4 = SABRShifted(0.013, 0.5, 0.5, 0.5, -0.008)
 model5 = HWTree(0.00001, 0.00001)
 model6 = BKTree(0.01, 0.01)
 
-settle_date = valuation_date.add_weekdays(2)
+settle_date = value_date.add_weekdays(2)
 
-libor_curve = build_curve(valuation_date)
+libor_curve = build_curve(value_date)
 
 
 def test_pay():
-    libor_curve = build_curve(valuation_date)
+    libor_curve = build_curve(value_date)
     swaptionType = SwapTypes.PAY
 
     k = 0.02
     swaption = IborSwaption(settle_date,
                             exercise_date,
-                            swapMaturityDate,
+                            swap_maturity_date,
                             swaptionType,
                             k,
-                            swapFixedFrequencyType,
+                            swap_fixed_frequency_type,
                             swapFixedDayCountType)
 
-    swap1 = swaption.value(valuation_date, libor_curve, model1)
-    swap2 = swaption.value(valuation_date, libor_curve, model2)
-    swap3 = swaption.value(valuation_date, libor_curve, model3)
-    swap4 = swaption.value(valuation_date, libor_curve, model4)
-    swap5 = swaption.value(valuation_date, libor_curve, model5)
-    swap6 = swaption.value(valuation_date, libor_curve, model6)
+    swap1 = swaption.value(value_date, libor_curve, model1)
+    swap2 = swaption.value(value_date, libor_curve, model2)
+    swap3 = swaption.value(value_date, libor_curve, model3)
+    swap4 = swaption.value(value_date, libor_curve, model4)
+    swap5 = swaption.value(value_date, libor_curve, model5)
+    swap6 = swaption.value(value_date, libor_curve, model6)
     assert round(swap1, 0) == 125087
     assert round(swap2, 0) == 125087
     assert round(swap3, 0) == 125087
@@ -109,18 +109,18 @@ def test_pay():
     k = 0.035
     swaption = IborSwaption(settle_date,
                             exercise_date,
-                            swapMaturityDate,
+                            swap_maturity_date,
                             swaptionType,
                             k,
-                            swapFixedFrequencyType,
+                            swap_fixed_frequency_type,
                             swapFixedDayCountType)
 
-    swap1 = swaption.value(valuation_date, libor_curve, model1)
-    swap2 = swaption.value(valuation_date, libor_curve, model2)
-    swap3 = swaption.value(valuation_date, libor_curve, model3)
-    swap4 = swaption.value(valuation_date, libor_curve, model4)
-    swap5 = swaption.value(valuation_date, libor_curve, model5)
-    swap6 = swaption.value(valuation_date, libor_curve, model6)
+    swap1 = swaption.value(value_date, libor_curve, model1)
+    swap2 = swaption.value(value_date, libor_curve, model2)
+    swap3 = swaption.value(value_date, libor_curve, model3)
+    swap4 = swaption.value(value_date, libor_curve, model4)
+    swap5 = swaption.value(value_date, libor_curve, model5)
+    swap6 = swaption.value(value_date, libor_curve, model6)
     assert round(swap1, 1) == 62492.6
     assert round(swap2, 1) == 62492.6
     assert round(swap3, 1) == 62492.6
@@ -131,18 +131,18 @@ def test_pay():
     k = 0.065
     swaption = IborSwaption(settle_date,
                             exercise_date,
-                            swapMaturityDate,
+                            swap_maturity_date,
                             swaptionType,
                             k,
-                            swapFixedFrequencyType,
+                            swap_fixed_frequency_type,
                             swapFixedDayCountType)
 
-    swap1 = swaption.value(valuation_date, libor_curve, model1)
-    swap2 = swaption.value(valuation_date, libor_curve, model2)
-    swap3 = swaption.value(valuation_date, libor_curve, model3)
-    swap4 = swaption.value(valuation_date, libor_curve, model4)
-    swap5 = swaption.value(valuation_date, libor_curve, model5)
-    swap6 = swaption.value(valuation_date, libor_curve, model6)
+    swap1 = swaption.value(value_date, libor_curve, model1)
+    swap2 = swaption.value(value_date, libor_curve, model2)
+    swap3 = swaption.value(value_date, libor_curve, model3)
+    swap4 = swaption.value(value_date, libor_curve, model4)
+    swap5 = swaption.value(value_date, libor_curve, model5)
+    swap6 = swaption.value(value_date, libor_curve, model6)
     assert round(swap1, 4) == 0.0
     assert round(swap2, 4) == 0.0
     assert round(swap3, 1) == 22.1
@@ -157,18 +157,18 @@ def test_receive():
     k = 0.02
     swaption = IborSwaption(settle_date,
                             exercise_date,
-                            swapMaturityDate,
+                            swap_maturity_date,
                             swaptionType,
                             k,
-                            swapFixedFrequencyType,
+                            swap_fixed_frequency_type,
                             swapFixedDayCountType)
 
-    swap1 = swaption.value(valuation_date, libor_curve, model1)
-    swap2 = swaption.value(valuation_date, libor_curve, model2)
-    swap3 = swaption.value(valuation_date, libor_curve, model3)
-    swap4 = swaption.value(valuation_date, libor_curve, model4)
-    swap5 = swaption.value(valuation_date, libor_curve, model5)
-    swap6 = swaption.value(valuation_date, libor_curve, model6)
+    swap1 = swaption.value(value_date, libor_curve, model1)
+    swap2 = swaption.value(value_date, libor_curve, model2)
+    swap3 = swaption.value(value_date, libor_curve, model3)
+    swap4 = swaption.value(value_date, libor_curve, model4)
+    swap5 = swaption.value(value_date, libor_curve, model5)
+    swap6 = swaption.value(value_date, libor_curve, model6)
     assert round(swap1, 4) == 0.0
     assert round(swap2, 4) == 0.0
     assert round(swap3, 4) == 0.0
@@ -179,18 +179,18 @@ def test_receive():
     k = 0.05
     swaption = IborSwaption(settle_date,
                             exercise_date,
-                            swapMaturityDate,
+                            swap_maturity_date,
                             swaptionType,
                             k,
-                            swapFixedFrequencyType,
+                            swap_fixed_frequency_type,
                             swapFixedDayCountType)
 
-    swap1 = swaption.value(valuation_date, libor_curve, model1)
-    swap2 = swaption.value(valuation_date, libor_curve, model2)
-    swap3 = swaption.value(valuation_date, libor_curve, model3)
-    swap4 = swaption.value(valuation_date, libor_curve, model4)
-    swap5 = swaption.value(valuation_date, libor_curve, model5)
-    swap6 = swaption.value(valuation_date, libor_curve, model6)
+    swap1 = swaption.value(value_date, libor_curve, model1)
+    swap2 = swaption.value(value_date, libor_curve, model2)
+    swap3 = swaption.value(value_date, libor_curve, model3)
+    swap4 = swaption.value(value_date, libor_curve, model4)
+    swap5 = swaption.value(value_date, libor_curve, model5)
+    swap6 = swaption.value(value_date, libor_curve, model6)
     assert round(swap1, 1) == 101.8
     assert round(swap2, 1) == 101.8
     assert round(swap3, 1) == 4945.4
@@ -201,18 +201,18 @@ def test_receive():
     k = 0.08
     swaption = IborSwaption(settle_date,
                             exercise_date,
-                            swapMaturityDate,
+                            swap_maturity_date,
                             swaptionType,
                             k,
-                            swapFixedFrequencyType,
+                            swap_fixed_frequency_type,
                             swapFixedDayCountType)
 
-    swap1 = swaption.value(valuation_date, libor_curve, model1)
-    swap2 = swaption.value(valuation_date, libor_curve, model2)
-    swap3 = swaption.value(valuation_date, libor_curve, model3)
-    swap4 = swaption.value(valuation_date, libor_curve, model4)
-    swap5 = swaption.value(valuation_date, libor_curve, model5)
-    swap6 = swaption.value(valuation_date, libor_curve, model6)
+    swap1 = swaption.value(value_date, libor_curve, model1)
+    swap2 = swaption.value(value_date, libor_curve, model2)
+    swap3 = swaption.value(value_date, libor_curve, model3)
+    swap4 = swaption.value(value_date, libor_curve, model4)
+    swap5 = swaption.value(value_date, libor_curve, model5)
+    swap6 = swaption.value(value_date, libor_curve, model6)
     assert round(swap1, 1) == 125290.5
     assert round(swap2, 1) == 125290.5
     assert round(swap3, 1) == 125291.1

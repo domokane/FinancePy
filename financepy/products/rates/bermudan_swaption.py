@@ -45,7 +45,7 @@ class IborBermudanSwaption:
                  notional=ONE_MILLION,
                  float_frequency_type=FrequencyTypes.QUARTERLY,
                  float_dc_type=DayCountTypes.THIRTY_E_360,
-                 calendar_type=CalendarTypes.WEEKEND,
+                 cal_type=CalendarTypes.WEEKEND,
                  bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
                  dg_rule_type=DateGenRuleTypes.BACKWARD):
         """ Create a Bermudan swaption contract. This is an option to enter
@@ -81,9 +81,9 @@ class IborBermudanSwaption:
         self._dg_rule_type = dg_rule_type
 
         self._pv01 = None
-        self._fwdSwapRate = None
-        self._forwardDf = None
-        self._underlyingSwap = None
+        self._fwd_swap_rate = None
+        self._forward_df = None
+        self._underlying_swap = None
         self._cpn_times = None
         self._cpn_flows = None
 
@@ -100,22 +100,22 @@ class IborBermudanSwaption:
         float_spread = 0.0
 
         # The underlying is a swap in which we pay the fixed amount
-        self._underlyingSwap = IborSwap(self._exercise_date,
-                                        self._maturity_date,
-                                        self._fixed_leg_type,
-                                        self._fixed_coupon,
-                                        self._fixed_freq_type,
-                                        self._fixed_dc_type,
-                                        self._notional,
-                                        float_spread,
-                                        self._float_freq_type,
-                                        self._float_dc_type,
-                                        self._cal_type,
-                                        self._bd_adjust_type,
-                                        self._dg_rule_type)
+        self._underlying_swap = IborSwap(self._exercise_date,
+                                         self._maturity_date,
+                                         self._fixed_leg_type,
+                                         self._fixed_coupon,
+                                         self._fixed_freq_type,
+                                         self._fixed_dc_type,
+                                         self._notional,
+                                         float_spread,
+                                         self._float_freq_type,
+                                         self._float_dc_type,
+                                         self._cal_type,
+                                         self._bd_adjust_type,
+                                         self._dg_rule_type)
 
         #  I need to do this to generate the fixed leg flows
-        self._pv01 = self._underlyingSwap.pv01(value_date, discount_curve)
+        self._pv01 = self._underlying_swap.pv01(value_date, discount_curve)
 
         t_exp = (self._exercise_date - value_date) / gDaysInYear
         tmat = (self._maturity_date - value_date) / gDaysInYear
@@ -128,13 +128,13 @@ class IborBermudanSwaption:
         cpn_flows = [0.0]
 
         # The first flow is the expiry date
-        num_flows = len(self._underlyingSwap._fixed_leg._payment_dates)
+        num_flows = len(self._underlying_swap._fixed_leg._payment_dates)
 
-        swap = self._underlyingSwap
+        swap = self._underlying_swap
 
         for iFlow in range(0, num_flows):
 
-            flow_date = self._underlyingSwap._fixed_leg._payment_dates[iFlow]
+            flow_date = self._underlying_swap._fixed_leg._payment_dates[iFlow]
 
             if flow_date > self._exercise_date:
                 cpn_time = (flow_date - value_date) / gDaysInYear

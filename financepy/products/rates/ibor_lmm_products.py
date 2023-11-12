@@ -71,7 +71,7 @@ class IborLMMProducts():
         self._gridDates = Schedule(settle_date,
                                    maturity_date,
                                    float_frequency_type,
-                                   calendar_type,
+                                   cal_type,
                                    bd_adjust_type,
                                    dg_rule_type)._generate()
 
@@ -302,7 +302,7 @@ class IborLMMProducts():
         swaptionFloatDates = Schedule(settle_date,
                                       maturity_date,
                                       float_frequency_type,
-                                      calendar_type,
+                                      cal_type,
                                       bd_adjust_type,
                                       dg_rule_type)._generate()
 
@@ -318,7 +318,7 @@ class IborLMMProducts():
         swaptionFixedDates = Schedule(settle_date,
                                       maturity_date,
                                       fixed_frequency_type,
-                                      calendar_type,
+                                      cal_type,
                                       bd_adjust_type,
                                       dg_rule_type)._generate()
 
@@ -373,7 +373,7 @@ class IborLMMProducts():
         capFloorDates = Schedule(settle_date,
                                  maturity_date,
                                  frequencyType,
-                                 calendar_type,
+                                 cal_type,
                                  bd_adjust_type,
                                  dg_rule_type)._generate()
 

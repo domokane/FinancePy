@@ -16,8 +16,8 @@ bump = 1e-4
 @njit(float64[:](float64, float64, float64, float64, int64, float64, int64,
                  float64, int64), fastmath=True, cache=True)
 def crr_tree_val(stock_price,
-                 ccInterestRate,  # continuously compounded
-                 ccDividendRate,  # continuously compounded
+                 interest_rate,  # continuously compounded
+                 dividend_rate,  # continuously compounded
                  volatility,  # Black scholes volatility
                  num_steps_per_year,
                  time_to_expiry,
@@ -43,8 +43,8 @@ def crr_tree_val(stock_price,
 #    print(num_steps)
     # this is the size of the step
     dt = time_to_expiry / num_steps
-    r = ccInterestRate
-    q = ccDividendRate
+    r = interest_rate
+    q = dividend_rate
 
     # the number of nodes on the tree
     num_nodes = int(0.5 * (num_steps + 1) * (num_steps + 2))
@@ -148,8 +148,8 @@ def crr_tree_val(stock_price,
 
 
 def crr_tree_val_avg(stock_price,
-                     ccInterestRate,  # continuously compounded
-                     ccDividendRate,  # continuously compounded
+                     interestRate,  # continuously compounded
+                     dividend_rate,  # continuously compounded
                      volatility,  # Black scholes volatility
                      num_steps_per_year,
                      time_to_expiry,
@@ -159,8 +159,8 @@ def crr_tree_val_avg(stock_price,
     number of time steps. """
 
     value1 = crr_tree_val(stock_price,
-                          ccInterestRate,
-                          ccDividendRate,
+                          interest_rate,
+                          dividend_rate,
                           volatility,
                           num_steps_per_year,
                           time_to_expiry,
@@ -169,8 +169,8 @@ def crr_tree_val_avg(stock_price,
                           1)  # even
 
     value2 = crr_tree_val(stock_price,
-                          ccInterestRate,
-                          ccDividendRate,
+                          interest_rate,
+                          dividend_rate,
                           volatility,
                           num_steps_per_year,
                           time_to_expiry,

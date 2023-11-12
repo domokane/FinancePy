@@ -88,7 +88,7 @@ class FinInflationBond(Bond):
         """ Calculate the principal value of the bond based on the face
         amount and the CPI growth. """
 
-        index_ratio = reference_cpi / self._baseCPIValue
+        index_ratio = reference_cpi / self._base_cpi_value
         dirty_price = self.dirty_price_from_ytm(settle_date, ytm,
                                                 convention)
         principal = dirty_price * face / self._par
@@ -106,7 +106,7 @@ class FinInflationBond(Bond):
         """ Calculate the flat clean price value of the bond based on the clean
         price amount and the CPI growth to the last coupon date. """
 
-        index_ratio = last_cpn_cpi / self._baseCPIValue
+        index_ratio = last_cpn_cpi / self._base_cpi_value
         clean_price = self.clean_price_from_ytm(
             settle_date, ytm, convention)
         flat_price = clean_price

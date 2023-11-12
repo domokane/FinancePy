@@ -35,45 +35,45 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurves():
 
     # Create a curve from times and discount factors
-    valuation_date = Date(1, 1, 2018)
+    value_date = Date(1, 1, 2018)
     years = [1.0, 2.0, 3.0, 4.0, 5.0]
-    dates = valuation_date.add_years(years)
+    dates = value_date.add_years(years)
     years2 = []
 
     for dt in dates:
-        y = (dt - valuation_date) / gDaysInYear
+        y = (dt - value_date) / gDaysInYear
         years2.append(y)
 
     rates = np.array([0.05, 0.06, 0.065, 0.07, 0.075])
     discount_factors = np.exp(-np.array(rates) * np.array(years2))
     curvesList = []
 
-    finDiscountCurve = DiscountCurve(valuation_date, dates, discount_factors,
+    finDiscountCurve = DiscountCurve(value_date, dates, discount_factors,
                                      InterpTypes.FLAT_FWD_RATES)
     curvesList.append(finDiscountCurve)
 
-    finDiscountCurveFlat = DiscountCurveFlat(valuation_date, 0.05)
+    finDiscountCurveFlat = DiscountCurveFlat(value_date, 0.05)
     curvesList.append(finDiscountCurveFlat)
 
-    finDiscountCurveNS = DiscountCurveNS(valuation_date, 0.0305, -0.01,
+    finDiscountCurveNS = DiscountCurveNS(value_date, 0.0305, -0.01,
                                          0.08, 10.0)
     curvesList.append(finDiscountCurveNS)
 
-    finDiscountCurveNSS = DiscountCurveNSS(valuation_date, 0.035, -0.02,
+    finDiscountCurveNSS = DiscountCurveNSS(value_date, 0.035, -0.02,
                                            0.09, 0.1, 1.0, 2.0)
     curvesList.append(finDiscountCurveNSS)
 
-    finDiscountCurvePoly = DiscountCurvePoly(valuation_date, [0.05, 0.002,
+    finDiscountCurvePoly = DiscountCurvePoly(value_date, [0.05, 0.002,
                                                               -0.00005])
     curvesList.append(finDiscountCurvePoly)
 
-    finDiscountCurvePWF = DiscountCurvePWF(valuation_date, dates, rates)
+    finDiscountCurvePWF = DiscountCurvePWF(value_date, dates, rates)
     curvesList.append(finDiscountCurvePWF)
 
-    finDiscountCurvePWL = DiscountCurvePWL(valuation_date, dates, rates)
+    finDiscountCurvePWL = DiscountCurvePWL(value_date, dates, rates)
     curvesList.append(finDiscountCurvePWL)
 
-    finDiscountCurveZeros = DiscountCurveZeros(valuation_date, dates, rates)
+    finDiscountCurveZeros = DiscountCurveZeros(value_date, dates, rates)
     curvesList.append(finDiscountCurveZeros)
 
     curveNames = []
@@ -84,7 +84,7 @@ def test_FinDiscountCurves():
     testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "SWAP")
 
     years = np.linspace(1, 10, 10)
-    fwdMaturityDates = valuation_date.add_years(years)
+    fwdMaturityDates = value_date.add_years(years)
 
     testCases.banner("######################################################")
     testCases.banner("SINGLE CALLS")
@@ -96,7 +96,7 @@ def test_FinDiscountCurves():
             zero_rate = curve.zero_rate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
             fwd_rate = curve.fwd_rate(fwdMaturityDate, tenor)
-            swap_rate = curve.swap_rate(valuation_date, fwdMaturityDate)
+            swap_rate = curve.swap_rate(value_date, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
             testCases.print("%-20s" % name,
@@ -117,7 +117,7 @@ def test_FinDiscountCurves():
         zero_rate = curve.zero_rate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
         fwd_rate = curve.fwd_rate(fwdMaturityDates, tenor)
-        swap_rate = curve.swap_rate(valuation_date, fwdMaturityDates)
+        swap_rate = curve.swap_rate(value_date, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):
@@ -133,8 +133,8 @@ def test_FinDiscountCurves():
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0
-        fwdDates = valuation_date.add_years(years)
-        fwdDates2 = valuation_date.add_years(years2)
+        fwdDates = value_date.add_years(years)
+        fwdDates2 = value_date.add_years(years2)
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):

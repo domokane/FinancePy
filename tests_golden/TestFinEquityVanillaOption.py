@@ -23,15 +23,15 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_EquityVanillaOption():
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 7, 2015)
     stock_price = 100
     volatility = 0.30
     interest_rate = 0.05
     dividend_yield = 0.01
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     num_paths_list = [10000, 20000, 40000] # , 80000, 160000, 320000]
 
@@ -42,11 +42,11 @@ def test_EquityVanillaOption():
         call_option = EquityVanillaOption(
             expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
 
-        value = call_option.value(valuation_date, stock_price, discount_curve,
+        value = call_option.value(value_date, stock_price, discount_curve,
                                   dividend_curve, model)
         start = time.time()
 
-        value_mc = call_option.value_mc(valuation_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc(value_date, stock_price, discount_curve,
                                         dividend_curve, model, num_paths)
         end = time.time()
         duration = end - start
@@ -67,17 +67,17 @@ def test_EquityVanillaOption():
         call_option = EquityVanillaOption(expiry_date, 100.0,
                                           OptionTypes.EUROPEAN_CALL)
 
-        value = call_option.value(valuation_date, stock_price, discount_curve,
+        value = call_option.value(value_date, stock_price, discount_curve,
                                   dividend_curve, model)
 
         start = time.time()
 
         useSobol = False
-        value_mc1 = call_option.value_mc(valuation_date, stock_price, discount_curve,
+        value_mc1 = call_option.value_mc(value_date, stock_price, discount_curve,
                                          dividend_curve, model, num_paths, useSobol)
 
         useSobol = True
-        value_mc2 = call_option.value_mc(valuation_date, stock_price, discount_curve,
+        value_mc2 = call_option.value_mc(value_date, stock_price, discount_curve,
                                          dividend_curve, model, num_paths, useSobol)
 
         end = time.time()
@@ -97,17 +97,17 @@ def test_EquityVanillaOption():
         put_option = EquityVanillaOption(expiry_date, 100.0,
                                          OptionTypes.EUROPEAN_PUT)
 
-        value = put_option.value(valuation_date, stock_price, discount_curve,
+        value = put_option.value(value_date, stock_price, discount_curve,
                                  dividend_curve, model)
 
         start = time.time()
 
         useSobol = False
-        value_mc1 = put_option.value_mc(valuation_date, stock_price, discount_curve,
+        value_mc1 = put_option.value_mc(value_date, stock_price, discount_curve,
                                         dividend_curve, model, num_paths, useSobol)
 
         useSobol = True
-        value_mc2 = put_option.value_mc(valuation_date, stock_price, discount_curve,
+        value_mc2 = put_option.value_mc(value_date, stock_price, discount_curve,
                                         dividend_curve, model, num_paths, useSobol)
 
         end = time.time()
@@ -126,17 +126,17 @@ def test_EquityVanillaOption():
 
         call_option = EquityVanillaOption(expiry_date, 100.0,
                                           OptionTypes.EUROPEAN_CALL)
-        value = call_option.value(valuation_date, stock_price, discount_curve,
+        value = call_option.value(value_date, stock_price, discount_curve,
                                   dividend_curve, model)
-        delta = call_option.delta(valuation_date, stock_price, discount_curve,
+        delta = call_option.delta(value_date, stock_price, discount_curve,
                                   dividend_curve, model)
-        vega = call_option.vega(valuation_date, stock_price, discount_curve,
+        vega = call_option.vega(value_date, stock_price, discount_curve,
                                 dividend_curve, model)
-        theta = call_option.theta(valuation_date, stock_price, discount_curve,
+        theta = call_option.theta(value_date, stock_price, discount_curve,
                                   dividend_curve, model)
-        rho = call_option.rho(valuation_date, stock_price, discount_curve,
+        rho = call_option.rho(value_date, stock_price, discount_curve,
                               dividend_curve, model)
-        vanna = call_option.vanna(valuation_date, stock_price, discount_curve,
+        vanna = call_option.vanna(value_date, stock_price, discount_curve,
                                   dividend_curve, model)
         testCases.print(stock_price, value, delta, vega, theta, rho, vanna)
 
@@ -150,29 +150,29 @@ def test_EquityVanillaOption():
         put_option = EquityVanillaOption(expiry_date, 100.0,
                                          OptionTypes.EUROPEAN_PUT)
 
-        value = put_option.value(valuation_date, stock_price, discount_curve,
+        value = put_option.value(value_date, stock_price, discount_curve,
                                  dividend_curve, model)
-        delta = put_option.delta(valuation_date, stock_price, discount_curve,
+        delta = put_option.delta(value_date, stock_price, discount_curve,
                                  dividend_curve, model)
-        vega = put_option.vega(valuation_date, stock_price, discount_curve,
+        vega = put_option.vega(value_date, stock_price, discount_curve,
                                dividend_curve, model)
-        theta = put_option.theta(valuation_date, stock_price, discount_curve,
+        theta = put_option.theta(value_date, stock_price, discount_curve,
                                  dividend_curve, model)
-        rho = put_option.rho(valuation_date, stock_price, discount_curve,
+        rho = put_option.rho(value_date, stock_price, discount_curve,
                              dividend_curve, model)
-        vanna = put_option.vanna(valuation_date, stock_price, discount_curve,
+        vanna = put_option.vanna(value_date, stock_price, discount_curve,
                                  dividend_curve, model)
         testCases.print(stock_price, value, delta, vega, theta, rho, vanna)
 
 
 def testImpliedVolatility_NEW():
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     stock_price = 100.0
     interest_rate = 0.05
     dividend_yield = 0.03
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     strikes = np.linspace(50, 150, 11)
     timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0]
@@ -192,7 +192,7 @@ def testImpliedVolatility_NEW():
 
         for time_to_expiry in timesToExpiry:
 
-            expiry_date = valuation_date.add_years(time_to_expiry)
+            expiry_date = value_date.add_years(time_to_expiry)
 
             for strike in strikes:
 
@@ -201,10 +201,10 @@ def testImpliedVolatility_NEW():
                     option = EquityVanillaOption(expiry_date, strike,
                                                  option_type)
 
-                    value = option.value(valuation_date, stock_price, discount_curve,
+                    value = option.value(value_date, stock_price, discount_curve,
                                          dividend_curve, model)
 
-                    intrinsic = option.intrinsic(valuation_date, stock_price,
+                    intrinsic = option.intrinsic(value_date, stock_price,
                                                  discount_curve, dividend_curve)
 
                     # I remove the cases where the time value is zero
@@ -214,7 +214,7 @@ def testImpliedVolatility_NEW():
 
                     if value - intrinsic > 1e-10:
 
-                        impliedVol = option.implied_volatility(valuation_date,
+                        impliedVol = option.implied_volatility(value_date,
                                                                stock_price,
                                                                discount_curve,
                                                                dividend_curve,
@@ -249,20 +249,20 @@ def testImpliedVolatility_NEW():
 
 
 if 1 == 0:
-    valuation_date = Date(30, 11, 2021)
-    expiry_date = valuation_date.add_years(1)
+    value_date = Date(30, 11, 2021)
+    expiry_date = value_date.add_years(1)
 
     stock_price = 100
     volatility = 0.20
     model = BlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(valuation_date, 0.05)
-    dividend_curve = DiscountCurveFlat(valuation_date, 0.0)
+    discount_curve = DiscountCurveFlat(value_date, 0.05)
+    dividend_curve = DiscountCurveFlat(value_date, 0.0)
 
     call_option = EquityVanillaOption(
         expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(valuation_date, 105.0, discount_curve,
+    value = call_option.value(value_date, 105.0, discount_curve,
                               dividend_curve, model)
 
 else:

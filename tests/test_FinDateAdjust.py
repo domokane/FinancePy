@@ -18,13 +18,13 @@ def test_date_adjust_no_adj():
     start_date = Date(28, 2, 2008)
     end_date = Date(28, 2, 2011)
 
-    calendar_type = CalendarTypes.NONE
+    cal_type = CalendarTypes.NONE
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 
@@ -38,13 +38,13 @@ def test_date_adjust_noweekend_following():
     start_date = Date(28, 2, 2008)
     end_date = Date(28, 2, 2011)
 
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 
@@ -58,13 +58,13 @@ def test_date_adjust_noweekend_modfollowing():
     start_date = Date(28, 2, 2008)
     end_date = Date(28, 2, 2011)
 
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 
@@ -78,13 +78,13 @@ def test_date_adjust_noweekend_usholidays_modfollowing():
     start_date = Date(4, 7, 2008)
     end_date = Date(4, 7, 2011)
 
-    calendar_type = CalendarTypes.UNITED_STATES
+    cal_type = CalendarTypes.UNITED_STATES
     bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 

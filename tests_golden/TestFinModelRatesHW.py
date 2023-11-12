@@ -136,7 +136,7 @@ def test_HullWhiteBondOption():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._cpn/bond._frequency
+    cpn = bond._cpn / bond._freq
 
     num_flows = len(bond._cpn_dates)
 
@@ -234,7 +234,7 @@ def test_HullWhiteCallableBond():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._cpn/bond._frequency
+    cpn = bond._cpn / bond._freq
 
     for flow_date in bond._cpn_dates[1:]:
 

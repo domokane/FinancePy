@@ -19,7 +19,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_EquityCompoundOption():
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date1 = Date(1, 1, 2017)
     expiry_date2 = Date(1, 1, 2018)
     k1 = 5.0
@@ -30,8 +30,8 @@ def test_EquityCompoundOption():
     dividend_yield = 0.01
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     num_steps_list = [100, 200, 500, 1000]
 
@@ -54,10 +54,10 @@ def test_EquityCompoundOption():
 
             for num_steps in num_steps_list:
 
-                value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+                value = cmpdOption.value(value_date, stock_price, discount_curve,
                                          dividend_curve, model)
 
-                values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+                values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                                 dividend_curve, model, num_steps)
 
                 testCases.print(option_type1, option_type2, k1, k2, stock_price,
@@ -82,10 +82,10 @@ def test_EquityCompoundOption():
 
             for num_steps in num_steps_list:
 
-                value = cmpdOption.value(valuation_date, stock_price, discount_curve,
+                value = cmpdOption.value(value_date, stock_price, discount_curve,
                                          dividend_curve, model, num_steps)
 
-                values = cmpdOption._value_tree(valuation_date, stock_price, discount_curve,
+                values = cmpdOption._value_tree(value_date, stock_price, discount_curve,
                                                 dividend_curve, model, num_steps)
 
                 testCases.print(option_type1, option_type2, k1, k2, stock_price,
@@ -110,31 +110,31 @@ def test_EquityCompoundOption():
 
             for stock_price in stock_prices:
                 value = cmpdOption.value(
-                    valuation_date,
+                    value_date,
                     stock_price,
                     discount_curve,
                     dividend_curve,
                     model)
                 delta = cmpdOption.delta(
-                    valuation_date,
+                    value_date,
                     stock_price,
                     discount_curve,
                     dividend_curve,
                     model)
                 vega = cmpdOption.vega(
-                    valuation_date,
+                    value_date,
                     stock_price,
                     discount_curve,
                     dividend_curve,
                     model)
                 theta = cmpdOption.theta(
-                    valuation_date,
+                    value_date,
                     stock_price,
                     discount_curve,
                     dividend_curve,
                     model)
 
-                values = cmpdOption._value_tree(valuation_date, stock_price,
+                values = cmpdOption._value_tree(value_date, stock_price,
                                                 discount_curve, dividend_curve,
                                                 model)
 

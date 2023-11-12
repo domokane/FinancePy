@@ -31,7 +31,7 @@ def test_BondAnnuity():
     maturity_date = Date(20, 6, 2019)
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     basis_type = DayCountTypes.ACT_360
@@ -40,7 +40,7 @@ def test_BondAnnuity():
     annuity = BondAnnuity(maturity_date,
                           coupon,
                           freq_type,
-                          calendar_type,
+                          cal_type,
                           bd_adjust_type,
                           dg_rule_type,
                           basis_type)
@@ -61,7 +61,7 @@ def test_BondAnnuity():
     maturity_date = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     basis_type = DayCountTypes.ACT_360
@@ -69,7 +69,7 @@ def test_BondAnnuity():
     annuity = BondAnnuity(maturity_date,
                           coupon,
                           freq_type,
-                          calendar_type,
+                          cal_type,
                           bd_adjust_type,
                           dg_rule_type,
                           basis_type)
@@ -90,7 +90,7 @@ def test_BondAnnuity():
     maturity_date = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.MONTHLY
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     basis_type = DayCountTypes.ACT_360
@@ -98,7 +98,7 @@ def test_BondAnnuity():
     annuity = BondAnnuity(maturity_date,
                           coupon,
                           freq_type,
-                          calendar_type,
+                          cal_type,
                           bd_adjust_type,
                           dg_rule_type,
                           basis_type)
@@ -119,7 +119,7 @@ def test_BondAnnuity():
     maturity_date = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.FORWARD
     basis_type = DayCountTypes.ACT_360
@@ -127,7 +127,7 @@ def test_BondAnnuity():
     annuity = BondAnnuity(maturity_date,
                           coupon,
                           freq_type,
-                          calendar_type,
+                          cal_type,
                           bd_adjust_type,
                           dg_rule_type,
                           basis_type)
@@ -148,7 +148,7 @@ def test_BondAnnuity():
     maturity_date = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.FORWARD
     basis_type = DayCountTypes.ACT_360
@@ -156,7 +156,7 @@ def test_BondAnnuity():
     annuity = BondAnnuity(maturity_date,
                           coupon,
                           freq_type,
-                          calendar_type,
+                          cal_type,
                           bd_adjust_type,
                           dg_rule_type,
                           basis_type)
@@ -177,7 +177,7 @@ def test_BondAnnuity():
     maturity_date = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.FORWARD
     basis_type = DayCountTypes.ACT_360
@@ -185,7 +185,7 @@ def test_BondAnnuity():
     annuity = BondAnnuity(maturity_date,
                           coupon,
                           freq_type,
-                          calendar_type,
+                          cal_type,
                           bd_adjust_type,
                           dg_rule_type,
                           basis_type)

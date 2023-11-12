@@ -9,7 +9,7 @@ from financepy.products.fx.fx_float_lookback_option import FXFloatLookbackOption
 from financepy.utils.global_types import OptionTypes
 
 
-valuation_date = Date(1, 1, 2015)
+value_date = Date(1, 1, 2015)
 expiry_date = Date(1, 1, 2016)
 stock_price = 100.0
 volatility = 0.3
@@ -18,10 +18,10 @@ stock_priceRange = range(90, 110, 5)
 num_steps_per_year = 252
 
 domesticRate = 0.05
-domestic_curve = DiscountCurveFlat(valuation_date, domesticRate)
+domestic_curve = DiscountCurveFlat(value_date, domesticRate)
 
 foreignRate = 0.02
-foreign_curve = DiscountCurveFlat(valuation_date, foreignRate)
+foreign_curve = DiscountCurveFlat(value_date, foreignRate)
 
 
 def test_european_call():
@@ -29,7 +29,7 @@ def test_european_call():
     option = FXFloatLookbackOption(expiry_date, option_type)
     stockMin = stock_price - 10
     value = option.value(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -37,7 +37,7 @@ def test_european_call():
         stockMin)
 
     value_mc = option.value_mc(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -53,7 +53,7 @@ def test_european_call():
     option = FXFixedLookbackOption(expiry_date, option_type, k)
     stockMin = stock_price
     value = option.value(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -61,7 +61,7 @@ def test_european_call():
         stockMin)
 
     value_mc = option.value_mc(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -79,7 +79,7 @@ def test_european_put():
     option = FXFloatLookbackOption(expiry_date, option_type)
     stockMax = stock_price + 10
     value = option.value(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -87,7 +87,7 @@ def test_european_put():
         stockMax)
 
     value_mc = option.value_mc(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -103,7 +103,7 @@ def test_european_put():
     option = FXFixedLookbackOption(expiry_date, option_type, k)
     stockMin = stock_price - 10.0
     value = option.value(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,
@@ -111,7 +111,7 @@ def test_european_put():
         stockMin)
 
     value_mc = option.value_mc(
-        valuation_date,
+        value_date,
         stock_price,
         domestic_curve,
         foreign_curve,

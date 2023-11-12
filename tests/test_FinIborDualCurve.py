@@ -20,12 +20,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def buildOIS(valuation_date):
+def buildOIS(value_date):
     """ Build the OIS funding curve from futures (FRAs) and OIS """
 
     spot_days = 0
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     fixed_leg_type = SwapTypes.PAY
 
     fras = []
@@ -128,7 +128,7 @@ def buildOIS(valuation_date):
                fixedDCCType)
     swaps.append(swap)
 
-    oisCurve = OISCurve(valuation_date,
+    oisCurve = OISCurve(value_date,
                         [],
                         fras,
                         swaps)
@@ -140,11 +140,11 @@ def test_bloombergPricingExample():
     """ This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """
-    valuation_date = Date(6, 6, 2018)
+    value_date = Date(6, 6, 2018)
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
@@ -154,17 +154,17 @@ def test_bloombergPricingExample():
     depos.append(depo)
 
     futs = []
-    fut = IborFuture(valuation_date, 1)
+    fut = IborFuture(value_date, 1)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 2)
+    fut = IborFuture(value_date, 2)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 3)
+    fut = IborFuture(value_date, 3)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 4)
+    fut = IborFuture(value_date, 4)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 5)
+    fut = IborFuture(value_date, 5)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 6)
+    fut = IborFuture(value_date, 6)
     futs.append(fut)
 
     fras = [None]*6
@@ -179,7 +179,7 @@ def test_bloombergPricingExample():
     freq = FrequencyTypes.SEMI_ANNUAL
 
     spot_days = 2
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     fixed_leg_type = SwapTypes.PAY
     interp_type = InterpTypes.FLAT_FWD_RATES
 
@@ -237,14 +237,14 @@ def test_bloombergPricingExample():
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(
-        valuation_date, depos, fras, swaps, interp_type, True)
+        value_date, depos, fras, swaps, interp_type, True)
 
     assert round(swaps[0].value(
-        valuation_date, libor_curve, libor_curve, None), 4) == 0.0
+        value_date, libor_curve, libor_curve, None), 4) == 0.0
     assert round(swaps[0]._fixed_leg.value(
-        valuation_date, libor_curve), 4) == -53707.6667
+        value_date, libor_curve), 4) == -53707.6667
     assert round(swaps[0]._float_leg.value(
-        valuation_date, libor_curve, libor_curve, None), 4) == 53707.6667
+        value_date, libor_curve, libor_curve, None), 4) == 53707.6667
 
     assert round(swaps[0].value(
         settle_date, libor_curve, libor_curve, None), 4) == 0.0
@@ -253,17 +253,17 @@ def test_bloombergPricingExample():
     assert round(swaps[0]._float_leg.value(
         settle_date, libor_curve, libor_curve, None), 4) == 53714.5507
 
-    oisCurve = buildOIS(valuation_date)
+    oisCurve = buildOIS(value_date)
 
-    liborDualCurve = IborDualCurve(valuation_date, oisCurve, depos, fras, swaps,
+    liborDualCurve = IborDualCurve(value_date, oisCurve, depos, fras, swaps,
                                    InterpTypes.FLAT_FWD_RATES, True)
 
     assert round(swaps[0].value(
-        valuation_date, oisCurve, liborDualCurve, None), 4) == 0.0
+        value_date, oisCurve, liborDualCurve, None), 4) == 0.0
     assert round(swaps[0]._fixed_leg.value(
-        valuation_date, oisCurve), 4) == -55524.5642
+        value_date, oisCurve), 4) == -55524.5642
     assert round(swaps[0]._float_leg.value(
-        valuation_date, oisCurve, liborDualCurve, None), 4) == 55524.5642
+        value_date, oisCurve, liborDualCurve, None), 4) == 55524.5642
 
     assert round(swaps[0].value(
         settle_date, oisCurve, liborDualCurve, None), 4) == 0.0

@@ -22,7 +22,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFXBarrierOption():
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     spot_fx_rate = 100.0
     currency_pair = "USDJPY"
@@ -36,8 +36,8 @@ def test_FinFXBarrierOption():
     drift = dom_interest_rate - forInterestRate
     scheme = FinGBMNumericalScheme.ANTITHETIC
     process_type = ProcessTypes.GBM
-    dom_discount_curve = DiscountCurveFlat(valuation_date, dom_interest_rate)
-    for_discount_curve = DiscountCurveFlat(valuation_date, forInterestRate)
+    dom_discount_curve = DiscountCurveFlat(value_date, dom_interest_rate)
+    for_discount_curve = DiscountCurveFlat(value_date, forInterestRate)
     model = BlackScholes(volatility)
 
     ###########################################################################
@@ -60,12 +60,12 @@ def test_FinFXBarrierOption():
                                      num_observations_per_year,
                                      notional, notional_currency)
 
-            value = option.value(valuation_date, spot_fx_rate,
+            value = option.value(value_date, spot_fx_rate,
                                  dom_discount_curve, for_discount_curve, model)
 
             start = time.time()
             model_params = (spot_fx_rate, drift, volatility, scheme)
-            value_mc = option.value_mc(valuation_date, spot_fx_rate,
+            value_mc = option.value_mc(value_date, spot_fx_rate,
                                        dom_interest_rate, process_type,
                                        model_params)
 
@@ -85,12 +85,12 @@ def test_FinFXBarrierOption():
                                      num_observations_per_year,
                                      notional, notional_currency)
 
-            value = option.value(valuation_date, spot_fx_rate,
+            value = option.value(value_date, spot_fx_rate,
                                  dom_discount_curve, for_discount_curve, model)
 
             start = time.time()
             model_params = (spot_fx_rate, drift, volatility, scheme)
-            value_mc = option.value_mc(valuation_date,
+            value_mc = option.value_mc(value_date,
                                        spot_fx_rate,
                                        dom_interest_rate,
                                        process_type,
@@ -123,25 +123,25 @@ def test_FinFXBarrierOption():
                                              notional,
                                              notional_currency)
 
-            value = barrier_option.value(valuation_date,
+            value = barrier_option.value(value_date,
                                          spot_fx_rate,
                                          dom_discount_curve,
                                          for_discount_curve,
                                          model)
 
-            delta = barrier_option.delta(valuation_date,
+            delta = barrier_option.delta(value_date,
                                          spot_fx_rate,
                                          dom_discount_curve,
                                          for_discount_curve,
                                          model)
 
-            vega = barrier_option.vega(valuation_date,
+            vega = barrier_option.vega(value_date,
                                        spot_fx_rate,
                                        dom_discount_curve,
                                        for_discount_curve,
                                        model)
 
-            theta = barrier_option.theta(valuation_date,
+            theta = barrier_option.theta(value_date,
                                          spot_fx_rate,
                                          dom_discount_curve,
                                          for_discount_curve,

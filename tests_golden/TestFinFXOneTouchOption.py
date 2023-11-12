@@ -21,7 +21,7 @@ def test_FinFXOneTouchOption():
     # Examples Haug Page 180 Table 4-22
     # Agreement not exact at t is not exactly 0.50
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(2, 7, 2016)
     volatility = 0.20
     barrier_level = 1.0  # H
@@ -33,8 +33,8 @@ def test_FinFXOneTouchOption():
     num_paths = 50000
     num_steps_per_year = 252 * 2
 
-    domCurve = DiscountCurveFlat(valuation_date, domesticRate)
-    forCurve = DiscountCurveFlat(valuation_date, foreignRate)
+    domCurve = DiscountCurveFlat(value_date, domesticRate)
+    forCurve = DiscountCurveFlat(value_date, foreignRate)
 
     spot_fx_rate = 1.050
     payment_size = 1.5
@@ -54,13 +54,13 @@ def test_FinFXOneTouchOption():
                                   barrier_level,
                                   payment_size)
 
-        v = option.value(valuation_date,
+        v = option.value(value_date,
                          spot_fx_rate,
                          domCurve,
                          forCurve,
                          model)
 
-        v_mc = option.value_mc(valuation_date,
+        v_mc = option.value_mc(value_date,
                                spot_fx_rate,
                                domCurve,
                                forCurve,
@@ -90,13 +90,13 @@ def test_FinFXOneTouchOption():
                                   barrier_level,
                                   payment_size)
 
-        v = option.value(valuation_date,
+        v = option.value(value_date,
                          spot_fx_rate,
                          domCurve,
                          forCurve,
                          model)
 
-        v_mc = option.value_mc(valuation_date,
+        v_mc = option.value_mc(value_date,
                                spot_fx_rate,
                                domCurve,
                                forCurve,
@@ -115,9 +115,9 @@ def test_FinFXOneTouchOption():
 
 def test_BBGOneTouchOption():
 
-    # 1YR ONETOUCH ON EURUSD 
+    # 1YR ONETOUCH ON EURUSD
 
-    valuation_date = Date(3, 12, 2021)
+    value_date = Date(3, 12, 2021)
     expiry_date = Date(5, 12, 2022)
     barrier_level = 1.1865  # THIS IS NUMBER OF DOLLARS PER EURO
 
@@ -132,8 +132,8 @@ def test_BBGOneTouchOption():
     num_paths = 50000
     num_steps_per_year = 252
 
-    domCurve = DiscountCurveFlat(valuation_date, domRate)
-    forCurve = DiscountCurveFlat(valuation_date, forRate)
+    domCurve = DiscountCurveFlat(value_date, domRate)
+    forCurve = DiscountCurveFlat(value_date, forRate)
 
     payment_size = 1000000 # EUR
 
@@ -144,13 +144,13 @@ def test_BBGOneTouchOption():
                               barrier_level,
                               payment_size)
 
-    v = option.value(valuation_date,
+    v = option.value(value_date,
                      spot_fx_rate,
                      domCurve,
                      forCurve,
                      model)
 
-    v_mc = option.value_mc(valuation_date,
+    v_mc = option.value_mc(value_date,
                            spot_fx_rate,
                            domCurve,
                            forCurve,
@@ -158,19 +158,19 @@ def test_BBGOneTouchOption():
                            num_steps_per_year,
                            num_paths)
 
-    d = option.delta(valuation_date,
+    d = option.delta(value_date,
                      spot_fx_rate,
                      domCurve,
                      forCurve,
                      model)
 
-    g = option.gamma(valuation_date,
+    g = option.gamma(value_date,
                      spot_fx_rate,
                      domCurve,
                      forCurve,
                      model)
 
-    v = option.vega(valuation_date,
+    v = option.vega(value_date,
                      spot_fx_rate,
                      domCurve,
                      forCurve,
@@ -180,7 +180,7 @@ def test_BBGOneTouchOption():
     # VEGA IS 68,777.26
     # GAMMA IS 916,285
     # DELTA IS -9560266
-    
+
     print(optionType)
     print("Value:", v)
     print("Value MC:", v_mc)

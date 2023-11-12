@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import datetime as dt
+import os
+
 import sys
 sys.path.append("..")
 
@@ -15,8 +18,6 @@ from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-import datetime as dt
-import os
 
 
 

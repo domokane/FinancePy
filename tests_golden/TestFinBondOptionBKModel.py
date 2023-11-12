@@ -2,6 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import OptionTypes
@@ -13,13 +20,6 @@ from financepy.products.bonds.bond import Bond
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
-import numpy as np
-import time
-import matplotlib.pyplot as plt
-
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

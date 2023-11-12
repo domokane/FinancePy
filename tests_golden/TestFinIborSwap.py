@@ -27,9 +27,9 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def buildIborSingleCurve(valuation_date):
+def buildIborSingleCurve(value_date):
 
-    settle_date = valuation_date.add_days(2)
+    settle_date = value_date.add_days(2)
     dcType = DayCountTypes.ACT_360
 
     depos = []
@@ -37,7 +37,7 @@ def buildIborSingleCurve(valuation_date):
     swaps = []
 
     maturity_date = settle_date.add_months(1)
-    depo1 = IborDeposit(valuation_date, maturity_date, -0.00251, dcType)
+    depo1 = IborDeposit(value_date, maturity_date, -0.00251, dcType)
     depos.append(depo1)
 
     # Series of 1M futures
@@ -245,7 +245,7 @@ def buildIborSingleCurve(valuation_date):
 
     ########################################
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     testCases.header("LABEL", "DATE", "VALUE")
 
@@ -308,9 +308,9 @@ def test_LiborSwap():
     same curve being used for discounting and working out the implied
     future Libor rates. """
 
-    valuation_date = Date(30, 11, 2018)
-    settle_date = valuation_date.add_days(2)
-    libor_curve = buildIborSingleCurve(valuation_date)
+    value_date = Date(30, 11, 2018)
+    settle_date = value_date.add_days(2)
+    libor_curve = buildIborSingleCurve(value_date)
     v = swap.value(settle_date, libor_curve, libor_curve, firstFixing)
 
     v_bbg = 388147.0
@@ -346,7 +346,7 @@ def test_dp_example():
                     float_freq_type=FrequencyTypes.SEMI_ANNUAL,
                     float_dc_type=DayCountTypes.ACT_360,
                     notional=notional,
-                    calendar_type=swapCalendarType,
+                    cal_type=swapCalendarType,
                     bd_adjust_type=bd_adjust_type,
                     dg_rule_type=dg_rule_type)
 
@@ -360,12 +360,12 @@ def test_dp_example():
     dfs = [0.9999843, 0.9966889, 0.9942107, 0.9911884, 0.9880738, 0.9836490,
            0.9786276, 0.9710461, 0.9621778, 0.9514315, 0.9394919]
 
-    valuation_date = start_date
+    value_date = start_date
 
-    curve = DiscountCurve(valuation_date, dts, np.array(dfs),
+    curve = DiscountCurve(value_date, dts, np.array(dfs),
                           InterpTypes.FLAT_FWD_RATES)
 
-    v = swap.value(valuation_date, curve, curve)
+    v = swap.value(value_date, curve, curve)
 
 #    swap.print_fixed_leg_pv()
 #    swap.print_float_leg_pv()

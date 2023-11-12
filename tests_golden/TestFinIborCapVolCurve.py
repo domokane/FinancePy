@@ -19,14 +19,14 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_FinCapVolCurve():
 
     # Reproduces example in Table 32.1 of Hull Book
-    valuation_date = Date(1, 1, 2020)
+    value_date = Date(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
     num_periods = 10
-    capletDt = valuation_date
+    capletDt = value_date
 
-    capVolDates.append(valuation_date)
+    capVolDates.append(value_date)
 
     for i in range(0, num_periods):
         capletDt = capletDt.add_tenor(capletVolTenor)
@@ -37,7 +37,7 @@ def test_FinCapVolCurve():
     capVolatilities = np.array(capVolatilities)/100.0
 
     day_count_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = IborCapVolCurve(valuation_date,
+    volCurve = IborCapVolCurve(value_date,
                                capVolDates,
                                capVolatilities,
                                day_count_type)

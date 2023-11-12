@@ -67,7 +67,7 @@ class EquitySwap:
             self._termination_date = effective_date.add_tenor(
                 termination_date_or_tenor)
 
-        calendar = Calendar(calendar_type)
+        calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
                                               bd_adjust_type)
 
@@ -92,7 +92,7 @@ class EquitySwap:
                                          quantity,
                                          eq_payment_lag,
                                          eq_return_type,
-                                         calendar_type,
+                                         cal_type,
                                          bd_adjust_type,
                                          dg_rule_type,
                                          end_of_month)
@@ -107,7 +107,7 @@ class EquitySwap:
                                       self._equity_leg._notional,
                                       self._principal,
                                       rate_payment_lag,
-                                      calendar_type,
+                                      cal_type,
                                       bd_adjust_type,
                                       dg_rule_type,
                                       end_of_month)

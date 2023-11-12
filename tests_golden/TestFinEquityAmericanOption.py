@@ -21,7 +21,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def testEquityAmericanOption():
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2017)
     stock_price = 50.0
     interest_rate = 0.06
@@ -29,8 +29,8 @@ def testEquityAmericanOption():
     volatility = 0.40
     strike_price = 50.0
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     testCases.banner("================== EUROPEAN PUT =======================")
 
@@ -43,13 +43,13 @@ def testEquityAmericanOption():
                          BlackScholesTypes.CRR_TREE,
                          num_steps)
 
-    value = put_option.value(valuation_date, stock_price,
+    value = put_option.value(value_date, stock_price,
                              discount_curve, dividend_curve, model)
-    delta = put_option.delta(valuation_date, stock_price,
+    delta = put_option.delta(value_date, stock_price,
                              discount_curve, dividend_curve, model)
-    gamma = put_option.gamma(valuation_date, stock_price,
+    gamma = put_option.gamma(value_date, stock_price,
                              discount_curve, dividend_curve, model)
-    theta = put_option.theta(valuation_date, stock_price,
+    theta = put_option.theta(value_date, stock_price,
                              discount_curve, dividend_curve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
@@ -70,7 +70,7 @@ def testEquityAmericanOption():
                              num_steps)
 
         start = time.time()
-        results = option.value(valuation_date, stock_price,
+        results = option.value(value_date, stock_price,
                                discount_curve, dividend_curve, model)
         end = time.time()
         duration = end - start
@@ -96,7 +96,7 @@ def testEquityAmericanOption():
                              num_steps)
 
         start = time.time()
-        results = option.value(valuation_date, stock_price,
+        results = option.value(value_date, stock_price,
                                discount_curve, dividend_curve, model)
         end = time.time()
         duration = end - start
@@ -110,13 +110,13 @@ def testEquityAmericanOption():
         strike_price,
         OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(valuation_date, stock_price,
+    value = call_option.value(value_date, stock_price,
                               discount_curve, dividend_curve, model)
-    delta = call_option.delta(valuation_date, stock_price,
+    delta = call_option.delta(value_date, stock_price,
                               discount_curve, dividend_curve, model)
-    gamma = call_option.gamma(valuation_date, stock_price,
+    gamma = call_option.gamma(value_date, stock_price,
                               discount_curve, dividend_curve, model)
-    theta = call_option.theta(valuation_date, stock_price,
+    theta = call_option.theta(value_date, stock_price,
                               discount_curve, dividend_curve, model)
 
     testCases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
@@ -139,7 +139,7 @@ def testEquityAmericanOption():
                              BlackScholesTypes.CRR_TREE,
                              num_steps)
         start = time.time()
-        results = option.value(valuation_date, stock_price, discount_curve,
+        results = option.value(value_date, stock_price, discount_curve,
                                dividend_curve, model)
         end = time.time()
         duration = end - start
@@ -164,7 +164,7 @@ def testEquityAmericanOption():
 
         start = time.time()
 
-        results = option.value(valuation_date, stock_price, discount_curve,
+        results = option.value(value_date, stock_price, discount_curve,
                                dividend_curve, model)
 
         end = time.time()
@@ -190,7 +190,7 @@ def testEquityAmericanOption():
 
         start = time.time()
 
-        results = option.value(valuation_date, stock_price, discount_curve,
+        results = option.value(value_date, stock_price, discount_curve,
                                dividend_curve, model)
 
         end = time.time()

@@ -27,15 +27,15 @@ def test_FinOptionImpliedDbn():
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        valuation_date = Date(10, 4, 2020)
+        value_date = Date(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        dom_discount_curve = DiscountCurveFlat(valuation_date, domCCRate)
-        for_discount_curve = DiscountCurveFlat(valuation_date, forCCRate)
+        dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
+        for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
 
         currency_pair = forName + domName
         spot_fx_rate = 1.3465
@@ -50,7 +50,7 @@ def test_FinOptionImpliedDbn():
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FXVolSurface(valuation_date,
+        fxMarket = FXVolSurface(value_date,
                                 spot_fx_rate,
                                 currency_pair,
                                 notional_currency,

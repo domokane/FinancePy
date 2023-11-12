@@ -217,7 +217,7 @@ class InflationSwapCurve(DiscountCurve):
             lastFRAMaturityDate = ibor_fras[-1]._maturity_date
 
         if num_swaps > 0:
-            firstSwapMaturityDate = ibor_swaps[0]._maturity_date
+            first_swap_maturity_date = ibor_swaps[0]._maturity_date
 
         if num_depos > 0 and num_fras > 0:
             if firstFRAMaturityDate <= lastDepositMaturityDate:
@@ -226,7 +226,7 @@ class InflationSwapCurve(DiscountCurve):
                 raise FinError("First FRA must end after last Deposit")
 
         if num_fras > 0 and num_swaps > 0:
-            if firstSwapMaturityDate <= lastFRAMaturityDate:
+            if first_swap_maturity_date <= lastFRAMaturityDate:
                 raise FinError("First Swap must mature after last FRA")
 
         # Now determine which instruments are used

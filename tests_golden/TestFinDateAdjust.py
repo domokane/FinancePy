@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
@@ -9,8 +12,6 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.schedule import Schedule
 from financepy.utils.date import Date
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -24,7 +25,7 @@ def test_date_adjust():
     end_date = Date(28, 2, 2011)
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.NONE
+    cal_type = CalendarTypes.NONE
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
@@ -32,7 +33,7 @@ def test_date_adjust():
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 
@@ -42,14 +43,14 @@ def test_date_adjust():
     testCases.banner("")
     testCases.header("NO WEEKENDS AND FOLLOWING", "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 
@@ -59,14 +60,14 @@ def test_date_adjust():
     testCases.banner("")
     testCases.header("NO WEEKENDS AND MODIFIED FOLLOWING", "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 
@@ -77,7 +78,7 @@ def test_date_adjust():
     testCases.header("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING",
                      "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.UNITED_STATES
+    cal_type = CalendarTypes.UNITED_STATES
     bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
@@ -87,7 +88,7 @@ def test_date_adjust():
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
 

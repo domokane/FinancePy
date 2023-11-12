@@ -34,10 +34,10 @@ def test_EquityVarianceSwap():
 
     volSwap = EquityVarianceSwap(start_date, tenor, strike)
 
-    valuation_date = Date(20, 3, 2018)
+    value_date = Date(20, 3, 2018)
     stock_price = 100.0
     dividend_yield = 0.0
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     maturity_date = start_date.add_months(3)
 
@@ -46,26 +46,26 @@ def test_EquityVarianceSwap():
     skew = -0.02/5.0  # defined as dsigma/dK
     strikes = np.linspace(50.0, 135.0, 18)
     vols = volSkew(strikes, atm_vol, atmK, skew)
-    volCurve = EquityVolCurve(valuation_date, maturity_date, strikes, vols)
+    volCurve = EquityVolCurve(value_date, maturity_date, strikes, vols)
 
     strike_spacing = 5.0
     num_call_options = 10
     num_put_options = 10
     r = 0.05
 
-    discount_curve = DiscountCurveFlat(valuation_date, r)
+    discount_curve = DiscountCurveFlat(value_date, r)
 
     use_forward = False
 
     testCases.header("LABEL", "VALUE")
 
-    k1 = volSwap.fair_strike(valuation_date, stock_price, dividend_curve,
+    k1 = volSwap.fair_strike(value_date, stock_price, dividend_curve,
                              volCurve, num_call_options, num_put_options,
                              strike_spacing, discount_curve, use_forward)
 
     testCases.print("REPLICATION VARIANCE:", k1)
 
-    k2 = volSwap.fair_strike_approx(valuation_date, stock_price, strikes, vols)
+    k2 = volSwap.fair_strike_approx(value_date, stock_price, strikes, vols)
     testCases.print("DERMAN SKEW APPROX for K:", k2)
 
 ##########################################################################

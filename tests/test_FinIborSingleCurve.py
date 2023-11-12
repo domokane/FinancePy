@@ -19,12 +19,12 @@ def test_bloombergPricingExample():
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
     """
-    valuation_date = Date(6, 6, 2018)
+    value_date = Date(6, 6, 2018)
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
@@ -34,17 +34,17 @@ def test_bloombergPricingExample():
     depos.append(depo)
 
     futs = []
-    fut = IborFuture(valuation_date, 1)
+    fut = IborFuture(value_date, 1)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 2)
+    fut = IborFuture(value_date, 2)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 3)
+    fut = IborFuture(value_date, 3)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 4)
+    fut = IborFuture(value_date, 4)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 5)
+    fut = IborFuture(value_date, 5)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 6)
+    fut = IborFuture(value_date, 6)
     futs.append(fut)
 
     fras = [None]*6
@@ -59,7 +59,7 @@ def test_bloombergPricingExample():
     freq = FrequencyTypes.SEMI_ANNUAL
 
     spot_days = 2
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     notional = ONE_MILLION
     fixed_leg_type = SwapTypes.PAY
 
@@ -117,18 +117,18 @@ def test_bloombergPricingExample():
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(
-        valuation_date, depos, fras, swaps, interp_type)
+        value_date, depos, fras, swaps, interp_type)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
 
     # Pay fixed so make fixed leg value negative
     assert round(swaps[0].value(
-        valuation_date, libor_curve, libor_curve, None), 4) == 0.0
+        value_date, libor_curve, libor_curve, None), 4) == 0.0
     assert round(-swaps[0]._fixed_leg.value(
-        valuation_date, libor_curve), 4) == 53707.6667
+        value_date, libor_curve), 4) == 53707.6667
     assert round(swaps[0]._float_leg.value(
-        valuation_date, libor_curve, libor_curve, None), 4) == 53707.6667
+        value_date, libor_curve, libor_curve, None), 4) == 53707.6667
 
     # Pay fixed so make fixed leg value negative
     assert round(swaps[0].value(

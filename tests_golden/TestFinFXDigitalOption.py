@@ -29,7 +29,7 @@ def test_FinFXDigitalOption():
 
     # Not exactly T=1.0 but close so don't exact exact agreement
     # (in fact I do not get exact agreement even if I do set T=1.0)
-    valuation_date = Date(13, 2, 2018)
+    value_date = Date(13, 2, 2018)
     expiry_date = Date(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
@@ -47,8 +47,8 @@ def test_FinFXDigitalOption():
 
     notional = 1.0
 
-    dom_discount_curve = DiscountCurveFlat(valuation_date, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(valuation_date, ccy1CCRate)
+    dom_discount_curve = DiscountCurveFlat(value_date, ccy2CCRate)
+    for_discount_curve = DiscountCurveFlat(value_date, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -61,7 +61,7 @@ def test_FinFXDigitalOption():
 
     spot_fx_rate = np.linspace(0.01, 2.0, 10)
 
-    value = digital_option.value(valuation_date,
+    value = digital_option.value(value_date,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,

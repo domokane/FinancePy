@@ -29,12 +29,12 @@ def test_FinBinomialTree():
     dividend_yield = 0.04
     volatility = 0.40
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2017)
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     num_steps_list = [100, 500, 1000]
 
@@ -46,13 +46,13 @@ def test_FinBinomialTree():
         expiry_date,
         strike_price,
         OptionTypes.EUROPEAN_PUT)
-    value = put_option.value(valuation_date, stock_price,
+    value = put_option.value(value_date, stock_price,
                              discount_curve, dividend_curve, model)
-    delta = put_option.delta(valuation_date, stock_price,
+    delta = put_option.delta(value_date, stock_price,
                              discount_curve, dividend_curve, model)
-    gamma = put_option.gamma(valuation_date, stock_price,
+    gamma = put_option.gamma(value_date, stock_price,
                              discount_curve, dividend_curve, model)
-    theta = put_option.theta(valuation_date, stock_price,
+    theta = put_option.theta(value_date, stock_price,
                              discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
@@ -72,7 +72,7 @@ def test_FinBinomialTree():
             dividend_curve,
             volatility,
             num_steps,
-            valuation_date,
+            value_date,
             payoff,
             expiry_date,
             payoff,
@@ -99,7 +99,7 @@ def test_FinBinomialTree():
             dividend_curve,
             volatility,
             num_steps,
-            valuation_date,
+            value_date,
             payoff,
             expiry_date,
             payoff,
@@ -116,13 +116,13 @@ def test_FinBinomialTree():
         expiry_date,
         strike_price,
         OptionTypes.EUROPEAN_CALL)
-    value = call_option.value(valuation_date, stock_price,
+    value = call_option.value(value_date, stock_price,
                               discount_curve, dividend_curve, model)
-    delta = call_option.delta(valuation_date, stock_price,
+    delta = call_option.delta(value_date, stock_price,
                               discount_curve, dividend_curve, model)
-    gamma = call_option.gamma(valuation_date, stock_price,
+    gamma = call_option.gamma(value_date, stock_price,
                               discount_curve, dividend_curve, model)
-    theta = call_option.theta(valuation_date, stock_price,
+    theta = call_option.theta(value_date, stock_price,
                               discount_curve, dividend_curve, model)
     testCases.header("BS Value", "BS Delta", "BS Gamma", "BS Theta")
     testCases.print(value, delta, gamma, theta)
@@ -142,7 +142,7 @@ def test_FinBinomialTree():
             dividend_curve,
             volatility,
             num_steps,
-            valuation_date,
+            value_date,
             payoff,
             expiry_date,
             payoff,
@@ -171,7 +171,7 @@ def test_FinBinomialTree():
             dividend_curve,
             volatility,
             num_steps,
-            valuation_date,
+            value_date,
             payoff,
             expiry_date,
             payoff,

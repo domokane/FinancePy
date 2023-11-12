@@ -22,11 +22,11 @@ def test_EquityBasketOption():
 
     import time
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     volatility = 0.30
     interest_rate = 0.05
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
 
     ##########################################################################
     # Homogeneous Basket
@@ -39,7 +39,7 @@ def test_EquityBasketOption():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     betaList = np.linspace(0.0, 0.999999, 11)
@@ -55,7 +55,7 @@ def test_EquityBasketOption():
 
             start = time.time()
             v = call_option.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -63,7 +63,7 @@ def test_EquityBasketOption():
                 corr_matrix)
 
             vMC = call_option.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -85,7 +85,7 @@ def test_EquityBasketOption():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     betaList = np.linspace(0.0, 0.999999, 11)
@@ -104,7 +104,7 @@ def test_EquityBasketOption():
             start = time.time()
 
             v = call_option.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -112,7 +112,7 @@ def test_EquityBasketOption():
                 corr_matrix)
 
             vMC = call_option.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -136,7 +136,7 @@ def test_EquityBasketOption():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
@@ -150,14 +150,14 @@ def test_EquityBasketOption():
 
             start = time.time()
             v = call_option.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
                 volatilities,
                 corr_matrix)
             vMC = call_option.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -180,7 +180,7 @@ def test_EquityBasketOption():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     testCases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
@@ -196,14 +196,14 @@ def test_EquityBasketOption():
 
             start = time.time()
             v = call_option.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
                 volatilities,
                 corr_matrix)
             vMC = call_option.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,

@@ -54,8 +54,8 @@ class CDSTranche:
                  running_coupon: float = 0.0,
                  long_protection: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_360,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
 
@@ -72,7 +72,7 @@ class CDSTranche:
         self._notional = notional
         self._running_coupon = running_coupon
         self._long_protection = long_protection
-        self._dc_type = day_count_type
+        self._dc_type = dc_type
         self._dg_rule_type = dg_rule_type
         self._cal_type = cal_type
         self._freq_type = freq_type

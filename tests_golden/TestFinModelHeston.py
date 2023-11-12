@@ -21,7 +21,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def testAnalyticalModels():
 
     # Reference see table 4.1 of Rouah book
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 4, 2015)
     v0 = 0.05  # initial variance of volatility
     theta = 0.05  # long term variance
@@ -55,7 +55,7 @@ def testAnalyticalModels():
                 call_option = EquityVanillaOption(
                     expiry_date, strike_price, OptionTypes.EUROPEAN_CALL)
                 value_mc_Heston = hestonModel.value_mc(
-                    valuation_date,
+                    value_date,
                     call_option,
                     stock_price,
                     interest_rate,
@@ -65,13 +65,13 @@ def testAnalyticalModels():
                     seed)
                 start = time.time()
                 valueGatheral = hestonModel.value_gatheral(
-                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+                    value_date, call_option, stock_price, interest_rate, dividend_yield)
                 valueLewisRouah = hestonModel.value_lewis_rouah(
-                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+                    value_date, call_option, stock_price, interest_rate, dividend_yield)
                 valueLewis = hestonModel.value_lewis(
-                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+                    value_date, call_option, stock_price, interest_rate, dividend_yield)
                 valueWeber = hestonModel.value_weber(
-                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+                    value_date, call_option, stock_price, interest_rate, dividend_yield)
                 err = (value_mc_Heston - valueWeber)
                 end = time.time()
                 elapsed = end - start
@@ -94,7 +94,7 @@ def testMonteCarlo():
     import time
 
     # Reference see table 4.1 of Rouah book
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     v0 = 0.04  # initial variance of volatility
     theta = 0.04  # long term variance
@@ -126,12 +126,12 @@ def testMonteCarlo():
                 call_option = EquityVanillaOption(
                     expiry_date, strike_price, OptionTypes.EUROPEAN_CALL)
                 valueWeber = hestonModel.value_weber(
-                    valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+                    value_date, call_option, stock_price, interest_rate, dividend_yield)
 
                 start = time.time()
 
                 value_mc_EULER = hestonModel.value_mc(
-                    valuation_date,
+                    value_date,
                     call_option,
                     stock_price,
                     interest_rate,
@@ -141,7 +141,7 @@ def testMonteCarlo():
                     seed,
                     HestonNumericalScheme.EULER)
                 value_mc_EULERLOG = hestonModel.value_mc(
-                    valuation_date,
+                    value_date,
                     call_option,
                     stock_price,
                     interest_rate,
@@ -151,7 +151,7 @@ def testMonteCarlo():
                     seed,
                     HestonNumericalScheme.EULERLOG)
                 value_mc_QUADEXP = hestonModel.value_mc(
-                    valuation_date,
+                    value_date,
                     call_option,
                     stock_price,
                     interest_rate,

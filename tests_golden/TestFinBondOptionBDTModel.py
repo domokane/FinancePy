@@ -2,6 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+
 import sys
 sys.path.append("..")
 
@@ -16,10 +20,6 @@ from financepy.products.bonds.bond import Bond
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
-import numpy as np
-import time
-import matplotlib.pyplot as plt
-
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

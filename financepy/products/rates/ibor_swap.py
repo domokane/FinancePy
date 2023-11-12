@@ -48,7 +48,7 @@ class IborSwap:
                  float_spread: float = 0.0,
                  float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
@@ -68,7 +68,7 @@ class IborSwap:
             self._termination_date = effective_date.add_tenor(
                 termination_date_or_tenor)
 
-        calendar = Calendar(calendar_type)
+        calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
                                               bd_adjust_type)
 
@@ -93,7 +93,7 @@ class IborSwap:
                                        notional,
                                        principal,
                                        payment_lag,
-                                       calendar_type,
+                                       cal_type,
                                        bd_adjust_type,
                                        dg_rule_type)
 
@@ -106,7 +106,7 @@ class IborSwap:
                                        notional,
                                        principal,
                                        payment_lag,
-                                       calendar_type,
+                                       cal_type,
                                        bd_adjust_type,
                                        dg_rule_type)
 

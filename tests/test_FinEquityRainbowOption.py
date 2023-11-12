@@ -10,11 +10,11 @@ from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
 import numpy as np
 from math import sqrt
 
-valuation_date = Date(1, 1, 2015)
+value_date = Date(1, 1, 2015)
 expiry_date = Date(1, 1, 2016)
 interest_rate = 0.05
 
-discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
+discount_curve = DiscountCurveFlat(value_date, interest_rate)
 
 num_assets = 2
 volatilities = np.ones(num_assets) * 0.3
@@ -23,7 +23,7 @@ dividend_yields = np.ones(num_assets) * 0.01
 
 dividend_curves = []
 for q in dividend_yields:
-    dividend_curve = DiscountCurveFlat(valuation_date, q)
+    dividend_curve = DiscountCurveFlat(value_date, q)
     dividend_curves.append(dividend_curve)
 
 stock_prices = np.ones(num_assets) * 100
@@ -44,7 +44,7 @@ def test_call_on_max():
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
     v = rainbowOption.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -52,7 +52,7 @@ def test_call_on_max():
         corr_matrix)
 
     v_MC = rainbowOption.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -74,7 +74,7 @@ def test_call_on_min():
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
     v = rainbowOption.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -82,7 +82,7 @@ def test_call_on_min():
         corr_matrix)
 
     v_MC = rainbowOption.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -104,7 +104,7 @@ def test_put_on_max():
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
     v = rainbowOption.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -112,7 +112,7 @@ def test_put_on_max():
         corr_matrix)
 
     v_MC = rainbowOption.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -134,7 +134,7 @@ def test_put_on_min():
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
     v = rainbowOption.value(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -142,7 +142,7 @@ def test_put_on_min():
         corr_matrix)
 
     v_MC = rainbowOption.value_mc(
-        valuation_date,
+        value_date,
         stock_prices,
         discount_curve,
         dividend_curves,
@@ -163,7 +163,7 @@ def test_call_on_nth():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     payoff_type = EquityRainbowOptionTypes.CALL_ON_NTH
@@ -186,7 +186,7 @@ def test_call_on_nth():
         corr_matrix = beta_vector_to_corr_matrix(betas)
 
         v_MC = rainbowOption.value_mc(
-            valuation_date,
+            value_date,
             stock_prices,
             discount_curve,
             dividend_curves,
@@ -208,7 +208,7 @@ def test_put_on_nth():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     payoff_type = EquityRainbowOptionTypes.PUT_ON_NTH
@@ -231,7 +231,7 @@ def test_put_on_nth():
         corr_matrix = beta_vector_to_corr_matrix(betas)
 
         v_MC = rainbowOption.value_mc(
-            valuation_date,
+            value_date,
             stock_prices,
             discount_curve,
             dividend_curves,

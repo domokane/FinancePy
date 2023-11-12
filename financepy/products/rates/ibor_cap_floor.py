@@ -54,7 +54,7 @@ class IborCapFloor():
                  maturity_date_or_tenor: (Date, str),
                  option_type: FinCapFloorTypes,
                  strike_rate: float,
-                 lastFixing: Optional[float] = None,
+                 last_fixing: Optional[float] = None,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
                  notional: float = ONE_MILLION,
@@ -83,7 +83,7 @@ class IborCapFloor():
         self._maturity_date = maturity_date
         self._option_type = option_type
         self._strike_rate = strike_rate
-        self._lastFixing = lastFixing
+        self._last_fixing = last_fixing
         self._freq_type = freq_type
         self._dc_type = dc_type
         self._notional = notional
@@ -145,11 +145,11 @@ class IborCapFloor():
         start_date = self._start_date
         end_date = self._capFloorLetDates[1]
 
-        if self._lastFixing is None:
+        if self._last_fixing is None:
             fwd_rate = libor_curve.fwd_rate(start_date, end_date,
                                             self._dc_type)
         else:
-            fwd_rate = self._lastFixing
+            fwd_rate = self._last_fixing
 
         alpha = self._day_counter.year_frac(start_date, end_date)[0]
         df = libor_curve.df(end_date)

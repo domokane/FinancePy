@@ -21,7 +21,7 @@ def test_dirty_priceCDSIndexOption():
 
     tradeDate = Date(1, 8, 2007)
     step_in_date = tradeDate.add_days(1)
-    valuation_date = step_in_date
+    value_date = step_in_date
 
     libor_curve = build_Ibor_Curve(tradeDate)
 
@@ -52,7 +52,7 @@ def test_dirty_priceCDSIndexOption():
         cds10Y = CDS(step_in_date, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(valuation_date,
+        issuer_curve = CDSCurve(value_date,
                                 cds_contracts,
                                 libor_curve,
                                 recovery_rate)
@@ -88,17 +88,17 @@ def test_dirty_priceCDSIndexOption():
 
         cds_contracts = []
         for dt in index_maturity_dates:
-            cds = CDS(valuation_date, dt, index / 10000.0)
+            cds = CDS(value_date, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(valuation_date, cds_contracts,
+        index_curve = CDSCurve(value_date, cds_contracts,
                                libor_curve, indexRecovery)
 
         indexSpreads = [index / 10000.0] * 4
 
         indexPortfolio = CDSIndexPortfolio()
         adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
-            valuation_date,
+            value_date,
             issuer_curves,
             indexSpreads,
             index_upfronts,
@@ -115,9 +115,9 @@ def test_dirty_priceCDSIndexOption():
                                 notional)
 
         v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
-            valuation_date, adjustedIssuerCurves, indexRecovery, volatility)
+            value_date, adjustedIssuerCurves, indexRecovery, volatility)
 
-        v_pay_2, v_rec_2 = option.value_adjusted_black(valuation_date,
+        v_pay_2, v_rec_2 = option.value_adjusted_black(value_date,
                                                        index_curve,
                                                        indexRecovery,
                                                        libor_curve,

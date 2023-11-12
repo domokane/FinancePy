@@ -2,11 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
 import os
 import datetime as dt
 import pandas as pd
 import numpy as np
+
+import sys
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -23,28 +25,25 @@ from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
 
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 ##########################################################################
 
-def build_Ibor_Curve(valuation_date):
+def build_Ibor_Curve(value_date):
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
     deposit_rate = 0.050
 
     depo0 = IborDeposit(
-        valuation_date,
+        value_date,
         "1D",
         deposit_rate,
         depoDCCType)
 
     spot_days = 2
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     maturity_date = settle_date.add_months(1)
     depo1 = IborDeposit(settle_date,
@@ -203,7 +202,7 @@ def build_Ibor_Curve(valuation_date):
 
     #    print(swap9._fixed_leg._payment_dates)
 
-    libor_curve = IborSingleCurve(valuation_date,
+    libor_curve = IborSingleCurve(value_date,
                                   depos,
                                   fras,
                                   swaps)

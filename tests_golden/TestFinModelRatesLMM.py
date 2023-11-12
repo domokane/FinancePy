@@ -4,6 +4,9 @@
 
 import numpy as np
 import time as time
+import sys
+sys.path.append("..")
+
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -26,9 +29,6 @@ from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
 from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -50,14 +50,14 @@ def getCorrelationMatrix(numFwds, beta, dt):
 
 """ def getVolCurve(numFwds, dt, flatVol=None):
 
-    valuation_date = Date(1, 1, 2020)
+    value_date = Date(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
     num_periods = 10
-    capletDt = valuation_date
+    capletDt = value_date
 
-    capVolDates.append(valuation_date)
+    capVolDates.append(value_date)
     for _ in range(0, num_periods):
         capletDt = capletDt.add_tenor(capletVolTenor)
         capVolDates.append(capletDt)
@@ -72,7 +72,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities[0] = 0.0
 
     dc_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = IborCapVolCurve(valuation_date,
+    volCurve = IborCapVolCurve(value_date,
                                    capVolDates,
                                    capVolatilities,
                                    dc_type)
@@ -147,11 +147,11 @@ def getForwardCurve(numFwds, r):
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
-#         valuation_date = Date(1, 1, 2010)
-#         libor_curve = FinDiscountCurveFlat(valuation_date, r,
+#         value_date = Date(1, 1, 2010)
+#         libor_curve = FinDiscountCurveFlat(value_date, r,
 #                                           FrequencyTypes.QUARTERLY)
 
-#         settle_date = valuation_date
+#         settle_date = value_date
 #         exercise_date = settle_date.add_months(a*3)
 #         maturity_date = settle_date.add_months(b*3)
 
@@ -176,7 +176,7 @@ def getForwardCurve(numFwds, r):
 #                                     float_dc_type)
 
 #         model = Black(swaptionVol)
-#         blackSwaptionPrice = swaption.value(valuation_date, libor_curve, model)
+#         blackSwaptionPrice = swaption.value(value_date, libor_curve, model)
 
 #         print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
 #               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF, swaptionVol,

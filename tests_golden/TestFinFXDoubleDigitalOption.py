@@ -22,7 +22,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_FinFXDoubleDigitalOption():
 
-    valuation_date = Date(10, 4, 2020)
+    value_date = Date(10, 4, 2020)
     expiry_date = Date(18, 9, 2020)
 
     forName = "EUR"
@@ -33,8 +33,8 @@ def test_FinFXDoubleDigitalOption():
     currency_pair = forName + domName  # Always FORDOM
     spot_fx_rate = 1.20
 
-    dom_discount_curve = DiscountCurveFlat(valuation_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(valuation_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
 
     volatility = 0.20
 
@@ -57,7 +57,7 @@ def test_FinFXDoubleDigitalOption():
     spot_fx_rate = np.linspace(0.01, 2.0, 10)
 
     value = double_digital_option.value(
-        valuation_date,
+        value_date,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,

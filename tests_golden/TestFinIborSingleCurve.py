@@ -35,48 +35,48 @@ def test_ibor_depositsOnly():
     # I have used the following useful blog post by Ioannis Rigopoulos for this
     # https://blog.deriscope.com/index.php/en/yield-curve-excel-quantlib-deposit
 
-    valuation_date = Date(23, 2, 2018)
+    value_date = Date(23, 2, 2018)
 
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     depos = []
 
     # 1 month
     deposit_rate = 0.04
     maturity_date = settle_date.add_months(1)
     depo = IborDeposit(settle_date, maturity_date, deposit_rate,
-                       depoDCCType, notional, calendar_type)
+                       depoDCCType, notional, cal_type)
     depos.append(depo)
 
     # 2 months
     deposit_rate = 0.04
     maturity_date = settle_date.add_months(2)
     depo = IborDeposit(settle_date, maturity_date, deposit_rate,
-                       depoDCCType, notional, calendar_type)
+                       depoDCCType, notional, cal_type)
     depos.append(depo)
 
     # 6 months
     deposit_rate = 0.04
     maturity_date = settle_date.add_months(6)
     depo = IborDeposit(settle_date, maturity_date, deposit_rate,
-                       depoDCCType, notional, calendar_type)
+                       depoDCCType, notional, cal_type)
     depos.append(depo)
 
     # 1 year
     deposit_rate = 0.04
     maturity_date = settle_date.add_months(12)
     depo = IborDeposit(settle_date, maturity_date, deposit_rate,
-                       depoDCCType, notional, calendar_type)
+                       depoDCCType, notional, cal_type)
     depos.append(depo)
 
     fras = []
     swaps = []
 
-    libor_curve = IborSingleCurve(valuation_date,
+    libor_curve = IborSingleCurve(value_date,
                                   depos,
                                   fras,
                                   swaps)
@@ -94,17 +94,17 @@ def test_ibor_depositsOnly():
 def test_FinIborFRAsOnly():
 
     # TO DO FIX THIS
-    valuation_date = Date(23, 2, 2018)
+    value_date = Date(23, 2, 2018)
 
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
 
     payFixed = True
 
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     fras = []
 
     # 1 x 4 FRA
@@ -112,7 +112,7 @@ def test_FinIborFRAsOnly():
     fraSettlementDate = settle_date.add_months(1)
     fraMaturityDate = settle_date.add_months(4)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate,
-                  depoDCCType, notional, payFixed, calendar_type)
+                  depoDCCType, notional, payFixed, cal_type)
     fras.append(fra)
 
     # 4 x 7 FRA
@@ -120,13 +120,13 @@ def test_FinIborFRAsOnly():
     fraSettlementDate = settle_date.add_months(4)
     fraMaturityDate = settle_date.add_months(7)
     fra = IborFRA(fraSettlementDate, fraMaturityDate, fraRate,
-                  depoDCCType, notional, payFixed, calendar_type)
+                  depoDCCType, notional, payFixed, cal_type)
     fras.append(fra)
 
     depos = []
     swaps = []
 
-    libor_curve = IborSingleCurve(valuation_date,
+    libor_curve = IborSingleCurve(value_date,
                                   depos,
                                   fras,
                                   swaps)
@@ -143,13 +143,13 @@ def test_FinIborFRAsOnly():
 
 def test_ibor_depositsFRAsSwaps():
 
-    valuation_date = Date(18, 9, 2019)
+    value_date = Date(18, 9, 2019)
 
     dccType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     deposit_rate = 0.050
     maturity_date = settle_date.add_months(1)
@@ -293,7 +293,7 @@ def test_ibor_depositsFRAsSwaps():
                     fixedDCCType)
     swaps.append(swap)
 
-    libor_curve = IborSingleCurve(valuation_date,
+    libor_curve = IborSingleCurve(value_date,
                                   depos,
                                   fras,
                                   swaps)
@@ -408,7 +408,7 @@ def test_ibor_depositsFuturesSwaps():
     principal = 0.0
     float_spread = 0.0
     floatDCCType = DayCountTypes.ACT_360
-    calendar_type = CalendarTypes.UNITED_STATES
+    cal_type = CalendarTypes.UNITED_STATES
     busDayAdjustRule = BusDayAdjustTypes.PRECEDING
 
     swap_rate = 0.02776305
@@ -416,7 +416,7 @@ def test_ibor_depositsFuturesSwaps():
     swap = IborSwap(start_date, "2Y", fixed_leg_type, swap_rate,
                     fixed_freq_type, fixedDCCType, notional,
                     float_spread, float_freq_type, floatDCCType,
-                    calendar_type, busDayAdjustRule)
+                    cal_type, busDayAdjustRule)
 
     swaps.append(swap)
 
@@ -477,28 +477,28 @@ def test_ibor_depositsFuturesSwaps():
 
 def test_derivativePricingExample():
 
-    valuation_date = Date(10, 11, 2011)
+    value_date = Date(10, 11, 2011)
 
     dccType = DayCountTypes.ACT_360
     depos = []
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     deposit_rate = 0.001410
     depo = IborDeposit(settle_date, "ON", deposit_rate, dccType)
     depos.append(depo)
 
     spot_days = 1
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     deposit_rate = 0.001410
     depo = IborDeposit(settle_date, "TN", deposit_rate, dccType)
     depos.append(depo)
 
     spot_days = 2
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
 
     deposit_rate = 0.001910
     depo = IborDeposit(settle_date, "1W", deposit_rate, dccType)
@@ -604,7 +604,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        _ = IborSingleCurve(valuation_date, depos, fras, swaps,
+        _ = IborSingleCurve(value_date, depos, fras, swaps,
                             InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
@@ -613,7 +613,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        _ = IborSingleCurve(valuation_date, depos, fras, swaps,
+        _ = IborSingleCurve(value_date, depos, fras, swaps,
                             InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
@@ -631,11 +631,11 @@ def test_bloombergPricingExample(interp_type):
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
     """
-    valuation_date = Date(6, 6, 2018)
+    value_date = Date(6, 6, 2018)
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
@@ -645,17 +645,17 @@ def test_bloombergPricingExample(interp_type):
     depos.append(depo)
 
     futs = []
-    fut = IborFuture(valuation_date, 1)
+    fut = IborFuture(value_date, 1)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 2)
+    fut = IborFuture(value_date, 2)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 3)
+    fut = IborFuture(value_date, 3)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 4)
+    fut = IborFuture(value_date, 4)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 5)
+    fut = IborFuture(value_date, 5)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 6)
+    fut = IborFuture(value_date, 6)
     futs.append(fut)
 
     fras = [None]*6
@@ -670,7 +670,7 @@ def test_bloombergPricingExample(interp_type):
     freq = FrequencyTypes.SEMI_ANNUAL
 
     spot_days = 2
-    settle_date = valuation_date.add_weekdays(spot_days)
+    settle_date = value_date.add_weekdays(spot_days)
     notional = ONE_MILLION
     fixed_leg_type = SwapTypes.PAY
 
@@ -728,7 +728,7 @@ def test_bloombergPricingExample(interp_type):
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(
-        valuation_date, depos, fras, swaps, interp_type)
+        value_date, depos, fras, swaps, interp_type)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     principal = 0.0
@@ -736,11 +736,11 @@ def test_bloombergPricingExample(interp_type):
     # Pay fixed so make fixed leg value negative
     testCases.header("VALUATION TO TODAY DATE", " PV")
     testCases.print("VALUE:", swaps[0].value(
-        valuation_date, libor_curve, libor_curve, None))
+        value_date, libor_curve, libor_curve, None))
     testCases.print(
-        "FIXED:", -swaps[0]._fixed_leg.value(valuation_date, libor_curve))
+        "FIXED:", -swaps[0]._fixed_leg.value(value_date, libor_curve))
     testCases.print("FLOAT:", swaps[0]._float_leg.value(
-        valuation_date, libor_curve, libor_curve, None))
+        value_date, libor_curve, libor_curve, None))
 
     # Pay fixed so make fixed leg value negative
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")

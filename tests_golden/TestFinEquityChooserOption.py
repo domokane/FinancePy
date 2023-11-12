@@ -19,7 +19,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_EquityChooserOptionHaug():
     """ Following example in Haug Page 130 """
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     choose_date = Date(2, 4, 2015)
     call_expiry_date = Date(1, 7, 2015)
     put_expiry_date = Date(2, 8, 2015)
@@ -31,8 +31,8 @@ def test_EquityChooserOptionHaug():
     dividend_yield = 0.05
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     chooserOption = EquityChooserOption(choose_date,
                                         call_expiry_date,
@@ -40,13 +40,13 @@ def test_EquityChooserOptionHaug():
                                         call_strike,
                                         put_strike)
 
-    v = chooserOption.value(valuation_date,
+    v = chooserOption.value(value_date,
                             stock_price,
                             discount_curve,
                             dividend_curve,
                             model)
 
-    v_mc = chooserOption.value_mc(valuation_date,
+    v_mc = chooserOption.value_mc(value_date,
                                   stock_price,
                                   discount_curve,
                                   dividend_curve,
@@ -62,7 +62,7 @@ def test_EquityChooserOptionHaug():
 def test_EquityChooserOptionMatlab():
     """https://fr.mathworks.com/help/fininst/chooserbybls.html """
 
-    valuation_date = Date(1, 6, 2007)
+    value_date = Date(1, 6, 2007)
     chooseDate = Date(31, 8, 2007)
     call_expiry_date = Date(2, 12, 2007)
     put_expiry_date = Date(2, 12, 2007)
@@ -75,8 +75,8 @@ def test_EquityChooserOptionMatlab():
 
     model = BlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
                                         call_expiry_date,
@@ -84,13 +84,13 @@ def test_EquityChooserOptionMatlab():
                                         call_strike,
                                         put_strike)
 
-    v = chooserOption.value(valuation_date,
+    v = chooserOption.value(value_date,
                             stock_price,
                             discount_curve,
                             dividend_curve,
                             model)
 
-    v_mc = chooserOption.value_mc(valuation_date,
+    v_mc = chooserOption.value_mc(value_date,
                                   stock_price,
                                   discount_curve,
                                   dividend_curve,
@@ -106,7 +106,7 @@ def test_EquityChooserOptionMatlab():
 def test_EquityChooserOptionDerivicom():
     """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm """
 
-    valuation_date = Date(1, 1, 2007)
+    value_date = Date(1, 1, 2007)
     chooseDate = Date(1, 2, 2007)
     call_expiry_date = Date(1, 4, 2007)
     put_expiry_date = Date(1, 5, 2007)
@@ -118,8 +118,8 @@ def test_EquityChooserOptionDerivicom():
     dividend_yield = 0.0625
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
                                         call_expiry_date,
@@ -127,13 +127,13 @@ def test_EquityChooserOptionDerivicom():
                                         call_strike,
                                         put_strike)
 
-    v = chooserOption.value(valuation_date,
+    v = chooserOption.value(value_date,
                             stock_price,
                             discount_curve,
                             dividend_curve,
                             model)
 
-    v_mc = chooserOption.value_mc(valuation_date,
+    v_mc = chooserOption.value_mc(value_date,
                                   stock_price,
                                   discount_curve,
                                   dividend_curve,

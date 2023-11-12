@@ -57,7 +57,7 @@ class IborIborSwap:
             self._termination_date = effective_date.add_tenor(
                 termination_date_or_tenor)
 
-        calendar = CalendarTypes(calendar_type)
+        calendar = CalendarTypes(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
                                               bd_adjust_type)
 

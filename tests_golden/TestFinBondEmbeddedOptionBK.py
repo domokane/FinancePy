@@ -2,10 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import matplotlib.pyplot as plt
+
 import sys
 sys.path.append("..")
-
-import time
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.bk_tree import BKTree
@@ -18,7 +19,6 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
-import matplotlib.pyplot as plt
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -34,8 +34,8 @@ def test_BondEmbeddedOptionMATLAB():
     # FOUND BY MATLAB ALTHOUGH THEY DO NOT EXAMINE THE ASYMPTOTIC PRICE
     # WHICH MIGHT BE A BETTER MATCH - ALSO THEY DO NOT USE A REALISTIC VOL
 
-    valuation_date = Date(1, 1, 2007)
-    settle_date = valuation_date
+    value_date = Date(1, 1, 2007)
+    settle_date = value_date
 
     ###########################################################################
 
@@ -49,7 +49,7 @@ def test_BondEmbeddedOptionMATLAB():
     swap3 = IborSwap(settle_date, "3Y", fixed_leg_type,
                      0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discount_curve = IborSingleCurve(valuation_date, [], [], swaps)
+    discount_curve = IborSingleCurve(value_date, [], [], swaps)
 
     ###########################################################################
 
@@ -113,12 +113,12 @@ def test_BondEmbeddedOptionQUANTLIB():
     # 68.38 found in blog article. But this is for 40 grid points.
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
-    valuation_date = Date(16, 8, 2016)
-    settle_date = valuation_date.add_weekdays(3)
+    value_date = Date(16, 8, 2016)
+    settle_date = value_date.add_weekdays(3)
 
     ###########################################################################
 
-    discount_curve = DiscountCurveFlat(valuation_date, 0.035,
+    discount_curve = DiscountCurveFlat(value_date, 0.035,
                                        FrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################

@@ -5,9 +5,10 @@
 import numpy as np
 from scipy.stats import norm
 
-from ..utils.helpers import label_to_string
-from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
+from ..utils.global_types import OptionTypes
+from ..utils.helpers import label_to_string
+
 
 ###############################################################################
 # NOTE: Need to convert option types to use enums.

@@ -22,14 +22,14 @@ def test_EquityDigitalOption():
 
     underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.30
     interest_rate = 0.05
     dividend_yield = 0.01
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     model = BlackScholes(volatility)
     import time
@@ -56,14 +56,14 @@ def test_EquityDigitalOption():
         call_option = EquityDigitalOption(
             expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
         value = call_option.value(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         start = time.time()
         value_mc = call_option.value_mc(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
@@ -94,25 +94,25 @@ def test_EquityDigitalOption():
         call_option = EquityDigitalOption(
             expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
         value = call_option.value(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         delta = call_option.delta(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         vega = call_option.vega(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         theta = call_option.theta(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
@@ -131,25 +131,25 @@ def test_EquityDigitalOption():
         put_option = EquityDigitalOption(
             expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type)
         value = put_option.value(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         delta = put_option.delta(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         vega = put_option.vega(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         theta = put_option.theta(
-            valuation_date,
+            value_date,
             stock_price,
             discount_curve,
             dividend_curve,

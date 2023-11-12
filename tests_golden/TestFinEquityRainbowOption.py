@@ -24,11 +24,11 @@ def test_EquityRainbowOption():
 
     #        import matplotlib.pyplot as plt
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     interest_rate = 0.05
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
 
     num_assets = 2
     volatilities = np.ones(num_assets) * 0.3
@@ -37,7 +37,7 @@ def test_EquityRainbowOption():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
     stock_prices = np.ones(num_assets) * 100
@@ -70,7 +70,7 @@ def test_EquityRainbowOption():
 
             start = time.time()
             v = rainbowOption.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -78,7 +78,7 @@ def test_EquityRainbowOption():
                 corr_matrix)
 
             v_MC = rainbowOption.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -126,7 +126,7 @@ def test_EquityRainbowOption():
             start = time.time()
 
             v = rainbowOption.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -134,7 +134,7 @@ def test_EquityRainbowOption():
                 corr_matrix)
 
             v_MC = rainbowOption.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -183,7 +183,7 @@ def test_EquityRainbowOption():
             start = time.time()
 
             v = rainbowOption.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -191,7 +191,7 @@ def test_EquityRainbowOption():
                 corr_matrix)
 
             v_MC = rainbowOption.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -238,14 +238,14 @@ def test_EquityRainbowOption():
 
             start = time.time()
             v = rainbowOption.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
                 volatilities,
                 corr_matrix)
             v_MC = rainbowOption.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -305,7 +305,7 @@ def test_EquityRainbowOption():
             start = time.time()
 
             v = rainbowOption1.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -313,7 +313,7 @@ def test_EquityRainbowOption():
                 corr_matrix)
 
             v_MC = rainbowOption2.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -365,7 +365,7 @@ def test_EquityRainbowOption():
             start = time.time()
 
             v = rainbowOption1.value(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -373,7 +373,7 @@ def test_EquityRainbowOption():
                 corr_matrix)
 
             v_MC = rainbowOption2.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -410,7 +410,7 @@ def test_EquityRainbowOption():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(valuation_date, q)
+        dividend_curve = DiscountCurveFlat(value_date, q)
         dividend_curves.append(dividend_curve)
 
 #    plt.figure(figsize=(10,8))
@@ -441,7 +441,7 @@ def test_EquityRainbowOption():
             start = time.time()
 
             v_MC = rainbowOption2.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,
@@ -501,7 +501,7 @@ def test_EquityRainbowOption():
             start = time.time()
 
             v_MC = rainbowOption2.value_mc(
-                valuation_date,
+                value_date,
                 stock_prices,
                 discount_curve,
                 dividend_curves,

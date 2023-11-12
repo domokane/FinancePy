@@ -37,8 +37,8 @@ def testBlackModelCheck():
     # Used to check swaption price below - we have Ts = 1 and Te = 4
     # Expect a price around 122 cents which is what I find.
 
-    valuation_date = Date(1, 1, 2020)
-    libor_curve = DiscountCurveFlat(valuation_date, 0.06,
+    value_date = Date(1, 1, 2020)
+    libor_curve = DiscountCurveFlat(value_date, 0.06,
                                     FrequencyTypes.SEMI_ANNUAL)
 
     settle_date = Date(1, 1, 2020)
@@ -62,7 +62,7 @@ def testBlackModelCheck():
                             notional)
 
     model = Black(0.20)
-    v = swaption.value(valuation_date, libor_curve, model)
+    v = swaption.value(value_date, libor_curve, model)
     testCases.header("LABEL", "VALUE")
     testCases.print("BLACK'S MODEL PRICE:", v*100)
 
@@ -73,9 +73,9 @@ def test_BDTExampleOne():
     # HULL BOOK NOTES
     # http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote23.pdf
 
-    valuation_date = Date(1, 1, 2020)
+    value_date = Date(1, 1, 2020)
     years = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
-    zero_dates = valuation_date.add_years(years)
+    zero_dates = value_date.add_years(years)
     zero_rates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
 
     testCases.header("DATES")
@@ -84,7 +84,7 @@ def test_BDTExampleOne():
     testCases.header("RATES")
     testCases.print(zero_rates)
 
-    curve = DiscountCurveZeros(valuation_date,
+    curve = DiscountCurveZeros(value_date,
                                zero_dates,
                                zero_rates,
                                FrequencyTypes.ANNUAL)
@@ -125,7 +125,7 @@ def test_BDTExampleTwo():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._cpn/bond._frequency
+    cpn = bond._cpn / bond._freq
     num_flows = len(bond._cpn_dates)
 
     for i in range(1, num_flows):
@@ -247,7 +247,7 @@ def test_BDTExampleThree():
 
                 cpn_times = []
                 cpn_flows = []
-                cpn = bond._cpn/bond._frequency
+                cpn = bond._cpn / bond._freq
                 for flow_date in bond._cpn_dates:
                     if flow_date > expiry_date:
                         flow_time = (flow_date - settle_date) / gDaysInYear

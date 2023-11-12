@@ -24,7 +24,7 @@ def test_EquityOneTouchOption():
     # Examples Haug Page 180 Table 4-22
     # Agreement not exact at t is not exactly 0.50
 
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(2, 7, 2016)
     interest_rate = 0.10
     volatility = 0.20
@@ -34,8 +34,8 @@ def test_EquityOneTouchOption():
     num_paths = 10000
     num_steps_per_year = 252
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     stock_price = 105.0
     payment_size = 15.0
@@ -55,13 +55,13 @@ def test_EquityOneTouchOption():
                                       barrier_level,
                                       payment_size)
 
-        v = option.value(valuation_date,
+        v = option.value(value_date,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(valuation_date,
+        v_mc = option.value_mc(value_date,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -89,13 +89,13 @@ def test_EquityOneTouchOption():
                                       barrier_level,
                                       payment_size)
 
-        v = option.value(valuation_date,
+        v = option.value(value_date,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(valuation_date,
+        v_mc = option.value_mc(value_date,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -124,13 +124,13 @@ def test_EquityOneTouchOption():
                                       downType,
                                       barrier_level)
 
-        v = option.value(valuation_date,
+        v = option.value(value_date,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(valuation_date,
+        v_mc = option.value_mc(value_date,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -154,13 +154,13 @@ def test_EquityOneTouchOption():
                                       upType,
                                       barrier_level)
 
-        v = option.value(valuation_date,
+        v = option.value(value_date,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(valuation_date,
+        v_mc = option.value_mc(value_date,
                                stock_price,
                                discount_curve,
                                dividend_curve,

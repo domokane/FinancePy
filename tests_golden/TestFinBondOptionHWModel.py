@@ -2,12 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import sys
-sys.path.append("..\\")
-
 import matplotlib.pyplot as plt
 import time
 import numpy as np
+
+import sys
+sys.path.append("..")
+
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.global_vars import gDaysInYear
 from financepy.utils.date import Date
@@ -20,7 +21,6 @@ from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from FinTestCases import FinTestCases, globalTestCaseMode
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -480,8 +480,8 @@ def test_BondOptionDerivaGem():
                                         OptionTypes.EUROPEAN_CALL)
     cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
     fp = bond.dirty_price_from_discount_curve(expiry_date, discount_curve)
-#    print("Fixed Income Clean Price: %9.3f"% cp)
-#    print("Fixed Income Full  Price: %9.3f"% fp)
+    #    print("Fixed Income Clean Price: %9.3f"% cp)
+    #    print("Fixed Income Full  Price: %9.3f"% fp)
 
     num_steps = 500
     sigma = 0.0125
@@ -494,7 +494,7 @@ def test_BondOptionDerivaGem():
 
     couponTimes = []
     couponFlows = []
-    cpn = bond._cpn/bond._frequency
+    cpn = bond._cpn / bond._freq
 
     numFlows = len(bond._cpn_dates)
     for i in range(0, numFlows):

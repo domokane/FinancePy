@@ -91,9 +91,9 @@ class IborSwaption():
         self._dg_rule_type = dg_rule_type
 
         self._pv01 = None
-        self._fwdSwapRate = None
-        self._forwardDf = None
-        self._underlyingSwap = None
+        self._fwd_swap_rate = None
+        self._forward_df = None
+        self._underlying_swap = None
 
 ###############################################################################
 
@@ -272,9 +272,9 @@ class IborSwaption():
             raise FinError("Unknown swaption model " + str(model))
 
         self._pv01 = pv01
-        self._fwdSwapRate = s
-        self._forwardDf = discount_curve.df(self._exercise_date)
-        self._underlyingSwap = swap
+        self._fwd_swap_rate = s
+        self._forward_df = discount_curve.df(self._exercise_date)
+        self._underlying_swap = swap
 
         # The exchange of cash occurs on the settlement date. However the
         # actual value is that on the specified valuation date which could
@@ -336,11 +336,11 @@ class IborSwaption():
             raise FinError("Cash settled swaptions must be priced using"
                            + " Black's model.")
 
-        self._fwdSwapRate = swap_rate
-        self._forwardDf = discount_curve.df(self._exercise_date)
-        self._underlyingSwap = swap
+        self._fwd_swap_rate = swap_rate
+        self._forward_df = discount_curve.df(self._exercise_date)
+        self._underlying_swap = swap
         # The annuity needs to be discounted to today using the correct df
-        self._pv01 = pv01 * self._forwardDf
+        self._pv01 = pv01 * self._forward_df
 
         # The exchange of cash occurs on the settlement date but we need to
         # value the swaption on the provided valuation date - which could be
@@ -353,19 +353,19 @@ class IborSwaption():
 
     def print_swap_fixed_leg(self):
 
-        if self._underlyingSwap is None:
+        if self._underlying_swap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
 
-        self._underlyingSwap.print_fixed_leg_pv()
+        self._underlying_swap.print_fixed_leg_pv()
 
 ###############################################################################
 
     def print_swap_float_leg(self):
 
-        if self._underlyingSwap is None:
+        if self._underlying_swap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
 
-        self._underlyingSwap.print_float_leg_pv()
+        self._underlying_swap.print_float_leg_pv()
 
 ###############################################################################
 
@@ -390,8 +390,8 @@ class IborSwaption():
 
         if self._pv01 is not None:
             s += label_to_string("PV01", self._pv01)
-            s += label_to_string("FWD SWAP RATE", self._fwdSwapRate*100)
-            s += label_to_string("FWD DF TO EXPIRY", self._forwardDf, "")
+            s += label_to_string("FWD SWAP RATE", self._fwd_swap_rate*100)
+            s += label_to_string("FWD DF TO EXPIRY", self._forward_df, "")
 
         return s
 

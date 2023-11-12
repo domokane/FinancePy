@@ -19,12 +19,12 @@ def test_american_call():
     risk_free_rate = 0.06
     dividend_yield = 0.00
     volatility = 0.40
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2017)
     # TODO MAKE WORK WITH EUROPEAN OPTIONS
     option_type = OptionTypes.AMERICAN_CALL
 
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
     num_steps_per_year = 500
     num_paths = 50_000
     poly_degree = 5
@@ -52,12 +52,12 @@ def test_american_put():
     risk_free_rate = 0.06
     dividend_yield = 0.00
     volatility = 0.20
-    valuation_date = Date(1, 1, 2016)
+    value_date = Date(1, 1, 2016)
     expiry_date = Date(1, 1, 2017)
     # TODO MAKE WORK WITH EUROPEAN OPTIONS
     option_type = OptionTypes.AMERICAN_PUT
 
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
     num_steps_per_year = 500
     num_paths = 50_000
     poly_degree = 5
@@ -86,7 +86,7 @@ def test_call_option():
     call_option = EquityVanillaOption(
         expiry_date, strike_price, option_type)
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     spot_price = 100
     volatility = 0.20
     risk_free_rate = 0.05
@@ -95,12 +95,12 @@ def test_call_option():
     num_paths = 50_000
     poly_degree = 5
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     # Call option
-    v0 = call_option.value(valuation_date, spot_price,
+    v0 = call_option.value(value_date, spot_price,
                            discount_curve, dividend_curve, model)
 
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
@@ -118,7 +118,7 @@ def test_put_option():
     put_option = EquityVanillaOption(
         expiry_date, strike_price, option_type)
 
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     spot_price = 100
     volatility = 0.20
     risk_free_rate = 0.05
@@ -127,12 +127,12 @@ def test_put_option():
     num_paths = 50_000
     poly_degree = 5
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_date - valuation_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(valuation_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     # Call option
-    v0 = put_option.value(valuation_date, spot_price,
+    v0 = put_option.value(value_date, spot_price,
                           discount_curve, dividend_curve, model)
     v_ls = equity_lsmc(spot_price, risk_free_rate, dividend_yield, volatility, num_steps_per_year, num_paths,
                        time_to_expiry, option_type.value, strike_price, poly_degree, FIT_TYPES.LAGUERRE.value, 0, 0)

@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -12,9 +15,6 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -27,7 +27,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def build_Ibor_Curve(tradeDate):
 
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
     dcType = DayCountTypes.ACT_360
     depos = []
 
@@ -37,7 +37,7 @@ def build_Ibor_Curve(tradeDate):
 
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    settle_date = valuation_date
+    settle_date = value_date
 
     maturity_date = settle_date.add_months(12)
     swap1 = IborSwap(
@@ -89,7 +89,7 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
 
     return libor_curve
 
@@ -98,18 +98,18 @@ def build_Ibor_Curve(tradeDate):
 
 def buildIssuerCurve(tradeDate, libor_curve):
 
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
 
     cdsMarketContracts = []
 
     cds_coupon = 0.0048375
     maturity_date = Date(20, 6, 2010)
-    cds = CDS(valuation_date, maturity_date, cds_coupon)
+    cds = CDS(value_date, maturity_date, cds_coupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -125,7 +125,7 @@ def test_valueCDSIndex():
     libor_curve = build_Ibor_Curve(tradeDate)
     issuer_curve = buildIssuerCurve(tradeDate, libor_curve)
     step_in_date = tradeDate.add_days(1)
-    valuation_date = step_in_date
+    value_date = step_in_date
     maturity_date = Date(20, 6, 2010)
 
     cdsRecovery = 0.40
@@ -139,19 +139,19 @@ def test_valueCDSIndex():
                            notional,
                            long_protection)
 
-#    cdsIndexContract.print(valuation_date)
+#    cdsIndexContract.print(value_date)
 
     testCases.header("LABEL", "VALUE")
 
     spd = cdsIndexContract.par_spread(
-        valuation_date, issuer_curve, cdsRecovery) * 10000.0
+        value_date, issuer_curve, cdsRecovery) * 10000.0
     testCases.print("PAR SPREAD", spd)
 
-    v = cdsIndexContract.value(valuation_date, issuer_curve, cdsRecovery)
+    v = cdsIndexContract.value(value_date, issuer_curve, cdsRecovery)
     testCases.print("DIRTY VALUE", v['dirty_pv'])
     testCases.print("CLEAN VALUE", v['clean_pv'])
 
-    p = cdsIndexContract.clean_price(valuation_date, issuer_curve, cdsRecovery)
+    p = cdsIndexContract.clean_price(value_date, issuer_curve, cdsRecovery)
     testCases.print("CLEAN PRICE", p)
 
     accrued_days = cdsIndexContract.accrued_days()
@@ -161,15 +161,15 @@ def test_valueCDSIndex():
     testCases.print("ACCRUED COUPON", accrued_interest)
 
     prot_pv = cdsIndexContract.protection_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     testCases.print("PROTECTION LEG PV", prot_pv)
 
     premPV = cdsIndexContract.premium_leg_pv(
-        valuation_date, issuer_curve, cdsRecovery)
+        value_date, issuer_curve, cdsRecovery)
     testCases.print("PREMIUM LEG PV", premPV)
 
     dirtyRPV01, cleanRPV01 = cdsIndexContract.risky_pv01(
-        valuation_date, issuer_curve)
+        value_date, issuer_curve)
     testCases.print("DIRTY RPV01", dirtyRPV01)
     testCases.print("CLEAN RPV01", cleanRPV01)
 

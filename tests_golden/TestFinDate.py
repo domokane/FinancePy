@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import set_date_format
-from financepy.utils.date import DateFormatTypes
-from financepy.utils.date import Date, date_range
 import numpy as np
 import time
 
 import sys
 sys.path.append("..")
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import set_date_format
+from financepy.utils.date import DateFormatTypes
+from financepy.utils.date import Date, date_range
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 

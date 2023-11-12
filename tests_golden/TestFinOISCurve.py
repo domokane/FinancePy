@@ -5,6 +5,10 @@
 import time as time
 import numpy as np
 import matplotlib.pyplot as plt
+
+import sys
+sys.path.append("..")
+
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -18,9 +22,6 @@ from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.global_types import SwapTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -32,17 +33,17 @@ PLOT_GRAPHS = False
 def test_OISFRAsOnly():
 
     # TO DO FIX THIS
-    valuation_date = Date(23, 2, 2018)
+    value_date = Date(23, 2, 2018)
 
     spot_days = 0
-    settleDt = valuation_date.add_weekdays(spot_days)
+    settleDt = value_date.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
 
     payFixed = True
 
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     fras = []
 
     # 1 x 4 FRA
@@ -50,7 +51,7 @@ def test_OISFRAsOnly():
     frasettleDt = settleDt.add_months(1)
     fraMaturityDate = settleDt.add_months(4)
     fra = IborFRA(frasettleDt, fraMaturityDate, fraRate,
-                  depoDCCType, notional, payFixed, calendar_type)
+                  depoDCCType, notional, payFixed, cal_type)
     fras.append(fra)
 
     # 4 x 7 FRA
@@ -58,7 +59,7 @@ def test_OISFRAsOnly():
     frasettleDt = settleDt.add_months(4)
     fraMaturityDate = settleDt.add_months(7)
     fra = IborFRA(frasettleDt, fraMaturityDate, fraRate,
-                  depoDCCType, notional, payFixed, calendar_type)
+                  depoDCCType, notional, payFixed, cal_type)
     fras.append(fra)
 
     swaps = []
@@ -79,24 +80,24 @@ def test_OISFRAsOnly():
 
 def test_OISDepositsFRAsSwaps():
 
-    valuation_date = Date(18, 9, 2019)
+    value_date = Date(18, 9, 2019)
 
     dccType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
-    settleDt = valuation_date.add_weekdays(spot_days)
+    settleDt = value_date.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     depos = []
 
     # 1 month
     deposit_rate = 0.04
     maturity_date = settleDt.add_months(1)
     depo = IborDeposit(settleDt, maturity_date, deposit_rate,
-                       depoDCCType, notional, calendar_type)
+                       depoDCCType, notional, cal_type)
     depos.append(depo)
 
     fras = []
@@ -216,7 +217,7 @@ def test_OISDepositsFRAsSwaps():
                fixedDCCType)
     swaps.append(swap)
 
-    libor_curve = OISCurve(valuation_date,
+    libor_curve = OISCurve(value_date,
                            depos,
                            fras,
                            swaps)
@@ -317,7 +318,7 @@ def test_OISDepositsFuturesSwaps():
     notional = 1000000
     float_spread = 0.0
     floatDCCType = DayCountTypes.ACT_360
-    calendar_type = CalendarTypes.UNITED_STATES
+    cal_type = CalendarTypes.UNITED_STATES
     busDayAdjustRule = BusDayAdjustTypes.PRECEDING
 
     swap_rate = 0.02776305
@@ -326,7 +327,7 @@ def test_OISDepositsFuturesSwaps():
     swap = OIS(start_date, "2Y", fixed_leg_type,
                swap_rate, fixed_freq_type, fixedDCCType, notional,
                payment_lag, float_spread, float_freq_type, floatDCCType,
-               calendar_type, busDayAdjustRule)
+               cal_type, busDayAdjustRule)
 
     swaps.append(swap)
 
@@ -382,11 +383,11 @@ def test_OISDepositsFuturesSwaps():
 
 def test_derivativePricingExample():
 
-    valuation_date = Date(10, 11, 2011)
+    value_date = Date(10, 11, 2011)
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settleDt = valuation_date.add_weekdays(spot_days)
+    settleDt = value_date.add_weekdays(spot_days)
 
     fras = []
 
@@ -440,7 +441,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        _ = OISCurve(valuation_date, fras, swaps,
+        _ = OISCurve(value_date, fras, swaps,
                      InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
@@ -449,7 +450,7 @@ def test_derivativePricingExample():
     start = time.time()
 
     for _ in range(0, numRepeats):
-        _ = OISCurve(valuation_date, fras, swaps,
+        _ = OISCurve(value_date, fras, swaps,
                      InterpTypes.LINEAR_SWAP_RATES)
 
     end = time.time()
@@ -467,28 +468,28 @@ def test_bloombergPricingExample():
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """
 
-    valuation_date = Date(6, 6, 2018)
+    value_date = Date(6, 6, 2018)
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settleDt = valuation_date.add_weekdays(spot_days)
+    settleDt = value_date.add_weekdays(spot_days)
     accrual = DayCountTypes.THIRTY_E_360
 
     depo = IborDeposit(settleDt, "1D", 1.712 / 100.0, accrual)
     depos = [depo]
 
     futs = []
-    fut = IborFuture(valuation_date, 1)
+    fut = IborFuture(value_date, 1)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 2)
+    fut = IborFuture(value_date, 2)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 3)
+    fut = IborFuture(value_date, 3)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 4)
+    fut = IborFuture(value_date, 4)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 5)
+    fut = IborFuture(value_date, 5)
     futs.append(fut)
-    fut = IborFuture(valuation_date, 6)
+    fut = IborFuture(value_date, 6)
     futs.append(fut)
 
     fras = [None]*6
@@ -502,7 +503,7 @@ def test_bloombergPricingExample():
     accrual = DayCountTypes.THIRTY_E_360
     freq = FrequencyTypes.SEMI_ANNUAL
     spot_days = 2
-    settleDt = valuation_date.add_weekdays(spot_days)
+    settleDt = value_date.add_weekdays(spot_days)
     payRec = SwapTypes.PAY
     lag = 1  # Not used
 
@@ -559,7 +560,7 @@ def test_bloombergPricingExample():
                (2.91552 + 2.93748) / 200, freq, accrual)
     swaps.append(swap)
 
-    oisCurve = OISCurve(valuation_date, depos, fras, swaps)
+    oisCurve = OISCurve(value_date, depos, fras, swaps)
 
 #    swaps[0]._fixed_leg.print_valuation()
 #    swaps[0]._float_leg.print_valuation()
@@ -567,11 +568,11 @@ def test_bloombergPricingExample():
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
 
     testCases.header("VALUATION TO TODAY DATE", " PV")
-    testCases.print("VALUE:", swaps[0].value(valuation_date, oisCurve, None))
+    testCases.print("VALUE:", swaps[0].value(value_date, oisCurve, None))
     testCases.print(
-        "FIXED:", -swaps[0]._fixed_leg.value(valuation_date, oisCurve))
+        "FIXED:", -swaps[0]._fixed_leg.value(value_date, oisCurve))
     testCases.print("FLOAT:", swaps[0]._float_leg.value(
-        valuation_date, oisCurve, None))
+        value_date, oisCurve, None))
 
     testCases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
     testCases.print("VALUE:", swaps[0].value(settleDt, oisCurve, None))

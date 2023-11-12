@@ -266,10 +266,10 @@ class OISCurve(DiscountCurve):
             lastFRAMaturityDate = oisFRAs[-1]._maturity_date
 
         if num_swaps > 0:
-            firstSwapMaturityDate = oisSwaps[0]._maturity_date
+            first_swap_maturity_date = oisSwaps[0]._maturity_date
 
         if num_fras > 0 and num_swaps > 0:
-            if firstSwapMaturityDate <= lastFRAMaturityDate:
+            if first_swap_maturity_date <= lastFRAMaturityDate:
                 raise FinError("First Swap must mature after last FRA ends")
 
         if num_depos > 0 and num_fras > 0:
@@ -279,7 +279,7 @@ class OISCurve(DiscountCurve):
                 raise FinError("First FRA must end after last Deposit")
 
         if num_fras > 0 and num_swaps > 0:
-            if firstSwapMaturityDate <= lastFRAMaturityDate:
+            if first_swap_maturity_date <= lastFRAMaturityDate:
                 raise FinError("First Swap must mature after last FRA")
 
         if swap_start_date > self._value_date:

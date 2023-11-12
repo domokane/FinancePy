@@ -41,7 +41,7 @@ class OISBasisSwap:
                  oisSpread: float = 0.0,
                  oisPaymentLag: int = 0,
                  notional: float = ONE_MILLION,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a Ibor basis swap contract giving the contract start
@@ -61,7 +61,7 @@ class OISBasisSwap:
             self._termination_date = effective_date.add_tenor(
                 termination_date_or_tenor)
 
-        calendar = Calendar(calendar_type)
+        calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
                                               bd_adjust_type)
 
@@ -83,7 +83,7 @@ class OISBasisSwap:
                                           notional,
                                           principal,
                                           0,
-                                          calendar_type,
+                                          cal_type,
                                           bd_adjust_type,
                                           dg_rule_type)
 
@@ -96,7 +96,7 @@ class OISBasisSwap:
                                          notional,
                                          principal,
                                          oisPaymentLag,
-                                         calendar_type,
+                                         cal_type,
                                          bd_adjust_type,
                                          dg_rule_type)
 

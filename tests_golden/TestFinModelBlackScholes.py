@@ -26,7 +26,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def testBlackScholes():
 
-    valuation_date = Date(8, 5, 2015)
+    value_date = Date(8, 5, 2015)
     expiry_date = Date(15, 1, 2016)
 
     strike_price = 130.0
@@ -47,11 +47,11 @@ def testBlackScholes():
     euOption = EquityVanillaOption(expiry_date, strike_price,
                                    euOptionType)
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate,
+    discount_curve = DiscountCurveFlat(value_date, interest_rate,
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield,
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield,
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 
@@ -61,24 +61,24 @@ def testBlackScholes():
                              BlackScholesTypes.CRR_TREE,
                              num_steps_per_year)
 
-    v = amOption.value(valuation_date, stock_price, discount_curve,
+    v = amOption.value(value_date, stock_price, discount_curve,
                        dividend_curve, modelTree)
 #    print(v)
 
     modelApprox = BlackScholes(volatility,
                                BlackScholesTypes.BARONE_ADESI)
 
-    v = amOption.value(valuation_date, stock_price, discount_curve,
+    v = amOption.value(value_date, stock_price, discount_curve,
                        dividend_curve, modelApprox)
 
 #    print(v)
 
-    v = ameuOption.value(valuation_date, stock_price, discount_curve,
+    v = ameuOption.value(value_date, stock_price, discount_curve,
                          dividend_curve, modelTree)
 
 #    print(v)
 
-    v = euOption.value(valuation_date, stock_price, discount_curve,
+    v = euOption.value(value_date, stock_price, discount_curve,
                        dividend_curve, modelTree)
 
 #    print(v)
@@ -103,16 +103,16 @@ def testBlackScholes():
     #     modelBAW = BlackScholes(volatility,
     #                                     BlackScholesTypes.BARONE_ADESI)
 
-    #     v_am = amOption.value(valuation_date, stock_price, discount_curve,
+    #     v_am = amOption.value(value_date, stock_price, discount_curve,
     #                           dividend_yield, modelTree)
 
-    #     v_eu = ameuOption.value(valuation_date, stock_price, discount_curve,
+    #     v_eu = ameuOption.value(value_date, stock_price, discount_curve,
     #                             dividend_yield, modelTree)
 
-    #     v_bs = euOption.value(valuation_date, stock_price, discount_curve,
+    #     v_bs = euOption.value(value_date, stock_price, discount_curve,
     #                           dividend_yield, modelAnal)
 
-    #     v_am_baw = amOption.value(valuation_date, stock_price, discount_curve,
+    #     v_am_baw = amOption.value(value_date, stock_price, discount_curve,
     #                               dividend_yield, modelBAW)
 
     #     amTreeValue.append(v_am)

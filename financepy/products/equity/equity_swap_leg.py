@@ -34,7 +34,7 @@ class EquitySwapLeg:
                  quantity: float = 1.0,  # Quantity at effective date
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
@@ -49,7 +49,7 @@ class EquitySwapLeg:
         else:
             termination_date = effective_date.add_tenor(term_date_or_tenor)
 
-        calendar = Calendar(calendar_type)
+        calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(termination_date,
                                               bd_adjust_type)
 

@@ -29,7 +29,7 @@ PLOT_GRAPHS = False
 
 def test_equity_vol_surface(verboseCalibration):
 
-    valuation_date = Date(11, 1, 2021)
+    value_date = Date(11, 1, 2021)
 
     stock_price = 3800.0  # Check
 
@@ -53,14 +53,14 @@ def test_equity_vol_surface(verboseCalibration):
     volSurface = volSurface / 100.0
 
     r = 0.020  # USD
-    discount_curve = DiscountCurveFlat(valuation_date, r)
+    discount_curve = DiscountCurveFlat(value_date, r)
 
     q = 0.010  # USD
-    dividend_curve = DiscountCurveFlat(valuation_date, q)
+    dividend_curve = DiscountCurveFlat(value_date, q)
 
     vol_functionType = VolFuncTypes.SVI
 
-    equitySurface = EquityVolSurface(valuation_date,
+    equitySurface = EquityVolSurface(value_date,
                                      stock_price,
                                      discount_curve,
                                      dividend_curve,

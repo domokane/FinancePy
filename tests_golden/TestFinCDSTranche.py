@@ -2,6 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import os
+import time
+
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -14,11 +20,6 @@ from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_tranche import CDSTranche
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
-import os
-import time
-
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
@@ -32,7 +33,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def build_Ibor_Curve(tradeDate):
 
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
     dcType = DayCountTypes.ACT_360
 
     depos = []
@@ -41,7 +42,7 @@ def build_Ibor_Curve(tradeDate):
 
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    settle_date = valuation_date
+    settle_date = value_date
 
     maturity_date = settle_date.add_months(12)
     swap1 = IborSwap(
@@ -93,13 +94,13 @@ def build_Ibor_Curve(tradeDate):
         dcType)
     swaps.append(swap5)
 
-    libor_curve = IborSingleCurve(valuation_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
     return libor_curve
 
 ##############################################################################
 
 
-def loadHomogeneousCDSCurves(valuation_date,
+def loadHomogeneousCDSCurves(value_date,
                              libor_curve,
                              cdsSpread3Y,
                              cdsSpread5Y,
@@ -107,21 +108,21 @@ def loadHomogeneousCDSCurves(valuation_date,
                              cdsSpread10Y,
                              num_credits):
 
-    maturity3Y = valuation_date.next_cds_date(36)
-    maturity5Y = valuation_date.next_cds_date(60)
-    maturity7Y = valuation_date.next_cds_date(84)
-    maturity10Y = valuation_date.next_cds_date(120)
+    maturity3Y = value_date.next_cds_date(36)
+    maturity5Y = value_date.next_cds_date(60)
+    maturity7Y = value_date.next_cds_date(84)
+    maturity10Y = value_date.next_cds_date(120)
 
     recovery_rate = 0.40
 
-    cds3Y = CDS(valuation_date, maturity3Y, cdsSpread3Y)
-    cds5Y = CDS(valuation_date, maturity5Y, cdsSpread5Y)
-    cds7Y = CDS(valuation_date, maturity7Y, cdsSpread7Y)
-    cds10Y = CDS(valuation_date, maturity10Y, cdsSpread10Y)
+    cds3Y = CDS(value_date, maturity3Y, cdsSpread3Y)
+    cds5Y = CDS(value_date, maturity5Y, cdsSpread5Y)
+    cds7Y = CDS(value_date, maturity7Y, cdsSpread7Y)
+    cds10Y = CDS(value_date, maturity10Y, cdsSpread10Y)
 
     contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-    issuer_curve = CDSCurve(valuation_date,
+    issuer_curve = CDSCurve(value_date,
                             contracts,
                             libor_curve,
                             recovery_rate)
@@ -135,12 +136,12 @@ def loadHomogeneousCDSCurves(valuation_date,
 ##########################################################################
 
 
-def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
+def loadHeterogeneousSpreadCurves(value_date, libor_curve):
 
-    maturity3Y = valuation_date.next_cds_date(36)
-    maturity5Y = valuation_date.next_cds_date(60)
-    maturity7Y = valuation_date.next_cds_date(84)
-    maturity10Y = valuation_date.next_cds_date(120)
+    maturity3Y = value_date.next_cds_date(36)
+    maturity5Y = value_date.next_cds_date(60)
+    maturity7Y = value_date.next_cds_date(84)
+    maturity10Y = value_date.next_cds_date(120)
     path = os.path.join(os.path.dirname(__file__),
                         './/data//CDX_NA_IG_S7_SPREADS.csv')
     f = open(path, 'r')
@@ -157,13 +158,13 @@ def loadHeterogeneousSpreadCurves(valuation_date, libor_curve):
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(valuation_date, maturity3Y, spd3Y)
-        cds5Y = CDS(valuation_date, maturity5Y, spd5Y)
-        cds7Y = CDS(valuation_date, maturity7Y, spd7Y)
-        cds10Y = CDS(valuation_date, maturity10Y, spd10Y)
+        cds3Y = CDS(value_date, maturity3Y, spd3Y)
+        cds5Y = CDS(value_date, maturity5Y, spd5Y)
+        cds7Y = CDS(value_date, maturity7Y, spd7Y)
+        cds10Y = CDS(value_date, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(valuation_date,
+        issuer_curve = CDSCurve(value_date,
                                 cds_contracts,
                                 libor_curve,
                                 recovery_rate)
@@ -179,23 +180,23 @@ def test_FinCDSTranche():
 
     tradeDate = Date(1, 3, 2007)
     step_in_date = tradeDate.add_days(1)
-    valuation_date = tradeDate.add_days(1)
+    value_date = tradeDate.add_days(1)
 
     testCases.header("DATE")
     testCases.print(str((tradeDate)))
     testCases.print(str((step_in_date)))
-    testCases.print(str((valuation_date)))
+    testCases.print(str((value_date)))
 
     libor_curve = build_Ibor_Curve(tradeDate)
 
     trancheMaturity = Date(20, 12, 2011)
-    tranche1 = CDSTranche(valuation_date, trancheMaturity, 0.00, 0.03)
-    tranche2 = CDSTranche(valuation_date, trancheMaturity, 0.03, 0.06)
-    tranche3 = CDSTranche(valuation_date, trancheMaturity, 0.06, 0.09)
-    tranche4 = CDSTranche(valuation_date, trancheMaturity, 0.09, 0.12)
-    tranche5 = CDSTranche(valuation_date, trancheMaturity, 0.12, 0.22)
-    tranche6 = CDSTranche(valuation_date, trancheMaturity, 0.22, 0.60)
-    tranche7 = CDSTranche(valuation_date, trancheMaturity, 0.00, 0.60)
+    tranche1 = CDSTranche(value_date, trancheMaturity, 0.00, 0.03)
+    tranche2 = CDSTranche(value_date, trancheMaturity, 0.03, 0.06)
+    tranche3 = CDSTranche(value_date, trancheMaturity, 0.06, 0.09)
+    tranche4 = CDSTranche(value_date, trancheMaturity, 0.09, 0.12)
+    tranche5 = CDSTranche(value_date, trancheMaturity, 0.12, 0.22)
+    tranche6 = CDSTranche(value_date, trancheMaturity, 0.22, 0.60)
+    tranche7 = CDSTranche(value_date, trancheMaturity, 0.00, 0.60)
     tranches = [
         tranche1,
         tranche2,
@@ -226,7 +227,7 @@ def test_FinCDSTranche():
     spd7Y = 0.0034
     spd10Y = 0.0046
 
-    issuer_curves = loadHomogeneousCDSCurves(valuation_date,
+    issuer_curves = loadHomogeneousCDSCurves(value_date,
                                              libor_curve,
                                              spd3Y,
                                              spd5Y,
@@ -234,7 +235,7 @@ def test_FinCDSTranche():
                                              spd10Y,
                                              num_credits)
 
-    intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
+    intrinsicSpd = cdsIndex.intrinsic_spread(value_date,
                                              step_in_date,
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
@@ -251,7 +252,7 @@ def test_FinCDSTranche():
             for num_points in [40]:
                 start = time.time()
                 v = tranche.value_bc(
-                    valuation_date,
+                    value_date,
                     issuer_curves,
                     upfront,
                     spd,
@@ -278,10 +279,10 @@ def test_FinCDSTranche():
     testCases.banner(
         "===================================================================")
 
-    issuer_curves = loadHeterogeneousSpreadCurves(valuation_date,
+    issuer_curves = loadHeterogeneousSpreadCurves(value_date,
                                                   libor_curve)
 
-    intrinsicSpd = cdsIndex.intrinsic_spread(valuation_date,
+    intrinsicSpd = cdsIndex.intrinsic_spread(value_date,
                                              step_in_date,
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
@@ -298,7 +299,7 @@ def test_FinCDSTranche():
             for num_points in [40]:
                 start = time.time()
                 v = tranche.value_bc(
-                    valuation_date,
+                    value_date,
                     issuer_curves,
                     upfront,
                     spd,

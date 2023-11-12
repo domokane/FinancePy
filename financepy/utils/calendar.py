@@ -87,15 +87,15 @@ class Calendar:
     specified calendar. """
 
     def __init__(self,
-                 calendar_type: CalendarTypes):
+                 cal_type: CalendarTypes):
         """ Create a calendar based on a specified calendar type. """
 
-        if calendar_type not in CalendarTypes:
+        if cal_type not in CalendarTypes:
             raise FinError(
                 "Need to pass FinCalendarType and not " +
-                str(calendar_type))
+                str(cal_type))
 
-        self._cal_type = calendar_type
+        self._cal_type = cal_type
 
     ###########################################################################
 

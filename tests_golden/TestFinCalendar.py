@@ -21,15 +21,15 @@ def test_Calendar():
     set_date_format(DateFormatTypes.US_LONGEST)
     end_date = Date(31, 12, 2030)
 
-    for calendar_type in CalendarTypes:
+    for cal_type in CalendarTypes:
 
         testCases.banner("================================")
         testCases.banner("================================")
 
         testCases.header("CALENDAR", "HOLIDAY")
-        testCases.print("STARTING", calendar_type)
+        testCases.print("STARTING", cal_type)
 
-        cal = Calendar(calendar_type)
+        cal = Calendar(cal_type)
         next_date = Date(31, 12, 2020)
 
         while next_date < end_date:

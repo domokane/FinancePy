@@ -10,7 +10,7 @@ import numpy as np
 
 
 # Reference see table 4.1 of Rouah book
-valuation_date = Date(1, 1, 2015)
+value_date = Date(1, 1, 2015)
 expiry_date = Date(1, 4, 2015)
 v0 = 0.05  # initial variance of volatility
 theta = 0.05  # long term variance
@@ -36,7 +36,7 @@ def test_heston():
         expiry_date, strike_price, OptionTypes.EUROPEAN_CALL)
 
     value_mc_Heston = hestonModel.value_mc(
-        valuation_date,
+        value_date,
         call_option,
         stock_price,
         interest_rate,
@@ -45,13 +45,13 @@ def test_heston():
         num_steps,
         seed)
     valueGatheral = hestonModel.value_gatheral(
-        valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+        value_date, call_option, stock_price, interest_rate, dividend_yield)
     valueLewisRouah = hestonModel.value_lewis_rouah(
-        valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+        value_date, call_option, stock_price, interest_rate, dividend_yield)
     valueLewis = hestonModel.value_lewis(
-        valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+        value_date, call_option, stock_price, interest_rate, dividend_yield)
     valueWeber = hestonModel.value_weber(
-        valuation_date, call_option, stock_price, interest_rate, dividend_yield)
+        value_date, call_option, stock_price, interest_rate, dividend_yield)
 
     assert round(value_mc_Heston, 4) == 1.7333
     assert round(valueGatheral, 4) == 1.8416

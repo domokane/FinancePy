@@ -39,9 +39,9 @@ class IborDeposit:
                  start_date: Date,  # When the interest starts to accrue
                  maturity_date_or_tenor: (Date, str),  # Repayment of interest
                  deposit_rate: float,  # MM rate using simple interest
-                 day_count_type: DayCountTypes,  # How year fraction is calculated
+                 dc_type: DayCountTypes,  # How year fraction is calculated
                  notional: float = 100.0,  # Amount borrowed
-                 calendar_type: CalendarTypes = CalendarTypes.WEEKEND,  # Holidays for maturity date
+                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,  # Maturity date
                  bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Libor deposit object which takes the start date when
         the amount of notional is borrowed, a maturity date or a tenor and the
@@ -71,7 +71,7 @@ class IborDeposit:
         self._start_date = start_date
         self._maturity_date = maturity_date
         self._deposit_rate = deposit_rate
-        self._dc_type = day_count_type
+        self._dc_type = dc_type
         self._notional = notional
 
     ###########################################################################

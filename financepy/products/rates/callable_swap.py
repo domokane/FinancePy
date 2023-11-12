@@ -65,7 +65,7 @@
 #                  notional=ONE_MILLION,
 #                  float_frequency_type=FrequencyTypes.QUARTERLY,
 #                  float_dc_type=DayCountTypes.THIRTY_E_360,
-#                  calendar_type=CalendarTypes.WEEKEND,
+#                  cal_type=CalendarTypes.WEEKEND,
 #                  bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
 #                  dg_rule_type=DateGenRuleTypes.BACKWARD):
 #         """ Create a Bermudan swaption contract. This is an option to enter
@@ -98,8 +98,8 @@
 #                 "Unknown Float Frequency type " +
 #                 str(fixed_frequency_type))
 
-#         if calendar_type not in CalendarTypes:
-#             raise FinError("Unknown Calendar type " + str(calendar_type))
+#         if cal_type not in CalendarTypes:
+#             raise FinError("Unknown Calendar type " + str(cal_type))
 
 #         if bd_adjust_type not in BusDayAdjustTypes:
 #             raise FinError(
@@ -125,9 +125,9 @@
 #         self._dg_rule_type = dg_rule_type
 
 #         self._pv01 = None
-#         self._fwdSwapRate = None
-#         self._forwardDf = None
-#         self._underlyingSwap = None
+#         self._fwd_swap_rate = None
+#         self._forward_df = None
+#         self._underlying_swap = None
 
 # ###############################################################################
 

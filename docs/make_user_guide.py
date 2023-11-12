@@ -868,7 +868,7 @@ if 1 == 1:
 #    os.remove(fileName + ".tex")
     os.remove(fileName + ".toc")
     os.remove(fileName + ".aux")
-    os.remove(fileName + ".fls")
+#    os.remove(fileName + ".fls")
     os.remove(fileName + ".fdb_latexmk")
     os.remove(fileName + ".log")
     os.remove(newHeadFile)

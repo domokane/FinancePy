@@ -14,11 +14,11 @@ from financepy.utils.global_vars import gDaysInYear
 def test_equity_european_index_option_price():
     # https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1540-6261.1986.tb04495.x
     # exiray_date is set so that time to maturity becomes 0.25
-    valuation_date = Date(8, 5, 2015)
+    value_date = Date(8, 5, 2015)
     expiry_date = Date(7, 8, 2015, hh=6)
-    discountRate = 0.08
+    discount_rate = 0.08
     volatility = 0.15
-    discount_curve = DiscountCurveFlat(valuation_date, discountRate)
+    discount_curve = DiscountCurveFlat(value_date, discount_rate)
     strike = 100.0
     future_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
     # expected result
@@ -38,22 +38,22 @@ def test_equity_european_index_option_price():
         volatility, implementation_type=BlackTypes.ANALYTICAL)
     for i in range(len(future_prices)):
         price = EuropeanCallOption.value(
-            valuation_date, future_prices[i], discount_curve, modelBsAnalytical)
+            value_date, future_prices[i], discount_curve, modelBsAnalytical)
         assert round(price, 1) == round(expected_european_call_prices[i], 1)
         price = EuropeanPutOption.value(
-            valuation_date, future_prices[i], discount_curve, modelBsAnalytical)
+            value_date, future_prices[i], discount_curve, modelBsAnalytical)
         assert round(price, 1) == round(expected_european_put_prices[i], 1)
 
 
 def test_equity_american_index_option_price():
     # Just check crr_tree_val_avg can called correctly from EquityIndexOption
     # in case of American exercise
-    valuation_date = Date(8, 5, 2015)
+    value_date = Date(8, 5, 2015)
     expiry_date = Date(7, 8, 2015, hh=6)
-    time_to_expiry = (expiry_date-valuation_date) / gDaysInYear
-    discountRate = 0.08
+    time_to_expiry = (expiry_date-value_date) / gDaysInYear
+    discount_rate = 0.08
     volatility = 0.15
-    discount_curve = DiscountCurveFlat(valuation_date, discountRate)
+    discount_curve = DiscountCurveFlat(value_date, discount_rate)
     strike = 100.0
     future_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
     num_steps = 200
@@ -67,14 +67,14 @@ def test_equity_american_index_option_price():
         volatility, implementation_type=BlackTypes.CRR_TREE, num_steps=num_steps)
     for i in range(len(future_prices)):
         price = AmericanCallOption.value(
-            valuation_date, future_prices[i], discount_curve, modelBsCrrTree)
+            value_date, future_prices[i], discount_curve, modelBsCrrTree)
         result = crr_tree_val_avg(
             future_prices[i], 0.0, 0.0, volatility, num_steps,
             time_to_expiry, OptionTypes.AMERICAN_CALL.value, strike)
         price_expected = result['value']
         assert round(price, 4) == round(price_expected, 4)
         price = AmericanPutOption.value(
-            valuation_date, future_prices[i], discount_curve, modelBsCrrTree)
+            value_date, future_prices[i], discount_curve, modelBsCrrTree)
         result = crr_tree_val_avg(
             future_prices[i], 0.0, 0.0, volatility, num_steps,
             time_to_expiry, OptionTypes.AMERICAN_PUT.value, strike)

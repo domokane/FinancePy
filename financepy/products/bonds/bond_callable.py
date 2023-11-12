@@ -133,7 +133,8 @@ class BondEmbeddedOption:
         model and a discount curve. """
 
         # Generate bond coupon flow schedule
-        cpn = self._bond._cpn/self._bond._frequency
+        cpn = self._bond._cpn/self._bond._freq
+
         cpn_times = []
         cpn_amounts = []
 

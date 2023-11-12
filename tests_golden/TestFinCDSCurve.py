@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+
 import sys
 sys.path.append("..")
 
@@ -19,7 +21,6 @@ from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 
-import numpy as np
 
 testCases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -102,8 +103,8 @@ def test_FinCDSCurve():
 
 def test_CDS_recovery_rate():
 
-    valuation_date = Date(15, 8, 2022)
-    settle_date = valuation_date
+    value_date = Date(15, 8, 2022)
+    settle_date = value_date
 
     swapType = SwapTypes.PAY
     dcType = DayCountTypes.ACT_360
@@ -119,7 +120,7 @@ def test_CDS_recovery_rate():
     swap9 = IborSwap(settle_date,"10Y",swapType,0.02823000,fixedFreq,dcType)
     swaps = [swap1,swap2,swap3,swap4,swap5,swap6,swap7,swap8,swap9]
 
-    libor_curve = IborSingleCurve(valuation_date, [], [], swaps)
+    libor_curve = IborSingleCurve(value_date, [], [], swaps)
 
     spreads = [0.000881720, 0.002246440, 0.004283100, 0.005730380, 0.006982450]
     tenors = ['1Y', '3Y', '5Y', '7Y', '10Y']
@@ -128,7 +129,7 @@ def test_CDS_recovery_rate():
     for i in range(len(spreads)):
         freq_type = FrequencyTypes.MONTHLY
         day_count_type = DayCountTypes.ACT_360
-        calendar_type = CalendarTypes.WEEKEND
+        cal_type = CalendarTypes.WEEKEND
         bd_adjust_type = BusDayAdjustTypes.FOLLOWING
         dg_rule_type = DateGenRuleTypes.FORWARD
         cds1 = CDS(settle_date,
@@ -137,22 +138,22 @@ def test_CDS_recovery_rate():
                    notional=100,
                    freq_type=freq_type,
                    dc_type=day_count_type,
-                   cal_type=calendar_type,
+                   cal_type=cal_type,
                    bd_adjust_type=bd_adjust_type,
                    dg_rule_type=dg_rule_type)
 
         cdss.append(cds1)
 
     recovery_rate = 0.575
-    issuer_curve = CDSCurve(valuation_date, cdss, libor_curve, recovery_rate)
+    issuer_curve = CDSCurve(value_date, cdss, libor_curve, recovery_rate)
 #    print(issuer_curve)
 
     recovery_rate = 0.1
-    issuer_curve = CDSCurve(valuation_date, cdss, libor_curve, recovery_rate)
+    issuer_curve = CDSCurve(value_date, cdss, libor_curve, recovery_rate)
 #    print(issuer_curve)
 
     recovery_rate = 0.9
-    issuer_curve = CDSCurve(valuation_date, cdss, libor_curve, recovery_rate)
+    issuer_curve = CDSCurve(value_date, cdss, libor_curve, recovery_rate)
 #    print(issuer_curve)
 
 

@@ -26,7 +26,7 @@ def test_equity_swap_at_inception():
     dc_type = DayCountTypes.THIRTY_360_BOND
     return_type = ReturnTypes.TOTAL_RETURN
     notional = ONE_MILLION
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
@@ -34,11 +34,11 @@ def test_equity_swap_at_inception():
 
     stock_price = 130.0
     stock_qty = notional/stock_price
-    discountRate = 0.05
-    dividendRate = 0.00
+    discount_rate = 0.05
+    dividend_rate = 0.00
 
-    discount_curve = DiscountCurveFlat(effective_date, discountRate)
-    dividend_curve = DiscountCurveFlat(effective_date, dividendRate)
+    discount_curve = DiscountCurveFlat(effective_date, discount_rate)
+    dividend_curve = DiscountCurveFlat(effective_date, dividend_rate)
 
     index_curve = discount_curve
 
@@ -55,7 +55,7 @@ def test_equity_swap_at_inception():
                              dc_type,
                              rate_spread,
                              payment_lag,
-                             calendar_type,
+                             cal_type,
                              bd_adjust_type,
                              dg_rule_type)
 
@@ -73,7 +73,7 @@ def test_equity_swap_not_in_inception():
     # relatively easy for a single period swap.
 
     effective_date = Date(13, 2, 2018)
-    valuation_date = effective_date.add_months(6)
+    value_date = effective_date.add_months(6)
     maturity_date = effective_date.add_months(12)
 
     leg_type = SwapTypes.RECEIVE
@@ -81,7 +81,7 @@ def test_equity_swap_not_in_inception():
     dc_type = DayCountTypes.THIRTY_360_BOND
     return_type = ReturnTypes.TOTAL_RETURN
     notional = ONE_MILLION
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
@@ -89,23 +89,23 @@ def test_equity_swap_not_in_inception():
 
     stock_strike = 125.0
     stock_qty = notional/stock_strike
-    discountRate = 0.05
-    dividendRate = 0.00
+    discount_rate = 0.05
+    dividend_rate = 0.00
 
-    discount_curve = DiscountCurveFlat(valuation_date, discountRate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividendRate)
+    discount_curve = DiscountCurveFlat(value_date, discount_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_rate)
 
     index_curve = discount_curve
 
     # Rate determined at last reset date, from that date to maturity
-    index_curve_first = DiscountCurveFlat(effective_date, discountRate)
+    index_curve_first = DiscountCurveFlat(effective_date, discount_rate)
     index_alpha_first = DayCount(index_curve_first._dc_type).year_frac(effective_date, maturity_date)[0]
     firstFixing = ((index_curve_first.df(effective_date) / index_curve_first.df(maturity_date))  - 1.0 ) / index_alpha_first
 
     # Rate between valuation date to maturity
-    index_curve_period = DiscountCurveFlat(valuation_date, discountRate)
-    index_alpha_period = DayCount(index_curve_period._dc_type).year_frac(valuation_date, maturity_date)[0]
-    periodFixing = ((index_curve_period.df(valuation_date) / index_curve_period.df(maturity_date))  - 1.0 ) / index_alpha_period
+    index_curve_period = DiscountCurveFlat(value_date, discount_rate)
+    index_alpha_period = DayCount(index_curve_period._dc_type).year_frac(value_date, maturity_date)[0]
+    periodFixing = ((index_curve_period.df(value_date) / index_curve_period.df(maturity_date))  - 1.0 ) / index_alpha_period
 
     # This is the price at which abs_value(equity leg) == abs_value(float leg)
     stock_price = stock_strike * (1 + firstFixing * index_alpha_first) / (1 + periodFixing * index_alpha_period)
@@ -123,11 +123,11 @@ def test_equity_swap_not_in_inception():
                              dc_type,
                              rate_spread,
                              payment_lag,
-                             calendar_type,
+                             cal_type,
                              bd_adjust_type,
                              dg_rule_type)
 
-    value = equity_swap.value(valuation_date,
+    value = equity_swap.value(value_date,
                               discount_curve,
                               index_curve,
                               dividend_curve,
@@ -146,7 +146,7 @@ def test_equity_swap_with_dividends():
     dc_type = DayCountTypes.THIRTY_360_BOND
     return_type = ReturnTypes.TOTAL_RETURN
     notional = ONE_MILLION
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
@@ -154,12 +154,12 @@ def test_equity_swap_with_dividends():
 
     stock_price = 130.0
     stock_qty = notional/stock_price
-    discountRate = 0.05
-    dividendRate = 0.02
+    discount_rate = 0.05
+    dividend_rate = 0.02
     indexRate = 0.03
 
-    discount_curve = DiscountCurveFlat(effective_date, discountRate)
-    dividend_curve = DiscountCurveFlat(effective_date, dividendRate)
+    discount_curve = DiscountCurveFlat(effective_date, discount_rate)
+    dividend_curve = DiscountCurveFlat(effective_date, dividend_rate)
     index_curve    = DiscountCurveFlat(effective_date, indexRate)
 
     equity_swap_leg = EquitySwapLeg(effective_date,
@@ -171,7 +171,7 @@ def test_equity_swap_with_dividends():
                                     stock_qty,
                                     payment_lag,
                                     return_type,
-                                    calendar_type,
+                                    cal_type,
                                     bd_adjust_type,
                                     dg_rule_type)
 

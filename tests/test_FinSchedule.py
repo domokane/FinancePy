@@ -28,7 +28,7 @@ def test_backward_frequencies():
     # BACKWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
     d1 = Date(20, 6, 2018)
     d2 = Date(20, 6, 2020)
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
@@ -36,7 +36,7 @@ def test_backward_frequencies():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -48,7 +48,7 @@ def test_backward_frequencies():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -60,7 +60,7 @@ def test_backward_frequencies():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -71,7 +71,7 @@ def test_backward_frequencies():
 
 def test_forward_frequencies():
     # FORWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.FORWARD
 
@@ -82,7 +82,7 @@ def test_forward_frequencies():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -94,7 +94,7 @@ def test_forward_frequencies():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
     adjusted_dates = schedule._adjusted_dates
@@ -105,7 +105,7 @@ def test_forward_frequencies():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -120,14 +120,14 @@ def test_backward_front_stub():
     d2 = Date(20, 6, 2020)
 
     freq_type = FrequencyTypes.QUARTERLY
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -140,14 +140,14 @@ def test_backward_front_stub():
     d2 = Date(20, 6, 2020)
 
     freq_type = FrequencyTypes.QUARTERLY
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -163,14 +163,14 @@ def test_forward_end_stub():
     d2 = Date(20, 6, 2020)
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.FORWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)
@@ -182,14 +182,14 @@ def test_forward_end_stub():
     d2 = Date(20, 6, 2020)
 
     freq_type = FrequencyTypes.QUARTERLY
-    calendar_type = CalendarTypes.TARGET
+    cal_type = CalendarTypes.TARGET
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.FORWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type)
     adjusted_dates = schedule._adjusted_dates
@@ -200,7 +200,7 @@ def test_forward_end_stub():
     d2 = Date(20, 6, 2020)
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    calendar_type = CalendarTypes.WEEKEND
+    cal_type = CalendarTypes.WEEKEND
     bd_adjust_type = BusDayAdjustTypes.FOLLOWING
     dg_rule_type = DateGenRuleTypes.BACKWARD
     termination_dateAdjust = True
@@ -208,7 +208,7 @@ def test_forward_end_stub():
     schedule = Schedule(d1,
                         d2,
                         freq_type,
-                        calendar_type,
+                        cal_type,
                         bd_adjust_type,
                         dg_rule_type,
                         termination_dateAdjust)

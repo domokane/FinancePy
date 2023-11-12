@@ -20,7 +20,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_EquityLookBackOption():
-    valuation_date = Date(1, 1, 2015)
+    value_date = Date(1, 1, 2015)
     expiry_date = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.3
@@ -30,8 +30,8 @@ def test_EquityLookBackOption():
     stock_priceRange = range(90, 110, 10)
     num_steps_per_year = 252
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
 ###############################################################################
 
@@ -51,7 +51,7 @@ def test_EquityLookBackOption():
             option = EquityFloatLookbackOption(expiry_date, option_type)
             stockMin = stock_price
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -59,7 +59,7 @@ def test_EquityLookBackOption():
                 stockMin)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -96,7 +96,7 @@ def test_EquityLookBackOption():
             option = EquityFloatLookbackOption(expiry_date, option_type)
             stockMin = stock_price - 10
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -104,7 +104,7 @@ def test_EquityLookBackOption():
                 stockMin)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -141,7 +141,7 @@ def test_EquityLookBackOption():
             option = EquityFloatLookbackOption(expiry_date, option_type)
             stockMax = stock_price
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -149,7 +149,7 @@ def test_EquityLookBackOption():
                 stockMax)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -186,7 +186,7 @@ def test_EquityLookBackOption():
             option = EquityFloatLookbackOption(expiry_date, option_type)
             stockMax = stock_price + 10
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -194,7 +194,7 @@ def test_EquityLookBackOption():
                 stockMax)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -239,7 +239,7 @@ def test_EquityLookBackOption():
             option = EquityFixedLookbackOption(expiry_date, option_type, k)
             stockMax = stock_price
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -247,7 +247,7 @@ def test_EquityLookBackOption():
                 stockMax)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -287,7 +287,7 @@ def test_EquityLookBackOption():
             option = EquityFixedLookbackOption(expiry_date, option_type, k)
             stockMax = stock_price
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -295,7 +295,7 @@ def test_EquityLookBackOption():
                 stockMax)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -335,7 +335,7 @@ def test_EquityLookBackOption():
             option = EquityFixedLookbackOption(expiry_date, option_type, k)
             stockMax = stock_price + 10.0
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -343,7 +343,7 @@ def test_EquityLookBackOption():
                 stockMax)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -383,7 +383,7 @@ def test_EquityLookBackOption():
             option = EquityFixedLookbackOption(expiry_date, option_type, k)
             stockMin = stock_price
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -391,7 +391,7 @@ def test_EquityLookBackOption():
                 stockMin)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -431,7 +431,7 @@ def test_EquityLookBackOption():
             option = EquityFixedLookbackOption(expiry_date, option_type, k)
             stockMin = stock_price
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -439,7 +439,7 @@ def test_EquityLookBackOption():
                 stockMin)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -479,7 +479,7 @@ def test_EquityLookBackOption():
             option = EquityFixedLookbackOption(expiry_date, option_type, k)
             stockMin = stock_price - 10.0
             value = option.value(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -487,7 +487,7 @@ def test_EquityLookBackOption():
                 stockMin)
             start = time.time()
             value_mc = option.value_mc(
-                valuation_date,
+                value_date,
                 stock_price,
                 discount_curve,
                 dividend_curve,
@@ -523,20 +523,20 @@ def test_example():
     lookbackPut = EquityFixedLookbackOption(
         expiry_date, option_typePut, strike_price)
 
-    valuation_date = Date(1, 1, 2020)
+    value_date = Date(1, 1, 2020)
     interest_rate = 0.10
     stock_price = 100.0
     dividend_yield = 0.0
     stock_min_max = 100.0
 
-    discount_curve = DiscountCurveFlat(valuation_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(valuation_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
     volatilities = [0.30]
 
     testCases.header("VALUE")
     for vol in volatilities:
-        v = lookbackCall.value(valuation_date, stock_price,
+        v = lookbackCall.value(value_date, stock_price,
                                discount_curve, dividend_curve, vol, stock_min_max)
         testCases.print(v)
 
