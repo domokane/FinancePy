@@ -18,20 +18,20 @@ with open("../version.py", "r") as fh:
     VERSION = str(version_number[start+1:start+end+1])
     VERSION = VERSION.replace('\n', '')
 
-# fileName = "FinancePyManualV_" + str(VERSION)
-fileName = "FinancePyManual"
-userGuideFileName = "./" + fileName + ".tex"
-headFile = "./head.tex"
-tailFile = "./tail.tex"
-newHeadFile = "./head_" + str(VERSION) + ".tex"
+# file_name = "FinancePyManualV_" + str(VERSION)
+file_name = "FinancePyManual"
+user_guide_file_name = "./" + file_name + ".tex"
+head_file = "./head.tex"
+tail_file = "./tail.tex"
+new_head_file = "./head_" + str(VERSION) + ".tex"
 
-shutil.copyfile(headFile, newHeadFile)
+shutil.copyfile(head_file, new_head_file)
 
-with fileinput.FileInput(newHeadFile, inplace=True, backup='.bak') as file:
+with fileinput.FileInput(new_head_file, inplace=True, backup='.bak') as file:
     for line in file:
         print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end='')
 
-verbose = False
+VERBOSE = False
 parseDataMembers = False
 
 ###############################################################################
@@ -39,97 +39,97 @@ parseDataMembers = False
 
 def parse_markdown(lines):
 
-    if verbose is True:
+    if VERBOSE is True:
         print("MARKDOWN IN")
         print(lines)
 
-    parsedLines = ["\n"]
+    parsed_lines = ["\n"]
 
     bulletListActive = False
     numberedListActive = False
 
     for line in lines:
 
-        lineFound = False
+        line_found = False
 
         line = sub("_", "\\_", line)
 
         if line[0] == "*":
-            lineFound = True
+            line_found = True
             if bulletListActive is False:
-                parsedLines.append("\\begin{itemize}")
-                parsedLines.append("\n")
+                parsed_lines.append("\\begin{itemize}")
+                parsed_lines.append("\n")
                 bulletListActive = True
-                parsedLines.append("\\item{" + line[1:] + "}")
-                parsedLines.append("\n")
+                parsed_lines.append("\\item{" + line[1:] + "}")
+                parsed_lines.append("\n")
             else:
-                parsedLines.append("\\item{" + line[1:] + "}")
-                parsedLines.append("\n")
+                parsed_lines.append("\\item{" + line[1:] + "}")
+                parsed_lines.append("\n")
         elif bulletListActive is True:
             bulletListActive = False
-            parsedLines.append("\\end{itemize}")
-            parsedLines.append("\n")
+            parsed_lines.append("\\end{itemize}")
+            parsed_lines.append("\n")
 
         if line[0].isdigit() is True:
-            lineFound = True
+            line_found = True
             col = line.find(".") + 1
             if numberedListActive is False:
-                parsedLines.append("\\begin{enumerate}")
-                parsedLines.append("\n")
+                parsed_lines.append("\\begin{enumerate}")
+                parsed_lines.append("\n")
                 numberedListActive = True
-                parsedLines.append("\\item{" + line[col:] + "}")
-                parsedLines.append("\n")
+                parsed_lines.append("\\item{" + line[col:] + "}")
+                parsed_lines.append("\n")
             else:
-                parsedLines.append("\\item{" + line[col:] + "}")
-                parsedLines.append("\n")
+                parsed_lines.append("\\item{" + line[col:] + "}")
+                parsed_lines.append("\n")
         elif numberedListActive is True:
             numberedListActive = False
-            parsedLines.append("\\end{enumerate}")
-            parsedLines.append("\n")
+            parsed_lines.append("\\end{enumerate}")
+            parsed_lines.append("\n")
 
         if line.find("###") > -1:
-            lineFound = True
+            line_found = True
             content = line.replace("#", "")
             content = content.replace("\n", "")
             content = content.strip()
-            parsedLines.append("\n")
-            parsedLines.append("\\subsubsection*{" + content + "}")
-            parsedLines.append("\n")
+            parsed_lines.append("\n")
+            parsed_lines.append("\\subsubsection*{" + content + "}")
+            parsed_lines.append("\n")
         elif line.find("##") > -1:
-            lineFound = True
+            line_found = True
             content = line.replace("#", "")
             content = content.replace("\n", "")
             content = content.strip()
-            parsedLines.append("\n")
-            parsedLines.append("\\subsection*{" + content + "}")
-            parsedLines.append("\n")
+            parsed_lines.append("\n")
+            parsed_lines.append("\\subsection*{" + content + "}")
+            parsed_lines.append("\n")
         elif line.find("#") > -1:
-            lineFound = True
+            line_found = True
             content = line.replace("#", "")
             content = content.replace("\n", "")
             content = content.strip()
-            parsedLines.append("\n")
-            parsedLines.append("\\section*{" + content + "}")
-            parsedLines.append("\n")
+            parsed_lines.append("\n")
+            parsed_lines.append("\\section*{" + content + "}")
+            parsed_lines.append("\n")
 
-        if lineFound is False:
-            parsedLines.append(line)
+        if line_found is False:
+            parsed_lines.append(line)
 
     if bulletListActive is True:
         bulletListActive = False
-        parsedLines.append("\\end{itemize}")
-        parsedLines.append("\n")
+        parsed_lines.append("\\end{itemize}")
+        parsed_lines.append("\n")
 
     if numberedListActive is True:
         numberedListActive = False
-        parsedLines.append("\\end{enumerate}")
-        parsedLines.append("\n")
+        parsed_lines.append("\\end{enumerate}")
+        parsed_lines.append("\n")
 
-    if verbose:
+    if VERBOSE:
         print("MARKDOWN OUT")
-        print(parsedLines)
+        print(parsed_lines)
 
-    return parsedLines
+    return parsed_lines
 
 ##########################################################################
 
@@ -160,11 +160,11 @@ def build_head():
     """ Start latex file with a header that sets all of the document
     properties. """
 
-    f = open(newHeadFile, 'r')
+    f = open(new_head_file, 'r')
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName, 'w', encoding="utf-8")
+    f = open(user_guide_file_name, 'w', encoding="utf-8")
     f.writelines(lines)
     f.close()
 
@@ -173,31 +173,31 @@ def build_head():
 
 def build_tail():
     """ Add on end latex to close document. """
-    f = open(tailFile, 'r')
+    f = open(tail_file, 'r')
     lines = f.readlines()
     f.close()
 
-    f = open(userGuideFileName, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, 'a', encoding="utf-8")
     f.writelines(lines)
     f.close()
 
 ##########################################################################
 
 
-def build_intro(introfile):
+def build_intro(intro_file):
     """ Add on end latex to close document. """
-    print("Building introduction from file:", introfile)
+    print("Building introduction from file:", intro_file)
 
-    f = open(introfile, 'r')
+    f = open(intro_file, 'r')
     lines = f.readlines()
     f.close()
 
-    parsedLines = parse_markdown(lines)
+    parsed_lines = parse_markdown(lines)
 
-    f = open(userGuideFileName, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, 'a', encoding="utf-8")
 
     f.write("\\chapter{Introduction to FinancePy}")
-    f.writelines(parsedLines)
+    f.writelines(parsed_lines)
     f.close()
 
 ##########################################################################
@@ -217,15 +217,15 @@ def build_chapter(folderName):
     chapterName = folderName.replace("//", ".")
     chapterName = chapterName.replace("...", "")
 
-    newLines = []
-    newLines.append("\n")
-    newLines.append("\\chapter{" + chapterName + "}")
-    newLines.append("\n")
-#    newLines.append("\\section{Introduction}")
-#    newLines.append("\n")
+    new_lines = []
+    new_lines.append("\n")
+    new_lines.append("\\chapter{" + chapterName + "}")
+    new_lines.append("\n")
+#    new_lines.append("\\section{Introduction}")
+#    new_lines.append("\n")
 
-    f = open(userGuideFileName, 'a', encoding="utf-8")
-    f.writelines(newLines)
+    f = open(user_guide_file_name, 'a', encoding="utf-8")
+    f.writelines(new_lines)
     f.close()
 
     # validIntro = False
@@ -238,34 +238,34 @@ def build_chapter(folderName):
     #     for line in readMeLines[0:1]:
     #         line = line.replace("#","")
     #         line = line.replace("$","\\$")
-    #         newLines.append(line)
+    #         new_lines.append(line)
 
-    #     newLines.append("\\begin{itemize}\n")
+    #     new_lines.append("\\begin{itemize}\n")
 
     #     for line in readMeLines[1:]:
     #         line = line.replace("#","")
     #         line = line.replace("$","\\$")
     #         if line[0:3] == "Fin":
-    #             newLines.append("\\item{" + line + "}\n")
+    #             new_lines.append("\\item{" + line + "}\n")
 
-    #     newLines.append("\\end{itemize}")
+    #     new_lines.append("\\end{itemize}")
 
-    #     newLines.append("\n")
+    #     new_lines.append("\n")
 
     readMeLines = parse_markdown(readMeLines)
 
-    f = open(userGuideFileName, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, 'a', encoding="utf-8")
     f.writelines(readMeLines)
     f.close()
 
     modules = glob.glob(folderName + "//*.py")
 
     for module in modules:
-        moduleName = module.split("\\")[-1]
-        escapedModuleName = sub("_", "\\_", moduleName[0:-3])
-        f = open(userGuideFileName, 'a', encoding="utf-8")
+        module_name = module.split("\\")[-1]
+        escaped_module_name = sub("_", "\\_", module_name[0:-3])
+        f = open(user_guide_file_name, 'a', encoding="utf-8")
         f.write("\\newpage\n")
-        f.write("\\section{" + escapedModuleName + "}\n")
+        f.write("\\section{" + escaped_module_name + "}\n")
         f.write("\n")
         f.close()
         parse_module(module)
@@ -273,12 +273,12 @@ def build_chapter(folderName):
     modules = glob.glob(folderName + "//TestFin*.py")
 
     for module in modules:
-        moduleName = module.split("\\")[-1]
-        escapedModuleName = sub("_", "\\_", moduleName[0:-3])
-        f = open(userGuideFileName, 'a', encoding="utf-8")
+        module_name = module.split("\\")[-1]
+        escaped_module_name = sub("_", "\\_", module_name[0:-3])
+        f = open(user_guide_file_name, 'a', encoding="utf-8")
         f.write("\n")
         f.write("\\newpage\n")
-        f.write("\\section{" + escapedModuleName + "}\n")
+        f.write("\\section{" + escaped_module_name + "}\n")
         f.write("\n")
         f.close()
         parse_module(module)
@@ -286,71 +286,72 @@ def build_chapter(folderName):
 ##########################################################################
 
 
-def parse_module(moduleName):
+def parse_module(module_name):
     """ Parse a module looking for classes, functions and classes for
     enumerated types. Functions inside classes are parsed inside the class. """
-    print(moduleName)
-    f = open(moduleName, 'r', encoding="utf-8")
+    print(module_name)
+    f = open(module_name, 'r', encoding="utf-8")
     lines = f.readlines()
     f.close()
 
     lines = [sub(r"\\", r"\\\\", line) for line in lines]
     lines = [sub("_", "\\_", line) for line in lines]
 
-    numEnums = 0
-    numClasses = 0
-    numFunctions = 0
+    num_enums = 0
+    num_classes = 0
+    num_functions = 0
 
-    startEnumLines = []
-    startClassLines = []
-    startFunctionLines = []
+    start_enum_lines = []
+    start_class_lines = []
+    start_function_lines = []
 
     # Module level classes and functions
     numRows = len(lines)
 
-    for rowNum in range(0, numRows):
+    for row_num in range(0, numRows):
 
-        line = lines[rowNum]
+        line = lines[row_num]
 
         if line.find("class", 0, 5) != -1 and line.find("Enum") != -1:
-            numEnums += 1
-            startEnumLines.append(rowNum)
+            num_enums += 1
+            start_enum_lines.append(row_num)
 
         if line.find("class", 0, 5) != -1 and line.find("Enum") == -1:
-            numClasses += 1
-            startClassLines.append(rowNum)
+            num_classes += 1
+            start_class_lines.append(row_num)
 
         if line.find("def", 0, 4) != -1:
-            numFunctions += 1
-            startFunctionLines.append(rowNum)
+            num_functions += 1
+            start_function_lines.append(row_num)
 
-    startEnumLines.append(numRows)
-    startClassLines.append(numRows)
-    startFunctionLines.append(numRows)
+    start_enum_lines.append(numRows)
+    start_class_lines.append(numRows)
+    start_function_lines.append(numRows)
 
-    # print("startClassLines", startClassLines)
+    # print("start_class_lines", start_class_lines)
 
-    f = open(userGuideFileName, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, 'a', encoding="utf-8")
 
-    for c in range(0, numEnums):
-        newLines = parse_enum(lines, startEnumLines[c], startEnumLines[c + 1])
+    for c in range(0, num_enums):
+        new_lines = parse_enum(lines, start_enum_lines[c],
+                               start_enum_lines[c + 1])
 
-        for newLine in newLines:
+        for newLine in new_lines:
             f.writelines(newLine)
 
-    for c in range(0, numClasses):
-        newLines = parse_class(lines,
-                               startClassLines[c],
-                               startClassLines[c + 1])
+    for c in range(0, num_classes):
+        new_lines = parse_class(lines,
+                                start_class_lines[c],
+                                start_class_lines[c + 1])
 
-        for newLine in newLines:
+        for newLine in new_lines:
             f.writelines(newLine)
 
-    for c in range(0, numFunctions):
-        newLines = parse_function(
-            lines, startFunctionLines[c], startFunctionLines[c + 1])
+    for c in range(0, num_functions):
+        new_lines = parse_function(
+            lines, start_function_lines[c], start_function_lines[c + 1])
 
-        for newLine in newLines:
+        for newLine in new_lines:
             f.writelines(newLine)
 
         f.write("\n")
@@ -360,64 +361,64 @@ def parse_module(moduleName):
 ##########################################################################
 
 
-def parse_class(lines, startLine, endLine):
+def parse_class(lines, start_line, end_line):
     """ Parse a Python class consisting of data members and functions. """
 
-    n1 = lines[startLine].find("class")
+    n1 = lines[start_line].find("class")
 
-    newLines = []
+    new_lines = []
 
-    className = lines[startLine].split(" ")[1]
-    className = className.replace(":", "")
-    className = className.replace("\n", "")
+    class_name = lines[start_line].split(" ")[1]
+    class_name = class_name.replace(":", "")
+    class_name = class_name.replace("\n", "")
 
-#    print(className, startLine, endLine)
+#    print(class_name, start_line, end_line)
 
-    newLines.append("\\subsection*{Class: " + className + "}")
-    newLines.append("\n")
+    new_lines.append("\\subsection*{Class: " + class_name + "}")
+    new_lines.append("\n")
 
     ##################################################
     # COMMENT AFTER CLASS BUT BEFORE FIRST FUNCTION
     ##################################################
 
-    startCommentRow = startLine
-    endCommentRow = endLine
-    commentEndLine = endLine
+    start_comment_row = start_line
+    end_comment_row = end_line
+    comment_end_line = end_line
 
-    for rowNum in range(startLine, endLine):
-        line = lines[rowNum]
+    for row_num in range(start_line, end_line):
+        line = lines[row_num]
         if line.find(" def ") > 0:
-            commentEndLine = rowNum
+            comment_end_line = row_num
             break
 
-    classComment = ""
-    startComment = False
-    endComment = False
+    class_comment = ""
+    start_comment = False
+    end_comment = False
 
-    for rowNum in range(startLine, commentEndLine):
-        line = lines[rowNum]
+    for row_num in range(start_line, comment_end_line):
+        line = lines[row_num]
         if line.find('"""') > 0:
-            startCommentRow = rowNum
-            startComment = True
-            startLine = rowNum + 1
+            start_comment_row = row_num
+            start_comment = True
+            start_line = row_num + 1
             break
 
-    for rowNum in range(startLine, commentEndLine):
-        line = lines[rowNum]
+    for row_num in range(start_line, comment_end_line):
+        line = lines[row_num]
         if line.find('"""') > 0:
-            endCommentRow = rowNum
-            endComment = True
+            end_comment_row = row_num
+            end_comment = True
             break
 
-    if startComment is False and endComment is False:
+    if start_comment is False and end_comment is False:
         # assume it's a one-line comment
-        endCommentRow = startCommentRow
-        endComment = True
+        end_comment_row = start_comment_row
+        end_comment = True
 
-    if endComment:
-        #  print(startCommentRow, endCommentRow)
-        for rowNum in range(startCommentRow, endCommentRow + 1):
-            line = lines[rowNum]
+    if end_comment:
+        #  print(start_comment_row, end_comment_row)
+        for row_num in range(start_comment_row, end_comment_row + 1):
+            line = lines[row_num]
 
             line = line.replace('"""', "")
             line = line.replace("'", "")
@@ -428,22 +429,22 @@ def parse_class(lines, startLine, endLine):
             if len(line) == 0:
                 line = "\n"
 
-            classComment += line + " "
+            class_comment += line + " "
 
-    newLines.append(classComment)
-    newLines.append("\n")
-    newLines.append("\n")
+    new_lines.append(class_comment)
+    new_lines.append("\n")
+    new_lines.append("\n")
 
     ##################################################
     # Now get the data members
 
     if parseDataMembers:
-        newLines.append("\\subsubsection*{Data Members}\n")
+        new_lines.append("\\subsubsection*{Data Members}\n")
 
-        dataMembers = []
+        data_members = []
 
-        for rowNum in range(startLine, endLine):
-            row = lines[rowNum]
+        for row_num in range(start_line, end_line):
+            row = lines[row_num]
             row = row.replace(" ", "")
             row = row.replace("!", "")
             row = row.replace("<", "")
@@ -458,62 +459,62 @@ def parse_class(lines, startLine, endLine):
                 dataMember = dataMember.strip(" ")
                 dataMember = dataMember.strip(")")
                 dataMember = dataMember.replace("self.", "")
-                dataMembers = add_to_list(dataMembers, dataMember)
+                data_members = add_to_list(data_members, dataMember)
 
-        if len(dataMembers) > 0:
-            newLines.append("\\begin{itemize}\n")
+        if len(data_members) > 0:
+            new_lines.append("\\begin{itemize}\n")
 
-            for dataMember in dataMembers:
-                newLines.append("\\item{" + dataMember + "}\n")
-            newLines.append("\\end{itemize}")
-            newLines.append("\n")
-            newLines.append("\n")
+            for dataMember in data_members:
+                new_lines.append("\\item{" + dataMember + "}\n")
+            new_lines.append("\\end{itemize}")
+            new_lines.append("\n")
+            new_lines.append("\n")
         else:
-            newLines.append("No data members found.")
-            newLines.append("\n")
-            newLines.append("\n")
+            new_lines.append("No data members found.")
+            new_lines.append("\n")
+            new_lines.append("\n")
 
-        newLines.append("\\subsection*{Functions}\n")
-        newLines.append("\n")
+        new_lines.append("\\subsection*{Functions}\n")
+        new_lines.append("\n")
 
     # Now get the functions
-    numClassFunctions = 0
+    num_class_functions = 0
     startClassFunctionLines = []
 
-#    print(startLine, endLine)
-    for rowNum in range(startLine, endLine):
+#    print(start_line, end_line)
+    for row_num in range(start_line, end_line):
 
-        line = lines[rowNum]
+        line = lines[row_num]
 
         if line.find(" def ") != -1:
-            numClassFunctions += 1
-            startClassFunctionLines.append(rowNum)
+            num_class_functions += 1
+            startClassFunctionLines.append(row_num)
 
-    startClassFunctionLines.append(endLine)
+    startClassFunctionLines.append(end_line)
 
-    # Remove inheritance name from className
-    endClassName = className.find("(")
-    if (endClassName != -1):
-        className = className[:endClassName]
+    # Remove inheritance name from class_name
+    endClassName = class_name.find("(")
+    if endClassName != -1:
+        class_name = class_name[:endClassName]
 
-    for c in range(0, numClassFunctions):
-        newLines += parse_function(lines,
-                                   startClassFunctionLines[c],
-                                   startClassFunctionLines[c + 1],
-                                   className)
-        newLines += "\n"
+    for c in range(0, num_class_functions):
+        new_lines += parse_function(lines,
+                                    startClassFunctionLines[c],
+                                    startClassFunctionLines[c + 1],
+                                    class_name)
+        new_lines += "\n"
 
-    return newLines
+    return new_lines
 
 ##########################################################################
 
 
-def parse_function(lines, startLine, endLine, className=""):
+def parse_function(lines, start_line, end_line, class_name=""):
     """ Given a set of lines and a start line I extract the function definition
     and any comment that goes below.
     TODO: Add parsing of function arguments and any comments."""
 
-    functionLine = lines[startLine]
+    functionLine = lines[start_line]
     leftCol = functionLine.find("def ")
     indent = leftCol + 4
 
@@ -530,100 +531,100 @@ def parse_function(lines, startLine, endLine, className=""):
         return ""
 
     # Functions beginning with underscores ('_') are not to be parsed
-    isPrivate = (functionLine.find("def _") != -1)
+    isPrivate = functionLine.find("def _") != -1
     if isPrivate and functionName != r"\_\_init\_\_":
         return ""
 
     # Ensure function stops before any class
-    for rowNum in range(startLine + 1, endLine):
-        line = lines[rowNum]
+    for row_num in range(start_line + 1, end_line):
+        line = lines[row_num]
         if line.find("class ") >= 0:
-            endLine = rowNum  # update start line to after function signature
+            end_line = row_num  # update start line to after function signature
             break
 
     # Ensure function stops before any other function
-    for rowNum in range(startLine + 1, endLine):
-        line = lines[rowNum]
+    for row_num in range(start_line + 1, end_line):
+        line = lines[row_num]
         if line.find("def ") >= 0:
-            endLine = rowNum  # update start line to after function signature
+            end_line = row_num  # update start line to after function signature
             break
 
-    functionSignature = ""
-    for rowNum in range(startLine, endLine):
-        line = lines[rowNum][indent:]
-        functionSignature += str(line)
+    function_signature = ""
+    for row_num in range(start_line, end_line):
+        line = lines[row_num][indent:]
+        function_signature += str(line)
         if line.find("):") >= 0:
-            startLine = rowNum  # update start line to after function signature
+            start_line = row_num  # update start line to after function signature
             break
 
-    # Replace `__init__` with className and remove `self` from signatures
-    if className != "":
+    # Replace `__init__` with class_name and remove `self` from signatures
+    if class_name != "":
         # Replace '__init__' with the function's class name
         if functionName == "\\_\\_init\\_\\_":
-            functionName = className
-            functionSignature = functionSignature.replace("\\_\\_init\\_\\_",
-                                                          className)
+            functionName = class_name
+            function_signature = function_signature.replace("\\_\\_init\\_\\_",
+                                                          class_name)
 
-            functionSignature = functionSignature.replace("def ", "")
+            function_signature = function_signature.replace("def ", "")
 
-            missingSpaces = len(className) - len("__init__")
-            if (missingSpaces >= 0):
-                functionSignature = functionSignature.replace(
+            missingSpaces = len(class_name) - len("__init__")
+            if missingSpaces >= 0:
+                function_signature = function_signature.replace(
                     "\n ", "\n " + " " * (missingSpaces))
             else:
-                functionSignature = functionSignature.replace(
+                function_signature = function_signature.replace(
                     "\n" + " " * (-missingSpaces), "\n")
 
         # Remove 'self' and any whitespace following it
-        functionSignature = functionSignature.replace("self", "")
+        function_signature = function_signature.replace("self", "")
 
         unchanged = ""
-        while unchanged != functionSignature:
-            unchanged = functionSignature
-            functionSignature = functionSignature.replace("(,", "(")
-            functionSignature = functionSignature.replace("( ", "(")
-            functionSignature = functionSignature.replace("(\n", "(")
+        while unchanged != function_signature:
+            unchanged = function_signature
+            function_signature = function_signature.replace("(,", "(")
+            function_signature = function_signature.replace("( ", "(")
+            function_signature = function_signature.replace("(\n", "(")
 
     functionComment = ""
-    startCommentRow = startLine+1
-    endCommentRow = startLine
-    endComment = False
+    start_comment_row = start_line+1
+    end_comment_row = start_line
+    end_comment = False
 
-    for rowNum in range(startLine+1, endLine):
-        line = lines[rowNum]
+    for row_num in range(start_line+1, end_line):
+        line = lines[row_num]
 
         if line.count("'''") == 1 or line.count('"""') == 1:
             if line.count("'''") == 1:
-                commentInit = "'''"
+                comment_init = "'''"
             else:
-                commentInit = '"""'
+                comment_init = '"""'
 
-            startCommentRow = rowNum
-            for rowNum in range(rowNum+1, endLine):
-                line = lines[rowNum]
-                if line.find(commentInit) > 0:
-                    endCommentRow = rowNum
-                    endComment = True
+            start_comment_row = row_num
+            for row_num in range(row_num+1, end_line):
+                line = lines[row_num]
+                if line.find(comment_init) > 0:
+                    end_comment_row = row_num
+                    end_comment = True
                     break
             break
 
         if line.count("'''") == 2 or line.count('"""') == 2:
             if line.count("'''") == 2:
-                commentInit = "'''"
+                comment_init = "'''"
             else:
-                commentInit = '"""'
+                comment_init = '"""'
 
-            startCommentRow = rowNum
-            endCommentRow = rowNum
-            endComment = True
+            start_comment_row = row_num
+            end_comment_row = row_num
+            end_comment = True
             break
 
-    if endComment:
-        #  print(startCommentRow, endCommentRow)
-        for rowNum in range(startCommentRow, endCommentRow + 1):
-            line = lines[rowNum]
+    if end_comment:
+        #  print(start_comment_row, end_comment_row)
+        for row_num in range(start_comment_row, end_comment_row + 1):
+            line = lines[row_num]
             line = line.replace("$", "\\$")
-            line = line.replace(commentInit, "")
+            line = line.replace(comment_init, "")
             line = line.replace("\n", "\n")
             line = line.replace("#", r"\#")
             line = line.lstrip()
@@ -633,52 +634,52 @@ def parse_function(lines, startLine, endLine, className=""):
     if functionComment == "":
         functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
 
-    paramDescription = extract_params(functionSignature)
+    param_description = extract_params(function_signature)
 
     # Inside lstlisting, backslashes used for escaping are interpreted as
     # backslashes
     # However, must be after `extract_params` where escaping is required
-    functionSignature = functionSignature.replace("\\_", "_")
+    function_signature = function_signature.replace("\\_", "_")
 
     # LATEX FORMATTING
-    if className != "":
-        functionDescription = r"\subsubsection*{{\bf " + \
+    if class_name != "":
+        func_description = r"\subsubsection*{{\bf " + \
             functionName + "}}\n"
     else:
-        functionDescription = r"\subsubsection*{{\bf " + \
+        func_description = r"\subsubsection*{{\bf " + \
             functionName + "}}\n"
 
-    functionDescription += "{\\it "
-    functionDescription += functionComment
-    functionDescription += "}"
-    functionDescription += "\n"
-    functionDescription += "\\vspace{0.25cm}\n"
-    functionDescription += "\\begin{lstlisting}\n"
-    functionDescription += functionSignature
-    functionDescription += "\\end{lstlisting}\n"
-    functionDescription += "\\vspace{0.25cm}\n"
-    functionDescription += "\\noindent \n"
-    functionDescription += "The function arguments are described in the following table.\n"
-    functionDescription += "\\vspace{0.25cm}\n"
-    functionDescription += paramDescription
-    return functionDescription
+    func_description += "{\\it "
+    func_description += functionComment
+    func_description += "}"
+    func_description += "\n"
+    func_description += "\\vspace{0.25cm}\n"
+    func_description += "\\begin{lstlisting}\n"
+    func_description += function_signature
+    func_description += "\\end{lstlisting}\n"
+    func_description += "\\vspace{0.25cm}\n"
+    func_description += "\\noindent \n"
+    func_description += "The function arguments are described in the following table.\n"
+    func_description += "\\vspace{0.25cm}\n"
+    func_description += param_description
+    return func_description
 
 ##########################################################################
 
 
-def parse_enum(lines, startLine, endLine):
+def parse_enum(lines, start_line, end_line):
     """ Parse a Class that implements an Enumerated type. """
-    enumDescription = []
+    enum_description = []
 
-    enumLine = lines[startLine]
+    enumLine = lines[start_line]
     n1 = enumLine.find("class")
     n2 = enumLine.find("(")
     # len("class ") == 6
     enumName = enumLine[n1 + 6:n2]
 
     enumTypes = []
-    for rowNum in range(startLine + 1, endLine):
-        line = lines[rowNum]
+    for row_num in range(start_line + 1, end_line):
+        line = lines[row_num]
         line = line.replace(" ", "")
         n = line.find("=")
         if n != -1:
@@ -687,42 +688,42 @@ def parse_enum(lines, startLine, endLine):
         else:
             break
 
-    enumDescription.append("\\subsubsection*{Enumerated Type: " + enumName+"}")
-    enumDescription.append("\n")
-    enumDescription.append("This enumerated type has the following values:\n")
-    enumDescription.append("\\begin{itemize}[nosep]")
-    enumDescription.append("\n")
+    enum_description.append("\\subsubsection*{Enumerated Type: " + enumName+"}")
+    enum_description.append("\n")
+    enum_description.append("This enumerated type has the following values:\n")
+    enum_description.append("\\begin{itemize}[nosep]")
+    enum_description.append("\n")
     for enumType in enumTypes:
-        enumDescription.append("\\item{" + enumType + "}")
-        enumDescription.append("\n")
-    enumDescription.append("\\end{itemize}")
-    enumDescription.append("\n")
-    enumDescription.append("\n")
+        enum_description.append("\\item{" + enumType + "}")
+        enum_description.append("\n")
+    enum_description.append("\\end{itemize}")
+    enum_description.append("\n")
+    enum_description.append("\n")
 
-    return enumDescription
+    return enum_description
 
 ##########################################################################
 
 
-def extract_params(functionSignature):
+def extract_params(function_signature):
     """ Parse a function signature into a table containing each function
     argument's name, type, description and default value"""
     # A good example to look at for testing is `BondConvertible`
 
-    functionSignature = functionSignature.replace("%", "\%")
+    function_signature = function_signature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
-    stripedSignature = functionSignature.split(
+    stripedSignature = function_signature.split(
         "(", 1)[1].replace("):", "").strip()
     if stripedSignature == "":
         # The function has no parameters
         return ""
 
-    paramDescription = "\\begin{center}\n"
-    paramDescription += "\\begin{tabular}{ c  c  c  c }\n"
-    paramDescription += "\\hline\n"
-    paramDescription += "{ \\bf Argument Name} & { \\bf Type} & {\\bf Description} & {\\bf Default Value} \\\\\n"
-    paramDescription += "\\hline\n"
+    param_description = "\\begin{center}\n"
+    param_description += "\\begin{tabular}{ c  c  c  c }\n"
+    param_description += "\\hline\n"
+    param_description += "{ \\bf Argument Name} & { \\bf Type} & {\\bf Description} & {\\bf Default Value} \\\\\n"
+    param_description += "\\hline\n"
 
     lines = stripedSignature.split("\n")
     for line in lines:
@@ -737,7 +738,7 @@ def extract_params(functionSignature):
 
         line = line.strip()
         # Split by comma while leaving commas that are in square brackets '[]'.
-        # This allows us to parse 'Union[Date, str]' for maturity_date_or_tenor.
+        # This allows us to parse 'Union[Date, str]' for maturity_date_or_tenor
         if line.find("[") != -1 or line.find("(") != -1:
             # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
             params = []
@@ -791,13 +792,13 @@ def extract_params(functionSignature):
             # Everything remaining must be the name
             pName = param
 
-            paramDescription += f"{pName} & {pType} & {pComment} & {pDefault} \\\\\n"
-            paramDescription += "\\hline\n"
+            param_description += f"{pName} & {pType} & {pComment} & {pDefault} \\\\\n"
+            param_description += "\\hline\n"
 
-    paramDescription += "\\end{tabular}"
-    paramDescription += "\\end{center}\n"
+    param_description += "\\end{tabular}"
+    param_description += "\\end{center}\n"
 
-    return paramDescription
+    return param_description
 
 ###############################################################################
 
@@ -848,31 +849,31 @@ if 1 == 1:
 
 build_tail()
 
-print("Latex filename:", userGuideFileName)
+print("Latex filename:", user_guide_file_name)
 
 if 1 == 1:
     # Do it twice for the TOC
-    print("pdflatex " + userGuideFileName)
-    os.system("pdflatex " + userGuideFileName)
+    print("pdflatex " + user_guide_file_name)
+    os.system("pdflatex " + user_guide_file_name)
     print("Doing it again for TOC")
-    os.system("pdflatex " + userGuideFileName)
+    os.system("pdflatex " + user_guide_file_name)
 
-    pdfFileName1 = fileName + ".pdf"
+    pdfFileName1 = file_name + ".pdf"
     pdfFileName2 = '..\\' + pdfFileName1
 
     # TODO: Only works if you have financepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
 
     print("Removing unneeded files.")
-    os.remove(fileName + ".out")
-#    os.remove(fileName + ".tex")
-    os.remove(fileName + ".toc")
-    os.remove(fileName + ".aux")
-#    os.remove(fileName + ".fls")
-    os.remove(fileName + ".fdb_latexmk")
-    os.remove(fileName + ".log")
-    os.remove(newHeadFile)
-    os.remove(newHeadFile + ".bak")
+    os.remove(file_name + ".out")
+#    os.remove(file_name + ".tex")
+    os.remove(file_name + ".toc")
+    os.remove(file_name + ".aux")
+#    os.remove(file_name + ".fls")
+    os.remove(file_name + ".fdb_latexmk")
+    os.remove(file_name + ".log")
+    os.remove(new_head_file)
+    os.remove(new_head_file + ".bak")
 
     print("Moving ", pdfFileName1, " to ", pdfFileName2)
     shutil.move(pdfFileName1, pdfFileName2)
