@@ -10,7 +10,7 @@ from ..utils.math import transpose_tridiagonal_matrix
 from financepy.utils.global_types import OptionTypes
 
 
-@njit
+# @njit
 def dx(x, wind=0):
     # Intermediate rows
     # Note: As first and last rows are handled separately

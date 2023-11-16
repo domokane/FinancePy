@@ -35,7 +35,7 @@ def test_BDTExampleTwo():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._coupon/bond._frequency
+    cpn = bond._cpn / bond._freq
     num_flows = len(bond._cpn_dates)
 
     for i in range(1, num_flows):
@@ -122,7 +122,9 @@ def test_BDTExampleThree():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._coupon/bond._frequency
+
+    cpn = bond._cpn / bond._freq
+
     for flow_date in bond._cpn_dates:
         if flow_date > expiry_date:
             flow_time = (flow_date - settle_date) / gDaysInYear
@@ -169,7 +171,9 @@ def test_BDTExampleThree():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._coupon/bond._frequency
+
+    cpn = bond._cpn / bond._freq
+
     for flow_date in bond._cpn_dates:
         if flow_date > expiry_date:
             flow_time = (flow_date - settle_date) / gDaysInYear

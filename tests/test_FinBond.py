@@ -278,7 +278,7 @@ def test_bond_cfets():
     path = os.path.join(os.path.dirname(__file__), test_case_file)
 
     df = pd.read_csv(path,
-                     parse_dates=['settle_date', 'issue_date',
+                     parse_dates=['settlement_date', 'issue_date',
                                   'maturity_date'])
 
     for row in df.itertuples(index=False):
@@ -302,9 +302,9 @@ def test_bond_cfets():
                     freq_type,
                     dc_type=DayCountTypes.ACT_ACT_ICMA)
 
-        settle_date = Date(row.settle_date.day,
-                               row.settle_date.month,
-                               row.settle_date.year)
+        settle_date = Date(row.settlement_date.day,
+                           row.settlement_date.month,
+                           row.settlement_date.year)
 
         accrued_interest = bond.accrued_interest(settle_date, face)
         clean_price = row.dirty_price - accrued_interest

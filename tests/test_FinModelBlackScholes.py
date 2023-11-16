@@ -27,13 +27,16 @@ dividend_yield = 0.0163
 option_type = OptionTypes.AMERICAN_CALL
 euOptionType = OptionTypes.EUROPEAN_CALL
 
-amOption = EquityAmericanOption(expiry_date, strike_price,
+amOption = EquityAmericanOption(expiry_date,
+                                strike_price,
                                 option_type)
 
-ameuOption = EquityAmericanOption(expiry_date, strike_price,
+ameuOption = EquityAmericanOption(expiry_date,
+                                  strike_price,
                                   euOptionType)
 
-euOption = EquityVanillaOption(expiry_date, strike_price,
+euOption = EquityVanillaOption(expiry_date,
+                               strike_price,
                                euOptionType)
 
 discount_curve = DiscountCurveFlat(value_date, interest_rate,
@@ -89,34 +92,53 @@ def test_bjerksund_stensland():
     stock_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
 
     # model setting
-    discount_curve = DiscountCurveFlat(value_date, interest_rate,
+    discount_curve = DiscountCurveFlat(value_date,
+                                       interest_rate,
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 
-    borrow_curve = DiscountCurveFlat(value_date, borrow_rate,
+    borrow_curve = DiscountCurveFlat(value_date,
+                                     borrow_rate,
                                      FrequencyTypes.CONTINUOUS,
                                      DayCountTypes.ACT_365F)
 
-    model = BlackScholes(volatility, BlackScholesTypes.Bjerksund_Stensland)
+    model = BlackScholes(volatility,
+                         BlackScholesTypes.Bjerksund_Stensland)
 
     # american call case
     amCallOption = EquityAmericanOption(
         expiry_date, strike_price, OptionTypes.AMERICAN_CALL)
     values = []
+
     for stock_price in stock_prices:
-        value = amCallOption.value(value_date, stock_price, discount_curve,
-                                   borrow_curve, model)
+
+        value = amCallOption.value(value_date,
+                                   stock_price,
+                                   discount_curve,
+                                   borrow_curve,
+                                   model)
+
         values.append(round(value, 2))
+
     assert values == [1.29, 3.82, 8.35, 14.80, 22.71]
 
     # american put case
-    amPutOption = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.AMERICAN_PUT)
+    amPutOption = EquityAmericanOption(expiry_date,
+                                       strike_price,
+                                       OptionTypes.AMERICAN_PUT)
+
     values = []
+
     for stock_price in stock_prices:
-        value = amPutOption.value(value_date, stock_price, discount_curve,
-                                  borrow_curve, model)
+
+        value = amPutOption.value(value_date,
+                                  stock_price,
+                                  discount_curve,
+                                  borrow_curve,
+                                  model)
+
         values.append(round(value, 2))
+
     assert values == [20.53, 12.91, 7.42, 3.93, 1.93]
 
 
@@ -129,20 +151,29 @@ def test_black_scholes_fd():
         'theta': 0.5
     }
     model = BlackScholes(volatility,
-                         bsType=BlackScholesTypes.FINITE_DIFFERENCE,
+                         bs_type=BlackScholesTypes.FINITE_DIFFERENCE,
                          params=params)
 
-    v = amOption.value(value_date, stock_price, discount_curve,
-                       dividend_curve, model)
+    v = amOption.value(value_date,
+                       stock_price,
+                       discount_curve,
+                       dividend_curve,
+                       model)
 
     assert v == approx(6.8391, 1e-1)
 
-    v = ameuOption.value(value_date, stock_price, discount_curve,
-                         dividend_curve, model)
+    v = ameuOption.value(value_date,
+                         stock_price,
+                         discount_curve,
+                         dividend_curve,
+                         model)
 
     assert v == approx(6.7510, 1e-1)
 
-    v = euOption.value(value_date, stock_price, discount_curve,
-                       dividend_curve, model)
+    v = euOption.value(value_date,
+                       stock_price,
+                       discount_curve,
+                       dividend_curve,
+                       model)
 
     assert v == approx(6.7493, 1e-1)

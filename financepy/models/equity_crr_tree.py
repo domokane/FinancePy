@@ -148,7 +148,7 @@ def crr_tree_val(stock_price,
 
 
 def crr_tree_val_avg(stock_price,
-                     interestRate,  # continuously compounded
+                     interest_rate,  # continuously compounded
                      dividend_rate,  # continuously compounded
                      volatility,  # Black scholes volatility
                      num_steps_per_year,
