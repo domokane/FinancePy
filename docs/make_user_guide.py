@@ -45,8 +45,8 @@ def parse_markdown(lines):
 
     parsed_lines = ["\n"]
 
-    bulletListActive = False
-    numberedListActive = False
+    bullet_list_active = False
+    numbered_list_active = False
 
     for line in lines:
 
@@ -56,34 +56,34 @@ def parse_markdown(lines):
 
         if line[0] == "*":
             line_found = True
-            if bulletListActive is False:
+            if bullet_list_active is False:
                 parsed_lines.append("\\begin{itemize}")
                 parsed_lines.append("\n")
-                bulletListActive = True
+                bullet_list_active = True
                 parsed_lines.append("\\item{" + line[1:] + "}")
                 parsed_lines.append("\n")
             else:
                 parsed_lines.append("\\item{" + line[1:] + "}")
                 parsed_lines.append("\n")
-        elif bulletListActive is True:
-            bulletListActive = False
+        elif bullet_list_active is True:
+            bullet_list_active = False
             parsed_lines.append("\\end{itemize}")
             parsed_lines.append("\n")
 
         if line[0].isdigit() is True:
             line_found = True
             col = line.find(".") + 1
-            if numberedListActive is False:
+            if numbered_list_active is False:
                 parsed_lines.append("\\begin{enumerate}")
                 parsed_lines.append("\n")
-                numberedListActive = True
+                numbered_list_active = True
                 parsed_lines.append("\\item{" + line[col:] + "}")
                 parsed_lines.append("\n")
             else:
                 parsed_lines.append("\\item{" + line[col:] + "}")
                 parsed_lines.append("\n")
-        elif numberedListActive is True:
-            numberedListActive = False
+        elif numbered_list_active is True:
+            numbered_list_active = False
             parsed_lines.append("\\end{enumerate}")
             parsed_lines.append("\n")
 
@@ -115,13 +115,13 @@ def parse_markdown(lines):
         if line_found is False:
             parsed_lines.append(line)
 
-    if bulletListActive is True:
-        bulletListActive = False
+    if bullet_list_active is True:
+        bullet_list_active = False
         parsed_lines.append("\\end{itemize}")
         parsed_lines.append("\n")
 
-    if numberedListActive is True:
-        numberedListActive = False
+    if numbered_list_active is True:
+        numbered_list_active = False
         parsed_lines.append("\\end{enumerate}")
         parsed_lines.append("\n")
 
@@ -203,23 +203,23 @@ def build_intro(intro_file):
 ##########################################################################
 
 
-def build_chapter(folderName):
+def build_chapter(folder_name):
     """ Parse a folder by loading up all of the modules in that folder that
     start with the three letters - Fin. """
 
-    print("Building chapter in folder:", folderName)
+    print("Building chapter in folder:", folder_name)
 
-    readMeFile = folderName + "//" + "README.md"
-    f = open(readMeFile, 'r', encoding="utf-8")
-    readMeLines = f.readlines()
+    read_me_file = folder_name + "//" + "README.md"
+    f = open(read_me_file, 'r', encoding="utf-8")
+    read_me_lines = f.readlines()
     f.close()
 
-    chapterName = folderName.replace("//", ".")
-    chapterName = chapterName.replace("...", "")
+    chapter_name = folder_name.replace("//", ".")
+    chapter_name = chapter_name.replace("...", "")
 
     new_lines = []
     new_lines.append("\n")
-    new_lines.append("\\chapter{" + chapterName + "}")
+    new_lines.append("\\chapter{" + chapter_name + "}")
     new_lines.append("\n")
 #    new_lines.append("\\section{Introduction}")
 #    new_lines.append("\n")
@@ -229,20 +229,20 @@ def build_chapter(folderName):
     f.close()
 
     # validIntro = False
-    # for line in readMeLines:
+    # for line in read_me_lines:
 
     #     if line[0:3] == "Fin":
     #         validIntro = True
 
     # if validIntro is True:
-    #     for line in readMeLines[0:1]:
+    #     for line in read_me_lines[0:1]:
     #         line = line.replace("#","")
     #         line = line.replace("$","\\$")
     #         new_lines.append(line)
 
     #     new_lines.append("\\begin{itemize}\n")
 
-    #     for line in readMeLines[1:]:
+    #     for line in read_me_lines[1:]:
     #         line = line.replace("#","")
     #         line = line.replace("$","\\$")
     #         if line[0:3] == "Fin":
@@ -252,13 +252,13 @@ def build_chapter(folderName):
 
     #     new_lines.append("\n")
 
-    readMeLines = parse_markdown(readMeLines)
+    read_me_lines = parse_markdown(read_me_lines)
 
     f = open(user_guide_file_name, 'a', encoding="utf-8")
-    f.writelines(readMeLines)
+    f.writelines(read_me_lines)
     f.close()
 
-    modules = glob.glob(folderName + "//*.py")
+    modules = glob.glob(folder_name + "//*.py")
 
     for module in modules:
         module_name = module.split("\\")[-1]
@@ -270,7 +270,7 @@ def build_chapter(folderName):
         f.close()
         parse_module(module)
 
-    modules = glob.glob(folderName + "//TestFin*.py")
+    modules = glob.glob(folder_name + "//TestFin*.py")
 
     for module in modules:
         module_name = module.split("\\")[-1]
@@ -479,7 +479,7 @@ def parse_class(lines, start_line, end_line):
 
     # Now get the functions
     num_class_functions = 0
-    startClassFunctionLines = []
+    start_class_function_lines = []
 
 #    print(start_line, end_line)
     for row_num in range(start_line, end_line):
@@ -488,19 +488,19 @@ def parse_class(lines, start_line, end_line):
 
         if line.find(" def ") != -1:
             num_class_functions += 1
-            startClassFunctionLines.append(row_num)
+            start_class_function_lines.append(row_num)
 
-    startClassFunctionLines.append(end_line)
+    start_class_function_lines.append(end_line)
 
     # Remove inheritance name from class_name
-    endClassName = class_name.find("(")
-    if endClassName != -1:
-        class_name = class_name[:endClassName]
+    end_class_name = class_name.find("(")
+    if end_class_name != -1:
+        class_name = class_name[:end_class_name]
 
     for c in range(0, num_class_functions):
         new_lines += parse_function(lines,
-                                    startClassFunctionLines[c],
-                                    startClassFunctionLines[c + 1],
+                                    start_class_function_lines[c],
+                                    start_class_function_lines[c + 1],
                                     class_name)
         new_lines += "\n"
 
@@ -514,25 +514,25 @@ def parse_function(lines, start_line, end_line, class_name=""):
     and any comment that goes below.
     TODO: Add parsing of function arguments and any comments."""
 
-    functionLine = lines[start_line]
-    leftCol = functionLine.find("def ")
+    function_line = lines[start_line]
+    leftCol = function_line.find("def ")
     indent = leftCol + 4
 
     # Do not include a commented out function
-    hashCol = functionLine.find("#")
+    hashCol = function_line.find("#")
     if hashCol < leftCol and hashCol != -1:
         return ""
 
-    n2 = functionLine.find("(")
-    functionName = functionLine[leftCol + 4:n2]
+    n2 = function_line.find("(")
+    function_name = function_line[leftCol + 4:n2]
 
     # If the function name starts with a _ and is not init then ignore it
-    if functionName[0] == "_" and functionName != "__init__":
+    if function_name[0] == "_" and function_name != "__init__":
         return ""
 
     # Functions beginning with underscores ('_') are not to be parsed
-    isPrivate = functionLine.find("def _") != -1
-    if isPrivate and functionName != r"\_\_init\_\_":
+    isPrivate = function_line.find("def _") != -1
+    if isPrivate and function_name != r"\_\_init\_\_":
         return ""
 
     # Ensure function stops before any class
@@ -560,8 +560,8 @@ def parse_function(lines, start_line, end_line, class_name=""):
     # Replace `__init__` with class_name and remove `self` from signatures
     if class_name != "":
         # Replace '__init__' with the function's class name
-        if functionName == "\\_\\_init\\_\\_":
-            functionName = class_name
+        if function_name == "\\_\\_init\\_\\_":
+            function_name = class_name
             function_signature = function_signature.replace("\\_\\_init\\_\\_",
                                                           class_name)
 
@@ -585,7 +585,7 @@ def parse_function(lines, start_line, end_line, class_name=""):
             function_signature = function_signature.replace("( ", "(")
             function_signature = function_signature.replace("(\n", "(")
 
-    functionComment = ""
+    function_comment = ""
     start_comment_row = start_line+1
     end_comment_row = start_line
     end_comment = False
@@ -629,10 +629,10 @@ def parse_function(lines, start_line, end_line, class_name=""):
             line = line.replace("#", r"\#")
             line = line.lstrip()
             # This is because we remove trailing whitespace
-            functionComment += line + " "
+            function_comment += line + " "
 
-    if functionComment == "":
-        functionComment = "PLEASE ADD A FUNCTION DESCRIPTION"
+    if function_comment == "":
+        function_comment = "PLEASE ADD A FUNCTION DESCRIPTION"
 
     param_description = extract_params(function_signature)
 
@@ -644,13 +644,13 @@ def parse_function(lines, start_line, end_line, class_name=""):
     # LATEX FORMATTING
     if class_name != "":
         func_description = r"\subsubsection*{{\bf " + \
-            functionName + "}}\n"
+            function_name + "}}\n"
     else:
         func_description = r"\subsubsection*{{\bf " + \
-            functionName + "}}\n"
+            function_name + "}}\n"
 
     func_description += "{\\it "
-    func_description += functionComment
+    func_description += function_comment
     func_description += "}"
     func_description += "\n"
     func_description += "\\vspace{0.25cm}\n"
@@ -675,26 +675,26 @@ def parse_enum(lines, start_line, end_line):
     n1 = enumLine.find("class")
     n2 = enumLine.find("(")
     # len("class ") == 6
-    enumName = enumLine[n1 + 6:n2]
+    enum_name = enumLine[n1 + 6:n2]
 
-    enumTypes = []
+    enum_types = []
     for row_num in range(start_line + 1, end_line):
         line = lines[row_num]
         line = line.replace(" ", "")
         n = line.find("=")
         if n != -1:
-            enumType = line[0:n]
-            enumTypes.append(enumType)
+            enum_type = line[0:n]
+            enum_types.append(enum_type)
         else:
             break
 
-    enum_description.append("\\subsubsection*{Enumerated Type: " + enumName+"}")
+    enum_description.append("\\subsubsection*{Enumerated Type: " + enum_name+"}")
     enum_description.append("\n")
     enum_description.append("This enumerated type has the following values:\n")
     enum_description.append("\\begin{itemize}[nosep]")
     enum_description.append("\n")
-    for enumType in enumTypes:
-        enum_description.append("\\item{" + enumType + "}")
+    for enum_type in enum_types:
+        enum_description.append("\\item{" + enum_type + "}")
         enum_description.append("\n")
     enum_description.append("\\end{itemize}")
     enum_description.append("\n")
@@ -730,11 +730,11 @@ def extract_params(function_signature):
         # Find comment
         # If multiple arguments are on the same line as a comment,
         # the comment will be used for each argument on that line.
-        commentLocation = line.find("#")
+        comment_location = line.find("#")
         pComment = "-"
-        if commentLocation != -1:
-            pComment = line[commentLocation+1:].strip()
-            line = line[:commentLocation]
+        if comment_location != -1:
+            pComment = line[comment_location+1:].strip()
+            line = line[:comment_location]
 
         line = line.strip()
         # Split by comma while leaving commas that are in square brackets '[]'.
@@ -743,21 +743,21 @@ def extract_params(function_signature):
             # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
             params = []
             p = []
-            bracketLevel = 0
+            bracket_level = 0
             for c in line + ",":
-                if c == "," and bracketLevel == 0:
+                if c == "," and bracket_level == 0:
                     params.append("".join(p))
                     p = []
                 else:
                     if c == "[":
-                        bracketLevel += 1
+                        bracket_level += 1
                     elif c == "]":
-                        bracketLevel -= 1
+                        bracket_level -= 1
 
                     if c == "(":
-                        bracketLevel += 1
+                        bracket_level += 1
                     elif c == ")":
-                        bracketLevel -= 1
+                        bracket_level -= 1
 
                     p.append(c)
         else:
@@ -769,30 +769,30 @@ def extract_params(function_signature):
                 continue
 
             # Find default value
-            pDefault = "-"
-            defaultLocation = param.find("=")
-            if defaultLocation != -1:
-                pDefault = param[defaultLocation+1:].strip()
+            p_default = "-"
+            default_location = param.find("=")
+            if default_location != -1:
+                p_default = param[default_location+1:].strip()
 
                 # Rip the type name out if it's an enumerated type
-                if pDefault[0:3] == "Fin":
-                    dotCol = pDefault.find(".")
-                    pDefault = pDefault[dotCol+1:]
+                if p_default[0:3] == "Fin":
+                    dotCol = p_default.find(".")
+                    p_default = p_default[dotCol+1:]
 
-                param = param[:defaultLocation]
+                param = param[:default_location]
 
             # Find type
-            pType = "-"
+            p_type = "-"
             typeLocation = param.find(':')
             if typeLocation != -1:
-                pType = param[typeLocation+1:].strip()
-                pType = parse_type(pType)
+                p_type = param[typeLocation+1:].strip()
+                p_type = parse_type(p_type)
                 param = param[:typeLocation].strip()
 
             # Everything remaining must be the name
-            pName = param
+            p_name = param
 
-            param_description += f"{pName} & {pType} & {pComment} & {pDefault} \\\\\n"
+            param_description += f"{p_name} & {p_type} & {pComment} & {p_default} \\\\\n"
             param_description += "\\hline\n"
 
     param_description += "\\end{tabular}"
@@ -803,24 +803,24 @@ def extract_params(function_signature):
 ###############################################################################
 
 
-def parse_type(pType):
-    pType = pType.replace(" ", "")
-    u = pType.find("Union")
-    b = pType.find("(")
+def parse_type(p_type):
+    p_type = p_type.replace(" ", "")
+    u = p_type.find("Union")
+    b = p_type.find("(")
     if u != -1 and b == -1:
-        lb = pType.find("[")
-        rb = pType.find("]")
-        cm = pType.find(",")
-        s = pType[lb+1:cm] + " or " + pType[cm+1:rb]
+        lb = p_type.find("[")
+        rb = p_type.find("]")
+        cm = p_type.find(",")
+        s = p_type[lb+1:cm] + " or " + p_type[cm+1:rb]
     elif u == -1 and b != -1:
         # Problem as list has a comma in it and this has already been used to
         # split the line of arguments above
-        lb = pType.find("(")
-        rb = pType.find(")")
-        cm = pType.find(",")
-        s = pType[lb+1:cm] + " or " + pType[cm+1:rb]
+        lb = p_type.find("(")
+        rb = p_type.find(")")
+        cm = p_type.find(",")
+        s = p_type[lb+1:cm] + " or " + p_type[cm+1:rb]
     else:
-        s = pType
+        s = p_type
 
     return s
 
@@ -858,8 +858,8 @@ if 1 == 1:
     print("Doing it again for TOC")
     os.system("pdflatex " + user_guide_file_name)
 
-    pdfFileName1 = file_name + ".pdf"
-    pdfFileName2 = '..\\' + pdfFileName1
+    pdf_filename_1 = file_name + ".pdf"
+    pdf_filename_2 = '..\\' + pdf_filename_1
 
     # TODO: Only works if you have financepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
@@ -875,7 +875,7 @@ if 1 == 1:
     os.remove(new_head_file)
     os.remove(new_head_file + ".bak")
 
-    print("Moving ", pdfFileName1, " to ", pdfFileName2)
-    shutil.move(pdfFileName1, pdfFileName2)
-    print(pdfFileName2)
-    open_file(pdfFileName1)
+    print("Moving ", pdf_filename_1, " to ", pdf_filename_2)
+    shutil.move(pdf_filename_1, pdf_filename_2)
+    print(pdf_filename_2)
+    open_file(pdf_filename_1)

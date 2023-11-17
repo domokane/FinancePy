@@ -11,7 +11,6 @@ from numba import jit, njit, float64, int64
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
-from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
 from ...products.fx.fx_mkt_conventions import FinFXATMMethod
@@ -30,12 +29,6 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_half
 from ...models.sabr import vol_function_sabr_beta_one
 
-from ...models.volatility_fns import VolFuncTypes
-
-from ...utils.math import norminvcdf
-
-from ...models.black_scholes_analytic import bs_value
-from ...products.fx.fx_vanilla_option import fast_delta
 from ...utils.distribution import FinDistribution
 
 from ...utils.solver_1d import newton_secant
@@ -129,18 +122,13 @@ def _obj(params, *args):
     tot = 0.0
 
     num_strikes = len(volatility_grid)
-    numExpiryDates = len(volatility_grid[0])
 
     for i in range(0, num_strikes):
 
         k = strikesGrid[i][index]
-
-        fittedVol = vol_function(vol_type_value, params, f, k, t)
-
+        fitted_vol = vol_function(vol_type_value, params, f, k, t)
         mkt_vol = volatility_grid[i][index]
-
-        diff = fittedVol - mkt_vol
-
+        diff = fitted_vol - mkt_vol
         tot += diff**2
 
     return tot
@@ -181,7 +169,7 @@ def _solve_to_horizon(t, f,
         elif finSolverType == FinSolverTypes.CONJUGATE_GRADIENT:
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
-    except:
+    except Exception:
         # If convergence fails try again with CG if necessary
         if finSolverType != FinSolverTypes.CONJUGATE_GRADIENT:
             print('Failed to converge, will try CG')
@@ -385,8 +373,8 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 class SwaptionVolSurface():
     """ Class to perform a calibration of a chosen parametrised surface to the
-    prices of swaptions at different expiry dates and swap tenors. There is a 
-    choice of volatility function from cubic in delta to full SABR and SSVI. 
+    prices of swaptions at different expiry dates and swap tenors. There is a
+    choice of volatility function from cubic in delta to full SABR and SSVI.
     Check out VolFuncTypes. Visualising the volatility curve is useful.
     Also, there is no guarantee that the implied pdf will be positive."""
 
@@ -398,7 +386,7 @@ class SwaptionVolSurface():
                  volatility_grid: (np.ndarray),
                  volatility_function_type: VolFuncTypes = VolFuncTypes.SABR,
                  finSolverType: FinSolverTypes = FinSolverTypes.NELDER_MEAD):
-        """ Create the FinSwaptionVolSurface object by passing in market vol 
+        """ Create the FinSwaptionVolSurface object by passing in market vol
         data for a list of strikes and expiry dates. """
 
         check_argument_types(self.__init__, locals())
@@ -437,15 +425,15 @@ class SwaptionVolSurface():
 
 ###############################################################################
 
-    def volatility_from_strike_date(self, K, expiry_date):
+    def vol_from_strike_date(self, K, expiry_date):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
-        is done in variance space. The smile strikes at bracketed dates are 
+        is done in variance space. The smile strikes at bracketed dates are
         determined by determining the strike that reproduces the provided delta
-        value. This uses the calibration delta convention, but it can be 
-        overriden by a provided delta convention. The resulting volatilities 
-        are then determined for each bracketing expiry time and linear 
-        interpolation is done in variance space and then converted back to a 
+        value. This uses the calibration delta convention, but it can be
+        overriden by a provided delta convention. The resulting volatilities
+        are then determined for each bracketing expiry time and linear
+        interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
         t_exp = (expiry_date - self._value_date) / gDaysInYear
@@ -814,8 +802,6 @@ class SwaptionVolSurface():
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
-        K_dummy = 999
-
         for i in range(0, self._numExpiryDates):
 
             expiry_date = self._expiry_dates[i]
@@ -825,16 +811,18 @@ class SwaptionVolSurface():
 
                 strike = self._strike_grid[j][i]
 
-                fittedVol = self.volatility_from_strike_date(
-                    strike, expiry_date)
+                fitted_vol = self.vol_from_strike_date(strike, expiry_date)
 
                 mkt_vol = self._volatility_grid[j][i]
 
-                diff = fittedVol - mkt_vol
+                diff = fitted_vol - mkt_vol
 
                 print("%s %12.3f %7.4f %7.4f %7.5f" %
-                      (expiry_date, strike,
-                       fittedVol*100.0, mkt_vol*100, diff*100))
+                      (expiry_date,
+                       strike,
+                       fitted_vol*100.0,
+                       mkt_vol*100,
+                       diff*100))
 
         print("==========================================================")
 
@@ -889,40 +877,35 @@ class SwaptionVolSurface():
         """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
 
-        volTypeVal = self._volatility_function_type.value
+        for tenor_index in range(0, self._numExpiryDates):
 
-        for tenorIndex in range(0, self._numExpiryDates):
+            lowK = self._strike_grid[0][tenor_index] * 0.9
+            highK = self._strike_grid[-1][tenor_index] * 1.1
 
-            lowK = self._strike_grid[0][tenorIndex] * 0.9
-            highK = self._strike_grid[-1][tenorIndex] * 1.1
-
-            expiry_date = self._expiry_dates[tenorIndex]
+            expiry_date = self._expiry_dates[tenor_index]
             plt.figure()
 
             ks = []
-            fittedVols = []
 
             numIntervals = 30
             K = lowK
             dK = (highK - lowK)/numIntervals
-            params = self._parameters[tenorIndex]
-            t = self._t_exp[tenorIndex]
-            f = self._fwd_swap_rates[tenorIndex]
+
+            fitted_vols = []
 
             for i in range(0, numIntervals):
 
                 ks.append(K)
-                fittedVol = self.volatility_from_strike_date(
-                    K, expiry_date) * 100.
-                fittedVols.append(fittedVol)
+                fitted_vol = self.vol_from_strike_date(K, expiry_date) * 100.0
+                fitted_vols.append(fitted_vol)
                 K = K + dK
 
-            labelStr = "FITTED AT " + str(self._expiry_dates[tenorIndex])
-            plt.plot(ks, fittedVols, label=labelStr)
+            labelStr = "FITTED AT " + str(self._expiry_dates[tenor_index])
+            plt.plot(ks, fitted_vols, label=labelStr)
 
-            labelStr = "MARKET AT " + str(self._expiry_dates[tenorIndex])
-            mkt_vols = self._volatility_grid[:, tenorIndex] * 100.0
-            plt.plot(self._strike_grid[:, tenorIndex],
+            labelStr = "MARKET AT " + str(self._expiry_dates[tenor_index])
+            mkt_vols = self._volatility_grid[:, tenor_index] * 100.0
+            plt.plot(self._strike_grid[:, tenor_index],
                      mkt_vols, 'o', label=labelStr)
 
             plt.xlabel("Strike")
@@ -935,6 +918,7 @@ class SwaptionVolSurface():
 ###############################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self._value_date)
         s += label_to_string("STOCK PRICE", self._stock_price)
@@ -954,6 +938,7 @@ class SwaptionVolSurface():
 
             for j in range(0, self._num_strikes):
 
+                expiry_date = self._expiry_dates[i]
                 k = self._strikes[j]
                 vol = self._volGrid[i][j]
                 print(expiry_date, k, vol)

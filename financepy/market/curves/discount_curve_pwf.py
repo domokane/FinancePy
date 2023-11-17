@@ -57,7 +57,7 @@ class DiscountCurvePWF(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-    ###############################################################################
+    ###########################################################################
 
     def _zero_rate(self,
                    times: (float, np.ndarray, list)):
@@ -95,7 +95,7 @@ class DiscountCurvePWF(DiscountCurve):
 
         return np.array(zero_rates)
 
-    ###############################################################################
+    ###########################################################################
 
     def _fwd(self,
              times: (np.ndarray, list)):

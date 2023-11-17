@@ -95,10 +95,13 @@ def search_root(x0, m, q_matrix, rt, df_end, dt, sigma):
 
 @njit(fastmath=True, cache=True)
 def bermudan_swaption_tree_fast(t_exp, tmat,
-                                strike_price, face_amount,
-                                cpn_times, cpn_flows,
+                                strike_price,
+                                face_amount,
+                                cpn_times,
+                                cpn_flows,
                                 exercise_type_int,
-                                _df_times, _df_values,
+                                _df_times,
+                                _df_values,
                                 _tree_times,
                                 _Q, _rt, _dt):
     """ Option to enter into a swap that can be exercised on coupon payment
@@ -139,6 +142,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
     mapped_times = np.array([0.0])
     mapped_amounts = np.array([0.0])
+
     for n in range(1, len(_tree_times)):
 
         accdAtExpiry = 0.0
@@ -179,7 +183,9 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
     # Now step back to today considering early exercise on coupon dates
     for m in range(maturity_step-1, -1, -1):
+
         nm = m
+
         flow = fixed_leg_flows[m] * face_amount
 
         for k in range(0, nm+1):
@@ -206,25 +212,25 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
             vrec = (pu*vu + pd*vd) * df
             rec_values[m, k] = vrec
 
-            holdPay = pay_values[m, k]
-            holdRec = rec_values[m, k]
+            hold_pay = pay_values[m, k]
+            hold_rec = rec_values[m, k]
 
             # The floating value is clean and so must be the fixed value
             fixed_leg_value = fixed_leg_values[m, k] - accrued[m]
             float_leg_value = float_leg_values[m]
 
-            payExercise = max(float_leg_value - fixed_leg_value, 0.0)
-            recExercise = max(fixed_leg_value - float_leg_value, 0.0)
+            pay_exercise = max(float_leg_value - fixed_leg_value, 0.0)
+            rec_exercise = max(fixed_leg_value - float_leg_value, 0.0)
 
             if m == expiry_step:
 
-                pay_values[m, k] = max(payExercise, holdPay)
-                rec_values[m, k] = max(recExercise, holdRec)
+                pay_values[m, k] = max(pay_exercise, hold_pay)
+                rec_values[m, k] = max(rec_exercise, hold_rec)
 
             elif exercise_type_int == 2 and flow > gSmall and m > expiry_step:
 
-                pay_values[m, k] = max(payExercise, holdPay)
-                rec_values[m, k] = max(recExercise, holdRec)
+                pay_values[m, k] = max(pay_exercise, hold_pay)
+                rec_values[m, k] = max(rec_exercise, hold_rec)
 
             elif exercise_type_int == 3 and m > expiry_step:
 
@@ -232,8 +238,8 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
                 # Need to define floating value on all grid dates
 
-                pay_values[m, k] = max(payExercise, holdPay)
-                rec_values[m, k] = max(recExercise, holdRec)
+                pay_values[m, k] = max(pay_exercise, hold_pay)
+                rec_values[m, k] = max(rec_exercise, hold_rec)
 
     return pay_values[0, 0], rec_values[0, 0]
 

@@ -27,12 +27,12 @@ class DiscountCurveNSS(DiscountCurve):
 
     def __init__(self,
                  value_date: Date,
-                 beta0: float,
-                 beta1: float,
-                 beta2: float,
-                 beta3: float,
-                 tau1: float,
-                 tau2: float,
+                 beta_0: float,
+                 beta_1: float,
+                 beta_2: float,
+                 beta_3: float,
+                 tau_1: float,
+                 tau_2: float,
                  frequency_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create a FinDiscountCurveNSS object by passing in curve valuation
@@ -42,19 +42,19 @@ class DiscountCurveNSS(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        if tau1 <= 0:
+        if tau_1 <= 0:
             raise FinError("Tau1 must be positive")
 
-        if tau2 <= 0:
+        if tau_2 <= 0:
             raise FinError("Tau2 must be positive")
 
         self._value_date = value_date
-        self._beta0 = beta0
-        self._beta1 = beta1
-        self._beta2 = beta2
-        self._beta3 = beta3
-        self._tau1 = tau1
-        self._tau2 = tau2
+        self._beta_0 = beta_0
+        self._beta_1 = beta_1
+        self._beta_2 = beta_2
+        self._beta_3 = beta_3
+        self._tau_1 = tau_1
+        self._tau_2 = tau_2
         self._freq_type = frequency_type
         self._dc_type = day_count_type
 
@@ -114,14 +114,14 @@ class DiscountCurveNSS(DiscountCurve):
 
         t = np.maximum(times, gSmall)
 
-        theta1 = t / self._tau1
-        theta2 = t / self._tau2
-        e1 = np.exp(-theta1)
-        e2 = np.exp(-theta2)
-        zero_rate = self._beta0
-        zero_rate += self._beta1 * (1.0 - e1) / theta1
-        zero_rate += self._beta2 * ((1.0 - e1) / theta1 - e1)
-        zero_rate += self._beta3 * ((1.0 - e2) / theta2 - e2)
+        theta_1 = t / self._tau_1
+        theta_2 = t / self._tau_2
+        e_1 = np.exp(-theta_1)
+        e_2 = np.exp(-theta_2)
+        zero_rate = self._beta_0
+        zero_rate += self._beta_1 * (1.0 - e_1) / theta_1
+        zero_rate += self._beta_2 * ((1.0 - e_1) / theta_1 - e_1)
+        zero_rate += self._beta_3 * ((1.0 - e_2) / theta_2 - e_2)
         return zero_rate
 
     ###########################################################################
@@ -158,12 +158,12 @@ class DiscountCurveNSS(DiscountCurve):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("PARAMETER", "VALUE")
-        s += label_to_string("BETA0", self._beta0)
-        s += label_to_string("BETA1", self._beta1)
-        s += label_to_string("BETA2", self._beta2)
-        s += label_to_string("BETA3", self._beta3)
-        s += label_to_string("TAU1", self._tau1)
-        s += label_to_string("TAU2", self._tau2)
+        s += label_to_string("BETA0", self._beta_0)
+        s += label_to_string("BETA1", self._beta_1)
+        s += label_to_string("BETA2", self._beta_2)
+        s += label_to_string("BETA3", self._beta_3)
+        s += label_to_string("TAU1", self._tau_1)
+        s += label_to_string("TAU2", self._tau_2)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY_COUNT", self._dc_type)
         return s

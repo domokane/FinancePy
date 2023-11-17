@@ -55,7 +55,7 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
     res = deepcopy(payoff)[0]
 
     # Explicit
-    Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1-theta, wind)
+    Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1.0-theta, wind)
     # Implicit
     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 

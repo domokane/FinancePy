@@ -1005,7 +1005,7 @@ class FXVolSurfacePlus():
 
 ###############################################################################
 
-    def volatility_from_strike_date(self, K, expiry_date):
+    def vol_from_strike_date(self, K, expiry_date):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -1622,7 +1622,7 @@ class FXVolSurfacePlus():
             ###################################################################
 
             if verbose:
-                print("==========================================================")
+                print("======================================================")
                 print("T_(YEARS): ", self._t_exp[i])
                 print("CNT_CPD_RD:%9.6f %%" % (self._rd[i]*100))
                 print("CNT_CPD_RF:%9.6f %%" % (self._rf[i]*100))
@@ -1637,10 +1637,10 @@ class FXVolSurfacePlus():
                                          self._t_exp[i])
 
             if verbose:
-                print("==========================================================")
+                print("======================================================")
                 print("VOL FUNCTION", self._volatility_function_type)
                 print("VOL_PARAMETERS:", self._parameters[i])
-                print("==========================================================")
+                print("======================================================")
                 print("OUT_K_ATM:  %9.6f" % (self._K_ATM[i]))
                 print("OUT_ATM_VOL: %9.6f %%"
                       % (100.0*sigma_ATM_out))
@@ -1684,7 +1684,7 @@ class FXVolSurfacePlus():
 
                 if verbose:
 
-                    print("==========================================================")
+                    print("==================================================")
                     print("MKT STRANGLE 25D VOL IN: %9.6f %%"
                           % (100.0*self._mktStrangle25DeltaVols[i]))
 

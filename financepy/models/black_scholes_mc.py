@@ -15,7 +15,8 @@ from math import exp
 
 ###############################################################################
 
-def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v,
+                              num_paths, seed, use_sobol):
     # SLOWEST - No use of NUMPY vectorisation or NUMBA
 
     num_paths = int(num_paths)
@@ -25,7 +26,7 @@ def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v, num_paths, seed, us
     vsqrtt = v * np.sqrt(t)
     payoff = 0.0
 
-    if useSobol == 1:
+    if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
@@ -57,7 +58,8 @@ def _value_mc_nonumba_nonumpy(s, t, K, option_type, r, q, v, num_paths, seed, us
 
 ###############################################################################
 
-def _value_mc_numpy_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numpy_only(s, t, K, option_type, r, q, v, num_paths,
+                         seed, use_sobol):
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -66,7 +68,7 @@ def _value_mc_numpy_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
     v2 = v ** 2
     vsqrtt = v * np.sqrt(t)
 
-    if useSobol == 1:
+    if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
@@ -95,7 +97,7 @@ def _value_mc_numpy_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
               int64, int64, int64), cache=True, fastmath=True)
-def _value_mc_numpy_numba(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numpy_numba(s, t, K, option_type, r, q, v, num_paths, seed, use_sobol):
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -104,7 +106,7 @@ def _value_mc_numpy_numba(s, t, K, option_type, r, q, v, num_paths, seed, useSob
     v2 = v ** 2
     vsqrtt = v * np.sqrt(t)
 
-    if useSobol == 1:
+    if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
@@ -133,7 +135,7 @@ def _value_mc_numpy_numba(s, t, K, option_type, r, q, v, num_paths, seed, useSob
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
               int64, int64, int64), fastmath=True, cache=True)
-def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, use_sobol):
     # No use of Numpy vectorisation but NUMBA
 
     num_paths = int(num_paths)
@@ -143,7 +145,7 @@ def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
     vsqrtt = v * np.sqrt(t)
     payoff = 0.0
 
-    if useSobol == 1:
+    if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)
@@ -180,7 +182,7 @@ def _value_mc_numba_only(s, t, K, option_type, r, q, v, num_paths, seed, useSobo
 
 @njit(float64(float64, float64, float64, int64, float64, float64, float64,
               int64, int64, int64), fastmath=True, cache=True)
-def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, useSobol):
+def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, use_sobol):
     # No use of Numpy vectorisation but NUMBA
 
     num_paths = int(num_paths)
@@ -189,7 +191,7 @@ def _value_mc_numba_parallel(s, t, K, option_type, r, q, v, num_paths, seed, use
     v2 = v ** 2
     vsqrtt = v * np.sqrt(t)
 
-    if useSobol == 1:
+    if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
         g = np.random.standard_normal(num_paths)

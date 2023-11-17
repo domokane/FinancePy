@@ -2,7 +2,6 @@ from copy import deepcopy
 from functools import partial
 
 import numpy as np
-from numba import njit
 
 from ..utils.math import band_matrix_multiplication
 from ..utils.math import solve_tridiagonal_matrix

@@ -55,14 +55,19 @@ class Black():
         k = strike_rate
         v = self._volatility
         r = -np.log(df)/t
-        if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
+        if option_type in (OptionTypes.EUROPEAN_CALL,
+                           OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
                 value = black_value(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
-        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
-            results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+
+        elif option_type in (OptionTypes.AMERICAN_CALL,
+                             OptionTypes.AMERICAN_PUT):
+
+            results = crr_tree_val_avg(f, 0.0, 0.0, v,
+                                       self._num_steps, t,
+                                       option_type.value, k)
             value = results['value']
         else:
             raise FinError(
@@ -86,12 +91,14 @@ class Black():
         v = self._volatility
         r = -np.log(df)/t
 
-        if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
+        if option_type in (OptionTypes.EUROPEAN_CALL,
+                           OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
                 return black_delta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
-        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+        elif option_type in (OptionTypes.AMERICAN_CALL,
+                             OptionTypes.AMERICAN_PUT):
             if self._implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
                     f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
@@ -119,12 +126,14 @@ class Black():
         v = self._volatility
         r = -np.log(df)/t
 
-        if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
+        if option_type in (OptionTypes.EUROPEAN_CALL,
+                           OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
                 return black_gamma(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
-        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+        elif option_type in (OptionTypes.AMERICAN_CALL,
+                             OptionTypes.AMERICAN_PUT):
             if self._implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
                     f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
@@ -151,12 +160,14 @@ class Black():
         v = self._volatility
         r = -np.log(df)/t
 
-        if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
+        if option_type in (OptionTypes.EUROPEAN_CALL,
+                           OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
                 theta = black_theta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
-        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+        elif option_type in (OptionTypes.AMERICAN_CALL,
+                             OptionTypes.AMERICAN_PUT):
             if self._implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
                     f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
@@ -185,18 +196,21 @@ class Black():
         v = self._volatility
         r = -np.log(df)/t
 
-        if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
+        if option_type in (OptionTypes.EUROPEAN_CALL,
+                           OptionTypes.EUROPEAN_PUT):
             if self._implementation_type == BlackTypes.ANALYTICAL:
                 vega = black_vega(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
-        elif option_type in (OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT):
+        elif option_type in (OptionTypes.AMERICAN_CALL,
+                             OptionTypes.AMERICAN_PUT):
             if self._implementation_type == BlackTypes.CRR_TREE:
                 bump_size = 0.01
                 results = crr_tree_val_avg(
                     f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
                 results_volshift = crr_tree_val_avg(
-                    f, 0.0, 0.0, v+bump_size, self._num_steps, t, option_type.value, k)
+                    f, 0.0, 0.0, v+bump_size, self._num_steps, t,
+                    option_type.value, k)
                 vega = (results_volshift['value'] -
                         results['value']) / bump_size
                 return vega
@@ -272,7 +286,8 @@ def black_theta(fwd, t, k, r, v, option_type):
         raise FinError("Option type must be a European Call or Put")
 
 
-@njit(float64[:](float64, float64, float64, float64), fastmath=True, cache=True)
+@njit(float64[:](float64, float64, float64, float64), fastmath=True,
+      cache=True)
 def calculate_d1_d2(f, t, k, v):
 
     t = np.maximum(t, gSmall)
@@ -295,12 +310,12 @@ def calculate_d1_d2(f, t, k, v):
 
 
 def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
-    """ Calculate the Black implied volatility of a European/American 
-    options on futures contracts using Newton with 
+    """ Calculate the Black implied volatility of a European/American
+    options on futures contracts using Newton with
     a fallback to bisection. """
 
     def _f_european(sigma, args):
-        """Function to determine ststar for pricing 
+        """Function to determine ststar for pricing
         European options on future contracts. """
         fwd, t, k, r, option_type, price = args
         value = black_value(fwd, t, k, r, sigma, option_type)
@@ -308,14 +323,14 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         return obj
 
     def _f_european_vega(sigma, args):
-        """ Function to calculate the Vega of European 
+        """ Function to calculate the Vega of European
         options on future contracts. """
         fwd, t, k, r, option_type, _ = args
         vega = black_vega(fwd, t, k, r, sigma, option_type)
         return vega
 
     def _f_american(sigma, args):
-        """Function to determine ststar for pricing 
+        """Function to determine ststar for pricing
         American options on future contracts. """
         fwd, t, k, _, option_type, price = args
         num_steps = 200
@@ -337,7 +352,7 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         vega = (results_volshift['value'] - results['value']) / bump_size
         return vega
 
-    def _estimate_volatility_from_price(fwd, t, k, european_option_type, european_price):
+    def _estimate_vol_from_price(fwd, t, k, european_option_type, european_price):
         # Brenner and Subrahmanyan (1988) and Feinstein
         # (1988) approximation for at-the-money forward call option. See Eq.(3) in
         # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20
@@ -358,7 +373,7 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
     if option_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
         _f = _f_european
         _f_vega = _f_european_vega
-        sigma0 = _estimate_volatility_from_price(fwd, t, k, option_type, price)
+        sigma0 = _estimate_vol_from_price(fwd, t, k, option_type, price)
     elif option_type == OptionTypes.AMERICAN_CALL:
         _f = _f_american
         _f_vega = _f_american_vega
@@ -366,14 +381,14 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         # Instead of european price, american price is
         # passed to an approximation formula for european option.
         # But it's just a initial point, so no affect on the calibration.
-        sigma0 = _estimate_volatility_from_price(
+        sigma0 = _estimate_vol_from_price(
             fwd, t, k, OptionTypes.EUROPEAN_CALL, price)
     elif option_type == OptionTypes.AMERICAN_PUT:
         _f = _f_american
         _f_vega = _f_american_vega
         # NOTE:
         # Same argument as american call's case
-        sigma0 = _estimate_volatility_from_price(
+        sigma0 = _estimate_vol_from_price(
             fwd, t, k, OptionTypes.EUROPEAN_PUT, price)
     else:
         raise FinError("Option type must be a European Call or Put")

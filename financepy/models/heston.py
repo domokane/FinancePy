@@ -283,7 +283,7 @@ class Heston():
             q = V * tau / 2.0
             Q = np.exp(-e * q)
             H = np.exp((2.0 * kappa * theta / V) * (q * g - np.log((1.0 -
-                                                                    h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
+                h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
             integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
             return integrand.real
 

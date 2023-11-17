@@ -46,7 +46,7 @@ def loss_dbn_recursion_gcd(num_credits,
     for i in range(0, len(loss_units)):
         num_loss_units += int(loss_units[i])
 
-    uncondLossDbn = np.zeros(num_loss_units)
+    uncond_loss_dbn = np.zeros(num_loss_units)
 
     z = minZ
     dz = 2.0 * abs(z) / num_integration_steps
@@ -65,20 +65,20 @@ def loss_dbn_recursion_gcd(num_credits,
             cond_default_probs[i_credit] = N(argz)
 
         indep_dbn = indep_loss_dbn_recursion_gcd(num_credits,
-                                                cond_default_probs,
-                                                loss_units)
+                                                 cond_default_probs,
+                                                 loss_units)
 
         gaussWt = np.exp(-(z*z)/2.0)
 
         for i_loss_unit in range(0, num_loss_units):
-            uncondLossDbn[i_loss_unit] += indep_dbn[i_loss_unit] * gaussWt
+            uncond_loss_dbn[i_loss_unit] += indep_dbn[i_loss_unit] * gaussWt
 
         z += dz
 
     for i_loss_unit in range(0, int(num_loss_units)):
-        uncondLossDbn[i_loss_unit] *= INVROOT2PI * dz
+        uncond_loss_dbn[i_loss_unit] *= INVROOT2PI * dz
 
-    return uncondLossDbn
+    return uncond_loss_dbn
 
 ###############################################################################
 
@@ -302,7 +302,7 @@ def loss_dbn_hetero_adj_binomial(num_credits,
 
     num_loss_units = num_credits + 1
     cond_default_probs = np.zeros(num_credits)
-    uncondLossDbn = np.zeros(num_loss_units)
+    uncond_loss_dbn = np.zeros(num_loss_units)
     indep_dbn = np.zeros(num_loss_units)
 
     # Determine default threshold for each credit
@@ -321,20 +321,20 @@ def loss_dbn_hetero_adj_binomial(num_credits,
             cond_default_probs[i_credit] = N(argz)
 
         indep_dbn = indep_loss_dbn_heterogeneous_adj_binomial(num_credits,
-                                                             cond_default_probs,
-                                                             loss_ratio)
+                                                              cond_default_probs,
+                                                              loss_ratio)
 
         gaussWt = np.exp(-(z**2) / 2.0)
 
         for i_loss_unit in range(0, num_loss_units):
-            uncondLossDbn[i_loss_unit] += indep_dbn[i_loss_unit] * gaussWt
+            uncond_loss_dbn[i_loss_unit] += indep_dbn[i_loss_unit] * gaussWt
 
         z = z + dz
 
     for i_loss_unit in range(0, num_loss_units):
-        uncondLossDbn[i_loss_unit] *= INVROOT2PI * dz
+        uncond_loss_dbn[i_loss_unit] *= INVROOT2PI * dz
 
-    return uncondLossDbn
+    return uncond_loss_dbn
 
 ###############################################################################
 

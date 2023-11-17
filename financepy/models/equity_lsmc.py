@@ -2,12 +2,9 @@
 # Copyright (C) 2022 Dominic O'Kane
 ###############################################################################
 
-import sys
-
 # https://people.math.ethz.ch/~hjfurrer/teaching/LongstaffSchwartzAmericanOptionsLeastSquareMonteCarlo.pdf
 
 import numpy as np
-from numba import jit, njit, float64, int64
 
 from enum import Enum, auto
 
@@ -91,6 +88,7 @@ def equity_lsmc(spot_price,
     stopping[-1] = np.where(exercise_matrix[-1] > 0, 1, 0)
 
     df = np.exp(-risk_free_rate * dt)
+
     for it in range(num_times-2, 0, -1):
         if fit_type_value == FIT_TYPES.HERMITE_E.value:
             regression2 = np.polynomial.hermite_e.hermefit(
@@ -113,7 +111,8 @@ def equity_lsmc(spot_price,
                 st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = np.polynomial.chebyshev.chebval(st[it], regression2)
         elif fit_type_value == FIT_TYPES.POLYNOMIAL.value:
-            regression2 = fit_poly(st[it], value_matrix[it + 1] * df, poly_degree)
+            regression2 = fit_poly(st[it], value_matrix[it + 1] * df,
+                                   poly_degree)
             cont_value = eval_polynomial(regression2, st[it])
         else:
             raise ValueError(f"Unknown FitType: {fit_type_value}")

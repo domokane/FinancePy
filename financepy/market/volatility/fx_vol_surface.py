@@ -247,8 +247,8 @@ def vol_function(vol_function_type_value, params, f, k, t):
 def delta_fit(K, *args):
     """ This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
-    inverse normcdf space to avoid the flat slope of this function at low vol 
-    and high K. It speeds up the code as it allows initial values close to 
+    inverse normcdf space to avoid the flat slope of this function at low vol
+    and high K. It speeds up the code as it allows initial values close to
     the solution to be used. """
 
     vol_type_value = args[0]
@@ -387,7 +387,7 @@ def solve_for_strike(spot_fx_rate,
 
 class FXVolSurface():
     """ Class to perform a calibration of a chosen parametrised surface to the
-    prices of FX options at different strikes and expiry tenors. The 
+    prices of FX options at different strikes and expiry tenors. The
     calibration inputs are the ATM and 25 Delta volatilities given in terms of
     the market strangle amd risk reversals. There is a choice of volatility
     function ranging from polynomial in delta to a limited version of SABR. """
@@ -778,7 +778,7 @@ class FXVolSurface():
             ###################################################################
 
             if verbose:
-                print("==========================================================")
+                print("======================================================")
                 print("T_(YEARS): ", self._t_exp[i])
                 print("CNT_CPD_RD:%9.6f %%" % (self._rd[i]*100))
                 print("CNT_CPD_RF:%9.6f %%" % (self._rf[i]*100))
@@ -791,10 +791,10 @@ class FXVolSurface():
                                          self._t_exp[i])
 
             if verbose:
-                print("==========================================================")
+                print("======================================================")
                 print("VOL FUNCTION", self._volatility_function_type)
                 print("VOL_PARAMETERS:", self._parameters[i])
-                print("==========================================================")
+                print("======================================================")
                 print("OUT_K_ATM:  %9.6f" % (self._K_ATM[i]))
                 print("OUT_ATM_VOL: %9.6f %%"
                       % (100.0*sigma_ATM_out))
@@ -836,7 +836,7 @@ class FXVolSurface():
 
             if verbose:
 
-                print("==========================================================")
+                print("======================================================")
                 print("MKT STRANGLE VOL IN: %9.6f %%"
                       % (100.0*self._mktStrangle25DeltaVols[i]))
 
@@ -1009,7 +1009,7 @@ class FXVolSurface():
 ###############################################################################
 
     def implied_dbns(self, lowFX, highFX, numIntervals):
-        """ Calculate the pdf for each tenor horizon. Returns a list of 
+        """ Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon. """
 
         dbns = []

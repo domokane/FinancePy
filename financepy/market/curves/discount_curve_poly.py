@@ -80,7 +80,7 @@ class DiscountCurvePoly(DiscountCurve):
         zero_rates = self._df_to_zero(dfs, dts, freq_type, dc_type)
         return zero_rates
 
-    ###############################################################################
+    ###########################################################################
 
     def _zero_rate(self,
                    times: (float, np.ndarray)):
@@ -97,7 +97,7 @@ class DiscountCurvePoly(DiscountCurve):
 
         return zero_rate
 
-    ###############################################################################
+    ###########################################################################
 
     def df(self,
            dates: (list, Date)):
@@ -123,7 +123,7 @@ class DiscountCurvePoly(DiscountCurve):
 
         return dfs
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         """ Display internal parameters of curve. """
@@ -136,7 +136,7 @@ class DiscountCurvePoly(DiscountCurve):
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

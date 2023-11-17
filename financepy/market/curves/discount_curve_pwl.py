@@ -56,7 +56,7 @@ class DiscountCurvePWL(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-    ###############################################################################
+    ###########################################################################
 
     def _zero_rate(self,
                    times: (list, np.ndarray)):
@@ -99,7 +99,7 @@ class DiscountCurvePWL(DiscountCurve):
 
         return np.array(zero_rates)
 
-    ###############################################################################
+    ###########################################################################
 
     def df(self,
            dates: (Date, list)):
@@ -124,7 +124,7 @@ class DiscountCurvePWL(DiscountCurve):
 
         return df
 
-    ###############################################################################
+    ###########################################################################
 
     # def _df(self,
     #         t: (float, np.ndarray)):
@@ -135,7 +135,7 @@ class DiscountCurvePWL(DiscountCurve):
     #     df = zero_to_df(r, t, self._freq_type)
     #     return df
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -146,7 +146,7 @@ class DiscountCurvePWL(DiscountCurve):
         s += label_to_string("FREQUENCY", self._freq_type)
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

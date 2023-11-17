@@ -94,7 +94,7 @@ class DiscountCurveNS(DiscountCurve):
 
         return zero_rates
 
-    ###############################################################################
+    ###########################################################################
 
     def _zero_rate(self,
                    times: (float, np.ndarray)):
@@ -110,7 +110,7 @@ class DiscountCurveNS(DiscountCurve):
         zero_rate += self._beta2 * ((1.0 - e) / theta - e)
         return zero_rate
 
-    ###############################################################################
+    ###########################################################################
 
     def df(self,
            dates: (Date, list)):
@@ -138,7 +138,7 @@ class DiscountCurveNS(DiscountCurve):
         else:
             return df
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -152,7 +152,7 @@ class DiscountCurveNS(DiscountCurve):
         s += label_to_string("DAY_COUNT", (self._dc_type))
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Simple print function for backward compatibility. """

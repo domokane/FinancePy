@@ -115,7 +115,7 @@ def _solve_to_horizon(s, t, r, q,
         elif finSolverType == FinSolverTypes.CONJUGATE_GRADIENT:
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
-    except:
+    except Exception:
         # If convergence fails try again with CG if necessary
         if finSolverType != FinSolverTypes.CONJUGATE_GRADIENT:
             print('Failed to converge, will try CG')
@@ -225,8 +225,8 @@ def _solver_for_smile_strike(s, t, r, q,
 
 class EquityVolSurface:
     """ Class to perform a calibration of a chosen parametrised surface to the
-    prices of equity options at different strikes and expiry tenors. There is0 
-    a choice of volatility function from cubic in delta to full SABR and SSVI. 
+    prices of equity options at different strikes and expiry tenors. There is0
+    a choice of volatility function from cubic in delta to full SABR and SSVI.
     Check out VolFuncTypes. Visualising the volatility curve is useful.
     Also, there is no guarantee that the implied pdf will be positive."""
 
@@ -275,7 +275,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def volatility_from_strike_date(self, K, expiry_date):
+    def vol_from_strike_date(self, K, expiry_date):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -457,12 +457,12 @@ class EquityVolSurface:
                                    delta_method=None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
-        is done in variance space. The smile strikes at bracketed dates are 
+        is done in variance space. The smile strikes at bracketed dates are
         determined by determining the strike that reproduces the provided delta
-        value. This uses the calibration delta convention, but it can be 
-        overriden by a provided delta convention. The resulting volatilities 
-        are then determined for each bracketing expiry time and linear 
-        interpolation is done in variance space and then converted back to a 
+        value. This uses the calibration delta convention, but it can be
+        overriden by a provided delta convention. The resulting volatilities
+        are then determined for each bracketing expiry time and linear
+        interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
         t_exp = (expiry_date - self._value_date) / gDaysInYear
@@ -620,13 +620,13 @@ class EquityVolSurface:
             expiry_date = self._expiry_dates[i]
             t_exp = (expiry_date - spot_date) / gDaysInYear
 
-            disDF = self._discount_curve._df(t_exp)
-            divDF = self._dividend_curve._df(t_exp)
-            f = s * divDF/disDF
+            dis_df = self._discount_curve._df(t_exp)
+            div_df = self._dividend_curve._df(t_exp)
+            f = s * div_df / dis_df
 
             self._t_exp[i] = t_exp
-            self._r[i] = -np.log(disDF) / t_exp
-            self._q[i] = -np.log(divDF) / t_exp
+            self._r[i] = -np.log(dis_df) / t_exp
+            self._q[i] = -np.log(div_df) / t_exp
             self._F0T[i] = f
 
         #######################################################################
@@ -681,16 +681,16 @@ class EquityVolSurface:
 
                 strike = self._strikes[j]
 
-                fittedVol = self.volatility_from_strike_date(
-                    strike, expiry_date)
+                fitted_vol = self.vol_from_strike_date(strike,
+                                                       expiry_date)
 
                 mkt_vol = self._volatility_grid[i][j]
 
-                diff = fittedVol - mkt_vol
+                diff = fitted_vol - mkt_vol
 
                 print("%s %12.3f %7.4f %7.4f %7.5f" %
                       (expiry_date, strike,
-                       fittedVol*100.0, mkt_vol*100, diff*100))
+                       fitted_vol*100.0, mkt_vol*100, diff*100))
 
         print("==========================================================")
 
@@ -704,7 +704,7 @@ class EquityVolSurface:
 
         for iTenor in range(0, self._numExpiryDates):
 
-            f = self._F0T[iTenor]
+            f = self._F_0T[iTenor]
             t = self._t_exp[iTenor]
 
             dS = (highS - lowS) / numIntervals
@@ -754,7 +754,7 @@ class EquityVolSurface:
             plt.figure()
 
             ks = []
-            fittedVols = []
+            fitted_vols = []
 
             numIntervals = 30
             K = lowK
@@ -763,13 +763,12 @@ class EquityVolSurface:
             for i in range(0, numIntervals):
 
                 ks.append(K)
-                fittedVol = self.volatility_from_strike_date(
-                    K, expiry_date) * 100.
-                fittedVols.append(fittedVol)
+                fittedVol = self.vol_from_strike_date(K, expiry_date) * 100.
+                fitted_vols.append(fittedVol)
                 K = K + dK
 
             labelStr = "FITTED AT " + str(self._expiry_dates[tenorIndex])
-            plt.plot(ks, fittedVols, label=labelStr)
+            plt.plot(ks, fitted_vols, label=labelStr)
 
             labelStr = "MARKET AT " + str(self._expiry_dates[tenorIndex])
             mkt_vols = self._volatility_grid[tenorIndex] * 100.0

@@ -27,7 +27,7 @@ class DiscountCurve:
     a vector of times and discount factors and an interpolation scheme for
     interpolating between these fixed points. '''
 
-    ###############################################################################
+    ###########################################################################
 
     def __init__(self,
                  value_date: Date,
