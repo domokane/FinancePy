@@ -46,8 +46,8 @@ class IborBermudanSwaption:
                  float_frequency_type=FrequencyTypes.QUARTERLY,
                  float_dc_type=DayCountTypes.THIRTY_E_360,
                  cal_type=CalendarTypes.WEEKEND,
-                 bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type=DateGenRuleTypes.BACKWARD):
+                 bd_type=BusDayAdjustTypes.FOLLOWING,
+                 dg_type=DateGenRuleTypes.BACKWARD):
         """ Create a Bermudan swaption contract. This is an option to enter
         into a payer or receiver swap at a fixed coupon on all of the fixed
         # leg coupon dates until the exercise date inclusive. """
@@ -77,8 +77,8 @@ class IborBermudanSwaption:
         self._float_dc_type = float_dc_type
 
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
 
         self._pv01 = None
         self._fwd_swap_rate = None
@@ -111,8 +111,8 @@ class IborBermudanSwaption:
                                          self._float_freq_type,
                                          self._float_dc_type,
                                          self._cal_type,
-                                         self._bd_adjust_type,
-                                         self._dg_rule_type)
+                                         self._bd_type,
+                                         self._dg_type)
 
         #  I need to do this to generate the fixed leg flows
         self._pv01 = self._underlying_swap.pv01(value_date, discount_curve)

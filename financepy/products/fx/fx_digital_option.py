@@ -121,7 +121,7 @@ class FXDigitalOption:
         domDF = dom_discount_curve._df(tdel)
         forDF = for_discount_curve._df(tdel)
 
-        rd = -np.log(domDF) / tdel
+        r_d = -np.log(domDF) / tdel
         rf = -np.log(forDF) / tdel
 
         S0 = spot_fx_rate
@@ -133,7 +133,7 @@ class FXDigitalOption:
             lnS0k = np.log(S0 / K)
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
-            mu = rd - rf
+            mu = r_d - rf
             d2 = (lnS0k + (mu - v2 / 2.0) * tdel) / den
 
             if self._option_type == OptionTypes.DIGITAL_CALL and \
@@ -144,10 +144,10 @@ class FXDigitalOption:
                 v = S0 * np.exp(-rf * tdel) * n_vect(-d2)
             elif self._option_type == OptionTypes.DIGITAL_CALL and \
                     self._domName == self._prem_currency:
-                v = np.exp(-rd * tdel) * n_vect(d2)
+                v = np.exp(-r_d * tdel) * n_vect(d2)
             elif self._option_type == OptionTypes.DIGITAL_PUT and \
                     self._domName == self._prem_currency:
-                v = np.exp(-rd * tdel) * n_vect(-d2)
+                v = np.exp(-r_d * tdel) * n_vect(-d2)
             else:
                 raise FinError("Unknown option type")
 

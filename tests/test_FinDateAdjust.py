@@ -11,7 +11,7 @@ from financepy.utils.date import Date
 
 
 freq_type = FrequencyTypes.SEMI_ANNUAL
-dg_rule_type = DateGenRuleTypes.BACKWARD
+dg_type = DateGenRuleTypes.BACKWARD
 
 
 def test_date_adjust_no_adj():
@@ -19,14 +19,14 @@ def test_date_adjust_no_adj():
     end_date = Date(28, 2, 2011)
 
     cal_type = CalendarTypes.NONE
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    bd_type = BusDayAdjustTypes.FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type)
+                        bd_type,
+                        dg_type)
 
     assert schedule._adjusted_dates == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
@@ -39,14 +39,14 @@ def test_date_adjust_noweekend_following():
     end_date = Date(28, 2, 2011)
 
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
+    bd_type = BusDayAdjustTypes.FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type)
+                        bd_type,
+                        dg_type)
 
     assert schedule._adjusted_dates == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
@@ -59,14 +59,14 @@ def test_date_adjust_noweekend_modfollowing():
     end_date = Date(28, 2, 2011)
 
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type)
+                        bd_type,
+                        dg_type)
 
     assert schedule._adjusted_dates == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
@@ -79,14 +79,14 @@ def test_date_adjust_noweekend_usholidays_modfollowing():
     end_date = Date(4, 7, 2011)
 
     cal_type = CalendarTypes.UNITED_STATES
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
 
     schedule = Schedule(start_date,
                         end_date,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type)
+                        bd_type,
+                        dg_type)
 
     assert schedule._adjusted_dates == [
         Date(4, 7, 2008), Date(5, 1, 2009), Date(6, 7, 2009), Date(4, 1, 2010),

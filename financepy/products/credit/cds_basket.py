@@ -48,8 +48,8 @@ class CDSBasket:
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
 
         check_argument_types(self.__init__, locals())
 
@@ -59,10 +59,10 @@ class CDSBasket:
         self._running_coupon = running_coupon / 10000.0
         self._long_protection = long_protection
         self._dc_type = dc_type
-        self._dg_rule_type = dg_rule_type
+        self._dg_type = dg_type
         self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         self._cds_contract = CDS(self._step_in_date,
                                  self._maturity_date,
@@ -72,8 +72,8 @@ class CDSBasket:
                                  self._freq_type,
                                  self._dc_type,
                                  self._cal_type,
-                                 self._bd_adjust_type,
-                                 self._dg_rule_type)
+                                 self._bd_type,
+                                 self._dg_type)
 
 ###############################################################################
 
@@ -332,8 +332,8 @@ class CDSBasket:
         s += label_to_string("DAYCOUNT", self._dc_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
-        s += label_to_string("DATEGENRULE", self._dg_rule_type)
+        s += label_to_string("BUSDAYRULE", self._bd_type)
+        s += label_to_string("DATEGENRULE", self._dg_type)
 
 #       header = "PAYMENT_DATE, YEAR_FRAC, FLOW"
 #       valueTable = [self._payment_dates, self._accrual_factors, self._flows]

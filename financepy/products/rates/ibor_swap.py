@@ -49,8 +49,8 @@ class IborSwap:
                  float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -70,7 +70,7 @@ class IborSwap:
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bd_adjust_type)
+                                              bd_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -94,8 +94,8 @@ class IborSwap:
                                        principal,
                                        payment_lag,
                                        cal_type,
-                                       bd_adjust_type,
-                                       dg_rule_type)
+                                       bd_type,
+                                       dg_type)
 
         self._float_leg = SwapFloatLeg(effective_date,
                                        self._termination_date,
@@ -107,8 +107,8 @@ class IborSwap:
                                        principal,
                                        payment_lag,
                                        cal_type,
-                                       bd_adjust_type,
-                                       dg_rule_type)
+                                       bd_type,
+                                       dg_type)
 
     ###########################################################################
 

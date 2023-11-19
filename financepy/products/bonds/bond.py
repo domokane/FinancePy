@@ -101,8 +101,8 @@ class Bond:
                  dc_type: DayCountTypes,
                  ex_div_days: int = 0,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type=DateGenRuleTypes.BACKWARD):
+                 bd_type=BusDayAdjustTypes.FOLLOWING,
+                 dg_type=DateGenRuleTypes.BACKWARD):
         """ Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
         amount and the number of ex-dividend days. A calendar type is used
@@ -154,8 +154,8 @@ class Bond:
         self._accrued_days = 0.0
         self._alpha = 0.0
 
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
 
         self._calculate_cpn_dates()
         self._calculate_flows()
@@ -169,15 +169,15 @@ class Bond:
         """
 
         # This should only be called once from init
-        # bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-        # dg_rule_type = DateGenRuleTypes.BACKWARD
+        # bd_type = BusDayAdjustTypes.FOLLOWING
+        # dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dates = Schedule(self._issue_date,
                                       self._maturity_date,
                                       self._freq_type,
                                       CalendarTypes.NONE,
-                                      self._bd_adjust_type,
-                                      self._dg_rule_type,
+                                      self._bd_type,
+                                      self._dg_type,
                                       end_of_month=self._end_of_month)._generate()
 
     ###########################################################################

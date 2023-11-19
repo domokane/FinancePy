@@ -193,12 +193,12 @@ class FXFixedLookbackOption:
         S0 = spot_fx_rate
 
         df = domestic_curve._df(t)
-        rd = -np.log(df)/t
+        r_d = -np.log(df)/t
 
         dq = foreign_curve._df(t)
-        rf = -np.log(dq)/t
+        r_f = -np.log(dq)/t
 
-        mu = rd - rf
+        mu = r_d - r_f
 
         num_time_steps = int(t * num_steps_per_year)
 
@@ -246,5 +246,5 @@ class FXFixedLookbackOption:
         else:
             raise FinError("Unknown lookback option type:" + str(option_type))
 
-        v = payoff.mean() * exp(-rd*t)
+        v = payoff.mean() * exp(-r_d*t)
         return v

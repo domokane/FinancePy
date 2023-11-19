@@ -57,8 +57,8 @@ class IborSwaption():
                  float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
@@ -87,8 +87,8 @@ class IborSwaption():
         self._float_dc_type = float_dc_type
 
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
 
         self._pv01 = None
         self._fwd_swap_rate = None
@@ -121,8 +121,8 @@ class IborSwaption():
                         self._float_freq_type,
                         self._float_dc_type,
                         self._cal_type,
-                        self._bd_adjust_type,
-                        self._dg_rule_type)
+                        self._bd_type,
+                        self._dg_type)
 
         k = self._fixed_coupon
 
@@ -309,8 +309,8 @@ class IborSwaption():
                         self._float_freq_type,
                         self._float_dc_type,
                         self._cal_type,
-                        self._bd_adjust_type,
-                        self._dg_rule_type)
+                        self._bd_type,
+                        self._dg_type)
 
         k = self._fixed_coupon
         s = swap_rate

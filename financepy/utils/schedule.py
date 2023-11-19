@@ -30,8 +30,8 @@ class Schedule:
                  termination_date: Date,
                  freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  adjust_termination_date: bool = True,  # Default is to adjust
                  end_of_month: bool = False,  # All flow dates are EOM if True
                  first_date=None,  # First coupon date
@@ -56,18 +56,20 @@ class Schedule:
         - If the EOM flag is false and the start date is 28 Feb then all
         unadjusted dates will fall on their respective EOM.
 
-        We then adjust all of the flow dates if they fall on a weekend or holiday
-        according to the calendar specified. These dates are adjusted in
-        accordance with the business date adjustment.
+        We then adjust all of the flow dates if they fall on a weekend or
+        holiday according to the calendar specified. These dates are adjusted
+        in accordance with the business date adjustment.
 
         The effective date is never adjusted as it is not a payment date.
         The termination date is not automatically business day adjusted in a
         swap - assuming it is a holiday date. This must be explicitly stated in
-        the trade confirm. However, it is adjusted in a CDS contract as standard.
+        the trade confirm. However, it is adjusted in a CDS contract as
+        standard.
 
-        Inputs first_date and next_to_last_date are for managing long payment stubs
-        at the start and end of the swap but *have not yet been implemented*. All
-        stubs are currently short, either at the start or end of swap. """
+        Inputs first_date and next_to_last_date are for managing long payment
+        stubs at the start and end of the swap but *have not yet been
+        implemented*. All stubs are currently short, either at the start or
+        end of swap. """
 
         check_argument_types(self.__init__, locals())
 
@@ -99,8 +101,8 @@ class Schedule:
 
         self._freq_type = freq_type
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
 
         self._adjust_termination_date = adjust_termination_date
 
@@ -113,7 +115,7 @@ class Schedule:
 
         self._generate()
 
-    ###############################################################################
+    ###########################################################################
 
     def schedule_dates(self):
         """ Returns a list of the schedule of Dates. """
@@ -123,7 +125,7 @@ class Schedule:
 
         return self._adjusted_dates
 
-    ###############################################################################
+    ###########################################################################
 
     def _generate(self):
         """ Generate schedule of dates according to specified date generation
@@ -137,7 +139,7 @@ class Schedule:
         unadjusted_schedule_dates = []
         self._adjusted_dates = []
 
-        if self._dg_rule_type == DateGenRuleTypes.BACKWARD:
+        if self._dg_type == DateGenRuleTypes.BACKWARD:
 
             next_date = self._termination_date
             flow_num = 0
@@ -166,13 +168,13 @@ class Schedule:
             # termination date to fall on business days according to their cal
             for i in range(1, flow_num - 1):
                 dt = calendar.adjust(unadjusted_schedule_dates[flow_num - i - 1],
-                                     self._bd_adjust_type)
+                                     self._bd_type)
 
                 self._adjusted_dates.append(dt)
 
             self._adjusted_dates.append(self._termination_date)
 
-        elif self._dg_rule_type == DateGenRuleTypes.FORWARD:
+        elif self._dg_type == DateGenRuleTypes.FORWARD:
 
             # This needs checking
             next_date = self._effective_date
@@ -190,7 +192,7 @@ class Schedule:
             # The effective date is not adjusted as it is given
             for i in range(1, flow_num):
                 dt = calendar.adjust(unadjusted_schedule_dates[i],
-                                     self._bd_adjust_type)
+                                     self._bd_type)
 
                 self._adjusted_dates.append(dt)
 
@@ -205,7 +207,7 @@ class Schedule:
         if self._adjust_termination_date is True:
 
             self._termination_date = calendar.adjust(self._termination_date,
-                                                     self._bd_adjust_type)
+                                                     self._bd_type)
 
             self._adjusted_dates[-1] = self._termination_date
 
@@ -234,7 +236,7 @@ class Schedule:
 
         return self._adjusted_dates
 
-    ##############################################################################
+    ###########################################################################
 
     def __repr__(self):
         """ Print out the details of the schedule and the actual dates. This
@@ -245,8 +247,8 @@ class Schedule:
         s += label_to_string("END DATE", self._termination_date)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
-        s += label_to_string("DATEGENRULE", self._dg_rule_type)
+        s += label_to_string("BUSDAYRULE", self._bd_type)
+        s += label_to_string("DATEGENRULE", self._dg_type)
         s += label_to_string("ADJUST TERM DATE", self._adjust_termination_date)
         s += label_to_string("END OF MONTH", self._end_of_month, "")
 
@@ -262,7 +264,7 @@ class Schedule:
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """ Print out the details of the schedule and the actual dates. This

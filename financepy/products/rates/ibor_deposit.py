@@ -42,7 +42,7 @@ class IborDeposit:
                  dc_type: DayCountTypes,  # How year fraction is calculated
                  notional: float = 100.0,  # Amount borrowed
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,  # Maturity date
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Libor deposit object which takes the start date when
         the amount of notional is borrowed, a maturity date or a tenor and the
         deposit rate. If a tenor is used then this is added to the start
@@ -54,7 +54,7 @@ class IborDeposit:
         check_argument_types(self.__init__, locals())
 
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
@@ -64,7 +64,7 @@ class IborDeposit:
         calendar = Calendar(self._cal_type)
 
         maturity_date = calendar.adjust(maturity_date,
-                                        self._bd_adjust_type)
+                                        self._bd_type)
         if start_date > maturity_date:
             raise FinError("Start date cannot be after maturity date")
 
@@ -132,7 +132,7 @@ class IborDeposit:
         s += label_to_string("DEPOSIT RATE", self._deposit_rate)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_adjust_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
         return s
 
     ###########################################################################

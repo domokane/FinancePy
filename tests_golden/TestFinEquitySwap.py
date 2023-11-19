@@ -34,8 +34,8 @@ def test_equity_swap_at_inception():
     return_type = ReturnTypes.TOTAL_RETURN
     notional = ONE_MILLION
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     rate_spread = 0
 
@@ -63,8 +63,8 @@ def test_equity_swap_at_inception():
                              rate_spread,
                              payment_lag,
                              cal_type,
-                             bd_adjust_type,
-                             dg_rule_type)
+                             bd_type,
+                             dg_type)
 
     value = equity_swap.value(effective_date,
                               discount_curve,
@@ -89,8 +89,8 @@ def test_equity_swap_not_in_inception():
     return_type = ReturnTypes.TOTAL_RETURN
     notional = ONE_MILLION
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     rate_spread = 0
 
@@ -131,8 +131,8 @@ def test_equity_swap_not_in_inception():
                              rate_spread,
                              payment_lag,
                              cal_type,
-                             bd_adjust_type,
-                             dg_rule_type)
+                             bd_type,
+                             dg_type)
 
     value = equity_swap.value(value_date,
                               discount_curve,
@@ -155,8 +155,8 @@ def test_equity_swap_with_dividends():
     return_type = ReturnTypes.TOTAL_RETURN
     notional = ONE_MILLION
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     rate_spread = 0
 
@@ -180,8 +180,8 @@ def test_equity_swap_with_dividends():
                                     payment_lag,
                                     return_type,
                                     cal_type,
-                                    bd_adjust_type,
-                                    dg_rule_type)
+                                    bd_type,
+                                    dg_type)
 
     value_higher_disc = equity_swap_leg.value(effective_date,
                                               discount_curve,

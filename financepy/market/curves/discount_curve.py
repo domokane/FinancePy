@@ -131,27 +131,27 @@ class DiscountCurve:
         f = annual_frequency(freq_type)
 
         if isinstance(maturityDts, Date):
-            dateList = [maturityDts]
+            date_list = [maturityDts]
         else:
-            dateList = maturityDts
+            date_list = maturityDts
 
         if isinstance(dfs, float):
-            dfList = [dfs]
+            df_list = [dfs]
         else:
-            dfList = dfs
+            df_list = dfs
 
-        if len(dateList) != len(dfList):
+        if len(date_list) != len(df_list):
             raise FinError("Date list and df list do not have same length")
 
-        num_dates = len(dateList)
+        num_dates = len(date_list)
         zero_rates = []
 
         times = times_from_dates(
-            dateList, self._value_date, dc_type)
+            date_list, self._value_date, dc_type)
 
         for i in range(0, num_dates):
 
-            df = dfList[i]
+            df = df_list[i]
 
             t = max(times[i], gSmall)
 
@@ -240,7 +240,7 @@ class DiscountCurve:
         else:
             maturity_dates = maturity_date
 
-        parRates = []
+        par_rates = []
 
         for maturityDt in maturity_dates:
 
@@ -266,19 +266,19 @@ class DiscountCurve:
                 prev_dt = next_dt
 
             if abs(pv01) < gSmall:
-                parRate = 0.0
+                par_rate = 0.0
             else:
-                dfStart = self.df(effective_date)
-                parRate = (dfStart - df) / pv01
+                df_start = self.df(effective_date)
+                par_rate = (df_start - df) / pv01
 
-            parRates.append(parRate)
+            par_rates.append(par_rate)
 
-        parRates = np.array(parRates)
+        par_rates = np.array(par_rates)
 
         if isinstance(maturity_date, Date):
-            return parRates[0]
+            return par_rates[0]
         else:
-            return parRates
+            return par_rates
 
     ###########################################################################
 

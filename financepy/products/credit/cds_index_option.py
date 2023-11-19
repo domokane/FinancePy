@@ -39,8 +39,8 @@ class CDSIndexOption:
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Initialisation of the class object. Note that a large number of the
         inputs are set to default values in line with the standard contract."""
 
@@ -63,10 +63,10 @@ class CDSIndexOption:
         self._long_protection = long_protection
 
         self._dc_type = dc_type
-        self._dg_rule_type = dg_rule_type
+        self._dg_type = dg_type
         self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         self._cds_contract = CDS(self._expiry_date,
                                  self._maturity_date,
@@ -76,8 +76,8 @@ class CDSIndexOption:
                                  self._freq_type,
                                  self._dc_type,
                                  self._cal_type,
-                                 self._bd_adjust_type,
-                                 self._dg_rule_type)
+                                 self._bd_type,
+                                 self._dg_type)
 
 ###############################################################################
 
@@ -357,8 +357,8 @@ class CDSIndexOption:
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAYCOUNT", self._dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
-        s += label_to_string("DATEGENRULE", self._dg_rule_type)
+        s += label_to_string("BUSDAYRULE", self._bd_type)
+        s += label_to_string("DATEGENRULE", self._dg_type)
         return s
 
 ###############################################################################

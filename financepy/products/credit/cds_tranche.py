@@ -56,8 +56,8 @@ class CDSTranche:
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
 
         check_argument_types(self.__init__, locals())
 
@@ -73,10 +73,10 @@ class CDSTranche:
         self._running_coupon = running_coupon
         self._long_protection = long_protection
         self._dc_type = dc_type
-        self._dg_rule_type = dg_rule_type
+        self._dg_type = dg_type
         self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         notional = 1.0
 
@@ -88,8 +88,8 @@ class CDSTranche:
                                  self._freq_type,
                                  self._dc_type,
                                  self._cal_type,
-                                 self._bd_adjust_type,
-                                 self._dg_rule_type)
+                                 self._bd_type,
+                                 self._dg_type)
 
     ###########################################################################
 

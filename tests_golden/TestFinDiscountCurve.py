@@ -68,14 +68,14 @@ def test_FinDiscountCurve():
         curve = DiscountCurve(start_date, dates, dfs, interp)
         fwd_rates = curve.fwd(plotDates)
         zero_rates = curve.zero_rate(plotDates, FrequencyTypes.ANNUAL)
-        parRates = curve.swap_rate(
+        par_rates = curve.swap_rate(
             start_date, plotDates, FrequencyTypes.ANNUAL)
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))
             plt.plot(plotYears, scale(fwd_rates, 100), label='FWD RATES')
             plt.plot(plotYears, scale(zero_rates, 100), label='ZERO RATES')
-            plt.plot(plotYears, scale(parRates, 100), label='PAR RATES')
+            plt.plot(plotYears, scale(par_rates, 100), label='PAR RATES')
             plt.ylim((3.0, 8.5))
 
             plt.title('Forward Curves using ' + str(interp))

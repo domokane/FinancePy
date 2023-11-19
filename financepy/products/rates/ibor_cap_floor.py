@@ -59,14 +59,14 @@ class IborCapFloor():
                  dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
                  notional: float = ONE_MILLION,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Initialise IborCapFloor object. """
 
         check_argument_types(self.__init__, locals())
 
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
@@ -74,7 +74,7 @@ class IborCapFloor():
             maturity_date = start_date.add_tenor(maturity_date_or_tenor)
             calendar = Calendar(self._cal_type)
             maturity_date = calendar.adjust(maturity_date,
-                                            self._bd_adjust_type)
+                                            self._bd_type)
 
         if start_date > maturity_date:
             raise FinError("Start date must be before maturity date")
@@ -87,7 +87,7 @@ class IborCapFloor():
         self._freq_type = freq_type
         self._dc_type = dc_type
         self._notional = notional
-        self._dg_rule_type = dg_rule_type
+        self._dg_type = dg_type
 
         self._capFloorLetValues = []
         self._capFloorLetAlphas = []
@@ -107,8 +107,8 @@ class IborCapFloor():
                             self._maturity_date,
                             self._freq_type,
                             self._cal_type,
-                            self._bd_adjust_type,
-                            self._dg_rule_type)
+                            self._bd_type,
+                            self._dg_type)
 
         self._capFloorLetDates = schedule._adjusted_dates
 

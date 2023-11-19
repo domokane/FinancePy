@@ -207,8 +207,8 @@ class CDS:
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a CDS from the step-in date, maturity date and coupon """
 
         check_argument_types(self.__init__, locals())
@@ -231,10 +231,10 @@ class CDS:
         self._notional = notional
         self._long_protection = long_protection
         self._dc_type = dc_type
-        self._dg_rule_type = dg_rule_type
+        self._dg_type = dg_type
         self._cal_type = cal_type
         self._freq_type = freq_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         self._generate_adjusted_cds_payment_dates()
         self._calc_flows()
@@ -256,7 +256,7 @@ class CDS:
         # We generate unadjusted dates - not adjusted for weekends or holidays
         unadjusted_schedule_dates = []
 
-        if self._dg_rule_type == DateGenRuleTypes.BACKWARD:
+        if self._dg_type == DateGenRuleTypes.BACKWARD:
 
             # We start at end date and step backwards
 
@@ -275,7 +275,7 @@ class CDS:
             adjusted_dates = []
 
             for date in reversed(unadjusted_schedule_dates):
-                adjusted = calendar.adjust(date, self._bd_adjust_type)
+                adjusted = calendar.adjust(date, self._bd_type)
                 adjusted_dates.append(adjusted)
 
 # eg: https://www.cdsmodel.com/assets/cds-model/docs/Standard%20CDS%20Examples.pdf
@@ -283,7 +283,7 @@ class CDS:
 # Accrual Start = [22-DEC-2008, 20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009]
 # Accrual End   = [19-MAR-2009, 21-JUN-2009, 20-SEP-2009, 20-DEC-2009, 20-MAR-2010]
 
-        elif self._dg_rule_type == DateGenRuleTypes.FORWARD:
+        elif self._dg_type == DateGenRuleTypes.FORWARD:
 
             # We start at start date and step forwards
 
@@ -300,7 +300,7 @@ class CDS:
 
             adjusted_dates = []
             for date in unadjusted_schedule_dates:
-                adjusted = calendar.adjust(date, self._bd_adjust_type)
+                adjusted = calendar.adjust(date, self._bd_type)
                 adjusted_dates.append(adjusted)
 
     # eg. Date(20, 2, 2009) to Date(20, 3, 2010) with DateGenRuleTypes.FORWARD
@@ -311,7 +311,7 @@ class CDS:
         else:
 
             raise FinError("Unknown DateGenRuleType:"
-                           + str(self._dg_rule_type))
+                           + str(self._dg_type))
 
         # We only include dates which fall after the CDS start date
         self._payment_dates = adjusted_dates[1:]
@@ -796,8 +796,8 @@ class CDS:
         s += label_to_string("DAYCOUNT", self._dc_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
-        s += label_to_string("DATEGENRULE", self._dg_rule_type)
+        s += label_to_string("BUSDAYRULE", self._bd_type)
+        s += label_to_string("DATEGENRULE", self._dg_type)
         s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
         header = "PAYMENT_DATE, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"

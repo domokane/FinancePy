@@ -41,8 +41,8 @@ class EquityCliquetOption(EquityOption):
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create the EquityCliquetOption by passing in the start date
         and the end date and whether it is a call or a put. Some additional
         data is needed in order to calculate the individual payments. """
@@ -62,15 +62,15 @@ class EquityCliquetOption(EquityOption):
         self._freq_type = freq_type
         self._dc_type = day_count_type
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
 
         self._expiry_dates = Schedule(self._start_date,
                                       self._final_expiry_date,
                                       self._freq_type,
                                       self._cal_type,
-                                      self._bd_adjust_type,
-                                      self._dg_rule_type)._generate()
+                                      self._bd_type,
+                                      self._dg_type)._generate()
 
 ###############################################################################
 
@@ -171,9 +171,9 @@ class EquityCliquetOption(EquityOption):
         s += label_to_string("FREQUENCY TYPE", self._freq_type)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("CALENDAR TYPE", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_adjust_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
         s += label_to_string("DATE GEN RULE TYPE",
-                             self._dg_rule_type, "")
+                             self._dg_type, "")
         return s
 
 ###############################################################################

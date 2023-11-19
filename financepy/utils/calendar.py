@@ -101,21 +101,21 @@ class Calendar:
 
     def adjust(self,
                dt: Date,
-               bd_adjust_type: BusDayAdjustTypes):
+               bd_type: BusDayAdjustTypes):
         """ Adjust a payment date if it falls on a holiday according to the
         specified business day convention. """
 
-        if type(bd_adjust_type) != BusDayAdjustTypes:
-            raise FinError("Invalid type passed. Need Finbd_adjust_type")
+        if type(bd_type) != BusDayAdjustTypes:
+            raise FinError("Invalid type passed. Need Finbd_type")
 
         # If calendar type is NONE then every day is a business day
         if self._cal_type == CalendarTypes.NONE:
             return dt
 
-        if bd_adjust_type == BusDayAdjustTypes.NONE:
+        if bd_type == BusDayAdjustTypes.NONE:
             return dt
 
-        elif bd_adjust_type == BusDayAdjustTypes.FOLLOWING:
+        elif bd_type == BusDayAdjustTypes.FOLLOWING:
 
             # step forward until we find a business day
             while self.is_business_day(dt) is False:
@@ -123,7 +123,7 @@ class Calendar:
 
             return dt
 
-        elif bd_adjust_type == BusDayAdjustTypes.MODIFIED_FOLLOWING:
+        elif bd_type == BusDayAdjustTypes.MODIFIED_FOLLOWING:
 
             d_start = dt._d
             m_start = dt._m
@@ -143,7 +143,7 @@ class Calendar:
 
             return dt
 
-        elif bd_adjust_type == BusDayAdjustTypes.PRECEDING:
+        elif bd_type == BusDayAdjustTypes.PRECEDING:
 
             # if the business day is in the next month look back
             # for previous first business day one day at a time
@@ -152,7 +152,7 @@ class Calendar:
 
             return dt
 
-        elif bd_adjust_type == BusDayAdjustTypes.MODIFIED_PRECEDING:
+        elif bd_type == BusDayAdjustTypes.MODIFIED_PRECEDING:
 
             d_start = dt._d
             m_start = dt._m
@@ -175,7 +175,7 @@ class Calendar:
         else:
 
             raise FinError("Unknown adjustment convention" +
-                           str(bd_adjust_type))
+                           str(bd_type))
 
         return dt
 

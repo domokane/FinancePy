@@ -26,11 +26,11 @@ class FXDoubleDigitalOption:
                  notional: float,
                  prem_currency: str,
                  spot_days: int = 0):
-        """ Create the FX Double Digital Option object. Inputs include 
-        expiry date, upper strike, lower strike, currency pair, 
-        option type notional and the currency of the notional. 
-        An adjustment for spot days is enabled. All currency rates 
-        must be entered in the price in domestic currency of one unit 
+        """ Create the FX Double Digital Option object. Inputs include
+        expiry date, upper strike, lower strike, currency pair,
+        option type notional and the currency of the notional.
+        An adjustment for spot days is enabled. All currency rates
+        must be entered in the price in domestic currency of one unit
         of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
         same for the domestic currency. """
@@ -47,7 +47,7 @@ class FXDoubleDigitalOption:
 
         if np.any(upper_strike < 0.0):
             raise FinError("Negative upper strike.")
-        
+
         if np.any(lower_strike < 0.0):
             raise FinError("Negative lower strike.")
 
@@ -78,7 +78,7 @@ class FXDoubleDigitalOption:
               dom_discount_curve,
               for_discount_curve,
               model):
-        """ Valuation of a double digital option using Black-Scholes model. 
+        """ Valuation of a double digital option using Black-Scholes model.
         The option pays out the notional in the premium currency if the
         fx rate is between the upper and lower strike at maturity. The
         valuation is equivalent to the valuation of the difference of
@@ -119,8 +119,8 @@ class FXDoubleDigitalOption:
         domDF = dom_discount_curve._df(tdel)
         forDF = for_discount_curve._df(tdel)
 
-        rd = -np.log(domDF) / tdel
-        rf = -np.log(forDF) / tdel
+        r_d = -np.log(domDF) / tdel
+        r_f = -np.log(forDF) / tdel
 
         S0 = spot_fx_rate
         K1 = self._lower_strike
@@ -133,16 +133,16 @@ class FXDoubleDigitalOption:
             lnS0k2 = np.log(S0 / K2)
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
-            mu = rd - rf
+            mu = r_d - r_f
             lower_d2 = (lnS0k1 + (mu - v2 / 2.0) * tdel) / den
             upper_d2 = (lnS0k2 + (mu - v2 / 2.0) * tdel) / den
 
             if self._prem_currency == self._forName:
-                lower_digital = S0 * np.exp(-rf * tdel) * n_vect(-lower_d2)
-                upper_digital = S0 * np.exp(-rf * tdel) * n_vect(-upper_d2)
+                lower_digital = S0 * np.exp(-r_f * tdel) * n_vect(-lower_d2)
+                upper_digital = S0 * np.exp(-r_f * tdel) * n_vect(-upper_d2)
             elif self._prem_currency == self._domName:
-                lower_digital = np.exp(-rf * tdel) * n_vect(-lower_d2)
-                upper_digital = np.exp(-rf * tdel) * n_vect(-upper_d2)
+                lower_digital = np.exp(-r_f * tdel) * n_vect(-lower_d2)
+                upper_digital = np.exp(-r_f * tdel) * n_vect(-upper_d2)
 
             v = (upper_digital - lower_digital) * self._notional
 

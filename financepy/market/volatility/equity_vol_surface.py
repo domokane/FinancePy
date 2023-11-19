@@ -453,8 +453,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def volatility_from_delta_date(self, call_delta, expiry_date,
-                                   delta_method=None):
+    def vol_from_delta_date(self, call_delta, expiry_date, delta_method=None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are

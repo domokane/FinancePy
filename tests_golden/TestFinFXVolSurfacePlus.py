@@ -281,7 +281,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             for delta in deltas:
                 volSmile = []
                 for dt in dates:
-                    (vol, k) = fxMarketPlus.volatility_from_delta_date(delta, dt)
+                    (vol, k) = fxMarketPlus.vol_from_delta_date(delta, dt)
                     volSmile.append(vol*100.0)
                     print(delta, k, dt, vol*100.0)
 
@@ -376,7 +376,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
             for delta in deltas:
                 volSmile = []
                 for dt in dates:
-                    (vol, k) = fxMarketPlus.volatility_from_delta_date(delta, dt)
+                    (vol, k) = fxMarketPlus.vol_from_delta_date(delta, dt)
                     volSmile.append(vol*100.0)
                     print(delta, k, dt, vol*100.0)
 

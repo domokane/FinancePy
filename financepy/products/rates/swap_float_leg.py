@@ -33,8 +33,8 @@ class SwapFloatLeg:
                  principal: float = 0.0,
                  payment_lag: int = 0,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create the fixed leg of a swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
@@ -50,7 +50,7 @@ class SwapFloatLeg:
         calendar = Calendar(cal_type)
 
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bd_adjust_type)
+                                              bd_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -67,8 +67,8 @@ class SwapFloatLeg:
 
         self._dc_type = dc_type
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
         self._end_of_month = end_of_month
 
         self._startAccruedDates = []
@@ -90,8 +90,8 @@ class SwapFloatLeg:
                             self._termination_date,
                             self._freq_type,
                             self._cal_type,
-                            self._bd_adjust_type,
-                            self._dg_rule_type,
+                            self._bd_type,
+                            self._dg_type,
                             end_of_month=self._end_of_month)
 
         scheduleDates = schedule._adjusted_dates
@@ -187,9 +187,9 @@ class SwapFloatLeg:
 
                 else:
 
-                    dfStart = index_curve.df(startAccruedDt)
+                    df_start = index_curve.df(startAccruedDt)
                     dfEnd = index_curve.df(endAccruedDt)
-                    fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
+                    fwd_rate = (df_start / dfEnd - 1.0) / index_alpha
 
                 pmntAmount = (fwd_rate + self._spread) * pay_alpha * self._notional_array[iPmnt]
 
@@ -308,8 +308,8 @@ class SwapFloatLeg:
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY COUNT", self._dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 
 ###############################################################################

@@ -41,8 +41,8 @@ class IborBasisSwap:
                  leg2Spread: float = 0.0,
                  notional: float = ONE_MILLION,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
@@ -62,7 +62,7 @@ class IborBasisSwap:
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bd_adjust_type)
+                                              bd_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -84,8 +84,8 @@ class IborBasisSwap:
                                        principal,
                                        payment_lag,
                                        cal_type,
-                                       bd_adjust_type,
-                                       dg_rule_type)
+                                       bd_type,
+                                       dg_type)
 
         self._floatLeg2 = SwapFloatLeg(effective_date,
                                        self._termination_date,
@@ -97,8 +97,8 @@ class IborBasisSwap:
                                        principal,
                                        payment_lag,
                                        cal_type,
-                                       bd_adjust_type,
-                                       dg_rule_type)
+                                       bd_type,
+                                       dg_type)
 
 ###############################################################################
 

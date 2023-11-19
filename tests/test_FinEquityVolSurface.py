@@ -54,18 +54,18 @@ def test_equity_vol_surface():
 
     expiry_date = expiry_dates[0]
     delta = 0.10
-    vol = equitySurface.volatility_from_delta_date(delta, expiry_date)
+    vol = equitySurface.vol_from_delta_date(delta, expiry_date)
     assert round(vol[0], 4) == 0.1544
     assert round(vol[1], 4) == 4032.9156
 
     expiry_date = expiry_dates[1]
     delta = 0.20
-    vol = equitySurface.volatility_from_delta_date(delta, expiry_date)
+    vol = equitySurface.vol_from_delta_date(delta, expiry_date)
     assert round(vol[0], 4) == 0.1555
     assert round(vol[1], 4) == 4019.3793
 
     expiry_date = expiry_dates[6]
     delta = 0.90
-    vol = equitySurface.volatility_from_delta_date(delta, expiry_date)
+    vol = equitySurface.vol_from_delta_date(delta, expiry_date)
     assert round(vol[0], 4) == 0.3498
     assert round(vol[1], 4) == 2199.6665

@@ -66,8 +66,8 @@
 #                  float_frequency_type=FrequencyTypes.QUARTERLY,
 #                  float_dc_type=DayCountTypes.THIRTY_E_360,
 #                  cal_type=CalendarTypes.WEEKEND,
-#                  bd_adjust_type=BusDayAdjustTypes.FOLLOWING,
-#                  dg_rule_type=DateGenRuleTypes.BACKWARD):
+#                  bd_type=BusDayAdjustTypes.FOLLOWING,
+#                  dg_type=DateGenRuleTypes.BACKWARD):
 #         """ Create a Bermudan swaption contract. This is an option to enter
 #         into a swap at a fixed coupon on all of the fixed leg coupon dates
 #         until the exercise date. """
@@ -101,15 +101,15 @@
 #         if cal_type not in CalendarTypes:
 #             raise FinError("Unknown Calendar type " + str(cal_type))
 
-#         if bd_adjust_type not in BusDayAdjustTypes:
+#         if bd_type not in BusDayAdjustTypes:
 #             raise FinError(
 #                 "Unknown Business Day Adjust type " +
-#                 str(bd_adjust_type))
+#                 str(bd_type))
 
-#         if dg_rule_type not in DateGenRuleTypes:
+#         if dg_type not in DateGenRuleTypes:
 #             raise FinError(
 #                 "Unknown Date Gen Rule type " +
-#                 str(dg_rule_type))
+#                 str(dg_type))
 
 #         self._exercise_date = exercise_date
 #         self._maturity_date = maturity_date
@@ -121,8 +121,8 @@
 #         self._float_dc_type = float_dc_type
 
 #         self._cal_type = cal_type
-#         self._bd_adjust_type = bd_adjust_type
-#         self._dg_rule_type = dg_rule_type
+#         self._bd_type = bd_type
+#         self._dg_type = dg_type
 
 #         self._pv01 = None
 #         self._fwd_swap_rate = None
@@ -153,8 +153,8 @@
 #                             self._float_dc_type,
 #                             payFixedFlag,
 #                             self._cal_type,
-#                             self._bd_adjust_type,
-#                             self._dg_rule_type)
+#                             self._bd_type,
+#                             self._dg_type)
 
 #         swap.generate_flows()
 #         cpn_times = []

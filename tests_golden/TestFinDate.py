@@ -163,17 +163,17 @@ def test_DateSpeed():
 
     num_steps = 100
     start = time.time()
-    dateList = []
+    date_list = []
     for _ in range(0, num_steps):
         start_date = Date(1, 1, 2010)
-        dateList.append(start_date)
+        date_list.append(start_date)
     end = time.time()
     elapsed = end - start
 
     testCases.header("LABEL", "TIME")
     testCases.print("TIMING", elapsed)
 
-    mem = sys.getsizeof(dateList)
+    mem = sys.getsizeof(date_list)
     testCases.print("Mem:", mem)
 
 

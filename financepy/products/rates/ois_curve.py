@@ -587,17 +587,17 @@ class OISCurve(DiscountCurve):
     #             prev_dt = next_dt
 
     #         if abs(pv01) < gSmall:
-    #             parRate = None
+    #             par_rate = None
     #         else:
-    #             dfStart = self.df(start_date)
-    #             parRate = (dfStart - df) / pv01
+    #             df_start = self.df(start_date)
+    #             par_rate = (df_start - df) / pv01
 
-    #         parRates.append(parRate)
+    #         par_rates.append(par_rate)
 
     #     if isinstance(maturity_date, Date):
-    #         return parRates[0]
+    #         return par_rates[0]
     #     else:
-    #         return parRates
+    #         return par_rates
 
 ###############################################################################
 

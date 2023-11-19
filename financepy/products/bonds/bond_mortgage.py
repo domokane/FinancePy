@@ -37,8 +37,8 @@ class BondMortgage:
                  principal: float,
                  freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Create the mortgage using start and end dates and principal. """
 
@@ -52,16 +52,16 @@ class BondMortgage:
         self._principal = principal
         self._freq_type = freq_type
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
         self._day_count_convention_type = day_count_convention_type
 
         self._schedule = Schedule(start_date,
                                   end_date,
                                   self._freq_type,
                                   self._cal_type,
-                                  self._bd_adjust_type,
-                                  self._dg_rule_type)
+                                  self._bd_type,
+                                  self._dg_type)
 
 ###############################################################################
 
@@ -118,8 +118,8 @@ class BondMortgage:
         print("MORTGAGE TYPE:", self._mortgage_type)
         print("FREQUENCY:", self._freq_type)
         print("CALENDAR:", self._cal_type)
-        print("BUSDAYRULE:", self._bd_adjust_type)
-        print("DATEGENRULE:", self._dg_rule_type)
+        print("BUSDAYRULE:", self._bd_type)
+        print("DATEGENRULE:", self._dg_type)
 
         num_flows = len(self._schedule._adjusted_dates)
 
@@ -145,8 +145,8 @@ class BondMortgage:
         s += label_to_string("MORTGAGE TYPE", self._mortgage_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_adjust_type)
-        s += label_to_string("DATEGENRULE", self._dg_rule_type)
+        s += label_to_string("BUSDAYRULE", self._bd_type)
+        s += label_to_string("DATEGENRULE", self._dg_type)
         return s
 
 ###############################################################################

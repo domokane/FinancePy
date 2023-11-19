@@ -54,8 +54,8 @@ class CDSOption:
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a FinCDSOption object with the option expiry date, the
         maturity date of the underlying CDS, the option strike coupon,
         notional, whether the option knocks out or not in the event of a credit
@@ -79,8 +79,8 @@ class CDSOption:
         self._freq_type = freq_type
         self._dc_type = dc_type
         self._cal_type = cal_type
-        self._businessDateAdjustType = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._businessDateAdjustType = bd_type
+        self._dg_type = dg_type
 
 ###############################################################################
 
@@ -110,7 +110,7 @@ class CDSOption:
                   self._dc_type,
                   self._cal_type,
                   self._businessDateAdjustType,
-                  self._dg_rule_type)
+                  self._dg_type)
 
         strike = self._strike_coupon
         forward_spread = cds.par_spread(value_date, issuer_curve)

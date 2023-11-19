@@ -63,16 +63,16 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     termination_dateAdjust = True
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("BACKWARD SEMI-ANNUAL FREQUENCY", schedule)
@@ -81,15 +81,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.QUARTERLY
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("BACKWARD QUARTERLY FREQUENCY", schedule)
@@ -98,15 +98,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.MONTHLY
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("BACKWARD MONTHLY FREQUENCY", schedule)
@@ -119,15 +119,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.FORWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.FORWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("FORWARD ANNUAL", schedule)
@@ -136,15 +136,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type)
+                        bd_type,
+                        dg_type)
 
     dumpSchedule("FORWARD SEMI-ANNUAL", schedule)
 
@@ -152,15 +152,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.MONTHLY
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("FORWARD MONTHLY", schedule)
@@ -173,15 +173,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.QUARTERLY
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
     dumpSchedule("BACKWARD GEN WITH SHORT END STUB", schedule)
 
@@ -193,15 +193,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.QUARTERLY
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("BACKWARD GEN WITH VERY SHORT END STUB", schedule)
@@ -214,15 +214,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.FORWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.FORWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("FORWARD GEN WITH END STUB", schedule)
@@ -231,15 +231,15 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.QUARTERLY
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.FORWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.FORWARD
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type)
+                        bd_type,
+                        dg_type)
 
     dumpSchedule("FORWARD GEN WITH VERY SHORT END STUB", schedule)
 
@@ -247,16 +247,16 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     termination_dateAdjust = True
 
     schedule = Schedule(d1,
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust)
 
     dumpSchedule("TERMINATION DATE ADJUSTED", schedule)
@@ -265,8 +265,8 @@ def test_FinSchedule():
     d2 = Date(20, 6, 2020)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     termination_dateAdjust = True
     eomFlag = True
 
@@ -274,8 +274,8 @@ def test_FinSchedule():
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust,
                         eomFlag)
 
@@ -285,8 +285,8 @@ def test_FinSchedule():
     d2 = Date(30, 6, 2020)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     termination_dateAdjust = True
     eomFlag = True
 
@@ -294,8 +294,8 @@ def test_FinSchedule():
                         d2,
                         freq_type,
                         cal_type,
-                        bd_adjust_type,
-                        dg_rule_type,
+                        bd_type,
+                        dg_type,
                         termination_dateAdjust,
                         eomFlag)
 
@@ -320,8 +320,8 @@ def test_FinScheduleAlignment(eomFlag):
     value_date = Date(29, 3, 2005)
     effDate = value_date.add_tenor("2d")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     cal_type = CalendarTypes.UNITED_STATES
     adjust_termination_date = False
 
@@ -333,8 +333,8 @@ def test_FinScheduleAlignment(eomFlag):
 
     myCal = Calendar(cal_type)
 
-    adjustedMatDate1 = myCal.adjust(matDate1, bd_adjust_type)
-    adjustedMatDate2 = myCal.adjust(matDate2, bd_adjust_type)
+    adjustedMatDate1 = myCal.adjust(matDate1, bd_type)
+    adjustedMatDate2 = myCal.adjust(matDate2, bd_type)
 
 #    print(adjustedMatDate1)
 #    print(adjustedMatDate2)
@@ -343,8 +343,8 @@ def test_FinScheduleAlignment(eomFlag):
                       adjustedMatDate1,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -354,8 +354,8 @@ def test_FinScheduleAlignment(eomFlag):
                       adjustedMatDate2,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -380,8 +380,8 @@ def test_FinScheduleAlignmentLeapYearEOM():
     value_date = Date(26, 2, 2006)
     effDate = value_date.add_tenor("2D")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     cal_type = CalendarTypes.UNITED_STATES
     adjust_termination_date = True
 
@@ -393,8 +393,8 @@ def test_FinScheduleAlignmentLeapYearEOM():
                       matDate1,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -402,8 +402,8 @@ def test_FinScheduleAlignmentLeapYearEOM():
                       matDate2,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -425,8 +425,8 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
     value_date = Date(26, 2, 2006)
     effDate = value_date.add_tenor("2D")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     cal_type = CalendarTypes.UNITED_STATES
     adjust_termination_date = True
 
@@ -439,8 +439,8 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
                       matDate1,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -448,8 +448,8 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
                       matDate2,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -470,8 +470,8 @@ def test_FinScheduleAlignmentEff31():
     value_date = Date(29, 7, 2006)
     effDate = value_date.add_tenor("2D")
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     cal_type = CalendarTypes.UNITED_STATES
     adjust_termination_date = True
 
@@ -484,8 +484,8 @@ def test_FinScheduleAlignmentEff31():
                       matDate1,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 
@@ -493,8 +493,8 @@ def test_FinScheduleAlignmentEff31():
                       matDate2,
                       freq_type,
                       cal_type,
-                      bd_adjust_type,
-                      dg_rule_type,
+                      bd_type,
+                      dg_type,
                       adjust_termination_date,
                       eomFlag)
 

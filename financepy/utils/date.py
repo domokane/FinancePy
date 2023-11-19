@@ -314,19 +314,19 @@ class Date():
 
     @classmethod
     def from_date(cls, date: [datetime.date, np.datetime64]):
-        """  Create a Date from a python datetime.date object or from a 
-        Numpy datetime64 object. 
+        """  Create a Date from a python datetime.date object or from a
+        Numpy datetime64 object.
         Example Input:
         start_date = Date.from_date(datetime.date(2022, 11, 8)) """
 
         if isinstance(date, datetime.date):
             d, m, y = date.day, date.month, date.year
             return cls(d, m, y)
-        
+
         if isinstance(date, np.datetime64):
             timestamp = ((date - np.datetime64('1970-01-01T00:00:00'))
                  / np.timedelta64(1, 's'))
-            
+
             date = datetime.datetime.utcfromtimestamp(timestamp)
             d, m, y = date.day, date.month, date.year
             return cls(d, m, y)
@@ -560,7 +560,7 @@ class Date():
 
         num_months = len(mmVector)
 
-        dateList = []
+        date_list = []
 
         for i in range(0, num_months):
 
@@ -594,12 +594,12 @@ class Date():
                     d = monthDaysNotLeapYear[m-1]
 
             newDt = Date(d, m, y)
-            dateList.append(newDt)
+            date_list.append(newDt)
 
         if scalarFlag is True:
-            return dateList[0]
+            return date_list[0]
         else:
-            return dateList
+            return date_list
 
     ###########################################################################
 
@@ -620,7 +620,7 @@ class Date():
 
         numYears = len(yyVector)
 
-        dateList = []
+        date_list = []
 
         for i in range(0, numYears):
 
@@ -635,12 +635,12 @@ class Date():
             newDt = self.add_months(mmi)
             newDt = newDt.add_days(ddi)
 
-            dateList.append(newDt)
+            date_list.append(newDt)
 
         if scalarFlag is True:
-            return dateList[0]
+            return date_list[0]
         else:
-            return dateList
+            return date_list
 
     ##########################################################################
 
@@ -707,7 +707,7 @@ class Date():
 
     def next_imm_date(self):
         """ This function returns the next IMM date after the current date
-            This is a 3rd Wednesday of Jun, March, Sep or December. For an 
+            This is a 3rd Wednesday of Jun, March, Sep or December. For an
             IMM contract the IMM date is the First Delivery Date of the
             futures contract. """
 
@@ -977,15 +977,15 @@ def daily_working_day_schedule(self,
     """ Returns a list of working dates between start_date and end_date.
     This function should be replaced by dateRange once add_tenor allows
     for working days. """
-    dateList = []
+    date_list = []
 
     dt = start_date
-    dateList.append(dt)
+    date_list.append(dt)
     while dt < end_date:
         dt = dt.add_weekdays(1)
-        dateList.append(dt)
+        date_list.append(dt)
 
-    return dateList
+    return date_list
 
 ###############################################################################
 
@@ -1033,15 +1033,15 @@ def date_range(start_date: Date,
     if start_date > end_date:
         return []
 
-    dateList = []
+    date_list = []
 
     dt = start_date
     while dt < end_date:
-        dateList.append(dt)
+        date_list.append(dt)
         dt = dt.add_tenor(tenor)
-    dateList.append(end_date)
+    date_list.append(end_date)
 
-    return dateList
+    return date_list
 
 ###############################################################################
 

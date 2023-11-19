@@ -51,8 +51,8 @@ class IborLMMProducts():
                  float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed coupon and the details of the fixed and the
@@ -72,8 +72,8 @@ class IborLMMProducts():
                                    maturity_date,
                                    float_frequency_type,
                                    cal_type,
-                                   bd_adjust_type,
-                                   dg_rule_type)._generate()
+                                   bd_type,
+                                   dg_type)._generate()
 
         self._accrual_factors = []
         self._float_dc_type = float_dc_type
@@ -284,8 +284,8 @@ class IborLMMProducts():
                        float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                        float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                       bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                       dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                       bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                       dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Value a swaption in the LMM model using simulated paths of the
         forward curve. This relies on pricing the fixed leg of the swap and
         assuming that the floating leg will be worth par. As a result we only
@@ -303,8 +303,8 @@ class IborLMMProducts():
                                       maturity_date,
                                       float_frequency_type,
                                       cal_type,
-                                      bd_adjust_type,
-                                      dg_rule_type)._generate()
+                                      bd_type,
+                                      dg_type)._generate()
 
         for swaptionDt in swaptionFloatDates:
             foundDt = False
@@ -319,8 +319,8 @@ class IborLMMProducts():
                                       maturity_date,
                                       fixed_frequency_type,
                                       cal_type,
-                                      bd_adjust_type,
-                                      dg_rule_type)._generate()
+                                      bd_type,
+                                      dg_type)._generate()
 
         for swaptionDt in swaptionFixedDates:
             foundDt = False
@@ -366,16 +366,16 @@ class IborLMMProducts():
                         dc_type: DayCountTypes = DayCountTypes.ACT_360,
                         notional: float = ONE_MILLION,
                         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                        bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                        dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Value a cap or floor in the LMM. """
 
         capFloorDates = Schedule(settle_date,
                                  maturity_date,
                                  frequencyType,
                                  cal_type,
-                                 bd_adjust_type,
-                                 dg_rule_type)._generate()
+                                 bd_type,
+                                 dg_type)._generate()
 
         for capFloorletDt in capFloorDates:
             foundDt = False

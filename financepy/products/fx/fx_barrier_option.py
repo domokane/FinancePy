@@ -96,13 +96,13 @@ class FXBarrierOption(FXOption):
 
         dq = for_discount_curve._df(t)
         df = dom_discount_curve._df(t)
-        rd = -log(df) / t
+        r_d = -log(df) / t
         rf = -log(dq) / t
 
         volatility = model._volatility
         sigmaRootT = volatility * sqrtT
         v2 = volatility * volatility
-        mu = rd - rf
+        mu = r_d - rf
         d1 = (lnS0k + (mu + v2 / 2.0) * t) / sigmaRootT
         d2 = (lnS0k + (mu - v2 / 2.0) * t) / sigmaRootT
 
@@ -252,7 +252,7 @@ class FXBarrierOption(FXOption):
 
         return price
 
-    ###############################################################################
+    ###########################################################################
 
     def value_mc(self,
                  value_date,
@@ -274,7 +274,7 @@ class FXBarrierOption(FXOption):
 
         process = FinProcessSimulator()
 
-        rd = dom_interest_rate
+        r_d = dom_interest_rate
 
         #######################################################################
 
@@ -308,13 +308,13 @@ class FXBarrierOption(FXOption):
         if simple_call:
             sT = Sall[:, -1]
             c = (np.maximum(sT - K, 0.0)).mean()
-            c = c * exp(-rd * t)
+            c = c * exp(-r_d * t)
             return c
 
         if simple_put:
             sT = Sall[:, -1]
             p = (np.maximum(K - sT, 0.0)).mean()
-            p = p * exp(-rd * t)
+            p = p * exp(-r_d * t)
             return p
 
         # Get full set of paths
@@ -373,7 +373,7 @@ class FXBarrierOption(FXOption):
             raise FinError("Unknown barrier option type." +
                            str(self._option_type))
 
-        v = payoff.mean() * exp(-rd * t)
+        v = payoff.mean() * exp(-r_d * t)
 
         return v
 

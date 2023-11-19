@@ -35,8 +35,8 @@ class EquitySwapLeg:
                  payment_lag: int = 0,
                  return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create the equity leg of a swap contract giving the contract start
         date, its maturity, underlying strike price and quantity, payment
@@ -51,7 +51,7 @@ class EquitySwapLeg:
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(termination_date,
-                                              bd_adjust_type)
+                                              bd_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Effective date after maturity date")
@@ -79,8 +79,8 @@ class EquitySwapLeg:
 
         self._dc_type = dc_type
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
         self._end_of_month = end_of_month
 
         self._startAccruedDates = []
@@ -104,8 +104,8 @@ class EquitySwapLeg:
                             self._maturity_date,
                             self._freq_type,
                             self._cal_type,
-                            self._bd_adjust_type,
-                            self._dg_rule_type,
+                            self._bd_type,
+                            self._dg_type,
                             end_of_month=self._end_of_month)
 
         scheduleDates = schedule._adjusted_dates
@@ -207,16 +207,16 @@ class EquitySwapLeg:
                 index_alpha = index_day_counter.year_frac(startAccruedDt,
                                                           endAccruedDt)[0]
 
-                dfStart = index_curve.df(startAccruedDt)
+                df_start = index_curve.df(startAccruedDt)
                 dfEnd = index_curve.df(endAccruedDt)
-                fwd_rate = (dfStart / dfEnd - 1.0) / index_alpha
+                fwd_rate = (df_start / dfEnd - 1.0) / index_alpha
 
                 divStart = dividend_curve.df(startAccruedDt)
                 divEnd = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
 
                 # Equity discount derived from index and div curves
-                eq_fwd_rate = ((dfStart / dfEnd) * (divStart / divEnd) - 1.0) / index_alpha
+                eq_fwd_rate = ((df_start / dfEnd) * (divStart / divEnd) - 1.0) / index_alpha
 
                 self._fwd_rates.append(fwd_rate)
                 self._div_fwd_rates.append(div_fwd_rate)
@@ -339,8 +339,8 @@ class EquitySwapLeg:
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY COUNT", self._dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 
 

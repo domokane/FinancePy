@@ -28,8 +28,8 @@ class BondAnnuity:
                  cpn: float,
                  freq_type: FrequencyTypes,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360):
 
         check_argument_types(self.__init__, locals())
@@ -41,8 +41,8 @@ class BondAnnuity:
 
         # ISDA Style conventions
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
         self._day_count_convention_type = day_count_convention_type
 
         self._par = 100.0
@@ -102,15 +102,15 @@ class BondAnnuity:
             raise FinError("Settlement date is maturity date.")
 
         self._settle_date = settle_date
-        bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-        dg_rule_type = DateGenRuleTypes.BACKWARD
+        bd_type = BusDayAdjustTypes.FOLLOWING
+        dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dates = Schedule(settle_date,
                                    self._maturity_date,
                                    self._freq_type,
                                    self._cal_type,
-                                   bd_adjust_type,
-                                   dg_rule_type)._generate()
+                                   bd_type,
+                                   dg_type)._generate()
 
         self._pcd = self._cpn_dates[0]
         self._ncd = self._cpn_dates[1]
@@ -180,8 +180,8 @@ class BondAnnuity:
         s += label_to_string("MATURITY DATE", self._maturity_date)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS_DAY_RULE", self._bd_adjust_type)
-        s += label_to_string("DATE_GEN_RULE", self._dg_rule_type)
+        s += label_to_string("BUS_DAY_RULE", self._bd_type)
+        s += label_to_string("DATE_GEN_RULE", self._dg_type)
 
         return s
 

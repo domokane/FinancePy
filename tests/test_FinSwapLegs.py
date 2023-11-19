@@ -26,8 +26,8 @@ def test_FinFixedIborSwapLeg():
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     principal = 0.0
 
@@ -41,8 +41,8 @@ def test_FinFixedIborSwapLeg():
                                 principal,
                                 payment_lag,
                                 cal_type,
-                                bd_adjust_type,
-                                dg_rule_type)
+                                bd_type,
+                                dg_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
@@ -61,8 +61,8 @@ def test_FinFixedOISSwapLeg():
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
     principal = 0.0
 
@@ -76,8 +76,8 @@ def test_FinFixedOISSwapLeg():
                                 principal,
                                 payment_lag,
                                 cal_type,
-                                bd_adjust_type,
-                                dg_rule_type)
+                                bd_type,
+                                dg_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
@@ -96,8 +96,8 @@ def test_FinFloatIborLeg():
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     principal = 0.0
 
@@ -111,8 +111,8 @@ def test_FinFloatIborLeg():
                                 principal,
                                 payment_lag,
                                 cal_type,
-                                bd_adjust_type,
-                                dg_rule_type)
+                                bd_type,
+                                dg_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 
@@ -134,8 +134,8 @@ def test_FinFloatOISLeg():
     notional = 10.0 * ONE_MILLION
     legPayRecType = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
     principal = 0.0
 
@@ -149,8 +149,8 @@ def test_FinFloatOISLeg():
                                 principal,
                                 payment_lag,
                                 cal_type,
-                                bd_adjust_type,
-                                dg_rule_type)
+                                bd_type,
+                                dg_type)
 
     libor_curve = DiscountCurveFlat(effective_date, 0.05)
 

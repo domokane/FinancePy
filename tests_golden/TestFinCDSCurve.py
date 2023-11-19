@@ -130,8 +130,8 @@ def test_CDS_recovery_rate():
         freq_type = FrequencyTypes.MONTHLY
         day_count_type = DayCountTypes.ACT_360
         cal_type = CalendarTypes.WEEKEND
-        bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-        dg_rule_type = DateGenRuleTypes.FORWARD
+        bd_type = BusDayAdjustTypes.FOLLOWING
+        dg_type = DateGenRuleTypes.FORWARD
         cds1 = CDS(settle_date,
                    tenors[i],
                    spreads[i],
@@ -139,8 +139,8 @@ def test_CDS_recovery_rate():
                    freq_type=freq_type,
                    dc_type=day_count_type,
                    cal_type=cal_type,
-                   bd_adjust_type=bd_adjust_type,
-                   dg_rule_type=dg_rule_type)
+                   bd_type=bd_type,
+                   dg_type=dg_type)
 
         cdss.append(cds1)
 

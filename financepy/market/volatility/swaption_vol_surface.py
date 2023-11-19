@@ -6,19 +6,12 @@ import numpy as np
 from scipy.optimize import minimize
 
 import matplotlib.pyplot as plt
-from numba import jit, njit, float64, int64
+from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import gDaysInYear
-from ...products.fx.fx_vanilla_option import FXVanillaOption
-from ...models.option_implied_dbn import option_implied_dbn
-from ...products.fx.fx_mkt_conventions import FinFXATMMethod
-from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
-from ...market.curves.discount_curve import DiscountCurve
-
-from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import VolFuncTypes
 from ...models.volatility_fns import vol_function_clark
@@ -29,9 +22,7 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_half
 from ...models.sabr import vol_function_sabr_beta_one
 
-from ...utils.distribution import FinDistribution
 
-from ...utils.solver_1d import newton_secant
 from ...utils.solver_nm import nelder_mead
 from ...utils.global_types import FinSolverTypes
 
@@ -477,12 +468,14 @@ class SwaptionVolSurface():
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0],
+        vol0 = vol_function(vol_type_value,
+                            self._parameters[index0],
                             fwd0, K, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1],
+            vol1 = vol_function(vol_type_value,
+                                self._parameters[index1],
                                 fwd1, K, t1)
 
         else:
@@ -603,7 +596,7 @@ class SwaptionVolSurface():
 
 ###############################################################################
 
-    # def volatility_from_delta_date(self, call_delta, expiry_date,
+    # def vol_from_delta_date(self, call_delta, expiry_date,
     #                                delta_method = None):
     #     """ Interpolates the Black-Scholes volatility from the volatility
     #     surface given a call option delta and expiry date. Linear interpolation

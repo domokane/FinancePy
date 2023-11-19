@@ -64,14 +64,14 @@ def _g(K, *args):
 
     s = args[0]
     t = args[1]
-    rd = args[2]
-    rf = args[3]
+    r_d = args[2]
+    r_f = args[3]
     volatility = args[4]
     delta_method_value = args[5]
     option_type_value = args[6]
     delta_target = args[7]
 
-    delta_out = fast_delta(s, t, K, rd, rf,
+    delta_out = fast_delta(s, t, K, r_d, r_f,
                            volatility,
                            delta_method_value,
                            option_type_value)
@@ -120,7 +120,7 @@ def _obj(params, *args):
 
     s = args[0]
     t = args[1]
-    rd = args[2]
+    r_d = args[2]
     rf = args[3]
     K_ATM = args[4]
     atm_vol = args[5]
@@ -298,7 +298,7 @@ def _obj_gap(gaps, *args):
 
     s = args[0]
     t = args[1]
-    rd = args[2]
+    r_d = args[2]
     rf = args[3]
     K_ATM = args[4]
     atm_vol = args[5]
@@ -707,8 +707,8 @@ def _delta_fit(k, *args):
     vol_type_value = args[0]
     s = args[1]
     t = args[2]
-    rd = args[3]
-    rf = args[4]
+    r_d = args[3]
+    r_f = args[4]
     option_type_value = args[5]
     deltaTypeValue = args[6]
     inverseDeltaTarget = args[7]
@@ -716,10 +716,12 @@ def _delta_fit(k, *args):
     strikes = args[9]
     gaps = args[10]
 
-    f = s * np.exp((rd-rf)*t)
+    f = s * np.exp((r_d-r_f)*t)
     v = vol_function(vol_type_value, params, strikes, gaps, f, k, t)
-    delta_out = fast_delta(
-        s, t, k, rd, rf, v, deltaTypeValue, option_type_value)
+
+    delta_out = fast_delta(s, t, k, r_d, r_f, v,
+                           deltaTypeValue, option_type_value)
+
     inverseDeltaOut = norminvcdf(np.abs(delta_out))
     invObjFn = inverseDeltaTarget - inverseDeltaOut
 
@@ -1188,9 +1190,9 @@ class FXVolSurfacePlus():
 
 ###############################################################################
 
-    def volatility_from_delta_date(self, call_delta,
-                                   expiry_date,
-                                   delta_method=None):
+    def vol_from_delta_date(self, call_delta,
+                            expiry_date,
+                            delta_method=None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -1523,8 +1525,8 @@ class FXVolSurfacePlus():
         for i in range(0, num_vol_curves):
 
             t = self._t_exp[i]
-            rd = self._rd[i]
-            rf = self._rf[i]
+            r_d = self._rd[i]
+            r_f = self._rf[i]
             K_ATM = self._K_ATM[i]
             atm_vol = self._atm_vols[i]
 
@@ -1544,7 +1546,7 @@ class FXVolSurfacePlus():
                 ms10DVol = -999.0
                 rr10DVol = -999.0
 
-            res = _solve_to_horizon(s, t, rd, rf,
+            res = _solve_to_horizon(s, t, r_d, r_f,
                                     K_ATM, atm_vol,
                                     ms25DVol, rr25DVol,
                                     ms10DVol, rr10DVol,
@@ -2069,8 +2071,8 @@ class FXVolSurfacePlus():
             domDF = self._dom_discount_curve._df(t)
             forDF = self._for_discount_curve._df(t)
 
-            rd = -np.log(domDF) / t
-            rf = -np.log(forDF) / t
+            r_d = -np.log(domDF) / t
+            r_f = -np.log(forDF) / t
 
             Ks = []
             vols = []
@@ -2091,8 +2093,8 @@ class FXVolSurfacePlus():
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = option_implied_dbn(
-                self._spot_fx_rate, t, rd, rf, Ks, vols)
+            density = option_implied_dbn(self._spot_fx_rate, t,
+                                         r_d, r_f, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
             dbns.append(dbn)

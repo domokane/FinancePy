@@ -337,15 +337,15 @@ class BondConvertible:
             return
 
         self._settle_date = settle_date
-        bd_adjust_type = BusDayAdjustTypes.NONE
-        dg_rule_type = DateGenRuleTypes.BACKWARD
+        bd_type = BusDayAdjustTypes.NONE
+        dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dates = Schedule(settle_date,
                                    self._maturity_date,
                                    self._freq_type,
                                    self._cal_type,
-                                   bd_adjust_type,
-                                   dg_rule_type)._generate()
+                                   bd_type,
+                                   dg_type)._generate()
 
         self._pcd = self._cpn_dates[0]
         self._ncd = self._cpn_dates[1]

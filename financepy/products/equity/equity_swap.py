@@ -48,8 +48,8 @@ class EquitySwap:
                  rate_spread: float = 0.0,
                  rate_payment_lag: int = 0,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
                  end_of_month: bool = False):
         """ Create an equity swap contract given the contract effective date, its maturity,
         underlying price and quantity, day count convention and return type and other details.
@@ -69,7 +69,7 @@ class EquitySwap:
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bd_adjust_type)
+                                              bd_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -93,8 +93,8 @@ class EquitySwap:
                                          eq_payment_lag,
                                          eq_return_type,
                                          cal_type,
-                                         bd_adjust_type,
-                                         dg_rule_type,
+                                         bd_type,
+                                         dg_type,
                                          end_of_month)
 
         # Fixed Rate Leg not implemented yet
@@ -108,8 +108,8 @@ class EquitySwap:
                                       self._principal,
                                       rate_payment_lag,
                                       cal_type,
-                                      bd_adjust_type,
-                                      dg_rule_type,
+                                      bd_type,
+                                      dg_type,
                                       end_of_month)
 
     ###########################################################################

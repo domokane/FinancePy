@@ -3,14 +3,15 @@
 ###############################################################################
 
 import numpy as np
+import sys
+sys.path.append("..")
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
 from financepy.utils.date import Date
 from financepy.models.volatility_fns import VolFuncTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 import time
-import sys
-sys.path.append("..")
 
 
 testCases = FinTestCases(__file__, globalTestCaseMode)

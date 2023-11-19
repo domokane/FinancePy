@@ -52,13 +52,13 @@ class IborFRA:
                  notional: float = 100.0,
                  payFixedRate: bool = True,  # True if the FRA rate is being paid
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Forward Rate Agreement object. """
 
         check_argument_types(self.__init__, locals())
 
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
+        self._bd_type = bd_type
 
         if type(maturity_date_or_tenor) == Date:
             maturity_date = maturity_date_or_tenor
@@ -66,7 +66,7 @@ class IborFRA:
             maturity_date = start_date.add_tenor(maturity_date_or_tenor)
             calendar = Calendar(self._cal_type)
             maturity_date = calendar.adjust(maturity_date,
-                                            self._bd_adjust_type)
+                                            self._bd_type)
 
         if start_date > maturity_date:
             raise FinError("Settlement date after maturity date")
@@ -151,7 +151,7 @@ class IborFRA:
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("PAY FIXED RATE", self._payFixedRate)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_adjust_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
         s += label_to_string("CALENDAR", self._cal_type)
         return s
 

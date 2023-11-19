@@ -40,8 +40,8 @@ class FinFixedIborXCcySwap:
                  float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  notional: float = ONE_MILLION,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_adjust_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_rule_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
         date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -61,7 +61,7 @@ class FinFixedIborXCcySwap:
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
-                                              bd_adjust_type)
+                                              bd_type)
 
         if effective_date > self._maturity_date:
             raise FinError("Start date after maturity date")
@@ -81,8 +81,8 @@ class FinFixedIborXCcySwap:
         self._fixed_leg_type = fixed_leg_type
 
         self._cal_type = cal_type
-        self._bd_adjust_type = bd_adjust_type
-        self._dg_rule_type = dg_rule_type
+        self._bd_type = bd_type
+        self._dg_type = dg_type
 
         # These are generated immediately as they are for the entire
         # life of the swap. Given a valuation date we can determine
@@ -155,8 +155,8 @@ class FinFixedIborXCcySwap:
             self._termination_date,
             self._fixed_freq_type,
             self._cal_type,
-            self._bd_adjust_type,
-            self._dg_rule_type)._generate()
+            self._bd_type,
+            self._dg_type)._generate()
 
 ##########################################################################
 
@@ -168,8 +168,8 @@ class FinFixedIborXCcySwap:
             self._termination_date,
             self._float_freq_type,
             self._cal_type,
-            self._bd_adjust_type,
-            self._dg_rule_type)._generate()
+            self._bd_type,
+            self._dg_type)._generate()
 
 ##########################################################################
 
@@ -587,8 +587,8 @@ class FinFixedIborXCcySwap:
         s += label_to_string("FIXED DAY COUNT", self._fixed_dc_type)
         s += label_to_string("FLOAT DAY COUNT", self._float_dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_adjust_type)
-        s += label_to_string("DATE GEN TYPE", self._dg_rule_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_type)
+        s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 
 ###############################################################################

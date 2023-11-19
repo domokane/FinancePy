@@ -285,12 +285,12 @@ class FXVanillaOption():
         domDF = dom_discount_curve._df(tdel)
         forDF = for_discount_curve._df(tdel)
 
-        rd = -np.log(domDF) / tdel
-        rf = -np.log(forDF) / tdel
+        r_d = -np.log(domDF) / tdel
+        r_f = -np.log(forDF) / tdel
 
         s0 = spot_fx_rate
         k = self._strike_fx_rate
-        f0t = s0 * np.exp((rd-rf)*tdel)
+        f0t = s0 * np.exp((r_d-r_f)*tdel)
 
         if type(model) == BlackScholes or \
            type(model) == SABR:
@@ -313,19 +313,19 @@ class FXVanillaOption():
 
             if self._option_type == OptionTypes.EUROPEAN_CALL:
 
-                vdf = bs_value(s0, t_exp, k, rd, rf, v,
+                vdf = bs_value(s0, t_exp, k, r_d, r_f, v,
                                OptionTypes.EUROPEAN_CALL.value)
 
             elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
-                vdf = bs_value(s0, t_exp, k, rd, rf, v,
+                vdf = bs_value(s0, t_exp, k, r_d, r_f, v,
                                OptionTypes.EUROPEAN_PUT.value)
 
             elif self._option_type == OptionTypes.AMERICAN_CALL:
 
                 num_steps_per_year = 100
 
-                vdf = crr_tree_val_avg(s0, rd, rf, volatility,
+                vdf = crr_tree_val_avg(s0, r_d, r_f, volatility,
                                        num_steps_per_year,
                                        t_exp, OptionTypes.AMERICAN_CALL.value,
                                        k)['value']
@@ -334,7 +334,7 @@ class FXVanillaOption():
 
                 num_steps_per_year = 100
 
-                vdf = crr_tree_val_avg(s0, rd, rf, volatility,
+                vdf = crr_tree_val_avg(s0, r_d, r_f, volatility,
                                        num_steps_per_year,
                                        t_exp, OptionTypes.AMERICAN_PUT.value,
                                        k)['value']
@@ -441,10 +441,10 @@ class FXVanillaOption():
         tdel = np.maximum(tdel, 1e-10)
 
         domDf = dom_discount_curve._df(tdel)
-        rd = -np.log(domDf)/tdel
+        r_d = -np.log(domDf)/tdel
 
         forDf = for_discount_curve._df(tdel)
-        rf = -np.log(forDf)/tdel
+        r_f = -np.log(forDf)/tdel
 
         S0 = spot_fx_rate
         K = self._strike_fx_rate
@@ -459,13 +459,13 @@ class FXVanillaOption():
             v = np.maximum(v, gSmall)
 
             pips_spot_delta = bs_delta(
-                S0, t_exp, K, rd, rf, v, self._option_type.value)
-            pips_fwd_delta = pips_spot_delta * np.exp(rf*tdel)
-            vpctf = bs_value(S0, t_exp, K, rd, rf, v,
+                S0, t_exp, K, r_d, r_f, v, self._option_type.value)
+            pips_fwd_delta = pips_spot_delta * np.exp(r_f*tdel)
+            vpctf = bs_value(S0, t_exp, K, r_d, r_f, v,
                              self._option_type.value) / S0
             pct_spot_delta_prem_adj = pips_spot_delta - vpctf
             pct_fwd_delta_prem_adj = np.exp(
-                rf*tdel) * (pips_spot_delta - vpctf)
+                r_f*tdel) * (pips_spot_delta - vpctf)
 
         return {"pips_spot_delta": pips_spot_delta,
                 "pips_fwd_delta": pips_fwd_delta,
@@ -488,8 +488,8 @@ class FXVanillaOption():
 #        tdel = (self._delivery_date - value_date) / gDaysInYear
 #        tdel = np.maximum(tdel, gSmall)
 
-#        rd = -np.log(domDF)/tdel
-#        rf = -np.log(forDF)/tdel
+#        r_d = -np.log(domDF)/tdel
+#         r_f = -np.log(forDF)/tdel
         k = self._strike_fx_rate
 
 #        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
@@ -533,10 +533,10 @@ class FXVanillaOption():
         t = np.maximum(t, 1e-10)
 
         domDf = dom_discount_curve._df(t)
-        rd = -np.log(domDf)/t
+        r_d = -np.log(domDf)/t
 
         forDf = for_discount_curve._df(t)
-        rf = -np.log(forDf)/t
+        r_f = -np.log(forDf)/t
 
         K = self._strike_fx_rate
         S0 = spot_fx_rate
@@ -553,10 +553,10 @@ class FXVanillaOption():
             lnS0k = np.log(S0 / K)
             sqrtT = np.sqrt(t)
             den = volatility * sqrtT
-            mu = rd - rf
+            mu = r_d - r_f
             v2 = volatility * volatility
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
-            gamma = np.exp(-rf * t) * nprime(d1)
+            gamma = np.exp(-r_f * t) * nprime(d1)
             gamma = gamma / S0 / den
         else:
             raise FinError("Unknown Model Type")
@@ -588,10 +588,10 @@ class FXVanillaOption():
         t = np.maximum(t, 1e-10)
 
         domDf = dom_discount_curve._df(t)
-        rd = -np.log(domDf)/t
+        r_d = -np.log(domDf)/t
 
         forDf = for_discount_curve._df(t)
-        rf = -np.log(forDf)/t
+        r_f = -np.log(forDf)/t
 
         K = self._strike_fx_rate
         S0 = spot_fx_rate
@@ -608,10 +608,10 @@ class FXVanillaOption():
             lnS0k = np.log(S0/K)
             sqrtT = np.sqrt(t)
             den = volatility * sqrtT
-            mu = rd - rf
+            mu = r_d - r_f
             v2 = volatility * volatility
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
-            vega = S0 * sqrtT * np.exp(-rf * t) * nprime(d1)
+            vega = S0 * sqrtT * np.exp(-r_f * t) * nprime(d1)
         else:
             raise FinError("Unknown Model type")
 
@@ -641,10 +641,10 @@ class FXVanillaOption():
         t = np.maximum(t, 1e-10)
 
         domDf = dom_discount_curve._df(t)
-        rd = -np.log(domDf)/t
+        r_d = -np.log(domDf)/t
 
         forDf = for_discount_curve._df(t)
-        rf = -np.log(forDf)/t
+        r_f = -np.log(forDf)/t
 
         K = self._strike_fx_rate
         S0 = spot_fx_rate
@@ -661,19 +661,19 @@ class FXVanillaOption():
             lnS0k = np.log(S0/K)
             sqrtT = np.sqrt(t)
             den = vol * sqrtT
-            mu = rd - rf
+            mu = r_d - r_f
             v2 = vol * vol
             d1 = (lnS0k + (mu + v2 / 2.0) * t) / den
             d2 = (lnS0k + (mu - v2 / 2.0) * t) / den
 
             if self._option_type == OptionTypes.EUROPEAN_CALL:
-                v = - S0 * np.exp(-rf * t) * nprime(d1) * vol / 2.0 / sqrtT
-                v = v + rf * S0 * np.exp(-rf * t) * N(d1)
-                v = v - rd * K * np.exp(-rd * t) * N(d2)
+                v = - S0 * np.exp(-r_f * t) * nprime(d1) * vol / 2.0 / sqrtT
+                v = v + r_f * S0 * np.exp(-r_f * t) * N(d1)
+                v = v - r_d * K * np.exp(-r_d * t) * N(d2)
             elif self._option_type == OptionTypes.EUROPEAN_PUT:
-                v = - S0 * np.exp(-rf * t) * nprime(d1) * vol / 2.0 / sqrtT
-                v = v + rd * K * np.exp(-rd * t) * N(-d2)
-                v = v - rf * S0 * np.exp(-rf * t) * N(-d1)
+                v = - S0 * np.exp(-r_f * t) * nprime(d1) * vol / 2.0 / sqrtT
+                v = v + r_d * K * np.exp(-r_d * t) * N(-d2)
+                v = v - r_f * S0 * np.exp(-r_f * t) * N(-d1)
             else:
                 raise FinError("Unknown option type")
 
@@ -725,13 +725,13 @@ class FXVanillaOption():
         np.random.seed(seed)
         t = (self._expiry_date - value_date) / gDaysInYear
 
-        domDF = dom_discount_curve.df(self._expiry_date)
-        forDF = for_discount_curve.df(self._expiry_date)
+        dom_Df = dom_discount_curve.df(self._expiry_date)
+        for_Df = for_discount_curve.df(self._expiry_date)
 
-        rd = -np.log(domDF)/t
-        rf = -np.log(forDF)/t
+        r_d = -np.log(dom_Df)/t
+        r_f = -np.log(for_Df)/t
 
-        mu = rd - rf
+        mu = r_d - r_f
         v2 = volatility**2
         K = self._strike_fx_rate
         sqrt_dt = np.sqrt(t)
@@ -753,7 +753,7 @@ class FXVanillaOption():
             raise FinError("Unknown option type.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * np.exp(-rd * t) / 2.0
+        v = payoff * np.exp(-r_d * t) / 2.0
         return v
 
 ###############################################################################

@@ -2,11 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+
 import sys
 sys.path.append("..")
 
-import numpy as np
-import time
 from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_swap import IborSwap
@@ -328,9 +329,9 @@ def test_IborCapFloorQLExample():
     start_date = Date(14, 6, 2016)
     end_date = Date(14, 6, 2026)
     cal_type = CalendarTypes.UNITED_STATES
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     freq_type = FrequencyTypes.QUARTERLY
-    dg_rule_type = DateGenRuleTypes.FORWARD
+    dg_type = DateGenRuleTypes.FORWARD
     last_fixing = 0.0065560
     notional = 1000000
     dc_type = DayCountTypes.ACT_360
@@ -339,7 +340,7 @@ def test_IborCapFloorQLExample():
 
     cap = IborCapFloor(start_date, end_date, option_type, strike_rate,
                        last_fixing, freq_type, dc_type, notional,
-                       cal_type, bd_adjust_type, dg_rule_type)
+                       cal_type, bd_type, dg_type)
 
     blackVol = 0.547295
     model = Black(blackVol)

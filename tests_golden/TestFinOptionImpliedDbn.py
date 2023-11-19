@@ -83,8 +83,8 @@ def test_FinOptionImpliedDbn():
             domDF = dom_discount_curve._df(t_exp)
             forDF = for_discount_curve._df(t_exp)
 
-            rd = -np.log(domDF) / t_exp
-            rf = -np.log(forDF) / t_exp
+            r_d = -np.log(domDF) / t_exp
+            r_f = -np.log(forDF) / t_exp
 
             params = fxMarket._parameters[iTenor]
 

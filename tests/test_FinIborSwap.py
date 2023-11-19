@@ -36,8 +36,8 @@ def test_LiborSwap():
     firstFixing = -0.00268
 
     swapCalendarType = CalendarTypes.WEEKEND
-    bd_adjust_type = BusDayAdjustTypes.FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     fixed_leg_type = SwapTypes.RECEIVE
 
     notional = 10.0 * ONE_MILLION
@@ -53,8 +53,8 @@ def test_LiborSwap():
                     float_freq_type,
                     float_dc_type,
                     swapCalendarType,
-                    bd_adjust_type,
-                    dg_rule_type)
+                    bd_type,
+                    dg_type)
 
     """ Now perform a valuation after the swap has seasoned but with the
     same curve being used for discounting and working out the implied
@@ -75,8 +75,8 @@ def test_dp_example():
     end_date = Date(14, 11, 2016)
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     swapCalendarType = CalendarTypes.TARGET
-    bd_adjust_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_rule_type = DateGenRuleTypes.BACKWARD
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_leg_type = SwapTypes.PAY
     fixed_coupon = 0.0124
@@ -92,8 +92,8 @@ def test_dp_example():
                     float_dc_type=DayCountTypes.ACT_360,
                     notional=notional,
                     cal_type=swapCalendarType,
-                    bd_adjust_type=bd_adjust_type,
-                    dg_rule_type=dg_rule_type)
+                    bd_type=bd_type,
+                    dg_type=dg_type)
 
     dts = [Date(14, 11, 2011), Date(14, 5, 2012), Date(14, 11, 2012),
            Date(14, 5, 2013), Date(14, 11, 2013), Date(14, 5, 2014),
