@@ -815,13 +815,13 @@ class FXVolSurface():
                                     self._spot_fx_rate,
                                     self._dom_discount_curve,
                                     self._for_discount_curve,
-                                    model)[self._delta_methodString]
+                                    model)[self._delta_method_string]
 
             delta_put = put.delta(self._value_date,
                                   self._spot_fx_rate,
                                   self._dom_discount_curve,
                                   self._for_discount_curve,
-                                  model)[self._delta_methodString]
+                                  model)[self._delta_method_string]
 
             if verbose:
                 print("CALL_DELTA: % 9.6f  PUT_DELTA: % 9.6f  NET_DELTA: % 9.6f"
@@ -849,13 +849,13 @@ class FXVolSurface():
                                     self._spot_fx_rate,
                                     self._dom_discount_curve,
                                     self._for_discount_curve,
-                                    model)[self._delta_methodString]
+                                    model)[self._delta_method_string]
 
             delta_put = put.delta(self._value_date,
                                   self._spot_fx_rate,
                                   self._dom_discount_curve,
                                   self._for_discount_curve,
-                                  model)[self._delta_methodString]
+                                  model)[self._delta_method_string]
 
             if verbose:
                 print("K_25D_C_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
@@ -906,7 +906,7 @@ class FXVolSurface():
                                     self._spot_fx_rate,
                                     self._dom_discount_curve,
                                     self._for_discount_curve,
-                                    model)[self._delta_methodString]
+                                    model)[self._delta_method_string]
 
             # PUT
             sigma_K_25D_P_MS = vol_function(self._vol_func_type.value,
@@ -927,7 +927,7 @@ class FXVolSurface():
                                   self._spot_fx_rate,
                                   self._dom_discount_curve,
                                   self._for_discount_curve,
-                                  model)[self._delta_methodString]
+                                  model)[self._delta_method_string]
 
             mktStrangleValueSkew = call_value + put_value
 
@@ -966,7 +966,7 @@ class FXVolSurface():
                                     self._spot_fx_rate,
                                     self._dom_discount_curve,
                                     self._for_discount_curve,
-                                    model)[self._delta_methodString]
+                                    model)[self._delta_method_string]
 
             sigma_K_25D_P = vol_function(self._vol_func_type.value,
                                          self._parameters[i],
@@ -981,7 +981,7 @@ class FXVolSurface():
                                   self._spot_fx_rate,
                                   self._dom_discount_curve,
                                   self._for_discount_curve,
-                                  model)[self._delta_methodString]
+                                  model)[self._delta_method_string]
 
             if verbose:
                 print("K_25D_C: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
