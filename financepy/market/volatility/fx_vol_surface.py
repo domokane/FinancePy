@@ -449,7 +449,7 @@ class FXVolSurface():
         if self._delta_method == FinFXDeltaMethod.SPOT_DELTA:
             self._delta_method_string = "pips_spot_delta"
         elif self._delta_method == FinFXDeltaMethod.FORWARD_DELTA:
-            self._delta_methodS_string = "pips_fwd_delta"
+            self._delta_method_string = "pips_fwd_delta"
         elif self._delta_method == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ:
             self._delta_method_string = "pct_spot_delta_prem_adj"
         elif self._delta_method == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ:
