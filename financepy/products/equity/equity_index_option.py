@@ -94,7 +94,8 @@ class EquityIndexOption:
               discount_curve: DiscountCurve,
               model):
         """ Calculate delta of a European/American Index option. """
-        if type(value_date) == Date:
+
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -123,7 +124,7 @@ class EquityIndexOption:
               model: Model):
         """ Calculate gamma of a European/American Index option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -151,7 +152,7 @@ class EquityIndexOption:
              model: Model):
         """ Calculate vega of a European/American Index option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -178,7 +179,8 @@ class EquityIndexOption:
               discount_curve: DiscountCurve,
               model: Model):
         """ Calculate theta of a European/American Index option. """
-        if type(value_date) == Date:
+
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date

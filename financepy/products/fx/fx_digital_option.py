@@ -101,7 +101,7 @@ class FXDigitalOption:
             raise FinError(
                 "Foreign Curve valuation date not same as valuation date")
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             spot_date = value_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spot_date) / gDaysInYear
             t_exp = (self._expiry_date - value_date) / gDaysInYear

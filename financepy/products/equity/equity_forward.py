@@ -58,7 +58,7 @@ class EquityForward():
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._expiry_date - value_date) / gDaysInYear
         else:
             t = value_date
@@ -95,7 +95,7 @@ class EquityForward():
                 dividend_curve):
         """ Calculate the forward price of the equity forward contract. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._expiry_date - value_date) / gDaysInYear
         else:
             t = value_date

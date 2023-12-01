@@ -16,6 +16,7 @@ from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
 from ...utils.global_types import OptionTypes
 
+
 class FXDoubleDigitalOption:
 
     def __init__(self,
@@ -99,7 +100,7 @@ class FXDoubleDigitalOption:
             raise FinError(
                 "Foreign Curve valuation date not same as valuation date")
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             spot_date = value_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spot_date) / gDaysInYear
             t_exp = (self._expiry_date - value_date) / gDaysInYear

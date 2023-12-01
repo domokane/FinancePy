@@ -222,7 +222,7 @@ class EquityVanillaOption():
               model):
         """ Calculate the analytical delta of a European vanilla option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -266,7 +266,7 @@ class EquityVanillaOption():
               model: Model):
         """ Calculate the analytical gamma of a European vanilla option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -309,7 +309,7 @@ class EquityVanillaOption():
              model: Model):
         """ Calculate the analytical vega of a European vanilla option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -351,7 +351,7 @@ class EquityVanillaOption():
               model: Model):
         """ Calculate the analytical theta of a European vanilla option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -391,7 +391,7 @@ class EquityVanillaOption():
             model: Model):
         """ Calculate the analytical rho of a European vanilla option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date
@@ -431,7 +431,7 @@ class EquityVanillaOption():
               model: Model):
         """ Calculate the analytical vanna of a European vanilla option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date

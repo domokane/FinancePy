@@ -692,7 +692,7 @@ class CDS:
         """ Implementation of fast valuation of the CDS contract using an
         accurate approximation that avoids curve building. """
 
-        if type(value_date) is not Date:
+        if isinstance(value_date, Date):
             raise FinError("Valuation date must be a Date and not " +
                            str(value_date))
 

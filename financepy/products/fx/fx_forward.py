@@ -84,7 +84,7 @@ class FXForward:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._expiry_date - value_date) / gDaysInYear
         else:
             t = value_date
@@ -141,7 +141,7 @@ class FXForward:
         """ Calculate the FX Forward rate that makes the value of the FX
         contract equal to zero. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._delivery_date - value_date) / gDaysInYear
         else:
             t = value_date

@@ -8,7 +8,7 @@ from ...utils.FinGlobalVariables import gSmall
 from ...utils.FinDayCount import FinDayCount, DayCountTypes
 from ...utils.FinFrequency import FrequencyTypes, FinFrequency
 from ...utils.FinCalendar import CalendarTypes,  DateGenRuleTypes
-from ...utils.FinCalendar import FinCalendar, BusDayAdjustTypes
+from ...utils.FinCalendar import Calendar, BusDayAdjustTypes
 from ...utils.FinSchedule import FinSchedule
 from ...utils.FinHelperFunctions import label_to_string, check_argument_types
 from ...utils.FinMath import ONE_MILLION
@@ -17,20 +17,20 @@ from ...utils.FinGlobalTypes import SwapTypes
 ##########################################################################
 
 
-class FinFixedFixedXCcySwap
-  """ Class for managing a cross currency swap contract. This is a contract
+class FinFixedFixedXCcySwap():
+    """ Class for managing a cross currency swap contract. This is a contract
     in which a fixed or floating payment leg in one currency is exchanged for a
     series of fixed or floating rates in a second currency. There is an
     exchange of par. The contract is entered into at zero initial cost and it
     lasts from a start date to a specified maturity date.
 
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount discount (one for each leg) which is separate
+    is done on a supplied discount discount (one for each leg)  is separate
     from the curve from which the implied index rates are extracted. """
 
-   def __init__(self,
+    def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
-                 termination_date_or_tenor: (Date, str),  # Date contract ends
+                 term_date_or_tenor: (Date, str),  # Date contract ends
                  fixed_leg_type: SwapTypes,
                  fixed_coupon: float,  # Fixed coupon (annualised)
                  fixed_freq_type: FrequencyTypes,
@@ -53,11 +53,11 @@ class FinFixedFixedXCcySwap
 
         check_argument_types(self.__init__, locals())
 
-        if type(termination_date_or_tenor) == Date:
-            self._termination_date = termination_date_or_tenor
+        if type(term_date_or_tenor) == Date:
+            self._termination_date = term_date_or_tenor
         else:
             self._termination_date = effective_date.add_tenor(
-                termination_date_or_tenor)
+                term_date_or_tenor)
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,

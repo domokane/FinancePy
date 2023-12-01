@@ -40,7 +40,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
     at times provided using one of the methods in the enum InterpTypes. The
     value of x can be an array so that the function is vectorised. """
 
-    if type(t) is float or type(t) is np.float64:
+    if isinstance(t, (float, np.float64)):
 
         if t < 0.0:
             print(t)
@@ -48,7 +48,7 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
 
         u = _uinterpolate(t, times, dfs, method)
         return u
-    elif type(t) is np.ndarray:
+    elif isinstance(t, np.ndarray):
 
         if np.any(t < 0.0):
             print(t)
@@ -289,7 +289,7 @@ class Interpolator():
         if self._dfs is None:
             raise FinError("Dfs have not been set.")
 
-        if type(t) is float or type(t) is np.float64:
+        if isinstance(t, (float, np.float64)):
 
             if t < 0.0:
                 print(t)
@@ -300,7 +300,7 @@ class Interpolator():
 
             tvec = np.array([t])
 
-        elif type(t) is np.ndarray:
+        elif isinstance(t, np.ndarray):
 
             if np.any(t < 0.0):
                 print(t)
@@ -344,7 +344,7 @@ class Interpolator():
             out = _vinterpolate(tvec, self._times, self._dfs,
                                 self._interp_type.value)
 
-        if type(t) is float or type(t) is np.float64:
+        if isinstance(t, (float, np.float64)):
             return out[0]
         else:
             return out

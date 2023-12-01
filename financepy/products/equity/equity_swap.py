@@ -34,13 +34,13 @@ class EquitySwap:
     which the implied index rates are extracted. """
 
     def __init__(self,
-                 effective_date: Date, # Date contract starts or last Equity Reset
-                 termination_date_or_tenor: (Date, str), # Date contract ends
+                 effective_date: Date,  # Date contract starts or last Equity Reset
+                 term_date_or_tenor: (Date, str),  # Date contract ends
                  eq_leg_type: SwapTypes,
                  eq_freq_type: FrequencyTypes,
                  eq_dc_type: DayCountTypes,
-                 strike: float, # Price at effective date
-                 quantity: float = 1.0, # Quantity at effective date
+                 strike: float,  # Price at effective date
+                 quantity: float = 1.0,  # Quantity at effective date
                  eq_payment_lag: int = 0,
                  eq_return_type: ReturnTypes = ReturnTypes.TOTAL_RETURN,
                  rate_freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
@@ -61,11 +61,11 @@ class EquitySwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(termination_date_or_tenor) == Date:
-            self._termination_date = termination_date_or_tenor
+        if type(term_date_or_tenor) == Date:
+            self._termination_date = term_date_or_tenor
         else:
             self._termination_date = effective_date.add_tenor(
-                termination_date_or_tenor)
+                term_date_or_tenor)
 
         calendar = Calendar(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,

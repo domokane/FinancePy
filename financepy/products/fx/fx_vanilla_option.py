@@ -265,7 +265,7 @@ class FXVanillaOption():
             raise FinError(
                 "Foreign Curve valuation date not same as valuation date")
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             spot_date = value_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spot_date) / gDaysInYear
             t_exp = (self._expiry_date - value_date) / gDaysInYear
@@ -424,7 +424,7 @@ class FXVanillaOption():
         definitions can be found on Page 44 of Foreign Exchange Option Pricing
         by Iain Clark, published by Wiley Finance. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             spot_date = value_date.add_weekdays(self._spot_days)
             tdel = (self._delivery_date - spot_date) / gDaysInYear
             t_exp = (self._expiry_date - value_date) / gDaysInYear
@@ -519,7 +519,7 @@ class FXVanillaOption():
         """ This function calculates the FX Option Gamma using the spot delta.
         """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._expiry_date - value_date) / gDaysInYear
         else:
             t = value_date
@@ -574,7 +574,7 @@ class FXVanillaOption():
         """ This function calculates the FX Option Vega using the spot delta.
         """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._expiry_date - value_date) / gDaysInYear
         else:
             t = value_date
@@ -627,7 +627,7 @@ class FXVanillaOption():
               model):
         """ This function calculates the time decay of the FX option. """
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t = (self._expiry_date - value_date) / gDaysInYear
         else:
             t = value_date

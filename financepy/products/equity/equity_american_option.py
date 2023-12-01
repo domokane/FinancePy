@@ -67,7 +67,7 @@ class EquityAmericanOption(EquityOption):
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if type(value_date) == Date:
+        if isinstance(value_date, Date):
             t_exp = (self._expiry_date - value_date) / gDaysInYear
         else:
             t_exp = value_date

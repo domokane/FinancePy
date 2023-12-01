@@ -4,15 +4,13 @@
 
 from ...utils.FinError import FinError
 from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gSmall
 from ...utils.FinDayCount import FinDayCount, DayCountTypes
 from ...utils.FinFrequency import FrequencyTypes, FinFrequency
-from ...utils.FinCalendar import CalendarTypes,  DateGenRuleTypes
-from ...utils.FinCalendar import FinCalendar, BusDayAdjustTypes
+from ...utils.FinCalendar import CalendarTypes, DateGenRuleTypes
+from ...utils.FinCalendar import Calendar, BusDayAdjustTypes
 from ...utils.FinSchedule import FinSchedule
 from ...utils.FinHelperFunctions import label_to_string, check_argument_types
 from ...utils.FinMath import ONE_MILLION
-from ...utils.FinGlobalTypes import SwapTypes
 
 ##########################################################################
 
@@ -30,7 +28,7 @@ class IborIborSwap:
 
     def __init__(self,
                  effective_date: Date,  # Date interest starts to accrue
-                 termination_date_or_tenor: (Date, str),  # Date contract ends
+                 term_date_or_tenor: (Date, str),  # Date contract ends
                  payFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  payDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  recFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
@@ -51,11 +49,11 @@ class IborIborSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(termination_date_or_tenor) == Date:
-            self._termination_date = termination_date_or_tenor
+        if type(term_date_or_tenor) == Date:
+            self._termination_date = term_date_or_tenor
         else:
             self._termination_date = effective_date.add_tenor(
-                termination_date_or_tenor)
+                term_date_or_tenor)
 
         calendar = CalendarTypes(cal_type)
         self._maturity_date = calendar.adjust(self._termination_date,
