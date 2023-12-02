@@ -470,16 +470,17 @@ def test_BondOptionDerivaGem():
     maturity_date = settle_date.add_tenor("10Y")
 
     coupon = 0.05
-    freqType = FrequencyTypes.SEMI_ANNUAL
-    accrualType = DayCountTypes.THIRTY_360_BOND
-    bond = Bond(issue_date, maturity_date, coupon, freqType, accrualType)
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.THIRTY_360_BOND
+    bond = Bond(issue_date, maturity_date, coupon, freq_type,  accrual_type)
     strike_price = 100.0
     face = 100.0
 
     europeanCallBondOption = BondOption(bond, expiry_date, strike_price,
                                         OptionTypes.EUROPEAN_CALL)
-    cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
-    fp = bond.dirty_price_from_discount_curve(expiry_date, discount_curve)
+
+    # cp = bond.clean_price_from_discount_curve(expiry_date, discount_curve)
+    # fp = bond.dirty_price_from_discount_curve(expiry_date, discount_curve)
     #    print("Fixed Income Clean Price: %9.3f"% cp)
     #    print("Fixed Income Full  Price: %9.3f"% fp)
 
@@ -488,7 +489,7 @@ def test_BondOptionDerivaGem():
     a = 0.1
     modelHW = HWTree(sigma, a, num_steps)
 
-    ec = europeanCallBondOption.value(settle_date, discount_curve, modelHW)
+    # ec = europeanCallBondOption.value(settle_date, discount_curve, modelHW)
 
     ###########################################################################
 

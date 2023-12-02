@@ -561,16 +561,19 @@ def test_BondPaymentDates():
 def test_Bond_ror():
 
     test_case_file = 'test_cases_bond_ror.csv'
-    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+    df = pd.read_csv('./data/' + test_case_file, parse_dates=['buy_date',
+                                                              'sell_date'])
     # A 10-year bond with 1 coupon per year. code: 210215
+
     bond = Bond(
         issue_date=Date(13, 9, 2021),
         maturity_date=Date(13, 9, 2031),
         coupon=0.0312,
         freq_type=FrequencyTypes.ANNUAL,
-        dc_type=DayCountTypes.ACT_ACT_ICMA
-    )
-    testCases.header('bond_code', 'buy_date', 'buy_ytm', 'buy_price', 'sell_date', 'sell_ytm', 'sell_price',
+        dc_type=DayCountTypes.ACT_ACT_ICMA)
+
+    testCases.header('bond_code', 'buy_date', 'buy_ytm', 'buy_price',
+                     'sell_date', 'sell_ytm', 'sell_price',
                      'simple_return', 'irr')
 
     for row in df.itertuples(index=False):
@@ -581,7 +584,8 @@ def test_Bond_ror():
         sell_price = bond.dirty_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.US_STREET)
         simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
 
-        testCases.print(row.bond_code, buy_date, row.buy_ytm, buy_price, sell_date, row.sell_ytm, sell_price,
+        testCases.print(row.bond_code, buy_date, row.buy_ytm, buy_price,
+                        sell_date, row.sell_ytm, sell_price,
                         simple, irr)
 
 
@@ -663,18 +667,17 @@ def test_key_rate_durations_Bloomberg_example():
 
     krt, krd = bond.key_rate_durations(settle_date,
                                        ytm,
-                                       key_rate_tenors = my_tenors,
-                                       rates = my_rates)
+                                       key_rate_tenors=my_tenors,
+                                       rates=my_rates)
 
 #    print(key_rate_tenors)
 #    print(key_rate_durations)
 
-    # Differences due to bonds not sitting exactly on these maturity points ? Did BBG interpolate ?
+    # Differences due to bonds not sitting exactly on these maturity points ?
+    # Did BBG interpolate ?
 
 ###############################################################################
 
-
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 def test_oas():
 
@@ -692,7 +695,8 @@ def test_oas():
     liborFlatCurve = DiscountCurveFlat(settle_date, liborFlatRate,
                                        FrequencyTypes.SEMI_ANNUAL)
 
-    clean_price = 99.780842   # I specified face to be 100 - if face is 1 then this must be 0.99780842
+    # I specified face to be 100 - if face is 1 then this must be 0.99780842
+    clean_price = 99.780842
 
     oas = bond.option_adjusted_spread(settle_date, clean_price,
                                       liborFlatCurve) * 10000
@@ -705,16 +709,16 @@ def test_oas():
 
 def test_div_dates():
 
-    issueDate = Date(15, 5, 2020)
-    maturityDate = Date(15, 5, 2035)
+    issue_date = Date(15, 5, 2020)
+    maturity_date = Date(15, 5, 2035)
     coupon = 0.02375
-    freqType = FrequencyTypes.SEMI_ANNUAL
-    accrualType = DayCountTypes.ACT_ACT_ICMA
+    freq_type = FrequencyTypes.SEMI_ANNUAL
+    accrual_type = DayCountTypes.ACT_ACT_ICMA
     face = 125000
     ex_div_days = 10
 
-    bond = Bond(issueDate, maturityDate, coupon, freqType,
-                accrualType, ex_div_days)
+    bond = Bond(issue_date, maturity_date, coupon, freq_type,
+                accrual_type, ex_div_days)
 
     print(bond)
 
