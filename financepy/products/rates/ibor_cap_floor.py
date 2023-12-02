@@ -207,21 +207,22 @@ class IborCapFloor():
 
     def value_caplet_floor_let(self,
                                value_date,
-                               capletStartDate,
-                               capletEndDate,
+                               caplet_start_date,
+                               caplet_end_date,
                                libor_curve,
                                model):
         """ Value the caplet or floorlet using a specific model. """
 
-        t_exp = (capletStartDate - self._start_date) / gDaysInYear
+        t_exp = (caplet_start_date - self._start_date) / gDaysInYear
 
-        alpha = self._day_counter.year_frac(capletStartDate, capletEndDate)[0]
+        alpha = self._day_counter.year_frac(caplet_start_date,
+                                            caplet_end_date)[0]
 
-        f = libor_curve.fwd_rate(capletStartDate, capletEndDate,
+        f = libor_curve.fwd_rate(caplet_start_date, caplet_end_date,
                                  self._dc_type)
 
         k = self._strike_rate
-        df = libor_curve.df(capletEndDate)
+        df = libor_curve.df(caplet_end_date)
 
         if k == 0.0:
             k = 1e-10
@@ -273,9 +274,9 @@ class IborCapFloor():
 
         elif isinstance(model, HWTree):
 
-            tmat = (capletEndDate - value_date) / gDaysInYear
-            alpha = self._day_counter.year_frac(capletStartDate,
-                                                capletEndDate)[0]
+            tmat = (caplet_end_date - value_date) / gDaysInYear
+            alpha = self._day_counter.year_frac(caplet_start_date,
+                                                caplet_end_date)[0]
             strike_price = 1.0/(1.0 + alpha * self._strike_rate)
             notionalAdj = (1.0 + self._strike_rate * alpha)
             face_amount = 1.0

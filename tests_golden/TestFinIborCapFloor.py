@@ -234,25 +234,25 @@ def test_IborCapFloorVolCurve():
 
     # Value cap by breaking it down into caplets using caplet vols
     vCaplets = 0.0
-    capletStartDate = capFloor._capFloorLetDates[1]
+    capletstart_date = capFloor._capFloorLetDates[1]
     testCases.header("START", "END", "VOL", "VALUE")
 
-    for capletEndDate in capFloor._capFloorLetDates[2:]:
-        vol = volCurve.caplet_vol(capletEndDate)
+    for caplet_end_date in capFloor._capFloorLetDates[2:]:
+        vol = volCurve.caplet_vol(caplet_end_date)
         modelCaplet = Black(vol)
         vCaplet = capFloor.value_caplet_floor_let(value_date,
-                                                  capletStartDate,
-                                                  capletEndDate,
+                                                  capletstart_date,
+                                                  caplet_end_date,
                                                   libor_curve,
                                                   modelCaplet)
 
         vCaplets += vCaplet
-        testCases.print("%12s" % capletStartDate,
-                        "%s" % capletEndDate,
+        testCases.print("%12s" % capletstart_date,
+                        "%s" % caplet_end_date,
                         "%9.5f" % (vol*100.0),
                         "%9.5f" % vCaplet)
 
-        capletStartDate = capletEndDate
+        capletstart_date = caplet_end_date
 
     testCases.header("LABEL", "VALUE")
     testCases.print("CAPLETS->CAP: ", vCaplets)
@@ -286,12 +286,12 @@ def test_IborCapletHull():
     capFloor.value(value_date, libor_curve, model)
 
     # Value cap by breaking it down into caplets using caplet vols
-    capletStartDate = value_date.add_tenor("1Y")
-    capletEndDate = capletStartDate.add_tenor("3M")
+    capletstart_date = value_date.add_tenor("1Y")
+    caplet_end_date = capletstart_date.add_tenor("3M")
 
     vCaplet = capFloor.value_caplet_floor_let(value_date,
-                                              capletStartDate,
-                                              capletEndDate,
+                                              capletstart_date,
+                                              caplet_end_date,
                                               libor_curve,
                                               model)
 

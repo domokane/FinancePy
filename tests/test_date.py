@@ -42,129 +42,129 @@ def test_excel_representation():
 
 def test_Date():
 
-    startDate = Date(1, 1, 2018)
+    start_date = Date(1, 1, 2018)
 
     # Checking for num_months = 0
-    next_cds_date = startDate.next_cds_date(0)
+    next_cds_date = start_date.next_cds_date(0)
     assert next_cds_date == Date(20, 3, 2018)
 
     # Checking for num_months = 120
-    next_cds_date = startDate.next_cds_date(120)
+    next_cds_date = start_date.next_cds_date(120)
     assert next_cds_date == Date(20, 3, 2028)
 
-    startDate = Date(1, 1, 2018)
+    start_date = Date(1, 1, 2018)
 
     # Checking for num_days = 1
-    next_imm_date = startDate.add_days(1).next_imm_date()
+    next_imm_date = start_date.add_days(1).next_imm_date()
     assert next_imm_date == Date(21, 3, 2018)
 
     # Checking for num_days = 365
-    next_imm_date = startDate.add_days(365).next_imm_date()
+    next_imm_date = start_date.add_days(365).next_imm_date()
     assert next_imm_date == Date(20, 3, 2019)
 
 
 def test_DateTenors():
 
-    startDate = Date(23, 2, 2018)
+    start_date = Date(23, 2, 2018)
 
     tenor = "5d"
-    assert startDate.add_tenor(tenor) == Date(28, 2, 2018)
+    assert start_date.add_tenor(tenor) == Date(28, 2, 2018)
 
     tenor = "7D"
-    assert startDate.add_tenor(tenor) == Date(2, 3, 2018)
+    assert start_date.add_tenor(tenor) == Date(2, 3, 2018)
 
     tenor = "1W"
-    assert startDate.add_tenor(tenor) == Date(2, 3, 2018)
+    assert start_date.add_tenor(tenor) == Date(2, 3, 2018)
 
     tenor = "4W"
-    assert startDate.add_tenor(tenor) == Date(23, 3, 2018)
+    assert start_date.add_tenor(tenor) == Date(23, 3, 2018)
 
     tenor = "1M"
-    assert startDate.add_tenor(tenor) == Date(23, 3, 2018)
+    assert start_date.add_tenor(tenor) == Date(23, 3, 2018)
 
     tenor = "24M"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2020)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2020)
 
     tenor = "2Y"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2020)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2020)
 
     tenor = "10y"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2028)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2028)
 
     tenor = "0m"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2018)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2018)
 
     tenor = "20Y"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2038)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2038)
 
     tenor = "-5d"
-    assert startDate.add_tenor(tenor) == Date(18, 2, 2018)
+    assert start_date.add_tenor(tenor) == Date(18, 2, 2018)
 
     tenor = "-7D"
-    assert startDate.add_tenor(tenor) == Date(16, 2, 2018)
+    assert start_date.add_tenor(tenor) == Date(16, 2, 2018)
 
     tenor = "-1W"
-    assert startDate.add_tenor(tenor) == Date(16, 2, 2018)
+    assert start_date.add_tenor(tenor) == Date(16, 2, 2018)
 
     tenor = "-4W"
-    assert startDate.add_tenor(tenor) == Date(26, 1, 2018)
+    assert start_date.add_tenor(tenor) == Date(26, 1, 2018)
 
     tenor = "-1M"
-    assert startDate.add_tenor(tenor) == Date(23, 1, 2018)
+    assert start_date.add_tenor(tenor) == Date(23, 1, 2018)
 
     tenor = "-24M"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2016)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2016)
 
     tenor = "-2Y"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2016)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2016)
 
     tenor = "-10y"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2008)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2008)
 
     tenor = "-0m"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 2018)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 2018)
 
     tenor = "-20Y"
-    assert startDate.add_tenor(tenor) == Date(23, 2, 1998)
+    assert start_date.add_tenor(tenor) == Date(23, 2, 1998)
 
 
 def test_DateRange():
 
-    startDate = Date(1, 1, 2010)
+    start_date = Date(1, 1, 2010)
 
     # Default
-    endDate = startDate.add_days(3)
-    dtRange = date_range(startDate, endDate)
+    end_date = start_date.add_days(3)
+    dtRange = date_range(start_date, end_date)
     assert dtRange[0] == Date(1, 1, 2010)
     assert dtRange[-1] == Date(4, 1, 2010)
 
     # 1W Tenor
-    endDate = startDate.add_days(20)
+    end_date = start_date.add_days(20)
     tenor = "1W"
-    dtRange = date_range(startDate, endDate, tenor)
+    dtRange = date_range(start_date, end_date, tenor)
     assert dtRange[0] == Date(1, 1, 2010)
     assert dtRange[-1] == Date(21, 1, 2010)
 
     # 7D Tenor
     tenor = "7D"
-    dtRange = date_range(startDate, endDate, tenor)
+    dtRange = date_range(start_date, end_date, tenor)
     assert dtRange[1] == Date(8, 1, 2010)
     assert dtRange[2] == Date(15, 1, 2010)
 
-    # Same startDate
-    assert date_range(startDate, startDate)[0] == Date(1, 1, 2010)
+    # Same start_date
+    assert date_range(start_date, start_date)[0] == Date(1, 1, 2010)
 
-    # startDate before endDate"
-    assert len(date_range(endDate, startDate)) == 0
+    # start_date before end_date"
+    assert len(date_range(end_date, start_date)) == 0
 
 
 def test_DateAddMonths():
 
-    startDate = Date(1, 1, 2010)
+    start_date = Date(1, 1, 2010)
 
     months = [1, 3, 6, 9, 12, 24, 36, 48, 60]
 
-    dates = startDate.add_months(months)
+    dates = start_date.add_months(months)
 
     assert dates[0] == Date(1, 2, 2010)
     assert dates[-1] == Date(1, 1, 2015)
@@ -173,25 +173,25 @@ def test_DateAddMonths():
 
 def test_DateAddYears():
 
-    startDate = Date(1, 1, 2010)
+    start_date = Date(1, 1, 2010)
 
     # Simple list as input
     years = [1, 3, 5, 7, 10]
-    dates_list = startDate.add_years(years)
+    dates_list = start_date.add_years(years)
     assert len(dates_list) == len(years)
     assert dates_list[0] == Date(1, 1, 2011)
     assert dates_list[-1] == Date(1, 1, 2020)
 
     # Numpy array as input
     years = np.array([1, 3, 5, 7, 10])
-    dates_numpy = startDate.add_years(years)
+    dates_numpy = start_date.add_years(years)
     assert len(dates_numpy) == len(years)
     assert dates_numpy[0] == Date(1, 1, 2011)
     assert dates_numpy[-1] == Date(1, 1, 2020)
 
     # Fractional years as input
     years = np.array([1.5, 3.25, 5.75, 7.25, 10.0])
-    dates_fractional = startDate.add_years(years)
+    dates_fractional = start_date.add_years(years)
     assert len(dates_fractional) == len(years)
     assert dates_fractional[0] == Date(1, 7, 2011)
     assert dates_fractional[-1] == Date(1, 1, 2020)
@@ -201,7 +201,7 @@ def test_DateAddYears():
     years = np.array(
         [1.5 + 2.0 * dt, 3.5 - 6 * dt, 5.75 + 3 * dt, 7.25 + dt, 10.0 + dt]
     )
-    dates_fractional_np = startDate.add_years(years)
+    dates_fractional_np = start_date.add_years(years)
     assert len(dates_fractional_np) == len(years)
     assert dates_fractional_np[0] == Date(3, 7, 2011)
     assert dates_fractional_np[-1] == Date(2, 1, 2020)
