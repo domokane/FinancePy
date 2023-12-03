@@ -109,7 +109,7 @@ def value_mc_fast(t,
 class EquityRainbowOption(EquityOption):
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  payoff_type: EquityRainbowOptionTypes,
                  payoff_params: List[float],
                  num_assets: int):
@@ -118,7 +118,7 @@ class EquityRainbowOption(EquityOption):
 
         self._validate_payoff(payoff_type, payoff_params, num_assets)
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._payoff_type = payoff_type
         self._payoff_params = payoff_params
         self._num_assets = num_assets
@@ -187,20 +187,20 @@ class EquityRainbowOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_prices: np.ndarray,
               discount_curve: DiscountCurve,
               dividend_curves: (list),
               volatilities: np.ndarray,
               corr_matrix: np.ndarray):
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
@@ -216,15 +216,15 @@ class EquityRainbowOption(EquityOption):
         if corr_matrix.shape[1] != 2:
             raise FinError("Corr matrix must be of size 2x2")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Value date after expiry date.")
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self._expiry_date - value_date) / gDaysInYear
-        r = discount_curve.zero_rate(self._expiry_date)
+        t = (self._expiry_dt - value_dt) / gDaysInYear
+        r = discount_curve.zero_rate(self._expiry_dt)
 
-        q1 = dividend_curves[0].zero_rate(self._expiry_date)
-        q2 = dividend_curves[1].zero_rate(self._expiry_date)
+        q1 = dividend_curves[0].zero_rate(self._expiry_dt)
+        q2 = dividend_curves[1].zero_rate(self._expiry_dt)
 
         dividend_yields = [q1, q2]
 
@@ -281,7 +281,7 @@ class EquityRainbowOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                 value_date,
+                 value_dt,
                  stock_prices,
                  discount_curve,
                  dividend_curves,
@@ -295,10 +295,10 @@ class EquityRainbowOption(EquityOption):
                        volatilities,
                        corr_matrix)
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
         v = value_mc_fast(t,
                           stock_prices,
@@ -319,7 +319,7 @@ class EquityRainbowOption(EquityOption):
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("PAYOFF TYPE", self._payoff_type)
         s += label_to_string("PAYOFF PARAMS", self._payoff_params)
         s += label_to_string("NUM ASSETS TYPE", self._num_assets, "")

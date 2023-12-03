@@ -32,7 +32,7 @@ class FXFixedLookbackOption:
     """ The Class for FX Fixed Strike Lookback options. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  option_type: OptionTypes,
                  optionStrike: float):
         """ Create option with expiry date, option type and the option strike
@@ -40,14 +40,14 @@ class FXFixedLookbackOption:
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._option_type = option_type
         self._optionStrike = optionStrike
 
 ##########################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: float,
               dom_discount_curve: DiscountCurve,
               for_discount_curve: DiscountCurve,
@@ -56,26 +56,26 @@ class FXFixedLookbackOption:
         """ Value FX Fixed Lookback Option using Black Scholes model and
         analytical formulae. """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_date != value_date:
+        if dom_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if for_discount_curve._value_date != value_date:
+        if for_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
-        df = dom_discount_curve.df(self._expiry_date)
+        df = dom_discount_curve.df(self._expiry_dt)
         r = -np.log(df)/t
 
-        dq = for_discount_curve.df(self._expiry_date)
+        dq = for_discount_curve.df(self._expiry_dt)
         q = -np.log(dq)/t
 
         v = volatility
@@ -178,7 +178,7 @@ class FXFixedLookbackOption:
 ###############################################################################
 
     def value_mc(self,
-                 value_date: Date,
+                 value_dt: Date,
                  spot_fx_rate: float,  # FORDOM
                  domestic_curve: DiscountCurve,
                  foreign_curve: DiscountCurve,
@@ -189,7 +189,7 @@ class FXFixedLookbackOption:
                  seed: int = 4242):
         """ Value FX Fixed Lookback option using Monte Carlo. """
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         S0 = spot_fx_rate
 
         df = domestic_curve._df(t)

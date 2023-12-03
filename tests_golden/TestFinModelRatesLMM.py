@@ -30,7 +30,7 @@ from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -50,14 +50,14 @@ def getCorrelationMatrix(numFwds, beta, dt):
 
 """ def getVolCurve(numFwds, dt, flatVol=None):
 
-    value_date = Date(1, 1, 2020)
+    value_dt = Date(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
     num_periods = 10
-    capletDt = value_date
+    capletDt = value_dt
 
-    capVolDates.append(value_date)
+    capVolDates.append(value_dt)
     for _ in range(0, num_periods):
         capletDt = capletDt.add_tenor(capletVolTenor)
         capVolDates.append(capletDt)
@@ -72,7 +72,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities[0] = 0.0
 
     dc_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = IborCapVolCurve(value_date,
+    volCurve = IborCapVolCurve(value_dt,
                                    capVolDates,
                                    capVolatilities,
                                    dc_type)
@@ -147,36 +147,36 @@ def getForwardCurve(numFwds, r):
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
-#         value_date = Date(1, 1, 2010)
-#         libor_curve = FinDiscountCurveFlat(value_date, r,
+#         value_dt = Date(1, 1, 2010)
+#         libor_curve = FinDiscountCurveFlat(value_dt, r,
 #                                           FrequencyTypes.QUARTERLY)
 
-#         settle_date = value_date
-#         exercise_date = settle_date.add_months(a*3)
-#         maturity_date = settle_date.add_months(b*3)
+#         settle_dt = value_dt
+#         exercise_dt = settle_dt.add_months(a*3)
+#         maturity_dt = settle_dt.add_months(b*3)
 
 #         fixed_coupon = strike
-#         fixed_frequency_type = FrequencyTypes.QUARTERLY
+#         fixed_freq_type = FrequencyTypes.QUARTERLY
 #         fixed_dc_type = DayCountTypes.ACT_ACT_ISDA
-#         float_frequency_type = FrequencyTypes.QUARTERLY
+#         float_freq_type = FrequencyTypes.QUARTERLY
 #         float_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         notional = 1.0
 
 #         # Pricing a PAY
 #         swaptionType = IborSwaptionTypes.PAY
-#         swaption = IborSwaption(settle_date,
-#                                     exercise_date,
-#                                     maturity_date,
+#         swaption = IborSwaption(settle_dt,
+#                                     exercise_dt,
+#                                     maturity_dt,
 #                                     swaptionType,
 #                                     fixed_coupon,
-#                                     fixed_frequency_type,
+#                                     fixed_freq_type,
 #                                     fixed_dc_type,
 #                                     notional,
-#                                     float_frequency_type,
+#                                     float_freq_type,
 #                                     float_dc_type)
 
 #         model = Black(swaptionVol)
-#         blackSwaptionPrice = swaption.value(value_date, libor_curve, model)
+#         blackSwaptionPrice = swaption.value(value_dt, libor_curve, model)
 
 #         print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
 #               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF, swaptionVol,
@@ -263,7 +263,7 @@ def test_HullBookExamples():
     num_paths = 500000
     spread = 0.0025  # basis points
 
-    testCases.header("COMMENTS", "VALUES")
+    test_cases.header("COMMENTS", "VALUES")
 
     ###########################################################################
     # HULL TABLE 32.1
@@ -293,9 +293,9 @@ def test_HullBookExamples():
     hullRatchetCaplets1F = np.array(hullRatchetCaplets1F)
 
     if verbose:
-        testCases.banner("Ratchet ONE FACTOR IMPLEMENTATION")
-        testCases.print("FINANCEPY GETS:", vRatchetCaplets)
-        testCases.print("HULL GETS:", hullRatchetCaplets1F)
+        test_cases.banner("Ratchet ONE FACTOR IMPLEMENTATION")
+        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
+        test_cases.print("HULL GETS:", hullRatchetCaplets1F)
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
@@ -306,9 +306,9 @@ def test_HullBookExamples():
                            0.498, 0.502, 0.501, 0.497, 0.488]
 
     if verbose:
-        testCases.banner("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
-        testCases.print("FINANCEPY GETS:", vStickyCaplets)
-        testCases.print("HULL GETS:", hullStickyCaplets1F)
+        test_cases.banner("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
+        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
+        test_cases.print("HULL GETS:", hullStickyCaplets1F)
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
@@ -328,9 +328,9 @@ def test_HullBookExamples():
                             0.1890, 0.172, 0.167, 0.160, 0.153]
 
     if verbose:
-        testCases.banner("RATCHET - NUM FACTORS 1F")
-        testCases.print("FINANCEPY GETS:", vRatchetCaplets)
-        testCases.print("HULL GETS:", hullRatchetCaplets1F)
+        test_cases.banner("RATCHET - NUM FACTORS 1F")
+        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
+        test_cases.print("HULL GETS:", hullRatchetCaplets1F)
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
@@ -343,9 +343,9 @@ def test_HullBookExamples():
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
     if verbose:
-        testCases.banner("STICKY RATCHET - NUM FACTORS 1")
-        testCases.print("FINANCEPY GETS:", vStickyCaplets)
-        testCases.print("HULL GETS:", hullStickyCaplets1F)
+        test_cases.banner("STICKY RATCHET - NUM FACTORS 1")
+        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
+        test_cases.print("HULL GETS:", hullStickyCaplets1F)
 
     numFactors = 2
     lambdas2FList = [[0.00, 0.1410, 0.1952, 0.1678, 0.1711, 0.1525,
@@ -364,9 +364,9 @@ def test_HullBookExamples():
                             0.189, 0.180, 0.174, 0.168, 0.162]
 
     if verbose:
-        testCases.banner("RATCHET - NUM FACTORS:2")
-        testCases.print("FINANCEPY GETS:", vRatchetCaplets)
-        testCases.print("HULL GETS:", hullRatchetCaplets2F)
+        test_cases.banner("RATCHET - NUM FACTORS:2")
+        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
+        test_cases.print("HULL GETS:", hullRatchetCaplets2F)
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
 
@@ -377,9 +377,9 @@ def test_HullBookExamples():
                            0.512, 0.520, 0.523, 0.523, 0.519]
 
     if verbose:
-        testCases.banner("STICKY RATCHET - NUM FACTORS:2")
-        testCases.print("FINANCEPY GETS:", vStickyCaplets)
-        testCases.print("HULL GETS:", hullStickyCaplets2F)
+        test_cases.banner("STICKY RATCHET - NUM FACTORS:2")
+        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
+        test_cases.print("HULL GETS:", hullStickyCaplets2F)
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
 
@@ -403,9 +403,9 @@ def test_HullBookExamples():
                                                 fwd0, fwds3F, taus) * 100.0
 
     if verbose:
-        testCases.banner("RATCHET - NUM FACTORS:3")
-        testCases.print("FINANCEPY GETS:", vRatchetCaplets)
-        testCases.print("HULL GETS:", hullRatchetCaplets3F)
+        test_cases.banner("RATCHET - NUM FACTORS:3")
+        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
+        test_cases.print("HULL GETS:", hullRatchetCaplets3F)
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
 
@@ -416,9 +416,9 @@ def test_HullBookExamples():
                            0.524, 0.533, 0.537, 0.537, 0.534]
 
     if verbose:
-        testCases.banner("STICKY RATCHET - NUM FACTORS:3")
-        testCases.print("FINANCEPY GETS:", vStickyCaplets)
-        testCases.print("HULL GETS:", hullStickyCaplets3F)
+        test_cases.banner("STICKY RATCHET - NUM FACTORS:3")
+        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
+        test_cases.print("HULL GETS:", hullStickyCaplets3F)
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets3F, 1e-2)
 
@@ -470,4 +470,4 @@ def fwdfwdCorrelation(fwds):
 test_HullBookExamples()
 # test_CapsFloors()
 # test_Swaptions()
-testCases.compareTestCases()
+test_cases.compareTestCases()

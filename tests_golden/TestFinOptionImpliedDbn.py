@@ -15,7 +15,7 @@ from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -27,15 +27,15 @@ def test_FinOptionImpliedDbn():
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
 
-        value_date = Date(10, 4, 2020)
+        value_dt = Date(10, 4, 2020)
 
         forName = "EUR"
         domName = "USD"
         forCCRate = 0.03460  # EUR
         domCCRate = 0.02940  # USD
 
-        dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-        for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+        dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+        for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
         currency_pair = forName + domName
         spot_fx_rate = 1.3465
@@ -50,7 +50,7 @@ def test_FinOptionImpliedDbn():
         atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FXVolSurface(value_date,
+        fxMarket = FXVolSurface(value_dt,
                                 spot_fx_rate,
                                 currency_pair,
                                 notional_currency,
@@ -109,4 +109,4 @@ def test_FinOptionImpliedDbn():
 
 
 test_FinOptionImpliedDbn()
-testCases.compareTestCases()
+test_cases.compareTestCases()

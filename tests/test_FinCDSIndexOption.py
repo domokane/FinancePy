@@ -21,7 +21,7 @@ def test_dirty_priceCDSIndexOption():
 
     tradeDate = Date(1, 8, 2007)
     step_in_date = tradeDate.add_days(1)
-    value_date = step_in_date
+    value_dt = step_in_date
 
     libor_curve = build_Ibor_Curve(tradeDate)
 
@@ -52,7 +52,7 @@ def test_dirty_priceCDSIndexOption():
         cds10Y = CDS(step_in_date, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(value_date,
+        issuer_curve = CDSCurve(value_dt,
                                 cds_contracts,
                                 libor_curve,
                                 recovery_rate)
@@ -63,7 +63,7 @@ def test_dirty_priceCDSIndexOption():
     ##########################################################################
 
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
-    index_maturity_dates = [Date(20, 12, 2009),
+    index_maturity_dts = [Date(20, 12, 2009),
                             Date(20, 12, 2011),
                             Date(20, 12, 2013),
                             Date(20, 12, 2016)]
@@ -72,7 +72,7 @@ def test_dirty_priceCDSIndexOption():
     index_coupon = 0.004
     volatility = 0.50
     expiry_date = Date(1, 2, 2008)
-    maturity_date = Date(20, 12, 2011)
+    maturity_dt = Date(20, 12, 2011)
     notional = 10000.0
     tolerance = 1e-6
 
@@ -87,37 +87,37 @@ def test_dirty_priceCDSIndexOption():
         #######################################################################
 
         cds_contracts = []
-        for dt in index_maturity_dates:
-            cds = CDS(value_date, dt, index / 10000.0)
+        for dt in index_maturity_dts:
+            cds = CDS(value_dt, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(value_date, cds_contracts,
+        index_curve = CDSCurve(value_dt, cds_contracts,
                                libor_curve, indexRecovery)
 
         indexSpreads = [index / 10000.0] * 4
 
         indexPortfolio = CDSIndexPortfolio()
         adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
-            value_date,
+            value_dt,
             issuer_curves,
             indexSpreads,
             index_upfronts,
-            index_maturity_dates,
+            index_maturity_dts,
             indexRecovery,
             tolerance)
 
         #######################################################################
 
         option = CDSIndexOption(expiry_date,
-                                maturity_date,
+                                maturity_dt,
                                 index_coupon,
                                 strike / 10000.0,
                                 notional)
 
         v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
-            value_date, adjustedIssuerCurves, indexRecovery, volatility)
+            value_dt, adjustedIssuerCurves, indexRecovery, volatility)
 
-        v_pay_2, v_rec_2 = option.value_adjusted_black(value_date,
+        v_pay_2, v_rec_2 = option.value_adjusted_black(value_dt,
                                                        index_curve,
                                                        indexRecovery,
                                                        libor_curve,

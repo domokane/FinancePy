@@ -13,7 +13,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-maturity_date = Date(15, 3, 2022)
+maturity_dt = Date(15, 3, 2022)
 coupon = 0.0575
 freq_type = FrequencyTypes.SEMI_ANNUAL
 start_convert_date = Date(31, 12, 2003)
@@ -33,7 +33,7 @@ putPrice = 90.0
 put_prices = np.array([putPrice, putPrice, putPrice])
 accrualBasis = DayCountTypes.ACT_365F
 
-bond = BondConvertible(maturity_date,
+bond = BondConvertible(maturity_dt,
                        coupon,
                        freq_type,
                        start_convert_date,
@@ -44,10 +44,10 @@ bond = BondConvertible(maturity_date,
                        put_prices,
                        accrualBasis)
 
-settle_date = Date(31, 12, 2003)
+settle_dt = Date(31, 12, 2003)
 stock_price = 28.5
 stock_volatility = 0.370
-dividend_dates = [Date(20, 3, 2007),
+dividend_dts = [Date(20, 3, 2007),
                   Date(15, 3, 2008),
                   Date(15, 3, 2009),
                   Date(15, 3, 2010),
@@ -65,7 +65,7 @@ dividend_dates = [Date(20, 3, 2007),
                   Date(15, 3, 2022)]
 rate = 0.04
 
-discount_curve = DiscountCurveFlat(settle_date,
+discount_curve = DiscountCurveFlat(settle_dt,
                                    rate,
                                    FrequencyTypes.CONTINUOUS)
 credit_spread = 0.00
@@ -78,10 +78,10 @@ def test_calls_or_puts():
 
     num_steps_per_year = 5
 
-    res = bond.value(settle_date,
+    res = bond.value(settle_dt,
                      stock_price,
                      stock_volatility,
-                     dividend_dates,
+                     dividend_dts,
                      dividend_yields,
                      discount_curve,
                      credit_spread,
@@ -95,10 +95,10 @@ def test_calls_or_puts():
     assert round(res['theta'], 4) == 39.6423
 
     num_steps_per_year = 20
-    res = bond.value(settle_date,
+    res = bond.value(settle_dt,
                      stock_price,
                      stock_volatility,
-                     dividend_dates,
+                     dividend_dts,
                      dividend_yields,
                      discount_curve,
                      credit_spread,
@@ -116,10 +116,10 @@ def test_dividends():
     dividend_yields = [0.02] * 16
 
     num_steps_per_year = 5
-    res = bond.value(settle_date,
+    res = bond.value(settle_dt,
                      stock_price,
                      stock_volatility,
-                     dividend_dates,
+                     dividend_dts,
                      dividend_yields,
                      discount_curve,
                      credit_spread,
@@ -133,10 +133,10 @@ def test_dividends():
     assert round(res['theta'], 4) == 37.8822
 
     num_steps_per_year = 20
-    res = bond.value(settle_date,
+    res = bond.value(settle_dt,
                      stock_price,
                      stock_volatility,
-                     dividend_dates,
+                     dividend_dts,
                      dividend_yields,
                      discount_curve,
                      credit_spread,

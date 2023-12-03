@@ -30,7 +30,8 @@ class Black():
     """ Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. """
 
-    def __init__(self, volatility, implementation_type=BlackTypes.ANALYTICAL, num_steps=0):
+    def __init__(self, volatility, implementation_type=BlackTypes.ANALYTICAL,
+                 num_steps=0):
         """ Create FinModel black using parameters. """
         self._volatility = volatility
         self._implementation_type = implementation_type

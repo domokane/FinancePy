@@ -17,7 +17,7 @@ from financepy.utils.frequency import FrequencyTypes
 import datetime as dt
 import os
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False
 
@@ -40,12 +40,12 @@ def test_BondZeroCurve():
 
     for _, bondRow in bondDataFrame.iterrows():
         date_string = bondRow['maturity']
-        matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-        maturityDt = from_datetime(matDatetime)
-        issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+        mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+        maturity_dt = from_datetime(mat_date_time)
+        issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
         coupon = bondRow['coupon']/100.0
         clean_price = bondRow['mid']
-        bond = Bond(issueDt, maturityDt, coupon, freq_type, dc_type)
+        bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
         bonds.append(bond)
         clean_prices.append(clean_price)
 
@@ -53,15 +53,15 @@ def test_BondZeroCurve():
 
     bondCurve = BondZeroCurve(settlement, bonds, clean_prices)
 
-    testCases.header("DATE", "ZERO RATE")
+    test_cases.header("DATE", "ZERO RATE")
 
     for _, bond in bondDataFrame.iterrows():
 
         date_string = bond['maturity']
-        matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-        maturityDt = from_datetime(matDatetime)
-        zero_rate = bondCurve.zero_rate(maturityDt)
-        testCases.print(maturityDt, zero_rate)
+        mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+        maturity_dt = from_datetime(mat_date_time)
+        zero_rate = bondCurve.zero_rate(maturity_dt)
+        test_cases.print(maturity_dt, zero_rate)
 
     if plotGraphs:
         bondCurve.plot("BOND CURVE")
@@ -70,4 +70,4 @@ def test_BondZeroCurve():
 ###############################################################################
 
 test_BondZeroCurve()
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -85,7 +85,7 @@ def loss_dbn_recursion_gcd(num_credits,
 
 @njit(float64[:](float64[:], float64[:], float64[:], int64),
       fastmath=True, cache=True)
-def homog_basket_loss_dbn(survival_probabilities,
+def homog_basket_loss_dbn(survival_probs,
                           recovery_rates,
                           beta_vector,
                           num_integration_steps):
@@ -93,7 +93,7 @@ def homog_basket_loss_dbn(survival_probabilities,
     portfolio is equally weighted and the losses in the portfolio are homo-
     geneous i.e. the credits have the same recovery rates. """
 
-    num_credits = len(survival_probabilities)
+    num_credits = len(survival_probs)
 
     if num_credits == 0:
         raise FinError("Number of credits equals zero")
@@ -118,7 +118,7 @@ def homog_basket_loss_dbn(survival_probabilities,
 
     default_probs = np.zeros(num_credits)
     for i_credit in range(0, num_credits):
-        default_probs[i_credit] = 1.0 - survival_probabilities[i_credit]
+        default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     lossDbn = loss_dbn_recursion_gcd(num_credits,
                                      default_probs,
@@ -136,7 +136,7 @@ def homog_basket_loss_dbn(survival_probabilities,
 def tranche_surv_prob_recursion(k1,
                                 k2,
                                 num_credits,
-                                survival_probabilities,
+                                survival_probs,
                                 recovery_rates,
                                 beta_vector,
                                 num_integration_steps):
@@ -183,7 +183,7 @@ def tranche_surv_prob_recursion(k1,
     default_probs = np.zeros(num_credits)
 
     for i_credit in range(0, num_credits):
-        default_probs[i_credit] = 1.0 - survival_probabilities[i_credit]
+        default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     lossDbn = loss_dbn_recursion_gcd(num_credits,
                                      default_probs,
@@ -231,7 +231,7 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
 def tranch_surv_prob_gaussian(k1,
                               k2,
                               num_credits,
-                              survival_probabilities,
+                              survival_probs,
                               recovery_rates,
                               beta_vector,
                               num_integration_steps):
@@ -248,7 +248,7 @@ def tranch_surv_prob_gaussian(k1,
 
     default_probs = [0.0] * num_credits
     for i_credit in range(0, num_credits):
-        default_probs[i_credit] = 1.0 - survival_probabilities[i_credit]
+        default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     dz = 2.0 * abs(minZ) / num_integration_steps
     z = minZ
@@ -257,7 +257,7 @@ def tranch_surv_prob_gaussian(k1,
     losses = np.zeros(num_credits)
 
     for i_credit in range(0, num_credits):
-        pd = 1.0 - survival_probabilities[i_credit]
+        pd = 1.0 - survival_probs[i_credit]
         thresholds[i_credit] = norminvcdf(pd)
         losses[i_credit] = (1.0 - recovery_rates[i_credit]) / num_credits
 
@@ -344,7 +344,7 @@ def loss_dbn_hetero_adj_binomial(num_credits,
 def tranche_surv_prob_adj_binomial(k1,
                                    k2,
                                    num_credits,
-                                   survival_probabilities,
+                                   survival_probs,
                                    recovery_rates,
                                    beta_vector,
                                    num_integration_steps):
@@ -361,7 +361,7 @@ def tranche_surv_prob_adj_binomial(k1,
 
     default_probs = np.zeros(num_credits)
     for i_credit in range(0, num_credits):
-        default_probs[i_credit] = 1.0 - survival_probabilities[i_credit]
+        default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     totalLoss = 0.0
     for i_credit in range(0, num_credits):

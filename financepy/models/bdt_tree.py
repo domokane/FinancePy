@@ -404,25 +404,25 @@ def american_bond_option_tree_fast(t_exp, tmat,
 
             dirty_price = bond_values[m, k]
             clean_price = dirty_price - accrued[m]
-            callExercise = max(clean_price - strike_price, 0.0)
-            putExercise = max(strike_price - clean_price, 0.0)
+            call_exercise = max(clean_price - strike_price, 0.0)
+            put_exercise = max(strike_price - clean_price, 0.0)
 
             holdCall = call_option_values[m, k]
             holdPut = put_option_values[m, k]
 
             if m == expiry_step:
 
-                call_option_values[m, k] = max(callExercise, holdCall)
-                put_option_values[m, k] = max(putExercise, holdPut)
+                call_option_values[m, k] = max(call_exercise, holdCall)
+                put_option_values[m, k] = max(put_exercise, holdPut)
 
             elif exercise_type_int == 3 and m < expiry_step:
 
-                call_option_values[m, k] = max(callExercise, holdCall)
-                put_option_values[m, k] = max(putExercise, holdPut)
+                call_option_values[m, k] = max(call_exercise, holdCall)
+                put_option_values[m, k] = max(put_exercise, holdPut)
 
         if DEBUG:
             print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
-                  callExercise, putExercise)
+                  call_exercise, put_exercise)
 
     return call_option_values[0, 0], put_option_values[0, 0]
 

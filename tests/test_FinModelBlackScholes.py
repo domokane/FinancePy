@@ -15,8 +15,8 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 
 
-value_date = Date(8, 5, 2015)
-expiry_date = Date(15, 1, 2016)
+value_dt = Date(8, 5, 2015)
+expiry_dt = Date(15, 1, 2016)
 
 strike_price = 130.0
 stock_price = 127.62
@@ -27,23 +27,23 @@ dividend_yield = 0.0163
 option_type = OptionTypes.AMERICAN_CALL
 euOptionType = OptionTypes.EUROPEAN_CALL
 
-amOption = EquityAmericanOption(expiry_date,
+amOption = EquityAmericanOption(expiry_dt,
                                 strike_price,
                                 option_type)
 
-ameuOption = EquityAmericanOption(expiry_date,
+ameuOption = EquityAmericanOption(expiry_dt,
                                   strike_price,
                                   euOptionType)
 
-euOption = EquityVanillaOption(expiry_date,
+euOption = EquityVanillaOption(expiry_dt,
                                strike_price,
                                euOptionType)
 
-discount_curve = DiscountCurveFlat(value_date, interest_rate,
+discount_curve = DiscountCurveFlat(value_dt, interest_rate,
                                    FrequencyTypes.CONTINUOUS,
                                    DayCountTypes.ACT_365F)
 
-dividend_curve = DiscountCurveFlat(value_date, dividend_yield,
+dividend_curve = DiscountCurveFlat(value_dt, dividend_yield,
                                    FrequencyTypes.CONTINUOUS,
                                    DayCountTypes.ACT_365F)
 
@@ -55,24 +55,24 @@ modelTree = BlackScholes(volatility,
 
 
 def test_black_scholes():
-    v = amOption.value(value_date, stock_price, discount_curve,
+    v = amOption.value(value_dt, stock_price, discount_curve,
                        dividend_curve, modelTree)
     assert round(v, 4) == 6.8391
 
     modelApprox = BlackScholes(volatility,
                                BlackScholesTypes.BARONE_ADESI)
 
-    v = amOption.value(value_date, stock_price, discount_curve,
+    v = amOption.value(value_dt, stock_price, discount_curve,
                        dividend_curve, modelApprox)
 
     assert round(v, 4) == 6.8277
 
-    v = ameuOption.value(value_date, stock_price, discount_curve,
+    v = ameuOption.value(value_dt, stock_price, discount_curve,
                          dividend_curve, modelTree)
 
     assert round(v, 4) == 6.7510
 
-    v = euOption.value(value_date, stock_price, discount_curve,
+    v = euOption.value(value_dt, stock_price, discount_curve,
                        dividend_curve, modelTree)
 
     assert round(v, 4) == 6.7493
@@ -82,9 +82,9 @@ def test_bjerksund_stensland():
     # Valuation of American call option as in Bjerksund and Sensland's paper published in 1993.
     # See Table 2 in https://www.sciencedirect.com/science/article/abs/pii/095652219390009H
 
-    # value_date and exipry_date are set so that time to maturity becomes 0.25
-    value_date = Date(8, 5, 2015)
-    expiry_date = Date(7, 8, 2015, hh=6)
+    # value_dt and exipry_dt are set so that time to maturity becomes 0.25
+    value_dt = Date(8, 5, 2015)
+    expiry_dt = Date(7, 8, 2015, hh=6)
     interest_rate = 0.08
     volatility = 0.40
     borrow_rate = 0.04
@@ -92,12 +92,12 @@ def test_bjerksund_stensland():
     stock_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
 
     # model setting
-    discount_curve = DiscountCurveFlat(value_date,
+    discount_curve = DiscountCurveFlat(value_dt,
                                        interest_rate,
                                        FrequencyTypes.CONTINUOUS,
                                        DayCountTypes.ACT_365F)
 
-    borrow_curve = DiscountCurveFlat(value_date,
+    borrow_curve = DiscountCurveFlat(value_dt,
                                      borrow_rate,
                                      FrequencyTypes.CONTINUOUS,
                                      DayCountTypes.ACT_365F)
@@ -107,12 +107,12 @@ def test_bjerksund_stensland():
 
     # american call case
     amCallOption = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.AMERICAN_CALL)
+        expiry_dt, strike_price, OptionTypes.AMERICAN_CALL)
     values = []
 
     for stock_price in stock_prices:
 
-        value = amCallOption.value(value_date,
+        value = amCallOption.value(value_dt,
                                    stock_price,
                                    discount_curve,
                                    borrow_curve,
@@ -123,7 +123,7 @@ def test_bjerksund_stensland():
     assert values == [1.29, 3.82, 8.35, 14.80, 22.71]
 
     # american put case
-    amPutOption = EquityAmericanOption(expiry_date,
+    amPutOption = EquityAmericanOption(expiry_dt,
                                        strike_price,
                                        OptionTypes.AMERICAN_PUT)
 
@@ -131,7 +131,7 @@ def test_bjerksund_stensland():
 
     for stock_price in stock_prices:
 
-        value = amPutOption.value(value_date,
+        value = amPutOption.value(value_dt,
                                   stock_price,
                                   discount_curve,
                                   borrow_curve,
@@ -154,7 +154,7 @@ def test_black_scholes_fd():
                          bs_type=BlackScholesTypes.FINITE_DIFFERENCE,
                          params=params)
 
-    v = amOption.value(value_date,
+    v = amOption.value(value_dt,
                        stock_price,
                        discount_curve,
                        dividend_curve,
@@ -162,7 +162,7 @@ def test_black_scholes_fd():
 
     assert v == approx(6.8391, 1e-1)
 
-    v = ameuOption.value(value_date,
+    v = ameuOption.value(value_dt,
                          stock_price,
                          discount_curve,
                          dividend_curve,
@@ -170,7 +170,7 @@ def test_black_scholes_fd():
 
     assert v == approx(6.7510, 1e-1)
 
-    v = euOption.value(value_date,
+    v = euOption.value(value_dt,
                        stock_price,
                        discount_curve,
                        dividend_curve,

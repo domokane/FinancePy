@@ -26,7 +26,7 @@ class DiscountCurveNS(DiscountCurve):
     correct time in years. The class inherits methods from FinDiscountCurve."""
 
     def __init__(self,
-                 value_date: Date,
+                 value_dt: Date,
                  beta0: float,
                  beta1: float,
                  beta2: float,
@@ -43,7 +43,7 @@ class DiscountCurveNS(DiscountCurve):
         if tau <= 0:
             raise FinError("Tau must be positive")
 
-        self._value_date = value_date
+        self._value_dt = value_dt
         self._beta0 = beta0
         self._beta1 = beta1
         self._beta2 = beta2
@@ -73,14 +73,14 @@ class DiscountCurveNS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_date,
+                                    self._value_dt,
                                     self._dc_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(self._value_date,
+        dfs = self._zero_to_df(self._value_dt,
                                zero_rates,
                                dc_times,
                                self._freq_type,
@@ -122,12 +122,12 @@ class DiscountCurveNS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_date,
+                                    self._value_dt,
                                     self._dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._value_date,
+        df = self._zero_to_df(self._value_dt,
                               zero_rates,
                               dc_times,
                               self._freq_type,

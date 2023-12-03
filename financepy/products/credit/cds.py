@@ -186,7 +186,6 @@ def _protection_leg_pv_numba(teff,
             z1 = z2
 
     prot_pv = prot_pv * (1.0 - contract_recovery_rate)
-
     return prot_pv
 
 ###############################################################################
@@ -199,8 +198,8 @@ class CDS:
     generation and the valuation and risk management of CDS. """
 
     def __init__(self,
-                 step_in_date: Date,  # Date protection starts
-                 maturity_date_or_tenor: (Date, str),  # Date or tenor
+                 step_in_dt: Date,  # Date protection starts
+                 maturity_dt_or_tenor: (Date, str),  # Date or tenor
                  running_coupon: float,  # Annualised coupon on premium fee leg
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
@@ -213,20 +212,20 @@ class CDS:
 
         check_argument_types(self.__init__, locals())
 
-        if type(maturity_date_or_tenor) == Date:
-            maturity_date = maturity_date_or_tenor
+        if type(maturity_dt_or_tenor) == Date:
+            maturity_dt = maturity_dt_or_tenor
         else:
             # To get the next CDS date we move on by the tenor and then roll to
             # the next CDS date after that. We do not holiday adjust it. That
             # is handled in the schedule generation.
-            maturity_date = step_in_date.add_tenor(maturity_date_or_tenor)
-            maturity_date = maturity_date.next_cds_date()
+            maturity_dt = step_in_dt.add_tenor(maturity_dt_or_tenor)
+            maturity_dt = maturity_dt.next_cds_date()
 
-        if step_in_date > maturity_date:
+        if step_in_dt > maturity_dt:
             raise FinError("Step in date after maturity date")
 
-        self._step_in_date = step_in_date
-        self._maturity_date = maturity_date
+        self._step_in_dt = step_in_dt
+        self._maturity_dt = maturity_dt
         self._running_coupon = running_coupon
         self._notional = notional
         self._long_protection = long_protection
@@ -236,47 +235,47 @@ class CDS:
         self._freq_type = freq_type
         self._bd_type = bd_type
 
-        self._generate_adjusted_cds_payment_dates()
+        self._generate_adjusted_cds_payment_dts()
         self._calc_flows()
 
     ###########################################################################
 
-    def _generate_adjusted_cds_payment_dates(self):
+    def _generate_adjusted_cds_payment_dts(self):
         """ Generate CDS payment dates which have been holiday adjusted."""
 
         frequency = annual_frequency(self._freq_type)
         calendar = Calendar(self._cal_type)
-        start_date = self._step_in_date
+        start_dt = self._step_in_dt
 
-        self._payment_dates = []
-        self._accrual_start_dates = []
-        self._accrual_end_dates = []
+        self._payment_dts = []
+        self._accrual_start_dts = []
+        self._accrual_end_dts = []
         num_months = int(12.0 / frequency)
 
         # We generate unadjusted dates - not adjusted for weekends or holidays
-        unadjusted_schedule_dates = []
+        unadjusted_schedule_dts = []
 
         if self._dg_type == DateGenRuleTypes.BACKWARD:
 
             # We start at end date and step backwards
 
-            next_date = self._maturity_date
+            next_dt = self._maturity_dt
 
-            unadjusted_schedule_dates.append(next_date)
+            unadjusted_schedule_dts.append(next_dt)
 
             # the unadjusted dates start at end date and end at previous
             # coupon date
-            while next_date > start_date:
-                next_date = next_date.add_months(-num_months)
-                unadjusted_schedule_dates.append(next_date)
+            while next_dt > start_dt:
+                next_dt = next_dt.add_months(-num_months)
+                unadjusted_schedule_dts.append(next_dt)
 
             # now we adjust for holiday using business day adjustment
             # convention specified
-            adjusted_dates = []
+            adjusted_dts = []
 
-            for date in reversed(unadjusted_schedule_dates):
+            for date in reversed(unadjusted_schedule_dts):
                 adjusted = calendar.adjust(date, self._bd_type)
-                adjusted_dates.append(adjusted)
+                adjusted_dts.append(adjusted)
 
 # eg: https://www.cdsmodel.com/assets/cds-model/docs/Standard%20CDS%20Examples.pdf
 # Payment       = [20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009, 22-MAR-2010]
@@ -287,21 +286,21 @@ class CDS:
 
             # We start at start date and step forwards
 
-            next_date = start_date
+            next_dt = start_dt
 
             # the unadjusted dates start at start date and end at last date
             # before maturity date
-            while next_date < self._maturity_date:
-                unadjusted_schedule_dates.append(next_date)
-                next_date = next_date.add_months(num_months)
+            while next_dt < self._maturity_dt:
+                unadjusted_schedule_dts.append(next_dt)
+                next_dt = next_dt.add_months(num_months)
 
             # We then append the maturity date
-            unadjusted_schedule_dates.append(self._maturity_date)
+            unadjusted_schedule_dts.append(self._maturity_dt)
 
-            adjusted_dates = []
-            for date in unadjusted_schedule_dates:
+            adjusted_dts = []
+            for date in unadjusted_schedule_dts:
                 adjusted = calendar.adjust(date, self._bd_type)
-                adjusted_dates.append(adjusted)
+                adjusted_dts.append(adjusted)
 
     # eg. Date(20, 2, 2009) to Date(20, 3, 2010) with DateGenRuleTypes.FORWARD
     # Payment       = [20-MAY-2009, 20-AUG-2009, 20-NOV-2009, 22-FEB-2010]
@@ -314,19 +313,19 @@ class CDS:
                            + str(self._dg_type))
 
         # We only include dates which fall after the CDS start date
-        self._payment_dates = adjusted_dates[1:]
+        self._payment_dts = adjusted_dts[1:]
 
         # Accrual start dates run from previous coupon date to penultimate
         # coupon date
-        self._accrual_start_dates = adjusted_dates[:-1]
+        self._accrual_start_dts = adjusted_dts[:-1]
 
         # Accrual end dates are one day before the start of the next
         # accrual period
-        self._accrual_end_dates = [
-            date.add_days(-1) for date in self._accrual_start_dates[1:]]
+        self._accrual_end_dts = [
+            date.add_days(-1) for date in self._accrual_start_dts[1:]]
 
         # Final accrual end date is the maturity date
-        self._accrual_end_dates.append(self._maturity_date)
+        self._accrual_end_dts.append(self._maturity_dt)
 
     ###########################################################################
 
@@ -340,7 +339,7 @@ class CDS:
         # self._accrual_factors.append(0.0)
         # self._flows.append(0.0)
 
-        for t0, t1 in zip(self._accrual_start_dates, self._accrual_end_dates):
+        for t0, t1 in zip(self._accrual_start_dts, self._accrual_end_dts):
             # Adding a day because `year_frac` is non-inclusive
             # eg. 20th to 22nd should be 3 days
             accrual_factor = day_count.year_frac(t0, t1.add_days(1))[0]
@@ -352,7 +351,7 @@ class CDS:
     ###########################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               issuer_curve,
               contract_recovery_rate,
               pv01_method=0,
@@ -361,14 +360,14 @@ class CDS:
         """ Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate."""
 
-        rpv01 = self.risky_pv01(value_date,
+        rpv01 = self.risky_pv01(value_dt,
                                 issuer_curve,
                                 pv01_method)
 
         dirtyRPV01 = rpv01['dirty_rpv01']
         cleanRPV01 = rpv01['clean_rpv01']
 
-        prot_pv = self.protection_leg_pv(value_date,
+        prot_pv = self.protection_leg_pv(value_dt,
                                          issuer_curve,
                                          contract_recovery_rate,
                                          num_steps_per_year,
@@ -391,7 +390,7 @@ class CDS:
     ###########################################################################
 
     def credit_dv01(self,
-                    value_date,
+                    value_dt,
                     issuer_curve,
                     contract_recovery_rate,
                     pv01_method=0,
@@ -400,7 +399,7 @@ class CDS:
         """ Calculation of the change in the value of the CDS contract for a
         one basis point change in the level of the CDS curve."""
 
-        v0 = self.value(value_date,
+        v0 = self.value(value_dt,
                         issuer_curve,
                         contract_recovery_rate,
                         pv01_method,
@@ -416,7 +415,7 @@ class CDS:
 
         bumpedIssuerCurve._build_curve()
 
-        v1 = self.value(value_date,
+        v1 = self.value(value_dt,
                         bumpedIssuerCurve,
                         contract_recovery_rate,
                         pv01_method,
@@ -429,7 +428,7 @@ class CDS:
     ###########################################################################
 
     def interest_dv01(self,
-                      value_date: Date,
+                      value_dt: Date,
                       issuer_curve,
                       contract_recovery_rate,
                       pv01_method: int = 0,
@@ -438,7 +437,7 @@ class CDS:
         """ Calculation of the interest DV01 based on a simple bump of
         the discount factors and reconstruction of the CDS curve. """
 
-        v0 = self.value(value_date,
+        v0 = self.value(value_dt,
                         issuer_curve,
                         contract_recovery_rate,
                         pv01_method,
@@ -475,7 +474,7 @@ class CDS:
         new_issuer_curve._libor_curve._build_curve()
         new_issuer_curve._build_curve()
 
-        v1 = self.value(value_date,
+        v1 = self.value(value_dt,
                         new_issuer_curve,
                         contract_recovery_rate,
                         pv01_method,
@@ -488,8 +487,8 @@ class CDS:
     ###########################################################################
 
     def cash_settlement_amount(self,
-                               value_date,
-                               settle_date,
+                               value_dt,
+                               settle_dt,
                                issuer_curve,
                                contract_recovery_rate,
                                pv01_method=0,
@@ -498,7 +497,7 @@ class CDS:
         """ Value of the contract on the settlement date including accrued
         interest. """
 
-        v = self.value(value_date,
+        v = self.value(value_dt,
                        issuer_curve,
                        contract_recovery_rate,
                        pv01_method,
@@ -506,14 +505,14 @@ class CDS:
                        num_steps_per_year)
 
         libor_curve = issuer_curve._libor_curve
-        df = libor_curve.df(settle_date)
+        df = libor_curve.df(settle_dt)
         v = v / df
         return v
 
     ###########################################################################
 
     def clean_price(self,
-                    value_date,
+                    value_dt,
                     issuer_curve,
                     contract_recovery_rate,
                     pv01_method=0,
@@ -521,11 +520,11 @@ class CDS:
                     num_steps_per_year=glob_num_steps_per_year):
         """ Value of the CDS contract excluding accrued interest. """
 
-        risky_pv01 = self.risky_pv01(value_date, issuer_curve, pv01_method)
+        risky_pv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)
 
         cleanRPV01 = risky_pv01['clean_rpv01']
 
-        prot_pv = self.protection_leg_pv(value_date,
+        prot_pv = self.protection_leg_pv(value_dt,
                                          issuer_curve,
                                          contract_recovery_rate,
                                          num_steps_per_year,
@@ -547,19 +546,19 @@ class CDS:
         in date. """
 
         # I assume accrued runs to the effective date
-        pcd = self._accrual_start_dates[0]
-        accrued_days = (self._step_in_date - pcd)
+        pcd = self._accrual_start_dts[0]
+        accrued_days = (self._step_in_dt - pcd)
         return accrued_days
 
     ###########################################################################
 
     def accrued_interest(self):
         """ Calculate the amount of accrued interest that has accrued from the
-        previous coupon date (PCD) to the step_in_date of the CDS contract. """
+        previous coupon date (PCD) to the step_in_dt of the CDS contract. """
 
         day_count = DayCount(self._dc_type)
-        pcd = self._accrual_start_dates[0]
-        accrual_factor = day_count.year_frac(pcd, self._step_in_date)[0]
+        pcd = self._accrual_start_dts[0]
+        accrual_factor = day_count.year_frac(pcd, self._step_in_dt)[0]
         accrued_interest = accrual_factor * self._notional \
             * self._running_coupon
 
@@ -571,7 +570,7 @@ class CDS:
     ###########################################################################
 
     def protection_leg_pv(self,
-                          value_date,
+                          value_dt,
                           issuer_curve,
                           contract_recovery_rate=standard_recovery_rate,
                           num_steps_per_year=glob_num_steps_per_year,
@@ -579,8 +578,8 @@ class CDS:
         """ Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above. """
 
-        teff = (self._step_in_date - value_date) / gDaysInYear
-        tmat = (self._maturity_date - value_date) / gDaysInYear
+        teff = (self._step_in_dt - value_dt) / gDaysInYear
+        tmat = (self._maturity_dt - value_dt) / gDaysInYear
 
         libor_curve = issuer_curve._libor_curve
 
@@ -599,7 +598,7 @@ class CDS:
     ###########################################################################
 
     def risky_pv01(self,
-                   value_date,
+                   value_dt,
                    issuer_curve,
                    pv01_method=0):
         """ The risky_pv01 is the present value of a risky one dollar paid on
@@ -608,22 +607,22 @@ class CDS:
         libor_curve = issuer_curve._libor_curve
 
         paymentTimes = []
-        for date in self._payment_dates:
-            t = (date - value_date) / gDaysInYear
+        for date in self._payment_dts:
+            t = (date - value_dt) / gDaysInYear
 
             if t > 0.0:
                 paymentTimes.append(t)
 
         # this is the part of the coupon accrued from the previous coupon date
         # to now
-        pcd = self._accrual_start_dates[0]
-        eff = self._step_in_date
+        pcd = self._accrual_start_dts[0]
+        eff = self._step_in_dt
         day_count = DayCount(self._dc_type)
 
         accrual_factorPCDToNow = day_count.year_frac(pcd, eff)[0]
 
         year_fracs = self._accrual_factors
-        teff = (eff - value_date) / gDaysInYear
+        teff = (eff - value_dt) / gDaysInYear
 
         valueRPV01 = _risky_pv01_numba(teff,
                                        accrual_factorPCDToNow,
@@ -643,12 +642,12 @@ class CDS:
     ###########################################################################
 
     def premium_leg_pv(self,
-                       value_date,
+                       value_dt,
                        issuer_curve,
                        pv01_method=0):
         """ Value of the premium leg of a CDS. """
 
-        fullRPV01 = self.risky_pv01(value_date,
+        fullRPV01 = self.risky_pv01(value_dt,
                                     issuer_curve,
                                     pv01_method)['dirty_rpv01']
 
@@ -658,7 +657,7 @@ class CDS:
     ###########################################################################
 
     def par_spread(self,
-                   value_date,
+                   value_dt,
                    issuer_curve,
                    contract_recovery_rate=standard_recovery_rate,
                    num_steps_per_year=glob_num_steps_per_year,
@@ -667,11 +666,11 @@ class CDS:
         """ Breakeven CDS coupon that would make the value of the CDS contract
         equal to zero. """
 
-        cleanRPV01 = self.risky_pv01(value_date,
+        cleanRPV01 = self.risky_pv01(value_dt,
                                      issuer_curve,
                                      pv01_method)['clean_rpv01']
 
-        prot = self.protection_leg_pv(value_date,
+        prot = self.protection_leg_pv(value_dt,
                                       issuer_curve,
                                       contract_recovery_rate,
                                       num_steps_per_year,
@@ -684,7 +683,7 @@ class CDS:
     ###########################################################################
 
     def value_fast_approx(self,
-                          value_date,
+                          value_dt,
                           flatContinuousInterestRate,
                           flatCDSCurveSpread,
                           curveRecovery=standard_recovery_rate,
@@ -692,12 +691,12 @@ class CDS:
         """ Implementation of fast valuation of the CDS contract using an
         accurate approximation that avoids curve building. """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date must be a Date and not " +
-                           str(value_date))
+                           str(value_dt))
 
-        t_mat = (self._maturity_date - value_date) / gDaysInYear
-        t_eff = (self._step_in_date - value_date) / gDaysInYear
+        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_eff = (self._step_in_dt - value_dt) / gDaysInYear
 
         h = flatCDSCurveSpread / (1.0 - curveRecovery)
         r = flatContinuousInterestRate
@@ -765,16 +764,16 @@ class CDS:
 
     ###########################################################################
 
-    def print_payments(self, value_date, issuer_curve):
+    def print_payments(self, value_dt, issuer_curve):
         ''' We only print payments after the current valuation date '''
-        num_flows = len(self._payment_dates)
+        num_flows = len(self._payment_dts)
 
-        print("PAYMENT_DATE      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")
+        print("PAYMENT_dt      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV")
 
         for it in range(0, num_flows):
-            dt = self._payment_dates[it]
+            dt = self._payment_dts[it]
 
-            if dt > value_date:
+            if dt > value_dt:
                 acc_factor = self._accrual_factors[it]
                 flow = self._flows[it]
                 z = issuer_curve.df(dt)
@@ -788,8 +787,8 @@ class CDS:
         """ print out details of the CDS contract and all of the calculated
         cash flows """
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("STEP-IN DATE", self._step_in_date)
-        s += label_to_string("MATURITY", self._maturity_date)
+        s += label_to_string("STEP-IN DATE", self._step_in_dt)
+        s += label_to_string("MATURITY", self._maturity_dt)
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("RUNNING COUPON",
                              self._running_coupon * 10000, "bp\n")
@@ -800,12 +799,12 @@ class CDS:
         s += label_to_string("DATEGENRULE", self._dg_type)
         s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
-        header = "PAYMENT_DATE, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"
+        header = "PAYMENT_dt, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"
         valueTable = [
-            self._payment_dates,
+            self._payment_dts,
             self._accrual_factors,
-            self._accrual_start_dates,
-            self._accrual_end_dates,
+            self._accrual_start_dts,
+            self._accrual_end_dts,
             self._flows
         ]
         precision = "12.6f"

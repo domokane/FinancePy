@@ -15,14 +15,14 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_double_digital_option import FXDoubleDigitalOption
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
 
 def test_FinFXDoubleDigitalOption():
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
     expiry_date = Date(18, 9, 2020)
 
     forName = "EUR"
@@ -33,8 +33,8 @@ def test_FinFXDoubleDigitalOption():
     currency_pair = forName + domName  # Always FORDOM
     spot_fx_rate = 1.20
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     volatility = 0.20
 
@@ -57,7 +57,7 @@ def test_FinFXDoubleDigitalOption():
     spot_fx_rate = np.linspace(0.01, 2.0, 10)
 
     value = double_digital_option.value(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -67,4 +67,4 @@ def test_FinFXDoubleDigitalOption():
 
 
 test_FinFXDoubleDigitalOption()
-testCases.compareTestCases()
+test_cases.compareTestCases()

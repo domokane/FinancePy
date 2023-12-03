@@ -10,7 +10,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -29,63 +29,63 @@ def test_FinStatistics():
 
     start = time.time()
 
-    testCases.header("l", "Mean", "SD")
+    test_cases.header("l", "Mean", "SD")
 
     for l in range(0, 10):
         meanx1 = x.mean()
         sd1 = x.std()
-        testCases.print(l, meanx1, sd1)
+        test_cases.print(l, meanx1, sd1)
 
     end = time.time()
     elapsed = end - start
 
     start = time.time()
 
-    testCases.header("Corr", "Measured")
+    test_cases.header("Corr", "Measured")
 
     for beta in np.linspace(0.0, 1.0, num=11):
         z = x * beta + y * np.sqrt(1.0 - beta * beta)
         c = np.corrcoef(x, z)[0, 1]
-        testCases.print(beta, c)
+        test_cases.print(beta, c)
 
     end = time.time()
     elapsed = end - start
-    testCases.header("TIME")
-    testCases.print(elapsed)
+    test_cases.header("TIME")
+    test_cases.print(elapsed)
 
     ##########################################################################
     # DO STATS TIMINGS
 
-    testCases.header("l", "Mean", "SD")
+    test_cases.header("l", "Mean", "SD")
 
     start = time.time()
 
     for l in range(0, 10):
         mean2 = mean(x)
         sd2 = stdev(x)
-        testCases.print(l, mean2, sd2)
+        test_cases.print(l, mean2, sd2)
 
     end = time.time()
     elapsed = end - start
-    testCases.header("TIME")
-    testCases.print(elapsed)
+    test_cases.header("TIME")
+    test_cases.print(elapsed)
 
     start = time.time()
 
-    testCases.header("Corr", "Measured")
+    test_cases.header("Corr", "Measured")
 
     for beta in np.linspace(0.0, 1.0, num=11):
         z = x * beta + y * np.sqrt(1.0 - beta * beta)
         c = correlation(x, z)
-        testCases.print(beta, c)
+        test_cases.print(beta, c)
 
     end = time.time()
     elapsed = end - start
-    testCases.header("TIME")
-    testCases.print(elapsed)
+    test_cases.header("TIME")
+    test_cases.print(elapsed)
 
 ###############################################################################
 
 
 test_FinStatistics()
-testCases.compareTestCases()
+test_cases.compareTestCases()

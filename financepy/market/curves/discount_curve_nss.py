@@ -26,14 +26,14 @@ class DiscountCurveNSS(DiscountCurve):
     class inherits methods from FinDiscountCurve."""
 
     def __init__(self,
-                 value_date: Date,
+                 value_dt: Date,
                  beta_0: float,
                  beta_1: float,
                  beta_2: float,
                  beta_3: float,
                  tau_1: float,
                  tau_2: float,
-                 frequency_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create a FinDiscountCurveNSS object by passing in curve valuation
         date plus the 4 different beta values and the 2 tau values. The zero
@@ -48,14 +48,14 @@ class DiscountCurveNSS(DiscountCurve):
         if tau_2 <= 0:
             raise FinError("Tau2 must be positive")
 
-        self._value_date = value_date
+        self._value_dt = value_dt
         self._beta_0 = beta_0
         self._beta_1 = beta_1
         self._beta_2 = beta_2
         self._beta_3 = beta_3
         self._tau_1 = tau_1
         self._tau_2 = tau_2
-        self._freq_type = frequency_type
+        self._freq_type = freq_type
         self._dc_type = day_count_type
 
     ###########################################################################
@@ -80,14 +80,14 @@ class DiscountCurveNSS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_date,
+                                    self._value_dt,
                                     self._dc_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(self._value_date,
+        dfs = self._zero_to_df(self._value_dt,
                                zero_rates,
                                dc_times,
                                self._freq_type,
@@ -136,12 +136,12 @@ class DiscountCurveNSS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_date,
+                                    self._value_dt,
                                     self._dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._value_date,
+        df = self._zero_to_df(self._value_dt,
                               zero_rates,
                               dc_times,
                               self._freq_type,

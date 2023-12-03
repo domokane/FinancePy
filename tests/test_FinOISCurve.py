@@ -23,28 +23,28 @@ def test_bloombergPricingExample():
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """
 
-    value_date = Date(6, 6, 2018)
+    value_dt = Date(6, 6, 2018)
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settleDt = value_date.add_weekdays(spot_days)
+    settleDt = value_dt.add_weekdays(spot_days)
     accrual = DayCountTypes.THIRTY_E_360
 
     depo = IborDeposit(settleDt, "1D", 1.712 / 100.0, accrual)
     depos = [depo]
 
     futs = []
-    fut = IborFuture(value_date, 1)
+    fut = IborFuture(value_dt, 1)
     futs.append(fut)
-    fut = IborFuture(value_date, 2)
+    fut = IborFuture(value_dt, 2)
     futs.append(fut)
-    fut = IborFuture(value_date, 3)
+    fut = IborFuture(value_dt, 3)
     futs.append(fut)
-    fut = IborFuture(value_date, 4)
+    fut = IborFuture(value_dt, 4)
     futs.append(fut)
-    fut = IborFuture(value_date, 5)
+    fut = IborFuture(value_dt, 5)
     futs.append(fut)
-    fut = IborFuture(value_date, 6)
+    fut = IborFuture(value_dt, 6)
     futs.append(fut)
 
     fras = [None]*6
@@ -58,7 +58,7 @@ def test_bloombergPricingExample():
     accrual = DayCountTypes.THIRTY_E_360
     freq = FrequencyTypes.SEMI_ANNUAL
     spot_days = 2
-    settleDt = value_date.add_weekdays(spot_days)
+    settleDt = value_dt.add_weekdays(spot_days)
     payRec = SwapTypes.PAY
     lag = 1  # Not used
 
@@ -115,14 +115,14 @@ def test_bloombergPricingExample():
                (2.91552 + 2.93748) / 200, freq, accrual)
     swaps.append(swap)
 
-    oisCurve = OISCurve(value_date, depos, fras, swaps)
+    oisCurve = OISCurve(value_dt, depos, fras, swaps)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
-    assert round(swaps[0].value(value_date, oisCurve, None), 4) == 0.0
-    assert round(-swaps[0]._fixed_leg.value(value_date,
+    assert round(swaps[0].value(value_dt, oisCurve, None), 4) == 0.0
+    assert round(-swaps[0]._fixed_leg.value(value_dt,
                                             oisCurve), 4) == 53708.2780
     assert round(swaps[0]._float_leg.value(
-        value_date, oisCurve, None), 4) == 53708.2780
+        value_dt, oisCurve, None), 4) == 53708.2780
 
     assert round(swaps[0].value(settleDt, oisCurve, None), 4) == 0.0
     assert round(-swaps[0]._fixed_leg.value(settleDt,

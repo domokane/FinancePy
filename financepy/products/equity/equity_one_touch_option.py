@@ -130,7 +130,7 @@ class EquityOneTouchOption(EquityOption):
     are all members of the FinTouchOptionTypes enumerated type. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  option_type: TouchOptionTypes,
                  barrier_price: float,
                  payment_size: float = 1.0):
@@ -139,7 +139,7 @@ class EquityOneTouchOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._option_type = option_type
         self._barrier_price = float(barrier_price)
         self._payment_size = payment_size
@@ -147,7 +147,7 @@ class EquityOneTouchOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: (float, np.ndarray),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -158,21 +158,21 @@ class EquityOneTouchOption(EquityOption):
 
         DEBUG_MODE = False
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve date not same as option valuation date")
 
-        if dividend_curve._value_date != value_date:
+        if dividend_curve._value_dt != value_dt:
             raise FinError(
                 "Dividend Curve date not same as option valuation date")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         t = max(t, 1e-6)
 
         s0 = stock_price
@@ -181,9 +181,9 @@ class EquityOneTouchOption(EquityOption):
 
         sqrtT = np.sqrt(t)
 
-        df = discount_curve.df(self._expiry_date)
-        r = discount_curve.cc_rate(self._expiry_date)
-        q = dividend_curve.cc_rate(self._expiry_date)
+        df = discount_curve.df(self._expiry_dt)
+        r = discount_curve.cc_rate(self._expiry_dt)
+        q = dividend_curve.cc_rate(self._expiry_dt)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -397,7 +397,7 @@ class EquityOneTouchOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                 value_date: Date,
+                 value_dt: Date,
                  stock_price: float,
                  discount_curve: DiscountCurve,
                  dividend_curve: DiscountCurve,
@@ -410,12 +410,12 @@ class EquityOneTouchOption(EquityOption):
         result as we only observe the barrier a finite number of times. The
         convergence is slow. """
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
-        df = discount_curve.df(self._expiry_date)
+        df = discount_curve.df(self._expiry_dt)
         r = -np.log(df)/t
 
-        dq = dividend_curve.df(self._expiry_date)
+        dq = dividend_curve.df(self._expiry_dt)
         q = -np.log(dq)/t
 
         num_time_steps = int(t * num_steps_per_year) + 1
@@ -556,7 +556,7 @@ class EquityOneTouchOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("BARRIER LEVEL", self._barrier_price)
         s += label_to_string("PAYMENT SIZE", self._payment_size, "")

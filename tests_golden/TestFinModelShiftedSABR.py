@@ -10,7 +10,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -19,7 +19,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_ShiftedSABR():
 
-    testCases.header("TEST", "CALIBRATION ERROR")
+    test_cases.header("TEST", "CALIBRATION ERROR")
 
     alpha = 0.0
     beta = 0.5
@@ -49,7 +49,7 @@ def test_ShiftedSABR():
 
     assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
-    testCases.print("LOGNORMAL CASE", calibrationError)
+    test_cases.print("LOGNORMAL CASE", calibrationError)
 
     # Volatility: pure SABR dynamics
     modelSABR_02 = SABRShifted(alpha, beta, rho, nu, shift)
@@ -59,7 +59,7 @@ def test_ShiftedSABR():
     impliedATMLognormalVol = modelSABR_02.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
-    testCases.print("SABR CASE", calibrationError)
+    test_cases.print("SABR CASE", calibrationError)
 
     # Valuation: pure SABR dynamics
     valueCall = modelSABR_02.value(f, k, t_exp, df, call_optionType)
@@ -73,4 +73,4 @@ def test_ShiftedSABR():
 
 
 test_ShiftedSABR()
-testCases.compareTestCases()
+test_cases.compareTestCases()

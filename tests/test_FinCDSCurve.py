@@ -14,7 +14,7 @@ from financepy.products.credit.cds import CDS
 
 def test_FinCDSCurve():
 
-    curve_date = Date(20, 12, 2018)
+    curve_dt = Date(20, 12, 2018)
 
     swaps = []
     depos = []
@@ -26,27 +26,27 @@ def test_FinCDSCurve():
 
     for i in range(1, 11):
 
-        maturity_date = curve_date.add_months(12 * i)
-        swap = IborSwap(curve_date,
-                        maturity_date,
+        maturity_dt = curve_dt.add_months(12 * i)
+        swap = IborSwap(curve_dt,
+                        maturity_dt,
                         SwapTypes.PAY,
                         fixed_coupon,
                         fixedFreq,
                         fixedDCC)
         swaps.append(swap)
 
-    libor_curve = IborSingleCurve(curve_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(curve_dt, depos, fras, swaps)
 
     cds_contracts = []
 
     for i in range(1, 11):
-        maturity_date = curve_date.add_months(12 * i)
-        cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
+        maturity_dt = curve_dt.add_months(12 * i)
+        cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
         cds_contracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(curve_date,
+    issuer_curve = CDSCurve(curve_dt,
                             cds_contracts,
                             libor_curve,
                             recovery_rate,
@@ -60,22 +60,22 @@ def test_FinCDSCurve():
     assert round(issuer_curve._values[9], 4) == 0.8071
 
     i = 1
-    maturity_date = curve_date.add_months(12 * i)
-    cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-    v = cds.value(curve_date, issuer_curve, recovery_rate)
+    maturity_dt = curve_dt.add_months(12 * i)
+    cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
+    v = cds.value(curve_dt, issuer_curve, recovery_rate)
     assert round(v['dirty_pv'] * 1000, 4) == -0.0086
     assert round(v['clean_pv'] * 1000, 4) == -0.0086
 
     i = 5
-    maturity_date = curve_date.add_months(12 * i)
-    cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-    v = cds.value(curve_date, issuer_curve, recovery_rate)
+    maturity_dt = curve_dt.add_months(12 * i)
+    cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
+    v = cds.value(curve_dt, issuer_curve, recovery_rate)
     assert round(v['dirty_pv'] * 1000, 4) == -0.1640
     assert round(v['clean_pv'] * 1000, 4) == -0.1640
 
     i = 10
-    maturity_date = curve_date.add_months(12 * i)
-    cds = CDS(curve_date, maturity_date, 0.005 + 0.001 * (i - 1))
-    v = cds.value(curve_date, issuer_curve, recovery_rate)
+    maturity_dt = curve_dt.add_months(12 * i)
+    cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
+    v = cds.value(curve_dt, issuer_curve, recovery_rate)
     assert round(v['dirty_pv'] * 1000, 4) == -1.1491
     assert round(v['clean_pv'] * 1000, 4) == -1.1491

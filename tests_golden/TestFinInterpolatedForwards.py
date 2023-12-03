@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
 
@@ -27,15 +27,15 @@ def test_FinInterpolatedForwards():
     df_values = np.exp(-tValues*rValues)
     tInterpValues = np.linspace(0.0, 12.0, 49)
 
-    curve_date = Date(1, 1, 2019)
+    curve_dt = Date(1, 1, 2019)
 
-    tDates = curve_date.add_years(tValues)
-    tInterpDates = curve_date.add_years(tInterpValues)
+    tDates = curve_dt.add_years(tValues)
+    tInterpDates = curve_dt.add_years(tInterpValues)
 
     for interp_type in InterpTypes:
 
         discount_curve = DiscountCurve(
-            curve_date, tDates, df_values, interp_type)
+            curve_dt, tDates, df_values, interp_type)
         dfInterpValues = discount_curve.df(tInterpDates)
         fwdInterpValues = discount_curve.fwd(tInterpDates)
         zeroInterpValues = discount_curve.zero_rate(tInterpDates)
@@ -58,4 +58,4 @@ def test_FinInterpolatedForwards():
 
 
 test_FinInterpolatedForwards()
-testCases.compareTestCases()
+test_cases.compareTestCases()

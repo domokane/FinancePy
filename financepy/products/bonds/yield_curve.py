@@ -33,7 +33,7 @@ class BondYieldCurve():
     interpolation but not for full term-structure-consistent pricing. """
 
     def __init__(self,
-                 settle_date: Date,
+                 settle_dt: Date,
                  bonds: list,
                  ylds: (np.ndarray, list),
                  curveFit):
@@ -41,7 +41,7 @@ class BondYieldCurve():
         specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters. """
 
-        self._settle_date = settle_date
+        self._settle_dt = settle_dt
         self._bonds = bonds
         self._ylds = np.array(ylds)
         self._curveFit = curveFit
@@ -51,8 +51,8 @@ class BondYieldCurve():
 
         yearsToMaturities = []
         for bond in bonds:
-            years_to_maturity = (bond._maturity_date -
-                                 settle_date)/gDaysInYear
+            years_to_maturity = (bond._maturity_dt -
+                                 settle_dt)/gDaysInYear
             yearsToMaturities.append(years_to_maturity)
         self._yearsToMaturity = np.array(yearsToMaturities)
 
@@ -105,16 +105,16 @@ class BondYieldCurve():
 ###############################################################################
 
     def interpolated_yield(self,
-                           maturity_date: Date):
+                           maturity_dt: Date):
 
-        if type(maturity_date) is Date:
-            t = (maturity_date - self._settle_date) / gDaysInYear
-        elif type(maturity_date) is list:
-            t = maturity_date
-        elif type(maturity_date) is np.ndarray:
-            t = maturity_date
-        elif type(maturity_date) is float or type(maturity_date) is np.float64:
-            t = maturity_date
+        if type(maturity_dt) is Date:
+            t = (maturity_dt - self._settle_dt) / gDaysInYear
+        elif type(maturity_dt) is list:
+            t = maturity_dt
+        elif type(maturity_dt) is np.ndarray:
+            t = maturity_dt
+        elif type(maturity_dt) is float or type(maturity_dt) is np.float64:
+            t = maturity_dt
         else:
             raise FinError("Unknown date type.")
 
@@ -170,7 +170,7 @@ class BondYieldCurve():
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("SETTLEMENT DATE", self._settle_date)
+        s += label_to_string("SETTLEMENT DATE", self._settle_dt)
         s += label_to_string("BOND", self._bonds)
         s += label_to_string("YIELDS", self._ylds)
         s += label_to_string("CURVE FIT", self._curveFit)

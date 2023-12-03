@@ -18,13 +18,13 @@ class IborCapVolCurveFn():
     parametric form suggested by Rebonato (1999). """
 
     def __init__(self,
-                 curve_date,
+                 curve_dt,
                  a,
                  b,
                  c,
                  d):
 
-        self._curve_date = curve_date
+        self._curve_dt = curve_dt
         self._a = a
         self._b = b
         self._c = c
@@ -36,7 +36,7 @@ class IborCapVolCurveFn():
         """ Return the caplet volatility. """
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_date) / gDaysInYear
+            t = (dt - self._curve_dt) / gDaysInYear
             vol = (self._a + self._b*t) * np.exp(-self._c*t) + self._d
 
         if vol < 0.0:

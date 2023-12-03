@@ -16,21 +16,20 @@ import time
 import numpy as np
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
 
 def test_BondConvertible():
 
-    settle_date = Date(31, 12, 2003)
+    settle_dt = Date(31, 12, 2003)
     start_convert_date = Date(31, 12, 2003)
-    maturity_date = Date(15, 3, 2022)
+    maturity_dt = Date(15, 3, 2022)
     conversion_ratio = 38.4615  # adjust for face
     coupon = 0.0575
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrualBasis = DayCountTypes.ACT_365F
-    face = 1000.0
 
     call_price = 1100
     call_dates = [Date(20, 3, 2007),
@@ -44,7 +43,7 @@ def test_BondConvertible():
                  Date(15, 3, 2017)]
     put_prices = np.array([putPrice, putPrice, putPrice])
 
-    bond = BondConvertible(maturity_date,
+    bond = BondConvertible(maturity_dt,
                            coupon,
                            freq_type,
                            start_convert_date,
@@ -56,7 +55,7 @@ def test_BondConvertible():
                            accrualBasis)
 #    print(bond)
 
-    dividend_dates = [Date(20, 3, 2007),
+    dividend_dts = [Date(20, 3, 2007),
                       Date(15, 3, 2008),
                       Date(15, 3, 2009),
                       Date(15, 3, 2010),
@@ -77,26 +76,26 @@ def test_BondConvertible():
     stock_price = 28.5
     stock_volatility = 0.370
     rate = 0.04
-    discount_curve = DiscountCurveFlat(settle_date,
+    discount_curve = DiscountCurveFlat(settle_dt,
                                        rate,
                                        FrequencyTypes.CONTINUOUS)
     credit_spread = 0.00
     recovery_rate = 0.40
     num_steps_per_year = 20
 
-    testCases.header("LABEL")
-    testCases.print("NO CALLS OR PUTS")
+    test_cases.header("LABEL")
+    test_cases.print("NO CALLS OR PUTS")
 
-    testCases.header("TIME", "NUMSTEPS", "PRICE")
+    test_cases.header("TIME", "NUMSTEPS", "PRICE")
 
     for num_steps_per_year in [5, 10, 20]:
 
         start = time.time()
 
-        res = bond.value(settle_date,
+        res = bond.value(settle_dt,
                          stock_price,
                          stock_volatility,
-                         dividend_dates,
+                         dividend_dts,
                          dividend_yields,
                          discount_curve,
                          credit_spread,
@@ -105,19 +104,19 @@ def test_BondConvertible():
 
         end = time.time()
         period = end - start
-        testCases.print(period, num_steps_per_year, res)
+        test_cases.print(period, num_steps_per_year, res)
 
     dividend_yields = [0.02] * 16
-    testCases.header("LABEL")
-    testCases.print("DIVIDENDS")
+    test_cases.header("LABEL")
+    test_cases.print("DIVIDENDS")
 
-    testCases.header("TIME", "NUMSTEPS", "PRICE")
+    test_cases.header("TIME", "NUMSTEPS", "PRICE")
     for num_steps_per_year in [5, 20, 80]:
         start = time.time()
-        res = bond.value(settle_date,
+        res = bond.value(settle_dt,
                          stock_price,
                          stock_volatility,
-                         dividend_dates,
+                         dividend_dts,
                          dividend_yields,
                          discount_curve,
                          credit_spread,
@@ -126,10 +125,10 @@ def test_BondConvertible():
 
         end = time.time()
         period = end - start
-        testCases.print(period, num_steps_per_year, res)
+        test_cases.print(period, num_steps_per_year, res)
 
 ###############################################################################
 
 
 test_BondConvertible()
-testCases.compareTestCases()
+test_cases.compareTestCases()

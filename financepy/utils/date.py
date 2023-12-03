@@ -96,7 +96,7 @@ def is_leap_year(y: int):
 ###############################################################################
 
 
-def parse_date(date_str, date_format):
+def parse_dt(date_str, date_format):
     dt_obj = datetime.datetime.strptime(date_str, date_format)
     return dt_obj.day, dt_obj.month, dt_obj.year
 
@@ -225,7 +225,7 @@ class Date():
         user can also supply an hour, minute and second for intraday work.
 
         Example Input:
-        start_date = Date(1, 1, 2018)
+        start_dt = Date(1, 1, 2018)
         """
 
         global gStartYear
@@ -288,7 +288,7 @@ class Date():
         self._mm = mm
         self._ss = ss
 
-        self._excel_date = 0  # This is a float as it includes intraday time
+        self._excel_dt = 0  # This is a float as it includes intraday time
 
         # update the excel date used for doing lots of financial calculations
         self._refresh()
@@ -297,7 +297,7 @@ class Date():
         dayFraction += self._mm/24.0/60.0
         dayFraction += self._ss/24.0/60.0/60.0
 
-        self._excel_date += dayFraction  # This is a float as it includes intraday time
+        self._excel_dt += dayFraction  # This is a float as it includes intraday time
 
     ###########################################################################
 
@@ -305,9 +305,9 @@ class Date():
     def from_string(cls, date_string, formatString):
         """  Create a Date from a date and format string.
         Example Input:
-        start_date = Date('1-1-2018', '%d-%m-%Y') """
+        start_dt = Date('1-1-2018', '%d-%m-%Y') """
 
-        d, m, y = parse_date(date_string, formatString)
+        d, m, y = parse_dt(date_string, formatString)
         return cls(d, m, y)
 
     ###########################################################################
@@ -317,7 +317,7 @@ class Date():
         """  Create a Date from a python datetime.date object or from a
         Numpy datetime64 object.
         Example Input:
-        start_date = Date.from_date(datetime.date(2022, 11, 8)) """
+        start_dt = Date.from_dt(datetime.date(2022, 11, 8)) """
 
         if isinstance(date, datetime.date):
             d, m, y = date.day, date.month, date.year
@@ -325,7 +325,7 @@ class Date():
 
         if isinstance(date, np.datetime64):
             timestamp = ((date - np.datetime64('1970-01-01T00:00:00'))
-                 / np.timedelta64(1, 's'))
+                         / np.timedelta64(1, 's'))
 
             date = datetime.datetime.utcfromtimestamp(timestamp)
             d, m, y = date.day, date.month, date.year
@@ -339,51 +339,51 @@ class Date():
         idx = date_index(self._d, self._m, self._y)
         daysSinceFirstJan1900 = gDateCounterList[idx]
         wd = weekday(daysSinceFirstJan1900)
-        self._excel_date = daysSinceFirstJan1900
+        self._excel_dt = daysSinceFirstJan1900
         self._weekday = wd
 
     ###########################################################################
 
     @vectorisation_helper
     def __gt__(self, other):
-        return self._excel_date > other._excel_date
+        return self._excel_dt > other._excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __lt__(self, other):
-        return self._excel_date < other._excel_date
+        return self._excel_dt < other._excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __ge__(self, other):
-        return self._excel_date >= other._excel_date
+        return self._excel_dt >= other._excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __le__(self, other):
-        return self._excel_date <= other._excel_date
+        return self._excel_dt <= other._excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __sub__(self, other):
-        return self._excel_date - other._excel_date
+        return self._excel_dt - other._excel_dt
 
     ###########################################################################
 
 
     @vectorisation_helper
     def __rsub__(self, other):
-        return self._excel_date - other._excel_date
+        return self._excel_dt - other._excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __eq__(self, other):
-        return self._excel_date == other._excel_date
+        return self._excel_dt == other._excel_dt
 
     ###########################################################################
 
@@ -487,7 +487,7 @@ class Date():
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE
 
-        end_date = self
+        end_dt = self
 
         if isinstance(numDays, int) is False:
             raise FinError("Num days must be an integer")
@@ -525,21 +525,21 @@ class Date():
         else:  # new logic
 
             numDaysLeft = numDays
-            end_date = self
+            end_dt = self
 
             while numDaysLeft > 0:
 
                 if positiveNumDays is True:
-                    end_date = end_date.add_days(1)
+                    end_dt = end_dt.add_days(1)
                 else:
-                    end_date = end_date.add_days(-1)
+                    end_dt = end_dt.add_days(-1)
 
-                if end_date._weekday == Date.SAT or end_date._weekday == Date.SUN:
+                if end_dt._weekday == Date.SAT or end_dt._weekday == Date.SUN:
                     pass
                 else:
                     numDaysLeft -= 1
 
-            return end_date
+            return end_dt
 
     ###########################################################################
 
@@ -649,11 +649,11 @@ class Date():
         """ Returns a CDS date that is mm months after the Date. If no
         argument is supplied then the next CDS date after today is returned."""
 
-        next_date = self.add_months(mm)
+        next_dt = self.add_months(mm)
 
-        y = next_date._y
-        m = next_date._m
-        d = next_date._d
+        y = next_dt._y
+        m = next_dt._m
+        d = next_dt._d
 
         d_cds = 20
         y_cds = y
@@ -972,16 +972,16 @@ class Date():
 
 
 def daily_working_day_schedule(self,
-                               start_date: Date,
-                               end_date: Date):
-    """ Returns a list of working dates between start_date and end_date.
+                               start_dt: Date,
+                               end_dt: Date):
+    """ Returns a list of working dates between start_dt and end_dt.
     This function should be replaced by dateRange once add_tenor allows
     for working days. """
     date_list = []
 
-    dt = start_date
+    dt = start_dt
     date_list.append(dt)
-    while dt < end_date:
+    while dt < end_dt:
         dt = dt.add_weekdays(1)
         date_list.append(dt)
 
@@ -993,7 +993,7 @@ def daily_working_day_schedule(self,
 def datediff(d1: Date,
              d2: Date):
     """ Calculate the number of days between two Findates. """
-    dd = (d2._excel_date - d1._excel_date)
+    dd = (d2._excel_dt - d1._excel_dt)
     return int(dd)
 
 ###############################################################################
@@ -1023,23 +1023,23 @@ def days_in_month(m, y):
 ###############################################################################
 
 
-def date_range(start_date: Date,
-               end_date: Date,
+def date_range(start_dt: Date,
+               end_dt: Date,
                tenor: str = "1D"):
-    """ Returns a list of dates between start_date (inclusive)
-    and end_date (inclusive). The tenor represents the distance between two
+    """ Returns a list of dates between start_dt (inclusive)
+    and end_dt (inclusive). The tenor represents the distance between two
     consecutive dates and is set to daily by default. """
 
-    if start_date > end_date:
+    if start_dt > end_dt:
         return []
 
     date_list = []
 
-    dt = start_date
-    while dt < end_date:
+    dt = start_dt
+    while dt < end_dt:
         date_list.append(dt)
         dt = dt.add_tenor(tenor)
-    date_list.append(end_date)
+    date_list.append(end_dt)
 
     return date_list
 

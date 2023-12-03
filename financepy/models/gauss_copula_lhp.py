@@ -18,7 +18,7 @@ from ..utils.error import FinError
 def tr_surv_prob_lhp(k1,
                      k2,
                      num_credits,
-                     survival_probabilities,
+                     survival_probs,
                      recovery_rates,
                      beta):
     """ Get the approximated tranche survival probability of a portfolio of
@@ -35,7 +35,7 @@ def tr_surv_prob_lhp(k1,
     p = 0.0
     portfolioEL = 0.0
     for i_credit in range(0, num_credits):
-        pd = (1.0 - survival_probabilities[i_credit])
+        pd = (1.0 - survival_probs[i_credit])
         p += pd
         portfolioEL += pd * (1.0 - recovery_rates[i_credit])
 

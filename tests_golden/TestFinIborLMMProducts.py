@@ -3,6 +3,10 @@
 ###############################################################################
 
 import numpy as np
+
+import sys
+sys.path.append("..")
+
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -15,11 +19,9 @@ from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.ibor_lmm_products import IborLMMProducts
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 # This is in progress and needs to be completed
 
@@ -31,29 +33,29 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 #     startYear = 2020
 #     endYear = 2030
-#     value_date = Date(1, 1, startYear)
-#     exercise_date = Date(1, 1, 2023)
-#     settle_date = value_date
-#     maturity_date = Date(1, 1, endYear)
+#     value_dt = Date(1, 1, startYear)
+#     exercise_dt = Date(1, 1, 2023)
+#     settle_dt = value_dt
+#     maturity_dt = Date(1, 1, endYear)
 #     fixed_coupon = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
-#     discount_curve = FinDiscountCurveFlat(value_date,
+#     discount_curve = FinDiscountCurveFlat(value_dt,
 #                                          0.04,
 #                                          FrequencyTypes.ANNUAL)
 
 #     swaptionVol = 15.54
 
-#     liborSwaption = IborSwaption(settle_date,
-#                                      exercise_date,
-#                                      maturity_date,
+#     liborSwaption = IborSwaption(settle_dt,
+#                                      exercise_dt,
+#                                      maturity_dt,
 #                                      IborSwaptionTypes.PAY,
 #                                      fixed_coupon,
 #                                      FrequencyTypes.ANNUAL,
 #                                      DayCountTypes.ACT_360)
 
 #     model = Black(swaptionVol/100.0)
-#     v_BLK = liborSwaption.value(value_date, discount_curve, model)
+#     v_BLK = liborSwaption.value(value_dt, discount_curve, model)
 
 #     dt = 0.5
 #     t_exp = 3.0
@@ -99,37 +101,37 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
-#         value_date = Date(1, 1, 2010)
-#         libor_curve = FinDiscountCurveFlat(value_date, r,
+#         value_dt = Date(1, 1, 2010)
+#         libor_curve = FinDiscountCurveFlat(value_dt, r,
 #                                           FrequencyTypes.QUARTERLY)
-#         settle_date = value_date
-#         exercise_date = settle_date.add_months(a*3)
-#         maturity_date = settle_date.add_months(b*3)
+#         settle_dt = value_dt
+#         exercise_dt = settle_dt.add_months(a*3)
+#         maturity_dt = settle_dt.add_months(b*3)
 
 #         fixed_coupon = strike
-#         fixed_frequency_type = FrequencyTypes.QUARTERLY
+#         fixed_freq_type = FrequencyTypes.QUARTERLY
 #         fixed_dc_type = DayCountTypes.ACT_ACT_ISDA
-#         float_frequency_type = FrequencyTypes.QUARTERLY
+#         float_freq_type = FrequencyTypes.QUARTERLY
 #         float_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         notional = 1.0
 
 #         # Pricing a PAY
 #         swaptionType = IborSwaptionTypes.PAY
-#         swaption = IborSwaption(settle_date,
-#                                     exercise_date,
-#                                     maturity_date,
+#         swaption = IborSwaption(settle_dt,
+#                                     exercise_dt,
+#                                     maturity_dt,
 #                                     swaptionType,
 #                                     fixed_coupon,
-#                                     fixed_frequency_type,
+#                                     fixed_freq_type,
 #                                     fixed_dc_type,
 #                                     notional,
-#                                     float_frequency_type,
+#                                     float_freq_type,
 #                                     float_dc_type)
 
 #         model = Black(swaptionVol)
-#         blackSwaptionPrice = swaption.value(value_date, libor_curve, model)
+#         blackSwaptionPrice = swaption.value(value_dt, libor_curve, model)
 
-#         testCases.print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
+#         test_cases.print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
 #                         " SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
 #               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF,
 #                  swaptionVol, swaption_price1F, swaption_priceNF,
@@ -145,21 +147,21 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # years which in our convention means we are modelling 10 forwards
 #     startYear = 2020
 #     endYear = 2030
-#     value_date = Date(1, 1, startYear)
-#     settle_date = value_date
+#     value_dt = Date(1, 1, startYear)
+#     settle_dt = value_dt
 #     capMaturityDate = Date(1, 1, endYear)
 #     freq_type = FrequencyTypes.ANNUAL
 #     dc_type = DayCountTypes.ACT_360
 #     capFloorRate = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
-#     discount_curve = FinDiscountCurveFlat(value_date,
+#     discount_curve = FinDiscountCurveFlat(value_dt,
 #                                          0.04,
 #                                          FrequencyTypes.ANNUAL)
 
 #     capVol = 15.54
 
-#     liborCap = IborCapFloor(settle_date,
+#     liborCap = IborCapFloor(settle_dt,
 #                                 capMaturityDate,
 #                                 IborCapFloorTypes.CAP,
 #                                 capFloorRate,
@@ -168,13 +170,13 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #                                 DayCountTypes.ACT_360)
 
 #     model = Black(capVol/100.0)
-#     v_BLK = liborCap.value(value_date, discount_curve, model)
+#     v_BLK = liborCap.value(value_dt, discount_curve, model)
 
 #     ###########################################################################
 #     # LMM VALUATION
 #     ###########################################################################
 
-#     lmmProducts = IborLMMProducts(settle_date,
+#     lmmProducts = IborLMMProducts(settle_dt,
 #                                       capMaturityDate,
 #                                       freq_type,
 #                                       dc_type)
@@ -182,11 +184,11 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # Set up forward rate vol structure
 #     capVolDates = []
 #     capletVolTenor = "1Y"
-#     capletDt = value_date
+#     capletDt = value_dt
 #     numForwards = endYear - startYear
 
 #     # Capvol dates has numForwards + 1 elements including today
-#     capVolDates.append(value_date)
+#     capVolDates.append(value_dt)
 #     for i in range(0, numForwards):
 #         capletDt = capletDt.add_tenor(capletVolTenor)
 #         capVolDates.append(capletDt)
@@ -197,7 +199,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     capVolatilities = np.array(capVolatilities)/100.0
 
 #     dc_type = DayCountTypes.ACT_ACT_ISDA
-#     volCurve = IborCapVolCurve(value_date,
+#     volCurve = IborCapVolCurve(value_dt,
 #                                    capVolDates,
 #                                    capVolatilities,
 #                                    dc_type)
@@ -211,7 +213,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #     # Simulate paths of future Libor rates
 #     numFactors = 1
 
-#     testCases.header("NUMPATHS", "VLMM", "VBLK", "ERROR")
+#     test_cases.header("NUMPATHS", "VLMM", "VBLK", "ERROR")
 
 #     for num_paths in [10000, 20000, 50000, 100000, 200000, 400000, 1000000]:
 
@@ -221,7 +223,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #             lmmProducts.simulateMF(discount_curve, numFactors, lambdas2F,
 #                                    num_paths, 0, True)
 
-#         v_lmm = lmmProducts.valueCapFloor(settle_date,
+#         v_lmm = lmmProducts.valueCapFloor(settle_dt,
 #                                           capMaturityDate,
 #                                           IborCapFloorTypes.CAP,
 #                                           capFloorRate,
@@ -229,11 +231,11 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #                                           DayCountTypes.ACT_360)
 
 #         err = v_lmm - v_BLK
-#         testCases.print(num_paths, v_lmm, v_BLK, err)
+#         test_cases.print(num_paths, v_lmm, v_BLK, err)
 
 ###############################################################################
 
 
 # test_CapsFloors()
 # test_Swaptions()
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -17,15 +17,15 @@ def test_FinFXMktVolSurface1(capsys):
     # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "USD"
     forCCRate = 0.03460  # EUR
     domCCRate = 0.02940  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3465
@@ -41,7 +41,7 @@ def test_FinFXMktVolSurface1(capsys):
     delta_method = FinFXDeltaMethod.SPOT_DELTA
     vol_functionType = VolFuncTypes.CLARK
 
-    fxMarket = FXVolSurface(value_date,
+    fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
@@ -64,15 +64,15 @@ def test_FinFXMktVolSurface2(capsys):
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURJPY EXAMPLE CLARK")
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "JPY"
     forCCRate = 0.0294  # EUR
     domCCRate = 0.0171  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 90.72
@@ -87,7 +87,7 @@ def test_FinFXMktVolSurface2(capsys):
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
-    fxMarket = FXVolSurface(value_date,
+    fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
@@ -109,15 +109,15 @@ def test_FinFXMktVolSurface3(capsys):
     # EURUSD Example from Paper by Uwe Wystup using Tables 4
     #        print("EURUSD EXAMPLE WYSTUP")
 
-    value_date = Date(20, 1, 2009)
+    value_dt = Date(20, 1, 2009)
 
     forName = "EUR"
     domName = "USD"
     forCCRate = 0.020113  # EUR
     domCCRate = 0.003525  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3088
@@ -132,7 +132,7 @@ def test_FinFXMktVolSurface3(capsys):
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA
 
-    fxMarket = FXVolSurface(value_date,
+    fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
@@ -153,15 +153,15 @@ def test_FinFXMktVolSurface3(capsys):
 def test_FinFXMktVolSurface4(capsys):
     # USDJPY Example from Paper by Uwe Wystup using Tables 4
 
-    value_date = Date(20, 1, 2009)
+    value_dt = Date(20, 1, 2009)
 
     forName = "USD"
     domName = "JPY"
     forCCRate = 0.003525  # USD
     domCCRate = 0.0042875  # JPY
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 90.68
@@ -176,7 +176,7 @@ def test_FinFXMktVolSurface4(capsys):
     atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
-    fxMarket = FXVolSurface(value_date,
+    fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,

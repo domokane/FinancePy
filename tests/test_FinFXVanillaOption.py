@@ -22,8 +22,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     # Not exactly T=1.0 but close so don't exact exact agreement
     # (in fact I do not get exact agreement even if I do set T=1.0)
-    value_date = Date(13, 2, 2018)
-    expiry_date = Date(13, 2, 2019)
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = Date(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -40,29 +40,29 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_date, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, ccy1CCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
     notional = 1000000.0
-    call_option = FXVanillaOption(expiry_date,
+    call_option = FXVanillaOption(expiry_dt,
                                   strike_fx_rate,
                                   currency_pair,
                                   OptionTypes.EUROPEAN_CALL,
                                   notional,
                                   "EUR", 2)
 
-    value = call_option.value(value_date,
+    value = call_option.value(value_dt,
                               spot_fx_rate,
                               dom_discount_curve,
                               for_discount_curve,
                               model)
 
     notional = 1250000.0
-    call_option = FXVanillaOption(expiry_date,
+    call_option = FXVanillaOption(expiry_dt,
                                   strike_fx_rate,
                                   currency_pair,
                                   OptionTypes.EUROPEAN_CALL,
@@ -70,7 +70,7 @@ def test_FinFXVanillaOptionWystupExample1():
                                   "USD", 2)
 
     value = call_option.value(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -89,7 +89,7 @@ def test_FinFXVanillaOptionWystupExample1():
     assert value['ccy_for'] == 'EUR'
 
     delta = call_option.delta(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -108,8 +108,8 @@ def test_FinFXVanillaOptionWystupExample2():
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    value_date = Date(13, 2, 2018)
-    expiry_date = Date(13, 2, 2019)
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = Date(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -126,15 +126,15 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_date, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, ccy1CCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
     # Two examples to show that changing the notional currency and notional
     # keeps the value unchanged
     notional = 1000000.0
-    call_option = FXVanillaOption(expiry_date,
+    call_option = FXVanillaOption(expiry_dt,
                                   strike_fx_rate,
                                   currency_pair,
                                   OptionTypes.EUROPEAN_PUT,
@@ -142,7 +142,7 @@ def test_FinFXVanillaOptionWystupExample2():
                                   "EUR", 2)
 
     value = call_option.value(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -161,7 +161,7 @@ def test_FinFXVanillaOptionWystupExample2():
     assert value['ccy_for'] == 'EUR'
 
     delta = call_option.delta(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -179,8 +179,8 @@ def test_FinFXVanillaOptionBloombergExample():
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    value_date = Date(13, 2, 2018)
-    expiry_date = Date(15, 2, 2019)
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = Date(15, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -196,8 +196,8 @@ def test_FinFXVanillaOptionBloombergExample():
     volatility = 0.20
 
     spot_days = 0
-    settle_date = value_date.add_weekdays(spot_days)
-    maturity_date = settle_date.add_months(12)
+    settle_dt = value_dt.add_weekdays(spot_days)
+    maturity_dt = settle_dt.add_months(12)
     notional = 1000000.0
     notional_currency = "EUR"
     cal_type = CalendarTypes.TARGET
@@ -205,22 +205,22 @@ def test_FinFXVanillaOptionBloombergExample():
     depos = []
     fras = []
     swaps = []
-    depo = IborDeposit(settle_date, maturity_date, domDepoRate,
+    depo = IborDeposit(settle_dt, maturity_dt, domDepoRate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    dom_discount_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    dom_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     depos = []
     fras = []
     swaps = []
-    depo = IborDeposit(settle_date, maturity_date, forDepoRate,
+    depo = IborDeposit(settle_dt, maturity_dt, forDepoRate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    for_discount_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    for_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     model = BlackScholes(volatility)
 
-    call_option = FXVanillaOption(expiry_date,
+    call_option = FXVanillaOption(expiry_dt,
                                   strike_fx_rate,
                                   currency_pair,
                                   OptionTypes.EUROPEAN_CALL,
@@ -228,7 +228,7 @@ def test_FinFXVanillaOptionBloombergExample():
                                   notional_currency, 2)
 
     value = call_option.value(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -247,7 +247,7 @@ def test_FinFXVanillaOptionBloombergExample():
     assert value['ccy_for'] == 'EUR'
 
     delta = call_option.delta(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -261,20 +261,20 @@ def test_FinFXVanillaOptionBloombergExample():
 
 def test_value_mc():
     #   Example from Hull 4th edition page 284
-    value_date = Date(1, 1, 2015)
-    expiry_date = value_date.add_months(4)
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = value_dt.add_months(4)
     spot_fx_rate = 1.60
     volatility = 0.1411
     dom_interest_rate = 0.08
     forInterestRate = 0.11
     model = BlackScholes(volatility)
-    dom_discount_curve = DiscountCurveFlat(value_date, dom_interest_rate)
-    for_discount_curve = DiscountCurveFlat(value_date, forInterestRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
     num_paths = 100000
 
     strike_fx_rate = 1.6
 
-    call_option = FXVanillaOption(expiry_date,
+    call_option = FXVanillaOption(expiry_dt,
                                   strike_fx_rate,
                                   "EURUSD",
                                   OptionTypes.EUROPEAN_CALL,
@@ -282,7 +282,7 @@ def test_value_mc():
                                   "USD")
 
     value_mc = call_option.value_mc(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -291,7 +291,7 @@ def test_value_mc():
 
     assert round(value_mc, 4) == 0.0429
 
-    put_option = FXVanillaOption(expiry_date,
+    put_option = FXVanillaOption(expiry_dt,
                                  strike_fx_rate,
                                  "EURUSD",
                                  OptionTypes.EUROPEAN_PUT,
@@ -299,7 +299,7 @@ def test_value_mc():
                                  "USD")
 
     value_mc = put_option.value_mc(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -311,19 +311,19 @@ def test_value_mc():
 
 def test_vega_theta():
     #   Example from Hull 4th edition page 284
-    value_date = Date(1, 1, 2015)
-    expiry_date = value_date.add_months(4)
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = value_dt.add_months(4)
     spot_fx_rate = 1.60
     volatility = 0.1411
     dom_interest_rate = 0.08
     forInterestRate = 0.11
     model = BlackScholes(volatility)
-    dom_discount_curve = DiscountCurveFlat(value_date, dom_interest_rate)
-    for_discount_curve = DiscountCurveFlat(value_date, forInterestRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
 
     strike_fx_rate = 1.6
 
-    call_option = FXVanillaOption(expiry_date,
+    call_option = FXVanillaOption(expiry_dt,
                                   strike_fx_rate,
                                   "EURUSD",
                                   OptionTypes.EUROPEAN_CALL,
@@ -331,7 +331,7 @@ def test_vega_theta():
                                   "USD")
 
     vega = call_option.vega(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,
@@ -340,7 +340,7 @@ def test_vega_theta():
     assert round(vega, 4) == 0.3518
 
     theta = call_option.theta(
-        value_date,
+        value_dt,
         spot_fx_rate,
         dom_discount_curve,
         for_discount_curve,

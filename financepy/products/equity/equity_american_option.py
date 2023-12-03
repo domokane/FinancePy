@@ -27,7 +27,7 @@ class EquityAmericanOption(EquityOption):
     calls and puts - a tree valuation model is used that can handle both. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  strike_price: float,
                  option_type: OptionTypes,
                  num_options: float = 1.0):
@@ -43,7 +43,7 @@ class EquityAmericanOption(EquityOption):
                 option_type != OptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._strike_price = strike_price
         self._option_type = option_type
         self._num_options = num_options
@@ -51,7 +51,7 @@ class EquityAmericanOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: (np.ndarray, float),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -59,18 +59,18 @@ class EquityAmericanOption(EquityOption):
         """ Valuation of an American option using a CRR tree to take into
         account the value of early exercise. """
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._value_date != value_date:
+        if dividend_curve._value_dt != value_dt:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if isinstance(value_date, Date):
-            t_exp = (self._expiry_date - value_date) / gDaysInYear
+        if isinstance(value_dt, Date):
+            t_exp = (self._expiry_dt - value_dt) / gDaysInYear
         else:
-            t_exp = value_date
+            t_exp = value_dt
 
         if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
@@ -83,8 +83,8 @@ class EquityAmericanOption(EquityOption):
 
         t_exp = np.maximum(t_exp, 1e-10)
 
-        r = discount_curve.cc_rate(self._expiry_date)
-        q = dividend_curve.cc_rate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_dt)
+        q = dividend_curve.cc_rate(self._expiry_dt)
 
         s = stock_price
         k = self._strike_price
@@ -101,7 +101,7 @@ class EquityAmericanOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("NUMBER", self._num_options, "")

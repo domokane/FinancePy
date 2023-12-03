@@ -10,7 +10,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
 
@@ -19,12 +19,12 @@ PLOT_GRAPHS = False
 
 def test_FinVolatilityCurve():
 
-    value_date = Date(20, 6, 2012)
-    expiry_date = Date(20, 12, 2012)
+    value_dt = Date(20, 6, 2012)
+    expiry_dt = Date(20, 12, 2012)
     strikes = np.linspace(70, 130, 7)
     vols = np.array([0.23, 0.24, 0.267, 0.29, 0.31, 0.33, 0.35])
     polynomial = 5
-    volCurve = EquityVolCurve(value_date, expiry_date,
+    volCurve = EquityVolCurve(value_dt, expiry_dt,
                               strikes, vols, polynomial)
 
     interpStrikes = np.linspace(50, 150, 10)
@@ -39,4 +39,4 @@ def test_FinVolatilityCurve():
 
 
 test_FinVolatilityCurve()
-testCases.compareTestCases()
+test_cases.compareTestCases()

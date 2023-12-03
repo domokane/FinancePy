@@ -16,17 +16,17 @@ def test_FinInflationBondBBG():
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     # Look for CPI Bond example
 
-    settle_date = Date(21, 7, 2017)
-    issue_date = Date(15, 7, 2010)
-    maturity_date = Date(15, 7, 2020)
+    settle_dt = Date(21, 7, 2017)
+    issue_dt = Date(15, 7, 2010)
+    maturity_dt = Date(15, 7, 2020)
     coupon = 0.0125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
     baseCPIValue = 218.08532
     ex_dividend_days = 0
 
-    bond = FinInflationBond(issue_date,
-                            maturity_date,
+    bond = FinInflationBond(issue_dt,
+                            maturity_dt,
                             coupon,
                             freq_type,
                             dc_type,
@@ -39,28 +39,28 @@ def test_FinInflationBondBBG():
     assert round(yld * 100, 4) == 1.2015
 
     # Inherited functions that just calculate real yield without CPI adjustments
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.UK_DMO)
 
     assert round(ytm, 4) == -0.0010
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.US_STREET)
 
     assert round(ytm, 4) == -0.0010
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.US_TREASURY)
 
     assert round(ytm, 4) == -0.0010
 
-    dirty_price = bond.dirty_price_from_ytm(settle_date, ytm)
+    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
     assert round(dirty_price, 4) == 104.0554
 
-    clean_price = bond.clean_price_from_ytm(settle_date, ytm)
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     assert round(clean_price, 4) == 104.0350
 
     accddays = bond._accrued_days
@@ -72,11 +72,11 @@ def test_FinInflationBondBBG():
     # Inflation functions that calculate nominal yield with CPI adjustment
     refCPIValue = 244.65884
 
-    clean_price = bond.clean_price_from_ytm(settle_date, ytm)
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     assert round(clean_price, 4) == 104.0350
 
     face = 100.0
-    inflationAccd = bond.inflation_accrued_interest(settle_date,
+    inflationAccd = bond.inflation_accrued_interest(settle_dt,
                                                     face,
                                                     refCPIValue)
 
@@ -84,13 +84,13 @@ def test_FinInflationBondBBG():
 
     lastCpnCPIValue = 244.61839
 
-    clean_price = bond.flat_price_from_yield_to_maturity(settle_date, ytm,
+    clean_price = bond.flat_price_from_yield_to_maturity(settle_dt, ytm,
                                                          lastCpnCPIValue,
                                                          YTMCalcType.US_TREASURY)
 
     assert round(clean_price, 4) == 116.6923
 
-    principal = bond.inflation_principal(settle_date,
+    principal = bond.inflation_principal(settle_dt,
                                          face,
                                          ytm,
                                          refCPIValue,
@@ -98,32 +98,32 @@ def test_FinInflationBondBBG():
 
     assert round(principal, 4) == 116.7342
 
-    duration = bond.dollar_duration(settle_date, ytm)
+    duration = bond.dollar_duration(settle_dt, ytm)
     assert round(duration, 4) == 305.9297
 
-    modified_duration = bond.modified_duration(settle_date, ytm)
+    modified_duration = bond.modified_duration(settle_dt, ytm)
     assert round(modified_duration, 4) == 2.9401
 
-    macauley_duration = bond.macauley_duration(settle_date, ytm)
+    macauley_duration = bond.macauley_duration(settle_dt, ytm)
     assert round(macauley_duration, 4) == 2.9386
 
-    conv = bond.convexity_from_ytm(settle_date, ytm)
+    conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.1020
 
 
 def test_FinInflationBondStack():
     # https://stackoverflow.com/questions/57676724/failing-to-obtain-correct-accrued-interest-with-quantlib-inflation-bond-pricer-i
 
-    issue_date = Date(25, 9, 2013)
-    maturity_date = Date(22, 3, 2068)
+    issue_dt = Date(25, 9, 2013)
+    maturity_dt = Date(22, 3, 2068)
     coupon = 0.00125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
     baseCPIValue = 249.70
     ex_dividend_days = 0
 
-    bond = FinInflationBond(issue_date,
-                            maturity_date,
+    bond = FinInflationBond(issue_dt,
+                            maturity_dt,
                             coupon,
                             freq_type,
                             dc_type,

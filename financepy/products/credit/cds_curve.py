@@ -24,7 +24,7 @@ def f(q, *args):
     zero value of the CDS has been determined. """
 
     curve = args[0]
-    value_date = args[1]
+    value_dt = args[1]
     cds = args[2]
     recovery_rate = args[3]
 
@@ -32,7 +32,7 @@ def f(q, *args):
     curve._values[num_points - 1] = q
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    obj_fn = cds.value(value_date, curve, recovery_rate)['clean_pv']
+    obj_fn = cds.value(value_dt, curve, recovery_rate)['clean_pv']
     return obj_fn
 
 ###############################################################################
@@ -45,27 +45,27 @@ class CDSCurve:
     the interpolation of the survival probabilities is also required. """
 
     def __init__(self,
-                 value_date: Date,
+                 value_dt: Date,
                  cds_contracts: list,
                  libor_curve,
                  recovery_rate,
                  use_cache: bool = False,
-                 interpolation_method: InterpTypes = InterpTypes.FLAT_FWD_RATES):
+                 interp_method: InterpTypes = InterpTypes.FLAT_FWD_RATES):
         """ Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the
         same interpolation method. """
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if value_date != libor_curve._value_date:
+        if value_dt != libor_curve._value_dt:
             raise FinError(
                 "Curve does not have same valuation date as Issuer curve.")
 
-        self._value_date = value_date
+        self._value_dt = value_dt
         self._cds_contracts = cds_contracts
         self._recovery_rate = recovery_rate
         self._libor_curve = libor_curve
-        self._interpolation_method = interpolation_method
+        self._interp_method = interp_method
         self._built_ok = False
 
         self._times = []
@@ -86,13 +86,13 @@ class CDSCurve:
         if len(cds_contracts) == 0:
             raise FinError("No CDS contracts have been supplied.")
 
-        maturity_date = cds_contracts[0]._maturity_date
+        maturity_dt = cds_contracts[0]._maturity_dt
 
         for cds in cds_contracts[1:]:
-            if cds._maturity_date <= maturity_date:
+            if cds._maturity_dt <= maturity_dt:
                 raise FinError("CDS contracts not in increasing maturity.")
 
-            maturity_date = cds._maturity_date
+            maturity_dt = cds._maturity_dt
 
 ###############################################################################
 
@@ -101,7 +101,7 @@ class CDSCurve:
         supports vectorisation. """
 
         if isinstance(dt, Date):
-            t = (dt - self._value_date) / gDaysInYear
+            t = (dt - self._value_dt) / gDaysInYear
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -117,13 +117,13 @@ class CDSCurve:
                 qs[i] = _uinterpolate(t[i],
                                       self._times,
                                       self._values,
-                                      self._interpolation_method.value)
+                                      self._interp_method.value)
             return qs
         elif isinstance(t, float):
             q = _uinterpolate(t,
                               self._times,
                               self._values,
-                              self._interpolation_method.value)
+                              self._interp_method.value)
             return q
         else:
             raise FinError("Unknown time type")
@@ -135,7 +135,7 @@ class CDSCurve:
         function supports vectorisation. """
 
         if isinstance(dt, Date):
-            t = (dt - self._value_date) / gDaysInYear
+            t = (dt - self._value_dt) / gDaysInYear
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -157,14 +157,14 @@ class CDSCurve:
 
         for i in range(0, num_times):
 
-            maturity_date = self._cds_contracts[i]._maturity_date
+            maturity_dt = self._cds_contracts[i]._maturity_dt
 
             argtuple = (self,
-                        self._value_date,
+                        self._value_dt,
                         self._cds_contracts[i],
                         self._recovery_rate)
 
-            tmat = (maturity_date - self._value_date) / gDaysInYear
+            tmat = (maturity_dt - self._value_dt) / gDaysInYear
             q = self._values[i]
 
             self._times = np.append(self._times, tmat)
@@ -192,7 +192,7 @@ class CDSCurve:
         """ Calculate the forward rate according between dates date1 and date2
         according to the specified day count convention. """
 
-        if date1 < self._value_date:
+        if date1 < self._value_dt:
             raise FinError("Date1 before curve value date.")
 
         if date2 < date1:
@@ -233,9 +233,9 @@ class CDSCurve:
         """ Print out the details of the survival probability curve. """
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         header = "TIME,SURVIVAL_PROBABILITY"
-        valueTable = [self._times, self._values]
+        value_table = [self._times, self._values]
         precision = "10.7f"
-        s += table_to_string(header, valueTable, precision)
+        s += table_to_string(header, value_table, precision)
         return s
 
 ###############################################################################

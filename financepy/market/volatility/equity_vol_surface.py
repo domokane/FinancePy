@@ -86,7 +86,7 @@ def _obj(params, *args):
 
 def _solve_to_horizon(s, t, r, q,
                       strikes,
-                      timeIndex,
+                      time_index,
                       volatility_grid,
                       vol_type_value,
                       x_inits,
@@ -98,7 +98,7 @@ def _solve_to_horizon(s, t, r, q,
 
     tol = 1e-6
 
-    args = (s, t, r, q, strikes, timeIndex, volatility_grid, vol_type_value)
+    args = (s, t, r, q, strikes, time_index, volatility_grid, vol_type_value)
 
     # Nelder-Mead (both SciPy and Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
@@ -178,14 +178,14 @@ def _delta_fit(k, *args):
     r = args[3]
     q = args[4]
     option_type_value = args[5]
-    inverseDeltaTarget = args[6]
+    inverse_delta_target = args[6]
     params = args[7]
 
     f = s * np.exp((r-q)*t)
     v = vol_function(vol_type_value, params, f, k, t)
     delta_out = bs_delta(s, t, k, r, q, v, option_type_value)
-    inverseDeltaOut = norminvcdf(np.abs(delta_out))
-    invObjFn = inverseDeltaTarget - inverseDeltaOut
+    inverse_delta_out = norminvcdf(np.abs(delta_out))
+    invObjFn = inverse_delta_target - inverse_delta_out
 
     return invObjFn
 
@@ -200,20 +200,20 @@ def _solver_for_smile_strike(s, t, r, q,
                              option_type_value,
                              volatilityTypeValue,
                              delta_target,
-                             initialGuess,
+                             initial_guess,
                              parameters):
     """ Solve for the strike that sets the delta of the option equal to the
     target value of delta allowing the volatility to be a function of the
     strike. """
 
-    inverseDeltaTarget = norminvcdf(np.abs(delta_target))
+    inverse_delta_target = norminvcdf(np.abs(delta_target))
 
     argtuple = (volatilityTypeValue, s, t, r, q,
                 option_type_value,
-                inverseDeltaTarget,
+                inverse_delta_target,
                 parameters)
 
-    K = newton_secant(_delta_fit, x0=initialGuess, args=argtuple,
+    K = newton_secant(_delta_fit, x0=initial_guess, args=argtuple,
                       tol=1e-8, maxiter=50)
 
     return K
@@ -231,11 +231,11 @@ class EquityVolSurface:
     Also, there is no guarantee that the implied pdf will be positive."""
 
     def __init__(self,
-                 value_date: Date,
+                 value_dt: Date,
                  stock_price: float,
                  discount_curve: DiscountCurve,
                  dividend_curve: DiscountCurve,
-                 expiry_dates: (list),
+                 expiry_dts: (list),
                  strikes: (list, np.ndarray),
                  volatility_grid: (list, np.ndarray),
                  volatility_function_type: VolFuncTypes = VolFuncTypes.CLARK,
@@ -245,13 +245,13 @@ class EquityVolSurface:
 
         check_argument_types(self.__init__, locals())
 
-        self._value_date = value_date
+        self._value_dt = value_dt
         self._stock_price = stock_price
 
         self._discount_curve = discount_curve
         self._dividend_curve = dividend_curve
 
-        nExpiryDates = len(expiry_dates)
+        nExpiryDates = len(expiry_dts)
         nStrikes = len(strikes)
         n = len(volatility_grid)
         m = len(volatility_grid[0])
@@ -265,8 +265,8 @@ class EquityVolSurface:
         self._strikes = strikes
         self._num_strikes = len(strikes)
 
-        self._expiry_dates = expiry_dates
-        self._numExpiryDates = len(expiry_dates)
+        self._expiry_dts = expiry_dts
+        self._numExpiryDates = len(expiry_dts)
 
         self._volatility_grid = volatility_grid
         self._volatility_function_type = volatility_function_type
@@ -275,7 +275,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def vol_from_strike_date(self, K, expiry_date):
+    def vol_from_strike_dt(self, K, expiry_dt):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -286,7 +286,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_date - self._value_date) / gDaysInYear
+        t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
         vol_type_value = self._volatility_function_type.value
 
@@ -359,11 +359,11 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    # def delta_to_strike(self, call_delta, expiry_date, delta_method):
+    # def delta_to_strike(self, call_delta, expiry_dt, delta_method):
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_date - self._value_date) / gDaysInYear
+    #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
     #     vol_type_value = self._volatility_function_type.value
 
@@ -411,13 +411,13 @@ class EquityVolSurface:
     #     t0 = self._t_exp[index0]
     #     t1 = self._t_exp[index1]
 
-    #     initialGuess = self._K_ATM[index0]
+    #     initial_guess = self._K_ATM[index0]
 
     #     K0 = _solver_for_smile_strike(s, t_exp, self._rd[index0], self._rf[index0],
     #                               OptionTypes.EUROPEAN_CALL.value,
     #                               vol_type_value, call_delta,
     #                               delta_method_value,
-    #                               initialGuess,
+    #                               initial_guess,
     #                               self._parameters[index0],
     #                               self._strikes[index0],
     #                               self._gaps[index0])
@@ -430,7 +430,7 @@ class EquityVolSurface:
     #                                   OptionTypes.EUROPEAN_CALL.value,
     #                                   vol_type_value, call_delta,
     #                                   delta_method_value,
-    #                                   initialGuess,
+    #                                   initial_guess,
     #                                   self._parameters[index1],
     #                                   self._strikes[index1],
     #                                   self._gaps[index1])
@@ -453,7 +453,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def vol_from_delta_date(self, call_delta, expiry_date, delta_method=None):
+    def vol_from_delta_dt(self, call_delta, expiry_dt, delta_method=None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -464,7 +464,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_date - self._value_date) / gDaysInYear
+        t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
         vol_type_value = self._volatility_function_type.value
 
@@ -508,7 +508,7 @@ class EquityVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        initialGuess = self._stock_price
+        initial_guess = self._stock_price
 
         K0 = _solver_for_smile_strike(s,
                                       t_exp,
@@ -516,7 +516,7 @@ class EquityVolSurface:
                                       self._q[index0],
                                       OptionTypes.EUROPEAN_CALL.value,
                                       vol_type_value, call_delta,
-                                      initialGuess,
+                                      initial_guess,
                                       self._parameters[index0])
 
         vol0 = vol_function(vol_type_value, self._parameters[index0],
@@ -529,7 +529,7 @@ class EquityVolSurface:
                                           self._q[index1],
                                           OptionTypes.EUROPEAN_CALL.value,
                                           vol_type_value, call_delta,
-                                          initialGuess,
+                                          initial_guess,
                                           self._parameters[index1])
 
             vol1 = vol_function(vol_type_value, self._parameters[index1],
@@ -612,12 +612,12 @@ class EquityVolSurface:
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        spot_date = self._value_date
+        spot_dt = self._value_dt
 
         for i in range(0, numExpiryDates):
 
-            expiry_date = self._expiry_dates[i]
-            t_exp = (expiry_date - spot_date) / gDaysInYear
+            expiry_dt = self._expiry_dts[i]
+            t_exp = (expiry_dt - spot_dt) / gDaysInYear
 
             dis_df = self._discount_curve._df(t_exp)
             div_df = self._dividend_curve._df(t_exp)
@@ -667,28 +667,28 @@ class EquityVolSurface:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self._value_date)
+            print("VALUE DATE:", self._value_dt)
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
         for i in range(0, self._numExpiryDates):
 
-            expiry_date = self._expiry_dates[i]
+            expiry_dt = self._expiry_dts[i]
             print("==========================================================")
 
             for j in range(0, self._num_strikes):
 
                 strike = self._strikes[j]
 
-                fitted_vol = self.vol_from_strike_date(strike,
-                                                       expiry_date)
+                fitted_vol = self.vol_from_strike_dt(strike,
+                                                       expiry_dt)
 
                 mkt_vol = self._volatility_grid[i][j]
 
                 diff = fitted_vol - mkt_vol
 
                 print("%s %12.3f %7.4f %7.4f %7.5f" %
-                      (expiry_date, strike,
+                      (expiry_dt, strike,
                        fitted_vol*100.0, mkt_vol*100, diff*100))
 
         print("==========================================================")
@@ -749,7 +749,7 @@ class EquityVolSurface:
 
         for tenorIndex in range(0, self._numExpiryDates):
 
-            expiry_date = self._expiry_dates[tenorIndex]
+            expiry_dt = self._expiry_dts[tenorIndex]
             plt.figure()
 
             ks = []
@@ -762,14 +762,14 @@ class EquityVolSurface:
             for i in range(0, numIntervals):
 
                 ks.append(K)
-                fittedVol = self.vol_from_strike_date(K, expiry_date) * 100.
+                fittedVol = self.vol_from_strike_dt(K, expiry_dt) * 100.
                 fitted_vols.append(fittedVol)
                 K = K + dK
 
-            labelStr = "FITTED AT " + str(self._expiry_dates[tenorIndex])
+            labelStr = "FITTED AT " + str(self._expiry_dts[tenorIndex])
             plt.plot(ks, fitted_vols, label=labelStr)
 
-            labelStr = "MARKET AT " + str(self._expiry_dates[tenorIndex])
+            labelStr = "MARKET AT " + str(self._expiry_dts[tenorIndex])
             mkt_vols = self._volatility_grid[tenorIndex] * 100.0
             plt.plot(self._strikes, mkt_vols, 'o', label=labelStr)
 
@@ -784,12 +784,12 @@ class EquityVolSurface:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self._value_date)
+        s += label_to_string("VALUE DATE", self._value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("VOL FUNCTION", self._volatility_function_type)
 
         for i in range(0, self._numExpiryDates):
-            s += label_to_string("EXPIRY DATE", self._expiry_dates[i])
+            s += label_to_string("EXPIRY DATE", self._expiry_dts[i])
 
         for i in range(0, self._num_strikes):
             s += label_to_string("STRIKE", self._strikes[i])

@@ -12,26 +12,26 @@ from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 
 def test_EquityCliquetOption():
 
-    start_date = Date(1, 1, 2014)
+    start_dt = Date(1, 1, 2014)
     final_expiry_date = Date(1, 1, 2017)
     freq_type = FrequencyTypes.QUARTERLY
     option_type = OptionTypes.EUROPEAN_CALL
 
-    cliquetOption = EquityCliquetOption(start_date,
+    cliquetOption = EquityCliquetOption(start_dt,
                                         final_expiry_date,
                                         option_type,
                                         freq_type)
 
-    value_date = Date(1, 1, 2015)
+    value_dt = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.05
     dividend_yield = 0.02
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    v = cliquetOption.value(value_date,
+    v = cliquetOption.value(value_dt,
                             stock_price,
                             discount_curve,
                             dividend_curve,

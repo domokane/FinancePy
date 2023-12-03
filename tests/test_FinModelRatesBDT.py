@@ -24,31 +24,31 @@ def test_BDTExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
 
-    settle_date = Date(1, 12, 2019)
-    issue_date = Date(1, 12, 2015)
-    expiry_date = settle_date.add_tenor("18m")
-    maturity_date = settle_date.add_tenor("10Y")
+    settle_dt = Date(1, 12, 2019)
+    issue_dt = Date(1, 12, 2015)
+    expiry_dt = settle_dt.add_tenor("18m")
+    maturity_dt = settle_dt.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
     cpn = bond._cpn / bond._freq
-    num_flows = len(bond._cpn_dates)
+    num_flows = len(bond._cpn_dts)
 
     for i in range(1, num_flows):
-        pcd = bond._cpn_dates[i-1]
-        ncd = bond._cpn_dates[i]
-        if pcd < settle_date and ncd > settle_date:
-            flow_time = (pcd - settle_date) / gDaysInYear
+        pcd = bond._cpn_dts[i-1]
+        ncd = bond._cpn_dts[i]
+        if pcd < settle_dt and ncd > settle_dt:
+            flow_time = (pcd - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
-    for flow_date in bond._cpn_dates:
-        if flow_date > settle_date:
-            flow_time = (flow_date - settle_date) / gDaysInYear
+    for flow_dt in bond._cpn_dts:
+        if flow_dt > settle_dt:
+            flow_time = (flow_dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -58,15 +58,15 @@ def test_BDTExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_date - settle_date) / gDaysInYear
-    t_exp = (expiry_date - settle_date) / gDaysInYear
+    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_exp = (expiry_dt - settle_dt) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settle_date.add_years(times)
+    dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05*times)
 
-    curve = DiscountCurve(settle_date, dates, dfs)
+    curve = DiscountCurve(settle_dt, dates, dfs)
 
-    price = bond.clean_price_from_discount_curve(settle_date, curve)
+    price = bond.clean_price_from_discount_curve(settle_dt, curve)
     assert round(price, 4) == 99.5420
 
     sigma = 0.20
@@ -88,12 +88,12 @@ def test_BDTExampleThree():
     # Valuation of a swaption as in Leif Andersen's paper - see Table 1 on
     # SSRN-id155208.pdf
 
-    settle_date = Date(1, 1, 2020)
+    settle_dt = Date(1, 1, 2020)
     times = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
-    dates = settle_date.add_years(times)
+    dates = settle_dt.add_years(times)
     rate = 0.06
     dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
-    curve = DiscountCurve(settle_date, dates, dfs)
+    curve = DiscountCurve(settle_dt, dates, dfs)
 
     coupon = 0.06
     freq_type = FrequencyTypes.SEMI_ANNUAL
@@ -107,17 +107,17 @@ def test_BDTExampleThree():
     years_to_maturity = 4.0
     expiryYears = 2.0
 
-    maturity_date = settle_date.add_years(years_to_maturity)
-    issue_date = Date(maturity_date._d, maturity_date._m, 2000)
+    maturity_dt = settle_dt.add_years(years_to_maturity)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
 
     sigma = 0.2012
 
-    expiry_date = settle_date.add_years(expiryYears)
+    expiry_dt = settle_dt.add_years(expiryYears)
 
-    tmat = (maturity_date - settle_date) / gDaysInYear
-    t_exp = (expiry_date - settle_date) / gDaysInYear
+    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_exp = (expiry_dt - settle_dt) / gDaysInYear
 
-    bond = Bond(issue_date, maturity_date,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     cpn_times = []
@@ -125,9 +125,9 @@ def test_BDTExampleThree():
 
     cpn = bond._cpn / bond._freq
 
-    for flow_date in bond._cpn_dates:
-        if flow_date > expiry_date:
-            flow_time = (flow_date - settle_date) / gDaysInYear
+    for flow_dt in bond._cpn_dts:
+        if flow_dt > expiry_dt:
+            flow_time = (flow_dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -135,7 +135,7 @@ def test_BDTExampleThree():
     cpn_flows = np.array(cpn_flows)
 
     price = bond.clean_price_from_discount_curve(
-        settle_date, curve)
+        settle_dt, curve)
 
     model = BDTTree(sigma, num_time_steps)
     model.build_tree(tmat, times, dfs)
@@ -156,17 +156,17 @@ def test_BDTExampleThree():
     years_to_maturity = 10.0
     expiryYears = 5.0
 
-    maturity_date = settle_date.add_years(years_to_maturity)
-    issue_date = Date(maturity_date._d, maturity_date._m, 2000)
+    maturity_dt = settle_dt.add_years(years_to_maturity)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
 
     sigma = 0.1522
 
-    expiry_date = settle_date.add_years(expiryYears)
+    expiry_dt = settle_dt.add_years(expiryYears)
 
-    tmat = (maturity_date - settle_date) / gDaysInYear
-    t_exp = (expiry_date - settle_date) / gDaysInYear
+    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_exp = (expiry_dt - settle_dt) / gDaysInYear
 
-    bond = Bond(issue_date, maturity_date,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     cpn_times = []
@@ -174,9 +174,9 @@ def test_BDTExampleThree():
 
     cpn = bond._cpn / bond._freq
 
-    for flow_date in bond._cpn_dates:
-        if flow_date > expiry_date:
-            flow_time = (flow_date - settle_date) / gDaysInYear
+    for flow_dt in bond._cpn_dts:
+        if flow_dt > expiry_dt:
+            flow_time = (flow_dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -184,7 +184,7 @@ def test_BDTExampleThree():
     cpn_flows = np.array(cpn_flows)
 
     price = bond.clean_price_from_discount_curve(
-        settle_date, curve)
+        settle_dt, curve)
 
     model = BDTTree(sigma, num_time_steps)
     model.build_tree(tmat, times, dfs)

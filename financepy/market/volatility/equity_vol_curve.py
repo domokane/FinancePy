@@ -20,13 +20,13 @@ class EquityVolCurve():
 ###############################################################################
 
     def __init__(self,
-                 curve_date,
-                 expiry_date,
+                 curve_dt,
+                 expiry_dt,
                  strikes,
                  volatilities,
                  polynomial=3):
 
-        if expiry_date <= curve_date:
+        if expiry_dt <= curve_dt:
             raise FinError("Expiry date before curve date.")
 
         if len(strikes) < 1:
@@ -45,7 +45,7 @@ class EquityVolCurve():
             if strikes[i] <= strikes[i - 1]:
                 raise FinError("Grid Strikes are not in increasing order")
 
-        self._curve_date = curve_date
+        self._curve_dt = curve_dt
         self._strikes = np.array(strikes)
         self._volatilities = np.array(volatilities)
 
@@ -67,7 +67,7 @@ class EquityVolCurve():
 
 ###############################################################################
 
-    def calculate_pdf():
+    def calculate_pdf(self):
         """ calculate the probability density function of the underlying using
         the volatility smile or skew curve following the approach set out in
         Breedon and Litzenberger. """

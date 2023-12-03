@@ -15,20 +15,20 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
 
 def test_BondAnnuity():
 
-    settle_date = Date(20, 6, 2018)
+    settle_dt = Date(20, 6, 2018)
 
     #   print("==============================================================")
     #   print("SEMI-ANNUAL FREQUENCY")
     #   print("==============================================================")
 
-    maturity_date = Date(20, 6, 2019)
+    maturity_dt = Date(20, 6, 2019)
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
@@ -37,7 +37,7 @@ def test_BondAnnuity():
     basis_type = DayCountTypes.ACT_360
     face = 1000000
 
-    annuity = BondAnnuity(maturity_date,
+    annuity = BondAnnuity(maturity_dt,
                           coupon,
                           freq_type,
                           cal_type,
@@ -45,20 +45,20 @@ def test_BondAnnuity():
                           dg_type,
                           basis_type)
 
-    annuity.calculate_payments(settle_date, face)
+    annuity.calculate_payments(settle_dt, face)
 
-    testCases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dates)
+    test_cases.header("Date", "Flow")
+    num_flows = len(annuity._cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dates[i]
+        dt = annuity._cpn_dts[i]
         flow = annuity._flow_amounts[i]
-        testCases.print(dt, flow)
+        test_cases.print(dt, flow)
 
 #    print("===============================================================")
 #    print("QUARTERLY FREQUENCY")
 #    print("===============================================================")
 
-    maturity_date = Date(20, 6, 2028)
+    maturity_dt = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
@@ -66,7 +66,7 @@ def test_BondAnnuity():
     dg_type = DateGenRuleTypes.BACKWARD
     basis_type = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(maturity_date,
+    annuity = BondAnnuity(maturity_dt,
                           coupon,
                           freq_type,
                           cal_type,
@@ -74,20 +74,20 @@ def test_BondAnnuity():
                           dg_type,
                           basis_type)
 
-    annuity.calculate_payments(settle_date, face)
+    annuity.calculate_payments(settle_dt, face)
 
-    testCases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dates)
+    test_cases.header("Date", "Flow")
+    num_flows = len(annuity._cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dates[i]
+        dt = annuity._cpn_dts[i]
         flow = annuity._flow_amounts[i]
-        testCases.print(dt, flow)
+        test_cases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("MONTHLY FREQUENCY")
 #    print("==================================================================")
 
-    maturity_date = Date(20, 6, 2028)
+    maturity_dt = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.MONTHLY
     cal_type = CalendarTypes.WEEKEND
@@ -95,7 +95,7 @@ def test_BondAnnuity():
     dg_type = DateGenRuleTypes.BACKWARD
     basis_type = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(maturity_date,
+    annuity = BondAnnuity(maturity_dt,
                           coupon,
                           freq_type,
                           cal_type,
@@ -103,20 +103,20 @@ def test_BondAnnuity():
                           dg_type,
                           basis_type)
 
-    annuity.calculate_payments(settle_date, face)
+    annuity.calculate_payments(settle_dt, face)
 
-    testCases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dates)
+    test_cases.header("Date", "Flow")
+    num_flows = len(annuity._cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dates[i]
+        dt = annuity._cpn_dts[i]
         flow = annuity._flow_amounts[i]
-        testCases.print(dt, flow)
+        test_cases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("FORWARD GEN")
 #    print("==================================================================")
 
-    maturity_date = Date(20, 6, 2028)
+    maturity_dt = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.ANNUAL
     cal_type = CalendarTypes.WEEKEND
@@ -124,7 +124,7 @@ def test_BondAnnuity():
     dg_type = DateGenRuleTypes.FORWARD
     basis_type = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(maturity_date,
+    annuity = BondAnnuity(maturity_dt,
                           coupon,
                           freq_type,
                           cal_type,
@@ -132,20 +132,20 @@ def test_BondAnnuity():
                           dg_type,
                           basis_type)
 
-    annuity.calculate_payments(settle_date, face)
+    annuity.calculate_payments(settle_dt, face)
 
-    testCases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dates)
+    test_cases.header("Date", "Flow")
+    num_flows = len(annuity._cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dates[i]
+        dt = annuity._cpn_dts[i]
         flow = annuity._flow_amounts[i]
-        testCases.print(dt, flow)
+        test_cases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("BACKWARD GEN WITH SHORT END STUB")
 #    print("==================================================================")
 
-    maturity_date = Date(20, 6, 2028)
+    maturity_dt = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.ANNUAL
     cal_type = CalendarTypes.WEEKEND
@@ -153,7 +153,7 @@ def test_BondAnnuity():
     dg_type = DateGenRuleTypes.FORWARD
     basis_type = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(maturity_date,
+    annuity = BondAnnuity(maturity_dt,
                           coupon,
                           freq_type,
                           cal_type,
@@ -161,20 +161,20 @@ def test_BondAnnuity():
                           dg_type,
                           basis_type)
 
-    annuity.calculate_payments(settle_date, face)
+    annuity.calculate_payments(settle_dt, face)
 
-    testCases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dates)
+    test_cases.header("Date", "Flow")
+    num_flows = len(annuity._cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dates[i]
+        dt = annuity._cpn_dts[i]
         flow = annuity._flow_amounts[i]
-        testCases.print(dt, flow)
+        test_cases.print(dt, flow)
 
 #    print("==================================================================")
 #    print("FORWARD GEN WITH LONG END STUB")
 #    print("==================================================================")
 
-    maturity_date = Date(20, 6, 2028)
+    maturity_dt = Date(20, 6, 2028)
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
@@ -182,7 +182,7 @@ def test_BondAnnuity():
     dg_type = DateGenRuleTypes.FORWARD
     basis_type = DayCountTypes.ACT_360
 
-    annuity = BondAnnuity(maturity_date,
+    annuity = BondAnnuity(maturity_dt,
                           coupon,
                           freq_type,
                           cal_type,
@@ -190,17 +190,17 @@ def test_BondAnnuity():
                           dg_type,
                           basis_type)
 
-    annuity.calculate_payments(settle_date, face)
+    annuity.calculate_payments(settle_dt, face)
 
-    testCases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dates)
+    test_cases.header("Date", "Flow")
+    num_flows = len(annuity._cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dates[i]
+        dt = annuity._cpn_dts[i]
         flow = annuity._flow_amounts[i]
-        testCases.print(dt, flow)
+        test_cases.print(dt, flow)
 
 ##########################################################################
 
 
 test_BondAnnuity()
-testCases.compareTestCases()
+test_cases.compareTestCases()

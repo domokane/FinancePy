@@ -19,16 +19,16 @@ class BondFuture:
 
     def __init__(self,
                  ticker_name: str,
-                 first_delivery_date: Date,
-                 last_delivery_date: Date,
+                 first_delivery_dt: Date,
+                 last_delivery_dt: Date,
                  contract_size: int,
                  cpn: float):
 
         check_argument_types(self.__init__, locals())
 
         self._ticker_name = ticker_name
-        self._first_delivery_date = first_delivery_date  # This is the IMM date
-        self._last_delivery_date = last_delivery_date
+        self._first_delivery_dt = first_delivery_dt  # This is the IMM date
+        self._last_delivery_dt = last_delivery_dt
         self._contract_size = contract_size
         self._cpn = cpn
 
@@ -46,21 +46,21 @@ class BondFuture:
         # https://www.cmegroup.com//trading//interest-rates//us-treasury-futures-conversion-factor-lookup-tables.html
         # for a reference.
 
-        tmat = (bond._maturity_date - self._first_delivery_date) / gDaysInYear
+        tmat = (bond._maturity_dt - self._first_delivery_dt) / gDaysInYear
         roundedTmatInMonths = int(tmat * 4.0) * 3
-        new_mat = self._first_delivery_date.add_months(roundedTmatInMonths)
+        new_mat = self._first_delivery_dt.add_months(roundedTmatInMonths)
         ex_div_days = 0
 
-        issue_date = Date(new_mat._d, new_mat._m, 2000)
+        issue_dt = Date(new_mat._d, new_mat._m, 2000)
 
-        newBond = Bond(issue_date,
+        newBond = Bond(issue_dt,
                        new_mat,
                        bond._cpn,
                        bond._freq_type,
                        bond._dc_type,
                        ex_div_days)
 
-        p = newBond.clean_price_from_ytm(self._first_delivery_date,
+        p = newBond.clean_price_from_ytm(self._first_delivery_dt,
                                          self._cpn)
 
         # Convention is to round the conversion factor to 4dp
@@ -81,13 +81,13 @@ class BondFuture:
 ###############################################################################
 
     def total_invoice_amount(self,
-                             settle_date: Date,
+                             settle_dt: Date,
                              bond: Bond,
                              futures_price: float):
         ' The total invoice amount paid to take delivery of bond. '
 
         if bond._accrued_interest is None:
-            bond.calculate_cpn_dates(settle_date)
+            bond.calculate_cpn_dts(settle_dt)
 
         accrued_interest = bond._accrued_interest
 
@@ -134,8 +134,8 @@ class BondFuture:
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("TICKER NAME", self._ticker_name)
-        s += label_to_string("FIRST DELIVERY DATE", self._first_delivery_date)
-        s += label_to_string("LAST DELIVERY DATE", self._last_delivery_date)
+        s += label_to_string("FIRST DELIVERY DATE", self._first_delivery_dt)
+        s += label_to_string("LAST DELIVERY DATE", self._last_delivery_dt)
         s += label_to_string("CONTRACT SIZE", self._contract_size)
         s += label_to_string("COUPON", self._cpn)
         return s

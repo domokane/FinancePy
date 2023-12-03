@@ -164,7 +164,7 @@ class Heston():
 ###############################################################################
 
     def value_mc(self,
-                 value_date,
+                 value_dt,
                  option,
                  stock_price,
                  interest_rate,
@@ -174,7 +174,7 @@ class Heston():
                  seed,
                  scheme=HestonNumericalScheme.EULERLOG):
 
-        tau = (option._expiry_date - value_date) / gDaysInYear
+        tau = (option._expiry_dt - value_dt) / gDaysInYear
 
         K = option._strike_price
         dt = 1.0 / num_steps_per_year
@@ -208,13 +208,13 @@ class Heston():
 ###############################################################################
 
     def value_lewis(self,
-                    value_date,
+                    value_dt,
                     option,
                     stock_price,
                     interest_rate,
                     dividend_yield):
 
-        tau = (option._expiry_date - value_date) / gDaysInYear
+        tau = (option._expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -256,13 +256,13 @@ class Heston():
 ###############################################################################
 
     def value_lewis_rouah(self,
-                          value_date,
+                          value_dt,
                           option,
                           stock_price,
                           interest_rate,
                           dividend_yield):
 
-        tau = (option._expiry_date - value_date) / gDaysInYear
+        tau = (option._expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -300,13 +300,13 @@ class Heston():
 ###############################################################################
 
     def value_weber(self,
-                    value_date,
+                    value_dt,
                     option,
                     stock_price,
                     interest_rate,
                     dividend_yield):
 
-        tau = (option._expiry_date - value_date) / gDaysInYear
+        tau = (option._expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -347,13 +347,13 @@ class Heston():
 ###############################################################################
 
     def value_gatheral(self,
-                       value_date,
+                       value_dt,
                        option,
                        stock_price,
                        interest_rate,
                        dividend_yield):
 
-        tau = (option._expiry_date - value_date) / gDaysInYear
+        tau = (option._expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma

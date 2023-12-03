@@ -11,7 +11,7 @@ from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
 
 
-value_date = Date(1, 1, 2015)
+value_dt = Date(1, 1, 2015)
 expiry_date = Date(1, 1, 2016)
 currency_pair = "USDJPY"
 volatility = 0.20
@@ -24,8 +24,8 @@ notional_currency = "USD"
 drift = dom_interest_rate - forInterestRate
 scheme = FinGBMNumericalScheme.ANTITHETIC
 process_type = ProcessTypes.GBM
-dom_discount_curve = DiscountCurveFlat(value_date, dom_interest_rate)
-for_discount_curve = DiscountCurveFlat(value_date, forInterestRate)
+dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
 model = BlackScholes(volatility)
 num_observations_per_year = 100
 
@@ -46,25 +46,25 @@ def test_DOWN_AND_OUT_CALL():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -89,25 +89,25 @@ def test_DOWN_AND_IN_CALL():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -132,25 +132,25 @@ def test_UP_AND_OUT_CALL():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -175,25 +175,25 @@ def test_UP_AND_IN_CALL():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -218,25 +218,25 @@ def test_UP_AND_OUT_PUT():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -261,25 +261,25 @@ def test_UP_AND_IN_PUT():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -304,25 +304,25 @@ def test_DOWN_AND_OUT_PUT():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -347,25 +347,25 @@ def test_DOWN_AND_IN_PUT():
                                      notional,
                                      notional_currency)
 
-    value = barrier_option.value(value_date,
+    value = barrier_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    delta = barrier_option.delta(value_date,
+    delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
                                  model)
 
-    vega = barrier_option.vega(value_date,
+    vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
                                dom_discount_curve,
                                for_discount_curve,
                                model)
 
-    theta = barrier_option.theta(value_date,
+    theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,

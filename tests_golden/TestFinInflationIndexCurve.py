@@ -9,7 +9,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##############################################################################
 
@@ -25,17 +25,17 @@ def test_FinInflationIndexCurve():
 
     refDate = Date(22, 7, 2008)
 
-    testCases.header("LABEL", "VALUE")
+    test_cases.header("LABEL", "VALUE")
 
     value = curve.index_value(refDate)
     value = curve.index_value(refDate)
     value = curve.index_value(refDate)
     value = curve.index_value(refDate)
 
-    testCases.print(refDate, value)
+    test_cases.print(refDate, value)
 
     index_ratio = curve.index_ratio(refDate)
-    testCases.print(refDate, index_ratio)
+    test_cases.print(refDate, index_ratio)
 
 #    print(curve)
 
@@ -43,4 +43,4 @@ def test_FinInflationIndexCurve():
 
 
 test_FinInflationIndexCurve()
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -35,12 +35,12 @@ class FinFXBarrierTypes(Enum):
 class FXBarrierOption(FXOption):
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  strike_fx_rate: float,  # 1 unit of foreign in domestic
                  currency_pair: str,  # FORDOM
                  option_type: FinFXBarrierTypes,
                  barrier_level: float,
-                 num_observations_per_year: int,
+                 num_obs_per_year: int,
                  notional: float,
                  notional_currency: str):
         """ Create FX Barrier option product. This is an option that cancels if
@@ -48,11 +48,11 @@ class FXBarrierOption(FXOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._strike_fx_rate = float(strike_fx_rate)
         self._currency_pair = currency_pair
         self._barrier_level = float(barrier_level)
-        self._num_observations_per_year = int(num_observations_per_year)
+        self._num_obs_per_year = int(num_obs_per_year)
         self._option_type = option_type
         self._notional = notional
         self._notional_currency = notional_currency
@@ -60,7 +60,7 @@ class FXBarrierOption(FXOption):
     ##########################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               spot_fx_rate,
               dom_discount_curve,
               for_discount_curve,
@@ -72,17 +72,17 @@ class FXBarrierOption(FXOption):
         # by Clewlow, Llanos and Strickland December 1994 which can be found at
         # https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_date != value_date:
+        if dom_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if for_discount_curve._value_date != value_date:
+        if for_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
@@ -90,7 +90,7 @@ class FXBarrierOption(FXOption):
         S0 = spot_fx_rate
         h = self._barrier_level
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         lnS0k = log(float(S0) / K)
         sqrtT = sqrt(t)
 
@@ -127,7 +127,7 @@ class FXBarrierOption(FXOption):
         elif self._option_type == FinFXBarrierTypes.DOWN_AND_IN_PUT and S0 <= h:
             return p
 
-        num_observations = t * self._num_observations_per_year
+        num_observations = t * self._num_obs_per_year
 
         # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
         # Adjusts the barrier for discrete and not continuous observations
@@ -255,7 +255,7 @@ class FXBarrierOption(FXOption):
     ###########################################################################
 
     def value_mc(self,
-                 value_date,
+                 value_dt,
                  spot_fx_rate,
                  dom_interest_rate,
                  process_type,
@@ -265,7 +265,7 @@ class FXBarrierOption(FXOption):
                  seed=4242):
         """ Value the FX Barrier Option using Monte Carlo. """
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         num_time_steps = int(t * num_ann_steps)
         K = self._strike_fx_rate
         B = self._barrier_level
@@ -381,13 +381,13 @@ class FXBarrierOption(FXOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
         s += label_to_string("CURRENCY PAIR", self._currency_pair)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("BARRIER LEVEL", self._barrier_level)
         s += label_to_string("NUM OBSERVATIONS",
-                             self._num_observations_per_year)
+                             self._num_obs_per_year)
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("NOTIONAL CURRENCY", self._notional_currency, "")
         return s

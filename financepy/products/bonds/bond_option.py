@@ -38,13 +38,13 @@ class BondOption():
 
     def __init__(self,
                  bond: Bond,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  strike_price: float,
                  option_type: OptionTypes):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._strike_price = strike_price
         self._bond = bond
         self._option_type = option_type
@@ -53,50 +53,50 @@ class BondOption():
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               discount_curve: DiscountCurve,
               model):
         """ Value a bond option (option on a bond) using a specified model
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
         model which are all implemented as short rate tree models. """
 
-        t_exp = (self._expiry_date - value_date) / gDaysInYear
-        tmat = (self._bond._maturity_date - value_date) / gDaysInYear
+        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
+        tmat = (self._bond._maturity_dt - value_dt) / gDaysInYear
 
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
         # We need all of the flows in case the option is American
         # and some occur before expiry
-        flow_dates = self._bond._cpn_dates
+        flow_dts = self._bond._cpn_dts
         flow_amounts = self._bond._flow_amounts
 
         cpn_times = []
         cpn_flows = []
 
-        num_flows = len(self._bond._cpn_dates)
+        num_flows = len(self._bond._cpn_dts)
 
         # Want the first flow to be the previous coupon date
         # This is needed to calculate accrued correctly
         for i in range(1, num_flows):
-            pcd = flow_dates[i-1]
-            ncd = flow_dates[i]
-            if pcd < value_date and ncd > value_date:
-                flow_time = (pcd - value_date) / gDaysInYear
+            pcd = flow_dts[i-1]
+            ncd = flow_dts[i]
+            if pcd < value_dt and ncd > value_dt:
+                flow_time = (pcd - value_dt) / gDaysInYear
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
                 break
 
         for i in range(1, num_flows):
-            if flow_dates[i] == value_date:
+            if flow_dts[i] == value_dt:
                 cpn_times.append(0.0)
                 cpn_flows.append(flow_amounts[i])
 
         # Now calculate the remaining coupons
         for i in range(1, num_flows):
-            ncd = flow_dates[i]
-            if ncd > value_date:
-                flow_time = (ncd - value_date) / gDaysInYear
+            ncd = flow_dts[i]
+            if ncd > value_dt:
+                flow_time = (ncd - value_dt) / gDaysInYear
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
 
@@ -131,7 +131,7 @@ class BondOption():
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("STRIKE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += "Underlying Bond\n"

@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_Black():
@@ -22,7 +22,7 @@ def test_Black():
     time_to_expiry = 2.0
     volatility = 0.20
 
-    testCases.header("ITEM", "CALL", "PUT")
+    test_cases.header("ITEM", "CALL", "PUT")
 
     call_optionType = OptionTypes.EUROPEAN_CALL
     put_optionType = OptionTypes.EUROPEAN_PUT
@@ -44,7 +44,7 @@ def test_Black():
         assert round((valueCall - valuePut), dp) == round(df*(forward - strike), dp), \
             "The method called 'value()' doesn't comply with Call-Put parity"
 
-        testCases.print("VALUE", valueCall, valuePut)
+        test_cases.print("VALUE", valueCall, valuePut)
 
         #######################################################################
 
@@ -56,7 +56,7 @@ def test_Black():
         assert round((1/df) * (deltaCall - deltaPut), dp) == 1.0, \
             "The method called 'delta()' doesn't comply with Call-put parity"
 
-        testCases.print("DELTA", deltaCall, deltaPut)
+        test_cases.print("DELTA", deltaCall, deltaPut)
 
         #######################################################################
 
@@ -68,7 +68,7 @@ def test_Black():
         assert round(gammaCall - gammaPut, dp) == 0.0, \
             "The method called 'gamma()' doesn't comply with Call-Put parity"
 
-        testCases.print("GAMMA", gammaCall, gammaPut)
+        test_cases.print("GAMMA", gammaCall, gammaPut)
 
         #######################################################################
 
@@ -80,7 +80,7 @@ def test_Black():
         assert round((thetaCall - thetaPut), dp) == round((riskFreeIR * time_to_expiry) * (forward - strike) * df, dp), \
             "The method called 'theta()' doesn't comply with Call-Put parity"
 
-        testCases.print("THETA", thetaCall, thetaPut)
+        test_cases.print("THETA", thetaCall, thetaPut)
 
         #######################################################################
 
@@ -92,7 +92,7 @@ def test_Black():
         assert round(vegaCall - vegaPut, dp) == 0.0, \
             "The method called 'vega()' doesn't comply with Call-Put parity"
 
-        testCases.print("VEGA", vegaCall, vegaPut)
+        test_cases.print("VEGA", vegaCall, vegaPut)
 
         #######################################################################
 
@@ -103,4 +103,4 @@ def test_Black():
 
 
 test_Black()
-testCases.compareTestCases()
+test_cases.compareTestCases()

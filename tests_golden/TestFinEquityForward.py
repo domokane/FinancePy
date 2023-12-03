@@ -11,15 +11,15 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
 
 def test_EquityForward():
 
-    value_date = Date(13, 2, 2018)
-    expiry_date = value_date.add_months(12)
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = value_dt.add_months(12)
 
     stock_price = 130.0
     forward_price = 125.0  # Locked
@@ -28,34 +28,34 @@ def test_EquityForward():
 
     ###########################################################################
 
-    expiry_date = value_date.add_months(12)
+    expiry_dt = value_dt.add_months(12)
     notional = 100.0
 
-    discount_curve = DiscountCurveFlat(value_date, discount_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_rate)
+    discount_curve = DiscountCurveFlat(value_dt, discount_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
 
-    equityForward = EquityForward(expiry_date,
+    equityForward = EquityForward(expiry_dt,
                                   forward_price,
                                   notional,
                                   FinLongShort.LONG)
 
-    testCases.header("SPOT FX", "FX FWD", "VALUE_BS")
+    test_cases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwdPrice = equityForward.forward(value_date,
+    fwdPrice = equityForward.forward(value_dt,
                                      stock_price,
                                      discount_curve,
                                      dividend_curve)
 
-    fwdValue = equityForward.value(value_date,
+    fwdValue = equityForward.value(value_dt,
                                    stock_price,
                                    discount_curve,
                                    dividend_curve)
 
 #    print(stock_price, fwdPrice, fwdValue)
-    testCases.print(stock_price, fwdPrice, fwdValue)
+    test_cases.print(stock_price, fwdPrice, fwdValue)
 
 ###############################################################################
 
 
 test_EquityForward()
-testCases.compareTestCases()
+test_cases.compareTestCases()

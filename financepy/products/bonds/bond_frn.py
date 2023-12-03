@@ -24,13 +24,13 @@ def _f(dm, *args):
     """ Function used to do solve root search in DM calculation """
 
     self = args[0]
-    settle_date = args[1]
+    settle_dt = args[1]
     next_cpn = args[2]
     current_ibor = args[3]
     future_ibor = args[4]
     dirty_price = args[5]
 
-    px = self.dirty_price_from_dm(settle_date,
+    px = self.dirty_price_from_dm(settle_dt,
                                   next_cpn,
                                   current_ibor,
                                   future_ibor,
@@ -47,8 +47,8 @@ class BondFRN:
     quoted margin."""
 
     def __init__(self,
-                 issue_date: Date,
-                 maturity_date: Date,
+                 issue_dt: Date,
+                 maturity_dt: Date,
                  quoted_margin: float,  # Fixed spread paid on top of index
                  freq_type: FrequencyTypes,
                  dc_type: DayCountTypes,
@@ -59,27 +59,27 @@ class BondFRN:
 
         check_argument_types(self.__init__, locals())
 
-        self._issue_date = issue_date
-        self._maturity_date = maturity_date
+        self._issue_dt = issue_dt
+        self._maturity_dt = maturity_dt
         self._quoted_margin = quoted_margin
         self._freq_type = freq_type
         self._dc_type = dc_type
         self._freq = annual_frequency(freq_type)
         self._cal_type = cal_type
 
-        self._settle_date = Date(1, 1, 1900)
+        self._settle_dt = Date(1, 1, 1900)
         self._accrued_interest = None
         self._accrued_days = 0.0
 
-        self._cpn_dates = []
+        self._cpn_dts = []
         self._flow_amounts = []
         self._par = 100.0  # This is how price is quoted
 
-        self._calculate_cpn_dates()
+        self._calculate_cpn_dts()
 
     ###########################################################################
 
-    def _calculate_cpn_dates(self):
+    def _calculate_cpn_dts(self):
         """ Determine the bond cashflow payment dates. """
 
         # This should only be called once from init
@@ -87,8 +87,8 @@ class BondFRN:
         bd_type = BusDayAdjustTypes.NONE
         dg_type = DateGenRuleTypes.BACKWARD
 
-        self._cpn_dates = Schedule(self._issue_date,
-                                   self._maturity_date,
+        self._cpn_dts = Schedule(self._issue_dt,
+                                   self._maturity_dt,
                                    self._freq_type,
                                    self._cal_type,
                                    bd_type,
@@ -97,7 +97,7 @@ class BondFRN:
     ###########################################################################
 
     def dirty_price_from_dm(self,
-                            settle_date: Date,
+                            settle_dt: Date,
                             next_cpn: float,  # The total reset coupon on NCD
                             current_ibor: float,  # Ibor discount to NCD
                             future_ibor: float,  # Future constant Ibor rates
@@ -109,15 +109,15 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
-        self.accrued_interest(settle_date, next_cpn, 1.0)
+        self.accrued_interest(settle_dt, next_cpn, 1.0)
 
         day_counter = DayCount(self._dc_type)
 
         q = self._quoted_margin
-        num_flows = len(self._cpn_dates)
+        num_flows = len(self._cpn_dts)
 
         # We discount using Libor over the period from settlement to the ncd
-        (alpha, _, _) = day_counter.year_frac(settle_date, self._ncd)
+        (alpha, _, _) = day_counter.year_frac(settle_dt, self._ncd)
         df = 1.0 / (1.0 + alpha * (current_ibor + dm))
 
         # A full coupon is paid
@@ -127,9 +127,9 @@ class BondFRN:
         # Now do all subsequent coupons that fall after the ncd
         for iFlow in range(1, num_flows):
 
-            if self._cpn_dates[iFlow] > self._ncd:
-                pcd = self._cpn_dates[iFlow - 1]
-                ncd = self._cpn_dates[iFlow]
+            if self._cpn_dts[iFlow] > self._ncd:
+                pcd = self._cpn_dts[iFlow - 1]
+                ncd = self._cpn_dts[iFlow]
                 (alpha, _, _) = day_counter.year_frac(pcd, ncd)
 
                 df = df / (1.0 + alpha * (future_ibor + dm))
@@ -143,7 +143,7 @@ class BondFRN:
     ###########################################################################
 
     def principal(self,
-                  settle_date: Date,
+                  settle_dt: Date,
                   next_cpn: float,
                   current_ibor: float,
                   future_ibor: float,
@@ -153,7 +153,7 @@ class BondFRN:
         amount from its discount margin and making assumptions about the
         future Ibor rates. """
 
-        dirty_price = self.dirty_price_from_dm(settle_date,
+        dirty_price = self.dirty_price_from_dm(settle_dt,
                                                next_cpn,
                                                current_ibor,
                                                future_ibor,
@@ -166,7 +166,7 @@ class BondFRN:
     ###########################################################################
 
     def dollar_duration(self,
-                        settle_date: Date,
+                        settle_dt: Date,
                         next_cpn: float,
                         current_ibor: float,
                         future_ibor: float,
@@ -176,13 +176,13 @@ class BondFRN:
 
         dy = 0.0001  # 1 basis point
 
-        p0 = self.dirty_price_from_dm(settle_date,
+        p0 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor + dy,
                                       future_ibor,
                                       dm)
 
-        p2 = self.dirty_price_from_dm(settle_date,
+        p2 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor - dy,
                                       future_ibor,
@@ -194,7 +194,7 @@ class BondFRN:
     ###########################################################################
 
     def dollar_credit_duration(self,
-                               settle_date: Date,
+                               settle_dt: Date,
                                next_cpn: float,
                                current_ibor: float,
                                future_ibor: float,
@@ -204,16 +204,16 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.accrued_interest(settle_date, next_cpn, 1.0)
+        self.accrued_interest(settle_dt, next_cpn, 1.0)
         dy = 0.0001
 
-        p0 = self.dirty_price_from_dm(settle_date,
+        p0 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor,
                                       future_ibor,
                                       dm + dy)
 
-        p2 = self.dirty_price_from_dm(settle_date,
+        p2 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor,
                                       future_ibor,
@@ -225,7 +225,7 @@ class BondFRN:
     ###########################################################################
 
     def macauley_duration(self,
-                          settle_date: Date,
+                          settle_dt: Date,
                           next_cpn: float,
                           current_ibor: float,
                           future_ibor: float,
@@ -233,13 +233,13 @@ class BondFRN:
         """ Calculate the Macauley duration of the FRN on a settlement date
         given its yield to maturity. """
 
-        dd = self.dollar_duration(settle_date,
+        dd = self.dollar_duration(settle_dt,
                                   next_cpn,
                                   current_ibor,
                                   future_ibor,
                                   dm)
 
-        fp = self.dirty_price_from_dm(settle_date,
+        fp = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor,
                                       future_ibor,
@@ -251,7 +251,7 @@ class BondFRN:
     ###########################################################################
 
     def modified_duration(self,
-                          settle_date: Date,
+                          settle_dt: Date,
                           next_cpn: float,
                           current_ibor: float,
                           future_ibor: float,
@@ -263,13 +263,13 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
-        dd = self.dollar_duration(settle_date,
+        dd = self.dollar_duration(settle_dt,
                                   next_cpn,
                                   current_ibor,
                                   future_ibor,
                                   dm)
 
-        fp = self.dirty_price_from_dm(settle_date,
+        fp = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor,
                                       future_ibor,
@@ -280,7 +280,7 @@ class BondFRN:
     ###########################################################################
 
     def modified_credit_duration(self,
-                                 settle_date: Date,
+                                 settle_dt: Date,
                                  next_cpn: float,
                                  current_ibor: float,
                                  future_ibor: float,
@@ -292,13 +292,13 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
-        dd = self.dollar_credit_duration(settle_date,
+        dd = self.dollar_credit_duration(settle_dt,
                                          next_cpn,
                                          current_ibor,
                                          future_ibor,
                                          dm)
 
-        fp = self.dirty_price_from_dm(settle_date,
+        fp = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor,
                                       future_ibor,
@@ -309,7 +309,7 @@ class BondFRN:
     ###########################################################################
 
     def convexity_from_dm(self,
-                          settle_date: Date,
+                          settle_dt: Date,
                           next_cpn: float,
                           current_ibor: float,
                           future_ibor: float,
@@ -323,19 +323,19 @@ class BondFRN:
 
         dy = 0.0001
 
-        p0 = self.dirty_price_from_dm(settle_date,
+        p0 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor - dy,
                                       future_ibor,
                                       dm)
 
-        p1 = self.dirty_price_from_dm(settle_date,
+        p1 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor,
                                       future_ibor,
                                       dm)
 
-        p2 = self.dirty_price_from_dm(settle_date,
+        p2 = self.dirty_price_from_dm(settle_dt,
                                       next_cpn,
                                       current_ibor + dy,
                                       future_ibor,
@@ -347,7 +347,7 @@ class BondFRN:
     ###########################################################################
 
     def clean_price_from_dm(self,
-                            settle_date: Date,
+                            settle_dt: Date,
                             next_cpn: float,
                             current_ibor: float,
                             future_ibor: float,
@@ -362,13 +362,13 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        dirty_price = self.dirty_price_from_dm(settle_date,
+        dirty_price = self.dirty_price_from_dm(settle_dt,
                                                next_cpn,
                                                current_ibor,
                                                future_ibor,
                                                dm)
 
-        accrued = self._accrued_interest(settle_date, next_cpn, 1.0)
+        accrued = self._accrued_interest(settle_dt, next_cpn, 1.0)
         accrued = accrued * self._par
 
         clean_price = dirty_price - accrued
@@ -377,7 +377,7 @@ class BondFRN:
     ###########################################################################
 
     def discount_margin(self,
-                        settle_date: Date,
+                        settle_dt: Date,
                         next_cpn: float,
                         current_ibor: float,
                         future_ibor: float,
@@ -385,14 +385,14 @@ class BondFRN:
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
-        self.accrued_interest(settle_date, next_cpn, 1.0)
+        self.accrued_interest(settle_dt, next_cpn, 1.0)
 
         # Needs to be adjusted to par notional
         accrued = self._accrued_interest * self._par
 
         dirty_price = clean_price + accrued
 
-        argtuple = (self, settle_date, next_cpn, current_ibor,
+        argtuple = (self, settle_dt, next_cpn, current_ibor,
                     future_ibor, dirty_price)
 
         dm = optimize.newton(_f,
@@ -408,14 +408,14 @@ class BondFRN:
     ###########################################################################
 
     def accrued_interest(self,
-                         settle_date: Date,
+                         settle_dt: Date,
                          next_cpn: float,
                          face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Ex-dividend dates are
         not handled. Contact me if you need this functionality. """
 
-        num_flows = len(self._cpn_dates)
+        num_flows = len(self._cpn_dts)
 
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -423,13 +423,13 @@ class BondFRN:
         dc = DayCount(self._dc_type)
 
         for i in range(1, num_flows):
-            if self._cpn_dates[i] > settle_date:
-                self._pcd = self._cpn_dates[i - 1]
-                self._ncd = self._cpn_dates[i]
+            if self._cpn_dts[i] > settle_dt:
+                self._pcd = self._cpn_dts[i - 1]
+                self._ncd = self._cpn_dts[i]
                 break
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
-                                            settle_date,
+                                            settle_dt,
                                             self._ncd,
                                             self._freq_type)
 
@@ -442,21 +442,21 @@ class BondFRN:
     ###########################################################################
 
     def print_payments(self,
-                       settle_date: Date):
+                       settle_dt: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-        self._calculate_cpn_dates()
-        for dt in self._cpn_dates[1:-1]:
+        self._calculate_cpn_dts()
+        for dt in self._cpn_dts[1:-1]:
             print(dt)
 
-        print(self._cpn_dates[-1])
+        print(self._cpn_dts[-1])
 
     ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("ISSUE DATE", self._issue_date)
-        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("ISSUE DATE", self._issue_dt)
+        s += label_to_string("MATURITY DATE", self._maturity_dt)
         s += label_to_string("QUOTED MARGIN (bp)",
                              self._quoted_margin * 10000.0)
         s += label_to_string("FREQUENCY", self._freq_type)

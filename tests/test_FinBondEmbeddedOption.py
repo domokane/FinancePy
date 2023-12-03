@@ -21,40 +21,40 @@ num_time_steps = 100
 
 # MATLAB EXAMPLE
 # https://fr.mathworks.com/help/fininst/optembndbybk.html
-issue_date = Date(1, 1, 2005)
-maturity_date = Date(1, 1, 2010)
+issue_dt = Date(1, 1, 2005)
+maturity_dt = Date(1, 1, 2010)
 coupon = 0.0525
 freq_type = FrequencyTypes.ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
 
-value_date = Date(1, 1, 2007)
-settle_date_matlab = value_date
+value_dt = Date(1, 1, 2007)
+settle_dt_matlab = value_dt
 
 fixed_leg_type = SwapTypes.PAY
 dcType = DayCountTypes.THIRTY_E_360
 fixedFreq = FrequencyTypes.ANNUAL
-swap1 = IborSwap(settle_date_matlab, "1Y",
+swap1 = IborSwap(settle_dt_matlab, "1Y",
                  fixed_leg_type, 0.0350, fixedFreq, dcType)
-swap2 = IborSwap(settle_date_matlab, "2Y",
+swap2 = IborSwap(settle_dt_matlab, "2Y",
                  fixed_leg_type, 0.0400, fixedFreq, dcType)
-swap3 = IborSwap(settle_date_matlab, "3Y",
+swap3 = IborSwap(settle_dt_matlab, "3Y",
                  fixed_leg_type, 0.0450, fixedFreq, dcType)
 swaps = [swap1, swap2, swap3]
-discount_curve_matlab = IborSingleCurve(value_date, [], [], swaps)
+discount_curve_matlab = IborSingleCurve(value_dt, [], [], swaps)
 
-bond_matlab = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
+bond_matlab = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
 call_dates = []
 call_prices = []
 put_dates = []
 put_prices = []
 
-putDate = Date(1, 1, 2008)
+put_date = Date(1, 1, 2008)
 for _ in range(0, 24):
-    put_dates.append(putDate)
+    put_dates.append(put_date)
     put_prices.append(100)
-    putDate = putDate.add_months(1)
-puttableBond_matlab = BondEmbeddedOption(issue_date, maturity_date, coupon,
+    put_date = put_date.add_months(1)
+puttable_bond_matlab = BondEmbeddedOption(issue_dt, maturity_dt, coupon,
                                          freq_type, dc_type,
                                          call_dates, call_prices,
                                          put_dates, put_prices)
@@ -62,7 +62,7 @@ puttableBond_matlab = BondEmbeddedOption(issue_date, maturity_date, coupon,
 
 def test_matlab_clean_price_from_discount_curve():
     v = bond_matlab.clean_price_from_discount_curve(
-        settle_date_matlab, discount_curve_matlab)
+        settle_dt_matlab, discount_curve_matlab)
 
     assert round(v, 4) == 102.0746
 
@@ -72,8 +72,8 @@ def test_matlab_bk():
     a = 0.1
     model = BKTree(sigma, a, num_time_steps)
 
-    v = puttableBond_matlab.value(
-        settle_date_matlab, discount_curve_matlab, model)
+    v = puttable_bond_matlab.value(
+        settle_dt_matlab, discount_curve_matlab, model)
 
     assert round(v['bondwithoption'], 4) == 102.3508
     assert round(v['bondpure'], 4) == 102.0603
@@ -85,8 +85,8 @@ def test_matlab_hw():
 
     model = HWTree(sigma, a, num_time_steps)
 
-    v = puttableBond_matlab.value(
-        settle_date_matlab, discount_curve_matlab, model)
+    v = puttable_bond_matlab.value(
+        settle_dt_matlab, discount_curve_matlab, model)
 
     assert round(v['bondwithoption'], 4) == 102.8733
     assert round(v['bondpure'], 4) == 102.0603
@@ -94,19 +94,19 @@ def test_matlab_hw():
 
 # QUANTLIB EXAMPLE
 # https://fr.mathworks.com/help/fininst/optembndbybk.html
-issue_date = Date(15, 9, 2010)
-maturity_date = Date(15, 9, 2022)
+issue_dt = Date(15, 9, 2010)
+maturity_dt = Date(15, 9, 2022)
 coupon = 0.025
 freq_type = FrequencyTypes.QUARTERLY
 dc_type = DayCountTypes.ACT_ACT_ICMA
 
-value_date = Date(16, 8, 2016)
-settle_date_quantlib = value_date.add_weekdays(3)
+value_dt = Date(16, 8, 2016)
+settle_dt_quantlib = value_dt.add_weekdays(3)
 
-discount_curve_quantlib = DiscountCurveFlat(value_date, 0.035,
+discount_curve_quantlib = DiscountCurveFlat(value_dt, 0.035,
                                             FrequencyTypes.SEMI_ANNUAL)
 
-bond_quantlib = Bond(issue_date, maturity_date,
+bond_quantlib = Bond(issue_dt, maturity_dt,
                      coupon, freq_type, dc_type)
 
 nextCallDate = Date(15, 9, 2016)
@@ -119,7 +119,7 @@ for _ in range(1, 24):
     call_dates.append(nextCallDate)
     call_prices.append(100.0)
 
-puttableBond_quantlib = BondEmbeddedOption(issue_date, maturity_date, coupon,
+puttable_bond_quantlib = BondEmbeddedOption(issue_dt, maturity_dt, coupon,
                                            freq_type, dc_type,
                                            call_dates, call_prices,
                                            put_dates, put_prices)
@@ -127,7 +127,7 @@ puttableBond_quantlib = BondEmbeddedOption(issue_date, maturity_date, coupon,
 
 def test_quantlib_clean_price_from_discount_curve():
     v = bond_quantlib.clean_price_from_discount_curve(
-        settle_date_quantlib, discount_curve_quantlib)
+        settle_dt_quantlib, discount_curve_quantlib)
 
     assert round(v, 4) == 94.6318
 
@@ -137,8 +137,8 @@ def test_quantlib_bk():
     a = 0.03
     model = BKTree(sigma, a, num_time_steps)
 
-    v = puttableBond_quantlib.value(
-        settle_date_quantlib, discount_curve_quantlib, model)
+    v = puttable_bond_quantlib.value(
+        settle_dt_quantlib, discount_curve_quantlib, model)
 
     assert round(v['bondwithoption'], 4) == 89.7614
     assert round(v['bondpure'], 4) == 95.0619
@@ -150,8 +150,8 @@ def test_quantlib_hw():
     a = 0.03
     model = HWTree(sigma, a, num_time_steps)
 
-    v = puttableBond_quantlib.value(
-        settle_date_quantlib, discount_curve_quantlib, model)
+    v = puttable_bond_quantlib.value(
+        settle_dt_quantlib, discount_curve_quantlib, model)
 
     assert round(v['bondwithoption'], 4) == 68.8665
     assert round(v['bondpure'], 4) == 95.0619

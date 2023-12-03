@@ -44,9 +44,9 @@ class IborFRA:
     """
 
     def __init__(self,
-                 start_date: Date,  # The date the FRA starts to accrue
+                 start_dt: Date,  # The date the FRA starts to accrue
                  # End of the Ibor rate period
-                 maturity_date_or_tenor: (Date, str),
+                 maturity_dt_or_tenor: (Date, str),
                  fraRate: float,  # The fixed contractual FRA rate
                  dc_type: DayCountTypes,  # For interest period
                  notional: float = 100.0,
@@ -60,28 +60,28 @@ class IborFRA:
         self._cal_type = cal_type
         self._bd_type = bd_type
 
-        if type(maturity_date_or_tenor) == Date:
-            maturity_date = maturity_date_or_tenor
+        if type(maturity_dt_or_tenor) == Date:
+            maturity_dt = maturity_dt_or_tenor
         else:
-            maturity_date = start_date.add_tenor(maturity_date_or_tenor)
+            maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
             calendar = Calendar(self._cal_type)
-            maturity_date = calendar.adjust(maturity_date,
+            maturity_dt = calendar.adjust(maturity_dt,
                                             self._bd_type)
 
-        if start_date > maturity_date:
+        if start_dt > maturity_dt:
             raise FinError("Settlement date after maturity date")
 
-        self._start_date = start_date
-        self._maturity_date = maturity_date
-        self._fraRate = fraRate
-        self._payFixedRate = payFixedRate
+        self._start_dt = start_dt
+        self._maturity_dt = maturity_dt
+        self._fra_rate = fraRate
+        self._pay_fixed_rate = payFixedRate
         self._dc_type = dc_type
         self._notional = notional
 
     ###########################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve = None):
         """ Determine mark to market value of a FRA contract based on the
@@ -93,21 +93,21 @@ class IborFRA:
 
         # Get the Libor index from the index curve
         dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
-        dfIndex1 = index_curve.df(self._start_date)
-        dfIndex2 = index_curve.df(self._maturity_date)
+        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
+        dfIndex1 = index_curve.df(self._start_dt)
+        dfIndex2 = index_curve.df(self._maturity_dt)
         liborFwd = (dfIndex1 / dfIndex2 - 1.0) / acc_factor
 
         # Get the discount factor from a discount curve
-        dfDiscount2 = discount_curve.df(self._maturity_date)
+        dfDiscount2 = discount_curve.df(self._maturity_dt)
 
-        v = acc_factor * (liborFwd - self._fraRate) * dfDiscount2
+        v = acc_factor * (liborFwd - self._fra_rate) * dfDiscount2
 
         # Forward value the FRA to the value date
-        df_to_value_date = discount_curve.df(value_date)
-        v = v * self._notional / df_to_value_date
+        df_to_value_dt = discount_curve.df(value_dt)
+        v = v * self._notional / df_to_value_dt
 
-        if self._payFixedRate is True:
+        if self._pay_fixed_rate is True:
             v *= -1.0
         return v
 
@@ -119,37 +119,37 @@ class IborFRA:
         rate discount factor but the index curve discount factor. """
 
         dc = DayCount(self._dc_type)
-        df1 = index_curve.df(self._start_date)
-        acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
-        df2 = df1 / (1.0 + acc_factor * self._fraRate)
+        df1 = index_curve.df(self._start_dt)
+        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
+        df2 = df1 / (1.0 + acc_factor * self._fra_rate)
         return df2
 
     ###########################################################################
 
-    def print_payments(self, value_date):
+    def print_payments(self, value_dt):
         """ Determine the value of the Deposit given a Ibor curve. """
 
         flow_settle = self._notional
         dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_date, self._maturity_date)[0]
-        flow_maturity = (1.0 + acc_factor * self._fraRate) * self._notional
+        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
+        flow_maturity = (1.0 + acc_factor * self._fra_rate) * self._notional
 
-        if self._payFixedRate is True:
-            print(self._start_date, -flow_settle)
-            print(self._maturity_date, flow_maturity)
+        if self._pay_fixed_rate is True:
+            print(self._start_dt, -flow_settle)
+            print(self._maturity_dt, flow_maturity)
         else:
-            print(self._start_date, flow_settle)
-            print(self._maturity_date, -flow_maturity)
+            print(self._start_dt, flow_settle)
+            print(self._maturity_dt, -flow_maturity)
 
     ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START ACCD DATE", self._start_date)
-        s += label_to_string("MATURITY DATE", self._maturity_date)
-        s += label_to_string("FRA RATE", self._fraRate)
+        s += label_to_string("START ACCD DATE", self._start_dt)
+        s += label_to_string("MATURITY DATE", self._maturity_dt)
+        s += label_to_string("FRA RATE", self._fra_rate)
         s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("PAY FIXED RATE", self._payFixedRate)
+        s += label_to_string("PAY FIXED RATE", self._pay_fixed_rate)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
         s += label_to_string("CALENDAR", self._cal_type)

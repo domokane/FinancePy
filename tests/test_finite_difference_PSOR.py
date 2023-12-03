@@ -101,9 +101,9 @@ def test_european_call():
     dividend_yield = 0.00
     volatility = 0.40
 
-    value_date = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    value_dt = Date(1, 1, 2016)
+    expiry_dt = Date(1, 1, 2021)
+    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
     strike_price = 50.0
     option_type = OptionTypes.EUROPEAN_CALL
     num_steps_per_year = 2000
@@ -134,9 +134,9 @@ def test_european_put():
     dividend_yield = 0.00
     volatility = 0.40
 
-    value_date = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    value_dt = Date(1, 1, 2016)
+    expiry_dt = Date(1, 1, 2021)
+    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
     num_steps_per_year = 2000
     strike_price = 50.0
     option_type = OptionTypes.EUROPEAN_PUT
@@ -167,9 +167,9 @@ def test_american_call():
     dividend_yield = 0.05
     volatility = 0.40
 
-    value_date = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    value_dt = Date(1, 1, 2016)
+    expiry_dt = Date(1, 1, 2021)
+    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
     num_steps_per_year = 2000
     strike_price = 50.0
     option_type = OptionTypes.AMERICAN_CALL
@@ -201,9 +201,9 @@ def test_american_put():
     dividend_yield = 0.05
     volatility = 0.40
 
-    value_date = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2021)
-    time_to_expiry = (expiry_date - value_date) / gDaysInYear
+    value_dt = Date(1, 1, 2016)
+    expiry_dt = Date(1, 1, 2021)
+    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
     num_steps_per_year = 2000
     strike_price = 50.0
     option_type = OptionTypes.AMERICAN_PUT
@@ -230,24 +230,24 @@ def test_call_option():
     """
     Check finite difference method gives similar result to BlackScholes model
     """
-    expiry_date = Date(1, 7, 2015)
+    expiry_dt = Date(1, 7, 2015)
     strike_price = 100.0
     option_type = OptionTypes.EUROPEAN_CALL
     call_option = EquityVanillaOption(
-        expiry_date, strike_price, option_type)
+        expiry_dt, strike_price, option_type)
 
-    value_date = Date(1, 1, 2015)
+    value_dt = Date(1, 1, 2015)
     spot_price = 100
     volatility = 0.30
     risk_free_rate = 0.05
     dividend_yield = 0.01
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_date - value_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
+    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = call_option.value(value_date, spot_price,
+    v0 = call_option.value(value_dt, spot_price,
                            discount_curve, dividend_curve, model)
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,
@@ -263,24 +263,24 @@ def test_put_option():
     """
     Check finite difference method gives similar result to BlackScholes model
     """
-    expiry_date = Date(1, 7, 2015)
+    expiry_dt = Date(1, 7, 2015)
     strike_price = 100.0
     option_type = OptionTypes.EUROPEAN_PUT
     put_option = EquityVanillaOption(
-        expiry_date, strike_price, option_type)
+        expiry_dt, strike_price, option_type)
 
-    value_date = Date(1, 1, 2015)
+    value_dt = Date(1, 1, 2015)
     spot_price = 100
     volatility = 0.30
     risk_free_rate = 0.05
     dividend_yield = 0.1
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_date - value_date) / gDaysInYear
-    discount_curve = DiscountCurveFlat(value_date, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
+    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = put_option.value(value_date, spot_price,
+    v0 = put_option.value(value_dt, spot_price,
                           discount_curve, dividend_curve, model)
 
     v = black_scholes_fd_PSOR(spot_price=spot_price, volatility=volatility,

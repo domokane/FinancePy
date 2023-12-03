@@ -24,13 +24,13 @@ from ...utils.helpers import label_to_string
 
 def _f(df, *args):
     curve = args[0]
-    value_date = args[1]
+    value_dt = args[1]
     bond = args[2]
     marketCleanPrice = args[3]
     num_points = len(curve._times)
     curve._values[num_points - 1] = df
     bondDiscountPrice = bond.clean_price_from_discount_curve(
-        value_date, curve)
+        value_dt, curve)
     obj_fn = bondDiscountPrice - marketCleanPrice
     return obj_fn
 
@@ -41,7 +41,7 @@ class BondZeroCurve(DiscountCurve):
     """ Class to do bootstrap exact fitting of the bond zero rate curve. """
 
     def __init__(self,
-                 value_date: Date,
+                 value_dt: Date,
                  bonds: list,
                  clean_prices: list,
                  interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
@@ -51,8 +51,8 @@ class BondZeroCurve(DiscountCurve):
         if len(bonds) != len(clean_prices):
             raise FinError("Num bonds does not equal number of prices.")
 
-        self._settle_date = value_date
-        self._value_date = value_date
+        self._settle_dt = value_dt
+        self._value_dt = value_dt
         self._bonds = bonds
         self._clean_prices = np.array(clean_prices)
         self._discount_curve = None
@@ -60,7 +60,7 @@ class BondZeroCurve(DiscountCurve):
 
         times = []
         for bond in self._bonds:
-            tmat = (bond._maturity_date - self._settle_date)/gDaysInYear
+            tmat = (bond._maturity_dt - self._settle_dt)/gDaysInYear
             times.append(tmat)
 
         times = np.array(times)
@@ -81,10 +81,10 @@ class BondZeroCurve(DiscountCurve):
 
         for i in range(0, len(self._bonds)):
             bond = self._bonds[i]
-            maturity_date = bond._maturity_date
+            maturity_dt = bond._maturity_dt
             clean_price = self._clean_prices[i]
-            tmat = (maturity_date - self._settle_date) / gDaysInYear
-            argtuple = (self, self._settle_date, bond, clean_price)
+            tmat = (maturity_dt - self._settle_dt) / gDaysInYear
+            argtuple = (self, self._settle_dt, bond, clean_price)
             self._times = np.append(self._times, tmat)
             self._values = np.append(self._values, df)
 
@@ -146,7 +146,7 @@ class BondZeroCurve(DiscountCurve):
         """ Calculate the forward rate according to the specified
         day count convention. """
 
-        if date1 < self._value_date:
+        if date1 < self._value_dt:
             raise FinError("Date1 before curve value date.")
 
         if date2 < date1:

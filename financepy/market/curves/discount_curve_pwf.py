@@ -25,8 +25,8 @@ class DiscountCurvePWF(DiscountCurve):
     continuous. The class inherits methods from FinDiscountCurve. """
 
     def __init__(self,
-                 value_date: Date,
-                 zero_dates: list,
+                 value_dt: Date,
+                 zero_dts: list,
                  zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
@@ -35,21 +35,21 @@ class DiscountCurvePWF(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self._value_date = value_date
+        self._value_dt = value_dt
 
-        if len(zero_dates) != len(zero_rates):
+        if len(zero_dts) != len(zero_rates):
             raise FinError("Dates and rates vectors must have same length")
 
-        if len(zero_dates) == 0:
+        if len(zero_dts) == 0:
             raise FinError("Dates vector must have length > 0")
 
-        self._zero_dates = zero_dates
+        self._zero_dts = zero_dts
         self._zero_rates = np.array(zero_rates)
         self._freq_type = freq_type
         self._dc_type = day_count_type
 
-        dc_times = times_from_dates(zero_dates,
-                                    self._value_date,
+        dc_times = times_from_dates(zero_dts,
+                                    self._value_dt,
                                     self._dc_type)
 
         self._times = np.array(dc_times)
@@ -130,12 +130,12 @@ class DiscountCurvePWF(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_date,
+                                    self._value_dt,
                                     self._dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._value_date,
+        df = self._zero_to_df(self._value_dt,
                               zero_rates,
                               dc_times,
                               self._freq_type,
@@ -149,8 +149,8 @@ class DiscountCurvePWF(DiscountCurve):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("DATE", "ZERO RATE")
-        for i in range(0, len(self._zero_dates)):
-            s += label_to_string(self._zero_dates[i], self._zero_rates[i])
+        for i in range(0, len(self._zero_dts)):
+            s += label_to_string(self._zero_dts[i], self._zero_rates[i])
         s += label_to_string("FREQUENCY", (self._freq_type))
         return s
 

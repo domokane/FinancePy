@@ -32,32 +32,32 @@ class BondMortgage:
     """
 
     def __init__(self,
-                 start_date: Date,
-                 end_date: Date,
+                 start_dt: Date,
+                 end_dt: Date,
                  principal: float,
                  freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-                 day_count_convention_type: DayCountTypes = DayCountTypes.ACT_360):
+                 dc_type: DayCountTypes = DayCountTypes.ACT_360):
         """ Create the mortgage using start and end dates and principal. """
 
         check_argument_types(self.__init__, locals())
 
-        if start_date > end_date:
+        if start_dt > end_dt:
             raise FinError("Start Date after End Date")
 
-        self._start_date = start_date
-        self._end_date = end_date
+        self._start_dt = start_dt
+        self._end_dt = end_dt
         self._principal = principal
         self._freq_type = freq_type
         self._cal_type = cal_type
         self._bd_type = bd_type
         self._dg_type = dg_type
-        self._day_count_convention_type = day_count_convention_type
+        self._dc_type = dc_type
 
-        self._schedule = Schedule(start_date,
-                                  end_date,
+        self._schedule = Schedule(start_dt,
+                                  end_dt,
                                   self._freq_type,
                                   self._cal_type,
                                   self._bd_type,
@@ -71,7 +71,7 @@ class BondMortgage:
 
         frequency = annual_frequency(self._freq_type)
 
-        num_flows = len(self._schedule._adjusted_dates)
+        num_flows = len(self._schedule._adjusted_dts)
         p = (1.0 + zero_rate/frequency) ** (num_flows-1)
         m = zero_rate * p / (p - 1.0) / frequency
         m = m * self._principal
@@ -90,7 +90,7 @@ class BondMortgage:
         self._principal_remaining = [self._principal]
         self._total_flows = [0]
 
-        num_flows = len(self._schedule._adjusted_dates)
+        num_flows = len(self._schedule._adjusted_dts)
         principal = self._principal
         frequency = annual_frequency(self._freq_type)
 
@@ -113,15 +113,15 @@ class BondMortgage:
 ###############################################################################
 
     def print_leg(self):
-        print("START DATE:", self._start_date)
-        print("MATURITY DATE:", self._end_date)
+        print("START DATE:", self._start_dt)
+        print("MATURITY DATE:", self._end_dt)
         print("MORTGAGE TYPE:", self._mortgage_type)
         print("FREQUENCY:", self._freq_type)
         print("CALENDAR:", self._cal_type)
         print("BUSDAYRULE:", self._bd_type)
         print("DATEGENRULE:", self._dg_type)
 
-        num_flows = len(self._schedule._adjusted_dates)
+        num_flows = len(self._schedule._adjusted_dts)
 
         print("%15s %12s %12s %12s %12s" %
               ("PAYMENT DATE", "INTEREST", "PRINCIPAL",
@@ -130,7 +130,7 @@ class BondMortgage:
         print("")
         for i in range(0, num_flows):
             print("%15s %12.2f %12.2f %12.2f %12.2f" %
-                  (self._schedule._adjusted_dates[i],
+                  (self._schedule._adjusted_dts[i],
                    self._interest_flows[i],
                    self._principal_flows[i],
                    self._principal_remaining[i],
@@ -140,8 +140,8 @@ class BondMortgage:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._start_date)
-        s += label_to_string("MATURITY DATE", self._end_date)
+        s += label_to_string("START DATE", self._start_dt)
+        s += label_to_string("MATURITY DATE", self._end_dt)
         s += label_to_string("MORTGAGE TYPE", self._mortgage_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)

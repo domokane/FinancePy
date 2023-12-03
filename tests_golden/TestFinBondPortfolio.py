@@ -14,7 +14,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -29,9 +29,9 @@ def test_BondPortfolio():
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
 
-    settle_date = Date(19, 9, 2012)
+    settle_dt = Date(19, 9, 2012)
 
-    testCases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
+    test_cases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
 
     for dc_type in DayCountTypes:
         if dc_type == DayCountTypes.ZERO:
@@ -39,23 +39,23 @@ def test_BondPortfolio():
         for _, bond in bondDataFrame.iterrows():
 
             date_string = bond['maturity']
-            matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-            maturityDt = from_datetime(matDatetime)
-            issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+            mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+            maturity_dt = from_datetime(mat_date_time)
+            issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
             coupon = bond['coupon']/100.0
             clean_price = bond['mid']
 
-            bond = Bond(issueDt, maturityDt,
+            bond = Bond(issue_dt, maturity_dt,
                         coupon, freq_type, dc_type)
 
-            ytm = bond.yield_to_maturity(settle_date, clean_price)
-            accrued_interest = bond.accrued_interest(settle_date, 100.0)
+            ytm = bond.yield_to_maturity(settle_dt, clean_price)
+            accrued_interest = bond.accrued_interest(settle_dt, 100.0)
 
-            testCases.print(dc_type, maturityDt, coupon*100.0,
-                            clean_price, accrued_interest, ytm*100.0)
+            test_cases.print(dc_type, maturity_dt, coupon*100.0,
+                             clean_price, accrued_interest, ytm*100.0)
 
 ##########################################################################
 
 
 test_BondPortfolio()
-testCases.compareTestCases()
+test_cases.compareTestCases()

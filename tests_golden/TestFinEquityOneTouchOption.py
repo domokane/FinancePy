@@ -15,7 +15,7 @@ from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -24,7 +24,7 @@ def test_EquityOneTouchOption():
     # Examples Haug Page 180 Table 4-22
     # Agreement not exact at t is not exactly 0.50
 
-    value_date = Date(1, 1, 2016)
+    value_dt = Date(1, 1, 2016)
     expiry_date = Date(2, 7, 2016)
     interest_rate = 0.10
     volatility = 0.20
@@ -34,19 +34,19 @@ def test_EquityOneTouchOption():
     num_paths = 10000
     num_steps_per_year = 252
 
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     stock_price = 105.0
     payment_size = 15.0
 
-    testCases.header("================================= CASH ONLY")
+    test_cases.header("================================= CASH ONLY")
 
     downTypes = [TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT,
                  TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY,
                  TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING]
 
-    testCases.header("TYPE", "VALUE", "VALUE_MC")
+    test_cases.header("TYPE", "VALUE", "VALUE_MC")
 
     for downType in downTypes:
 
@@ -55,13 +55,13 @@ def test_EquityOneTouchOption():
                                       barrier_level,
                                       payment_size)
 
-        v = option.value(value_date,
+        v = option.value(value_dt,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(value_date,
+        v_mc = option.value_mc(value_dt,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -69,7 +69,7 @@ def test_EquityOneTouchOption():
                                num_steps_per_year,
                                num_paths)
 
-        testCases.print("%60s " % downType,
+        test_cases.print("%60s " % downType,
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
@@ -80,7 +80,7 @@ def test_EquityOneTouchOption():
                TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY,
                TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING]
 
-    testCases.header("TYPE", "VALUE", "VALUE_MC")
+    test_cases.header("TYPE", "VALUE", "VALUE_MC")
 
     for upType in upTypes:
 
@@ -89,13 +89,13 @@ def test_EquityOneTouchOption():
                                       barrier_level,
                                       payment_size)
 
-        v = option.value(value_date,
+        v = option.value(value_dt,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(value_date,
+        v_mc = option.value_mc(value_dt,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -103,7 +103,7 @@ def test_EquityOneTouchOption():
                                num_steps_per_year,
                                num_paths)
 
-        testCases.print("%60s " % upType,
+        test_cases.print("%60s " % upType,
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
@@ -111,26 +111,26 @@ def test_EquityOneTouchOption():
 
     stock_price = 105.0
 
-    testCases.banner("================= ASSET ONLY")
+    test_cases.banner("================= ASSET ONLY")
 
     downTypes = [TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT,
                  TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY,
                  TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING]
 
-    testCases.header("TYPE", "VALUE", "VALUE_MC")
+    test_cases.header("TYPE", "VALUE", "VALUE_MC")
     for downType in downTypes:
 
         option = EquityOneTouchOption(expiry_date,
                                       downType,
                                       barrier_level)
 
-        v = option.value(value_date,
+        v = option.value(value_dt,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(value_date,
+        v_mc = option.value_mc(value_dt,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -138,7 +138,7 @@ def test_EquityOneTouchOption():
                                num_steps_per_year,
                                num_paths)
 
-        testCases.print("%60s " % downType,
+        test_cases.print("%60s " % downType,
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
@@ -154,13 +154,13 @@ def test_EquityOneTouchOption():
                                       upType,
                                       barrier_level)
 
-        v = option.value(value_date,
+        v = option.value(value_dt,
                          stock_price,
                          discount_curve,
                          dividend_curve,
                          model)
 
-        v_mc = option.value_mc(value_date,
+        v_mc = option.value_mc(value_dt,
                                stock_price,
                                discount_curve,
                                dividend_curve,
@@ -168,7 +168,7 @@ def test_EquityOneTouchOption():
                                num_steps_per_year,
                                num_paths)
 
-        testCases.print("%60s " % upType,
+        test_cases.print("%60s " % upType,
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
@@ -176,4 +176,4 @@ def test_EquityOneTouchOption():
 
 
 test_EquityOneTouchOption()
-testCases.compareTestCases()
+test_cases.compareTestCases()

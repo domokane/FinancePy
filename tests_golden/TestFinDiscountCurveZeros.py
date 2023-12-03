@@ -15,34 +15,34 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
 
 def test_FinDiscountCurveZeros():
 
-    start_date = Date(1, 1, 2018)
+    start_dt = Date(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
-    dates = start_date.add_years(times)
+    dates = start_dt.add_years(times)
     zero_rates = np.linspace(5.0, 6.0, 10)/100
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ISDA
 
-    curve = DiscountCurveZeros(start_date,
+    curve = DiscountCurveZeros(start_dt,
                                dates,
                                zero_rates,
                                freq_type,
                                dc_type,
                                InterpTypes.FLAT_FWD_RATES)
 
-    testCases.header("T", "DF")
+    test_cases.header("T", "DF")
 
     years = np.linspace(0, 10, 21)
-    dates = start_date.add_years(years)
+    dates = start_dt.add_years(years)
     for dt in dates:
         df = curve.df(dt)
-        testCases.print(dt, df)
+        test_cases.print(dt, df)
 
 #    print(curve)
 
@@ -66,9 +66,9 @@ def test_FinDiscountCurveZeros():
                       0.009599, 0.011203, 0.015068, 0.017583,
                       0.018998, 0.020080]
 
-        start_date = dates[0]
+        start_dt = dates[0]
 
-        curve = DiscountCurveZeros(start_date,
+        curve = DiscountCurveZeros(start_dt,
                                    dates,
                                    zero_rates,
                                    freq_type,
@@ -85,4 +85,4 @@ def test_FinDiscountCurveZeros():
 
 
 test_FinDiscountCurveZeros()
-testCases.compareTestCases()
+test_cases.compareTestCases()

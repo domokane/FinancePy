@@ -15,7 +15,7 @@ from financepy.utils.global_types import SwapTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -25,10 +25,10 @@ def test_FinFixedOIS():
     # Here I follow the example in
     # https://blog.deriscope.com/index.php/en/excel-quantlib-overnight-index-swap
 
-    effective_date = Date(30, 11, 2018)
-    end_date = Date(30, 11, 2023)
+    effective_dt = Date(30, 11, 2018)
+    end_dt = Date(30, 11, 2023)
 
-    end_date = effective_date.add_months(60)
+    end_dt = effective_dt.add_months(60)
     oisRate = 0.04
     fixed_leg_type = SwapTypes.PAY
     fixed_freq_type = FrequencyTypes.ANNUAL
@@ -39,8 +39,8 @@ def test_FinFixedOIS():
     notional = ONE_MILLION
     payment_lag = 1
 
-    ois = OIS(effective_date,
-              end_date,
+    ois = OIS(effective_dt,
+              end_dt,
               fixed_leg_type,
               oisRate,
               fixed_freq_type,
@@ -53,24 +53,24 @@ def test_FinFixedOIS():
 
 #    print(ois)
 
-    value_date = effective_date
+    value_dt = effective_dt
     marketRate = 0.05
-    oisCurve = DiscountCurveFlat(value_date,
+    oisCurve = DiscountCurveFlat(value_dt,
                                  marketRate,
                                  FrequencyTypes.ANNUAL)
 
-    v = ois.value(effective_date, oisCurve)
+    v = ois.value(effective_dt, oisCurve)
 
 #    print(v)
 
 #    ois._fixed_leg.print_valuation()
 #    ois._float_leg.print_valuation()
 
-    testCases.header("LABEL", "VALUE")
-    testCases.print("SWAP_VALUE", v)
+    test_cases.header("LABEL", "VALUE")
+    test_cases.print("SWAP_VALUE", v)
 
 ###############################################################################
 
 
 test_FinFixedOIS()
-testCases.compareTestCases()
+test_cases.compareTestCases()

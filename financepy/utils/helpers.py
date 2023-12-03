@@ -79,14 +79,14 @@ def pv01_times(t: float,
 
 
 def times_from_dates(dt: (Date, list),
-                     value_date: Date,
+                     value_dt: Date,
                      day_count_type: DayCountTypes = None):
     """ If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
     times from the valuation date. The output is always a numpy vector of times
     which has only one element if the input is only one date. """
 
-    if isinstance(value_date, Date) is False:
+    if isinstance(value_dt, Date) is False:
         raise FinError("Valuation date is not a Date")
 
     if day_count_type is None:
@@ -98,9 +98,9 @@ def times_from_dates(dt: (Date, list),
         num_dates = 1
         times = [None]
         if dcCounter is None:
-            times[0] = (dt - value_date) / gDaysInYear
+            times[0] = (dt - value_dt) / gDaysInYear
         else:
-            times[0] = dcCounter.year_frac(value_date, dt)[0]
+            times[0] = dcCounter.year_frac(value_dt, dt)[0]
 
         return times[0]
 
@@ -109,9 +109,9 @@ def times_from_dates(dt: (Date, list),
         times = []
         for i in range(0, num_dates):
             if dcCounter is None:
-                t = (dt[i] - value_date) / gDaysInYear
+                t = (dt[i] - value_dt) / gDaysInYear
             else:
-                t = dcCounter.year_frac(value_date, dt[i])[0]
+                t = dcCounter.year_frac(value_dt, dt[i])[0]
             times.append(t)
 
         return np.array(times)
@@ -230,7 +230,7 @@ def input_time(dt: Date,
         t = dt
         return check(t)
     elif isinstance(dt, Date):
-        t = (dt - curve._value_date) / gDaysInYear
+        t = (dt - curve._value_dt) / gDaysInYear
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt

@@ -27,7 +27,7 @@ def default_times_gc(issuer_curves,
     c = np.linalg.cholesky(correlation_matrix)
     y = np.dot(c, x)
 
-    corrTimes = np.empty(shape=(num_credits, 2 * num_trials))
+    corr_times = np.empty(shape=(num_credits, 2 * num_trials))
 
     for i_credit in range(0, num_credits):
         issuer_curve = issuer_curves[i_credit]
@@ -39,9 +39,9 @@ def default_times_gc(issuer_curves,
             values = issuer_curve._values
             t1 = uniform_to_default_time(u1, times, values)
             t2 = uniform_to_default_time(u2, times, values)
-            corrTimes[i_credit, i_trial] = t1
-            corrTimes[i_credit, num_trials + i_trial] = t2
+            corr_times[i_credit, i_trial] = t1
+            corr_times[i_credit, num_trials + i_trial] = t2
 
-    return corrTimes
+    return corr_times
 
 ##########################################################################

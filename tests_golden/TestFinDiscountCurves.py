@@ -21,7 +21,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 set_date_format(DateFormatTypes.UK_LONG)
 
@@ -35,60 +35,60 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurves():
 
     # Create a curve from times and discount factors
-    value_date = Date(1, 1, 2018)
+    value_dt = Date(1, 1, 2018)
     years = [1.0, 2.0, 3.0, 4.0, 5.0]
-    dates = value_date.add_years(years)
+    dates = value_dt.add_years(years)
     years2 = []
 
     for dt in dates:
-        y = (dt - value_date) / gDaysInYear
+        y = (dt - value_dt) / gDaysInYear
         years2.append(y)
 
     rates = np.array([0.05, 0.06, 0.065, 0.07, 0.075])
     discount_factors = np.exp(-np.array(rates) * np.array(years2))
     curvesList = []
 
-    finDiscountCurve = DiscountCurve(value_date, dates, discount_factors,
+    finDiscountCurve = DiscountCurve(value_dt, dates, discount_factors,
                                      InterpTypes.FLAT_FWD_RATES)
     curvesList.append(finDiscountCurve)
 
-    finDiscountCurveFlat = DiscountCurveFlat(value_date, 0.05)
+    finDiscountCurveFlat = DiscountCurveFlat(value_dt, 0.05)
     curvesList.append(finDiscountCurveFlat)
 
-    finDiscountCurveNS = DiscountCurveNS(value_date, 0.0305, -0.01,
+    finDiscountCurveNS = DiscountCurveNS(value_dt, 0.0305, -0.01,
                                          0.08, 10.0)
     curvesList.append(finDiscountCurveNS)
 
-    finDiscountCurveNSS = DiscountCurveNSS(value_date, 0.035, -0.02,
+    finDiscountCurveNSS = DiscountCurveNSS(value_dt, 0.035, -0.02,
                                            0.09, 0.1, 1.0, 2.0)
     curvesList.append(finDiscountCurveNSS)
 
-    finDiscountCurvePoly = DiscountCurvePoly(value_date, [0.05, 0.002,
-                                                              -0.00005])
+    finDiscountCurvePoly = DiscountCurvePoly(value_dt, [0.05, 0.002,
+                                                          -0.00005])
     curvesList.append(finDiscountCurvePoly)
 
-    finDiscountCurvePWF = DiscountCurvePWF(value_date, dates, rates)
+    finDiscountCurvePWF = DiscountCurvePWF(value_dt, dates, rates)
     curvesList.append(finDiscountCurvePWF)
 
-    finDiscountCurvePWL = DiscountCurvePWL(value_date, dates, rates)
+    finDiscountCurvePWL = DiscountCurvePWL(value_dt, dates, rates)
     curvesList.append(finDiscountCurvePWL)
 
-    finDiscountCurveZeros = DiscountCurveZeros(value_date, dates, rates)
+    finDiscountCurveZeros = DiscountCurveZeros(value_dt, dates, rates)
     curvesList.append(finDiscountCurveZeros)
 
     curveNames = []
     for curve in curvesList:
         curveNames.append(type(curve).__name__)
 
-    testCases.banner("SINGLE CALLS NO VECTORS")
-    testCases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "SWAP")
+    test_cases.banner("SINGLE CALLS NO VECTORS")
+    test_cases.header("CURVE", "DATE", "ZERO", "DF", "CCFWD", "MMFWD", "SWAP")
 
     years = np.linspace(1, 10, 10)
-    fwdMaturityDates = value_date.add_years(years)
+    fwdMaturityDates = value_dt.add_years(years)
 
-    testCases.banner("######################################################")
-    testCases.banner("SINGLE CALLS")
-    testCases.banner("######################################################")
+    test_cases.banner("######################################################")
+    test_cases.banner("SINGLE CALLS")
+    test_cases.banner("######################################################")
 
     for name, curve in zip(curveNames, curvesList):
         for fwdMaturityDate in fwdMaturityDates:
@@ -96,10 +96,10 @@ def test_FinDiscountCurves():
             zero_rate = curve.zero_rate(fwdMaturityDate)
             fwd = curve.fwd(fwdMaturityDate)
             fwd_rate = curve.fwd_rate(fwdMaturityDate, tenor)
-            swap_rate = curve.swap_rate(value_date, fwdMaturityDate)
+            swap_rate = curve.swap_rate(value_dt, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
-            testCases.print("%-20s" % name,
+            test_cases.print("%-20s" % name,
                             "%-12s" % fwdMaturityDate,
                             "%7.6f" % (zero_rate),
                             "%8.7f" % (df),
@@ -108,20 +108,20 @@ def test_FinDiscountCurves():
                             "%7.6f" % (swap_rate))
 
     # Examine vectorisation
-    testCases.banner("######################################################")
-    testCases.banner("VECTORISATIONS")
-    testCases.banner("######################################################")
+    test_cases.banner("######################################################")
+    test_cases.banner("VECTORISATIONS")
+    test_cases.banner("######################################################")
 
     for name, curve in zip(curveNames, curvesList):
         tenor = "3M"
         zero_rate = curve.zero_rate(fwdMaturityDates)
         fwd = curve.fwd(fwdMaturityDates)
         fwd_rate = curve.fwd_rate(fwdMaturityDates, tenor)
-        swap_rate = curve.swap_rate(value_date, fwdMaturityDates)
+        swap_rate = curve.swap_rate(value_dt, fwdMaturityDates)
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):
-            testCases.print("%-20s" % name,
+            test_cases.print("%-20s" % name,
                             "%-12s" % fwdMaturityDate,
                             "%7.6f" % (zero_rate[i]),
                             "%8.7f" % (df[i]),
@@ -133,8 +133,8 @@ def test_FinDiscountCurves():
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0
-        fwdDates = value_date.add_years(years)
-        fwdDates2 = value_date.add_years(years2)
+        fwdDates = value_dt.add_years(years)
+        fwdDates2 = value_dt.add_years(years2)
 
         plt.figure()
         for name, curve in zip(curveNames, curvesList):
@@ -168,4 +168,4 @@ def test_FinDiscountCurves():
 
 
 test_FinDiscountCurves()
-testCases.compareTestCases()
+test_cases.compareTestCases()

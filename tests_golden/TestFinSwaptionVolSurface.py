@@ -14,7 +14,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 import time
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 ###############################################################################
@@ -34,10 +34,10 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
 
         # https://fr.mathworks.com/help/fininst/pricing-a-swaption-using-the-sabr-model.html
 
-        value_date = Date(12, 6, 2013)
+        value_dt = Date(12, 6, 2013)
 
         # These are 3M, 1Y, 2Y, 3Y, 4Y, 5Y, 7Y, 10Y
-        exercise_dates = [Date(12, 9, 2013), Date(12, 6, 2014),
+        exercise_dts = [Date(12, 9, 2013), Date(12, 6, 2014),
                           Date(12, 6, 2015), Date(12, 6, 2016),
                           Date(12, 6, 2017), Date(12, 6, 2018),
                           Date(12, 6, 2020), Date(12, 6, 2023)]
@@ -68,15 +68,15 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
         atm_vols = marketVolatilities[3]
 
         rfrRate = 0.020  # USD
-        discount_curve = DiscountCurveFlat(value_date, rfrRate)
+        discount_curve = DiscountCurveFlat(value_dt, rfrRate)
 
         divRate = 0.010  # USD
-        dividend_curve = DiscountCurveFlat(value_date, divRate)
+        dividend_curve = DiscountCurveFlat(value_dt, divRate)
 
         vol_functionType = VolFuncTypes.SABR_BETA_HALF
 
-        swaptionSurface = SwaptionVolSurface(value_date,
-                                             exercise_dates,
+        swaptionSurface = SwaptionVolSurface(value_dt,
+                                             exercise_dts,
                                              fwd_swap_rates,
                                              marketStrikes,
                                              marketVolatilities,
@@ -97,8 +97,8 @@ def test_FinSwaptionVolSurface1(verboseCalibration):
             # dbns = swaptionSurface.implied_dbns(mins, maxs, 1000)
 
             # for i in range(0, len(dbns)):
-            #     expiry_date_str = str(equitySurface._expiry_dates[i])
-            #     plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiry_date_str)
+            #     expiry_dt_str = str(equitySurface._expiry_dts[i])
+            #     plt.plot(dbns[i]._x, dbns[i]._densitydx, label = expiry_dt_str)
             #     plt.title(vol_functionType)
             #     plt.legend()
             #     print("SUM:", dbns[i].sum())
@@ -118,4 +118,4 @@ if __name__ == '__main__':
 
     elapsed = end - start
     print("Elapsed Time:", elapsed)
-    testCases.compareTestCases()
+    test_cases.compareTestCases()

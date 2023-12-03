@@ -22,8 +22,8 @@ class EquityVarianceSwap:
     """ Class for managing an equity variance swap contract. """
 
     def __init__(self,
-                 start_date: Date,
-                 maturity_date_or_tenor: (Date, str),
+                 start_dt: Date,
+                 maturity_dt_or_tenor: (Date, str),
                  strike_variance: float,
                  notional: float = ONE_MILLION,
                  pay_strike_flag: bool = True):
@@ -31,16 +31,16 @@ class EquityVarianceSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(maturity_date_or_tenor) == Date:
-            maturity_date = maturity_date_or_tenor
+        if type(maturity_dt_or_tenor) == Date:
+            maturity_dt = maturity_dt_or_tenor
         else:
-            maturity_date = start_date.add_tenor(maturity_date_or_tenor)
+            maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
 
-        if start_date >= maturity_date:
+        if start_dt >= maturity_dt:
             raise FinError("Start date after or same as maturity date")
 
-        self._start_date = start_date
-        self._maturity_date = maturity_date
+        self._start_dt = start_dt
+        self._maturity_dt = maturity_dt
         self._strike_variance = strike_variance
         self._notional = notional
         self._pay_strike_flag = pay_strike_flag
@@ -56,7 +56,7 @@ class EquityVarianceSwap:
 ###############################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               realisedVar,
               fair_strikeVar,
               libor_curve):
@@ -64,22 +64,22 @@ class EquityVarianceSwap:
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve. """
 
-        t1 = (value_date - self._start_date) / gDaysInYear
-        t2 = (self._maturity_date - self._start_date) / gDaysInYear
+        t1 = (value_dt - self._start_dt) / gDaysInYear
+        t2 = (self._maturity_dt - self._start_dt) / gDaysInYear
 
         expectedVariance = t1 * realisedVar/t2
         expectedVariance += (t2-t1) * fair_strikeVar / t2
 
         payoff = expectedVariance - self._strike_variance
 
-        df = libor_curve.df(self._maturity_date)
+        df = libor_curve.df(self._maturity_dt)
         v = payoff * self._notional * df
         return v
 
 ###############################################################################
 
     def fair_strike_approx(self,
-                           value_date,
+                           value_dt,
                            fwdStockPrice,
                            strikes,
                            volatilities):
@@ -91,7 +91,7 @@ class EquityVarianceSwap:
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
-        tmat = (self._maturity_date - value_date)/gDaysInYear
+        tmat = (self._maturity_dt - value_dt)/gDaysInYear
 
         """ Calculate the slope of the volatility curve by taking the end
         points in the volatilities and strikes to calculate the gradient."""
@@ -105,7 +105,7 @@ class EquityVarianceSwap:
 ###############################################################################
 
     def fair_strike(self,
-                    value_date,
+                    value_dt,
                     stock_price,
                     dividend_curve,
                     volatility_curve,
@@ -125,7 +125,7 @@ class EquityVarianceSwap:
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        tmat = (self._maturity_date - value_date)/gDaysInYear
+        tmat = (self._maturity_dt - value_dt)/gDaysInYear
 
         df = discount_curve._df(tmat)
         r = - np.log(df)/tmat
@@ -198,9 +198,9 @@ class EquityVarianceSwap:
         for n in range(0, num_put_options):
             k = putK[n]
             vol = volatility_curve.volatility(k)
-            opt = EquityVanillaOption(self._maturity_date, k, put_type)
+            opt = EquityVanillaOption(self._maturity_dt, k, put_type)
             model = BlackScholes(vol)
-            v = opt.value(value_date, s0, discount_curve,
+            v = opt.value(value_dt, s0, discount_curve,
                           dividend_curve, model)
             piPut += v * self._putWts[n]
 
@@ -208,9 +208,9 @@ class EquityVarianceSwap:
         for n in range(0, num_call_options):
             k = callK[n]
             vol = volatility_curve.volatility(k)
-            opt = EquityVanillaOption(self._maturity_date, k, call_type)
+            opt = EquityVanillaOption(self._maturity_dt, k, call_type)
             model = BlackScholes(vol)
-            v = opt.value(value_date, s0, discount_curve,
+            v = opt.value(value_dt, s0, discount_curve,
                           dividend_curve, model)
             piCall += v * self._callWts[n]
 
@@ -271,8 +271,8 @@ class EquityVarianceSwap:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._start_date)
-        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("START DATE", self._start_dt)
+        s += label_to_string("MATURITY DATE", self._maturity_dt)
         s += label_to_string("STRIKE VARIANCE", self._strike_variance)
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("PAY STRIKE FLAG", self._pay_strike_flag, "")

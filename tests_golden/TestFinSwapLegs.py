@@ -18,15 +18,15 @@ from financepy.products.rates.swap_float_leg import SwapFloatLeg
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
 
 def test_FinFixedIborSwapLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     coupon = -0.44970/100.0
     freq_type = FrequencyTypes.ANNUAL
@@ -39,8 +39,8 @@ def test_FinFixedIborSwapLeg():
     payment_lag = 0
     principal = 0.0
 
-    swapFixedLeg = SwapFixedLeg(effective_date,
-                                maturity_date,
+    swapFixedLeg = SwapFixedLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 coupon,
                                 freq_type,
@@ -57,8 +57,8 @@ def test_FinFixedIborSwapLeg():
 
 def test_FinFixedOISSwapLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     coupon = -0.515039/100.0
     freq_type = FrequencyTypes.ANNUAL
@@ -71,8 +71,8 @@ def test_FinFixedOISSwapLeg():
     payment_lag = 1
     principal = 0.0
 
-    swapFixedLeg = SwapFixedLeg(effective_date,
-                                maturity_date,
+    swapFixedLeg = SwapFixedLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 coupon,
                                 freq_type,
@@ -89,8 +89,8 @@ def test_FinFixedOISSwapLeg():
 
 def test_FinFloatIborLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     spread = 0.0
     freq_type = FrequencyTypes.ANNUAL
@@ -103,8 +103,8 @@ def test_FinFloatIborLeg():
     payment_lag = 0
     principal = 0.0
 
-    swapFloatLeg = SwapFloatLeg(effective_date,
-                                maturity_date,
+    swapFloatLeg = SwapFloatLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 spread,
                                 freq_type,
@@ -116,11 +116,11 @@ def test_FinFloatIborLeg():
                                 bd_type,
                                 dg_type)
 
-    libor_curve = DiscountCurveFlat(effective_date, 0.05)
+    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
     firstFixing = 0.03
 
-    v = swapFloatLeg.value(effective_date,
+    v = swapFloatLeg.value(effective_dt,
                            libor_curve,
                            libor_curve,
                            firstFixing)
@@ -130,8 +130,8 @@ def test_FinFloatIborLeg():
 
 def test_FinFloatOISLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     spread = 0.0
     freq_type = FrequencyTypes.ANNUAL
@@ -144,8 +144,8 @@ def test_FinFloatOISLeg():
     payment_lag = 1
     principal = 0.0
 
-    swapFloatLeg = SwapFloatLeg(effective_date,
-                                maturity_date,
+    swapFloatLeg = SwapFloatLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 spread,
                                 freq_type,
@@ -157,11 +157,11 @@ def test_FinFloatOISLeg():
                                 bd_type,
                                 dg_type)
 
-    libor_curve = DiscountCurveFlat(effective_date, 0.05)
+    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
     firstFixing = 0.03
 
-    v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
+    v = swapFloatLeg.value(effective_dt, libor_curve, libor_curve,
                            firstFixing)
 
 ###############################################################################
@@ -171,8 +171,8 @@ def swapFixedLegMonthEnds():
 
     # Written in response to github issue that has been solved
 
-    fixedleg_1 = SwapFixedLeg(effective_date=Date(30, 8, 2021),
-                              end_date='2Y',
+    fixedleg_1 = SwapFixedLeg(effective_dt=Date(30, 8, 2021),
+                              end_dt='2Y',
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               dc_type=DayCountTypes.THIRTY_E_360,
@@ -180,8 +180,8 @@ def swapFixedLegMonthEnds():
                               coupon=0.0,
                               end_of_month=False)
 
-    fixedleg_2 = SwapFixedLeg(effective_date=Date(30, 8, 2021),
-                              end_date='3Y',
+    fixedleg_2 = SwapFixedLeg(effective_dt=Date(30, 8, 2021),
+                              end_dt='3Y',
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               dc_type=DayCountTypes.THIRTY_E_360,
@@ -202,18 +202,18 @@ def swapFixedLegMonthEnds():
 
 def test_swapFloatLeg():
 
-    effective_date = Date(1, 9, 2021)
+    effective_dt = Date(1, 9, 2021)
 
-    fixedleg_2 = SwapFixedLeg(effective_date,
-                              end_date='3Y',
+    fixedleg_2 = SwapFixedLeg(effective_dt,
+                              end_dt='3Y',
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               dc_type=DayCountTypes.THIRTY_E_360,
                               cal_type=CalendarTypes.UNITED_STATES,
                               coupon=0)
 
-    floatleg_2 = SwapFloatLeg(effective_date,
-                              end_date='3Y',
+    floatleg_2 = SwapFloatLeg(effective_dt,
+                              end_dt='3Y',
                               leg_type=SwapTypes.PAY,
                               freq_type=FrequencyTypes.SEMI_ANNUAL,
                               dc_type=DayCountTypes.THIRTY_E_360,
@@ -221,14 +221,14 @@ def test_swapFloatLeg():
                               spread=0)
 
     fixedleg_2.generate_payments()
-    floatleg_2.generate_payment_dates()
+    floatleg_2.generate_payment_dts()
 
     discount_curve = DiscountCurveFlat(
-        effective_date, 0.05, dc_type=DayCountTypes.THIRTY_E_360)
+        effective_dt, 0.05, dc_type=DayCountTypes.THIRTY_E_360)
     index_curve = DiscountCurveFlat(
-        effective_date, 0.05, dc_type=DayCountTypes.ACT_ACT_ISDA)
+        effective_dt, 0.05, dc_type=DayCountTypes.ACT_ACT_ISDA)
 
-    floatleg_2.value(effective_date, discount_curve, index_curve)
+    floatleg_2.value(effective_dt, discount_curve, index_curve)
     # print("leg_2")
     # fixedleg_2.print_payments()
     # print("fleg_2")
@@ -248,4 +248,4 @@ test_FinFloatIborLeg()
 test_FinFixedOISSwapLeg()
 test_FinFloatOISLeg()
 
-testCases.compareTestCases()
+test_cases.compareTestCases()

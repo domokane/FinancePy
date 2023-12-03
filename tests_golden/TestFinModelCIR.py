@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -28,7 +28,7 @@ def test_FinModelRatesCIR():
     dt = 0.05
     seed = 1968
 
-    testCases.header(
+    test_cases.header(
         "MATURITY",
         "TIME",
         "FORMULA",
@@ -94,10 +94,10 @@ def test_FinModelRatesCIR():
             CIRNumericalScheme.EXACT.value)
         end = time.time()
         elapsed = end - start
-        testCases.print(t, elapsed, p, p_MC1, p_MC2, p_MC3, p_MC4, p_MC5)
+        test_cases.print(t, elapsed, p, p_MC1, p_MC2, p_MC3, p_MC4, p_MC5)
 
 ###############################################################################
 
 
 test_FinModelRatesCIR()
-testCases.compareTestCases()
+test_cases.compareTestCases()

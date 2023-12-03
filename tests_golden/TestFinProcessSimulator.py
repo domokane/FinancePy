@@ -13,7 +13,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
@@ -29,7 +29,7 @@ def test_FinProcessSimulator():
     modelSim = FinProcessSimulator()
     printPaths = False
 
-    testCases.banner(
+    test_cases.banner(
         "######################## GBM NORMAL ###############################")
     sigma = 0.10
     stock_price = 100.0
@@ -46,12 +46,12 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.header("PROCESS", "TIME")
-    testCases.print("GBM NORMAL", elapsed)
+    test_cases.header("PROCESS", "TIME")
+    test_cases.print("GBM NORMAL", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "######################## GBM ANTITHETIC ###########################")
     sigma = 0.10
     stock_price = 100.0
@@ -68,11 +68,11 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("GBM ANTITHETIC", elapsed)
+    test_cases.print("GBM ANTITHETIC", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "###################### HESTON EULER ###############################")
     stock_price = 100.0
     v0 = 0.05
@@ -92,11 +92,11 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("HESTON EULER", elapsed)
+    test_cases.print("HESTON EULER", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "###################### HESTON EULERLOG ############################")
     stock_price = 100.0
     v0 = 0.05
@@ -116,11 +116,11 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("HESTON EULERLOG", elapsed)
+    test_cases.print("HESTON EULERLOG", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "###################### HESTON QUADEXP #############################")
     stock_price = 100.0
     v0 = 0.05
@@ -140,11 +140,11 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("HESTON QUADEXP", elapsed)
+    test_cases.print("HESTON QUADEXP", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "######################## VASICEK NORMAL ###########################")
     r0 = 0.05
     kappa = 0.50
@@ -162,11 +162,11 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("VASICEK_NORMAL", elapsed)
+    test_cases.print("VASICEK_NORMAL", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "####################### VASICEK ANTITHETIC ########################")
     r0 = 0.05
     kappa = 0.50
@@ -184,11 +184,11 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("VASICEK_NORMAL ANTI", elapsed)
+    test_cases.print("VASICEK_NORMAL ANTI", elapsed)
     if printPaths:
         print(paths)
 
-    testCases.banner(
+    test_cases.banner(
         "############################# CIR #################################")
     r0 = 0.05
     kappa = 0.50
@@ -206,7 +206,7 @@ def test_FinProcessSimulator():
         seed)
     end = time.time()
     elapsed = end - start
-    testCases.print("CIR", elapsed)
+    test_cases.print("CIR", elapsed)
     if printPaths:
         print(paths)
 
@@ -214,4 +214,4 @@ def test_FinProcessSimulator():
 
 
 test_FinProcessSimulator()
-testCases.compareTestCases()
+test_cases.compareTestCases()

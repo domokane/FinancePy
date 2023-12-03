@@ -20,7 +20,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False
 
@@ -34,74 +34,74 @@ def test_BondEmbeddedOptionMATLAB():
     # FOUND BY MATLAB ALTHOUGH THEY DO NOT EXAMINE THE ASYMPTOTIC PRICE
     # WHICH MIGHT BE A BETTER MATCH
 
-    settle_date = Date(1, 1, 2007)
-    value_date = settle_date
+    settle_dt = Date(1, 1, 2007)
+    value_dt = settle_dt
 
     ###########################################################################
 
     dcType = DayCountTypes.THIRTY_E_360
     fixedFreq = FrequencyTypes.ANNUAL
     fixed_leg_type = SwapTypes.PAY
-    swap1 = IborSwap(settle_date, "1Y", fixed_leg_type,
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type,
                      0.0350, fixedFreq, dcType)
-    swap2 = IborSwap(settle_date, "2Y", fixed_leg_type,
+    swap2 = IborSwap(settle_dt, "2Y", fixed_leg_type,
                      0.0400, fixedFreq, dcType)
-    swap3 = IborSwap(settle_date, "3Y", fixed_leg_type,
+    swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type,
                      0.0450, fixedFreq, dcType)
     swaps = [swap1, swap2, swap3]
-    discount_curve = IborSingleCurve(value_date, [], [], swaps)
+    discount_curve = IborSingleCurve(value_dt, [], [], swaps)
 
     ###########################################################################
 
-    issue_date = Date(1, 1, 2004)
-    maturity_date = Date(1, 1, 2010)
+    issue_dt = Date(1, 1, 2004)
+    maturity_dt = Date(1, 1, 2010)
 
     coupon = 0.0525
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-    call_dates = []
+    call_dts = []
     call_prices = []
-    put_dates = []
+    put_dts = []
     put_prices = []
 
-    putDate = Date(1, 1, 2008)
+    put_dt = Date(1, 1, 2008)
     for _ in range(0, 24):
-        put_dates.append(putDate)
+        put_dts.append(put_dt)
         put_prices.append(100)
-        putDate = putDate.add_months(1)
+        put_dt = put_dt.add_months(1)
 
-    testCases.header("BOND PRICE", "PRICE")
-    v = bond.clean_price_from_discount_curve(settle_date, discount_curve)
-    testCases.print("Bond Pure Price:", v)
+    test_cases.header("BOND PRICE", "PRICE")
+    v = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
+    test_cases.print("Bond Pure Price:", v)
 
     sigma = 0.01  # basis point volatility
     a = 0.1
 
-    puttableBond = BondEmbeddedOption(issue_date,
-                                      maturity_date, coupon,
-                                      freq_type, dc_type,
-                                      call_dates, call_prices,
-                                      put_dates, put_prices)
+    puttable_bond = BondEmbeddedOption(issue_dt,
+                                       maturity_dt, coupon,
+                                       freq_type, dc_type,
+                                       call_dts, call_prices,
+                                       put_dts, put_prices)
 
-    testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
+    test_cases.header("TIME", "Numtime_steps", "BondWithOption", "BondPure")
 
-    timeSteps = range(50, 1000, 50)
+    time_steps = range(50, 1000, 50)
     values = []
-    for num_time_steps in timeSteps:
+    for num_time_steps in time_steps:
         model = HWTree(sigma, a, num_time_steps)
         start = time.time()
-        v = puttableBond.value(settle_date, discount_curve, model)
+        v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, num_time_steps, v['bondwithoption'],
-                        v['bondpure'])
+        test_cases.print(period, num_time_steps, v['bondwithoption'],
+                         v['bondpure'])
         values.append(v['bondwithoption'])
 
     if plotGraphs:
         plt.figure()
-        plt.plot(timeSteps, values)
+        plt.plot(time_steps, values)
 
 ###############################################################################
 
@@ -114,74 +114,74 @@ def test_BondEmbeddedOptionQUANTLIB():
     # 68.38 found in blog article. But this is for 40 grid points.
     # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
 
-    value_date = Date(16, 8, 2016)
-    settle_date = value_date.add_weekdays(3)
+    value_dt = Date(16, 8, 2016)
+    settle_dt = value_dt.add_weekdays(3)
 
     ###########################################################################
 
-    discount_curve = DiscountCurveFlat(value_date, 0.035,
+    discount_curve = DiscountCurveFlat(value_dt, 0.035,
                                        FrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
 
-    issue_date = Date(15, 9, 2010)
-    maturity_date = Date(15, 9, 2022)
+    issue_dt = Date(15, 9, 2010)
+    maturity_dt = Date(15, 9, 2022)
     coupon = 0.025
     freq_type = FrequencyTypes.QUARTERLY
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
     ###########################################################################
     # Set up the call and put times and prices
     ###########################################################################
 
     nextCallDate = Date(15, 9, 2016)
-    call_dates = [nextCallDate]
+    call_dts = [nextCallDate]
     call_prices = [100.0]
 
     for _ in range(1, 24):
         nextCallDate = nextCallDate.add_months(3)
-        call_dates.append(nextCallDate)
+        call_dts.append(nextCallDate)
         call_prices.append(100.0)
 
-    put_dates = []
+    put_dts = []
     put_prices = []
 
     # the value used in blog of 12% bp vol is unrealistic
     sigma = 0.12  # basis point volatility
     a = 0.03
 
-    puttableBond = BondEmbeddedOption(issue_date,
-                                      maturity_date, coupon,
+    puttable_bond = BondEmbeddedOption(issue_dt,
+                                      maturity_dt, coupon,
                                       freq_type, dc_type,
-                                      call_dates, call_prices,
-                                      put_dates, put_prices)
+                                      call_dts, call_prices,
+                                      put_dts, put_prices)
 
-    testCases.header("BOND PRICE", "PRICE")
-    v = bond.clean_price_from_discount_curve(settle_date, discount_curve)
-    testCases.print("Bond Pure Price:", v)
+    test_cases.header("BOND PRICE", "PRICE")
+    v = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
+    test_cases.print("Bond Pure Price:", v)
 
-    testCases.header("TIME", "NumTimeSteps", "BondWithOption", "BondPure")
-    timeSteps = range(100, 200, 50)
+    test_cases.header("TIME", "Numtime_steps", "BondWithOption", "BondPure")
+    time_steps = range(100, 200, 50)
     values = []
-    for num_time_steps in timeSteps:
+    for num_time_steps in time_steps:
         model = HWTree(sigma, a, num_time_steps)
         start = time.time()
-        v = puttableBond.value(settle_date, discount_curve, model)
+        v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        testCases.print(period, num_time_steps,
+        test_cases.print(period, num_time_steps,
                         v['bondwithoption'], v['bondpure'])
         values.append(v['bondwithoption'])
 
     if plotGraphs:
         plt.figure()
         plt.title("Puttable Bond Price Convergence")
-        plt.plot(timeSteps, values)
+        plt.plot(time_steps, values)
 
 ###############################################################################
 
 
 test_BondEmbeddedOptionMATLAB()
 test_BondEmbeddedOptionQUANTLIB()
-testCases.compareTestCases()
+test_cases.compareTestCases()

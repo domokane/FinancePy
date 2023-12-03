@@ -11,7 +11,7 @@ from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -19,30 +19,30 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_Calendar():
 
     set_date_format(DateFormatTypes.US_LONGEST)
-    end_date = Date(31, 12, 2030)
+    end_dt = Date(31, 12, 2030)
 
     for cal_type in CalendarTypes:
 
-        testCases.banner("================================")
-        testCases.banner("================================")
+        test_cases.banner("================================")
+        test_cases.banner("================================")
 
-        testCases.header("CALENDAR", "HOLIDAY")
-        testCases.print("STARTING", cal_type)
+        test_cases.header("CALENDAR", "HOLIDAY")
+        test_cases.print("STARTING", cal_type)
 
         cal = Calendar(cal_type)
-        next_date = Date(31, 12, 2020)
+        next_dt = Date(31, 12, 2020)
 
-        while next_date < end_date:
-            next_date = next_date.add_days(1)
+        while next_dt < end_dt:
+            next_dt = next_dt.add_days(1)
 
-            if next_date._d == 1 and next_date._m == 1:
-                testCases.banner("================================")
+            if next_dt._d == 1 and next_dt._m == 1:
+                test_cases.banner("================================")
 #                print("=========================")
 
-            is_holidayDay = cal.is_holiday(next_date)
+            is_holidayDay = cal.is_holiday(next_dt)
             if is_holidayDay is True:
-                testCases.print(cal, next_date)
-#                print(cal, next_date)
+                test_cases.print(cal, next_dt)
+#                print(cal, next_dt)
 
     set_date_format(DateFormatTypes.US_LONG)
 
@@ -50,4 +50,4 @@ def test_Calendar():
 
 
 test_Calendar()
-testCases.compareTestCases()
+test_cases.compareTestCases()

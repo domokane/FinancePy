@@ -9,25 +9,25 @@ from financepy.utils.currency import CurrencyTypes
 from financepy.utils.amount import Amount
 from FinTestCases import FinTestCases, globalTestCaseMode
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
 
 def test_amount():
 
-    testCases.header("LABEL", "AMOUNT")
+    test_cases.header("LABEL", "AMOUNT")
     x = Amount(101000.232)
 
-    testCases.print("Amount", x)
+    test_cases.print("Amount", x)
 
     x = Amount(101000.232, CurrencyTypes.CAD)
 
-    testCases.print("Amount", x)
+    test_cases.print("Amount", x)
 
 ###############################################################################
 
 
 test_amount()
 
-testCases.compareTestCases()
+test_cases.compareTestCases()

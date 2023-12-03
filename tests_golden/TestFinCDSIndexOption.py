@@ -21,7 +21,7 @@ import time
 import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 # TO DO
@@ -33,7 +33,7 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 
 def build_Ibor_Curve(tradeDate):
 
-    value_date = tradeDate.add_days(1)
+    value_dt = tradeDate.add_days(1)
     dcType = DayCountTypes.ACT_360
     depos = []
 
@@ -43,59 +43,59 @@ def build_Ibor_Curve(tradeDate):
 
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    settle_date = value_date
+    settle_dt = value_dt
 
-    maturity_date = settle_date.add_months(12)
+    maturity_dt = settle_dt.add_months(12)
     swap1 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settle_date.add_months(24)
+    maturity_dt = settle_dt.add_months(24)
     swap2 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settle_date.add_months(36)
+    maturity_dt = settle_dt.add_months(36)
     swap3 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settle_date.add_months(48)
+    maturity_dt = settle_dt.add_months(48)
     swap4 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         0.0502,
         fixedFreq,
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settle_date.add_months(60)
+    maturity_dt = settle_dt.add_months(60)
     swap5 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         0.0501,
         fixedFreq,
         dcType)
     swaps.append(swap5)
 
-    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     return libor_curve
 
@@ -104,15 +104,15 @@ def build_Ibor_Curve(tradeDate):
 
 def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
 
-    value_date = tradeDate.add_days(1)
+    value_dt = tradeDate.add_days(1)
 
     cdsMarketContracts = []
 
-    maturity_date = Date(29, 6, 2010)
-    cds = CDS(value_date, maturity_date, spread)
+    maturity_dt = Date(29, 6, 2010)
+    cds = CDS(value_dt, maturity_dt, spread)
     cdsMarketContracts.append(cds)
 
-    issuer_curve = CDSCurve(value_date,
+    issuer_curve = CDSCurve(value_dt,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -125,8 +125,8 @@ def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
 def test_dirty_priceCDSIndexOption():
 
     tradeDate = Date(1, 8, 2007)
-    step_in_date = tradeDate.add_days(1)
-    value_date = step_in_date
+    step_in_dt = tradeDate.add_days(1)
+    value_dt = step_in_dt
 
     libor_curve = build_Ibor_Curve(tradeDate)
 
@@ -152,13 +152,13 @@ def test_dirty_priceCDSIndexOption():
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(step_in_date, maturity3Y, spd3Y)
-        cds5Y = CDS(step_in_date, maturity5Y, spd5Y)
-        cds7Y = CDS(step_in_date, maturity7Y, spd7Y)
-        cds10Y = CDS(step_in_date, maturity10Y, spd10Y)
+        cds3Y = CDS(step_in_dt, maturity3Y, spd3Y)
+        cds5Y = CDS(step_in_dt, maturity5Y, spd5Y)
+        cds7Y = CDS(step_in_dt, maturity7Y, spd7Y)
+        cds10Y = CDS(step_in_dt, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(value_date,
+        issuer_curve = CDSCurve(value_dt,
                                 cds_contracts,
                                 libor_curve,
                                 recovery_rate)
@@ -169,23 +169,23 @@ def test_dirty_priceCDSIndexOption():
     ##########################################################################
 
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
-    index_maturity_dates = [Date(20, 12, 2009),
+    index_maturity_dts = [Date(20, 12, 2009),
                             Date(20, 12, 2011),
                             Date(20, 12, 2013),
                             Date(20, 12, 2016)]
     indexRecovery = 0.40
 
-    testCases.banner(
+    test_cases.banner(
         "======================= CDS INDEX OPTION ==========================")
 
     index_coupon = 0.004
     volatility = 0.50
-    expiry_date = Date(1, 2, 2008)
-    maturity_date = Date(20, 12, 2011)
+    expiry_dt = Date(1, 2, 2008)
+    maturity_dt = Date(20, 12, 2011)
     notional = 10000.0
     tolerance = 1e-6
 
-    testCases.header(
+    test_cases.header(
         "TIME",
         "STRIKE",
         "INDEX",
@@ -207,12 +207,12 @@ def test_dirty_priceCDSIndexOption():
 
         cds_contracts = []
 
-        for dt in index_maturity_dates:
+        for dt in index_maturity_dts:
 
-            cds = CDS(value_date, dt, index / 10000.0)
+            cds = CDS(value_dt, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(value_date,
+        index_curve = CDSCurve(value_dt,
                                cds_contracts,
                                libor_curve,
                                indexRecovery)
@@ -224,11 +224,11 @@ def test_dirty_priceCDSIndexOption():
             indexPortfolio = CDSIndexPortfolio()
 
             adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
-                value_date,
+                value_dt,
                 issuer_curves,
                 indexSpreads,
                 index_upfronts,
-                index_maturity_dates,
+                index_maturity_dts,
                 indexRecovery,
                 tolerance)
 
@@ -253,20 +253,20 @@ def test_dirty_priceCDSIndexOption():
 
             start = time.time()
 
-            option = CDSIndexOption(expiry_date,
-                                    maturity_date,
+            option = CDSIndexOption(expiry_dt,
+                                    maturity_dt,
                                     index_coupon,
                                     strike / 10000.0,
                                     notional)
 
             v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
-                value_date, adjustedIssuerCurves, indexRecovery, volatility)
+                value_dt, adjustedIssuerCurves, indexRecovery, volatility)
             end = time.time()
             elapsed = end - start
 
             end = time.time()
 
-            v_pay_2, v_rec_2 = option.value_adjusted_black(value_date,
+            v_pay_2, v_rec_2 = option.value_adjusted_black(value_dt,
                                                            index_curve,
                                                            indexRecovery,
                                                            libor_curve,
@@ -274,7 +274,7 @@ def test_dirty_priceCDSIndexOption():
 
             elapsed = end - start
 
-            testCases.print(
+            test_cases.print(
                 elapsed,
                 strike,
                 index,
@@ -290,4 +290,4 @@ def test_dirty_priceCDSIndexOption():
 
 
 test_dirty_priceCDSIndexOption()
-testCases.compareTestCases()
+test_cases.compareTestCases()

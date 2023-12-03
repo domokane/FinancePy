@@ -60,43 +60,43 @@ def crr_tree_val(stock_price,
     periodDiscountFactors = np.zeros(num_steps)
 
     # store time independent information for later use in tree
-    for iTime in range(0, num_steps):
+    for i_time in range(0, num_steps):
         a = np.exp((r - q) * dt)
-        probs[iTime] = (a - d) / (u - d)
-        periodDiscountFactors[iTime] = np.exp(-r * dt)
+        probs[i_time] = (a - d) / (u - d)
+        periodDiscountFactors[i_time] = np.exp(-r * dt)
 
-    for iTime in range(1, num_steps + 1):
+    for i_time in range(1, num_steps + 1):
         sLow *= d
         s = sLow
-        for iNode in range(0, iTime + 1):
-            index = 0.5 * iTime * (iTime + 1)
-            stock_values[int(index + iNode)] = s
+        for i_node in range(0, i_time + 1):
+            index = 0.5 * i_time * (i_time + 1)
+            stock_values[int(index + i_node)] = s
             s = s * (u * u)
 
     # work backwards by first setting values at expiry date
     index = int(0.5 * num_steps * (num_steps + 1))
 
-    for iNode in range(0, iTime + 1):
+    for i_node in range(0, i_time + 1):
 
-        s = stock_values[index + iNode]
+        s = stock_values[index + i_node]
 
         if option_type == OptionTypes.EUROPEAN_CALL.value:
-            option_values[index + iNode] = np.maximum(s - strike_price, 0.0)
+            option_values[index + i_node] = np.maximum(s - strike_price, 0.0)
         elif option_type == OptionTypes.EUROPEAN_PUT.value:
-            option_values[index + iNode] = np.maximum(strike_price - s, 0.0)
+            option_values[index + i_node] = np.maximum(strike_price - s, 0.0)
         elif option_type == OptionTypes.AMERICAN_CALL.value:
-            option_values[index + iNode] = np.maximum(s - strike_price, 0.0)
+            option_values[index + i_node] = np.maximum(s - strike_price, 0.0)
         elif option_type == OptionTypes.AMERICAN_PUT.value:
-            option_values[index + iNode] = np.maximum(strike_price - s, 0.0)
+            option_values[index + i_node] = np.maximum(strike_price - s, 0.0)
 
     # begin backward steps from expiry to value date
-    for iTime in range(num_steps - 1, -1, -1):
+    for i_time in range(num_steps - 1, -1, -1):
 
-        index = int(0.5 * iTime * (iTime + 1))
+        index = int(0.5 * i_time * (i_time + 1))
 
-        for iNode in range(0, iTime + 1):
+        for i_node in range(0, i_time + 1):
 
-            s = stock_values[index + iNode]
+            s = stock_values[index + i_node]
 
             exerciseValue = 0.0
 
@@ -109,27 +109,27 @@ def crr_tree_val(stock_price,
             elif option_type == OptionTypes.AMERICAN_PUT.value:
                 exerciseValue = np.maximum(strike_price - s, 0.0)
 
-            nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
+            nextIndex = int(0.5 * (i_time + 1) * (i_time + 2))
 
-            nextNodeDn = nextIndex + iNode
-            nextNodeUp = nextIndex + iNode + 1
+            nextNodeDn = nextIndex + i_node
+            nextNodeUp = nextIndex + i_node + 1
 
             vUp = option_values[nextNodeUp]
             vDn = option_values[nextNodeDn]
-            futureExpectedValue = probs[iTime] * vUp
-            futureExpectedValue += (1.0 - probs[iTime]) * vDn
-            holdValue = periodDiscountFactors[iTime] * futureExpectedValue
+            futureExpectedValue = probs[i_time] * vUp
+            futureExpectedValue += (1.0 - probs[i_time]) * vDn
+            holdValue = periodDiscountFactors[i_time] * futureExpectedValue
 
             if option_type == OptionTypes.EUROPEAN_CALL.value:
-                option_values[index + iNode] = holdValue
+                option_values[index + i_node] = holdValue
             elif option_type == OptionTypes.EUROPEAN_PUT.value:
-                option_values[index + iNode] = holdValue
+                option_values[index + i_node] = holdValue
             elif option_type == OptionTypes.AMERICAN_CALL.value:
                 option_values[index +
-                              iNode] = np.maximum(exerciseValue, holdValue)
+                              i_node] = np.maximum(exerciseValue, holdValue)
             elif option_type == OptionTypes.AMERICAN_PUT.value:
                 option_values[index +
-                              iNode] = np.maximum(exerciseValue, holdValue)
+                              i_node] = np.maximum(exerciseValue, holdValue)
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]

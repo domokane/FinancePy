@@ -10,7 +10,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -29,7 +29,7 @@ def test_FinModelRatesVasicek():
     dt = 0.02
     seed = 1968
 
-    testCases.header("TIME", "T", "P", "P_MC", "P_MC2")
+    test_cases.header("TIME", "T", "P", "P_MC", "P_MC2")
 
     for t in np.linspace(0, 10, 21):
         start = time.time()
@@ -38,11 +38,11 @@ def test_FinModelRatesVasicek():
         p = zero_price(r0, a, b, sigma, t)
         end = time.time()
         elapsed = end - start
-        testCases.print(elapsed, t, p, p_MC, p_MC2)
+        test_cases.print(elapsed, t, p, p_MC, p_MC2)
 
 
 ###############################################################################
 
 
 test_FinModelRatesVasicek()
-testCases.compareTestCases()
+test_cases.compareTestCases()

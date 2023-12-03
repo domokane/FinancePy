@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
 
@@ -109,4 +109,4 @@ test_FinSABR()
 test_FinShiftedSABRSimple()
 test_FinShiftedSABR()
 
-testCases.compareTestCases()
+test_cases.compareTestCases()

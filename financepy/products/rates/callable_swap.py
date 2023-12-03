@@ -55,15 +55,15 @@
 #     """ Class for fixed coupon bonds with embedded call or put optionality. """
 
 #     def __init__(self,
-#                  exercise_date,
+#                  exercise_dt,
 #                  exercise_type,
-#                  maturity_date,
+#                  maturity_dt,
 #                  swaptionType,
 #                  fixed_coupon,
-#                  fixed_frequency_type,
+#                  fixed_freq_type,
 #                  fixed_dc_type,
 #                  notional=ONE_MILLION,
-#                  float_frequency_type=FrequencyTypes.QUARTERLY,
+#                  float_freq_type=FrequencyTypes.QUARTERLY,
 #                  float_dc_type=DayCountTypes.THIRTY_E_360,
 #                  cal_type=CalendarTypes.WEEKEND,
 #                  bd_type=BusDayAdjustTypes.FOLLOWING,
@@ -72,7 +72,7 @@
 #         into a swap at a fixed coupon on all of the fixed leg coupon dates
 #         until the exercise date. """
 
-#         if exercise_date > maturity_date:
+#         if exercise_dt > maturity_dt:
 #             raise FinError("Exercise date must be before swap maturity date")
 
 #         if exercise_type not in FinSwaptionExerciseTypes:
@@ -83,20 +83,20 @@
 #                 "Unknown Fixed Day Count Rule type " +
 #                 str(fixed_dc_type))
 
-#         if fixed_frequency_type not in FrequencyTypes:
+#         if fixed_freq_type not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Fixed Frequency type " +
-#                 str(fixed_frequency_type))
+#                 str(fixed_freq_type))
 
 #         if float_dc_type not in DayCountTypes:
 #             raise FinError(
 #                 "Unknown Float Day Count Rule type " +
 #                 str(float_dc_type))
 
-#         if float_frequency_type not in FrequencyTypes:
+#         if float_freq_type not in FrequencyTypes:
 #             raise FinError(
 #                 "Unknown Float Frequency type " +
-#                 str(fixed_frequency_type))
+#                 str(fixed_freq_type))
 
 #         if cal_type not in CalendarTypes:
 #             raise FinError("Unknown Calendar type " + str(cal_type))
@@ -111,13 +111,13 @@
 #                 "Unknown Date Gen Rule type " +
 #                 str(dg_type))
 
-#         self._exercise_date = exercise_date
-#         self._maturity_date = maturity_date
+#         self._exercise_dt = exercise_dt
+#         self._maturity_dt = maturity_dt
 #         self._fixed_coupon = fixed_coupon
-#         self._fixed_freq_type = fixed_frequency_type
+#         self._fixed_freq_type = fixed_freq_type
 #         self._fixed_dc_type = fixed_dc_type
 #         self._notional = notional
-#         self._float_freq_type = float_frequency_type
+#         self._float_freq_type = float_freq_type
 #         self._float_dc_type = float_dc_type
 
 #         self._cal_type = cal_type
@@ -132,7 +132,7 @@
 # ###############################################################################
 
 #     def value(self,
-#               value_date,
+#               value_dt,
 #               discount_curve,
 #               model):
 #         """ Value the bermuda swaption. This is done using the specified
@@ -142,8 +142,8 @@
 #         payFixedFlag = True
 
 #         # The underlying is a swap in which we pay the fixed amount
-#         swap = IborSwap(self._exercise_date,
-#                             self._maturity_date,
+#         swap = IborSwap(self._exercise_dt,
+#                             self._maturity_dt,
 #                             self._fixed_coupon,
 #                             self._fixed_freq_type,
 #                             self._fixed_dc_type,
@@ -160,9 +160,9 @@
 #         cpn_times = []
 #         cpn_amounts = []
 
-#         for iFlow in range(1, len(self._swap._adjusted_fixed_dates)):
-#             flow_date= swap._adjusted_fixed_dates[iFlow]
-#             cpn_time = (flow_date - settle_date) / gDaysInYear
+#         for iFlow in range(1, len(self._swap._adjusted_fixed_dts)):
+#             flow_dt= swap._adjusted_fixed_dts[iFlow]
+#             cpn_time = (flow_dt - settle_dt) / gDaysInYear
 #             cpn_flow = swap._fixedFlows[iFlow-1] / self._notional
 #             cpn_times.append(cpn_time)
 #             cpn_amounts.append(cpn_flow)
@@ -172,8 +172,8 @@
 
 #         # Generate bond call times and prices
 #         call_times = []
-#         for dt in self._call_dates:
-#             call_time = (dt - settle_date) / gDaysInYear
+#         for dt in self._call_dts:
+#             call_time = (dt - settle_dt) / gDaysInYear
 #             call_times.append(call_time)
 #         call_times = np.array(call_times)
 #         call_prices = np.array(self._call_prices)
@@ -187,16 +187,16 @@
 #             putPrice = 100.0
 
 #         put_times = []
-#         for putDate in swap._adjusted_fixed_dates[1:]:
-#             if putDate <= self._exercise_date:
-#                 put_time = (putDate - settle_date) / gDaysInYear
+#         for put_dt in swap._adjusted_fixed_dts[1:]:
+#             if put_dt <= self._exercise_dt:
+#                 put_time = (put_dt - settle_dt) / gDaysInYear
 #                 put_times.append(put_time)
 
 #         put_times = np.array(put_times)
 #         put_prices = np.array(self._put_prices)
 
-#         maturity_date = self._bond._maturity_date
-#         tmat = (maturity_date - settle_date) / gDaysInYear
+#         maturity_dt = self._bond._maturity_dt
+#         tmat = (maturity_dt - settle_dt) / gDaysInYear
 #         df_times = discount_curve._times
 #         df_values = discount_curve._values
 
@@ -209,12 +209,12 @@
 #             we can do that refinement at a later date. """
 
 #             model.buildTree(tmat, df_times, df_values)
-#             v1 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
+#             v1 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
 #             model._num_time_steps += 1
 #             model.buildTree(tmat, df_times, df_values)
-#             v2 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
+#             v2 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
 #             model._num_time_steps -= 1
@@ -230,13 +230,13 @@
 #             the tree out to the bond maturity which is after option expiry. """
 
 #             model.buildTree(tmat, df_times, df_values)
-#             v1 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
+#             v1 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
 #             model._num_time_steps += 1
 #             model.buildTree(tmat, df_times, df_values)
-#             v2 = model.callablePuttableBond_Tree(cpn_times, cpn_amounts,
+#             v2 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
@@ -253,21 +253,21 @@
 
 #     def __repr__(self):
 
-#         s = label_to_string("MATURITY DATE", self._maturity_date)
-#         s += label_to_string("EXERCISE DATE", self._exercise_date)
+#         s = label_to_string("MATURITY DATE", self._maturity_dt)
+#         s += label_to_string("EXERCISE DATE", self._exercise_dt)
 #         s += label_to_string("COUPON", self._cpn)
 #         s += label_to_string("FREQUENCY", self._freq_type)
 #         s += label_to_string("DAY COUNT TYPE", self._dc_type)
 #         s += label_to_string("FACE AMOUNT", self._face)
 #         s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
-#         s += label_to_string("START CONVERT DATE", self._start_convert_date)
+#         s += label_to_string("START CONVERT DATE", self._start_convert_dt)
 
-#         for i in range(0, len(self._call_dates)):
-#             s += label_to_string("CALL DATE AND PRICE", self._call_dates[i],
+#         for i in range(0, len(self._call_dts)):
+#             s += label_to_string("CALL DATE AND PRICE", self._call_dts[i],
 #                                self._call_prices[i])
 
-#         for i in range(0, len(self._put_dates)):
-#             s += label_to_string("PUT DATE AND PRICE", self._put_dates[i],
+#         for i in range(0, len(self._put_dts)):
+#             s += label_to_string("PUT DATE AND PRICE", self._put_dts[i],
 #                                self._put_prices[i])
 
 #         return s

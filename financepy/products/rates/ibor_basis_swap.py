@@ -30,8 +30,8 @@ class IborBasisSwap:
     index discount from which the implied index rates are extracted. """
 
     def __init__(self,
-                 effective_date: Date,  # Date interest starts to accrue
-                 term_date_or_tenor: (Date, str),  # Date contract ends
+                 effective_dt: Date,  # Date interest starts to accrue
+                 term_dt_or_tenor: (Date, str),  # Date contract ends
                  leg1Type: SwapTypes,
                  leg1FreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  leg1DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
@@ -54,17 +54,17 @@ class IborBasisSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_date_or_tenor) == Date:
-            self._termination_date = term_date_or_tenor
+        if type(term_dt_or_tenor) == Date:
+            self._termination_dt = term_dt_or_tenor
         else:
-            self._termination_date = effective_date.add_tenor(
-                term_date_or_tenor)
+            self._termination_dt = effective_dt.add_tenor(
+                term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_date = calendar.adjust(self._termination_date,
+        self._maturity_dt = calendar.adjust(self._termination_dt,
                                               bd_type)
 
-        if effective_date > self._maturity_date:
+        if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")
 
         leg2Type = SwapTypes.PAY
@@ -74,8 +74,8 @@ class IborBasisSwap:
         payment_lag = 0
         principal = 0.0
 
-        self._floatLeg1 = SwapFloatLeg(effective_date,
-                                       self._termination_date,
+        self._floatLeg1 = SwapFloatLeg(effective_dt,
+                                       self._termination_dt,
                                        leg1Type,
                                        leg1Spread,
                                        leg1FreqType,
@@ -87,8 +87,8 @@ class IborBasisSwap:
                                        bd_type,
                                        dg_type)
 
-        self._floatLeg2 = SwapFloatLeg(effective_date,
-                                       self._termination_date,
+        self._floatLeg2 = SwapFloatLeg(effective_dt,
+                                       self._termination_dt,
                                        leg2Type,
                                        leg2Spread,
                                        leg2FreqType,
@@ -103,7 +103,7 @@ class IborBasisSwap:
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               discount_curve: DiscountCurve,
               index_curveLeg1: DiscountCurve = None,
               index_curveLeg2: DiscountCurve = None,
@@ -118,12 +118,12 @@ class IborBasisSwap:
         if index_curveLeg2 is None:
             index_curveLeg2 = discount_curve
 
-        floatLeg1Value = self._floatLeg1.value(value_date,
+        floatLeg1Value = self._floatLeg1.value(value_dt,
                                                discount_curve,
                                                index_curveLeg1,
                                                firstFixingRateLeg1)
 
-        floatLeg2Value = self._floatLeg2.value(value_date,
+        floatLeg2Value = self._floatLeg2.value(value_dt,
                                                discount_curve,
                                                index_curveLeg2,
                                                firstFixingRateLeg2)

@@ -29,12 +29,12 @@ ylds = []
 for _, bond in bondDataFrame.iterrows():
 
     date_string = bond['maturity']
-    matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-    maturityDt = from_datetime(matDatetime)
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+    maturity_dt = from_datetime(mat_date_time)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     coupon = bond['coupon']/100.0
     clean_price = bond['mid']
-    bond = Bond(issueDt, maturityDt, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
     yld = bond.yield_to_maturity(settlement, clean_price)
     bonds.append(bond)
     ylds.append(yld)
@@ -42,9 +42,9 @@ for _, bond in bondDataFrame.iterrows():
 
 def test_poly():
     curveFitMethod = CurveFitPolynomial(5)
-    fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    coeffs = fittedCurve._curveFit._coeffs
+    coeffs = fitted_curve._curveFit._coeffs
     assert round(coeffs[0] * 1e9, 4) == -1.4477
     assert round(coeffs[1] * 1e7, 4) == 1.7840
     assert round(coeffs[2] * 1e6, 4) == -7.4147
@@ -55,30 +55,30 @@ def test_poly():
 
 def test_nelson_siegel():
     curveFitMethod = CurveFitNelsonSiegel()
-    fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    assert round(fittedCurve._curveFit._beta1, 3) == -0.094
-    assert round(fittedCurve._curveFit._beta2, 3) == 0.092
-    assert round(fittedCurve._curveFit._beta3, 3) == 0.259
-    assert round(fittedCurve._curveFit._tau, 1) == 35.8
+    assert round(fitted_curve._curveFit._beta1, 3) == -0.094
+    assert round(fitted_curve._curveFit._beta2, 3) == 0.092
+    assert round(fitted_curve._curveFit._beta3, 3) == 0.259
+    assert round(fitted_curve._curveFit._tau, 1) == 35.8
 
 
 def test_nelson_siegel_svensson():
     curveFitMethod = CurveFitNelsonSiegelSvensson()
-    fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    assert round(fittedCurve._curveFit._beta1, 4) == 0.0460
-    assert round(fittedCurve._curveFit._beta2, 4) == -0.0433
-    assert round(fittedCurve._curveFit._beta3, 4) == -0.0523
-    assert round(fittedCurve._curveFit._beta4, 4) == -0.0376
-    assert round(fittedCurve._curveFit._tau1, 3) == 3.177
-    assert round(fittedCurve._curveFit._tau2, 4) == 100.0000
+    assert round(fitted_curve._curveFit._beta1, 4) == 0.0460
+    assert round(fitted_curve._curveFit._beta2, 4) == -0.0433
+    assert round(fitted_curve._curveFit._beta3, 4) == -0.0523
+    assert round(fitted_curve._curveFit._beta4, 4) == -0.0376
+    assert round(fitted_curve._curveFit._tau1, 3) == 3.177
+    assert round(fitted_curve._curveFit._tau2, 4) == 100.0000
 
 
 def test_interpolated_yield():
     curveFitMethod = CurveFitBSpline()
-    fittedCurve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    maturity_date = Date(19, 9, 2030)
-    interpolated_yield = fittedCurve.interpolated_yield(maturity_date)
+    maturity_dt = Date(19, 9, 2030)
+    interpolated_yield = fitted_curve.interpolated_yield(maturity_dt)
     assert round(float(interpolated_yield), 8) == 0.02601858

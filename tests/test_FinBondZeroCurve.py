@@ -25,12 +25,12 @@ clean_prices = []
 
 for _, bondRow in bondDataFrame.iterrows():
     date_string = bondRow['maturity']
-    matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-    maturityDt = from_datetime(matDatetime)
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+    maturity_dt = from_datetime(mat_date_time)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     coupon = bondRow['coupon']/100.0
     clean_price = bondRow['mid']
-    bond = Bond(issueDt, maturityDt, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
     bonds.append(bond)
     clean_prices.append(clean_price)
 
@@ -39,14 +39,14 @@ bondCurve = BondZeroCurve(settlement, bonds, clean_prices)
 
 def test_zero_curve():
 
-    maturityDt = Date(7, 3, 2013)
-    zero_rate = bondCurve.zero_rate(maturityDt)
+    maturity_dt = Date(7, 3, 2013)
+    zero_rate = bondCurve.zero_rate(maturity_dt)
     assert round(zero_rate, 4) == 0.0022
 
-    maturityDt = Date(7, 9, 2019)
-    zero_rate = bondCurve.zero_rate(maturityDt)
+    maturity_dt = Date(7, 9, 2019)
+    zero_rate = bondCurve.zero_rate(maturity_dt)
     assert round(zero_rate, 4) == 0.0128
 
-    maturityDt = Date(22, 1, 2060)
-    zero_rate = bondCurve.zero_rate(maturityDt)
+    maturity_dt = Date(22, 1, 2060)
+    zero_rate = bondCurve.zero_rate(maturity_dt)
     assert round(zero_rate, 4) == 0.0351

@@ -26,9 +26,9 @@ class IborCapVolCurve():
     dates. Note also that this class also handles floor vols."""
 
     def __init__(self,
-                 curve_date,  # Valuation date for cap volatility
-                 capMaturityDates,  # curve date + maturity dates for caps
-                 capSigmas,  # Flat cap volatility for cap maturity dates
+                 curve_dt,  # Valuation date for cap volatility
+                 cap_maturity_dts,  # curve date + maturity dates for caps
+                 cap_sigmas,  # Flat cap volatility for cap maturity dates
                  dc_type):
         """ Create a cap/floor volatility curve given a curve date, a list of
         cap maturity dates and a vector of cap volatilities. To avoid confusion
@@ -38,8 +38,8 @@ class IborCapVolCurve():
         floor volatilities are the same for the same strike and tenor, I just
         refer to cap volatilities in the code for code simplicity. """
 
-        num_times = len(capMaturityDates)
-        num_vols = len(capSigmas)
+        num_times = len(cap_maturity_dts)
+        num_vols = len(cap_sigmas)
 
         if num_times != num_vols:
             raise FinError("Date and volatility vectors not same length.")
@@ -47,20 +47,20 @@ class IborCapVolCurve():
         if num_times < 2:
             raise FinError("FinCapVolCurve requires at least two dates/vols")
 
-        if curve_date != capMaturityDates[0]:
+        if curve_dt != cap_maturity_dts[0]:
             raise FinError("FinCapFloorDates must start on curve date")
 
-        self._curve_date = curve_date
+        self._curve_dt = curve_dt
 
-        if capSigmas[0] != 0.0:
+        if cap_sigmas[0] != 0.0:
             raise FinError("Curve date cap floor volatility must equal zero")
 
-        self._capSigmas = np.array(capSigmas)
-        self._capletGammas = []
+        self._cap_sigmas = np.array(cap_sigmas)
+        self._caplet_gammas = []
 
         # Basic validation of dates
-        prev_dt = self._curve_date
-        for dt in capMaturityDates[1:]:
+        prev_dt = self._curve_dt
+        for dt in cap_maturity_dts[1:]:
             if dt < prev_dt:
                 raise FinError("CapFloorLet Dates not in increasing order")
 
@@ -69,7 +69,7 @@ class IborCapVolCurve():
 
             prev_dt = dt
 
-        self._capMaturityDates = capMaturityDates
+        self._cap_maturity_dts = cap_maturity_dts
 
         if isinstance(dc_type, DayCountTypes) is False:
             raise FinError("DayCountType must be of type DayCountTypes.")
@@ -89,34 +89,34 @@ class IborCapVolCurve():
         self._taus = []
 
         day_counter = DayCount(self._dc_type)
-        prev_dt = self._curve_date
-        numCaps = len(self._capMaturityDates)
+        prev_dt = self._curve_dt
+        numCaps = len(self._cap_maturity_dts)
 
-        for dt in self._capMaturityDates:
-            t = (dt - self._curve_date) / gDaysInYear
+        for dt in self._cap_maturity_dts:
+            t = (dt - self._curve_dt) / gDaysInYear
             self._times.append(t)
             tau = day_counter.year_frac(prev_dt, dt)[0]
             self._taus.append(tau)
             prev_dt = dt
 
-        fwd_rateVol = self._capSigmas[0]
-        self._capletGammas = np.zeros(numCaps)
-        self._capletGammas[0] = 0.0
+        fwd_rateVol = self._cap_sigmas[0]
+        self._caplet_gammas = np.zeros(numCaps)
+        self._caplet_gammas[0] = 0.0
         cumIbor2Tau = (fwd_rateVol**2) * self._taus[0]
 
         sumTau = 0.0
-        for i in range(1, len(self._capMaturityDates)):
+        for i in range(1, len(self._cap_maturity_dts)):
             t = self._times[i]
             tau = self._taus[i]
             sumTau += tau
-            volCap = self._capSigmas[i]
+            volCap = self._cap_sigmas[i]
             volIbor2 = ((volCap**2) * sumTau - cumIbor2Tau) / tau
 
             if volIbor2 < 0.0:
                 raise FinError("Error due to negative caplet variance.")
 
             volIbor = np.sqrt(volIbor2)
-            self._capletGammas[i] = volIbor
+            self._caplet_gammas[i] = volIbor
             cumIbor2Tau += volIbor2 * self._taus[i]
 
 ###############################################################################
@@ -128,27 +128,27 @@ class IborCapVolCurve():
         The volatility interpolation is piecewise flat. """
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_date) / gDaysInYear
+            t = (dt - self._curve_dt) / gDaysInYear
         else:
             t = dt
 
         if t <= self._times[1]:
-            return self._capletGammas[1]
+            return self._caplet_gammas[1]
 
         if 1 == 0:
             print(self._times)
-            print(self._capletGammas)
+            print(self._caplet_gammas)
             print(t)
 
         num_vols = len(self._times)
-        vol = self._capletGammas[1]
+        vol = self._caplet_gammas[1]
 
         for i in range(1, num_vols):
             if self._times[i] >= t:
-                vol = self._capletGammas[i]
+                vol = self._caplet_gammas[i]
                 return vol
 
-        return self._capletGammas[-1]
+        return self._caplet_gammas[-1]
 
 ###############################################################################
 
@@ -158,24 +158,24 @@ class IborCapVolCurve():
         is piecewise flat. """
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_date) / gDaysInYear
+            t = (dt - self._curve_dt) / gDaysInYear
         else:
             t = dt
 
         num_vols = len(self._times)
-        vol = self._capSigmas[0]
+        vol = self._cap_sigmas[0]
 
         if 1 == 0:
             print(self._times)
-            print(self._capletGammas)
+            print(self._caplet_gammas)
             print(t)
 
         for i in range(1, num_vols):
             if self._times[i] >= t:
-                vol = self._capSigmas[i]
+                vol = self._cap_sigmas[i]
                 return vol
 
-        return self._capSigmas[-1]
+        return self._cap_sigmas[-1]
 
 ###############################################################################
 
@@ -188,7 +188,7 @@ class IborCapVolCurve():
         for i in range(0, num_times):
             t = self._times[i]
             tau = self._taus[i]
-            volCap = self._capSigmas[i]
+            volCap = self._cap_sigmas[i]
             fwdIborVol = self._capletVols[i]
             s += label_to_string("%7.4f  %6.4f  %9.4f  %9.4f"
                                  % (t, tau, volCap*100.0, fwdIborVol*100.0))

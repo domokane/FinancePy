@@ -13,7 +13,7 @@ from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
@@ -22,14 +22,14 @@ def test_EquityDigitalOption():
 
     underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
 
-    value_date = Date(1, 1, 2015)
-    expiry_date = Date(1, 1, 2016)
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.30
     interest_rate = 0.05
     dividend_yield = 0.01
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     model = BlackScholes(volatility)
     import time
@@ -49,21 +49,21 @@ def test_EquityDigitalOption():
         2560000]
     '''
 
-    testCases.header("NumLoops", "ValueBS", "ValueMC", "TIME")
+    test_cases.header("NumLoops", "ValueBS", "ValueMC", "TIME")
 
     for num_paths in num_paths_list:
 
         call_option = EquityDigitalOption(
-            expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
         value = call_option.value(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         start = time.time()
         value_mc = call_option.value_mc(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
@@ -71,7 +71,7 @@ def test_EquityDigitalOption():
             num_paths)
         end = time.time()
         duration = end - start
-        testCases.print(num_paths, value, value_mc, duration)
+        test_cases.print(num_paths, value, value_mc, duration)
 
         call_option_values.append(value)
         call_option_valuesMC.append(value_mc)
@@ -92,27 +92,27 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         call_option = EquityDigitalOption(
-            expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
         value = call_option.value(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         delta = call_option.delta(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         vega = call_option.vega(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         theta = call_option.theta(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
@@ -129,27 +129,27 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         put_option = EquityDigitalOption(
-            expiry_date, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type)
         value = put_option.value(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         delta = put_option.delta(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         vega = put_option.vega(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
             model)
         theta = put_option.theta(
-            value_date,
+            value_dt,
             stock_price,
             discount_curve,
             dividend_curve,
@@ -163,4 +163,4 @@ def test_EquityDigitalOption():
 
 
 test_EquityDigitalOption()
-testCases.compareTestCases()
+test_cases.compareTestCases()

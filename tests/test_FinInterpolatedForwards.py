@@ -13,16 +13,16 @@ rValues = np.array([0.04, 0.07, 0.08, 0.09])
 df_values = np.exp(-tValues*rValues)
 tInterpValues = np.linspace(0.0, 12.0, 49)
 
-curve_date = Date(1, 1, 2019)
+curve_dt = Date(1, 1, 2019)
 
-tDates = curve_date.add_years(tValues)
-tInterpDates = curve_date.add_years(tInterpValues)
+tDates = curve_dt.add_years(tValues)
+tInterpDates = curve_dt.add_years(tInterpValues)
 
 
 def test_FinInterpolatedForwards():
     interp_type = InterpTypes.FLAT_FWD_RATES
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.949, 0.932, 0.916, 0.901, 0.885, 0.869, 0.855,
@@ -33,7 +33,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.LINEAR_FWD_RATES
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.949, 0.932, 0.916, 0.901, 0.885, 0.869, 0.855,
@@ -44,7 +44,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.LINEAR_ZERO_RATES
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.949, 0.932, 0.916, 0.901, 0.885, 0.869, 0.855,
@@ -55,7 +55,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.950, 0.934, 0.918, 0.903, 0.888, 0.873, 0.858,
@@ -66,7 +66,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.NATCUBIC_LOG_DISCOUNT
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.985, 0.969, 0.954, 0.939, 0.924, 0.908, 0.893, 0.877, 0.861,
@@ -77,7 +77,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.NATCUBIC_ZERO_RATES
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.950, 0.934, 0.918, 0.903, 0.888, 0.873, 0.858,
@@ -88,7 +88,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.PCHIP_ZERO_RATES
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.983, 0.966, 0.949, 0.932, 0.916, 0.901, 0.885, 0.869, 0.855,
@@ -99,7 +99,7 @@ def test_FinInterpolatedForwards():
 
     interp_type = InterpTypes.PCHIP_LOG_DISCOUNT
     discount_curve = DiscountCurve(
-        curve_date, tDates, df_values, interp_type)
+        curve_dt, tDates, df_values, interp_type)
     dfInterpValues = discount_curve.df(tInterpDates)
     assert [round(x, 3) for x in dfInterpValues] == \
         [1.0, 0.986, 0.972, 0.957, 0.941, 0.925, 0.910, 0.893, 0.877, 0.861,

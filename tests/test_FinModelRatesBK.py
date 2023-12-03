@@ -20,12 +20,12 @@ def test_BKExampleOne():
     zeros = np.array(zeros)
     dfs = np.exp(-zeros*times)
 
-    start_date = Date(1, 12, 2019)
-    end_date = Date(1, 6, 2021)
+    start_dt = Date(1, 12, 2019)
+    end_dt = Date(1, 6, 2021)
     sigma = 0.25
     a = 0.22
     num_time_steps = 3
-    tmat = (end_date - start_date)/gDaysInYear
+    tmat = (end_dt - start_dt)/gDaysInYear
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(tmat, times, dfs)
 
@@ -50,33 +50,33 @@ def test_BKExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book but does not
     # have the exact same dt so there are some differences
 
-    settle_date = Date(1, 12, 2019)
-    issue_date = Date(1, 12, 2018)
-    expiry_date = settle_date.add_tenor("18m")
-    maturity_date = settle_date.add_tenor("10Y")
+    settle_dt = Date(1, 12, 2019)
+    issue_dt = Date(1, 12, 2018)
+    expiry_dt = settle_dt.add_tenor("18m")
+    maturity_dt = settle_dt.add_tenor("10Y")
     coupon = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_date, maturity_date, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
 
     cpn = bond._cpn / bond._freq
 
-    num_flows = len(bond._cpn_dates)
+    num_flows = len(bond._cpn_dts)
 
     for i in range(1, num_flows):
-        pcd = bond._cpn_dates[i-1]
-        ncd = bond._cpn_dates[i]
-        if pcd < settle_date and ncd > settle_date:
-            flow_time = (pcd - settle_date) / gDaysInYear
+        pcd = bond._cpn_dts[i-1]
+        ncd = bond._cpn_dts[i]
+        if pcd < settle_dt and ncd > settle_dt:
+            flow_time = (pcd - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
-    for flow_date in bond._cpn_dates:
-        if flow_date > settle_date:
-            flow_time = (flow_date - settle_date) / gDaysInYear
+    for flow_dt in bond._cpn_dts:
+        if flow_dt > settle_dt:
+            flow_time = (flow_dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -86,14 +86,14 @@ def test_BKExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_date - settle_date) / gDaysInYear
-    t_exp = (expiry_date - settle_date) / gDaysInYear
+    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_exp = (expiry_dt - settle_dt) / gDaysInYear
     times = np.linspace(0, tmat, 11)
-    dates = settle_date.add_years(times)
+    dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05*times)
-    curve = DiscountCurve(settle_date, dates, dfs)
+    curve = DiscountCurve(settle_dt, dates, dfs)
 
-    price = bond.clean_price_from_discount_curve(settle_date, curve)
+    price = bond.clean_price_from_discount_curve(settle_dt, curve)
     assert round(price, 4) == 99.5420
 
     sigma = 0.20

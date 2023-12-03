@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import numpy as np
+
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -18,8 +21,6 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
-import time
-import numpy as np
 
 
 def buildFullIssuerCurve1(mktSpreadBump, irBump):
@@ -28,32 +29,32 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
 
     tradeDate = Date(9, 8, 2019)
-    value_date = tradeDate.add_days(1)
+    value_dt = tradeDate.add_days(1)
 
     m = 1.0  # 0.00000000000
 
     dcType = DayCountTypes.ACT_360
     depos = []
-    depo1 = IborDeposit(value_date, "1D", m * 0.0220, dcType)
+    depo1 = IborDeposit(value_dt, "1D", m * 0.0220, dcType)
     depos.append(depo1)
 
     spot_days = 2
-    settle_date = value_date.add_days(spot_days)
+    settle_dt = value_dt.add_days(spot_days)
 
-    maturity_date = settle_date.add_months(1)
-    depo1 = IborDeposit(settle_date, maturity_date, m * 0.022009, dcType)
+    maturity_dt = settle_dt.add_months(1)
+    depo1 = IborDeposit(settle_dt, maturity_dt, m * 0.022009, dcType)
 
-    maturity_date = settle_date.add_months(2)
-    depo2 = IborDeposit(settle_date, maturity_date, m * 0.022138, dcType)
+    maturity_dt = settle_dt.add_months(2)
+    depo2 = IborDeposit(settle_dt, maturity_dt, m * 0.022138, dcType)
 
-    maturity_date = settle_date.add_months(3)
-    depo3 = IborDeposit(settle_date, maturity_date, m * 0.021810, dcType)
+    maturity_dt = settle_dt.add_months(3)
+    depo3 = IborDeposit(settle_dt, maturity_dt, m * 0.021810, dcType)
 
-    maturity_date = settle_date.add_months(6)
-    depo4 = IborDeposit(settle_date, maturity_date, m * 0.020503, dcType)
+    maturity_dt = settle_dt.add_months(6)
+    depo4 = IborDeposit(settle_dt, maturity_dt, m * 0.020503, dcType)
 
-    maturity_date = settle_date.add_months(12)
-    depo5 = IborDeposit(settle_date, maturity_date, m * 0.019930, dcType)
+    maturity_dt = settle_dt.add_months(12)
+    depo5 = IborDeposit(settle_dt, maturity_dt, m * 0.019930, dcType)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -67,151 +68,151 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
 
-    maturity_date = settle_date.add_months(24)
+    maturity_dt = settle_dt.add_months(24)
     swap1 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.015910 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settle_date.add_months(36)
+    maturity_dt = settle_dt.add_months(36)
     swap2 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.014990 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settle_date.add_months(48)
+    maturity_dt = settle_dt.add_months(48)
     swap3 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.014725 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settle_date.add_months(60)
+    maturity_dt = settle_dt.add_months(60)
     swap4 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.014640 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap4)
 
-    maturity_date = settle_date.add_months(72)
+    maturity_dt = settle_dt.add_months(72)
     swap5 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.014800 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap5)
 
-    maturity_date = settle_date.add_months(84)
+    maturity_dt = settle_dt.add_months(84)
     swap6 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.014995 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap6)
 
-    maturity_date = settle_date.add_months(96)
+    maturity_dt = settle_dt.add_months(96)
     swap7 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.015180 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap7)
 
-    maturity_date = settle_date.add_months(108)
+    maturity_dt = settle_dt.add_months(108)
     swap8 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.015610 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap8)
 
-    maturity_date = settle_date.add_months(120)
+    maturity_dt = settle_dt.add_months(120)
     swap9 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.015880 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap9)
 
-    maturity_date = settle_date.add_months(144)
+    maturity_dt = settle_dt.add_months(144)
     swap10 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.016430 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap10)
 
-    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     cdsMarketContracts = []
 
     cds_coupon = 0.04 + mktSpreadBump
 
-    maturity_date = value_date.next_cds_date(6)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(6)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(12)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(12)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(24)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(24)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(36)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(36)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(48)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(48)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(60)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(60)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(84)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(84)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(120)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(120)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
-    maturity_date = value_date.next_cds_date(180)
-    cds = CDS(value_date, maturity_date, cds_coupon)
+    maturity_dt = value_dt.next_cds_date(180)
+    cds = CDS(value_dt, maturity_dt, cds_coupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(value_date,
+    issuer_curve = CDSCurve(value_dt,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
@@ -226,25 +227,25 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     m = 1.0
 
-    value_date = Date(24, 8, 2020)
-    settle_date = Date(24, 8, 2020)
+    value_dt = Date(24, 8, 2020)
+    settle_dt = Date(24, 8, 2020)
     dcType = DayCountTypes.ACT_360
     depos = []
 
-    maturity_date = settle_date.add_months(1)
-    depo1 = IborDeposit(settle_date, maturity_date, m * 0.001709, dcType)
+    maturity_dt = settle_dt.add_months(1)
+    depo1 = IborDeposit(settle_dt, maturity_dt, m * 0.001709, dcType)
 
-    maturity_date = settle_date.add_months(2)
-    depo2 = IborDeposit(settle_date, maturity_date, m * 0.002123, dcType)
+    maturity_dt = settle_dt.add_months(2)
+    depo2 = IborDeposit(settle_dt, maturity_dt, m * 0.002123, dcType)
 
-    maturity_date = settle_date.add_months(3)
-    depo3 = IborDeposit(settle_date, maturity_date, m * 0.002469, dcType)
+    maturity_dt = settle_dt.add_months(3)
+    depo3 = IborDeposit(settle_dt, maturity_dt, m * 0.002469, dcType)
 
-    maturity_date = settle_date.add_months(6)
-    depo4 = IborDeposit(settle_date, maturity_date, m * 0.003045, dcType)
+    maturity_dt = settle_dt.add_months(6)
+    depo4 = IborDeposit(settle_dt, maturity_dt, m * 0.003045, dcType)
 
-    maturity_date = settle_date.add_months(12)
-    depo5 = IborDeposit(settle_date, maturity_date, m * 0.004449, dcType)
+    maturity_dt = settle_dt.add_months(12)
+    depo5 = IborDeposit(settle_dt, maturity_dt, m * 0.004449, dcType)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -256,85 +257,85 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
     dcType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
 
-    maturity_date = settle_date.add_months(24)
+    maturity_dt = settle_dt.add_months(24)
     swap1 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.002155 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap1)
 
-    maturity_date = settle_date.add_months(36)
+    maturity_dt = settle_dt.add_months(36)
     swap2 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.002305 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap2)
 
-    maturity_date = settle_date.add_months(48)
+    maturity_dt = settle_dt.add_months(48)
     swap3 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.002665 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap3)
 
-    maturity_date = settle_date.add_months(60)
+    maturity_dt = settle_dt.add_months(60)
     swap4 = IborSwap(
-        settle_date,
-        maturity_date,
+        settle_dt,
+        maturity_dt,
         SwapTypes.PAY,
         m * 0.003290 + irBump,
         fixedFreq,
         dcType)
     swaps.append(swap4)
 
-    libor_curve = IborSingleCurve(value_date, depos, [], swaps)
+    libor_curve = IborSingleCurve(value_dt, depos, [], swaps)
 
     cds_coupon = 0.01 + mktSpreadBump
 
     cdsMarketContracts = []
-    effective_date = Date(21, 8, 2020)
-    cds = CDS(effective_date, "6M", cds_coupon)
+    effective_dt = Date(21, 8, 2020)
+    cds = CDS(effective_dt, "6M", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "1Y", cds_coupon)
+    cds = CDS(effective_dt, "1Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "2Y", cds_coupon)
+    cds = CDS(effective_dt, "2Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "3Y", cds_coupon)
+    cds = CDS(effective_dt, "3Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "4Y", cds_coupon)
+    cds = CDS(effective_dt, "4Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "5Y", cds_coupon)
+    cds = CDS(effective_dt, "5Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "7Y", cds_coupon)
+    cds = CDS(effective_dt, "7Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_date, "10Y", cds_coupon)
+    cds = CDS(effective_dt, "10Y", cds_coupon)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(settle_date,
+    issuer_curve = CDSCurve(settle_dt,
                             cdsMarketContracts,
                             libor_curve,
                             recovery_rate)
 
     years = np.linspace(0.0, 10.0, 20)
-    dates = settle_date.add_years(years)
+    dates = settle_dt.add_years(years)
     for dt in dates:
         df = libor_curve.df(dt)
         q = issuer_curve.survival_prob(dt)
@@ -347,76 +348,76 @@ cdsRecovery = 0.40
 libor_curve, issuer_curve1 = buildFullIssuerCurve1(0.0, 0.0)
 
 # This is the 10 year contract at an off market coupon
-maturity_date = Date(20, 6, 2029)
+maturity_dt = Date(20, 6, 2029)
 cds_coupon = 0.0150
 notional = ONE_MILLION
 long_protection = True
 tradeDate = Date(9, 8, 2019)
-value_date1 = tradeDate.add_days(1)
-effective_date = value_date1
+value_dt1 = tradeDate.add_days(1)
+effective_dt = value_dt1
 
-cds_contract1 = CDS(effective_date,
-                    maturity_date,
+cds_contract1 = CDS(effective_dt,
+                    maturity_dt,
                     cds_coupon,
                     notional,
                     long_protection)
-t = (maturity_date - value_date1) / gDaysInYear
-z = libor_curve.df(maturity_date)
+t = (maturity_dt - value_dt1) / gDaysInYear
+z = libor_curve.df(maturity_dt)
 r1 = -np.log(z) / t
-print(t, z, r1, maturity_date)
+print(t, z, r1, maturity_dt)
 mktSpread1 = 0.040
 
 libor_curve, issuer_curve2 = buildFullIssuerCurve2(0.0, 0.0)
 
 # This is the 10 year contract at an off market coupon
-maturity_date = Date(20, 6, 2025)
+maturity_dt = Date(20, 6, 2025)
 cds_coupon = 0.050
 notional = ONE_MILLION
 long_protection = True
 tradeDate = Date(20, 8, 2020)
-effective_date = Date(21, 8, 2020)
-value_date2 = tradeDate
+effective_dt = Date(21, 8, 2020)
+value_dt2 = tradeDate
 
-cds_contract2 = CDS(effective_date,
-                    maturity_date,
+cds_contract2 = CDS(effective_dt,
+                    maturity_dt,
                     cds_coupon,
                     notional,
                     long_protection)
-t = (maturity_date - value_date2) / gDaysInYear
-z = libor_curve.df(maturity_date)
+t = (maturity_dt - value_dt2) / gDaysInYear
+z = libor_curve.df(maturity_dt)
 r2 = -np.log(z) / t
 mktSpread2 = 0.01
 
 
 def test_par_spread():
     spd = cds_contract1.par_spread(
-        value_date1,
+        value_dt1,
         issuer_curve1,
         cdsRecovery) * 10000.0
     assert round(spd, 4) == 399.9996
 
     spd = cds_contract2.par_spread(
-        value_date2,
+        value_dt2,
         issuer_curve2,
         cdsRecovery) * 10000.0
     assert round(spd, 4) == 99.5858
 
 
 def test_value():
-    v = cds_contract1.value(value_date1, issuer_curve1, cdsRecovery)
+    v = cds_contract1.value(value_dt1, issuer_curve1, cdsRecovery)
     assert round(v['dirty_pv'], 4) == 168514.5956
     assert round(v['clean_pv'], 4) == 170639.5956
 
-    v = cds_contract2.value(value_date2, issuer_curve2, cdsRecovery)
+    v = cds_contract2.value(value_dt2, issuer_curve2, cdsRecovery)
     assert round(v['dirty_pv'], 4) == -199842.7922
     assert round(v['clean_pv'], 4) == -191509.4589
 
 
 def test_clean_price():
-    p = cds_contract1.clean_price(value_date1, issuer_curve1, cdsRecovery)
+    p = cds_contract1.clean_price(value_dt1, issuer_curve1, cdsRecovery)
     assert round(p, 4) == 82.936
 
-    p = cds_contract2.clean_price(value_date2, issuer_curve2, cdsRecovery)
+    p = cds_contract2.clean_price(value_dt2, issuer_curve2, cdsRecovery)
     assert round(p, 4) == 119.1509
 
 
@@ -438,37 +439,37 @@ def test_accrued_interest():
 
 def test_protection_leg_pv():
     prot_pv = cds_contract1.protection_leg_pv(
-        value_date1, issuer_curve1, cdsRecovery)
+        value_dt1, issuer_curve1, cdsRecovery)
     assert round(prot_pv, 4) == 273023.5221
 
     prot_pv = cds_contract2.protection_leg_pv(
-        value_date2, issuer_curve2, cdsRecovery)
+        value_dt2, issuer_curve2, cdsRecovery)
     assert round(prot_pv, 4) == 47629.7343
 
 
 def test_premium_leg_pv():
     premPV = cds_contract1.premium_leg_pv(
-        value_date1, issuer_curve1, cdsRecovery)
+        value_dt1, issuer_curve1, cdsRecovery)
     assert round(premPV, 4) == 104508.9265
 
     premPV = cds_contract2.premium_leg_pv(
-        value_date2, issuer_curve2, cdsRecovery)
+        value_dt2, issuer_curve2, cdsRecovery)
     assert round(premPV, 4) == 247472.5265
 
 
 def test_value_approx():
 
-    v_approx = cds_contract1.value_fast_approx(value_date1,
+    v_approx = cds_contract1.value_fast_approx(value_dt1,
                                                r1,
                                                mktSpread1,
                                                cdsRecovery)
-    print(value_date1, r1, mktSpread1, cdsRecovery)
+    print(value_dt1, r1, mktSpread1, cdsRecovery)
     assert round(v_approx[0], 4) == 165262.8062
     assert round(v_approx[1], 4) == 167387.8062
     assert round(v_approx[2], 4) == 555.5746
     assert round(v_approx[3], 4) == -71.4881
 
-    v_approx = cds_contract2.value_fast_approx(value_date2,
+    v_approx = cds_contract2.value_fast_approx(value_dt2,
                                                r2,
                                                mktSpread2,
                                                cdsRecovery)

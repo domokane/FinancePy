@@ -10,13 +10,13 @@ from financepy.products.bonds.bond_future import BondFuture
 
 freq = FrequencyTypes.SEMI_ANNUAL
 basis = DayCountTypes.ACT_ACT_ICMA
-issue_date = Date(15, 2, 2004)
+issue_dt = Date(15, 2, 2004)
 
 
 def test_bond_future_1():
-    bond = Bond(issue_date, Date(15, 8, 2011), 0.0500, freq, basis)
+    bond = Bond(issue_dt, Date(15, 8, 2011), 0.0500, freq, basis)
 
-    assert bond._maturity_date == Date(15, 8, 2011)
+    assert bond._maturity_dt == Date(15, 8, 2011)
     assert bond._cpn * 100 == 5.0
 
     first_delivery_date = Date(1, 3, 2002)
@@ -35,13 +35,13 @@ def test_bond_future_1():
 
 
 def test_bond_future_2():
-    bond = Bond(issue_date, Date(15, 8, 2027), 0.0225, freq, basis)
-    assert bond._maturity_date == Date(15, 8, 2027)
+    bond = Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis)
+    assert bond._maturity_dt == Date(15, 8, 2027)
 
-    settle_date = Date(10, 10, 2017)
+    settle_dt = Date(10, 10, 2017)
     price = 99 + 1 / 32
 
-    yld = bond.yield_to_maturity(settle_date, price)
+    yld = bond.yield_to_maturity(settle_dt, price)
 
     assert round(yld, 4) == 0.0236
 
@@ -67,7 +67,7 @@ def test_bond_future_2():
     assert round(pip, 4) == 9162291.0800
 
     tia = bondFutureContract.total_invoice_amount(
-        settle_date, bond, futures_price)
+        settle_dt, bond, futures_price)
 
     assert round(tia, 4) == 9162294.5
 
@@ -89,46 +89,46 @@ def test_future_bond_ctd():
 
     bonds = []
     prices = []
-    bond = Bond(issue_date, Date(15, 8, 2027), 0.0225, freq, basis)
+    bond = Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(99 + 1 / 32)
-    bond = Bond(issue_date, Date(15, 5, 2027), 0.02375, freq, basis)
+    bond = Bond(issue_dt, Date(15, 5, 2027), 0.02375, freq, basis)
     bonds.append(bond)
     prices.append(100 + 5 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 2, 2027), 0.0225, freq, basis)
+    bond = Bond(issue_dt, Date(15, 2, 2027), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(99 + 5 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 11, 2026), 0.02, freq, basis)
+    bond = Bond(issue_dt, Date(15, 11, 2026), 0.02, freq, basis)
     bonds.append(bond)
     prices.append(97 + 7 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 8, 2026), 0.015, freq, basis)
+    bond = Bond(issue_dt, Date(15, 8, 2026), 0.015, freq, basis)
     bonds.append(bond)
     prices.append(93 + 14 / 32)
-    bond = Bond(issue_date, Date(15, 5, 2026), 0.01625, freq, basis)
+    bond = Bond(issue_dt, Date(15, 5, 2026), 0.01625, freq, basis)
     bonds.append(bond)
     prices.append(94 + 21 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 2, 2026), 0.01625, freq, basis)
+    bond = Bond(issue_dt, Date(15, 2, 2026), 0.01625, freq, basis)
     bonds.append(bond)
     prices.append(94 + 29 / 32)
-    bond = Bond(issue_date, Date(15, 11, 2025), 0.0225, freq, basis)
+    bond = Bond(issue_dt, Date(15, 11, 2025), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(99 + 25 / 32)
-    bond = Bond(issue_date, Date(15, 8, 2025), 0.02, freq, basis)
+    bond = Bond(issue_dt, Date(15, 8, 2025), 0.02, freq, basis)
     bonds.append(bond)
     prices.append(98 + 3 / 32)
-    bond = Bond(issue_date, Date(15, 5, 2025), 0.02125, freq, basis)
+    bond = Bond(issue_dt, Date(15, 5, 2025), 0.02125, freq, basis)
     bonds.append(bond)
     prices.append(99 + 5 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 2, 2025), 0.02, freq, basis)
+    bond = Bond(issue_dt, Date(15, 2, 2025), 0.02, freq, basis)
     bonds.append(bond)
     prices.append(98 + 14 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 11, 2024), 0.0225, freq, basis)
+    bond = Bond(issue_dt, Date(15, 11, 2024), 0.0225, freq, basis)
     bonds.append(bond)
     prices.append(100 + 9 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 8, 2024), 0.02375, freq, basis)
+    bond = Bond(issue_dt, Date(15, 8, 2024), 0.02375, freq, basis)
     bonds.append(bond)
     prices.append(101 + 7 / 32 + 1 / 64)
-    bond = Bond(issue_date, Date(15, 8, 2024), 0.01875, freq, basis)
+    bond = Bond(issue_dt, Date(15, 8, 2024), 0.01875, freq, basis)
     bonds.append(bond)
     # There may be an error in the document says 98-01+
     prices.append(98 + 1 / 32)

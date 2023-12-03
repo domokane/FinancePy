@@ -14,89 +14,89 @@ from financepy.utils.schedule import Schedule
 from financepy.utils.date import Date
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
 
-def test_date_adjust():
+def test_dt_adjust():
 
-    start_date = Date(28, 2, 2008)
-    end_date = Date(28, 2, 2011)
+    start_dt = Date(28, 2, 2008)
+    end_dt = Date(28, 2, 2011)
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.NONE
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    testCases.header("NO ADJUSTMENTS", "DATE")
-    schedule = Schedule(start_date,
-                        end_date,
+    test_cases.header("NO ADJUSTMENTS", "DATE")
+    schedule = Schedule(start_dt,
+                        end_dt,
                         freq_type,
                         cal_type,
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dates:
-        testCases.print("Date:", dt)
+    for dt in schedule._adjusted_dts:
+        test_cases.print("Date:", dt)
 
-    testCases.banner("")
-    testCases.header("NO WEEKENDS AND FOLLOWING", "DATE")
+    test_cases.banner("")
+    test_cases.header("NO WEEKENDS AND FOLLOWING", "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(start_date,
-                        end_date,
+    schedule = Schedule(start_dt,
+                        end_dt,
                         freq_type,
                         cal_type,
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dates:
-        testCases.print("Date:", dt)
+    for dt in schedule._adjusted_dts:
+        test_cases.print("Date:", dt)
 
-    testCases.banner("")
-    testCases.header("NO WEEKENDS AND MODIFIED FOLLOWING", "DATE")
+    test_cases.banner("")
+    test_cases.header("NO WEEKENDS AND MODIFIED FOLLOWING", "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(start_date,
-                        end_date,
+    schedule = Schedule(start_dt,
+                        end_dt,
                         freq_type,
                         cal_type,
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dates:
-        testCases.print("Date:", dt)
+    for dt in schedule._adjusted_dts:
+        test_cases.print("Date:", dt)
 
-    testCases.banner("")
-    testCases.header("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING",
+    test_cases.banner("")
+    test_cases.header("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING",
                      "DATE")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.UNITED_STATES
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    start_date = Date(4, 7, 2008)
-    end_date = Date(4, 7, 2011)
+    start_dt = Date(4, 7, 2008)
+    end_dt = Date(4, 7, 2011)
 
-    schedule = Schedule(start_date,
-                        end_date,
+    schedule = Schedule(start_dt,
+                        end_dt,
                         freq_type,
                         cal_type,
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dates:
-        testCases.print("Date:", dt)
+    for dt in schedule._adjusted_dts:
+        test_cases.print("Date:", dt)
 
 ###############################################################################
 
 
-test_date_adjust()
-testCases.compareTestCases()
+test_dt_adjust()
+test_cases.compareTestCases()

@@ -34,16 +34,16 @@ class IborBermudanSwaption:
     exercise date. """
 
     def __init__(self,
-                 settle_date: Date,
-                 exercise_date: Date,
-                 maturity_date: Date,
+                 settle_dt: Date,
+                 exercise_dt: Date,
+                 maturity_dt: Date,
                  fixed_leg_type: SwapTypes,
                  exercise_type: FinExerciseTypes,
                  fixed_coupon: float,
-                 fixed_frequency_type: FrequencyTypes,
+                 fixed_freq_type: FrequencyTypes,
                  fixed_dc_type: DayCountTypes,
                  notional=ONE_MILLION,
-                 float_frequency_type=FrequencyTypes.QUARTERLY,
+                 float_freq_type=FrequencyTypes.QUARTERLY,
                  float_dc_type=DayCountTypes.THIRTY_E_360,
                  cal_type=CalendarTypes.WEEKEND,
                  bd_type=BusDayAdjustTypes.FOLLOWING,
@@ -54,26 +54,26 @@ class IborBermudanSwaption:
 
         check_argument_types(self.__init__, locals())
 
-        if settle_date > exercise_date:
+        if settle_dt > exercise_dt:
             raise FinError("Settlement date must be before expiry date")
 
-        if exercise_date > maturity_date:
+        if exercise_dt > maturity_dt:
             raise FinError("Exercise date must be before swap maturity date")
 
         if exercise_type == FinExerciseTypes.AMERICAN:
             raise FinError("American optionality not supported.")
 
-        self._settle_date = settle_date
-        self._exercise_date = exercise_date
-        self._maturity_date = maturity_date
+        self._settle_dt = settle_dt
+        self._exercise_dt = exercise_dt
+        self._maturity_dt = maturity_dt
         self._fixed_leg_type = fixed_leg_type
         self._exercise_type = exercise_type
 
         self._fixed_coupon = fixed_coupon
-        self._fixed_freq_type = fixed_frequency_type
+        self._fixed_freq_type = fixed_freq_type
         self._fixed_dc_type = fixed_dc_type
         self._notional = notional
-        self._float_freq_type = float_frequency_type
+        self._float_freq_type = float_freq_type
         self._float_dc_type = float_dc_type
 
         self._cal_type = cal_type
@@ -90,7 +90,7 @@ class IborBermudanSwaption:
 ###############################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               discount_curve,
               model):
         """ Value the Bermudan swaption using the specified model and a
@@ -100,8 +100,8 @@ class IborBermudanSwaption:
         float_spread = 0.0
 
         # The underlying is a swap in which we pay the fixed amount
-        self._underlying_swap = IborSwap(self._exercise_date,
-                                         self._maturity_date,
+        self._underlying_swap = IborSwap(self._exercise_dt,
+                                         self._maturity_dt,
                                          self._fixed_leg_type,
                                          self._fixed_coupon,
                                          self._fixed_freq_type,
@@ -115,10 +115,10 @@ class IborBermudanSwaption:
                                          self._dg_type)
 
         #  I need to do this to generate the fixed leg flows
-        self._pv01 = self._underlying_swap.pv01(value_date, discount_curve)
+        self._pv01 = self._underlying_swap.pv01(value_dt, discount_curve)
 
-        t_exp = (self._exercise_date - value_date) / gDaysInYear
-        tmat = (self._maturity_date - value_date) / gDaysInYear
+        t_exp = (self._exercise_dt - value_dt) / gDaysInYear
+        tmat = (self._maturity_dt - value_dt) / gDaysInYear
 
         #######################################################################
         # For the tree models we need to generate a vector of the coupons
@@ -128,16 +128,16 @@ class IborBermudanSwaption:
         cpn_flows = [0.0]
 
         # The first flow is the expiry date
-        num_flows = len(self._underlying_swap._fixed_leg._payment_dates)
+        num_flows = len(self._underlying_swap._fixed_leg._payment_dts)
 
         swap = self._underlying_swap
 
         for iFlow in range(0, num_flows):
 
-            flow_date = self._underlying_swap._fixed_leg._payment_dates[iFlow]
+            flow_dt = self._underlying_swap._fixed_leg._payment_dts[iFlow]
 
-            if flow_date > self._exercise_date:
-                cpn_time = (flow_date - value_date) / gDaysInYear
+            if flow_dt > self._exercise_dt:
+                cpn_time = (flow_dt - value_dt) / gDaysInYear
                 cpn_flow = swap._fixed_leg._payments[iFlow-1] / self._notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
@@ -204,8 +204,8 @@ class IborBermudanSwaption:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXERCISE DATE", self._exercise_date)
-        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("EXERCISE DATE", self._exercise_dt)
+        s += label_to_string("MATURITY DATE", self._maturity_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", self._fixed_leg_type)
         s += label_to_string("EXERCISE TYPE", self._exercise_type)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)

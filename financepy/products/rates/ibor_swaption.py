@@ -46,15 +46,15 @@ class IborSwaption():
     future and with a fixed maturity, at a swap rate fixed today. """
 
     def __init__(self,
-                 settle_date: Date,
-                 exercise_date: Date,
-                 maturity_date: Date,
+                 settle_dt: Date,
+                 exercise_dt: Date,
+                 maturity_dt: Date,
                  fixed_leg_type: SwapTypes,
                  fixed_coupon: float,
-                 fixed_frequency_type: FrequencyTypes,
+                 fixed_freq_type: FrequencyTypes,
                  fixed_dc_type: DayCountTypes,
                  notional: float = ONE_MILLION,
-                 float_frequency_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -67,23 +67,23 @@ class IborSwaption():
 
         check_argument_types(self.__init__, locals())
 
-        if settle_date > exercise_date:
+        if settle_dt > exercise_dt:
             raise FinError("Settlement date must be before expiry date")
 
-        if exercise_date > maturity_date:
+        if exercise_dt > maturity_dt:
             raise FinError("Exercise date must be before swap maturity date")
 
-        self._settle_date = settle_date
-        self._exercise_date = exercise_date
-        self._maturity_date = maturity_date
+        self._settle_dt = settle_dt
+        self._exercise_dt = exercise_dt
+        self._maturity_dt = maturity_dt
         self._fixed_leg_type = fixed_leg_type
 
         self._notional = notional
 
         self._fixed_coupon = fixed_coupon
-        self._fixed_freq_type = fixed_frequency_type
+        self._fixed_freq_type = fixed_freq_type
         self._fixed_dc_type = fixed_dc_type
-        self._float_freq_type = float_frequency_type
+        self._float_freq_type = float_freq_type
         self._float_dc_type = float_dc_type
 
         self._cal_type = cal_type
@@ -98,7 +98,7 @@ class IborSwaption():
 ###############################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               discount_curve,
               model):
         """ Valuation of a Ibor European-style swaption using a choice of
@@ -110,8 +110,8 @@ class IborSwaption():
         float_spread = 0.0
 
         # We create a swap that starts on the exercise date.
-        swap = IborSwap(self._exercise_date,
-                        self._maturity_date,
+        swap = IborSwap(self._exercise_dt,
+                        self._maturity_dt,
                         self._fixed_leg_type,
                         self._fixed_coupon,
                         self._fixed_freq_type,
@@ -127,14 +127,14 @@ class IborSwaption():
         k = self._fixed_coupon
 
         # The pv01 is the value of the swap cash flows as of the curve date
-        pv01 = swap.pv01(value_date, discount_curve)
+        pv01 = swap.pv01(value_dt, discount_curve)
 
         # We need to calculate the forward swap rate on the swaption exercise
         # date that makes the forward swap worth par including principal
-        s = swap.swap_rate(value_date, discount_curve)
+        s = swap.swap_rate(value_dt, discount_curve)
 
-        t_exp = (self._exercise_date - self._settle_date) / gDaysInYear
-        tmat = (self._maturity_date - self._settle_date) / gDaysInYear
+        t_exp = (self._exercise_dt - self._settle_dt) / gDaysInYear
+        tmat = (self._maturity_dt - self._settle_dt) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
@@ -147,16 +147,16 @@ class IborSwaption():
         cpn_flows = [0.0]
 
         # The first flow is on the day after the expiry date
-        num_flows = len(swap._fixed_leg._payment_dates)
+        num_flows = len(swap._fixed_leg._payment_dts)
 
         for iFlow in range(0, num_flows):
 
-            flow_date = swap._fixed_leg._payment_dates[iFlow]
+            flow_dt = swap._fixed_leg._payment_dts[iFlow]
 
             # Only flows occurring after option expiry are counted.
             # Flows on the expiry date are not included
-            if flow_date > self._exercise_date:
-                cpn_time = (flow_date - value_date) / gDaysInYear
+            if flow_dt > self._exercise_dt:
+                cpn_time = (flow_dt - value_dt) / gDaysInYear
                 cpn_flow = swap._fixed_leg._payments[iFlow] / self._notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
@@ -273,20 +273,20 @@ class IborSwaption():
 
         self._pv01 = pv01
         self._fwd_swap_rate = s
-        self._forward_df = discount_curve.df(self._exercise_date)
+        self._forward_df = discount_curve.df(self._exercise_dt)
         self._underlying_swap = swap
 
         # The exchange of cash occurs on the settlement date. However the
         # actual value is that on the specified valuation date which could
         # be the swaption settlement date.
-        df_settle = discount_curve.df(self._settle_date)
+        df_settle = discount_curve.df(self._settle_dt)
         swaption_price = swaption_price * pv01 * self._notional / df_settle
         return swaption_price
 
 ###############################################################################
 
     def cash_settled_value(self,
-                           value_date: Date,
+                           value_dt: Date,
                            discount_curve,
                            swap_rate: float,
                            model):
@@ -298,8 +298,8 @@ class IborSwaption():
 
         float_spread = 0.0
 
-        swap = IborSwap(self._exercise_date,
-                        self._maturity_date,
+        swap = IborSwap(self._exercise_dt,
+                        self._maturity_dt,
                         self._fixed_leg_type,
                         self._fixed_coupon,
                         self._fixed_freq_type,
@@ -315,11 +315,11 @@ class IborSwaption():
         k = self._fixed_coupon
         s = swap_rate
 
-        pv01 = swap.cash_settled_pv01(value_date,
+        pv01 = swap.cash_settled_pv01(value_dt,
                                       swap_rate,
                                       self._fixed_freq_type)
 
-        t_exp = (self._exercise_date - self._settle_date) / gDaysInYear
+        t_exp = (self._exercise_dt - self._settle_dt) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
@@ -337,7 +337,7 @@ class IborSwaption():
                            + " Black's model.")
 
         self._fwd_swap_rate = swap_rate
-        self._forward_df = discount_curve.df(self._exercise_date)
+        self._forward_df = discount_curve.df(self._exercise_dt)
         self._underlying_swap = swap
         # The annuity needs to be discounted to today using the correct df
         self._pv01 = pv01 * self._forward_df
@@ -345,7 +345,7 @@ class IborSwaption():
         # The exchange of cash occurs on the settlement date but we need to
         # value the swaption on the provided valuation date - which could be
         # the settlement date or may be a different date.
-        dfValuation = discount_curve.df(value_date)
+        dfValuation = discount_curve.df(value_dt)
         swaption_price = swaption_price * self._pv01 * self._notional / dfValuation
         return swaption_price
 
@@ -373,10 +373,10 @@ class IborSwaption():
         """ Function to allow us to print the swaption details. """
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("SETTLEMENT DATE", self._settle_date)
-        s += label_to_string("EXERCISE DATE", self._exercise_date)
+        s += label_to_string("SETTLEMENT DATE", self._settle_dt)
+        s += label_to_string("EXERCISE DATE", self._exercise_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", str(self._fixed_leg_type))
-        s += label_to_string("SWAP MATURITY DATE", self._maturity_date)
+        s += label_to_string("SWAP MATURITY DATE", self._maturity_dt)
         s += label_to_string("SWAP NOTIONAL", self._notional)
         s += label_to_string("FIXED COUPON", self._fixed_coupon * 100)
         s += label_to_string("FIXED FREQUENCY",

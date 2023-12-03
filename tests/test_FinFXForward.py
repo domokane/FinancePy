@@ -14,8 +14,8 @@ def test_FinFXForward():
     #  https://stackoverflow.com/questions/48778712
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
-    value_date = Date(13, 2, 2018)
-    expiry_date = value_date.add_months(12)
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = value_dt.add_months(12)
     # Forward is on EURUSD which is expressed as number of USD per EUR
     # ccy1 = EUR and ccy2 = USD
     forName = "EUR"
@@ -27,8 +27,8 @@ def test_FinFXForward():
     ccy2InterestRate = 0.05  # EUR rates
 
     spot_days = 0
-    settle_date = value_date.add_weekdays(spot_days)
-    maturity_date = settle_date.add_months(12)
+    settle_dt = value_dt.add_weekdays(spot_days)
+    maturity_dt = settle_dt.add_months(12)
     notional = 100.0
     cal_type = CalendarTypes.TARGET
 
@@ -36,33 +36,33 @@ def test_FinFXForward():
     fras = []
     swaps = []
     deposit_rate = ccy1InterestRate
-    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
+    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    for_discount_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    for_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     depos = []
     fras = []
     swaps = []
     deposit_rate = ccy2InterestRate
-    depo = IborDeposit(settle_date, maturity_date, deposit_rate,
+    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    dom_discount_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    dom_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     notional = 100.0
     notional_currency = forName
 
-    fxForward = FXForward(expiry_date,
+    fxForward = FXForward(expiry_dt,
                           strike_fx_rate,
                           currency_pair,
                           notional,
                           notional_currency)
 
-    fwdValue = fxForward.value(value_date, spot_fx_rate,
+    fwdValue = fxForward.value(value_dt, spot_fx_rate,
                                dom_discount_curve, for_discount_curve)
 
-    fwdFXRate = fxForward.forward(value_date, spot_fx_rate,
+    fwdFXRate = fxForward.forward(value_dt, spot_fx_rate,
                                   dom_discount_curve,
                                   for_discount_curve)
 

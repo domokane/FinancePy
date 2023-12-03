@@ -36,20 +36,20 @@ class FXFloatLookbackOption(FXOption):
     or the maximum fx rate in the case of a put. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  option_type: OptionTypes):
         """ Create the FX Float Look Back Option by specifying the expiry
         date and the option type. """
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._option_type = option_type
 
     ##########################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: float,
               domestic_curve: DiscountCurve,
               foreign_curve: DiscountCurve,
@@ -58,21 +58,21 @@ class FXFloatLookbackOption(FXOption):
         """ Valuation of the Floating Lookback option using Black-Scholes
         using the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve._value_date != value_date:
+        if domestic_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if foreign_curve._value_date != value_date:
+        if foreign_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
         df = domestic_curve._df(t)
         r = -np.log(df) / t
@@ -146,7 +146,7 @@ class FXFloatLookbackOption(FXOption):
     ##########################################################################
 
     def value_mc(self,
-                 value_date,
+                 value_dt,
                  stock_price,
                  domestic_curve,
                  foreign_curve,
@@ -156,7 +156,7 @@ class FXFloatLookbackOption(FXOption):
                  num_steps_per_year=252,
                  seed=4242):
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         df = domestic_curve._df(t)
         r = -np.log(df) / t
 

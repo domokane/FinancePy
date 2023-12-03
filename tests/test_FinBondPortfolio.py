@@ -15,13 +15,13 @@ settlement = Date(19, 9, 2012)
 
 def test_1():
     dc_type = DayCountTypes.THIRTY_360_BOND
-    maturityDt = Date(7, 3, 2013)
+    maturity_dt = Date(7, 3, 2013)
     coupon = 0.045
     clean_price = 101.99500000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -31,13 +31,13 @@ def test_1():
 
 def test_2():
     dc_type = DayCountTypes.THIRTY_360_BOND
-    maturityDt = Date(7, 3, 2013)
+    maturity_dt = Date(7, 3, 2013)
     coupon = 0.045
     clean_price = 101.99500000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -47,13 +47,13 @@ def test_2():
 
 def test_3():
     dc_type = DayCountTypes.THIRTY_E_360
-    maturityDt = Date(27, 9, 2013)
+    maturity_dt = Date(27, 9, 2013)
     coupon = 0.080000
     clean_price = 107.92000000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -63,13 +63,13 @@ def test_3():
 
 def test_4():
     dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    maturityDt = Date(7, 3, 2014)
+    maturity_dt = Date(7, 3, 2014)
     coupon = 0.022500
     clean_price = 102.9750
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -79,13 +79,13 @@ def test_4():
 
 def test_5():
     dc_type = DayCountTypes.THIRTY_E_PLUS_360
-    maturityDt = Date(7, 9, 2014)
+    maturity_dt = Date(7, 9, 2014)
     coupon = 0.0500000000
     clean_price = 109.35500000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -95,13 +95,13 @@ def test_5():
 
 def test_6():
     dc_type = DayCountTypes.ACT_ACT_ISDA
-    maturityDt = Date(22, 1, 2015)
+    maturity_dt = Date(22, 1, 2015)
     coupon = 0.0275000000
     clean_price = 105.62500000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -111,13 +111,13 @@ def test_6():
 
 def test_7():
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    maturityDt = Date(7, 9, 2015)
+    maturity_dt = Date(7, 9, 2015)
     coupon = 0.0475000000
     clean_price = 112.98000000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -127,13 +127,13 @@ def test_7():
 
 def test_8():
     dc_type = DayCountTypes.ACT_365F
-    maturityDt = Date(7, 12, 2015)
+    maturity_dt = Date(7, 12, 2015)
     coupon = 0.0800000000
     clean_price = 124.47000000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -143,13 +143,13 @@ def test_8():
 
 def test_9():
     dc_type = DayCountTypes.ACT_360
-    maturityDt = Date(22, 1, 2016)
+    maturity_dt = Date(22, 1, 2016)
     coupon = 0.0200000000
     clean_price = 104.98000000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -159,13 +159,13 @@ def test_9():
 
 def test_10():
     dc_type = DayCountTypes.ACT_365L
-    maturityDt = Date(7, 9, 2016)
+    maturity_dt = Date(7, 9, 2016)
     coupon = 0.0400000000
     clean_price = 113.49500000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
@@ -175,13 +175,13 @@ def test_10():
 
 def test_11():
     dc_type = DayCountTypes.SIMPLE
-    maturityDt = Date(25, 8, 2017)
+    maturity_dt = Date(25, 8, 2017)
     coupon = 0.0875000000
     clean_price = 138.57000000
 
-    issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
-    bond = Bond(issueDt, maturityDt,
+    bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)

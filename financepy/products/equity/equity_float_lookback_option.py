@@ -39,7 +39,7 @@ class EquityFloatLookbackOption(EquityOption):
     highest price before expiry. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  option_type: OptionTypes):
         """ Create the FloatLookbackOption by specifying the expiry date and
         the option type. The strike is determined internally as the maximum or
@@ -51,13 +51,13 @@ class EquityFloatLookbackOption(EquityOption):
         if option_type != OptionTypes.EUROPEAN_CALL and option_type != OptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._option_type = option_type
 
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -66,25 +66,25 @@ class EquityFloatLookbackOption(EquityOption):
         """ Valuation of the Floating Lookback option using Black-Scholes using
         the formulae derived by Goldman, Sosin and Gatto (1979). """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._value_date != value_date:
+        if dividend_curve._value_dt != value_dt:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
-        df = discount_curve.df(self._expiry_date)
+        t = (self._expiry_dt - value_dt) / gDaysInYear
+        df = discount_curve.df(self._expiry_dt)
 
-        r = discount_curve.cc_rate(self._expiry_date)
-        q = dividend_curve.cc_rate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_dt)
+        q = dividend_curve.cc_rate(self._expiry_dt)
 
         v = volatility
         s0 = stock_price
@@ -152,7 +152,7 @@ class EquityFloatLookbackOption(EquityOption):
 ###############################################################################
 
     def value_mc(self,
-                 value_date: Date,
+                 value_dt: Date,
                  stock_price: float,
                  discount_curve: DiscountCurve,
                  dividend_curve: DiscountCurve,
@@ -164,12 +164,12 @@ class EquityFloatLookbackOption(EquityOption):
         """ Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process. """
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         num_time_steps = int(t * num_steps_per_year)
 
-        df = discount_curve.df(self._expiry_date)
-        r = discount_curve.cc_rate(self._expiry_date)
-        q = dividend_curve.cc_rate(self._expiry_date)
+        df = discount_curve.df(self._expiry_dt)
+        r = discount_curve.cc_rate(self._expiry_dt)
+        q = dividend_curve.cc_rate(self._expiry_dt)
         mu = r - q
 
         option_type = self._option_type
@@ -213,7 +213,7 @@ class EquityFloatLookbackOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("OPTION TYPE", self._option_type, "")
         return s
 

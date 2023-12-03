@@ -22,7 +22,7 @@ from ...utils.global_types import OptionTypes
 class FXDigitalOption:
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  strike_fx_rate: (float, np.ndarray),
                  currency_pair: str,  # FORDOM
                  option_type: (OptionTypes, list),
@@ -39,16 +39,16 @@ class FXDigitalOption:
 
         check_argument_types(self.__init__, locals())
 
-        delivery_date = expiry_date.add_weekdays(spot_days)
+        delivery_dt = expiry_dt.add_weekdays(spot_days)
 
-        if delivery_date < expiry_date:
+        if delivery_dt < expiry_dt:
             raise FinError("Delivery date must be on or after expiry date.")
 
         if len(currency_pair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._expiry_date = expiry_date
-        self._delivery_date = delivery_date
+        self._expiry_dt = expiry_dt
+        self._delivery_dt = delivery_dt
 
         if np.any(strike_fx_rate < 0.0):
             raise FinError("Negative strike.")
@@ -76,7 +76,7 @@ class FXDigitalOption:
 ###############################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               spot_fx_rate,  # 1 unit of foreign in domestic
               dom_discount_curve,
               for_discount_curve,
@@ -87,26 +87,26 @@ class FXDigitalOption:
         cash payout (puts) PLUS the fact that the cash payment can be in
         domestic or foreign currency. """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_date != value_date:
+        if dom_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as valuation date")
 
-        if for_discount_curve._value_date != value_date:
+        if for_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as valuation date")
 
-        if isinstance(value_date, Date):
-            spot_date = value_date.add_weekdays(self._spot_days)
-            tdel = (self._delivery_date - spot_date) / gDaysInYear
-            t_exp = (self._expiry_date - value_date) / gDaysInYear
+        if isinstance(value_dt, Date):
+            spot_dt = value_dt.add_weekdays(self._spot_days)
+            tdel = (self._delivery_dt - spot_dt) / gDaysInYear
+            t_exp = (self._expiry_dt - value_dt) / gDaysInYear
         else:
-            tdel = value_date
+            tdel = value_dt
             t_exp = tdel
 
         if np.any(spot_fx_rate <= 0.0):

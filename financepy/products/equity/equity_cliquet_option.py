@@ -35,8 +35,8 @@ class EquityCliquetOption(EquityOption):
     at the start of its life. This is also known as a reset option."""
 
     def __init__(self,
-                 start_date: Date,
-                 final_expiry_date: Date,
+                 start_dt: Date,
+                 final_expiry_dt: Date,
                  option_type: OptionTypes,
                  freq_type: FrequencyTypes,
                  day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
@@ -53,11 +53,11 @@ class EquityCliquetOption(EquityOption):
            option_type != OptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
-        if final_expiry_date < start_date:
+        if final_expiry_dt < start_dt:
             raise FinError("Expiry date precedes start date")
 
-        self._start_date = start_date
-        self._final_expiry_date = final_expiry_date
+        self._start_dt = start_dt
+        self._final_expiry_dt = final_expiry_dt
         self._option_type = option_type
         self._freq_type = freq_type
         self._dc_type = day_count_type
@@ -65,17 +65,17 @@ class EquityCliquetOption(EquityOption):
         self._bd_type = bd_type
         self._dg_type = dg_type
 
-        self._expiry_dates = Schedule(self._start_date,
-                                      self._final_expiry_date,
-                                      self._freq_type,
-                                      self._cal_type,
-                                      self._bd_type,
-                                      self._dg_type)._generate()
+        self._expiry_dts = Schedule(self._start_dt,
+                                    self._final_expiry_dt,
+                                    self._freq_type,
+                                    self._cal_type,
+                                    self._bd_type,
+                                    self._dg_type)._generate()
 
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: float,
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -83,18 +83,18 @@ class EquityCliquetOption(EquityOption):
         """ Value the cliquet option as a sequence of options using the Black-
         Scholes model. """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._value_date != value_date:
+        if dividend_curve._value_dt != value_dt:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if value_date > self._final_expiry_date:
+        if value_dt > self._final_expiry_dt:
             raise FinError("Value date after final expiry date.")
 
         s = stock_price
@@ -113,12 +113,12 @@ class EquityCliquetOption(EquityOption):
             v = max(v, 1e-6)
             tprev = 0.0
 
-            for dt in self._expiry_dates:
+            for dt in self._expiry_dts:
 
-                if dt > value_date:
+                if dt > value_dt:
 
                     df = discount_curve.df(dt)
-                    t_exp = (dt - value_date) / gDaysInYear
+                    t_exp = (dt - value_dt) / gDaysInYear
                     r = -np.log(df) / t_exp
 
                     # option life
@@ -165,8 +165,8 @@ class EquityCliquetOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._start_date)
-        s += label_to_string("FINAL EXPIRY DATE", self._final_expiry_date)
+        s += label_to_string("START DATE", self._start_dt)
+        s += label_to_string("FINAL EXPIRY DATE", self._final_expiry_dt)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("FREQUENCY TYPE", self._freq_type)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)

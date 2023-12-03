@@ -132,7 +132,7 @@ class FXOneTouchOption(FXOption):
     All of these variants are members of the FinTouchOptionTypes type. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  option_type: TouchOptionTypes,
                  barrier_rate: float,
                  payment_size: float = 1.0):
@@ -141,7 +141,7 @@ class FXOneTouchOption(FXOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._option_type = option_type
         self._barrier_rate = float(barrier_rate)
         self._payment_size = payment_size
@@ -149,7 +149,7 @@ class FXOneTouchOption(FXOption):
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               spot_fx_rate: (float, np.ndarray),
               dom_discount_curve: DiscountCurve,
               for_discount_curve: DiscountCurve,
@@ -158,26 +158,26 @@ class FXOneTouchOption(FXOption):
         assuming a continuous (American) barrier from value date to expiry.
         Handles both cash-or-nothing and asset-or-nothing options."""
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_date != value_date:
+        if dom_discount_curve._value_dt != value_dt:
             raise FinError("Domestic Curve date not same as valuation date")
 
-        if for_discount_curve._value_date != value_date:
+        if for_discount_curve._value_dt != value_dt:
             raise FinError("Foreign Curve date not same as valuation date")
 
         DEBUG_MODE = False
 
         print("USE WITH CAUTION. MORE TESTING REQUIRED.")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
         t = max(t, 1e-6)
 
         s0 = spot_fx_rate
@@ -186,9 +186,9 @@ class FXOneTouchOption(FXOption):
 
         sqrtT = np.sqrt(t)
 
-        df = dom_discount_curve.df(self._expiry_date)
-        r_d = dom_discount_curve.cc_rate(self._expiry_date)
-        r_f = for_discount_curve.cc_rate(self._expiry_date)
+        df = dom_discount_curve.df(self._expiry_dt)
+        r_d = dom_discount_curve.cc_rate(self._expiry_dt)
+        r_f = for_discount_curve.cc_rate(self._expiry_dt)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -400,7 +400,7 @@ class FXOneTouchOption(FXOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("BARRIER LEVEL", self._barrier_rate)
         s += label_to_string("PAYMENT SIZE", self._payment_size, "")
@@ -415,7 +415,7 @@ class FXOneTouchOption(FXOption):
 ###############################################################################
 
     def value_mc(self,
-                 value_date: Date,
+                 value_dt: Date,
                  stock_price: float,
                  domCurve: DiscountCurve,
                  forCurve: DiscountCurve,
@@ -430,12 +430,12 @@ class FXOneTouchOption(FXOption):
 
         print("THIS NEEDS TO BE CHECKED")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
-        df_d = domCurve.df(self._expiry_date)
+        df_d = domCurve.df(self._expiry_dt)
         r_d = -np.log(df_d)/t
 
-        df_f = forCurve.df(self._expiry_date)
+        df_f = forCurve.df(self._expiry_dt)
         r_f = -np.log(df_f)/t
 
         num_time_steps = int(t * num_steps_per_year) + 1

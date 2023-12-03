@@ -13,7 +13,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
 
@@ -25,23 +25,23 @@ def test_FinNelsonSiegelSvenssonCurve():
     tau1 = 2.0
     tau2 = 0.5
     times = np.linspace(0.0, 10.0, 5)
-    start_date = Date(1, 1, 2020)
-    dates = start_date.add_years(times)
+    start_dt = Date(1, 1, 2020)
+    dates = start_dt.add_years(times)
 
-    curve1 = DiscountCurveNSS(start_date, 1., 0., 0., 0., tau1, tau2)
+    curve1 = DiscountCurveNSS(start_dt, 1., 0., 0., 0., tau1, tau2)
     factor1loading = curve1.zero_rate(dates)
-    curve2 = DiscountCurveNSS(start_date, 0., 1., 0., 0., tau1, tau2)
+    curve2 = DiscountCurveNSS(start_dt, 0., 1., 0., 0., tau1, tau2)
     factor2loading = curve2.zero_rate(dates)
-    curve3 = DiscountCurveNSS(start_date, 0., 0., 1., 0., tau1, tau2)
+    curve3 = DiscountCurveNSS(start_dt, 0., 0., 1., 0., tau1, tau2)
     factor3loading = curve3.zero_rate(dates)
-    curve4 = DiscountCurveNSS(start_date, 0., 0., 0., 1., tau1, tau2)
+    curve4 = DiscountCurveNSS(start_dt, 0., 0., 0., 1., tau1, tau2)
     factor4loading = curve4.zero_rate(dates)
 
-    testCases.header("FACTOR LOADING ON ZERO RATES")
-    testCases.print(factor1loading)
-    testCases.print(factor2loading)
-    testCases.print(factor3loading)
-    testCases.print(factor4loading)
+    test_cases.header("FACTOR LOADING ON ZERO RATES")
+    test_cases.print(factor1loading)
+    test_cases.print(factor2loading)
+    test_cases.print(factor3loading)
+    test_cases.print(factor4loading)
 
 #    plt.figure(figsize = (6,4))
 #    plt.plot(times,scaleVector(factor1loading,1),label='beta1');
@@ -56,52 +56,52 @@ def test_FinNelsonSiegelSvenssonCurve():
 
 ##########################################################################
 
-    testCases.header("BETA1", "BETA2", "BETA3", "BETA4", "ZEROS")
+    test_cases.header("BETA1", "BETA2", "BETA3", "BETA4", "ZEROS")
 
     beta1 = 0.03
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve1 = DiscountCurveNSS(start_date,
+    curve1 = DiscountCurveNSS(start_dt,
                               beta1, beta2, beta3, beta4, tau1, tau2)
     zero_rates1 = curve1.zero_rate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zero_rates1)
+    test_cases.print(beta1, beta2, beta3, beta4, zero_rates1)
 
     beta1 = 0.04
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve2 = DiscountCurveNSS(start_date,
+    curve2 = DiscountCurveNSS(start_dt,
                               beta1, beta2, beta3, beta4, tau1, tau2)
     zero_rates2 = curve2.zero_rate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zero_rates2)
+    test_cases.print(beta1, beta2, beta3, beta4, zero_rates2)
 
     beta1 = 0.05
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve3 = DiscountCurveNSS(start_date,
+    curve3 = DiscountCurveNSS(start_dt,
                               beta1, beta2, beta3, beta4, tau1, tau2)
     zero_rates3 = curve3.zero_rate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zero_rates3)
+    test_cases.print(beta1, beta2, beta3, beta4, zero_rates3)
 
     beta1 = 0.06
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve4 = DiscountCurveNSS(start_date,
+    curve4 = DiscountCurveNSS(start_dt,
                               beta1, beta2, beta3, beta4, tau1, tau2)
     zero_rates4 = curve4.zero_rate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zero_rates4)
+    test_cases.print(beta1, beta2, beta3, beta4, zero_rates4)
 
     beta1 = 0.07
     beta2 = -0.02
     beta3 = -0.02
     beta4 = 0.08
-    curve5 = DiscountCurveNSS(start_date,
+    curve5 = DiscountCurveNSS(start_dt,
                               beta1, beta2, beta3, beta4, tau1, tau2)
     zero_rates5 = curve5.zero_rate(dates)
-    testCases.print(beta1, beta2, beta3, beta4, zero_rates5)
+    test_cases.print(beta1, beta2, beta3, beta4, zero_rates5)
 
     if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
@@ -121,4 +121,4 @@ def test_FinNelsonSiegelSvenssonCurve():
 
 
 test_FinNelsonSiegelSvenssonCurve()
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -19,18 +19,18 @@ from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.utils.global_types import FinCapFloorTypes
 
 
-def build_curve(value_date):
+def build_curve(value_dt):
 
     depoBasis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
-    settle_date = value_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settle_date, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settle_date, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settle_date, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_dt, "1M", deposit_rate, depoBasis)
+    depo2 = IborDeposit(settle_dt, "3M", deposit_rate, depoBasis)
+    depo3 = IborDeposit(settle_dt, "6M", deposit_rate, depoBasis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -44,26 +44,26 @@ def build_curve(value_date):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settle_date, "1Y", fixed_leg_type,
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap2 = IborSwap(settle_date, "3Y", fixed_leg_type,
+    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
-    swap3 = IborSwap(settle_date, "5Y", fixed_leg_type,
+    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type,
                      swap_rate, fixedFreq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
     swaps.append(swap3)
 
-    libor_curve = IborSingleCurve(value_date, depos, fras, swaps)
+    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     return libor_curve
 
 
 todayDate = Date(20, 6, 2019)
-value_date = todayDate
-start_date = todayDate.add_weekdays(2)
-maturity_date = start_date.add_tenor("1Y")
+value_dt = todayDate
+start_dt = todayDate.add_weekdays(2)
+maturity_dt = start_dt.add_tenor("1Y")
 libor_curve = build_curve(todayDate)
 
 model1 = Black(0.20)
@@ -78,13 +78,13 @@ def test_cap():
     capFloorType = FinCapFloorTypes.CAP
 
     k = 0.02
-    capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
-    cvalue1 = capfloor.value(value_date, libor_curve, model1)
-    cvalue2 = capfloor.value(value_date, libor_curve, model2)
-    cvalue3 = capfloor.value(value_date, libor_curve, model3)
-    cvalue4 = capfloor.value(value_date, libor_curve, model4)
-    cvalue5 = capfloor.value(value_date, libor_curve, model5)
-    cvalue6 = capfloor.value(value_date, libor_curve, model6)
+    capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+    cvalue1 = capfloor.value(value_dt, libor_curve, model1)
+    cvalue2 = capfloor.value(value_dt, libor_curve, model2)
+    cvalue3 = capfloor.value(value_dt, libor_curve, model3)
+    cvalue4 = capfloor.value(value_dt, libor_curve, model4)
+    cvalue5 = capfloor.value(value_dt, libor_curve, model5)
+    cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 28889.2445
     assert round(cvalue2, 4) == 28889.2482
     assert round(cvalue3, 4) == 28889.2445
@@ -93,13 +93,13 @@ def test_cap():
     assert round(cvalue6, 4) == 28889.3760
 
     k = 0.05
-    capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
-    cvalue1 = capfloor.value(value_date, libor_curve, model1)
-    cvalue2 = capfloor.value(value_date, libor_curve, model2)
-    cvalue3 = capfloor.value(value_date, libor_curve, model3)
-    cvalue4 = capfloor.value(value_date, libor_curve, model4)
-    cvalue5 = capfloor.value(value_date, libor_curve, model5)
-    cvalue6 = capfloor.value(value_date, libor_curve, model6)
+    capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+    cvalue1 = capfloor.value(value_dt, libor_curve, model1)
+    cvalue2 = capfloor.value(value_dt, libor_curve, model2)
+    cvalue3 = capfloor.value(value_dt, libor_curve, model3)
+    cvalue4 = capfloor.value(value_dt, libor_curve, model4)
+    cvalue5 = capfloor.value(value_dt, libor_curve, model5)
+    cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 1904.9614
     assert round(cvalue2, 4) == 2399.1333
     assert round(cvalue3, 4) == 516.9324
@@ -108,13 +108,13 @@ def test_cap():
     assert round(cvalue6, 4) == 1910.0023
 
     k = 0.08
-    capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
-    cvalue1 = capfloor.value(value_date, libor_curve, model1)
-    cvalue2 = capfloor.value(value_date, libor_curve, model2)
-    cvalue3 = capfloor.value(value_date, libor_curve, model3)
-    cvalue4 = capfloor.value(value_date, libor_curve, model4)
-    cvalue5 = capfloor.value(value_date, libor_curve, model5)
-    cvalue6 = capfloor.value(value_date, libor_curve, model6)
+    capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+    cvalue1 = capfloor.value(value_dt, libor_curve, model1)
+    cvalue2 = capfloor.value(value_dt, libor_curve, model2)
+    cvalue3 = capfloor.value(value_dt, libor_curve, model3)
+    cvalue4 = capfloor.value(value_dt, libor_curve, model4)
+    cvalue5 = capfloor.value(value_dt, libor_curve, model5)
+    cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 3.0923
     assert round(cvalue2, 4) == 21.2585
     assert round(cvalue3, 4) == 0.0023
@@ -127,13 +127,13 @@ def test_floor():
     capFloorType = FinCapFloorTypes.FLOOR
 
     k = 0.02
-    capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
-    cvalue1 = capfloor.value(value_date, libor_curve, model1)
-    cvalue2 = capfloor.value(value_date, libor_curve, model2)
-    cvalue3 = capfloor.value(value_date, libor_curve, model3)
-    cvalue4 = capfloor.value(value_date, libor_curve, model4)
-    cvalue5 = capfloor.value(value_date, libor_curve, model5)
-    cvalue6 = capfloor.value(value_date, libor_curve, model6)
+    capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+    cvalue1 = capfloor.value(value_dt, libor_curve, model1)
+    cvalue2 = capfloor.value(value_dt, libor_curve, model2)
+    cvalue3 = capfloor.value(value_dt, libor_curve, model3)
+    cvalue4 = capfloor.value(value_dt, libor_curve, model4)
+    cvalue5 = capfloor.value(value_dt, libor_curve, model5)
+    cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 0.0
     assert round(cvalue2, 4) == 0.0037
     assert round(cvalue3, 4) == 0.0
@@ -142,13 +142,13 @@ def test_floor():
     assert round(cvalue6, 4) == 0.1316
 
     k = 0.05
-    capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
-    cvalue1 = capfloor.value(value_date, libor_curve, model1)
-    cvalue2 = capfloor.value(value_date, libor_curve, model2)
-    cvalue3 = capfloor.value(value_date, libor_curve, model3)
-    cvalue4 = capfloor.value(value_date, libor_curve, model4)
-    cvalue5 = capfloor.value(value_date, libor_curve, model5)
-    cvalue6 = capfloor.value(value_date, libor_curve, model6)
+    capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+    cvalue1 = capfloor.value(value_dt, libor_curve, model1)
+    cvalue2 = capfloor.value(value_dt, libor_curve, model2)
+    cvalue3 = capfloor.value(value_dt, libor_curve, model3)
+    cvalue4 = capfloor.value(value_dt, libor_curve, model4)
+    cvalue5 = capfloor.value(value_dt, libor_curve, model5)
+    cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 2089.3995
     assert round(cvalue2, 4) == 2583.5715
     assert round(cvalue3, 4) == 701.3705
@@ -157,13 +157,13 @@ def test_floor():
     assert round(cvalue6, 4) == 2094.4405
 
     k = 0.08
-    capfloor = IborCapFloor(start_date, maturity_date, capFloorType, k)
-    cvalue1 = capfloor.value(value_date, libor_curve, model1)
-    cvalue2 = capfloor.value(value_date, libor_curve, model2)
-    cvalue3 = capfloor.value(value_date, libor_curve, model3)
-    cvalue4 = capfloor.value(value_date, libor_curve, model4)
-    cvalue5 = capfloor.value(value_date, libor_curve, model5)
-    cvalue6 = capfloor.value(value_date, libor_curve, model6)
+    capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+    cvalue1 = capfloor.value(value_dt, libor_curve, model1)
+    cvalue2 = capfloor.value(value_dt, libor_curve, model2)
+    cvalue3 = capfloor.value(value_dt, libor_curve, model3)
+    cvalue4 = capfloor.value(value_dt, libor_curve, model4)
+    cvalue5 = capfloor.value(value_dt, libor_curve, model5)
+    cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 29261.2132
     assert round(cvalue2, 4) == 29279.3794
     assert round(cvalue3, 4) == 29258.1231

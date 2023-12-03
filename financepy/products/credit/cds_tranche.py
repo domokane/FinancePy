@@ -46,8 +46,8 @@ class FinLossDistributionBuilder(Enum):
 class CDSTranche:
 
     def __init__(self,
-                 step_in_date: Date,
-                 maturity_date: Date,
+                 step_in_dt: Date,
+                 maturity_dt: Date,
                  k1: float,
                  k2: float,
                  notional: float = ONE_MILLION,
@@ -67,8 +67,8 @@ class CDSTranche:
         self._k1 = k1
         self._k2 = k2
 
-        self._step_in_date = step_in_date
-        self._maturity_date = maturity_date
+        self._step_in_dt = step_in_dt
+        self._maturity_dt = maturity_dt
         self._notional = notional
         self._running_coupon = running_coupon
         self._long_protection = long_protection
@@ -80,8 +80,8 @@ class CDSTranche:
 
         notional = 1.0
 
-        self._cds_contract = CDS(self._step_in_date,
-                                 self._maturity_date,
+        self._cds_contract = CDS(self._step_in_dt,
+                                 self._maturity_dt,
                                  self._running_coupon,
                                  notional,
                                  self._long_protection,
@@ -94,7 +94,7 @@ class CDSTranche:
     ###########################################################################
 
     def value_bc(self,
-                 value_date,
+                 value_dt,
                  issuer_curves,
                  upfront,
                  running_coupon,
@@ -106,7 +106,7 @@ class CDSTranche:
         num_credits = len(issuer_curves)
         k1 = self._k1
         k2 = self._k2
-        tmat = (self._maturity_date - value_date) / gDaysInYear
+        tmat = (self._maturity_dt - value_dt) / gDaysInYear
 
         if tmat < 0.0:
             raise FinError("Value date is after maturity date")
@@ -126,8 +126,8 @@ class CDSTranche:
 
         recovery_rates = np.zeros(num_credits)
 
-        payment_dates = self._cds_contract._payment_dates
-        num_payments = len(payment_dates)
+        payment_dts = self._cds_contract._payment_dts
+        num_payments = len(payment_dts)
         num_times = num_payments + 1
 
         beta1 = sqrt(corr1)
@@ -154,7 +154,7 @@ class CDSTranche:
 
         for i in range(1, num_times):
 
-            t = (payment_dates[i-1] - value_date) / gDaysInYear
+            t = (payment_dts[i-1] - value_dt) / gDaysInYear
 
             for j in range(0, num_credits):
 
@@ -228,14 +228,14 @@ class CDSTranche:
         curveRecovery = 0.0  # For tranches only
         libor_curve = issuer_curves[0]._libor_curve
         trancheCurve = CDSCurve(
-            value_date, [], libor_curve, curveRecovery)
+            value_dt, [], libor_curve, curveRecovery)
         trancheCurve._times = trancheTimes
         trancheCurve._values = trancheSurvivalCurve
 
         protLegPV = self._cds_contract.protection_leg_pv(
-            value_date, trancheCurve, curveRecovery)
+            value_dt, trancheCurve, curveRecovery)
         risky_pv01 = self._cds_contract.risky_pv01(
-            value_date, trancheCurve)['clean_rpv01']
+            value_dt, trancheCurve)['clean_rpv01']
 
         mtm = self._notional * (protLegPV - upfront -
                                 risky_pv01 * running_coupon)

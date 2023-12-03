@@ -17,7 +17,7 @@ from financepy.products.inflation.FinInflationIndexCurve import FinInflationInde
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
@@ -29,10 +29,10 @@ def test_FinInflationBondBBG():
     # Look for CPI Bond example
     ##########################################################################
 
-    testCases.banner("BLOOMBERG US TIPS EXAMPLE")
-    settle_date = Date(21, 7, 2017)
-    issue_date = Date(15, 7, 2010)
-    maturity_date = Date(15, 7, 2020)
+    test_cases.banner("BLOOMBERG US TIPS EXAMPLE")
+    settle_dt = Date(21, 7, 2017)
+    issue_dt = Date(15, 7, 2010)
+    maturity_dt = Date(15, 7, 2020)
     coupon = 0.0125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
@@ -40,53 +40,53 @@ def test_FinInflationBondBBG():
     baseCPIValue = 218.08532
     ex_div_days = 0
 
-    bond = FinInflationBond(issue_date,
-                            maturity_date,
+    bond = FinInflationBond(issue_dt,
+                            maturity_dt,
                             coupon,
                             freq_type,
                             dc_type,
                             ex_div_days,
                             baseCPIValue)
 
-    testCases.header("FIELD", "VALUE")
+    test_cases.header("FIELD", "VALUE")
     clean_price = 104.03502
 
     yld = bond.current_yield(clean_price)
-    testCases.print("Current Yield = ", yld)
+    test_cases.print("Current Yield = ", yld)
 
     ###########################################################################
     # Inherited functions that just calculate real yield without CPI adjustments
     ###########################################################################
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.UK_DMO)
 
-    testCases.print("UK DMO REAL Yield To Maturity = ", ytm)
+    test_cases.print("UK DMO REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.US_STREET)
 
-    testCases.print("US STREET REAL Yield To Maturity = ", ytm)
+    test_cases.print("US STREET REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.US_TREASURY)
 
-    testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
+    test_cases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
-    dirty_price = bond.dirty_price_from_ytm(settle_date, ytm)
-    testCases.print("Dirty Price from REAL YTM = ", dirty_price)
+    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
+    test_cases.print("Dirty Price from REAL YTM = ", dirty_price)
 
-    clean_price = bond.clean_price_from_ytm(settle_date, ytm)
-    testCases.print("Clean Price from Real YTM = ", clean_price)
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
+    test_cases.print("Clean Price from Real YTM = ", clean_price)
 
     accddays = bond._accrued_days
-    testCases.print("Accrued Days = ", accddays)
+    test_cases.print("Accrued Days = ", accddays)
 
     accrued_interest = bond._accrued_interest
-    testCases.print("REAL Accrued Interest = ", accrued_interest)
+    test_cases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
     # Inflation functions that calculate nominal yield with CPI adjustment
@@ -96,46 +96,46 @@ def test_FinInflationBondBBG():
 
     ###########################################################################
 
-    clean_price = bond.clean_price_from_ytm(settle_date, ytm)
-    testCases.print("Clean Price from Real YTM = ", clean_price)
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
+    test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.inflation_accrued_interest(settle_date,
+    inflationAccd = bond.inflation_accrued_interest(settle_dt,
                                                     face,
                                                     refCPIValue)
 
-    testCases.print("Inflation Accrued = ", inflationAccd)
+    test_cases.print("Inflation Accrued = ", inflationAccd)
 
     lastCpnCPIValue = 244.61839
 
-    clean_price = bond.flat_price_from_yield_to_maturity(settle_date, ytm,
+    clean_price = bond.flat_price_from_yield_to_maturity(settle_dt, ytm,
                                                          lastCpnCPIValue,
                                                          YTMCalcType.US_TREASURY)
 
-    testCases.print("Flat Price from Real YTM = ", clean_price)
+    test_cases.print("Flat Price from Real YTM = ", clean_price)
 
     face = 100.0
 
-    principal = bond.inflation_principal(settle_date,
+    principal = bond.inflation_principal(settle_dt,
                                          face,
                                          ytm,
                                          refCPIValue,
                                          YTMCalcType.US_TREASURY)
 
-    testCases.print("Inflation Principal = ", principal)
+    test_cases.print("Inflation Principal = ", principal)
 
     ###########################################################################
 
-    duration = bond.dollar_duration(settle_date, ytm)
-    testCases.print("Dollar Duration = ", duration)
+    duration = bond.dollar_duration(settle_dt, ytm)
+    test_cases.print("Dollar Duration = ", duration)
 
-    modified_duration = bond.modified_duration(settle_date, ytm)
-    testCases.print("Modified Duration = ", modified_duration)
+    modified_duration = bond.modified_duration(settle_dt, ytm)
+    test_cases.print("Modified Duration = ", modified_duration)
 
-    macauley_duration = bond.macauley_duration(settle_date, ytm)
-    testCases.print("Macauley Duration = ", macauley_duration)
+    macauley_duration = bond.macauley_duration(settle_dt, ytm)
+    test_cases.print("Macauley Duration = ", macauley_duration)
 
-    conv = bond.convexity_from_ytm(settle_date, ytm)
-    testCases.print("Convexity = ", conv)
+    conv = bond.convexity_from_ytm(settle_dt, ytm)
+    test_cases.print("Convexity = ", conv)
 
 
 ###############################################################################
@@ -147,12 +147,12 @@ def test_FinInflationBondStack():
     # https://stackoverflow.com/questions/57676724/failing-to-obtain-correct-accrued-interest-with-quantlib-inflation-bond-pricer-i
     ##########################################################################
 
-    testCases.banner("=============================")
-    testCases.banner("QUANT FINANCE US TIPS EXAMPLE")
-    testCases.banner("=============================")
-    settle_date = Date(23, 8, 2019)
-    issue_date = Date(25, 9, 2013)
-    maturity_date = Date(22, 3, 2068)
+    test_cases.banner("=============================")
+    test_cases.banner("QUANT FINANCE US TIPS EXAMPLE")
+    test_cases.banner("=============================")
+    settle_dt = Date(23, 8, 2019)
+    issue_dt = Date(25, 9, 2013)
+    maturity_dt = Date(22, 3, 2068)
     coupon = 0.00125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
@@ -161,14 +161,14 @@ def test_FinInflationBondStack():
 
     ###########################################################################
     # Discount curve
-    discount_curve = DiscountCurveFlat(settle_date,
+    discount_curve = DiscountCurveFlat(settle_dt,
                                        0.01033692,
                                        FrequencyTypes.ANNUAL,
                                        DayCountTypes.ACT_ACT_ISDA)
 
     lag = 3
     fixingCPI = 244.65884
-    fixingDate = settle_date.add_months(-lag)
+    fixingDate = settle_dt.add_months(-lag)
 
     ###########################################################################
     # Create Index Curve
@@ -242,7 +242,7 @@ def test_FinInflationBondStack():
         zcDates.append(zciisData[i][0])
         zcRates.append(zciisData[i][1]/100.0)
 
-    inflationZeroCurve = DiscountCurveZeros(settle_date,
+    inflationZeroCurve = DiscountCurveZeros(settle_dt,
                                             zcDates,
                                             zcRates,
                                             FrequencyTypes.ANNUAL,
@@ -254,19 +254,19 @@ def test_FinInflationBondStack():
 
     ex_div_days = 0
 
-    bond = FinInflationBond(issue_date,
-                            maturity_date,
+    bond = FinInflationBond(issue_dt,
+                            maturity_dt,
                             coupon,
                             freq_type,
                             dc_type,
                             ex_div_days,
                             baseCPIValue)
 
-    testCases.header("FIELD", "VALUE")
+    test_cases.header("FIELD", "VALUE")
     clean_price = 104.03502
 
     yld = bond.current_yield(clean_price)
-    testCases.print("Current Yield = ", yld)
+    test_cases.print("Current Yield = ", yld)
 
     return
 
@@ -274,35 +274,35 @@ def test_FinInflationBondStack():
     # Inherited functions that just calculate real yield without CPI adjustments
     ###########################################################################
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.UK_DMO)
 
-    testCases.print("UK DMO REAL Yield To Maturity = ", ytm)
+    test_cases.print("UK DMO REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.US_STREET)
 
-    testCases.print("US STREET REAL Yield To Maturity = ", ytm)
+    test_cases.print("US STREET REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settle_date,
+    ytm = bond.yield_to_maturity(settle_dt,
                                  clean_price,
                                  YTMCalcType.US_TREASURY)
 
-    testCases.print("US TREASURY REAL Yield To Maturity = ", ytm)
+    test_cases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
-    dirty_price = bond.dirty_price_from_discount_curve(settle_date, ytm)
-    testCases.print("Dirty Price from REAL YTM = ", dirty_price)
+    dirty_price = bond.dirty_price_from_discount_curve(settle_dt, ytm)
+    test_cases.print("Dirty Price from REAL YTM = ", dirty_price)
 
-    clean_price = bond.clean_price_from_ytm(settle_date, ytm)
-    testCases.print("Clean Price from Real YTM = ", clean_price)
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
+    test_cases.print("Clean Price from Real YTM = ", clean_price)
 
     accddays = bond._accrued_days
-    testCases.print("Accrued Days = ", accddays)
+    test_cases.print("Accrued Days = ", accddays)
 
     accrued_interest = bond._accrued_interest
-    testCases.print("REAL Accrued Interest = ", accrued_interest)
+    test_cases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
     # Inflation functions that calculate nominal yield with CPI adjustment
@@ -310,46 +310,46 @@ def test_FinInflationBondStack():
 
     ###########################################################################
 
-    clean_price = bond.clean_price_from_ytm(settle_date, ytm)
-    testCases.print("Clean Price from Real YTM = ", clean_price)
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
+    test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calc_inflation_accrued_interest(settle_date,
+    inflationAccd = bond.calc_inflation_accrued_interest(settle_dt,
                                                          refCPIValue)
 
-    testCases.print("Inflation Accrued = ", inflationAccd)
+    test_cases.print("Inflation Accrued = ", inflationAccd)
 
     lastCpnCPIValue = 244.61839
 
-    clean_price = bond.flat_price_from_yield_to_maturity(settle_date, ytm,
+    clean_price = bond.flat_price_from_yield_to_maturity(settle_dt, ytm,
                                                          lastCpnCPIValue,
                                                          YTMCalcType.US_TREASURY)
 
-    testCases.print("Flat Price from Real YTM = ", clean_price)
+    test_cases.print("Flat Price from Real YTM = ", clean_price)
 
-    principal = bond.inflation_principal(settle_date,
+    principal = bond.inflation_principal(settle_dt,
                                          ytm,
                                          refCPIValue,
                                          YTMCalcType.US_TREASURY)
 
-    testCases.print("Inflation Principal = ", principal)
+    test_cases.print("Inflation Principal = ", principal)
 
     ###########################################################################
 
-    duration = bond.dollar_duration(settle_date, ytm)
-    testCases.print("Dollar Duration = ", duration)
+    duration = bond.dollar_duration(settle_dt, ytm)
+    test_cases.print("Dollar Duration = ", duration)
 
-    modified_duration = bond.modified_duration(settle_date, ytm)
-    testCases.print("Modified Duration = ", modified_duration)
+    modified_duration = bond.modified_duration(settle_dt, ytm)
+    test_cases.print("Modified Duration = ", modified_duration)
 
-    macauley_duration = bond.macauley_duration(settle_date, ytm)
-    testCases.print("Macauley Duration = ", macauley_duration)
+    macauley_duration = bond.macauley_duration(settle_dt, ytm)
+    test_cases.print("Macauley Duration = ", macauley_duration)
 
-    conv = bond.convexity_from_ytm(settle_date, ytm)
-    testCases.print("Convexity = ", conv)
+    conv = bond.convexity_from_ytm(settle_dt, ytm)
+    test_cases.print("Convexity = ", conv)
 
 ###############################################################################
 
 
 test_FinInflationBondBBG()
 test_FinInflationBondStack()
-testCases.compareTestCases()
+test_cases.compareTestCases()

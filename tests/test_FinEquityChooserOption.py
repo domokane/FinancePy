@@ -11,10 +11,10 @@ from financepy.products.equity.equity_chooser_option import EquityChooserOption
 def test_EquityChooserOptionHaug():
     """ Following example in Haug Page 130 """
 
-    value_date = Date(1, 1, 2015)
-    choose_date = Date(2, 4, 2015)
-    call_expiry_date = Date(1, 7, 2015)
-    put_expiry_date = Date(2, 8, 2015)
+    value_dt = Date(1, 1, 2015)
+    choose_dt = Date(2, 4, 2015)
+    call_expiry_dt = Date(1, 7, 2015)
+    put_expiry_dt = Date(2, 8, 2015)
     call_strike = 55.0
     put_strike = 48.0
     stock_price = 50.0
@@ -23,22 +23,22 @@ def test_EquityChooserOptionHaug():
     dividend_yield = 0.05
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(choose_date,
-                                        call_expiry_date,
-                                        put_expiry_date,
+    chooserOption = EquityChooserOption(choose_dt,
+                                        call_expiry_dt,
+                                        put_expiry_dt,
                                         call_strike,
                                         put_strike)
 
-    v = chooserOption.value(value_date,
+    v = chooserOption.value(value_dt,
                             stock_price,
                             discount_curve,
                             dividend_curve,
                             model)
 
-    v_mc = chooserOption.value_mc(value_date,
+    v_mc = chooserOption.value_mc(value_dt,
                                   stock_price,
                                   discount_curve,
                                   dividend_curve,
@@ -54,10 +54,10 @@ def test_EquityChooserOptionHaug():
 def test_EquityChooserOptionMatlab():
     """https://fr.mathworks.com/help/fininst/chooserbybls.html """
 
-    value_date = Date(1, 6, 2007)
+    value_dt = Date(1, 6, 2007)
     chooseDate = Date(31, 8, 2007)
-    call_expiry_date = Date(2, 12, 2007)
-    put_expiry_date = Date(2, 12, 2007)
+    call_expiry_dt = Date(2, 12, 2007)
+    put_expiry_dt = Date(2, 12, 2007)
     call_strike = 60.0
     put_strike = 60.0
     stock_price = 50.0
@@ -67,22 +67,22 @@ def test_EquityChooserOptionMatlab():
 
     model = BlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                        call_expiry_date,
-                                        put_expiry_date,
+                                        call_expiry_dt,
+                                        put_expiry_dt,
                                         call_strike,
                                         put_strike)
 
-    v = chooserOption.value(value_date,
+    v = chooserOption.value(value_dt,
                             stock_price,
                             discount_curve,
                             dividend_curve,
                             model)
 
-    v_mc = chooserOption.value_mc(value_date,
+    v_mc = chooserOption.value_mc(value_dt,
                                   stock_price,
                                   discount_curve,
                                   dividend_curve,
@@ -98,10 +98,10 @@ def test_EquityChooserOptionMatlab():
 def test_EquityChooserOptionDerivicom():
     """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm """
 
-    value_date = Date(1, 1, 2007)
+    value_dt = Date(1, 1, 2007)
     chooseDate = Date(1, 2, 2007)
-    call_expiry_date = Date(1, 4, 2007)
-    put_expiry_date = Date(1, 5, 2007)
+    call_expiry_dt = Date(1, 4, 2007)
+    put_expiry_dt = Date(1, 5, 2007)
     call_strike = 40.0
     put_strike = 35.0
     stock_price = 38.0
@@ -110,22 +110,22 @@ def test_EquityChooserOptionDerivicom():
     dividend_yield = 0.0625
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     chooserOption = EquityChooserOption(chooseDate,
-                                        call_expiry_date,
-                                        put_expiry_date,
+                                        call_expiry_dt,
+                                        put_expiry_dt,
                                         call_strike,
                                         put_strike)
 
-    v = chooserOption.value(value_date,
+    v = chooserOption.value(value_dt,
                             stock_price,
                             discount_curve,
                             dividend_curve,
                             model)
 
-    v_mc = chooserOption.value_mc(value_date,
+    v_mc = chooserOption.value_mc(value_dt,
                                   stock_price,
                                   discount_curve,
                                   dividend_curve,

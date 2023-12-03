@@ -15,7 +15,7 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import numpy as np
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 ###############################################################################
@@ -29,7 +29,7 @@ PLOT_GRAPHS = False
 
 def test_equity_vol_surface(verboseCalibration):
 
-    value_date = Date(11, 1, 2021)
+    value_dt = Date(11, 1, 2021)
 
     stock_price = 3800.0  # Check
 
@@ -53,14 +53,14 @@ def test_equity_vol_surface(verboseCalibration):
     volSurface = volSurface / 100.0
 
     r = 0.020  # USD
-    discount_curve = DiscountCurveFlat(value_date, r)
+    discount_curve = DiscountCurveFlat(value_dt, r)
 
     q = 0.010  # USD
-    dividend_curve = DiscountCurveFlat(value_date, q)
+    dividend_curve = DiscountCurveFlat(value_dt, q)
 
     vol_functionType = VolFuncTypes.SVI
 
-    equitySurface = EquityVolSurface(value_date,
+    equitySurface = EquityVolSurface(value_dt,
                                      stock_price,
                                      discount_curve,
                                      dividend_curve,
@@ -92,11 +92,11 @@ def test_equity_vol_surface(verboseCalibration):
 
     deltas = np.linspace(0.10, 0.90, 9)
 
-    testCases.header("EXPIRY", "DELTA", "VOL", "STRIKE")
+    test_cases.header("EXPIRY", "DELTA", "VOL", "STRIKE")
     for expiry_date in expiry_dates:
         for delta in deltas:
             vol = equitySurface.vol_from_delta_date(delta, expiry_date)
-            testCases.print(expiry_date, delta, vol[0], vol[1])
+            test_cases.print(expiry_date, delta, vol[0], vol[1])
 
 ###############################################################################
 
@@ -113,4 +113,4 @@ if __name__ == '__main__':
 
     elapsed = end - start
 #    print("Elapsed Time:", elapsed)
-    testCases.compareTestCases()
+    test_cases.compareTestCases()

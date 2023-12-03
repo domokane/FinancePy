@@ -59,7 +59,7 @@ def black_scholes_fd_PSOR(spot_price, volatility, time_to_expiry,
     # Implicit
     Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
-    # Loop backwards through timesteps, starting with a higher number for
+    # Loop backwards through time_steps, starting with a higher number for
     # faster convergence and lower as estimation improves
 
     omega = 1.8

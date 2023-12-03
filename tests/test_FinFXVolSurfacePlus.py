@@ -20,15 +20,15 @@ def test_FinFXMktVolSurface1(capsys):
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "USD"
     forCCRate = 0.03460  # EUR
     domCCRate = 0.02940  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3465
@@ -48,7 +48,7 @@ def test_FinFXMktVolSurface1(capsys):
     vol_functionType = VolFuncTypes.CLARK5
     alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
-    fxMarketPlus = FXVolSurfacePlus(value_date,
+    fxMarketPlus = FXVolSurfacePlus(value_dt,
                                     spot_fx_rate,
                                     currency_pair,
                                     notional_currency,
@@ -74,15 +74,15 @@ def test_FinFXMktVolSurface2(capsys):
     # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
     # print("EURJPY EXAMPLE CLARK")
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "JPY"
     forCCRate = 0.0294  # EUR
     domCCRate = 0.0171  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 90.72
@@ -102,7 +102,7 @@ def test_FinFXMktVolSurface2(capsys):
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
     vol_functionType = VolFuncTypes.CLARK5
 
-    fxMarketPlus = FXVolSurfacePlus(value_date,
+    fxMarketPlus = FXVolSurfacePlus(value_dt,
                                     spot_fx_rate,
                                     currency_pair,
                                     notional_currency,
@@ -129,15 +129,15 @@ def test_FinFXMktVolSurface3(capsys):
     # Example from Book extract by Iain Clark using Tables 4.4 and 4.5
     # where we examine the calibration to a full surface in Chapter 4
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "USD"
     forCCRate = 0.03460  # EUR
     domCCRate = 0.02940  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3465
@@ -159,7 +159,7 @@ def test_FinFXMktVolSurface3(capsys):
     vol_functionType = VolFuncTypes.CLARK5
     alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
-    fxMarketPlus = FXVolSurfacePlus(value_date,
+    fxMarketPlus = FXVolSurfacePlus(value_dt,
                                     spot_fx_rate,
                                     currency_pair,
                                     notional_currency,
@@ -189,15 +189,15 @@ def test_FinFXMktVolSurface4(capsys):
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "USD"
     forCCRate = 0.03460  # EUR
     domCCRate = 0.02940  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3465
@@ -220,7 +220,7 @@ def test_FinFXMktVolSurface4(capsys):
     vol_functionType = VolFuncTypes.CLARK
     alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
-    fxMarketPlus = FXVolSurfacePlus(value_date,
+    fxMarketPlus = FXVolSurfacePlus(value_dt,
                                     spot_fx_rate,
                                     currency_pair,
                                     notional_currency,
@@ -250,15 +250,15 @@ def test_FinFXMktVolSurface5(capsys):
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
 
-    value_date = Date(10, 4, 2020)
+    value_dt = Date(10, 4, 2020)
 
     forName = "EUR"
     domName = "USD"
     forCCRate = 0.03460  # EUR
     domCCRate = 0.02940  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_date, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, forCCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3465
@@ -281,7 +281,7 @@ def test_FinFXMktVolSurface5(capsys):
     vol_functionType = VolFuncTypes.CLARK
     alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
-    fxMarketPlus = FXVolSurfacePlus(value_date,
+    fxMarketPlus = FXVolSurfacePlus(value_dt,
                                     spot_fx_rate,
                                     currency_pair,
                                     notional_currency,

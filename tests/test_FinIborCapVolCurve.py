@@ -10,14 +10,14 @@ import numpy as np
 
 def test_FinCapVolCurve():
     # Reproduces example in Table 32.1 of Hull Book
-    value_date = Date(1, 1, 2020)
+    value_dt = Date(1, 1, 2020)
 
     capVolDates = []
     capletVolTenor = "1Y"
     num_periods = 10
-    capletDt = value_date
+    capletDt = value_dt
 
-    capVolDates.append(value_date)
+    capVolDates.append(value_dt)
 
     for i in range(0, num_periods):
         capletDt = capletDt.add_tenor(capletVolTenor)
@@ -28,7 +28,7 @@ def test_FinCapVolCurve():
     capVolatilities = np.array(capVolatilities)/100.0
 
     day_count_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = IborCapVolCurve(value_date,
+    volCurve = IborCapVolCurve(value_dt,
                                capVolDates,
                                capVolatilities,
                                day_count_type)

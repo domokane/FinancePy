@@ -23,8 +23,8 @@ import numpy as np
 def test_LiborSwap():
     # I have tried to reproduce the example from the blog by Ioannis Rigopoulos
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
-    start_date = Date(27, 12, 2017)
-    end_date = Date(27, 12, 2067)
+    start_dt = Date(27, 12, 2017)
+    end_dt = Date(27, 12, 2067)
 
     fixed_coupon = 0.015
     fixed_freq_type = FrequencyTypes.ANNUAL
@@ -35,15 +35,15 @@ def test_LiborSwap():
     float_dc_type = DayCountTypes.ACT_360
     firstFixing = -0.00268
 
-    swapCalendarType = CalendarTypes.WEEKEND
+    swap_cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     fixed_leg_type = SwapTypes.RECEIVE
 
     notional = 10.0 * ONE_MILLION
 
-    swap = IborSwap(start_date,
-                    end_date,
+    swap = IborSwap(start_dt,
+                    end_dt,
                     fixed_leg_type,
                     fixed_coupon,
                     fixed_freq_type,
@@ -52,7 +52,7 @@ def test_LiborSwap():
                     float_spread,
                     float_freq_type,
                     float_dc_type,
-                    swapCalendarType,
+                    swap_cal_type,
                     bd_type,
                     dg_type)
 
@@ -60,10 +60,10 @@ def test_LiborSwap():
     same curve being used for discounting and working out the implied
     future Libor rates. """
 
-    value_date = Date(30, 11, 2018)
-    settle_date = value_date.add_days(2)
-    libor_curve = buildIborSingleCurve(value_date)
-    v = swap.value(settle_date, libor_curve, libor_curve, firstFixing)
+    value_dt = Date(30, 11, 2018)
+    settle_dt = value_dt.add_days(2)
+    libor_curve = buildIborSingleCurve(value_dt)
+    v = swap.value(settle_dt, libor_curve, libor_curve, firstFixing)
 
     assert round(v, 4) == 318901.6015
 
@@ -71,10 +71,10 @@ def test_LiborSwap():
 def test_dp_example():
     #  http://www.derivativepricing.com/blogpage.asp?id=8
 
-    start_date = Date(14, 11, 2011)
-    end_date = Date(14, 11, 2016)
+    start_dt = Date(14, 11, 2011)
+    end_dt = Date(14, 11, 2016)
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-    swapCalendarType = CalendarTypes.TARGET
+    swap_cal_type = CalendarTypes.TARGET
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
@@ -82,8 +82,8 @@ def test_dp_example():
     fixed_coupon = 0.0124
     notional = ONE_MILLION
 
-    swap = IborSwap(start_date,
-                    end_date,
+    swap = IborSwap(start_dt,
+                    end_dt,
                     fixed_leg_type,
                     fixed_coupon=fixed_coupon,
                     fixed_freq_type=fixed_freq_type,
@@ -91,7 +91,7 @@ def test_dp_example():
                     float_freq_type=FrequencyTypes.SEMI_ANNUAL,
                     float_dc_type=DayCountTypes.ACT_360,
                     notional=notional,
-                    cal_type=swapCalendarType,
+                    cal_type=swap_cal_type,
                     bd_type=bd_type,
                     dg_type=dg_type)
 
@@ -103,12 +103,12 @@ def test_dp_example():
     dfs = [0.9999843, 0.9966889, 0.9942107, 0.9911884, 0.9880738, 0.9836490,
            0.9786276, 0.9710461, 0.9621778, 0.9514315, 0.9394919]
 
-    value_date = start_date
+    value_dt = start_dt
 
-    curve = DiscountCurve(value_date, dts, np.array(dfs),
+    curve = DiscountCurve(value_dt, dts, np.array(dfs),
                           InterpTypes.FLAT_FWD_RATES)
 
-    v = swap.value(value_date, curve, curve)
+    v = swap.value(value_dt, curve, curve)
 
     # This is essentially zero
     assert round(v * 1000, 4) == 785300.0566

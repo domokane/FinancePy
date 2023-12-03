@@ -17,8 +17,8 @@ from financepy.utils.math import ONE_MILLION
 
 def test_FinFixedIborSwapLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     coupon = -0.44970/100.0
     freq_type = FrequencyTypes.ANNUAL
@@ -31,8 +31,8 @@ def test_FinFixedIborSwapLeg():
     payment_lag = 0
     principal = 0.0
 
-    swapFixedLeg = SwapFixedLeg(effective_date,
-                                maturity_date,
+    swapFixedLeg = SwapFixedLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 coupon,
                                 freq_type,
@@ -44,16 +44,16 @@ def test_FinFixedIborSwapLeg():
                                 bd_type,
                                 dg_type)
 
-    libor_curve = DiscountCurveFlat(effective_date, 0.05)
+    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
-    v = swapFixedLeg.value(effective_date, libor_curve)
+    v = swapFixedLeg.value(effective_dt, libor_curve)
     assert round(v, 4) == 194018.0116
 
 
 def test_FinFixedOISSwapLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     coupon = -0.515039/100.0
     freq_type = FrequencyTypes.ANNUAL
@@ -66,8 +66,8 @@ def test_FinFixedOISSwapLeg():
     payment_lag = 1
     principal = 0.0
 
-    swapFixedLeg = SwapFixedLeg(effective_date,
-                                maturity_date,
+    swapFixedLeg = SwapFixedLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 coupon,
                                 freq_type,
@@ -79,16 +79,16 @@ def test_FinFixedOISSwapLeg():
                                 bd_type,
                                 dg_type)
 
-    libor_curve = DiscountCurveFlat(effective_date, 0.05)
+    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
-    v = swapFixedLeg.value(effective_date, libor_curve)
+    v = swapFixedLeg.value(effective_dt, libor_curve)
     assert round(v, 4) == 225367.1730
 
 
 def test_FinFloatIborLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     spread = 0.0
     freq_type = FrequencyTypes.ANNUAL
@@ -101,8 +101,8 @@ def test_FinFloatIborLeg():
     payment_lag = 0
     principal = 0.0
 
-    swapFloatLeg = SwapFloatLeg(effective_date,
-                                maturity_date,
+    swapFloatLeg = SwapFloatLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 spread,
                                 freq_type,
@@ -114,19 +114,19 @@ def test_FinFloatIborLeg():
                                 bd_type,
                                 dg_type)
 
-    libor_curve = DiscountCurveFlat(effective_date, 0.05)
+    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
     firstFixing = 0.03
 
-    v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
+    v = swapFloatLeg.value(effective_dt, libor_curve, libor_curve,
                            firstFixing)
     assert round(v, 4) == -2009695.8385
 
 
 def test_FinFloatOISLeg():
 
-    effective_date = Date(28, 10, 2020)
-    maturity_date = Date(28, 10, 2025)
+    effective_dt = Date(28, 10, 2020)
+    maturity_dt = Date(28, 10, 2025)
 
     spread = 0.0
     freq_type = FrequencyTypes.ANNUAL
@@ -139,8 +139,8 @@ def test_FinFloatOISLeg():
     payment_lag = 1
     principal = 0.0
 
-    swapFloatLeg = SwapFloatLeg(effective_date,
-                                maturity_date,
+    swapFloatLeg = SwapFloatLeg(effective_dt,
+                                maturity_dt,
                                 legPayRecType,
                                 spread,
                                 freq_type,
@@ -152,10 +152,10 @@ def test_FinFloatOISLeg():
                                 bd_type,
                                 dg_type)
 
-    libor_curve = DiscountCurveFlat(effective_date, 0.05)
+    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
     firstFixing = 0.03
 
-    v = swapFloatLeg.value(effective_date, libor_curve, libor_curve,
+    v = swapFloatLeg.value(effective_dt, libor_curve, libor_curve,
                            firstFixing)
     assert round(v, 4) == -2038364.5665

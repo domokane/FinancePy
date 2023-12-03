@@ -13,7 +13,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
@@ -24,50 +24,50 @@ def test_FinMath():
 
     start = time.time()
 
-    testCases.header("FUNCTION", "X", "Y")
+    test_cases.header("FUNCTION", "X", "Y")
     for x in xValues:
         y = N(x)
-        testCases.print("NORMCDF1", x, y)
+        test_cases.print("NORMCDF1", x, y)
 
     end = time.time()
     duration = end - start
-    testCases.header("LABEL", "TIME")
-    testCases.print("Fast N(x) takes ", duration)
+    test_cases.header("LABEL", "TIME")
+    test_cases.print("Fast N(x) takes ", duration)
 
     ##########################################################################
 
-    testCases.header("FUNCTION", "X", "Y")
+    test_cases.header("FUNCTION", "X", "Y")
 
     start = time.time()
     for x in xValues:
         y = normcdf_slow(x)
-        testCases.print("NORMCDF2", x, y)
+        test_cases.print("NORMCDF2", x, y)
 
     end = time.time()
     duration = end - start
-    testCases.header("LABEL", "TIME")
-    testCases.print("Slow N(x) takes ", duration)
+    test_cases.header("LABEL", "TIME")
+    test_cases.print("Slow N(x) takes ", duration)
 
     ##########################################################################
 
-    testCases.header("FUNCTION", "X", "Y")
+    test_cases.header("FUNCTION", "X", "Y")
 
     start = time.time()
     for x in xValues:
         y = normcdf_integrate(x)
-        testCases.print("NORMCDF INTEGRATE", x, y)
+        test_cases.print("NORMCDF INTEGRATE", x, y)
 
     end = time.time()
     duration = end - start
 
-    testCases.header("LABEL", "TIME")
-    testCases.print("Trapezium N(x) takes ", duration)
+    test_cases.header("LABEL", "TIME")
+    test_cases.print("Trapezium N(x) takes ", duration)
 
     ##########################################################################
 
     xValues = np.linspace(-6.0, 6.0, 20)
 
-    testCases.header("X", "Y1", "Y2", "Y3", "DIFF1", "DIFF2")
+    test_cases.header("X", "Y1", "Y2", "Y3", "DIFF1", "DIFF2")
 
     for x in xValues:
         y1 = N(x)
@@ -75,13 +75,13 @@ def test_FinMath():
         y3 = normcdf_integrate(x)
         diff1 = y3 - y1
         diff2 = y3 - y2
-        testCases.print(x, y1, y2, y3, diff1, diff2)
+        test_cases.print(x, y1, y2, y3, diff1, diff2)
 
     ##########################################################################
 
     xValues = np.linspace(-6.0, 6.0, 20)
 
-    testCases.header("X", "Y1", "Y2", "INV_Y1", "INV_Y2", "DIFF1", "DIFF2")
+    test_cases.header("X", "Y1", "Y2", "INV_Y1", "INV_Y2", "DIFF1", "DIFF2")
 
     for x_in in xValues:
         y1 = N(x_in)
@@ -90,11 +90,11 @@ def test_FinMath():
         x_out2 = norminvcdf(y2)
         diff1 = x_out1 - x_in
         diff2 = x_out2 - x_in
-        testCases.print(x, y1, y2, x_out1, x_out2, diff1, diff2)
+        test_cases.print(x, y1, y2, x_out1, x_out2, diff1, diff2)
 
 
 ##########################################################################
 
 
 test_FinMath()
-testCases.compareTestCases()
+test_cases.compareTestCases()

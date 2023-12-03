@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 PLOT_GRAPHS = False
 
@@ -35,7 +35,7 @@ def test_FinInterpolate():
 
     xInterpolateValues = np.linspace(0.0, 10.0, 20)
 
-    testCases.header("METHOD", "X", "Y_INTERPOLATED")
+    test_cases.header("METHOD", "X", "Y_INTERPOLATED")
 
     for interp_type in InterpTypes:
 
@@ -47,7 +47,7 @@ def test_FinInterpolate():
 
         for x in xInterpolateValues:
             y_int = interpolator.interpolate(x)
-            testCases.print(interp_type, x, y_int)
+            test_cases.print(interp_type, x, y_int)
             yInterpValues.append(y_int)
 
         end = time.time()
@@ -63,7 +63,7 @@ def test_FinInterpolate():
     yp = np.array([0.4, 0.9, 0.32, 0.2, 0.22, 0.10, 0.28])
     n = 10000
 
-    testCases.header("LABEL", "TIME")
+    test_cases.header("LABEL", "TIME")
     interpolator = Interpolator(interp_type)
     interpolator.fit(xp, yp)
 
@@ -71,10 +71,10 @@ def test_FinInterpolate():
     for i in range(0, n):
         interpolator.interpolate(0.8)
     end = time.time()
-    testCases.print("10000 Interpolations", end - start)
+    test_cases.print("10000 Interpolations", end - start)
 
 ###############################################################################
 
 
 test_FinInterpolate()
-testCases.compareTestCases()
+test_cases.compareTestCases()

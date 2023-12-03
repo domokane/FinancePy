@@ -34,8 +34,8 @@ class EquitySwap:
     which the implied index rates are extracted. """
 
     def __init__(self,
-                 effective_date: Date,  # Date contract starts or last Equity Reset
-                 term_date_or_tenor: (Date, str),  # Date contract ends
+                 effective_dt: Date,  # Date contract starts or last Equity Reset
+                 term_dt_or_tenor: (Date, str),  # Date contract ends
                  eq_leg_type: SwapTypes,
                  eq_freq_type: FrequencyTypes,
                  eq_dc_type: DayCountTypes,
@@ -61,20 +61,20 @@ class EquitySwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_date_or_tenor) == Date:
-            self._termination_date = term_date_or_tenor
+        if type(term_dt_or_tenor) == Date:
+            self._termination_dt = term_dt_or_tenor
         else:
-            self._termination_date = effective_date.add_tenor(
-                term_date_or_tenor)
+            self._termination_dt = effective_dt.add_tenor(
+                term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_date = calendar.adjust(self._termination_date,
+        self._maturity_dt = calendar.adjust(self._termination_dt,
                                               bd_type)
 
-        if effective_date > self._maturity_date:
+        if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_date = effective_date
+        self._effective_dt = effective_dt
 
         # There is no exchange of principal
         self._principal = 0.0
@@ -83,8 +83,8 @@ class EquitySwap:
         if eq_leg_type == SwapTypes.PAY:
             rate_leg_type = SwapTypes.RECEIVE
 
-        self._equity_leg = EquitySwapLeg(effective_date,
-                                         self._maturity_date,
+        self._equity_leg = EquitySwapLeg(effective_dt,
+                                         self._maturity_dt,
                                          eq_leg_type,
                                          eq_freq_type,
                                          eq_dc_type,
@@ -98,8 +98,8 @@ class EquitySwap:
                                          end_of_month)
 
         # Fixed Rate Leg not implemented yet
-        self._rate_leg = SwapFloatLeg(effective_date,
-                                      self._maturity_date,
+        self._rate_leg = SwapFloatLeg(effective_dt,
+                                      self._maturity_dt,
                                       rate_leg_type,
                                       rate_spread,
                                       rate_freq_type,
@@ -115,7 +115,7 @@ class EquitySwap:
     ###########################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve = None,
               dividend_curve: DiscountCurve = None,
@@ -123,14 +123,14 @@ class EquitySwap:
               firstFixingRate=None):
         """ Value the Equity swap on a valuation date. """
 
-        self._equity_leg_value = self._equity_leg.value(value_date,
+        self._equity_leg_value = self._equity_leg.value(value_dt,
                                                         discount_curve,
                                                         index_curve,
                                                         dividend_curve,
                                                         current_price)
         self._fill_rate_notional_array()
 
-        self._rate_leg_value = self._rate_leg.value(value_date,
+        self._rate_leg_value = self._rate_leg.value(value_dt,
                                                     discount_curve,
                                                     index_curve,
                                                     firstFixingRate)

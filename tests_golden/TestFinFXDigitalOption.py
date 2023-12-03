@@ -20,7 +20,7 @@ from financepy.products.fx.fx_digital_option import FXDigitalOption
 from financepy.utils.global_types import OptionTypes
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
@@ -29,8 +29,8 @@ def test_FinFXDigitalOption():
 
     # Not exactly T=1.0 but close so don't exact exact agreement
     # (in fact I do not get exact agreement even if I do set T=1.0)
-    value_date = Date(13, 2, 2018)
-    expiry_date = Date(13, 2, 2019)
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = Date(13, 2, 2019)
 
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
@@ -47,12 +47,12 @@ def test_FinFXDigitalOption():
 
     notional = 1.0
 
-    dom_discount_curve = DiscountCurveFlat(value_date, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_date, ccy1CCRate)
+    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
-    digital_option = FXDigitalOption(expiry_date,
+    digital_option = FXDigitalOption(expiry_dt,
                                      strike_fx_rate,
                                      currency_pair,
                                      OptionTypes.DIGITAL_CALL,
@@ -61,7 +61,7 @@ def test_FinFXDigitalOption():
 
     spot_fx_rate = np.linspace(0.01, 2.0, 10)
 
-    value = digital_option.value(value_date,
+    value = digital_option.value(value_dt,
                                  spot_fx_rate,
                                  dom_discount_curve,
                                  for_discount_curve,
@@ -71,4 +71,4 @@ def test_FinFXDigitalOption():
 
 
 test_FinFXDigitalOption()
-testCases.compareTestCases()
+test_cases.compareTestCases()

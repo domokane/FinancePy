@@ -16,7 +16,7 @@ from financepy.utils.global_types import OptionTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -29,9 +29,9 @@ testMCTimings = True
 
 def testConvergence():
 
-    value_date = Date(1, 1, 2014)
+    value_dt = Date(1, 1, 2014)
     startAveragingDate = Date(1, 6, 2014)
-    expiry_date = Date(1, 1, 2015)
+    expiry_dt = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.30
@@ -42,16 +42,16 @@ def testConvergence():
     seed = 1976
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     asianOption = EquityAsianOption(startAveragingDate,
-                                    expiry_date,
+                                    expiry_dt,
                                     K,
                                     OptionTypes.EUROPEAN_CALL,
                                     num_observations)
 
-    testCases.header(
+    test_cases.header(
         "K",
         "Geometric",
         "Turnbull_Wakeman",
@@ -71,7 +71,7 @@ def testConvergence():
 
         accruedAverage = stock_price * 1.1
 
-        value_mc_fast = asianOption._value_mc_fast(value_date,
+        value_mc_fast = asianOption._value_mc_fast(value_dt,
                                                    stock_price,
                                                    discount_curve,
                                                    dividend_curve,
@@ -80,7 +80,7 @@ def testConvergence():
                                                    seed,
                                                    accruedAverage)
 
-        value_mc_CV = asianOption.value_mc(value_date,
+        value_mc_CV = asianOption.value_mc(value_dt,
                                            stock_price,
                                            discount_curve,
                                            dividend_curve,
@@ -89,7 +89,7 @@ def testConvergence():
                                            seed,
                                            accruedAverage)
 
-        valueGeometric = asianOption.value(value_date,
+        valueGeometric = asianOption.value(value_dt,
                                            stock_price,
                                            discount_curve,
                                            dividend_curve,
@@ -97,7 +97,7 @@ def testConvergence():
                                            AsianOptionValuationMethods.GEOMETRIC,
                                            accruedAverage)
 
-        valueTurnbullWakeman = asianOption.value(value_date,
+        valueTurnbullWakeman = asianOption.value(value_dt,
                                                  stock_price,
                                                  discount_curve,
                                                  dividend_curve,
@@ -105,7 +105,7 @@ def testConvergence():
                                                  AsianOptionValuationMethods.TURNBULL_WAKEMAN,
                                                  accruedAverage)
 
-        valueCurran = asianOption.value(value_date,
+        valueCurran = asianOption.value(value_dt,
                                         stock_price,
                                         discount_curve,
                                         dividend_curve,
@@ -119,7 +119,7 @@ def testConvergence():
         valuesMC_fast.append(value_mc_fast)
         valuesMC_CV.append(value_mc_CV)
 
-        testCases.print(
+        test_cases.print(
             num_paths,
             valueGeometric,
             valueTurnbullWakeman,
@@ -145,7 +145,7 @@ def testConvergence():
 def testTimeEvolution():
 
     startAveragingDate = Date(1, 1, 2015)
-    expiry_date = Date(1, 1, 2016)
+    expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.30
@@ -158,12 +158,12 @@ def testTimeEvolution():
     model = BlackScholes(volatility)
 
     asianOption = EquityAsianOption(startAveragingDate,
-                                    expiry_date,
+                                    expiry_dt,
                                     K,
                                     OptionTypes.EUROPEAN_CALL,
                                     num_observations)
 
-    testCases.header(
+    test_cases.header(
         "Date",
         "Geometric",
         "Turnbull_Wakeman",
@@ -177,25 +177,25 @@ def testTimeEvolution():
     valuesMC_fast = []
     valuesMC_CV = []
 
-    value_dates = []
-    value_dates.append(Date(1, 4, 2014))
-    value_dates.append(Date(1, 6, 2014))
-    value_dates.append(Date(1, 8, 2014))
-    value_dates.append(Date(1, 2, 2015))
-    value_dates.append(Date(1, 4, 2015))
-    value_dates.append(Date(1, 6, 2015))
-    value_dates.append(Date(1, 8, 2015))
+    value_dts = []
+    value_dts.append(Date(1, 4, 2014))
+    value_dts.append(Date(1, 6, 2014))
+    value_dts.append(Date(1, 8, 2014))
+    value_dts.append(Date(1, 2, 2015))
+    value_dts.append(Date(1, 4, 2015))
+    value_dts.append(Date(1, 6, 2015))
+    value_dts.append(Date(1, 8, 2015))
 
     num_paths = 10000
 
-    for value_date in value_dates:
+    for value_dt in value_dts:
 
         accruedAverage = stock_price * 0.9
 
-        discount_curve = DiscountCurveFlat(value_date, interest_rate)
-        dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+        discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+        dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-        value_mc_fast = asianOption._value_mc_fast(value_date,
+        value_mc_fast = asianOption._value_mc_fast(value_dt,
                                                    stock_price,
                                                    discount_curve,
                                                    dividend_curve,
@@ -204,7 +204,7 @@ def testTimeEvolution():
                                                    seed,
                                                    accruedAverage)
 
-        value_mc_CV = asianOption.value_mc(value_date,
+        value_mc_CV = asianOption.value_mc(value_dt,
                                            stock_price,
                                            discount_curve,
                                            dividend_curve,
@@ -213,7 +213,7 @@ def testTimeEvolution():
                                            seed,
                                            accruedAverage)
 
-        valueGeometric = asianOption.value(value_date,
+        valueGeometric = asianOption.value(value_dt,
                                            stock_price,
                                            discount_curve,
                                            dividend_curve,
@@ -221,7 +221,7 @@ def testTimeEvolution():
                                            AsianOptionValuationMethods.GEOMETRIC,
                                            accruedAverage)
 
-        valueTurnbullWakeman = asianOption.value(value_date,
+        valueTurnbullWakeman = asianOption.value(value_dt,
                                                  stock_price,
                                                  discount_curve,
                                                  dividend_curve,
@@ -229,7 +229,7 @@ def testTimeEvolution():
                                                  AsianOptionValuationMethods.TURNBULL_WAKEMAN,
                                                  accruedAverage)
 
-        valueCurran = asianOption.value(value_date,
+        valueCurran = asianOption.value(value_dt,
                                         stock_price,
                                         discount_curve,
                                         dividend_curve,
@@ -243,8 +243,8 @@ def testTimeEvolution():
         valuesMC_fast.append(value_mc_fast)
         valuesMC_CV.append(value_mc_CV)
 
-        testCases.print(
-            str(value_date),
+        test_cases.print(
+            str(value_dt),
             valueGeometric,
             valueTurnbullWakeman,
             valueCurran,
@@ -252,7 +252,7 @@ def testTimeEvolution():
             value_mc_CV)
 
 #    import matplotlib.pyplot as plt
-#    x = [ dt.date() for dt in value_dates]
+#    x = [ dt.date() for dt in value_dts]
 #
 #    plt.figure(figsize=(8,6))
 #    plt.plot(x,valuesGeometric,label="Geometric")
@@ -269,9 +269,9 @@ def testTimeEvolution():
 
 def testMCTimings():
 
-    value_date = Date(1, 1, 2014)
+    value_dt = Date(1, 1, 2014)
     startAveragingDate = Date(1, 6, 2014)
-    expiry_date = Date(1, 1, 2015)
+    expiry_dt = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.30
@@ -282,16 +282,16 @@ def testMCTimings():
     seed = 1976
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     asianOption = EquityAsianOption(startAveragingDate,
-                                    expiry_date,
+                                    expiry_dt,
                                     K,
                                     OptionTypes.EUROPEAN_CALL,
                                     num_observations)
 
-    testCases.header(
+    test_cases.header(
         "NUMPATHS",
         "VALUE",
         "TIME",
@@ -315,7 +315,7 @@ def testMCTimings():
         accruedAverage = stock_price * 1.1
 
         start = time.time()
-        value_mc = asianOption.value_mc(value_date,
+        value_mc = asianOption.value_mc(value_dt,
                                         stock_price,
                                         discount_curve,
                                         dividend_curve,
@@ -328,7 +328,7 @@ def testMCTimings():
         t_MC = end - start
 
         start = time.time()
-        value_mc_fast = asianOption._value_mc_fast(value_date,
+        value_mc_fast = asianOption._value_mc_fast(value_dt,
                                                    stock_price,
                                                    discount_curve,
                                                    dividend_curve,
@@ -341,7 +341,7 @@ def testMCTimings():
         t_MC_fast = end - start
 
         start = time.time()
-        value_mc_fast_CV = asianOption.value_mc(value_date,
+        value_mc_fast_CV = asianOption.value_mc(value_dt,
                                                 stock_price,
                                                 discount_curve,
                                                 dividend_curve,
@@ -361,7 +361,7 @@ def testMCTimings():
         tvaluesMC_fast.append(t_MC_fast)
         tvaluesMC_fast_CV.append(t_MC_fast_CV)
 
-        testCases.print(
+        test_cases.print(
             num_paths,
             value_mc,
             t_MC,
@@ -384,4 +384,4 @@ def testMCTimings():
 testConvergence()
 testMCTimings()
 testTimeEvolution()
-testCases.compareTestCases()
+test_cases.compareTestCases()

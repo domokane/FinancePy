@@ -10,12 +10,12 @@ from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 
 
-termination_dateAdjust = True
+termination_date_adjust = True
 
 
 def check_frequency(schedule, start=0):
-    dates = schedule._adjusted_dates
-    diff_d1d2 = (schedule._termination_date - schedule._effective_date) / 365.0
+    dates = schedule._adjusted_dts
+    diff_d1d2 = (schedule._termination_dt - schedule._effective_dt) / 365.0
 
     for i in range(start, len(dates) - 2):
         diff = (dates[i+1] - dates[i]) / 365.0
@@ -39,9 +39,9 @@ def test_backward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 5
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 5
     check_frequency(schedule)
 
     freq_type = FrequencyTypes.QUARTERLY
@@ -51,9 +51,9 @@ def test_backward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 9
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 9
     check_frequency(schedule)
 
     freq_type = FrequencyTypes.MONTHLY
@@ -63,9 +63,9 @@ def test_backward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 25
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 25
     check_frequency(schedule)
 
 
@@ -85,9 +85,9 @@ def test_forward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 3
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 3
     check_frequency(schedule)
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
@@ -97,8 +97,8 @@ def test_forward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 5
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 5
     check_frequency(schedule)
 
     freq_type = FrequencyTypes.MONTHLY
@@ -108,9 +108,9 @@ def test_forward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 25
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 25
     check_frequency(schedule)
 
 
@@ -130,9 +130,9 @@ def test_backward_front_stub():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 9
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 9
     check_frequency(schedule, start=1)
 
     # BACKWARD SUPER SHORT STUB AT FRONT
@@ -150,14 +150,14 @@ def test_backward_front_stub():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 9
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 9
     check_frequency(schedule, start=1)
 
 def test_forward_end_stub():
     # FORWARD SHORT STUB AT END
-    termination_dateAdjust = True
+    termination_date_adjust = True
 
     d1 = Date(20, 8, 2018)
     d2 = Date(20, 6, 2020)
@@ -173,9 +173,9 @@ def test_forward_end_stub():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 5
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 5
     check_frequency(schedule)
 
     d1 = Date(19, 9, 2018)
@@ -192,8 +192,8 @@ def test_forward_end_stub():
                         cal_type,
                         bd_type,
                         dg_type)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 9
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 9
     check_frequency(schedule)
 
     d1 = Date(20, 6, 2018)
@@ -203,7 +203,7 @@ def test_forward_end_stub():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
-    termination_dateAdjust = True
+    termination_date_adjust = True
 
     schedule = Schedule(d1,
                         d2,
@@ -211,7 +211,7 @@ def test_forward_end_stub():
                         cal_type,
                         bd_type,
                         dg_type,
-                        termination_dateAdjust)
-    adjusted_dates = schedule._adjusted_dates
-    assert len(adjusted_dates) == 5
+                        termination_date_adjust)
+    adjusted_dts = schedule._adjusted_dts
+    assert len(adjusted_dts) == 5
     check_frequency(schedule)

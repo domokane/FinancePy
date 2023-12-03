@@ -10,7 +10,7 @@ from financepy.models.merton_firm_mkt import MertonFirmMkt
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -32,17 +32,17 @@ def test_FinModelMertonCredit():
                           assetGrowthRate,
                           equity_vol)
 
-    testCases.header("MERTON MARKET MODEL", "VALUE")
-    testCases.print("ASSET VALUE", model._A)
-    testCases.print("EQUITY VALUE", model._E)
-    testCases.print("DEBT VALUE", model.debt_value())
+    test_cases.header("MERTON MARKET MODEL", "VALUE")
+    test_cases.print("ASSET VALUE", model._A)
+    test_cases.print("EQUITY VALUE", model._E)
+    test_cases.print("DEBT VALUE", model.debt_value())
 
-    testCases.print("ASSET VOLATILITY", model._vA)
-    testCases.print("EQUITY VOL", model._vE)
+    test_cases.print("ASSET VOLATILITY", model._vA)
+    test_cases.print("EQUITY VOL", model._vE)
 
-    testCases.print("CREDIT SPREAD", model.credit_spread())
-    testCases.print("LEVERAGE", model.leverage())
-    testCases.print("PROD DEFAULT", model.prob_default())
+    test_cases.print("CREDIT SPREAD", model.credit_spread())
+    test_cases.print("LEVERAGE", model.leverage())
+    test_cases.print("PROD DEFAULT", model.prob_default())
 
     assetValue = model._A
     assetVol = model._vA
@@ -54,19 +54,19 @@ def test_FinModelMertonCredit():
                        assetGrowthRate,
                        assetVol)
 
-    testCases.header("BASIC MERTON MODEL", "VALUE")
+    test_cases.header("BASIC MERTON MODEL", "VALUE")
 
-    testCases.print("ASSET VALUE", model._A)
-    testCases.print("EQUITY VALUE", model._E)
-    testCases.print("DEBT VALUE", model.debt_value())
+    test_cases.print("ASSET VALUE", model._A)
+    test_cases.print("EQUITY VALUE", model._E)
+    test_cases.print("DEBT VALUE", model.debt_value())
 
-    testCases.print("ASSET VOLATILITY", model._vA)
-    testCases.print("EQUITY VOL", model._vE)
+    test_cases.print("ASSET VOLATILITY", model._vA)
+    test_cases.print("EQUITY VOL", model._vE)
 
-    testCases.print("CREDIT SPREAD", model.credit_spread())
-    testCases.print("LEVERAGE", model.leverage())
-    testCases.print("PROD DEFAULT", model.prob_default())
-    testCases.print("DISTANCE DEFAULT", model.dist_default())
+    test_cases.print("CREDIT SPREAD", model.credit_spread())
+    test_cases.print("LEVERAGE", model.leverage())
+    test_cases.print("PROD DEFAULT", model.prob_default())
+    test_cases.print("DISTANCE DEFAULT", model.dist_default())
 
     assetValue = 140.0
     bondFace = 100.0
@@ -82,22 +82,22 @@ def test_FinModelMertonCredit():
                        assetGrowthRate,
                        assetVol)
 
-    testCases.header("BASIC MERTON MODEL", "VALUE")
+    test_cases.header("BASIC MERTON MODEL", "VALUE")
 
-    testCases.print("ASSET VALUE", model._A)
-    testCases.print("EQUITY VALUE", model._E)
-    testCases.print("DEBT VALUE", model.debt_value())
+    test_cases.print("ASSET VALUE", model._A)
+    test_cases.print("EQUITY VALUE", model._E)
+    test_cases.print("DEBT VALUE", model.debt_value())
 
-    testCases.print("ASSET VOLATILITY", model._vA)
-    testCases.print("EQUITY VOL", model._vE)
+    test_cases.print("ASSET VOLATILITY", model._vA)
+    test_cases.print("EQUITY VOL", model._vE)
 
-    testCases.print("CREDIT SPREAD", model.credit_spread()*10000)
-    testCases.print("LEVERAGE", model.leverage())
-    testCases.print("PROD DEFAULT", model.prob_default())
-    testCases.print("DISTANCE DEFAULT", model.dist_default())
+    test_cases.print("CREDIT SPREAD", model.credit_spread()*10000)
+    test_cases.print("LEVERAGE", model.leverage())
+    test_cases.print("PROD DEFAULT", model.prob_default())
+    test_cases.print("DISTANCE DEFAULT", model.dist_default())
 
 ###############################################################################
 
 
 test_FinModelMertonCredit()
-testCases.compareTestCases()
+test_cases.compareTestCases()

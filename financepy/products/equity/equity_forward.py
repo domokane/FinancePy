@@ -20,7 +20,7 @@ class EquityForward():
     """ Contract to buy or sell a stock in future at a price agreed today. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  forward_price: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
                  notional: float,
                  long_short: FinLongShort = FinLongShort.LONG):
@@ -29,7 +29,7 @@ class EquityForward():
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._forward_price = forward_price
         self._notional = notional
         self._long_short = long_short
@@ -37,31 +37,31 @@ class EquityForward():
 ###############################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               stock_price,  # Current stock price
               discount_curve,
               dividend_curve):
         """ Calculate the value of an equity forward contract from the stock
         price and discount and dividend discount. """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._value_date != value_date:
+        if dividend_curve._value_dt != value_dt:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if isinstance(value_date, Date):
-            t = (self._expiry_date - value_date) / gDaysInYear
+        if isinstance(value_dt, Date):
+            t = (self._expiry_dt - value_dt) / gDaysInYear
         else:
-            t = value_date
+            t = value_dt
 
         if np.any(stock_price <= 0.0):
             raise FinError("Stock price must be greater than zero.")
@@ -71,7 +71,7 @@ class EquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        fwdStockPrice = self.forward(value_date,
+        fwdStockPrice = self.forward(value_dt,
                                      stock_price,
                                      discount_curve,
                                      dividend_curve)
@@ -89,16 +89,16 @@ class EquityForward():
 ###############################################################################
 
     def forward(self,
-                value_date,
+                value_dt,
                 stock_price,  # Current stock price
                 discount_curve,
                 dividend_curve):
         """ Calculate the forward price of the equity forward contract. """
 
-        if isinstance(value_date, Date):
-            t = (self._expiry_date - value_date) / gDaysInYear
+        if isinstance(value_dt, Date):
+            t = (self._expiry_dt - value_dt) / gDaysInYear
         else:
-            t = value_date
+            t = value_dt
 
         if np.any(stock_price <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")
@@ -118,7 +118,7 @@ class EquityForward():
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("FORWARD PRICE", self._forward_price)
         s += label_to_string("LONG OR SHORT", self._long_short)
         s += label_to_string("NOTIONAL", self._notional, "")

@@ -32,31 +32,31 @@ results = [
 
 
 def test_FinFlatCurve():
-    curve_date = Date(1, 1, 2019)
+    curve_dt = Date(1, 1, 2019)
     months = range(1, 60, 3)
-    dates = curve_date.add_months(months)
+    dates = curve_dt.add_months(months)
     compounding = FrequencyTypes.CONTINUOUS
 
-    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[0]
 
     compounding = FrequencyTypes.ANNUAL
-    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[1]
 
     compounding = FrequencyTypes.SEMI_ANNUAL
-    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[2]
 
     compounding = FrequencyTypes.QUARTERLY
-    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[3]
 
     compounding = FrequencyTypes.MONTHLY
-    flat_curve = DiscountCurveFlat(curve_date, 0.05, compounding)
+    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[4]

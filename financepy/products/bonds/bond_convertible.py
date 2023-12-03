@@ -261,14 +261,14 @@ class BondConvertible:
     the credit quality of the issuer and the level of interest rates."""
 
     def __init__(self,
-                 maturity_date: Date,  # bond maturity date
+                 maturity_dt: Date,  # bond maturity date
                  coupon: float,  # annual coupon
                  freq_type: FrequencyTypes,  # coupon frequency type
-                 start_convert_date: Date,  # conversion starts on this date
+                 start_convert_dt: Date,  # conversion starts on this date
                  conversion_ratio: float,  # num shares per face of notional
-                 call_dates: List[Date],  # list of call dates
+                 call_dts: List[Date],  # list of call dates
                  call_prices: List[float],  # list of call prices
-                 put_dates: List[Date],  # list of put dates
+                 put_dts: List[Date],  # list of put dates
                  put_prices: List[float],  # list of put prices
                  dc_type: DayCountTypes,  # day count type for accrued
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND):
@@ -280,36 +280,36 @@ class BondConvertible:
 
         check_argument_types(self.__init__, locals())
 
-        if start_convert_date > maturity_date:
+        if start_convert_dt > maturity_dt:
             raise FinError("Start convert date is after bond maturity.")
 
-        self._maturity_date = maturity_date
+        self._maturity_dt = maturity_dt
         self._cpn = coupon
         self._dc_type = dc_type
         self._freq = annual_frequency(freq_type)
         self._freq_type = freq_type
         self._cal_type = cal_type
-        self._call_dates = call_dates
+        self._call_dts = call_dts
         self._call_prices = call_prices
 
-        if len(self._call_dates) != len(self._call_prices):
+        if len(self._call_dts) != len(self._call_prices):
             raise FinError("Call dates and prices not same length.")
 
-        self._put_dates = put_dates
+        self._put_dts = put_dts
         self._put_prices = put_prices
 
-        if len(self._put_dates) != len(self._put_prices):
+        if len(self._put_dts) != len(self._put_prices):
             raise FinError("Put dates and prices not same length.")
 
-        if len(put_dates) > 0:
-            if put_dates[-1] > maturity_date:
+        if len(put_dts) > 0:
+            if put_dts[-1] > maturity_dt:
                 raise FinError("Last put is after bond maturity.")
 
-        if len(call_dates) > 0:
-            if call_dates[-1] > maturity_date:
+        if len(call_dts) > 0:
+            if call_dts[-1] > maturity_dt:
                 raise FinError("Last call is after bond maturity.")
 
-        self._start_convert_date = start_convert_date
+        self._start_convert_dt = start_convert_dt
 
         if conversion_ratio < 0.0:
             raise FinError("Conversion ratio is negative.")
@@ -317,7 +317,7 @@ class BondConvertible:
         self._conversion_ratio = conversion_ratio
         self._par = 100.0
 
-        self._settle_date = Date(1, 1, 1900)
+        self._settle_dt = Date(1, 1, 1900)
         """ I do not determine cashflow dates as I do not want to require
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. """
@@ -328,36 +328,36 @@ class BondConvertible:
 
     ###########################################################################
 
-    def _calculate_cpn_dates(self,
-                             settle_date: Date):
+    def _calculate_cpn_dts(self,
+                             settle_dt: Date):
         """ Determine the convertible bond cash flow payment dates. """
 
         # No need to generate flows if settlement date has not changed
-        if settle_date == self._settle_date:
+        if settle_dt == self._settle_dt:
             return
 
-        self._settle_date = settle_date
+        self._settle_dt = settle_dt
         bd_type = BusDayAdjustTypes.NONE
         dg_type = DateGenRuleTypes.BACKWARD
 
-        self._cpn_dates = Schedule(settle_date,
-                                   self._maturity_date,
+        self._cpn_dts = Schedule(settle_dt,
+                                   self._maturity_dt,
                                    self._freq_type,
                                    self._cal_type,
                                    bd_type,
                                    dg_type)._generate()
 
-        self._pcd = self._cpn_dates[0]
-        self._ncd = self._cpn_dates[1]
-        self.accrued_interest(settle_date, 1.0)
+        self._pcd = self._cpn_dts[0]
+        self._ncd = self._cpn_dts[1]
+        self.accrued_interest(settle_dt, 1.0)
 
     ###########################################################################
 
     def value(self,
-              settle_date: Date,
+              settle_dt: Date,
               stock_price: float,
               stock_volatility: float,
-              dividend_dates: List[Date],
+              dividend_dts: List[Date],
               dividend_yields: List[float],
               discount_curve: DiscountCurve,
               credit_spread: float,
@@ -390,9 +390,9 @@ class BondConvertible:
         if stock_volatility <= 0.0:
             stock_volatility = 1e-10  # Avoid overflows in delta calc
 
-        self._calculate_cpn_dates(settle_date)
+        self._calculate_cpn_dts(settle_dt)
 
-        tmat = (self._maturity_date - settle_date) / gDaysInYear
+        tmat = (self._maturity_dt - settle_dt) / gDaysInYear
 
         if tmat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
@@ -403,8 +403,8 @@ class BondConvertible:
 
         cpn = self._cpn / self._freq
 
-        for dt in self._cpn_dates[1:]:
-            flow_time = (dt - settle_date) / gDaysInYear
+        for dt in self._cpn_dts[1:]:
+            flow_time = (dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -419,8 +419,8 @@ class BondConvertible:
 
         call_times = []
 
-        for dt in self._call_dates:
-            call_time = (dt - settle_date) / gDaysInYear
+        for dt in self._call_dts:
+            call_time = (dt - settle_dt) / gDaysInYear
             call_times.append(call_time)
 
         call_times = np.array(call_times)
@@ -434,8 +434,8 @@ class BondConvertible:
 
         put_times = []
 
-        for dt in self._put_dates:
-            put_time = (dt - settle_date) / gDaysInYear
+        for dt in self._put_dts:
+            put_time = (dt - settle_dt) / gDaysInYear
             put_times.append(put_time)
 
         put_times = np.array(put_times)
@@ -447,18 +447,18 @@ class BondConvertible:
         if np.any(put_times <= 0.0):
             raise FinError("No put times can be on or before value date.")
 
-        if len(dividend_yields) != len(dividend_dates):
+        if len(dividend_yields) != len(dividend_dts):
             raise FinError("Number of dividend yields and dates not same.")
 
         dividend_times = []
-        for dt in dividend_dates:
-            dividend_time = (dt - settle_date) / gDaysInYear
+        for dt in dividend_dts:
+            dividend_time = (dt - settle_dt) / gDaysInYear
             dividend_times.append(dividend_time)
         dividend_times = np.array(dividend_times)
         dividend_yields = np.array(dividend_yields)
 
         # If it's before today it starts today
-        tconv = (self._start_convert_date - settle_date) / gDaysInYear
+        tconv = (self._start_convert_dt - settle_dt) / gDaysInYear
         tconv = max(tconv, 0.0)
 
         discount_factors = []
@@ -545,33 +545,33 @@ class BondConvertible:
     ###########################################################################
 
     def accrued_days(self,
-                     settle_date: Date):
+                     settle_dt: Date):
         """ Calculate number days from previous coupon date to settlement."""
-        self._calculate_cpn_dates(settle_date)
+        self._calculate_cpn_dts(settle_dt)
 
-        if len(self._cpn_dates) <= 2:
+        if len(self._cpn_dts) <= 2:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        return settle_date - self._pcd
+        return settle_dt - self._pcd
 
     ###########################################################################
 
     def accrued_interest(self,
-                         settle_date: Date,
+                         settle_dt: Date,
                          face: (float)):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
 
-        if settle_date != self._settle_date:
-            self._calculate_cpn_dates(settle_date)
+        if settle_dt != self._settle_dt:
+            self._calculate_cpn_dts(settle_dt)
 
-        if len(self._cpn_dates) == 0:
+        if len(self._cpn_dts) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
         dc = DayCount(self._dc_type)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
-                                            settle_date,
+                                            settle_dt,
                                             self._ncd,
                                             self._freq)
 
@@ -597,22 +597,22 @@ class BondConvertible:
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("MATURITY DATE", self._maturity_date)
+        s += label_to_string("MATURITY DATE", self._maturity_dt)
         s += label_to_string("COUPON", self._cpn)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
-        s += label_to_string("START CONVERT DATE", self._start_convert_date)
+        s += label_to_string("START CONVERT DATE", self._start_convert_dt)
         s += label_to_string("CALL", "DATES")
 
-        for i in range(0, len(self._call_dates)):
-            s += label_to_string(self._call_dates[i],
+        for i in range(0, len(self._call_dts)):
+            s += label_to_string(self._call_dts[i],
                                  self._call_prices[i])
 
         s += label_to_string("PUT", "DATES")
 
-        for i in range(0, len(self._put_dates)):
-            s += label_to_string(self._put_dates[i],
+        for i in range(0, len(self._put_dts)):
+            s += label_to_string(self._put_dts[i],
                                  self._put_prices[i])
 
         return s

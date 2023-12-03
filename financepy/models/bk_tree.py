@@ -165,7 +165,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
     # This is the value of the floating leg - this is a ONE CURVE approach.
     ###########################################################################
 
-    fixed_legFlows = np.zeros(num_time_steps)
+    fixed_leg_flows = np.zeros(num_time_steps)
     # Initialise it with ones CHANGE
     float_leg_values = np.ones(num_time_steps)
     num_cpns = len(cpn_times)
@@ -177,7 +177,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
         ttree = _tree_times[n]
         df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
-        fixed_legFlows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
+        fixed_leg_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
         float_leg_values[n] = strike_price  # * df_flow / df_tree
 
     ############################## REMOVE START ###############################
@@ -187,7 +187,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
         for n in range(0, num_time_steps-1):
             ttree = _tree_times[n]
             df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
-            flow = fixed_legFlows[n]
+            flow = fixed_leg_flows[n]
             pv_flow = flow * df_tree
             fixed_pv += pv_flow
             print(">>", n, ttree, df_tree, flow, fixed_pv)
@@ -228,9 +228,9 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
             mapped_times = np.append(mapped_times, t_exp)
             mapped_amounts = np.append(mapped_amounts, accdAtExpiry)
 
-        if fixed_legFlows[n] > 0.0:
+        if fixed_leg_flows[n] > 0.0:
             mapped_times = np.append(mapped_times, _tree_times[n])
-            mapped_amounts = np.append(mapped_amounts, fixed_legFlows[n])
+            mapped_amounts = np.append(mapped_amounts, fixed_leg_flows[n])
 
     ###########################################################################
 
@@ -242,8 +242,8 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
-        if fixed_legFlows[m] > gSmall:
-            accrued[m] = fixed_legFlows[m] * face_amount
+        if fixed_leg_flows[m] > gSmall:
+            accrued[m] = fixed_leg_flows[m] * face_amount
 
     #######################################################################
 
@@ -256,7 +256,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
     # Start with the value of the fixed leg at maturity
     for k in range(0, num_nodes):
-        flow = 1.0 + fixed_legFlows[maturity_step]
+        flow = 1.0 + fixed_leg_flows[maturity_step]
         fixed_leg_values[maturity_step, k] = flow * face_amount
 
     N = jmax
@@ -264,7 +264,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
     # Now step back to today considering early exercise on coupon dates
     for m in range(maturity_step-1, -1, -1):
         nm = min(m, jmax)
-        flow = fixed_legFlows[m] * face_amount
+        flow = fixed_leg_flows[m] * face_amount
 
         for k in range(-nm, nm+1):
             kN = k + N
@@ -566,25 +566,25 @@ def american_bond_option_tree_fast(t_exp, tmat,
 
             dirty_price = bond_values[m, kN]
             clean_price = dirty_price - accrued[m]
-            callExercise = max(clean_price - strike_price, 0.0)
-            putExercise = max(strike_price - clean_price, 0.0)
+            call_exercise = max(clean_price - strike_price, 0.0)
+            put_exercise = max(strike_price - clean_price, 0.0)
 
             holdCall = call_option_values[m, kN]
             holdPut = put_option_values[m, kN]
 
             if m == expiry_step:
 
-                call_option_values[m, kN] = max(callExercise, holdCall)
-                put_option_values[m, kN] = max(putExercise, holdPut)
+                call_option_values[m, kN] = max(call_exercise, holdCall)
+                put_option_values[m, kN] = max(put_exercise, holdPut)
 
             elif exercise_typeInt == 3 and m < expiry_step:  # AMERICAN
 
-                call_option_values[m, kN] = max(callExercise, holdCall)
-                put_option_values[m, kN] = max(putExercise, holdPut)
+                call_option_values[m, kN] = max(call_exercise, holdCall)
+                put_option_values[m, kN] = max(put_exercise, holdPut)
 
         if DEBUG:
             print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
-                  callExercise, putExercise)
+                  call_exercise, put_exercise)
 
     return call_option_values[0, jmax], put_option_values[0, jmax]
 

@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -37,18 +37,18 @@ def test_FinSobol():
     numRepeats = 100
     numDimensions = 10
 
-    testCases.header("LABEL", "TIME")
+    test_cases.header("LABEL", "TIME")
     start = time.time()
     for _ in range(numRepeats):
         get_uniform_sobol(1000, numDimensions)
     end = time.time()
-    testCases.print("Average time taken", (end - start) / numRepeats)
+    test_cases.print("Average time taken", (end - start) / numRepeats)
 
     start = time.time()
     for _ in range(numRepeats):
         get_gaussian_sobol(1000, numDimensions)
     end = time.time()
-    testCases.print("Average time taken", (end - start) / numRepeats)
+    test_cases.print("Average time taken", (end - start) / numRepeats)
 
 
 ###############################################################################
@@ -62,4 +62,4 @@ def test_FinSobolCache():
 
 test_FinSobol()
 test_FinSobolCache()
-testCases.compareTestCases()
+test_cases.compareTestCases()

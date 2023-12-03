@@ -25,10 +25,10 @@ def fvol(volatility, *args):
     volatility. """
 
     self = args[0]
-    value_date = args[1]
+    value_dt = args[1]
     issuer_curve = args[2]
     option_value = args[3]
-    value = self.value(value_date, issuer_curve, volatility)
+    value = self.value(value_dt, issuer_curve, volatility)
     obj_fn = value - option_value
     return obj_fn
 
@@ -45,8 +45,8 @@ class CDSOption:
     option expiry. This needs to be specified. """
 
     def __init__(self,
-                 expiry_date: Date,
-                 maturity_date: Date,
+                 expiry_dt: Date,
+                 maturity_dt: Date,
                  strike_coupon: float,
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
@@ -63,14 +63,14 @@ class CDSOption:
 
         check_argument_types(self.__init__, locals())
 
-        if maturity_date < expiry_date:
+        if maturity_dt < expiry_dt:
             raise FinError("Maturity date must be after option expiry date")
 
         if strike_coupon < 0.0:
             raise FinError("Strike must be greater than zero")
 
-        self._expiry_date = expiry_date
-        self._maturity_date = maturity_date
+        self._expiry_dt = expiry_dt
+        self._maturity_dt = maturity_dt
         self._strike_coupon = strike_coupon
         self._long_protection = long_protection
         self._knockout_flag = knockout_flag
@@ -79,20 +79,20 @@ class CDSOption:
         self._freq_type = freq_type
         self._dc_type = dc_type
         self._cal_type = cal_type
-        self._businessDateAdjustType = bd_type
+        self._bd_type = bd_type
         self._dg_type = dg_type
 
 ###############################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               issuer_curve,
               volatility):
         """ Value the CDS option using Black's model with an adjustment for any
         Front End Protection.
         TODO - Should the CDS be created in the init method ? """
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Expiry date is now or in the past")
 
         if volatility < 0.0:
@@ -101,23 +101,23 @@ class CDSOption:
         # The underlying is a forward starting option that steps in on
         # the expiry date and matures on the expiry date with a coupon
         # set equal to the option spread strike
-        cds = CDS(self._expiry_date,
-                  self._maturity_date,
+        cds = CDS(self._expiry_dt,
+                  self._maturity_dt,
                   self._strike_coupon,
                   self._notional,
                   self._long_protection,
                   self._freq_type,
                   self._dc_type,
                   self._cal_type,
-                  self._businessDateAdjustType,
+                  self._bd_type,
                   self._dg_type)
 
         strike = self._strike_coupon
-        forward_spread = cds.par_spread(value_date, issuer_curve)
+        forward_spread = cds.par_spread(value_dt, issuer_curve)
         forward_rpv01 = cds.risky_pv01(
-            value_date, issuer_curve)['dirty_rpv01']
+            value_dt, issuer_curve)['dirty_rpv01']
 
-        time_to_expiry = (self._expiry_date - value_date) / gDaysInYear
+        time_to_expiry = (self._expiry_dt - value_dt) / gDaysInYear
         logMoneyness = log(forward_spread / strike)
 
         halfVolSquaredT = 0.5 * volatility * volatility * time_to_expiry
@@ -149,11 +149,11 @@ class CDSOption:
 ###############################################################################
 
     def implied_volatility(self,
-                           value_date,
+                           value_dt,
                            issuer_curve,
                            option_value):
         """ Calculate the implied CDS option volatility from a price. """
-        arg_tuple = (self, value_date, issuer_curve, option_value)
+        arg_tuple = (self, value_dt, issuer_curve, option_value)
         sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6,
                                 maxiter=50)
         return sigma

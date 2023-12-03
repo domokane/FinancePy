@@ -99,7 +99,7 @@ def value_mc_fast(t,
 class FXRainbowOption(EquityOption):
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  payoff_type: FXRainbowOptionTypes,
                  payoff_params: List[float],
                  num_assets: int):
@@ -108,7 +108,7 @@ class FXRainbowOption(EquityOption):
 
         self.validate_payoff(payoff_type, payoff_params, num_assets)
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._payoff_type = payoff_type
         self._payoff_params = payoff_params
         self._num_assets = num_assets
@@ -178,31 +178,31 @@ class FXRainbowOption(EquityOption):
     ###########################################################################
 
     def value(self,
-              value_date,
+              value_dt,
               stock_prices,
               dom_discount_curve,
               for_discount_curve,
               volatilities,
               betas):
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_date != value_date:
+        if dom_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if for_discount_curve._value_date != value_date:
+        if for_discount_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
         if self._num_assets != 2:
             raise FinError("Analytical results for two assets only.")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Value date after expiry date.")
 
         self.validate(stock_prices,
@@ -211,7 +211,7 @@ class FXRainbowOption(EquityOption):
                       betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
         df = dom_discount_curve._df(t)
         r = -np.log(df) / t
@@ -264,8 +264,8 @@ class FXRainbowOption(EquityOption):
     ###############################################################################
 
     def value_mc(self,
-                 value_date,
-                 expiry_date,
+                 value_dt,
+                 expiry_dt,
                  stock_prices,
                  discount_curve,
                  dividend_yields,
@@ -279,10 +279,10 @@ class FXRainbowOption(EquityOption):
                       volatilities,
                       betas)
 
-        if value_date > expiry_date:
+        if value_dt > expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiry_date - value_date) / gDaysInYear
+        t = (self._expiry_dt - value_dt) / gDaysInYear
 
         v = value_mc_fast(t,
                           stock_prices,

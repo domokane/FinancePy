@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
@@ -29,14 +29,14 @@ t = 2.0
 
 def test_SABR():
 
-    testCases.header("ALPHA", "BETA", "RHO", "VOL")
+    test_cases.header("ALPHA", "BETA", "RHO", "VOL")
 
     for alpha in [0.1, 0.2, 0.3]:
         for beta in [0.5, 1.0, 2.0]:
             for rho in [-0.8, 0.0, 0.8]:
                 params = np.array([alpha, beta, rho, nu])
                 vol = vol_function_sabr(params, f, k, t)
-                testCases.print(alpha, beta, rho, vol)
+                test_cases.print(alpha, beta, rho, vol)
 
 ###############################################################################
 
@@ -59,7 +59,7 @@ def test_SABR_Calibration():
 
     df = np.exp(-r * t_exp)
 
-    testCases.header("TEST", "CALIBRATION ERROR")
+    test_cases.header("TEST", "CALIBRATION ERROR")
 
     # Make SABR equivalent to lognormal (Black) model
     # (i.e. alpha = 0, beta = 1, rho = 0, nu = 0, shift = 0)
@@ -72,7 +72,7 @@ def test_SABR_Calibration():
 
     assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
-    testCases.print("LOGNORMAL CASE", calibrationError)
+    test_cases.print("LOGNORMAL CASE", calibrationError)
 
     # Volatility: pure SABR dynamics
     modelSABR_02 = SABR(alpha, beta, rho, nu)
@@ -82,7 +82,7 @@ def test_SABR_Calibration():
     impliedATMLognormalVol = modelSABR_02.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
-    testCases.print("SABR CASE", calibrationError)
+    test_cases.print("SABR CASE", calibrationError)
 
     # Valuation: pure SABR dynamics
     valueCall = modelSABR_02.value(f, k, t_exp, df, call_optionType)
@@ -96,4 +96,4 @@ def test_SABR_Calibration():
 test_SABR()
 test_SABR_Calibration()
 
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -21,7 +21,7 @@ from financepy.utils.frequency import FrequencyTypes
 
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 ###############################################################################
@@ -46,12 +46,12 @@ def test_BondYieldCurve():
     for _, bond in bondDataFrame.iterrows():
 
         date_string = bond['maturity']
-        matDatetime = dt.datetime.strptime(date_string, '%d-%b-%y')
-        maturityDt = from_datetime(matDatetime)
-        issueDt = Date(maturityDt._d, maturityDt._m, 2000)
+        mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+        maturity_dt = from_datetime(mat_date_time)
+        issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
         coupon = bond['coupon']/100.0
         clean_price = bond['mid']
-        bond = Bond(issueDt, maturityDt, coupon, freq_type, dc_type)
+        bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
         yld = bond.yield_to_maturity(settlement, clean_price)
         bonds.append(bond)
         ylds.append(yld)
@@ -59,55 +59,55 @@ def test_BondYieldCurve():
 ###############################################################################
 
     curveFitMethod = CurveFitPolynomial()
-    fittedCurve1 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-#    fittedCurve1.display("GBP Yield Curve")
+    fitted_curve1 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+#    fitted_curve1.display("GBP Yield Curve")
 
     curveFitMethod = CurveFitPolynomial(5)
-    fittedCurve2 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-#    fittedCurve2.display("GBP Yield Curve")
+    fitted_curve2 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+#    fitted_curve2.display("GBP Yield Curve")
 
     curveFitMethod = CurveFitNelsonSiegel()
-    fittedCurve3 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-#    fittedCurve3.display("GBP Yield Curve")
+    fitted_curve3 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+#    fitted_curve3.display("GBP Yield Curve")
 
     curveFitMethod = CurveFitNelsonSiegelSvensson()
-    fittedCurve4 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-#    fittedCurve4.display("GBP Yield Curve")
+    fitted_curve4 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+#    fitted_curve4.display("GBP Yield Curve")
 
     curveFitMethod = CurveFitBSpline()
-    fittedCurve5 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
-#    fittedCurve5.display("GBP Yield Curve")
+    fitted_curve5 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+#    fitted_curve5.display("GBP Yield Curve")
 
 ###############################################################################
 
-    testCases.header("PARAMETER", "VALUE")
-    testCases.print("values", fittedCurve1._curveFit._coeffs)
+    test_cases.header("PARAMETER", "VALUE")
+    test_cases.print("values", fitted_curve1._curveFit._coeffs)
 
-    testCases.header("PARAMETER", "VALUE")
-    testCases.print("values", fittedCurve2._curveFit._coeffs)
+    test_cases.header("PARAMETER", "VALUE")
+    test_cases.print("values", fitted_curve2._curveFit._coeffs)
 
-    testCases.header("PARAMETER", "VALUE")
-    testCases.print("beta1", fittedCurve3._curveFit._beta1)
-    testCases.print("beta2", fittedCurve3._curveFit._beta2)
-    testCases.print("beta3", fittedCurve3._curveFit._beta3)
-    testCases.print("tau", fittedCurve3._curveFit._tau)
+    test_cases.header("PARAMETER", "VALUE")
+    test_cases.print("beta1", fitted_curve3._curveFit._beta1)
+    test_cases.print("beta2", fitted_curve3._curveFit._beta2)
+    test_cases.print("beta3", fitted_curve3._curveFit._beta3)
+    test_cases.print("tau", fitted_curve3._curveFit._tau)
 
-    testCases.header("PARAMETER", "VALUE")
-    testCases.print("beta1", fittedCurve4._curveFit._beta1)
-    testCases.print("beta2", fittedCurve4._curveFit._beta2)
-    testCases.print("beta3", fittedCurve4._curveFit._beta3)
-    testCases.print("beta4", fittedCurve4._curveFit._beta4)
-    testCases.print("tau1", fittedCurve4._curveFit._tau1)
-    testCases.print("tau2", fittedCurve4._curveFit._tau2)
+    test_cases.header("PARAMETER", "VALUE")
+    test_cases.print("beta1", fitted_curve4._curveFit._beta1)
+    test_cases.print("beta2", fitted_curve4._curveFit._beta2)
+    test_cases.print("beta3", fitted_curve4._curveFit._beta3)
+    test_cases.print("beta4", fitted_curve4._curveFit._beta4)
+    test_cases.print("tau1", fitted_curve4._curveFit._tau1)
+    test_cases.print("tau2", fitted_curve4._curveFit._tau2)
 
 ###############################################################################
 
-    maturity_date = Date(19, 9, 2030)
-    interpolated_yield = fittedCurve5.interpolated_yield(maturity_date)
-    testCases.print(maturity_date, interpolated_yield)
+    maturity_dt = Date(19, 9, 2030)
+    interpolated_yield = fitted_curve5.interpolated_yield(maturity_dt)
+    test_cases.print(maturity_dt, interpolated_yield)
 
 ###############################################################################
 
 
 test_BondYieldCurve()
-testCases.compareTestCases()
+test_cases.compareTestCases()

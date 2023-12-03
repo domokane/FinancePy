@@ -9,7 +9,7 @@ sys.path.append("..")
 # import numpy as np
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 #
@@ -21,16 +21,16 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 #    flat_curve = FinPieceCurve(times,values)
 #
 #    dfs = flat_curve.df(times, 0)
-#    testCases.print(dfs)
+#    test_cases.print(dfs)
 #    dfs = flat_curve.df(times, 1)
-#    testCases.print(dfs)
+#    test_cases.print(dfs)
 #    dfs = flat_curve.df(times, 2)
-#    testCases.print(dfs)
+#    test_cases.print(dfs)
 #    dfs = flat_curve.df(times, -1)
-#    testCases.print(dfs)
+#    test_cases.print(dfs)
 
 ##########################################################################
 
 
 # test_FinPieceCurve()
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -28,17 +28,17 @@ def test_HullWhiteExampleTwo():
     zeros = np.array(zero_rates) / 100.0
     dfs = np.exp(-zeros*times)
 
-    start_date = Date(1, 12, 2019)
+    start_dt = Date(1, 12, 2019)
     sigma = 0.01
     a = 0.1
     strike = 63.0
     face = 100.0
 
-    expiry_date = start_date.add_tenor("3Y")
-    maturity_date = start_date.add_tenor("9Y")
+    expiry_dt = start_dt.add_tenor("3Y")
+    maturity_dt = start_dt.add_tenor("9Y")
 
-    t_exp = (expiry_date - start_date)/gDaysInYear
-    tmat = (maturity_date - start_date)/gDaysInYear
+    t_exp = (expiry_dt - start_dt)/gDaysInYear
+    tmat = (maturity_dt - start_dt)/gDaysInYear
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)

@@ -15,15 +15,15 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
 
 def test_FinNumbaNumpySpeed(useSobol):
 
-    value_date = Date(1, 1, 2015)
-    expiry_date = Date(1, 7, 2015)
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = Date(1, 7, 2015)
     stock_price = 100
     volatility = 0.30
     interest_rate = 0.05
@@ -31,16 +31,16 @@ def test_FinNumbaNumpySpeed(useSobol):
     seed = 1999
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 
     useSobolInt = int(useSobol)
 
-    testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
+    test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    call_option = EquityVanillaOption(expiry_date, 100.0,
+    call_option = EquityVanillaOption(expiry_dt, 100.0,
                                       OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(value_date, stock_price, discount_curve,
+    value = call_option.value(value_dt, stock_price, discount_curve,
                               dividend_yield, model)
 
     num_points = 20
@@ -59,7 +59,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_nonumba_nonumpy(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_nonumba_nonumpy(value_dt, stock_price, discount_curve,
                                                         dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -77,7 +77,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numpy_only(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numpy_only(value_dt, stock_price, discount_curve,
                                                    dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -129,7 +129,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numpy_only(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numpy_only(value_dt, stock_price, discount_curve,
                                                    dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -147,7 +147,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numpy_numba(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numpy_numba(value_dt, stock_price, discount_curve,
                                                     dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -165,7 +165,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numba_only(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numba_only(value_dt, stock_price, discount_curve,
                                                    dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -183,7 +183,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numba_parallel(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numba_parallel(value_dt, stock_price, discount_curve,
                                                        dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -259,8 +259,8 @@ def test_FinNumbaNumpySpeed(useSobol):
 
 def test_FinNumbaNumbaParallel(useSobol):
 
-    value_date = Date(1, 1, 2015)
-    expiry_date = Date(1, 7, 2015)
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = Date(1, 7, 2015)
     stock_price = 100
     volatility = 0.30
     interest_rate = 0.05
@@ -268,16 +268,16 @@ def test_FinNumbaNumbaParallel(useSobol):
     seed = 2021
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_date, interest_rate)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 
     useSobolInt = int(useSobol)
 
-    testCases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
+    test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    call_option = EquityVanillaOption(expiry_date, 100.0,
+    call_option = EquityVanillaOption(expiry_dt, 100.0,
                                       OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(value_date, stock_price, discount_curve,
+    value = call_option.value(value_dt, stock_price, discount_curve,
                               dividend_yield, model)
 
     num_points = 20
@@ -292,7 +292,7 @@ def test_FinNumbaNumbaParallel(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numba_only(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numba_only(value_dt, stock_price, discount_curve,
                                                    dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -310,7 +310,7 @@ def test_FinNumbaNumbaParallel(useSobol):
     for num_paths in num_paths_list:
 
         start = time.time()
-        value_mc = call_option.value_mc_numba_parallel(value_date, stock_price, discount_curve,
+        value_mc = call_option.value_mc_numba_parallel(value_dt, stock_price, discount_curve,
                                                        dividend_yield, model, num_paths, seed, useSobolInt)
         end = time.time()
         duration = end - start
@@ -358,4 +358,4 @@ if 1 == 0:
     test_FinNumbaNumbaParallel(False)
     test_FinNumbaNumbaParallel(True)
 
-#  testCases.compareTestCases()
+#  test_cases.compareTestCases()

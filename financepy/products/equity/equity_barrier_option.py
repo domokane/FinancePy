@@ -27,7 +27,7 @@ class EquityBarrierOption(EquityOption):
     variants on the Barrier structure in enum EquityBarrierTypes. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  strike_price: float,
                  option_type: EquityBarrierTypes,
                  barrier_level: float,
@@ -39,7 +39,7 @@ class EquityBarrierOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._strike_price = float(strike_price)
         self._barrier_level = float(barrier_level)
         self._num_obs_per_year = int(num_obs_per_year)
@@ -53,7 +53,7 @@ class EquityBarrierOption(EquityOption):
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_price: (float, np.ndarray),
               discount_curve: DiscountCurve,
               dividend_curve: DiscountCurve,
@@ -65,17 +65,17 @@ class EquityBarrierOption(EquityOption):
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         """
 
-        if isinstance(value_date, Date) is False:
+        if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._value_date != value_date:
+        if discount_curve._value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve._value_date != value_date:
+        if dividend_curve._value_dt != value_dt:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
@@ -89,7 +89,7 @@ class EquityBarrierOption(EquityOption):
 
         values = []
 
-        t_exp = (self._expiry_date - value_date) / gDaysInYear
+        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
         if t_exp < 0:
             raise FinError("Option expires before value date.")
@@ -98,8 +98,8 @@ class EquityBarrierOption(EquityOption):
                           self._strike_price,
                           self._barrier_level,
                           stock_prices,
-                          discount_curve.cc_rate(self._expiry_date),
-                          dividend_curve.cc_rate(self._expiry_date),
+                          discount_curve.cc_rate(self._expiry_dt),
+                          dividend_curve.cc_rate(self._expiry_dt),
                           model._volatility,
                           self._option_type.value,
                           self._num_obs_per_year)
@@ -239,7 +239,7 @@ class EquityBarrierOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("BARRIER LEVEL", self._barrier_level)

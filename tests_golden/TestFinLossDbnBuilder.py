@@ -12,7 +12,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plotGraphs = False
 
@@ -29,7 +29,7 @@ def test_FinLossDbnBuilder():
     loss_units = np.ones(num_credits)
     loss_ratio = np.ones(num_credits)
 
-    testCases.header(
+    test_cases.header(
         "BETA",
         "BUILDER",
         "LOSS0",
@@ -53,7 +53,7 @@ def test_FinLossDbnBuilder():
 
         end = time.time()
 
-        testCases.print(
+        test_cases.print(
             beta,
             "FULL_GCD",
             dbn1[0],
@@ -72,7 +72,7 @@ def test_FinLossDbnBuilder():
                                             num_steps)
         end = time.time()
 
-        testCases.print(
+        test_cases.print(
             beta,
             "ADJ_BIN",
             dbn2[0],
@@ -115,7 +115,7 @@ def test_FinLossDbnBuilder():
                                   num_steps)
     end = time.time()
 
-    testCases.print(
+    test_cases.print(
         beta,
         "ADJ_BIN",
         dbn1[0],
@@ -132,7 +132,7 @@ def test_FinLossDbnBuilder():
                                         num_steps)
     end = time.time()
 
-    testCases.print(
+    test_cases.print(
         beta,
         "ADJ_BIN",
         dbn2[0],
@@ -145,4 +145,4 @@ def test_FinLossDbnBuilder():
 
 
 test_FinLossDbnBuilder()
-testCases.compareTestCases()
+test_cases.compareTestCases()

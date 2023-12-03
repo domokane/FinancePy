@@ -36,8 +36,8 @@ for module_file_name in modules[N:M + 1]:
                                                         module_text_name),
               end="")
         module_name = __import__(module_text_name)
-        num_errors = module_name.testCases._globalNumErrors
-        num_warnings = module_name.testCases._globalNumWarnings
+        num_errors = module_name.test_cases._globalNumErrors
+        num_warnings = module_name.test_cases._globalNumWarnings
 
         print("WARNINGS: %3d ERRORS: %3d " % (num_warnings, num_errors),
               end="")

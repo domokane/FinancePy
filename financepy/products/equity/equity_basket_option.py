@@ -32,7 +32,7 @@ class EquityBasketOption:
     have been implemented for a European style option. """
 
     def __init__(self,
-                 expiry_date: Date,
+                 expiry_dt: Date,
                  strike_price: float,
                  option_type: OptionTypes,
                  num_assets: int):
@@ -42,7 +42,7 @@ class EquityBasketOption:
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_date = expiry_date
+        self._expiry_dt = expiry_dt
         self._strike_price = float(strike_price)
         self._option_type = option_type
         self._num_assets = num_assets
@@ -96,7 +96,7 @@ class EquityBasketOption:
 ###############################################################################
 
     def value(self,
-              value_date: Date,
+              value_dt: Date,
               stock_prices: np.ndarray,
               discount_curve: DiscountCurve,
               dividend_curves: (list),
@@ -107,14 +107,14 @@ class EquityBasketOption:
         able to handle a full rank correlation structure between the individual
         assets. """
 
-        t_exp = (self._expiry_date - value_date) / gDaysInYear
+        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Value date after expiry date.")
 
         qs = []
         for curve in dividend_curves:
-            q = curve.cc_rate(self._expiry_date)
+            q = curve.cc_rate(self._expiry_dt)
             qs.append(q)
 
         v = volatilities
@@ -127,7 +127,7 @@ class EquityBasketOption:
 
         a = np.ones(self._num_assets) * (1.0 / self._num_assets)
 
-        r = discount_curve.cc_rate(self._expiry_date)
+        r = discount_curve.cc_rate(self._expiry_dt)
 
         smean = 0.0
         for ia in range(0, self._num_assets):
@@ -180,7 +180,7 @@ class EquityBasketOption:
 ###############################################################################
 
     def value_mc(self,
-                 value_date: Date,
+                 value_dt: Date,
                  stock_prices: np.ndarray,
                  discount_curve: DiscountCurve,
                  dividend_curves: (list),
@@ -196,14 +196,14 @@ class EquityBasketOption:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if value_date > self._expiry_date:
+        if value_dt > self._expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t_exp = (self._expiry_date - value_date) / gDaysInYear
+        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
         dividend_yields = []
         for curve in dividend_curves:
-            dq = curve.df(self._expiry_date)
+            dq = curve.df(self._expiry_dt)
             q = -np.log(dq) / t_exp
             dividend_yields.append(q)
 
@@ -214,7 +214,7 @@ class EquityBasketOption:
 
         num_assets = len(stock_prices)
 
-        df = discount_curve.df(self._expiry_date)
+        df = discount_curve.df(self._expiry_dt)
         r = -np.log(df)/t_exp
 
         mus = r - dividend_yields
@@ -250,7 +250,7 @@ class EquityBasketOption:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_date)
+        s += label_to_string("EXPIRY DATE", self._expiry_dt)
         s += label_to_string("STRIKE PRICE", self._strike_price)
         s += label_to_string("OPTION TYPE", self._option_type)
         s += label_to_string("NUM ASSETS", self._num_assets, "")

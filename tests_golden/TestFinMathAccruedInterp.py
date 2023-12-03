@@ -10,7 +10,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 pltGraph = False
 
@@ -40,8 +40,8 @@ def test_FinMathAccdInterpolator():
         v = accrued_interpolator(t, cpn_times, cpn_flows)
         values.append(v)
 
-    testCases.header("VALUE")
-    testCases.print(values)
+    test_cases.header("VALUE")
+    test_cases.print(values)
 
     if pltGraph:
         plt.plot(tree_times, values)
@@ -50,4 +50,4 @@ def test_FinMathAccdInterpolator():
 
 
 test_FinMathAccdInterpolator()
-testCases.compareTestCases()
+test_cases.compareTestCases()

@@ -11,7 +11,7 @@ from financepy.products.bonds.bond_mortgage import BondMortgage
 from financepy.utils.date import Date
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 ###############################################################################
@@ -20,40 +20,40 @@ testCases = FinTestCases(__file__, globalTestCaseMode)
 def test_BondMortgage():
 
     principal = 130000
-    start_date = Date(23, 2, 2018)
-    end_date = start_date.add_tenor("10Y")
-    mortgage = BondMortgage(start_date, end_date, principal)
+    start_dt = Date(23, 2, 2018)
+    end_dt = start_dt.add_tenor("10Y")
+    mortgage = BondMortgage(start_dt, end_dt, principal)
 
     rate = 0.035
     mortgage.generate_flows(rate, BondMortgageTypes.REPAYMENT)
 
-    num_flows = len(mortgage._schedule._adjusted_dates)
+    num_flows = len(mortgage._schedule._adjusted_dts)
 
-    testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
-                     "TOTAL")
+    test_cases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
+                      "TOTAL")
 
     for i in range(0, num_flows):
-        testCases.print(mortgage._schedule._adjusted_dates[i],
-                        mortgage._interest_flows[i],
-                        mortgage._principal_flows[i],
-                        mortgage._principal_remaining[i],
-                        mortgage._total_flows[i])
+        test_cases.print(mortgage._schedule._adjusted_dts[i],
+                         mortgage._interest_flows[i],
+                         mortgage._principal_flows[i],
+                         mortgage._principal_remaining[i],
+                         mortgage._total_flows[i])
 
     mortgage.generate_flows(rate, BondMortgageTypes.INTEREST_ONLY)
 
-    testCases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
-                     "TOTAL")
+    test_cases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
+                      "TOTAL")
 
     for i in range(0, num_flows):
-        testCases.print(mortgage._schedule._adjusted_dates[i],
-                        mortgage._interest_flows[i],
-                        mortgage._principal_flows[i],
-                        mortgage._principal_remaining[i],
-                        mortgage._total_flows[i])
+        test_cases.print(mortgage._schedule._adjusted_dts[i],
+                         mortgage._interest_flows[i],
+                         mortgage._principal_flows[i],
+                         mortgage._principal_remaining[i],
+                         mortgage._total_flows[i])
 
 
 ###############################################################################
 
 
 test_BondMortgage()
-testCases.compareTestCases()
+test_cases.compareTestCases()

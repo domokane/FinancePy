@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 
-testCases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##############################################################################
 # TODO
@@ -26,10 +26,10 @@ PLOT_GRAPHS = False
 def test_FinDiscountCurvePolynomial():
 
     times = np.linspace(0.00, 10.0, 21)
-    curve_date = Date(2, 2, 2019)
-    dates = curve_date.add_years(times)
+    curve_dt = Date(2, 2, 2019)
+    dates = curve_dt.add_years(times)
     coeffs = [0.0004, -0.0001, 0.00000010]
-    curve1 = DiscountCurvePoly(curve_date, coeffs)
+    curve1 = DiscountCurvePoly(curve_dt, coeffs)
     zeros = curve1.zero_rate(dates)
     fwds = curve1.fwd(dates)
 
@@ -44,4 +44,4 @@ def test_FinDiscountCurvePolynomial():
 
 
 test_FinDiscountCurvePolynomial()
-testCases.compareTestCases()
+test_cases.compareTestCases()
