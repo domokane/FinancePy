@@ -105,7 +105,7 @@ def _obj(params, *args):
 
     t = args[0]
     f = args[1]
-    strikesGrid = args[2]
+    strikes_grid = args[2]
     index = args[3]
     volatility_grid = args[4]
     vol_type_value = args[5]
@@ -116,7 +116,7 @@ def _obj(params, *args):
 
     for i in range(0, num_strikes):
 
-        k = strikesGrid[i][index]
+        k = strikes_grid[i][index]
         fitted_vol = vol_function(vol_type_value, params, f, k, t)
         mkt_vol = volatility_grid[i][index]
         diff = fitted_vol - mkt_vol
@@ -130,8 +130,8 @@ def _obj(params, *args):
 
 
 def _solve_to_horizon(t, f,
-                      strikesGrid,
-                      timeIndex,
+                      strikes_grid,
+                      time_index,
                       volatility_grid,
                       vol_type_value,
                       x_inits,
@@ -143,7 +143,7 @@ def _solve_to_horizon(t, f,
 
     tol = 1e-6
 
-    args = (t, f, strikesGrid, timeIndex, volatility_grid, vol_type_value)
+    args = (t, f, strikes_grid, time_index, volatility_grid, vol_type_value)
 
     # Nelder-Mead (both SciPy amd Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
@@ -227,7 +227,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     rf = args[4]
 #     option_type_value = args[5]
 #     deltaTypeValue = args[6]
-#     inverseDeltaTarget = args[7]
+#     inverse_delta_target = args[7]
 #     params = args[8]
 #     strikes = args[9]
 #     gaps = args[10]
@@ -235,10 +235,10 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     f = s * np.exp((rd-rf)*t)
 #     v = vol_function(vol_type_value, params, strikes, gaps, f, k, t)
 #     delta_out = fast_delta(s, t, k, rd, rf, v, deltaTypeValue, option_type_value)
-#     inverseDeltaOut = norminvcdf(np.abs(delta_out))
-#     invObjFn = inverseDeltaTarget - inverseDeltaOut
+#     inverse_delta_out = norminvcdf(np.abs(delta_out))
+#     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
-#     return invObjFn
+#     return inv_obj_fn
 
 ###############################################################################
 # Unable to cache this function due to dynamic globals warning. Revisit.
@@ -261,11 +261,11 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     target value of delta allowing the volatility to be a function of the
 #     strike. """
 
-#     inverseDeltaTarget = norminvcdf(np.abs(delta_target))
+#     inverse_delta_target = norminvcdf(np.abs(delta_target))
 
 #     argtuple = (volatilityTypeValue, s, t, rd, rf,
 #                 option_type_value, delta_method_value,
-#                 inverseDeltaTarget,
+#                 inverse_delta_target,
 #                 parameters, strikes, gaps)
 
 #     K = newton_secant(_delta_fit, x0=initial_guess, args=argtuple,
@@ -303,32 +303,32 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
 
-#         domDF = np.exp(-rd*tdel)
-#         forDF = np.exp(-rf*tdel)
+#         dom_df = np.exp(-rd*tdel)
+#         for_df = np.exp(-rf*tdel)
 
 #         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
 #         else:
 #             phi = -1.0
 
-#         F0T = spot_fx_rate * forDF / domDF
+#         F0T = spot_fx_rate * for_df / dom_df
 #         vsqrtt = volatility * np.sqrt(tdel)
-#         arg = delta_target*phi/forDF  # CHECK THIS !!!
+#         arg = delta_target*phi/for_df  # CHECK THIS !!!
 #         norm_inv_delta = norminvcdf(arg)
 #         K = F0T * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt/2.0))
 #         return K
 
 #     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
 
-#         domDF = np.exp(-rd*tdel)
-#         forDF = np.exp(-rf*tdel)
+#         dom_df = np.exp(-rd*tdel)
+#         for_df = np.exp(-rf*tdel)
 
 #         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
 #         else:
 #             phi = -1.0
 
-#         F0T = spot_fx_rate * forDF / domDF
+#         F0T = spot_fx_rate * for_df / dom_df
 #         vsqrtt = volatility * np.sqrt(tdel)
 #         arg = delta_target*phi
 #         norm_inv_delta = norminvcdf(arg)
@@ -834,11 +834,11 @@ class SwaptionVolSurface():
 
     #         dS = (highS - lowS)/ numIntervals
 
-    #         disDF = self._discount_curve._df(t)
-    #         divDF = self._dividend_curve._df(t)
+    #         dis_df = self._discount_curve._df(t)
+    #         div_df = self._dividend_curve._df(t)
 
-    #         r = -np.log(disDF) / t
-    #         q = -np.log(divDF) / t
+    #         r = -np.log(dis_df) / t
+    #         q = -np.log(div_df) / t
 
     #         Ks = []
     #         vols = []
@@ -893,13 +893,13 @@ class SwaptionVolSurface():
                 fitted_vols.append(fitted_vol)
                 K = K + dK
 
-            labelStr = "FITTED AT " + str(self._expiry_dts[tenor_index])
-            plt.plot(ks, fitted_vols, label=labelStr)
+            label_str = "FITTED AT " + str(self._expiry_dts[tenor_index])
+            plt.plot(ks, fitted_vols, label=label_str)
 
-            labelStr = "MARKET AT " + str(self._expiry_dts[tenor_index])
+            label_str = "MARKET AT " + str(self._expiry_dts[tenor_index])
             mkt_vols = self._volatility_grid[:, tenor_index] * 100.0
             plt.plot(self._strike_grid[:, tenor_index],
-                     mkt_vols, 'o', label=labelStr)
+                     mkt_vols, 'o', label=label_str)
 
             plt.xlabel("Strike")
             plt.ylabel("Volatility")

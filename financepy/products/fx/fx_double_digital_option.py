@@ -117,11 +117,11 @@ class FXDoubleDigitalOption:
         tdel = np.maximum(tdel, 1e-10)
 
         # TODO RESOLVE TDEL versus TEXP
-        domDF = dom_discount_curve._df(tdel)
-        forDF = for_discount_curve._df(tdel)
+        dom_df = dom_discount_curve._df(tdel)
+        for_df = for_discount_curve._df(tdel)
 
-        r_d = -np.log(domDF) / tdel
-        r_f = -np.log(forDF) / tdel
+        r_d = -np.log(dom_df) / tdel
+        r_f = -np.log(for_df) / tdel
 
         S0 = spot_fx_rate
         K1 = self._lower_strike

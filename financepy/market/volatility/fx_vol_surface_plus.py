@@ -712,7 +712,7 @@ def _delta_fit(k, *args):
     r_f = args[4]
     option_type_value = args[5]
     deltaTypeValue = args[6]
-    inverseDeltaTarget = args[7]
+    inverse_delta_target = args[7]
     params = args[8]
     strikes = args[9]
     gaps = args[10]
@@ -723,12 +723,12 @@ def _delta_fit(k, *args):
     delta_out = fast_delta(s, t, k, r_d, r_f, v,
                            deltaTypeValue, option_type_value)
 
-    inverseDeltaOut = norminvcdf(np.abs(delta_out))
-    invObjFn = inverseDeltaTarget - inverseDeltaOut
+    inverse_delta_out = norminvcdf(np.abs(delta_out))
+    inv_obj_fn = inverse_delta_target - inverse_delta_out
 
-#    print(k, f, v, delta_out, invObjFn)
+#    print(k, f, v, delta_out, inv_obj_fn)
 
-    return invObjFn
+    return inv_obj_fn
 
 ###############################################################################
 # Unable to cache this function due to dynamic globals warning. Revisit.
@@ -751,11 +751,11 @@ def _solver_for_smile_strike(s, t, rd, rf,
     target value of delta allowing the volatility to be a function of the
     strike. """
 
-    inverseDeltaTarget = norminvcdf(np.abs(delta_target))
+    inverse_delta_target = norminvcdf(np.abs(delta_target))
 
     argtuple = (volatilityTypeValue, s, t, rd, rf,
                 option_type_value, delta_method_value,
-                inverseDeltaTarget,
+                inverse_delta_target,
                 parameters, strikes, gaps)
 
     K = newton_secant(_delta_fit, x0=initial_guess, args=argtuple,
@@ -793,32 +793,32 @@ def solve_for_strike(spot_fx_rate,
 
     if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
 
-        domDF = np.exp(-rd*tdel)
-        forDF = np.exp(-rf*tdel)
+        dom_df = np.exp(-rd*tdel)
+        for_df = np.exp(-rf*tdel)
 
         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
             phi = +1.0
         else:
             phi = -1.0
 
-        F0T = spot_fx_rate * forDF / domDF
+        F0T = spot_fx_rate * for_df / dom_df
         vsqrtt = volatility * np.sqrt(tdel)
-        arg = delta_target*phi/forDF  # CHECK THIS !!!
+        arg = delta_target*phi/for_df  # CHECK THIS !!!
         norminvdelta = norminvcdf(arg)
         K = F0T * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt/2.0))
         return K
 
     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
 
-        domDF = np.exp(-rd*tdel)
-        forDF = np.exp(-rf*tdel)
+        dom_df = np.exp(-rd*tdel)
+        for_df = np.exp(-rf*tdel)
 
         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
             phi = +1.0
         else:
             phi = -1.0
 
-        F0T = spot_fx_rate * forDF / domDF
+        F0T = spot_fx_rate * for_df / dom_df
         vsqrtt = volatility * np.sqrt(tdel)
         arg = delta_target*phi
         norminvdelta = norminvcdf(arg)
@@ -997,7 +997,7 @@ class FXVolSurfacePlus():
             raise FinError("Unknown Delta Type")
 
         self._volatility_function_type = volatility_function_type
-        self._tenorIndex = 0
+        self._tenor_index = 0
 
         self._expiry_dts = []
         for i in range(0, self._num_vol_curves):
@@ -1374,13 +1374,13 @@ class FXVolSurfacePlus():
             expiry_dt = self._expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / gDaysInYear
 
-            domDF = self._dom_discount_curve._df(t_exp)
-            forDF = self._for_discount_curve._df(t_exp)
-            f = s * forDF/domDF
+            dom_df = self._dom_discount_curve._df(t_exp)
+            for_df = self._for_discount_curve._df(t_exp)
+            f = s * for_df/dom_df
 
             self._t_exp[i] = t_exp
-            self._rd[i] = -np.log(domDF) / t_exp
-            self._rf[i] = -np.log(forDF) / t_exp
+            self._rd[i] = -np.log(dom_df) / t_exp
+            self._rf[i] = -np.log(for_df) / t_exp
             self._F0T[i] = f
 
             atm_vol = self._atm_vols[i]
@@ -2069,11 +2069,11 @@ class FXVolSurfacePlus():
 
             dFX = (highFX - lowFX) / numIntervals
 
-            domDF = self._dom_discount_curve._df(t)
-            forDF = self._for_discount_curve._df(t)
+            dom_df = self._dom_discount_curve._df(t)
+            for_df = self._for_discount_curve._df(t)
 
-            r_d = -np.log(domDF) / t
-            r_f = -np.log(forDF) / t
+            r_d = -np.log(dom_df) / t
+            r_f = -np.log(for_df) / t
 
             Ks = []
             vols = []
@@ -2112,28 +2112,28 @@ class FXVolSurfacePlus():
 
         volTypeVal = self._volatility_function_type.value
 
-        for tenorIndex in range(0, self._num_vol_curves):
+        for tenor_index in range(0, self._num_vol_curves):
 
-            atm_vol = self._atm_vols[tenorIndex]*100
-            msVol25 = self._mktStrangle25DeltaVols[tenorIndex]*100
-            rrVol25 = self._riskReversal25DeltaVols[tenorIndex]*100
-            msVol10 = self._mktStrangle10DeltaVols[tenorIndex]*100
-            rrVol10 = self._riskReversal10DeltaVols[tenorIndex]*100
-            strikes = self._strikes[tenorIndex]
+            atm_vol = self._atm_vols[tenor_index]*100
+            msVol25 = self._mktStrangle25DeltaVols[tenor_index]*100
+            rrVol25 = self._riskReversal25DeltaVols[tenor_index]*100
+            msVol10 = self._mktStrangle10DeltaVols[tenor_index]*100
+            rrVol10 = self._riskReversal10DeltaVols[tenor_index]*100
+            strikes = self._strikes[tenor_index]
 
-            gaps = self._gaps[tenorIndex]
+            gaps = self._gaps[tenor_index]
 
-            lowK = self._K_10D_P[tenorIndex] * 0.90
-            highK = self._K_10D_C_MS[tenorIndex] * 1.10
+            lowK = self._K_10D_P[tenor_index] * 0.90
+            highK = self._K_10D_C_MS[tenor_index] * 1.10
 
             ks = []
             vols = []
             numIntervals = 30
             K = lowK
             dK = (highK - lowK)/numIntervals
-            params = self._parameters[tenorIndex]
-            t = self._t_exp[tenorIndex]
-            f = self._F0T[tenorIndex]
+            params = self._parameters[tenor_index]
+            t = self._t_exp[tenor_index]
+            f = self._F0T[tenor_index]
 
             for i in range(0, numIntervals):
 
@@ -2143,65 +2143,65 @@ class FXVolSurfacePlus():
                 vols.append(sigma)
                 K = K + dK
 
-            labelStr = self._tenors[tenorIndex]
-            labelStr += " ATM: " + str(atm_vol)[0:6]
-            labelStr += " MS25: " + str(msVol25)[0:6]
-            labelStr += " RR25: " + str(rrVol25)[0:6]
-            labelStr += " MS10: " + str(msVol10)[0:6]
-            labelStr += " RR10: " + str(rrVol10)[0:6]
+            label_str = self._tenors[tenor_index]
+            label_str += " ATM: " + str(atm_vol)[0:6]
+            label_str += " MS25: " + str(msVol25)[0:6]
+            label_str += " RR25: " + str(rrVol25)[0:6]
+            label_str += " MS10: " + str(msVol10)[0:6]
+            label_str += " RR10: " + str(rrVol10)[0:6]
 
-            plt.plot(ks, vols, label=labelStr)
+            plt.plot(ks, vols, label=label_str)
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
             title = "JNT FIT:" + self._currency_pair + " " +\
                     str(self._volatility_function_type)
 
-            keyStrikes = []
-            keyStrikes.append(self._K_ATM[tenorIndex])
+            key_strikes = []
+            key_strikes.append(self._K_ATM[tenor_index])
 
-            keyVols = []
-            for K in keyStrikes:
-
-                sigma = vol_function(volTypeVal, params,
-                                     strikes, gaps,
-                                     f, K, t) * 100.0
-
-                keyVols.append(sigma)
-
-            plt.plot(keyStrikes, keyVols, 'ko', markersize=4)
-
-            keyStrikes = []
-            keyStrikes.append(self._K_25D_P[tenorIndex])
-            keyStrikes.append(self._K_25D_P_MS[tenorIndex])
-            keyStrikes.append(self._K_25D_C[tenorIndex])
-            keyStrikes.append(self._K_25D_C_MS[tenorIndex])
-
-            keyVols = []
-            for K in keyStrikes:
+            key_vols = []
+            for K in key_strikes:
 
                 sigma = vol_function(volTypeVal, params,
                                      strikes, gaps,
                                      f, K, t) * 100.0
 
-                keyVols.append(sigma)
+                key_vols.append(sigma)
 
-            plt.plot(keyStrikes, keyVols, 'bo', markersize=4)
+            plt.plot(key_strikes, key_vols, 'ko', markersize=4)
 
-            keyStrikes = []
-            keyStrikes.append(self._K_10D_P[tenorIndex])
-            keyStrikes.append(self._K_10D_P_MS[tenorIndex])
-            keyStrikes.append(self._K_10D_C[tenorIndex])
-            keyStrikes.append(self._K_10D_C_MS[tenorIndex])
+            key_strikes = []
+            key_strikes.append(self._K_25D_P[tenor_index])
+            key_strikes.append(self._K_25D_P_MS[tenor_index])
+            key_strikes.append(self._K_25D_C[tenor_index])
+            key_strikes.append(self._K_25D_C_MS[tenor_index])
 
-            keyVols = []
-            for K in keyStrikes:
+            key_vols = []
+            for K in key_strikes:
+
                 sigma = vol_function(volTypeVal, params,
                                      strikes, gaps,
                                      f, K, t) * 100.0
-                keyVols.append(sigma)
 
-            plt.plot(keyStrikes, keyVols, 'ro', markersize=4)
+                key_vols.append(sigma)
+
+            plt.plot(key_strikes, key_vols, 'bo', markersize=4)
+
+            key_strikes = []
+            key_strikes.append(self._K_10D_P[tenor_index])
+            key_strikes.append(self._K_10D_P_MS[tenor_index])
+            key_strikes.append(self._K_10D_C[tenor_index])
+            key_strikes.append(self._K_10D_C_MS[tenor_index])
+
+            key_vols = []
+            for K in key_strikes:
+                sigma = vol_function(volTypeVal, params,
+                                     strikes, gaps,
+                                     f, K, t) * 100.0
+                key_vols.append(sigma)
+
+            plt.plot(key_strikes, key_vols, 'ro', markersize=4)
 
         plt.title(title)
         plt.legend(loc="lower left", bbox_to_anchor=(1, 0))

@@ -102,7 +102,7 @@ class FXForward:
                                     dom_discount_curve,
                                     for_discount_curve)
 
-        domDF = dom_discount_curve._df(t)
+        dom_df = dom_discount_curve._df(t)
 
         if self._notional_currency == self._domName:
             self._notional_dom = self._notional
@@ -115,10 +115,10 @@ class FXForward:
 
         if self._notional_currency == self._forName:
             v = (newFwdFXRate - self._strike_fx_rate)
-            v = v * self._notional * domDF
+            v = v * self._notional * dom_df
         elif self._notional_currency == self._domName:
             v = (newFwdFXRate - self._strike_fx_rate)
-            v = v * self._notional * domDF * newFwdFXRate
+            v = v * self._notional * dom_df * newFwdFXRate
 
         self._cash_dom = v * self._notional_dom / self._strike_fx_rate
         self._cash_for = v * self._notional_for / spot_fx_rate
@@ -154,10 +154,10 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        forDF = for_discount_curve._df(t)
-        domDF = dom_discount_curve._df(t)
+        for_df = for_discount_curve._df(t)
+        dom_df = dom_discount_curve._df(t)
 
-        fwdFXRate = spot_fx_rate * forDF / domDF
+        fwdFXRate = spot_fx_rate * for_df / dom_df
         return fwdFXRate
 
 ###############################################################################

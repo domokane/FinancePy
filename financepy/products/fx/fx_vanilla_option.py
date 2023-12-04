@@ -144,8 +144,8 @@ def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 #     self = args[0]
 #     value_dt = args[1]
 #     stock_price = args[2]
-#     domDF = args[3]
-#     forDF = args[4]
+#     dom_df = args[3]
+#     for_df = args[4]
 #     delta = args[5]
 #     deltaType = args[6]
 #     volatility = args[7]
@@ -154,8 +154,8 @@ def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 
 #     deltaDict = self.fast_delta(value_dt,
 #                                stock_price,
-#                                domDF,
-#                                forDF,
+#                                dom_df,
+#                                for_df,
 #                                volatility)
 
 #     delta_out = deltaDict[deltaType]
@@ -282,11 +282,11 @@ class FXVanillaOption():
         tdel = np.maximum(tdel, 1e-10)
 
         # TODO RESOLVE TDEL versus TEXP
-        domDF = dom_discount_curve._df(tdel)
-        forDF = for_discount_curve._df(tdel)
+        dom_df = dom_discount_curve._df(tdel)
+        for_df = for_discount_curve._df(tdel)
 
-        r_d = -np.log(domDF) / tdel
-        r_f = -np.log(forDF) / tdel
+        r_d = -np.log(dom_df) / tdel
+        r_f = -np.log(for_df) / tdel
 
         s0 = spot_fx_rate
         k = self._strike_fx_rate
@@ -440,11 +440,11 @@ class FXVanillaOption():
 
         tdel = np.maximum(tdel, 1e-10)
 
-        domDf = dom_discount_curve._df(tdel)
-        r_d = -np.log(domDf)/tdel
+        dom_df = dom_discount_curve._df(tdel)
+        r_d = -np.log(dom_df)/tdel
 
-        forDf = for_discount_curve._df(tdel)
-        r_f = -np.log(forDf)/tdel
+        for_df = for_discount_curve._df(tdel)
+        r_f = -np.log(for_df)/tdel
 
         S0 = spot_fx_rate
         K = self._strike_fx_rate
@@ -488,8 +488,8 @@ class FXVanillaOption():
 #        tdel = (self._delivery_dt - value_dt) / gDaysInYear
 #        tdel = np.maximum(tdel, gSmall)
 
-#        r_d = -np.log(domDF)/tdel
-#         r_f = -np.log(forDF)/tdel
+#        r_d = -np.log(dom_df)/tdel
+#         r_f = -np.log(for_df)/tdel
         k = self._strike_fx_rate
 
 #        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
@@ -532,11 +532,11 @@ class FXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        domDf = dom_discount_curve._df(t)
-        r_d = -np.log(domDf)/t
+        dom_df = dom_discount_curve._df(t)
+        r_d = -np.log(dom_df)/t
 
-        forDf = for_discount_curve._df(t)
-        r_f = -np.log(forDf)/t
+        for_df = for_discount_curve._df(t)
+        r_f = -np.log(for_df)/t
 
         K = self._strike_fx_rate
         S0 = spot_fx_rate
@@ -587,11 +587,11 @@ class FXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        domDf = dom_discount_curve._df(t)
-        r_d = -np.log(domDf)/t
+        dom_df = dom_discount_curve._df(t)
+        r_d = -np.log(dom_df)/t
 
-        forDf = for_discount_curve._df(t)
-        r_f = -np.log(forDf)/t
+        for_df = for_discount_curve._df(t)
+        r_f = -np.log(for_df)/t
 
         K = self._strike_fx_rate
         S0 = spot_fx_rate
@@ -640,11 +640,11 @@ class FXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        domDf = dom_discount_curve._df(t)
-        r_d = -np.log(domDf)/t
+        dom_df = dom_discount_curve._df(t)
+        r_d = -np.log(dom_df)/t
 
-        forDf = for_discount_curve._df(t)
-        r_f = -np.log(forDf)/t
+        for_df = for_discount_curve._df(t)
+        r_f = -np.log(for_df)/t
 
         K = self._strike_fx_rate
         S0 = spot_fx_rate

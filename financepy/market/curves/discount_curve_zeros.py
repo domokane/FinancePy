@@ -99,11 +99,11 @@ class DiscountCurveZeros(DiscountCurve):
 #             t = times[i]
 #             discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
 
-#         discCurve = FinDiscountCurve(self._value_dt, times,
+#         disc_curve = FinDiscountCurve(self._value_dt, times,
 #                                      discount_factors,
 #                                      self._interp_type)
 
-#         return discCurve
+#         return disc_curve
 
 ###############################################################################
 

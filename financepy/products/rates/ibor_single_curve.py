@@ -79,7 +79,7 @@ def _cost_function(dfs, *args):
     # For discount that need a fit function, we fit it now
     libor_curve._interpolator.fit(libor_curve._times, libor_curve._dfs)
 
-    if libor_curve._interp_type == InterpTypes.CUBIC_SPLINE_LOGDFS:
+    if libor_curve._interp_type == InterpTypes.CUBIC_SPLINE_log_dfs:
         libor_curve._splineFunction = CubicSpline(times, values)
     elif libor_curve._interp_type == InterpTypes.PCHIP_CUBIC_SPLINE:
         libor_curve._splineFunction = PchipInterpolator(times, values)
@@ -434,23 +434,23 @@ class IborSingleCurve(DiscountCurve):
         tmat = 0.0
         df_mat = 1.0
 
-        gridTimes = [tmat]
+        grid_times = [tmat]
         gridDfs = [df_mat]
 
         for depo in self._usedDeposits:
             tmat = (depo._maturity_dt - self._value_dt) / gDaysInYear
-            gridTimes.append(tmat)
+            grid_times.append(tmat)
 
         for fra in self._usedFRAs:
             tmat = (fra._maturity_dt - self._value_dt) / gDaysInYear
-            gridTimes.append(tmat)
+            grid_times.append(tmat)
             gridDfs.append(df_mat)
 
         for swap in self._usedSwaps:
             tmat = (swap._maturity_dt - self._value_dt) / gDaysInYear
-            gridTimes.append(tmat)
+            grid_times.append(tmat)
 
-        self._times = np.array(gridTimes)
+        self._times = np.array(grid_times)
         self._dfs = np.exp(-self._times * 0.05)
 
         argtuple = (self)

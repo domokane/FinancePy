@@ -26,12 +26,12 @@ def _func_name():
 ###############################################################################
 
 
-def grid_index(t, gridTimes):
-    n = len(gridTimes)
+def grid_index(t, grid_times):
+    n = len(grid_times)
     for i in range(0, n):
-        gridTime = gridTimes[i]
+        gridTime = grid_times[i]
         if abs(gridTime - t) < gSmall:
-            print(t, gridTimes, i)
+            print(t, grid_times, i)
             return i
 
     raise FinError("Grid index not found")
@@ -449,27 +449,27 @@ def uniform_to_default_time(u, t, v):
 # THIS IS NOT USED
 
 @njit(fastmath=True, cache=True)
-def accrued_tree(gridTimes: np.ndarray,
+def accrued_tree(grid_times: np.ndarray,
                  gridFlows: np.ndarray,
                  face: float):
     """ Fast calulation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
-    numGridTimes = len(gridTimes)
+    numgrid_times = len(grid_times)
 
-    if len(gridFlows) != numGridTimes:
+    if len(gridFlows) != numgrid_times:
         raise FinError("Grid flows not same size as grid times.")
 
-    accrued = np.zeros(numGridTimes)
+    accrued = np.zeros(numgrid_times)
 
     # When the grid time is before the first coupon we have to extrapolate back
 
     cpn_times = np.zeros(0)
     cpn_flows = np.zeros(0)
 
-    for iGrid in range(1, numGridTimes):
+    for iGrid in range(1, numgrid_times):
 
-        cpn_time = gridTimes[iGrid]
+        cpn_time = grid_times[iGrid]
         cpn_flow = gridFlows[iGrid]
 
         if gridFlows[iGrid] > gSmall:
@@ -479,8 +479,8 @@ def accrued_tree(gridTimes: np.ndarray,
     num_cpns = len(cpn_times)
 
     # interpolate between coupons
-    for iGrid in range(0, numGridTimes):
-        t = gridTimes[iGrid]
+    for iGrid in range(0, numgrid_times):
+        t = grid_times[iGrid]
         for i in range(0, num_cpns):
             if t > cpn_times[i - 1] and t <= cpn_times[i]:
                 den = cpn_times[i] - cpn_times[i - 1]

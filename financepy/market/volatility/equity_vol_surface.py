@@ -185,9 +185,9 @@ def _delta_fit(k, *args):
     v = vol_function(vol_type_value, params, f, k, t)
     delta_out = bs_delta(s, t, k, r, q, v, option_type_value)
     inverse_delta_out = norminvcdf(np.abs(delta_out))
-    invObjFn = inverse_delta_target - inverse_delta_out
+    inv_obj_fn = inverse_delta_target - inverse_delta_out
 
-    return invObjFn
+    return inv_obj_fn
 
 ###############################################################################
 # Unable to cache this function due to dynamic globals warning. Revisit.
@@ -709,10 +709,10 @@ class EquityVolSurface:
             dS = (highS - lowS) / numIntervals
 
             disDF = self._discount_curve._df(t)
-            divDF = self._dividend_curve._df(t)
+            div_df = self._dividend_curve._df(t)
 
             r = -np.log(disDF) / t
-            q = -np.log(divDF) / t
+            q = -np.log(div_df) / t
 
             Ks = []
             vols = []
@@ -747,9 +747,9 @@ class EquityVolSurface:
         lowK = self._strikes[0] * 0.9
         highK = self._strikes[-1] * 1.1
 
-        for tenorIndex in range(0, self._numExpiryDates):
+        for tenor_index in range(0, self._numExpiryDates):
 
-            expiry_dt = self._expiry_dts[tenorIndex]
+            expiry_dt = self._expiry_dts[tenor_index]
             plt.figure()
 
             ks = []
@@ -766,12 +766,12 @@ class EquityVolSurface:
                 fitted_vols.append(fittedVol)
                 K = K + dK
 
-            labelStr = "FITTED AT " + str(self._expiry_dts[tenorIndex])
-            plt.plot(ks, fitted_vols, label=labelStr)
+            label_str = "FITTED AT " + str(self._expiry_dts[tenor_index])
+            plt.plot(ks, fitted_vols, label=label_str)
 
-            labelStr = "MARKET AT " + str(self._expiry_dts[tenorIndex])
-            mkt_vols = self._volatility_grid[tenorIndex] * 100.0
-            plt.plot(self._strikes, mkt_vols, 'o', label=labelStr)
+            label_str = "MARKET AT " + str(self._expiry_dts[tenor_index])
+            mkt_vols = self._volatility_grid[tenor_index] * 100.0
+            plt.plot(self._strikes, mkt_vols, 'o', label=label_str)
 
             plt.xlabel("Strike")
             plt.ylabel("Volatility")

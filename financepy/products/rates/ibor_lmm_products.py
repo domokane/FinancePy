@@ -68,7 +68,7 @@ class IborLMMProducts():
         be priced. """
 
         self._start_dt = settle_dt
-        self._gridDates = Schedule(settle_dt,
+        self._grid_dates = Schedule(settle_dt,
                                    maturity_dt,
                                    float_freq_type,
                                    cal_type,
@@ -79,18 +79,18 @@ class IborLMMProducts():
         self._float_dc_type = float_dc_type
 
         basis = DayCount(self._float_dc_type)
-        prev_dt = self._gridDates[0]
+        prev_dt = self._grid_dates[0]
 
-        self._gridTimes = [0.0]
+        self._grid_times = [0.0]
 
-        for next_dt in self._gridDates[1:]:
+        for next_dt in self._grid_dates[1:]:
             tau = basis.year_frac(prev_dt, next_dt)[0]
-            t = (next_dt - self._gridDates[0]) / gDaysInYear
+            t = (next_dt - self._grid_dates[0]) / gDaysInYear
             self._accrual_factors.append(tau)
-            self._gridTimes.append(t)
+            self._grid_times.append(t)
             prev_dt = next_dt
 
-#        print(self._gridTimes)
+#        print(self._grid_times)
         self._accrual_factors = np.array(self._accrual_factors)
         self._num_fwds = len(self._accrual_factors)
         self._fwds = None
@@ -119,14 +119,14 @@ class IborLMMProducts():
         self._numeraire_index = numeraireIndex
         self._use_sobol = useSobol
 
-        num_grid_points = len(self._gridDates)
+        num_grid_points = len(self._grid_dates)
 
         self._num_fwds = num_grid_points
         self._forwardCurve = []
 
         for i in range(1, num_grid_points):
-            start_dt = self._gridDates[i-1]
-            end_dt = self._gridDates[i]
+            start_dt = self._grid_dates[i-1]
+            end_dt = self._grid_dates[i]
             fwd_rate = discount_curve.fwd_rate(start_dt,
                                                end_dt,
                                                self._float_dc_type)
@@ -136,7 +136,7 @@ class IborLMMProducts():
 
         gammas = np.zeros(num_grid_points)
         for ix in range(1, num_grid_points):
-            dt = self._gridDates[ix]
+            dt = self._grid_dates[ix]
             gammas[ix] = vol_curve.caplet_vol(dt)
 
         self._fwds = lmm_simulate_fwds_1f(self._num_fwds,
@@ -186,12 +186,12 @@ class IborLMMProducts():
         self._numeraire_index = numeraireIndex
         self._use_sobol = useSobol
 
-        self._num_fwds = len(self._gridDates) - 1
+        self._num_fwds = len(self._grid_dates) - 1
         self._forwardCurve = []
 
         for i in range(1, self._num_fwds):
-            start_dt = self._gridDates[i-1]
-            end_dt = self._gridDates[i]
+            start_dt = self._grid_dates[i-1]
+            end_dt = self._grid_dates[i]
             fwd_rate = discount_curve.fwd_rate(start_dt, end_dt,
                                                self._float_dc_type)
             self._forwardCurve.append(fwd_rate)
@@ -241,14 +241,14 @@ class IborLMMProducts():
         self._numeraire_index = numeraire_index
         self._use_sobol = use_sobol
 
-        num_grid_points = len(self._gridTimes)
+        num_grid_points = len(self._grid_times)
 
         self._num_fwds = num_grid_points - 1
         self._fwd_curve = []
 
         for i in range(1, num_grid_points):
-            start_dt = self._gridDates[i-1]
-            end_dt = self._gridDates[i]
+            start_dt = self._grid_dates[i-1]
+            end_dt = self._grid_dates[i]
             fwd_rate = discount_curve.forward_rate(start_dt,
                                                    end_dt,
                                                    self._float_dc_type)
@@ -258,7 +258,7 @@ class IborLMMProducts():
 
         zetas = np.zeros(num_grid_points)
         for ix in range(1, num_grid_points):
-            dt = self._gridDates[ix]
+            dt = self._grid_dates[ix]
             zetas[ix] = vol_curve.caplet_vol(dt)
 
         # This function does not use Sobol - TODO
@@ -308,7 +308,7 @@ class IborLMMProducts():
 
         for swaptionDt in swaption_float_dts:
             foundDt = False
-            for gridDt in self._gridDates:
+            for gridDt in self._grid_dates:
                 if swaptionDt == gridDt:
                     foundDt = True
                     break
@@ -324,7 +324,7 @@ class IborLMMProducts():
 
         for swaptionDt in swaptionFixedDates:
             foundDt = False
-            for gridDt in self._gridDates:
+            for gridDt in self._grid_dates:
                 if swaptionDt == gridDt:
                     foundDt = True
                     break
@@ -334,13 +334,13 @@ class IborLMMProducts():
         a = 0
         b = 0
 
-        for gridDt in self._gridDates:
+        for gridDt in self._grid_dates:
             if gridDt == exercise_dt:
                 break
             else:
                 a += 1
 
-        for gridDt in self._gridDates:
+        for gridDt in self._grid_dates:
             if gridDt == maturity_dt:
                 break
             else:
@@ -379,7 +379,7 @@ class IborLMMProducts():
 
         for cap_floorlet_dt in cap_floor_dts:
             foundDt = False
-            for gridDt in self._gridDates:
+            for gridDt in self._grid_dates:
                 if cap_floorlet_dt == gridDt:
                     foundDt = True
                     break

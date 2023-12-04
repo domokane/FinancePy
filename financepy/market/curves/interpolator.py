@@ -219,8 +219,8 @@ class Interpolator():
 
         if self._interp_type == InterpTypes.PCHIP_LOG_DISCOUNT:
 
-            logDfs = np.log(self._dfs)
-            self._interp_fn = PchipInterpolator(self._times, logDfs)
+            log_dfs = np.log(self._dfs)
+            self._interp_fn = PchipInterpolator(self._times, log_dfs)
 
         elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
 
@@ -236,8 +236,8 @@ class Interpolator():
 
         #     """ Second derivatives at left is zero and first derivative at
         #     right is clamped to zero. """
-        #     logDfs = np.log(self._dfs)
-        #     self._interp_fn = CubicSpline(self._times, logDfs,
+        #     log_dfs = np.log(self._dfs)
+        #     self._interp_fn = CubicSpline(self._times, log_dfs,
         #                                  bc_type=((2, 0.0), (1, 0.0)))
 
         elif self._interp_type == InterpTypes.FINCUBIC_ZERO_RATES:
@@ -256,8 +256,8 @@ class Interpolator():
         elif self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
 
             """ Second derivatives are clamped to zero at end points """
-            logDfs = np.log(self._dfs)
-            self._interp_fn = CubicSpline(self._times, logDfs,
+            log_dfs = np.log(self._dfs)
+            self._interp_fn = CubicSpline(self._times, log_dfs,
                                           bc_type='natural')
 
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
@@ -274,8 +274,8 @@ class Interpolator():
 
     #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
     #
-    #            logDfs = np.log(self._dfs)
-    #            self._interp_fn = interp1d(self._times, logDfs,
+    #            log_dfs = np.log(self._dfs)
+    #            self._interp_fn = interp1d(self._times, log_dfs,
     #                                      fill_value="extrapolate")
 
     ###########################################################################

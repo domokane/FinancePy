@@ -54,11 +54,11 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
-        dates = self._value_dt.add_years(years)
+        dts = self._value_dt.add_years(years)
 
         # Set up a grid of times and discount factors for functions
-        self._dfs = self.df(dates)
-        self._times = times_from_dates(dates, self._value_dt, dc_type)
+        self._dfs = self.df(dts)
+        self._times = times_from_dates(dts, self._value_dt, dc_type)
 
 ###############################################################################
 
@@ -67,25 +67,25 @@ class DiscountCurveFlat(DiscountCurve):
         """ Creates a new FinDiscountCurveFlat object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
-        rBumped = self._flat_rate + bump_size
-        discCurve = DiscountCurveFlat(self._value_dt,
-                                      rBumped,
-                                      freq_type=self._freq_type,
-                                      dc_type=self._dc_type)
-        return discCurve
+        rate_bumped = self._flat_rate + bump_size
+        disc_curve = DiscountCurveFlat(self._value_dt,
+                                       rate_bumped,
+                                       freq_type=self._freq_type,
+                                       dc_type=self._dc_type)
+        return disc_curve
 
 ###############################################################################
 
     def df(self,
-           dates: (Date, list)):
-        """ Return discount factors given a single or vector of dates. The
+           dts: (Date, list)):
+        """ Return discount factors given a single or vector of dts. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
         also depends on the day count convention. This was set in the
         construction of the curve to be ACT_ACT_ISDA. """
 
         # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dates,
+        dc_times = times_from_dates(dts,
                                     self._value_dt,
                                     self._dc_type)
 
@@ -95,7 +95,7 @@ class DiscountCurveFlat(DiscountCurve):
                                self._freq_type,
                                self._dc_type)
 
-        if isinstance(dates, Date):
+        if isinstance(dts, Date):
             return dfs[0]
         else:
             return np.array(dfs)

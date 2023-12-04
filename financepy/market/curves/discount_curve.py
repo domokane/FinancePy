@@ -85,7 +85,7 @@ class DiscountCurve:
     ###########################################################################
 
     def _zero_to_df(self,
-                    value_dt: Date,
+                    value_dt: Date,       #TODO: why is value_date not used ?
                     rates: (float, np.ndarray),
                     times: (float, np.ndarray),
                     freq_type: FrequencyTypes,
@@ -342,15 +342,15 @@ class DiscountCurve:
         one date. """
 
         if isinstance(dts, Date):
-            dtsPlusOneDays = [dts.add_days(1)]
+            dts_plus_one_days = [dts.add_days(1)]
         else:
-            dtsPlusOneDays = []
+            dts_plus_one_days = []
             for dt in dts:
-                dtsPlusOneDay = dt.add_days(1)
-                dtsPlusOneDays.append(dtsPlusOneDay)
+                dts_plus_one_day = dt.add_days(1)
+                dts_plus_one_days.append(dts_plus_one_day)
 
         df1 = self.df(dts)
-        df2 = self.df(dtsPlusOneDays)
+        df2 = self.df(dts_plus_one_days)
         dt = 1.0 / gDaysInYear
         fwd = np.log(df1 / df2) / (1.0 * dt)
 
@@ -392,12 +392,12 @@ class DiscountCurve:
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        discCurve = DiscountCurve(self._value_dt,
-                                  times,
-                                  values,
-                                  self._interp_type)
+        disc_curve = DiscountCurve(self._value_dt,
+                                   times,
+                                   values,
+                                   self._interp_type)
 
-        return discCurve
+        return disc_curve
 
     ###########################################################################
 
