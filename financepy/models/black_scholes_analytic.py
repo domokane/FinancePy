@@ -519,18 +519,3 @@ def bjerksund_stensland_value(s, t, k, r, q, v, option_type_value):
     return value
 
 ###############################################################################
-
-
-if __name__ == '__main__':
-    # spot_price, strike_price, time_to_expiry, r, b, vol, phi
-
-    # Checking against table 3-1 in Haug
-    k = 100.0
-    r = 0.10
-    q = 0.10
-
-    for t in [0.1, 0.5]:
-        for v in [0.15, 0.25, 0.35]:
-            for s in [90.0, 100.0, 110.0]:
-                bawPrice = baw_value(s, t, k, r, q, v, +1)
-                print("%9.5f %9.5f %9.5f %9.5f" % (s, t, v, bawPrice))

@@ -104,7 +104,7 @@ class IborLMMProducts():
                     vol_curve: IborCapVolCurve,
                     num_paths: int = 1000,
                     numeraireIndex: int = 0,
-                    useSobol: bool = True,
+                    use_sobol: bool = True,
                     seed: int = 42):
         """ Run the one-factor simulation of the evolution of the forward
         Ibors to generate and store all of the Ibor forward rate paths. """
@@ -117,12 +117,12 @@ class IborLMMProducts():
 
         self._num_paths = num_paths
         self._numeraire_index = numeraireIndex
-        self._use_sobol = useSobol
+        self._use_sobol = use_sobol
 
         num_grid_points = len(self._grid_dates)
 
         self._num_fwds = num_grid_points
-        self._forwardCurve = []
+        self._fwd_curve = []
 
         for i in range(1, num_grid_points):
             start_dt = self._grid_dates[i-1]
@@ -130,9 +130,9 @@ class IborLMMProducts():
             fwd_rate = discount_curve.fwd_rate(start_dt,
                                                end_dt,
                                                self._float_dc_type)
-            self._forwardCurve.append(fwd_rate)
+            self._fwd_curve.append(fwd_rate)
 
-        self._forwardCurve = np.array(self._forwardCurve)
+        self._fwd_curve = np.array(self._fwd_curve)
 
         gammas = np.zeros(num_grid_points)
         for ix in range(1, num_grid_points):
@@ -142,10 +142,10 @@ class IborLMMProducts():
         self._fwds = lmm_simulate_fwds_1f(self._num_fwds,
                                           num_paths,
                                           numeraireIndex,
-                                          self._forwardCurve,
+                                          self._fwd_curve,
                                           gammas,
                                           self._accrual_factors,
-                                          useSobol,
+                                          use_sobol,
                                           seed)
 
 ###############################################################################
@@ -156,7 +156,7 @@ class IborLMMProducts():
                     lambdas: np.ndarray,
                     num_paths: int = 10000,
                     numeraireIndex: int = 0,
-                    useSobol: bool = True,
+                    use_sobol: bool = True,
                     seed: int = 42):
         """ Run the simulation to generate and store all of the Ibor forward
         rate paths. This is a multi-factorial version so the user must input
@@ -184,28 +184,28 @@ class IborLMMProducts():
 
         self._num_paths = num_paths
         self._numeraire_index = numeraireIndex
-        self._use_sobol = useSobol
+        self._use_sobol = use_sobol
 
         self._num_fwds = len(self._grid_dates) - 1
-        self._forwardCurve = []
+        self._fwd_curve = []
 
         for i in range(1, self._num_fwds):
             start_dt = self._grid_dates[i-1]
             end_dt = self._grid_dates[i]
             fwd_rate = discount_curve.fwd_rate(start_dt, end_dt,
                                                self._float_dc_type)
-            self._forwardCurve.append(fwd_rate)
+            self._fwd_curve.append(fwd_rate)
 
-        self._forwardCurve = np.array(self._forwardCurve)
+        self._fwd_curve = np.array(self._fwd_curve)
 
         self._fwds = lmm_simulate_fwds_mf(self._num_fwds,
                                           numFactors,
                                           num_paths,
                                           numeraireIndex,
-                                          self._forwardCurve,
+                                          self._fwd_curve,
                                           lambdas,
                                           self._accrual_factors,
-                                          useSobol,
+                                          use_sobol,
                                           seed)
 
 ###############################################################################
@@ -276,7 +276,7 @@ class IborLMMProducts():
                        settle_dt: Date,
                        exercise_dt: Date,
                        maturity_dt: Date,
-                       swaptionType: SwapTypes,
+                       swaption_type: SwapTypes,
                        fixed_coupon: float,
                        fixed_freq_type: FrequencyTypes,
                        fixed_dc_type: DayCountTypes,
@@ -306,42 +306,42 @@ class IborLMMProducts():
                                       bd_type,
                                       dg_type)._generate()
 
-        for swaptionDt in swaption_float_dts:
-            foundDt = False
-            for gridDt in self._grid_dates:
-                if swaptionDt == gridDt:
-                    foundDt = True
+        for swaption_dt in swaption_float_dts:
+            found_dt = False
+            for grid_dt in self._grid_dates:
+                if swaption_dt == grid_dt:
+                    found_dt = True
                     break
-            if foundDt is False:
+            if found_dt is False:
                 raise FinError("Swaption float leg not on grid.")
 
-        swaptionFixedDates = Schedule(settle_dt,
-                                      maturity_dt,
-                                      fixed_freq_type,
-                                      cal_type,
-                                      bd_type,
-                                      dg_type)._generate()
+        swaption_fixed_dates = Schedule(settle_dt,
+                                        maturity_dt,
+                                        fixed_freq_type,
+                                        cal_type,
+                                        bd_type,
+                                        dg_type)._generate()
 
-        for swaptionDt in swaptionFixedDates:
-            foundDt = False
-            for gridDt in self._grid_dates:
-                if swaptionDt == gridDt:
-                    foundDt = True
+        for swaption_dt in swaption_fixed_dates:
+            found_dt = False
+            for grid_dt in self._grid_dates:
+                if swaption_dt == grid_dt:
+                    found_dt = True
                     break
-            if foundDt is False:
+            if found_dt is False:
                 raise FinError("Swaption fixed leg not on grid.")
 
         a = 0
         b = 0
 
-        for gridDt in self._grid_dates:
-            if gridDt == exercise_dt:
+        for grid_dt in self._grid_dates:
+            if grid_dt == exercise_dt:
                 break
             else:
                 a += 1
 
-        for gridDt in self._grid_dates:
-            if gridDt == maturity_dt:
+        for grid_dt in self._grid_dates:
+            if grid_dt == maturity_dt:
                 break
             else:
                 b += 1
@@ -378,15 +378,15 @@ class IborLMMProducts():
                                  dg_type)._generate()
 
         for cap_floorlet_dt in cap_floor_dts:
-            foundDt = False
-            for gridDt in self._grid_dates:
-                if cap_floorlet_dt == gridDt:
-                    foundDt = True
+            found_dt = False
+            for grid_dt in self._grid_dates:
+                if cap_floorlet_dt == grid_dt:
+                    found_dt = True
                     break
-            if foundDt is False:
+            if found_dt is False:
                 raise FinError("CapFloor date not on grid.")
 
-        numFowards = len(cap_floor_dts)
+        num_fwds = len(cap_floor_dts)
         num_paths = self._num_paths
         K = cap_floor_rate
 
@@ -398,7 +398,7 @@ class IborLMMProducts():
         fwds = self._fwds
         taus = self._accrual_factors
 
-        v = lmm_cap_flr_pricer(numFowards, num_paths, K,
+        v = lmm_cap_flr_pricer(num_fwds, num_paths, K,
                                fwd0, fwds, taus, is_cap)
 
         # Sum the cap/floorlets to get cap/floor value

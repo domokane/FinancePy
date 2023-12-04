@@ -158,7 +158,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
     # Step 1: Sort
     sort_ind = f_val.argsort()
-    LV_ratio = 1
+    lv_ratio = 1
 
     # Compute centroid
     x_bar = vertices[sort_ind[:n]].sum(axis=0) / n
@@ -175,7 +175,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
         term_f = f_val[worst_val_idx] - f_val[best_val_idx] < tol_f
 
         # Linearized volume ratio test (see [2])
-        term_x = LV_ratio < tol_x
+        term_x = lv_ratio < tol_x
 
         if term_x or term_f or fail:
             break
@@ -190,7 +190,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
         if f_r >= f_val[best_val_idx] and f_r < f_val[sort_ind[n - 1]]:
             # Accept reflection
             vertices[worst_val_idx] = x_r
-            LV_ratio *= roh
+            lv_ratio *= roh
 
         # Step 3: Expansion
         elif f_r < f_val[best_val_idx]:
@@ -201,10 +201,10 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
             f_e = fun(x_e, *args)
             if f_e < f_r:  # Greedy minimization
                 vertices[worst_val_idx] = x_e
-                LV_ratio *= rohchi
+                lv_ratio *= rohchi
             else:
                 vertices[worst_val_idx] = x_r
-                LV_ratio *= roh
+                lv_ratio *= roh
 
         # Step 4 and 5: Contraction and Shrink
         else:
@@ -213,16 +213,16 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
             temp = v * (x_r - x_bar)
             if f_r < f_val[worst_val_idx]:  # Step 4.a: Outside Contraction
                 x_c = x_bar + temp
-                LV_ratio_update = rohv
+                lv_ratio_update = rohv
             else:  # Step 4.b: Inside Contraction
                 x_c = x_bar - temp
-                LV_ratio_update = v
+                lv_ratio_update = v
 
             # f_c = _bounded_fun(fun, bounds, x_c, args=args)
             f_c = fun(x_c, *args)
             if f_c < min(f_r, f_val[worst_val_idx]):  # Accept contraction
                 vertices[worst_val_idx] = x_c
-                LV_ratio *= LV_ratio_update
+                lv_ratio *= lv_ratio_update
 
             # Step 5: Shrink
             else:
@@ -238,7 +238,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
                     (x_bar - vertices[best_val_idx]) + \
                     (vertices[worst_val_idx] - vertices[sort_ind[n]]) / n
 
-                LV_ratio *= sigma_n
+                lv_ratio *= sigma_n
 
         if not shrink:  # Nonshrink ordering rule
             # fun(x, *args)

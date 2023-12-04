@@ -5,6 +5,9 @@
 import sys
 sys.path.append("..")
 
+import os
+import time
+import numpy as np
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -16,9 +19,6 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_option import CDSIndexOption
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-import os
-import time
-import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -173,7 +173,7 @@ def test_dirty_priceCDSIndexOption():
                             Date(20, 12, 2011),
                             Date(20, 12, 2013),
                             Date(20, 12, 2016)]
-    indexRecovery = 0.40
+    index_recovery = 0.40
 
     test_cases.banner(
         "======================= CDS INDEX OPTION ==========================")
@@ -215,7 +215,7 @@ def test_dirty_priceCDSIndexOption():
         index_curve = CDSCurve(value_dt,
                                cds_contracts,
                                libor_curve,
-                               indexRecovery)
+                               index_recovery)
 
         if 1 == 1:
 
@@ -229,7 +229,7 @@ def test_dirty_priceCDSIndexOption():
                 indexSpreads,
                 index_upfronts,
                 index_maturity_dts,
-                indexRecovery,
+                index_recovery,
                 tolerance)
 
         else:
@@ -239,7 +239,7 @@ def test_dirty_priceCDSIndexOption():
             issuer_curve = buildFlatIssuerCurve(tradeDate,
                                                 libor_curve,
                                                 indexSpread,
-                                                indexRecovery)
+                                                index_recovery)
 
             adjustedIssuerCurves = []
             for i_credit in range(0, 125):
@@ -260,7 +260,7 @@ def test_dirty_priceCDSIndexOption():
                                     notional)
 
             v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
-                value_dt, adjustedIssuerCurves, indexRecovery, volatility)
+                value_dt, adjustedIssuerCurves, index_recovery, volatility)
             end = time.time()
             elapsed = end - start
 
@@ -268,7 +268,7 @@ def test_dirty_priceCDSIndexOption():
 
             v_pay_2, v_rec_2 = option.value_adjusted_black(value_dt,
                                                            index_curve,
-                                                           indexRecovery,
+                                                           index_recovery,
                                                            libor_curve,
                                                            volatility)
 

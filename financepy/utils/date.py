@@ -32,13 +32,13 @@ class DateFormatTypes(Enum):
 
 
 # Set the default
-gDateFormatType = DateFormatTypes.UK_LONG
+g_date_type_format = DateFormatTypes.UK_LONG
 
 
 def set_date_format(format_type):
     """ Function that sets the global date format type. """
-    global gDateFormatType
-    gDateFormatType = format_type
+    global g_date_type_format
+    g_date_type_format = format_type
 
 ###############################################################################
 
@@ -105,9 +105,9 @@ def parse_dt(date_str, date_format):
 ###############################################################################
 
 
-gDateCounterList = None
-gStartYear = 1900
-gEndYear = 2100
+g_date_counter_list = None
+g_start_year = 1900
+g_end_year = 2100
 
 
 def calculate_list():
@@ -121,15 +121,15 @@ def calculate_list():
     day_counter = 0
     max_days = 0
 
-    global gDateCounterList
-    global gStartYear
-    global gEndYear
+    global g_date_counter_list
+    global g_start_year
+    global g_end_year
 
-    gDateCounterList = []
+    g_date_counter_list = []
 
     idx = -1  # the first element will be idx=0
 
-    for yy in range(1900, gEndYear+1):
+    for yy in range(1900, g_end_year+1):
 
         # DO NOT CHANGE THIS FOR AGREEMENT WITH EXCEL WHICH ASSUMES THAT 1900
         # WAS A LEAP YEAR AND THAT 29 FEB 1900 ACTUALLY HAPPENED. A LOTUS BUG.
@@ -148,13 +148,13 @@ def calculate_list():
             for _ in range(1, max_days+1):
                 idx += 1
                 day_counter += 1
-                if yy >= gStartYear:
-                    gDateCounterList.append(day_counter)
+                if yy >= g_start_year:
+                    g_date_counter_list.append(day_counter)
 
             for _ in range(max_days, 31):
                 idx += 1
-                if yy >= gStartYear:
-                    gDateCounterList.append(-999)
+                if yy >= g_start_year:
+                    g_date_counter_list.append(-999)
 
 ###############################################################################
 # The index in these functions is not the excel date index used as the
@@ -166,7 +166,7 @@ def calculate_list():
 
 @njit(fastmath=True, cache=True)
 def date_index(d, m, y):
-    idx = (y-gStartYear) * 12 * 31 + (m-1) * 31 + (d-1)
+    idx = (y-g_start_year) * 12 * 31 + (m-1) * 31 + (d-1)
     return idx
 
 ###############################################################################
@@ -176,9 +176,9 @@ def date_index(d, m, y):
 def date_from_index(idx):
     """ Reverse mapping from index to date. Take care with numba as it can do
     weird rounding on the integer. Seems OK now. """
-    y = int(gStartYear + idx/12/31)
-    m = 1 + int((idx - (y-gStartYear) * 12 * 31) / 31)
-    d = 1 + idx - (y-gStartYear) * 12 * 31 - (m-1) * 31
+    y = int(g_start_year + idx/12/31)
+    m = 1 + int((idx - (y-g_start_year) * 12 * 31) / 31)
+    d = 1 + idx - (y-g_start_year) * 12 * 31 - (m-1) * 31
     return (d, m, y)
 
 ###############################################################################
@@ -204,6 +204,7 @@ def vectorisation_helper(func):
 
 ###############################################################################
 
+
 class Date():
     """ A date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance. """
@@ -228,34 +229,34 @@ class Date():
         start_dt = Date(1, 1, 2018)
         """
 
-        global gStartYear
-        global gEndYear
+        global g_start_year
+        global g_end_year
 
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
-        if d >= gStartYear and d < gEndYear and y > 0 and y <= 31:
+        if d >= g_start_year and d < g_end_year and y > 0 and y <= 31:
             raise FinError(
                 "Date arguments must now be in the order Date(dd, mm, yyyy)")
 
-        if gDateCounterList is None:
+        if g_date_counter_list is None:
             calculate_list()
 
         if y < 1900:
             raise FinError("Year cannot be before 1900")
 
         # Resize date list dynamically if required
-        if y < gStartYear:
-            gStartYear = y
+        if y < g_start_year:
+            g_start_year = y
             calculate_list()
 
-        if y > gEndYear:
-            gEndYear = y
+        if y > g_end_year:
+            g_end_year = y
             calculate_list()
 
-        if y < gStartYear or y > gEndYear:
+        if y < g_start_year or y > g_end_year:
             raise FinError(
-                "Date: year " + str(y) + " should be " + str(gStartYear) +
-                " to " + str(gEndYear))
+                "Date: year " + str(y) + " should be " + str(g_start_year) +
+                " to " + str(g_end_year))
 
         if d < 1:
             raise FinError("Date: Leap year. Day not valid.")
@@ -293,11 +294,28 @@ class Date():
         # update the excel date used for doing lots of financial calculations
         self._refresh()
 
-        dayFraction = self._hh/24.0
-        dayFraction += self._mm/24.0/60.0
-        dayFraction += self._ss/24.0/60.0/60.0
+        day_fraction = self._hh/24.0
+        day_fraction += self._mm/24.0/60.0
+        day_fraction += self._ss/24.0/60.0/60.0
 
-        self._excel_dt += dayFraction  # This is a float as it includes intraday time
+        self._excel_dt += day_fraction  # This is float - holds intraday time
+
+    ###########################################################################
+
+    def d(self):
+        return self._d
+
+    def m(self):
+        return self._m
+
+    def y(self):
+        return self._y
+
+    def excel_dt(self):
+        return self._excel_dt
+
+    def weekday(self):
+        return self._weekday
 
     ###########################################################################
 
@@ -332,12 +350,13 @@ class Date():
             return cls(d, m, y)
 
     ###########################################################################
+
     def _refresh(self):
         """ Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. """
 
         idx = date_index(self._d, self._m, self._y)
-        daysSinceFirstJan1900 = gDateCounterList[idx]
+        daysSinceFirstJan1900 = g_date_counter_list[idx]
         wd = weekday(daysSinceFirstJan1900)
         self._excel_dt = daysSinceFirstJan1900
         self._weekday = wd
@@ -469,7 +488,7 @@ class Date():
 
         while numDays != 0:
             idx += step
-            if gDateCounterList[idx] > 0:
+            if g_date_counter_list[idx] > 0:
                 numDays -= step
 
         (d, m, y) = date_from_index(idx)
@@ -751,10 +770,10 @@ class Date():
         years. The date is NOT weekend or holiday calendar adjusted. This must
         be done AFTERWARDS. """
 
-        listFlag = False
+        list_flag = False
 
         if isinstance(tenor, list) is True:
-            listFlag = True
+            list_flag = True
             for ten in tenor:
                 if isinstance(ten, str) is False:
                     raise FinError("Tenor must be a string e.g. '5Y'")
@@ -764,68 +783,68 @@ class Date():
             else:
                 raise FinError("Tenor must be a string e.g. '5Y'")
 
-        newDates = []
+        new_dates = []
 
-        for tenStr in tenor:
+        for tenor_str in tenor:
 
-            tenStr = tenStr.upper()
+            tenor_str = tenor_str.upper()
             DAYS = 1
             WEEKS = 2
             MONTHS = 3
             YEARS = 4
 
-            periodType = 0
+            period_type = 0
             num_periods = 0
 
-            if tenStr == "ON":   # overnight - should be used only if spot days = 0
-                periodType = DAYS
+            if tenor_str == "ON":   # overnight - should be used only if spot days = 0
+                period_type = DAYS
                 num_periods = 1
-            elif tenStr == "TN":  # overnight - should be used when spot days > 0
-                periodType = DAYS
+            elif tenor_str == "TN":  # overnight - should be used when spot days > 0
+                period_type = DAYS
                 num_periods = 1
-            elif tenStr[-1] == "D":
-                periodType = DAYS
-                num_periods = int(tenStr[0:-1])
-            elif tenStr[-1] == "W":
-                periodType = WEEKS
-                num_periods = int(tenStr[0:-1])
-            elif tenStr[-1] == "M":
-                periodType = MONTHS
-                num_periods = int(tenStr[0:-1])
-            elif tenStr[-1] == "Y":
-                periodType = YEARS
-                num_periods = int(tenStr[0:-1])
+            elif tenor_str[-1] == "D":
+                period_type = DAYS
+                num_periods = int(tenor_str[0:-1])
+            elif tenor_str[-1] == "W":
+                period_type = WEEKS
+                num_periods = int(tenor_str[0:-1])
+            elif tenor_str[-1] == "M":
+                period_type = MONTHS
+                num_periods = int(tenor_str[0:-1])
+            elif tenor_str[-1] == "Y":
+                period_type = YEARS
+                num_periods = int(tenor_str[0:-1])
             else:
                 raise FinError("Unknown tenor type in " + tenor)
 
-            newDate = Date(self._d, self._m, self._y)
+            new_date = Date(self._d, self._m, self._y)
 
-            if periodType == DAYS:
+            if period_type == DAYS:
                 for _ in range(0, abs(num_periods)):
-                    newDate = newDate.add_days(math.copysign(1, num_periods))
-            elif periodType == WEEKS:
+                    new_date = new_date.add_days(math.copysign(1, num_periods))
+            elif period_type == WEEKS:
                 for _ in range(0, abs(num_periods)):
-                    newDate = newDate.add_days(math.copysign(7, num_periods))
-            elif periodType == MONTHS:
+                    new_date = new_date.add_days(math.copysign(7, num_periods))
+            elif period_type == MONTHS:
                 for _ in range(0, abs(num_periods)):
-                    newDate = newDate.add_months(math.copysign(1, num_periods))
+                    new_date = new_date.add_months(math.copysign(1, num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day we add this logic
-                y = newDate._y
-                m = newDate._m
-                d = min(self._d, newDate.eom()._d)
-                newDate = Date(d, m, y)
+                y = new_date._y
+                m = new_date._m
+                d = min(self._d, new_date.eom()._d)
+                new_date = Date(d, m, y)
 
-            elif periodType == YEARS:
+            elif period_type == YEARS:
                 for _ in range(0, abs(num_periods)):
-                    newDate = newDate.add_months(math.copysign(12, num_periods))
+                    new_date = new_date.add_months(math.copysign(12, num_periods))
 
-            newDates.append(newDate)
+            new_dates.append(new_date)
 
-        if listFlag is True:
-            return newDates
+        if list_flag is True:
+            return new_dates
         else:
-            return newDates[0]
+            return new_dates[0]
 
     ###########################################################################
 
@@ -857,7 +876,7 @@ class Date():
     def __repr__(self):
         """ returns a formatted string of the date """
 
-        global gDateFormatType
+        global g_date_type_format
 
         dayNameStr = short_day_names[self._weekday]
 
@@ -876,61 +895,61 @@ class Date():
         shortYearStr = str(self._y)[2:]
         longYearStr = str(self._y)
 
-        if gDateFormatType == DateFormatTypes.UK_LONGEST:
+        if g_date_type_format == DateFormatTypes.UK_LONGEST:
 
             sep = " "
             date_str = dayNameStr + " " + dayStr + sep + longMonthStr + sep + longYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.UK_LONG:
+        elif g_date_type_format == DateFormatTypes.UK_LONG:
 
             sep = "-"
             date_str = dayStr + sep + longMonthStr + sep + longYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.UK_MEDIUM:
+        elif g_date_type_format == DateFormatTypes.UK_MEDIUM:
 
             sep = "/"
             date_str = dayStr + sep + shortMonthStr + sep + longYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.UK_SHORT:
+        elif g_date_type_format == DateFormatTypes.UK_SHORT:
 
             sep = "/"
             date_str = dayStr + sep + shortMonthStr + sep + shortYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.US_LONGEST:
+        elif g_date_type_format == DateFormatTypes.US_LONGEST:
 
             sep = " "
             date_str = dayNameStr + " " + longMonthStr + sep + dayStr + sep + longYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.US_LONG:
+        elif g_date_type_format == DateFormatTypes.US_LONG:
 
             sep = "-"
             date_str = longMonthStr + sep + dayStr + sep + longYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.US_MEDIUM:
+        elif g_date_type_format == DateFormatTypes.US_MEDIUM:
 
             sep = "-"
             date_str = shortMonthStr + sep + dayStr + sep + longYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.US_SHORT:
+        elif g_date_type_format == DateFormatTypes.US_SHORT:
 
             sep = "-"
             date_str = shortMonthStr + sep + dayStr + sep + shortYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.BLOOMBERG:
+        elif g_date_type_format == DateFormatTypes.BLOOMBERG:
 
             sep = "/"
             date_str = shortMonthStr + sep + dayStr + sep + shortYearStr
             return date_str
 
-        elif gDateFormatType == DateFormatTypes.DATETIME:
+        elif g_date_type_format == DateFormatTypes.DATETIME:
 
             sep = "/"
 
@@ -1047,7 +1066,7 @@ def date_range(start_dt: Date,
 
 
 def test_type():
-    global gDateFormatType
-    print("TEST TYPE", gDateFormatType)
+    global g_date_type_format
+    print("TEST TYPE", g_date_type_format)
 
 ###############################################################################

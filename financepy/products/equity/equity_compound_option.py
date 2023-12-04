@@ -89,114 +89,114 @@ def _value_once(s,
     periodDiscountFactors = np.zeros(num_steps)
 
     # store time independent information for later use in tree
-    for iTime in range(0, num_steps1):
+    for i_time in range(0, num_steps1):
         a1 = np.exp((r - q) * dt1)
-        probs[iTime] = (a1 - d1) / (u1 - d1)
-        periodDiscountFactors[iTime] = np.exp(-r * dt1)
+        probs[i_time] = (a1 - d1) / (u1 - d1)
+        periodDiscountFactors[i_time] = np.exp(-r * dt1)
 
-    for iTime in range(num_steps1, num_steps):
+    for i_time in range(num_steps1, num_steps):
         a2 = np.exp((r - q) * dt2)
-        probs[iTime] = (a2 - d2) / (u2 - d2)
-        periodDiscountFactors[iTime] = np.exp(-r * dt2)
+        probs[i_time] = (a2 - d2) / (u2 - d2)
+        periodDiscountFactors[i_time] = np.exp(-r * dt2)
 
     stock_values = np.zeros(num_nodes)
     stock_values[0] = s
     sLow = s
 
-    for iTime in range(1, num_steps1 + 1):
+    for i_time in range(1, num_steps1 + 1):
         sLow *= d1
         s = sLow
-        for iNode in range(0, iTime + 1):
-            index = int(0.5 * iTime * (iTime + 1))
-            stock_values[index + iNode] = s
+        for i_node in range(0, i_time + 1):
+            index = int(0.5 * i_time * (i_time + 1))
+            stock_values[index + i_node] = s
             s = s * (u1 * u1)
 
-    for iTime in range(num_steps1 + 1, num_steps + 1):
+    for i_time in range(num_steps1 + 1, num_steps + 1):
         sLow *= d2
         s = sLow
-        for iNode in range(0, iTime + 1):
-            index = int(0.5 * iTime * (iTime + 1))
-            stock_values[index + iNode] = s
+        for i_node in range(0, i_time + 1):
+            index = int(0.5 * i_time * (i_time + 1))
+            stock_values[index + i_node] = s
             s = s * (u2 * u2)
 
     # work backwards by first setting values at expiry date t2
     index = int(0.5 * num_steps * (num_steps + 1))
 
-    for iNode in range(0, iTime + 1):
-        s = stock_values[index + iNode]
+    for i_node in range(0, i_time + 1):
+        s = stock_values[index + i_node]
         if option_type2 == OptionTypes.EUROPEAN_CALL\
            or option_type2 == OptionTypes.AMERICAN_CALL:
-            option_values[index + iNode] = max(s - k2, 0.0)
+            option_values[index + i_node] = max(s - k2, 0.0)
         elif option_type2 == OptionTypes.EUROPEAN_PUT\
                 or option_type2 == OptionTypes.AMERICAN_PUT:
-            option_values[index + iNode] = max(k2 - s, 0.0)
+            option_values[index + i_node] = max(k2 - s, 0.0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
-    for iTime in range(num_steps - 1, num_steps1, -1):
-        index = int(0.5 * iTime * (iTime + 1))
-        for iNode in range(0, iTime + 1):
-            s = stock_values[index + iNode]
-            nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
-            nextNodeDn = nextIndex + iNode
-            nextNodeUp = nextIndex + iNode + 1
+    for i_time in range(num_steps - 1, num_steps1, -1):
+        index = int(0.5 * i_time * (i_time + 1))
+        for i_node in range(0, i_time + 1):
+            s = stock_values[index + i_node]
+            next_index = int(0.5 * (i_time + 1) * (i_time + 2))
+            nextNodeDn = next_index + i_node
+            nextNodeUp = next_index + i_node + 1
             vUp = option_values[nextNodeUp]
             vDn = option_values[nextNodeDn]
-            futureExpectedValue = probs[iTime] * vUp
-            futureExpectedValue += (1.0 - probs[iTime]) * vDn
-            holdValue = periodDiscountFactors[iTime] * futureExpectedValue
+            future_exp_val = probs[i_time] * vUp
+            future_exp_val += (1.0 - probs[i_time]) * vDn
+            hold_value = periodDiscountFactors[i_time] * future_exp_val
 
-            exerciseValue = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
+            exercise_value = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if option_type1 == OptionTypes.AMERICAN_CALL:
-                exerciseValue = max(s - k2, 0.0)
+                exercise_value = max(s - k2, 0.0)
             elif option_type1 == OptionTypes.AMERICAN_PUT:
-                exerciseValue = max(k2 - s, 0.0)
+                exercise_value = max(k2 - s, 0.0)
 
-            option_values[index + iNode] = max(exerciseValue, holdValue)
+            option_values[index + i_node] = max(exercise_value, hold_value)
 
     # Now do payoff at the end of the first expiry period at t1
-    iTime = num_steps1
-    index = int(0.5 * iTime * (iTime + 1))
-    for iNode in range(0, iTime + 1):
-        s = stock_values[index + iNode]
-        nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
-        nextNodeDn = nextIndex + iNode
-        nextNodeUp = nextIndex + iNode + 1
+    i_time = num_steps1
+    index = int(0.5 * i_time * (i_time + 1))
+    for i_node in range(0, i_time + 1):
+        s = stock_values[index + i_node]
+        next_index = int(0.5 * (i_time + 1) * (i_time + 2))
+        nextNodeDn = next_index + i_node
+        nextNodeUp = next_index + i_node + 1
         vUp = option_values[nextNodeUp]
         vDn = option_values[nextNodeDn]
-        futureExpectedValue = probs[iTime] * vUp
-        futureExpectedValue += (1.0 - probs[iTime]) * vDn
-        holdValue = periodDiscountFactors[iTime] * futureExpectedValue
+        future_exp_val = probs[i_time] * vUp
+        future_exp_val += (1.0 - probs[i_time]) * vDn
+        hold_value = periodDiscountFactors[i_time] * future_exp_val
 
         if option_type1 == OptionTypes.EUROPEAN_CALL\
            or option_type1 == OptionTypes.AMERICAN_CALL:
-            option_values[index + iNode] = max(holdValue - k1, 0.0)
+            option_values[index + i_node] = max(hold_value - k1, 0.0)
         elif option_type1 == OptionTypes.EUROPEAN_PUT\
                 or option_type1 == OptionTypes.AMERICAN_PUT:
-            option_values[index + iNode] = max(k1 - holdValue, 0.0)
+            option_values[index + i_node] = max(k1 - hold_value, 0.0)
 
     # begin backward steps from t1 expiry to value date
-    for iTime in range(num_steps1 - 1, -1, -1):
-        index = int(0.5 * iTime * (iTime + 1))
-        for iNode in range(0, iTime + 1):
-            s = stock_values[index + iNode]
-            nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
-            nextNodeDn = nextIndex + iNode
-            nextNodeUp = nextIndex + iNode + 1
+    for i_time in range(num_steps1 - 1, -1, -1):
+        index = int(0.5 * i_time * (i_time + 1))
+        for i_node in range(0, i_time + 1):
+            s = stock_values[index + i_node]
+            next_index = int(0.5 * (i_time + 1) * (i_time + 2))
+            nextNodeDn = next_index + i_node
+            nextNodeUp = next_index + i_node + 1
             vUp = option_values[nextNodeUp]
             vDn = option_values[nextNodeDn]
-            futureExpectedValue = probs[iTime] * vUp
-            futureExpectedValue += (1.0 - probs[iTime]) * vDn
-            holdValue = periodDiscountFactors[iTime] * futureExpectedValue
+            future_exp_val = probs[i_time] * vUp
+            future_exp_val += (1.0 - probs[i_time]) * vDn
+            hold_value = periodDiscountFactors[i_time] * future_exp_val
 
-            exerciseValue = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
+            exercise_value = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
             if option_type1 == OptionTypes.AMERICAN_CALL:
-                exerciseValue = max(holdValue - k1, 0.0)
+                exercise_value = max(hold_value - k1, 0.0)
             elif option_type1 == OptionTypes.AMERICAN_PUT:
-                exerciseValue = max(k1 - holdValue, 0.0)
+                exercise_value = max(k1 - hold_value, 0.0)
 
-            option_values[index + iNode] = max(exerciseValue, holdValue)
+            option_values[index + i_node] = max(exercise_value, hold_value)
 
     verbose = False
     if verbose:

@@ -51,7 +51,7 @@ class CDSTranche:
                  k1: float,
                  k2: float,
                  notional: float = ONE_MILLION,
-                 running_coupon: float = 0.0,
+                 running_cpn: float = 0.0,
                  long_protection: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
@@ -70,7 +70,7 @@ class CDSTranche:
         self._step_in_dt = step_in_dt
         self._maturity_dt = maturity_dt
         self._notional = notional
-        self._running_coupon = running_coupon
+        self._running_cpn = running_cpn
         self._long_protection = long_protection
         self._dc_type = dc_type
         self._dg_type = dg_type
@@ -82,7 +82,7 @@ class CDSTranche:
 
         self._cds_contract = CDS(self._step_in_dt,
                                  self._maturity_dt,
-                                 self._running_coupon,
+                                 self._running_cpn,
                                  notional,
                                  self._long_protection,
                                  self._freq_type,
@@ -97,7 +97,7 @@ class CDSTranche:
                  value_dt,
                  issuer_curves,
                  upfront,
-                 running_coupon,
+                 running_cpn,
                  corr1,
                  corr2,
                  num_points=50,
@@ -140,15 +140,15 @@ class CDSTranche:
         for bb in range(0, num_credits):
             beta_vector2[bb] = beta2
 
-        qVector = np.zeros(num_credits)
+        q_vector = np.zeros(num_credits)
         qt1 = np.zeros(num_times)  # include 1.0
         qt2 = np.zeros(num_times)  # include 1.0
 
-        trancheTimes = np.zeros(num_times)
-        trancheSurvivalCurve = np.zeros(num_times)
+        tranche_times = np.zeros(num_times)
+        tranche_surv_curve = np.zeros(num_times)
 
-        trancheTimes[0] = 0
-        trancheSurvivalCurve[0] = 1.0
+        tranche_times[0] = 0
+        tranche_surv_curve[0] = 1.0
         qt1[0] = 1.0
         qt2[0] = 1.0
 
@@ -162,25 +162,25 @@ class CDSTranche:
                 vTimes = issuer_curve._times
                 qRow = issuer_curve._values
                 recovery_rates[j] = issuer_curve._recovery_rate
-                qVector[j] = interpolate(
+                q_vector[j] = interpolate(
                     t, vTimes, qRow, InterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
 
                 qt1[i] = tranche_surv_prob_recursion(
-                    0.0, k1, num_credits, qVector, recovery_rates,
+                    0.0, k1, num_credits, q_vector, recovery_rates,
                     beta_vector1, num_points)
                 qt2[i] = tranche_surv_prob_recursion(
-                    0.0, k2, num_credits, qVector, recovery_rates,
+                    0.0, k2, num_credits, q_vector, recovery_rates,
                     beta_vector2, num_points)
 
             elif model == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
 
                 qt1[i] = tranche_surv_prob_adj_binomial(
-                    0.0, k1, num_credits, qVector, recovery_rates,
+                    0.0, k1, num_credits, q_vector, recovery_rates,
                     beta_vector1, num_points)
                 qt2[i] = tranche_surv_prob_adj_binomial(
-                    0.0, k2, num_credits, qVector, recovery_rates,
+                    0.0, k2, num_credits, q_vector, recovery_rates,
                     beta_vector2, num_points)
 
             elif model == FinLossDistributionBuilder.GAUSSIAN:
@@ -189,7 +189,7 @@ class CDSTranche:
                     0.0,
                     k1,
                     num_credits,
-                    qVector,
+                    q_vector,
                     recovery_rates,
                     beta_vector1,
                     num_points)
@@ -197,7 +197,7 @@ class CDSTranche:
                     0.0,
                     k2,
                     num_credits,
-                    qVector,
+                    q_vector,
                     recovery_rates,
                     beta_vector2,
                     num_points)
@@ -205,10 +205,10 @@ class CDSTranche:
             elif model == FinLossDistributionBuilder.LHP:
 
                 qt1[i] = tr_surv_prob_lhp(
-                    0.0, k1, num_credits, qVector, recovery_rates, beta1)
+                    0.0, k1, num_credits, q_vector, recovery_rates, beta1)
 
                 qt2[i] = tr_surv_prob_lhp(
-                    0.0, k2, num_credits, qVector, recovery_rates, beta2)
+                    0.0, k2, num_credits, q_vector, recovery_rates, beta2)
 
             else:
                 raise FinError(
@@ -222,33 +222,33 @@ class CDSTranche:
                 raise FinError(
                     "Tranche K2 survival probabilities not decreasing.")
 
-            trancheSurvivalCurve[i] = kappa * qt2[i] + (1.0 - kappa) * qt1[i]
-            trancheTimes[i] = t
+            tranche_surv_curve[i] = kappa * qt2[i] + (1.0 - kappa) * qt1[i]
+            tranche_times[i] = t
 
-        curveRecovery = 0.0  # For tranches only
+        curve_recovery = 0.0  # For tranches only
         libor_curve = issuer_curves[0]._libor_curve
-        trancheCurve = CDSCurve(
-            value_dt, [], libor_curve, curveRecovery)
-        trancheCurve._times = trancheTimes
-        trancheCurve._values = trancheSurvivalCurve
+        tranche_curve = CDSCurve(
+            value_dt, [], libor_curve, curve_recovery)
+        tranche_curve._times = tranche_times
+        tranche_curve._values = tranche_surv_curve
 
         protLegPV = self._cds_contract.protection_leg_pv(
-            value_dt, trancheCurve, curveRecovery)
+            value_dt, tranche_curve, curve_recovery)
         risky_pv01 = self._cds_contract.risky_pv01(
-            value_dt, trancheCurve)['clean_rpv01']
+            value_dt, tranche_curve)['clean_rpv01']
 
         mtm = self._notional * (protLegPV - upfront -
-                                risky_pv01 * running_coupon)
+                                risky_pv01 * running_cpn)
 
         if not self._long_protection:
             mtm *= -1.0
 
-        trancheOutput = np.zeros(4)
-        trancheOutput[0] = mtm
-        trancheOutput[1] = risky_pv01 * self._notional * running_coupon
-        trancheOutput[2] = protLegPV * self._notional
-        trancheOutput[3] = protLegPV / risky_pv01
+        tranche_output = np.zeros(4)
+        tranche_output[0] = mtm
+        tranche_output[1] = risky_pv01 * self._notional * running_cpn
+        tranche_output[2] = protLegPV * self._notional
+        tranche_output[3] = protLegPV / risky_pv01
 
-        return trancheOutput
+        return tranche_output
 
 ###############################################################################

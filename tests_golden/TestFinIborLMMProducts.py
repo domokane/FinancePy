@@ -78,11 +78,11 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                                zetas, correl, taus, seed)
 #     strike = r
 #     PAYSwaption = 1
-#     useSobol = 0
+#     use_sobol = 0
 #     numeraireIndex = 0
 
 #     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
-#                                zetas, taus, useSobol, seed)
+#                                zetas, taus, use_sobol, seed)
 
 #     for iExp in range(1, 10):
 

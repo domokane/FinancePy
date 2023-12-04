@@ -157,7 +157,7 @@ class SwapFloatLeg:
         self._cumulativePVs = []
 
         dfValue = discount_curve.df(value_dt)
-        legPV = 0.0
+        leg_pv = 0.0
         numPayments = len(self._payment_dts)
         firstPayment = False
 
@@ -195,13 +195,13 @@ class SwapFloatLeg:
 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
-                legPV += pmntPV
+                leg_pv += pmntPV
 
                 self._rates.append(fwd_rate)
                 self._payments.append(pmntAmount)
                 self._paymentDfs.append(dfPmnt)
                 self._paymentPVs.append(pmntPV)
-                self._cumulativePVs.append(legPV)
+                self._cumulativePVs.append(leg_pv)
 
             else:
 
@@ -209,18 +209,18 @@ class SwapFloatLeg:
                 self._payments.append(0.0)
                 self._paymentDfs.append(0.0)
                 self._paymentPVs.append(0.0)
-                self._cumulativePVs.append(legPV)
+                self._cumulativePVs.append(leg_pv)
 
         if pmntDate > value_dt:
             paymentPV = self._principal * dfPmnt * self._notional_array[-1]
             self._paymentPVs[-1] += paymentPV
-            legPV += paymentPV
-            self._cumulativePVs[-1] = legPV
+            leg_pv += paymentPV
+            self._cumulativePVs[-1] = leg_pv
 
         if self._leg_type == SwapTypes.PAY:
-            legPV = legPV * (-1.0)
+            leg_pv = leg_pv * (-1.0)
 
-        return legPV
+        return leg_pv
 
 ##########################################################################
 

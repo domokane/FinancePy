@@ -21,11 +21,11 @@ from enum import Enum
 
 def is_last_day_of_feb(dt: Date):
     # Return true if we are on the last day of February
-    if dt._m == 2:
+    if dt.m() == 2:
         is_leap = is_leap_year(dt._y)
-        if is_leap is True and dt._d == 29:
+        if is_leap is True and dt.d() == 29:
             return True
-        if is_leap is False and dt._d == 28:
+        if is_leap is False and dt.d() == 28:
             return True
     else:
         return False
@@ -46,7 +46,7 @@ def is_last_day_of_feb(dt: Date):
 
 
 class DayCountTypes(Enum):
-    ZERO = 0 # zero coupon bond
+    ZERO = 0  # zero coupon bond
     THIRTY_360_BOND = 1
     THIRTY_E_360 = 2
     THIRTY_E_360_ISDA = 3
@@ -81,7 +81,7 @@ class DayCount:
                   dt2: Date,  # Settlement (for bonds) or period end(swaps)
                   dt3: Date = None,  # End of coupon period for accrued
                   freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                  isTerminationDate: bool = False):  # Is dt2 a termination date
+                  isTerminationDate: bool = False):  # Is dt2 a term date
         """ This method performs two functions:
 
         1) It calculates the year fraction between dates dt1 and dt2 using the
@@ -94,7 +94,7 @@ class DayCount:
         coupon frequency for some conventions.
 
         Note that if the date is intraday, i.e. hh,mm and ss do not equal zero
-        then that is used in the calculation of the year frac. This avoids 
+        then that is used in the calculation of the year frac. This avoids
         discontinuities for short dated intra day products. It should not
         affect normal dates for which hh=mm=ss=0.
 
@@ -106,13 +106,13 @@ class DayCount:
         http://data.cbonds.info/files/cbondscalc/Calculator.pdf
         """
 
-        d1 = dt1._d
-        m1 = dt1._m
-        y1 = dt1._y
+        d1 = dt1.d()
+        m1 = dt1.m()
+        y1 = dt1.y()
 
-        d2 = dt2._d
-        m2 = dt2._m
-        y2 = dt2._y
+        d2 = dt2.d()
+        m2 = dt2.m()
+        y2 = dt2.y()
 
         num = 0
         den = 0
@@ -205,14 +205,14 @@ class DayCount:
                 acc_factor = (dt2 - dt1) / denom1
                 return (acc_factor, num, den)
             else:
-                daysYear1 = datediff(dt1, Date(1, 1, y1 + 1))
-                daysYear2 = datediff(Date(1, 1, y2), dt2)
-                acc_factor1 = daysYear1 / denom1
-                acc_factor2 = daysYear2 / denom2
+                day_years_1 = datediff(dt1, Date(1, 1, y1 + 1))
+                day_years_2 = datediff(Date(1, 1, y2), dt2)
+                acc_factor1 = day_years_1 / denom1
+                acc_factor2 = day_years_2 / denom2
                 yearDiff = y2 - y1 - 1.0
                 # Note that num/den does not equal acc_factor
                 # I do need to pass num back
-                num = daysYear1 + daysYear2
+                num = day_years_1 + day_years_2
                 den = denom1 + denom2
                 acc_factor = acc_factor1 + acc_factor2 + yearDiff
                 return (acc_factor, num, den)

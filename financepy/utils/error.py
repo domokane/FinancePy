@@ -12,6 +12,7 @@ import sys
 # iPython dependency is only loaded if required.
 
 ipython = None
+
 try:
     from IPython import get_ipython
     ipython = get_ipython()
@@ -24,8 +25,7 @@ def _hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
     etype, value, _ = sys.exc_info()
     if ipython is not None:
         msg = ipython._showtraceback(etype, value,
-                                     ipython.InteractiveTB.get_exception_only(
-                                         etype, value))
+                                     ipython.InteractiveTB.get_exception_only(etype, value))
     else:
         msg = None
     return msg

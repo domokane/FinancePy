@@ -455,8 +455,8 @@ def _obj_gap(gaps, *args):
 
 def _solve_to_horizon(s, t, rd, rf,
                       K_ATM, atm_vol,
-                      ms25DVol, rr25DVol,
-                      ms10DVol, rr10DVol,
+                      ms_25d_vol, rr_25d_vol,
+                      ms_10d_vol, rr_10d_vol,
                       delta_method_value, vol_type_value,
                       alpha,
                       x_inits,
@@ -472,15 +472,15 @@ def _solve_to_horizon(s, t, rd, rf,
     use10D = True
     use25D = True
 
-    if ms25DVol == -999.0:
+    if ms_25d_vol == -999.0:
         use25D = False
 
-    if ms10DVol == -999.0:
+    if ms_10d_vol == -999.0:
         use10D = False
 
     if use25D is True:
 
-        vol_25D_MS = atm_vol + ms25DVol
+        vol_25D_MS = atm_vol + ms_25d_vol
 
         K_25D_C_MS = solve_for_strike(s, t, rd, rf,
                                       OptionTypes.EUROPEAN_CALL.value,
@@ -517,7 +517,7 @@ def _solve_to_horizon(s, t, rd, rf,
 
     if use10D is True:
 
-        vol_10D_MS = atm_vol + ms10DVol
+        vol_10D_MS = atm_vol + ms_10d_vol
 
         K_10D_C_MS = solve_for_strike(s, t, rd, rf,
                                       OptionTypes.EUROPEAN_CALL.value,
@@ -558,8 +558,8 @@ def _solve_to_horizon(s, t, rd, rf,
 
     args = (s, t, rd, rf,
             K_ATM, atm_vol,
-            K_25D_C_MS, K_25D_P_MS, V_25D_MS, rr25DVol,
-            K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
+            K_25D_C_MS, K_25D_P_MS, V_25D_MS, rr_25d_vol,
+            K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr_10d_vol,
             delta_method_value, vol_type_value, alpha)
 
     # Nelder-Mead (both SciPy & Numba) is quicker, but occasionally fails
@@ -601,8 +601,8 @@ def _solve_to_horizon(s, t, rd, rf,
 
         args = (s, t, rd, rf,
                 K_ATM, atm_vol,
-                K_25D_C_MS, K_25D_P_MS, V_25D_MS, rr25DVol,
-                K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr10DVol,
+                K_25D_C_MS, K_25D_P_MS, V_25D_MS, rr_25d_vol,
+                K_10D_C_MS, K_10D_P_MS, V_10D_MS, rr_10d_vol,
                 delta_method_value, vol_type_value, params)
 
         opt = minimize(_obj_gap, ginits, args, method="Nelder-Mead", tol=tol)
@@ -924,10 +924,10 @@ class FXVolSurfacePlus():
 
         self._atm_vols = np.array(atm_vols)/100.0
 
-        self._useMS25DVol = True
-        self._useRR25DVol = True
-        self._useMS10DVol = True
-        self._useRR10DVol = True
+        self._usems_25d_vol = True
+        self._userr_25d_vol = True
+        self._usems_10d_vol = True
+        self._userr_10d_vol = True
 
         # Some of these can be missing which is signified by length zero
         n = len(mktStrangle25DeltaVols)
@@ -936,7 +936,7 @@ class FXVolSurfacePlus():
             raise FinError("Number MS25D vols must equal number of tenors")
 
         if n == 0:
-            self._useMS25DVol = False
+            self._usems_25d_vol = False
 
         n = len(riskReversal25DeltaVols)
 
@@ -944,7 +944,7 @@ class FXVolSurfacePlus():
             raise FinError("Number RR25D vols must equal number of tenors")
 
         if n == 0:
-            self._useRR25DVol = False
+            self._userr_25d_vol = False
 
         n = len(mktStrangle10DeltaVols)
 
@@ -952,7 +952,7 @@ class FXVolSurfacePlus():
             raise FinError("Number MS10D vols must equal number of tenors")
 
         if n == 0:
-            self._useMS10DVol = False
+            self._usems_10d_vol = False
 
         n = len(riskReversal10DeltaVols)
 
@@ -960,15 +960,15 @@ class FXVolSurfacePlus():
             raise FinError("Number RR10D vols must equal number of tenors")
 
         if n == 0:
-            self._useRR10DVol = False
+            self._userr_10d_vol = False
 
-        if self._useMS10DVol != self._useRR10DVol:
+        if self._usems_10d_vol != self._userr_10d_vol:
             raise FinError("You must provide both 10D RR + 10D MS or neither")
 
-        if self._useMS25DVol != self._useRR25DVol:
+        if self._usems_25d_vol != self._userr_25d_vol:
             raise FinError("You must provide both 25D RR + 25D MS or neither")
 
-        if self._useMS10DVol is False and self._useMS25DVol is False:
+        if self._usems_10d_vol is False and self._usems_25d_vol is False:
             raise FinError(
                 "No MS and RR. You must provide 10D or 25D MS + RR.")
 
@@ -1409,22 +1409,22 @@ class FXVolSurfacePlus():
 
             atm_vol = self._atm_vols[i]
 
-            if self._useMS25DVol > 0:
+            if self._usems_25d_vol > 0:
                 ms25 = self._mktStrangle25DeltaVols[i]
             else:
                 ms25 = 0.0
 
-            if self._useRR25DVol > 0:
+            if self._userr_25d_vol > 0:
                 rr25 = self._riskReversal25DeltaVols[i]
             else:
                 rr25 = 0.0
 
-            if self._useMS10DVol > 0:
+            if self._usems_10d_vol > 0:
                 ms10 = self._mktStrangle10DeltaVols[i]
             else:
                 ms10 = 0.0
 
-            if self._useRR10DVol > 0:
+            if self._userr_10d_vol > 0:
                 rr10 = self._riskReversal10DeltaVols[i]
             else:
                 rr10 = 0.0
@@ -1441,7 +1441,7 @@ class FXVolSurfacePlus():
             if self._volatility_function_type == VolFuncTypes.CLARK:
 
                 # Our preference is to fit to the 10D wings first
-                if self._useMS10DVol is False:
+                if self._usems_10d_vol is False:
                     # Fit to 25D
                     c0 = np.log(atm_vol)
                     c1 = 2.0 * np.log(s75/s25)
@@ -1485,7 +1485,7 @@ class FXVolSurfacePlus():
             elif self._volatility_function_type == VolFuncTypes.BBG:
 
                 # Our preference is to fit to the 10D wings first
-                if self._useMS10DVol is False:
+                if self._usems_10d_vol is False:
                     # BBG Params if we fit to 25D
                     a = 8.0*s75-16.0*s50+8.0*s25
                     b = -6.0*s75+16.0*s50-10.0*s25
@@ -1501,7 +1501,7 @@ class FXVolSurfacePlus():
             elif self._volatility_function_type == VolFuncTypes.CLARK5:
 
                 # Our preference is to fit to the 10D wings first
-                if self._useMS10DVol is False:
+                if self._usems_10d_vol is False:
                     # Fit to 25D
                     c0 = np.log(atm_vol)
                     c1 = 2.0 * np.log(s75/s25)
@@ -1533,24 +1533,24 @@ class FXVolSurfacePlus():
 
             # If the data has not been provided, pass a dummy value
             # as I don't want more arguments and Numpy needs floats
-            if self._useMS25DVol:
-                ms25DVol = self._mktStrangle25DeltaVols[i]
-                rr25DVol = self._riskReversal25DeltaVols[i]
+            if self._usems_25d_vol:
+                ms_25d_vol = self._mktStrangle25DeltaVols[i]
+                rr_25d_vol = self._riskReversal25DeltaVols[i]
             else:
-                ms25DVol = -999.0
-                rr25DVol = -999.0
+                ms_25d_vol = -999.0
+                rr_25d_vol = -999.0
 
-            if self._useMS10DVol:
-                ms10DVol = self._mktStrangle10DeltaVols[i]
-                rr10DVol = self._riskReversal10DeltaVols[i]
+            if self._usems_10d_vol:
+                ms_10d_vol = self._mktStrangle10DeltaVols[i]
+                rr_10d_vol = self._riskReversal10DeltaVols[i]
             else:
-                ms10DVol = -999.0
-                rr10DVol = -999.0
+                ms_10d_vol = -999.0
+                rr_10d_vol = -999.0
 
             res = _solve_to_horizon(s, t, r_d, r_f,
                                     K_ATM, atm_vol,
-                                    ms25DVol, rr25DVol,
-                                    ms10DVol, rr10DVol,
+                                    ms_25d_vol, rr_25d_vol,
+                                    ms_10d_vol, rr_10d_vol,
                                     delta_method_value, vol_type_value,
                                     self._alpha,
                                     x_inits[i],
@@ -1594,13 +1594,13 @@ class FXVolSurfacePlus():
                 print("IN ATM VOL: %9.6f %%" %
                       (100.0*self._atm_vols[i]))
 
-                if self._useMS25DVol:
+                if self._usems_25d_vol:
                     print("IN MKT STRANGLE 25D VOL: %9.6f %%" %
                           (100.0*self._mktStrangle25DeltaVols[i]))
                     print("IN RSK REVERSAL 25D VOL: %9.6f %%" %
                           (100.0*self._riskReversal25DeltaVols[i]))
 
-                if self._useMS10DVol:
+                if self._usems_10d_vol:
                     print("IN MKT STRANGLE 10D VOL: %9.6f %%" %
                           (100.0*self._mktStrangle10DeltaVols[i]))
                     print("IN RSK REVERSAL 10D VOL: %9.6f %%" %
@@ -1681,7 +1681,7 @@ class FXVolSurfacePlus():
             # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.25/-0.25
             ###################################################################
 
-            if self._useMS25DVol is True:
+            if self._usems_25d_vol is True:
 
                 msVol = self._atm_vols[i] + self._mktStrangle25DeltaVols[i]
 
@@ -1870,7 +1870,7 @@ class FXVolSurfacePlus():
             # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.10/-0.10
             ###################################################################
 
-            if self._useMS10DVol:
+            if self._usems_10d_vol:
 
                 msVol = self._atm_vols[i] + self._mktStrangle10DeltaVols[i]
 

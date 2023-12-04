@@ -72,9 +72,9 @@ def _obj(params, *args):
     tot = 0.0
 
     for i in range(0, num_strikes):
-        fittedVol = vol_function(vol_type_value, params, f, strikes[i], t)
+        fitted_vol = vol_function(vol_type_value, params, f, strikes[i], t)
         mkt_vol = volatility_grid[index][i]
-        diff = fittedVol - mkt_vol
+        diff = fitted_vol - mkt_vol
         tot += diff**2
 
     return tot
@@ -762,8 +762,8 @@ class EquityVolSurface:
             for i in range(0, numIntervals):
 
                 ks.append(K)
-                fittedVol = self.vol_from_strike_dt(K, expiry_dt) * 100.
-                fitted_vols.append(fittedVol)
+                fitted_vol = self.vol_from_strike_dt(K, expiry_dt) * 100.
+                fitted_vols.append(fitted_vol)
                 K = K + dK
 
             label_str = "FITTED AT " + str(self._expiry_dts[tenor_index])

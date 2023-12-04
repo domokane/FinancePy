@@ -236,7 +236,7 @@ def test_CDSIndexAdjustSpreads():
                           Date(20, 12, 2011),
                           Date(20, 12, 2013),
                           Date(20, 12, 2016)]
-    indexRecoveryRate = 0.40
+    index_recovery = 0.40
 
     tolerance = 1e-4  # should be smaller
 
@@ -250,7 +250,7 @@ def test_CDSIndexAdjustSpreads():
         index_cpns,
         index_upfronts,
         index_maturity_dts,
-        indexRecoveryRate,
+        index_recovery,
         tolerance)
 
     end = time.time()

@@ -59,36 +59,36 @@ def _risky_pv01_numba(teff,
         print("QTimes", npSurvTimes)
         print("QValues", npSurvValues)
 
-    couponAccruedIndicator = 1
+    cpnAccruedIndicator = 1
 
-    # Method 0 : This is the market standard which assumes that the coupon
+    # Method 0 : This is the market standard which assumes that the cpn
     # accrued is treated as though on average default occurs roughly midway
-    # through a coupon period.
+    # through a cpn period.
 
     tncd = paymentTimes[0]
 
-    # The first coupon is a special case which needs to be handled carefully
-    # taking into account what coupon has already accrued and what has not
+    # The first cpn is a special case which needs to be handled carefully
+    # taking into account what cpn has already accrued and what has not
     qeff = _uinterpolate(teff, npSurvTimes, npSurvValues, method)
     q1 = _uinterpolate(tncd, npSurvTimes, npSurvValues, method)
     z1 = _uinterpolate(tncd, npIborTimes, npIborValues, method)
 
-    # this is the part of the coupon accrued from previous coupon date to now
+    # this is the part of the cpn accrued from previous cpn date to now
     # accrual_factorPCDToNow = day_count.year_frac(pcd,teff)
 
     # reference credit survives to the premium payment date
-    fullRPV01 = q1 * z1 * year_fracs[1]
+    full_rpv01 = q1 * z1 * year_fracs[1]
 
-    # coupon accrued from previous coupon to today paid in full at default
-    # before coupon payment
-    fullRPV01 = fullRPV01 + z1 * \
-        (qeff - q1) * accrual_factorPCDToNow * couponAccruedIndicator
+    # cpn accrued from previous cpn to today paid in full at default
+    # before cpn payment
+    full_rpv01 = full_rpv01 + z1 * \
+        (qeff - q1) * accrual_factorPCDToNow * cpnAccruedIndicator
 
-    # future accrued from now to coupon payment date assuming default roughly
+    # future accrued from now to cpn payment date assuming default roughly
     # midway
-    fullRPV01 += 0.5 * z1 * \
+    full_rpv01 += 0.5 * z1 * \
         (qeff - q1) * (year_fracs[1] - accrual_factorPCDToNow) \
-        * couponAccruedIndicator
+        * cpnAccruedIndicator
 
     for it in range(1, len(paymentTimes)):
 
@@ -99,13 +99,13 @@ def _risky_pv01_numba(teff,
 
         accrual_factor = year_fracs[it]
 
-        # full coupon is paid at the end of the current period if survives to
+        # full cpn is paid at the end of the current period if survives to
         # payment date
-        fullRPV01 += q2 * z2 * accrual_factor
+        full_rpv01 += q2 * z2 * accrual_factor
 
         #######################################################################
 
-        if couponAccruedIndicator == 1:
+        if cpnAccruedIndicator == 1:
 
             if useFlatHazardRateIntegral:
                 # This needs to be updated to handle small h+r
@@ -115,18 +115,18 @@ def _risky_pv01_numba(teff,
                 alpha = h12 + r12
                 expTerm = 1.0 - exp(-alpha * tau) - alpha * \
                     tau * exp(-alpha * tau)
-                dfullRPV01 = q1 * z1 * h12 * \
+                d_full_rpv01 = q1 * z1 * h12 * \
                     expTerm / abs(alpha * alpha + 1e-20)
             else:
-                dfullRPV01 = 0.50 * (q1 - q2) * z2 * accrual_factor
+                d_full_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
 
-            fullRPV01 = fullRPV01 + dfullRPV01
+            full_rpv01 = full_rpv01 + d_full_rpv01
 
         q1 = q2
 
-    cleanRPV01 = fullRPV01 - accrual_factorPCDToNow
+    clean_rpv01 = full_rpv01 - accrual_factorPCDToNow
 
-    return np.array([fullRPV01, cleanRPV01])
+    return np.array([full_rpv01, clean_rpv01])
 
 ###############################################################################
 
@@ -200,7 +200,7 @@ class CDS:
     def __init__(self,
                  step_in_dt: Date,  # Date protection starts
                  maturity_dt_or_tenor: (Date, str),  # Date or tenor
-                 running_coupon: float,  # Annualised coupon on premium fee leg
+                 running_cpn: float,  # Annualised cpn on premium fee leg
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
@@ -208,7 +208,7 @@ class CDS:
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Create a CDS from the step-in date, maturity date and coupon """
+        """ Create a CDS from the step-in date, maturity date and cpn """
 
         check_argument_types(self.__init__, locals())
 
@@ -226,7 +226,7 @@ class CDS:
 
         self._step_in_dt = step_in_dt
         self._maturity_dt = maturity_dt
-        self._running_coupon = running_coupon
+        self._running_cpn = running_cpn
         self._notional = notional
         self._long_protection = long_protection
         self._dc_type = dc_type
@@ -264,7 +264,7 @@ class CDS:
             unadjusted_schedule_dts.append(next_dt)
 
             # the unadjusted dates start at end date and end at previous
-            # coupon date
+            # cpn date
             while next_dt > start_dt:
                 next_dt = next_dt.add_months(-num_months)
                 unadjusted_schedule_dts.append(next_dt)
@@ -315,8 +315,8 @@ class CDS:
         # We only include dates which fall after the CDS start date
         self._payment_dts = adjusted_dts[1:]
 
-        # Accrual start dates run from previous coupon date to penultimate
-        # coupon date
+        # Accrual start dates run from previous cpn date to penultimate
+        # cpn date
         self._accrual_start_dts = adjusted_dts[:-1]
 
         # Accrual end dates are one day before the start of the next
@@ -343,7 +343,7 @@ class CDS:
             # Adding a day because `year_frac` is non-inclusive
             # eg. 20th to 22nd should be 3 days
             accrual_factor = day_count.year_frac(t0, t1.add_days(1))[0]
-            flow = accrual_factor * self._running_coupon * self._notional
+            flow = accrual_factor * self._running_cpn * self._notional
 
             self._accrual_factors.append(accrual_factor)
             self._flows.append(flow)
@@ -365,7 +365,7 @@ class CDS:
                                 pv01_method)
 
         dirtyRPV01 = rpv01['dirty_rpv01']
-        cleanRPV01 = rpv01['clean_rpv01']
+        clean_rpv01 = rpv01['clean_rpv01']
 
         prot_pv = self.protection_leg_pv(value_dt,
                                          issuer_curve,
@@ -381,11 +381,11 @@ class CDS:
             longProt = -1
 
         dirtyPV = fwdDf * longProt * \
-            (prot_pv - self._running_coupon * dirtyRPV01 * self._notional)
-        cleanPV = fwdDf * longProt * \
-            (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
+            (prot_pv - self._running_cpn * dirtyRPV01 * self._notional)
+        clean_pv = fwdDf * longProt * \
+            (prot_pv - self._running_cpn * clean_rpv01 * self._notional)
 
-        return {'dirty_pv': dirtyPV, 'clean_pv': cleanPV}
+        return {'dirty_pv': dirtyPV, 'clean_pv': clean_pv}
 
     ###########################################################################
 
@@ -411,7 +411,7 @@ class CDS:
         # we create a deep copy to avoid state issues
         bumpedIssuerCurve = deepcopy(issuer_curve)
         for cds in bumpedIssuerCurve._cds_contracts:
-            cds._running_coupon += bump
+            cds._running_cpn += bump
 
         bumpedIssuerCurve._build_curve()
 
@@ -460,9 +460,9 @@ class CDS:
         for swap in new_issuer_curve._libor_curve._usedSwaps:
 
             cpn = swap._fixed_leg._cpn
-            swap._fixed_leg._coupon = cpn + bump
+            swap._fixed_leg._cpn = cpn + bump
 
-            # Need to regenerate fixed leg payments with bumped coupon
+            # Need to regenerate fixed leg payments with bumped cpn
             # I could call swap._fixed_leg.generate_payments() but it is
             # overkill as it has to do all the schedule generation which is
             # not needed as the dates are unchanged
@@ -522,7 +522,7 @@ class CDS:
 
         risky_pv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)
 
-        cleanRPV01 = risky_pv01['clean_rpv01']
+        clean_rpv01 = risky_pv01['clean_rpv01']
 
         prot_pv = self.protection_leg_pv(value_dt,
                                          issuer_curve,
@@ -532,17 +532,17 @@ class CDS:
 
         fwdDf = 1.0
 
-        cleanPV = fwdDf * (prot_pv - self._running_coupon * cleanRPV01
+        clean_pv = fwdDf * (prot_pv - self._running_cpn * clean_rpv01
                            * self._notional)
 
-        clean_price = (self._notional - cleanPV) / self._notional * 100.0
+        clean_price = (self._notional - clean_pv) / self._notional * 100.0
 
         return clean_price
 
     ###########################################################################
 
     def accrued_days(self):
-        """ Number of days between the previous coupon and the currrent step
+        """ Number of days between the previous cpn and the currrent step
         in date. """
 
         # I assume accrued runs to the effective date
@@ -554,13 +554,13 @@ class CDS:
 
     def accrued_interest(self):
         """ Calculate the amount of accrued interest that has accrued from the
-        previous coupon date (PCD) to the step_in_dt of the CDS contract. """
+        previous cpn date (PCD) to the step_in_dt of the CDS contract. """
 
         day_count = DayCount(self._dc_type)
         pcd = self._accrual_start_dts[0]
         accrual_factor = day_count.year_frac(pcd, self._step_in_dt)[0]
         accrued_interest = accrual_factor * self._notional \
-            * self._running_coupon
+            * self._running_cpn
 
         if self._long_protection:
             accrued_interest *= -1.0
@@ -613,7 +613,7 @@ class CDS:
             if t > 0.0:
                 paymentTimes.append(t)
 
-        # this is the part of the coupon accrued from the previous coupon date
+        # this is the part of the cpn accrued from the previous cpn date
         # to now
         pcd = self._accrual_start_dts[0]
         eff = self._step_in_dt
@@ -634,10 +634,10 @@ class CDS:
                                        issuer_curve._values,
                                        pv01_method)
 
-        fullRPV01 = valueRPV01[0]
-        cleanRPV01 = valueRPV01[1]
+        full_rpv01 = valueRPV01[0]
+        clean_rpv01 = valueRPV01[1]
 
-        return {'dirty_rpv01': fullRPV01, 'clean_rpv01': cleanRPV01}
+        return {'dirty_rpv01': full_rpv01, 'clean_rpv01': clean_rpv01}
 
     ###########################################################################
 
@@ -647,11 +647,11 @@ class CDS:
                        pv01_method=0):
         """ Value of the premium leg of a CDS. """
 
-        fullRPV01 = self.risky_pv01(value_dt,
+        full_rpv01 = self.risky_pv01(value_dt,
                                     issuer_curve,
                                     pv01_method)['dirty_rpv01']
 
-        v = fullRPV01 * self._notional * self._running_coupon
+        v = full_rpv01 * self._notional * self._running_cpn
         return v
 
     ###########################################################################
@@ -663,10 +663,10 @@ class CDS:
                    num_steps_per_year=glob_num_steps_per_year,
                    pv01_method=0,
                    protMethod=0):
-        """ Breakeven CDS coupon that would make the value of the CDS contract
+        """ Breakeven CDS cpn that would make the value of the CDS contract
         equal to zero. """
 
-        cleanRPV01 = self.risky_pv01(value_dt,
+        clean_rpv01 = self.risky_pv01(value_dt,
                                      issuer_curve,
                                      pv01_method)['clean_rpv01']
 
@@ -677,16 +677,16 @@ class CDS:
                                       protMethod)
 
         # By convention this is calculated using the clean RPV01
-        spd = prot / cleanRPV01 / self._notional
+        spd = prot / clean_rpv01 / self._notional
         return spd
 
     ###########################################################################
 
     def value_fast_approx(self,
                           value_dt,
-                          flatContinuousInterestRate,
-                          flatCDSCurveSpread,
-                          curveRecovery=standard_recovery_rate,
+                          flat_cont_interest_rate,
+                          flat_cds_curve_spread,
+                          curve_recovery=standard_recovery_rate,
                           contract_recovery_rate=standard_recovery_rate):
         """ Implementation of fast valuation of the CDS contract using an
         accurate approximation that avoids curve building. """
@@ -698,8 +698,8 @@ class CDS:
         t_mat = (self._maturity_dt - value_dt) / gDaysInYear
         t_eff = (self._step_in_dt - value_dt) / gDaysInYear
 
-        h = flatCDSCurveSpread / (1.0 - curveRecovery)
-        r = flatContinuousInterestRate
+        h = flat_cds_curve_spread / (1.0 - curve_recovery)
+        r = flat_cont_interest_rate
         fwdDf = 1.0
         bump_size = 0.0001
 
@@ -717,50 +717,50 @@ class CDS:
 
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
-        cleanRPV01 = (z / w) * 365.0 / 360.0
+        clean_rpv01 = (z / w) * 365.0 / 360.0
         prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self._notional
-        cleanPV = fwdDf * long_protection * \
-            (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
-        fullPV = cleanPV + fwdDf * accrued
+        clean_pv = fwdDf * long_protection * \
+            (prot_pv - self._running_cpn * clean_rpv01 * self._notional)
+        full_pv = clean_pv + fwdDf * accrued
 
         #######################################################################
         # bump CDS spread and calculate
         #######################################################################
 
-        h = (flatCDSCurveSpread + bump_size) / (1.0 - contract_recovery_rate)
-        r = flatContinuousInterestRate
+        h = (flat_cds_curve_spread + bump_size) / (1.0 - contract_recovery_rate)
+        r = flat_cont_interest_rate
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
-        cleanRPV01 = (z / w) * 365.0 / 360.0
+        clean_rpv01 = (z / w) * 365.0 / 360.0
         prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self._notional
-        cleanPV_credit_bumped = fwdDf * long_protection * \
-            (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
-        fullPV_credit_bumped = cleanPV_credit_bumped \
+        clean_pv_credit_bumped = fwdDf * long_protection * \
+            (prot_pv - self._running_cpn * clean_rpv01 * self._notional)
+        full_pv_credit_bumped = clean_pv_credit_bumped \
             + fwdDf * long_protection * accrued
-        credit01 = fullPV_credit_bumped - fullPV
+        credit01 = full_pv_credit_bumped - full_pv
 
         #######################################################################
         # bump Rate and calculate
         #######################################################################
 
-        h = flatCDSCurveSpread / (1.0 - contract_recovery_rate)
-        r = flatContinuousInterestRate + bump_size
+        h = flat_cds_curve_spread / (1.0 - contract_recovery_rate)
+        r = flat_cont_interest_rate + bump_size
 
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
 
-        cleanRPV01 = (z / w) * 365.0 / 360.0
+        clean_rpv01 = (z / w) * 365.0 / 360.0
 
         prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self._notional
 
-        cleanPV_ir_bumped = fwdDf * long_protection * \
-            (prot_pv - self._running_coupon * cleanRPV01 * self._notional)
+        clean_pv_ir_bumped = fwdDf * long_protection * \
+            (prot_pv - self._running_cpn * clean_rpv01 * self._notional)
 
-        fullPV_ir_bumped = cleanPV_ir_bumped + fwdDf * long_protection * accrued
+        full_pv_ir_bumped = clean_pv_ir_bumped + fwdDf * long_protection * accrued
 
-        ir01 = fullPV_ir_bumped - fullPV
+        ir01 = full_pv_ir_bumped - full_pv
 
-        return (fullPV, cleanPV, credit01, ir01)
+        return (full_pv, clean_pv, credit01, ir01)
 
     ###########################################################################
 
@@ -790,8 +790,7 @@ class CDS:
         s += label_to_string("STEP-IN DATE", self._step_in_dt)
         s += label_to_string("MATURITY", self._maturity_dt)
         s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("RUNNING COUPON",
-                             self._running_coupon * 10000, "bp\n")
+        s += label_to_string("RUN COUPON", self._running_cpn * 10000, "bp\n")
         s += label_to_string("DAYCOUNT", self._dc_type)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("CALENDAR", self._cal_type)

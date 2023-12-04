@@ -63,13 +63,13 @@ class FinTestCases():
 
 ###############################################################################
 
-    def __init__(self, moduleName, mode):
+    def __init__(self, module_name, mode):
         """ Create the TestCase given the module name and whether we are in
         GOLDEN or COMPARE mode. """
 
-        rootFolder, moduleFilename = split(moduleName)
+        root_folder, module_file_name = split(module_name)
 
-        self._carefulMode = False
+        self._careful_mode = False
         self._verbose = False
 
         if mode in FinTestCaseMode:
@@ -82,18 +82,18 @@ class FinTestCases():
             self._verbose = True
             return
 
-        self._moduleName = moduleFilename[0:-3]
+        self._module_name = module_file_name[0:-3]
         self._foldersExist = True
-        self._rootFolder = rootFolder
-        self._headerFields = None
-        self._globalNumWarnings = 0
-        self._globalNumErrors = 0
+        self._root_folder = root_folder
+        self._header_fields = None
+        self._global_num_warnings = 0
+        self._global_num_errors = 0
 
-#        print("Root folder:",self._rootFolder)
-#        print("Modulename:",self._moduleName)
+#        print("Root folder:",self._root_folder)
+#        print("module_name:",self._module_name)
 
-        self._goldenFolder = join(rootFolder, "golden")
-        self._differencesFolder = join(rootFolder, "differences")
+        self._goldenFolder = join(root_folder, "golden")
+        self._differencesFolder = join(root_folder, "differences")
 
         if exists(self._goldenFolder) is False:
             print("Looking for:", self._goldenFolder)
@@ -101,29 +101,29 @@ class FinTestCases():
             self._foldersExist = False
             return None
 
-        self._compareFolder = join(rootFolder, "compare")
+        self._compare_folder = join(root_folder, "compare")
 
-        if exists(self._compareFolder) is False:
-            print("Looking for:", self._compareFolder)
+        if exists(self._compare_folder) is False:
+            print("Looking for:", self._compare_folder)
             print("COMPARE Folder DOES NOT EXIST. You must create it. Exiting")
             self._foldersExist = False
             return None
 
-        self._goldenFilename = join(self._goldenFolder,
-                                    self._moduleName + "_GOLDEN.testLog")
+        self._golden_file_name = join(self._goldenFolder,
+                                     self._module_name + "_GOLDEN.testLog")
 
-        self._compareFilename = join(self._compareFolder,
-                                     self._moduleName + "_COMPARE.testLog")
+        self._compare_file_name = join(self._compare_folder,
+                                       self._module_name + "_COMPARE.testLog")
 
-        self._differencesFilename = join(self._differencesFolder,
-                                         self._moduleName + "_DIFFS.testLog")
+        self._differences_file_name = join(self._differencesFolder,
+                                           self._module_name + "_DIFFS.testLog")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
 
-            print("GOLDEN Test Case Creation for module:", moduleFilename)
+            print("GOLDEN Test Case Creation for module:", module_file_name)
 
-            if exists(self._goldenFilename) and self._carefulMode:
-                overwrite = input("File " + self._goldenFilename
+            if exists(self._golden_file_name) and self._careful_mode:
+                overwrite = input("File " + self._golden_file_name
                                   + " exists. Overwrite (Y/N) ?")
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
@@ -131,19 +131,19 @@ class FinTestCases():
                 elif overwrite == "Y":
                     print("Overwriting existing file...")
 
-            creationTime = time.strftime("%Y%m%d_%H%M%S")
-            f = open(self._goldenFilename, 'w')
-            f.write("File Created on:" + creationTime)
+            creation_time = time.strftime("%Y%m%d_%H%M%S")
+            f = open(self._golden_file_name, 'w')
+            f.write("File Created on:" + creation_time)
             f.write("\n")
             f.close()
 
         else:
 
-            #            print("GENERATING NEW OUTPUT FOR MODULE", moduleFilename,
+            #            print("GENERATING NEW OUTPUT FOR MODULE", module_file_name,
             #                "FOR COMPARISON.")
 
-            if exists(self._compareFilename) and self._carefulMode:
-                overwrite = input("File " + self._compareFilename +
+            if exists(self._compare_file_name) and self._careful_mode:
+                overwrite = input("File " + self._compare_file_name +
                                   " exists. Overwrite (Y/N) ?")
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
@@ -151,10 +151,10 @@ class FinTestCases():
                 elif overwrite == "Y":
                     print("Overwriting existing file...")
 
-#            print("Creating empty file",self._compareFilename)
-            creationTime = time.strftime("%Y%m%d_%H%M%S")
-            f = open(self._compareFilename, 'w')
-            f.write("File Created on:" + creationTime)
+#            print("Creating empty file",self._compare_file_name)
+            creation_time = time.strftime("%Y%m%d_%H%M%S")
+            f = open(self._compare_file_name, 'w')
+            f.write("File Created on:" + creation_time)
             f.write("\n")
             f.close()
 
@@ -171,21 +171,21 @@ class FinTestCases():
             print("Cannot print as GOLDEN and COMPARE folders don't exist")
             return
 
-        if self._headerFields is None:
+        if self._header_fields is None:
             print("ERROR: Need to set header fields before printing results")
-        elif len(self._headerFields) != len(args):
-            n1 = len(self._headerFields)
+        elif len(self._header_fields) != len(args):
+            n1 = len(self._header_fields)
             n2 = len(args)
             raise FinError("ERROR: Number of data columns is " + str(n1)
                            + " but must equal " + str(n2)
                            + " to align with headers.")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
-            filename = self._goldenFilename
+            file_name = self._golden_file_name
         else:
-            filename = self._compareFilename
+            file_name = self._compare_file_name
 
-        f = open(filename, 'a')
+        f = open(file_name, 'a')
         f.write("RESULTS,")
 
         for arg in args:
@@ -212,11 +212,11 @@ class FinTestCases():
             return
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
-            filename = self._goldenFilename
+            file_name = self._golden_file_name
         else:
-            filename = self._compareFilename
+            file_name = self._compare_file_name
 
-        f = open(filename, 'a')
+        f = open(file_name, 'a')
         f.write("BANNER,")
 
         f.write(txt)
@@ -238,18 +238,18 @@ class FinTestCases():
                 "Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
-        self._headerFields = args
+        self._header_fields = args
 
-        if len(self._headerFields) == 0:
+        if len(self._header_fields) == 0:
             self.printLog(
                 "ERROR: Number of header fields must be greater than 0")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
-            filename = self._goldenFilename
+            file_name = self._golden_file_name
         else:
-            filename = self._compareFilename
+            file_name = self._compare_file_name
 
-        f = open(filename, 'a')
+        f = open(file_name, 'a')
         f.write("HEADER,")
 
         for arg in args:
@@ -261,98 +261,98 @@ class FinTestCases():
 
 ###############################################################################
 
-    def compareRows(self, goldenRow, compareRow, rowNum):
+    def compare_rows(self, golden_row, compare_row, row_num):
         """ Compare the contents of two rows in GOLDEN and COMPARE folders."""
 
-        numWarnings = 0
-        numErrors = 0
+        num_warnings = 0
+        num_errors = 0
 
-        goldenFields = goldenRow.split(",")
-        compareFields = compareRow.split(",")
+        golden_fields = golden_row.split(",")
+        compare_fields = compare_row.split(",")
 
-        numGoldenFields = len(goldenFields)
-        numCompareFields = len(compareFields)
+        num_golden_fields = len(golden_fields)
+        num_compare_fields = len(compare_fields)
 
-        if numGoldenFields == 0:
+        if num_golden_fields == 0:
             self.printLog("ERROR: No field in golden row")
-            numErrors += 1
-            return (0, numErrors)
+            num_errors += 1
+            return (0, num_errors)
 
-        if numCompareFields == 0:
+        if num_compare_fields == 0:
             self.printLog("ERROR: No field in golden row")
-            numErrors += 1
-            return (0, numErrors)
+            num_errors += 1
+            return (0, num_errors)
 
-        if numGoldenFields != numCompareFields:
+        if num_golden_fields != num_compare_fields:
             self.printLog("ERROR: Mismatch in number of fields")
-            numErrors += 1
-            return (0, numErrors)
+            num_errors += 1
+            return (0, num_errors)
 
-        numCols = numGoldenFields
+        num_cols = num_golden_fields
 
-        if goldenFields[0] != compareFields[0]:
+        if golden_fields[0] != compare_fields[0]:
             self.printLog("ERROR: Mismatch in row types HEADER vs RESULT",
-                          goldenFields[0], compareFields[0])
-            numErrors += 1
-            return (0, numErrors)
+                          golden_fields[0], compare_fields[0])
+            num_errors += 1
+            return (0, num_errors)
 
-        if goldenFields[0] == "HEADER" and compareFields[0] == "HEADER":
-            for colNum in range(0, numCols):
-                if compareFields[colNum] != goldenFields[colNum]:
-                    numErrors += 1
+        if golden_fields[0] == "HEADER" and compare_fields[0] == "HEADER":
+            for col_num in range(0, num_cols):
+                if compare_fields[col_num] != golden_fields[col_num]:
+                    num_errors += 1
 
-            self._headerFields = goldenFields
-            return (0, numErrors)
+            self._header_fields = golden_fields
+            return (0, num_errors)
 
-        if self._headerFields is None:
+        if self._header_fields is None:
             self.printLog("ERROR: No Header row has been assigned")
-            numErrors += 1
-            return (0, numErrors)
+            num_errors += 1
+            return (0, num_errors)
 
-        for colNum in range(0, numCols):
+        for col_num in range(0, num_cols):
 
-            if len(self._headerFields) <= colNum:
+            if len(self._header_fields) <= col_num:
                 self.printLog("ERROR: Mismatch in headers. Rerun!")
-                return (0, numErrors)
+                return (0, num_errors)
 
-            timeColumn = False
-            if self._headerFields[colNum] == "TIME":
-                timeColumn = True
+            time_column = False
+            if self._header_fields[col_num] == "TIME":
+                time_column = True
 
-            compareField = compareFields[colNum]
-            goldenField = goldenFields[colNum]
+            compare_field = compare_fields[col_num]
+            golden_field = golden_fields[col_num]
 
-            if compareField != goldenField:
+            if compare_field != golden_field:
 
                 # Only reject with tolerance of 1e-8 - OK for finance!
                 tol = 1e-4
-                compareFlag = compareField.replace(".", "").isnumeric()
-                goldenFlag = goldenField.replace(".", "").isnumeric()
+                compare_flag = compare_field.replace(".", "").isnumeric()
+                golden_flag = golden_field.replace(".", "").isnumeric()
 
-                if compareFlag is True and goldenFlag is True\
-                        and timeColumn is False:
+                if compare_flag is True and golden_flag is True\
+                        and time_column is False:
 
-                    compareValue = float(compareField)
-                    goldenValue = float(goldenField)
-                    err = compareValue - goldenValue
+                    compare_value = float(compare_field)
+                    golden_value = float(golden_field)
+                    err = compare_value - golden_value
 
                     if abs(err) > tol:
-                        numErrors += 1
-#                        print("OK:", compareValue, goldenValue, numErrors)
+                        num_errors += 1
+#                        print("OK:", compare_value, golden_value, num_errors)
 
-                if timeColumn is True:
-                    time1 = float(goldenFields[colNum])
-                    time2 = float(compareFields[colNum])
+                if time_column is True:
+                    time1 = float(golden_fields[col_num])
+                    time2 = float(compare_fields[col_num])
                     change = (time2 / abs(time1 + 1e-10) - 1.0) * 100.0
 
                     if abs(change) > 50.0:
-                        self.printLog("Row# ", rowNum,
+                        self.printLog("Row# ", row_num,
                                       " WARNING: Calculation time has changed by %5.2f"
                                       % change, " percent.")
 
-                    numWarnings += 1
+                    num_warnings += 1
 
-        return (numWarnings, numErrors)
+        return (num_warnings, num_errors)
 
 ###############################################################################
 
@@ -370,120 +370,120 @@ class FinTestCases():
             return
 
         self.printLog("EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: " +
-                      self._moduleName)
+                      self._module_name)
 
-        totalNumWarnings = 0
-        totalNumErrors = 0
+        totalnum_warnings = 0
+        totalnum_errors = 0
 
         # check golden file exists
-        if exists(self._goldenFilename) is False:
+        if exists(self._golden_file_name) is False:
             print(
                 "No GOLDEN file exists. You need to change the mode to SAVE_TEST_CASES and then rerun.")
             return
 
         # open golden file and load it up
-        f = open(self._goldenFilename, 'r')
-        goldenContents = f.readlines()
+        f = open(self._golden_file_name, 'r')
+        golden_contents = f.readlines()
         f.close()
 
-        numGoldenLines = len(goldenContents)
+        num_golden_lines = len(golden_contents)
 
         # open golden file and load it up
-        f = open(self._compareFilename, 'r')
+        f = open(self._compare_file_name, 'r')
         compareContents = f.readlines()
         f.close()
 
-        numCompareLines = len(compareContents)
+        num_compare_lines = len(compareContents)
 
-        if numGoldenLines != numCompareLines:
+        if num_golden_lines != num_compare_lines:
             self.printLog("File lengths not the same")
-            self.printLog("Number of COMPARE lines: ", numCompareLines)
-            self.printLog("Number of GOLDEN lines: ", numGoldenLines)
+            self.printLog("Number of COMPARE lines: ", num_compare_lines)
+            self.printLog("Number of GOLDEN lines: ", num_golden_lines)
 
-        minNumLines = min(numGoldenLines, numCompareLines)
-#        maxNumLines = max(numGoldenLines, numCompareLines)
+        minNumLines = min(num_golden_lines, num_compare_lines)
+#        maxNumLines = max(num_golden_lines, num_compare_lines)
 
         # We start at second row as first row has time stamp
-        for rowNum in range(1, minNumLines):
+        for row_num in range(1, minNumLines):
 
-            goldenRow = goldenContents[rowNum]
-            compareRow = compareContents[rowNum]
+            golden_row = golden_contents[row_num]
+            compare_row = compareContents[row_num]
 
-            numWarnings, numErrors = self.compareRows(
-                goldenRow, compareRow, rowNum)
+            num_warnings, num_errors = self.compare_rows(
+                golden_row, compare_row, row_num)
 
-            if numErrors > 0:
+            if num_errors > 0:
                 self.printLog(
                     "Row# ",
-                    rowNum,
+                    row_num,
                     " ERROR - ",
-                    numErrors,
+                    num_errors,
                     " DIFFERENCE(S) IN ROW ",
-                    rowNum)
+                    row_num)
 
-                if self._headerFields is None:
+                if self._header_fields is None:
                     self.printLog("ERROR: Header must be defined")
-                    numErrors += 1
+                    num_errors += 1
                 else:
-                    self.printLog("Row# ", rowNum, " HEADER:  ==>",
-                                  self._headerFields[0:-1])
+                    self.printLog("Row# ", row_num, " HEADER:  ==>",
+                                  self._header_fields[0:-1])
 
-                self.printLog("Row# ", rowNum, " GOLDEN : ==>", goldenRow[:-2])
-                self.printLog("Row# ", rowNum,
-                              " COMPARE: ==>", compareRow[:-2])
+                self.printLog("Row# ", row_num, " GOLDEN : ==>", golden_row[:-2])
+                self.printLog("Row# ", row_num,
+                              " COMPARE: ==>", compare_row[:-2])
                 self.printLog("")
 
-            totalNumWarnings += numWarnings
-            totalNumErrors += numErrors
+            totalnum_warnings += num_warnings
+            totalnum_errors += num_errors
 
-        if numGoldenLines == minNumLines and numCompareLines > minNumLines:
+        if num_golden_lines == minNumLines and num_compare_lines > minNumLines:
             self.printLog(
                 "ERROR:The COMPARE file is longer than the GOLDEN file")
 
-#            for rowNum in range(minNumLines,maxNumLines):
-#                numWarnings, numErrors = compareContents[rowNum]
-#                print(rowNum,"COMPARE: ==>",compareRow)
+#            for row_num in range(minNumLines,maxNumLines):
+#                num_warnings, num_errors = compareContents[row_num]
+#                print(row_num,"COMPARE: ==>",compare_row)
 
-        if numCompareLines == minNumLines and numGoldenLines > minNumLines:
+        if num_compare_lines == minNumLines and num_golden_lines > minNumLines:
             self.printLog(
                 "ERROR:The GOLDEN file is longer than the COMPARE file")
 
-#            for rowNum in range(minNumLines,maxNumLines):
-#                numWarnings, numErrors = compareContents[rowNum]
-#                print(rowNum,"GOLDEN: ==>",goldenRow)
+#            for row_num in range(minNumLines,maxNumLines):
+#                num_warnings, num_errors = compareContents[row_num]
+#                print(row_num,"GOLDEN: ==>",golden_row)
 
-#        print("Analysis of", self._moduleName, "completed with",
-#              totalNumErrors, "errors and", totalNumWarnings, "warnings.")
+#        print("Analysis of", self._module_name, "completed with",
+#              totalnum_errors, "errors and", totalnum_warnings, "warnings.")
 
-#        print("NUM LINES:", numCompareLines,
+#        print("NUM LINES:", num_compare_lines,
 #              "====>",
-#              "ERRORS:", totalNumErrors,
-#              "WARNINGS:", totalNumWarnings)
+#              "ERRORS:", totalnum_errors,
+#              "WARNINGS:", totalnum_warnings)
 
-        self.printLog("Analysis of ", self._moduleName, " completed with ",
-                      totalNumErrors, " errors and ", totalNumWarnings,
+        self.printLog("Analysis of ", self._module_name, " completed with ",
+                      totalnum_errors, " errors and ", totalnum_warnings,
                       " warnings.")
 
-        self.printLog("NUM LINES:", numCompareLines,
+        self.printLog("NUM LINES:", num_compare_lines,
                       "====>",
-                      "ERRORS:", totalNumErrors,
-                      " WARNINGS:", totalNumWarnings)
+                      "ERRORS:", totalnum_errors,
+                      " WARNINGS:", totalnum_warnings)
 
-        self._globalNumErrors = totalNumErrors
-        self._globalNumWarnings = totalNumWarnings
+        self._global_num_errors = totalnum_errors
+        self._global_num_warnings = totalnum_warnings
 
         return
 
 ###############################################################################
 
     def startLog(self):
-        f = open(self._differencesFilename, 'w')
+        f = open(self._differences_file_name, 'w')
         f.close()
 
 ###############################################################################
 
     def printLog(self, *args):
-        f = open(self._differencesFilename, 'a')
+        f = open(self._differences_file_name, 'a')
         for arg in args:
             f.write(str(arg) + " ")
 

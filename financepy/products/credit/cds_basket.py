@@ -97,14 +97,14 @@ class CDSBasket:
 
         rpv01ToTimes = np.zeros(num_payments)
 
-        for iTime in range(1, num_payments):
+        for i_time in range(1, num_payments):
 
-            t = (payment_dts[iTime] - value_dt) / gDaysInYear
-            dt0 = payment_dts[iTime - 1]
-            dt1 = payment_dts[iTime]
+            t = (payment_dts[i_time] - value_dt) / gDaysInYear
+            dt0 = payment_dts[i_time - 1]
+            dt1 = payment_dts[i_time]
             accrual_factor = day_count.year_frac(dt0, dt1)[0]
             averageAccrualFactor += accrual_factor
-            rpv01ToTimes[iTime] = rpv01ToTimes[iTime - 1] + \
+            rpv01ToTimes[i_time] = rpv01ToTimes[i_time - 1] + \
                 accrual_factor * libor_curve._df(t)
 
         averageAccrualFactor /= num_payments
@@ -131,8 +131,8 @@ class CDSBasket:
             if minTau < tmat:
 
                 numPaymentsIndex = int(minTau / averageAccrualFactor)
-                rpv01Trial = rpv01ToTimes[numPaymentsIndex]
-                rpv01Trial += (minTau - numPaymentsIndex *
+                rpv01_trial = rpv01ToTimes[numPaymentsIndex]
+                rpv01_trial += (minTau - numPaymentsIndex *
                                averageAccrualFactor)
 
                 # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
@@ -142,17 +142,17 @@ class CDSBasket:
                         assetIndex = i_credit
                         break
 
-                protTrial = (1.0 - issuer_curves[assetIndex]._recovery_rate)
-                protTrial *= libor_curve._df(minTau)
+                prot_trial = (1.0 - issuer_curves[assetIndex]._recovery_rate)
+                prot_trial *= libor_curve._df(minTau)
 
             else:
 
                 numPaymentsIndex = int(tmat / averageAccrualFactor)
-                rpv01Trial = rpv01ToTimes[-1]
-                protTrial = 0.0
+                rpv01_trial = rpv01ToTimes[-1]
+                prot_trial = 0.0
 
-            rpv01 += rpv01Trial
-            prot += protTrial
+            rpv01 += rpv01_trial
+            prot += prot_trial
 
         rpv01 = rpv01 / num_trials
         prot = prot / num_trials
@@ -202,7 +202,7 @@ class CDSBasket:
                            n_to_default,
                            issuer_curves,
                            correlation_matrix,
-                           degreesOfFreedom,
+                           degrees_of_freedom,
                            libor_curve,
                            num_trials,
                            seed):
@@ -217,7 +217,7 @@ class CDSBasket:
 
         default_times = model.default_times(issuer_curves,
                                             correlation_matrix,
-                                            degreesOfFreedom,
+                                            degrees_of_freedom,
                                             num_trials,
                                             seed)
 
@@ -263,46 +263,46 @@ class CDSBasket:
         payment_dts = self._cds_contract._payment_dts
         num_times = len(payment_dts)
 
-        issuerSurvivalProbabilities = np.zeros(num_credits)
+        issuer_surv_probs = np.zeros(num_credits)
         recovery_rates = np.zeros(num_credits)
-        basketTimes = np.zeros(num_times)
-        basketSurvivalCurve = np.zeros(num_times)
+        basket_times = np.zeros(num_times)
+        basket_surv_curve = np.zeros(num_times)
 
-        basketTimes[0] = 0.0
-        basketSurvivalCurve[0] = 1.0
+        basket_times[0] = 0.0
+        basket_surv_curve[0] = 1.0
 
-        for iTime in range(0, num_times):
+        for i_time in range(0, num_times):
 
-            t = (payment_dts[iTime] - value_dt) / gDaysInYear
+            t = (payment_dts[i_time] - value_dt) / gDaysInYear
 
             for i_credit in range(0, num_credits):
                 issuer_curve = issuer_curves[i_credit]
                 recovery_rates[i_credit] = issuer_curve._recovery_rate
-                issuerSurvivalProbabilities[i_credit] = interpolate(
+                issuer_surv_probs[i_credit] = interpolate(
                     t, issuer_curve._times, issuer_curve._values,
                     InterpTypes.FLAT_FWD_RATES.value)
 
-            lossDbn = homog_basket_loss_dbn(issuerSurvivalProbabilities,
+            lossDbn = homog_basket_loss_dbn(issuer_surv_probs,
                                             recovery_rates,
                                             beta_vector,
                                             num_points)
 
-            basketSurvivalCurve[iTime] = 1.0
+            basket_surv_curve[i_time] = 1.0
             for iToDefault in range(n_to_default, num_credits + 1):
-                basketSurvivalCurve[iTime] -= lossDbn[iToDefault]
+                basket_surv_curve[i_time] -= lossDbn[iToDefault]
 
-            basketTimes[iTime] = t
+            basket_times[i_time] = t
 
-        curveRecovery = recovery_rates[0]
+        curve_recovery = recovery_rates[0]
         libor_curve = issuer_curves[0]._libor_curve
-        basketCurve = CDSCurve(value_dt, [], libor_curve, curveRecovery)
-        basketCurve._times = basketTimes
-        basketCurve._values = basketSurvivalCurve
+        basket_curve = CDSCurve(value_dt, [], libor_curve, curve_recovery)
+        basket_curve._times = basket_times
+        basket_curve._values = basket_surv_curve
 
         protLegPV = self._cds_contract.protection_leg_pv(
-            value_dt, basketCurve, curveRecovery)
+            value_dt, basket_curve, curve_recovery)
         risky_pv01 = self._cds_contract.risky_pv01(
-            value_dt, basketCurve)['clean_rpv01']
+            value_dt, basket_curve)['clean_rpv01']
 
         # Long protection
         mtm = self._notional * (protLegPV - risky_pv01 * self._running_cpn)

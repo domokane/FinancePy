@@ -4,7 +4,6 @@
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.math import ONE_MILLION
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes,  DateGenRuleTypes
@@ -51,7 +50,7 @@ class EquitySwapLeg:
 
         calendar = Calendar(cal_type)
         self._maturity_dt = calendar.adjust(termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Effective date after maturity date")
@@ -86,7 +85,7 @@ class EquitySwapLeg:
         self._startAccruedDates = []
         self._endAccruedDates = []
         self._payment_dts = []
-        self._payments = []
+        self._pmnts = []
         self._year_fracs = []
         self._accrued_days = []
         self._rates = []
@@ -134,7 +133,7 @@ class EquitySwapLeg:
                 payment_dt = next_dt
             else:
                 payment_dt = calendar.add_business_days(next_dt,
-                                                          self._payment_lag)
+                                                        self._payment_lag)
 
             self._payment_dts.append(payment_dt)
 
@@ -183,13 +182,13 @@ class EquitySwapLeg:
         self._div_fwd_rates = []
         self._eq_fwd_rates = []
         self._last_notionals = []
-        self._payments = []
-        self._paymentDfs = []
-        self._paymentPVs = []
-        self._cumulativePVs = []
+        self._pmnts = []
+        self._pmnt_dfs = []
+        self._pmnt_pvs = []
+        self._cumulative_pvs = []
 
         dfValue = discount_curve.df(value_dt)
-        legPV, eq_term_rate = 0.0, 0.0
+        leg_pv, eq_term_rate = 0.0, 0.0
         lastNotional = self._notional
         numPayments = len(self._payment_dts)
 
@@ -211,12 +210,12 @@ class EquitySwapLeg:
                 dfEnd = index_curve.df(endAccruedDt)
                 fwd_rate = (df_start / dfEnd - 1.0) / index_alpha
 
-                divStart = dividend_curve.df(startAccruedDt)
-                divEnd = dividend_curve.df(endAccruedDt)
-                div_fwd_rate = (divStart / divEnd - 1.0) / index_alpha
+                div_start = dividend_curve.df(startAccruedDt)
+                div_end = dividend_curve.df(endAccruedDt)
+                div_fwd_rate = (div_start / div_end - 1.0) / index_alpha
 
                 # Equity discount derived from index and div curves
-                eq_fwd_rate = ((df_start / dfEnd) * (divStart / divEnd) - 1.0) / index_alpha
+                eq_fwd_rate = ((df_start / dfEnd) * (div_start / div_end) - 1.0) / index_alpha
 
                 self._fwd_rates.append(fwd_rate)
                 self._div_fwd_rates.append(div_fwd_rate)
@@ -229,15 +228,15 @@ class EquitySwapLeg:
                 nextNotional = nextPrice * self._quantity
                 pmntAmount = nextNotional - lastNotional
 
-                dfPmnt = discount_curve.df(pmntDate) / dfValue
-                pmntPV = pmntAmount * dfPmnt
-                legPV += pmntPV
+                df_pmnt = discount_curve.df(pmntDate) / dfValue
+                pmntPV = pmntAmount * df_pmnt
+                leg_pv += pmntPV
 
                 self._last_notionals.append(lastNotional)
-                self._payments.append(pmntAmount)
-                self._paymentDfs.append(dfPmnt)
-                self._paymentPVs.append(pmntPV)
-                self._cumulativePVs.append(legPV)
+                self._pmnts.append(pmntAmount)
+                self._pmnt_dfs.append(df_pmnt)
+                self._pmnt_pvs.append(pmntPV)
+                self._cumulative_pvs.append(leg_pv)
 
             else:
 
@@ -245,21 +244,21 @@ class EquitySwapLeg:
                 self._div_fwd_rates.append(0.0)
                 self._eq_fwd_rates.append(0.0)
                 self._last_notionals.append(self._notional)
-                self._payments.append(0.0)
-                self._paymentDfs.append(0.0)
-                self._paymentPVs.append(0.0)
-                self._cumulativePVs.append(legPV)
+                self._pmnts.append(0.0)
+                self._pmnt_dfs.append(0.0)
+                self._pmnt_pvs.append(0.0)
+                self._cumulative_pvs.append(leg_pv)
 
             lastNotional = nextNotional
 
         if self._leg_type == SwapTypes.PAY:
-            legPV = legPV * (-1.0)
+            leg_pv = leg_pv * (-1.0)
 
-        return legPV
+        return leg_pv
 
 ##########################################################################
 
-    def print_payments(self):
+    def print_pmnts(self):
         """ Prints the payment dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
@@ -299,9 +298,9 @@ class EquitySwapLeg:
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        self.print_payments()
+        self.print_pmnts()
 
-        if len(self._payments) == 0:
+        if len(self._pmnts) == 0:
             print("Payments not calculated.")
             return
 
@@ -317,10 +316,10 @@ class EquitySwapLeg:
                 self._payment_dts[iFlow],
                 round(self._last_notionals[iFlow], 0),
                 round(self._eq_fwd_rates[iFlow] * 100.0, 4),
-                round(self._payments[iFlow], 2),
-                round(self._paymentDfs[iFlow], 4),
-                round(self._paymentPVs[iFlow], 2),
-                round(self._cumulativePVs[iFlow], 2),
+                round(self._pmnts[iFlow], 2),
+                round(self._pmnt_dfs[iFlow], 4),
+                round(self._pmnt_pvs[iFlow], 2),
+                round(self._cumulative_pvs[iFlow], 2),
             ])
 
         table = format_table(header, rows)

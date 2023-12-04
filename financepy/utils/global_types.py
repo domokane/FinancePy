@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# Copyright (C) 2018 2019 2020 Dominic O'Kane
 ##############################################################################
 
 # This is an exhaustive list of all option types
@@ -82,15 +82,15 @@ class FinSolverTypes(Enum):
 ###############################################################################
 
 class TouchOptionTypes(Enum):
-    DOWN_AND_IN_CASH_AT_HIT = 1,         # S0>H pays $1 at hit time from above
-    UP_AND_IN_CASH_AT_HIT = 2,           # S0<H pays $1 at hit time from below
-    DOWN_AND_IN_CASH_AT_EXPIRY = 3,      # S0>H pays $1 at T if hit from below
-    UP_AND_IN_CASH_AT_EXPIRY = 4,        # S0<H pays $1 at T if hit from below
-    DOWN_AND_OUT_CASH_OR_NOTHING = 5,    # S0>H pays $1 at T if S>H for all t<T
-    UP_AND_OUT_CASH_OR_NOTHING = 6,      # S0<H pays $1 at T if S<H for all t<T
-    DOWN_AND_IN_ASSET_AT_HIT = 7,        # S0>H pays H at hit time from above
-    UP_AND_IN_ASSET_AT_HIT = 8,          # S0>H pays H at hit time from below
-    DOWN_AND_IN_ASSET_AT_EXPIRY = 9,     # S0>H pays S(T) at T if S<H for t < T
-    UP_AND_IN_ASSET_AT_EXPIRY = 10,      # S0<H pays S(T) at T if S>H for t < T
-    DOWN_AND_OUT_ASSET_OR_NOTHING = 11,  # S0>H pays S(T) at T if S>H for t < T
+    DOWN_AND_IN_CASH_AT_HIT = 1         # S0>H pays $1 at hit time from above
+    UP_AND_IN_CASH_AT_HIT = 2           # S0<H pays $1 at hit time from below
+    DOWN_AND_IN_CASH_AT_EXPIRY = 3      # S0>H pays $1 at T if hit from below
+    UP_AND_IN_CASH_AT_EXPIRY = 4        # S0<H pays $1 at T if hit from below
+    DOWN_AND_OUT_CASH_OR_NOTHING = 5    # S0>H pays $1 at T if S>H for all t<T
+    UP_AND_OUT_CASH_OR_NOTHING = 6      # S0<H pays $1 at T if S<H for all t<T
+    DOWN_AND_IN_ASSET_AT_HIT = 7        # S0>H pays H at hit time from above
+    UP_AND_IN_ASSET_AT_HIT = 8          # S0>H pays H at hit time from below
+    DOWN_AND_IN_ASSET_AT_EXPIRY = 9     # S0>H pays S(T) at T if S<H for t < T
+    UP_AND_IN_ASSET_AT_EXPIRY = 10      # S0<H pays S(T) at T if S>H for t < T
+    DOWN_AND_OUT_ASSET_OR_NOTHING = 11  # S0>H pays S(T) at T if S>H for t < T
     UP_AND_OUT_ASSET_OR_NOTHING = 12     # S0<H pays S(T) at T if S<H for t < T

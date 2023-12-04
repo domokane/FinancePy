@@ -70,7 +70,7 @@ class IborSwap:
 
         calendar = Calendar(cal_type)
         self._maturity_dt = calendar.adjust(self._termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")

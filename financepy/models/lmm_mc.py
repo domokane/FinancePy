@@ -191,14 +191,14 @@ def lmm_sim_swaption_vol(a, b, fwd0, fwds, taus):
 
 @njit(float64[:, :](int64, int64, int64, float64[:, :, :]),
       cache=True, fastmath=True)
-def lmm_fwd_fwd_correlation(numForwards, num_paths, iTime, fwds):
+def lmm_fwd_fwd_correlation(numForwards, num_paths, i_time, fwds):
     """ Extract forward forward correlation matrix at some future time index
     from the simulated forward rates and return the matrix. """
 
-    size = numForwards - iTime
+    size = numForwards - i_time
     fwdCorr = np.zeros((size, size))
 
-    for iFwd in range(iTime, numForwards):
+    for iFwd in range(i_time, numForwards):
         for jFwd in range(iFwd, numForwards):
 
             sumfwdi = 0.0
@@ -208,8 +208,8 @@ def lmm_fwd_fwd_correlation(numForwards, num_paths, iTime, fwds):
             sumfwdjfwdj = 0.0
 
             for p in range(0, num_paths):  # changed from prange
-                dfwdi = fwds[p, iTime, iFwd] - fwds[p, iTime-1, iFwd]
-                dfwdj = fwds[p, iTime, jFwd] - fwds[p, iTime-1, jFwd]
+                dfwdi = fwds[p, i_time, iFwd] - fwds[p, i_time-1, iFwd]
+                dfwdj = fwds[p, i_time, jFwd] - fwds[p, i_time-1, jFwd]
                 sumfwdi += dfwdi
                 sumfwdj += dfwdj
                 sumfwdifwdi += dfwdi * dfwdi
@@ -228,11 +228,11 @@ def lmm_fwd_fwd_correlation(numForwards, num_paths, iTime, fwds):
             corr = covij / np.sqrt(covii*covjj)
 
             if abs(covii*covjj) > 1e-20:
-                fwdCorr[iFwd-iTime][jFwd-iTime] = corr
-                fwdCorr[jFwd-iTime][iFwd-iTime] = corr
+                fwdCorr[iFwd-i_time][jFwd-i_time] = corr
+                fwdCorr[jFwd-i_time][iFwd-i_time] = corr
             else:
-                fwdCorr[iFwd-iTime][jFwd-iTime] = 0.0
-                fwdCorr[jFwd-iTime][iFwd-iTime] = 0.0
+                fwdCorr[iFwd-i_time][jFwd-i_time] = 0.0
+                fwdCorr[jFwd-i_time][iFwd-i_time] = 0.0
 
     return fwdCorr
 
@@ -408,7 +408,7 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
 @njit(float64[:, :, :](int64, int64, int64, float64[:], float64[:], float64[:],
                        int64, int64), cache=True, fastmath=True)
 def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
-                         taus, useSobol, seed):
+                         taus, use_sobol, seed):
     """ One factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility term structure. The 3D matrix of forward rates by path, time
@@ -446,7 +446,7 @@ def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
 
     num_times = num_fwds
 
-    if useSobol == 1:
+    if use_sobol == 1:
         numDimensions = num_times
         rands = get_uniform_sobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((num_paths, num_times))
@@ -456,7 +456,7 @@ def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
                 g = norminvcdf(u)
                 gMatrix[i_path, j] = g
                 gMatrix[i_path + halfNumPaths, j] = -g
-    elif useSobol == 0:
+    elif use_sobol == 0:
         gMatrix = np.empty((num_paths, num_times))
         for i_path in range(0, halfNumPaths):
             for j in range(0, num_times):
@@ -510,7 +510,7 @@ def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
 @njit(float64[:, :, :](int64, int64, int64, int64, float64[:], float64[:, :],
                        float64[:], int64, int64), cache=True, fastmath=True)
 def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
-                         fwd0, lambdas, taus, useSobol, seed):
+                         fwd0, lambdas, taus, use_sobol, seed):
     """ Multi-Factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
     volatility factor term structure. The 3D matrix of forward rates by path,
@@ -532,7 +532,7 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
 
     num_times = num_fwds
 
-    if useSobol == 1:
+    if use_sobol == 1:
         numDimensions = num_times * numFactors
         rands = get_uniform_sobol(halfNumPaths, numDimensions)
         gMatrix = np.empty((num_paths, num_times, numFactors))
@@ -544,7 +544,7 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
                     g = norminvcdf(u)
                     gMatrix[i_path, j, q] = g
                     gMatrix[i_path + halfNumPaths, j, q] = -g
-    elif useSobol == 0:
+    elif use_sobol == 0:
         gMatrix = np.empty((num_paths, num_times, numFactors))
         for i_path in range(0, halfNumPaths):
             for j in range(0, num_times):

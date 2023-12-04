@@ -502,7 +502,7 @@ class EquityVanillaOption():
                             model: Model,
                             num_paths: int = 10000,
                             seed: int = 4242,
-                            useSobol: int = 0):
+                            use_sobol: int = 0):
 
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
@@ -523,7 +523,7 @@ class EquityVanillaOption():
                                  vol,
                                  num_paths,
                                  seed,
-                                 useSobol)
+                                 use_sobol)
 
         return v
 
@@ -537,7 +537,7 @@ class EquityVanillaOption():
                             model: Model,
                             num_paths: int = 10000,
                             seed: int = 4242,
-                            useSobol: int = 0):
+                            use_sobol: int = 0):
 
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
@@ -558,7 +558,7 @@ class EquityVanillaOption():
                                  vol,
                                  num_paths,
                                  seed,
-                                 useSobol)
+                                 use_sobol)
 
         return v
 
@@ -572,7 +572,7 @@ class EquityVanillaOption():
                                 model: Model,
                                 num_paths: int = 10000,
                                 seed: int = 4242,
-                                useSobol: int = 0):
+                                use_sobol: int = 0):
 
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
@@ -593,7 +593,7 @@ class EquityVanillaOption():
                                      vol,
                                      num_paths,
                                      seed,
-                                     useSobol)
+                                     use_sobol)
 
 #        _value_mc_NUMBA_ONLY.parallel_diagnostics(level=4)
 
@@ -609,7 +609,7 @@ class EquityVanillaOption():
                              model: Model,
                              num_paths: int = 10000,
                              seed: int = 4242,
-                             useSobol: int = 0):
+                             use_sobol: int = 0):
 
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
@@ -630,7 +630,7 @@ class EquityVanillaOption():
                                   vol,
                                   num_paths,
                                   seed,
-                                  useSobol)
+                                  use_sobol)
 
         return v
 
@@ -644,7 +644,7 @@ class EquityVanillaOption():
                                  model: Model,
                                  num_paths: int = 10000,
                                  seed: int = 4242,
-                                 useSobol: int = 0):
+                                 use_sobol: int = 0):
 
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
 
@@ -665,7 +665,7 @@ class EquityVanillaOption():
                                       vol,
                                       num_paths,
                                       seed,
-                                      useSobol)
+                                      use_sobol)
 
         return v
 
@@ -679,7 +679,7 @@ class EquityVanillaOption():
                  model: Model,
                  num_paths: int = 10000,
                  seed: int = 4242,
-                 useSobol: int = 0):
+                 use_sobol: int = 0):
         """ Value European style call or put option using Monte Carlo. This is
         mainly for educational purposes. Sobol numbers can be used. """
 
@@ -702,7 +702,7 @@ class EquityVanillaOption():
                                  vol,
                                  num_paths,
                                  seed,
-                                 useSobol)
+                                 use_sobol)
 
         return v
 

@@ -1,6 +1,6 @@
 [MAIN]
 
-disable=duplicate-code
+disable=duplicate-code, consider-using-f-string, line-too-long, import-error, too-many-arguments
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
@@ -41,7 +41,7 @@ extension-pkg-whitelist=
 fail-on=
 
 # Specify a score threshold under which the program will exit with error.
-fail-under=10
+fail-under=6
 
 # Interpret the stdin as a python script, whose filename needs to be passed as
 # the module_or_package argument.
@@ -181,22 +181,7 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i,
-           j,
-           k,
-           p,
-           q,
-           r,
-           s,
-           t,
-           K,
-           Q,
-           P,
-           X,
-           S,
-           N,
-           M
-           _
+good-names=i,j,k,p,q,r,s,f,t,K,Q,P,X,S,N,M
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted

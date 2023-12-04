@@ -85,7 +85,7 @@ class DiscountCurve:
     ###########################################################################
 
     def _zero_to_df(self,
-                    value_dt: Date,       #TODO: why is value_date not used ?
+                    value_dt: Date,    #TODO: why is value_date not used ?
                     rates: (float, np.ndarray),
                     times: (float, np.ndarray),
                     freq_type: FrequencyTypes,

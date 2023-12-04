@@ -124,11 +124,11 @@ def getForwardCurve(numFwds, r):
 #                                zetas, correl, taus, seed)
 #     strike = r
 #     PAYSwaption = 1
-#     useSobol = 0
+#     use_sobol = 0
 #     numeraireIndex = 0
 
 #     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
-#                                zetas, taus, useSobol, seed)
+#                                zetas, taus, use_sobol, seed)
 
 #     for iExp in range(1, 10):
 
@@ -209,7 +209,7 @@ def getForwardCurve(numFwds, r):
 
 #     numFactors = 1
 #     numeraireIndex = 1
-#     useSobol = 1
+#     use_sobol = 1
 
 #     # Examine variance for different seeds
 #     for seed in seeds:
@@ -218,7 +218,7 @@ def getForwardCurve(numFwds, r):
 #         print("Seed:", seed)
 
 #         fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
-#                                    zetas, taus, useSobol, seed)
+#                                    zetas, taus, use_sobol, seed)
 
 #         sumCap1F = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwds1F, taus, 1)
 #         sumFlr1F = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwds1F, taus, 0)
@@ -269,7 +269,7 @@ def test_HullBookExamples():
     # HULL TABLE 32.1
     ###########################################################################
 
-    useSobol = 1
+    use_sobol = 1
     numeraireIndex = 0
 
     # We need the volatility for the forward rates out to the one starting in
@@ -281,7 +281,7 @@ def test_HullBookExamples():
 
     # One factor model
     fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraireIndex, fwd0,
-                                  gammas1F, taus, useSobol, seed)
+                                  gammas1F, taus, use_sobol, seed)
 
 #    LMMPrintForwards(fwds1F)
 
@@ -319,7 +319,7 @@ def test_HullBookExamples():
 
     # One factor model
     fwdsMF = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
-                                  fwd0, lambdas1F, taus, useSobol, seed)
+                                  fwd0, lambdas1F, taus, use_sobol, seed)
 
     vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
                                                 fwd0, fwdsMF, taus) * 100.0
@@ -356,7 +356,7 @@ def test_HullBookExamples():
 
     # Two factor model
     fwds2F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
-                                  fwd0, lambdas2F, taus, useSobol, seed)
+                                  fwd0, lambdas2F, taus, use_sobol, seed)
 
     vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
                                                 fwd0, fwds2F, taus) * 100.0
@@ -394,7 +394,7 @@ def test_HullBookExamples():
 
     # Three factor model
     fwds3F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
-                                  fwd0, lambdas3F, taus, useSobol, seed)
+                                  fwd0, lambdas3F, taus, use_sobol, seed)
 
     hullRatchetCaplets3F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,
                             0.189, 0.180, 0.174, 0.168, 0.162]

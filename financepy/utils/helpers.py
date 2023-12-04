@@ -29,8 +29,8 @@ def _func_name():
 def grid_index(t, grid_times):
     n = len(grid_times)
     for i in range(0, n):
-        gridTime = grid_times[i]
-        if abs(gridTime - t) < gSmall:
+        grid_time = grid_times[i]
+        if abs(grid_time - t) < gSmall:
             print(t, grid_times, i)
             return i
 
@@ -66,13 +66,13 @@ def pv01_times(t: float,
     with the first coupon date. """
 
     dt = 1.0 / f
-    pv01Times = []
+    pv01_times = []
 
     while t >= 0.0:
-        pv01Times.append(t)
+        pv01_times.append(t)
         t -= dt
 
-    return pv01Times
+    return pv01_times
 
 
 ###############################################################################
@@ -90,17 +90,17 @@ def times_from_dates(dt: (Date, list),
         raise FinError("Valuation date is not a Date")
 
     if day_count_type is None:
-        dcCounter = None
+        dc_counter = None
     else:
-        dcCounter = DayCount(day_count_type)
+        dc_counter = DayCount(day_count_type)
 
     if isinstance(dt, Date):
         num_dates = 1
         times = [None]
-        if dcCounter is None:
+        if dc_counter is None:
             times[0] = (dt - value_dt) / gDaysInYear
         else:
-            times[0] = dcCounter.year_frac(value_dt, dt)[0]
+            times[0] = dc_counter.year_frac(value_dt, dt)[0]
 
         return times[0]
 
@@ -108,10 +108,10 @@ def times_from_dates(dt: (Date, list),
         num_dates = len(dt)
         times = []
         for i in range(0, num_dates):
-            if dcCounter is None:
+            if dc_counter is None:
                 t = (dt[i] - value_dt) / gDaysInYear
             else:
-                t = dcCounter.year_frac(value_dt, dt[i])[0]
+                t = dc_counter.year_frac(value_dt, dt[i])[0]
             times.append(t)
 
         return np.array(times)
@@ -295,16 +295,16 @@ def frange(start: int,
 
 
 @njit(fastmath=True, cache=True)
-def normalise_weights(wtVector: np.ndarray):
+def normalise_weights(wt_vector: np.ndarray):
     """ Normalise a vector of weights so that they sum up to 1.0. """
 
-    n = len(wtVector)
+    n = len(wt_vector)
     sumWts = 0.0
     for i in range(0, n):
-        sumWts += wtVector[i]
+        sumWts += wt_vector[i]
     for i in range(0, n):
-        wtVector[i] = wtVector[i] / sumWts
-    return wtVector
+        wt_vector[i] = wt_vector[i] / sumWts
+    return wt_vector
 
 
 ###############################################################################
@@ -313,7 +313,7 @@ def normalise_weights(wtVector: np.ndarray):
 def label_to_string(label: str,
                     value: (float, str),
                     separator: str = "\n",
-                    listFormat: bool = False):
+                    list_format: bool = False):
     """ Format label/value pairs for a unified formatting. """
     # Format option for lists such that all values are aligned:
     # Label: value1
@@ -321,7 +321,7 @@ def label_to_string(label: str,
     #        ...
     label = str(label)
 
-    if listFormat and type(value) is list and len(value) > 0:
+    if list_format and type(value) is list and len(value) > 0:
         s = label + ": "
         labelSpacing = " " * len(s)
         s += str(value[0])
@@ -338,21 +338,21 @@ def label_to_string(label: str,
 
 
 def table_to_string(header: str,
-                    valueTable,
-                    floatPrecision="10.7f"):
+                    value_table,
+                    float_precision="10.7f"):
     """ Format a 2D array into a table-like string. """
-    if (len(valueTable) == 0 or type(valueTable) is not list):
-        print(len(valueTable))
+    if (len(value_table) == 0 or type(value_table) is not list):
+        print(len(value_table))
         return ""
 
-    numRows = len(valueTable[0])
+    numRows = len(value_table[0])
 
     s = header + "\n"
     for i in range(numRows):
-        for vList in valueTable:
+        for vList in value_table:
             # isinstance is needed instead of type in case of pandas floats
             if (isinstance(vList[i], float)):
-                s += format(vList[i], floatPrecision) + ", "
+                s += format(vList[i], float_precision) + ", "
             else:
                 s += str(vList[i]) + ", "
         s = s[:-2] + "\n"
@@ -450,14 +450,14 @@ def uniform_to_default_time(u, t, v):
 
 @njit(fastmath=True, cache=True)
 def accrued_tree(grid_times: np.ndarray,
-                 gridFlows: np.ndarray,
+                 grid_flows: np.ndarray,
                  face: float):
     """ Fast calulation of accrued interest using an Actual/Actual type of
     convention. This does not calculate according to other conventions. """
 
     numgrid_times = len(grid_times)
 
-    if len(gridFlows) != numgrid_times:
+    if len(grid_flows) != numgrid_times:
         raise FinError("Grid flows not same size as grid times.")
 
     accrued = np.zeros(numgrid_times)
@@ -470,9 +470,9 @@ def accrued_tree(grid_times: np.ndarray,
     for iGrid in range(1, numgrid_times):
 
         cpn_time = grid_times[iGrid]
-        cpn_flow = gridFlows[iGrid]
+        cpn_flow = grid_flows[iGrid]
 
-        if gridFlows[iGrid] > gSmall:
+        if grid_flows[iGrid] > gSmall:
             cpn_times = np.append(cpn_times, cpn_time)
             cpn_flows = np.append(cpn_flows, cpn_flow)
 
@@ -498,19 +498,19 @@ def check_argument_types(func, values):
     """ Check that all values passed into a function are of the same type
     as the function annotations. If a value has not been annotated, it
     will not be checked. """
-    for valueName, annotationType in func.__annotations__.items():
+    for value_name, annotation_type in func.__annotations__.items():
 
-        if valueName in values:
-            value = values[valueName]
-            usableType = to_usable_type(annotationType)
+        if value_name in values:
+            value = values[value_name]
+            usable_type = to_usable_type(annotation_type)
 
-        if (not isinstance(value, usableType)):
+        if (not isinstance(value, usable_type)):
 
             print("ERROR with function arguments for", func.__name__)
             print("This is in module", func.__module__)
-            print("Please check inputs for argument >>", valueName, "<<")
+            print("Please check inputs for argument >>", value_name, "<<")
             print("You have input an argument", value, "of type", type(value))
-            print("The allowed types are", usableType)
+            print("The allowed types are", usable_type)
             print("It is none of these so FAILS. Please amend.")
             #            s = f"In {func.__module__}.{func.__name__}:\n"
             #            s += f"Mismatched Types: expected a "

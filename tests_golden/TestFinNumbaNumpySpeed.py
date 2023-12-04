@@ -20,7 +20,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 ###############################################################################
 
 
-def test_FinNumbaNumpySpeed(useSobol):
+def test_FinNumbaNumpySpeed(use_sobol):
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 7, 2015)
@@ -33,7 +33,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 
-    useSobolInt = int(useSobol)
+    use_sobolInt = int(use_sobol)
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
@@ -60,7 +60,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_nonumba_nonumpy(value_dt, stock_price, discount_curve,
-                                                        dividend_yield, model, num_paths, seed, useSobolInt)
+                                                        dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -78,7 +78,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numpy_only(value_dt, stock_price, discount_curve,
-                                                   dividend_yield, model, num_paths, seed, useSobolInt)
+                                                   dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -93,7 +93,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 #    print(NONUMBA_NONUMPY_t)
 #    print(speedUp)
 
-    if useSobol:
+    if use_sobol:
         title = "SOBOL: PURE PYTHON VS NUMPY"
     else:
         title = "PSEUDORANDOM: PURE PYTHON VS NUMPY"
@@ -130,7 +130,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numpy_only(value_dt, stock_price, discount_curve,
-                                                   dividend_yield, model, num_paths, seed, useSobolInt)
+                                                   dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -148,7 +148,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numpy_numba(value_dt, stock_price, discount_curve,
-                                                    dividend_yield, model, num_paths, seed, useSobolInt)
+                                                    dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -166,7 +166,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numba_only(value_dt, stock_price, discount_curve,
-                                                   dividend_yield, model, num_paths, seed, useSobolInt)
+                                                   dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -184,7 +184,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numba_parallel(value_dt, stock_price, discount_curve,
-                                                       dividend_yield, model, num_paths, seed, useSobolInt)
+                                                       dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -207,7 +207,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     CPP_v = np.array([9.30872, 9.29576, 9.29422, 9.29832, 9.29863, 9.30153, 9.2994, 9.3025, 9.29653, 9.29875,
                       9.29897, 9.29996, 9.29931, 9.29796, 9.29784, 9.2992, 9.3001, 9.30093, 9.29876, 9.29921])
 
-    if useSobol:
+    if use_sobol:
         title = "SOBOL: COMPARING OPTIMISATIONS"
     else:
         title = "PSEUDORANDOM: COMPARING OPTIMISATIONS"
@@ -223,7 +223,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 
     ###########################################################################
 
-    if useSobol:
+    if use_sobol:
         title = "SOBOL: COMPARING OPTIMISATIONS"
     else:
         title = "PSEUDORANDOM: COMPARING OPTIMISATIONS"
@@ -234,7 +234,7 @@ def test_FinNumbaNumpySpeed(useSobol):
     plt.plot(num_paths_list, NUMBA_ONLY_t, 'o-', label="NUMBA ONLY")
     plt.plot(num_paths_list, NUMBA_PARALLEL_t, 'o-', label="NUMBA PARALLEL")
 
-    if useSobol is False:
+    if use_sobol is False:
         plt.plot(num_paths_list, CPP_t, 'o-', label="C++")
 
     plt.xlabel("Number of Paths")
@@ -257,7 +257,7 @@ def test_FinNumbaNumpySpeed(useSobol):
 ###############################################################################
 
 
-def test_FinNumbaNumbaParallel(useSobol):
+def test_FinNumbaNumbaParallel(use_sobol):
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 7, 2015)
@@ -270,7 +270,7 @@ def test_FinNumbaNumbaParallel(useSobol):
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 
-    useSobolInt = int(useSobol)
+    use_sobolInt = int(use_sobol)
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
@@ -293,7 +293,7 @@ def test_FinNumbaNumbaParallel(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numba_only(value_dt, stock_price, discount_curve,
-                                                   dividend_yield, model, num_paths, seed, useSobolInt)
+                                                   dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -311,7 +311,7 @@ def test_FinNumbaNumbaParallel(useSobol):
 
         start = time.time()
         value_mc = call_option.value_mc_numba_parallel(value_dt, stock_price, discount_curve,
-                                                       dividend_yield, model, num_paths, seed, useSobolInt)
+                                                       dividend_yield, model, num_paths, seed, use_sobolInt)
         end = time.time()
         duration = end - start
 
@@ -325,7 +325,7 @@ def test_FinNumbaNumbaParallel(useSobol):
 
     import matplotlib.pyplot as plt
 
-    if useSobol:
+    if use_sobol:
         title = "SOBOL: NUMBA VS NUMBA + PARALLEL"
     else:
         title = "PSEUDORANDOM: NUMBA VS NUMBA + PARALLEL"

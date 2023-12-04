@@ -34,7 +34,7 @@ def test_HullBookExamples(capsys):
     # HULL TABLE 32.1
     ###########################################################################
 
-    useSobol = 1
+    use_sobol = 1
     numeraireIndex = 0
 
     # We need the volatility for the forward rates out to the one starting in
@@ -46,7 +46,7 @@ def test_HullBookExamples(capsys):
 
     # One factor model
     fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraireIndex, fwd0,
-                                  gammas1F, taus, useSobol, seed)
+                                  gammas1F, taus, use_sobol, seed)
 
 #    LMMPrintForwards(fwds1F)
 
@@ -75,7 +75,7 @@ def test_HullBookExamples(capsys):
 
     # One factor model
     fwdsMF = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
-                                  fwd0, lambdas1F, taus, useSobol, seed)
+                                  fwd0, lambdas1F, taus, use_sobol, seed)
 
     vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
                                                 fwd0, fwdsMF, taus) * 100.0
@@ -104,7 +104,7 @@ def test_HullBookExamples(capsys):
 
     # Three factor model
     fwds3F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
-                                  fwd0, lambdas3F, taus, useSobol, seed)
+                                  fwd0, lambdas3F, taus, use_sobol, seed)
 
     hullRatchetCaplets3F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,
                             0.189, 0.180, 0.174, 0.168, 0.162]

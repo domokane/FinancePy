@@ -60,7 +60,7 @@ def test_EquityVanillaOption():
 
     test_cases.header("NUMPATHS", "CALL_VALUE_BS", "CALL_VALUE_MC",
                      "CALL_VALUE_MC_SOBOL", "TIME")
-    useSobol = True
+    use_sobol = True
 
     for stock_price in stock_prices:
 
@@ -72,13 +72,13 @@ def test_EquityVanillaOption():
 
         start = time.time()
 
-        useSobol = False
+        use_sobol = False
         value_mc1 = call_option.value_mc(value_dt, stock_price, discount_curve,
-                                         dividend_curve, model, num_paths, useSobol)
+                                         dividend_curve, model, num_paths, use_sobol)
 
-        useSobol = True
+        use_sobol = True
         value_mc2 = call_option.value_mc(value_dt, stock_price, discount_curve,
-                                         dividend_curve, model, num_paths, useSobol)
+                                         dividend_curve, model, num_paths, use_sobol)
 
         end = time.time()
         duration = end - start
@@ -102,13 +102,13 @@ def test_EquityVanillaOption():
 
         start = time.time()
 
-        useSobol = False
+        use_sobol = False
         value_mc1 = put_option.value_mc(value_dt, stock_price, discount_curve,
-                                        dividend_curve, model, num_paths, useSobol)
+                                        dividend_curve, model, num_paths, use_sobol)
 
-        useSobol = True
+        use_sobol = True
         value_mc2 = put_option.value_mc(value_dt, stock_price, discount_curve,
-                                        dividend_curve, model, num_paths, useSobol)
+                                        dividend_curve, model, num_paths, use_sobol)
 
         end = time.time()
         duration = end - start

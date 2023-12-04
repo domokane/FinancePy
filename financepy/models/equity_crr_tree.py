@@ -98,16 +98,16 @@ def crr_tree_val(stock_price,
 
             s = stock_values[index + i_node]
 
-            exerciseValue = 0.0
+            exercise_value = 0.0
 
             if option_type == OptionTypes.EUROPEAN_CALL.value:
-                exerciseValue = 0.0
+                exercise_value = 0.0
             elif option_type == OptionTypes.EUROPEAN_PUT.value:
-                exerciseValue = 0.0
+                exercise_value = 0.0
             elif option_type == OptionTypes.AMERICAN_CALL.value:
-                exerciseValue = np.maximum(s - strike_price, 0.0)
+                exercise_value = np.maximum(s - strike_price, 0.0)
             elif option_type == OptionTypes.AMERICAN_PUT.value:
-                exerciseValue = np.maximum(strike_price - s, 0.0)
+                exercise_value = np.maximum(strike_price - s, 0.0)
 
             nextIndex = int(0.5 * (i_time + 1) * (i_time + 2))
 
@@ -116,9 +116,9 @@ def crr_tree_val(stock_price,
 
             vUp = option_values[nextNodeUp]
             vDn = option_values[nextNodeDn]
-            futureExpectedValue = probs[i_time] * vUp
-            futureExpectedValue += (1.0 - probs[i_time]) * vDn
-            holdValue = periodDiscountFactors[i_time] * futureExpectedValue
+            future_expected_value = probs[i_time] * vUp
+            future_expected_value += (1.0 - probs[i_time]) * vDn
+            holdValue = periodDiscountFactors[i_time] * future_expected_value
 
             if option_type == OptionTypes.EUROPEAN_CALL.value:
                 option_values[index + i_node] = holdValue
@@ -126,10 +126,10 @@ def crr_tree_val(stock_price,
                 option_values[index + i_node] = holdValue
             elif option_type == OptionTypes.AMERICAN_CALL.value:
                 option_values[index +
-                              i_node] = np.maximum(exerciseValue, holdValue)
+                              i_node] = np.maximum(exercise_value, holdValue)
             elif option_type == OptionTypes.AMERICAN_PUT.value:
                 option_values[index +
-                              i_node] = np.maximum(exerciseValue, holdValue)
+                              i_node] = np.maximum(exercise_value, holdValue)
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]

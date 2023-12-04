@@ -52,9 +52,9 @@ def option_exercise_types_to_int(optionExerciseType):
 
 
 @njit(fastmath=True, cache=True)
-def p_fast(t, T, Rt, delta, pt, ptd, pT, _sigma, _a):
+def p_fast(t, T, r_t, delta, pt, ptd, pT, _sigma, _a):
     """ Forward discount factor as seen at some time t which may be in the
-    future for payment at time T where Rt is the delta-period short rate
+    future for payment at time T where r_t is the delta-period shor_t rate
     seen at time t and pt is the discount factor to time t, ptd is the one
     period discount factor to time t+dt and pT is the discount factor from
     now until the payment of the 1 dollar of the discount factor. """
@@ -72,7 +72,7 @@ def p_fast(t, T, Rt, delta, pt, ptd, pT, _sigma, _a):
 
     logAhat = term1 - term2
     BhattT = (BtT/BtDelta) * delta
-    p = np.exp(logAhat - BhattT * Rt)
+    p = np.exp(logAhat - BhattT * r_t)
     return p
 
 ###############################################################################
@@ -84,29 +84,29 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     treeMaturity = tree_times[-1]
     dt = treeMaturity / (num_time_steps+1)
     dR = sigma * np.sqrt(3.0 * dt)
-    jmax = ceil(0.1835/(a * dt))
-    N = jmax
+    j_max = ceil(0.1835/(a * dt))
+    N = j_max
 
-    pu = np.zeros(shape=(2*jmax+1))
-    pm = np.zeros(shape=(2*jmax+1))
-    pd = np.zeros(shape=(2*jmax+1))
+    pu = np.zeros(shape=(2*j_max+1))
+    pm = np.zeros(shape=(2*j_max+1))
+    pd = np.zeros(shape=(2*j_max+1))
 
-    # The short rate goes out one step extra to have the final short rate
-    rt = np.zeros(shape=(num_time_steps+2, 2*jmax+1))
+    # The shor_t rate goes out one step extra to have the final shor_t rate
+    r_t = np.zeros(shape=(num_time_steps+2, 2*j_max+1))
 
-    # probabilities start at time 0 and go out to one step before T
+    # probabilities star_t at time 0 and go out to one step before T
     # Branching is simple trinomial out to time step m=1 after which
     # the top node and bottom node connect internally to two lower nodes
     # and two upper nodes respectively. The probabilities only depend on j
 
-    for j in range(-jmax, jmax+1):
+    for j in range(-j_max, j_max+1):
         ajdt = a*j*dt
         jN = j + N
-        if j == jmax:
+        if j == j_max:
             pu[jN] = 7.0/6.0 + 0.50*(ajdt*ajdt - 3.0*ajdt)
             pm[jN] = -1.0/3.0 - ajdt*ajdt + 2.0*ajdt
             pd[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt - ajdt)
-        elif j == -jmax:
+        elif j == -j_max:
             pu[jN] = 1.0/6.0 + 0.50*(ajdt*ajdt + ajdt)
             pm[jN] = -1.0/3.0 - ajdt*ajdt - 2.0*ajdt
             pd[jN] = 7.0/6.0 + 0.50*(ajdt*ajdt + 3.0*ajdt)
@@ -127,7 +127,7 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     # Big loop over time steps
     for m in range(0, num_time_steps + 1):
 
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         sumQZ = 0.0
         for j in range(-nm, nm+1):
             rdt = j*dR*dt
@@ -136,19 +136,19 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
 
         for j in range(-nm, nm+1):
             jN = j + N
-            rt[m, jN] = alpha[m] + j*dR
+            r_t[m, jN] = alpha[m] + j*dR
 
         # Loop over all nodes at time m to calculate next values of Q
         for j in range(-nm, nm+1):
             jN = j + N
-            rdt = rt[m, jN] * dt
+            rdt = r_t[m, jN] * dt
             z = np.exp(-rdt)
 
-            if j == jmax:
+            if j == j_max:
                 Q[m+1, jN] += Q[m, jN] * pu[jN] * z
                 Q[m+1, jN-1] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN-2] += Q[m, jN] * pd[jN] * z
-            elif j == -jmax:
+            elif j == -j_max:
                 Q[m+1, jN] += Q[m, jN] * pd[jN] * z
                 Q[m+1, jN+1] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN+2] += Q[m, jN] * pu[jN] * z
@@ -157,7 +157,7 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
                 Q[m+1, jN] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN-1] += Q[m, jN] * pd[jN] * z
 
-    return (Q, pu, pm, pd, rt, dt)
+    return (Q, pu, pm, pd, r_t, dt)
 
 ###############################################################################
 
@@ -173,7 +173,7 @@ def american_bond_option_tree_fast(t_exp,
                                    _a,
                                    _Q,
                                    _pu, _pm, _pd,
-                                   _rt,
+                                   _r_t,
                                    _dt,
                                    _tree_times,
                                    _df_times, _df_values):
@@ -189,8 +189,8 @@ def american_bond_option_tree_fast(t_exp,
 
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
-    jmax = ceil(0.1835/(_a * dt))
-    expiryStep = int(t_exp/dt + 0.50)
+    j_max = ceil(0.1835/(_a * dt))
+    expiry_step = int(t_exp/dt + 0.50)
 
     ###########################################################################
 
@@ -216,7 +216,7 @@ def american_bond_option_tree_fast(t_exp,
     # result in some convergence noise issues as it is inconsistent
     ###########################################################################
 
-    # I start the tree with the previous coupon time and amount
+    # I star_t the tree with the previous coupon time and amount
     # (does not matter)
     mapped_times = np.zeros(0)   # CHANGE
     mapped_amounts = np.zeros(0)  # CHANGE
@@ -238,7 +238,7 @@ def american_bond_option_tree_fast(t_exp,
     ###########################################################################
 
     accrued = np.zeros(num_time_steps)
-    for m in range(0, expiryStep+1):
+    for m in range(0, expiry_step+1):
         ttree = _tree_times[m]
         accrued[m] = accrued_interpolator(ttree, cpn_times, cpn_amounts)
         accrued[m] *= face_amount
@@ -249,7 +249,7 @@ def american_bond_option_tree_fast(t_exp,
             accrued[m] = treeFlows[m] * face_amount
 
     if DEBUG:
-        for i in range(0, expiryStep+1):
+        for i in range(0, expiry_step+1):
             print(i, treeFlows[i], accrued[i])
 
     ###########################################################################
@@ -269,67 +269,67 @@ def american_bond_option_tree_fast(t_exp,
     # this fact to calculate the bond price at expiry on the tree nodes
     ###########################################################################
 
-    nm = min(expiryStep, jmax)
+    nm = min(expiry_step, j_max)
     for k in range(-nm, nm+1):
-        kN = k + jmax
-        rt = _rt[expiryStep, kN]
-        bondPrice = 0.0
+        kN = k + j_max
+        r_t = _r_t[expiry_step, kN]
+        bond_price = 0.0
         for i in range(0, num_cpns):
             tflow = cpn_times[i]
             if tflow >= t_exp:
                 ptflow = _uinterpolate(tflow, _df_times, _df_values, interp)
-                zcb = p_fast(t_exp, tflow, rt, dt, pt_exp, ptdelta, ptflow,
+                zcb = p_fast(t_exp, tflow, r_t, dt, pt_exp, ptdelta, ptflow,
                              _sigma, _a)
                 cpn = cpn_amounts[i]
-                bondPrice += cpn * face_amount * zcb
+                bond_price += cpn * face_amount * zcb
 
-        bondPrice += zcb * face_amount
+        bond_price += zcb * face_amount
 
         # The flow on this date has been added
-        bond_values[expiryStep, kN] = bondPrice
+        bond_values[expiry_step, kN] = bond_price
 
     # Now consider exercise of the option on the expiry date
-    nm = min(expiryStep, jmax)
+    nm = min(expiry_step, j_max)
     for k in range(-nm, nm+1):
-        kN = k + jmax
-        dirty_price = bond_values[expiryStep, kN]
-        clean_price = dirty_price - accrued[expiryStep]
+        kN = k + j_max
+        dir_ty_price = bond_values[expiry_step, kN]
+        clean_price = dir_ty_price - accrued[expiry_step]
         call_exercise = max(clean_price - strike_price, 0.0)
         put_exercise = max(strike_price - clean_price, 0.0)
-        call_option_values[expiryStep, kN] = call_exercise
-        put_option_values[expiryStep, kN] = put_exercise
+        call_option_values[expiry_step, kN] = call_exercise
+        put_option_values[expiry_step, kN] = put_exercise
 
-    m = expiryStep
+    m = expiry_step
 
     if DEBUG:
         print("-----------------------------------------")
-        print("EXP", _tree_times[m], accrued[m], dirty_price, clean_price,
+        print("EXP", _tree_times[m], accrued[m], dir_ty_price, clean_price,
               call_exercise, put_exercise)
 
-#        print(kN, bond_values[expiryStep, kN], "CLEAN", clean_price)
-#        print("EXPIRY DATE", kN, clean_price, accrued[expiryStep], strike_price)
+#        print(kN, bond_values[expiry_step, kN], "CLEAN", clean_price)
+#        print("EXPIRY DATE", kN, clean_price, accrued[expiry_step], strike_price)
 
     # Now step back to today considering exercise at expiry and before
-    for m in range(expiryStep-1, -1, -1):
-        nm = min(m, jmax)
+    for m in range(expiry_step-1, -1, -1):
+        nm = min(m, j_max)
         flow = treeFlows[m] * face_amount
 
         for k in range(-nm, nm+1):
-            kN = k + jmax
-            r = _rt[m, kN]
+            kN = k + j_max
+            r = _r_t[m, kN]
             df = np.exp(-r*dt)
 
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = bond_values[m+1, kN]
                 vm = bond_values[m+1, kN-1]
                 vd = bond_values[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 bond_values[m, kN] = v
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = bond_values[m+1, kN+2]
                 vm = bond_values[m+1, kN+1]
                 vd = bond_values[m+1, kN]
@@ -347,12 +347,12 @@ def american_bond_option_tree_fast(t_exp,
             vcall = 0.0
             vput = 0.0
 
-            if k == jmax:
+            if k == j_max:
                 vu = call_option_values[m+1, kN]
                 vm = call_option_values[m+1, kN-1]
                 vd = call_option_values[m+1, kN-2]
                 vcall = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = call_option_values[m+1, kN+2]
                 vm = call_option_values[m+1, kN+1]
                 vd = call_option_values[m+1, kN]
@@ -365,12 +365,12 @@ def american_bond_option_tree_fast(t_exp,
 
             call_option_values[m, kN] = vcall
 
-            if k == jmax:
+            if k == j_max:
                 vu = put_option_values[m+1, kN]
                 vm = put_option_values[m+1, kN-1]
                 vd = put_option_values[m+1, kN-2]
                 vput = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = put_option_values[m+1, kN+2]
                 vm = put_option_values[m+1, kN+1]
                 vd = put_option_values[m+1, kN]
@@ -383,29 +383,29 @@ def american_bond_option_tree_fast(t_exp,
 
             put_option_values[m, kN] = vput
 
-            dirty_price = bond_values[m, kN]
-            clean_price = dirty_price - accrued[m]
+            dir_ty_price = bond_values[m, kN]
+            clean_price = dir_ty_price - accrued[m]
             call_exercise = max(clean_price - strike_price, 0.0)
             put_exercise = max(strike_price - clean_price, 0.0)
 
             holdCall = call_option_values[m, kN]
             holdPut = put_option_values[m, kN]
 
-            if m == expiryStep:
+            if m == expiry_step:
 
                 call_option_values[m, kN] = max(call_exercise, holdCall)
                 put_option_values[m, kN] = max(put_exercise, holdPut)
 
-            elif exercise_typeInt == 3 and m < expiryStep:  # AMERICAN
+            elif exercise_typeInt == 3 and m < expiry_step:  # AMERICAN
 
                 call_option_values[m, kN] = max(call_exercise, holdCall)
                 put_option_values[m, kN] = max(put_exercise, holdPut)
 
         if DEBUG:
-            print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
+            print(m, _tree_times[m], accrued[m], dir_ty_price, clean_price,
                   call_exercise, put_exercise)
 
-    return call_option_values[0, jmax], put_option_values[0, jmax]
+    return call_option_values[0, j_max], put_option_values[0, j_max]
 
 ###############################################################################
 
@@ -415,15 +415,15 @@ def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
                                 cpn_times, cpn_flows,
                                 exercise_typeInt,
                                 _df_times, _df_values,
-                                _tree_times, _Q, _pu, _pm, _pd, _rt, _dt, _a):
+                                _tree_times, _Q, _pu, _pm, _pd, _r_t, _dt, _a):
     """ Option to enter into a swap that can be exercised on coupon payment
-    dates after the start of the exercise period. Due to multiple exercise
+    dates after the star_t of the exercise period. Due to multiple exercise
     times we need to extend tree out to bond maturity and take into account
     cash flows through time. """
 
     num_time_steps, num_nodes = _Q.shape
-    jmax = ceil(0.1835/(_a * _dt))
-    expiryStep = int(t_exp/_dt + 0.50)
+    j_max = ceil(0.1835/(_a * _dt))
+    expiry_step = int(t_exp/_dt + 0.50)
     maturityStep = int(tmat/_dt + 0.50)
 
     ###########################################################################
@@ -484,33 +484,33 @@ def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
     # The value of the option to enter into a receiver swap
     rec_values = np.zeros(shape=(num_time_steps, num_nodes))
 
-    # Start with the value of the bond at maturity
+    # Star_t with the value of the bond at maturity
     for k in range(0, num_nodes):
         flow = 1.0 + fixed_leg_flows[maturityStep]
         fixed_leg_values[maturityStep, k] = flow * face_amount
 
-    N = jmax
+    N = j_max
 
     # Now step back to today considering early exercise
     for m in range(maturityStep-1, -1, -1):
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         flow = fixed_leg_flows[m] * face_amount
 
         for k in range(-nm, nm+1):
             kN = k + N
-            rt = _rt[m, kN]
-            df = np.exp(-rt * _dt)
+            r_t = _r_t[m, kN]
+            df = np.exp(-r_t * _dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = fixed_leg_values[m+1, kN]
                 vm = fixed_leg_values[m+1, kN-1]
                 vd = fixed_leg_values[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 fixed_leg_values[m, kN] = v
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = fixed_leg_values[m+1, kN+2]
                 vm = fixed_leg_values[m+1, kN+1]
                 vd = fixed_leg_values[m+1, kN]
@@ -527,12 +527,12 @@ def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
             vpay = 0.0
             vrec = 0.0
 
-            if k == jmax:
+            if k == j_max:
                 vu = pay_values[m+1, kN]
                 vm = pay_values[m+1, kN-1]
                 vd = pay_values[m+1, kN-2]
                 vpay = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = pay_values[m+1, kN+2]
                 vm = pay_values[m+1, kN+1]
                 vd = pay_values[m+1, kN]
@@ -545,12 +545,12 @@ def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
 
             pay_values[m, kN] = vpay
 
-            if k == jmax:
+            if k == j_max:
                 vu = rec_values[m+1, kN]
                 vm = rec_values[m+1, kN-1]
                 vd = rec_values[m+1, kN-2]
                 vrec = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = rec_values[m+1, kN+2]
                 vm = rec_values[m+1, kN+1]
                 vd = rec_values[m+1, kN]
@@ -563,36 +563,36 @@ def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
 
             rec_values[m, kN] = vrec
 
-            holdPay = pay_values[m, kN]
-            holdRec = rec_values[m, kN]
+            hold_pay = pay_values[m, kN]
+            hold_rec = rec_values[m, kN]
 
             # The floating value is clean and so must be the fixed value
             fixed_leg_value = fixed_leg_values[m, kN] - accrued[m]
             float_leg_value = float_leg_values[m]
 
-            payExercise = max(float_leg_value - fixed_leg_value, 0.0)
-            recExercise = max(fixed_leg_value - float_leg_value, 0.0)
+            pay_exercise = max(float_leg_value - fixed_leg_value, 0.0)
+            rec_exercise = max(fixed_leg_value - float_leg_value, 0.0)
 
-            if m == expiryStep:
+            if m == expiry_step:
 
-                pay_values[m, kN] = max(payExercise, holdPay)
-                rec_values[m, kN] = max(recExercise, holdRec)
+                pay_values[m, kN] = max(pay_exercise, hold_pay)
+                rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 2 and flow > gSmall and m >= expiryStep:
+            elif exercise_typeInt == 2 and flow > gSmall and m >= expiry_step:
 
-                pay_values[m, kN] = max(payExercise, holdPay)
-                rec_values[m, kN] = max(recExercise, holdRec)
+                pay_values[m, kN] = max(pay_exercise, hold_pay)
+                rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 3 and m >= expiryStep:
+            elif exercise_typeInt == 3 and m >= expiry_step:
 
-                pay_values[m, kN] = max(payExercise, holdPay)
-                rec_values[m, kN] = max(recExercise, holdRec)
+                pay_values[m, kN] = max(pay_exercise, hold_pay)
+                rec_values[m, kN] = max(rec_exercise, hold_rec)
 
                 # Need to define floating value on all grid dates
 
                 raise FinError("American optionality not tested.")
 
-    return pay_values[0, jmax], rec_values[0, jmax]
+    return pay_values[0, j_max], rec_values[0, j_max]
 
 ###############################################################################
 # TODO: CHECK ACCRUED AND COUPONS TO SEE IF IT WORKS FOR LOW TREE STEPS
@@ -604,7 +604,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
                                      call_times, call_prices,
                                      put_times, put_prices, face,
                                      _sigma, _a, _Q,  # IS SIGMA USED ?
-                                     _pu, _pm, _pd, _rt, _dt, _tree_times,
+                                     _pu, _pm, _pd, _r_t, _dt, _tree_times,
                                      _df_times, _df_values):
     """ Value an option on a bond with coupons that can have European or
     American exercise. Some minor issues to do with handling coupons on
@@ -621,7 +621,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
 
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
-    jmax = ceil(0.1835/(_a * dt))
+    j_max = ceil(0.1835/(_a * dt))
     tmat = cpn_times[-1]
     maturityStep = int(tmat/dt + 0.50)
 
@@ -687,7 +687,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
         tree_put_value[n] = put_prices[i]
 
     ###########################################################################
-    # Value the bond by backward induction starting at bond maturity
+    # Value the bond by backward induction star_ting at bond maturity
     ###########################################################################
 
     callPutBondValues = np.zeros(shape=(num_time_steps, num_nodes))
@@ -713,7 +713,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     ###########################################################################
 
     m = maturityStep
-    nm = min(maturityStep, jmax)
+    nm = min(maturityStep, j_max)
     vcall = tree_call_value[m]
     vput = tree_put_value[m]
     vhold = (1.0 + treeFlows[m]) * face
@@ -721,30 +721,30 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     value = min(max(vclean, vput), vcall) + accrued[m]
 
     for k in range(-nm, nm+1):
-        kN = k + jmax
+        kN = k + j_max
         bond_values[m, kN] = (1.0 + treeFlows[m]) * face
         callPutBondValues[m, kN] = value
 
     # Now step back to today considering early put and call
     for m in range(maturityStep-1, -1, -1):
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         flow = treeFlows[m] * face
         vcall = tree_call_value[m]
         vput = tree_put_value[m]
 
         for k in range(-nm, nm+1):
-            kN = k + jmax
-            rt = _rt[m, kN]
-            df = np.exp(-rt*dt)
+            kN = k + j_max
+            r_t = _r_t[m, kN]
+            df = np.exp(-r_t*dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = bond_values[m+1, kN]
                 vm = bond_values[m+1, kN-1]
                 vd = bond_values[m+1, kN-2]
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = bond_values[m+1, kN+2]
                 vm = bond_values[m+1, kN+1]
                 vd = bond_values[m+1, kN]
@@ -757,11 +757,11 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
             bond_values[m, kN] = v
             bond_values[m, kN] += flow
 
-            if k == jmax:
+            if k == j_max:
                 vu = callPutBondValues[m+1, kN]
                 vm = callPutBondValues[m+1, kN-1]
                 vd = callPutBondValues[m+1, kN-2]
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = callPutBondValues[m+1, kN+2]
                 vm = callPutBondValues[m+1, kN+1]
                 vd = callPutBondValues[m+1, kN]
@@ -776,16 +776,16 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
             callPutBondValues[m, kN] = value
 
-    return {'bondwithoption': callPutBondValues[0, jmax],
-            'bondpure': bond_values[0, jmax]}
+    return {'bondwithoption': callPutBondValues[0, j_max],
+            'bondpure': bond_values[0, j_max]}
 
 ###############################################################################
 
 
-def fwd_dirty_bond_price(rt, *args):
+def fwd_dir_ty_bond_price(r_t, *args):
     """ Price a coupon bearing bond on the option expiry date and return
     the difference from a strike price. This is used in a root search to
-    find the future expiry time short rate that makes the bond price equal
+    find the future expiry time shor_t rate that makes the bond price equal
     to the option strike price. It is a key step in the Jamshidian bond
     decomposition approach. The strike is a clean price. """
 
@@ -815,7 +815,7 @@ def fwd_dirty_bond_price(rt, *args):
 
         if tcpn > t_exp:
             ptcpn = _uinterpolate(tcpn, df_times, df_values, interp)
-            zcb = p_fast(t_exp, tcpn, rt, dt, pt_exp, ptdelta, ptcpn,
+            zcb = p_fast(t_exp, tcpn, r_t, dt, pt_exp, ptdelta, ptcpn,
                          self._sigma, self._a)
             pv = pv + zcb * cpn
 #            print("TCPN", tcpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
@@ -834,7 +834,7 @@ def fwd_dirty_bond_price(rt, *args):
     pv_clean = pv - accd
     obj = face * pv_clean - strike_price
 
-#    print("FWD PRICE", rt, pv, accd, strike_price, obj)
+#    print("FWD PRICE", r_t, pv, accd, strike_price, obj)
     return obj
 
 ###############################################################################
@@ -848,7 +848,7 @@ class HWTree():
                  num_time_steps=100,
                  europeanCalcType=FinHWEuropeanCalcType.EXPIRY_TREE):
         """ Constructs the Hull-White rate model. The speed of mean reversion
-        a and volatility are passed in. The short rate process is given by
+        a and volatility are passed in. The shor_t rate process is given by
         dr = (theta(t) - ar) * dt  + sigma * dW. The model will switch to use
         Jamshidian's approach where possible unless the useJamshidian flag is
         set to false in which case it uses the trinomial Tree. """
@@ -924,7 +924,7 @@ class HWTree():
                                         df_values):
         """ Valuation of a European bond option using the Jamshidian
         deconstruction of the bond into a strip of zero coupon bonds with the
-        short rate that would make the bond option be at the money forward. """
+        shor_t rate that would make the bond option be at the money forward. """
 
 #        print(df_times)
 #        print(df_values)
@@ -937,11 +937,11 @@ class HWTree():
         # Can I improve on this initial guess ?
         x0 = 0.05
 
-        rstar = optimize.newton(fwd_dirty_bond_price, x0=x0, fprime=None,
+        rstar = optimize.newton(fwd_dir_ty_bond_price, x0=x0, fprime=None,
                                 args=argtuple, tol=1e-10, maxiter=50,
                                 fprime2=None)
 
-        # Now we price a series of zero coupon bonds using this short rate
+        # Now we price a series of zero coupon bonds using this shor_t rate
         dt = 1e-6
 
         pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
@@ -986,7 +986,7 @@ class HWTree():
                                          cpn_times,
                                          cpn_amounts):
         """ Price a European option on a coupon-paying bond using a tree to
-        generate short rates at the expiry date and then to use the analytical
+        generate shor_t rates at the expiry date and then to use the analytical
         solution of zero coupon bond prices in the HW model to calculate the
         corresponding bond price. User provides bond object and option details.
         """
@@ -998,7 +998,7 @@ class HWTree():
         ptdelta = _uinterpolate(tdelta, self._df_times, self._dfs, interp)
 
         _, num_nodes = self._Q.shape
-        expiryStep = int(t_exp/dt+0.50)
+        expiry_step = int(t_exp/dt+0.50)
 
         call_value = 0.0
         put_value = 0.0
@@ -1008,8 +1008,8 @@ class HWTree():
 
         for k in range(0, num_nodes):
 
-            q = self._Q[expiryStep, k]
-            rt = self._rt[expiryStep, k]
+            q = self._Q[expiry_step, k]
+            r_t = self._r_t[expiry_step, k]
 
             pv = 0.0
 
@@ -1023,7 +1023,7 @@ class HWTree():
                     ptcpn = _uinterpolate(tcpn, self._df_times, self._dfs,
                                           interp)
 
-                    zcb = p_fast(t_exp, tcpn, rt, dt, pt_exp, ptdelta, ptcpn,
+                    zcb = p_fast(t_exp, tcpn, r_t, dt, pt_exp, ptdelta, ptcpn,
                                  self._sigma, self._a)
 
                     pv += cpn * zcb
@@ -1079,18 +1079,18 @@ class HWTree():
         ptmat = _uinterpolate(tmat, self._df_times, self._dfs, interp)
 
         _, num_nodes = self._Q.shape
-        expiryStep = int(t_exp/dt+0.50)
+        expiry_step = int(t_exp/dt+0.50)
 
         call_value = 0.0
         put_value = 0.0
 
         for k in range(0, num_nodes):
 
-            q = self._Q[expiryStep, k]
-            rt = self._rt[expiryStep, k]
+            q = self._Q[expiry_step, k]
+            r_t = self._r_t[expiry_step, k]
 
             zcb = p_fast(t_exp, tmat,
-                         rt, dt, pt_exp, ptdelta, ptmat,
+                         r_t, dt, pt_exp, ptdelta, ptmat,
                          self._sigma, self._a)
 
             putPayoff = max(strike_price - zcb * face_amount, 0.0)
@@ -1127,7 +1127,7 @@ class HWTree():
                                           self._df_times, self._dfs,
                                           self._tree_times, self._Q,
                                           self._pu, self._pm, self._pd,
-                                          self._rt,
+                                          self._r_t,
                                           self._dt, self._a)
 
         return {'pay': payValue, 'rec': recValue}
@@ -1179,7 +1179,7 @@ class HWTree():
                                                      self._sigma, self._a,
                                                      self._Q,
                                                      self._pu, self._pm, self._pd,
-                                                     self._rt, self._dt,
+                                                     self._r_t, self._dt,
                                                      self._tree_times,
                                                      self._df_times, self._dfs)
 
@@ -1196,7 +1196,7 @@ class HWTree():
                                                  self._sigma, self._a,
                                                  self._Q,
                                                  self._pu, self._pm, self._pd,
-                                                 self._rt, self._dt,
+                                                 self._r_t, self._dt,
                                                  self._tree_times,
                                                  self._df_times, self._dfs)
 
@@ -1233,7 +1233,7 @@ class HWTree():
                                              self._sigma, self._a,
                                              self._Q,
                                              self._pu, self._pm, self._pd,
-                                             self._rt, self._dt,
+                                             self._r_t, self._dt,
                                              self._tree_times,
                                              self._df_times, self._dfs)
 
@@ -1294,7 +1294,7 @@ class HWTree():
         self._df_times = df_times
         self._dfs = df_values
 
-        self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
+        self._Q, self._pu, self._pm, self._pd, self._r_t, self._dt \
             = build_tree_fast(self._a, self._sigma,
                               tree_times, self._num_time_steps, dfTree)
 

@@ -402,7 +402,7 @@ class BondZero:
         clean_price = np.array(clean_price)
         self.accrued_interest(settle_dt, 1.0)
         accrued_amount = self._accrued_interest * self._par
-        bondPrice = clean_price + accrued_amount
+        bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pvIbor = 0.0
         prev_dt = self._pcd
@@ -436,7 +436,7 @@ class BondZero:
             pv01 = pv01 + year_frac * df
             prev_dt = dt
 
-        asw = (pvIbor - bondPrice / self._par) / pv01
+        asw = (pvIbor - bond_price / self._par) / pv01
         return asw
 
     ###########################################################################

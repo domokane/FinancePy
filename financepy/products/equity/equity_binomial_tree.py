@@ -129,50 +129,50 @@ def _value_once(stock_price,
     periodDiscountFactors = np.zeros(num_steps)
 
     # store time independent information for later use in tree
-    for iTime in range(0, num_steps):
+    for i_time in range(0, num_steps):
         a = exp((r - q) * dt)
-        probs[iTime] = (a - d) / (u - d)
-        periodDiscountFactors[iTime] = exp(-r * dt)
+        probs[i_time] = (a - d) / (u - d)
+        periodDiscountFactors[i_time] = exp(-r * dt)
 
-    for iTime in range(1, num_steps + 1):
+    for i_time in range(1, num_steps + 1):
         sLow *= d
         s = sLow
-        for iNode in range(0, iTime + 1):
-            index = 0.5 * iTime * (iTime + 1)
-            stock_values[int(index + iNode)] = s
+        for i_node in range(0, i_time + 1):
+            index = 0.5 * i_time * (i_time + 1)
+            stock_values[int(index + i_node)] = s
             s = s * (u * u)
 
     # work backwards by first setting values at expiry date
     index = int(0.5 * num_steps * (num_steps + 1))
 
-    for iNode in range(0, iTime + 1):
-        s = stock_values[index + iNode]
-        option_values[index + iNode] =\
+    for i_node in range(0, i_time + 1):
+        s = stock_values[index + i_node]
+        option_values[index + i_node] =\
             _payoff_value(s, payoff_typeValue, payoff_params)
 
     # begin backward steps from expiry
-    for iTime in range(num_steps - 1, -1, -1):
+    for i_time in range(num_steps - 1, -1, -1):
 
-        index = int(0.5 * iTime * (iTime + 1))
+        index = int(0.5 * i_time * (i_time + 1))
 
-        for iNode in range(0, iTime + 1):
+        for i_node in range(0, i_time + 1):
 
-            nextIndex = int(0.5 * (iTime + 1) * (iTime + 2))
-            nextNodeDn = nextIndex + iNode
+            next_index = int(0.5 * (i_time + 1) * (i_time + 2))
+            nextNodeDn = next_index + i_node
             nextNodeUp = nextNodeDn + 1
             vUp = option_values[nextNodeUp]
             vDn = option_values[nextNodeDn]
-            futureExpectedValue = probs[iTime] * vUp
-            futureExpectedValue += (1.0 - probs[iTime]) * vDn
-            holdValue = periodDiscountFactors[iTime] * futureExpectedValue
+            future_expected_value = probs[i_time] * vUp
+            future_expected_value += (1.0 - probs[i_time]) * vDn
+            hold_value = periodDiscountFactors[i_time] * future_expected_value
 
             if exercise_type == EquityTreeExerciseTypes.EUROPEAN:
-                option_values[index + iNode] = holdValue
+                option_values[index + i_node] = hold_value
             elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
-                s = stock_values[index + iNode]
-                exerciseValue = _payoff_value(
+                s = stock_values[index + i_node]
+                exercise_value = _payoff_value(
                     s, payoff_typeValue, payoff_params)
-                option_values[index + iNode] = max(exerciseValue, holdValue)
+                option_values[index + i_node] = max(exercise_value, hold_value)
 
     price = option_values[0]
     delta = (option_values[2] - option_values[1]) / \

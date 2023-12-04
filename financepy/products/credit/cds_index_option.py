@@ -84,7 +84,7 @@ class CDSIndexOption:
     def value_adjusted_black(self,
                              value_dt,
                              index_curve,
-                             indexRecovery,
+                             index_recovery,
                              libor_curve,
                              sigma):
         """ This approach uses two adjustments to Black's option pricing
@@ -98,7 +98,7 @@ class CDSIndexOption:
 
         cds = CDS(value_dt, self._maturity_dt, k)
         strikeCurve = CDSCurve(
-            value_dt, [cds], libor_curve, indexRecovery)
+            value_dt, [cds], libor_curve, index_recovery)
 #        qExpiryStrike = strikeCurve.survivalProbability(time_to_expiry)
 
         strikeRPV01 = self._cds_contract.risky_pv01(
@@ -108,7 +108,7 @@ class CDSIndexOption:
 
         s = self._cds_contract.par_spread(value_dt, index_curve)
 
-        fep = df * (1.0 - qExpiryIndex) * (1.0 - indexRecovery)
+        fep = df * (1.0 - qExpiryIndex) * (1.0 - index_recovery)
         adjFwd = s + fep / indexRPV01
         adjStrike = c + (k - c) * strikeRPV01 / indexRPV01 / qExpiryIndex
 
@@ -209,22 +209,22 @@ class CDSIndexOption:
                      value_dt,
                      sigma,
                      index_coupon,
-                     indexRecovery,
+                     index_recovery,
                      libor_curve,
                      expH):
         """ Function to solve for the arbitrage free """
         x1 = 0.0
         x2 = 0.9999
         ftol = 1e-8
-        jmax = 40
+        j_max = 40
         xacc = 0.000000001
         rtb = 999999
 
         f = self._calc_obj_func(x1, value_dt, sigma, index_coupon,
-                                indexRecovery, libor_curve) - expH
+                                index_recovery, libor_curve) - expH
 
         fmid = self._calc_obj_func(x2, value_dt, sigma, index_coupon,
-                                   indexRecovery, libor_curve) - expH
+                                   index_recovery, libor_curve) - expH
 
         if f * fmid >= 0.0:
             raise FinError("Solution not bracketed.")
@@ -236,12 +236,12 @@ class CDSIndexOption:
             rtb = x2
             dx = x1 - x2
 
-        for _ in range(0, jmax):
+        for _ in range(0, j_max):
             dx = dx * 0.5
             xmid = rtb + dx
             fmid = self._calc_obj_func(xmid, value_dt, sigma,
                                        index_coupon,
-                                       indexRecovery, libor_curve) - expH
+                                       index_recovery, libor_curve) - expH
             if fmid <= 0.0:
                 rtb = xmid
             if abs(dx) < xacc or abs(fmid) < ftol:
@@ -256,7 +256,7 @@ class CDSIndexOption:
                        value_dt,
                        sigma,
                        index_coupon,
-                       indexRecovery,
+                       index_recovery,
                        libor_curve):
         """ An internal function used in the Anderson valuation. """
 
@@ -270,7 +270,7 @@ class CDSIndexOption:
                                                      self._index_coupon,
                                                      strike_value,
                                                      libor_curve,
-                                                     indexRecovery)
+                                                     index_recovery)
 
         return values[0]
 
@@ -283,7 +283,7 @@ class CDSIndexOption:
                                        index_coupon,
                                        strike_value,
                                        libor_curve,
-                                       indexRecovery):
+                                       index_recovery):
         """ Calculates the intrinsic value of the index payer swap and the
         value of the index payer option which are both returned in an array.
         """
@@ -296,7 +296,7 @@ class CDSIndexOption:
         num_flows = len(flow_dts)
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
         dfToExpiry = libor_curve.df(self._expiry_dt)
-        lgd = 1.0 - indexRecovery
+        lgd = 1.0 - index_recovery
 
         fwdDfs = [1.0] * (num_flows)
         expiryToFlowTimes = [1.0] * (num_flows)

@@ -50,7 +50,7 @@ class SwapFixedLeg:
         calendar = Calendar(cal_type)
 
         self._maturity_dt = calendar.adjust(self._termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Effective date after maturity date")
@@ -70,8 +70,8 @@ class SwapFixedLeg:
         self._dg_type = dg_type
         self._end_of_month = end_of_month
 
-        self._startAccruedDates = []
-        self._endAccruedDates = []
+        self._start_accrued_dts = []
+        self._end_accrued_dts = []
         self._payment_dts = []
         self._payments = []
         self._year_fracs = []
@@ -103,8 +103,8 @@ class SwapFixedLeg:
         if len(scheduleDates) < 2:
             raise FinError("Schedule has none or only one date")
 
-        self._startAccruedDates = []
-        self._endAccruedDates = []
+        self._start_accrued_dts = []
+        self._end_accrued_dts = []
         self._payment_dts = []
         self._payments = []
         self._year_fracs = []
@@ -118,14 +118,14 @@ class SwapFixedLeg:
 
         for next_dt in scheduleDates[1:]:
 
-            self._startAccruedDates.append(prev_dt)
-            self._endAccruedDates.append(next_dt)
+            self._start_accrued_dts.append(prev_dt)
+            self._end_accrued_dts.append(next_dt)
 
             if self._payment_lag == 0:
                 payment_dt = next_dt
             else:
                 payment_dt = calendar.add_business_days(next_dt,
-                                                          self._payment_lag)
+                                                        self._payment_lag)
 
             self._payment_dts.append(payment_dt)
 
@@ -149,12 +149,12 @@ class SwapFixedLeg:
               discount_curve: DiscountCurve):
 
         self._paymentDfs = []
-        self._paymentPVs = []
+        self._payment_pvs = []
         self._cumulativePVs = []
 
         notional = self._notional
         dfValue = discount_curve.df(value_dt)
-        legPV = 0.0
+        leg_pv = 0.0
         numPayments = len(self._payment_dts)
 
         dfPmnt = 0.0
@@ -168,28 +168,28 @@ class SwapFixedLeg:
 
                 dfPmnt = discount_curve.df(pmntDate) / dfValue
                 pmntPV = pmntAmount * dfPmnt
-                legPV += pmntPV
+                leg_pv += pmntPV
 
                 self._paymentDfs.append(dfPmnt)
-                self._paymentPVs.append(pmntAmount*dfPmnt)
-                self._cumulativePVs.append(legPV)
+                self._payment_pvs.append(pmntAmount*dfPmnt)
+                self._cumulativePVs.append(leg_pv)
 
             else:
 
                 self._paymentDfs.append(0.0)
-                self._paymentPVs.append(0.0)
+                self._payment_pvs.append(0.0)
                 self._cumulativePVs.append(0.0)
 
         if pmntDate > value_dt:
-            paymentPV = self._principal * dfPmnt * notional
-            self._paymentPVs[-1] += paymentPV
-            legPV += paymentPV
-            self._cumulativePVs[-1] = legPV
+            payment_pv = self._principal * dfPmnt * notional
+            self._payment_pvs[-1] += payment_pv
+            leg_pv += payment_pv
+            self._cumulativePVs[-1] = leg_pv
 
         if self._leg_type == SwapTypes.PAY:
-            legPV = legPV * (-1.0)
+            leg_pv = leg_pv * (-1.0)
 
-        return legPV
+        return leg_pv
 
 ##########################################################################
 
@@ -208,8 +208,8 @@ class SwapFixedLeg:
             print("Payments not calculated.")
             return
 
-        header = [ "PAY_NUM", "PAY_dt", "ACCR_START", "ACCR_END",
-                    "DAYS", "YEARFRAC", "RATE", "PMNT"]
+        header = ["PAY_NUM", "PAY_dt", "ACCR_START", "ACCR_END",
+                  "DAYS", "YEARFRAC", "RATE", "PMNT"]
 
         rows = []
         num_flows = len(self._payment_dts)
@@ -217,8 +217,8 @@ class SwapFixedLeg:
             rows.append([
                 iFlow + 1,
                 self._payment_dts[iFlow],
-                self._startAccruedDates[iFlow],
-                self._endAccruedDates[iFlow],
+                self._start_accrued_dts[iFlow],
+                self._end_accrued_dts[iFlow],
                 self._accrued_days[iFlow],
                 round(self._year_fracs[iFlow], 4),
                 round(self._rates[iFlow] * 100.0, 4),
@@ -259,7 +259,7 @@ class SwapFixedLeg:
                 round(self._rates[iFlow] * 100.0, 4),
                 round(self._payments[iFlow], 2),
                 round(self._paymentDfs[iFlow], 4),
-                round(self._paymentPVs[iFlow], 2),
+                round(self._payment_pvs[iFlow], 2),
                 round(self._cumulativePVs[iFlow], 2),
             ])
 

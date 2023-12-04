@@ -224,8 +224,8 @@ class Interpolator():
 
         elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
 
-            gSmallVector = np.ones(len(self._times)) * gSmall
-            zero_rates = -np.log(self._dfs) / (self._times + gSmallVector)
+            g_small_vector = np.ones(len(self._times)) * gSmall
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -244,8 +244,8 @@ class Interpolator():
 
             """ Second derivatives at left is zero and first derivative at
             right is clamped to zero. """
-            gSmallVector = np.ones(len(self._times)) * gSmall
-            zero_rates = -np.log(self._dfs) / (self._times + gSmallVector)
+            g_small_vector = np.ones(len(self._times)) * gSmall
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -263,8 +263,8 @@ class Interpolator():
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
             """ Second derivatives are clamped to zero at end points """
-            gSmallVector = np.ones(len(self._times)) * gSmall
-            zero_rates = -np.log(self._dfs) / (self._times + gSmallVector)
+            g_small_vector = np.ones(len(self._times)) * gSmall
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]

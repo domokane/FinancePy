@@ -777,7 +777,7 @@ class Bond:
         clean_price = np.array(clean_price)
         self.accrued_interest(settle_dt, 1.0)
         accrued_amount = self._accrued_interest * self._par
-        bondPrice = clean_price + accrued_amount
+        bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pvIbor = 0.0
         prev_dt = self._pcd
@@ -811,7 +811,7 @@ class Bond:
             pv01 = pv01 + year_frac * df
             prev_dt = dt
 
-        asw = (pvIbor - bondPrice / self._par) / pv01
+        asw = (pvIbor - bond_price / self._par) / pv01
         return asw
 
     ###########################################################################
@@ -1004,18 +1004,23 @@ class Bond:
                  end_ytm: float,
                  convention: YTMCalcType = YTMCalcType.US_STREET):
         """
-        Calculate the rate of total return(capital return and interest) given a BUY YTM and a SELL YTM of this bond.
-        This function computes the full prices at buying and selling, plus the coupon payments during the period.
-        It returns a tuple which includes a simple rate of return, a compounded IRR and the PnL.
+        Calculate the rate of total return(capital return and interest) given a
+        BUY YTM and a SELL YTM of this bond.
+        This function computes the full prices at buying and selling, plus the
+        coupon payments during the period.
+        It returns a tuple which includes a simple rate of return, a compounded
+        IRR and the PnL.
         """
         buy_price = self.dirty_price_from_ytm(
             begin_dt, begin_ytm, convention)
         sell_price = self.dirty_price_from_ytm(end_dt, end_ytm, convention)
         dates_cfs = zip(self._cpn_dts, self._flow_amounts)
+
         # The coupon or par payments on buying date belong to the buyer.
         # The coupon or par payments on selling date are given to the new buyer.
         dates_cfs = [(d, c * self._par)
                      for (d, c) in dates_cfs if (d >= begin_dt) and (d < end_dt)]
+
         dates_cfs.append((begin_dt, -buy_price))
         dates_cfs.append((end_dt, sell_price))
         times_cfs = [((d - begin_dt)/365, c) for (d, c) in dates_cfs]

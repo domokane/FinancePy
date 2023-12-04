@@ -160,28 +160,28 @@ def _value_convertible(tmat,
     d = 1.0 / u
     u2 = u * u
     treeStockValue[0, 0] = stock_price
-    for iTime in range(1, num_times):
-        s = treeStockValue[iTime - 1, 0] * d
-        treeStockValue[iTime, 0] = s
+    for i_time in range(1, num_times):
+        s = treeStockValue[i_time - 1, 0] * d
+        treeStockValue[i_time, 0] = s
 
-        for iNode in range(1, iTime + 1):
+        for i_node in range(1, i_time + 1):
             s = s * u2
-            treeStockValue[iTime, iNode] = s
+            treeStockValue[i_time, i_node] = s
 
         # we now reduce all stocks by the same yield amount at the same date
-        y = treeDividendYield[iTime]
-        for iNode in range(0, iTime + 1):
-            treeStockValue[iTime, iNode] *= (1.0 - y)
+        y = treeDividendYield[i_time]
+        for i_node in range(0, i_time + 1):
+            treeStockValue[i_time, i_node] *= (1.0 - y)
 
     # set up the tree of conversion values. Before allowed to convert the
     # conversion value must be set equal to zero
 
     treeConvertValue = np.zeros(shape=(num_times, numLevels))
-    for iTime in range(0, num_times):
-        if tree_times[iTime] >= start_convert_time:
-            for iNode in range(0, iTime + 1):
-                s = treeStockValue[iTime, iNode]
-                treeConvertValue[iTime, iNode] = s * conv_ratio * 1.0
+    for i_time in range(0, num_times):
+        if tree_times[i_time] >= start_convert_time:
+            for i_node in range(0, i_time + 1):
+                s = treeStockValue[i_time, i_node]
+                treeConvertValue[i_time, i_node] = s * conv_ratio * 1.0
 
     #    print_tree(treeConvertValue)
 
@@ -191,10 +191,10 @@ def _value_convertible(tmat,
     treeProbsUp = np.zeros(num_times)
     treeProbsDn = np.zeros(num_times)
     q = 0.0  # we have discrete dividends paid as dividend yields only
-    for iTime in range(1, num_times):
-        a = treeDfs[iTime - 1] / treeDfs[iTime] * exp(-q * dt)
-        treeProbsUp[iTime] = (a - d * survival_prob) / (u - d)
-        treeProbsDn[iTime] = (u * survival_prob - a) / (u - d)
+    for i_time in range(1, num_times):
+        a = treeDfs[i_time - 1] / treeDfs[i_time] * exp(-q * dt)
+        treeProbsUp[i_time] = (a - d * survival_prob) / (u - d)
+        treeProbsDn[i_time] = (u * survival_prob - a) / (u - d)
     #        r = log(a)/dt
     #        n_min = r*r / stock_volatility / stock_volatility
 
@@ -207,30 +207,30 @@ def _value_convertible(tmat,
 
     flow = treeFlows[num_times - 1]
     bulletPV = (1.0 + flow) * face_amount
-    for iNode in range(0, numLevels):
-        convValue = treeConvertValue[num_times - 1, iNode]
-        treeConvBondValue[num_times - 1, iNode] = max(bulletPV, convValue)
+    for i_node in range(0, numLevels):
+        convValue = treeConvertValue[num_times - 1, i_node]
+        treeConvBondValue[num_times - 1, i_node] = max(bulletPV, convValue)
 
     #  begin backward steps from expiry
-    for iTime in range(num_times - 2, -1, -1):
+    for i_time in range(num_times - 2, -1, -1):
 
-        pUp = treeProbsUp[iTime + 1]
-        pDn = treeProbsDn[iTime + 1]
+        pUp = treeProbsUp[i_time + 1]
+        pDn = treeProbsDn[i_time + 1]
         pDef = 1.0 - survival_prob
-        df = treeDfs[iTime + 1] / treeDfs[iTime]
-        call = tree_call_value[iTime]
-        put = tree_put_value[iTime]
-        flow = treeFlows[iTime]
+        df = treeDfs[i_time + 1] / treeDfs[i_time]
+        call = tree_call_value[i_time]
+        put = tree_put_value[i_time]
+        flow = treeFlows[i_time]
 
-        for iNode in range(0, iTime + 1):
-            futValueUp = treeConvBondValue[iTime + 1, iNode + 1]
-            futValueDn = treeConvBondValue[iTime + 1, iNode]
+        for i_node in range(0, i_time + 1):
+            futValueUp = treeConvBondValue[i_time + 1, i_node + 1]
+            futValueDn = treeConvBondValue[i_time + 1, i_node]
             hold = pUp * futValueUp + pDn * futValueDn  # pUp already embeds Q
             holdPV = df * hold + pDef * df * recovery_rate * face_amount \
                 + flow * face_amount
-            conv = treeConvertValue[iTime, iNode]
+            conv = treeConvertValue[i_time, i_node]
             value = min(max(holdPV, conv, put), call)
-            treeConvBondValue[iTime, iNode] = value
+            treeConvBondValue[i_time, i_node] = value
 
         bulletPV = df * bulletPV * survival_prob
         bulletPV += pDef * df * recovery_rate * face_amount

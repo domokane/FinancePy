@@ -33,10 +33,10 @@ class BlackShifted():
 ###############################################################################
 
     def value(self,
-              forward_rate,   # Forward rate
-              strike_rate,    # Strike Rate
+              forward_rate,    # Forward rate
+              strike_rate,     # Strike Rate
               time_to_expiry,  # time to expiry in years
-              df,            # Discount Factor to expiry date
+              df,              # Discount Factor to expiry date
               call_or_put):    # Call or put
         """ Price a derivative using Black's model which values in the forward
         measure following a change of measure. The sign of the shift is the

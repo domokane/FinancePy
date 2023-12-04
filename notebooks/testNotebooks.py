@@ -35,13 +35,14 @@ def notebook_run_new(notebook_filepathname):
     nb = nbformat.read(open(notebook), as_version=4)
     ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
 
-    notebook_filename_out = dirname + "\ERROR_" + filename
+    notebook_filename_out = dirname + "//ERROR_" + filename
 
     try:
-        out = ep.preprocess(nb, {'metadata': {'path': "./"}})
+
+        out = ep.preprocess(nb, {'metadata': {'path': ".//"}})
+
     except CellExecutionError:
 
-        out = None
         msg = 'Error executing the notebook "%s".\n\n' % filename
         msg += 'See notebook "%s" for the traceback.' % notebook_filename_out
         print(msg)

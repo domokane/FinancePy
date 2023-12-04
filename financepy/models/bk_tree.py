@@ -144,7 +144,7 @@ def search_root_deriv(x0, nm, Q, P, dX, dt, N):
 def bermudan_swaption_tree_fast(t_exp, tmat,
                                 strike_price, face_amount,
                                 cpn_times, cpn_flows,
-                                exercise_typeInt,
+                                exercise_type_int,
                                 _df_times, _df_values,
                                 _tree_times, _Q,
                                 _pu, _pm, _pd,
@@ -155,7 +155,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
     cash flows through time. """
 
     num_time_steps, num_nodes = _Q.shape
-    jmax = ceil(0.1835/(_a * _dt))
+    j_max = ceil(0.1835/(_a * _dt))
     expiry_step = int(t_exp/_dt + 0.50)
     maturity_step = int(tmat/_dt + 0.50)
 
@@ -259,11 +259,11 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
         flow = 1.0 + fixed_leg_flows[maturity_step]
         fixed_leg_values[maturity_step, k] = flow * face_amount
 
-    N = jmax
+    N = j_max
 
     # Now step back to today considering early exercise on coupon dates
     for m in range(maturity_step-1, -1, -1):
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         flow = fixed_leg_flows[m] * face_amount
 
         for k in range(-nm, nm+1):
@@ -274,13 +274,13 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = fixed_leg_values[m+1, kN]
                 vm = fixed_leg_values[m+1, kN-1]
                 vd = fixed_leg_values[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 fixed_leg_values[m, kN] = v
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = fixed_leg_values[m+1, kN+2]
                 vm = fixed_leg_values[m+1, kN+1]
                 vd = fixed_leg_values[m+1, kN]
@@ -297,12 +297,12 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
             vpay = 0.0
             vrec = 0.0
 
-            if k == jmax:
+            if k == j_max:
                 vu = pay_values[m+1, kN]
                 vm = pay_values[m+1, kN-1]
                 vd = pay_values[m+1, kN-2]
                 vpay = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = pay_values[m+1, kN+2]
                 vm = pay_values[m+1, kN+1]
                 vd = pay_values[m+1, kN]
@@ -315,12 +315,12 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
             pay_values[m, kN] = vpay
 
-            if k == jmax:
+            if k == j_max:
                 vu = rec_values[m+1, kN]
                 vm = rec_values[m+1, kN-1]
                 vd = rec_values[m+1, kN-2]
                 vrec = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = rec_values[m+1, kN+2]
                 vm = rec_values[m+1, kN+1]
                 vd = rec_values[m+1, kN]
@@ -333,36 +333,36 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
             rec_values[m, kN] = vrec
 
-            holdPay = pay_values[m, kN]
-            holdRec = rec_values[m, kN]
+            hold_pay = pay_values[m, kN]
+            hold_rec = rec_values[m, kN]
 
             # The floating value is clean and so must be the fixed value
             fixed_leg_value = fixed_leg_values[m, kN] - accrued[m]
             float_leg_value = float_leg_values[m]
 
-            payExercise = max(float_leg_value - fixed_leg_value, 0.0)
-            recExercise = max(fixed_leg_value - float_leg_value, 0.0)
+            pay_exercise = max(float_leg_value - fixed_leg_value, 0.0)
+            rec_exercise = max(fixed_leg_value - float_leg_value, 0.0)
 
             if m == expiry_step:
 
-                pay_values[m, kN] = max(payExercise, holdPay)
-                rec_values[m, kN] = max(recExercise, holdRec)
+                pay_values[m, kN] = max(pay_exercise, hold_pay)
+                rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 2 and flow > gSmall and m > expiry_step:
+            elif exercise_type_int == 2 and flow > gSmall and m > expiry_step:
 
-                pay_values[m, kN] = max(payExercise, holdPay)
-                rec_values[m, kN] = max(recExercise, holdRec)
+                pay_values[m, kN] = max(pay_exercise, hold_pay)
+                rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 3 and m > expiry_step:
+            elif exercise_type_int == 3 and m > expiry_step:
 
                 raise FinError("American optionality not allowed.")
 
                 # Need to define floating value on all grid dates
 
-                pay_values[m, kN] = max(payExercise, holdPay)
-                rec_values[m, kN] = max(recExercise, holdRec)
+                pay_values[m, kN] = max(pay_exercise, hold_pay)
+                rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-    return pay_values[0, jmax], rec_values[0, jmax]
+    return pay_values[0, j_max], rec_values[0, j_max]
 
 ###############################################################################
 
@@ -371,7 +371,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 def american_bond_option_tree_fast(t_exp, tmat,
                                    strike_price, face_amount,
                                    cpn_times, cpn_flows,
-                                   exercise_typeInt,
+                                   exercise_type_int,
                                    _df_times, _df_values,
                                    _tree_times, _Q,
                                    _pu, _pm, _pd,
@@ -386,7 +386,7 @@ def american_bond_option_tree_fast(t_exp, tmat,
     ###########################################################################
 
     num_time_steps, num_nodes = _Q.shape
-    jmax = ceil(0.1835/(_a * _dt))
+    j_max = ceil(0.1835/(_a * _dt))
     expiry_step = int(t_exp/_dt + 0.50)
     maturity_step = int(tmat/_dt + 0.50)
 
@@ -453,11 +453,11 @@ def american_bond_option_tree_fast(t_exp, tmat,
     # Step back from maturity to expiry date but with no exercise allowed.
     for m in range(maturity_step-1, expiry_step, -1):
 
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         flow = tree_flows[m] * face_amount
 
         for k in range(-nm, nm+1):
-            kN = k + jmax
+            kN = k + j_max
             r = _rt[m, kN]
             df = np.exp(-r * _dt)
 
@@ -465,13 +465,13 @@ def american_bond_option_tree_fast(t_exp, tmat,
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = bond_values[m+1, kN]
                 vm = bond_values[m+1, kN-1]
                 vd = bond_values[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 bond_values[m, kN] = v
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = bond_values[m+1, kN+2]
                 vm = bond_values[m+1, kN+1]
                 vd = bond_values[m+1, kN]
@@ -491,12 +491,12 @@ def american_bond_option_tree_fast(t_exp, tmat,
 
     # Now consider exercise of the option on and before the expiry date
     for m in range(expiry_step, -1, -1):
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         flow = tree_flows[m] * face_amount
 
         for k in range(-nm, nm+1):
 
-            kN = k + jmax
+            kN = k + j_max
             r = _rt[m, kN]
             df = np.exp(-r * _dt)
 
@@ -504,13 +504,13 @@ def american_bond_option_tree_fast(t_exp, tmat,
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = bond_values[m+1, kN]
                 vm = bond_values[m+1, kN-1]
                 vd = bond_values[m+1, kN-2]
                 v = (pu*vu + pm*vm + pd*vd) * df
                 bond_values[m, kN] = v
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = bond_values[m+1, kN+2]
                 vm = bond_values[m+1, kN+1]
                 vd = bond_values[m+1, kN]
@@ -528,12 +528,12 @@ def american_bond_option_tree_fast(t_exp, tmat,
             vcall = 0.0
             vput = 0.0
 
-            if k == jmax:
+            if k == j_max:
                 vu = call_option_values[m+1, kN]
                 vm = call_option_values[m+1, kN-1]
                 vd = call_option_values[m+1, kN-2]
                 vcall = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = call_option_values[m+1, kN+2]
                 vm = call_option_values[m+1, kN+1]
                 vd = call_option_values[m+1, kN]
@@ -546,12 +546,12 @@ def american_bond_option_tree_fast(t_exp, tmat,
 
             call_option_values[m, kN] = vcall
 
-            if k == jmax:
+            if k == j_max:
                 vu = put_option_values[m+1, kN]
                 vm = put_option_values[m+1, kN-1]
                 vd = put_option_values[m+1, kN-2]
                 vput = (pu*vu + pm*vm + pd*vd) * df
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = put_option_values[m+1, kN+2]
                 vm = put_option_values[m+1, kN+1]
                 vd = put_option_values[m+1, kN]
@@ -577,7 +577,7 @@ def american_bond_option_tree_fast(t_exp, tmat,
                 call_option_values[m, kN] = max(call_exercise, holdCall)
                 put_option_values[m, kN] = max(put_exercise, holdPut)
 
-            elif exercise_typeInt == 3 and m < expiry_step:  # AMERICAN
+            elif exercise_type_int == 3 and m < expiry_step:  # AMERICAN
 
                 call_option_values[m, kN] = max(call_exercise, holdCall)
                 put_option_values[m, kN] = max(put_exercise, holdPut)
@@ -586,7 +586,7 @@ def american_bond_option_tree_fast(t_exp, tmat,
             print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
                   call_exercise, put_exercise)
 
-    return call_option_values[0, jmax], put_option_values[0, jmax]
+    return call_option_values[0, j_max], put_option_values[0, j_max]
 
 ###############################################################################
 
@@ -606,7 +606,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     #######################################################################
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
-    jmax = ceil(0.1835/(_a * _dt))
+    j_max = ceil(0.1835/(_a * _dt))
     tmat = cpn_times[-1]
     maturity_step = int(tmat/dt + 0.50)
 
@@ -693,7 +693,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     ###########################################################################
 
     m = maturity_step
-    nm = min(maturity_step, jmax)
+    nm = min(maturity_step, j_max)
     vcall = tree_call_value[m]
     vput = tree_put_value[m]
     vhold = (1.0 + tree_flows[m]) * face_amount
@@ -701,29 +701,29 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     value = min(max(vclean, vput), vcall) + accrued[m]
 
     for k in range(-nm, nm+1):
-        kN = k + jmax
+        kN = k + j_max
         bond_values[m, kN] = (1.0 + tree_flows[m]) * face_amount
         callPutBondValues[m, kN] = value
 
     for m in range(maturity_step-1, -1, -1):
-        nm = min(m, jmax)
+        nm = min(m, j_max)
         flow = tree_flows[m] * face_amount
         vcall = tree_call_value[m]
         vput = tree_put_value[m]
 
         for k in range(-nm, nm+1):
-            kN = k + jmax
+            kN = k + j_max
             rt = _rt[m, kN]
             df = np.exp(-rt*dt)
             pu = _pu[kN]
             pm = _pm[kN]
             pd = _pd[kN]
 
-            if k == jmax:
+            if k == j_max:
                 vu = bond_values[m+1, kN]
                 vm = bond_values[m+1, kN-1]
                 vd = bond_values[m+1, kN-2]
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = bond_values[m+1, kN+2]
                 vm = bond_values[m+1, kN+1]
                 vd = bond_values[m+1, kN]
@@ -736,11 +736,11 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
             bond_values[m, kN] = v
             bond_values[m, kN] += flow
 
-            if k == jmax:
+            if k == j_max:
                 vu = callPutBondValues[m+1, kN]
                 vm = callPutBondValues[m+1, kN-1]
                 vd = callPutBondValues[m+1, kN-2]
-            elif k == -jmax:
+            elif k == -j_max:
                 vu = callPutBondValues[m+1, kN+2]
                 vm = callPutBondValues[m+1, kN+1]
                 vd = callPutBondValues[m+1, kN]
@@ -755,8 +755,8 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
             callPutBondValues[m, kN] = value
 
-    return {'bondwithoption': callPutBondValues[0, jmax],
-            'bondpure': bond_values[0, jmax]}
+    return {'bondwithoption': callPutBondValues[0, j_max],
+            'bondpure': bond_values[0, j_max]}
 
 ###############################################################################
 
@@ -768,35 +768,35 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     treeMaturity = tree_times[-1]
     dt = treeMaturity / (num_time_steps+1)
     dX = sigma * np.sqrt(3.0 * dt)
-    jmax = ceil(0.1835/(a * dt))
+    j_max = ceil(0.1835/(a * dt))
 
-    if jmax > 1000:
-        raise FinError("Jmax > 1000. Increase a or dt.")
+    if j_max > 1000:
+        raise FinError("j_max > 1000. Increase a or dt.")
 
-    pu = np.zeros(shape=(2*jmax+1))
-    pm = np.zeros(shape=(2*jmax+1))
-    pd = np.zeros(shape=(2*jmax+1))
+    pu = np.zeros(shape=(2*j_max+1))
+    pm = np.zeros(shape=(2*j_max+1))
+    pd = np.zeros(shape=(2*j_max+1))
 
     # The short rate goes out one step extra to have the final short rate
     # This is the BK model so x = log(r)
-    X = np.zeros(shape=(num_time_steps+2, 2*jmax+1))
-    rt = np.zeros(shape=(num_time_steps+2, 2*jmax+1))
+    X = np.zeros(shape=(num_time_steps+2, 2*j_max+1))
+    rt = np.zeros(shape=(num_time_steps+2, 2*j_max+1))
 
     # probabilities start at time 0 and go out to one step before T
     # Branching is simple trinomial out to time step m=1 after which
     # the top node and bottom node connect internally to two lower nodes
     # and two upper nodes respectively. The probabilities only depend on j
 
-    for j in range(-jmax, jmax+1):
+    for j in range(-j_max, j_max+1):
 
         ajdt = a*j*dt
-        jN = j + jmax
+        jN = j + j_max
 
-        if j == jmax:
+        if j == j_max:
             pu[jN] = 7.0/6.0 + 0.50 * (ajdt*ajdt - 3.0*ajdt)
             pm[jN] = -1.0/3.0 - ajdt * ajdt + 2.0 * ajdt
             pd[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt - ajdt)
-        elif j == -jmax:
+        elif j == -j_max:
             pu[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt + ajdt)
             pm[jN] = -1.0/3.0 - ajdt * ajdt - 2.0 * ajdt
             pd[jN] = 7.0/6.0 + 0.50 * (ajdt * ajdt + 3.0 * ajdt)
@@ -806,13 +806,13 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
             pd[jN] = 1.0/6.0 + 0.50 * (ajdt * ajdt + ajdt)
 
     # Arrow-Debreu array
-    Q = np.zeros(shape=(num_time_steps+2, 2*jmax+1))
+    Q = np.zeros(shape=(num_time_steps+2, 2*j_max+1))
 
     # This is the drift adjustment to ensure no arbitrage at each time
     alpha = np.zeros(num_time_steps+1)
 
     # Time zero is trivial for the Arrow-Debreu price
-    Q[0, jmax] = 1.0
+    Q[0, j_max] = 1.0
 
     # Estimate short rate over first year
     r0 = -np.log(discount_factors[1])/tree_times[1]
@@ -823,33 +823,33 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     # Big loop over time steps
     for m in range(0, num_time_steps + 1):
 
-        nm = min(m, jmax)
+        nm = min(m, j_max)
 
         # Need to do drift adjustment which is non-linear and so requires
         # a root search algorithm to find value of x0.
 
         alpha[m] = search_root_deriv(x0, nm, Q[m], discount_factors[m + 1],
-                                     dX, dt, jmax)
+                                     dX, dt, j_max)
 
         x0 = alpha[m]
 
         for j in range(-nm, nm+1):
-            jN = j + jmax
+            jN = j + j_max
             X[m, jN] = alpha[m] + j*dX
             rt[m, jN] = np.exp(X[m, jN])
 
         # Loop over all nodes at time m to calculate next values of Q
         for j in range(-nm, nm+1):
 
-            jN = j + jmax
+            jN = j + j_max
             rdt = np.exp(X[m, jN]) * dt
             z = np.exp(-rdt)
 
-            if j == jmax:
+            if j == j_max:
                 Q[m+1, jN] += Q[m, jN] * pu[jN] * z
                 Q[m+1, jN-1] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN-2] += Q[m, jN] * pd[jN] * z
-            elif j == -jmax:
+            elif j == -j_max:
                 Q[m+1, jN] += Q[m, jN] * pd[jN] * z
                 Q[m+1, jN+1] += Q[m, jN] * pm[jN] * z
                 Q[m+1, jN+2] += Q[m, jN] * pu[jN] * z
@@ -937,7 +937,7 @@ class BKTree():
         """ Value a bond option that has European or American exercise using
         the Black-Karasinski model. The model uses a trinomial tree. """
 
-        exercise_typeInt = option_exercise_types_to_int(exercise_type)
+        exercise_type_int = option_exercise_types_to_int(exercise_type)
 
         tmat = cpn_times[-1]
 
@@ -953,7 +953,7 @@ class BKTree():
             = american_bond_option_tree_fast(t_exp, tmat,
                                              strike_price, face_amount,
                                              cpn_times, cpn_flows,
-                                             exercise_typeInt,
+                                             exercise_type_int,
                                              self._df_times, self._dfs,
                                              self._tree_times, self._Q,
                                              self._pu, self._pm, self._pd,
@@ -970,7 +970,7 @@ class BKTree():
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time. """
 
-        exercise_typeInt = option_exercise_types_to_int(exercise_type)
+        exercise_type_int = option_exercise_types_to_int(exercise_type)
 
         tmat = cpn_times[-1]
 
@@ -986,7 +986,7 @@ class BKTree():
             = bermudan_swaption_tree_fast(t_exp, tmat,
                                           strike_price, face_amount,
                                           cpn_times, cpn_flows,
-                                          exercise_typeInt,
+                                          exercise_type_int,
                                           self._df_times, self._dfs,
                                           self._tree_times, self._Q,
                                           self._pu, self._pm, self._pd,
