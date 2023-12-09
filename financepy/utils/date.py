@@ -166,6 +166,7 @@ def calculate_list():
 
 @njit(fastmath=True, cache=True)
 def date_index(d, m, y):
+    ''' Calculate the index of a date assuming 31 days in all months '''
     idx = (y-g_start_year) * 12 * 31 + (m-1) * 31 + (d-1)
     return idx
 
@@ -186,8 +187,9 @@ def date_from_index(idx):
 
 @njit(fastmath=True, cache=True)
 def weekday(day_count):
-    weekday = (day_count+5) % 7
-    return weekday
+    ''' Converts day count to a weekday based on Excel date '''
+    week_day = (day_count+5) % 7
+    return week_day
 
 ###############################################################################
 
@@ -448,11 +450,11 @@ class Date():
         leap_year = is_leap_year(y)
 
         if leap_year:
-            lastDay = month_days_leap_year[m - 1]
-            return Date(lastDay, m, y)
+            last_day = month_days_leap_year[m - 1]
+            return Date(last_day, m, y)
         else:
-            lastDay = month_days_not_leap_year[m - 1]
-            return Date(lastDay, m, y)
+            last_day = month_days_not_leap_year[m - 1]
+            return Date(last_day, m, y)
 
         return False
 
@@ -470,11 +472,11 @@ class Date():
         hour = final_hour % 24
 
         # Move forward a specific number of days
-        dt1 = self.add_days(days)
+        dt_1 = self.add_days(days)
 
         # On that date we then move to the correct hour
-        dt2 = Date(dt1._d, dt1._m, dt1._y, hour, dt1._mm, dt1._ss)
-        return dt2
+        dt_2 = Date(dt_1.d(), dt_1.m(), dt_1.y(), hour, dt_1._mm, dt_1._ss)
+        return dt_2
 
     ###########################################################################
 
@@ -518,9 +520,10 @@ class Date():
         num_days = abs(num_days)
 
         # 5 week days make up a week
-        oldLogic = False
+        old_logic = False
 
-        if oldLogic is True:
+        if old_logic is True:
+
             num_weeks = int(num_days / 5)
             remaining_days = num_days % 5
 
@@ -531,14 +534,16 @@ class Date():
             else:
                 weekend_adjust = 2
 
-            if (positive_num_days):
-                if (self._weekday + remaining_days > self.FRI):
+            if positive_num_days is True:
+                if self._weekday + remaining_days > self.FRI:
                     # add weekend
                     remaining_days += weekend_adjust
 
                 return self.add_days(num_weeks * 7 + remaining_days)
+
             else:
-                if (self._weekday - remaining_days < self.MON):
+
+                if self._weekday - remaining_days < self.MON:
                     # add weekend
                     remaining_days += weekend_adjust
 
@@ -556,7 +561,7 @@ class Date():
                 else:
                     end_dt = end_dt.add_days(-1)
 
-                if end_dt._weekday == Date.SAT or end_dt._weekday == Date.SUN:
+                if end_dt.weekday() == Date.SAT or end_dt.weekday() == Date.SUN:
                     pass
                 else:
                     num_days_left -= 1
@@ -673,9 +678,9 @@ class Date():
 
         next_dt = self.add_months(mm)
 
-        y = next_dt._y
-        m = next_dt._m
-        d = next_dt._d
+        y = next_dt.y()
+        m = next_dt.m()
+        d = next_dt.d()
 
         d_cds = 20
         y_cds = y
@@ -699,8 +704,8 @@ class Date():
         elif m == 1 or m == 2 or m == 3:
             m_cds = 3
 
-        cdsDate = Date(d_cds, m_cds, y_cds)
-        return cdsDate
+        cds_date = Date(d_cds, m_cds, y_cds)
+        return cds_date
 
     ##########################################################################
 
@@ -719,7 +724,7 @@ class Date():
 
         for d in range(d_start, d_end+1):
             imm_date = Date(d, m, y)
-            if imm_date._weekday == self.WED:
+            if imm_date.weekday() == self.WED:
                 return d
 
         # Should never reach this line but just to be defensive
@@ -833,9 +838,9 @@ class Date():
                     new_date = new_date.add_months(math.copysign(1, num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day we add this logic
-                y = new_date._y
-                m = new_date._m
-                d = min(self._d, new_date.eom()._d)
+                y = new_date.y()
+                m = new_date.m()
+                d = min(self.d(), new_date.eom()._d)
                 new_date = Date(d, m, y)
 
             elif period_type == YEARS:
@@ -861,7 +866,7 @@ class Date():
     # TODO: Find elegant way to return long and short strings
     ###########################################################################
 
-    def str(self, format):
+    def str(self, format=None):
         """ returns a formatted string of the date """
         date_str = ""
 
@@ -925,8 +930,7 @@ class Date():
         elif g_date_type_format == DateFormatTypes.US_LONGEST:
 
             sep = " "
-            date_str = day_name_str + " " + long_month_str + sep + day_str
-            + sep + long_year_str
+            date_str = day_name_str + " " + long_month_str + sep + day_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.US_LONG:
@@ -1015,7 +1019,7 @@ def daily_working_day_schedule(self,
 def datediff(d1: Date,
              d2: Date):
     """ Calculate the number of days between two Findates. """
-    dd = (d2._excel_dt - d1._excel_dt)
+    dd = d2.excel_dt() - d1.excel_dt()
     return int(dd)
 
 ###############################################################################
