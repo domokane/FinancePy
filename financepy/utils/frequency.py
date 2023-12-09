@@ -31,7 +31,8 @@ def annual_frequency(freq_type: FrequencyTypes):
 
     if freq_type == FrequencyTypes.CONTINUOUS:
         return -1
-    elif freq_type == FrequencyTypes.ZERO: # This means that there is no regular coupon I use 1 to avoid division by zero
+    elif freq_type == FrequencyTypes.ZERO:
+        # This means that there is no coupon and I use 1 to avoid div by zero
         return 1.0
     elif freq_type == FrequencyTypes.ANNUAL:
         return 1.0

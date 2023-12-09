@@ -39,15 +39,15 @@ class Schedule:
         """ Create Schedule object which calculates a sequence of dates
         following the ISDA convention for fixed income products, mainly swaps.
 
-        If the date gen rule type is FORWARD we get the unadjusted dates by stepping
-        forward from the effective date in steps of months determined by the period
-        tenor - i.e. the number of months between payments. We stop before we go past the
-        termination date.
+        If the date gen rule type is FORWARD we get the unadjusted dates by
+        stepping forward from the effective date in steps of months determined
+        by the period tenor - i.e. the number of months between payments. We
+        stop before we go past the termination date.
 
         If the date gen rule type is BACKWARD we get the unadjusted dates by
-        stepping backward from the termination date in steps of months determined by
-        the period tenor - i.e. the number of months between payments. We stop
-        before we go past the effective date.
+        stepping backward from the termination date in steps of months
+        determined by the period tenor - i.e. the number of months between
+        payments. We stop before we go past the effective date.
 
         - If the EOM flag is false, and the start date is on the 31st then the
         the unadjusted dates will fall on the 30 if a 30 is a previous date.
@@ -207,7 +207,7 @@ class Schedule:
         if self._adjust_termination_dt is True:
 
             self._termination_dt = calendar.adjust(self._termination_dt,
-                                                     self._bd_type)
+                                                   self._bd_type)
 
             self._adjusted_dts[-1] = self._termination_dt
 

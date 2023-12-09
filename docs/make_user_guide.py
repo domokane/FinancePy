@@ -306,9 +306,9 @@ def parse_module(module_name):
     start_function_lines = []
 
     # Module level classes and functions
-    numRows = len(lines)
+    num_rows = len(lines)
 
-    for row_num in range(0, numRows):
+    for row_num in range(0, num_rows):
 
         line = lines[row_num]
 
@@ -324,9 +324,9 @@ def parse_module(module_name):
             num_functions += 1
             start_function_lines.append(row_num)
 
-    start_enum_lines.append(numRows)
-    start_class_lines.append(numRows)
-    start_function_lines.append(numRows)
+    start_enum_lines.append(num_rows)
+    start_class_lines.append(num_rows)
+    start_function_lines.append(num_rows)
 
     # print("start_class_lines", start_class_lines)
 
@@ -870,7 +870,7 @@ if 1 == 1:
     os.remove(file_name + ".toc")
     os.remove(file_name + ".aux")
 #    os.remove(file_name + ".fls")
-    os.remove(file_name + ".fdb_latexmk")
+#    os.remove(file_name + ".fdb_latexmk")
     os.remove(file_name + ".log")
     os.remove(new_head_file)
     os.remove(new_head_file + ".bak")

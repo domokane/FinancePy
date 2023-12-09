@@ -36,9 +36,9 @@ def accrued_interpolator(t_set: float,  # Settlement time in years
         denom = (nct-pct)
 
         if t_set >= pct and t_set < nct:
-            accdFrac = (t_set-pct) / denom
-            accdCpn = accdFrac * cpn_amounts[i]
-            return accdCpn
+            accd_frac = (t_set-pct) / denom
+            accd_cpn = accd_frac * cpn_amounts[i]
+            return accd_cpn
 
     # TODO: NEED TO REVISIT THIS TODO
     return 0.0
@@ -506,7 +506,7 @@ def norminvcdf(p):
     d3 = 2.445134137143
     d4 = 3.75440866190742
 
-    inverseCDF = 0.0
+    inverse_cdf = 0.0
 
     # Define break-points
     p_low = 0.02425
@@ -525,21 +525,22 @@ def norminvcdf(p):
     if p < p_low:
         # Rational approximation for lower region
         q = np.sqrt(-2.0 * np.log(p))
-        inverseCDF = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
-                      * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+        inverse_cdf = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
+                       * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q
+                           + 1.0)
     elif p <= p_high:
         # Rational approximation for lower region
         q = p - 0.5
         r = q * q
-        inverseCDF = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * \
+        inverse_cdf = (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * \
             q / (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1.0)
     elif p < 1.0:
         # Rational approximation for upper region
         q = np.sqrt(-2.0 * np.log(1 - p))
-        inverseCDF = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
+        inverse_cdf = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
                        * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
 
-    return inverseCDF
+    return inverse_cdf
 
 ###############################################################################
 # This is used for consistency with Haug and its conciseness. Consider renaming
@@ -656,14 +657,15 @@ def corr_matrix_generator(rho, n):
 
 @njit(fastmath=True, cache=True)
 def npv(irr: float, times_cfs: list):
-    """
-    Function to calculate the npv given irr and cashflow. It can be used to do root search in IRR.
-    times_cfs is a list of tuples. The tuple is in the form of (years from first date, cashflow)
-    """
+    ''' Function to calculate the npv given irr and cashflow. It can be used to
+    do root search in IRR. times_cfs is a list of tuples. The tuple is in
+    the form of (years from first date, cashflow) '''
     _npv = 0
     for t, c in times_cfs:
         _npv += c / ((1 + irr) ** t)
     return _npv
+
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -684,6 +686,8 @@ def band_matrix_multiplication(A, m1, m2, b):
 
     return x
 
+###############################################################################
+
 
 @njit(fastmath=True, cache=True)
 def solve_tridiagonal_matrix(A, r):
@@ -700,7 +704,7 @@ def solve_tridiagonal_matrix(A, r):
     a, b, c = A.T
 
     if b[0] == 0:
-        raise ValueError("First entry is zero, rewrite as set of N-1 equations")
+        raise ValueError("First entry is zero, rewrite as set of N-1 eqns")
 
     n = len(a)  # Length of output vector
     u = np.zeros(n)  # Output vector
@@ -723,6 +727,8 @@ def solve_tridiagonal_matrix(A, r):
         u[j] -= gam[j + 1] * u[j + 1]
 
     return u
+
+###############################################################################
 
 
 @njit(fastmath=True, cache=True)

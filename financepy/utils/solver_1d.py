@@ -579,7 +579,8 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
 
 
 @njit(cache=True, fastmath=True)
-def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None, verbose=False, concise=False):
+def minimize_wolfe_powel(f, X, length, fargs=(), reduction=None,
+                         verbose=False, concise=False):
     """
     Minimize a differentiable multivariate function.
     Parameters

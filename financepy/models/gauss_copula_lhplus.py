@@ -15,7 +15,7 @@ class LHPlusModel():
     """ Large Homogenous Portfolio model with extra asset. Used for
     approximating full Gaussian copula. """
 
-    def __init__(self, P, R, H, beta, P0, R0, H0, beta0):
+    def __init__(self, P, R, H, beta, P0, R0, H0, beta_0):
         self._P = P
         self._R = R
         self._H = H
@@ -23,7 +23,7 @@ class LHPlusModel():
         self._P0 = P0
         self._R0 = R0
         self._H0 = H0
-        self._beta0 = beta0
+        self._beta_0 = beta_0
 
 ###############################################################################
 
@@ -59,7 +59,7 @@ class LHPlusModel():
         b = (1.0 / self._beta) * \
             ((c - RtOneMinusBeta2 * invb))
 
-        probLgtK = N(a) + M(c0, b, self._beta0) - M(c0, a, self._beta0)
+        probLgtK = N(a) + M(c0, b, self._beta_0) - M(c0, a, self._beta_0)
 
         return probLgtK
 
@@ -112,13 +112,13 @@ class LHPlusModel():
         b = 1.0 / self._beta * (c - RtOneMinusBeta2 * invb)
 
         r12 = self._beta
-        r13 = self._beta0
-        r23 = self._beta * self._beta0
+        r13 = self._beta_0
+        r23 = self._beta * self._beta_0
 
         el1 = self._P * self._H * (1.0 - self._R)
         el2 = self._P0 * self._H0 * (1.0 - self._R0)
-        el3 = -K * (M(c0, a, self._beta0) - N(a))
-        el4 = - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
+        el3 = -K * (M(c0, a, self._beta_0) - N(a))
+        el4 = - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta_0)
         term1 = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
             - phi3(a, c, c0, r12, r13, r23)
         el5 = - (1.0 - self._R) * self._H * term1
@@ -151,13 +151,13 @@ class LHPlusModel():
         b = (1.0 / self._beta) * (c - RtOneMinusBeta2 * invb)
 
         r12 = self._beta
-        r13 = self._beta0
-        r23 = self._beta * self._beta0
+        r13 = self._beta_0
+        r23 = self._beta * self._beta_0
 
         el1 = self._P * self._H * (1.0 - self._R) + \
             self._P0 * self._H0 * (1.0 - self._R0)
-        el1 = el1 - K * (M(c0, a, self._beta0) - N(a))
-        el1 = el1 - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta0)
+        el1 = el1 - K * (M(c0, a, self._beta_0) - N(a))
+        el1 = el1 - ((1.0 - self._R0) * self._H0 - K) * M(c0, b, self._beta_0)
 
         term = M(c, a, self._beta) + phi3(b, c, c0, r12, r13, r23) \
             - phi3(a, c, c0, r12, r13, r23)

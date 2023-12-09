@@ -197,9 +197,9 @@ def _vinterpolate(xValues,
 class Interpolator():
 
     def __init__(self,
-                 interpolatorType: InterpTypes):
+                 interpolator_type: InterpTypes):
 
-        self._interp_type = interpolatorType
+        self._interp_type = interpolator_type
         self._interp_fn = None
         self._times = None
         self._dfs = None

@@ -33,16 +33,16 @@ def _barrier_pay_one_at_hit_pv_down(s, H, r, dt):
     pv = 0.0
 
     for ip in range(0, num_paths):
-        hitFlag = 0
+        hit_flag = 0
 
         for it in range(0, num_time_steps):
             if s[ip][it] <= H:
-                hitTime = dt * it
-                v = np.exp(-r * hitTime)
-                hitFlag = 1
+                hit_time = dt * it
+                v = np.exp(-r * hit_time)
+                hit_flag = 1
                 break
 
-        pv = pv + v * hitFlag
+        pv = pv + v * hit_flag
 
     pv = pv / num_paths
     return pv
@@ -58,16 +58,16 @@ def _barrier_pay_one_at_hit_pv_up(s, H, r, dt):
     pv = 0.0
 
     for ip in range(0, num_paths):
-        hitFlag = 0
+        hit_flag = 0
 
         for it in range(0, num_time_steps):
             if s[ip][it] >= H:
-                hitTime = dt * it
-                v = np.exp(-r * hitTime)
-                hitFlag = 1
+                hit_time = dt * it
+                v = np.exp(-r * hit_time)
+                hit_flag = 1
                 break
 
-        pv = pv + v * hitFlag
+        pv = pv + v * hit_flag
 
     pv = pv / num_paths
     return pv
@@ -82,14 +82,14 @@ def _barrier_pay_asset_at_expiry_down_out(s, H):
     pv = 0.0
 
     for ip in range(0, num_paths):
-        hitFlag = 1
+        hit_flag = 1
 
         for it in range(0, num_time_steps):
             if s[ip][it] <= H:
-                hitFlag = 0
+                hit_flag = 0
                 break
 
-        pv = pv + hitFlag * s[ip][num_time_steps-1]
+        pv = pv + hit_flag * s[ip][num_time_steps-1]
 
     pv = pv / num_paths
     return pv
@@ -105,14 +105,14 @@ def _barrier_pay_asset_at_expiry_up_out(s, H):
     pv = 0.0
 
     for ip in range(0, num_paths):
-        hitFlag = 1
+        hit_flag = 1
 
         for it in range(0, num_time_steps):
             if s[ip][it] >= H:
-                hitFlag = 0
+                hit_flag = 0
                 break
 
-        pv = pv + hitFlag * s[ip][num_time_steps-1]
+        pv = pv + hit_flag * s[ip][num_time_steps-1]
 
     pv = pv / num_paths
     return pv

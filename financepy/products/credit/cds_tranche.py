@@ -130,15 +130,15 @@ class CDSTranche:
         num_payments = len(payment_dts)
         num_times = num_payments + 1
 
-        beta1 = sqrt(corr1)
-        beta2 = sqrt(corr2)
+        beta_1 = sqrt(corr1)
+        beta_2 = sqrt(corr2)
         beta_vector1 = np.zeros(num_credits)
         for bb in range(0, num_credits):
-            beta_vector1[bb] = beta1
+            beta_vector1[bb] = beta_1
 
         beta_vector2 = np.zeros(num_credits)
         for bb in range(0, num_credits):
-            beta_vector2[bb] = beta2
+            beta_vector2[bb] = beta_2
 
         q_vector = np.zeros(num_credits)
         qt1 = np.zeros(num_times)  # include 1.0
@@ -205,10 +205,10 @@ class CDSTranche:
             elif model == FinLossDistributionBuilder.LHP:
 
                 qt1[i] = tr_surv_prob_lhp(
-                    0.0, k1, num_credits, q_vector, recovery_rates, beta1)
+                    0.0, k1, num_credits, q_vector, recovery_rates, beta_1)
 
                 qt2[i] = tr_surv_prob_lhp(
-                    0.0, k2, num_credits, q_vector, recovery_rates, beta2)
+                    0.0, k2, num_credits, q_vector, recovery_rates, beta_2)
 
             else:
                 raise FinError(

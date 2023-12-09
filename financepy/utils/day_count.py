@@ -2,7 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from .date import Date, monthDaysLeapYear, monthDaysNotLeapYear, datediff
+from .date import Date
+from .date import datediff
 from .date import is_leap_year
 from .error import FinError
 from .frequency import FrequencyTypes, annual_frequency
@@ -20,7 +21,8 @@ from enum import Enum
 
 
 def is_last_day_of_feb(dt: Date):
-    # Return true if we are on the last day of February
+    ''' Returns True if we are on the last day of February '''
+
     if dt.m() == 2:
         is_leap = is_leap_year(dt._y)
         if is_leap is True and dt.d() == 29:
@@ -33,7 +35,7 @@ def is_last_day_of_feb(dt: Date):
 ###############################################################################
 
 ###############################################################################
-#    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA 2000)
+#    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA2000)
 #    THIRTY_E_360 = 2  # ISDA 2006 4.16(g) 30/360 ISMA, ICMA
 #    THIRTY_E_360_ISDA = 3  # ISDA 2006 4.16(h)
 #    THIRTY_E_PLUS_360 = 4  # ROLLS D2 TO NEXT MONTH IF D2 = 31
@@ -187,7 +189,7 @@ class DayCount:
             acc_factor = num / den
             return acc_factor, num, den
 
-        elif (self._type == DayCountTypes.ACT_ACT_ISDA) or (self._type == DayCountTypes.ZERO):
+        elif self._type in [DayCountTypes.ACT_ACT_ISDA, DayCountTypes.ZERO]:
 
             if is_leap_year(y1):
                 denom1 = 366

@@ -178,8 +178,8 @@ class IborLMMProducts():
         if numFactors != len(lambdas):
             raise FinError("Lambda doesn't have specified number of factors.")
 
-        numRows = len(lambdas[0])
-        if numRows != self._num_fwds+1:
+        num_rows = len(lambdas[0])
+        if num_rows != self._num_fwds+1:
             raise FinError("Vol Components needs same number of rows as grid")
 
         self._num_paths = num_paths

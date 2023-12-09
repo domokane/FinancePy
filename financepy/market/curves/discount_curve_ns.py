@@ -27,14 +27,14 @@ class DiscountCurveNS(DiscountCurve):
 
     def __init__(self,
                  value_dt: Date,
-                 beta0: float,
-                 beta1: float,
-                 beta2: float,
+                 beta_0: float,
+                 beta_1: float,
+                 beta_2: float,
                  tau: float,
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Creation of a FinDiscountCurveNS object. Parameters are provided
-        individually for beta0, beta1, beta2 and tau. The zero rates produced
+        individually for beta_0, beta_1, beta_2 and tau. The zero rates produced
         by this parametrisation have an implicit compounding convention that
         defaults to continuous but which can be overridden. """
 
@@ -44,9 +44,9 @@ class DiscountCurveNS(DiscountCurve):
             raise FinError("Tau must be positive")
 
         self._value_dt = value_dt
-        self._beta0 = beta0
-        self._beta1 = beta1
-        self._beta2 = beta2
+        self._beta_0 = beta_0
+        self._beta_1 = beta_1
+        self._beta_2 = beta_2
         self._tau = tau
         self._freq_type = freq_type
         self._dc_type = dc_type
@@ -105,9 +105,9 @@ class DiscountCurveNS(DiscountCurve):
 
         theta = t / self._tau
         e = np.exp(-theta)
-        zero_rate = self._beta0
-        zero_rate += self._beta1 * (1.0 - e) / theta
-        zero_rate += self._beta2 * ((1.0 - e) / theta - e)
+        zero_rate = self._beta_0
+        zero_rate += self._beta_1 * (1.0 - e) / theta
+        zero_rate += self._beta_2 * ((1.0 - e) / theta - e)
         return zero_rate
 
     ###########################################################################
@@ -144,9 +144,9 @@ class DiscountCurveNS(DiscountCurve):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("PARAMETER", "VALUE")
-        s += label_to_string("BETA0", self._beta0)
-        s += label_to_string("BETA1", self._beta1)
-        s += label_to_string("BETA2", self._beta2)
+        s += label_to_string("beta_0", self._beta_0)
+        s += label_to_string("beta_1", self._beta_1)
+        s += label_to_string("beta_2", self._beta_2)
         s += label_to_string("TAU", self._tau)
         s += label_to_string("FREQUENCY", (self._freq_type))
         s += label_to_string("DAY_COUNT", (self._dc_type))

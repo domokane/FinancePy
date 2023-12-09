@@ -47,42 +47,42 @@ class CurveFitNelsonSiegel():
 
     def __init__(self, tau=None, bounds=[(-1, -1, -1, 0.5), (1, 1, 1, 100)]):
         self._parentType = FinCurveFitMethod
-        self._beta1 = None
-        self._beta2 = None
-        self._beta3 = None
+        self._beta_1 = None
+        self._beta_2 = None
+        self._beta_3 = None
         self._tau = tau
-        """ Fairly permissive bounds. Only tau1 is 1-100 """
+        """ Fairly permissive bounds. Only tau_1 is 1-100 """
         self._bounds = bounds
 
-    def _interpolated_yield(self, t, beta1=None, beta2=None,
-                            beta3=None, tau=None):
+    def _interpolated_yield(self, t, beta_1=None, beta_2=None,
+                            beta_3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
 
-        if beta1 is None:
-            beta1 = self._beta1
+        if beta_1 is None:
+            beta_1 = self._beta_1
 
-        if beta2 is None:
-            beta2 = self._beta2
+        if beta_2 is None:
+            beta_2 = self._beta_2
 
-        if beta3 is None:
-            beta3 = self._beta3
+        if beta_3 is None:
+            beta_3 = self._beta_3
 
         if tau is None:
             tau = self._tau
 
         theta = t / tau
         expTerm = np.exp(-theta)
-        yld = beta1
-        yld += beta2 * (1.0 - expTerm) / theta
-        yld += beta3 * ((1.0 - expTerm) / theta - expTerm)
+        yld = beta_1
+        yld += beta_2 * (1.0 - expTerm) / theta
+        yld += beta_3 * ((1.0 - expTerm) / theta - expTerm)
         return yld
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("Beta1", self._beta1)
-        s += label_to_string("Beta2", self._beta2)
-        s += label_to_string("Beta3", self._beta3)
+        s += label_to_string("beta_1", self._beta_1)
+        s += label_to_string("beta_2", self._beta_2)
+        s += label_to_string("beta_3", self._beta_3)
         s += label_to_string("Tau", self._tau)
         return s
 
@@ -95,65 +95,65 @@ class CurveFitNelsonSiegel():
 
 class CurveFitNelsonSiegelSvensson():
 
-    def __init__(self, tau1=None, tau2=None,
+    def __init__(self, tau_1=None, tau_2=None,
                  bounds=[(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]):
         """ Create object to store calibration and functional form of NSS
         parametric fit. """
 
         self._parentType = FinCurveFitMethod
-        self._beta1 = None
-        self._beta2 = None
-        self._beta3 = None
-        self._beta4 = None
-        self._tau1 = tau1
-        self._tau2 = tau2
+        self._beta_1 = None
+        self._beta_2 = None
+        self._beta_3 = None
+        self._beta_4 = None
+        self._tau_1 = tau_1
+        self._tau_2 = tau_2
 
         """ I impose some bounds to help ensure a sensible result if
-        the user does not provide any bounds. Especially for tau2. """
+        the user does not provide any bounds. Especially for tau_2. """
         self._bounds = bounds
 
-    def _interpolated_yield(self, t, beta1=None, beta2=None, beta3=None,
-                            beta4=None, tau1=None, tau2=None):
+    def _interpolated_yield(self, t, beta_1=None, beta_2=None, beta_3=None,
+                            beta_4=None, tau_1=None, tau_2=None):
 
         # Careful if we get a time zero point
         t = np.maximum(t, 1e-10)
 
-        if beta1 is None:
-            beta1 = self._beta1
+        if beta_1 is None:
+            beta_1 = self._beta_1
 
-        if beta2 is None:
-            beta2 = self._beta2
+        if beta_2 is None:
+            beta_2 = self._beta_2
 
-        if beta3 is None:
-            beta3 = self._beta3
+        if beta_3 is None:
+            beta_3 = self._beta_3
 
-        if beta4 is None:
-            beta4 = self._beta4
+        if beta_4 is None:
+            beta_4 = self._beta_4
 
-        if tau1 is None:
-            tau1 = self._tau1
+        if tau_1 is None:
+            tau_1 = self._tau_1
 
-        if tau2 is None:
-            tau2 = self._tau2
+        if tau_2 is None:
+            tau_2 = self._tau_2
 
-        theta1 = t / tau1
-        theta2 = t / tau2
+        theta1 = t / tau_1
+        theta2 = t / tau_2
         expTerm1 = np.exp(-theta1)
         expTerm2 = np.exp(-theta2)
-        yld = beta1
-        yld += beta2 * (1.0 - expTerm1) / theta1
-        yld += beta3 * ((1.0 - expTerm1) / theta1 - expTerm1)
-        yld += beta4 * ((1.0 - expTerm2) / theta2 - expTerm2)
+        yld = beta_1
+        yld += beta_2 * (1.0 - expTerm1) / theta1
+        yld += beta_3 * ((1.0 - expTerm1) / theta1 - expTerm1)
+        yld += beta_4 * ((1.0 - expTerm2) / theta2 - expTerm2)
         return yld
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("Beta1", self._beta1)
-        s += label_to_string("Beta2", self._beta2)
-        s += label_to_string("Beta3", self._beta3)
-        s += label_to_string("Beta4", self._beta3)
-        s += label_to_string("Tau1", self._tau1)
-        s += label_to_string("Tau2", self._tau2)
+        s += label_to_string("beta_1", self._beta_1)
+        s += label_to_string("beta_2", self._beta_2)
+        s += label_to_string("beta_3", self._beta_3)
+        s += label_to_string("beta_4", self._beta_3)
+        s += label_to_string("tau_1", self._tau_1)
+        s += label_to_string("tau_2", self._tau_2)
         return s
 
     def _print(self):

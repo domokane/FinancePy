@@ -70,9 +70,9 @@ class BondYieldCurve():
             popt, pcov = curve_fit(self._curveFit._interpolated_yield,
                                    xdata, ydata, bounds=fit._bounds)
 
-            fit._beta1 = popt[0]
-            fit._beta2 = popt[1]
-            fit._beta3 = popt[2]
+            fit._beta_1 = popt[0]
+            fit._beta_2 = popt[1]
+            fit._beta_3 = popt[2]
             fit._tau = popt[3]
 
         elif fitType is CurveFitNelsonSiegelSvensson:
@@ -83,12 +83,12 @@ class BondYieldCurve():
             popt, pcov = curve_fit(self._curveFit._interpolated_yield,
                                    xdata, ydata, bounds=fit._bounds)
 
-            fit._beta1 = popt[0]
-            fit._beta2 = popt[1]
-            fit._beta3 = popt[2]
-            fit._beta4 = popt[3]
-            fit._tau1 = popt[4]
-            fit._tau2 = popt[5]
+            fit._beta_1 = popt[0]
+            fit._beta_2 = popt[1]
+            fit._beta_3 = popt[2]
+            fit._beta_4 = popt[3]
+            fit._tau_1 = popt[4]
+            fit._tau_2 = popt[5]
 
         elif fitType is CurveFitBSpline:
 
@@ -124,19 +124,19 @@ class BondYieldCurve():
             yld = fit._interpolated_yield(t)
         elif type(fit) == CurveFitNelsonSiegel:
             yld = fit._interpolated_yield(t,
-                                          fit._beta1,
-                                          fit._beta2,
-                                          fit._beta3,
+                                          fit._beta_1,
+                                          fit._beta_2,
+                                          fit._beta_3,
                                           fit._tau)
 
         elif type(fit) == CurveFitNelsonSiegelSvensson:
             yld = fit._interpolated_yield(t,
-                                          fit._beta1,
-                                          fit._beta2,
-                                          fit._beta3,
-                                          fit._beta4,
-                                          fit._tau1,
-                                          fit._tau2)
+                                          fit._beta_1,
+                                          fit._beta_2,
+                                          fit._beta_3,
+                                          fit._beta_4,
+                                          fit._tau_1,
+                                          fit._tau_2)
 
         elif type(fit) == CurveFitBSpline:
             yld = fit._interpolated_yield(t)

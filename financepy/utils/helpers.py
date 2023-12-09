@@ -345,10 +345,10 @@ def table_to_string(header: str,
         print(len(value_table))
         return ""
 
-    numRows = len(value_table[0])
+    num_rows = len(value_table[0])
 
     s = header + "\n"
-    for i in range(numRows):
+    for i in range(num_rows):
         for vList in value_table:
             # isinstance is needed instead of type in case of pandas floats
             if (isinstance(vList[i], float)):
@@ -369,14 +369,14 @@ def format_table(header: (list, tuple),
     around PrettyTable to get a nice formatting. """
 
     t = PrettyTable(header)
-    numRows = len(header)
+    num_rows = len(header)
 
     if len(rows) == 0:
         print(len(rows))
         return ""
 
     for row in rows:
-        if len(row) != numRows:
+        if len(row) != num_rows:
             raise ValueError("Header and Row Size must match!")
 
         t.add_row(row)
@@ -467,25 +467,25 @@ def accrued_tree(grid_times: np.ndarray,
     cpn_times = np.zeros(0)
     cpn_flows = np.zeros(0)
 
-    for iGrid in range(1, numgrid_times):
+    for i_grid in range(1, numgrid_times):
 
-        cpn_time = grid_times[iGrid]
-        cpn_flow = grid_flows[iGrid]
+        cpn_time = grid_times[i_grid]
+        cpn_flow = grid_flows[i_grid]
 
-        if grid_flows[iGrid] > gSmall:
+        if grid_flows[i_grid] > gSmall:
             cpn_times = np.append(cpn_times, cpn_time)
             cpn_flows = np.append(cpn_flows, cpn_flow)
 
     num_cpns = len(cpn_times)
 
     # interpolate between coupons
-    for iGrid in range(0, numgrid_times):
-        t = grid_times[iGrid]
+    for i_grid in range(0, numgrid_times):
+        t = grid_times[i_grid]
         for i in range(0, num_cpns):
             if t > cpn_times[i - 1] and t <= cpn_times[i]:
                 den = cpn_times[i] - cpn_times[i - 1]
                 num = (t - cpn_times[i - 1])
-                accrued[iGrid] = face * num * cpn_flows[i] / den
+                accrued[i_grid] = face * num * cpn_flows[i] / den
                 break
 
     return accrued
@@ -512,10 +512,6 @@ def check_argument_types(func, values):
             print("You have input an argument", value, "of type", type(value))
             print("The allowed types are", usable_type)
             print("It is none of these so FAILS. Please amend.")
-            #            s = f"In {func.__module__}.{func.__name__}:\n"
-            #            s += f"Mismatched Types: expected a "
-            #            s += f"{valueName} of type '{usableType.__name__}', however"
-            #            s += f" a value of type '{type(value).__name__}' was given."
             raise FinError("Argument Type Error")
 
 ###############################################################################

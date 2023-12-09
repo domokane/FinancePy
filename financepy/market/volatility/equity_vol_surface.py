@@ -251,16 +251,16 @@ class EquityVolSurface:
         self._discount_curve = discount_curve
         self._dividend_curve = dividend_curve
 
-        nExpiryDates = len(expiry_dts)
-        nStrikes = len(strikes)
+        num_expiry_dates = len(expiry_dts)
+        num_strikes = len(strikes)
         n = len(volatility_grid)
         m = len(volatility_grid[0])
 
-        if n != nExpiryDates:
-            raise FinError("1st dimension of vol grid is not nExpiryDates")
+        if n != num_expiry_dates:
+            raise FinError("1st dim of vol grid is not num_expiry_dates")
 
-        if m != nStrikes:
-            raise FinError("2nd dimension of the vol matrix is not nStrikes")
+        if m != num_strikes:
+            raise FinError("2nd dim of the vol matrix is not num_strikes")
 
         self._strikes = strikes
         self._num_strikes = len(strikes)
@@ -681,7 +681,7 @@ class EquityVolSurface:
                 strike = self._strikes[j]
 
                 fitted_vol = self.vol_from_strike_dt(strike,
-                                                       expiry_dt)
+                                                     expiry_dt)
 
                 mkt_vol = self._volatility_grid[i][j]
 
@@ -695,7 +695,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def implied_dbns(self, lowS, highS, numIntervals):
+    def implied_dbns(self, lowS, highS, num_intervals):
         """ Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon. """
 
@@ -706,7 +706,7 @@ class EquityVolSurface:
             f = self._F_0T[iTenor]
             t = self._t_exp[iTenor]
 
-            dS = (highS - lowS) / numIntervals
+            dS = (highS - lowS) / num_intervals
 
             disDF = self._discount_curve._df(t)
             div_df = self._dividend_curve._df(t)
@@ -717,7 +717,7 @@ class EquityVolSurface:
             Ks = []
             vols = []
 
-            for iK in range(0, numIntervals):
+            for iK in range(0, num_intervals):
 
                 k = lowS + iK*dS
 
@@ -755,11 +755,11 @@ class EquityVolSurface:
             ks = []
             fitted_vols = []
 
-            numIntervals = 30
+            num_intervals = 30
             K = lowK
-            dK = (highK - lowK)/numIntervals
+            dK = (highK - lowK)/num_intervals
 
-            for i in range(0, numIntervals):
+            for i in range(0, num_intervals):
 
                 ks.append(K)
                 fitted_vol = self.vol_from_strike_dt(K, expiry_dt) * 100.

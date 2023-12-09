@@ -52,7 +52,7 @@ long_day_names = [
     'FRIDAY',
     'SATURDAY',
     'SUNDAY']
-shortMonthNames = [
+short_month_names = [
     'JAN',
     'FEB',
     'MAR',
@@ -79,8 +79,8 @@ longMonthNames = [
     'NOVEMBER',
     'DECEMBER']
 
-monthDaysNotLeapYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-monthDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+month_days_not_leap_year = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+month_days_leap_year = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 ###############################################################################
 
@@ -141,9 +141,9 @@ def calculate_list():
         for mm in range(1, 13):
 
             if leap_year is True:
-                max_days = monthDaysLeapYear[mm-1]
+                max_days = month_days_leap_year[mm-1]
             else:
-                max_days = monthDaysNotLeapYear[mm-1]
+                max_days = month_days_not_leap_year[mm-1]
 
             for _ in range(1, max_days+1):
                 idx += 1
@@ -264,11 +264,11 @@ class Date():
         leap_year = is_leap_year(y)
 
         if leap_year:
-            if d > monthDaysLeapYear[m - 1]:
+            if d > month_days_leap_year[m - 1]:
                 print(d, m, y)
                 raise FinError("Date: Leap year. Day not valid.")
         else:
-            if d > monthDaysNotLeapYear[m - 1]:
+            if d > month_days_not_leap_year[m - 1]:
                 print(d, m, y)
                 raise FinError("Date: Not Leap year. Day not valid.")
 
@@ -303,18 +303,23 @@ class Date():
     ###########################################################################
 
     def d(self):
+        ''' Get day of month as integer '''
         return self._d
 
     def m(self):
+        ''' Get month of year as integer '''
         return self._m
 
     def y(self):
+        ''' Get year as integer '''
         return self._y
 
     def excel_dt(self):
+        ''' get this date in form of Excel date i.e. as an integer'''
         return self._excel_dt
 
     def weekday(self):
+        ''' get day of week as integer '''
         return self._weekday
 
     ###########################################################################
@@ -342,10 +347,10 @@ class Date():
             return cls(d, m, y)
 
         if isinstance(date, np.datetime64):
-            timestamp = ((date - np.datetime64('1970-01-01T00:00:00'))
-                         / np.timedelta64(1, 's'))
+            time_stamp = ((date - np.datetime64('1970-01-01T00:00:00'))
+                          / np.timedelta64(1, 's'))
 
-            date = datetime.datetime.utcfromtimestamp(timestamp)
+            date = datetime.datetime.utcfromtime_stamp(time_stamp)
             d, m, y = date.day, date.month, date.year
             return cls(d, m, y)
 
@@ -354,11 +359,10 @@ class Date():
     def _refresh(self):
         """ Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. """
-
         idx = date_index(self._d, self._m, self._y)
-        daysSinceFirstJan1900 = g_date_counter_list[idx]
-        wd = weekday(daysSinceFirstJan1900)
-        self._excel_dt = daysSinceFirstJan1900
+        days_since_first_jan_1900 = g_date_counter_list[idx]
+        wd = weekday(days_since_first_jan_1900)
+        self._excel_dt = days_since_first_jan_1900
         self._weekday = wd
 
     ###########################################################################
@@ -425,10 +429,10 @@ class Date():
         leap_year = is_leap_year(y)
 
         if leap_year:
-            if d == monthDaysLeapYear[m - 1]:
+            if d == month_days_leap_year[m - 1]:
                 return True
         else:
-            if d == monthDaysNotLeapYear[m - 1]:
+            if d == month_days_not_leap_year[m - 1]:
                 return True
 
         return False
@@ -444,10 +448,10 @@ class Date():
         leap_year = is_leap_year(y)
 
         if leap_year:
-            lastDay = monthDaysLeapYear[m - 1]
+            lastDay = month_days_leap_year[m - 1]
             return Date(lastDay, m, y)
         else:
-            lastDay = monthDaysNotLeapYear[m - 1]
+            lastDay = month_days_not_leap_year[m - 1]
             return Date(lastDay, m, y)
 
         return False
@@ -460,10 +464,10 @@ class Date():
         if hours < 0:
             raise FinError("Number of hours must be positive")
 
-        startHour = self._hh
-        finalHour = startHour + hours
-        days = int(finalHour/24)
-        hour = finalHour % 24
+        start_hour = self._hh
+        final_hour = start_hour + hours
+        days = int(final_hour/24)
+        hour = final_hour % 24
 
         # Move forward a specific number of days
         dt1 = self.add_days(days)
@@ -475,30 +479,30 @@ class Date():
     ###########################################################################
 
     def add_days(self,
-                 numDays: int = 1):
-        """ Returns a new date that is numDays after the Date. I also make
+                 num_days: int = 1):
+        """ Returns a new date that is num_days after the Date. I also make
         it possible to go backwards a number of days. """
 
         idx = date_index(self._d, self._m, self._y)
 
         step = +1
-        if numDays < 0:
+        if num_days < 0:
             step = -1
 
-        while numDays != 0:
+        while num_days != 0:
             idx += step
             if g_date_counter_list[idx] > 0:
-                numDays -= step
+                num_days -= step
 
         (d, m, y) = date_from_index(idx)
-        newDt = Date(d, m, y)
-        return newDt
+        new_dt = Date(d, m, y)
+        return new_dt
 
     ###########################################################################
 
     def add_weekdays(self,
-                     numDays: int):
-        """ Returns a new date that is numDays working days after Date. Note
+                     num_days: int):
+        """ Returns a new date that is num_days working days after Date. Note
         that only weekends are taken into account. Other Holidays are not. If
         you want to include regional holidays then use add_business_days from
         the FinCalendar class. """
@@ -507,47 +511,47 @@ class Date():
 
         end_dt = self
 
-        if isinstance(numDays, int) is False:
+        if isinstance(num_days, int) is False:
             raise FinError("Num days must be an integer")
 
-        positiveNumDays = (numDays > 0)
-        numDays = abs(numDays)
+        positive_num_days = (num_days > 0)
+        num_days = abs(num_days)
 
         # 5 week days make up a week
         oldLogic = False
 
         if oldLogic is True:
-            numWeeks = int(numDays / 5)
-            remainingDays = numDays % 5
+            num_weeks = int(num_days / 5)
+            remaining_days = num_days % 5
 
             if self._weekday == Date.SAT:
-                weekendAdjust = 1
+                weekend_adjust = 1
             elif self._weekday == Date.SUN:
-                weekendAdjust = 0
+                weekend_adjust = 0
             else:
-                weekendAdjust = 2
+                weekend_adjust = 2
 
-            if (positiveNumDays):
-                if (self._weekday + remainingDays > self.FRI):
+            if (positive_num_days):
+                if (self._weekday + remaining_days > self.FRI):
                     # add weekend
-                    remainingDays += weekendAdjust
+                    remaining_days += weekend_adjust
 
-                return self.add_days(numWeeks * 7 + remainingDays)
+                return self.add_days(num_weeks * 7 + remaining_days)
             else:
-                if (self._weekday - remainingDays < self.MON):
+                if (self._weekday - remaining_days < self.MON):
                     # add weekend
-                    remainingDays += weekendAdjust
+                    remaining_days += weekend_adjust
 
-            return self.add_days(-(numWeeks * 7 + remainingDays))
+            return self.add_days(-(num_weeks * 7 + remaining_days))
 
         else:  # new logic
 
-            numDaysLeft = numDays
+            num_days_left = num_days
             end_dt = self
 
-            while numDaysLeft > 0:
+            while num_days_left > 0:
 
-                if positiveNumDays is True:
+                if positive_num_days is True:
                     end_dt = end_dt.add_days(1)
                 else:
                     end_dt = end_dt.add_days(-1)
@@ -555,7 +559,7 @@ class Date():
                 if end_dt._weekday == Date.SAT or end_dt._weekday == Date.SUN:
                     pass
                 else:
-                    numDaysLeft -= 1
+                    num_days_left -= 1
 
             return end_dt
 
@@ -568,21 +572,21 @@ class Date():
         back a vector of dates."""
 
         num_months = 1
-        scalarFlag = False
+        scalar_flag = False
 
         if isinstance(mm, int) or isinstance(mm, float):
-            mmVector = [mm]
-            scalarFlag = True
+            mm_vector = [mm]
+            scalar_flag = True
         else:
-            mmVector = mm
+            mm_vector = mm
 
-        num_months = len(mmVector)
+        num_months = len(mm_vector)
 
         date_list = []
 
         for i in range(0, num_months):
 
-            mmi = mmVector[i]
+            mmi = mm_vector[i]
 
             # If I get a float I check it has no decimal places
             if int(mmi) != mmi:
@@ -605,16 +609,16 @@ class Date():
             leap_year = is_leap_year(y)
 
             if leap_year:
-                if d > monthDaysLeapYear[m - 1]:
-                    d = monthDaysLeapYear[m-1]
+                if d > month_days_leap_year[m - 1]:
+                    d = month_days_leap_year[m-1]
             else:
-                if d > monthDaysNotLeapYear[m - 1]:
-                    d = monthDaysNotLeapYear[m-1]
+                if d > month_days_not_leap_year[m - 1]:
+                    d = month_days_not_leap_year[m-1]
 
-            newDt = Date(d, m, y)
-            date_list.append(newDt)
+            new_dt = Date(d, m, y)
+            date_list.append(new_dt)
 
-        if scalarFlag is True:
+        if scalar_flag is True:
             return date_list[0]
         else:
             return date_list
@@ -627,22 +631,22 @@ class Date():
         integer or float you get back a single date. If yy is a list you get
         back a vector of dates."""
 
-        numYears = 1
-        scalarFlag = False
+        num_years = 1
+        scalar_flag = False
 
         if isinstance(yy, int) or isinstance(yy, float):
-            yyVector = [yy]
-            scalarFlag = True
+            yy_vector = [yy]
+            scalar_flag = True
         else:
-            yyVector = yy
+            yy_vector = yy
 
-        numYears = len(yyVector)
+        num_years = len(yy_vector)
 
         date_list = []
 
-        for i in range(0, numYears):
+        for i in range(0, num_years):
 
-            yyi = yyVector[i]
+            yyi = yy_vector[i]
 
             # If yyi is not a whole month I adjust for days using average
             # number of days in a month which is 365.242/12
@@ -650,12 +654,12 @@ class Date():
 
             mmi = int(yyi * 12.0)
             ddi = int((yyi * 12.0 - mmi) * daysInMonth)
-            newDt = self.add_months(mmi)
-            newDt = newDt.add_days(ddi)
+            new_dt = self.add_months(mmi)
+            new_dt = new_dt.add_days(ddi)
 
-            date_list.append(newDt)
+            date_list.append(new_dt)
 
-        if scalarFlag is True:
+        if scalar_flag is True:
             return date_list[0]
         else:
             return date_list
@@ -866,7 +870,7 @@ class Date():
         else:
             date_str += "" + str(self._d) + ""
 
-        date_str += shortMonthNames[self._m - 1]
+        date_str += short_month_names[self._m - 1]
         date_str += "" + str(self._y)
         return date_str
 
@@ -889,7 +893,7 @@ class Date():
         else:
             short_month_str = str(self._m)
 
-        long_month_str = shortMonthNames[self._m - 1]
+        long_month_str = short_month_names[self._m - 1]
 
         short_year_str = str(self._y)[2:]
         long_year_str = str(self._y)
@@ -921,7 +925,8 @@ class Date():
         elif g_date_type_format == DateFormatTypes.US_LONGEST:
 
             sep = " "
-            date_str = day_name_str + " " + long_month_str + sep + day_str + sep + long_year_str
+            date_str = day_name_str + " " + long_month_str + sep + day_str
+            + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.US_LONG:
@@ -983,7 +988,6 @@ class Date():
         """ prints formatted string of the date. """
         print(self)
 
-
 ###############################################################################
 # Date functions that are not class members but are useful
 ###############################################################################
@@ -1034,9 +1038,9 @@ def days_in_month(m, y):
         raise FinError("Month must be 1-12")
 
     if is_leap_year(y) is False:
-        return monthDaysNotLeapYear[m-1]
+        return month_days_not_leap_year[m-1]
     else:
-        return monthDaysLeapYear[m-1]
+        return month_days_leap_year[m-1]
 
 ###############################################################################
 

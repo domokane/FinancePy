@@ -42,46 +42,46 @@ def indep_loss_dbn_heterogeneous_adj_binomial(num_credits,
 
     ###########################################################################
 
-    vapprox = 0.0
-    vexact = 0.0
+    v_approx = 0.0
+    v_exact = 0.0
 
     for i_credit in range(0, num_credits):
         loss_ratio2 = loss_ratio[i_credit] ** 2
-        vapprox += loss_ratio2 * p * (1.0 - p)
-        vexact += loss_ratio2 * cond_probs[i_credit] \
+        v_approx += loss_ratio2 * p * (1.0 - p)
+        v_exact += loss_ratio2 * cond_probs[i_credit] \
             * (1.0 - cond_probs[i_credit])
 
     ###########################################################################
 
-    meanLoss = p * num_credits
-    meanAbove = round(meanLoss + 1)
-    meanBelow = round(meanLoss)
+    mean_loss = p * num_credits
+    mean_above = round(mean_loss + 1)
+    mean_below = round(mean_loss)
 
-    if meanAbove > num_credits:
-        meanAbove = num_credits
+    if mean_above > num_credits:
+        mean_above = num_credits
 
-    diffAbove = meanAbove - meanLoss
-    diffBelow = meanBelow - meanLoss
+    diff_above = mean_above - mean_loss
+    diff_below = mean_below - mean_loss
 
     # DOK - TO DO - SIMPLIFY THIS CODE AS PER JOD PAPER
-    term = diffAbove * diffAbove + \
-        (diffBelow * diffBelow - diffAbove * diffAbove) * diffAbove
-    numer = vexact - term
-    denom = vapprox - term
+    term = diff_above * diff_above + \
+        (diff_below * diff_below - diff_above * diff_above) * diff_above
+
+    numer = v_exact - term
+    denom = v_approx - term
 
     if abs(denom) < 1e-30:
         denom = 1e-30
 
     alpha = numer / denom
-    epsilonBelow = (1.0 - alpha) * diffAbove
-    epsilonAbove = (1.0 - alpha) - epsilonBelow
+    epsilon_below = (1.0 - alpha) * diff_above
+    epsilon_above = (1.0 - alpha) - epsilon_below
 
     for i_loss_unit in range(0, num_losses):
         indep_dbn[i_loss_unit] *= alpha
 
-    indep_dbn[int(meanBelow)] += epsilonBelow
-    indep_dbn[int(meanAbove)] += epsilonAbove
-
+    indep_dbn[int(mean_below)] += epsilon_below
+    indep_dbn[int(mean_above)] += epsilon_above
     return indep_dbn
 
 ###############################################################################
@@ -114,11 +114,11 @@ def indep_loss_dbn_recursion_gcd(num_credits,
     for i in range(0, len(loss_units)):
         num_loss_units += int(loss_units[i])
 
-    prevDbn = np.zeros(num_loss_units)
-    prevDbn[0] = 1.0
+    prev_dbn = np.zeros(num_loss_units)
+    prev_dbn[0] = 1.0
 
     small = 1e-10
-    nextDbn = np.zeros(num_loss_units)
+    next_dbn = np.zeros(num_loss_units)
 
     for i_credit in range(0, num_credits):
 
@@ -126,15 +126,15 @@ def indep_loss_dbn_recursion_gcd(num_credits,
         loss = (int)(loss_units[i_credit] + small)
 
         for i_loss_unit in range(0, loss):
-            nextDbn[i_loss_unit] = prevDbn[i_loss_unit] * (1.0 - p)
+            next_dbn[i_loss_unit] = prev_dbn[i_loss_unit] * (1.0 - p)
 
         for i_loss_unit in range(loss, num_loss_units):
-            nextDbn[i_loss_unit] = prevDbn[i_loss_unit - loss] * \
-                p + prevDbn[i_loss_unit] * (1.0 - p)
+            next_dbn[i_loss_unit] = prev_dbn[i_loss_unit - loss] * \
+                p + prev_dbn[i_loss_unit] * (1.0 - p)
 
         for i_loss_unit in range(0, num_loss_units):
-            prevDbn[i_loss_unit] = nextDbn[i_loss_unit]
+            prev_dbn[i_loss_unit] = next_dbn[i_loss_unit]
 
-    return nextDbn
+    return next_dbn
 
 ##########################################################################

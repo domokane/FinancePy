@@ -821,7 +821,7 @@ class SwaptionVolSurface():
 
 ###############################################################################
 
-    # def implied_dbns(self, lowS, highS, numIntervals):
+    # def implied_dbns(self, lowS, highS, num_intervals):
     #     """ Calculate the pdf for each tenor horizon. Returns a list of
     #     FinDistribution objects, one for each tenor horizon. """
 
@@ -832,7 +832,7 @@ class SwaptionVolSurface():
     #         f = self._fwd_swap_rates[iTenor]
     #         t = self._t_exp[iTenor]
 
-    #         dS = (highS - lowS)/ numIntervals
+    #         dS = (highS - lowS)/ num_intervals
 
     #         dis_df = self._discount_curve._df(t)
     #         div_df = self._dividend_curve._df(t)
@@ -843,7 +843,7 @@ class SwaptionVolSurface():
     #         Ks = []
     #         vols = []
 
-    #         for iK in range(0, numIntervals):
+    #         for iK in range(0, num_intervals):
 
     #             k = lowS + iK*dS
 
@@ -880,13 +880,13 @@ class SwaptionVolSurface():
 
             ks = []
 
-            numIntervals = 30
+            num_intervals = 30
             K = lowK
-            dK = (highK - lowK)/numIntervals
+            dK = (highK - lowK)/num_intervals
 
             fitted_vols = []
 
-            for i in range(0, numIntervals):
+            for i in range(0, num_intervals):
 
                 ks.append(K)
                 fitted_vol = self.vol_from_strike_dt(K, expiry_dt) * 100.0
