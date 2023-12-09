@@ -1,4 +1,8 @@
 # Latest News and Versions
+9 December 2023  version 0.34 released
+- A lot of various pep8 fixes - should all be nearly done soon
+- Some minor bug fixes
+
 10 November 2023  version 0.33 released
 - Tidied up key rate code
 - Fixed unit tests for pytest
