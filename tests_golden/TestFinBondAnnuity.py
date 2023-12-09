@@ -21,6 +21,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_BondAnnuity():
+    ''' Test '''
 
     settle_dt = Date(20, 6, 2018)
 

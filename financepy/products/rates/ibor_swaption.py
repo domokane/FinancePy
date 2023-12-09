@@ -134,7 +134,7 @@ class IborSwaption():
         s = swap.swap_rate(value_dt, discount_curve)
 
         t_exp = (self._exercise_dt - self._settle_dt) / gDaysInYear
-        tmat = (self._maturity_dt - self._settle_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - self._settle_dt) / gDaysInYear
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
@@ -235,9 +235,9 @@ class IborSwaption():
 
         elif isinstance(model, BKTree):
 
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
             swaptionPx = model.bermudan_swaption(t_exp,
-                                                 tmat,
+                                                 t_mat,
                                                  strike_price,
                                                  face_amount,
                                                  cpn_times,
@@ -253,9 +253,9 @@ class IborSwaption():
 
         elif isinstance(model, BDTTree):
 
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
             swaptionPx = model.bermudan_swaption(t_exp,
-                                                 tmat,
+                                                 t_mat,
                                                  strike_price,
                                                  face_amount,
                                                  cpn_times,

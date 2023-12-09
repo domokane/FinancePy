@@ -527,7 +527,7 @@ def test_BondOptionDerivaGem():
 
     #  Test convergence
     t_exp = (expiry_dt - settle_dt)/gDaysInYear
-    tmat = (maturity_dt - settle_dt)/gDaysInYear
+    t_mat = (maturity_dt - settle_dt)/gDaysInYear
 
     # Jamshidian approach
     vjam = model.european_bond_option_jamshidian(t_exp, strike_price, face,
@@ -536,7 +536,7 @@ def test_BondOptionDerivaGem():
     # print("Jamshidian:", vjam)
 
     model._num_time_steps = 100
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
     exerciseType = FinExerciseTypes.EUROPEAN
 
     vHW = model.bond_option(t_exp, strike_price, face,

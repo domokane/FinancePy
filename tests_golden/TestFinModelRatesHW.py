@@ -74,11 +74,11 @@ def test_HullWhiteExampleTwo():
     maturity_dt = start_dt.add_tenor("9Y")
 
     t_exp = (expiry_dt - start_dt)/gDaysInYear
-    tmat = (maturity_dt - start_dt)/gDaysInYear
+    t_mat = (maturity_dt - start_dt)/gDaysInYear
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)
-    vAnal = model.option_on_zcb(t_exp, tmat, strike, face, times, dfs)
+    vAnal = model.option_on_zcb(t_exp, t_mat, strike, face, times, dfs)
 
     # Test convergence
     num_steps_list = range(100, 500, 100)
@@ -97,12 +97,12 @@ def test_HullWhiteExampleTwo():
         model = HWTree(sigma, a, num_time_steps)
         model.build_tree(t_exp, times, dfs)
         vTree1 = model.option_on_zero_coupon_bond_tree(
-            t_exp, tmat, strike, face)
+            t_exp, t_mat, strike, face)
 
         model = HWTree(sigma, a, num_time_steps+1)
         model.build_tree(t_exp, times, dfs)
         vTree2 = model.option_on_zero_coupon_bond_tree(
-            t_exp, tmat, strike, face)
+            t_exp, t_mat, strike, face)
 
         end = time.time()
         period = end-start
@@ -298,7 +298,7 @@ def test_HullWhiteCallableBond():
 
     ###########################################################################
 
-    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / gDaysInYear
     curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     dfs = []
@@ -323,7 +323,7 @@ def test_HullWhiteCallableBond():
 
     # Test convergence
     num_steps_list = [100, 200, 500, 1000]
-    tmat = (maturity_dt - settle_dt)/gDaysInYear
+    t_mat = (maturity_dt - settle_dt)/gDaysInYear
 
     test_cases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")
 
@@ -331,7 +331,7 @@ def test_HullWhiteCallableBond():
 
         start = time.time()
         model = HWTree(sigma, a, num_time_steps)
-        model.build_tree(tmat, times, dfs)
+        model.build_tree(t_mat, times, dfs)
 
         v2 = model.callable_puttable_bond_tree(cpn_times, cpn_flows,
                                                call_times, call_prices,

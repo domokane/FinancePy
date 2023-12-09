@@ -164,10 +164,10 @@ class CDSCurve:
                         self._cds_contracts[i],
                         self._recovery_rate)
 
-            tmat = (maturity_dt - self._value_dt) / gDaysInYear
+            t_mat = (maturity_dt - self._value_dt) / gDaysInYear
             q = self._values[i]
 
-            self._times = np.append(self._times, tmat)
+            self._times = np.append(self._times, t_mat)
             self._values = np.append(self._values, q)
 
             optimize.newton(f, x0=q, fprime=None, args=argtuple,

@@ -381,7 +381,7 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         # NOTE:
         # Instead of european price, american price is
         # passed to an approximation formula for european option.
-        # But it's just a initial point, so no affect on the calibration.
+        # But it's just an initial point, so has no affect on the calibration.
         sigma0 = _estimate_vol_from_price(
             fwd, t, k, OptionTypes.EUROPEAN_CALL, price)
     elif option_type == OptionTypes.AMERICAN_PUT:

@@ -49,7 +49,7 @@ class IborBermudanSwaption:
                  bd_type=BusDayAdjustTypes.FOLLOWING,
                  dg_type=DateGenRuleTypes.BACKWARD):
         """ Create a Bermudan swaption contract. This is an option to enter
-        into a payer or receiver swap at a fixed coupon on all of the fixed
+        into a payer or receiver swap at a fixed coupon on all the fixed
         # leg coupon dates until the exercise date inclusive. """
 
         check_argument_types(self.__init__, locals())
@@ -118,7 +118,7 @@ class IborBermudanSwaption:
         self._pv01 = self._underlying_swap.pv01(value_dt, discount_curve)
 
         t_exp = (self._exercise_dt - value_dt) / gDaysInYear
-        tmat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
 
         #######################################################################
         # For the tree models we need to generate a vector of the coupons
@@ -164,10 +164,10 @@ class IborBermudanSwaption:
 
         if isinstance(model, BDTTree) or isinstance(model, BKTree) or isinstance(model, HWTree):
 
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
 
             v = model.bermudan_swaption(t_exp,
-                                        tmat,
+                                        t_mat,
                                         strike_price,
                                         face_amount,
                                         cpn_times,

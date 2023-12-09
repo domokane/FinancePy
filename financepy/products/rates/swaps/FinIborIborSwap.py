@@ -38,7 +38,7 @@ class IborIborSwap:
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Create a Ibor basis swap contract giving the contract start
+        """ Create an Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual

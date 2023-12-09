@@ -60,8 +60,8 @@ class BondZeroCurve(DiscountCurve):
 
         times = []
         for bond in self._bonds:
-            tmat = (bond._maturity_dt - self._settle_dt)/gDaysInYear
-            times.append(tmat)
+            t_mat = (bond._maturity_dt - self._settle_dt)/gDaysInYear
+            times.append(t_mat)
 
         times = np.array(times)
         if test_monotonicity(times) is False:
@@ -83,9 +83,9 @@ class BondZeroCurve(DiscountCurve):
             bond = self._bonds[i]
             maturity_dt = bond._maturity_dt
             clean_price = self._clean_prices[i]
-            tmat = (maturity_dt - self._settle_dt) / gDaysInYear
+            t_mat = (maturity_dt - self._settle_dt) / gDaysInYear
             argtuple = (self, self._settle_dt, bond, clean_price)
-            self._times = np.append(self._times, tmat)
+            self._times = np.append(self._times, t_mat)
             self._values = np.append(self._values, df)
 
             optimize.newton(_f, x0=df, fprime=None, args=argtuple,

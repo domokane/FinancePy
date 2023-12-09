@@ -93,9 +93,9 @@ class DayCount:
         must be set to the next coupon date. You will also need to provide a
         coupon frequency for some conventions.
 
-        Note that if the date is intraday, i.e. hh,mm and ss do not equal zero
+        Note that if the date is intra-day, i.e. hh,mm and ss do not equal zero
         then that is used in the calculation of the year frac. This avoids
-        discontinuities for short dated intra day products. It should not
+        discontinuities for short-dated intraday products. It should not
         affect normal dates for which hh=mm=ss=0.
 
         This seems like a useful source:
@@ -131,7 +131,7 @@ class DayCount:
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.THIRTY_E_360:
             # This is in section 4.16(g) of ISDA 2006 Definitions
@@ -148,7 +148,7 @@ class DayCount:
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
             den = 360
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.THIRTY_E_360_ISDA:
             # This is 30E/360 (ISDA 2000), 30E/360 (ISDA) section 4.16(h)
@@ -157,15 +157,15 @@ class DayCount:
             if d1 == 31:
                 d1 = 30
 
-            lastDayOfFeb1 = is_last_day_of_feb(dt1)
-            if lastDayOfFeb1 is True:
+            last_day_of_feb1 = is_last_day_of_feb(dt1)
+            if last_day_of_feb1 is True:
                 d1 = 30
 
             if d2 == 31:
                 d2 = 30
 
-            lastDayOfFeb2 = is_last_day_of_feb(dt2)
-            if lastDayOfFeb2 is True and isTerminationDate is False:
+            last_day_of_feb2 = is_last_day_of_feb(dt2)
+            if last_day_of_feb2 is True and isTerminationDate is False:
                 d2 = 30
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
@@ -203,19 +203,19 @@ class DayCount:
                 num = dt2 - dt1
                 den = denom1
                 acc_factor = (dt2 - dt1) / denom1
-                return (acc_factor, num, den)
+                return acc_factor, num, den
             else:
                 day_years_1 = datediff(dt1, Date(1, 1, y1 + 1))
                 day_years_2 = datediff(Date(1, 1, y2), dt2)
                 acc_factor1 = day_years_1 / denom1
                 acc_factor2 = day_years_2 / denom2
-                yearDiff = y2 - y1 - 1.0
+                year_diff = y2 - y1 - 1.0
                 # Note that num/den does not equal acc_factor
                 # I do need to pass num back
                 num = day_years_1 + day_years_2
                 den = denom1 + denom2
-                acc_factor = acc_factor1 + acc_factor2 + yearDiff
-                return (acc_factor, num, den)
+                acc_factor = acc_factor1 + acc_factor2 + year_diff
+                return acc_factor, num, den
 
         elif self._type == DayCountTypes.ACT_ACT_ICMA:
 
@@ -227,21 +227,21 @@ class DayCount:
             num = dt2 - dt1
             den = freq * (dt3 - dt1)
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.ACT_365F:
 
             num = dt2 - dt1
             den = 365
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.ACT_360:
 
             num = dt2 - dt1
             den = 360
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.ACT_365L:
 
@@ -273,14 +273,14 @@ class DayCount:
                     den = 366
 
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         elif self._type == DayCountTypes.SIMPLE:
 
             num = dt2 - dt1
             den = gDaysInYear
             acc_factor = num / den
-            return (acc_factor, num, den)
+            return acc_factor, num, den
 
         else:
 

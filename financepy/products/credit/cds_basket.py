@@ -93,7 +93,7 @@ class CDSBasket:
         num_payments = len(payment_dts)
         day_count = DayCount(self._dc_type)
 
-        averageAccrualFactor = 0.0
+        avg_acc_factor = 0.0
 
         rpv01ToTimes = np.zeros(num_payments)
 
@@ -103,13 +103,13 @@ class CDSBasket:
             dt0 = payment_dts[i_time - 1]
             dt1 = payment_dts[i_time]
             accrual_factor = day_count.year_frac(dt0, dt1)[0]
-            averageAccrualFactor += accrual_factor
+            avg_acc_factor += accrual_factor
             rpv01ToTimes[i_time] = rpv01ToTimes[i_time - 1] + \
                 accrual_factor * libor_curve._df(t)
 
-        averageAccrualFactor /= num_payments
+        avg_acc_factor /= num_payments
 
-        tmat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
 
         rpv01 = 0.0
         prot = 0.0
@@ -128,12 +128,11 @@ class CDSBasket:
             # GET THE Nth DEFAULT TIME
             minTau = assetTau[n_to_default - 1]
 
-            if minTau < tmat:
+            if minTau < t_mat:
 
-                numPaymentsIndex = int(minTau / averageAccrualFactor)
-                rpv01_trial = rpv01ToTimes[numPaymentsIndex]
-                rpv01_trial += (minTau - numPaymentsIndex *
-                               averageAccrualFactor)
+                num_pmnts_index = int(minTau / avg_acc_factor)
+                rpv01_trial = rpv01ToTimes[num_pmnts_index]
+                rpv01_trial += (minTau - num_pmnts_index * avg_acc_factor)
 
                 # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
                 assetIndex = 0
@@ -147,7 +146,7 @@ class CDSBasket:
 
             else:
 
-                numPaymentsIndex = int(tmat / averageAccrualFactor)
+                num_pmnts_index = int(t_mat / avg_acc_factor)
                 rpv01_trial = rpv01ToTimes[-1]
                 prot_trial = 0.0
 
@@ -255,9 +254,9 @@ class CDSBasket:
         if n_to_default < 1 or n_to_default > num_credits:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        tmat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
 
-        if tmat < 0.0:
+        if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
 
         payment_dts = self._cds_contract._payment_dts
@@ -299,13 +298,13 @@ class CDSBasket:
         basket_curve._times = basket_times
         basket_curve._values = basket_surv_curve
 
-        protLegPV = self._cds_contract.protection_leg_pv(
+        prot_leg_pv = self._cds_contract.protection_leg_pv(
             value_dt, basket_curve, curve_recovery)
         risky_pv01 = self._cds_contract.risky_pv01(
             value_dt, basket_curve)['clean_rpv01']
 
         # Long protection
-        mtm = self._notional * (protLegPV - risky_pv01 * self._running_cpn)
+        mtm = self._notional * (prot_leg_pv - risky_pv01 * self._running_cpn)
 
         if not self._long_protection:
             mtm *= -1.0
@@ -313,8 +312,8 @@ class CDSBasket:
         basketOutput = np.zeros(4)
         basketOutput[0] = mtm
         basketOutput[1] = risky_pv01 * self._notional * self._running_cpn
-        basketOutput[2] = protLegPV * self._notional
-        basketOutput[3] = protLegPV / risky_pv01
+        basketOutput[2] = prot_leg_pv * self._notional
+        basketOutput[3] = prot_leg_pv / risky_pv01
 
         return basketOutput
 

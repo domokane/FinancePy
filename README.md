@@ -58,15 +58,15 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
-I have encountered problems using Anaconda3-2020.07 due to some Numba and LLVMLite problems. However Anaconda3-2020.02 works.
+I have encountered problems using Anaconda3-2020.07 due to some Numba and LLVMLite problems. However, Anaconda3-2020.02 works.
 
 ## Using FinancePy in a Jupyter Notebook
 
 Once financepy has been installed, it is easy to get started.
 
-Just download the project and examine the set of Jupyter Notebooks in the notebooks folder.
+Just download the project and examine the set of Jupyter Notebooks in the notebook folder.
 
-A pdf manual describing all of the functions can be found in the project directory.
+A pdf manual describing all the functions can be found in the project directory.
 
 ## Overview
 
@@ -139,7 +139,7 @@ See the changelog for a detailed history of changes.
 Contributions are very welcome. There are a number of requirements:
 
 * The code should be Pep8 compliant.
-* Comments are required for every class and function and they should be a clear description.
+* Comments are required for every class and function, and they should be a clear description.
 * At least one broad test case and a set of unit tests must be provided for every function.
 * Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability is the priority.
 

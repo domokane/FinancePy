@@ -59,9 +59,9 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 #     dt = 0.5
 #     t_exp = 3.0
-#     tmat = 10.0
+#     t_mat = 10.0
 #     a = int(2*t_exp)
-#     b = int(2*tmat)
+#     b = int(2*t_mat)
 #     numFwds = 20
 #     taus = np.array([dt] * numFwds)
 

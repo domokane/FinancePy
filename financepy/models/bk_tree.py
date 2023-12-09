@@ -46,13 +46,13 @@ def option_exercise_types_to_int(optionExerciseType):
       fastmath=True, cache=True)
 def f(alpha, nm, Q, P, dX, dt, N):
 
-    sumQZ = 0.0
+    sum_qz = 0.0
     for j in range(-nm, nm+1):
         x = alpha + j*dX
         rdt = np.exp(x)*dt
-        sumQZ += Q[j+N] * np.exp(-rdt)
+        sum_qz += Q[j+N] * np.exp(-rdt)
 
-    obj_fn = sumQZ - P
+    obj_fn = sum_qz - P
     return obj_fn
 
 ###############################################################################
@@ -62,13 +62,13 @@ def f(alpha, nm, Q, P, dX, dt, N):
       fastmath=True, cache=True)
 def fprime(alpha, nm, Q, P, dX, dt, N):
 
-    sumQZdZ = 0.0
+    sum_q_zd_z = 0.0
     for j in range(-nm, nm+1):
         x = alpha + j*dX
         rdt = np.exp(x)*dt
-        sumQZdZ += Q[j+N] * np.exp(-rdt) * np.exp(x)
+        sum_q_zd_z += Q[j+N] * np.exp(-rdt) * np.exp(x)
 
-    deriv = -sumQZdZ*dt
+    deriv = -sum_q_zd_z*dt
     return deriv
 
 ###############################################################################
@@ -101,7 +101,7 @@ def search_root(x0, nm, Q, P, dX, dt, N):
         x1 = x
         f1 = f(x1, nm, Q, P, dX, dt, N)
 
-        if (abs(f1) <= max_error):
+        if abs(f1) <= max_error:
             return x1
 
     raise FinError("Search root deriv FAILED to find alpha.")
@@ -141,7 +141,7 @@ def search_root_deriv(x0, nm, Q, P, dX, dt, N):
 
 
 @njit(fastmath=True, cache=True)
-def bermudan_swaption_tree_fast(t_exp, tmat,
+def bermudan_swaption_tree_fast(t_exp, t_mat,
                                 strike_price, face_amount,
                                 cpn_times, cpn_flows,
                                 exercise_type_int,
@@ -157,10 +157,10 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
     num_time_steps, num_nodes = _Q.shape
     j_max = ceil(0.1835/(_a * _dt))
     expiry_step = int(t_exp/_dt + 0.50)
-    maturity_step = int(tmat/_dt + 0.50)
+    maturity_step = int(t_mat/_dt + 0.50)
 
     ###########################################################################
-    # I shove the floating rate value into the grid so it is handled in terms
+    # I shove the floating rate value into the grid, so it is handled in terms
     # of PV - it will not sit on a grid date so needs to be PV adjusted.
     # This is the value of the floating leg - this is a ONE CURVE approach.
     ###########################################################################
@@ -368,7 +368,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
 
 @njit(fastmath=True, cache=True)
-def american_bond_option_tree_fast(t_exp, tmat,
+def american_bond_option_tree_fast(t_exp, t_mat,
                                    strike_price, face_amount,
                                    cpn_times, cpn_flows,
                                    exercise_type_int,
@@ -388,7 +388,7 @@ def american_bond_option_tree_fast(t_exp, tmat,
     num_time_steps, num_nodes = _Q.shape
     j_max = ceil(0.1835/(_a * _dt))
     expiry_step = int(t_exp/_dt + 0.50)
-    maturity_step = int(tmat/_dt + 0.50)
+    maturity_step = int(t_mat/_dt + 0.50)
 
     ###########################################################################
 
@@ -607,8 +607,8 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
     j_max = ceil(0.1835/(_a * _dt))
-    tmat = cpn_times[-1]
-    maturity_step = int(tmat/dt + 0.50)
+    t_mat = cpn_times[-1]
+    maturity_step = int(t_mat/dt + 0.50)
 
     ###########################################################################
     # Map coupons onto tree while preserving their present value
@@ -900,7 +900,7 @@ class BKTree():
 
 ###############################################################################
 
-    def build_tree(self, tmat, df_times, df_values):
+    def build_tree(self, t_mat, df_times, df_values):
 
         if isinstance(df_times, np.ndarray) is False:
             raise FinError("DF TIMES must be a numpy vector")
@@ -910,7 +910,7 @@ class BKTree():
 
         interp = InterpTypes.FLAT_FWD_RATES.value
 
-        treeMaturity = tmat * (self._num_time_steps+1)/self._num_time_steps
+        treeMaturity = t_mat * (self._num_time_steps+1)/self._num_time_steps
         tree_times = np.linspace(0.0, treeMaturity, self._num_time_steps + 2)
         self._tree_times = tree_times
 
@@ -939,9 +939,9 @@ class BKTree():
 
         exercise_type_int = option_exercise_types_to_int(exercise_type)
 
-        tmat = cpn_times[-1]
+        t_mat = cpn_times[-1]
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
@@ -950,7 +950,7 @@ class BKTree():
         #######################################################################
 
         call_value, put_value \
-            = american_bond_option_tree_fast(t_exp, tmat,
+            = american_bond_option_tree_fast(t_exp, t_mat,
                                              strike_price, face_amount,
                                              cpn_times, cpn_flows,
                                              exercise_type_int,
@@ -964,7 +964,7 @@ class BKTree():
 
 ###############################################################################
 
-    def bermudan_swaption(self, t_exp, tmat, strike_price, face_amount,
+    def bermudan_swaption(self, t_exp, t_mat, strike_price, face_amount,
                           cpn_times, cpn_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
@@ -972,9 +972,9 @@ class BKTree():
 
         exercise_type_int = option_exercise_types_to_int(exercise_type)
 
-        tmat = cpn_times[-1]
+        t_mat = cpn_times[-1]
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
@@ -983,7 +983,7 @@ class BKTree():
         #######################################################################
 
         payValue, recValue \
-            = bermudan_swaption_tree_fast(t_exp, tmat,
+            = bermudan_swaption_tree_fast(t_exp, t_mat,
                                           strike_price, face_amount,
                                           cpn_times, cpn_flows,
                                           exercise_type_int,

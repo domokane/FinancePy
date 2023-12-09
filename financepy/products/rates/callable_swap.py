@@ -196,7 +196,7 @@
 #         put_prices = np.array(self._put_prices)
 
 #         maturity_dt = self._bond._maturity_dt
-#         tmat = (maturity_dt - settle_dt) / gDaysInYear
+#         t_mat = (maturity_dt - settle_dt) / gDaysInYear
 #         df_times = discount_curve._times
 #         df_values = discount_curve._values
 
@@ -208,12 +208,12 @@
 #             more precise we only need to go out the the last option date but
 #             we can do that refinement at a later date. """
 
-#             model.buildTree(tmat, df_times, df_values)
+#             model.buildTree(t_mat, df_times, df_values)
 #             v1 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
 #             model._num_time_steps += 1
-#             model.buildTree(tmat, df_times, df_values)
+#             model.buildTree(t_mat, df_times, df_values)
 #             v2 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
@@ -229,13 +229,13 @@
 #             """ Because we not have a closed form bond price we need to build
 #             the tree out to the bond maturity which is after option expiry. """
 
-#             model.buildTree(tmat, df_times, df_values)
+#             model.buildTree(t_mat, df_times, df_values)
 #             v1 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
 #             model._num_time_steps += 1
-#             model.buildTree(tmat, df_times, df_values)
+#             model.buildTree(t_mat, df_times, df_values)
 #             v2 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,

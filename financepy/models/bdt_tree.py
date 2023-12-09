@@ -94,7 +94,7 @@ def search_root(x0, m, q_matrix, rt, df_end, dt, sigma):
 
 
 @njit(fastmath=True, cache=True)
-def bermudan_swaption_tree_fast(t_exp, tmat,
+def bermudan_swaption_tree_fast(t_exp, t_mat,
                                 strike_price,
                                 face_amount,
                                 cpn_times,
@@ -116,7 +116,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
     num_time_steps, num_nodes = _Q.shape
     expiry_step = int(t_exp/_dt + 0.50)
-    maturity_step = int(tmat/_dt + 0.50)
+    maturity_step = int(t_mat/_dt + 0.50)
 
     ###########################################################################
 
@@ -247,7 +247,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat,
 
 
 @njit(fastmath=True, cache=True)
-def american_bond_option_tree_fast(t_exp, tmat,
+def american_bond_option_tree_fast(t_exp, t_mat,
                                    strike_price, face_amount,
                                    cpn_times, cpn_flows,
                                    exercise_type_int,
@@ -274,7 +274,7 @@ def american_bond_option_tree_fast(t_exp, tmat,
 
     num_time_steps, num_nodes = _Q.shape
     expiry_step = int(t_exp/_dt + 0.50)
-    maturity_step = int(tmat/_dt + 0.50)
+    maturity_step = int(t_mat/_dt + 0.50)
 
     ###########################################################################
 
@@ -447,8 +447,8 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     #######################################################################
     num_time_steps, num_nodes = _q_matrix.shape
     dt = _dt
-    tmat = cpn_times[-1]
-    maturity_step = int(tmat/dt + 0.50)
+    t_mat = cpn_times[-1]
+    maturity_step = int(t_mat/dt + 0.50)
 
     ###########################################################################
     # Map coupons onto tree while preserving their present value
@@ -588,8 +588,8 @@ def build_tree_fast(sigma, tree_times, num_time_steps, discount_factors):
     dt = tree_maturity / (num_time_steps+1)
 
     # The short rate goes out one step extra to have the final short rate
-    # as it follows HW code but I am not sure this is needed. EXAMINE
-    # NOTE HW code uses this to have short rate at expiry so it can use
+    # as it follows HW code, but I am not sure if this is needed. EXAMINE
+    # NOTE HW code uses this to have short rate at expiry, so it can use
     # analytical solutions for the zero coupon bond price
     # This is the BDT model so x = log(r)
 
@@ -616,7 +616,7 @@ def build_tree_fast(sigma, tree_times, num_time_steps, discount_factors):
         Q[1, 1] = 0.50 / ((1.0 + rt[0, 0]) ** dt)
 
     # The short rate goes out one step extra to have the final short rate
-    # as it follows HW code but I am not sure this is needed. EXAMINE
+    # as it follows HW code, but I am not sure if this is needed. EXAMINE
     for m in range(1, num_time_steps+1):
 
         df_end = discount_factors[m+1]
@@ -713,9 +713,9 @@ class BDTTree():
 
         exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
-        tmat = cpn_times[-1]
+        t_mat = cpn_times[-1]
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
@@ -724,7 +724,7 @@ class BDTTree():
         #######################################################################
 
         call_value, put_value \
-            = american_bond_option_tree_fast(t_exp, tmat,
+            = american_bond_option_tree_fast(t_exp, t_mat,
                                              strike_price, face_amount,
                                              cpn_times, cpn_flows,
                                              exercise_typeInt,
@@ -737,7 +737,7 @@ class BDTTree():
 
 ###############################################################################
 
-    def bermudan_swaption(self, t_exp, tmat, strike, face_amount,
+    def bermudan_swaption(self, t_exp, t_mat, strike, face_amount,
                           cpn_times, cpn_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
@@ -745,9 +745,9 @@ class BDTTree():
 
         exercise_type_int = option_exercise_types_to_int(exercise_type)
 
-        tmat = cpn_times[-1]
+        t_mat = cpn_times[-1]
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
@@ -756,7 +756,7 @@ class BDTTree():
         #######################################################################
 
         payValue, recValue \
-            = bermudan_swaption_tree_fast(t_exp, tmat,
+            = bermudan_swaption_tree_fast(t_exp, t_mat,
                                           strike, face_amount,
                                           cpn_times, cpn_flows,
                                           exercise_type_int,

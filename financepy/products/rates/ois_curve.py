@@ -254,12 +254,12 @@ class OISCurve(DiscountCurve):
         # Now we have ensure they are in order check for overlaps and the like
         #######################################################################
 
-        lastDepositMaturityDate = Date(1, 1, 1900)
+        lastDeposit_maturityDate = Date(1, 1, 1900)
         firstFRAMaturityDate = Date(1, 1, 1900)
         lastFRAMaturityDate = Date(1, 1, 1900)
 
         if num_depos > 0:
-            lastDepositMaturityDate = oisDeposits[-1]._maturity_dt
+            lastDeposit_maturityDate = oisDeposits[-1]._maturity_dt
 
         if num_fras > 0:
             firstFRAMaturityDate = oisFRAs[0]._maturity_dt
@@ -273,9 +273,9 @@ class OISCurve(DiscountCurve):
                 raise FinError("First Swap must mature after last FRA ends")
 
         if num_depos > 0 and num_fras > 0:
-            if firstFRAMaturityDate <= lastDepositMaturityDate:
+            if firstFRAMaturityDate <= lastDeposit_maturityDate:
                 print("FRA Maturity Date:", firstFRAMaturityDate)
-                print("Last Deposit Date:", lastDepositMaturityDate)
+                print("Last Deposit Date:", lastDeposit_maturityDate)
                 raise FinError("First FRA must end after last Deposit")
 
         if num_fras > 0 and num_swaps > 0:
@@ -321,7 +321,7 @@ class OISCurve(DiscountCurve):
         self._dfs = np.array([])
 
         # time zero is now.
-        tmat = 0.0
+        t_mat = 0.0
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
@@ -330,27 +330,27 @@ class OISCurve(DiscountCurve):
         for depo in self._usedDeposits:
             df_settle = self.df(depo._start_dt)
             df_mat = depo._maturity_df() * df_settle
-            tmat = (depo._maturity_dt - self._value_dt) / gDaysInYear
-            self._times = np.append(self._times, tmat)
+            t_mat = (depo._maturity_dt - self._value_dt) / gDaysInYear
+            self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self._interpolator.fit(self._times, self._dfs)
 
-        oldtmat = tmat
+        old_t_mat = t_mat
 
         for fra in self._usedFRAs:
 
-            tset = (fra._start_dt - self._value_dt) / gDaysInYear
-            tmat = (fra._maturity_dt - self._value_dt) / gDaysInYear
+            t_set = (fra._start_dt - self._value_dt) / gDaysInYear
+            t_mat = (fra._maturity_dt - self._value_dt) / gDaysInYear
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
 
-            if tset < oldtmat and tmat > oldtmat:
+            if t_set < old_t_mat and t_mat > old_t_mat:
                 df_mat = fra.maturity_df(self)
-                self._times = np.append(self._times, tmat)
+                self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
             else:
-                self._times = np.append(self._times, tmat)
+                self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
                 argtuple = (self, self._value_dt, fra)
                 df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
@@ -361,9 +361,9 @@ class OISCurve(DiscountCurve):
             # I use the lastPaymentDate in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap._fixed_leg._payment_dts[-1]
-            tmat = (maturity_dt - self._value_dt) / gDaysInYear
+            t_mat = (maturity_dt - self._value_dt) / gDaysInYear
 
-            self._times = np.append(self._times, tmat)
+            self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
 
             argtuple = (self, self._value_dt, swap)
@@ -383,12 +383,11 @@ class OISCurve(DiscountCurve):
         require the use of a solver. It is also market standard. """
 
         self._interpolator = Interpolator(self._interp_type)
-
         self._times = np.array([])
         self._dfs = np.array([])
 
         # time zero is now.
-        tmat = 0.0
+        t_mat = 0.0
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
@@ -396,35 +395,35 @@ class OISCurve(DiscountCurve):
         for depo in self._usedDeposits:
             df_settle = self.df(depo._start_dt)
             df_mat = depo._maturity_df() * df_settle
-            tmat = (depo._maturity_dt - self._value_dt) / gDaysInYear
-            self._times = np.append(self._times, tmat)
+            t_mat = (depo._maturity_dt - self._value_dt) / gDaysInYear
+            self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self._interpolator.fit(self._times, self._dfs)
 
-        oldtmat = tmat
+        old_t_mat = t_mat
 
         for fra in self._usedFRAs:
 
-            tset = (fra._start_dt - self._value_dt) / gDaysInYear
-            tmat = (fra._maturity_dt - self._value_dt) / gDaysInYear
+            t_set = (fra._start_dt - self._value_dt) / gDaysInYear
+            t_mat = (fra._maturity_dt - self._value_dt) / gDaysInYear
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
 
-            if tset < oldtmat and tmat > oldtmat:
+            if t_set < old_t_mat and t_mat > old_t_mat:
                 df_mat = fra.maturity_df(self)
-                self._times = np.append(self._times, tmat)
+                self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
                 self._interpolator.fit(self._times, self._dfs)
             else:
-                self._times = np.append(self._times, tmat)
+                self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
                 self._interpolator.fit(self._times, self._dfs)
 
                 argtuple = (self, self._value_dt, fra)
                 df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
-                                        args=argtuple, tol=swaptol,
-                                        maxiter=50, fprime2=None)
+                                         args=argtuple, tol=swaptol,
+                                         maxiter=50, fprime2=None)
 
         if len(self._usedSwaps) == 0:
             if self._check_refit is True:
@@ -436,13 +435,13 @@ class OISCurve(DiscountCurve):
         #######################################################################
 
         # Find where the FRAs and Depos go up to as this bit of curve is done
-        foundStart = False
-        lastDate = self._value_dt
+        found_start = False
+        last_dt = self._value_dt
         if len(self._usedDeposits) != 0:
-            lastDate = self._usedDeposits[-1]._maturity_dt
+            last_dt = self._usedDeposits[-1]._maturity_dt
 
         if len(self._usedFRAs) != 0:
-            lastDate = self._usedFRAs[-1]._maturity_dt
+            last_dt = self._usedFRAs[-1]._maturity_dt
 
         # We use the longest swap assuming it has a superset of ALL of the
         # swap flow dates used in the curve construction
@@ -453,12 +452,12 @@ class OISCurve(DiscountCurve):
         # Find where first coupon without discount factor starts
         start_index = 0
         for i in range(0, num_flows):
-            if cpn_dts[i] > lastDate:
+            if cpn_dts[i] > last_dt:
                 start_index = i
-                foundStart = True
+                found_start = True
                 break
 
-        if foundStart is False:
+        if found_start is False:
             raise FinError("Found start is false. Swaps payments inside FRAs")
 
         swap_rates = []
@@ -474,18 +473,17 @@ class OISCurve(DiscountCurve):
             swap_times.append(tswap)
             swap_rates.append(swap_rate)
 
-        interpolatedSwapRates = [0.0]
-        interpolatedswap_times = [0.0]
+        interpolated_swap_rates = [0.0]
+        interpolated_swap_times = [0.0]
 
         for dt in cpn_dts[1:]:
-            swapTime = (dt - self._value_dt) / gDaysInYear
-            swap_rate = np.interp(swapTime, swap_times, swap_rates)
-            interpolatedSwapRates.append(swap_rate)
-            interpolatedswap_times.append(swapTime)
+            swap_time = (dt - self._value_dt) / gDaysInYear
+            swap_rate = np.interp(swap_time, swap_times, swap_rates)
+            interpolated_swap_rates.append(swap_rate)
+            interpolated_swap_times.append(swap_time)
 
         # Do I need this line ?
-        interpolatedSwapRates[0] = interpolatedSwapRates[1]
-
+        interpolated_swap_rates[0] = interpolated_swap_rates[1]
         accrual_factors = longestSwap._fixed_year_fracs
 
         acc = 0.0
@@ -502,14 +500,14 @@ class OISCurve(DiscountCurve):
         for i in range(start_index, num_flows):
 
             dt = cpn_dts[i]
-            tmat = (dt - self._value_dt) / gDaysInYear
-            swap_rate = interpolatedSwapRates[i]
+            t_mat = (dt - self._value_dt) / gDaysInYear
+            swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i-1]
             pv01End = (acc * swap_rate + 1.0)
 
             df_mat = (df_settle - swap_rate * pv01) / pv01End
 
-            self._times = np.append(self._times, tmat)
+            self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self._interpolator.fit(self._times, self._dfs)
 

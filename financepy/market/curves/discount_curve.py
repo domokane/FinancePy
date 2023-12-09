@@ -40,7 +40,6 @@ class DiscountCurve:
         specify any compounding convention or day count calculation since
         discount factors are pure prices. We do however need to specify a
         convention for interpolating the discount factors in time."""
-
         check_argument_types(self.__init__, locals())
 
         # Validate curve
@@ -85,7 +84,7 @@ class DiscountCurve:
     ###########################################################################
 
     def _zero_to_df(self,
-                    value_dt: Date,    #TODO: why is value_date not used ?
+                    value_dt: Date,  # TODO: why is value_date not used ?
                     rates: (float, np.ndarray),
                     times: (float, np.ndarray),
                     freq_type: FrequencyTypes,

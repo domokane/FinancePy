@@ -25,9 +25,9 @@ def test_BKExampleOne():
     sigma = 0.25
     a = 0.22
     num_time_steps = 3
-    tmat = (end_dt - start_dt)/gDaysInYear
+    t_mat = (end_dt - start_dt)/gDaysInYear
     model = BKTree(sigma, a, num_time_steps)
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
 
     assert [round(x, 4) for x in model._Q[2]] == \
         [0.0190, 0.2126, 0.5009, 0.2112, 0.0187]
@@ -86,9 +86,9 @@ def test_BKExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / gDaysInYear
     t_exp = (expiry_dt - settle_dt) / gDaysInYear
-    times = np.linspace(0, tmat, 11)
+    times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05*times)
     curve = DiscountCurve(settle_dt, dates, dfs)
@@ -101,7 +101,7 @@ def test_BKExampleTwo():
     num_time_steps = 26
 
     model = BKTree(sigma, a, num_time_steps)
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
     exercise_type = FinExerciseTypes.AMERICAN
     v = model.bond_option(t_exp, strike_price, face, cpn_times,
                           cpn_flows, exercise_type)
@@ -112,7 +112,7 @@ def test_BKExampleTwo():
 
     treeVector = []
     model = BKTree(sigma, a, num_time_steps)
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
     v = model.bond_option(t_exp, strike_price,
                           face, cpn_times, cpn_flows, exercise_type)
     treeVector.append(v)

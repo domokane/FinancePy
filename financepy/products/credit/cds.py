@@ -134,7 +134,7 @@ def _risky_pv01_numba(teff,
 @njit(float64(float64, float64, float64[:], float64[:], float64[:], float64[:],
               float64, int64, int64), fastmath=True, cache=True)
 def _protection_leg_pv_numba(teff,
-                             tmat,
+                             t_mat,
                              npIborTimes,
                              npIborValues,
                              npSurvTimes,
@@ -147,8 +147,8 @@ def _protection_leg_pv_numba(teff,
 
     method = InterpTypes.FLAT_FWD_RATES.value
     dt = 1.0 / num_steps_per_year
-    num_steps = int((tmat-teff) * num_steps_per_year + 0.50)
-    dt = (tmat - teff) / num_steps
+    num_steps = int((t_mat-teff) * num_steps_per_year + 0.50)
+    dt = (t_mat - teff) / num_steps
 
     t = teff
     z1 = _uinterpolate(t, npIborTimes, npIborValues, method)
@@ -542,7 +542,7 @@ class CDS:
     ###########################################################################
 
     def accrued_days(self):
-        """ Number of days between the previous cpn and the currrent step
+        """ Number of days between the previous coupon and the currrent step
         in date. """
 
         # I assume accrued runs to the effective date
@@ -579,12 +579,12 @@ class CDS:
         fast NUMBA code that has been defined above. """
 
         teff = (self._step_in_dt - value_dt) / gDaysInYear
-        tmat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
 
         libor_curve = issuer_curve._libor_curve
 
         v = _protection_leg_pv_numba(teff,
-                                     tmat,
+                                     t_mat,
                                      libor_curve._times,
                                      libor_curve._dfs,
                                      issuer_curve._times,
@@ -784,7 +784,7 @@ class CDS:
     ###########################################################################
 
     def __repr__(self):
-        """ print out details of the CDS contract and all of the calculated
+        """ print out details of the CDS contract and all the calculated
         cash flows """
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("STEP-IN DATE", self._step_in_dt)

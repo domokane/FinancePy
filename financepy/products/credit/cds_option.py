@@ -133,7 +133,7 @@ class CDSOption:
 
         option_value = option_value * forward_rpv01
 
-        # If the option does not knockout on a default before expiry then we
+        # If the option does not knock out on a default before expiry then we
         # need to include the cost of protection which is provided between
         # the value date and the expiry date
         if self._knockout_flag is False and self._long_protection is True:

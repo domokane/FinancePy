@@ -99,7 +99,7 @@ class FinTestCases():
             print("Looking for:", self._goldenFolder)
             print("GOLDEN Folder DOES NOT EXIST. You must create it. Exiting")
             self._foldersExist = False
-            return None
+            return
 
         self._compare_folder = join(root_folder, "compare")
 
@@ -107,7 +107,7 @@ class FinTestCases():
             print("Looking for:", self._compare_folder)
             print("COMPARE Folder DOES NOT EXIST. You must create it. Exiting")
             self._foldersExist = False
-            return None
+            return
 
         self._golden_file_name = join(self._goldenFolder,
                                      self._module_name + "_GOLDEN.testLog")

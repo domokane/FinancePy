@@ -157,7 +157,7 @@ def calculate_list():
                     g_date_counter_list.append(-999)
 
 ###############################################################################
-# The index in these functions is not the excel date index used as the
+# The index in these functions is not the Excel date index used as the
 # internal representation of the date but the index of that date in the
 # padded date object used to store the dates in a way that allows for a
 # quick lookup. Do not confuse them as you will find they are out by months
@@ -291,7 +291,7 @@ class Date():
 
         self._excel_dt = 0  # This is a float as it includes intraday time
 
-        # update the excel date used for doing lots of financial calculations
+        # update the Excel date used for doing lots of financial calculations
         self._refresh()
 
         day_fraction = self._hh/24.0
@@ -392,7 +392,6 @@ class Date():
         return self._excel_dt - other._excel_dt
 
     ###########################################################################
-
 
     @vectorisation_helper
     def __rsub__(self, other):
@@ -707,16 +706,16 @@ class Date():
         """ For a specific month and year this returns the day number of the
             3rd Wednesday by scanning through dates in the third week. """
 
-        # Suppose 1st is Weds then 8th is Wed and 15th is 3rd Wed
-        # Suppose 1st is Thur then 7th is Wed and 14th is 2nd Wed so 21 is 3rd
-        # so earliest and latest dates are 15th and 21st
+        # Suppose 1st is Weds then 8th is Wed and 15th is 3rd Wednesday
+        # Suppose 1st is Thur then 7th is Wed and 14th is 2nd Wednesday so 21
+        # is 3rd so earliest and latest dates are 15th and 21st
 
         d_start = 15
         d_end = 21
 
         for d in range(d_start, d_end+1):
-            immDate = Date(d, m, y)
-            if immDate._weekday == self.WED:
+            imm_date = Date(d, m, y)
+            if imm_date._weekday == self.WED:
                 return d
 
         # Should never reach this line but just to be defensive
@@ -756,8 +755,8 @@ class Date():
 
         d_imm = self.third_wednesday_of_month(m_imm, y_imm)
 
-        immDate = Date(d_imm, m_imm, y_imm)
-        return immDate
+        imm_date = Date(d_imm, m_imm, y_imm)
+        return imm_date
 
     ###########################################################################
 
@@ -878,75 +877,75 @@ class Date():
 
         global g_date_type_format
 
-        dayNameStr = short_day_names[self._weekday]
+        day_name_str = short_day_names[self._weekday]
 
         if self._d < 10:
-            dayStr = "0" + str(self._d)
+            day_str = "0" + str(self._d)
         else:
-            dayStr = "" + str(self._d)
+            day_str = "" + str(self._d)
 
         if self._m < 10:
-            shortMonthStr = "0" + str(self._m)
+            short_month_str = "0" + str(self._m)
         else:
-            shortMonthStr = str(self._m)
+            short_month_str = str(self._m)
 
-        longMonthStr = shortMonthNames[self._m - 1]
+        long_month_str = shortMonthNames[self._m - 1]
 
-        shortYearStr = str(self._y)[2:]
-        longYearStr = str(self._y)
+        short_year_str = str(self._y)[2:]
+        long_year_str = str(self._y)
 
         if g_date_type_format == DateFormatTypes.UK_LONGEST:
 
             sep = " "
-            date_str = dayNameStr + " " + dayStr + sep + longMonthStr + sep + longYearStr
+            date_str = day_name_str + " " + day_str + sep + long_month_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.UK_LONG:
 
             sep = "-"
-            date_str = dayStr + sep + longMonthStr + sep + longYearStr
+            date_str = day_str + sep + long_month_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.UK_MEDIUM:
 
             sep = "/"
-            date_str = dayStr + sep + shortMonthStr + sep + longYearStr
+            date_str = day_str + sep + short_month_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.UK_SHORT:
 
             sep = "/"
-            date_str = dayStr + sep + shortMonthStr + sep + shortYearStr
+            date_str = day_str + sep + short_month_str + sep + short_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.US_LONGEST:
 
             sep = " "
-            date_str = dayNameStr + " " + longMonthStr + sep + dayStr + sep + longYearStr
+            date_str = day_name_str + " " + long_month_str + sep + day_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.US_LONG:
 
             sep = "-"
-            date_str = longMonthStr + sep + dayStr + sep + longYearStr
+            date_str = long_month_str + sep + day_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.US_MEDIUM:
 
             sep = "-"
-            date_str = shortMonthStr + sep + dayStr + sep + longYearStr
+            date_str = short_month_str + sep + day_str + sep + long_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.US_SHORT:
 
             sep = "-"
-            date_str = shortMonthStr + sep + dayStr + sep + shortYearStr
+            date_str = short_month_str + sep + day_str + sep + short_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.BLOOMBERG:
 
             sep = "/"
-            date_str = shortMonthStr + sep + dayStr + sep + shortYearStr
+            date_str = short_month_str + sep + day_str + sep + short_year_str
             return date_str
 
         elif g_date_type_format == DateFormatTypes.DATETIME:
@@ -954,23 +953,23 @@ class Date():
             sep = "/"
 
             if self._hh < 10:
-                hourStr = "0" + str(self._hh)
+                hour_str = "0" + str(self._hh)
             else:
-                hourStr = str(self._hh)
+                hour_str = str(self._hh)
 
             if self._mm < 10:
-                minuteStr = "0" + str(self._mm)
+                minute_str = "0" + str(self._mm)
             else:
-                minuteStr = str(self._mm)
+                minute_str = str(self._mm)
 
             if self._ss < 10:
-                secondStr = "0" + str(self._ss)
+                second_str = "0" + str(self._ss)
             else:
-                secondStr = str(self._ss)
+                second_str = str(self._ss)
 
-            timeStr = hourStr + ":" + minuteStr + ":" + secondStr
-            date_str = dayStr + sep + shortMonthStr + sep + longYearStr
-            date_str = date_str + " " + timeStr
+            time_str = hour_str + ":" + minute_str + ":" + second_str
+            date_str = day_str + sep + short_month_str + sep + long_year_str
+            date_str = date_str + " " + time_str
             return date_str
 
         else:
@@ -1022,8 +1021,8 @@ def from_datetime(dt: Date):
     """ Construct a Date from a datetime as this is often needed if we
     receive inputs from other Python objects such as Pandas dataframes. """
 
-    finDate = Date(dt.day, dt.month, dt.year)
-    return finDate
+    fin_date = Date(dt.day, dt.month, dt.year)
+    return fin_date
 
 ###############################################################################
 

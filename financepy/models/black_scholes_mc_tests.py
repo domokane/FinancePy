@@ -15,7 +15,7 @@ from math import exp, sqrt
 
 def value_mc1(s0, t, k, r, q, v, num_paths, seed):
 
-    vsqrtt = v * sqrt(t)
+    v_sqrtt = v * sqrt(t)
     st = s0 * exp((r - q - v*v / 2.0) * t)
 
     np.random.seed(seed)

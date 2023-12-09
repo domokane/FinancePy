@@ -25,8 +25,8 @@ freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
 bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-tmat = (maturity_dt - settle_dt) / gDaysInYear
-times = np.linspace(0, tmat, 20)
+t_mat = (maturity_dt - settle_dt) / gDaysInYear
+times = np.linspace(0, t_mat, 20)
 dates = settle_dt.add_years(times)
 dfs = np.exp(-0.05*times)
 discount_curve = DiscountCurve(settle_dt, dates, dfs)
@@ -163,7 +163,7 @@ def test_american_put_bdt():
 
 
 # Results different from TestFinBondOptionHWModel.py
-# because tmat != 10.0
+# because t_mat != 10.0
 def test_european_call_hw():
     option_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100

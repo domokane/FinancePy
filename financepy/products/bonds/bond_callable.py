@@ -57,7 +57,7 @@ class BondEmbeddedOption:
                  put_dts: List[Date],
                  put_prices: List[float]):
         """ Create a BondEmbeddedOption object with a maturity date, coupon
-        and all of the bond inputs. """
+        and all the bond inputs. """
 
         check_argument_types(self.__init__, locals())
 
@@ -166,7 +166,7 @@ class BondEmbeddedOption:
         put_prices = np.array(self._put_prices)
 
         maturity_dt = self._bond._maturity_dt
-        tmat = (maturity_dt - settle_dt) / gDaysInYear
+        t_mat = (maturity_dt - settle_dt) / gDaysInYear
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
@@ -178,13 +178,13 @@ class BondEmbeddedOption:
             more precise we only need to go out the the last option date but
             we can do that refinement at a later date. """
 
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
             v1 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
                                                    call_times, call_prices,
                                                    put_times, put_prices,
                                                    face_amount)
             model._num_time_steps += 1
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
             v2 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
                                                    call_times, call_prices,
                                                    put_times, put_prices,
@@ -201,13 +201,13 @@ class BondEmbeddedOption:
             """ Because we not have a closed form bond price we need to build
             the tree out to the bond maturity which is after option expiry. """
 
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
             v1 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
                                                    call_times, call_prices,
                                                    put_times, put_prices,
                                                    face_amount)
             model._num_time_steps += 1
-            model.build_tree(tmat, df_times, df_values)
+            model.build_tree(t_mat, df_times, df_values)
             v2 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
                                                    call_times, call_prices,
                                                    put_times, put_prices,

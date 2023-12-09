@@ -105,7 +105,7 @@ class BondFRN:
         """ Calculate the full price of the bond from its discount margin (DM)
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
-        Ibor rate from settlement to the next coupon date (NCD). Finally there
+        Ibor rate from settlement to the next coupon date (NCD). Finally, there
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
@@ -259,7 +259,7 @@ class BondFRN:
         """ Calculate the modified duration of the bond on a settlement date
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
-        Ibor rate from settlement to the next coupon date (NCD). Finally there
+        Ibor rate from settlement to the next coupon date (NCD). Finally, there
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
@@ -288,7 +288,7 @@ class BondFRN:
         """ Calculate the modified duration of the bond on a settlement date
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
-        Ibor rate from settlement to the next coupon date (NCD). Finally there
+        Ibor rate from settlement to the next coupon date (NCD). Finally, there
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
@@ -317,7 +317,7 @@ class BondFRN:
         """ Calculate the bond convexity from the discount margin (DM) using a
         standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
-        Ibor rate from settlement to the next coupon date (NCD). Finally there
+        Ibor rate from settlement to the next coupon date (NCD). Finally, there
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
@@ -355,7 +355,7 @@ class BondFRN:
         """ Calculate the bond clean price from the discount margin
         using standard model based on assumptions about future Ibor rates. The
         next Ibor payment which has reset is entered, so to is the current
-        Ibor rate from settlement to the next coupon date (NCD). Finally there
+        Ibor rate from settlement to the next coupon date (NCD). Finally, there
         is the level of subsequent future Ibor payments and the discount
         margin. """
 

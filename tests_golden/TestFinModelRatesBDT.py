@@ -92,7 +92,7 @@ def test_BDTExampleOne():
     yieldVol = 0.16
 
     num_time_steps = 5
-    tmat = years[-1]
+    t_mat = years[-1]
     dfs = curve.df(zero_dts)
 
     test_cases.print("DFS")
@@ -102,7 +102,7 @@ def test_BDTExampleOne():
     dfs = np.array(dfs)
 
     model = BDTTree(yieldVol, num_time_steps)
-    model.build_tree(tmat, years, dfs)
+    model.build_tree(t_mat, years, dfs)
 
 ###############################################################################
 
@@ -148,9 +148,9 @@ def test_BDTExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / gDaysInYear
     t_exp = (expiry_dt - settle_dt) / gDaysInYear
-    times = np.linspace(0, tmat, 11)
+    times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05*times)
 
@@ -172,7 +172,7 @@ def test_BDTExampleTwo():
     treeVector = []
     for num_time_steps in num_steps_list:
         model = BDTTree(sigma, num_time_steps)
-        model.build_tree(tmat, times, dfs)
+        model.build_tree(t_mat, times, dfs)
         v = model.bond_option(t_exp, strike_price,
                               face, cpn_times, cpn_flows, exercise_type)
 
@@ -217,7 +217,7 @@ def test_BDTExampleThree():
     # Andersen paper
     num_time_steps = 200
 
-    test_cases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat",
+    test_cases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "t_mat",
                      "V_Fixed", "V_pay", "V_rec")
 
     for exercise_type in [FinExerciseTypes.EUROPEAN,
@@ -239,7 +239,7 @@ def test_BDTExampleThree():
 
                 expiry_dt = settle_dt.add_years(expiryYears)
 
-                tmat = (maturity_dt - settle_dt) / gDaysInYear
+                t_mat = (maturity_dt - settle_dt) / gDaysInYear
                 t_exp = (expiry_dt - settle_dt) / gDaysInYear
 
                 bond = Bond(issue_dt, maturity_dt,
@@ -261,10 +261,10 @@ def test_BDTExampleThree():
                     settle_dt, curve)
 
                 model = BDTTree(sigma, num_time_steps)
-                model.build_tree(tmat, times, dfs)
+                model.build_tree(t_mat, times, dfs)
 
                 v = model.bermudan_swaption(t_exp,
-                                            tmat,
+                                            t_mat,
                                             strike_price,
                                             face,
                                             cpn_times,

@@ -274,7 +274,7 @@ class IborCapFloor():
 
         elif isinstance(model, HWTree):
 
-            tmat = (caplet_end_dt - value_dt) / gDaysInYear
+            t_mat = (caplet_end_dt - value_dt) / gDaysInYear
             alpha = self._day_counter.year_frac(caplet_start_dt,
                                                 caplet_end_dt)[0]
             strike_price = 1.0/(1.0 + alpha * self._strike_rate)
@@ -283,7 +283,7 @@ class IborCapFloor():
             df_times = libor_curve._times
             df_values = libor_curve._dfs
 
-            v = model.option_on_zcb(t_exp, tmat, strike_price, face_amount,
+            v = model.option_on_zcb(t_exp, t_mat, strike_price, face_amount,
                                     df_times, df_values)
 
             # we divide by alpha to offset the multiplication above

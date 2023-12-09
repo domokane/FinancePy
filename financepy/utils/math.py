@@ -21,7 +21,7 @@ ONE_BILLION = 1000000000
 
 
 @njit(fastmath=True, cache=True)
-def accrued_interpolator(tset: float,  # Settlement time in years
+def accrued_interpolator(t_set: float,  # Settlement time in years
                          cpn_times: np.ndarray,
                          cpn_amounts: np.ndarray):
     """ Fast calculation of accrued interest using an Actual/Actual type of
@@ -35,14 +35,14 @@ def accrued_interpolator(tset: float,  # Settlement time in years
         nct = cpn_times[i]
         denom = (nct-pct)
 
-        if tset >= pct and tset < nct:
-            accdFrac = (tset-pct) / denom
+        if t_set >= pct and t_set < nct:
+            accdFrac = (t_set-pct) / denom
             accdCpn = accdFrac * cpn_amounts[i]
             return accdCpn
 
     # TODO: NEED TO REVISIT THIS TODO
     return 0.0
-    print("t", tset)
+    print("t", t_set)
     print("CPN TIMES", cpn_times)
     print("CPN AMNTS", cpn_amounts)
 

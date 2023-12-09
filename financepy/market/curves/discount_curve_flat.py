@@ -23,8 +23,8 @@ from ...market.curves.interpolator import InterpTypes
 
 
 class DiscountCurveFlat(DiscountCurve):
-    """ A very simple discount curve based on a single zero rate with its
-    own specified compounding method. Hence the curve is assumed to be flat.
+    """A very simple discount curve based on a single zero rate with its
+    own specified compounding method. Hence, the curve is assumed to be flat.
     It is used for quick and dirty analysis and when limited information is
     available. It inherits several methods from FinDiscountCurve. """
 
@@ -49,7 +49,7 @@ class DiscountCurveFlat(DiscountCurve):
         self._freq_type = freq_type
         self._dc_type = dc_type
 
-        # This is used by some inherited functions so we choose the simplest
+        # This is used by some inherited functions, so we choose the simplest
         self._interp_type = InterpTypes.FLAT_FWD_RATES
 
         # Need to set up a grid of times and discount factors
@@ -64,7 +64,7 @@ class DiscountCurveFlat(DiscountCurve):
 
     def bump(self,
              bump_size: float):
-        """ Creates a new FinDiscountCurveFlat object with the entire curve
+        """ Create a new FinDiscountCurveFlat object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
         rate_bumped = self._flat_rate + bump_size
@@ -80,7 +80,7 @@ class DiscountCurveFlat(DiscountCurve):
            dts: (Date, list)):
         """ Return discount factors given a single or vector of dts. The
         discount factor depends on the rate and this in turn depends on its
-        compounding frequency and it defaults to continuous compounding. It
+        compounding frequency, and it defaults to continuous compounding. It
         also depends on the day count convention. This was set in the
         construction of the curve to be ACT_ACT_ISDA. """
 

@@ -40,7 +40,6 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes
 from .zero_curve import BondZeroCurve
 
-
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD
 # JAPANESE SIMPLE YIELD
@@ -72,6 +71,7 @@ def _f(ytm, *args):
     obj_fn = px - price
     return obj_fn
 
+
 ###############################################################################
 
 
@@ -84,6 +84,7 @@ def _g(oas, *args):
     px = bond.dirty_price_from_oas(settle_dt, discount_curve, oas)
     obj_fn = px - price
     return obj_fn
+
 
 ###############################################################################
 
@@ -141,6 +142,7 @@ class Bond:
             raise FinError("Ex dividend days cannot be more than 90"
                            + str(ex_div_days))
 
+        self._ex_div_dt = None
         self._ex_div_days = ex_div_days
 
         self._par = 100.0  # This is how price is quoted and amount at maturity
@@ -173,17 +175,17 @@ class Bond:
         # dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dts = Schedule(self._issue_dt,
-                                      self._maturity_dt,
-                                      self._freq_type,
-                                      CalendarTypes.NONE,
-                                      self._bd_type,
-                                      self._dg_type,
-                                      end_of_month=self._end_of_month)._generate()
+                                 self._maturity_dt,
+                                 self._freq_type,
+                                 CalendarTypes.NONE,
+                                 self._bd_type,
+                                 self._dg_type,
+                                 end_of_month=self._end_of_month)._generate()
 
     ###########################################################################
 
     def _calculate_payment_dts(self):
-        """ For the actual payment dates, they are adjusted
+        """ For the actual payment dates, they are adjusted,
         and so we then use the calendar payment dates. Although payments are
         calculated as though coupon periods are the same length, payments that
         fall on a Saturday or Sunday can only be made on the next business day
@@ -199,14 +201,14 @@ class Bond:
 
         # Expect at least an issue date and a maturity date - if not - problem
         if len(self._cpn_dts) < 2:
-            raise FinError("Unable to calculate pmnt dates with only one pmnt")
+            raise FinError("Unable to calculate payment dates with only one payment")
 
         # I do not adjust the first date as it is the issue date
         self._payment_dts.append(self._cpn_dts[0])
 
         for cpn_dt in self._cpn_dts[1:]:
             pmt_dt = calendar.adjust(cpn_dt,
-                                       bus_day_adj_type)
+                                     bus_day_adj_type)
 
             self._payment_dts.append(pmt_dt)
 
@@ -235,7 +237,7 @@ class Bond:
         if convention not in YTMCalcType:
             raise FinError("Yield convention unknown." + str(convention))
 
-        # TODO check that no unneccesary calculations are being done
+        # TODO check that no unnecessary calculations are being done
         self.accrued_interest(settle_dt, 1.0)
 
         #######################################################################
@@ -278,7 +280,7 @@ class Bond:
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
                 dp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
-#                print(term1, term2, term3, term4, v, self._alpha, dp)
+        #                print(term1, term2, term3, term4, v, self._alpha, dp)
         elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
                 dp = (v ** (self._alpha)) * (1.0 + c / f)
@@ -424,7 +426,7 @@ class Bond:
         # if it is None, create an array of key rates from 0.5 to 30 years
 
         if key_rate_tenors is None:
-            key_rate_tenors = np.array([0.5,  1,  2,  3,  5,  7,  10, 20, 30])
+            key_rate_tenors = np.array([0.5, 1, 2, 3, 5, 7, 10, 20, 30])
 
         # set the shift to a small value if not give
         if not shift:
@@ -449,7 +451,6 @@ class Bond:
             par_bonds = []
 
             for tenor, cpn in zip(key_rate_tenors, rates):
-
                 mat_dt = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat_dt, cpn,
@@ -460,7 +461,6 @@ class Bond:
             clean_prices = []
 
             for par_bond, ytm in zip(par_bonds, rates):
-
                 clean_price = par_bond.clean_price_from_ytm(settle_dt,
                                                             ytm,
                                                             us_street)
@@ -481,7 +481,6 @@ class Bond:
             par_bonds = []
 
             for tenor, cpn in zip(key_rate_tenors, rates):
-
                 mat = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat, cpn,
@@ -492,7 +491,6 @@ class Bond:
             clean_prices = []
 
             for par_bond, ytm in zip(par_bonds, rates):
-
                 clean_price = par_bond.clean_price_from_ytm(settle_dt,
                                                             ytm,
                                                             us_street)
@@ -515,7 +513,6 @@ class Bond:
             par_bonds = []
 
             for tenor, cpn in zip(key_rate_tenors, rates):
-
                 mat = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat, cpn,
@@ -526,7 +523,6 @@ class Bond:
             clean_prices = []
 
             for par_bond, ytm in zip(par_bonds, rates):
-
                 clean_price = par_bond.clean_price_from_ytm(settle_dt,
                                                             ytm,
                                                             us_street)
@@ -617,8 +613,7 @@ class Bond:
 
         cal = Calendar(self._cal_type)
 
-        self._ex_div_dt = cal.add_business_days(self._ncd,
-                                                  -self._ex_div_days)
+        self._ex_div_dt = cal.add_business_days(self._ncd, -self._ex_div_days)
 
         pay_first_cpn = 1.0
         if settle_dt > self._ex_div_dt:
@@ -682,7 +677,6 @@ class Bond:
         ytms = []
 
         for dirty_price in dirty_prices:
-
             argtuple = (self, settle_dt, dirty_price, convention)
 
             ytm = optimize.newton(_f,
@@ -722,15 +716,15 @@ class Bond:
     def accrued_interest(self,
                          settle_dt: Date,
                          face: float = 100.0):
-        ''' Calculate the amount of coupon that has accrued between the
+        """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
         between the previous coupon payment date and settlement date. If the
         bond trades with ex-coupon dates then you need to use the number of
         days before the coupon date the ex-coupon date is. You can specify the
         calendar to be used in the bond constructor - NONE means only calendar
-        days, WEEKEND is only weekends or you can specify a country calendar
-        for business days.'''
+        days, WEEKEND is only weekends, or you can specify a country calendar
+        for business days."""
 
         self._calc_pcd_ncd(settle_dt)
 
@@ -738,7 +732,7 @@ class Bond:
         cal = Calendar(self._cal_type)
 
         self._ex_div_dt = cal.add_business_days(self._ncd,
-                                                  -self._ex_div_days)
+                                                -self._ex_div_days)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
                                             settle_dt,
@@ -771,7 +765,7 @@ class Bond:
             swapFloatBusDayAdjustRuleType=BusDayAdjustTypes.FOLLOWING,
             swapFloatDateGenRuleType=DateGenRuleTypes.BACKWARD):
         """ Calculate the par asset swap spread of the bond. The discount curve
-        is a Ibor curve that is passed in. This function is vectorised with
+        is an Ibor curve that is passed in. This function is vectorised with
         respect to the clean price. """
 
         clean_price = np.array(clean_price)
@@ -779,7 +773,7 @@ class Bond:
         accrued_amount = self._accrued_interest * self._par
         bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
-        pvIbor = 0.0
+        pv_ibor = 0.0
         prev_dt = self._pcd
 
         for dt in self._cpn_dts[1:]:
@@ -787,9 +781,9 @@ class Bond:
             # coupons paid on a settlement date are paid to the seller
             if dt > settle_dt:
                 df = discount_curve.df(dt)
-                pvIbor += df * self._cpn / self._freq
+                pv_ibor += df * self._cpn / self._freq
 
-        pvIbor += df
+        pv_ibor += df
 
         # Calculate the PV01 of the floating leg of the asset swap
         # I assume here that the coupon starts accruing on the settlement date
@@ -811,7 +805,7 @@ class Bond:
             pv01 = pv01 + year_frac * df
             prev_dt = dt
 
-        asw = (pvIbor - bond_price / self._par) / pv01
+        asw = (pv_ibor - bond_price / self._par) / pv01
         return asw
 
     ###########################################################################
@@ -826,6 +820,7 @@ class Bond:
         self.accrued_interest(settle_dt, 1.0)
         f = self._freq
         c = self._cpn
+        df_adjusted = 1.0
 
         pv = 0.0
         for dt in self._cpn_dts[1:]:
@@ -916,7 +911,7 @@ class Bond:
 
     def print_payments(self,
                        settle_dt: Date,
-                       face: (float) = 100.0):
+                       face: float = 100.0):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
 
@@ -1023,7 +1018,7 @@ class Bond:
 
         dates_cfs.append((begin_dt, -buy_price))
         dates_cfs.append((end_dt, sell_price))
-        times_cfs = [((d - begin_dt)/365, c) for (d, c) in dates_cfs]
+        times_cfs = [((d - begin_dt) / 365, c) for (d, c) in dates_cfs]
         pnl = sum(c for (t, c) in times_cfs)
         simple_return = (pnl / buy_price) * 365 / (end_dt - begin_dt)
         brentq_up_bound = 5
@@ -1050,7 +1045,7 @@ class Bond:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self._issue_dt)
         s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("COUPON (%)", self._cpn*100.0)
+        s += label_to_string("COUPON (%)", self._cpn * 100.0)
         s += label_to_string("FREQUENCY", self._freq_type)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("EX_DIV DAYS", self._ex_div_days, "")

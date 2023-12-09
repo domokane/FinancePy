@@ -91,7 +91,7 @@ class EquityVarianceSwap:
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
-        tmat = (self._maturity_dt - value_dt)/gDaysInYear
+        t_mat = (self._maturity_dt - value_dt)/gDaysInYear
 
         """ Calculate the slope of the volatility curve by taking the end
         points in the volatilities and strikes to calculate the gradient."""
@@ -99,7 +99,7 @@ class EquityVarianceSwap:
         dvol = volatilities[-1] - volatilities[0]
         dK = strikes[-1] - strikes[0]
         b = f * dvol / dK
-        var = (atm_vol**2) * np.sqrt(1.0 + 3.0*tmat*(b**2))
+        var = (atm_vol**2) * np.sqrt(1.0 + 3.0*t_mat*(b**2))
         return var
 
 ###############################################################################
@@ -125,16 +125,16 @@ class EquityVarianceSwap:
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        tmat = (self._maturity_dt - value_dt)/gDaysInYear
+        t_mat = (self._maturity_dt - value_dt)/gDaysInYear
 
-        df = discount_curve._df(tmat)
-        r = - np.log(df)/tmat
+        df = discount_curve._df(t_mat)
+        r = - np.log(df)/t_mat
 
-        dq = dividend_curve._df(tmat)
-        q = - np.log(dq)/tmat
+        dq = dividend_curve._df(t_mat)
+        q = - np.log(dq)/t_mat
 
         s0 = stock_price
-        g = np.exp((r-q)*tmat)
+        g = np.exp((r-q)*t_mat)
         fwd = stock_price * g
 
         # This fixes the centre strike of the replication options
@@ -173,12 +173,12 @@ class EquityVarianceSwap:
 
         self._call_strikes = callK
 
-        optionTotal = 2.0*(r*tmat - (s0*g/sstar-1.0) - np.log(sstar/s0))/tmat
+        optionTotal = 2.0*(r*t_mat - (s0*g/sstar-1.0) - np.log(sstar/s0))/t_mat
 
         self._callWts = np.zeros(num_call_options)
         self._putWts = np.zeros(num_put_options)
 
-        def f(x): return (2.0/tmat)*((x-sstar)/sstar-np.log(x/sstar))
+        def f(x): return (2.0/t_mat)*((x-sstar)/sstar-np.log(x/sstar))
 
         sumWts = 0.0
         for n in range(0, self._num_put_options):

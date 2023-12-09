@@ -58,9 +58,9 @@ def test_BDTExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / gDaysInYear
     t_exp = (expiry_dt - settle_dt) / gDaysInYear
-    times = np.linspace(0, tmat, 11)
+    times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05*times)
 
@@ -76,7 +76,7 @@ def test_BDTExampleTwo():
     exercise_type = FinExerciseTypes.AMERICAN
 
     model = BDTTree(sigma, num_time_steps)
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
     v = model.bond_option(t_exp, strike_price,
                           face, cpn_times, cpn_flows, exercise_type)
 
@@ -114,7 +114,7 @@ def test_BDTExampleThree():
 
     expiry_dt = settle_dt.add_years(expiryYears)
 
-    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / gDaysInYear
     t_exp = (expiry_dt - settle_dt) / gDaysInYear
 
     bond = Bond(issue_dt, maturity_dt,
@@ -138,10 +138,10 @@ def test_BDTExampleThree():
         settle_dt, curve)
 
     model = BDTTree(sigma, num_time_steps)
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
 
     v = model.bermudan_swaption(t_exp,
-                                tmat,
+                                t_mat,
                                 strike_price,
                                 face,
                                 cpn_times,
@@ -163,7 +163,7 @@ def test_BDTExampleThree():
 
     expiry_dt = settle_dt.add_years(expiryYears)
 
-    tmat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / gDaysInYear
     t_exp = (expiry_dt - settle_dt) / gDaysInYear
 
     bond = Bond(issue_dt, maturity_dt,
@@ -187,10 +187,10 @@ def test_BDTExampleThree():
         settle_dt, curve)
 
     model = BDTTree(sigma, num_time_steps)
-    model.build_tree(tmat, times, dfs)
+    model.build_tree(t_mat, times, dfs)
 
     v = model.bermudan_swaption(t_exp,
-                                tmat,
+                                t_mat,
                                 strike_price,
                                 face,
                                 cpn_times,

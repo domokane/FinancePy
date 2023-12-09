@@ -352,25 +352,25 @@ class EquityAsianOption:
     Monte-Carlo simulation."""
 
     def __init__(self,
-                 startAveragingDate: Date,
+                 start_averaging_dt: Date,
                  expiry_dt: Date,
                  strike_price: float,
                  option_type: OptionTypes,
-                 numberOfObservations: int = 100):
+                 num_obs: int = 100):
         """ Create an EquityAsian option object which takes a start date for
         the averaging, an expiry date, a strike price, an option type and a
         number of observations. """
 
         check_argument_types(self.__init__, locals())
 
-        if startAveragingDate > expiry_dt:
+        if start_averaging_dt > expiry_dt:
             raise FinError("Averaging starts after expiry date")
 
-        self._startAveragingDate = startAveragingDate
+        self._startAveragingDate = start_averaging_dt
         self._expiry_dt = expiry_dt
         self._strike_price = float(strike_price)
         self._option_type = option_type
-        self._num_observations = numberOfObservations
+        self._num_observations = num_obs
 
 ###############################################################################
 

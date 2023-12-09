@@ -29,7 +29,7 @@ from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
 
 @njit(fastmath=True, cache=True)
-def _value_convertible(tmat,
+def _value_convertible(t_mat,
                        face_amount,
                        cpn_times,
                        cpn_flows,
@@ -54,23 +54,23 @@ def _value_convertible(tmat,
     interp = InterpTypes.FLAT_FWD_RATES.value
 
     if len(cpn_times) > 0:
-        if cpn_times[-1] > tmat:
+        if cpn_times[-1] > t_mat:
             raise FinError("Coupon after maturity")
 
     if len(call_times) > 0:
-        if call_times[-1] > tmat:
+        if call_times[-1] > t_mat:
             raise FinError("Call times after maturity")
 
     if len(put_times) > 0:
-        if put_times[-1] > tmat:
+        if put_times[-1] > t_mat:
             raise FinError("Put times after maturity")
 
     if len(df_times) > 0:
-        if df_times[-1] > tmat:
+        if df_times[-1] > t_mat:
             raise FinError("Discount times after maturity")
 
     if len(dividend_times) > 0:
-        if dividend_times[-1] > tmat:
+        if dividend_times[-1] > t_mat:
             raise FinError("Dividend times after maturity")
 
     if credit_spread < 0.0:
@@ -86,13 +86,13 @@ def _value_convertible(tmat,
         raise FinError("Num Steps per year must more than 1.")
 
     if len(dividend_times) > 0.0:
-        if dividend_times[-1] > tmat:
+        if dividend_times[-1] > t_mat:
             raise FinError("Last dividend is after bond maturity.")
 
     if recovery_rate > 0.999 or recovery_rate < 0.0:
         raise FinError("Recovery rate must be between 0 and 0.999.")
 
-    num_times = int(num_steps_per_year * tmat) + 1  # add one for today time 0
+    num_times = int(num_steps_per_year * t_mat) + 1  # add one for today time 0
     num_times = num_steps_per_year  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
 
     if num_times < 5:
@@ -101,9 +101,9 @@ def _value_convertible(tmat,
     numLevels = num_times
 
     # this is the size of the step
-    dt = tmat / (num_times - 1)
+    dt = t_mat / (num_times - 1)
 
-    tree_times = np.linspace(0.0, tmat, num_times)
+    tree_times = np.linspace(0.0, t_mat, num_times)
     treeDfs = np.zeros(num_times)
     for i in range(0, num_times):
         df = _uinterpolate(tree_times[i], df_times, df_values, interp)
@@ -149,7 +149,7 @@ def _value_convertible(tmat,
         n = int(round(dividend_time / dt, 0))
         treeDividendYield[n] = dividend_yields[i]
 
-    # Set up the tree of stock prices using a 2D matrix (half the matrix is
+    # Set up the tree of stock prices using a 2D matrix - half the matrix is
     # unused but this may be a cost worth bearing for simpler code. Review.
     treeStockValue = np.zeros(shape=(num_times, numLevels))
     e = stock_volatility ** 2 - h
@@ -254,7 +254,7 @@ def _value_convertible(tmat,
 
 class BondConvertible:
     """ Class for convertible bonds. These bonds embed rights to call and put
-    the bond in return for equity. Until then they are bullet bonds which
+    the bond in return for equity. Until then, they are bullet bonds which
     means they have regular coupon payments of a known size that are paid on
     known dates plus a payment of par at maturity. As the options are price
     based, the decision to convert to equity depends on the stock price,
@@ -273,7 +273,7 @@ class BondConvertible:
                  dc_type: DayCountTypes,  # day count type for accrued
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND):
         """ Create BondConvertible object by providing the bond Maturity
-        date, coupon, frequency type, accrual convention type and then all of
+        date, coupon, frequency type, accrual convention type and then all
         the details regarding the conversion option including the list of the
         call and put dates and the corresponding list of call and put prices.
         """
@@ -392,9 +392,9 @@ class BondConvertible:
 
         self._calculate_cpn_dts(settle_dt)
 
-        tmat = (self._maturity_dt - settle_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - settle_dt) / gDaysInYear
 
-        if tmat <= 0.0:
+        if t_mat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
 
         # We include time zero in the coupon times and flows
@@ -414,7 +414,7 @@ class BondConvertible:
         if np.any(cpn_times < 0.0):
             raise FinError("No coupon times can be before the value date.")
 
-        if np.any(cpn_times > tmat):
+        if np.any(cpn_times > t_mat):
             raise FinError("No coupon times can be after the maturity date.")
 
         call_times = []
@@ -429,7 +429,7 @@ class BondConvertible:
         if np.any(call_times < 0.0):
             raise FinError("No call times can be before the value date.")
 
-        if np.any(call_times > tmat):
+        if np.any(call_times > t_mat):
             raise FinError("No call times can be after the maturity date.")
 
         put_times = []
@@ -441,7 +441,7 @@ class BondConvertible:
         put_times = np.array(put_times)
         put_prices = np.array(self._put_prices)
 
-        if np.any(put_times > tmat):
+        if np.any(put_times > t_mat):
             raise FinError("No put times can be after the maturity date.")
 
         if np.any(put_times <= 0.0):
@@ -484,7 +484,7 @@ class BondConvertible:
         if test_monotonicity(dividend_times) is False:
             raise FinError("Coupon times not monotonic")
 
-        v1 = _value_convertible(tmat,
+        v1 = _value_convertible(t_mat,
                                 self._par,
                                 cpn_times,
                                 cpn_flows,
@@ -506,7 +506,7 @@ class BondConvertible:
                                 # Tree details
                                 num_steps_per_year)
 
-        v2 = _value_convertible(tmat,
+        v2 = _value_convertible(t_mat,
                                 self._par,
                                 cpn_times,
                                 cpn_flows,

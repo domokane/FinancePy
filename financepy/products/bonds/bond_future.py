@@ -46,9 +46,9 @@ class BondFuture:
         # https://www.cmegroup.com//trading//interest-rates//us-treasury-futures-conversion-factor-lookup-tables.html
         # for a reference.
 
-        tmat = (bond._maturity_dt - self._first_delivery_dt) / gDaysInYear
-        roundedTmatInMonths = int(tmat * 4.0) * 3
-        new_mat = self._first_delivery_dt.add_months(roundedTmatInMonths)
+        t_mat = (bond._maturity_dt - self._first_delivery_dt) / gDaysInYear
+        roundedt_matInMonths = int(t_mat * 4.0) * 3
+        new_mat = self._first_delivery_dt.add_months(roundedt_matInMonths)
         ex_div_days = 0
 
         issue_dt = Date(new_mat._d, new_mat._m, 2000)
@@ -103,7 +103,7 @@ class BondFuture:
                             bonds: list,
                             bond_clean_prices: list,
                             futures_price: float):
-        """ Determination of CTD as deliverable bond with lowest cost to buy
+        """ Determination of CTD as deliverable bond with the lowest cost to buy
         versus what is received when the bond is delivered. """
         ctdBond = None
         ctdNet = -self._contract_size * 100

@@ -61,12 +61,12 @@ class BondOption():
         model which are all implemented as short rate tree models. """
 
         t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tmat = (self._bond._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self._bond._maturity_dt - value_dt) / gDaysInYear
 
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
-        # We need all of the flows in case the option is American
+        # We need all the flows in case the option is American
         # and some occur before expiry
         flow_dts = self._bond._cpn_dts
         flow_amounts = self._bond._flow_amounts
@@ -112,7 +112,7 @@ class BondOption():
             exercise_type = FinExerciseTypes.EUROPEAN
 
         # This is wasteful if model is Jamshidian but how to do neat design
-        model.build_tree(tmat, df_times, df_values)
+        model.build_tree(t_mat, df_times, df_values)
 
         v = model.bond_option(t_exp, self._strike_price, self._par,
                               cpn_times, cpn_flows, exercise_type)

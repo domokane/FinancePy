@@ -411,7 +411,7 @@ def american_bond_option_tree_fast(t_exp,
 
 
 @njit(fastmath=True, cache=True)
-def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
+def bermudan_swaption_tree_fast(t_exp, t_mat, strike_price, face_amount,
                                 cpn_times, cpn_flows,
                                 exercise_typeInt,
                                 _df_times, _df_values,
@@ -424,7 +424,7 @@ def bermudan_swaption_tree_fast(t_exp, tmat, strike_price, face_amount,
     num_time_steps, num_nodes = _Q.shape
     j_max = ceil(0.1835/(_a * _dt))
     expiry_step = int(t_exp/_dt + 0.50)
-    maturityStep = int(tmat/_dt + 0.50)
+    maturityStep = int(t_mat/_dt + 0.50)
 
     ###########################################################################
 
@@ -622,8 +622,8 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
     j_max = ceil(0.1835/(_a * dt))
-    tmat = cpn_times[-1]
-    maturityStep = int(tmat/dt + 0.50)
+    t_mat = cpn_times[-1]
+    maturityStep = int(t_mat/dt + 0.50)
 
     ###########################################################################
     # Map coupons onto tree while preserving their present value
@@ -876,21 +876,21 @@ class HWTree():
 ###############################################################################
 
     def option_on_zcb(self,
-                      t_exp, tmat,
+                      t_exp, t_mat,
                       strike, face_amount,
                       df_times, df_values):
         """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
         pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
-        ptmat = _uinterpolate(tmat, df_times, df_values, interp)
+        pt_mat = _uinterpolate(t_mat, df_times, df_values, interp)
 
         sigma = self._sigma
         a = self._a
@@ -898,17 +898,17 @@ class HWTree():
         if abs(a) < small:
             a = small
 
-        sigmap = (sigma/a) * (1.0 - np.exp(-a*(tmat-t_exp)))
+        sigmap = (sigma/a) * (1.0 - np.exp(-a*(t_mat-t_exp)))
         sigmap *= np.sqrt((1.0-np.exp(-2.0*a*t_exp))/2.0/a)
 
         if abs(sigmap) < small:
             sigmap = small
 
-        h = np.log((face_amount*ptmat)/(strike * pt_exp)) / \
+        h = np.log((face_amount*pt_mat)/(strike * pt_exp)) / \
             sigmap + sigmap / 2.0
-        call_value = face_amount * ptmat * N(h) - strike * pt_exp * N(h - sigmap)
+        call_value = face_amount * pt_mat * N(h) - strike * pt_exp * N(h - sigmap)
         put_value = strike * pt_exp * \
-            N(-h + sigmap) - face_amount * ptmat * N(-h)
+            N(-h + sigmap) - face_amount * pt_mat * N(-h)
 
         return {'call': call_value, 'put': put_value}
 
@@ -1053,13 +1053,13 @@ class HWTree():
 
     def option_on_zero_coupon_bond_tree(self,
                                         t_exp,
-                                        tmat,
+                                        t_mat,
                                         strike_price,
                                         face_amount):
         """ Price an option on a zero coupon bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build. """
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
@@ -1076,7 +1076,7 @@ class HWTree():
 
         pt_exp = _uinterpolate(t_exp, self._df_times, self._dfs, interp)
         ptdelta = _uinterpolate(tdelta, self._df_times, self._dfs, interp)
-        ptmat = _uinterpolate(tmat, self._df_times, self._dfs, interp)
+        pt_mat = _uinterpolate(t_mat, self._df_times, self._dfs, interp)
 
         _, num_nodes = self._Q.shape
         expiry_step = int(t_exp/dt+0.50)
@@ -1089,8 +1089,8 @@ class HWTree():
             q = self._Q[expiry_step, k]
             r_t = self._r_t[expiry_step, k]
 
-            zcb = p_fast(t_exp, tmat,
-                         r_t, dt, pt_exp, ptdelta, ptmat,
+            zcb = p_fast(t_exp, t_mat,
+                         r_t, dt, pt_exp, ptdelta, pt_mat,
                          self._sigma, self._a)
 
             putPayoff = max(strike_price - zcb * face_amount, 0.0)
@@ -1102,7 +1102,7 @@ class HWTree():
 
 ###############################################################################
 
-    def bermudan_swaption(self, t_exp, tmat, strike, face,
+    def bermudan_swaption(self, t_exp, t_mat, strike, face,
                           cpn_times, cpn_flows, exercise_type):
         """ Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
@@ -1110,9 +1110,9 @@ class HWTree():
 
         exercise_typeInt = option_exercise_types_to_int(exercise_type)
 
-        tmat = cpn_times[-1]
+        t_mat = cpn_times[-1]
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
@@ -1121,7 +1121,7 @@ class HWTree():
         #######################################################################
 
         payValue, recValue \
-            = bermudan_swaption_tree_fast(t_exp, tmat, strike, face,
+            = bermudan_swaption_tree_fast(t_exp, t_mat, strike, face,
                                           cpn_times, cpn_flows,
                                           exercise_typeInt,
                                           self._df_times, self._dfs,
@@ -1242,26 +1242,26 @@ class HWTree():
 
 ###############################################################################
 
-    def df_tree(self, tmat):
-        """ Discount factor as seen from now to time tmat as long as the time
+    def df_tree(self, t_mat):
+        """ Discount factor as seen from now to time t_mat as long as the time
         is on the tree grid. """
 
-        if tmat == 0.0:
+        if t_mat == 0.0:
             return 1.0
 
         _, num_nodes = self._Q.shape
-        fn1 = tmat/self._dt
-        fn2 = float(int(tmat/self._dt))
+        fn1 = t_mat/self._dt
+        fn2 = float(int(t_mat/self._dt))
         if abs(fn1 - fn2) > 1e-6:
             raise FinError("Time not on tree time grid")
 
-        timeStep = int(tmat / self._dt) + 1
+        timeStep = int(t_mat / self._dt) + 1
 
         p = 0.0
         for i in range(0, num_nodes):
             ad = self._Q[timeStep, i]
             p += ad
-        zero_rate = -np.log(p)/tmat
+        zero_rate = -np.log(p)/t_mat
         return p, zero_rate
 
 ###############################################################################

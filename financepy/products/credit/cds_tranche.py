@@ -106,9 +106,9 @@ class CDSTranche:
         num_credits = len(issuer_curves)
         k1 = self._k1
         k2 = self._k2
-        tmat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
 
-        if tmat < 0.0:
+        if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
 
         if abs(k1 - k2) < 0.00000001:

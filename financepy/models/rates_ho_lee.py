@@ -64,32 +64,32 @@ class ModelRatesHoLee:
 
 ###############################################################################
 
-    def option_on_zcb(self, t_exp, tmat,
+    def option_on_zcb(self, t_exp, t_mat,
                       strike_price, face_amount,
                       df_times, df_values):
         """ Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
 
-        if t_exp > tmat:
+        if t_exp > t_mat:
             raise FinError("Option expiry after bond matures.")
 
         if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
         pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
-        ptmat = _uinterpolate(tmat, df_times, df_values, interp)
+        pt_mat = _uinterpolate(t_mat, df_times, df_values, interp)
 
         sigma = self._sigma
 
-        sigmap = sigma * (tmat-t_exp) * np.sqrt(t_exp)
+        sigmap = sigma * (t_mat-t_exp) * np.sqrt(t_exp)
 
-        h = np.log((face_amount*ptmat)/(strike_price*pt_exp))/sigmap+sigmap/2.0
+        h = np.log((face_amount*pt_mat)/(strike_price*pt_exp))/sigmap+sigmap/2.0
 
-        call_value = face_amount * ptmat * \
+        call_value = face_amount * pt_mat * \
             N(h) - strike_price * pt_exp * N(h - sigmap)
         put_value = strike_price * pt_exp * \
-            N(-h + sigmap) - face_amount * ptmat * N(-h)
+            N(-h + sigmap) - face_amount * pt_mat * N(-h)
 
         return {'call': call_value, 'put': put_value}
 
