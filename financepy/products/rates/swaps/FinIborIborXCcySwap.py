@@ -478,17 +478,17 @@ class FinIborIborXCcySwap:
                "-",
                "-"))
 
-        iFlow = 0
+        i_flow = 0
         for payment_dt in self._adjusted_fixed_dts[start_index:]:
             print("%15s %10.7f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_dt,
-                   self._fixed_year_fracs[iFlow],
-                   self._fixedFlows[iFlow],
-                   self._fixedDfs[iFlow],
-                   self._fixedFlowPVs[iFlow],
-                   self._fixed_total_pv[iFlow]))
+                   self._fixed_year_fracs[i_flow],
+                   self._fixedFlows[i_flow],
+                   self._fixedDfs[i_flow],
+                   self._fixedFlowPVs[i_flow],
+                   self._fixed_total_pv[i_flow]))
 
-            iFlow += 1
+            i_flow += 1
 
 ##########################################################################
 
@@ -511,14 +511,14 @@ class FinIborIborXCcySwap:
 
         start_index = 1
 
-        iFlow = 0
+        i_flow = 0
         for payment_dt in self._adjusted_fixed_dts[start_index:]:
             print("%15s %12.8f %12.2f" %
                   (payment_dt,
-                   self._fixed_year_fracs[iFlow],
-                   self._fixedFlows[iFlow]))
+                   self._fixed_year_fracs[i_flow],
+                   self._fixedFlows[i_flow]))
 
-            iFlow += 1
+            i_flow += 1
 
 ##########################################################################
 
@@ -558,18 +558,18 @@ class FinIborIborXCcySwap:
                "-",
                "-"))
 
-        iFlow = 0
+        i_flow = 0
         for payment_dt in self._adjustedFloatDates[start_index:]:
             print("%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_dt,
-                   self._float_year_fracs[iFlow],
-                   self._floatRates[iFlow]*100.0,
-                   self._floatFlows[iFlow],
-                   self._floatDfs[iFlow],
-                   self._floatFlowPVs[iFlow],
-                   self._floatTotalPV[iFlow]))
+                   self._float_year_fracs[i_flow],
+                   self._floatRates[i_flow]*100.0,
+                   self._floatFlows[i_flow],
+                   self._floatDfs[i_flow],
+                   self._floatFlowPVs[i_flow],
+                   self._floatTotalPV[i_flow]))
 
-            iFlow += 1
+            i_flow += 1
 
 ##########################################################################
 

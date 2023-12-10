@@ -90,16 +90,16 @@ class EquityFixedLookbackOption(EquityOption):
         v = volatility
         s0 = stock_price
         k = self._strike_price
-        smin = 0.0
-        smax = 0.0
+        s_min = 0.0
+        s_max = 0.0
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
-            smax = stock_min_max
-            if smax < s0:
+            s_max = stock_min_max
+            if s_max < s0:
                 raise FinError("The Smax value must be >= the stock price.")
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
-            smin = stock_min_max
-            if smin > s0:
+            s_min = stock_min_max
+            if s_min > s0:
                 raise FinError("The Smin value must be <= the stock price.")
 
         # There is a risk of an overflow in the limit of q=r which
@@ -118,7 +118,7 @@ class EquityFixedLookbackOption(EquityOption):
         # Taken from Hull Page 536 (6th edition) and Haug Page 143
         if self._option_type == OptionTypes.EUROPEAN_CALL:
 
-            if k > smax:
+            if k > s_max:
 
                 d1 = (np.log(s0 / k) + (b + v * v/2.0) * t) / v / sqrtT
                 d2 = d1 - v * sqrtT
@@ -135,37 +135,37 @@ class EquityFixedLookbackOption(EquityOption):
 
             else:
 
-                e1 = (np.log(s0/smax) + (r - q + v*v/2) * t) / v / sqrtT
+                e1 = (np.log(s0/s_max) + (r - q + v*v/2) * t) / v / sqrtT
                 e2 = e1 - v * sqrtT
 
-                if s0 == smax:
+                if s0 == s_max:
                     term = -N(e1 - 2.0 * b * sqrtT / v) + expbt * N(e1)
-                elif s0 < smax and w > 100.0:
+                elif s0 < s_max and w > 100.0:
                     term = expbt * N(e1)
                 else:
-                    term = (-(s0 / smax)**(-w)) * \
+                    term = (-(s0 / s_max)**(-w)) * \
                         N(e1 - 2.0 * b * sqrtT / v) + expbt * N(e1)
 
-                v = df * (smax - k) + s0 * dq * N(e1) - \
-                    smax * df * N(e2) + s0 * df * u * term
+                v = df * (s_max - k) + s0 * dq * N(e1) - \
+                    s_max * df * N(e2) + s0 * df * u * term
 
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
-            if k >= smin:
+            if k >= s_min:
 
-                f1 = (np.log(s0/smin) + (b + v * v / 2.0) * t) / v / sqrtT
+                f1 = (np.log(s0/s_min) + (b + v * v / 2.0) * t) / v / sqrtT
                 f2 = f1 - v * sqrtT
 
-                if s0 == smin:
+                if s0 == s_min:
                     term = N(-f1 + 2.0 * b * sqrtT / v) - expbt * N(-f1)
-                elif s0 > smin and w < -100.0:
+                elif s0 > s_min and w < -100.0:
                     term = -expbt * N(-f1)
                 else:
-                    term = ((s0 / smin)**(-w)) * N(-f1 + 2.0 * b * sqrtT / v) \
+                    term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 * b * sqrtT / v) \
                         - expbt * N(-f1)
 
-                v = df * (k - smin) - s0 * dq * N(-f1) + \
-                    smin * df * N(-f2) + s0 * df * u * term
+                v = df * (k - s_min) - s0 * dq * N(-f1) + \
+                    s_min * df * N(-f2) + s0 * df * u * term
 
             else:
 
@@ -204,7 +204,7 @@ class EquityFixedLookbackOption(EquityOption):
         Black-Scholes model that assumes the stock follows a GBM process. """
 
         t = (self._expiry_dt - value_dt) / gDaysInYear
-
+        
         df = discount_curve.df(self._expiry_dt)
         r = discount_curve.cc_rate(self._expiry_dt)
         q = dividend_curve.cc_rate(self._expiry_dt)
@@ -215,38 +215,42 @@ class EquityFixedLookbackOption(EquityOption):
         option_type = self._option_type
         k = self._strike_price
 
-        smin = 0.0
-        smax = 0.0
+        s_min = 0.0
+        s_max = 0.0
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
-            smax = stock_min_max
-            if smax < stock_price:
+            s_max = stock_min_max
+            if s_max < stock_price:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
-            smin = stock_min_max
-            if smin > stock_price:
+            s_min = stock_min_max
+            if s_min > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.get_paths(num_paths, num_time_steps, t, mu, stock_price,
-                               volatility, seed)
+        s_all = model.get_paths(num_paths,
+                                num_time_steps, t,
+                                mu,
+                                stock_price,
+                                volatility,
+                                seed)
 
         # Due to antithetics we have doubled the number of paths
         num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
         if option_type == OptionTypes.EUROPEAN_CALL:
-            SMax = np.max(Sall, axis=1)
-            smaxs = np.ones(num_paths) * smax
-            payoff = np.maximum(SMax - k, 0.0)
-            payoff = np.maximum(payoff, smaxs - k)
+            s_max_vector = np.max(s_all, axis=1)
+            s_maxs = np.ones(num_paths) * s_max
+            payoff = np.maximum(s_max_vector - k, 0.0)
+            payoff = np.maximum(payoff, s_maxs - k)
         elif option_type == OptionTypes.EUROPEAN_PUT:
-            SMin = np.min(Sall, axis=1)
-            smins = np.ones(num_paths) * smin
-            payoff = np.maximum(k - SMin, 0.0)
-            payoff = np.maximum(payoff, k - smins)
+            s_min_vector = np.min(s_all, axis=1)
+            s_mins = np.ones(num_paths) * s_min
+            payoff = np.maximum(k - s_min_vector, 0.0)
+            payoff = np.maximum(payoff, k - s_mins)
         else:
             raise FinError("Unknown lookback option type:" + str(option_type))
 

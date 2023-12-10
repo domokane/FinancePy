@@ -8,27 +8,24 @@
 import numpy as np
 
 from ...utils.error import FinError
-
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
-
-from ...products.credit.cds import CDS
+from ...utils.global_vars import gDaysInYear
+from ...utils.math import ONE_MILLION
+from ...utils.helpers import check_argument_types
+from ...utils.date import Date
+from ...utils.helpers import label_to_string
 
 from ...models.gauss_copula_onefactor import homog_basket_loss_dbn
 from ...models.gauss_copula import default_times_gc
 from ...models.student_t_copula import StudentTCopula
 
-from ...products.credit.cds_curve import CDSCurve
-
-from ...utils.global_vars import gDaysInYear
-from ...utils.math import ONE_MILLION
 from ...market.curves.interpolator import interpolate, InterpTypes
 
-from ...utils.helpers import check_argument_types
-from ...utils.date import Date
-from ...utils.helpers import label_to_string
+from ...products.credit.cds_curve import CDSCurve
+from ...products.credit.cds import CDS
 
 ###############################################################################
 # TODO: Convert functions to use NUMBA!!

@@ -225,20 +225,20 @@ class EquityBasketOption:
         model = FinGBMProcess()
         np.random.seed(seed)
 
-        Sall = model.get_paths_assets(num_assets,
-                                      num_paths,
-                                      num_time_steps,
-                                      t_exp,
-                                      mus,
-                                      stock_prices,
-                                      volatilities,
-                                      corr_matrix,
-                                      seed)
+        s_all = model.get_paths_assets(num_assets,
+                                       num_paths,
+                                       num_time_steps,
+                                       t_exp,
+                                       mus,
+                                       stock_prices,
+                                       volatilities,
+                                       corr_matrix,
+                                       seed)
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
-            payoff = np.maximum(np.mean(Sall, axis=1) - k, 0.0)
+            payoff = np.maximum(np.mean(s_all, axis=1) - k, 0.0)
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
-            payoff = np.maximum(k - np.mean(Sall, axis=1), 0.0)
+            payoff = np.maximum(k - np.mean(s_all, axis=1), 0.0)
         else:
             raise FinError("Unknown option type.")
 

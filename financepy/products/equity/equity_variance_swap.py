@@ -48,9 +48,9 @@ class EquityVarianceSwap:
         # Replication portfolio is stored
         self._num_put_options = 0
         self._num_call_options = 0
-        self._putWts = []
+        self._put_wts = []
         self._put_strikes = []
-        self._callWts = []
+        self._call_wts = []
         self._call_strikes = []
 
 ###############################################################################
@@ -149,9 +149,9 @@ class EquityVarianceSwap:
 
         minStrike = sstar - (num_put_options+1) * strike_spacing
 
-        self._putWts = []
+        self._put_wts = []
         self._put_strikes = []
-        self._callWts = []
+        self._call_wts = []
         self._call_strikes = []
 
         # if the lower strike is < 0 we go to as low as the strike spacing
@@ -161,50 +161,50 @@ class EquityVarianceSwap:
             while k >= strike_spacing:
                 k -= strike_spacing
                 klist.append(k)
-            putK = np.array(klist)
-            self._num_put_options = len(putK) - 1
+            put_k = np.array(klist)
+            self._num_put_options = len(put_k) - 1
         else:
-            putK = np.linspace(sstar, minStrike, num_put_options+2)
+            put_k = np.linspace(sstar, minStrike, num_put_options+2)
 
-        self._put_strikes = putK
+        self._put_strikes = put_k
 
-        maxStrike = sstar + (num_call_options+1) * strike_spacing
-        callK = np.linspace(sstar, maxStrike, num_call_options+2)
+        max_strike = sstar + (num_call_options+1) * strike_spacing
+        callK = np.linspace(sstar, max_strike, num_call_options+2)
 
         self._call_strikes = callK
 
         optionTotal = 2.0*(r*t_mat - (s0*g/sstar-1.0) - np.log(sstar/s0))/t_mat
 
-        self._callWts = np.zeros(num_call_options)
-        self._putWts = np.zeros(num_put_options)
+        self._call_wts = np.zeros(num_call_options)
+        self._put_wts = np.zeros(num_put_options)
 
         def f(x): return (2.0/t_mat)*((x-sstar)/sstar-np.log(x/sstar))
 
-        sumWts = 0.0
+        sum_wts = 0.0
         for n in range(0, self._num_put_options):
-            kp = putK[n+1]
-            k = putK[n]
-            self._putWts[n] = (f(kp)-f(k))/(k-kp) - sumWts
-            sumWts += self._putWts[n]
+            kp = put_k[n+1]
+            k = put_k[n]
+            self._put_wts[n] = (f(kp)-f(k))/(k-kp) - sum_wts
+            sum_wts += self._put_wts[n]
 
-        sumWts = 0.0
+        sum_wts = 0.0
         for n in range(0, self._num_call_options):
             kp = callK[n+1]
             k = callK[n]
-            self._callWts[n] = (f(kp)-f(k))/(kp-k) - sumWts
-            sumWts += self._callWts[n]
+            self._call_wts[n] = (f(kp)-f(k))/(kp-k) - sum_wts
+            sum_wts += self._call_wts[n]
 
-        piPut = 0.0
+        pi_put = 0.0
         for n in range(0, num_put_options):
-            k = putK[n]
+            k = put_k[n]
             vol = volatility_curve.volatility(k)
             opt = EquityVanillaOption(self._maturity_dt, k, put_type)
             model = BlackScholes(vol)
             v = opt.value(value_dt, s0, discount_curve,
                           dividend_curve, model)
-            piPut += v * self._putWts[n]
+            pi_put += v * self._put_wts[n]
 
-        piCall = 0.0
+        pi_call = 0.0
         for n in range(0, num_call_options):
             k = callK[n]
             vol = volatility_curve.volatility(k)
@@ -212,9 +212,9 @@ class EquityVarianceSwap:
             model = BlackScholes(vol)
             v = opt.value(value_dt, s0, discount_curve,
                           dividend_curve, model)
-            piCall += v * self._callWts[n]
+            pi_call += v * self._call_wts[n]
 
-        pi = piCall + piPut
+        pi = pi_call + pi_put
         optionTotal += g * pi
         var = optionTotal
 
@@ -222,7 +222,7 @@ class EquityVarianceSwap:
 
 ###############################################################################
 
-    def realised_variance(self, closePrices, useLogs=True):
+    def realised_variance(self, closePrices, use_logs=True):
         """ Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns."""
 
@@ -234,7 +234,7 @@ class EquityVarianceSwap:
 
         cumX2 = 0.0
 
-        if useLogs is True:
+        if use_logs is True:
             for i in range(1, num_observations):
                 x = np.log(closePrices[i]/closePrices[i-1])
                 cumX2 += x*x
@@ -259,12 +259,12 @@ class EquityVarianceSwap:
         print("TYPE", "STRIKE", "WEIGHT")
         for n in range(self._num_put_options-1, -1, -1):
             k = self._put_strikes[n]
-            wt = self._putWts[n]*self._notional
+            wt = self._put_wts[n]*self._notional
             print("PUT %7.2f %10.3f" % (k, wt))
 
         for n in range(0, self._num_call_options):
             k = self._call_strikes[n]
-            wt = self._callWts[n]*self._notional
+            wt = self._call_wts[n]*self._notional
             print("CALL %7.2f %10.3f" % (k, wt))
 
 ###############################################################################

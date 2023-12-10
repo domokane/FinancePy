@@ -158,10 +158,10 @@ def _value_once(stock_price,
         for i_node in range(0, i_time + 1):
 
             next_index = int(0.5 * (i_time + 1) * (i_time + 2))
-            nextNodeDn = next_index + i_node
-            nextNodeUp = nextNodeDn + 1
-            vUp = option_values[nextNodeUp]
-            vDn = option_values[nextNodeDn]
+            next_node_dn = next_index + i_node
+            next_node_up = next_node_dn + 1
+            vUp = option_values[next_node_up]
+            vDn = option_values[next_node_dn]
             future_expected_value = probs[i_time] * vUp
             future_expected_value += (1.0 - probs[i_time]) * vDn
             hold_value = periodDiscountFactors[i_time] * future_expected_value

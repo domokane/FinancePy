@@ -149,15 +149,15 @@ class IborSwaption():
         # The first flow is on the day after the expiry date
         num_flows = len(swap._fixed_leg._payment_dts)
 
-        for iFlow in range(0, num_flows):
+        for i_flow in range(0, num_flows):
 
-            flow_dt = swap._fixed_leg._payment_dts[iFlow]
+            flow_dt = swap._fixed_leg._payment_dts[i_flow]
 
             # Only flows occurring after option expiry are counted.
             # Flows on the expiry date are not included
             if flow_dt > self._exercise_dt:
                 cpn_time = (flow_dt - value_dt) / gDaysInYear
-                cpn_flow = swap._fixed_leg._payments[iFlow] / self._notional
+                cpn_flow = swap._fixed_leg._payments[i_flow] / self._notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
 

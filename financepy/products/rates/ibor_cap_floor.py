@@ -325,24 +325,24 @@ class IborCapFloor():
 
         print(header)
 
-        iFlow = 0
+        i_flow = 0
 
-        for payment_dt in self._capFloorLetDates[iFlow:]:
-            if iFlow == 0:
+        for payment_dt in self._capFloorLetDates[i_flow:]:
+            if i_flow == 0:
                 print("%15s %10s %9s %12s %12.6f %12s %12s" %
                       (payment_dt, "-", "-", "-",
-                       self._cap_floor_let_dfs[iFlow], "-", "-"))
+                       self._cap_floor_let_dfs[i_flow], "-", "-"))
             else:
                 print("%15s %10.7f %9.5f %12.2f %12.6f %12.2f %12.2f" %
                       (payment_dt,
-                       self._cap_floor_let_alphas[iFlow],
-                       self._cap_floor_let_fwd_rates[iFlow]*100,
-                       self._cap_floor_let_intrinsic[iFlow],
-                       self._cap_floor_let_dfs[iFlow],
-                       self._cap_floor_let_values[iFlow],
-                       self._cap_floor_pv[iFlow]))
+                       self._cap_floor_let_alphas[i_flow],
+                       self._cap_floor_let_fwd_rates[i_flow]*100,
+                       self._cap_floor_let_intrinsic[i_flow],
+                       self._cap_floor_let_dfs[i_flow],
+                       self._cap_floor_let_values[i_flow],
+                       self._cap_floor_pv[i_flow]))
 
-            iFlow += 1
+            i_flow += 1
 
 ###############################################################################
 

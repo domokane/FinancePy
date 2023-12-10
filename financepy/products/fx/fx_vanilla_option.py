@@ -532,10 +532,10 @@ class FXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        dom_df = dom_discount_curve._df(t)
+        dom_df = dom_discount_curve.df(t)
         r_d = -np.log(dom_df)/t
 
-        for_df = for_discount_curve._df(t)
+        for_df = for_discount_curve.df(t)
         r_f = -np.log(for_df)/t
 
         K = self._strike_fx_rate

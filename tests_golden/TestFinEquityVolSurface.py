@@ -95,7 +95,7 @@ def test_equity_vol_surface(verboseCalibration):
     test_cases.header("EXPIRY", "DELTA", "VOL", "STRIKE")
     for expiry_date in expiry_dates:
         for delta in deltas:
-            vol = equitySurface.vol_from_delta_date(delta, expiry_date)
+            vol = equitySurface.vol_from_delta_dt(delta, expiry_date)
             test_cases.print(expiry_date, delta, vol[0], vol[1])
 
 ###############################################################################

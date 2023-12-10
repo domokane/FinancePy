@@ -243,14 +243,14 @@ class SwapFloatLeg:
 
         rows = []
         num_flows = len(self._payment_dts)
-        for iFlow in range(0, num_flows):
+        for i_flow in range(0, num_flows):
             rows.append([
-                iFlow + 1,
-                self._payment_dts[iFlow],
-                self._startAccruedDates[iFlow],
-                self._endAccruedDates[iFlow],
-                self._accrued_days[iFlow],
-                round(self._year_fracs[iFlow],4),
+                i_flow + 1,
+                self._payment_dts[i_flow],
+                self._startAccruedDates[i_flow],
+                self._endAccruedDates[i_flow],
+                self._accrued_days[i_flow],
+                round(self._year_fracs[i_flow],4),
             ])
 
         table = format_table(header, rows)
@@ -279,16 +279,16 @@ class SwapFloatLeg:
 
         rows = []
         num_flows = len(self._payment_dts)
-        for iFlow in range(0, num_flows):
+        for i_flow in range(0, num_flows):
             rows.append([
-                iFlow + 1,
-                self._payment_dts[iFlow],
-                round(self._notional_array[iFlow], 0),
-                round(self._rates[iFlow] * 100.0, 4),
-                round(self._payments[iFlow], 2),
-                round(self._paymentDfs[iFlow], 4),
-                round(self._paymentPVs[iFlow], 2),
-                round(self._cumulativePVs[iFlow], 2),
+                i_flow + 1,
+                self._payment_dts[i_flow],
+                round(self._notional_array[i_flow], 0),
+                round(self._rates[i_flow] * 100.0, 4),
+                round(self._payments[i_flow], 2),
+                round(self._paymentDfs[i_flow], 4),
+                round(self._paymentPVs[i_flow], 2),
+                round(self._cumulativePVs[i_flow], 2),
             ])
 
         table = format_table(header, rows)

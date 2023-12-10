@@ -1021,8 +1021,8 @@ class FXVolSurface():
 
             dFX = (high_fx - low_fx) / num_intervals
 
-            dom_df = self._dom_discount_curve._df(t_exp)
-            for_df = self._for_discount_curve._df(t_exp)
+            dom_df = self._dom_discount_curve.df(t_exp)
+            for_df = self._for_discount_curve.df(t_exp)
 
             r_d = -np.log(dom_df) / t_exp
             r_f = -np.log(for_df) / t_exp

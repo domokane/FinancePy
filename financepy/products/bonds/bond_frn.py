@@ -125,11 +125,11 @@ class BondFRN:
         pv = next_cpn * alpha * df
 
         # Now do all subsequent coupons that fall after the ncd
-        for iFlow in range(1, num_flows):
+        for i_flow in range(1, num_flows):
 
-            if self._cpn_dts[iFlow] > self._ncd:
-                pcd = self._cpn_dts[iFlow - 1]
-                ncd = self._cpn_dts[iFlow]
+            if self._cpn_dts[i_flow] > self._ncd:
+                pcd = self._cpn_dts[i_flow - 1]
+                ncd = self._cpn_dts[i_flow]
                 (alpha, _, _) = day_counter.year_frac(pcd, ncd)
 
                 df = df / (1.0 + alpha * (future_ibor + dm))

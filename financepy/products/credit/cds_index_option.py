@@ -301,9 +301,9 @@ class CDSIndexOption:
         fwdDfs = [1.0] * (num_flows)
         expiryToFlowTimes = [1.0] * (num_flows)
 
-        for iFlow in range(0, num_flows):
-            expiryToFlowTimes[iFlow] = (flow_dts[iFlow] - self._expiry_dt) / gDaysInYear
-            fwdDfs[iFlow] = libor_curve.df(flow_dts[iFlow]) / dfToExpiry
+        for i_flow in range(0, num_flows):
+            expiryToFlowTimes[i_flow] = (flow_dts[i_flow] - self._expiry_dt) / gDaysInYear
+            fwdDfs[i_flow] = libor_curve.df(flow_dts[i_flow]) / dfToExpiry
 
         intH = 0.0
         intMaxH = 0.0
@@ -327,10 +327,10 @@ class CDSIndexOption:
             z = z + dz
 
             fwdRPV01 = 0.0
-            for iFlow in range(1, num_flows):
-                acc_factor = self._cds_contract._accrual_factors[iFlow]
-                survivalProbability = exp(-s * expiryToFlowTimes[iFlow] / lgd)
-                fwdRPV01 += acc_factor * survivalProbability * fwdDfs[iFlow]
+            for i_flow in range(1, num_flows):
+                acc_factor = self._cds_contract._accrual_factors[i_flow]
+                survivalProbability = exp(-s * expiryToFlowTimes[i_flow] / lgd)
+                fwdRPV01 += acc_factor * survivalProbability * fwdDfs[i_flow]
 
             fwdRPV01 += -accrual_factorPCDToExpiry
             h = (s - index_coupon) * fwdRPV01

@@ -37,11 +37,11 @@ def dumpSchedule(desc, schedule):
     test_cases.print(0, "EFCT DATE", str(effDate), years, diff)
 
     prev_dt = schedule._adjusted_dts[0]
-    for iFlow in range(1, num_flows-1):
-        adjustedDate = schedule._adjusted_dts[iFlow]
+    for i_flow in range(1, num_flows-1):
+        adjustedDate = schedule._adjusted_dts[i_flow]
         years = (adjustedDate - effDate) / 365.0
         diff = (adjustedDate - prev_dt) / 365.0
-        test_cases.print(iFlow, "FLOW DATE", str(adjustedDate), years, diff)
+        test_cases.print(i_flow, "FLOW DATE", str(adjustedDate), years, diff)
         prev_dt = adjustedDate
 
     termDate = schedule._adjusted_dts[-1]

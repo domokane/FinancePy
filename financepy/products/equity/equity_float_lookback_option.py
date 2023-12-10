@@ -188,21 +188,24 @@ class EquityFloatLookbackOption(EquityOption):
                     "Smax must be greater than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.get_paths(num_paths, num_time_steps, t, mu, stock_price,
-                               volatility, seed)
+        s_all = model.get_paths(num_paths,
+                                num_time_steps,
+                                t, mu,
+                                stock_price,
+                                volatility, seed)
 
         # Due to antithetics we have doubled the number of paths
         num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
         if option_type == OptionTypes.EUROPEAN_CALL:
-            SMin = np.min(Sall, axis=1)
-            SMin = np.minimum(SMin, smin)
-            payoff = np.maximum(Sall[:, -1] - SMin, 0.0)
+            s_min = np.min(s_all, axis=1)
+            s_min = np.minimum(s_min, smin)
+            payoff = np.maximum(s_all[:, -1] - s_min, 0.0)
         elif option_type == OptionTypes.EUROPEAN_PUT:
-            SMax = np.max(Sall, axis=1)
-            SMax = np.maximum(SMax, smax)
-            payoff = np.maximum(SMax - Sall[:, -1], 0.0)
+            s_max = np.max(s_all, axis=1)
+            s_max = np.maximum(s_max, smax)
+            payoff = np.maximum(s_max - s_all[:, -1], 0.0)
         else:
             raise FinError("Unknown lookback option type:" + str(option_type))
 

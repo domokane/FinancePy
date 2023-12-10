@@ -111,11 +111,11 @@ def crr_tree_val(stock_price,
 
             nextIndex = int(0.5 * (i_time + 1) * (i_time + 2))
 
-            nextNodeDn = nextIndex + i_node
-            nextNodeUp = nextIndex + i_node + 1
+            next_node_dn = nextIndex + i_node
+            next_node_up = nextIndex + i_node + 1
 
-            vUp = option_values[nextNodeUp]
-            vDn = option_values[nextNodeDn]
+            vUp = option_values[next_node_up]
+            vDn = option_values[next_node_dn]
             future_expected_value = probs[i_time] * vUp
             future_expected_value += (1.0 - probs[i_time]) * vDn
             holdValue = periodDiscountFactors[i_time] * future_expected_value

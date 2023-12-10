@@ -85,10 +85,10 @@ def value_mc_fast(t,
     model = FinGBMProcess()
 
     num_time_steps = 2
-    Sall = model.get_paths_assets(num_assets, num_paths, num_time_steps,
+    s_all = model.get_paths_assets(num_assets, num_paths, num_time_steps,
                                   t, mus, stock_prices, volatilities, betas, seed)
 
-    payoff = payoff_value(Sall, payoff_type.value, payoff_params)
+    payoff = payoff_value(s_all, payoff_type.value, payoff_params)
     payoff = np.mean(payoff)
     v = payoff * np.exp(-r * t)
     return v

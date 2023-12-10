@@ -34,7 +34,7 @@ class FXFixedLookbackOption:
     def __init__(self,
                  expiry_dt: Date,
                  option_type: OptionTypes,
-                 optionStrike: float):
+                 option_strike: float):
         """ Create option with expiry date, option type and the option strike
         """
 
@@ -42,7 +42,7 @@ class FXFixedLookbackOption:
 
         self._expiry_dt = expiry_dt
         self._option_type = option_type
-        self._optionStrike = optionStrike
+        self._option_strike = option_strike
 
 ##########################################################################
 
@@ -80,20 +80,20 @@ class FXFixedLookbackOption:
 
         v = volatility
         s0 = stock_price
-        k = self._optionStrike
-        smin = 0.0
-        smax = 0.0
+        k = self._option_strike
+        s_min = 0.0
+        s_max = 0.0
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
-            smax = stock_min_max
-            if smax < s0:
+            s_max = stock_min_max
+            if s_max < s0:
                 raise FinError(
                     "The Smax value must be >= the stock price.")
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
-            smin = stock_min_max
-            if smin > s0:
+            s_min = stock_min_max
+            if s_min > s0:
                 raise FinError(
-                    "The Smin value must be <= the stock price.")
+                    "The s_min value must be <= the stock price.")
 
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
@@ -110,7 +110,7 @@ class FXFixedLookbackOption:
         # Taken from Hull Page 536 (6th edition) and Haug Page 143
         if self._option_type == OptionTypes.EUROPEAN_CALL:
 
-            if k > smax:
+            if k > s_max:
                 d1 = (log(s0/k) + (b+v*v/2.0)*t)/v/sqrt(t)
                 d2 = d1 - v * sqrt(t)
 
@@ -125,36 +125,36 @@ class FXFixedLookbackOption:
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
             else:
-                e1 = (log(s0/smax) + (b+v*v/2.0)*t) / v / sqrt(t)
+                e1 = (log(s0/s_max) + (b+v*v/2.0)*t) / v / sqrt(t)
                 e2 = e1 - v * sqrt(t)
 
-                if s0 == smax:
+                if s0 == s_max:
                     term = -N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
-                elif s0 < smax and w > 100:
+                elif s0 < s_max and w > 100:
                     term = expbt * N(e1)
                 else:
-                    term = (-(s0 / smax)**(-w)) * \
+                    term = (-(s0 / s_max)**(-w)) * \
                         N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
 
-                v = df * (smax - k) + s0 * dq * N(e1) - \
-                    smax * df * N(e2) + s0 * df * u * term
+                v = df * (s_max - k) + s0 * dq * N(e1) - \
+                    s_max * df * N(e2) + s0 * df * u * term
 
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
 
-            if k >= smin:
-                f1 = (log(s0 / smin) + (b + v * v / 2.0) * t) / v / sqrt(t)
+            if k >= s_min:
+                f1 = (log(s0 / s_min) + (b + v * v / 2.0) * t) / v / sqrt(t)
                 f2 = f1 - v * sqrt(t)
 
-                if s0 == smin:
+                if s0 == s_min:
                     term = N(-f1 + 2.0 * b * sqrt(t) / v) - expbt * N(-f1)
-                elif s0 > smin and w < -100:
+                elif s0 > s_min and w < -100:
                     term = -expbt * N(-f1)
                 else:
-                    term = ((s0 / smin)**(-w)) * N(-f1 + 2.0 *
+                    term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 *
                                                    b * sqrt(t) / v) - expbt * N(-f1)
 
-                v = df * (k - smin) - s0 * dq * N(-f1) + \
-                    smin * df * N(-f2) + s0 * df * u * term
+                v = df * (k - s_min) - s0 * dq * N(-f1) + \
+                    s_min * df * N(-f2) + s0 * df * u * term
 
             else:
                 d1 = (log(s0 / k) + (b + v * v / 2) * t) / v / sqrt(t)
@@ -183,14 +183,14 @@ class FXFixedLookbackOption:
                  domestic_curve: DiscountCurve,
                  foreign_curve: DiscountCurve,
                  volatility: float,
-                 spot_fx_rateMinMax: float,
+                 spot_fx_rate_min_max: float,
                  num_paths: int = 10000,
                  num_steps_per_year: int = 252,
                  seed: int = 4242):
         """ Value FX Fixed Lookback option using Monte Carlo. """
 
         t = (self._expiry_dt - value_dt) / gDaysInYear
-        S0 = spot_fx_rate
+        s_0 = spot_fx_rate
 
         df = domestic_curve._df(t)
         r_d = -np.log(df)/t
@@ -203,46 +203,45 @@ class FXFixedLookbackOption:
         num_time_steps = int(t * num_steps_per_year)
 
         option_type = self._option_type
-        k = self._optionStrike
+        k = self._option_strike
 
-        smin = 0.0
-        smax = 0.0
+        s_min = 0.0
+        s_max = 0.0
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
-            smax = spot_fx_rateMinMax
-            if smax < S0:
+            s_max = spot_fx_rate_min_max
+            if s_max < s_0:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
         elif self._option_type == OptionTypes.EUROPEAN_PUT:
-            smin = spot_fx_rateMinMax
-            if smin > S0:
+            s_min = spot_fx_rate_min_max
+            if s_min > s_0:
                 raise FinError(
-                    "Smin must be less than or equal to the stock price.")
+                    "s_min must be less than or equal to the stock price.")
 
         model = FinGBMProcess()
-        Sall = model.get_paths(
-            num_paths,
-            num_time_steps,
-            t,
-            mu,
-            S0,
-            volatility,
-            seed)
+        s_all = model.get_paths(num_paths,
+                                num_time_steps,
+                                t,
+                                mu,
+                                s_0,
+                                volatility,
+                                seed)
 
         # Due to antithetics we have doubled the number of paths
         num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
         if option_type == OptionTypes.EUROPEAN_CALL:
-            SMax = np.max(Sall, axis=1)
-            smaxs = np.ones(num_paths) * smax
-            payoff = np.maximum(SMax - k, 0.0)
-            payoff = np.maximum(payoff, smaxs - k)
+            s_max_vector = np.max(s_all, axis=1)
+            s_maxs = np.ones(num_paths) * s_max
+            payoff = np.maximum(s_max_vector - k, 0.0)
+            payoff = np.maximum(payoff, s_maxs - k)
         elif option_type == OptionTypes.EUROPEAN_PUT:
-            SMin = np.min(Sall, axis=1)
-            smins = np.ones(num_paths) * smin
-            payoff = np.maximum(k - SMin, 0.0)
-            payoff = np.maximum(payoff, k - smins)
+            s_min_vector = np.min(s_all, axis=1)
+            s_mins = np.ones(num_paths) * s_min
+            payoff = np.maximum(k - s_min_vector, 0.0)
+            payoff = np.maximum(payoff, k - s_mins)
         else:
             raise FinError("Unknown lookback option type:" + str(option_type))
 

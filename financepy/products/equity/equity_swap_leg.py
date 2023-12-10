@@ -63,7 +63,8 @@ class EquitySwapLeg:
             raise NotImplementedError("Return Type still not implemented")
 
         # To generate ISDA pmnt schedule properly we can't use these types
-        if freq_type in (FrequencyTypes.CONTINUOUS, FrequencyTypes, FrequencyTypes.SIMPLE):
+        if freq_type in (FrequencyTypes.CONTINUOUS, FrequencyTypes,
+                         FrequencyTypes.SIMPLE):
             raise FinError("Cannot generate payment schedule for this frequency!")
 
         self._effective_dt = effective_dt
@@ -82,8 +83,8 @@ class EquitySwapLeg:
         self._dg_type = dg_type
         self._end_of_month = end_of_month
 
-        self._startAccruedDates = []
-        self._endAccruedDates = []
+        self._start_accd_dates = []
+        self._end_accd_dates = []
         self._payment_dts = []
         self._pmnts = []
         self._year_fracs = []
@@ -112,8 +113,8 @@ class EquitySwapLeg:
         if len(scheduleDates) < 2:
             raise FinError("Schedule has none or only one date")
 
-        self._startAccruedDates = []
-        self._endAccruedDates = []
+        self._start_accd_dates = []
+        self._end_accd_dates = []
         self._payment_dts = []
         self._year_fracs = []
         self._accrued_days = []
@@ -126,8 +127,8 @@ class EquitySwapLeg:
         # All of the lists end up with the same length
         for next_dt in scheduleDates[1:]:
 
-            self._startAccruedDates.append(prev_dt)
-            self._endAccruedDates.append(next_dt)
+            self._start_accd_dates.append(prev_dt)
+            self._end_accd_dates.append(next_dt)
 
             if self._payment_lag == 0:
                 payment_dt = next_dt
@@ -189,7 +190,7 @@ class EquitySwapLeg:
 
         dfValue = discount_curve.df(value_dt)
         leg_pv, eq_term_rate = 0.0, 0.0
-        lastNotional = self._notional
+        last_notional = self._notional
         numPayments = len(self._payment_dts)
 
         index_basis = index_curve._dc_type
@@ -201,21 +202,21 @@ class EquitySwapLeg:
 
             if pmntDate > value_dt:
 
-                startAccruedDt = self._startAccruedDates[iPmnt]
-                endAccruedDt = self._endAccruedDates[iPmnt]
+                startAccruedDt = self._start_accd_dates[iPmnt]
+                endAccruedDt = self._end_accd_dates[iPmnt]
                 index_alpha = index_day_counter.year_frac(startAccruedDt,
                                                           endAccruedDt)[0]
 
                 df_start = index_curve.df(startAccruedDt)
-                dfEnd = index_curve.df(endAccruedDt)
-                fwd_rate = (df_start / dfEnd - 1.0) / index_alpha
+                df_end = index_curve.df(endAccruedDt)
+                fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
                 div_start = dividend_curve.df(startAccruedDt)
                 div_end = dividend_curve.df(endAccruedDt)
                 div_fwd_rate = (div_start / div_end - 1.0) / index_alpha
 
                 # Equity discount derived from index and div curves
-                eq_fwd_rate = ((df_start / dfEnd) * (div_start / div_end) - 1.0) / index_alpha
+                eq_fwd_rate = ((df_start / df_end) * (div_start / div_end) - 1) / index_alpha
 
                 self._fwd_rates.append(fwd_rate)
                 self._div_fwd_rates.append(div_fwd_rate)
@@ -224,18 +225,18 @@ class EquitySwapLeg:
                 # Iterative update of the term rate
                 eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) * (1 + eq_term_rate)  - 1
 
-                nextPrice = self._current_price * (1 + eq_term_rate)
-                nextNotional = nextPrice * self._quantity
-                pmntAmount = nextNotional - lastNotional
+                next_price = self._current_price * (1 + eq_term_rate)
+                next_notional = next_price * self._quantity
+                pmntAmount = next_notional - last_notional
 
                 df_pmnt = discount_curve.df(pmntDate) / dfValue
-                pmntPV = pmntAmount * df_pmnt
-                leg_pv += pmntPV
+                pmnt_pv = pmntAmount * df_pmnt
+                leg_pv += pmnt_pv
 
-                self._last_notionals.append(lastNotional)
+                self._last_notionals.append(last_notional)
                 self._pmnts.append(pmntAmount)
                 self._pmnt_dfs.append(df_pmnt)
-                self._pmnt_pvs.append(pmntPV)
+                self._pmnt_pvs.append(pmnt_pv)
                 self._cumulative_pvs.append(leg_pv)
 
             else:
@@ -249,7 +250,7 @@ class EquitySwapLeg:
                 self._pmnt_pvs.append(0.0)
                 self._cumulative_pvs.append(leg_pv)
 
-            lastNotional = nextNotional
+            last_notional = next_notional
 
         if self._leg_type == SwapTypes.PAY:
             leg_pv = leg_pv * (-1.0)
@@ -277,14 +278,14 @@ class EquitySwapLeg:
 
         rows = []
         num_flows = len(self._payment_dts)
-        for iFlow in range(0, num_flows):
+        for i_flow in range(0, num_flows):
             rows.append([
-                iFlow + 1,
-                self._payment_dts[iFlow],
-                self._startAccruedDates[iFlow],
-                self._endAccruedDates[iFlow],
-                self._accrued_days[iFlow],
-                round(self._year_fracs[iFlow], 4),
+                i_flow + 1,
+                self._payment_dts[i_flow],
+                self._start_accd_dates[i_flow],
+                self._end_accd_dates[i_flow],
+                self._accrued_days[i_flow],
+                round(self._year_fracs[i_flow], 4),
             ])
 
         table = format_table(header, rows)
@@ -310,16 +311,16 @@ class EquitySwapLeg:
 
         rows = []
         num_flows = len(self._payment_dts)
-        for iFlow in range(0, num_flows):
+        for i_flow in range(0, num_flows):
             rows.append([
-                iFlow + 1,
-                self._payment_dts[iFlow],
-                round(self._last_notionals[iFlow], 0),
-                round(self._eq_fwd_rates[iFlow] * 100.0, 4),
-                round(self._pmnts[iFlow], 2),
-                round(self._pmnt_dfs[iFlow], 4),
-                round(self._pmnt_pvs[iFlow], 2),
-                round(self._cumulative_pvs[iFlow], 2),
+                i_flow + 1,
+                self._payment_dts[i_flow],
+                round(self._last_notionals[i_flow], 0),
+                round(self._eq_fwd_rates[i_flow] * 100.0, 4),
+                round(self._pmnts[i_flow], 2),
+                round(self._pmnt_dfs[i_flow], 4),
+                round(self._pmnt_pvs[i_flow], 2),
+                round(self._cumulative_pvs[i_flow], 2),
             ])
 
         table = format_table(header, rows)

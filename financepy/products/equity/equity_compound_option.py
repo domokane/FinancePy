@@ -137,10 +137,10 @@ def _value_once(s,
         for i_node in range(0, i_time + 1):
             s = stock_values[index + i_node]
             next_index = int(0.5 * (i_time + 1) * (i_time + 2))
-            nextNodeDn = next_index + i_node
-            nextNodeUp = next_index + i_node + 1
-            vUp = option_values[nextNodeUp]
-            vDn = option_values[nextNodeDn]
+            next_node_dn = next_index + i_node
+            next_node_up = next_index + i_node + 1
+            vUp = option_values[next_node_up]
+            vDn = option_values[next_node_dn]
             future_exp_val = probs[i_time] * vUp
             future_exp_val += (1.0 - probs[i_time]) * vDn
             hold_value = periodDiscountFactors[i_time] * future_exp_val
@@ -157,13 +157,14 @@ def _value_once(s,
     # Now do payoff at the end of the first expiry period at t1
     i_time = num_steps1
     index = int(0.5 * i_time * (i_time + 1))
+
     for i_node in range(0, i_time + 1):
         s = stock_values[index + i_node]
         next_index = int(0.5 * (i_time + 1) * (i_time + 2))
-        nextNodeDn = next_index + i_node
-        nextNodeUp = next_index + i_node + 1
-        vUp = option_values[nextNodeUp]
-        vDn = option_values[nextNodeDn]
+        next_node_dn = next_index + i_node
+        next_node_up = next_index + i_node + 1
+        vUp = option_values[next_node_up]
+        vDn = option_values[next_node_dn]
         future_exp_val = probs[i_time] * vUp
         future_exp_val += (1.0 - probs[i_time]) * vDn
         hold_value = periodDiscountFactors[i_time] * future_exp_val
@@ -177,14 +178,17 @@ def _value_once(s,
 
     # begin backward steps from t1 expiry to value date
     for i_time in range(num_steps1 - 1, -1, -1):
+
         index = int(0.5 * i_time * (i_time + 1))
+
         for i_node in range(0, i_time + 1):
+
             s = stock_values[index + i_node]
             next_index = int(0.5 * (i_time + 1) * (i_time + 2))
-            nextNodeDn = next_index + i_node
-            nextNodeUp = next_index + i_node + 1
-            vUp = option_values[nextNodeUp]
-            vDn = option_values[nextNodeDn]
+            next_node_dn = next_index + i_node
+            next_node_up = next_index + i_node + 1
+            vUp = option_values[next_node_up]
+            vDn = option_values[next_node_dn]
             future_exp_val = probs[i_time] * vUp
             future_exp_val += (1.0 - probs[i_time]) * vDn
             hold_value = periodDiscountFactors[i_time] * future_exp_val

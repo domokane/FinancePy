@@ -47,7 +47,7 @@ def test_european_call():
         num_steps_per_year)
 
     assert round(value, 4) == 23.7455
-    assert round(value_mc, 4) == 21.3861
+    assert round(value_mc, 4) == 23.3281
 
     k = 100.0
     option = FXFixedLookbackOption(expiry_date, option_type, k)
@@ -97,7 +97,7 @@ def test_european_put():
         num_steps_per_year)
 
     assert round(value, 4) == 25.2429
-    assert round(value_mc, 4) == 25.4885
+    assert round(value_mc, 4) == 24.2806
 
     k = 105.0
     option = FXFixedLookbackOption(expiry_date, option_type, k)

@@ -48,7 +48,7 @@ class EquityDigitalOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if call_put_type != OptionTypes.EUROPEAN_CALL and call_put_type != OptionTypes.EUROPEAN_PUT:
+        if call_put_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
             raise FinError("Option type must be EUROPEAN CALL or PUT")
 
         self._expiry_dt = expiry_dt

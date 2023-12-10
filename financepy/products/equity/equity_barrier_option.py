@@ -162,24 +162,25 @@ class EquityBarrierOption(EquityOption):
             simple_put = True
 
         if simple_put or simple_call:
-            Sall = process.get_process(
+            s_all = process.get_process(
                 process_type, t, model_params, 1, num_paths, seed)
 
         if simple_call:
-            c = (np.maximum(Sall[:, -1] - k, 0.0)).mean()
+            c = (np.maximum(s_all[:, -1] - k, 0.0)).mean()
             c = c * np.exp(-r * t)
             return c
 
         if simple_put:
-            p = (np.maximum(k - Sall[:, -1], 0.0)).mean()
+            p = (np.maximum(k - s_all[:, -1], 0.0)).mean()
             p = p * np.exp(-r * t)
             return p
 
         # Get full set of paths
-        Sall = process.get_process(process_type, t, model_params, num_time_steps,
-                                   num_paths, seed)
+        s_all = process.get_process(process_type, t, model_params,
+                                    num_time_steps,
+                                    num_paths, seed)
 
-        (num_paths, num_time_steps) = Sall.shape
+        (num_paths, num_time_steps) = s_all.shape
 
         if option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value or \
                 option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value or \
@@ -189,7 +190,7 @@ class EquityBarrierOption(EquityOption):
             barrier_crossed_from_above = [False] * num_paths
 
             for p in range(0, num_paths):
-                barrier_crossed_from_above[p] = np.any(Sall[p] <= b)
+                barrier_crossed_from_above[p] = np.any(s_all[p] <= b)
 
         if option_type == EquityBarrierTypes.UP_AND_IN_CALL.value or \
                 option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value or \
@@ -198,34 +199,34 @@ class EquityBarrierOption(EquityOption):
 
             barrier_crossed_from_below = [False] * num_paths
             for p in range(0, num_paths):
-                barrier_crossed_from_below[p] = np.any(Sall[p] >= b)
+                barrier_crossed_from_below[p] = np.any(s_all[p] >= b)
 
         payoff = np.zeros(num_paths)
         ones = np.ones(num_paths)
 
         if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * \
                      (ones - barrier_crossed_from_above)
         elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * \
                 barrier_crossed_from_above
         elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * \
                 barrier_crossed_from_below
         elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
-            payoff = np.maximum(Sall[:, -1] - k, 0.0) * \
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * \
                      (ones - barrier_crossed_from_below)
         elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
-            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * \
                 barrier_crossed_from_below
         elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
-            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * \
                      (ones - barrier_crossed_from_below)
         elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
-            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * \
                      (ones - barrier_crossed_from_above)
         elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
-            payoff = np.maximum(k - Sall[:, -1], 0.0) * \
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * \
                 barrier_crossed_from_above
         else:
             raise FinError("Unknown barrier option type." +

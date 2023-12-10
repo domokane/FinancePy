@@ -80,11 +80,10 @@ def test_FinOptionImpliedDbn():
             num_steps = 10000
             dFX = (endFX - startFX) / num_steps
 
-            dom_df = dom_discount_curve._df(t_exp)
-            for_df = for_discount_curve._df(t_exp)
-
-            r_d = -np.log(dom_df) / t_exp
-            r_f = -np.log(for_df) / t_exp
+#            dom_df = dom_discount_curve._df(t_exp)
+#            for_df = for_discount_curve._df(t_exp)
+#            r_d = -np.log(dom_df) / t_exp
+#            r_f = -np.log(for_df) / t_exp
 
             params = fxMarket._parameters[iTenor]
 

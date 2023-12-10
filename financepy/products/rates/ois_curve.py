@@ -246,8 +246,8 @@ class OISCurve(DiscountCurve):
 #            for swap in oisSwaps[0:-1]:
 #                swapCpnDates = swap._adjusted_fixed_dts
 #                num_flows = len(swapCpnDates)
-#                for iFlow in range(0, num_flows):
-#                    if swapCpnDates[iFlow] != longestSwapCpnDates[iFlow]:
+#                for i_flow in range(0, num_flows):
+#                    if swapCpnDates[i_flow] != longestSwapCpnDates[i_flow]:
 #                        raise FinError("Swap coupons are not on the same date grid.")
 
         #######################################################################

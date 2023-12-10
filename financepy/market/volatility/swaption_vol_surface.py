@@ -834,8 +834,8 @@ class SwaptionVolSurface():
 
     #         dS = (highS - lowS)/ num_intervals
 
-    #         dis_df = self._discount_curve._df(t)
-    #         div_df = self._dividend_curve._df(t)
+    #         dis_df = self._discount_curve.df(t)
+    #         div_df = self._dividend_curve.df(t)
 
     #         r = -np.log(dis_df) / t
     #         q = -np.log(div_df) / t

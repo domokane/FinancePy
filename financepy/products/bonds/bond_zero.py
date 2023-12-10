@@ -350,11 +350,11 @@ class BondZero:
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        for iFlow in range(1, num_flows):
+        for i_flow in range(1, num_flows):
             # coupons paid on the settlement date are paid to the seller
-            if self._cpn_dts[iFlow] > settle_dt:
-                self._pcd = self._cpn_dts[iFlow - 1]
-                self._ncd = self._cpn_dts[iFlow]
+            if self._cpn_dts[i_flow] > settle_dt:
+                self._pcd = self._cpn_dts[i_flow - 1]
+                self._ncd = self._cpn_dts[i_flow]
                 break
 
         dc = DayCount(self._dc_type)

@@ -231,7 +231,7 @@ class FinFXVarianceSwap:
 
 ###############################################################################
 
-    def realised_variance(self, closePrices, useLogs=True):
+    def realised_variance(self, closePrices, use_logs=True):
         """ Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns."""
 
@@ -243,7 +243,7 @@ class FinFXVarianceSwap:
 
         cumX2 = 0.0
 
-        if useLogs is True:
+        if use_logs is True:
             for i in range(1, num_observations):
                 x = np.log(closePrices[i]/closePrices[i-1])
                 cumX2 += x*x

@@ -1374,8 +1374,8 @@ class FXVolSurfacePlus():
             expiry_dt = self._expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / gDaysInYear
 
-            dom_df = self._dom_discount_curve._df(t_exp)
-            for_df = self._for_discount_curve._df(t_exp)
+            dom_df = self._dom_discount_curve.df(t_exp)
+            for_df = self._for_discount_curve.df(t_exp)
             f = s * for_df/dom_df
 
             self._t_exp[i] = t_exp
@@ -2069,8 +2069,8 @@ class FXVolSurfacePlus():
 
             dFX = (highFX - lowFX) / num_intervals
 
-            dom_df = self._dom_discount_curve._df(t)
-            for_df = self._for_discount_curve._df(t)
+            dom_df = self._dom_discount_curve.df(t)
+            for_df = self._for_discount_curve.df(t)
 
             r_d = -np.log(dom_df) / t
             r_f = -np.log(for_df) / t

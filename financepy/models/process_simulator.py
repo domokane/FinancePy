@@ -235,34 +235,34 @@ def get_gbm_paths(num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, see
 
     if scheme == FinGBMNumericalScheme.NORMAL.value:
 
-        Sall = np.empty((num_paths, num_time_steps + 1))
-        Sall[:, 0] = stock_price
+        s_all = np.empty((num_paths, num_time_steps + 1))
+        s_all[:, 0] = stock_price
         for it in range(1, num_time_steps + 1):
             g1D = np.random.standard_normal((num_paths))
             for ip in range(0, num_paths):
                 w = np.exp(g1D[ip] * vsqrt_dt)
-                Sall[ip, it] = Sall[ip, it - 1] * m * w
+                s_all[ip, it] = s_all[ip, it - 1] * m * w
 
     elif scheme == FinGBMNumericalScheme.ANTITHETIC.value:
 
-        Sall = np.empty((2 * num_paths, num_time_steps + 1))
-        Sall[:, 0] = stock_price
+        s_all = np.empty((2 * num_paths, num_time_steps + 1))
+        s_all[:, 0] = stock_price
         for it in range(1, num_time_steps + 1):
             g1D = np.random.standard_normal((num_paths))
             for ip in range(0, num_paths):
                 w = np.exp(g1D[ip] * vsqrt_dt)
-                Sall[ip, it] = Sall[ip, it - 1] * m * w
-                Sall[ip + num_paths, it] = Sall[ip + num_paths, it - 1] * m / w
+                s_all[ip, it] = s_all[ip, it - 1] * m * w
+                s_all[ip + num_paths, it] = s_all[ip + num_paths, it - 1] * m / w
 
     else:
 
         raise FinError("Unknown FinGBMNumericalScheme")
 
-#    m = np.mean(Sall[:, -1])
-#    v = np.var(Sall[:, -1]/Sall[:, 0])
+#    m = np.mean(s_all[:, -1])
+#    v = np.var(s_all[:, -1]/s_all[:, 0])
 #    print("GBM", num_paths, numAnnSteps, t, mu, stock_price, sigma, scheme, m,v)
 
-    return Sall
+    return s_all
 
 ###############################################################################
 

@@ -160,10 +160,10 @@
 #         cpn_times = []
 #         cpn_amounts = []
 
-#         for iFlow in range(1, len(self._swap._adjusted_fixed_dts)):
-#             flow_dt= swap._adjusted_fixed_dts[iFlow]
+#         for i_flow in range(1, len(self._swap._adjusted_fixed_dts)):
+#             flow_dt= swap._adjusted_fixed_dts[i_flow]
 #             cpn_time = (flow_dt - settle_dt) / gDaysInYear
-#             cpn_flow = swap._fixedFlows[iFlow-1] / self._notional
+#             cpn_flow = swap._fixedFlows[i_flow-1] / self._notional
 #             cpn_times.append(cpn_time)
 #             cpn_amounts.append(cpn_flow)
 
