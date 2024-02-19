@@ -1410,22 +1410,22 @@ class FXVolSurfacePlus():
             atm_vol = self._atm_vols[i]
 
             if self._usems_25d_vol > 0:
-                ms25 = self._mktStrangle25DeltaVols[i]
+                ms25 = self._ms25DeltaVols[i]
             else:
                 ms25 = 0.0
 
             if self._userr_25d_vol > 0:
-                rr25 = self._riskReversal25DeltaVols[i]
+                rr25 = self._rr25DeltaVols[i]
             else:
                 rr25 = 0.0
 
             if self._usems_10d_vol > 0:
-                ms10 = self._mktStrangle10DeltaVols[i]
+                ms10 = self._ms10DeltaVols[i]
             else:
                 ms10 = 0.0
 
             if self._userr_10d_vol > 0:
-                rr10 = self._riskReversal10DeltaVols[i]
+                rr10 = self._rr10DeltaVols[i]
             else:
                 rr10 = 0.0
 
@@ -1534,15 +1534,15 @@ class FXVolSurfacePlus():
             # If the data has not been provided, pass a dummy value
             # as I don't want more arguments and Numpy needs floats
             if self._usems_25d_vol:
-                ms_25d_vol = self._mktStrangle25DeltaVols[i]
-                rr_25d_vol = self._riskReversal25DeltaVols[i]
+                ms_25d_vol = self._ms25DeltaVols[i]
+                rr_25d_vol = self._rr25DeltaVols[i]
             else:
                 ms_25d_vol = -999.0
                 rr_25d_vol = -999.0
 
             if self._usems_10d_vol:
-                ms_10d_vol = self._mktStrangle10DeltaVols[i]
-                rr_10d_vol = self._riskReversal10DeltaVols[i]
+                ms_10d_vol = self._ms10DeltaVols[i]
+                rr_10d_vol = self._rr10DeltaVols[i]
             else:
                 ms_10d_vol = -999.0
                 rr_10d_vol = -999.0
@@ -1596,15 +1596,15 @@ class FXVolSurfacePlus():
 
                 if self._usems_25d_vol:
                     print("IN MKT STRANGLE 25D VOL: %9.6f %%" %
-                          (100.0*self._mktStrangle25DeltaVols[i]))
+                          (100.0*self._ms25DeltaVols[i]))
                     print("IN RSK REVERSAL 25D VOL: %9.6f %%" %
-                          (100.0*self._riskReversal25DeltaVols[i]))
+                          (100.0*self._rr25DeltaVols[i]))
 
                 if self._usems_10d_vol:
                     print("IN MKT STRANGLE 10D VOL: %9.6f %%" %
-                          (100.0*self._mktStrangle10DeltaVols[i]))
+                          (100.0*self._ms10DeltaVols[i]))
                     print("IN RSK REVERSAL 10D VOL: %9.6f %%" %
-                          (100.0*self._riskReversal10DeltaVols[i]))
+                          (100.0*self._rr10DeltaVols[i]))
 
             call = FXVanillaOption(expiry_dt,
                                    K_dummy,
@@ -1683,13 +1683,13 @@ class FXVolSurfacePlus():
 
             if self._usems_25d_vol is True:
 
-                ms_vol = self._atm_vols[i] + self._mktStrangle25DeltaVols[i]
+                ms_vol = self._atm_vols[i] + self._ms25DeltaVols[i]
 
                 if verbose:
 
                     print("==================================================")
                     print("MKT STRANGLE 25D VOL IN: %9.6f %%"
-                          % (100.0*self._mktStrangle25DeltaVols[i]))
+                          % (100.0*self._ms25DeltaVols[i]))
 
                 call._strike_fx_rate = self._K_25D_C_MS[i]
                 put._strike_fx_rate = self._K_25D_P_MS[i]
@@ -2115,10 +2115,10 @@ class FXVolSurfacePlus():
         for tenor_index in range(0, self._num_vol_curves):
 
             atm_vol = self._atm_vols[tenor_index]*100
-            ms_vol25 = self._mktStrangle25DeltaVols[tenor_index]*100
-            rrVol25 = self._riskReversal25DeltaVols[tenor_index]*100
-            ms_vol10 = self._mktStrangle10DeltaVols[tenor_index]*100
-            rrVol10 = self._riskReversal10DeltaVols[tenor_index]*100
+            ms_vol25 = self._ms25DeltaVols[tenor_index]*100
+            rrVol25 = self._rr25DeltaVols[tenor_index]*100
+            ms_vol10 = self._ms10DeltaVols[tenor_index]*100
+            rrVol10 = self._rr10DeltaVols[tenor_index]*100
             strikes = self._strikes[tenor_index]
 
             gaps = self._gaps[tenor_index]
@@ -2230,10 +2230,8 @@ class FXVolSurfacePlus():
             s += label_to_string("FWD FX", self._F0T[i])
 
             s += label_to_string("ATM VOLS", self._atm_vols[i]*100.0)
-            s += label_to_string("MS VOLS",
-                                 self._mktStrangle25DeltaVols[i]*100.)
-            s += label_to_string("RR VOLS",
-                                 self._riskReversal25DeltaVols[i]*100.)
+            s += label_to_string("MS VOLS", self._ms25DeltaVols[i]*100.)
+            s += label_to_string("RR VOLS", self._rr25DeltaVols[i]*100.)
 
             s += label_to_string("ATM Strike", self._K_ATM[i])
             s += label_to_string("ATM Delta", self._deltaATM[i])

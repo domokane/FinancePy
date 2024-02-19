@@ -616,8 +616,8 @@ class FXVolSurface():
         for i in range(0, num_vol_curves):
 
             atm_vol = self._atm_vols[i]
-            ms25 = self._mktStrangle25DeltaVols[i]
-            rr25 = self._riskReversal25DeltaVols[i]
+            ms25 = self._ms25DeltaVols[i]
+            rr25 = self._rr25DeltaVols[i]
             s25 = atm_vol + ms25 + rr25/2.0
             s50 = atm_vol
             s75 = atm_vol + ms25 - rr25/2.0
@@ -686,8 +686,8 @@ class FXVolSurface():
             r_f = self._rf[i]
             K_ATM = self._K_ATM[i]
             atm_vol = self._atm_vols[i]
-            ms_25d_vol = self._mktStrangle25DeltaVols[i]
-            rr_25d_vol = self._riskReversal25DeltaVols[i]
+            ms_25d_vol = self._ms25DeltaVols[i]
+            rr_25d_vol = self._rr25DeltaVols[i]
 
 #            print(t, rd, rf, K_ATM, atm_vol, ms_25d_vol, rr_25d_vol)
 
@@ -755,9 +755,9 @@ class FXVolSurface():
                 print("EXPIRY DATE:", expiry_dt)
                 print("IN ATM VOL: %9.6f %%" % (100.0*self._atm_vols[i]))
                 print("IN MKT STRANGLE 25D VOL: %9.6f %%" %
-                      (100.0*self._mktStrangle25DeltaVols[i]))
+                      (100.0*self._ms25DeltaVols[i]))
                 print("IN RSK REVERSAL 25D VOL: %9.6f %%" %
-                      (100.0*self._riskReversal25DeltaVols[i]))
+                      (100.0*self._rr25DeltaVols[i]))
 
             call = FXVanillaOption(expiry_dt,
                                    K_dummy,
@@ -832,13 +832,13 @@ class FXVolSurface():
             # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.25/-0.25
             ###################################################################
 
-            msVol = self._atm_vols[i] + self._mktStrangle25DeltaVols[i]
+            msVol = self._atm_vols[i] + self._ms25DeltaVols[i]
 
             if verbose:
 
                 print("======================================================")
                 print("MKT STRANGLE VOL IN: %9.6f %%"
-                      % (100.0*self._mktStrangle25DeltaVols[i]))
+                      % (100.0*self._ms25DeltaVols[i]))
 
             call._strike_fx_rate = self._k_25d_c_ms[i]
             put._strike_fx_rate = self._k_25d_p_ms[i]
@@ -998,11 +998,11 @@ class FXVolSurface():
                       % (100.0 * self._riskReversal25DeltaVols[i], 100.0*sigma_RR))
                 print("==========================================================")
 
-            diff = sigma_RR - self._riskReversal25DeltaVols[i]
+            diff = sigma_RR - self._rr25DeltaVols[i]
 
             if np.abs(diff) > tol:
                 print("FAILED FIT TO 25D RRV IN: % 9.6f  OUT: % 9.6f  DIFF: % 9.6f" %
-                      (self._riskReversal25DeltaVols[i]*100.0,
+                      (self._rr25DeltaVols[i]*100.0,
                        sigma_RR*100.0,
                        diff*100.0))
 
@@ -1063,8 +1063,8 @@ class FXVolSurface():
         for tenor_index in range(0, self._num_vol_curves):
 
             atm_vol = self._atm_vols[tenor_index]*100
-            msVol = self._mktStrangle25DeltaVols[tenor_index]*100
-            rrVol = self._riskReversal25DeltaVols[tenor_index]*100
+            msVol = self._ms25DeltaVols[tenor_index]*100
+            rrVol = self._rr25DeltaVols[tenor_index]*100
 
             lowK = self._k_25d_p[tenor_index] * 0.75
             highK = self._k_25d_c[tenor_index] * 1.25
@@ -1146,10 +1146,8 @@ class FXVolSurface():
             s += label_to_string("FWD FX", self._F0T[i])
 
             s += label_to_string("ATM VOLS", self._atm_vols[i]*100.0)
-            s += label_to_string("MS VOLS",
-                                 self._mktStrangle25DeltaVols[i]*100.0)
-            s += label_to_string("RR VOLS",
-                                 self._riskReversal25DeltaVols[i]*100.0)
+            s += label_to_string("MS VOLS", self._ms25DeltaVols[i]*100.0)
+            s += label_to_string("RR VOLS", self._rr25DeltaVols[i]*100.0)
 
             s += label_to_string("ATM Strike", self._K_ATM[i])
             s += label_to_string("ATM Delta", self._deltaATM[i])
