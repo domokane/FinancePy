@@ -562,7 +562,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def _build_vol_surface(self, fin_solver_type=fin_solver_types.NELDER_MEAD):
+    def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
         s = self._stock_price

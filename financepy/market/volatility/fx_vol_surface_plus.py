@@ -1683,7 +1683,7 @@ class FXVolSurfacePlus():
 
             if self._usems_25d_vol is True:
 
-                msVol = self._atm_vols[i] + self._mktStrangle25DeltaVols[i]
+                ms_vol = self._atm_vols[i] + self._mktStrangle25DeltaVols[i]
 
                 if verbose:
 
@@ -1694,7 +1694,7 @@ class FXVolSurfacePlus():
                 call._strike_fx_rate = self._K_25D_C_MS[i]
                 put._strike_fx_rate = self._K_25D_P_MS[i]
 
-                model = BlackScholes(msVol)
+                model = BlackScholes(ms_vol)
 
                 delta_call = call.delta(self._value_dt,
                                         self._spot_fx_rate,
@@ -1709,11 +1709,11 @@ class FXVolSurfacePlus():
                                       model)[self._delta_method_string]
 
                 if verbose:
-                    print("K_25D_C_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
-                          % (self._K_25D_C_MS[i], 100.0*msVol, delta_call))
+                    print("K_25D_C_MS: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
+                          % (self._K_25D_C_MS[i], 100.0*ms_vol, delta_call))
 
-                    print("K_25D_P_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
-                          % (self._K_25D_P_MS[i], 100.0*msVol, delta_put))
+                    print("K_25D_P_MS: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
+                          % (self._K_25D_P_MS[i], 100.0*ms_vol, delta_put))
 
                 call_value = call.value(self._value_dt,
                                         self._spot_fx_rate,
@@ -1872,7 +1872,7 @@ class FXVolSurfacePlus():
 
             if self._usems_10d_vol:
 
-                msVol = self._atm_vols[i] + self._mktStrangle10DeltaVols[i]
+                ms_vol = self._atm_vols[i] + self._mktStrangle10DeltaVols[i]
 
                 if verbose:
 
@@ -1883,7 +1883,7 @@ class FXVolSurfacePlus():
                 call._strike_fx_rate = self._K_10D_C_MS[i]
                 put._strike_fx_rate = self._K_10D_P_MS[i]
 
-                model = BlackScholes(msVol)
+                model = BlackScholes(ms_vol)
 
                 delta_call = call.delta(self._value_dt,
                                         self._spot_fx_rate,
@@ -1898,11 +1898,11 @@ class FXVolSurfacePlus():
                                       model)[self._delta_method_string]
 
                 if verbose:
-                    print("K_10D_C_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
-                          % (self._K_10D_C_MS[i], 100.0*msVol, delta_call))
+                    print("K_10D_C_MS: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
+                          % (self._K_10D_C_MS[i], 100.0*ms_vol, delta_call))
 
-                    print("K_10D_P_MS: %9.6f  ATM + MSVOL: %9.6f %%   DELTA: %9.6f"
-                          % (self._K_10D_P_MS[i], 100.0*msVol, delta_put))
+                    print("K_10D_P_MS: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
+                          % (self._K_10D_P_MS[i], 100.0*ms_vol, delta_put))
 
                 call_value = call.value(self._value_dt,
                                         self._spot_fx_rate,
@@ -2115,9 +2115,9 @@ class FXVolSurfacePlus():
         for tenor_index in range(0, self._num_vol_curves):
 
             atm_vol = self._atm_vols[tenor_index]*100
-            msVol25 = self._mktStrangle25DeltaVols[tenor_index]*100
+            ms_vol25 = self._mktStrangle25DeltaVols[tenor_index]*100
             rrVol25 = self._riskReversal25DeltaVols[tenor_index]*100
-            msVol10 = self._mktStrangle10DeltaVols[tenor_index]*100
+            ms_vol10 = self._mktStrangle10DeltaVols[tenor_index]*100
             rrVol10 = self._riskReversal10DeltaVols[tenor_index]*100
             strikes = self._strikes[tenor_index]
 
@@ -2145,9 +2145,9 @@ class FXVolSurfacePlus():
 
             label_str = self._tenors[tenor_index]
             label_str += " ATM: " + str(atm_vol)[0:6]
-            label_str += " MS25: " + str(msVol25)[0:6]
+            label_str += " MS25: " + str(ms_vol25)[0:6]
             label_str += " RR25: " + str(rrVol25)[0:6]
-            label_str += " MS10: " + str(msVol10)[0:6]
+            label_str += " MS10: " + str(ms_vol10)[0:6]
             label_str += " RR10: " + str(rrVol10)[0:6]
 
             plt.plot(ks, vols, label=label_str)

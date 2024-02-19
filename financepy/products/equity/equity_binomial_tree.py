@@ -126,13 +126,13 @@ def _value_once(stock_price,
     sLow = stock_price
 
     probs = np.zeros(num_steps)
-    periodDiscountFactors = np.zeros(num_steps)
+    period_dfs = np.zeros(num_steps)
 
     # store time independent information for later use in tree
     for i_time in range(0, num_steps):
         a = exp((r - q) * dt)
         probs[i_time] = (a - d) / (u - d)
-        periodDiscountFactors[i_time] = exp(-r * dt)
+        period_dfs[i_time] = exp(-r * dt)
 
     for i_time in range(1, num_steps + 1):
         sLow *= d
@@ -164,7 +164,7 @@ def _value_once(stock_price,
             vDn = option_values[next_node_dn]
             future_expected_value = probs[i_time] * vUp
             future_expected_value += (1.0 - probs[i_time]) * vDn
-            hold_value = periodDiscountFactors[i_time] * future_expected_value
+            hold_value = period_dfs[i_time] * future_expected_value
 
             if exercise_type == EquityTreeExerciseTypes.EUROPEAN:
                 option_values[index + i_node] = hold_value
