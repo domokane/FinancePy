@@ -1,3 +1,7 @@
+# HEY ! I'D LIKE YOUR OPINION ! 
+### I AM CONSIDERING SPENDING TIME THIS YEAR IMPROVING THE LIBRARY. LET ME HAVE ANY COMMENTS, REQUESTS OR ISSUES YOU MAY HAVE. JUST ENTER THEM IN THE DISCUSSION SECTION HERE OR EMAIL ME.
+
+
 # Latest News and Versions
 19 February 2024 version 0.350 released
 - A lot of various pep8 fixes - should all be nearly done soon
