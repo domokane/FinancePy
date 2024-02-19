@@ -22,7 +22,7 @@ jobs:
        python setup.py install
    - name: Run tests
      run: 
-       python tests_golden/runAllTests.py
+       python tests_golden/run_all_tests.py
    - name: Archive code coverage results
      uses: actions/upload-artifact@v2
      with:
