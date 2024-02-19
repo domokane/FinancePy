@@ -93,7 +93,7 @@ class BondAnnuity:
     def calculate_payments(self,
                            settle_dt: Date,
                            face: (float)):
-
+        ''' Calculate bond payments '''
         # No need to generate flows if settlement date has not changed
         if settle_dt == self._settle_dt:
             return
@@ -106,11 +106,11 @@ class BondAnnuity:
         dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dts = Schedule(settle_dt,
-                                   self._maturity_dt,
-                                   self._freq_type,
-                                   self._cal_type,
-                                   bd_type,
-                                   dg_type)._generate()
+                                 self._maturity_dt,
+                                 self._freq_type,
+                                 self._cal_type,
+                                 bd_type,
+                                 dg_type).generate()
 
         self._pcd = self._cpn_dts[0]
         self._ncd = self._cpn_dts[1]

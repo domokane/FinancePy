@@ -103,7 +103,7 @@ class IborIborSwap:
                                  freq_type,
                                  self._cal_type,
                                  self._bd_type,
-                                 self._dg_type)._generate()
+                                 self._dg_type).generate()
 
         return floatDates
 

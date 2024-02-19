@@ -8,6 +8,7 @@ import time
 import sys
 sys.path.append("..")
 
+from financepy.utils.schedule import Schedule
 from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_swap import IborSwap
@@ -31,7 +32,6 @@ from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
 from financepy.utils.global_vars import gDaysInYear
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from financepy.utils.schedule import Schedule
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
@@ -135,14 +135,14 @@ def test_IborCapFloor():
         fvalue5 = capfloor.value(value_dt, libor_curve, model5)
         fvalue6 = capfloor.value(value_dt, libor_curve, model6)
         test_cases.print("FLR", k, fvalue1, fvalue2,
-                        fvalue3, fvalue4, fvalue5, fvalue6)
+                         fvalue3, fvalue4, fvalue5, fvalue6)
 
 ###############################################################################
 # PUT CALL CHECK
 ###############################################################################
 
     test_cases.header("LABEL", "STRIKE", "BLK", "BLK_SHFTD", "SABR",
-                     "SABR SHFTD", "HW", "BACH")
+                      "SABR SHFTD", "HW", "BACH")
 
     for k in strikes:
         capFloorType = FinCapFloorTypes.CAP
@@ -171,7 +171,7 @@ def test_IborCapFloor():
         pcvalue6 = cvalue6 - fvalue6
 
         test_cases.print("PUT_CALL", k, pcvalue1, pcvalue2, pcvalue3,
-                        pcvalue4, pcvalue5, pcvalue6)
+                         pcvalue4, pcvalue5, pcvalue6)
 
 ###############################################################################
 
@@ -199,7 +199,7 @@ def test_IborCapFloorVolCurve():
 
     capVolDates = Schedule(value_dt,
                            value_dt.add_tenor("10Y"),
-                           frequency)._generate()
+                           frequency).generate()
 
     flat_rate = 0.04
     libor_curve = DiscountCurveFlat(value_dt,
@@ -248,9 +248,9 @@ def test_IborCapFloorVolCurve():
 
         vCaplets += vCaplet
         test_cases.print("%12s" % capletstart_dt,
-                        "%s" % caplet_end_dt,
-                        "%9.5f" % (vol*100.0),
-                        "%9.5f" % vCaplet)
+                         "%s" % caplet_end_dt,
+                         "%9.5f" % (vol*100.0),
+                         "%9.5f" % vCaplet)
 
         capletstart_dt = caplet_end_dt
 

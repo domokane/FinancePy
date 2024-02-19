@@ -156,7 +156,7 @@ class FinFixedIborXCcySwap:
             self._fixed_freq_type,
             self._cal_type,
             self._bd_type,
-            self._dg_type)._generate()
+            self._dg_type).generate()
 
 ##########################################################################
 
@@ -169,7 +169,7 @@ class FinFixedIborXCcySwap:
             self._float_freq_type,
             self._cal_type,
             self._bd_type,
-            self._dg_type)._generate()
+            self._dg_type).generate()
 
 ##########################################################################
 

@@ -42,6 +42,8 @@ class DiscountCurveFlat(DiscountCurve):
         As the curve is flat, no interpolation scheme is required.
         """
 
+#        super().__init__()
+
         check_argument_types(self.__init__, locals())
 
         self._value_dt = value_dt
@@ -97,8 +99,8 @@ class DiscountCurveFlat(DiscountCurve):
 
         if isinstance(dts, Date):
             return dfs[0]
-        else:
-            return np.array(dfs)
+
+        return np.array(dfs)
 
 ###############################################################################
 

@@ -53,7 +53,7 @@ class FinFixedFixedXCcySwap():
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date) is True:
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -61,7 +61,7 @@ class FinFixedFixedXCcySwap():
 
         calendar = Calendar(cal_type)
         self._maturity_dt = calendar.adjust(self._termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")
@@ -90,30 +90,30 @@ class FinFixedFixedXCcySwap():
         self._generate_fixed_leg_payment_dts()
         self._generate_float_leg_payment_dts()
 
-        self._adjustedMaturityDate = self._adjusted_fixed_dts[-1]
+        self._adjusted_maturity_dt = self._adjusted_fixed_dts[-1]
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
-        self._lastPaymentDate = self._maturity_dt
-        if self._adjusted_fixed_dts[-1] > self._lastPaymentDate:
-            self._lastPaymentDate = self._adjusted_fixed_dts[-1]
+        self._last_payment_dt = self._maturity_dt
+        if self._adjusted_fixed_dts[-1] > self._last_payment_dt:
+            self._last_payment_date = self._adjusted_fixed_dts[-1]
 
-        if self._adjustedFloatDates[-1] > self._lastPaymentDate:
-            self._lastPaymentDate = self._adjustedFloatDates[-1]
+        if self._adjusted_float_dts[-1] > self._last_payment_dt:
+            self._last_payment_dt = self._adjusted_float_dts[-1]
 
         # NOT TO BE PRINTED
         self._float_year_fracs = []
-        self._floatFlows = []
-        self._floatFlowPVs = []
-        self._floatDfs = []
+        self._float_flows = []
+        self._float_flow_pvs = []
+        self._float_dfs = []
 
         self._fixed_year_fracs = []
-        self._fixedFlows = []
-        self._fixedDfs = []
-        self._fixedFlowPVs = []
+        self._fixed_flows = []
+        self._fixed_dfs = []
+        self._fixed_flow_pvs = []
 
-        self._firstFixingRate = None
+        self._first_fixing_rate = None
         self._value_dt = None
-        self._fixedStartIndex = None
+        self._fixed_start_index = None
 
         self._calc_fixed_leg_flows()
 
@@ -156,20 +156,20 @@ class FinFixedFixedXCcySwap():
             self._fixed_freq_type,
             self._cal_type,
             self._bd_type,
-            self._dg_type)._generate()
+            self._dg_type).generate()
 
 ##########################################################################
 
     def _generate_float_leg_payment_dts(self):
         """ Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
-        self._adjustedFloatDates = FinSchedule(
+        self._adjusted_float_dts = FinSchedule(
             self._effective_dt,
             self._termination_dt,
             self._float_freq_type,
             self._cal_type,
             self._bd_type,
-            self._dg_type)._generate()
+            self._dg_type).generate()
 
 ##########################################################################
 
@@ -184,10 +184,10 @@ class FinFixedFixedXCcySwap():
 
     def float_dts(self):
         """ return a vector of the fixed leg payment dates """
-        if self._adjustedFloatDates is None:
+        if self._adjusted_float_dts is None:
             raise FinError("Float dates have not been generated")
 
-        return self._adjustedFloatDates[1:]
+        return self._adjusted_float_dts[1:]
 
 ##########################################################################
 
@@ -211,16 +211,16 @@ class FinFixedFixedXCcySwap():
         pv01 = self.pv01(value_dt, discount_curve)
 
         if value_dt < self._effective_dt:
-            df0 = discount_curve.df(self._effective_dt)
+            df_0 = discount_curve.df(self._effective_dt)
         else:
-            df0 = discount_curve.df(value_dt)
+            df_0 = discount_curve.df(value_dt)
 
-        dfT = discount_curve.df(self._maturity_dt)
+        df_T = discount_curve.df(self._maturity_dt)
 
         if abs(pv01) < gSmall:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        cpn = (df0 - dfT) / pv01
+        cpn = (df_0 - df_T) / pv01
         return cpn
 
 ##########################################################################
@@ -228,30 +228,29 @@ class FinFixedFixedXCcySwap():
     def fixed_leg_value(self, value_dt, discount_curve, principal=0.0):
 
         self._value_dt = value_dt
-
         self._fixed_year_fracs = []
-        self._fixedFlows = []
-        self._fixedDfs = []
-        self._fixedFlowPVs = []
+        self._fixed_flows = []
+        self._fixed_dfs = []
+        self._fixed_flow_pvs = []
         self._fixed_total_pv = []
 
         day_counter = FinDayCount(self._fixed_dc_type)
 
-        """ The swap may have started in the past but we can only value
-        payments that have occurred after the valuation date. """
+        # The swap may have started in the past but we can only value
+        # payments that have occurred after the valuation date.
         start_index = 0
         while self._adjusted_fixed_dts[start_index] < value_dt:
             start_index += 1
 
-        """ If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. """
+        # If the swap has yet to settle then we do not include the
+        # start date of the swap as a coupon payment date.
         if value_dt <= self._effective_dt:
             start_index = 1
 
-        self._fixedStartIndex = start_index
+        self._fixed_start_index = start_index
 
-        """ Now PV fixed leg flows. """
-        self._dfValuationDate = discount_curve.df(value_dt)
+        # Now PV fixed leg flows
+        self._df_valuation_dt = discount_curve.df(value_dt)
 
         pv = 0.0
         prev_dt = self._adjusted_fixed_dts[start_index - 1]
@@ -261,22 +260,22 @@ class FinFixedFixedXCcySwap():
 
         for next_dt in self._adjusted_fixed_dts[start_index:]:
             alpha = day_counter.year_frac(prev_dt, next_dt)[0]
-            df_discount = discount_curve.df(next_dt) / self._dfValuationDate
+            df_discount = discount_curve.df(next_dt) / self._df_value_dt
             flow = self._fixed_coupon * alpha * self._notional
-            flowPV = flow * df_discount
-            pv += flowPV
+            flow_pv = flow * df_discount
+            pv += flow_pv
             prev_dt = next_dt
 
             self._fixed_year_fracs.append(alpha)
-            self._fixedFlows.append(flow)
-            self._fixedDfs.append(df_discount)
-            self._fixedFlowPVs.append(flow * df_discount)
+            self._fixed_flows.append(flow)
+            self._fixed_dfs.append(df_discount)
+            self._fixed_flow_pvs.append(flow * df_discount)
             self._fixed_total_pv.append(pv)
 
         flow = principal * self._notional
         pv = pv + flow * df_discount
-        self._fixedFlowPVs[-1] += flow * df_discount
-        self._fixedFlows[-1] += flow
+        self._fixed_flow_pvs[-1] += flow * df_discount
+        self._fixed_flows[-1] += flow
         self._fixed_total_pv[-1] = pv
         return pv
 
@@ -285,11 +284,11 @@ class FinFixedFixedXCcySwap():
     def _calc_fixed_leg_flows(self):
 
         self._fixed_year_fracs = []
-        self._fixedFlows = []
+        self._fixed_flows = []
 
         day_counter = FinDayCount(self._fixed_dc_type)
 
-        """ Now PV fixed leg flows. """
+        # Now PV fixed leg flows
         prev_dt = self._adjusted_fixed_dts[0]
 
         for next_dt in self._adjusted_fixed_dts[1:]:
@@ -297,7 +296,7 @@ class FinFixedFixedXCcySwap():
             flow = self._fixed_coupon * alpha * self._notional
             prev_dt = next_dt
             self._fixed_year_fracs.append(alpha)
-            self._fixedFlows.append(flow)
+            self._fixed_flows.append(flow)
 
 ##########################################################################
 
@@ -315,27 +314,27 @@ class FinFixedFixedXCcySwap():
         if m == 0:
             raise FinError("Frequency cannot be zero.")
 
-        """ The swap may have started in the past but we can only value
-        payments that have occurred after the valuation date. """
+        # The swap may have started in the past but we can only value
+        # payments that have occurred after the valuation date.
         start_index = 0
         while self._adjusted_fixed_dts[start_index] < value_dt:
             start_index += 1
 
-        """ If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. """
+        # If the swap has yet to settle then we do not include the
+        # start date of the swap as a coupon payment date.
         if value_dt <= self._effective_dt:
             start_index = 1
 
-        """ Now PV fixed leg flows. """
-        flatPV01 = 0.0
+        # Now PV fixed leg flows.
+        flat_pv01 = 0.0
         df = 1.0
         alpha = 1.0 / m
 
         for _ in self._adjusted_fixed_dts[start_index:]:
             df = df / (1.0 + alpha * flat_swap_rate)
-            flatPV01 += df * alpha
+            flat_pv01 += df * alpha
 
-        return flatPV01
+        return flat_pv01
 
 ##########################################################################
 
@@ -354,35 +353,35 @@ class FinFixedFixedXCcySwap():
 
         self._value_dt = value_dt
         self._float_year_fracs = []
-        self._floatFlows = []
-        self._floatRates = []
-        self._floatDfs = []
-        self._floatFlowPVs = []
-        self._floatTotalPV = []
-        self._firstFixingRate = first_fixing_rate
+        self._float_flows = []
+        self._float_rates = []
+        self._float_dfs = []
+        self._float_flow_pvs = []
+        self._float_total_pv = []
+        self._first_fixing_rate = first_fixing_rate
 
         basis = FinDayCount(self._float_dc_type)
 
-        """ The swap may have started in the past but we can only value
-        payments that have occurred after the start date. """
+        # The swap may have started in the past but we can only value
+        # payments that have occurred after the start date.
         start_index = 0
-        while self._adjustedFloatDates[start_index] < value_dt:
+        while self._adjusted_float_dts[start_index] < value_dt:
             start_index += 1
 
-        """ If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. """
+        # If the swap has yet to settle then we do not include the
+        # start date of the swap as a coupon payment date. """
         if value_dt <= self._effective_dt:
             start_index = 1
 
-        self._floatStartIndex = start_index
+        self._float_start_index = start_index
 
         # Forward price to settlement date (if valuation is settlement date)
-        self._dfValuationDate = discount_curve.df(value_dt)
+        self._df_value_dt = discount_curve.df(value_dt)
 
-        """ The first floating payment is usually already fixed so is
-        not implied by the index curve. """
-        prev_dt = self._adjustedFloatDates[start_index - 1]
-        next_dt = self._adjustedFloatDates[start_index]
+        # The first floating payment is usually already fixed so is
+        # not implied by the index curve. """
+        prev_dt = self._adjusted_float_dts[start_index - 1]
+        next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
         # Cannot be pcd as has past
         df1_index = index_curve.df(self._effective_dt)
@@ -390,30 +389,30 @@ class FinFixedFixedXCcySwap():
 
         float_rate = 0.0
 
-        if self._firstFixingRate is None:
+        if self._first_fixing_rate is None:
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self._notional
             float_rate = fwd_rate
         else:
-            flow = self._firstFixingRate * alpha * self._notional
-            float_rate = self._firstFixingRate
+            flow = self._first_fixing_rate * alpha * self._notional
+            float_rate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
-        df_discount = discount_curve.df(next_dt) / self._dfValuationDate
+        df_discount = discount_curve.df(next_dt) / self._df_value_dt
 
         pv = flow * df_discount
 
         self._float_year_fracs.append(alpha)
-        self._floatFlows.append(flow)
-        self._floatRates.append(float_rate)
-        self._floatDfs.append(df_discount)
-        self._floatFlowPVs.append(flow * df_discount)
-        self._floatTotalPV.append(pv)
+        self._float_flows.append(flow)
+        self._float_rates.append(float_rate)
+        self._float_dfs.append(df_discount)
+        self._float_flow_pvs.append(flow * df_discount)
+        self._float_total_pv.append(pv)
 
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjustedFloatDates[start_index + 1:]:
+        for next_dt in self._adjusted_float_dts[start_index + 1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -421,24 +420,24 @@ class FinFixedFixedXCcySwap():
             flow = (fwd_rate + self._float_spread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
-            df_discount = discount_curve.df(next_dt) / self._dfValuationDate
+            df_discount = discount_curve.df(next_dt) / self._df_value_dt
 
             pv += flow * df_discount
             df1_index = df2_index
             prev_dt = next_dt
 
-            self._floatFlows.append(flow)
+            self._float_flows.append(flow)
             self._float_year_fracs.append(alpha)
-            self._floatRates.append(fwd_rate)
-            self._floatDfs.append(df_discount)
-            self._floatFlowPVs.append(flow * df_discount)
-            self._floatTotalPV.append(pv)
+            self._float_rates.append(fwd_rate)
+            self._float_dfs.append(df_discount)
+            self._float_flow_pvs.append(flow * df_discount)
+            self._float_total_pv.append(pv)
 
         flow = principal * self._notional
         pv = pv + flow * df_discount
-        self._floatFlows[-1] += flow
-        self._floatFlowPVs[-1] += flow * df_discount
-        self._floatTotalPV[-1] = pv
+        self._float_flows[-1] += flow
+        self._float_flow_pvs[-1] += flow * df_discount
+        self._float_total_pv[-1] = pv
 
         return pv
 
@@ -456,7 +455,7 @@ class FinFixedFixedXCcySwap():
         print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
         print("VALUATION DATE", self._value_dt)
 
-        if len(self._fixedFlows) == 0:
+        if len(self._fixed_flows) == 0:
             print("Fixed Flows not calculated.")
             return
 
@@ -464,10 +463,10 @@ class FinFixedFixedXCcySwap():
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
-        if self._fixedStartIndex is None:
+        if self._fixed_start_index is None:
             raise FinError("Need to value swap before calling this function.")
 
-        start_index = self._fixedStartIndex
+        start_index = self._fixed_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
         print("%15s %10s %12s %12.8f %12s %12s" %
@@ -483,9 +482,9 @@ class FinFixedFixedXCcySwap():
             print("%15s %10.7f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_dt,
                    self._fixed_year_fracs[i_flow],
-                   self._fixedFlows[i_flow],
-                   self._fixedDfs[i_flow],
-                   self._fixedFlowPVs[i_flow],
+                   self._fixed_flows[i_flow],
+                   self._fixed_dfs[i_flow],
+                   self._fixed_flow_pvs[i_flow],
                    self._fixed_total_pv[i_flow]))
 
             i_flow += 1
@@ -502,7 +501,7 @@ class FinFixedFixedXCcySwap():
         print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
         print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
 
-        if len(self._fixedFlows) == 0:
+        if len(self._fixed_flows) == 0:
             print("Fixed Flows not calculated.")
             return
 
@@ -516,7 +515,7 @@ class FinFixedFixedXCcySwap():
             print("%15s %12.8f %12.2f" %
                   (payment_dt,
                    self._fixed_year_fracs[i_flow],
-                   self._fixedFlows[i_flow]))
+                   self._fixed_flows[i_flow]))
 
             i_flow += 1
 
@@ -534,18 +533,18 @@ class FinFixedFixedXCcySwap():
         print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
         print("VALUATION DATE", self._value_dt)
 
-        if len(self._floatFlows) == 0:
+        if len(self._float_flows) == 0:
             print("Floating Flows not calculated.")
             return
 
-        if self._firstFixingRate is None:
+        if self._first_fixing_rate is None:
             print("         *** FIRST FLOATING RATE PAYMENT IS IMPLIED ***")
 
         header = "PAYMENT_dt     YEAR_FRAC    RATE(%)       FLOW         DF"
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
-        start_index = self._floatStartIndex
+        start_index = self._float_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
 
@@ -559,15 +558,15 @@ class FinFixedFixedXCcySwap():
                "-"))
 
         i_flow = 0
-        for payment_dt in self._adjustedFloatDates[start_index:]:
+        for payment_dt in self._adjusted_float_dts[start_index:]:
             print("%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f" %
                   (payment_dt,
                    self._float_year_fracs[i_flow],
-                   self._floatRates[i_flow]*100.0,
-                   self._floatFlows[i_flow],
-                   self._floatDfs[i_flow],
-                   self._floatFlowPVs[i_flow],
-                   self._floatTotalPV[i_flow]))
+                   self._float_rates[i_flow]*100.0,
+                   self._float_flows[i_flow],
+                   self._float_dfs[i_flow],
+                   self._float_flow_pvs[i_flow],
+                   self._float_total_pv[i_flow]))
 
             i_flow += 1
 
@@ -579,7 +578,7 @@ class FinFixedFixedXCcySwap():
         s += label_to_string("TERMINATION DATE", self._termination_dt)
         s += label_to_string("MATURITY DATE", self._maturity_dt)
         s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("SWAP TYPE", self._swapType)
+        s += label_to_string("SWAP TYPE", self._swap_type)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)
         s += label_to_string("FLOAT SPREAD", self._float_spread)
         s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)

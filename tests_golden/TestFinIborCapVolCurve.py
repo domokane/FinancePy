@@ -7,9 +7,9 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from FinTestCases import FinTestCases, globalTestCaseMode
+
 import sys
 sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

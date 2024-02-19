@@ -73,7 +73,7 @@ class IborLMMProducts():
                                    float_freq_type,
                                    cal_type,
                                    bd_type,
-                                   dg_type)._generate()
+                                   dg_type).generate()
 
         self._accrual_factors = []
         self._float_dc_type = float_dc_type
@@ -304,7 +304,7 @@ class IborLMMProducts():
                                       float_freq_type,
                                       cal_type,
                                       bd_type,
-                                      dg_type)._generate()
+                                      dg_type).generate()
 
         for swaption_dt in swaption_float_dts:
             found_dt = False
@@ -320,7 +320,7 @@ class IborLMMProducts():
                                         fixed_freq_type,
                                         cal_type,
                                         bd_type,
-                                        dg_type)._generate()
+                                        dg_type).generate()
 
         for swaption_dt in swaption_fixed_dates:
             found_dt = False
@@ -375,7 +375,7 @@ class IborLMMProducts():
                                  freq_type,
                                  cal_type,
                                  bd_type,
-                                 dg_type)._generate()
+                                 dg_type).generate()
 
         for cap_floorlet_dt in cap_floor_dts:
             found_dt = False

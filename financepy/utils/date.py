@@ -866,7 +866,7 @@ class Date():
     # TODO: Find elegant way to return long and short strings
     ###########################################################################
 
-    def str(self, format=None):
+    def str(self):
         """ returns a formatted string of the date """
         date_str = ""
 
@@ -997,8 +997,7 @@ class Date():
 ###############################################################################
 
 
-def daily_working_day_schedule(self,
-                               start_dt: Date,
+def daily_working_day_schedule(start_dt: Date,
                                end_dt: Date):
     """ Returns a list of working dates between start_dt and end_dt.
     This function should be replaced by dateRange once add_tenor allows

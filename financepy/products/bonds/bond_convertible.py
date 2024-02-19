@@ -329,7 +329,7 @@ class BondConvertible:
     ###########################################################################
 
     def _calculate_cpn_dts(self,
-                             settle_dt: Date):
+                           settle_dt: Date):
         """ Determine the convertible bond cash flow payment dates. """
 
         # No need to generate flows if settlement date has not changed
@@ -341,11 +341,11 @@ class BondConvertible:
         dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dts = Schedule(settle_dt,
-                                   self._maturity_dt,
-                                   self._freq_type,
-                                   self._cal_type,
-                                   bd_type,
-                                   dg_type)._generate()
+                                 self._maturity_dt,
+                                 self._freq_type,
+                                 self._cal_type,
+                                 bd_type,
+                                 dg_type).generate()
 
         self._pcd = self._cpn_dts[0]
         self._ncd = self._cpn_dts[1]

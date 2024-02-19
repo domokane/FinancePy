@@ -180,7 +180,7 @@ class Bond:
                                  CalendarTypes.NONE,
                                  self._bd_type,
                                  self._dg_type,
-                                 end_of_month=self._end_of_month)._generate()
+                                 end_of_month=self._end_of_month).generate()
 
     ###########################################################################
 
@@ -201,7 +201,7 @@ class Bond:
 
         # Expect at least an issue date and a maturity date - if not - problem
         if len(self._cpn_dts) < 2:
-            raise FinError("Unable to calculate payment dates with only one payment")
+            raise FinError("Cannot calculate payment dates with one payment")
 
         # I do not adjust the first date as it is the issue date
         self._payment_dts.append(self._cpn_dts[0])
@@ -379,8 +379,8 @@ class Bond:
                           settle_dt: Date,
                           ytm: float,
                           convention: YTMCalcType = YTMCalcType.UK_DMO):
-        """ Calculate the modified duration of the bond on a settlement date
-        given its yield to maturity. """
+        """ Calculate the modified duration of the bond on a settlement
+        date given its yield to maturity. """
 
         dd = self.dollar_duration(settle_dt, ytm, convention)
         fp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
@@ -1011,8 +1011,8 @@ class Bond:
         sell_price = self.dirty_price_from_ytm(end_dt, end_ytm, convention)
         dates_cfs = zip(self._cpn_dts, self._flow_amounts)
 
-        # The coupon or par payments on buying date belong to the buyer.
-        # The coupon or par payments on selling date are given to the new buyer.
+        # The coupon or par payments on buying date belong to the buyer. The
+        # coupon or par payments on selling date are given to the new buyer.
         dates_cfs = [(d, c * self._par)
                      for (d, c) in dates_cfs if (d >= begin_dt) and (d < end_dt)]
 
@@ -1021,17 +1021,17 @@ class Bond:
         times_cfs = [((d - begin_dt) / 365, c) for (d, c) in dates_cfs]
         pnl = sum(c for (t, c) in times_cfs)
         simple_return = (pnl / buy_price) * 365 / (end_dt - begin_dt)
-        brentq_up_bound = 5
-        brentq_down_bound = -0.9999
+        brentq_up_lim = 5
+        brentq_dn_lim = -0.9999
 
         # in case brentq cannot find the irr root
-        if simple_return > brentq_up_bound or simple_return < brentq_down_bound:
+        if simple_return > brentq_up_lim or simple_return < brentq_dn_lim:
             irr = simple_return
         else:
             irr = optimize.brentq(npv,
                                   # f(a) and f(b) must have opposite signs
-                                  a=brentq_down_bound,
-                                  b=brentq_up_bound,
+                                  a=brentq_dn_lim,
+                                  b=brentq_up_lim,
                                   xtol=1e-8,
                                   args=(np.array(times_cfs),)
                                   )

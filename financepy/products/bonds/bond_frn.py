@@ -88,11 +88,11 @@ class BondFRN:
         dg_type = DateGenRuleTypes.BACKWARD
 
         self._cpn_dts = Schedule(self._issue_dt,
-                                   self._maturity_dt,
-                                   self._freq_type,
-                                   self._cal_type,
-                                   bd_type,
-                                   dg_type)._generate()
+                                 self._maturity_dt,
+                                 self._freq_type,
+                                 self._cal_type,
+                                 bd_type,
+                                 dg_type).generate()
 
     ###########################################################################
 

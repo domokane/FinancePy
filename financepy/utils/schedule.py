@@ -113,7 +113,7 @@ class Schedule:
 
         self._adjusted_dts = None
 
-        self._generate()
+        self.generate()
 
     ###########################################################################
 
@@ -121,13 +121,13 @@ class Schedule:
         """ Returns a list of the schedule of Dates. """
 
         if self._adjusted_dts is None:
-            self._generate()
+            self.generate()
 
         return self._adjusted_dts
 
     ###########################################################################
 
-    def _generate(self):
+    def generate(self):
         """ Generate schedule of dates according to specified date generation
         rules and also adjust these dates for holidays according to the
         specified business day convention and the specified calendar. """
@@ -260,7 +260,7 @@ class Schedule:
             if len(self._adjusted_dts) > 1:
                 s += "\n"
                 s += label_to_string("FLW", self._adjusted_dts[1:], "",
-                                     listFormat=True)
+                                     list_format=True)
 
         return s
 

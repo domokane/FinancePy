@@ -250,7 +250,7 @@ class DiscountCurve:
                                 maturity_dt,
                                 freq_type)
 
-            flow_dts = schedule._generate()
+            flow_dts = schedule.generate()
             flow_dts[0] = effective_dt
 
             day_counter = DayCount(dc_type)
