@@ -995,7 +995,7 @@ class FXVolSurface():
             if verbose:
                 print("==========================================================")
                 print("RR = VOL_K_25_C - VOL_K_25_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
-                      % (100.0 * self._riskReversal25DeltaVols[i], 100.0*sigma_RR))
+                      % (100.0 * self._rr25DeltaVols[i], 100.0*sigma_RR))
                 print("==========================================================")
 
             diff = sigma_RR - self._rr25DeltaVols[i]

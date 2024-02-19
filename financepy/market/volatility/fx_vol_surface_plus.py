@@ -1854,14 +1854,14 @@ class FXVolSurfacePlus():
                 if verbose:
                     print("==========================================================")
                     print("RR = VOL_K_25_C - VOL_K_25_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
-                          % (100.0 * self._riskReversal25DeltaVols[i], 100.0*sigma_RR))
+                          % (100.0 * self._rr25DeltaVols[i], 100.0*sigma_RR))
                     print("==========================================================")
 
-                diff = sigma_RR - self._riskReversal25DeltaVols[i]
+                diff = sigma_RR - self._rr25DeltaVols[i]
 
                 if np.abs(diff) > tol:
                     print("FAILED FIT TO 25D RRV IN: % 9.6f  OUT: % 9.6f  DIFF: % 9.6f" %
-                          (self._riskReversal25DeltaVols[i]*100.0,
+                          (self._rr25DeltaVols[i]*100.0,
                            sigma_RR*100.0,
                            diff*100.0))
 
@@ -1872,13 +1872,13 @@ class FXVolSurfacePlus():
 
             if self._usems_10d_vol:
 
-                ms_vol = self._atm_vols[i] + self._mktStrangle10DeltaVols[i]
+                ms_vol = self._atm_vols[i] + self._ms10DeltaVols[i]
 
                 if verbose:
 
                     print("==========================================================")
                     print("MKT STRANGLE 10D VOL IN: %9.6f %%"
-                          % (100.0*self._mktStrangle10DeltaVols[i]))
+                          % (100.0*self._ms10DeltaVols[i]))
 
                 call._strike_fx_rate = self._K_10D_C_MS[i]
                 put._strike_fx_rate = self._K_10D_P_MS[i]
@@ -2043,14 +2043,14 @@ class FXVolSurfacePlus():
                 if verbose:
                     print("==========================================================")
                     print("RR = VOL_K_10D_C - VOL_K_10D_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
-                          % (100.0 * self._riskReversal10DeltaVols[i], 100.0*sigma_RR))
+                          % (100.0 * self._rr10DeltaVols[i], 100.0*sigma_RR))
                     print("==========================================================")
 
-                diff = sigma_RR - self._riskReversal10DeltaVols[i]
+                diff = sigma_RR - self._rr10DeltaVols[i]
 
                 if np.abs(diff) > tol:
                     print("FAILED FIT TO 10D RRV IN: % 9.6f  OUT: % 9.6f  DIFF: % 9.6f" %
-                          (self._riskReversal10DeltaVols[i]*100.0,
+                          (self._rr10DeltaVols[i]*100.0,
                            sigma_RR*100.0,
                            diff*100.0))
 
