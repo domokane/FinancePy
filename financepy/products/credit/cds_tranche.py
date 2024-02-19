@@ -4,8 +4,8 @@
 
 # TODO: Add __repr__ method
 
-import numpy as np
 from math import sqrt
+import numpy as np
 
 from ...models.gauss_copula_onefactor import tranch_surv_prob_gaussian
 from ...models.gauss_copula_onefactor import tranche_surv_prob_adj_binomial
@@ -34,6 +34,7 @@ from enum import Enum
 
 
 class FinLossDistributionBuilder(Enum):
+    ''' Method for constructing loss distributions numerically '''
     RECURSION = 1
     ADJUSTED_BINOMIAL = 2
     GAUSSIAN = 3
@@ -170,6 +171,7 @@ class CDSTranche:
                 qt1[i] = tranche_surv_prob_recursion(
                     0.0, k1, num_credits, q_vector, recovery_rates,
                     beta_vector1, num_points)
+
                 qt2[i] = tranche_surv_prob_recursion(
                     0.0, k2, num_credits, q_vector, recovery_rates,
                     beta_vector2, num_points)
@@ -179,36 +181,28 @@ class CDSTranche:
                 qt1[i] = tranche_surv_prob_adj_binomial(
                     0.0, k1, num_credits, q_vector, recovery_rates,
                     beta_vector1, num_points)
+
                 qt2[i] = tranche_surv_prob_adj_binomial(
                     0.0, k2, num_credits, q_vector, recovery_rates,
                     beta_vector2, num_points)
 
             elif model == FinLossDistributionBuilder.GAUSSIAN:
 
-                qt1[i] = tranch_surv_prob_gaussian(
-                    0.0,
-                    k1,
-                    num_credits,
-                    q_vector,
-                    recovery_rates,
-                    beta_vector1,
-                    num_points)
-                qt2[i] = tranch_surv_prob_gaussian(
-                    0.0,
-                    k2,
-                    num_credits,
-                    q_vector,
-                    recovery_rates,
-                    beta_vector2,
-                    num_points)
+                qt1[i] = tranch_surv_prob_gaussian(0.0, k1, num_credits,
+                                                   q_vector, recovery_rates,
+                                                   beta_vector1, num_points)
+
+                qt2[i] = tranch_surv_prob_gaussian(0.0, k2, num_credits,
+                                                   q_vector, recovery_rates,
+                                                   beta_vector2, num_points)
 
             elif model == FinLossDistributionBuilder.LHP:
 
-                qt1[i] = tr_surv_prob_lhp(
-                    0.0, k1, num_credits, q_vector, recovery_rates, beta_1)
+                qt1[i] = tr_surv_prob_lhp(0.0, k1, num_credits, 
+                                          q_vector, recovery_rates, beta_1)
 
-                qt2[i] = tr_surv_prob_lhp(
-                    0.0, k2, num_credits, q_vector, recovery_rates, beta_2)
+                qt2[i] = tr_surv_prob_lhp(0.0, k2, num_credits, 
+                                          q_vector, recovery_rates, beta_2)
 
             else:
                 raise FinError(
@@ -237,8 +231,7 @@ class CDSTranche:
         risky_pv01 = self._cds_contract.risky_pv01(
             value_dt, tranche_curve)['clean_rpv01']
 
-        mtm = self._notional * (protLegPV - upfront -
-                                risky_pv01 * running_cpn)
+        mtm = self._notional * (protLegPV - upfront - risky_pv01 * running_cpn)
 
         if not self._long_protection:
             mtm *= -1.0

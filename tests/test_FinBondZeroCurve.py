@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from financepy.products.bonds.zero_curve import BondZeroCurve
+from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes

@@ -351,16 +351,15 @@ def test_key_rate_durations_bloomberg_example():
     my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575,
                          3.6272,  3.5825,  3.5347]) / 100.0
 
-    key_rate_tenors, key_rate_durations =\
-        bond.key_rate_durations(settle_dt,
-                                ytm,
-                                key_rate_tenors=my_tenors,
-                                rates=my_rates)
+    krt, krd = bond.key_rate_durations(settle_dt,
+                                       ytm,
+                                       key_rate_tenors=my_tenors,
+                                       rates=my_rates)
 
     bbg_key_rate_durations = [-0.001, -.009, -0.022, 1.432,
                               2.527, 0.00, 0.00, 0.00, 0.00]
 
-    for i in range(len(key_rate_durations)):
-        assert round(key_rate_durations[i], 3) == bbg_key_rate_durations[i]
+    for i in range(len(krd)):
+        assert round(krd[i], 3) == bbg_key_rate_durations[i]
 
 ###############################################################################

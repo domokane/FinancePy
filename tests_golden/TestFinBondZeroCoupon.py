@@ -10,7 +10,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond import Bond, YTMCalcType
 
-from financepy.products.bonds.zero_curve import BondZeroCurve
+from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes

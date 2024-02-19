@@ -7,9 +7,8 @@ sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond import YTMCalcType
 
-from financepy.products.bonds.zero_curve import BondZeroCurve
+from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes

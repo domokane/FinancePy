@@ -9,11 +9,11 @@ import sys
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegelSvensson
-from financepy.products.bonds.yield_curve_model import CurveFitNelsonSiegel
-from financepy.products.bonds.yield_curve_model import CurveFitBSpline
-from financepy.products.bonds.yield_curve_model import CurveFitPolynomial
-from financepy.products.bonds.yield_curve import BondYieldCurve
+from financepy.products.bonds.curve_fits import CurveFitNelsonSiegelSvensson
+from financepy.products.bonds.curve_fits import CurveFitNelsonSiegel
+from financepy.products.bonds.curve_fits import CurveFitBSpline
+from financepy.products.bonds.curve_fits import CurveFitPolynomial
+from financepy.products.bonds.bond_yield_curve import BondYieldCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
@@ -58,47 +58,47 @@ def test_BondYieldCurve():
 
 ###############################################################################
 
-    curveFitMethod = CurveFitPolynomial()
-    fitted_curve1 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    curve_fitter = CurveFitPolynomial()
+    fitted_curve1 = BondYieldCurve(settlement, bonds, ylds, curve_fitter)
 #    fitted_curve1.display("GBP Yield Curve")
 
-    curveFitMethod = CurveFitPolynomial(5)
-    fitted_curve2 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    curve_fitter = CurveFitPolynomial(5)
+    fitted_curve2 = BondYieldCurve(settlement, bonds, ylds, curve_fitter)
 #    fitted_curve2.display("GBP Yield Curve")
 
-    curveFitMethod = CurveFitNelsonSiegel()
-    fitted_curve3 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    curve_fitter = CurveFitNelsonSiegel()
+    fitted_curve3 = BondYieldCurve(settlement, bonds, ylds, curve_fitter)
 #    fitted_curve3.display("GBP Yield Curve")
 
-    curveFitMethod = CurveFitNelsonSiegelSvensson()
-    fitted_curve4 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    curve_fitter = CurveFitNelsonSiegelSvensson()
+    fitted_curve4 = BondYieldCurve(settlement, bonds, ylds, curve_fitter)
 #    fitted_curve4.display("GBP Yield Curve")
 
-    curveFitMethod = CurveFitBSpline()
-    fitted_curve5 = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
+    curve_fitter = CurveFitBSpline()
+    fitted_curve5 = BondYieldCurve(settlement, bonds, ylds, curve_fitter)
 #    fitted_curve5.display("GBP Yield Curve")
 
 ###############################################################################
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("values", fitted_curve1._curveFit._coeffs)
+    test_cases.print("values", fitted_curve1._curve_fit._coeffs)
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("values", fitted_curve2._curveFit._coeffs)
+    test_cases.print("values", fitted_curve2._curve_fit._coeffs)
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("beta_1", fitted_curve3._curveFit._beta_1)
-    test_cases.print("beta_2", fitted_curve3._curveFit._beta_2)
-    test_cases.print("beta_3", fitted_curve3._curveFit._beta_3)
-    test_cases.print("tau", fitted_curve3._curveFit._tau)
+    test_cases.print("beta_1", fitted_curve3._curve_fit._beta_1)
+    test_cases.print("beta_2", fitted_curve3._curve_fit._beta_2)
+    test_cases.print("beta_3", fitted_curve3._curve_fit._beta_3)
+    test_cases.print("tau", fitted_curve3._curve_fit._tau)
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("beta_1", fitted_curve4._curveFit._beta_1)
-    test_cases.print("beta_2", fitted_curve4._curveFit._beta_2)
-    test_cases.print("beta_3", fitted_curve4._curveFit._beta_3)
-    test_cases.print("beta_4", fitted_curve4._curveFit._beta_4)
-    test_cases.print("tau_1", fitted_curve4._curveFit._tau_1)
-    test_cases.print("tau_2", fitted_curve4._curveFit._tau_2)
+    test_cases.print("beta_1", fitted_curve4._curve_fit._beta_1)
+    test_cases.print("beta_2", fitted_curve4._curve_fit._beta_2)
+    test_cases.print("beta_3", fitted_curve4._curve_fit._beta_3)
+    test_cases.print("beta_4", fitted_curve4._curve_fit._beta_4)
+    test_cases.print("tau_1", fitted_curve4._curve_fit._tau_1)
+    test_cases.print("tau_2", fitted_curve4._curve_fit._tau_2)
 
 ###############################################################################
 

@@ -620,15 +620,13 @@ def test_key_rate_durations():
     dc_type, freq_type, settlementDays, exDiv, calendar = \
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
-    bond = Bond(issue_dt, maturity_dt, coupon,
-                freq_type, dc_type, ex_div_days)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
     settle_dt = Date(24, 4, 2023)
 
-    ytm = 3.725060/100
+    ytm = 3.725060 / 100.0
 
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
-        settle_dt, ytm)
+    krt, krd = bond.key_rate_durations(settle_dt, ytm)
 
 #    print(key_rate_tenors)
 #    print(key_rate_durations)

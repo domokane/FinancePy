@@ -38,7 +38,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes
-from .zero_curve import BondZeroCurve
+from .bond_zero_curve import BondZeroCurve
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD
@@ -390,7 +390,6 @@ class Bond:
     ###########################################################################
 
     def key_rate_durations(self, 
-                           bond,
                            settle_dt: Date,
                            ytm: float,
                            key_rate_tenors: list = None,
@@ -455,7 +454,7 @@ class Bond:
                 mat_dt = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat_dt, cpn,
-                                bond._freq_type, bond._dc_type)
+                                self._freq_type, self._dc_type)
 
                 par_bonds.append(par_bond)
 
@@ -473,7 +472,7 @@ class Bond:
                                     lin_zero_interp)
 
             # calculate the dirty price of the bond using the discount curve
-            p_zero = bond.dirty_price_from_discount_curve(settle_dt,
+            p_zero = self.dirty_price_from_discount_curve(settle_dt,
                                                           par_crv)
 
             # shift up by the yield of corresponding par bond
@@ -485,7 +484,8 @@ class Bond:
                 mat = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat, cpn,
-                                bond._freq_type, bond._dc_type)
+                                self._freq_type, 
+                                self._dc_type)
 
                 par_bonds.append(par_bond)
 
@@ -504,7 +504,7 @@ class Bond:
 
             # calculate the full price of the bond
             # using the discount curve with the key rate shifted up
-            p_up = bond.dirty_price_from_discount_curve(
+            p_up = self.dirty_price_from_discount_curve(
                 settle_dt, par_crv_up)
 
             # create a curve again with the key rate shifted down
@@ -517,7 +517,7 @@ class Bond:
                 mat = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat, cpn,
-                                bond._freq_type, bond._dc_type)
+                                self._freq_type, self._dc_type)
 
                 par_bonds.append(par_bond)
 
@@ -535,7 +535,7 @@ class Bond:
                                          lin_zero_interp)
 
             # calculate the full price of the bond using
-            p_down = bond.dirty_price_from_discount_curve(
+            p_down = self.dirty_price_from_discount_curve(
                 settle_dt, par_crv_down)
 
             # calculate the key rate duration

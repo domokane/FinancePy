@@ -98,7 +98,7 @@ def test_homogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 4.3979
+    assert round(v[3] * 10000, 4) == 4.5835
 
     method = FinLossDistributionBuilder.LHP
     v = tranche7.value_bc(
@@ -160,7 +160,7 @@ def test_heterogeneous():
         corr2,
         num_points,
         method)
-    assert round(v[3] * 10000, 4) == 12.3681
+    assert round(v[3] * 10000, 4) == 16.1785
 
     method = FinLossDistributionBuilder.LHP
     v = tranche6.value_bc(
