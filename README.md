@@ -1,4 +1,8 @@
 # Latest News and Versions
+19 January 2024 version 0.350 released
+- A lot of various pep8 fixes - should all be nearly done soon
+- Fixed a bug in gauss_approx_tranche_loss
+
 9 December 2023  version 0.34 released
 - A lot of various pep8 fixes - should all be nearly done soon
 - Some minor bug fixes
