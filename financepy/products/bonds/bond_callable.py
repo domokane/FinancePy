@@ -2,6 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
+
+from typing import List
+import numpy as np
+
 from ...utils.global_vars import gDaysInYear
 from ...models.hw_tree import HWTree
 from ...models.bk_tree import BKTree
@@ -13,10 +18,6 @@ from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
-
-from enum import Enum
-import numpy as np
-from typing import List
 
 
 ###############################################################################

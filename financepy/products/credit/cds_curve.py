@@ -141,7 +141,9 @@ class CDSCurve:
         else:
             t = dt
 
-        return self._libor_curve._df(t)
+        df = self._libor_curve.df(t)
+
+        return df
 
 ###############################################################################
 

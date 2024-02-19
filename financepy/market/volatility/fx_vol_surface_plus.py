@@ -873,10 +873,10 @@ class FXVolSurfacePlus():
                  for_discount_curve: DiscountCurve,
                  tenors: (list),
                  atm_vols: (list, np.ndarray),
-                 mktStrangle25DeltaVols: (list, np.ndarray),
-                 riskReversal25DeltaVols: (list, np.ndarray),
-                 mktStrangle10DeltaVols: (list, np.ndarray),
-                 riskReversal10DeltaVols: (list, np.ndarray),
+                 ms25DeltaVols: (list, np.ndarray),
+                 rr25DeltaVols: (list, np.ndarray),
+                 ms10DeltaVols: (list, np.ndarray),
+                 rr10DeltaVols: (list, np.ndarray),
                  alpha: float,
                  atmMethod: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
@@ -889,17 +889,17 @@ class FXVolSurfacePlus():
         is 100% 10D. An alpha of 0.50 is equally weighted. """
 
         # I want to allow Nones for some of the market inputs
-        if mktStrangle10DeltaVols is None:
-            mktStrangle10DeltaVols = []
+        if ms10DeltaVols is None:
+            ms10DeltaVols = []
 
-        if riskReversal10DeltaVols is None:
-            riskReversal10DeltaVols = []
+        if rr10DeltaVols is None:
+            rr10DeltaVols = []
 
-        if mktStrangle25DeltaVols is None:
-            mktStrangle25DeltaVols = []
+        if ms25DeltaVols is None:
+            ms25DeltaVols = []
 
-        if riskReversal25DeltaVols is None:
-            riskReversal25DeltaVols = []
+        if rr25DeltaVols is None:
+            rr25DeltaVols = []
 
         check_argument_types(self.__init__, locals())
 
@@ -930,7 +930,7 @@ class FXVolSurfacePlus():
         self._userr_10d_vol = True
 
         # Some of these can be missing which is signified by length zero
-        n = len(mktStrangle25DeltaVols)
+        n = len(ms25DeltaVols)
 
         if n != self._num_vol_curves and n != 0:
             raise FinError("Number MS25D vols must equal number of tenors")
@@ -938,7 +938,7 @@ class FXVolSurfacePlus():
         if n == 0:
             self._usems_25d_vol = False
 
-        n = len(riskReversal25DeltaVols)
+        n = len(rr25DeltaVols)
 
         if n != self._num_vol_curves and n != 0:
             raise FinError("Number RR25D vols must equal number of tenors")
@@ -946,7 +946,7 @@ class FXVolSurfacePlus():
         if n == 0:
             self._userr_25d_vol = False
 
-        n = len(mktStrangle10DeltaVols)
+        n = len(ms10DeltaVols)
 
         if n != self._num_vol_curves and n != 0:
             raise FinError("Number MS10D vols must equal number of tenors")
@@ -954,7 +954,7 @@ class FXVolSurfacePlus():
         if n == 0:
             self._usems_10d_vol = False
 
-        n = len(riskReversal10DeltaVols)
+        n = len(rr10DeltaVols)
 
         if n != self._num_vol_curves and n != 0:
             raise FinError("Number RR10D vols must equal number of tenors")
@@ -972,10 +972,10 @@ class FXVolSurfacePlus():
             raise FinError(
                 "No MS and RR. You must provide 10D or 25D MS + RR.")
 
-        self._mktStrangle25DeltaVols = np.array(mktStrangle25DeltaVols)/100.0
-        self._riskReversal25DeltaVols = np.array(riskReversal25DeltaVols)/100.0
-        self._mktStrangle10DeltaVols = np.array(mktStrangle10DeltaVols)/100.0
-        self._riskReversal10DeltaVols = np.array(riskReversal10DeltaVols)/100.0
+        self._ms25DeltaVols = np.array(ms25DeltaVols)/100.0
+        self._rr25DeltaVols = np.array(rr25DeltaVols)/100.0
+        self._ms10DeltaVols = np.array(ms10DeltaVols)/100.0
+        self._rr10DeltaVols = np.array(rr10DeltaVols)/100.0
 
         if alpha < 0.0 or alpha > 1.0:
             raise FinError("Alpha must be between 0.0 and 1.0")

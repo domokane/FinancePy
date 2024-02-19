@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
 
 import numpy as np
 from numba import njit
@@ -23,10 +24,8 @@ from ...utils.math import N
 
 ###############################################################################
 
-from enum import Enum
-
-
 class AsianOptionValuationMethods(Enum):
+    ''' Types of Asian Option valuation methods '''
     GEOMETRIC = 1,
     TURNBULL_WAKEMAN = 2,
     CURRAN = 3

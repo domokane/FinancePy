@@ -2,20 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
 from numba import njit, float64, int64
 import numpy as np
+from scipy.interpolate import PchipInterpolator
+from scipy.interpolate import CubicSpline
 from ...utils.error import FinError
 from ...utils.global_vars import gSmall
 
-from scipy.interpolate import PchipInterpolator
-from scipy.interpolate import CubicSpline
-
 ###############################################################################
-
-from enum import Enum
 
 
 class InterpTypes(Enum):
+    ''' Types of interpolation '''
     FLAT_FWD_RATES = 1
     LINEAR_FWD_RATES = 2
     LINEAR_ZERO_RATES = 4

@@ -257,14 +257,14 @@ def delta_fit(K, *args):
     r_d = args[3]
     r_f = args[4]
     option_type_value = args[5]
-    deltaTypeValue = args[6]
+    delta_type_value = args[6]
     inverse_delta_target = args[7]
     params = args[8]
 
     f = s*np.exp((r_d-r_f)*t)
     v = vol_function(vol_type_value, params, f, K, t)
     delta_out = fast_delta(
-        s, t, K, r_d, r_f, v, deltaTypeValue, option_type_value)
+        s, t, K, r_d, r_f, v, delta_type_value, option_type_value)
     inverse_delta_out = norminvcdf(np.abs(delta_out))
     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
@@ -278,7 +278,7 @@ def delta_fit(K, *args):
               int64, float64, float64[:]), fastmath=True, cache=False)
 def solver_for_smile_strike_fast(s, t, rd, rf,
                                  option_type_value,
-                                 volatilityTypeValue,
+                                 volatility_type_value,
                                  delta_target,
                                  delta_method_value,
                                  initial_guess,
@@ -289,7 +289,7 @@ def solver_for_smile_strike_fast(s, t, rd, rf,
 
     inverse_delta_target = norminvcdf(np.abs(delta_target))
 
-    argtuple = (volatilityTypeValue, s, t, rd, rf, option_type_value,
+    argtuple = (volatility_type_value, s, t, rd, rf, option_type_value,
                 delta_method_value, inverse_delta_target, parameters)
 
     K = newton_secant(delta_fit, x0=initial_guess, args=argtuple,
@@ -401,8 +401,8 @@ class FXVolSurface():
                  for_discount_curve: DiscountCurve,
                  tenors: (list),
                  atm_vols: (list, np.ndarray),
-                 mktStrangle25DeltaVols: (list, np.ndarray),
-                 riskReversal25DeltaVols: (list, np.ndarray),
+                 ms25DeltaVols: (list, np.ndarray),
+                 rr25DeltaVols: (list, np.ndarray),
                  atmMethod: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
                  volatility_function_type: VolFuncTypes = VolFuncTypes.CLARK):
@@ -432,16 +432,16 @@ class FXVolSurface():
         if len(atm_vols) != self._num_vol_curves:
             raise FinError("Number ATM vols must equal number of tenors")
 
-        if len(mktStrangle25DeltaVols) != self._num_vol_curves:
+        if len(ms25DeltaVols) != self._num_vol_curves:
             raise FinError("Number MS25D vols must equal number of tenors")
 
-        if len(riskReversal25DeltaVols) != self._num_vol_curves:
+        if len(rr25DeltaVols) != self._num_vol_curves:
             raise FinError("Number RR25D vols must equal number of tenors")
 
         self._tenors = tenors
         self._atm_vols = np.array(atm_vols)/100.0
-        self._mktStrangle25DeltaVols = np.array(mktStrangle25DeltaVols)/100.0
-        self._riskReversal25DeltaVols = np.array(riskReversal25DeltaVols)/100.0
+        self._ms25DeltaVols = np.array(ms25DeltaVols)/100.0
+        self._rr25DeltaVols = np.array(rr25DeltaVols)/100.0
 
         self._atmMethod = atmMethod
         self._delta_method = delta_method

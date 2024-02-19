@@ -71,6 +71,6 @@ class EquityVolCurve():
         """ calculate the probability density function of the underlying using
         the volatility smile or skew curve following the approach set out in
         Breedon and Litzenberger. """
-        pass
+        return
 
 ###############################################################################

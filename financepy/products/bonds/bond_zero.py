@@ -119,7 +119,7 @@ class BondZero:
         # assuming an annualised rate raised to the power of years
 
         dc = DayCount(self._dc_type)
-        (acc_factor, num, _) = dc.year_frac(settle_dt,
+        (acc_factor, _, _) = dc.year_frac(settle_dt,
                                             self._maturity_dt,
                                             self._maturity_dt,
                                             FrequencyTypes.ZERO)

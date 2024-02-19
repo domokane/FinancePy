@@ -278,14 +278,14 @@ class CDSBasket:
                     t, issuer_curve._times, issuer_curve._values,
                     InterpTypes.FLAT_FWD_RATES.value)
 
-            lossDbn = homog_basket_loss_dbn(issuer_surv_probs,
+            loss_dbn = homog_basket_loss_dbn(issuer_surv_probs,
                                             recovery_rates,
                                             beta_vector,
                                             num_points)
 
             basket_surv_curve[i_time] = 1.0
             for iToDefault in range(n_to_default, num_credits + 1):
-                basket_surv_curve[i_time] -= lossDbn[iToDefault]
+                basket_surv_curve[i_time] -= loss_dbn[iToDefault]
 
             basket_times[i_time] = t
 

@@ -19,7 +19,7 @@ class FinCurveFitMethod():
 class CurveFitPolynomial():
 
     def __init__(self, power=3):
-        self._parentType = FinCurveFitMethod
+        self._parent_type = FinCurveFitMethod
         self._power = power
         self._coeffs = []
 
@@ -46,7 +46,7 @@ class CurveFitPolynomial():
 class CurveFitNelsonSiegel():
 
     def __init__(self, tau=None, bounds=[(-1, -1, -1, 0.5), (1, 1, 1, 100)]):
-        self._parentType = FinCurveFitMethod
+        self._parent_type = FinCurveFitMethod
         self._beta_1 = None
         self._beta_2 = None
         self._beta_3 = None
@@ -72,10 +72,10 @@ class CurveFitNelsonSiegel():
             tau = self._tau
 
         theta = t / tau
-        expTerm = np.exp(-theta)
+        exp_term = np.exp(-theta)
         yld = beta_1
-        yld += beta_2 * (1.0 - expTerm) / theta
-        yld += beta_3 * ((1.0 - expTerm) / theta - expTerm)
+        yld += beta_2 * (1.0 - exp_term) / theta
+        yld += beta_3 * ((1.0 - exp_term) / theta - exp_term)
         return yld
 
     def __repr__(self):
@@ -100,7 +100,7 @@ class CurveFitNelsonSiegelSvensson():
         """ Create object to store calibration and functional form of NSS
         parametric fit. """
 
-        self._parentType = FinCurveFitMethod
+        self._parent_type = FinCurveFitMethod
         self._beta_1 = None
         self._beta_2 = None
         self._beta_3 = None
@@ -138,12 +138,12 @@ class CurveFitNelsonSiegelSvensson():
 
         theta1 = t / tau_1
         theta2 = t / tau_2
-        expTerm1 = np.exp(-theta1)
-        expTerm2 = np.exp(-theta2)
+        exp_term1 = np.exp(-theta1)
+        exp_term2 = np.exp(-theta2)
         yld = beta_1
-        yld += beta_2 * (1.0 - expTerm1) / theta1
-        yld += beta_3 * ((1.0 - expTerm1) / theta1 - expTerm1)
-        yld += beta_4 * ((1.0 - expTerm2) / theta2 - expTerm2)
+        yld += beta_2 * (1.0 - exp_term1) / theta1
+        yld += beta_3 * ((1.0 - exp_term1) / theta1 - exp_term1)
+        yld += beta_4 * ((1.0 - exp_term2) / theta2 - exp_term2)
         return yld
 
     def __repr__(self):
@@ -166,7 +166,7 @@ class CurveFitNelsonSiegelSvensson():
 class CurveFitBSpline():
 
     def __init__(self, power=3, knots=[1, 3, 5, 10]):
-        self._parentType = FinCurveFitMethod
+        self._parent_type = FinCurveFitMethod
         self._power = power
         self._knots = knots
         self._spline = None

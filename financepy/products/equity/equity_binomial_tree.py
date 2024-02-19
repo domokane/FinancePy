@@ -177,11 +177,11 @@ def _value_once(stock_price,
     price = option_values[0]
     delta = (option_values[2] - option_values[1]) / \
         (stock_values[2] - stock_values[1])
-    deltaUp = (option_values[5] - option_values[4]) / \
+    delta_up = (option_values[5] - option_values[4]) / \
         (stock_values[5] - stock_values[4])
     deltaDn = (option_values[4] - option_values[3]) / \
         (stock_values[4] - stock_values[3])
-    gamma = (deltaUp - deltaDn) / (stock_values[2] - stock_values[1])
+    gamma = (delta_up - deltaDn) / (stock_values[2] - stock_values[1])
     theta = (option_values[4] - option_values[0]) / (2.0 * dt)
     results = np.array([price, delta, gamma, theta])
     return results

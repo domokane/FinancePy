@@ -17,7 +17,7 @@ class FinTestCaseMode(Enum):
     DEBUG_TEST_CASES = 3
 
 
-verbose = False
+VERBOSE = False
 
 ###############################################################################
 ###############################################################################
@@ -31,7 +31,7 @@ verbose = False
 globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
 # globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
 
-tolerance = 1e-8
+TOLERANCE = 1e-8
 
 
 ###############################################################################
@@ -132,7 +132,7 @@ class FinTestCases():
                     print("Overwriting existing file...")
 
             creation_time = time.strftime("%Y%m%d_%H%M%S")
-            f = open(self._golden_file_name, 'w')
+            f = open(self._golden_file_name, 'w', encoding="utf-8")
             f.write("File Created on:" + creation_time)
             f.write("\n")
             f.close()
@@ -153,7 +153,7 @@ class FinTestCases():
 
 #            print("Creating empty file",self._compare_file_name)
             creation_time = time.strftime("%Y%m%d_%H%M%S")
-            f = open(self._compare_file_name, 'w')
+            f = open(self._compare_file_name, 'w', encoding="utf-8")
             f.write("File Created on:" + creation_time)
             f.write("\n")
             f.close()
@@ -185,7 +185,7 @@ class FinTestCases():
         else:
             file_name = self._compare_file_name
 
-        f = open(file_name, 'a')
+        f = open(file_name, 'a', encoding="utf-8")
         f.write("RESULTS,")
 
         for arg in args:
@@ -216,7 +216,7 @@ class FinTestCases():
         else:
             file_name = self._compare_file_name
 
-        f = open(file_name, 'a')
+        f = open(file_name, 'a', encoding="utf-8")
         f.write("BANNER,")
 
         f.write(txt)
@@ -230,18 +230,18 @@ class FinTestCases():
         """ Print a header on a line to the GOLDEN or COMPARE directory. """
 
         if self._mode == FinTestCaseMode.DEBUG_TEST_CASES:
-            self.printLog(args)
+            self.print_log(args)
             return
 
         if not self._foldersExist:
-            self.printLog(
+            self.print_log(
                 "Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
         self._header_fields = args
 
         if len(self._header_fields) == 0:
-            self.printLog(
+            self.print_log(
                 "ERROR: Number of header fields must be greater than 0")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
@@ -249,7 +249,7 @@ class FinTestCases():
         else:
             file_name = self._compare_file_name
 
-        f = open(file_name, 'a')
+        f = open(file_name, 'a', encoding="utf-8")
         f.write("HEADER,")
 
         for arg in args:
@@ -274,24 +274,24 @@ class FinTestCases():
         num_compare_fields = len(compare_fields)
 
         if num_golden_fields == 0:
-            self.printLog("ERROR: No field in golden row")
+            self.print_log("ERROR: No field in golden row")
             num_errors += 1
             return (0, num_errors)
 
         if num_compare_fields == 0:
-            self.printLog("ERROR: No field in golden row")
+            self.print_log("ERROR: No field in golden row")
             num_errors += 1
             return (0, num_errors)
 
         if num_golden_fields != num_compare_fields:
-            self.printLog("ERROR: Mismatch in number of fields")
+            self.print_log("ERROR: Mismatch in number of fields")
             num_errors += 1
             return (0, num_errors)
 
         num_cols = num_golden_fields
 
         if golden_fields[0] != compare_fields[0]:
-            self.printLog("ERROR: Mismatch in row types HEADER vs RESULT",
+            self.print_log("ERROR: Mismatch in row types HEADER vs RESULT",
                           golden_fields[0], compare_fields[0])
             num_errors += 1
             return (0, num_errors)
@@ -305,14 +305,14 @@ class FinTestCases():
             return (0, num_errors)
 
         if self._header_fields is None:
-            self.printLog("ERROR: No Header row has been assigned")
+            self.print_log("ERROR: No Header row has been assigned")
             num_errors += 1
             return (0, num_errors)
 
         for col_num in range(0, num_cols):
 
             if len(self._header_fields) <= col_num:
-                self.printLog("ERROR: Mismatch in headers. Rerun!")
+                self.print_log("ERROR: Mismatch in headers. Rerun!")
                 return (0, num_errors)
 
             time_column = False
@@ -324,7 +324,7 @@ class FinTestCases():
 
             if compare_field != golden_field:
 
-                # Only reject with tolerance of 1e-8 - OK for finance!
+                # Only reject with TOLERANCE of 1e-8 - OK for finance!
                 tol = 1e-4
                 compare_flag = compare_field.replace(".", "").isnumeric()
                 golden_flag = golden_field.replace(".", "").isnumeric()
@@ -346,7 +346,7 @@ class FinTestCases():
                     change = (time2 / abs(time1 + 1e-10) - 1.0) * 100.0
 
                     if abs(change) > 50.0:
-                        self.printLog("Row# ", row_num,
+                        self.print_log("Row# ", row_num,
                                       " WARNING: Calculation time has changed by %5.2f"
                                       % change, " percent.")
 
@@ -359,7 +359,7 @@ class FinTestCases():
     def compareTestCases(self):
         """ Compare output of COMPARE mode to GOLDEN output """
 
-        self.startLog()
+        self.start_log()
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             # Do nothing
@@ -369,7 +369,7 @@ class FinTestCases():
             # Do nothing
             return
 
-        self.printLog("EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: " +
+        self.print_log("EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: " +
                       self._module_name)
 
         totalnum_warnings = 0
@@ -382,23 +382,21 @@ class FinTestCases():
             return
 
         # open golden file and load it up
-        f = open(self._golden_file_name, 'r')
-        golden_contents = f.readlines()
-        f.close()
+        with open(self._golden_file_name, 'r', encoding="utf-8") as f:
+            golden_contents = f.readlines()
 
         num_golden_lines = len(golden_contents)
 
         # open golden file and load it up
-        f = open(self._compare_file_name, 'r')
-        compareContents = f.readlines()
-        f.close()
+        with open(self._compare_file_name, 'r', encoding="utf-8") as f:
+            compareContents = f.readlines()
 
         num_compare_lines = len(compareContents)
 
         if num_golden_lines != num_compare_lines:
-            self.printLog("File lengths not the same")
-            self.printLog("Number of COMPARE lines: ", num_compare_lines)
-            self.printLog("Number of GOLDEN lines: ", num_golden_lines)
+            self.print_log("File lengths not the same")
+            self.print_log("Number of COMPARE lines: ", num_compare_lines)
+            self.print_log("Number of GOLDEN lines: ", num_golden_lines)
 
         minNumLines = min(num_golden_lines, num_compare_lines)
 #        maxNumLines = max(num_golden_lines, num_compare_lines)
@@ -413,7 +411,7 @@ class FinTestCases():
                 golden_row, compare_row, row_num)
 
             if num_errors > 0:
-                self.printLog(
+                self.print_log(
                     "Row# ",
                     row_num,
                     " ERROR - ",
@@ -422,22 +420,22 @@ class FinTestCases():
                     row_num)
 
                 if self._header_fields is None:
-                    self.printLog("ERROR: Header must be defined")
+                    self.print_log("ERROR: Header must be defined")
                     num_errors += 1
                 else:
-                    self.printLog("Row# ", row_num, " HEADER:  ==>",
+                    self.print_log("Row# ", row_num, " HEADER:  ==>",
                                   self._header_fields[0:-1])
 
-                self.printLog("Row# ", row_num, " GOLDEN : ==>", golden_row[:-2])
-                self.printLog("Row# ", row_num,
+                self.print_log("Row# ", row_num, " GOLDEN : ==>", golden_row[:-2])
+                self.print_log("Row# ", row_num,
                               " COMPARE: ==>", compare_row[:-2])
-                self.printLog("")
+                self.print_log("")
 
             totalnum_warnings += num_warnings
             totalnum_errors += num_errors
 
         if num_golden_lines == minNumLines and num_compare_lines > minNumLines:
-            self.printLog(
+            self.print_log(
                 "ERROR:The COMPARE file is longer than the GOLDEN file")
 
 #            for row_num in range(minNumLines,maxNumLines):
@@ -445,7 +443,7 @@ class FinTestCases():
 #                print(row_num,"COMPARE: ==>",compare_row)
 
         if num_compare_lines == minNumLines and num_golden_lines > minNumLines:
-            self.printLog(
+            self.print_log(
                 "ERROR:The GOLDEN file is longer than the COMPARE file")
 
 #            for row_num in range(minNumLines,maxNumLines):
@@ -460,11 +458,11 @@ class FinTestCases():
 #              "ERRORS:", totalnum_errors,
 #              "WARNINGS:", totalnum_warnings)
 
-        self.printLog("Analysis of ", self._module_name, " completed with ",
+        self.print_log("Analysis of ", self._module_name, " completed with ",
                       totalnum_errors, " errors and ", totalnum_warnings,
                       " warnings.")
 
-        self.printLog("NUM LINES:", num_compare_lines,
+        self.print_log("NUM LINES:", num_compare_lines,
                       "====>",
                       "ERRORS:", totalnum_errors,
                       " WARNINGS:", totalnum_warnings)
@@ -476,14 +474,14 @@ class FinTestCases():
 
 ###############################################################################
 
-    def startLog(self):
-        f = open(self._differences_file_name, 'w')
+    def start_log(self):
+        f = open(self._differences_file_name, 'w', encoding="utf-8")
         f.close()
 
 ###############################################################################
 
-    def printLog(self, *args):
-        f = open(self._differences_file_name, 'a')
+    def print_log(self, *args):
+        f = open(self._differences_file_name, 'a', encoding="utf-8")
         for arg in args:
             f.write(str(arg) + " ")
 

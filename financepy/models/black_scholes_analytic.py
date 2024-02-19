@@ -32,11 +32,11 @@ def bs_value(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    vsqrtT = v * np.sqrt(t)
+    v_sqrt_t = v * np.sqrt(t)
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    d2 = d1 - vsqrtT
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
+    d2 = d1 - v_sqrt_t
 
     value = phi * ss * N(phi * d1) - phi * kk * N(phi * d2)
     return value
@@ -61,10 +61,10 @@ def bs_delta(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    vsqrtT = v * np.sqrt(t)
+    v_sqrt_t = v * np.sqrt(t)
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
     delta = phi * np.exp(-q*t) * n_vect(phi * d1)
     return delta
 
@@ -80,11 +80,11 @@ def bs_gamma(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    vsqrtT = v * np.sqrt(t)
+    v_sqrt_t = v * np.sqrt(t)
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    gamma = np.exp(-q*t) * n_prime_vect(d1) / s / vsqrtT
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
+    gamma = np.exp(-q*t) * n_prime_vect(d1) / s / v_sqrt_t
     return gamma
 
 ###############################################################################
@@ -99,12 +99,12 @@ def bs_vega(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    sqrtT = np.sqrt(t)
-    vsqrtT = v * sqrtT
+    sqrt_t = np.sqrt(t)
+    v_sqrt_t = v * sqrt_t
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    vega = ss * sqrtT * n_prime_vect(d1)
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
+    vega = ss * sqrt_t * n_prime_vect(d1)
     return vega
 
 ###############################################################################
@@ -124,13 +124,13 @@ def bs_theta(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    sqrtT = np.sqrt(t)
-    vsqrtT = v * sqrtT
+    sqrt_t = np.sqrt(t)
+    v_sqrt_t = v * sqrt_t
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    d2 = d1 - vsqrtT
-    theta = - ss * n_prime_vect(d1) * v / 2.0 / sqrtT
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
+    d2 = d1 - v_sqrt_t
+    theta = - ss * n_prime_vect(d1) * v / 2.0 / sqrt_t
     theta = theta - phi * r * k * np.exp(-r*t) * n_vect(phi * d2)
     theta = theta + phi * q * ss * n_vect(phi * d1)
     return theta
@@ -152,12 +152,12 @@ def bs_rho(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    sqrtT = np.sqrt(t)
-    vsqrtT = v * sqrtT
+    sqrt_t = np.sqrt(t)
+    v_sqrt_t = v * sqrt_t
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    d2 = d1 - vsqrtT
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
+    d2 = d1 - v_sqrt_t
     rho = phi * k * t * np.exp(-r*t) * n_vect(phi * d2)
     return rho
 
@@ -173,13 +173,13 @@ def bs_vanna(s, t, k, r, q, v, option_type_value):
     t = np.maximum(t, gSmall)
     v = np.maximum(v, gSmall)
 
-    sqrtT = np.sqrt(t)
-    vsqrtT = v * sqrtT
+    sqrt_t = np.sqrt(t)
+    v_sqrt_t = v * sqrt_t
     ss = s * np.exp(-q*t)
     kk = k * np.exp(-r*t)
-    d1 = np.log(ss/kk) / vsqrtT + vsqrtT / 2.0
-    d2 = d1 - vsqrtT
-    vanna = np.exp(-q*t) * sqrtT * n_prime_vect(d1) * (d2/v)
+    d1 = np.log(ss/kk) / v_sqrt_t + v_sqrt_t / 2.0
+    d2 = d1 - v_sqrt_t
+    vanna = np.exp(-q*t) * sqrt_t * n_prime_vect(d1) * (d2/v)
     return vanna
 
 ###############################################################################
@@ -280,9 +280,9 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     ###########################################################################
 
     if option_type_value == OptionTypes.EUROPEAN_CALL.value:
-        C = price
+        call = price
     else:
-        C = price + (divAdjStockPrice - k * df)
+        call = price + (divAdjStockPrice - k * df)
 
     # Notation in SSRN-id567721.pdf
     X = k * np.exp(-r*t)
@@ -316,12 +316,12 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
 
     hsigma = 0.0
     gamma = 2.0
-    arg = (2*C+X-S)**2 - gamma * (S+X)*(S-X)*(S-X) / pi / S
+    arg = (2*call+X-S)**2 - gamma * (S+X)*(S-X)*(S-X) / pi / S
 
     if arg < 0.0:
         arg = 0.0
 
-    hsigma = (2 * C + X - S + np.sqrt(arg))
+    hsigma = (2 * call + X - S + np.sqrt(arg))
     hsigma = hsigma * np.sqrt(2.0*pi) / 2.0 / (S+X)
     hsigma = hsigma / np.sqrt(t)
 
@@ -372,11 +372,11 @@ def _fcall(si, *args):
     b = r - q
     v2 = v*v
 
-    M = 2.0 * r / v2
-    W = 2.0 * b / v2
-    K = 1.0 - np.exp(-r * t)
+    mm = 2.0 * r / v2
+    ww = 2.0 * b / v2
+    kk = 1.0 - np.exp(-r * t)
 
-    q2 = (1.0 - W + np.sqrt((W - 1.0)**2 + 4.0 * M/K)) / 2.0
+    q2 = (1.0 - ww + np.sqrt((ww - 1.0)**2 + 4.0 * mm/kk)) / 2.0
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
 
     obj_fn = si - k

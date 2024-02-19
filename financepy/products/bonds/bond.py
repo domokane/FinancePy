@@ -389,7 +389,8 @@ class Bond:
 
     ###########################################################################
 
-    def key_rate_durations(bond,
+    def key_rate_durations(self, 
+                           bond,
                            settle_dt: Date,
                            ytm: float,
                            key_rate_tenors: list = None,

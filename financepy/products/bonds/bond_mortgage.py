@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
 
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
@@ -14,8 +15,6 @@ from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
 
 ###############################################################################
-
-from enum import Enum
 
 
 class BondMortgageTypes(Enum):
@@ -101,12 +100,12 @@ class BondMortgage:
         else:
             raise FinError("Unknown Mortgage type.")
 
-        for i in range(1, num_flows):
-            interestFlow = principal * zero_rate / frequency
-            principalFlow = monthly_flow - interestFlow
-            principal = principal - principalFlow
-            self._interest_flows.append(interestFlow)
-            self._principal_flows.append(principalFlow)
+        for _ in range(1, num_flows):
+            interest_flow = principal * zero_rate / frequency
+            principal_flow = monthly_flow - interest_flow
+            principal = principal - principal_flow
+            self._interest_flows.append(interest_flow)
+            self._principal_flows.append(principal_flow)
             self._principal_remaining.append(principal)
             self._total_flows.append(monthly_flow)
 

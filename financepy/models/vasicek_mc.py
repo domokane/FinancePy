@@ -36,6 +36,7 @@ class ModelRatesVasicek():
 
 @njit(fastmath=True, cache=True)
 def meanr(r0, a, b, t):
+    ''' Expectation of short rate at later time t '''
     mr = r0 * exp(-a * t) + b * (1 - exp(-a * t))
     return mr
 
@@ -43,7 +44,8 @@ def meanr(r0, a, b, t):
 
 
 @njit(fastmath=True, cache=True)
-def variancer(a, b, sigma, t):
+def variancer(a, sigma, t):
+    ''' Variance of short rate at later time t '''
     vr = sigma * sigma * (1.0 - exp(-2.0 * a * t)) / 2.0 / a
     return vr
 
@@ -72,10 +74,10 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
     sigmasqrt_dt = sigma * sqrt(dt)
 
-    for i_path in range(0, num_paths):
+    for _ in range(0, num_paths):
 
         r = r0
-        z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+        z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
         for i_step in range(1, num_steps):
             r = r + a * (b - r) * dt + z[i_step - 1] * sigmasqrt_dt
@@ -94,8 +96,8 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
     num_steps = int(t / dt)
     sigmasqrt_dt = sigma * sqrt(dt)
     zcb = 0.0
-    for i_path in range(0, num_paths):
-        z = np.random.normal(0.0, 1.0, size=(num_steps))
+    for _ in range(0, num_paths):
+        z = np.random.normal(0.0, 1.0, size=num_steps)
         rsum = 0.0
         r = r0
         for i_step in range(0, num_steps):

@@ -83,6 +83,11 @@ class DiscountCurve:
 
     ###########################################################################
 
+    def value_dt(self):
+        return self._value_dt
+
+    ###########################################################################
+
     def _zero_to_df(self,
                     value_dt: Date,  # TODO: why is value_date not used ?
                     rates: (float, np.ndarray),

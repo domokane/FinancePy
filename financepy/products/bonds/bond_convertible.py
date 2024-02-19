@@ -5,9 +5,10 @@
 # TODO - MUST ADD ACCRUED INTEREST TO MODEL!!!!
 
 from math import exp, sqrt
+from typing import List
+
 from numba import njit
 import numpy as np
-from typing import List
 
 from ...utils.date import Date
 from ...utils.error import FinError
@@ -98,7 +99,7 @@ def _value_convertible(t_mat,
     if num_times < 5:
         raise FinError("Numsteps must be greater than 5.")
 
-    numLevels = num_times
+    num_levels = num_times
 
     # this is the size of the step
     dt = t_mat / (num_times - 1)
@@ -113,7 +114,7 @@ def _value_convertible(t_mat,
     survival_prob = exp(-h * dt)
 
     # map coupons onto tree but preserve their present value using risky dfs
-    treeFlows = np.zeros(num_times)
+    tree_flows = np.zeros(num_times)
     num_cpns = len(cpn_times)
     for i in range(0, num_cpns):
         flow_time = cpn_times[i]
@@ -123,7 +124,7 @@ def _value_convertible(t_mat,
         df_flow *= exp(-h * flow_time)
         df_tree = _uinterpolate(treeTime, df_times, df_values, interp)
         df_tree *= exp(-h * treeTime)
-        treeFlows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
+        tree_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
     tree_call_value = np.ones(num_times) * face_amount * 1000.0
@@ -151,7 +152,7 @@ def _value_convertible(t_mat,
 
     # Set up the tree of stock prices using a 2D matrix - half the matrix is
     # unused but this may be a cost worth bearing for simpler code. Review.
-    treeStockValue = np.zeros(shape=(num_times, numLevels))
+    treeStockValue = np.zeros(shape=(num_times, num_levels))
     e = stock_volatility ** 2 - h
     if e < 0.0:
         raise FinError("Volatility squared minus the hazard rate is negative.")
@@ -176,7 +177,7 @@ def _value_convertible(t_mat,
     # set up the tree of conversion values. Before allowed to convert the
     # conversion value must be set equal to zero
 
-    treeConvertValue = np.zeros(shape=(num_times, numLevels))
+    treeConvertValue = np.zeros(shape=(num_times, num_levels))
     for i_time in range(0, num_times):
         if tree_times[i_time] >= start_convert_time:
             for i_node in range(0, i_time + 1):
@@ -185,7 +186,7 @@ def _value_convertible(t_mat,
 
     #    print_tree(treeConvertValue)
 
-    treeConvBondValue = np.zeros(shape=(num_times, numLevels))
+    treeConvBondValue = np.zeros(shape=(num_times, num_levels))
 
     # store probability of up move as a function of time on the tree
     treeProbsUp = np.zeros(num_times)
@@ -205,11 +206,11 @@ def _value_convertible(t_mat,
     # work backwards by first setting values at bond maturity date
     ###########################################################################
 
-    flow = treeFlows[num_times - 1]
-    bulletPV = (1.0 + flow) * face_amount
-    for i_node in range(0, numLevels):
+    flow = tree_flows[num_times - 1]
+    bullet_pv = (1.0 + flow) * face_amount
+    for i_node in range(0, num_levels):
         convValue = treeConvertValue[num_times - 1, i_node]
-        treeConvBondValue[num_times - 1, i_node] = max(bulletPV, convValue)
+        treeConvBondValue[num_times - 1, i_node] = max(bullet_pv, convValue)
 
     #  begin backward steps from expiry
     for i_time in range(num_times - 2, -1, -1):
@@ -220,7 +221,7 @@ def _value_convertible(t_mat,
         df = treeDfs[i_time + 1] / treeDfs[i_time]
         call = tree_call_value[i_time]
         put = tree_put_value[i_time]
-        flow = treeFlows[i_time]
+        flow = tree_flows[i_time]
 
         for i_node in range(0, i_time + 1):
             futValueUp = treeConvBondValue[i_time + 1, i_node + 1]
@@ -232,20 +233,20 @@ def _value_convertible(t_mat,
             value = min(max(holdPV, conv, put), call)
             treeConvBondValue[i_time, i_node] = value
 
-        bulletPV = df * bulletPV * survival_prob
-        bulletPV += pDef * df * recovery_rate * face_amount
-        bulletPV += flow * face_amount
+        bullet_pv = df * bullet_pv * survival_prob
+        bullet_pv += pDef * df * recovery_rate * face_amount
+        bullet_pv += flow * face_amount
 
     price = treeConvBondValue[0, 0]
     delta = (treeConvBondValue[1, 1] - treeConvBondValue[1, 0]) / \
             (treeStockValue[1, 1] - treeStockValue[1, 0])
-    deltaUp = (treeConvBondValue[2, 3] - treeConvBondValue[2, 2]) / \
+    delta_up = (treeConvBondValue[2, 3] - treeConvBondValue[2, 2]) / \
               (treeStockValue[2, 3] - treeStockValue[2, 2])
-    deltaDn = (treeConvBondValue[2, 2] - treeConvBondValue[2, 1]) / \
+    delta_dn = (treeConvBondValue[2, 2] - treeConvBondValue[2, 1]) / \
               (treeStockValue[2, 2] - treeStockValue[2, 1])
-    gamma = (deltaUp - deltaDn) / (treeStockValue[1, 1] - treeStockValue[1, 0])
+    gamma = (delta_up - delta_dn) / (treeStockValue[1, 1] - treeStockValue[1, 0])
     theta = (treeConvBondValue[2, 2] - treeConvBondValue[0, 0]) / (2.0 * dt)
-    results = np.array([price, bulletPV, delta, gamma, theta])
+    results = np.array([price, bullet_pv, delta, gamma, theta])
     return results
 
 
@@ -642,8 +643,8 @@ class BondConvertible:
 #        for i in range(0, num_times):
 #            t = tree_times[i]
 #            df = uinterpolate(t, discount_times, discount_factors, interp)
-#            pv += df * treeFlows[i]
-#            print(i, t, treeFlows[i], df, pv)
+#            pv += df * tree_flows[i]
+#            print(i, t, tree_flows[i], df, pv)
 #        pv += df
 #
 #        print("ACTUAL PV",pv)

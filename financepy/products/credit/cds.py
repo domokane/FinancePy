@@ -2,11 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from copy import deepcopy
+from math import exp, log
 
 import numpy as np
 from numba import njit, float64, int64
-from math import exp, log
-from copy import deepcopy
 
 from ...utils.date import Date
 from ...utils.error import FinError
@@ -21,7 +21,7 @@ from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
 from ...utils.helpers import check_argument_types
 
-useFlatHazardRateIntegral = True
+use_flat_hazard_rate_integral = True
 standard_recovery_rate = 0.40
 glob_num_steps_per_year = 25
 
@@ -38,7 +38,7 @@ glob_num_steps_per_year = 25
       fastmath=True, cache=True)
 def _risky_pv01_numba(teff,
                       accrual_factorPCDToNow,
-                      paymentTimes,
+                      payment_times,
                       year_fracs,
                       npIborTimes,
                       npIborValues,
@@ -54,7 +54,7 @@ def _risky_pv01_numba(teff,
         print("===================")
         print("Teff", teff)
         print("Acc", accrual_factorPCDToNow)
-        print("Payments", paymentTimes)
+        print("Payments", payment_times)
         print("Alphas", year_fracs)
         print("QTimes", npSurvTimes)
         print("QValues", npSurvValues)
@@ -65,7 +65,7 @@ def _risky_pv01_numba(teff,
     # accrued is treated as though on average default occurs roughly midway
     # through a cpn period.
 
-    tncd = paymentTimes[0]
+    tncd = payment_times[0]
 
     # The first cpn is a special case which needs to be handled carefully
     # taking into account what cpn has already accrued and what has not
@@ -90,9 +90,9 @@ def _risky_pv01_numba(teff,
         (qeff - q1) * (year_fracs[1] - accrual_factorPCDToNow) \
         * cpnAccruedIndicator
 
-    for it in range(1, len(paymentTimes)):
+    for it in range(1, len(payment_times)):
 
-        t2 = paymentTimes[it]
+        t2 = payment_times[it]
 
         q2 = _uinterpolate(t2, npSurvTimes, npSurvValues, method)
         z2 = _uinterpolate(t2, npIborTimes, npIborValues, method)
@@ -107,7 +107,7 @@ def _risky_pv01_numba(teff,
 
         if cpnAccruedIndicator == 1:
 
-            if useFlatHazardRateIntegral:
+            if use_flat_hazard_rate_integral:
                 # This needs to be updated to handle small h+r
                 tau = accrual_factor
                 h12 = -log(q2 / q1) / tau
@@ -141,7 +141,7 @@ def _protection_leg_pv_numba(teff,
                              npSurvValues,
                              contract_recovery_rate,
                              num_steps_per_year,
-                             protMethod):
+                             prot_method):
     """ Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time. """
 
@@ -157,7 +157,7 @@ def _protection_leg_pv_numba(teff,
     prot_pv = 0.0
     small = 1e-8
 
-    if useFlatHazardRateIntegral:
+    if use_flat_hazard_rate_integral:
 
         for _ in range(0, num_steps):
             t = t + dt
@@ -422,7 +422,7 @@ class CDS:
                         prot_method,
                         num_steps_per_year)
 
-        credit_dv01 = (v1['dirty_pv'] - v0['dirty_pv'])
+        credit_dv01 = v1['dirty_pv'] - v0['dirty_pv']
         return credit_dv01
 
     ###########################################################################
@@ -481,7 +481,7 @@ class CDS:
                         prot_method,
                         num_steps_per_year)
 
-        interest_dv01 = (v1['dirty_pv'] - v0['dirty_pv'])
+        interest_dv01 = v1['dirty_pv'] - v0['dirty_pv']
         return interest_dv01
 
     ###########################################################################
@@ -547,7 +547,7 @@ class CDS:
 
         # I assume accrued runs to the effective date
         pcd = self._accrual_start_dts[0]
-        accrued_days = (self._step_in_dt - pcd)
+        accrued_days = self._step_in_dt - pcd
         return accrued_days
 
     ###########################################################################
@@ -574,7 +574,7 @@ class CDS:
                           issuer_curve,
                           contract_recovery_rate=standard_recovery_rate,
                           num_steps_per_year=glob_num_steps_per_year,
-                          protMethod=0):
+                          prot_method=0):
         """ Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above. """
 
@@ -591,7 +591,7 @@ class CDS:
                                      issuer_curve._values,
                                      contract_recovery_rate,
                                      num_steps_per_year,
-                                     protMethod)
+                                     prot_method)
 
         return v * self._notional
 
@@ -606,12 +606,12 @@ class CDS:
 
         libor_curve = issuer_curve._libor_curve
 
-        paymentTimes = []
+        payment_times = []
         for date in self._payment_dts:
             t = (date - value_dt) / gDaysInYear
 
             if t > 0.0:
-                paymentTimes.append(t)
+                payment_times.append(t)
 
         # this is the part of the cpn accrued from the previous cpn date
         # to now
@@ -626,7 +626,7 @@ class CDS:
 
         valueRPV01 = _risky_pv01_numba(teff,
                                        accrual_factorPCDToNow,
-                                       np.array(paymentTimes),
+                                       np.array(payment_times),
                                        np.array(year_fracs),
                                        libor_curve._times,
                                        libor_curve._dfs,
@@ -662,7 +662,7 @@ class CDS:
                    contract_recovery_rate=standard_recovery_rate,
                    num_steps_per_year=glob_num_steps_per_year,
                    pv01_method=0,
-                   protMethod=0):
+                   prot_method=0):
         """ Breakeven CDS cpn that would make the value of the CDS contract
         equal to zero. """
 
@@ -674,7 +674,7 @@ class CDS:
                                       issuer_curve,
                                       contract_recovery_rate,
                                       num_steps_per_year,
-                                      protMethod)
+                                      prot_method)
 
         # By convention this is calculated using the clean RPV01
         spd = prot / clean_rpv01 / self._notional
@@ -799,7 +799,7 @@ class CDS:
         s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
         header = "PAYMENT_dt, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"
-        valueTable = [
+        value_table = [
             self._payment_dts,
             self._accrual_factors,
             self._accrual_start_dts,
@@ -808,7 +808,7 @@ class CDS:
         ]
         precision = "12.6f"
 
-        s += table_to_string(header, valueTable, precision)
+        s += table_to_string(header, value_table, precision)
 
         return s
 
