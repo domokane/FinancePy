@@ -23,7 +23,7 @@ Many Bond Classes have been amended
 - Removed face amount from bond class - how much you buy is not intrinsic to a bond
 - Made number of ex-dividend days a member of bond class
 - Added adjustment for ex-dividend dates to yield calculations
-- Revised acccrued and principal functions to take face amount as input
+- Revised accrued and principal functions to take face amount as input
 - Updated document
 
 29 May 2023 - Version 0.30 released
