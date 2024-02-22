@@ -10,7 +10,7 @@ from financepy.utils.global_types import OptionTypes
 
 
 value_dt = Date(1, 1, 2015)
-expiry_date = Date(1, 1, 2016)
+expiry_dt = Date(1, 1, 2016)
 stock_price = 100.0
 volatility = 0.3
 num_paths = 10000
@@ -26,7 +26,7 @@ foreign_curve = DiscountCurveFlat(value_dt, foreignRate)
 
 def test_european_call():
     option_type = OptionTypes.EUROPEAN_CALL
-    option = FXFloatLookbackOption(expiry_date, option_type)
+    option = FXFloatLookbackOption(expiry_dt, option_type)
     stockMin = stock_price - 10
     value = option.value(
         value_dt,
@@ -50,7 +50,7 @@ def test_european_call():
     assert round(value_mc, 4) == 23.3281
 
     k = 100.0
-    option = FXFixedLookbackOption(expiry_date, option_type, k)
+    option = FXFixedLookbackOption(expiry_dt, option_type, k)
     stockMin = stock_price
     value = option.value(
         value_dt,
@@ -76,7 +76,7 @@ def test_european_call():
 
 def test_european_put():
     option_type = OptionTypes.EUROPEAN_PUT
-    option = FXFloatLookbackOption(expiry_date, option_type)
+    option = FXFloatLookbackOption(expiry_dt, option_type)
     stockMax = stock_price + 10
     value = option.value(
         value_dt,
@@ -100,7 +100,7 @@ def test_european_put():
     assert round(value_mc, 4) == 24.2806
 
     k = 105.0
-    option = FXFixedLookbackOption(expiry_date, option_type, k)
+    option = FXFixedLookbackOption(expiry_dt, option_type, k)
     stockMin = stock_price - 10.0
     value = option.value(
         value_dt,

@@ -105,8 +105,7 @@ def _value_once(stock_price,
                 exercise_type,
                 payoff_params):
 
-    if num_steps < 3:
-        num_steps = 3
+    num_steps = max(num_steps, 3)
 
 #        validate_payoff(payoff_type.value,payoff_params)
 
@@ -123,7 +122,7 @@ def _value_once(stock_price,
     option_values = np.zeros(num_nodes)
     u = exp(volatility * sqrt(dt))
     d = 1.0 / u
-    sLow = stock_price
+    s_low = stock_price
 
     probs = np.zeros(num_steps)
     period_dfs = np.zeros(num_steps)
@@ -135,8 +134,8 @@ def _value_once(stock_price,
         period_dfs[i_time] = exp(-r * dt)
 
     for i_time in range(1, num_steps + 1):
-        sLow *= d
-        s = sLow
+        s_low *= d
+        s = s_low
         for i_node in range(0, i_time + 1):
             index = 0.5 * i_time * (i_time + 1)
             stock_values[int(index + i_node)] = s
@@ -160,10 +159,10 @@ def _value_once(stock_price,
             next_index = int(0.5 * (i_time + 1) * (i_time + 2))
             next_node_dn = next_index + i_node
             next_node_up = next_node_dn + 1
-            vUp = option_values[next_node_up]
-            vDn = option_values[next_node_dn]
-            future_expected_value = probs[i_time] * vUp
-            future_expected_value += (1.0 - probs[i_time]) * vDn
+            v_up = option_values[next_node_up]
+            v_dn = option_values[next_node_dn]
+            future_expected_value = probs[i_time] * v_up
+            future_expected_value += (1.0 - probs[i_time]) * v_dn
             hold_value = period_dfs[i_time] * future_expected_value
 
             if exercise_type == EquityTreeExerciseTypes.EUROPEAN:
@@ -179,9 +178,9 @@ def _value_once(stock_price,
         (stock_values[2] - stock_values[1])
     delta_up = (option_values[5] - option_values[4]) / \
         (stock_values[5] - stock_values[4])
-    deltaDn = (option_values[4] - option_values[3]) / \
+    delta_dn = (option_values[4] - option_values[3]) / \
         (stock_values[4] - stock_values[3])
-    gamma = (delta_up - deltaDn) / (stock_values[2] - stock_values[1])
+    gamma = (delta_up - delta_dn) / (stock_values[2] - stock_values[1])
     theta = (option_values[4] - option_values[0]) / (2.0 * dt)
     results = np.array([price, delta, gamma, theta])
     return results

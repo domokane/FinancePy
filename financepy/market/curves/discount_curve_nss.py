@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gSmall
+from ...utils.global_vars import g_small
 from ...utils.helpers import label_to_string
 from ...utils.error import FinError
 from ...market.curves.discount_curve import DiscountCurve
@@ -112,7 +112,7 @@ class DiscountCurveNSS(DiscountCurve):
         times. This function can return a single zero rate or a vector of zero
         rates. The compounding frequency must be provided. """
 
-        t = np.maximum(times, gSmall)
+        t = np.maximum(times, g_small)
 
         theta_1 = t / self._tau_1
         theta_2 = t / self._tau_2

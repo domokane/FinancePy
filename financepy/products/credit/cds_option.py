@@ -118,13 +118,13 @@ class CDSOption:
             value_dt, issuer_curve)['dirty_rpv01']
 
         time_to_expiry = (self._expiry_dt - value_dt) / gDaysInYear
-        logMoneyness = log(forward_spread / strike)
+        log_moneyness = log(forward_spread / strike)
 
-        halfVolSquaredT = 0.5 * volatility * volatility * time_to_expiry
-        volSqrtT = volatility * sqrt(time_to_expiry)
+        half_vol_squared_t = 0.5 * volatility * volatility * time_to_expiry
+        vol_sqrt_t = volatility * sqrt(time_to_expiry)
 
-        d1 = (logMoneyness + halfVolSquaredT) / volSqrtT
-        d2 = (logMoneyness - halfVolSquaredT) / volSqrtT
+        d1 = (log_moneyness + half_vol_squared_t) / vol_sqrt_t
+        d2 = (log_moneyness - half_vol_squared_t) / vol_sqrt_t
 
         if self._long_protection:
             option_value = forward_spread * N(d1) - strike * N(d2)
@@ -140,8 +140,8 @@ class CDSOption:
             df = issuer_curve.getDF(time_to_expiry)
             q = issuer_curve.getSurvProb(time_to_expiry)
             recovery = issuer_curve._recovery_rate
-            frontEndProtection = df * (1.0 - q) * (1.0 - recovery)
-            option_value += frontEndProtection
+            front_end_protection = df * (1.0 - q) * (1.0 - recovery)
+            option_value += front_end_protection
 
         # we return the option price in dollars
         return option_value * self._notional

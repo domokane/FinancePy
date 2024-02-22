@@ -10,7 +10,7 @@ from financepy.products.equity.equity_float_lookback_option import EquityFloatLo
 
 
 value_dt = Date(1, 1, 2015)
-expiry_date = Date(1, 1, 2016)
+expiry_dt = Date(1, 1, 2016)
 stock_price = 100.0
 volatility = 0.3
 interest_rate = 0.05
@@ -26,7 +26,7 @@ dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 def test_european_call():
     option_type = OptionTypes.EUROPEAN_CALL
     k = 100.0
-    option = EquityFixedLookbackOption(expiry_date, option_type, k)
+    option = EquityFixedLookbackOption(expiry_dt, option_type, k)
 
     stockMax = stock_price + 10.0
     value = option.value(
@@ -53,7 +53,7 @@ def test_european_call():
 def test_european_put():
     option_type = OptionTypes.EUROPEAN_PUT
     k = 100.0
-    option = EquityFixedLookbackOption(expiry_date, option_type, k)
+    option = EquityFixedLookbackOption(expiry_dt, option_type, k)
 
     stockMin = stock_price - 10
     value = option.value(

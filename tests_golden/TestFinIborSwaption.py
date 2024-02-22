@@ -347,12 +347,12 @@ def testFinIborCashSettledSwaption():
     v = swaption.value(settle_dt, libor_curve, model)
     test_cases.print("Swaption No-Arb Value:", v)
 
-    fwdSwapRate1 = libor_curve.swap_rate(exercise_dt,
+    fwd_swap_rate1 = libor_curve.swap_rate(exercise_dt,
                                          swap_maturity_dt,
                                          swap_fixed_freq_type,
                                          swapFixedDayCountType)
 
-    test_cases.print("Curve Fwd Swap Rate:", fwdSwapRate1)
+    test_cases.print("Curve Fwd Swap Rate:", fwd_swap_rate1)
 
     fwdSwap = IborSwap(exercise_dt,
                        swap_maturity_dt,
@@ -361,14 +361,14 @@ def testFinIborCashSettledSwaption():
                        swap_fixed_freq_type,
                        swapFixedDayCountType)
 
-    fwdSwapRate2 = fwdSwap.swap_rate(settle_dt, libor_curve)
-    test_cases.print("Fwd Swap Swap Rate:", fwdSwapRate2)
+    fwd_swap_rate2 = fwdSwap.swap_rate(settle_dt, libor_curve)
+    test_cases.print("Fwd Swap Swap Rate:", fwd_swap_rate2)
 
     model = Black(0.1533)
 
     v = swaption.cash_settled_value(value_dt,
                                     libor_curve,
-                                    fwdSwapRate2,
+                                    fwd_swap_rate2,
                                     model)
 
     test_cases.print("Swaption Cash Settled Value:", v)

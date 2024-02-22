@@ -2,16 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.utils.date import Date
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.products.fx.fx_forward import FXForward
 import sys
 sys.path.append("..")
-
-from financepy.products.fx.fx_forward import FXForward
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -51,7 +50,7 @@ def test_FinFXForward():
     depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    for_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -60,7 +59,7 @@ def test_FinFXForward():
     depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    dom_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     notional = 100.0
     notional_currency = forName
@@ -74,13 +73,13 @@ def test_FinFXForward():
     test_cases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
     fwdValue = fxForward.value(value_dt, spot_fx_rate,
-                               dom_discount_curve, for_discount_curve)
+                               domestic_curve, foreign_curve)
 
-    fwdFXRate = fxForward.forward(value_dt, spot_fx_rate,
-                                  dom_discount_curve,
-                                  for_discount_curve)
+    fwd_fx_rate = fxForward.forward(value_dt, spot_fx_rate,
+                                    domestic_curve,
+                                    foreign_curve)
 
-    test_cases.print(spot_fx_rate, fwdFXRate, fwdValue)
+    test_cases.print(spot_fx_rate, fwd_fx_rate, fwdValue)
 
 ###############################################################################
 

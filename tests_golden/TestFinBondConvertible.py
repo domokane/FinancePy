@@ -32,13 +32,13 @@ def test_BondConvertible():
     accrualBasis = DayCountTypes.ACT_365F
 
     call_price = 1100
-    call_dates = [Date(20, 3, 2007),
+    call_dts = [Date(20, 3, 2007),
                   Date(15, 3, 2012),
                   Date(15, 3, 2017)]
     call_prices = np.array([call_price, call_price, call_price])
 
     putPrice = 90
-    put_dates = [Date(20, 3, 2007),
+    put_dts = [Date(20, 3, 2007),
                  Date(15, 3, 2012),
                  Date(15, 3, 2017)]
     put_prices = np.array([putPrice, putPrice, putPrice])
@@ -48,9 +48,9 @@ def test_BondConvertible():
                            freq_type,
                            start_convert_date,
                            conversion_ratio,
-                           call_dates,
+                           call_dts,
                            call_prices,
-                           put_dates,
+                           put_dts,
                            put_prices,
                            accrualBasis)
 #    print(bond)

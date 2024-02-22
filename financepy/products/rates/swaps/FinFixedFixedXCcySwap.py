@@ -4,7 +4,7 @@
 
 from ...utils.FinError import FinError
 from ...utils.Date import Date
-from ...utils.FinGlobalVariables import gSmall
+from ...utils.FinGlobalVariables import g_small
 from ...utils.FinDayCount import FinDayCount, DayCountTypes
 from ...utils.FinFrequency import FrequencyTypes, FinFrequency
 from ...utils.FinCalendar import CalendarTypes,  DateGenRuleTypes
@@ -95,7 +95,7 @@ class FinFixedFixedXCcySwap():
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
         self._last_payment_dt = self._maturity_dt
         if self._adjusted_fixed_dts[-1] > self._last_payment_dt:
-            self._last_payment_date = self._adjusted_fixed_dts[-1]
+            self._last_payment_dt = self._adjusted_fixed_dts[-1]
 
         if self._adjusted_float_dts[-1] > self._last_payment_dt:
             self._last_payment_dt = self._adjusted_float_dts[-1]
@@ -217,7 +217,7 @@ class FinFixedFixedXCcySwap():
 
         df_T = discount_curve.df(self._maturity_dt)
 
-        if abs(pv01) < gSmall:
+        if abs(pv01) < g_small:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
         cpn = (df_0 - df_T) / pv01

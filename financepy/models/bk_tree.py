@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 import numpy as np
 from numba import njit, float64, int64
@@ -11,7 +11,7 @@ from ..utils.math import accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
 from ..utils.global_types import FinExerciseTypes
-from ..utils.global_vars import gSmall
+from ..utils.global_vars import g_small
 
 interp = InterpTypes.FLAT_FWD_RATES.value
 
@@ -28,13 +28,12 @@ interp = InterpTypes.FLAT_FWD_RATES.value
 ###############################################################################
 
 
-def option_exercise_types_to_int(optionExerciseType):
-
-    if optionExerciseType == FinExerciseTypes.EUROPEAN:
+def option_exercise_types_to_int(option_exercise_type):
+    if option_exercise_type == FinExerciseTypes.EUROPEAN:
         return 1
-    if optionExerciseType == FinExerciseTypes.BERMUDAN:
+    if option_exercise_type == FinExerciseTypes.BERMUDAN:
         return 2
-    if optionExerciseType == FinExerciseTypes.AMERICAN:
+    if option_exercise_type == FinExerciseTypes.AMERICAN:
         return 3
     else:
         raise FinError("Unknown option exercise type.")
@@ -44,11 +43,10 @@ def option_exercise_types_to_int(optionExerciseType):
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
       fastmath=True, cache=True)
-def f(alpha, nm, Q, P, dX, dt, N):
-
+def f(alpha, nm, Q, P, dx, dt, N):
     sum_qz = 0.0
     for j in range(-nm, nm+1):
-        x = alpha + j*dX
+        x = alpha + j*dx
         rdt = np.exp(x)*dt
         sum_qz += Q[j+N] * np.exp(-rdt)
 
@@ -60,11 +58,10 @@ def f(alpha, nm, Q, P, dX, dt, N):
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
       fastmath=True, cache=True)
-def fprime(alpha, nm, Q, P, dX, dt, N):
-
+def fprime(alpha, nm, Q, P, dx, dt, N):
     sum_q_zd_z = 0.0
     for j in range(-nm, nm+1):
-        x = alpha + j*dX
+        x = alpha + j*dx
         rdt = np.exp(x)*dt
         sum_q_zd_z += Q[j+N] * np.exp(-rdt) * np.exp(x)
 
@@ -79,15 +76,14 @@ def fprime(alpha, nm, Q, P, dX, dt, N):
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
       fastmath=True, cache=True)
-def search_root(x0, nm, Q, P, dX, dt, N):
-
+def search_root(x0, nm, Q, P, dx, dt, N):
     #    print("Searching for root", x0)
     max_iter = 50
     max_error = 1e-8
 
     x1 = x0 * 1.0001
-    f0 = f(x0, nm, Q, P, dX, dt, N)
-    f1 = f(x1, nm, Q, P, dX, dt, N)
+    f0 = f(x0, nm, Q, P, dx, dt, N)
+    f1 = f(x1, nm, Q, P, dx, dt, N)
 
     for _ in range(0, max_iter):
 
@@ -99,7 +95,7 @@ def search_root(x0, nm, Q, P, dX, dt, N):
         x = x1 - f1 * (x1 - x0) / df
         x0, f0 = x1, f1
         x1 = x
-        f1 = f(x1, nm, Q, P, dX, dt, N)
+        f1 = f(x1, nm, Q, P, dx, dt, N)
 
         if abs(f1) <= max_error:
             return x1
@@ -114,19 +110,19 @@ def search_root(x0, nm, Q, P, dX, dt, N):
 
 @njit(float64(float64, int64, float64[:], float64, float64, float64, int64),
       fastmath=True, cache=True)
-def search_root_deriv(x0, nm, Q, P, dX, dt, N):
+def search_root_deriv(x0, nm, Q, P, dx, dt, N):
 
     max_iter = 50
     max_error = 1e-8
 
     for _ in range(0, max_iter):
 
-        fval = f(x0, nm, Q, P, dX, dt, N)
+        fval = f(x0, nm, Q, P, dx, dt, N)
 
         if abs(fval) <= max_error:
             return x0
 
-        fderiv = fprime(x0, nm, Q, P, dX, dt, N)
+        fderiv = fprime(x0, nm, Q, P, dx, dt, N)
 
         if abs(fderiv) == 0.0:
             print(x0, fval, fderiv)
@@ -223,10 +219,10 @@ def bermudan_swaption_tree_fast(t_exp, t_mat,
     mapped_amounts = np.array([0.0])
     for n in range(1, len(_tree_times)):
 
-        accdAtExpiry = 0.0
+        accd_at_expiry = 0.0
         if _tree_times[n-1] < t_exp and _tree_times[n] >= t_exp:
             mapped_times = np.append(mapped_times, t_exp)
-            mapped_amounts = np.append(mapped_amounts, accdAtExpiry)
+            mapped_amounts = np.append(mapped_amounts, accd_at_expiry)
 
         if fixed_leg_flows[n] > 0.0:
             mapped_times = np.append(mapped_times, _tree_times[n])
@@ -242,7 +238,7 @@ def bermudan_swaption_tree_fast(t_exp, t_mat,
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
-        if fixed_leg_flows[m] > gSmall:
+        if fixed_leg_flows[m] > g_small:
             accrued[m] = fixed_leg_flows[m] * face_amount
 
     #######################################################################
@@ -348,7 +344,7 @@ def bermudan_swaption_tree_fast(t_exp, t_mat,
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_type_int == 2 and flow > gSmall and m > expiry_step:
+            elif exercise_type_int == 2 and flow > g_small and m > expiry_step:
 
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
@@ -427,7 +423,7 @@ def american_bond_option_tree_fast(t_exp, t_mat,
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
-        if tree_flows[m] > gSmall:
+        if tree_flows[m] > g_small:
             accrued[m] = tree_flows[m] * face_amount
 
     if DEBUG:
@@ -487,7 +483,8 @@ def american_bond_option_tree_fast(t_exp, t_mat,
             bond_values[m, kN] += flow
 
         if DEBUG:
-            print(m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0)
+            print(m, _tree_times[m], accrued[m],
+                  dirty_price, clean_price, 0, 0)
 
     # Now consider exercise of the option on and before the expiry date
     for m in range(expiry_step, -1, -1):
@@ -569,18 +566,18 @@ def american_bond_option_tree_fast(t_exp, t_mat,
             call_exercise = max(clean_price - strike_price, 0.0)
             put_exercise = max(strike_price - clean_price, 0.0)
 
-            holdCall = call_option_values[m, kN]
-            holdPut = put_option_values[m, kN]
+            hold_call = call_option_values[m, kN]
+            hold_put = put_option_values[m, kN]
 
             if m == expiry_step:
 
-                call_option_values[m, kN] = max(call_exercise, holdCall)
-                put_option_values[m, kN] = max(put_exercise, holdPut)
+                call_option_values[m, kN] = max(call_exercise, hold_call)
+                put_option_values[m, kN] = max(put_exercise, hold_put)
 
             elif exercise_type_int == 3 and m < expiry_step:  # AMERICAN
 
-                call_option_values[m, kN] = max(call_exercise, holdCall)
-                put_option_values[m, kN] = max(put_exercise, holdPut)
+                call_option_values[m, kN] = max(call_exercise, hold_call)
+                put_option_values[m, kN] = max(put_exercise, hold_put)
 
         if DEBUG:
             print(m, _tree_times[m], accrued[m], dirty_price, clean_price,
@@ -674,7 +671,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     # Value the bond by backward induction starting at bond maturity
     ###########################################################################
 
-    callPutBondValues = np.zeros(shape=(num_time_steps, num_nodes))
+    call_put_bond_values = np.zeros(shape=(num_time_steps, num_nodes))
     bond_values = np.zeros(shape=(num_time_steps, num_nodes))
 
     DEBUG = False
@@ -703,7 +700,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     for k in range(-nm, nm+1):
         kN = k + j_max
         bond_values[m, kN] = (1.0 + tree_flows[m]) * face_amount
-        callPutBondValues[m, kN] = value
+        call_put_bond_values[m, kN] = value
 
     for m in range(maturity_step-1, -1, -1):
         nm = min(m, j_max)
@@ -737,25 +734,25 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
             bond_values[m, kN] += flow
 
             if k == j_max:
-                vu = callPutBondValues[m+1, kN]
-                vm = callPutBondValues[m+1, kN-1]
-                vd = callPutBondValues[m+1, kN-2]
+                vu = call_put_bond_values[m+1, kN]
+                vm = call_put_bond_values[m+1, kN-1]
+                vd = call_put_bond_values[m+1, kN-2]
             elif k == -j_max:
-                vu = callPutBondValues[m+1, kN+2]
-                vm = callPutBondValues[m+1, kN+1]
-                vd = callPutBondValues[m+1, kN]
+                vu = call_put_bond_values[m+1, kN+2]
+                vm = call_put_bond_values[m+1, kN+1]
+                vd = call_put_bond_values[m+1, kN]
             else:
-                vu = callPutBondValues[m+1, kN+1]
-                vm = callPutBondValues[m+1, kN]
-                vd = callPutBondValues[m+1, kN-1]
+                vu = call_put_bond_values[m+1, kN+1]
+                vm = call_put_bond_values[m+1, kN]
+                vd = call_put_bond_values[m+1, kN-1]
 
             vhold = (pu*vu + pm*vm + pd*vd) * df
             # Need to make add on coupons paid if we hold
             vhold = vhold + flow
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
-            callPutBondValues[m, kN] = value
+            call_put_bond_values[m, kN] = value
 
-    return {'bondwithoption': callPutBondValues[0, j_max],
+    return {'bondwithoption': call_put_bond_values[0, j_max],
             'bondpure': bond_values[0, j_max]}
 
 ###############################################################################
@@ -765,8 +762,8 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
 def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     """ Calibrate the tree to a term structure of interest rates. """
 
-    treeMaturity = tree_times[-1]
-    dt = treeMaturity / (num_time_steps+1)
+    tree_maturity = tree_times[-1]
+    dt = tree_maturity / (num_time_steps+1)
     dX = sigma * np.sqrt(3.0 * dt)
     j_max = ceil(0.1835/(a * dt))
 
@@ -910,23 +907,23 @@ class BKTree():
 
         interp = InterpTypes.FLAT_FWD_RATES.value
 
-        treeMaturity = t_mat * (self._num_time_steps+1)/self._num_time_steps
-        tree_times = np.linspace(0.0, treeMaturity, self._num_time_steps + 2)
+        tree_maturity = t_mat * (self._num_time_steps+1)/self._num_time_steps
+        tree_times = np.linspace(0.0, tree_maturity, self._num_time_steps + 2)
         self._tree_times = tree_times
 
-        dfTree = np.zeros(shape=(self._num_time_steps+2))
-        dfTree[0] = 1.0
+        df_tree = np.zeros(shape=(self._num_time_steps+2))
+        df_tree[0] = 1.0
 
         for i in range(1, self._num_time_steps+2):
             t = tree_times[i]
-            dfTree[i] = _uinterpolate(t, df_times, df_values, interp)
+            df_tree[i] = _uinterpolate(t, df_times, df_values, interp)
 
         self._df_times = df_times
         self._dfs = df_values
 
         self._Q, self._pu, self._pm, self._pd, self._rt, self._dt \
             = build_tree_fast(self._a, self._sigma,
-                              tree_times, self._num_time_steps, dfTree)
+                              tree_times, self._num_time_steps, df_tree)
 
         return
 
@@ -982,7 +979,7 @@ class BKTree():
 
         #######################################################################
 
-        payValue, recValue \
+        pay_value, rec_value \
             = bermudan_swaption_tree_fast(t_exp, t_mat,
                                           strike_price, face_amount,
                                           cpn_times, cpn_flows,
@@ -993,7 +990,7 @@ class BKTree():
                                           self._rt,
                                           self._dt, self._a)
 
-        return {'pay': payValue, 'rec': recValue}
+        return {'pay': pay_value, 'rec': rec_value}
 
 ###############################################################################
 

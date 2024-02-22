@@ -2,22 +2,21 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
+import time
+from financepy.utils.global_types import OptionTypes
+from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+from financepy.models.sabr import SABR
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.models.sabr import SABR
-from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.utils.global_types import OptionTypes
-import time
-import numpy as np
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -50,8 +49,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -66,8 +65,8 @@ def test_FinFXVanillaOptionWystupExample1():
                                   "EUR", 2)
 
     value = call_option.value(value_dt, spot_fx_rate,
-                              dom_discount_curve,
-                              for_discount_curve, model)
+                              domestic_curve,
+                              foreign_curve, model)
 
     notional = 1250000.0
     call_option = FXVanillaOption(expiry_dt,
@@ -80,15 +79,15 @@ def test_FinFXVanillaOptionWystupExample1():
     value = call_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     delta = call_option.delta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     test_cases.header("value", "delta")
@@ -120,8 +119,8 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -138,15 +137,15 @@ def test_FinFXVanillaOptionWystupExample2():
     value = call_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     delta = call_option.delta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     test_cases.header("value", "delta")
@@ -189,7 +188,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = IborDeposit(settle_dt, maturity_dt, domDepoRate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    dom_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -197,7 +196,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = IborDeposit(settle_dt, maturity_dt, forDepoRate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    for_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     model = BlackScholes(volatility)
 
@@ -211,15 +210,15 @@ def test_FinFXVanillaOptionBloombergExample():
     value = call_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     delta = call_option.delta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     test_cases.header("value", "delta")
@@ -238,8 +237,8 @@ def test_FinFXVanillaOptionHullExample():
     dom_interest_rate = 0.08
     forInterestRate = 0.11
     model = BlackScholes(volatility)
-    dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
+    domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
 
     num_paths_list = [10000, 20000, 40000, 80000, 160000, 320000]
 
@@ -258,8 +257,8 @@ def test_FinFXVanillaOptionHullExample():
         value = call_option.value(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
 
         start = time.time()
@@ -267,8 +266,8 @@ def test_FinFXVanillaOptionHullExample():
         value_mc = call_option.value_mc(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model,
             num_paths)
 
@@ -296,15 +295,15 @@ def test_FinFXVanillaOptionHullExample():
         value = call_option.value(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         start = time.time()
         value_mc = call_option.value_mc(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model,
             num_paths)
         end = time.time()
@@ -330,15 +329,15 @@ def test_FinFXVanillaOptionHullExample():
         value = put_option.value(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         start = time.time()
         value_mc = put_option.value_mc(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model,
             num_paths)
         end = time.time()
@@ -367,26 +366,26 @@ def test_FinFXVanillaOptionHullExample():
         value = call_option.value(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         delta = call_option.delta(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         vega = call_option.vega(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         theta = call_option.theta(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         #  call_option.rho(value_dt,stock_price, interest_rate,
         #  dividend_yield, modelType, model_params)
@@ -412,26 +411,26 @@ def test_FinFXVanillaOptionHullExample():
         value = put_option.value(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         delta = put_option.delta(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         vega = put_option.vega(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         theta = put_option.theta(
             value_dt,
             spot_fx_rate,
-            dom_discount_curve,
-            for_discount_curve,
+            domestic_curve,
+            foreign_curve,
             model)
         # put_option.rho(value_dt,stock_price, interest_rate, dividend_yield,
         # modelType, model_params)
@@ -454,19 +453,20 @@ def test_FinFXVanillaOptionHullExample():
 
         value = call_option.value(value_dt,
                                   spot_fx_rate,
-                                  dom_discount_curve,
-                                  for_discount_curve,
+                                  domestic_curve,
+                                  foreign_curve,
                                   model)['v']
 
         impliedVol = call_option.implied_volatility(value_dt,
                                                     spot_fx_rate,
-                                                    dom_discount_curve,
-                                                    for_discount_curve,
+                                                    domestic_curve,
+                                                    foreign_curve,
                                                     value)
 
         test_cases.print(spot_fx_rate, value, volatility, impliedVol)
 
 ###############################################################################
+
 
 def test_FinFXVanillaOptionSABRExample():
     """
@@ -478,8 +478,8 @@ def test_FinFXVanillaOptionSABRExample():
     domName = "JPY"
     forCCRate = 0.0381  # USD
     domCCRate = 0.000396  # JPY
-    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
     currency_pair = forName + domName
     spot_fx_rate = 131.32
     strike_price = 130
@@ -501,9 +501,9 @@ def test_FinFXVanillaOptionSABRExample():
     nu = 0.5
 
     model = SABR(alpha, beta, rho, nu)
-    blackVol = volatility
+    black_vol = volatility
     t_exp = 0.8444  # 10M
-    model.set_alpha_from_black_vol(blackVol,
+    model.set_alpha_from_black_vol(black_vol,
                                    spot_fx_rate,
                                    strike_price,
                                    t_exp)
@@ -514,8 +514,8 @@ def test_FinFXVanillaOptionSABRExample():
 
     for f in spot_fx_rate:
 
-        call_value = call_option.value(value_dt, f, dom_discount_curve,
-                                       for_discount_curve, model)['cash_dom']
+        call_value = call_option.value(value_dt, f, domestic_curve,
+                                       foreign_curve, model)['cash_dom']
 
         call_values.append(call_value)
 

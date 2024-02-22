@@ -139,7 +139,7 @@
 #         model and a discount curve. """
 
 #         float_spread = 0.0
-#         payFixedFlag = True
+#         pay_fixedFlag = True
 
 #         # The underlying is a swap in which we pay the fixed amount
 #         swap = IborSwap(self._exercise_dt,
@@ -151,7 +151,7 @@
 #                             float_spread,
 #                             self._float_freq_type,
 #                             self._float_dc_type,
-#                             payFixedFlag,
+#                             pay_fixedFlag,
 #                             self._cal_type,
 #                             self._bd_type,
 #                             self._dg_type)
@@ -163,7 +163,7 @@
 #         for i_flow in range(1, len(self._swap._adjusted_fixed_dts)):
 #             flow_dt= swap._adjusted_fixed_dts[i_flow]
 #             cpn_time = (flow_dt - settle_dt) / gDaysInYear
-#             cpn_flow = swap._fixedFlows[i_flow-1] / self._notional
+#             cpn_flow = swap._fixed_flows[i_flow-1] / self._notional
 #             cpn_times.append(cpn_time)
 #             cpn_amounts.append(cpn_flow)
 

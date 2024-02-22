@@ -36,35 +36,35 @@ def test_OISFRAsOnly():
     value_dt = Date(23, 2, 2018)
 
     spot_days = 0
-    settleDt = value_dt.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
 
-    payFixed = True
+    pay_fixed = True
 
     cal_type = CalendarTypes.TARGET
     fras = []
 
     # 1 x 4 FRA
-    fraRate = 0.04
-    frasettleDt = settleDt.add_months(1)
-    fraMaturityDate = settleDt.add_months(4)
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate,
-                  depoDCCType, notional, payFixed, cal_type)
+    fra_rate = 0.04
+    fra_settle_dt = settle_dt.add_months(1)
+    fra_maturity_dt = settle_dt.add_months(4)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate,
+                  depoDCCType, notional, pay_fixed, cal_type)
     fras.append(fra)
 
     # 4 x 7 FRA
-    fraRate = 0.08
-    frasettleDt = settleDt.add_months(4)
-    fraMaturityDate = settleDt.add_months(7)
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate,
-                  depoDCCType, notional, payFixed, cal_type)
+    fra_rate = 0.08
+    fra_settle_dt = settle_dt.add_months(4)
+    fra_maturity_dt = settle_dt.add_months(7)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate,
+                  depoDCCType, notional, pay_fixed, cal_type)
     fras.append(fra)
 
     swaps = []
 
-    libor_curve = OISCurve(settleDt,
+    libor_curve = OISCurve(settle_dt,
                            fras,
                            swaps)
 
@@ -72,7 +72,7 @@ def test_OISFRAsOnly():
 
     """ Check calibration """
     for fra in fras:
-        v = fra.value(settleDt, libor_curve)
+        v = fra.value(settle_dt, libor_curve)
         test_cases.print("FRA:", fra._maturity_dt, v)
 
 ###############################################################################
@@ -86,7 +86,7 @@ def test_OISDepositsFRAsSwaps():
     depos = []
 
     spot_days = 0
-    settleDt = value_dt.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
 
     depoDCCType = DayCountTypes.ACT_360
     notional = 100.0
@@ -95,126 +95,126 @@ def test_OISDepositsFRAsSwaps():
 
     # 1 month
     deposit_rate = 0.04
-    maturity_dt = settleDt.add_months(1)
-    depo = IborDeposit(settleDt, maturity_dt, deposit_rate,
+    maturity_dt = settle_dt.add_months(1)
+    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        depoDCCType, notional, cal_type)
     depos.append(depo)
 
     fras = []
     # 1 x 4 FRA
-    fraRate = 0.04
-    frasettleDt = settleDt.add_months(9)
-    fraMaturityDate = settleDt.add_months(13)
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, dccType)
+    fra_rate = 0.04
+    fra_settle_dt = settle_dt.add_months(9)
+    fra_maturity_dt = settle_dt.add_months(13)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dccType)
     fras.append(fra)
 
     # 4 x 7 FRA
-    fraRate = 0.03
-    frasettleDt = settleDt.add_months(13)
-    fraMaturityDate = settleDt.add_months(17)
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, dccType)
+    fra_rate = 0.03
+    fra_settle_dt = settle_dt.add_months(13)
+    fra_maturity_dt = settle_dt.add_months(17)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dccType)
     fras.append(fra)
 
     # 4 x 7 FRA
-    fraRate = 0.07
-    frasettleDt = settleDt.add_months(17)
-    fraMaturityDate = settleDt.add_months(21)
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, dccType)
+    fra_rate = 0.07
+    fra_settle_dt = settle_dt.add_months(17)
+    fra_maturity_dt = settle_dt.add_months(21)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dccType)
     fras.append(fra)
 
     swaps = []
-    fixedDCCType = DayCountTypes.ACT_365F
+    fixed_dcc_type = DayCountTypes.ACT_365F
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap_rate = 0.05
-#    maturity_dt = settleDt.add_months(24)
-#    swap = IborSwap(settleDt, maturity_dt, swap_rate, fixed_freq_type,
-#                        fixedDCCType)
+#    maturity_dt = settle_dt.add_months(24)
+#    swap = IborSwap(settle_dt, maturity_dt, swap_rate, fixed_freq_type,
+#                        fixed_dcc_type)
 #    swaps.append(swap)
 
     fixed_leg_type = SwapTypes.PAY
-    maturity_dt = settleDt.add_months(36)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(36)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(48)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(48)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(60)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(60)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(72)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(72)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(84)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(84)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(96)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(96)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(108)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(108)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(120)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(120)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(132)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(132)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(144)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(144)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(180)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(180)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(240)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(240)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(300)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(300)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
-    maturity_dt = settleDt.add_months(360)
-    swap = OIS(settleDt, maturity_dt, fixed_leg_type, swap_rate,
+    maturity_dt = settle_dt.add_months(360)
+    swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     libor_curve = OISCurve(value_dt,
@@ -222,10 +222,10 @@ def test_OISDepositsFRAsSwaps():
                            fras,
                            swaps)
 
-    df = libor_curve.df(settleDt)
+    df = libor_curve.df(settle_dt)
 
     test_cases.header("SETTLEMENT DATE", "DF")
-    test_cases.print(str(settleDt), df)
+    test_cases.print(str(settle_dt), df)
     test_cases.header("DATE", "DF")
 
     for deposit in depos:
@@ -245,14 +245,14 @@ def test_OISDepositsFRAsSwaps():
 # AGREEMENT IS VERY CLOSE - NOT SURE ABOUT SIZE OF LAST PAYMENT ON FIXED LEG!
 
 
-def futureToFRARate(price, convexity):
+def futureTofra_rate(price, convexity):
     futRate = (100-price)/100
     if convexity < 0:
-        fraRate = futRate + convexity/100.0
+        fra_rate = futRate + convexity/100.0
     else:
-        fraRate = futRate - convexity/100.0
+        fra_rate = futRate - convexity/100.0
 
-    return fraRate
+    return fra_rate
 
 ###############################################################################
 
@@ -261,48 +261,48 @@ def test_OISDepositsFuturesSwaps():
 
     spot_dt = Date(6, 6, 2018)
     spot_days = 0
-    settleDt = spot_dt.add_weekdays(spot_days)
+    settle_dt = spot_dt.add_weekdays(spot_days)
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
 
-    depo = IborDeposit(settleDt, "1D", 1.712 / 100.0, depoDCCType)
+    depo = IborDeposit(settle_dt, "1D", 1.712 / 100.0, depoDCCType)
     depos = [depo]
 
     fras = []
 
-    fraRate = futureToFRARate(97.6675, -0.00005)
-    frasettleDt = spot_dt.next_imm_date()
-    fraMaturityDate = frasettleDt.next_imm_date()
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
+    fra_rate = futureTofra_rate(97.6675, -0.00005)
+    fra_settle_dt = spot_dt.next_imm_date()
+    fra_maturity_dt = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depoDCCType)
     fras.append(fra)
 
-    fraRate = futureToFRARate(97.5200, -0.00060)
-    frasettleDt = fraMaturityDate
-    fraMaturityDate = frasettleDt.next_imm_date()
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
+    fra_rate = futureTofra_rate(97.5200, -0.00060)
+    fra_settle_dt = fra_maturity_dt
+    fra_maturity_dt = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depoDCCType)
     fras.append(fra)
 
-    fraRate = futureToFRARate(97.3550, -0.00146)
-    frasettleDt = fraMaturityDate
-    fraMaturityDate = frasettleDt.next_imm_date()
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
+    fra_rate = futureTofra_rate(97.3550, -0.00146)
+    fra_settle_dt = fra_maturity_dt
+    fra_maturity_dt = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depoDCCType)
     fras.append(fra)
 
-    fraRate = futureToFRARate(97.2450, -0.00263)
-    frasettleDt = fraMaturityDate
-    fraMaturityDate = frasettleDt.next_imm_date()
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
+    fra_rate = futureTofra_rate(97.2450, -0.00263)
+    fra_settle_dt = fra_maturity_dt
+    fra_maturity_dt = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depoDCCType)
     fras.append(fra)
 
-    fraRate = futureToFRARate(97.1450, -0.00411)
-    frasettleDt = fraMaturityDate
-    fraMaturityDate = frasettleDt.next_imm_date()
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
+    fra_rate = futureTofra_rate(97.1450, -0.00411)
+    fra_settle_dt = fra_maturity_dt
+    fra_maturity_dt = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depoDCCType)
     fras.append(fra)
 
-    fraRate = futureToFRARate(97.0750, -0.00589)
-    frasettleDt = frasettleDt.next_imm_date()
-    fraMaturityDate = frasettleDt.next_imm_date()
-    fra = IborFRA(frasettleDt, fraMaturityDate, fraRate, depoDCCType)
+    fra_rate = futureTofra_rate(97.0750, -0.00589)
+    fra_settle_dt = fra_settle_dt.next_imm_date()
+    fra_maturity_dt = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depoDCCType)
     fras.append(fra)
 
     ###########################################################################
@@ -312,7 +312,7 @@ def test_OISDepositsFuturesSwaps():
 
     swaps = []
     fixed_leg_type = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     float_freq_type = FrequencyTypes.QUARTERLY
     notional = 1000000
@@ -325,7 +325,7 @@ def test_OISDepositsFuturesSwaps():
     payment_lag = 1
 
     swap = OIS(start_dt, "2Y", fixed_leg_type,
-               swap_rate, fixed_freq_type, fixedDCCType, notional,
+               swap_rate, fixed_freq_type, fixed_dcc_type, notional,
                payment_lag, float_spread, float_freq_type, floatDCCType,
                cal_type, busDayAdjustRule)
 
@@ -355,7 +355,7 @@ def test_OISDepositsFuturesSwaps():
         df = libor_curve.df(end_dt)
         print(end_dt, df)
 
-        end_dt = settleDt
+        end_dt = settle_dt
         df = libor_curve.df(end_dt)
         print(end_dt, df)
 
@@ -387,7 +387,7 @@ def test_derivativePricingExample():
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settleDt = value_dt.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
 
     fras = []
 
@@ -398,42 +398,42 @@ def test_derivativePricingExample():
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.0058
-    swap = OIS(settleDt, "1Y", fixed_leg_type,
+    swap = OIS(settle_dt, "1Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0060
-    swap = OIS(settleDt, "2Y", fixed_leg_type,
+    swap = OIS(settle_dt, "2Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0072
-    swap = OIS(settleDt, "3Y", fixed_leg_type,
+    swap = OIS(settle_dt, "3Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0096
-    swap = OIS(settleDt, "4Y", fixed_leg_type,
+    swap = OIS(settle_dt, "4Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0124
-    swap = OIS(settleDt, "5Y", fixed_leg_type,
+    swap = OIS(settle_dt, "5Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0173
-    swap = OIS(settleDt, "7Y", fixed_leg_type,
+    swap = OIS(settle_dt, "7Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0219
-    swap = OIS(settleDt, "10Y", fixed_leg_type,
+    swap = OIS(settle_dt, "10Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
     swap_rate = 0.0283
-    swap = OIS(settleDt, "30Y", fixed_leg_type,
+    swap = OIS(settle_dt, "30Y", fixed_leg_type,
                swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
@@ -472,10 +472,10 @@ def test_bloombergPricingExample():
 
     # We do the O/N rate which settles on trade date
     spot_days = 0
-    settleDt = value_dt.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     accrual = DayCountTypes.THIRTY_E_360
 
-    depo = IborDeposit(settleDt, "1D", 1.712 / 100.0, accrual)
+    depo = IborDeposit(settle_dt, "1D", 1.712 / 100.0, accrual)
     depos = [depo]
 
     futs = []
@@ -503,60 +503,60 @@ def test_bloombergPricingExample():
     accrual = DayCountTypes.THIRTY_E_360
     freq = FrequencyTypes.SEMI_ANNUAL
     spot_days = 2
-    settleDt = value_dt.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     payRec = SwapTypes.PAY
     lag = 1  # Not used
 
     swaps = []
-    swap = OIS(settleDt, "2Y", payRec,
+    swap = OIS(settle_dt, "2Y", payRec,
                (2.77417 + 2.77844) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "3Y", payRec,
+    swap = OIS(settle_dt, "3Y", payRec,
                (2.86098 + 2.86582) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "4Y", payRec,
+    swap = OIS(settle_dt, "4Y", payRec,
                (2.90240 + 2.90620) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "5Y", payRec,
+    swap = OIS(settle_dt, "5Y", payRec,
                (2.92944 + 2.92906) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "6Y", payRec,
+    swap = OIS(settle_dt, "6Y", payRec,
                (2.94001 + 2.94499) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "7Y", payRec,
+    swap = OIS(settle_dt, "7Y", payRec,
                (2.95352 + 2.95998) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "8Y", payRec,
+    swap = OIS(settle_dt, "8Y", payRec,
                (2.96830 + 2.97400) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "9Y", payRec,
+    swap = OIS(settle_dt, "9Y", payRec,
                (2.98403 + 2.98817) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "10Y", payRec,
+    swap = OIS(settle_dt, "10Y", payRec,
                (2.99716 + 3.00394) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "11Y", payRec,
+    swap = OIS(settle_dt, "11Y", payRec,
                (3.01344 + 3.01596) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "12Y", payRec,
+    swap = OIS(settle_dt, "12Y", payRec,
                (3.02276 + 3.02684) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "15Y", payRec,
+    swap = OIS(settle_dt, "15Y", payRec,
                (3.04092 + 3.04508) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "20Y", payRec,
+    swap = OIS(settle_dt, "20Y", payRec,
                (3.04417 + 3.05183) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "25Y", payRec,
+    swap = OIS(settle_dt, "25Y", payRec,
                (3.03219 + 3.03621) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "30Y", payRec,
+    swap = OIS(settle_dt, "30Y", payRec,
                (3.01030 + 3.01370) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "40Y", payRec,
+    swap = OIS(settle_dt, "40Y", payRec,
                (2.96946 + 2.97354) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settleDt, "50Y", payRec,
+    swap = OIS(settle_dt, "50Y", payRec,
                (2.91552 + 2.93748) / 200, freq, accrual)
     swaps.append(swap)
 
@@ -575,10 +575,10 @@ def test_bloombergPricingExample():
         value_dt, oisCurve, None))
 
     test_cases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
-    test_cases.print("VALUE:", swaps[0].value(settleDt, oisCurve, None))
-    test_cases.print("FIXED:", -swaps[0]._fixed_leg.value(settleDt, oisCurve))
+    test_cases.print("VALUE:", swaps[0].value(settle_dt, oisCurve, None))
+    test_cases.print("FIXED:", -swaps[0]._fixed_leg.value(settle_dt, oisCurve))
     test_cases.print("FLOAT:", swaps[0]._float_leg.value(
-        settleDt, oisCurve, None))
+        settle_dt, oisCurve, None))
 
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()

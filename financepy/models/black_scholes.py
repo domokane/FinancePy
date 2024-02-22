@@ -4,6 +4,8 @@
 
 # TODO Fix this
 
+from enum import Enum
+
 import numpy as np
 
 from ..utils.global_types import OptionTypes
@@ -24,9 +26,6 @@ from .finite_difference import black_scholes_fd
 from .finite_difference_PSOR import black_scholes_fd_PSOR
 
 
-from enum import Enum
-
-
 class BlackScholesTypes(Enum):
     DEFAULT = 0
     ANALYTICAL = 1
@@ -41,8 +40,6 @@ class BlackScholesTypes(Enum):
 
 
 class BlackScholes(Model):
-
-    ###########################################################################
 
     def __init__(self,
                  volatility: (float, np.ndarray),
@@ -62,6 +59,8 @@ class BlackScholes(Model):
         self._seed = seed
         self._use_sobol = use_sobol
         self._params = params if params else {}
+        self._poly_degree = None
+        self._fit_type = None
 
     ###########################################################################
 
@@ -146,7 +145,7 @@ class BlackScholes(Model):
                                 option_type_value=option_type.value,
                                 strike_price=strike_price,
                                 poly_degree=poly_degree,
-                                fit_type=fit_type,
+                                fit_type_value=fit_type.value,
                                 use_sobol=self._use_sobol,
                                 seed=self._seed)
 

@@ -25,8 +25,8 @@ class EquityOptionModelTypes(Enum):
 
 
 class EquityOption:
-    """ This class is a parent class for all option classes that require any
-    perturbatory risk. """
+    """ This class is a parent class for all equitu option classes that 
+    require any perturbatory risk. """
 
 ###############################################################################
 
@@ -53,12 +53,12 @@ class EquityOption:
         v = self.value(value_dt, stock_price, discount_curve,
                        dividend_curve, model)
 
-        vBumped = self.value(value_dt, stock_price + bump,
-                             discount_curve,
-                             dividend_curve,
-                             model)
+        v_bumped = self.value(value_dt, stock_price + bump,
+                              discount_curve,
+                              dividend_curve,
+                              model)
 
-        delta = (vBumped - v) / bump
+        delta = (v_bumped - v) / bump
         return delta
 
 ###############################################################################
@@ -75,15 +75,15 @@ class EquityOption:
         v = self.value(value_dt, stock_price, discount_curve,
                        dividend_curve, model)
 
-        vBumpedDn = self.value(value_dt, stock_price - bump,
-                               discount_curve,
-                               dividend_curve, model)
+        v_bumped_dn = self.value(value_dt, stock_price - bump,
+                                 discount_curve,
+                                 dividend_curve, model)
 
-        vBumpedUp = self.value(value_dt, stock_price + bump,
-                               discount_curve,
-                               dividend_curve, model)
+        v_bumped_up = self.value(value_dt, stock_price + bump,
+                                 discount_curve,
+                                 dividend_curve, model)
 
-        gamma = (vBumpedUp - 2.0 * v + vBumpedDn) / bump / bump
+        gamma = (v_bumped_up - 2.0 * v + v_bumped_dn) / bump / bump
         return gamma
 
 ###############################################################################
@@ -103,10 +103,10 @@ class EquityOption:
 
         model = BlackScholes(model._volatility + bump)
 
-        vBumped = self.value(value_dt, stock_price, discount_curve,
-                             dividend_curve, model)
+        v_bumped = self.value(value_dt, stock_price, discount_curve,
+                              dividend_curve, model)
 
-        vega = (vBumped - v)
+        vega = (v_bumped - v)
         return vega
 
 ##############################################################################
@@ -160,15 +160,15 @@ class EquityOption:
         dividend_curve._value_dt = next_dt
         bump = (next_dt - value_dt) / gDaysInYear
 
-        vBumped = self.value(next_dt, stock_price,
-                             discount_curve,
-                             dividend_curve, model)
+        v_bumped = self.value(next_dt, stock_price,
+                              discount_curve,
+                              dividend_curve, model)
 
         # restore valuation dates
         discount_curve._value_dt = value_dt
         dividend_curve._value_dt = value_dt
 
-        theta = (vBumped - v) / bump
+        theta = (v_bumped - v) / bump
         return theta
 
 ###############################################################################
@@ -185,12 +185,12 @@ class EquityOption:
         v = self.value(value_dt, stock_price, discount_curve,
                        dividend_curve, model)
 
-        vBumped = self.value(value_dt,
-                             stock_price,
-                             discount_curve.bump(bump),
-                             dividend_curve, model)
+        v_bumped = self.value(value_dt,
+                              stock_price,
+                              discount_curve.bump(bump),
+                              dividend_curve, model)
 
-        rho = (vBumped - v) / bump
+        rho = (v_bumped - v) / bump
         return rho
 
 ###############################################################################

@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import gSmall
+from ...utils.global_vars import g_small
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
@@ -62,7 +62,7 @@ class IborSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -116,7 +116,7 @@ class IborSwap:
               value_dt: Date,
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve = None,
-              firstFixingRate=None):
+              first_fixing_rate=None):
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve. """
 
@@ -129,7 +129,7 @@ class IborSwap:
         float_leg_value = self._float_leg.value(value_dt,
                                                 discount_curve,
                                                 index_curve,
-                                                firstFixingRate)
+                                                first_fixing_rate)
 
         value = fixed_leg_value + float_leg_value
         return value
@@ -163,7 +163,7 @@ class IborSwap:
 
         pv01 = self.pv01(value_dt, discount_curve)
 
-        if abs(pv01) < gSmall:
+        if abs(pv01) < g_small:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
         if value_dt < self._effective_dt:
@@ -215,15 +215,15 @@ class IborSwap:
             start_index = 1
 
         """ Now PV fixed leg flows. """
-        flatPV01 = 0.0
+        flat_pv01 = 0.0
         df = 1.0
         alpha = 1.0 / m
 
         for _ in self._fixed_leg._payment_dts[start_index:]:
             df = df / (1.0 + alpha * flat_swap_rate)
-            flatPV01 += df * alpha
+            flat_pv01 += df * alpha
 
-        return flatPV01
+        return flat_pv01
 
     ###########################################################################
 

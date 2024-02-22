@@ -160,7 +160,7 @@ def test_valueCDSIndex():
     accrued_interest = cdsIndexContract.accrued_interest()
     test_cases.print("ACCRUED COUPON", accrued_interest)
 
-    prot_pv = cdsIndexContract.protection_leg_pv(
+    prot_pv = cdsIndexContract.prot_leg_pv(
         value_dt, issuer_curve, cdsRecovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
 
@@ -168,10 +168,10 @@ def test_valueCDSIndex():
         value_dt, issuer_curve, cdsRecovery)
     test_cases.print("PREMIUM LEG PV", premPV)
 
-    dirtyRPV01, cleanRPV01 = cdsIndexContract.risky_pv01(
+    dirty_rpv01, clean_rpv01 = cdsIndexContract.risky_pv01(
         value_dt, issuer_curve)
-    test_cases.print("DIRTY RPV01", dirtyRPV01)
-    test_cases.print("CLEAN RPV01", cleanRPV01)
+    test_cases.print("DIRTY RPV01", dirty_rpv01)
+    test_cases.print("CLEAN RPV01", clean_rpv01)
 
 #    cdsIndexContract.print_payments(issuer_curve)
 

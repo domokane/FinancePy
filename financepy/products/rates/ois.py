@@ -87,7 +87,7 @@ class OIS:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -95,7 +95,7 @@ class OIS:
 
         calendar = Calendar(cal_type)
         self._maturity_dt = calendar.adjust(self._termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")
@@ -160,7 +160,7 @@ class OIS:
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
         pv = self._fixed_leg.value(value_dt, discount_curve)
-        pv01 = pv / self._fixed_leg._coupon / self._fixed_leg._notional
+        pv01 = pv / self._fixed_leg._cpn / self._fixed_leg._notional
 
         # Needs to be positive even if it is a payer leg and/or coupon < 0
         pv01 = np.abs(pv01)

@@ -24,8 +24,8 @@ def test_FinFXMktVolSurface1(capsys):
     forCCRate = 0.03460  # EUR
     domCCRate = 0.02940  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3465
@@ -37,7 +37,7 @@ def test_FinFXMktVolSurface1(capsys):
 
     notional_currency = forName
 
-    atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
+    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA
     vol_functionType = VolFuncTypes.CLARK
 
@@ -45,13 +45,13 @@ def test_FinFXMktVolSurface1(capsys):
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
-                            dom_discount_curve,
-                            for_discount_curve,
+                            domestic_curve,
+                            foreign_curve,
                             tenors,
                             atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
-                            atmMethod,
+                            atm_method,
                             delta_method,
                             vol_functionType)
 
@@ -71,8 +71,8 @@ def test_FinFXMktVolSurface2(capsys):
     forCCRate = 0.0294  # EUR
     domCCRate = 0.0171  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 90.72
@@ -84,20 +84,20 @@ def test_FinFXMktVolSurface2(capsys):
 
     notional_currency = forName
 
-    atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
+    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
     fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
-                            dom_discount_curve,
-                            for_discount_curve,
+                            domestic_curve,
+                            foreign_curve,
                             tenors,
                             atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
-                            atmMethod,
+                            atm_method,
                             delta_method)
 
     fxMarket.check_calibration(verboseCalibration, tol=0.0005)
@@ -116,8 +116,8 @@ def test_FinFXMktVolSurface3(capsys):
     forCCRate = 0.020113  # EUR
     domCCRate = 0.003525  # USD
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 1.3088
@@ -129,20 +129,20 @@ def test_FinFXMktVolSurface3(capsys):
 
     notional_currency = forName
 
-    atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
+    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA
 
     fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
-                            dom_discount_curve,
-                            for_discount_curve,
+                            domestic_curve,
+                            foreign_curve,
                             tenors,
                             atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
-                            atmMethod,
+                            atm_method,
                             delta_method)
 
     fxMarket.check_calibration(verboseCalibration)
@@ -160,8 +160,8 @@ def test_FinFXMktVolSurface4(capsys):
     forCCRate = 0.003525  # USD
     domCCRate = 0.0042875  # JPY
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     currency_pair = forName + domName
     spot_fx_rate = 90.68
@@ -173,20 +173,20 @@ def test_FinFXMktVolSurface4(capsys):
 
     notional_currency = forName
 
-    atmMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL
+    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
     fxMarket = FXVolSurface(value_dt,
                             spot_fx_rate,
                             currency_pair,
                             notional_currency,
-                            dom_discount_curve,
-                            for_discount_curve,
+                            domestic_curve,
+                            foreign_curve,
                             tenors,
                             atm_vols,
                             marketStrangle25DeltaVols,
                             riskReversal25DeltaVols,
-                            atmMethod,
+                            atm_method,
                             delta_method)
 
     fxMarket.check_calibration(verboseCalibration)

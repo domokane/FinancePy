@@ -28,30 +28,29 @@ class FinInflationIndexCurve():
 ###############################################################################
 
     def __init__(self,
-                 index_dates: list,
+                 index_dts: list,
                  index_values: (list, np.ndarray),
                  lag_in_months: int = 3):
 
         check_argument_types(self.__init__, locals())
 
         # Validate curve
-        if len(index_dates) == 0:
+        if len(index_dts) == 0:
             raise FinError("Dates has zero length")
 
-        if len(index_dates) != len(index_values):
+        if len(index_dts) != len(index_values):
             raise FinError("Dates and Values are not the same length")
 
         if lag_in_months < 0:
             raise FinError("Lag must be positive.")
 
-        self._index_dates = np.array(index_dates)
+        self._index_dts = np.array(index_dts)
         self._index_values = np.array(index_values)
         self._lag_in_months = lag_in_months
-        self._base_date = index_dates[0]
+        self._base_dt = index_dts[0]
+        self._index_times = times_from_dates(index_dts, self._base_dt)
 
-        self._indexTimes = times_from_dates(index_dates, self._base_date)
-
-        if test_monotonicity(self._indexTimes) is False:
+        if test_monotonicity(self._index_times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
 ###############################################################################
@@ -61,26 +60,26 @@ class FinInflationIndexCurve():
 
         lagMonthsAgoDt = dt.add_months(-self._lag_in_months)
 
-        cpiFirstDate = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
-        cpiSecondDate = cpiFirstDate.add_months(1)
+        cpi_first_dt = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
+        cpi_second_dt = cpi_first_dt.add_months(1)
 
-        cpiFirstTime = (cpiFirstDate - self._base_date) / gDaysInYear
-        cpiSecondTime = (cpiSecondDate - self._base_date) / gDaysInYear
+        cpi_first_time = (cpi_first_dt - self._base_dt) / gDaysInYear
+        cpi_second_time = (cpi_second_dt - self._base_dt) / gDaysInYear
 
-        cpiFirstValue = np.interp(cpiFirstTime,
-                                  self._indexTimes,
+        cpi_first_value = np.interp(cpi_first_time,
+                                  self._index_times,
                                   self._index_values)
 
-        cpiSecondValue = np.interp(cpiSecondTime,
-                                   self._indexTimes,
+        cpi_second_value = np.interp(cpi_second_time,
+                                   self._index_times,
                                    self._index_values)
 
         d = dt._d
         m = dt._m
         y = dt._y
-        numDays = days_in_month(m, y)
-        v = cpiFirstValue + (d - 1) * (cpiSecondValue -
-                                       cpiFirstValue) / numDays
+        num_days = days_in_month(m, y)
+        v = cpi_first_value + (d - 1) * (cpi_second_value -
+                                       cpi_first_value) / num_days
         return v
 
 ###############################################################################
@@ -89,7 +88,7 @@ class FinInflationIndexCurve():
         """ Calculate index value by interpolating the CPI curve """
 
         vt = self.index_value(dt)
-        v0 = self.index_value(self._base_date)
+        v0 = self.index_value(self._base_dt)
         index_ratio = vt / v0
         return index_ratio
 
@@ -98,13 +97,13 @@ class FinInflationIndexCurve():
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("BASE DATE", self._base_date)
+        s += label_to_string("BASE DATE", self._base_dt)
         s += label_to_string("INDEX LAG", self._lag_in_months)
 
         s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._index_values)
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._index_dates[i],
+            s += label_to_string("%12s" % self._index_dts[i],
                                  "%10.7f" % self._index_values[i])
 
         return s

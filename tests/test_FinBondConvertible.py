@@ -19,13 +19,13 @@ freq_type = FrequencyTypes.SEMI_ANNUAL
 start_convert_date = Date(31, 12, 2003)
 conversion_ratio = 3.84615  # adjust for face
 
-call_dates = [Date(20, 3, 2007),
+call_dts = [Date(20, 3, 2007),
               Date(15, 3, 2012),
               Date(15, 3, 2017)]
 call_price = 1100
 call_prices = np.array([call_price, call_price, call_price])
 
-put_dates = [Date(20, 3, 2007),
+put_dts = [Date(20, 3, 2007),
              Date(15, 3, 2012),
              Date(15, 3, 2017)]
 
@@ -38,9 +38,9 @@ bond = BondConvertible(maturity_dt,
                        freq_type,
                        start_convert_date,
                        conversion_ratio,
-                       call_dates,
+                       call_dts,
                        call_prices,
-                       put_dates,
+                       put_dts,
                        put_prices,
                        accrualBasis)
 

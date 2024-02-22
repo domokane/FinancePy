@@ -107,18 +107,18 @@ def _obj(params, *args):
     f = args[1]
     strikes_grid = args[2]
     index = args[3]
-    volatility_grid = args[4]
+    vol_grid = args[4]
     vol_type_value = args[5]
 
     tot = 0.0
 
-    num_strikes = len(volatility_grid)
+    num_strikes = len(vol_grid)
 
     for i in range(0, num_strikes):
 
         k = strikes_grid[i][index]
         fitted_vol = vol_function(vol_type_value, params, f, k, t)
-        mkt_vol = volatility_grid[i][index]
+        mkt_vol = vol_grid[i][index]
         diff = fitted_vol - mkt_vol
         tot += diff**2
 
@@ -132,10 +132,10 @@ def _obj(params, *args):
 def _solve_to_horizon(t, f,
                       strikes_grid,
                       time_index,
-                      volatility_grid,
+                      vol_grid,
                       vol_type_value,
                       x_inits,
-                      finSolverType):
+                      fin_solver_type):
 
     ###########################################################################
     # Determine parameters of vol surface using minimisation
@@ -143,26 +143,26 @@ def _solve_to_horizon(t, f,
 
     tol = 1e-6
 
-    args = (t, f, strikes_grid, time_index, volatility_grid, vol_type_value)
+    args = (t, f, strikes_grid, time_index, vol_grid, vol_type_value)
 
     # Nelder-Mead (both SciPy amd Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
     try:
-        if finSolverType == FinSolverTypes.NELDER_MEAD_NUMBA:
+        if fin_solver_type == FinSolverTypes.NELDER_MEAD_NUMBA:
             xopt = nelder_mead(_obj, np.array(x_inits),
                                bounds=np.array([[], []]).T,
                                args=args, tol_f=tol,
                                tol_x=tol, max_iter=1000)
-        elif finSolverType == FinSolverTypes.NELDER_MEAD:
+        elif fin_solver_type == FinSolverTypes.NELDER_MEAD:
             opt = minimize(_obj, x_inits, args, method="Nelder-Mead", tol=tol)
             xopt = opt.x
-        elif finSolverType == FinSolverTypes.CONJUGATE_GRADIENT:
+        elif fin_solver_type == FinSolverTypes.CONJUGATE_GRADIENT:
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
     except Exception:
         # If convergence fails try again with CG if necessary
-        if finSolverType != FinSolverTypes.CONJUGATE_GRADIENT:
+        if fin_solver_type != FinSolverTypes.CONJUGATE_GRADIENT:
             print('Failed to converge, will try CG')
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
@@ -374,9 +374,9 @@ class SwaptionVolSurface():
                  expiry_dts: (list),
                  fwd_swap_rates: (list, np.ndarray),
                  strike_grid: (np.ndarray),
-                 volatility_grid: (np.ndarray),
-                 volatility_function_type: VolFuncTypes = VolFuncTypes.SABR,
-                 finSolverType: FinSolverTypes = FinSolverTypes.NELDER_MEAD):
+                 vol_grid: (np.ndarray),
+                 vol_func_type: VolFuncTypes = VolFuncTypes.SABR,
+                 fin_solver_type: FinSolverTypes = FinSolverTypes.NELDER_MEAD):
         """ Create the FinSwaptionVolSurface object by passing in market vol
         data for a list of strikes and expiry dates. """
 
@@ -387,32 +387,40 @@ class SwaptionVolSurface():
         if len(strike_grid.shape) != 2:
             raise FinError("Strike grid must be a 2D grid of values")
 
-        if len(volatility_grid.shape) != 2:
+        if len(vol_grid.shape) != 2:
             raise FinError("Volatility grid must be a 2D grid of values")
 
-        if len(strike_grid) != len(volatility_grid):
+        if len(strike_grid) != len(vol_grid):
             raise FinError(
                 "Strike grid and volatility grid must have same size")
 
-        if len(strike_grid[0]) != len(volatility_grid[0]):
+        if len(strike_grid[0]) != len(vol_grid[0]):
             raise FinError(
                 "Strike grid and volatility grid must have same size")
 
-        if len(expiry_dts) != len(volatility_grid[0]):
+        if len(expiry_dts) != len(vol_grid[0]):
             raise FinError("Expiry dates not same size as volatility grid")
 
-        self._numExpiryDates = len(volatility_grid[0])
-        self._num_strikes = len(volatility_grid)
+        self._num_expiry_dts = len(vol_grid[0])
+        self._num_strikes = len(vol_grid)
 
         self._strike_grid = strike_grid
-        self._volatility_grid = volatility_grid
+        self._vol_grid = vol_grid
 
         self._expiry_dts = expiry_dts
-        self._volatility_function_type = volatility_function_type
+        self._vol_func_type = vol_func_type
 
         self._fwd_swap_rates = fwd_swap_rates
 
-        self._build_vol_surface(finSolverType=finSolverType)
+        self._build_vol_surface(fin_solver_type=fin_solver_type)
+
+        self._F0T = []
+        self._stock_price = None
+        self._atm_method = None
+        self._atm_vols = []
+        self._delta_method = None
+        self._strikes = []
+        self._vol_grid = []
 
 ###############################################################################
 
@@ -429,12 +437,12 @@ class SwaptionVolSurface():
 
         t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
-        vol_type_value = self._volatility_function_type.value
+        vol_type_value = self._vol_func_type.value
 
         index0 = 0  # lower index in bracket
         index1 = 0  # upper index in bracket
 
-        num_curves = self._numExpiryDates
+        num_curves = self._num_expiry_dts
 
         if num_curves == 1:
 
@@ -508,7 +516,7 @@ class SwaptionVolSurface():
 
     #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
-    #     vol_type_value = self._volatility_function_type.value
+    #     vol_type_value = self._vol_func_type.value
 
     #     s = self._spot_fx_rate
 
@@ -610,7 +618,7 @@ class SwaptionVolSurface():
 
     #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
-    #     vol_type_value = self._volatility_function_type.value
+    #     vol_type_value = self._vol_func_type.value
 
     #     s = self._spot_fx_rate
 
@@ -715,39 +723,39 @@ class SwaptionVolSurface():
 
 ###############################################################################
 
-    def _build_vol_surface(self, finSolverType=FinSolverTypes.NELDER_MEAD):
+    def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
         """ Main function to construct the vol surface. """
 
-        if self._volatility_function_type == VolFuncTypes.CLARK:
+        if self._vol_func_type == VolFuncTypes.CLARK:
             num_parameters = 3
-        elif self._volatility_function_type == VolFuncTypes.SABR_BETA_ONE:
+        elif self._vol_func_type == VolFuncTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._volatility_function_type == VolFuncTypes.SABR_BETA_HALF:
+        elif self._vol_func_type == VolFuncTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._volatility_function_type == VolFuncTypes.BBG:
+        elif self._vol_func_type == VolFuncTypes.BBG:
             num_parameters = 3
-        elif self._volatility_function_type == VolFuncTypes.SABR:
+        elif self._vol_func_type == VolFuncTypes.SABR:
             num_parameters = 4
-        elif self._volatility_function_type == VolFuncTypes.CLARK5:
+        elif self._vol_func_type == VolFuncTypes.CLARK5:
             num_parameters = 5
-        elif self._volatility_function_type == VolFuncTypes.SVI:
+        elif self._vol_func_type == VolFuncTypes.SVI:
             num_parameters = 5
-        elif self._volatility_function_type == VolFuncTypes.SSVI:
+        elif self._vol_func_type == VolFuncTypes.SSVI:
             num_parameters = 5
         else:
-            print(self._volatility_function_type)
+            print(self._vol_func_type)
             raise FinError("Unknown Model Type")
 
-        numExpiryDates = self._numExpiryDates
+        num_expiry_dts = self._num_expiry_dts
 
-        self._parameters = np.zeros([numExpiryDates, num_parameters])
-        self._t_exp = np.zeros(numExpiryDates)
+        self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        self._t_exp = np.zeros(num_expiry_dts)
 
         #######################################################################
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        for i in range(0, numExpiryDates):
+        for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
             t_exp = (expiry_dt - self._value_dt) / gDaysInYear
@@ -757,13 +765,13 @@ class SwaptionVolSurface():
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
         #######################################################################
 
-        vol_type_value = self._volatility_function_type.value
+        vol_type_value = self._vol_func_type.value
 
         x_inits = []
         x_init = np.zeros(num_parameters)
         x_inits.append(x_init)
 
-        for i in range(0, numExpiryDates):
+        for i in range(0, num_expiry_dts):
 
             t = self._t_exp[i]
             f = self._fwd_swap_rates[i]
@@ -771,10 +779,10 @@ class SwaptionVolSurface():
             res = _solve_to_horizon(t, f,
                                     self._strike_grid,
                                     i,
-                                    self._volatility_grid,
+                                    self._vol_grid,
                                     vol_type_value,
                                     x_inits[i],
-                                    finSolverType)
+                                    fin_solver_type)
 
             self._parameters[i, :] = res
 
@@ -795,7 +803,7 @@ class SwaptionVolSurface():
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
-        for i in range(0, self._numExpiryDates):
+        for i in range(0, self._num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
             print("==========================================================")
@@ -806,7 +814,7 @@ class SwaptionVolSurface():
 
                 fitted_vol = self.vol_from_strike_dt(strike, expiry_dt)
 
-                mkt_vol = self._volatility_grid[j][i]
+                mkt_vol = self._vol_grid[j][i]
 
                 diff = fitted_vol - mkt_vol
 
@@ -827,7 +835,7 @@ class SwaptionVolSurface():
 
     #     dbns = []
 
-    #     for iTenor in range(0, self._numExpiryDates):
+    #     for iTenor in range(0, self._num_expiry_dts):
 
     #         f = self._fwd_swap_rates[iTenor]
     #         t = self._t_exp[iTenor]
@@ -847,7 +855,7 @@ class SwaptionVolSurface():
 
     #             k = lowS + iK*dS
 
-    #             vol = vol_function(self._volatility_function_type.value,
+    #             vol = vol_function(self._vol_func_type.value,
     #                               self._parameters[iTenor],
     #                               f, k, t)
 
@@ -870,10 +878,10 @@ class SwaptionVolSurface():
         """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
 
-        for tenor_index in range(0, self._numExpiryDates):
+        for tenor_index in range(0, self._num_expiry_dts):
 
-            lowK = self._strike_grid[0][tenor_index] * 0.9
-            highK = self._strike_grid[-1][tenor_index] * 1.1
+            low_k = self._strike_grid[0][tenor_index] * 0.9
+            high_k = self._strike_grid[-1][tenor_index] * 1.1
 
             expiry_dt = self._expiry_dts[tenor_index]
             plt.figure()
@@ -881,8 +889,8 @@ class SwaptionVolSurface():
             ks = []
 
             num_intervals = 30
-            K = lowK
-            dK = (highK - lowK)/num_intervals
+            K = low_k
+            dK = (high_k - low_k)/num_intervals
 
             fitted_vols = []
 
@@ -897,14 +905,14 @@ class SwaptionVolSurface():
             plt.plot(ks, fitted_vols, label=label_str)
 
             label_str = "MARKET AT " + str(self._expiry_dts[tenor_index])
-            mkt_vols = self._volatility_grid[:, tenor_index] * 100.0
+            mkt_vols = self._vol_grid[:, tenor_index] * 100.0
             plt.plot(self._strike_grid[:, tenor_index],
                      mkt_vols, 'o', label=label_str)
 
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = str(self._volatility_function_type)
+            title = str(self._vol_func_type)
             plt.title(title)
             plt.legend()
 
@@ -915,25 +923,24 @@ class SwaptionVolSurface():
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self._value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
-        s += label_to_string("ATM METHOD", self._atmMethod)
+        s += label_to_string("ATM METHOD", self._atm_method)
         s += label_to_string("DELTA METHOD", self._delta_method)
-        s += label_to_string("VOL FUNCTION", self._volatility_function_type)
+        s += label_to_string("VOL FUNCTION", self._vol_func_type)
 
-        for i in range(0, self._numExpiryDates):
+        for i in range(0, self._num_expiry_dts):
 
             s += "\n"
 
             s += label_to_string("EXPIRY DATE", self._expiry_dts[i])
             s += label_to_string("TIME (YRS)", self._t_exp[i])
             s += label_to_string("FWD FX", self._F0T[i])
-
             s += label_to_string("ATM VOLS", self._atm_vols[i]*100.0)
 
             for j in range(0, self._num_strikes):
 
                 expiry_dt = self._expiry_dts[i]
                 k = self._strikes[j]
-                vol = self._volGrid[i][j]
+                vol = self._vol_grid[i][j]
                 print(expiry_dt, k, vol)
 
         return s

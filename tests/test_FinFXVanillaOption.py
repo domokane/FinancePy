@@ -40,8 +40,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -57,8 +57,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     value = call_option.value(value_dt,
                               spot_fx_rate,
-                              dom_discount_curve,
-                              for_discount_curve,
+                              domestic_curve,
+                              foreign_curve,
                               model)
 
     notional = 1250000.0
@@ -72,8 +72,8 @@ def test_FinFXVanillaOptionWystupExample1():
     value = call_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(value['v'], 4) == 0.0251
@@ -91,8 +91,8 @@ def test_FinFXVanillaOptionWystupExample1():
     delta = call_option.delta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(delta['pips_spot_delta'], 4) == 0.3315
@@ -126,8 +126,8 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -144,8 +144,8 @@ def test_FinFXVanillaOptionWystupExample2():
     value = call_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(value['v'], 4) == 0.0436
@@ -163,8 +163,8 @@ def test_FinFXVanillaOptionWystupExample2():
     delta = call_option.delta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(delta['pips_spot_delta'], 4) == -0.4700
@@ -208,7 +208,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = IborDeposit(settle_dt, maturity_dt, domDepoRate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    dom_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -216,7 +216,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = IborDeposit(settle_dt, maturity_dt, forDepoRate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    for_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     model = BlackScholes(volatility)
 
@@ -230,8 +230,8 @@ def test_FinFXVanillaOptionBloombergExample():
     value = call_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(value['v'], 4) == 0.0601
@@ -249,8 +249,8 @@ def test_FinFXVanillaOptionBloombergExample():
     delta = call_option.delta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(delta['pips_spot_delta'], 4) == 0.3671
@@ -268,8 +268,8 @@ def test_value_mc():
     dom_interest_rate = 0.08
     forInterestRate = 0.11
     model = BlackScholes(volatility)
-    dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
+    domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
     num_paths = 100000
 
     strike_fx_rate = 1.6
@@ -284,8 +284,8 @@ def test_value_mc():
     value_mc = call_option.value_mc(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model,
         num_paths)
 
@@ -301,8 +301,8 @@ def test_value_mc():
     value_mc = put_option.value_mc(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model,
         num_paths)
 
@@ -318,8 +318,8 @@ def test_vega_theta():
     dom_interest_rate = 0.08
     forInterestRate = 0.11
     model = BlackScholes(volatility)
-    dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
+    domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
 
     strike_fx_rate = 1.6
 
@@ -333,8 +333,8 @@ def test_vega_theta():
     vega = call_option.vega(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(vega, 4) == 0.3518
@@ -342,8 +342,8 @@ def test_vega_theta():
     theta = call_option.theta(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
     assert round(theta, 4) == -0.0504

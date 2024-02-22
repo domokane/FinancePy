@@ -2,10 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import numpy as np
-
 import sys
 sys.path.append("..")
+
+import numpy as np
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import SwapTypes
@@ -106,18 +106,18 @@ def test_CDS_recovery_rate():
     value_dt = Date(15, 8, 2022)
     settle_dt = value_dt
 
-    swapType = SwapTypes.PAY
+    swap_type = SwapTypes.PAY
     dcType = DayCountTypes.ACT_360
     fixedFreq = FrequencyTypes.MONTHLY
-    swap1 = IborSwap(settle_dt,"2Y",swapType,0.03512100,fixedFreq,dcType)
-    swap2 = IborSwap(settle_dt,"3Y",swapType,0.03259300,fixedFreq,dcType)
-    swap3 = IborSwap(settle_dt,"4Y",swapType,0.03069300,fixedFreq,dcType)
-    swap4 = IborSwap(settle_dt,"5Y",swapType,0.02952200,fixedFreq,dcType)
-    swap5 = IborSwap(settle_dt,"6Y",swapType,0.02889300,fixedFreq,dcType)
-    swap6 = IborSwap(settle_dt,"7Y",swapType,0.02850200,fixedFreq,dcType)
-    swap7 = IborSwap(settle_dt,"8Y",swapType,0.02827400,fixedFreq,dcType)
-    swap8 = IborSwap(settle_dt,"9Y",swapType,0.02818500,fixedFreq,dcType)
-    swap9 = IborSwap(settle_dt,"10Y",swapType,0.02823000,fixedFreq,dcType)
+    swap1 = IborSwap(settle_dt,"2Y",swap_type,0.03512100,fixedFreq,dcType)
+    swap2 = IborSwap(settle_dt,"3Y",swap_type,0.03259300,fixedFreq,dcType)
+    swap3 = IborSwap(settle_dt,"4Y",swap_type,0.03069300,fixedFreq,dcType)
+    swap4 = IborSwap(settle_dt,"5Y",swap_type,0.02952200,fixedFreq,dcType)
+    swap5 = IborSwap(settle_dt,"6Y",swap_type,0.02889300,fixedFreq,dcType)
+    swap6 = IborSwap(settle_dt,"7Y",swap_type,0.02850200,fixedFreq,dcType)
+    swap7 = IborSwap(settle_dt,"8Y",swap_type,0.02827400,fixedFreq,dcType)
+    swap8 = IborSwap(settle_dt,"9Y",swap_type,0.02818500,fixedFreq,dcType)
+    swap9 = IborSwap(settle_dt,"10Y",swap_type,0.02823000,fixedFreq,dcType)
     swaps = [swap1,swap2,swap3,swap4,swap5,swap6,swap7,swap8,swap9]
 
     libor_curve = IborSingleCurve(value_dt, [], [], swaps)

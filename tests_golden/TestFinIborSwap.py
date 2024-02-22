@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import numpy as np
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
@@ -18,8 +21,6 @@ from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)

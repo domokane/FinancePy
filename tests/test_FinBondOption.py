@@ -31,7 +31,7 @@ dates = settle_dt.add_years(times)
 dfs = np.exp(-0.05*times)
 discount_curve = DiscountCurve(settle_dt, dates, dfs)
 
-expiry_date = settle_dt.add_tenor("18m")
+expiry_dt = settle_dt.add_tenor("18m")
 face = 100.0
 
 num_time_steps = 100
@@ -42,7 +42,7 @@ def test_european_call_bk():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.20
     a = 0.1
@@ -59,7 +59,7 @@ def test_american_call_bk():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.01
     a = 0.1
@@ -75,7 +75,7 @@ def test_european_put_bk():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.01
     a = 0.1
@@ -91,7 +91,7 @@ def test_american_put_bk():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.02
     a = 0.1
@@ -107,7 +107,7 @@ def test_european_call_bdt():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.20
     model = BDTTree(sigma, num_time_steps)
@@ -122,7 +122,7 @@ def test_american_call_bdt():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.20
     model = BDTTree(sigma, num_time_steps)
@@ -137,7 +137,7 @@ def test_european_put_bdt():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.01
     model = BDTTree(sigma, num_time_steps)
@@ -152,7 +152,7 @@ def test_american_put_bdt():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.02
     model = BDTTree(sigma, num_time_steps)
@@ -170,7 +170,7 @@ def test_european_call_hw():
     num_time_steps = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.01
     a = 0.1
@@ -186,7 +186,7 @@ def test_american_call_hw():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.01
     a = 0.1
@@ -202,7 +202,7 @@ def test_european_put_hw():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.01
     a = 0.1
@@ -218,7 +218,7 @@ def test_american_put_hw():
     strike_price = 100
 
     bond_option = BondOption(
-        bond, expiry_date, strike_price, option_type)
+        bond, expiry_dt, strike_price, option_type)
 
     sigma = 0.02
     a = 0.1

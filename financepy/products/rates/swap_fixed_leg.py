@@ -98,9 +98,9 @@ class SwapFixedLeg:
                             self._dg_type,
                             end_of_month=self._end_of_month)
 
-        scheduleDates = schedule._adjusted_dts
+        schedule_dts = schedule._adjusted_dts
 
-        if len(scheduleDates) < 2:
+        if len(schedule_dts) < 2:
             raise FinError("Schedule has none or only one date")
 
         self._start_accrued_dts = []
@@ -111,12 +111,12 @@ class SwapFixedLeg:
         self._accrued_days = []
         self._rates = []
 
-        prev_dt = scheduleDates[0]
+        prev_dt = schedule_dts[0]
 
         day_counter = DayCount(self._dc_type)
         calendar = Calendar(self._cal_type)
 
-        for next_dt in scheduleDates[1:]:
+        for next_dt in schedule_dts[1:]:
 
             self._start_accrued_dts.append(prev_dt)
             self._end_accrued_dts.append(next_dt)
@@ -148,43 +148,43 @@ class SwapFixedLeg:
               value_dt: Date,
               discount_curve: DiscountCurve):
 
-        self._paymentDfs = []
+        self._payment_dfs = []
         self._payment_pvs = []
-        self._cumulativePVs = []
+        self._cumulative_pvs = []
 
         notional = self._notional
-        dfValue = discount_curve.df(value_dt)
+        df_value = discount_curve.df(value_dt)
         leg_pv = 0.0
-        numPayments = len(self._payment_dts)
+        num_payments = len(self._payment_dts)
 
-        dfPmnt = 0.0
+        df_pmnt = 0.0
 
-        for iPmnt in range(0, numPayments):
+        for i_pmnt in range(0, num_payments):
 
-            pmntDate = self._payment_dts[iPmnt]
-            pmntAmount = self._payments[iPmnt]
+            pmnt_dt = self._payment_dts[i_pmnt]
+            pmnt_amount = self._payments[i_pmnt]
 
-            if pmntDate > value_dt:
+            if pmnt_dt > value_dt:
 
-                dfPmnt = discount_curve.df(pmntDate) / dfValue
-                pmntPV = pmntAmount * dfPmnt
-                leg_pv += pmntPV
+                df_pmnt = discount_curve.df(pmnt_dt) / df_value
+                pmnt_pv = pmnt_amount * df_pmnt
+                leg_pv += pmnt_pv
 
-                self._paymentDfs.append(dfPmnt)
-                self._payment_pvs.append(pmntAmount*dfPmnt)
-                self._cumulativePVs.append(leg_pv)
+                self._payment_dfs.append(df_pmnt)
+                self._payment_pvs.append(pmnt_amount*df_pmnt)
+                self._cumulative_pvs.append(leg_pv)
 
             else:
 
-                self._paymentDfs.append(0.0)
+                self._payment_dfs.append(0.0)
                 self._payment_pvs.append(0.0)
-                self._cumulativePVs.append(0.0)
+                self._cumulative_pvs.append(0.0)
 
-        if pmntDate > value_dt:
-            payment_pv = self._principal * dfPmnt * notional
+        if pmnt_dt > value_dt:
+            payment_pv = self._principal * df_pmnt * notional
             self._payment_pvs[-1] += payment_pv
             leg_pv += payment_pv
-            self._cumulativePVs[-1] = leg_pv
+            self._cumulative_pvs[-1] = leg_pv
 
         if self._leg_type == SwapTypes.PAY:
             leg_pv = leg_pv * (-1.0)
@@ -258,9 +258,9 @@ class SwapFixedLeg:
                 round(self._notional, 0),
                 round(self._rates[i_flow] * 100.0, 4),
                 round(self._payments[i_flow], 2),
-                round(self._paymentDfs[i_flow], 4),
+                round(self._payment_dfs[i_flow], 4),
                 round(self._payment_pvs[i_flow], 2),
-                round(self._cumulativePVs[i_flow], 2),
+                round(self._cumulative_pvs[i_flow], 2),
             ])
 
         table = format_table(header, rows)

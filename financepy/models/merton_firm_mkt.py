@@ -3,11 +3,9 @@
 ##############################################################################
 
 import numpy as np
-
-from ..utils.math import N
-
 from scipy import optimize
 
+from ..utils.math import N
 from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
 from .merton_firm import MertonFirm
@@ -42,19 +40,21 @@ def _fobj(x, *args):
 
 
 class MertonFirmMkt(MertonFirm):
-    """ Market Extension of the Merton Firm Model according to the original
+    """
+    Market Extension of the Merton Firm Model according to the original
     formulation by Merton with the inputs being the equity value of the firm,
     the liabilities (bond face), the time to maturity in years, the risk-free
     rate, the asset growth rate and the equity volatility. The asset value and
     asset volatility are computed internally by solving two non-linear
-    simultaneous equations. """
+    simultaneous equations.
+    """
 
     def __init__(self,
                  equity_value: (float, list, np.ndarray),
-                 bondFace: (float, list, np.ndarray),
-                 timeToMaturity: (float, list, np.ndarray),
+                 bond_face: (float, list, np.ndarray),
+                 years_to_maturity: (float, list, np.ndarray),
                  risk_free_rate: (float, list, np.ndarray),
-                 assetGrowthRate: (float, list, np.ndarray),
+                 asset_growth_rate: (float, list, np.ndarray),
                  equity_volatility: (float, list, np.ndarray)):
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
@@ -64,26 +64,26 @@ class MertonFirmMkt(MertonFirm):
         if isinstance(equity_value, float):
             equity_value = [equity_value]
 
-        if isinstance(bondFace, float):
-            bondFace = [bondFace]
+        if isinstance(bond_face, float):
+            bond_face = [bond_face]
 
-        if isinstance(timeToMaturity, float):
-            timeToMaturity = [timeToMaturity]
+        if isinstance(years_to_maturity, float):
+            years_to_maturity = [years_to_maturity]
 
         if isinstance(risk_free_rate, float):
             risk_free_rate = [risk_free_rate]
 
-        if isinstance(assetGrowthRate, float):
-            assetGrowthRate = [assetGrowthRate]
+        if isinstance(asset_growth_rate, float):
+            asset_growth_rate = [asset_growth_rate]
 
         if isinstance(equity_volatility, float):
             equity_volatility = [equity_volatility]
 
         self._E = np.array(equity_value)
-        self._L = np.array(bondFace)
-        self._t = np.array(timeToMaturity)
+        self._L = np.array(bond_face)
+        self._t = np.array(years_to_maturity)
         self._r = np.array(risk_free_rate)
-        self._mu = np.array(assetGrowthRate)
+        self._mu = np.array(asset_growth_rate)
         self._vE = np.array(equity_volatility)
 
         nmax = max(len(self._E),

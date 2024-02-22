@@ -39,7 +39,7 @@ def test_FinFXForward():
     depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    for_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     depos = []
     fras = []
@@ -48,7 +48,7 @@ def test_FinFXForward():
     depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
                        DayCountTypes.ACT_360, notional, cal_type)
     depos.append(depo)
-    dom_discount_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     notional = 100.0
     notional_currency = forName
@@ -60,13 +60,13 @@ def test_FinFXForward():
                           notional_currency)
 
     fwdValue = fxForward.value(value_dt, spot_fx_rate,
-                               dom_discount_curve, for_discount_curve)
+                               domestic_curve, foreign_curve)
 
-    fwdFXRate = fxForward.forward(value_dt, spot_fx_rate,
-                                  dom_discount_curve,
-                                  for_discount_curve)
+    fwd_fx_rate = fxForward.forward(value_dt, spot_fx_rate,
+                                    domestic_curve,
+                                    foreign_curve)
 
-    assert round(fwdFXRate, 4) == 1.3388
+    assert round(fwd_fx_rate, 4) == 1.3388
 
     assert round(fwdValue['value'], 4) == -2.4978
     assert round(fwdValue['cash_dom'], 4) == -249.7797

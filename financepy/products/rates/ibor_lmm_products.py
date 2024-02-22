@@ -68,7 +68,7 @@ class IborLMMProducts():
         be priced. """
 
         self._start_dt = settle_dt
-        self._grid_dates = Schedule(settle_dt,
+        self._grid_dts = Schedule(settle_dt,
                                    maturity_dt,
                                    float_freq_type,
                                    cal_type,
@@ -79,13 +79,13 @@ class IborLMMProducts():
         self._float_dc_type = float_dc_type
 
         basis = DayCount(self._float_dc_type)
-        prev_dt = self._grid_dates[0]
+        prev_dt = self._grid_dts[0]
 
         self._grid_times = [0.0]
 
-        for next_dt in self._grid_dates[1:]:
+        for next_dt in self._grid_dts[1:]:
             tau = basis.year_frac(prev_dt, next_dt)[0]
-            t = (next_dt - self._grid_dates[0]) / gDaysInYear
+            t = (next_dt - self._grid_dts[0]) / gDaysInYear
             self._accrual_factors.append(tau)
             self._grid_times.append(t)
             prev_dt = next_dt
@@ -94,7 +94,14 @@ class IborLMMProducts():
         self._accrual_factors = np.array(self._accrual_factors)
         self._num_fwds = len(self._accrual_factors)
         self._fwds = None
-
+        self._use_sobol = None
+        self._num_paths = None
+        self._numeraire_index = None
+        self._fwd_curve = None
+        self._vol_curves = None
+        self._corr_matrix = None
+        self._model_type = None
+        
 #        print("Num FORWARDS", self._num_fwds)
 
 ###############################################################################
@@ -103,7 +110,7 @@ class IborLMMProducts():
                     discount_curve,
                     vol_curve: IborCapVolCurve,
                     num_paths: int = 1000,
-                    numeraireIndex: int = 0,
+                    numeraire_index: int = 0,
                     use_sobol: bool = True,
                     seed: int = 42):
         """ Run the one-factor simulation of the evolution of the forward
@@ -116,17 +123,17 @@ class IborLMMProducts():
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         self._num_paths = num_paths
-        self._numeraire_index = numeraireIndex
+        self._numeraire_index = numeraire_index
         self._use_sobol = use_sobol
 
-        num_grid_points = len(self._grid_dates)
+        num_grid_points = len(self._grid_dts)
 
         self._num_fwds = num_grid_points
         self._fwd_curve = []
 
         for i in range(1, num_grid_points):
-            start_dt = self._grid_dates[i-1]
-            end_dt = self._grid_dates[i]
+            start_dt = self._grid_dts[i-1]
+            end_dt = self._grid_dts[i]
             fwd_rate = discount_curve.fwd_rate(start_dt,
                                                end_dt,
                                                self._float_dc_type)
@@ -136,12 +143,12 @@ class IborLMMProducts():
 
         gammas = np.zeros(num_grid_points)
         for ix in range(1, num_grid_points):
-            dt = self._grid_dates[ix]
+            dt = self._grid_dts[ix]
             gammas[ix] = vol_curve.caplet_vol(dt)
 
         self._fwds = lmm_simulate_fwds_1f(self._num_fwds,
                                           num_paths,
-                                          numeraireIndex,
+                                          numeraire_index,
                                           self._fwd_curve,
                                           gammas,
                                           self._accrual_factors,
@@ -152,10 +159,10 @@ class IborLMMProducts():
 
     def simulate_mf(self,
                     discount_curve,
-                    numFactors: int,
+                    num_factors: int,
                     lambdas: np.ndarray,
                     num_paths: int = 10000,
-                    numeraireIndex: int = 0,
+                    numeraire_index: int = 0,
                     use_sobol: bool = True,
                     seed: int = 42):
         """ Run the simulation to generate and store all of the Ibor forward
@@ -175,7 +182,7 @@ class IborLMMProducts():
         print("LEN LAMBDAS", len(lambdas))
         print("LEN", len(lambdas[0]))
         # We pass a vector of vol discount, one for each factor
-        if numFactors != len(lambdas):
+        if num_factors != len(lambdas):
             raise FinError("Lambda doesn't have specified number of factors.")
 
         num_rows = len(lambdas[0])
@@ -183,15 +190,15 @@ class IborLMMProducts():
             raise FinError("Vol Components needs same number of rows as grid")
 
         self._num_paths = num_paths
-        self._numeraire_index = numeraireIndex
+        self._numeraire_index = numeraire_index
         self._use_sobol = use_sobol
 
-        self._num_fwds = len(self._grid_dates) - 1
+        self._num_fwds = len(self._grid_dts) - 1
         self._fwd_curve = []
 
         for i in range(1, self._num_fwds):
-            start_dt = self._grid_dates[i-1]
-            end_dt = self._grid_dates[i]
+            start_dt = self._grid_dts[i-1]
+            end_dt = self._grid_dts[i]
             fwd_rate = discount_curve.fwd_rate(start_dt, end_dt,
                                                self._float_dc_type)
             self._fwd_curve.append(fwd_rate)
@@ -199,9 +206,9 @@ class IborLMMProducts():
         self._fwd_curve = np.array(self._fwd_curve)
 
         self._fwds = lmm_simulate_fwds_mf(self._num_fwds,
-                                          numFactors,
+                                          num_factors,
                                           num_paths,
-                                          numeraireIndex,
+                                          numeraire_index,
                                           self._fwd_curve,
                                           lambdas,
                                           self._accrual_factors,
@@ -237,7 +244,7 @@ class IborLMMProducts():
         self._num_paths = num_paths
         self._vol_curves = vol_curve
         self._corr_matrix = corr_matrix
-        self._modelType = model_type
+        self._model_type = model_type
         self._numeraire_index = numeraire_index
         self._use_sobol = use_sobol
 
@@ -247,8 +254,8 @@ class IborLMMProducts():
         self._fwd_curve = []
 
         for i in range(1, num_grid_points):
-            start_dt = self._grid_dates[i-1]
-            end_dt = self._grid_dates[i]
+            start_dt = self._grid_dts[i-1]
+            end_dt = self._grid_dts[i]
             fwd_rate = discount_curve.forward_rate(start_dt,
                                                    end_dt,
                                                    self._float_dc_type)
@@ -258,7 +265,7 @@ class IborLMMProducts():
 
         zetas = np.zeros(num_grid_points)
         for ix in range(1, num_grid_points):
-            dt = self._grid_dates[ix]
+            dt = self._grid_dts[ix]
             zetas[ix] = vol_curve.caplet_vol(dt)
 
         # This function does not use Sobol - TODO
@@ -308,23 +315,23 @@ class IborLMMProducts():
 
         for swaption_dt in swaption_float_dts:
             found_dt = False
-            for grid_dt in self._grid_dates:
+            for grid_dt in self._grid_dts:
                 if swaption_dt == grid_dt:
                     found_dt = True
                     break
             if found_dt is False:
                 raise FinError("Swaption float leg not on grid.")
 
-        swaption_fixed_dates = Schedule(settle_dt,
+        swaption_fixed_dts = Schedule(settle_dt,
                                         maturity_dt,
                                         fixed_freq_type,
                                         cal_type,
                                         bd_type,
                                         dg_type).generate()
 
-        for swaption_dt in swaption_fixed_dates:
+        for swaption_dt in swaption_fixed_dts:
             found_dt = False
-            for grid_dt in self._grid_dates:
+            for grid_dt in self._grid_dts:
                 if swaption_dt == grid_dt:
                     found_dt = True
                     break
@@ -334,13 +341,13 @@ class IborLMMProducts():
         a = 0
         b = 0
 
-        for grid_dt in self._grid_dates:
+        for grid_dt in self._grid_dts:
             if grid_dt == exercise_dt:
                 break
             else:
                 a += 1
 
-        for grid_dt in self._grid_dates:
+        for grid_dt in self._grid_dts:
             if grid_dt == maturity_dt:
                 break
             else:
@@ -351,7 +358,7 @@ class IborLMMProducts():
 
 #        num_paths = 1000
 #        v = LMMSwaptionPricer(fixed_coupon, a, b, num_paths,
-#                              fwd0, fwds, taus, isPayer)
+#                              fwd0, fwds, taus, is_payer)
         v = 0.0
         return v
 
@@ -379,7 +386,7 @@ class IborLMMProducts():
 
         for cap_floorlet_dt in cap_floor_dts:
             found_dt = False
-            for grid_dt in self._grid_dates:
+            for grid_dt in self._grid_dts:
                 if cap_floorlet_dt == grid_dt:
                     found_dt = True
                     break
@@ -402,11 +409,11 @@ class IborLMMProducts():
                                fwd0, fwds, taus, is_cap)
 
         # Sum the cap/floorlets to get cap/floor value
-        v_capFloor = 0.0
-        for v_capFloorLet in v:
-            v_capFloor += v_capFloorLet * notional
+        v_cap_floor = 0.0
+        for v_cap_floor_let in v:
+            v_cap_floor += v_cap_floor_let * notional
 
-        return v_capFloor
+        return v_cap_floor
 
 ###############################################################################
 

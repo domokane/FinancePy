@@ -437,12 +437,12 @@ def test_accrued_interest():
     assert round(accrued_interest, 4) == -8333.3333
 
 
-def test_protection_leg_pv():
-    prot_pv = cds_contract1.protection_leg_pv(
+def test_prot_leg_pv():
+    prot_pv = cds_contract1.prot_leg_pv(
         value_dt1, issuer_curve1, cdsRecovery)
     assert round(prot_pv, 4) == 273023.5221
 
-    prot_pv = cds_contract2.protection_leg_pv(
+    prot_pv = cds_contract2.prot_leg_pv(
         value_dt2, issuer_curve2, cdsRecovery)
     assert round(prot_pv, 4) == 47629.7343
 

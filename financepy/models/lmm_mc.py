@@ -20,8 +20,8 @@ useParallel = False
 ###############################################################################
 
 """ This module manages the Ibor Market Model and so stores a specific MC
-    forward rate simulation of a 3D matrix of num_paths x numForwards
-    x (numForwards-1)/2 elements. This is a lognormal model although a shifted
+    forward rate simulation of a 3D matrix of num_paths x num_fwds
+    x (num_fwds-1)/2 elements. This is a lognormal model although a shifted
     Lognormal rate is also allowed. Implementations include 1 factor, M factor
     where the volatility curve per factor is provided and a full N-factor corr-
     elation matrix where a Cholesky is done to decompose the N factors. """
@@ -107,7 +107,7 @@ def lmm_swaption_vol_approx(a, b, fwd0, taus, zetas, rho):
     for i in range(a, b):
         wts[i] = taus[i] * p[i] / pv01ab
 
-    swaptionVar = 0.0
+    swaption_var = 0.0
     for i in range(a, b):
         for j in range(a, b):
             wti = wts[i]
@@ -120,7 +120,7 @@ def lmm_swaption_vol_approx(a, b, fwd0, taus, zetas, rho):
                 intsigmaij += zetas[i] * zetas[j] * taus[k]
 
             term = wti * wtj * fi * fj * rho[i][j] * intsigmaij / (sab**2)
-            swaptionVar += term
+            swaption_var += term
 
     taua = 0.0
     for i in range(0, a):
@@ -130,8 +130,8 @@ def lmm_swaption_vol_approx(a, b, fwd0, taus, zetas, rho):
     for i in range(0, b):
         taub += taus[i]
 
-    swaptionVol = np.sqrt(swaptionVar/taua)
-    return swaptionVol
+    swaption_vol = np.sqrt(swaption_var/taua)
+    return swaption_vol
 
 
 ###############################################################################
@@ -144,16 +144,16 @@ def lmm_sim_swaption_vol(a, b, fwd0, fwds, taus):
     simulation to see how it compares to Rebonatto estimate. """
 
     num_paths = len(fwds)
-    numForwards = len(fwds[0])
+    num_fwds = len(fwds[0])
 
-    if a > numForwards:
-        raise FinError("NumPeriods > numForwards")
+    if a > num_fwds:
+        raise FinError("NumPeriods > num_fwds")
 
     if a >= b:
         raise FinError("Swap maturity is before expiry date")
 
-    fwdSwapRateMean = 0.0
-    fwdSwapRateVar = 0.0
+    fwd_swap_rate_mean = 0.0
+    fwd_swap_rate_var = 0.0
 
     for i_path in range(0, num_paths):  # changed from prange
 
@@ -171,35 +171,35 @@ def lmm_sim_swaption_vol(a, b, fwd0, fwds, taus):
             df = df / (1.0 + tau * f)
             pv01 = pv01 + tau * df
 
-        fwdSwapRate = (1.0 - df) / pv01
+        fwd_swap_rate = (1.0 - df) / pv01
 
-        fwdSwapRateMean += fwdSwapRate
-        fwdSwapRateVar += fwdSwapRate**2
+        fwd_swap_rate_mean += fwd_swap_rate
+        fwd_swap_rate_var += fwd_swap_rate**2
 
     taua = 0.0
     for i in range(0, a):
         taua += taus[i]
 
-    fwdSwapRateMean /= num_paths
-    fwdSwapRateVar = fwdSwapRateVar/num_paths - fwdSwapRateMean**2
-    fwdSwapRateVol = np.sqrt(fwdSwapRateVar/taua)
-    fwdSwapRateVol /= fwdSwapRateMean
-    return fwdSwapRateVol
+    fwd_swap_rate_mean /= num_paths
+    fwd_swap_rate_var = fwd_swap_rate_var/num_paths - fwd_swap_rate_mean**2
+    fwd_swap_rate_vol = np.sqrt(fwd_swap_rate_var/taua)
+    fwd_swap_rate_vol /= fwd_swap_rate_mean
+    return fwd_swap_rate_vol
 
 ###############################################################################
 
 
 @njit(float64[:, :](int64, int64, int64, float64[:, :, :]),
       cache=True, fastmath=True)
-def lmm_fwd_fwd_correlation(numForwards, num_paths, i_time, fwds):
+def lmm_fwd_fwd_correlation(num_fwds, num_paths, i_time, fwds):
     """ Extract forward forward correlation matrix at some future time index
     from the simulated forward rates and return the matrix. """
 
-    size = numForwards - i_time
-    fwdCorr = np.zeros((size, size))
+    size = num_fwds - i_time
+    fwd_corr = np.zeros((size, size))
 
-    for iFwd in range(i_time, numForwards):
-        for jFwd in range(iFwd, numForwards):
+    for i_fwd in range(i_time, num_fwds):
+        for j_fwd in range(i_fwd, num_fwds):
 
             sumfwdi = 0.0
             sumfwdj = 0.0
@@ -208,8 +208,8 @@ def lmm_fwd_fwd_correlation(numForwards, num_paths, i_time, fwds):
             sumfwdjfwdj = 0.0
 
             for p in range(0, num_paths):  # changed from prange
-                dfwdi = fwds[p, i_time, iFwd] - fwds[p, i_time-1, iFwd]
-                dfwdj = fwds[p, i_time, jFwd] - fwds[p, i_time-1, jFwd]
+                dfwdi = fwds[p, i_time, i_fwd] - fwds[p, i_time-1, i_fwd]
+                dfwdj = fwds[p, i_time, j_fwd] - fwds[p, i_time-1, j_fwd]
                 sumfwdi += dfwdi
                 sumfwdj += dfwdj
                 sumfwdifwdi += dfwdi * dfwdi
@@ -228,13 +228,13 @@ def lmm_fwd_fwd_correlation(numForwards, num_paths, i_time, fwds):
             corr = covij / np.sqrt(covii*covjj)
 
             if abs(covii*covjj) > 1e-20:
-                fwdCorr[iFwd-i_time][jFwd-i_time] = corr
-                fwdCorr[jFwd-i_time][iFwd-i_time] = corr
+                fwd_corr[i_fwd-i_time][j_fwd-i_time] = corr
+                fwd_corr[j_fwd-i_time][i_fwd-i_time] = corr
             else:
-                fwdCorr[iFwd-i_time][jFwd-i_time] = 0.0
-                fwdCorr[jFwd-i_time][iFwd-i_time] = 0.0
+                fwd_corr[i_fwd-i_time][j_fwd-i_time] = 0.0
+                fwd_corr[j_fwd-i_time][i_fwd-i_time] = 0.0
 
-    return fwdCorr
+    return fwd_corr
 
 ###############################################################################
 
@@ -246,15 +246,15 @@ def lmm_price_caps_black(fwd0, volCaplet, p, K, taus):
     of the LMM model. The prices can be compared with the LMM model prices. """
 
     caplet = np.zeros(p+1)
-    discFwd = np.zeros(p+1)
+    disc_fwd = np.zeros(p+1)
 
     if K <= 0.0:
         raise FinError("Negative strike not allowed.")
 
     # Set up initial term structure
-    discFwd[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    disc_fwd[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
     for i in range(1, p):
-        discFwd[i] = discFwd[i-1] / (1.0 + fwd0[i] * taus[i])
+        disc_fwd[i] = disc_fwd[i-1] / (1.0 + fwd0[i] * taus[i])
 
     # Price ATM caplets
     t_exp = 0.0
@@ -267,7 +267,7 @@ def lmm_price_caps_black(fwd0, volCaplet, p, K, taus):
         F = fwd0[i]
         d1 = (np.log(F/K) + vol * vol * t_exp / 2.0) / vol / np.sqrt(t_exp)
         d2 = d1 - vol * np.sqrt(t_exp)
-        caplet[i] = (F * N(d1) - K * N(d2)) * taus[i] * discFwd[i]
+        caplet[i] = (F * N(d1) - K * N(d2)) * taus[i] * disc_fwd[i]
 
     return caplet
 
@@ -315,17 +315,17 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
 
     # Even number of paths for antithetics
     num_paths = 2 * int(num_paths/2)
-    halfNumPaths = int(num_paths/2)
+    half_num_paths = int(num_paths/2)
 
     fwd = np.empty((num_paths, num_fwds, num_fwds))
     fwdB = np.zeros(num_fwds)
 
-    discFwd = np.zeros(num_fwds)
+    disc_fwd = np.zeros(num_fwds)
 
     # Set up initial term structure
-    discFwd[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    disc_fwd[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
     for ix in range(1, num_fwds):
-        discFwd[ix] = discFwd[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+        disc_fwd[ix] = disc_fwd[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     corr = [None]  # from 0 to p-1
     factors = [None]  # from 0 to p-1
@@ -342,14 +342,14 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
     ###########################################################################
 
     if 1 == 1:
-        gMatrix = np.empty((num_paths, num_fwds, num_fwds))
-        for i_path in range(0, halfNumPaths):
+        g_matrix = np.empty((num_paths, num_fwds, num_fwds))
+        for i_path in range(0, half_num_paths):
             for j in range(1, num_fwds):
                 for k in range(0, num_fwds-j):
                     g = np.random.normal()
                     # ANTITHETICS
-                    gMatrix[i_path, j, k] = g
-                    gMatrix[i_path + halfNumPaths, j, k] = -g
+                    g_matrix[i_path, j, k] = g
+                    g_matrix[i_path + half_num_paths, j, k] = -g
 
     avgg = 0.0
     stdg = 0.0
@@ -357,8 +357,8 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
     for i_path in range(0, num_paths):
 
         # Initial value of forward curve at time 0
-        for iFwd in range(0, num_fwds):
-            fwd[i_path, 0, iFwd] = fwd0[iFwd]
+        for i_fwd in range(0, num_fwds):
+            fwd[i_path, 0, i_fwd] = fwd0[i_fwd]
 
         for j in range(1, num_fwds):  # TIME LOOP
 
@@ -380,7 +380,7 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
                 w = 0.0
                 for k in range(0, num_fwds-j):
                     f = factors[j][i-j, k]
-                    w = w + f * gMatrix[i_path, j, k]
+                    w = w + f * g_matrix[i_path, j, k]
 
                 avgg += w
                 stdg += w*w
@@ -407,7 +407,7 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
 
 @njit(float64[:, :, :](int64, int64, int64, float64[:], float64[:], float64[:],
                        int64, int64), cache=True, fastmath=True)
-def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
+def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraire_index, fwd0, gammas,
                          taus, use_sobol, seed):
     """ One factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
@@ -432,49 +432,49 @@ def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
         raise FinError("Gamma vector does not have right number of forwards")
 
     if len(fwd0) != num_fwds:
-        raise FinError("The length of fwd0 is not equal to numForwards")
+        raise FinError("The length of fwd0 is not equal to num_fwds")
 
     if len(taus) != num_fwds:
-        raise FinError("The length of Taus is not equal to numForwards")
+        raise FinError("The length of Taus is not equal to num_fwds")
 
     np.random.seed(seed)
     # Even number of paths for antithetics
     num_paths = 2 * int(num_paths/2)
-    halfNumPaths = int(num_paths/2)
+    half_num_paths = int(num_paths/2)
     fwd = np.empty((num_paths, num_fwds, num_fwds))
     fwdB = np.zeros(num_fwds)
 
     num_times = num_fwds
 
     if use_sobol == 1:
-        numDimensions = num_times
-        rands = get_uniform_sobol(halfNumPaths, numDimensions)
-        gMatrix = np.empty((num_paths, num_times))
-        for i_path in range(0, halfNumPaths):
+        num_dimensions = num_times
+        rands = get_uniform_sobol(half_num_paths, num_dimensions)
+        g_matrix = np.empty((num_paths, num_times))
+        for i_path in range(0, half_num_paths):
             for j in range(0, num_times):
                 u = rands[i_path, j]
                 g = norminvcdf(u)
-                gMatrix[i_path, j] = g
-                gMatrix[i_path + halfNumPaths, j] = -g
+                g_matrix[i_path, j] = g
+                g_matrix[i_path + half_num_paths, j] = -g
     elif use_sobol == 0:
-        gMatrix = np.empty((num_paths, num_times))
-        for i_path in range(0, halfNumPaths):
+        g_matrix = np.empty((num_paths, num_times))
+        for i_path in range(0, half_num_paths):
             for j in range(0, num_times):
                 g = np.random.normal()
-                gMatrix[i_path, j] = g
-                gMatrix[i_path + halfNumPaths, j] = -g
+                g_matrix[i_path, j] = g
+                g_matrix[i_path + half_num_paths, j] = -g
     else:
         raise FinError("Use Sobol must be 0 or 1")
 
     for i_path in range(0, num_paths):  # changed from prange
         # Initial value of forward curve at time 0
-        for iFwd in range(0, num_fwds):
-            fwd[i_path, 0, iFwd] = fwd0[iFwd]
+        for i_fwd in range(0, num_fwds):
+            fwd[i_path, 0, i_fwd] = fwd0[i_fwd]
 
         for j in range(0, num_fwds-1):  # TIME LOOP
             dtj = taus[j]
             sqrt_dtj = np.sqrt(dtj)
-            w = gMatrix[i_path, j]
+            w = g_matrix[i_path, j]
 
             for k in range(j, num_fwds):  # FORWARDS LOOP
                 zkj = gammas[k-j]
@@ -509,7 +509,7 @@ def lmm_simulate_fwds_1f(num_fwds, num_paths, numeraireIndex, fwd0, gammas,
 
 @njit(float64[:, :, :](int64, int64, int64, int64, float64[:], float64[:, :],
                        float64[:], int64, int64), cache=True, fastmath=True)
-def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
+def lmm_simulate_fwds_mf(num_fwds, num_factors, num_paths, numeraire_index,
                          fwd0, lambdas, taus, use_sobol, seed):
     """ Multi-Factor Arbitrage-free simulation of forward Ibor discount in the
     spot measure following Hull Page 768. Given an initial forward curve,
@@ -518,7 +518,7 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
 
     np.random.seed(seed)
 
-    if len(lambdas) != numFactors:
+    if len(lambdas) != num_factors:
         raise FinError("Lambda does not have the right number of factors")
 
     if len(lambdas[0]) != num_fwds:
@@ -526,39 +526,39 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
 
     # Even number of paths for antithetics
     num_paths = 2 * int(num_paths/2)
-    halfNumPaths = int(num_paths/2)
+    half_num_paths = int(num_paths/2)
     fwd = np.empty((num_paths, num_fwds, num_fwds))
     fwdB = np.zeros(num_fwds)
 
     num_times = num_fwds
 
     if use_sobol == 1:
-        numDimensions = num_times * numFactors
-        rands = get_uniform_sobol(halfNumPaths, numDimensions)
-        gMatrix = np.empty((num_paths, num_times, numFactors))
-        for i_path in range(0, halfNumPaths):
+        num_dimensions = num_times * num_factors
+        rands = get_uniform_sobol(half_num_paths, num_dimensions)
+        g_matrix = np.empty((num_paths, num_times, num_factors))
+        for i_path in range(0, half_num_paths):
             for j in range(0, num_times):
-                for q in range(0, numFactors):
-                    col = j*numFactors + q
+                for q in range(0, num_factors):
+                    col = j*num_factors + q
                     u = rands[i_path, col]
                     g = norminvcdf(u)
-                    gMatrix[i_path, j, q] = g
-                    gMatrix[i_path + halfNumPaths, j, q] = -g
+                    g_matrix[i_path, j, q] = g
+                    g_matrix[i_path + half_num_paths, j, q] = -g
     elif use_sobol == 0:
-        gMatrix = np.empty((num_paths, num_times, numFactors))
-        for i_path in range(0, halfNumPaths):
+        g_matrix = np.empty((num_paths, num_times, num_factors))
+        for i_path in range(0, half_num_paths):
             for j in range(0, num_times):
-                for q in range(0, numFactors):
+                for q in range(0, num_factors):
                     g = np.random.normal()
-                    gMatrix[i_path, j, q] = g
-                    gMatrix[i_path + halfNumPaths, j, q] = -g
+                    g_matrix[i_path, j, q] = g
+                    g_matrix[i_path + half_num_paths, j, q] = -g
     else:
         raise FinError("Use Sobol must be 0 or 1.")
 
     for i_path in range(0, num_paths):
         # Initial value of forward curve at time 0
-        for iFwd in range(0, num_fwds):
-            fwd[i_path, 0, iFwd] = fwd0[iFwd]
+        for i_fwd in range(0, num_fwds):
+            fwd[i_path, 0, i_fwd] = fwd0[i_fwd]
 
         for j in range(0, num_fwds-1):  # TIME LOOP
             dtj = taus[j]
@@ -571,23 +571,23 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
                     fi = fwd[i_path, j, i]
                     ti = taus[i]
                     zz = 0.0
-                    for q in range(0, numFactors):
+                    for q in range(0, num_factors):
                         zij = lambdas[q][i-j]
                         zkj = lambdas[q][k-j]
                         zz += zij * zkj
                     muA += fi * ti * zz / (1.0 + fi * ti)
 
                 itoTerm = 0.0
-                for q in range(0, numFactors):
+                for q in range(0, num_factors):
                     itoTerm += lambdas[q][k-j] * lambdas[q][k-j]
 
-                randomTerm = 0.0
-                for q in range(0, numFactors):
-                    wq = gMatrix[i_path, j, q]
-                    randomTerm += lambdas[q][k-j] * wq
-                randomTerm *= sqrt_dtj
+                random_term = 0.0
+                for q in range(0, num_factors):
+                    wq = g_matrix[i_path, j, q]
+                    random_term += lambdas[q][k-j] * wq
+                random_term *= sqrt_dtj
 
-                x = np.exp(muA * dtj - 0.5 * itoTerm * dtj + randomTerm)
+                x = np.exp(muA * dtj - 0.5 * itoTerm * dtj + random_term)
                 fwdB[k] = fwd[i_path, j, k] * x
 
                 muB = 0.0
@@ -595,7 +595,7 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
                     fi = fwdB[k]
                     ti = taus[i]
                     zz = 0.0
-                    for q in range(0, numFactors):
+                    for q in range(0, num_factors):
                         zij = lambdas[q][i-j]
                         zkj = lambdas[q][k-j]
                         zz += zij * zkj
@@ -603,7 +603,7 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
 
                 muC = 0.5 * (muA + muB)
 
-                x = np.exp(muC * dtj - 0.5 * itoTerm * dtj + randomTerm)
+                x = np.exp(muC * dtj - 0.5 * itoTerm * dtj + random_term)
                 fwd[i_path, j+1, k] = fwd[i_path, j, k] * x
 
     return fwd
@@ -614,7 +614,7 @@ def lmm_simulate_fwds_mf(num_fwds, numFactors, num_paths, numeraireIndex,
 @njit(float64[:](int64, int64, float64, float64[:], float64[:, :, :],
                  float64[:], int64),
       cache=True, fastmath=True)
-def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, isCap):
+def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
     """ Function to price a strip of cap or floorlets in accordance with the
     simulated forward curve dynamics. """
 
@@ -622,19 +622,19 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, isCap):
     max_fwds = len(fwds[0])
 
     if num_fwds > max_fwds:
-        raise FinError("NumForwards > maxForwards")
+        raise FinError("num_fwds > max_fwds")
 
     if num_paths > max_paths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(num_fwds)
+    df = np.zeros(num_fwds)
     capFlrLets = np.zeros(num_fwds-1)
     capFlrLetValues = np.zeros(num_fwds-1)
     numeraire = np.zeros(num_fwds)
 
     for i_path in range(0, num_paths):
 
-        periodRoll = 1.0
+        period_roll = 1.0
         libor = fwds[i_path, 0, 0]
         capFlrLets[0] = max(K - libor, 0.0) * taus[0]
 
@@ -644,29 +644,29 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, isCap):
 
             libor = fwds[i_path, j, j]
             if j == 1:
-                if isCap == 0:
+                if is_cap == 0:
                     capFlrLets[j] = max(K - libor, 0.0) * taus[j]
                 else:
                     capFlrLets[j] = max(libor - K, 0.0) * taus[j]
 
-                numeraire[0] = 1.0 / discFactor[0]
+                numeraire[0] = 1.0 / df[0]
             else:
-                if isCap == 1:
+                if is_cap == 1:
                     capFlrLets[j] = max(libor - K, 0.0) * taus[j]
-                elif isCap == 0:
+                elif is_cap == 0:
                     capFlrLets[j] = max(K - libor, 0.0) * taus[j]
                 else:
-                    raise FinError("isCap should be 0 or 1")
+                    raise FinError("is_cap should be 0 or 1")
 
-            periodRoll = (1.0 + libor * taus[j])
-            numeraire[j] = numeraire[j - 1] * periodRoll
+            period_roll = (1.0 + libor * taus[j])
+            numeraire[j] = numeraire[j - 1] * period_roll
 
-        for iFwd in range(0, num_fwds):
-            denom = abs(numeraire[iFwd]) + 1e-12
-            capFlrLetValues[iFwd] += capFlrLets[iFwd] / denom
+        for i_fwd in range(0, num_fwds):
+            denom = abs(numeraire[i_fwd]) + 1e-12
+            capFlrLetValues[i_fwd] += capFlrLets[i_fwd] / denom
 
-    for iFwd in range(0, num_fwds):
-        capFlrLetValues[iFwd] /= num_paths
+    for i_fwd in range(0, num_fwds):
+        capFlrLetValues[i_fwd] /= num_paths
 
     return capFlrLetValues
 
@@ -679,61 +679,62 @@ def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
     """ Function to reprice a basic swap using the simulated forward Ibors.
     """
 
-    maxPaths = len(fwds)
-    maxForwards = len(fwds[0])
+    max_paths = len(fwds)
+    max_fwds = len(fwds[0])
 
-    if num_periods > maxForwards:
-        raise FinError("NumPeriods > numForwards")
+    if num_periods > max_fwds:
+        raise FinError("NumPeriods > num_fwds")
 
-    if num_paths > maxPaths:
+    if num_paths > max_paths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(maxForwards)
-    numeraire = np.zeros(maxForwards)
-    sumFixed = 0.0
-    sumFloat = 0.0
-    fixedFlows = np.zeros(maxForwards)
-    floatFlows = np.zeros(maxForwards)
+    df = np.zeros(max_fwds)
+    numeraire = np.zeros(max_fwds)
+    sum_fixed = 0.0
+    sun_float = 0.0
+    fixed_flows = np.zeros(max_fwds)
+    float_flows = np.zeros(max_fwds)
 
     # Set up initial term structure
-    discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, maxForwards):
-        discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+    df[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    for ix in range(1, max_fwds):
+        df[ix] = df[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     for i_path in range(0, num_paths):
 
-        periodRoll = 1.0
+        period_roll = 1.0
         libor = fwds[i_path, 0, 0]
-        floatFlows[0] = libor * taus[0]
-        fixedFlows[0] = cpn * taus[0]
-        numeraire[0] = 1.0 / discFactor[0]
+        float_flows[0] = libor * taus[0]
+        fixed_flows[0] = cpn * taus[0]
+        numeraire[0] = 1.0 / df[0]
 
         for j in range(1, num_periods):  # TIME LOOP
 
             libor = fwds[i_path, j, j]
 
             if j == 1:
-                fixedFlows[j] = cpn * taus[j]
-                floatFlows[j] = libor * taus[j]
+                fixed_flows[j] = cpn * taus[j]
+                float_flows[j] = libor * taus[j]
             else:
-                fixedFlows[j] = fixedFlows[j-1] * periodRoll + cpn * taus[j]
-                floatFlows[j] = floatFlows[j-1] * periodRoll + libor * taus[j]
+                fixed_flows[j] = fixed_flows[j-1] * period_roll + cpn * taus[j]
+                float_flows[j] = float_flows[j-1] * \
+                    period_roll + libor * taus[j]
 
-            periodRoll = (1.0 + libor * taus[j])
-            numeraire[j] = numeraire[j - 1] * periodRoll
+            period_roll = (1.0 + libor * taus[j])
+            numeraire[j] = numeraire[j - 1] * period_roll
 
-        for iFwd in range(0, num_periods):
-            sumFloat += floatFlows[iFwd] / numeraire[iFwd]
-            sumFixed += fixedFlows[iFwd] / numeraire[iFwd]
+        for i_fwd in range(0, num_periods):
+            sun_float += float_flows[i_fwd] / numeraire[i_fwd]
+            sum_fixed += fixed_flows[i_fwd] / numeraire[i_fwd]
 
-    sumFloat /= num_paths
-    sumFixed /= num_paths
-    v = sumFixed - sumFloat
-    pv01 = sumFixed/cpn
-    swap_rate = sumFloat/pv01
+    sun_float /= num_paths
+    sum_fixed /= num_paths
+    v = sum_fixed - sun_float
+    pv01 = sum_fixed/cpn
+    swap_rate = sun_float/pv01
 
-    print("FLOAT LEG:", sumFloat)
-    print("FIXED LEG:", sumFixed)
+    print("FLOAT LEG:", sun_float)
+    print("FIXED LEG:", sum_fixed)
     print("SWAP RATE:", swap_rate)
     print("NET VALUE:", v)
     return v
@@ -743,29 +744,29 @@ def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
 
 @njit(float64(float64, int64, int64, int64, float64[:], float64[:, :, :],
               float64[:], int64), cache=True, fastmath=True)
-def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
+def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, is_payer):
     """ Function to price a European swaption using the simulated forward
     discount. """
 
-    maxPaths = len(fwds)
-    maxForwards = len(fwds[0])
+    max_paths = len(fwds)
+    max_fwds = len(fwds[0])
 
-    if a > maxForwards:
-        raise FinError("NumPeriods > numForwards")
+    if a > max_fwds:
+        raise FinError("NumPeriods > num_fwds")
 
     if a >= b:
         raise FinError("Swap maturity is before expiry date")
 
-    if num_paths > maxPaths:
+    if num_paths > max_paths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(maxForwards)
-#    pv01 = np.zeros(maxForwards)
+    df = np.zeros(max_fwds)
+#    pv01 = np.zeros(max_fwds)
 
     # Set up initial term structure
-    discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    df[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
     for ix in range(1, b):
-        discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+        df[ix] = df[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     sumPayRecSwaption = 0.0
 
@@ -785,12 +786,12 @@ def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
             df = df / (1.0 + tau * f)
             pv01 = pv01 + tau * df
 
-        fwdSwapRate = (1.0 - df) / pv01
+        fwd_swap_rate = (1.0 - df) / pv01
 
-        if isPayer == 1:
-            payRecSwaption = max(fwdSwapRate - strike, 0.0) * pv01
-        elif isPayer == 0:
-            payRecSwaption = max(strike - fwdSwapRate, 0.0) * pv01
+        if is_payer == 1:
+            payRecSwaption = max(fwd_swap_rate - strike, 0.0) * pv01
+        elif is_payer == 0:
+            payRecSwaption = max(strike - fwd_swap_rate, 0.0) * pv01
         else:
             raise FinError("Unknown payRecSwaption value - must be 0 or 1")
 
@@ -807,30 +808,30 @@ def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, isPayer):
 def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a ratchet using the simulated Ibor rates."""
 
-    maxPaths = len(fwds)
-    maxForwards = len(fwds[0][0])
+    max_paths = len(fwds)
+    max_fwds = len(fwds[0][0])
 
-    if num_periods > maxForwards:
-        raise FinError("NumPeriods > numForwards")
+    if num_periods > max_fwds:
+        raise FinError("NumPeriods > num_fwds")
 
-    if num_paths > maxPaths:
+    if num_paths > max_paths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(maxForwards)
-    numeraire = np.zeros(maxForwards)
-    ratchetCaplets = np.zeros(maxForwards)
-    ratchetCapletValues = np.zeros(maxForwards)
+    df = np.zeros(max_fwds)
+    numeraire = np.zeros(max_fwds)
+    rachet_caplets = np.zeros(max_fwds)
+    rachet_caplet_values = np.zeros(max_fwds)
 
     # Set up initial term structure
-    discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, maxForwards):
-        discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+    df[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    for ix in range(1, max_fwds):
+        df[ix] = df[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     for i_path in range(0, num_paths):
 
-        periodRoll = 1.0
+        period_roll = 1.0
         libor = fwds[i_path, 0, 0]
-        ratchetCaplets[0] = 0.0
+        rachet_caplets[0] = 0.0
 
         for j in range(1, num_periods):  # TIME LOOP
 
@@ -839,21 +840,22 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
             libor = fwds[i_path, j, j]
 
             if j == 1:
-                ratchetCaplets[j] = max(libor - K, 0.0) * taus[j]
-                numeraire[0] = 1.0 / discFactor[0]
+                rachet_caplets[j] = max(libor - K, 0.0) * taus[j]
+                numeraire[0] = 1.0 / df[0]
             else:
-                ratchetCaplets[j] = max(libor - K, 0.0) * taus[j]
+                rachet_caplets[j] = max(libor - K, 0.0) * taus[j]
 
-            periodRoll = (1.0 + libor * taus[j])
-            numeraire[j] = numeraire[j - 1] * periodRoll
+            period_roll = (1.0 + libor * taus[j])
+            numeraire[j] = numeraire[j - 1] * period_roll
 
-        for iFwd in range(0, num_periods):
-            ratchetCapletValues[iFwd] += ratchetCaplets[iFwd] / numeraire[iFwd]
+        for i_fwd in range(0, num_periods):
+            rachet_caplet_values[i_fwd] += rachet_caplets[i_fwd] / \
+                numeraire[i_fwd]
 
-    for iFwd in range(0, num_periods):
-        ratchetCapletValues[iFwd] /= num_paths
+    for i_fwd in range(0, num_periods):
+        rachet_caplet_values[i_fwd] /= num_paths
 
-    return ratchetCapletValues
+    return rachet_caplet_values
 
 ###############################################################################
 
@@ -864,61 +866,61 @@ def lmm_flexi_cap_pricer(maxCaplets, K, num_periods, num_paths,
                          fwd0, fwds, taus):
     """ Price a flexicap using the simulated Ibor rates."""
 
-    maxPaths = len(fwds)
-    maxForwards = len(fwds[0][0])
+    max_paths = len(fwds)
+    max_fwds = len(fwds[0][0])
 
-    if num_periods > maxForwards:
-        raise FinError("NumPeriods > numForwards")
+    if num_periods > max_fwds:
+        raise FinError("NumPeriods > num_fwds")
 
-    if num_paths > maxPaths:
+    if num_paths > max_paths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(maxForwards)
-    numeraire = np.zeros(maxForwards)
-    flexiCaplets = np.zeros(maxForwards)
-    flexiCapletValues = np.zeros(maxForwards)
+    df = np.zeros(max_fwds)
+    numeraire = np.zeros(max_fwds)
+    flexi_caplets = np.zeros(max_fwds)
+    flexi_caplet_values = np.zeros(max_fwds)
 
     # Set up initial term structure
-    discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, maxForwards):
-        discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+    df[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    for ix in range(1, max_fwds):
+        df[ix] = df[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     for i_path in range(0, num_paths):
 
-        periodRoll = 1.0
+        period_roll = 1.0
         libor = fwds[i_path, 0, 0]
-        flexiCaplets[0] = 0.0
+        flexi_caplets[0] = 0.0
 
-        numCapletsLeft = maxCaplets
+        num_caplets_left = maxCaplets
 
         for j in range(1, num_periods):  # TIME LOOP
 
             libor = fwds[i_path, j, j]
 
             if j == 1:
-                if libor > K and numCapletsLeft > 0:
-                    flexiCaplets[j] = max(libor - K, 0.0) * taus[j]
-                    numCapletsLeft -= 1
-                numeraire[0] = 1.0 / discFactor[0]
+                if libor > K and num_caplets_left > 0:
+                    flexi_caplets[j] = max(libor - K, 0.0) * taus[j]
+                    num_caplets_left -= 1
+                numeraire[0] = 1.0 / df[0]
             else:
-                if libor > K and numCapletsLeft > 0:
-                    flexiCaplets[j] = max(libor - K, 0.0) * taus[j]
-                    numCapletsLeft -= 1
+                if libor > K and num_caplets_left > 0:
+                    flexi_caplets[j] = max(libor - K, 0.0) * taus[j]
+                    num_caplets_left -= 1
 
-            periodRoll = (1.0 + libor * taus[j])
-            numeraire[j] = numeraire[j - 1] * periodRoll
+            period_roll = (1.0 + libor * taus[j])
+            numeraire[j] = numeraire[j - 1] * period_roll
 
-        for iFwd in range(0, num_periods):
-            flexiCapletValues[iFwd] += flexiCaplets[iFwd] / numeraire[iFwd]
+        for i_fwd in range(0, num_periods):
+            flexi_caplet_values[i_fwd] += flexi_caplets[i_fwd] / numeraire[i_fwd]
 
-    for iFwd in range(0, num_periods):
-        flexiCapletValues[iFwd] /= num_paths
+    for i_fwd in range(0, num_periods):
+        flexi_caplet_values[i_fwd] /= num_paths
 
-    flexiCapValue = 0.0
-    for iFwd in range(0, num_periods):
-        flexiCapValue += flexiCapletValues[iFwd]
+    flexi_cap_value = 0.0
+    for i_fwd in range(0, num_periods):
+        flexi_cap_value += flexi_caplet_values[i_fwd]
 
-    return flexiCapValue
+    return flexi_cap_value
 
 ###############################################################################
 
@@ -928,28 +930,28 @@ def lmm_flexi_cap_pricer(maxCaplets, K, num_periods, num_paths,
 def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
     """ Price a sticky cap using the simulated Ibor rates. """
 
-    maxPaths = len(fwds)
-    maxForwards = len(fwds[0][0])
+    max_paths = len(fwds)
+    max_fwds = len(fwds[0][0])
 
-    if num_periods > maxForwards:
-        raise FinError("NumPeriods > numForwards")
+    if num_periods > max_fwds:
+        raise FinError("NumPeriods > num_fwds")
 
-    if num_paths > maxPaths:
+    if num_paths > max_paths:
         raise FinError("NumPaths > MaxPaths")
 
-    discFactor = np.zeros(maxForwards)
-    numeraire = np.zeros(maxForwards)
-    stickyCaplets = np.zeros(maxForwards)
-    stickyCapletValues = np.zeros(maxForwards)
+    df = np.zeros(max_fwds)
+    numeraire = np.zeros(max_fwds)
+    stickyCaplets = np.zeros(max_fwds)
+    stickyCapletValues = np.zeros(max_fwds)
 
     # Set up initial term structure
-    discFactor[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
-    for ix in range(1, maxForwards):
-        discFactor[ix] = discFactor[ix-1] / (1.0 + fwd0[ix] * taus[ix])
+    df[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
+    for ix in range(1, max_fwds):
+        df[ix] = df[ix-1] / (1.0 + fwd0[ix] * taus[ix])
 
     for i_path in range(0, num_paths):
 
-        periodRoll = 1.0
+        period_roll = 1.0
         libor = fwds[i_path, 0, 0]
         stickyCaplets[0] = 0.0
         K = libor
@@ -962,18 +964,19 @@ def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
 
             if j == 1:
                 stickyCaplets[j] = max(libor-K, 0.0) * taus[j]
-                numeraire[0] = 1.0 / discFactor[0]
+                numeraire[0] = 1.0 / df[0]
             else:
                 stickyCaplets[j] = max(libor - K, 0.0) * taus[j]
 
-            periodRoll = (1.0 + libor * taus[j])
-            numeraire[j] = numeraire[j - 1] * periodRoll
+            period_roll = (1.0 + libor * taus[j])
+            numeraire[j] = numeraire[j - 1] * period_roll
 
-        for iFwd in range(0, num_periods):
-            stickyCapletValues[iFwd] += stickyCaplets[iFwd] / numeraire[iFwd]
+        for i_fwd in range(0, num_periods):
+            stickyCapletValues[i_fwd] += stickyCaplets[i_fwd] / \
+                numeraire[i_fwd]
 
-    for iFwd in range(0, num_periods):
-        stickyCapletValues[iFwd] /= num_paths
+    for i_fwd in range(0, num_periods):
+        stickyCapletValues[i_fwd] /= num_paths
 
     return stickyCapletValues
 

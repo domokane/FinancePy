@@ -11,7 +11,7 @@ import numpy as np
 
 # Reference see table 4.1 of Rouah book
 value_dt = Date(1, 1, 2015)
-expiry_date = Date(1, 4, 2015)
+expiry_dt = Date(1, 4, 2015)
 v0 = 0.05  # initial variance of volatility
 theta = 0.05  # long term variance
 kappa = 2.0  # speed of variance reversion
@@ -33,7 +33,7 @@ def test_heston():
     hestonModel = Heston(v0, kappa, theta, sigma, rho)
 
     call_option = EquityVanillaOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_CALL)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL)
 
     value_mc_Heston = hestonModel.value_mc(
         value_dt,

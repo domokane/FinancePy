@@ -47,10 +47,10 @@ class IborFRA:
                  start_dt: Date,  # The date the FRA starts to accrue
                  # End of the Ibor rate period
                  maturity_dt_or_tenor: (Date, str),
-                 fraRate: float,  # The fixed contractual FRA rate
+                 fra_rate: float,  # The fixed contractual FRA rate
                  dc_type: DayCountTypes,  # For interest period
                  notional: float = 100.0,
-                 payFixedRate: bool = True,  # True if the FRA rate is being paid
+                 pay_fixed_rate: bool = True,  # True if the FRA rate is being paid
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Forward Rate Agreement object. """
@@ -73,8 +73,8 @@ class IborFRA:
 
         self._start_dt = start_dt
         self._maturity_dt = maturity_dt
-        self._fra_rate = fraRate
-        self._pay_fixed_rate = payFixedRate
+        self._fra_rate = fra_rate
+        self._pay_fixed_rate = pay_fixed_rate
         self._dc_type = dc_type
         self._notional = notional
 
@@ -94,14 +94,14 @@ class IborFRA:
         # Get the Libor index from the index curve
         dc = DayCount(self._dc_type)
         acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        dfIndex1 = index_curve.df(self._start_dt)
-        dfIndex2 = index_curve.df(self._maturity_dt)
-        liborFwd = (dfIndex1 / dfIndex2 - 1.0) / acc_factor
+        df_index1 = index_curve.df(self._start_dt)
+        df_index2 = index_curve.df(self._maturity_dt)
+        libor_fwd = (df_index1 / df_index2 - 1.0) / acc_factor
 
         # Get the discount factor from a discount curve
-        dfDiscount2 = discount_curve.df(self._maturity_dt)
+        df_discount2 = discount_curve.df(self._maturity_dt)
 
-        v = acc_factor * (liborFwd - self._fra_rate) * dfDiscount2
+        v = acc_factor * (libor_fwd - self._fra_rate) * df_discount2
 
         # Forward value the FRA to the value date
         df_to_value_dt = discount_curve.df(value_dt)

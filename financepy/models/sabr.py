@@ -90,22 +90,22 @@ def vol_function_sabr_beta_one(params, f, k, t):
     if abs(m - 1.0) > 1e-6:
 
         sigma = 1.0
-        numTerm1 = 0.0
-        numTerm2 = rho * nu * alpha / 4.0
-        numTerm3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
-        num = alpha * (1.0 + (numTerm1 + numTerm2 + numTerm3) * t)
-        logM = np.log(m)
-        z = nu / alpha * logM
+        num_term1 = 0.0
+        num_term2 = rho * nu * alpha / 4.0
+        num_term3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
+        num = alpha * (1.0 + (num_term1 + num_term2 + num_term3) * t)
+        log_m = np.log(m)
+        z = nu / alpha * log_m
         denom = 1.0
         x = np.log((np.sqrt(1.0 - 2.0*rho*z + z**2.0) + z - rho)/(1.0 - rho))
         sigma = num*z/(denom*x)
 
     else:
         # when the option is at the money
-        numTerm1 = 0.0
-        numTerm2 = rho * nu * alpha / 4.0
-        numTerm3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
-        num = alpha * (1.0 + (numTerm1 + numTerm2 + numTerm3) * t)
+        num_term1 = 0.0
+        num_term2 = rho * nu * alpha / 4.0
+        num_term3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
+        num = alpha * (1.0 + (num_term1 + num_term2 + num_term3) * t)
         denom = 1.0
         sigma = num / denom
 
@@ -213,8 +213,8 @@ class SABR():
     def black_vol_with_alpha(self, alpha, f, k, t):
 
         self._alpha = alpha[0]
-        blackVol = self.black_vol(f, k, t)
-        return blackVol
+        black_vol = self.black_vol(f, k, t)
+        return black_vol
 
 ###############################################################################
 
@@ -230,12 +230,12 @@ class SABR():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        sqrtT = np.sqrt(t)
+        sqrt_t = np.sqrt(t)
         vol = self.black_vol(f, k, t)
 
         d1 = np.log(f/k) + vol * vol * t / 2
-        d1 = d1 / (vol * sqrtT)
-        d2 = d1 - vol * sqrtT
+        d1 = d1 / (vol * sqrt_t)
+        d2 = d1 - vol * sqrt_t
 
         if call_or_put == OptionTypes.EUROPEAN_CALL:
             return df * (f * N(d1) - k * N(d2))
@@ -247,53 +247,51 @@ class SABR():
 ###############################################################################
 
     def set_alpha_from_black_vol(self,
-                                 blackVol,
+                                 black_vol,
                                  forward,
                                  strike,
                                  time_to_expiry):
         """ Estimate the value of the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
         to the input black vol. This uses a numerical 1D solver. """
-
         t_exp = time_to_expiry
         f = forward
-        K = strike
+        k = strike
 
         # The starting point is based on assuming that the strike is ATM
-        self.set_alpha_from_atm_black_vol(blackVol, strike, time_to_expiry)
+        self.set_alpha_from_atm_black_vol(black_vol, strike, time_to_expiry)
 
-        initAlpha = self._alpha
+        init_alpha = self._alpha
 
-        if initAlpha != blackVol:
+        if init_alpha != black_vol:
             # Objective function
             def fn(x): return np.sqrt(
-                (blackVol - self.black_vol_with_alpha(x, f, K, t_exp)) ** 2)
+                (black_vol - self.black_vol_with_alpha(x, f, k, t_exp)) ** 2)
             bnds = ((0.0, None),)
-            x0 = initAlpha
+            x0 = init_alpha
             results = minimize(fn, x0, method="L-BFGS-B",
                                bounds=bnds, tol=1e-8)
             alpha = results.x[0]
         else:
-            alpha = initAlpha
+            alpha = init_alpha
 
         self._alpha = alpha
 
 ###############################################################################
 
-    def set_alpha_from_atm_black_vol(self, blackVol, atmStrike, time_to_expiry):
+    def set_alpha_from_atm_black_vol(self, black_vol, atm_strike, time_to_expiry):
         """ We solve cubic equation for the unknown variable alpha for the
         special ATM case of the strike equalling the forward following Hagan
         and al. equation (3.3). We take the smallest real root as the preferred
         solution. This is useful for calibrating the model when beta has been
         chosen."""
-
         beta = self._beta
         rho = self._rho
         nu = self._nu
         t_exp = time_to_expiry
-        K = atmStrike
+        K = atm_strike
 
-        coeff0 = -blackVol * (K**(1.0 - self._beta))
+        coeff0 = -black_vol * (K**(1.0 - self._beta))
         coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
         coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K**(1.0 - beta)))
         coeff3 = (((1.0 - beta)**2) * t_exp) / (24.0 * (K**(2.0 - 2.0 * beta)))
@@ -308,7 +306,6 @@ class SABR():
 
     def __repr__(self):
         """ Return string with class details. """
-
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("Alpha", self._alpha)
         s += label_to_string("Beta", self._beta)

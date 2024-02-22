@@ -15,26 +15,26 @@ class StudentTCopula():
 
     def default_times(self,
                       issuer_curves,
-                      correlation_matrix,
-                      degreesOfFreedom,
+                      corr_matrix,
+                      degrees_of_freedom,
                       num_trials,
                       seed):
 
         np.random.seed(seed)
         num_credits = len(issuer_curves)
         x = np.random.normal(0.0, 1.0, size=(num_credits, num_trials))
-        c = np.linalg.cholesky(correlation_matrix)
+        c = np.linalg.cholesky(corr_matrix)
         y = np.dot(c, x)
 
         corr_times = np.empty(shape=(num_credits, 2 * num_trials))
 
         for i_trial in range(0, num_trials):
-            chi2 = np.random.chisquare(degreesOfFreedom)
-            c = sqrt(chi2 / degreesOfFreedom)
+            chi2 = np.random.chisquare(degrees_of_freedom)
+            c = sqrt(chi2 / degrees_of_freedom)
             for iCredit in range(0, num_credits):
                 issuer_curve = issuer_curves[iCredit]
                 g = y[iCredit, i_trial] / c
-                u1 = student.cdf(g, degreesOfFreedom)
+                u1 = student.cdf(g, degrees_of_freedom)
                 u2 = 1.0 - u1
                 times = issuer_curve._times
                 values = issuer_curve._values

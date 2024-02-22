@@ -22,7 +22,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 def testEquityAmericanOption():
 
     value_dt = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2017)
+    expiry_dt = Date(1, 1, 2017)
     stock_price = 50.0
     interest_rate = 0.06
     dividend_yield = 0.04
@@ -35,7 +35,7 @@ def testEquityAmericanOption():
     test_cases.banner("================== EUROPEAN PUT =======================")
 
     put_option = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
     num_steps = 4
 
@@ -56,7 +56,7 @@ def testEquityAmericanOption():
     test_cases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
 
     option = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
     test_cases.header("OPTION_TYPE", "NUMSTEPS",
                      "VALUE DELTA GAMMA THETA", "TIME")
@@ -79,7 +79,7 @@ def testEquityAmericanOption():
     test_cases.banner("================== AMERICAN PUT =======================")
 
     option = EquityAmericanOption(
-        expiry_date,
+        expiry_dt,
         strike_price,
         OptionTypes.AMERICAN_PUT)
 
@@ -106,7 +106,7 @@ def testEquityAmericanOption():
         "================== EUROPEAN CALL =======================")
 
     call_option = EquityAmericanOption(
-        expiry_date,
+        expiry_dt,
         strike_price,
         OptionTypes.EUROPEAN_CALL)
 
@@ -123,7 +123,7 @@ def testEquityAmericanOption():
     test_cases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
 
     option = EquityAmericanOption(
-        expiry_date,
+        expiry_dt,
         strike_price,
         OptionTypes.EUROPEAN_CALL)
 
@@ -153,7 +153,7 @@ def testEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    option = EquityAmericanOption(expiry_date, strike_price,
+    option = EquityAmericanOption(expiry_dt, strike_price,
                                   OptionTypes.AMERICAN_CALL)
 
     for num_steps in num_steps_list:
@@ -179,7 +179,7 @@ def testEquityAmericanOption():
         "VALUE DELTA GAMMA THETA",
         "TIME")
 
-    option = EquityAmericanOption(expiry_date, strike_price,
+    option = EquityAmericanOption(expiry_dt, strike_price,
                                   OptionTypes.AMERICAN_PUT)
 
     for num_steps in num_steps_list:

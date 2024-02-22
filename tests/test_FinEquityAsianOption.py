@@ -11,8 +11,8 @@ from financepy.utils.global_types import OptionTypes
 
 
 value_dt = Date(1, 1, 2014)
-startAveragingDate = Date(1, 6, 2014)
-expiry_date = Date(1, 1, 2015)
+start_averaging_dt = Date(1, 6, 2014)
+expiry_dt = Date(1, 1, 2015)
 stock_price = 100.0
 volatility = 0.20
 interest_rate = 0.30
@@ -27,8 +27,8 @@ model = BlackScholes(volatility)
 discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-asianOption = EquityAsianOption(startAveragingDate,
-                                expiry_date,
+asianOption = EquityAsianOption(start_averaging_dt,
+                                expiry_dt,
                                 K,
                                 OptionTypes.EUROPEAN_CALL,
                                 num_observations)

@@ -63,8 +63,8 @@ class EquityIndexOption:
             t_exp = (self._expiry_dt - value_dt) / gDaysInYear
         elif isinstance(self._expiry_dt, list):
             t_exp = []
-            for expDate in self._expiry_dt:
-                t = (expDate - value_dt) / gDaysInYear
+            for exp_dt in self._expiry_dt:
+                t = (exp_dt - value_dt) / gDaysInYear
             t_exp.append(t)
             t_exp = np.array(t_exp)
         else:

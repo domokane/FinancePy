@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import gSmall
+from ...utils.global_vars import g_small
 from ...utils.math import test_monotonicity
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
@@ -69,7 +69,7 @@ class DiscountCurvePWF(DiscountCurve):
         if np.any(times < 0.0):
             raise FinError("All times must be positive")
 
-        times = np.maximum(times, gSmall)
+        times = np.maximum(times, g_small)
 
         zero_rates = []
 

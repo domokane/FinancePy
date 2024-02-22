@@ -27,7 +27,7 @@ from scipy import optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
@@ -51,10 +51,10 @@ from enum import Enum
 
 
 class YTMCalcType(Enum):
-    ZERO = 0,
-    UK_DMO = 1,
-    US_STREET = 2,
-    US_TREASURY = 3,
+    ZERO = 0
+    UK_DMO = 1
+    US_STREET = 2
+    US_TREASURY = 3
     CFETS = 4  # China Foreign Exchange Trade System
 
 
@@ -161,6 +161,9 @@ class Bond:
 
         self._calculate_cpn_dts()
         self._calculate_flows()
+
+        self._pcd = None
+        self._ncd = None
 
     ###########################################################################
 
@@ -389,7 +392,7 @@ class Bond:
 
     ###########################################################################
 
-    def key_rate_durations(self, 
+    def key_rate_durations(self,
                            settle_dt: Date,
                            ytm: float,
                            key_rate_tenors: list = None,
@@ -484,7 +487,7 @@ class Bond:
                 mat = settle_dt.add_years(tenor)
 
                 par_bond = Bond(settle_dt, mat, cpn,
-                                self._freq_type, 
+                                self._freq_type,
                                 self._dc_type)
 
                 par_bonds.append(par_bond)
@@ -622,7 +625,7 @@ class Bond:
 
         px = 0.0
         df = 1.0
-        dfSettle = discount_curve.df(settle_dt)
+        df_settle_dt = discount_curve.df(settle_dt)
 
         dt = self._cpn_dts[1]
         if dt > settle_dt:
@@ -641,7 +644,7 @@ class Bond:
                 px += pv
 
         px += df
-        px = px / dfSettle
+        px = px / df_settle_dt
 
         return px * self._par
 
@@ -663,14 +666,14 @@ class Bond:
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
-        if type(clean_price) is float or type(clean_price) is np.float64:
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif type(clean_price) is list or type(clean_price) is np.ndarray:
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
             raise FinError("Unknown type for clean_price "
                            + str(type(clean_price)))
-
+        
         self.accrued_interest(settle_dt, 1.0)
 
         accrued_amount = self._accrued_interest * self._par
@@ -830,7 +833,7 @@ class Bond:
             if dt > settle_dt:
                 t = (dt - settle_dt) / gDaysInYear
 
-                t = np.maximum(t, gSmall)
+                t = np.maximum(t, g_small)
 
                 df = discount_curve.df(dt)
 
@@ -854,9 +857,9 @@ class Bond:
         """ Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed. """
 
-        if type(clean_price) is float or type(clean_price) is np.float64:
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif type(clean_price) is list or type(clean_price) is np.ndarray:
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
             raise FinError("Unknown type for clean_price "

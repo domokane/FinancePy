@@ -68,14 +68,14 @@ class BondEmbeddedOption:
         self._freq_type = freq_type
         self._dc_type = dc_type
 
-        ex_div_days = 0
+        self._ex_div_days = 0
 
         self._bond = Bond(issue_dt,
                           maturity_dt,
                           coupon,
                           freq_type,
                           dc_type,
-                          ex_div_days)
+                          self._ex_div_days)
 
         # Validate call and put schedules
         for dt in call_dts:

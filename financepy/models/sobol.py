@@ -34,7 +34,7 @@ import os
 import numpy as np
 from numba import njit
 
-from financepy.utils.math import norminvcdf
+from ..utils.math import norminvcdf
 
 ###############################################################################
 # This code loads sobol coefficients from binary numpy file and allocates
@@ -45,8 +45,8 @@ dirname = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(dirname, "sobolcoeff.npz")
 
 with np.load(path, mmap_mode='r') as f:
-    sArr = np.array(f['sa'][0])
-    aArr = np.array(f['sa'][1])
+    s_arr = np.array(f['sa'][0])
+    a_arr = np.array(f['sa'][1])
     m_i = f['c']
 
 ###############################################################################
@@ -75,8 +75,8 @@ def get_uniform_sobol(num_points, dimension):
     random draws. Each column of random numbers is ordered so as not to
     correlate, i.e be independent from any other column."""
 
-    global sArr
-    global aArr
+    global s_arr
+    global a_arr
     global m_i
 
     # ll = number of bits needed
@@ -111,8 +111,8 @@ def get_uniform_sobol(num_points, dimension):
     # ----- Compute the remaining dimensions -----
     for j in range(1, dimension):
         # read parameters from file
-        s = sArr[j-1]
-        a = aArr[j-1]
+        s = s_arr[j-1]
+        a = a_arr[j-1]
         mm = m_i[j-1]
         m = np.concatenate((np.zeros(1), mm))
 

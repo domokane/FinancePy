@@ -11,7 +11,7 @@ import numpy as np
 from math import sqrt
 
 value_dt = Date(1, 1, 2015)
-expiry_date = Date(1, 1, 2016)
+expiry_dt = Date(1, 1, 2016)
 interest_rate = 0.05
 
 discount_curve = DiscountCurveFlat(value_dt, interest_rate)
@@ -38,7 +38,7 @@ def test_call_on_max():
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MAXIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_date, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets)
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -68,7 +68,7 @@ def test_call_on_min():
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MINIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_date, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets)
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -98,7 +98,7 @@ def test_put_on_max():
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MAXIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_date, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets)
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -128,7 +128,7 @@ def test_put_on_min():
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MINIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_date, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets)
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -180,7 +180,7 @@ def test_call_on_nth():
         print(n)
         payoff_params = [n, strike]
         rainbowOption = EquityRainbowOption(
-            expiry_date, payoff_type, payoff_params, num_assets)
+            expiry_dt, payoff_type, payoff_params, num_assets)
 
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -225,7 +225,7 @@ def test_put_on_nth():
         print(n)
         payoff_params = [n, strike]
         rainbowOption = EquityRainbowOption(
-            expiry_date, payoff_type, payoff_params, num_assets)
+            expiry_dt, payoff_type, payoff_params, num_assets)
 
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vector_to_corr_matrix(betas)

@@ -103,8 +103,8 @@ def test_BondYieldCurve():
 ###############################################################################
 
     maturity_dt = Date(19, 9, 2030)
-    interpolated_yield = fitted_curve5.interpolated_yield(maturity_dt)
-    test_cases.print(maturity_dt, interpolated_yield)
+    interp_yield = fitted_curve5.interp_yield(maturity_dt)
+    test_cases.print(maturity_dt, interp_yield)
 
 ###############################################################################
 

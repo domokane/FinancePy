@@ -87,7 +87,7 @@ def build_Ibor_Curve(value_dt):
     depos.append(depo5)
 
     fras = []
-    fixedDCCType = DayCountTypes.ACT_365F
+    fixed_dcc_type = DayCountTypes.ACT_365F
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swaps = []
@@ -100,7 +100,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
 
     #    print(swap1._fixed_leg._payment_dts)
 
@@ -113,7 +113,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap2)
 
     #    print(swap2._fixed_leg._payment_dts)
@@ -125,7 +125,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap3)
 
     #    print(swap3._fixed_leg._payment_dts)
@@ -137,7 +137,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap4)
 
     #    print(swap4._fixed_leg._payment_dts)
@@ -149,7 +149,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap5)
 
     #    print(swap5._fixed_leg._payment_dts)
@@ -161,7 +161,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap6)
 
     #    print(swap6._fixed_leg._payment_dts)
@@ -173,7 +173,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap7)
 
     #    print(swap7._fixed_leg._payment_dts)
@@ -185,7 +185,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap8)
 
     #    print(swap8._fixed_leg._payment_dts)
@@ -197,7 +197,7 @@ def build_Ibor_Curve(value_dt):
         SwapTypes.PAY,
         swap_rate,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap9)
 
     #    print(swap9._fixed_leg._payment_dts)
@@ -503,7 +503,7 @@ def test_BondExDividend():
     settle_dt = Date(7, 9, 2003)
     accrued = bond.accrued_interest(settle_dt, face)
 
-    test_cases.print("SettlementDate:", settle_dt)
+    test_cases.print("settle_dt:", settle_dt)
     test_cases.print("Accrued:", accrued)
 
     ###########################################################################
@@ -617,7 +617,7 @@ def test_key_rate_durations():
     coupon = 0.0275
     ex_div_days = 0
 
-    dc_type, freq_type, settlementDays, exDiv, calendar = \
+    dc_type, freq_type, settle_days, exDiv, calendar = \
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
@@ -636,7 +636,7 @@ def test_key_rate_durations():
 
 def test_key_rate_durations_Bloomberg_example():
 
-    dc_type, frequencyType, settlementDays, exDiv, calendar =\
+    dc_type, frequencyType, settle_days, exDiv, calendar =\
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     # interest accrues on this date. Issue date is 01/08/2022
@@ -645,7 +645,7 @@ def test_key_rate_durations_Bloomberg_example():
     coupon = 2.75/100.0
     ex_div_days = 0
 
-    dc_type, freq_type, settlementDays, exDiv, calendar =\
+    dc_type, freq_type, settle_days, exDiv, calendar =\
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_dt, maturity_dt, coupon,
@@ -722,13 +722,13 @@ def test_div_dts():
 
     clean_price = 99.7808417  # if face is 1 then this must be 0.99780842
 
-    settlementDate = Date(15, 5, 2023)
-    print(bond.bond_payments(settlementDate, face))
+    settle_dt = Date(15, 5, 2023)
+    print(bond.bond_payments(settle_dt, face))
 
     current_yield = bond.current_yield(clean_price)*100
     print("Currnt Yield: %10.5f %%" % (current_yield))
 
-    ytm = bond.yield_to_maturity(settlementDate, clean_price) * 100.0
+    ytm = bond.yield_to_maturity(settle_dt, clean_price) * 100.0
     print("Yield to Mat: %10.5f %%" % (ytm))
 
 ###############################################################################

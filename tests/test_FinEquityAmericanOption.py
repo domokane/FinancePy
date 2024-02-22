@@ -10,7 +10,7 @@ from financepy.products.equity.equity_american_option import EquityAmericanOptio
 
 
 value_dt = Date(1, 1, 2016)
-expiry_date = Date(1, 1, 2017)
+expiry_dt = Date(1, 1, 2017)
 stock_price = 50.0
 interest_rate = 0.06
 dividend_yield = 0.04
@@ -28,7 +28,7 @@ model = BlackScholes(volatility,
 
 def test_european_put():
     put_option = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_PUT)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
     value = put_option.value(value_dt, stock_price,
                              discount_curve, dividend_curve, model)
@@ -38,7 +38,7 @@ def test_european_put():
 
 def test_american_put():
     put_option = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.AMERICAN_PUT)
+        expiry_dt, strike_price, OptionTypes.AMERICAN_PUT)
 
     value = put_option.value(value_dt, stock_price,
                              discount_curve, dividend_curve, model)
@@ -48,7 +48,7 @@ def test_american_put():
 
 def test_european_call():
     call_option = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.EUROPEAN_CALL)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(value_dt, stock_price,
                               discount_curve, dividend_curve, model)
@@ -58,7 +58,7 @@ def test_european_call():
 
 def test_american_call():
     call_option = EquityAmericanOption(
-        expiry_date, strike_price, OptionTypes.AMERICAN_CALL)
+        expiry_dt, strike_price, OptionTypes.AMERICAN_CALL)
 
     value = call_option.value(value_dt, stock_price, discount_curve,
                               dividend_curve, model)

@@ -33,7 +33,7 @@ def test_equity_vol_surface(verboseCalibration):
 
     stock_price = 3800.0  # Check
 
-    expiry_dates = [Date(11, 2, 2021), Date(11, 3, 2021),
+    expiry_dts = [Date(11, 2, 2021), Date(11, 3, 2021),
                     Date(11, 4, 2021), Date(11, 7, 2021),
                     Date(11, 10, 2021), Date(11, 1, 2022),
                     Date(11, 1, 2023)]
@@ -64,7 +64,7 @@ def test_equity_vol_surface(verboseCalibration):
                                      stock_price,
                                      discount_curve,
                                      dividend_curve,
-                                     expiry_dates,
+                                     expiry_dts,
                                      strikes,
                                      volSurface,
                                      vol_functionType)
@@ -84,8 +84,8 @@ def test_equity_vol_surface(verboseCalibration):
         dbns = equitySurface.implied_dbns(mins, maxs, 1000)
 
         for i in range(0, len(dbns)):
-            expiry_date_str = str(equitySurface._expiry_dates[i])
-            plt.plot(dbns[i]._x, dbns[i]._densitydx, label=expiry_date_str)
+            expiry_dt_str = str(equitySurface._expiry_dts[i])
+            plt.plot(dbns[i]._x, dbns[i]._densitydx, label=expiry_dt_str)
             plt.title(vol_functionType)
             plt.legend()
             print("SUM:", dbns[i].sum())
@@ -93,10 +93,10 @@ def test_equity_vol_surface(verboseCalibration):
     deltas = np.linspace(0.10, 0.90, 9)
 
     test_cases.header("EXPIRY", "DELTA", "VOL", "STRIKE")
-    for expiry_date in expiry_dates:
+    for expiry_dt in expiry_dts:
         for delta in deltas:
-            vol = equitySurface.vol_from_delta_dt(delta, expiry_date)
-            test_cases.print(expiry_date, delta, vol[0], vol[1])
+            vol = equitySurface.vol_from_delta_dt(delta, expiry_dt)
+            test_cases.print(expiry_dt, delta, vol[0], vol[1])
 
 ###############################################################################
 

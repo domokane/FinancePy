@@ -17,11 +17,12 @@ from ..utils.helpers import label_to_string
 
 
 class Bachelier():
-    """ Bachelier's Model which prices call and put options in the forward
-    measure assuming the underlying rate follows a normal process. """
+    """Bachelier's Model which prices call and put options in the forward
+    measure assuming the underlying rate follows a normal process.
+    """
 
     def __init__(self, volatility):
-        """ Create FinModel black using parameters. """
+        """Create FinModel black using parameters."""
         self._volatility = volatility
 
 ###############################################################################
@@ -32,8 +33,7 @@ class Bachelier():
               time_to_expiry,  # Time to Expiry (years)
               df,            # Discount Factor to expiry date
               call_or_put):    # Call or put
-        """ Price a call or put option using Bachelier's model. """
-
+        """Price a call or put option using Bachelier's model."""
         f = forward_rate
         t = time_to_expiry
         k = strike_rate

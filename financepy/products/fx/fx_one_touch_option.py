@@ -151,8 +151,8 @@ class FXOneTouchOption(FXOption):
     def value(self,
               value_dt: Date,
               spot_fx_rate: (float, np.ndarray),
-              dom_discount_curve: DiscountCurve,
-              for_discount_curve: DiscountCurve,
+              domestic_curve: DiscountCurve,
+              foreign_curve: DiscountCurve,
               model):
         """ FX One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
@@ -164,10 +164,10 @@ class FXOneTouchOption(FXOption):
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_dt != value_dt:
+        if domestic_curve._value_dt != value_dt:
             raise FinError("Domestic Curve date not same as valuation date")
 
-        if for_discount_curve._value_dt != value_dt:
+        if foreign_curve._value_dt != value_dt:
             raise FinError("Foreign Curve date not same as valuation date")
 
         DEBUG_MODE = False
@@ -184,11 +184,11 @@ class FXOneTouchOption(FXOption):
         H = self._barrier_rate
         K = self._payment_size
 
-        sqrtT = np.sqrt(t)
+        sqrt_t = np.sqrt(t)
 
-        df = dom_discount_curve.df(self._expiry_dt)
-        r_d = dom_discount_curve.cc_rate(self._expiry_dt)
-        r_f = for_discount_curve.cc_rate(self._expiry_dt)
+        df = domestic_curve.df(self._expiry_dt)
+        r_d = domestic_curve.cc_rate(self._expiry_dt)
+        r_f = foreign_curve.cc_rate(self._expiry_dt)
 
         v = model._volatility
         v = max(v, 1e-6)
@@ -212,9 +212,10 @@ class FXOneTouchOption(FXOption):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = 1.0
-            z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
+            z = np.log(H/s0) / v / sqrt_t + lam * v * sqrt_t
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrt_t)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -225,9 +226,10 @@ class FXOneTouchOption(FXOption):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
-            z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
+            z = np.log(H/s0) / v / sqrt_t + lam * v * sqrt_t
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrt_t)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -239,9 +241,10 @@ class FXOneTouchOption(FXOption):
 
             eta = 1.0
             K = H
-            z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
+            z = np.log(H/s0) / v / sqrt_t + lam * v * sqrt_t
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrt_t)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -253,9 +256,10 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             K = H
-            z = np.log(H/s0) / v / sqrtT + lam * v * sqrtT
+            z = np.log(H/s0) / v / sqrt_t + lam * v * sqrt_t
             A5_1 = np.power(H/s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta * z - 2.0 * eta * lam * v * sqrtT)
+            A5_2 = np.power(H/s0, mu - lam) * n_vect(eta *
+                                                     z - 2.0 * eta * lam * v * sqrt_t)
             v = (A5_1 + A5_2) * K
             return v
 
@@ -267,11 +271,11 @@ class FXOneTouchOption(FXOption):
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
             B4 = K * df * np.power(H/s0, 2.0 * mu) * \
-                n_vect(eta * y2 - eta * v * sqrtT)
+                n_vect(eta * y2 - eta * v * sqrt_t)
             v = (B2 + B4)
             return v
 
@@ -284,10 +288,11 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             phi = +1.0
 
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
-            B4 = K * df * np.power(H/s0, 2.0 * mu) * n_vect(eta * y2 - eta * v * sqrtT)
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            B4 = K * df * np.power(H/s0, 2.0 * mu) * \
+                n_vect(eta * y2 - eta * v * sqrt_t)
             v = (B2 + B4)
             return v
 
@@ -299,8 +304,8 @@ class FXOneTouchOption(FXOption):
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
             A2 = s0 * dq * n_vect(phi * x2)
             A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
@@ -315,8 +320,8 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             phi = +1.0
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
             A2 = s0 * dq * n_vect(phi * x2)
             A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
@@ -332,11 +337,11 @@ class FXOneTouchOption(FXOption):
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
             B4 = K * df * np.power(H/s0, 2.0 * mu) * \
-                n_vect(eta * y2 - eta * v * sqrtT)
+                n_vect(eta * y2 - eta * v * sqrt_t)
             v = (B2 - B4)
             return v
 
@@ -349,11 +354,11 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrtT)
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
             B4 = K * df * np.power(H/s0, 2.0 * mu) * \
-                n_vect(eta * y2 - eta * v * sqrtT)
+                n_vect(eta * y2 - eta * v * sqrt_t)
             v = (B2 - B4)
             return v
 
@@ -366,8 +371,8 @@ class FXOneTouchOption(FXOption):
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f*t)
             A2 = s0 * dq * n_vect(phi * x2)
             A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
@@ -383,8 +388,8 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0/H) / v / sqrtT + (mu + 1.0) * v * sqrtT
-            y2 = np.log(H/s0) / v / sqrtT + (mu + 1.0) * v * sqrtT
+            x2 = np.log(s0/H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(H/s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f*t)
             A2 = s0 * dq * n_vect(phi * x2)
             A4 = s0 * dq * np.power(H/s0, 2.0*(mu+1.0)) * n_vect(eta * y2)
@@ -417,8 +422,8 @@ class FXOneTouchOption(FXOption):
     def value_mc(self,
                  value_dt: Date,
                  stock_price: float,
-                 domCurve: DiscountCurve,
-                 forCurve: DiscountCurve,
+                 dom_curve: DiscountCurve,
+                 for_curve: DiscountCurve,
                  model,
                  num_paths: int = 10000,
                  num_steps_per_year: int = 252,
@@ -432,10 +437,10 @@ class FXOneTouchOption(FXOption):
 
         t = (self._expiry_dt - value_dt) / gDaysInYear
 
-        df_d = domCurve.df(self._expiry_dt)
+        df_d = dom_curve.df(self._expiry_dt)
         r_d = -np.log(df_d)/t
 
-        df_f = forCurve.df(self._expiry_dt)
+        df_f = for_curve.df(self._expiry_dt)
         r_f = -np.log(df_f)/t
 
         num_time_steps = int(t * num_steps_per_year) + 1

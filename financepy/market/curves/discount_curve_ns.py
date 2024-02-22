@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gSmall
+from ...utils.global_vars import g_small
 from ...utils.error import FinError
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
@@ -101,7 +101,7 @@ class DiscountCurveNS(DiscountCurve):
         """ Zero rate for Nelson-Siegel curve parametrisation. This means that
         the t vector must use the curve day count."""
 
-        t = np.maximum(times, gSmall)
+        t = np.maximum(times, g_small)
 
         theta = t / self._tau
         e = np.exp(-theta)

@@ -12,8 +12,8 @@ sys.path.append("./..")
 
 
 value_dt = Date(1, 1, 2015)
-expiry_date1 = Date(1, 1, 2017)
-expiry_date2 = Date(1, 1, 2018)
+expiry_dt1 = Date(1, 1, 2017)
+expiry_dt2 = Date(1, 1, 2018)
 k1 = 5.0
 k2 = 95.0
 stock_price = 85.0
@@ -34,8 +34,8 @@ def test_european():
     option_type1 = OptionTypes.EUROPEAN_CALL
     option_type2 = OptionTypes.EUROPEAN_CALL
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -47,8 +47,8 @@ def test_european():
     option_type1 = OptionTypes.EUROPEAN_CALL
     option_type2 = OptionTypes.EUROPEAN_PUT
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -60,8 +60,8 @@ def test_european():
     option_type1 = OptionTypes.EUROPEAN_PUT
     option_type2 = OptionTypes.EUROPEAN_CALL
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -73,8 +73,8 @@ def test_european():
     option_type1 = OptionTypes.EUROPEAN_PUT
     option_type2 = OptionTypes.EUROPEAN_PUT
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -90,8 +90,8 @@ def test_american():
     option_type1 = OptionTypes.AMERICAN_CALL
     option_type2 = OptionTypes.AMERICAN_CALL
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -103,8 +103,8 @@ def test_american():
     option_type1 = OptionTypes.AMERICAN_CALL
     option_type2 = OptionTypes.AMERICAN_PUT
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -116,8 +116,8 @@ def test_american():
     option_type1 = OptionTypes.AMERICAN_PUT
     option_type2 = OptionTypes.AMERICAN_CALL
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -129,8 +129,8 @@ def test_american():
     option_type1 = OptionTypes.AMERICAN_PUT
     option_type2 = OptionTypes.AMERICAN_PUT
 
-    cmpdOption = EquityCompoundOption(expiry_date1, option_type1, k1,
-                                      expiry_date2, option_type2, k2)
+    cmpdOption = EquityCompoundOption(expiry_dt1, option_type1, k1,
+                                      expiry_dt2, option_type2, k2)
     value = cmpdOption.value(value_dt, stock_price, discount_curve,
                              dividend_curve, model)
     values = cmpdOption._value_tree(value_dt, stock_price, discount_curve,
@@ -145,8 +145,8 @@ def test_greeks():
     option_type1 = OptionTypes.EUROPEAN_CALL
     option_type2 = OptionTypes.EUROPEAN_PUT
     cmpdOption = EquityCompoundOption(
-        expiry_date1, option_type1, k1,
-        expiry_date2, option_type2, k2)
+        expiry_dt1, option_type1, k1,
+        expiry_dt2, option_type2, k2)
 
     delta = cmpdOption.delta(
         value_dt,

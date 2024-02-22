@@ -27,9 +27,7 @@ def crr_tree_val(stock_price,
     """ Value an American option using a Binomial Treee """
 
     num_steps = int(num_steps_per_year * time_to_expiry)
-
-    if num_steps < 30:
-        num_steps = 30
+    num_steps = max(num_steps, 30)
 
     # OVERRIDE JUST TO SEE
     num_steps = num_steps_per_year
@@ -54,20 +52,20 @@ def crr_tree_val(stock_price,
     option_values = np.zeros(num_nodes)
     u = np.exp(volatility * np.sqrt(dt))
     d = 1.0 / u
-    sLow = stock_price
+    s_low = stock_price
 
     probs = np.zeros(num_steps)
-    periodDiscountFactors = np.zeros(num_steps)
+    period_dfs = np.zeros(num_steps)
 
     # store time independent information for later use in tree
     for i_time in range(0, num_steps):
         a = np.exp((r - q) * dt)
         probs[i_time] = (a - d) / (u - d)
-        periodDiscountFactors[i_time] = np.exp(-r * dt)
+        period_dfs[i_time] = np.exp(-r * dt)
 
     for i_time in range(1, num_steps + 1):
-        sLow *= d
-        s = sLow
+        s_low *= d
+        s = s_low
         for i_node in range(0, i_time + 1):
             index = 0.5 * i_time * (i_time + 1)
             stock_values[int(index + i_node)] = s
@@ -109,27 +107,27 @@ def crr_tree_val(stock_price,
             elif option_type == OptionTypes.AMERICAN_PUT.value:
                 exercise_value = np.maximum(strike_price - s, 0.0)
 
-            nextIndex = int(0.5 * (i_time + 1) * (i_time + 2))
+            next_index = int(0.5 * (i_time + 1) * (i_time + 2))
 
-            next_node_dn = nextIndex + i_node
-            next_node_up = nextIndex + i_node + 1
+            next_node_dn = next_index + i_node
+            next_node_up = next_index + i_node + 1
 
-            vUp = option_values[next_node_up]
-            vDn = option_values[next_node_dn]
-            future_expected_value = probs[i_time] * vUp
-            future_expected_value += (1.0 - probs[i_time]) * vDn
-            holdValue = periodDiscountFactors[i_time] * future_expected_value
+            v_up = option_values[next_node_up]
+            v_dn = option_values[next_node_dn]
+            future_expected_value = probs[i_time] * v_up
+            future_expected_value += (1.0 - probs[i_time]) * v_dn
+            hold_value = period_dfs[i_time] * future_expected_value
 
             if option_type == OptionTypes.EUROPEAN_CALL.value:
-                option_values[index + i_node] = holdValue
+                option_values[index + i_node] = hold_value
             elif option_type == OptionTypes.EUROPEAN_PUT.value:
-                option_values[index + i_node] = holdValue
+                option_values[index + i_node] = hold_value
             elif option_type == OptionTypes.AMERICAN_CALL.value:
                 option_values[index +
-                              i_node] = np.maximum(exercise_value, holdValue)
+                              i_node] = np.maximum(exercise_value, hold_value)
             elif option_type == OptionTypes.AMERICAN_PUT.value:
                 option_values[index +
-                              i_node] = np.maximum(exercise_value, holdValue)
+                              i_node] = np.maximum(exercise_value, hold_value)
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]

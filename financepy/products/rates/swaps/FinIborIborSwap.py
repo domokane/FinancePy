@@ -49,7 +49,7 @@ class IborIborSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -57,7 +57,7 @@ class IborIborSwap:
 
         calendar = CalendarTypes(cal_type)
         self._maturity_dt = calendar.adjust(self._termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")
@@ -81,14 +81,14 @@ class IborIborSwap:
         self._payFloatYearFracs = []
         self._recFloatYearFracs = []
 
-        self._payFloatFlows = []
-        self._recFloatFlows = []
+        self._payfloat_flows = []
+        self._recfloat_flows = []
 
-        self._payFloatFlowPVs = []
-        self._recFloatFlowPVs = []
+        self._pay_float_flow_pvs = []
+        self._recfloat_flow_pvs = []
 
-        self._payFirstFixingRate = None
-        self._recFirstFixingRate = None
+        self._payfirst_fixing_rate = None
+        self._recfirst_fixing_rate = None
 
         self._value_dt = None
 
@@ -114,8 +114,8 @@ class IborIborSwap:
               discount_curve,
               payIndexCurve,
               recIndexCurve,
-              payFirstFixingRate=None,
-              recFirstFixingRate=None,
+              payfirst_fixing_rate=None,
+              recfirst_fixing_rate=None,
               principal=0.0):
         """ Value the LIBOR basis swap on a value date given a single Ibor
         discount curve and each of the index discount for the two floating legs
@@ -124,13 +124,13 @@ class IborIborSwap:
         payFloatLegValue = self.float_leg_value(value_dt,
                                                 discount_curve,
                                                 payIndexCurve,
-                                                payFirstFixingRate,
+                                                payfirst_fixing_rate,
                                                 principal)
 
         recFloatLegValue = self.float_leg_value(value_dt,
                                                 discount_curve,
                                                 recIndexCurve,
-                                                recFirstFixingRate,
+                                                recfirst_fixing_rate,
                                                 principal)
 
         value = recFloatLegValue - payFloatLegValue
@@ -142,7 +142,7 @@ class IborIborSwap:
                         value_dt,  # This should be the settlement date
                         discount_curve,
                         index_curve,
-                        firstFixingRate=None,
+                        first_fixing_rate=None,
                         principal=0.0):
         """ Value the floating leg with payments from an index curve and
         discounting based on a supplied discount curve. The valuation date can
@@ -153,12 +153,12 @@ class IborIborSwap:
 
         self._value_dt = value_dt
         self._floatYearFracs = []
-        self._floatFlows = []
+        self._float_flows = []
         self._floatRates = []
         self._floatDfs = []
-        self._floatFlowPVs = []
+        self._float_flow_pvs = []
         self._floatTotalPV = []
-        self._firstFixingRate = firstFixingRate
+        self._first_fixing_rate = first_fixing_rate
 
         basis = FinDayCount(self._float_dc_type)
 
@@ -176,7 +176,7 @@ class IborIborSwap:
         self._floatStartIndex = start_index
 
         # Forward price to settlement date (if valuation is settlement date)
-        self._dfValuationDate = discount_curve.df(value_dt)
+        self._df_value_dt = discount_curve.df(value_dt)
 
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
@@ -189,24 +189,24 @@ class IborIborSwap:
 
         floatRate = 0.0
 
-        if self._firstFixingRate is None:
+        if self._first_fixing_rate is None:
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self._notional
             floatRate = fwd_rate
         else:
-            flow = self._firstFixingRate * alpha * self._notional
-            floatRate = self._firstFixingRate
+            flow = self._first_fixing_rate * alpha * self._notional
+            floatRate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
-        df_discount = discount_curve.df(next_dt) / self._dfValuationDate
+        df_discount = discount_curve.df(next_dt) / self._df_value_dt
 
         pv = flow * df_discount
 
         self._floatYearFracs.append(alpha)
-        self._floatFlows.append(flow)
+        self._float_flows.append(flow)
         self._floatRates.append(floatRate)
         self._floatDfs.append(df_discount)
-        self._floatFlowPVs.append(flow * df_discount)
+        self._float_flow_pvs.append(flow * df_discount)
         self._floatTotalPV.append(pv)
 
         prev_dt = next_dt
@@ -220,23 +220,23 @@ class IborIborSwap:
             flow = (fwd_rate + self._float_spread) * alpha * self._notional
 
             # All discounting is done forward to the valuation date
-            df_discount = discount_curve.df(next_dt) / self._dfValuationDate
+            df_discount = discount_curve.df(next_dt) / self._df_value_dt
 
             pv += flow * df_discount
             df1_index = df2_index
             prev_dt = next_dt
 
-            self._floatFlows.append(flow)
+            self._float_flows.append(flow)
             self._floatYearFracs.append(alpha)
             self._floatRates.append(fwd_rate)
             self._floatDfs.append(df_discount)
-            self._floatFlowPVs.append(flow * df_discount)
+            self._float_flow_pvs.append(flow * df_discount)
             self._floatTotalPV.append(pv)
 
         flow = principal * self._notional
         pv = pv + flow * df_discount
-        self._floatFlows[-1] += flow
-        self._floatFlowPVs[-1] += flow * df_discount
+        self._float_flows[-1] += flow
+        self._float_flow_pvs[-1] += flow * df_discount
         self._floatTotalPV[-1] = pv
 
         return pv
@@ -255,11 +255,11 @@ class IborIborSwap:
         print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
         print("VALUATION DATE", self._value_dt)
 
-        if len(self._floatFlows) == 0:
+        if len(self._float_flows) == 0:
             print("Floating Flows not calculated.")
             return
 
-        if self._firstFixingRate is None:
+        if self._first_fixing_rate is None:
             print("         *** FIRST FLOATING RATE PAYMENT IS IMPLIED ***")
 
         header = "PAYMENT_dt     YEAR_FRAC    RATE(%)       FLOW         DF"
@@ -285,9 +285,9 @@ class IborIborSwap:
                   (payment_dt,
                    self._floatYearFracs[i_flow],
                    self._floatRates[i_flow]*100.0,
-                   self._floatFlows[i_flow],
+                   self._float_flows[i_flow],
                    self._floatDfs[i_flow],
-                   self._floatFlowPVs[i_flow],
+                   self._float_flow_pvs[i_flow],
                    self._floatTotalPV[i_flow]))
 
             i_flow += 1
@@ -300,7 +300,7 @@ class IborIborSwap:
         s += label_to_string("TERMINATION DATE", self._termination_dt)
         s += label_to_string("MATURITY DATE", self._maturity_dt)
         s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("SWAP TYPE", self._swapType)
+        s += label_to_string("SWAP TYPE", self._swap_type)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)
         s += label_to_string("FLOAT SPREAD", self._float_spread)
         s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)

@@ -8,7 +8,7 @@ from scipy import optimize
 
 from ...utils.math import M
 from ...utils.global_vars import gDaysInYear
-from ...utils.global_vars import gSmall
+from ...utils.global_vars import g_small
 from ...utils.error import FinError
 
 from ...products.equity.equity_option import EquityOption
@@ -130,12 +130,12 @@ class EquityChooserOption(EquityOption):
 
         q = dividend_curve.cc_rate(self._chooseDate)
 
-        t = max(t, gSmall)
-        tc = max(tc, gSmall)
-        tp = max(tp, gSmall)
+        t = max(t, g_small)
+        tc = max(tc, g_small)
+        tp = max(tp, g_small)
 
         v = model._volatility
-        v = max(v, gSmall)
+        v = max(v, g_small)
 
         s0 = stock_price
         xc = self._call_strike

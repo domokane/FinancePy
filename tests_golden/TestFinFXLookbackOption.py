@@ -20,7 +20,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 def test_EquityLookBackOption():
     value_dt = Date(1, 1, 2015)
-    expiry_date = Date(1, 1, 2016)
+    expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.3
     num_pathsRange = [10000]
@@ -48,7 +48,7 @@ def test_EquityLookBackOption():
     option_type = OptionTypes.EUROPEAN_CALL
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFloatLookbackOption(expiry_date, option_type)
+            option = FXFloatLookbackOption(expiry_dt, option_type)
             stockMin = stock_price
             value = option.value(
                 value_dt,
@@ -93,7 +93,7 @@ def test_EquityLookBackOption():
     option_type = OptionTypes.EUROPEAN_CALL
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFloatLookbackOption(expiry_date, option_type)
+            option = FXFloatLookbackOption(expiry_dt, option_type)
             stockMin = stock_price - 10
             value = option.value(
                 value_dt,
@@ -138,7 +138,7 @@ def test_EquityLookBackOption():
     option_type = OptionTypes.EUROPEAN_PUT
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFloatLookbackOption(expiry_date, option_type)
+            option = FXFloatLookbackOption(expiry_dt, option_type)
             stockMax = stock_price
             value = option.value(
                 value_dt,
@@ -183,7 +183,7 @@ def test_EquityLookBackOption():
     option_type = OptionTypes.EUROPEAN_PUT
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFloatLookbackOption(expiry_date, option_type)
+            option = FXFloatLookbackOption(expiry_dt, option_type)
             stockMax = stock_price + 10
             value = option.value(
                 value_dt,
@@ -236,7 +236,7 @@ def test_EquityLookBackOption():
     k = 95.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFixedLookbackOption(expiry_date, option_type, k)
+            option = FXFixedLookbackOption(expiry_dt, option_type, k)
             stockMax = stock_price
             value = option.value(
                 value_dt,
@@ -284,7 +284,7 @@ def test_EquityLookBackOption():
     k = 100.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFixedLookbackOption(expiry_date, option_type, k)
+            option = FXFixedLookbackOption(expiry_dt, option_type, k)
             stockMax = stock_price
             value = option.value(
                 value_dt,
@@ -332,7 +332,7 @@ def test_EquityLookBackOption():
     k = 105.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFixedLookbackOption(expiry_date, option_type, k)
+            option = FXFixedLookbackOption(expiry_dt, option_type, k)
             stockMax = stock_price + 10.0
             value = option.value(
                 value_dt,
@@ -380,7 +380,7 @@ def test_EquityLookBackOption():
     k = 95.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFixedLookbackOption(expiry_date, option_type, k)
+            option = FXFixedLookbackOption(expiry_dt, option_type, k)
             stockMin = stock_price
             value = option.value(
                 value_dt,
@@ -428,7 +428,7 @@ def test_EquityLookBackOption():
     k = 100.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFixedLookbackOption(expiry_date, option_type, k)
+            option = FXFixedLookbackOption(expiry_dt, option_type, k)
             stockMin = stock_price
             value = option.value(
                 value_dt,
@@ -476,7 +476,7 @@ def test_EquityLookBackOption():
     k = 105.0
     for stock_price in stock_priceRange:
         for num_paths in num_pathsRange:
-            option = FXFixedLookbackOption(expiry_date, option_type, k)
+            option = FXFixedLookbackOption(expiry_dt, option_type, k)
             stockMin = stock_price - 10.0
             value = option.value(
                 value_dt,

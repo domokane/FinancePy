@@ -28,8 +28,8 @@ currency_pair = ccy1 + ccy2  # Always ccy1ccy2
 strike_fx_rate = 1.250
 volatility = 0.10
 
-dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
 model = BlackScholes(volatility)
 
@@ -46,8 +46,8 @@ def test_call():
 
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     call_option = FXVanillaOption(expiry_dt,
@@ -59,8 +59,8 @@ def test_call():
 
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     diff = (valueAmerican - valueEuropean)
@@ -78,8 +78,8 @@ def test_call():
 
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     call_option = FXVanillaOption(expiry_dt,
@@ -91,8 +91,8 @@ def test_call():
 
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     diff = (valueAmerican - valueEuropean)
@@ -110,8 +110,8 @@ def test_call():
 
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     call_option = FXVanillaOption(expiry_dt,
@@ -123,8 +123,8 @@ def test_call():
 
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     diff = (valueAmerican - valueEuropean)
@@ -144,8 +144,8 @@ def test_put():
 
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     call_option = FXVanillaOption(expiry_dt,
@@ -157,8 +157,8 @@ def test_put():
 
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     diff = (valueAmerican - valueEuropean)
@@ -176,8 +176,8 @@ def test_put():
 
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     call_option = FXVanillaOption(expiry_dt,
@@ -189,8 +189,8 @@ def test_put():
 
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     diff = (valueAmerican - valueEuropean)
@@ -208,8 +208,8 @@ def test_put():
 
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     call_option = FXVanillaOption(expiry_dt,
@@ -221,8 +221,8 @@ def test_put():
 
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     diff = (valueAmerican - valueEuropean)

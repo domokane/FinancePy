@@ -10,7 +10,7 @@ import numpy as np
 from numba import njit, float64
 
 from ..utils.math import n_vect, n_prime_vect
-from ..utils.global_vars import gSmall
+from ..utils.global_vars import g_small
 from ..utils.helpers import label_to_string
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
@@ -78,10 +78,10 @@ class Black():
 ###############################################################################
 
     def delta(self,
-              forward_rate,   # Forward rate F
-              strike_rate,    # Strike Rate K
+              forward_rate,   # Forward rate
+              strike_rate,    # Strike Rate
               time_to_expiry,  # Time to Expiry (years)
-              df,  # RFR to expiry date
+              df,  # Discount factor to expiry date
               option_type):    # Call or put
         """ Calculate delta using Black's model which values in the forward
         measure following a change of measure. """
@@ -227,7 +227,7 @@ class Black():
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self._volatility)
-        s += label_to_string("IMPLEMENTATION", self._implementation)
+        s += label_to_string("IMPLEMENTATION", self._implementation_type)
         s += label_to_string("NUMSTEPS", self._num_steps)
         return s
 
@@ -291,10 +291,10 @@ def black_theta(fwd, t, k, r, v, option_type):
       cache=True)
 def calculate_d1_d2(f, t, k, v):
 
-    t = np.maximum(t, gSmall)
-    vol = np.maximum(v, gSmall)
-    k = np.maximum(k, gSmall)
-    sqrtT = np.sqrt(t)
+    t = np.maximum(t, g_small)
+    vol = np.maximum(v, g_small)
+    k = np.maximum(k, g_small)
+    sqrt_t = np.sqrt(t)
 
     if f <= 0.0:
         raise FinError("Forward is zero.")
@@ -302,8 +302,8 @@ def calculate_d1_d2(f, t, k, v):
     if k <= 0.0:
         raise FinError("Strike is zero.")
 
-    d1 = (np.log(f/k) + vol * vol * t / 2.0) / (vol * sqrtT)
-    d2 = d1 - vol * sqrtT
+    d1 = (np.log(f/k) + vol * vol * t / 2.0) / (vol * sqrt_t)
+    d2 = d1 - vol * sqrt_t
 
     return np.array([d1, d2])
 
@@ -364,7 +364,7 @@ def implied_volatility(fwd, t, r, k, price, option_type, debug_print=True):
         else:
             raise FinError("Option type must be a European Call or Put")
         sigma_guess = price / (0.398 * np.sqrt(t) * fwd * np.exp(-r*t))
-        if t < gSmall:  # avoid zero division
+        if t < g_small:  # avoid zero division
             sigma_guess = 0.0
         return sigma_guess
 

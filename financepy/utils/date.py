@@ -4,6 +4,7 @@
 
 from collections.abc import Iterable
 from functools import partial
+from enum import Enum
 
 from numba import njit
 import numpy as np
@@ -14,8 +15,6 @@ import math
 from .error import FinError
 
 ###############################################################################
-
-from enum import Enum
 
 
 class DateFormatTypes(Enum):
@@ -105,7 +104,7 @@ def parse_dt(date_str, date_format):
 ###############################################################################
 
 
-g_date_counter_list = None
+g_dt_counter_list = None
 g_start_year = 1900
 g_end_year = 2100
 
@@ -121,11 +120,11 @@ def calculate_list():
     day_counter = 0
     max_days = 0
 
-    global g_date_counter_list
+    global g_dt_counter_list
     global g_start_year
     global g_end_year
 
-    g_date_counter_list = []
+    g_dt_counter_list = []
 
     idx = -1  # the first element will be idx=0
 
@@ -149,12 +148,12 @@ def calculate_list():
                 idx += 1
                 day_counter += 1
                 if yy >= g_start_year:
-                    g_date_counter_list.append(day_counter)
+                    g_dt_counter_list.append(day_counter)
 
             for _ in range(max_days, 31):
                 idx += 1
                 if yy >= g_start_year:
-                    g_date_counter_list.append(-999)
+                    g_dt_counter_list.append(-999)
 
 ###############################################################################
 # The index in these functions is not the Excel date index used as the
@@ -240,7 +239,7 @@ class Date():
             raise FinError(
                 "Date arguments must now be in the order Date(dd, mm, yyyy)")
 
-        if g_date_counter_list is None:
+        if g_dt_counter_list is None:
             calculate_list()
 
         if y < 1900:
@@ -362,7 +361,7 @@ class Date():
         """ Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. """
         idx = date_index(self._d, self._m, self._y)
-        days_since_first_jan_1900 = g_date_counter_list[idx]
+        days_since_first_jan_1900 = g_dt_counter_list[idx]
         wd = weekday(days_since_first_jan_1900)
         self._excel_dt = days_since_first_jan_1900
         self._weekday = wd
@@ -493,7 +492,7 @@ class Date():
 
         while num_days != 0:
             idx += step
-            if g_date_counter_list[idx] > 0:
+            if g_dt_counter_list[idx] > 0:
                 num_days -= step
 
         (d, m, y) = date_from_index(idx)
@@ -704,8 +703,8 @@ class Date():
         elif m == 1 or m == 2 or m == 3:
             m_cds = 3
 
-        cds_date = Date(d_cds, m_cds, y_cds)
-        return cds_date
+        cds_dt = Date(d_cds, m_cds, y_cds)
+        return cds_dt
 
     ##########################################################################
 
@@ -723,8 +722,8 @@ class Date():
         d_end = 21
 
         for d in range(d_start, d_end+1):
-            imm_date = Date(d, m, y)
-            if imm_date.weekday() == self.WED:
+            imm_dt = Date(d, m, y)
+            if imm_dt.weekday() == self.WED:
                 return d
 
         # Should never reach this line but just to be defensive
@@ -764,8 +763,8 @@ class Date():
 
         d_imm = self.third_wednesday_of_month(m_imm, y_imm)
 
-        imm_date = Date(d_imm, m_imm, y_imm)
-        return imm_date
+        imm_dt = Date(d_imm, m_imm, y_imm)
+        return imm_dt
 
     ###########################################################################
 
@@ -791,7 +790,7 @@ class Date():
             else:
                 raise FinError("Tenor must be a string e.g. '5Y'")
 
-        new_dates = []
+        new_dts = []
 
         for tenor_str in tenor:
 
@@ -825,34 +824,34 @@ class Date():
             else:
                 raise FinError("Unknown tenor type in " + tenor)
 
-            new_date = Date(self._d, self._m, self._y)
+            new_dt = Date(self._d, self._m, self._y)
 
             if period_type == DAYS:
                 for _ in range(0, abs(num_periods)):
-                    new_date = new_date.add_days(math.copysign(1, num_periods))
+                    new_dt = new_dt.add_days(math.copysign(1, num_periods))
             elif period_type == WEEKS:
                 for _ in range(0, abs(num_periods)):
-                    new_date = new_date.add_days(math.copysign(7, num_periods))
+                    new_dt = new_dt.add_days(math.copysign(7, num_periods))
             elif period_type == MONTHS:
                 for _ in range(0, abs(num_periods)):
-                    new_date = new_date.add_months(math.copysign(1, num_periods))
+                    new_dt = new_dt.add_months(math.copysign(1, num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day we add this logic
-                y = new_date.y()
-                m = new_date.m()
-                d = min(self.d(), new_date.eom()._d)
-                new_date = Date(d, m, y)
+                y = new_dt.y()
+                m = new_dt.m()
+                d = min(self.d(), new_dt.eom()._d)
+                new_dt = Date(d, m, y)
 
             elif period_type == YEARS:
                 for _ in range(0, abs(num_periods)):
-                    new_date = new_date.add_months(math.copysign(12, num_periods))
+                    new_dt = new_dt.add_months(math.copysign(12, num_periods))
 
-            new_dates.append(new_date)
+            new_dts.append(new_dt)
 
         if list_flag is True:
-            return new_dates
+            return new_dts
         else:
-            return new_dates[0]
+            return new_dts[0]
 
     ###########################################################################
 
@@ -1028,8 +1027,8 @@ def from_datetime(dt: Date):
     """ Construct a Date from a datetime as this is often needed if we
     receive inputs from other Python objects such as Pandas dataframes. """
 
-    fin_date = Date(dt.day, dt.month, dt.year)
-    return fin_date
+    fin_dt = Date(dt.day, dt.month, dt.year)
+    return fin_dt
 
 ###############################################################################
 

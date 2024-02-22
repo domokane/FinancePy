@@ -18,8 +18,8 @@ from financepy.products.credit.cds import CDS
 tradeDate = Date(7, 2, 2006)
 libor_curve = build_Ibor_Curve(tradeDate)
 issuer_curve = buildIssuerCurve(tradeDate, libor_curve)
-step_in_date = tradeDate.add_days(1)
-value_dt = step_in_date
+step_in_dt = tradeDate.add_days(1)
+value_dt = step_in_dt
 maturity_dt = Date(20, 6, 2010)
 
 cdsRecovery = 0.40
@@ -27,7 +27,7 @@ notional = 10.0 * ONE_MILLION
 long_protection = True
 index_coupon = 0.004
 
-cdsIndexContract = CDS(step_in_date,
+cdsIndexContract = CDS(step_in_dt,
                        maturity_dt,
                        index_coupon,
                        notional,
@@ -52,7 +52,7 @@ def test_cds_index():
     accrued_interest = cdsIndexContract.accrued_interest()
     assert round(accrued_interest, 4) == -5555.5556
 
-    prot_pv = cdsIndexContract.protection_leg_pv(
+    prot_pv = cdsIndexContract.prot_leg_pv(
         value_dt, issuer_curve, cdsRecovery)
     assert round(prot_pv, 4) == 188423.9948
 

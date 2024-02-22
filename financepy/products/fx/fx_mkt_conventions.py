@@ -130,6 +130,6 @@ class FinFXRate():
             raise FinError("Unknown currency code ", ccy2)
 
         self._ccy2 = ccy2
-        self._rate
+        self._rate = None
 
 ###############################################################################

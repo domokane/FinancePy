@@ -21,23 +21,23 @@ class MertonFirm():
     rate, the asset growth rate and the asset value volatility. """
 
     def __init__(self,
-                 assetValue: (float, list, np.ndarray),
-                 bondFace: (float, list, np.ndarray),
-                 timeToMaturity: (float, list, np.ndarray),
+                 asset_value: (float, list, np.ndarray),
+                 bond_face: (float, list, np.ndarray),
+                 years_to_maturity: (float, list, np.ndarray),
                  risk_free_rate: (float, list, np.ndarray),
-                 assetGrowthRate: (float, list, np.ndarray),
-                 assetVolatility: (float, list, np.ndarray)):
+                 asset_growth_rate: (float, list, np.ndarray),
+                 asset_volatility: (float, list, np.ndarray)):
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
 
         check_argument_types(self.__init__, locals())
 
-        self._A = np.array(assetValue)
-        self._L = np.array(bondFace)
-        self._t = np.array(timeToMaturity)
+        self._A = np.array(asset_value)
+        self._L = np.array(bond_face)
+        self._t = np.array(years_to_maturity)
         self._r = np.array(risk_free_rate)
-        self._mu = np.array(assetGrowthRate)
-        self._vA = np.array(assetVolatility)
+        self._mu = np.array(asset_growth_rate)
+        self._vA = np.array(asset_volatility)
         self._D = self.debt_value()
         self._E = self.equity_value()
         self._vE = self.equity_vol()
@@ -72,10 +72,10 @@ class MertonFirm():
         E = self.equity_value()
 
         lvg = self._A / self._L
-        sigmaRootT = self._vA * np.sqrt(self._t)
+        sigma_root_t = self._vA * np.sqrt(self._t)
 
         d1 = np.log(lvg) + (self._r + 0.5 * self._vA ** 2) * self._t
-        d1 = d1 / sigmaRootT
+        d1 = d1 / sigma_root_t
         evol = (self._A / E) * N(d1) * self._vA
         return evol
 
@@ -85,10 +85,10 @@ class MertonFirm():
         """ Calculate the equity value. """
 
         lvg = self._A / self._L
-        sigmaRootT = self._vA * np.sqrt(self._t)
+        sigma_root_t = self._vA * np.sqrt(self._t)
         d1 = np.log(lvg) + (self._r + 0.5 * self._vA ** 2) * self._t
-        d1 = d1 / sigmaRootT
-        d2 = d1 - sigmaRootT
+        d1 = d1 / sigma_root_t
+        d2 = d1 - sigma_root_t
         evalue = self._A * N(d1) - self._L * np.exp(-self._r * self._t) * N(d2)
         return evalue
 
@@ -98,10 +98,10 @@ class MertonFirm():
         """ Calculate the debt value """
 
         lvg = self._A / self._L
-        sigmaRootT = self._vA * np.sqrt(self._t)
+        sigma_root_t = self._vA * np.sqrt(self._t)
         d1 = np.log(lvg) + (self._r + 0.5 * self._vA ** 2) * self._t
-        d1 = d1 / sigmaRootT
-        d2 = d1 - sigmaRootT
+        d1 = d1 / sigma_root_t
+        d2 = d1 - sigma_root_t
         dvalue = self._A * N(-d1) + self._L * \
             np.exp(-self._r * self._t) * N(d2)
         return dvalue

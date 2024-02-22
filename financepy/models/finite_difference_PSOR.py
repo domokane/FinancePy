@@ -4,7 +4,7 @@ import numpy as np
 from numba import njit
 
 from ..utils.math import band_matrix_multiplication
-from financepy.utils.global_types import OptionTypes
+from ..utils.global_types import OptionTypes
 from .finite_difference import option_payoff, calculate_fd_matrix
 
 

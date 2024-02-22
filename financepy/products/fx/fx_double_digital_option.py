@@ -59,10 +59,10 @@ class FXDoubleDigitalOption:
             raise FinError("Currency pair must be 6 characters.")
 
         self._currency_pair = currency_pair
-        self._forName = self._currency_pair[0:3]
-        self._domName = self._currency_pair[3:6]
+        self._for_name = self._currency_pair[0:3]
+        self._dom_name = self._currency_pair[3:6]
 
-        if prem_currency != self._domName and prem_currency != self._forName:
+        if prem_currency != self._dom_name and prem_currency != self._for_name:
             raise FinError("Notional currency not in currency pair.")
 
         self._prem_currency = prem_currency
@@ -76,8 +76,8 @@ class FXDoubleDigitalOption:
     def value(self,
               value_dt,
               spot_fx_rate,  # 1 unit of foreign in domestic
-              dom_discount_curve,
-              for_discount_curve,
+              domestic_curve,
+              foreign_curve,
               model):
         """ Valuation of a double digital option using Black-Scholes model.
         The option pays out the notional in the premium currency if the
@@ -92,11 +92,11 @@ class FXDoubleDigitalOption:
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_dt != value_dt:
+        if domestic_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as valuation date")
 
-        if for_discount_curve._value_dt != value_dt:
+        if foreign_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as valuation date")
 
@@ -117,31 +117,31 @@ class FXDoubleDigitalOption:
         tdel = np.maximum(tdel, 1e-10)
 
         # TODO RESOLVE TDEL versus TEXP
-        dom_df = dom_discount_curve._df(tdel)
-        for_df = for_discount_curve._df(tdel)
+        dom_df = domestic_curve._df(tdel)
+        for_df = foreign_curve._df(tdel)
 
         r_d = -np.log(dom_df) / tdel
         r_f = -np.log(for_df) / tdel
 
-        S0 = spot_fx_rate
+        s0 = spot_fx_rate
         K1 = self._lower_strike
         K2 = self._upper_strike
 
-        if type(model) == BlackScholes:
+        if isinstance(model, BlackScholes):
 
             volatility = model._volatility
-            lnS0k1 = np.log(S0 / K1)
-            lnS0k2 = np.log(S0 / K2)
+            ln_s0_k1 = np.log(s0 / K1)
+            ln_s0_k2 = np.log(s0 / K2)
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = r_d - r_f
-            lower_d2 = (lnS0k1 + (mu - v2 / 2.0) * tdel) / den
-            upper_d2 = (lnS0k2 + (mu - v2 / 2.0) * tdel) / den
+            lower_d2 = (ln_s0_k1 + (mu - v2 / 2.0) * tdel) / den
+            upper_d2 = (ln_s0_k2 + (mu - v2 / 2.0) * tdel) / den
 
-            if self._prem_currency == self._forName:
-                lower_digital = S0 * np.exp(-r_f * tdel) * n_vect(-lower_d2)
-                upper_digital = S0 * np.exp(-r_f * tdel) * n_vect(-upper_d2)
-            elif self._prem_currency == self._domName:
+            if self._prem_currency == self._for_name:
+                lower_digital = s0 * np.exp(-r_f * tdel) * n_vect(-lower_d2)
+                upper_digital = s0 * np.exp(-r_f * tdel) * n_vect(-upper_d2)
+            elif self._prem_currency == self._dom_name:
                 lower_digital = np.exp(-r_f * tdel) * n_vect(-lower_d2)
                 upper_digital = np.exp(-r_f * tdel) * n_vect(-upper_d2)
 

@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from ...models.equity_barrier_models import value_bs
+from ...models.equity_barrier_models import value_barrier
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 from ...models.process_simulator import FinProcessSimulator
@@ -94,15 +94,15 @@ class EquityBarrierOption(EquityOption):
         if t_exp < 0:
             raise FinError("Option expires before value date.")
 
-        values = value_bs(t_exp,
-                          self._strike_price,
-                          self._barrier_level,
-                          stock_prices,
-                          discount_curve.cc_rate(self._expiry_dt),
-                          dividend_curve.cc_rate(self._expiry_dt),
-                          model._volatility,
-                          self._option_type.value,
-                          self._num_obs_per_year)
+        values = value_barrier(t_exp,
+                               self._strike_price,
+                               self._barrier_level,
+                               stock_prices,
+                               discount_curve.cc_rate(self._expiry_dt),
+                               dividend_curve.cc_rate(self._expiry_dt),
+                               model._volatility,
+                               self._option_type.value,
+                               self._num_obs_per_year)
 
         values = values * self._notional
 

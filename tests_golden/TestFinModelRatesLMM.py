@@ -2,33 +2,33 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
+from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
+from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
+from financepy.models.lmm_mc import lmm_swap_pricer
+from financepy.models.lmm_mc import lmm_price_caps_black
+from financepy.models.lmm_mc import lmm_cap_flr_pricer
+from financepy.models.lmm_mc import lmm_swaption_vol_approx
+from financepy.models.lmm_mc import lmm_sim_swaption_vol
+from financepy.models.lmm_mc import lmm_swaption_pricer
+from financepy.models.lmm_mc import lmm_simulate_fwds_mf
+from financepy.models.lmm_mc import lmm_simulate_fwds_1f
+from financepy.models.lmm_mc import lmm_simulate_fwds_nf
+from financepy.utils.helpers import check_vector_differences
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.black import Black
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 import numpy as np
 import time as time
 import sys
 sys.path.append("..")
 
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.models.black import Black
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.utils.helpers import check_vector_differences
-from financepy.models.lmm_mc import lmm_simulate_fwds_nf
-from financepy.models.lmm_mc import lmm_simulate_fwds_1f
-from financepy.models.lmm_mc import lmm_simulate_fwds_mf
-from financepy.models.lmm_mc import lmm_swaption_pricer
-from financepy.models.lmm_mc import lmm_sim_swaption_vol
-from financepy.models.lmm_mc import lmm_swaption_vol_approx
-from financepy.models.lmm_mc import lmm_cap_flr_pricer
-from financepy.models.lmm_mc import lmm_price_caps_black
-from financepy.models.lmm_mc import lmm_swap_pricer
-from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
-from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
-from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -125,9 +125,9 @@ def getForwardCurve(numFwds, r):
 #     strike = r
 #     PAYSwaption = 1
 #     use_sobol = 0
-#     numeraireIndex = 0
+#     numeraire_index = 0
 
-#     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
+#     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraire_index, fwd0,
 #                                zetas, taus, use_sobol, seed)
 
 #     for iExp in range(1, 10):
@@ -142,7 +142,7 @@ def getForwardCurve(numFwds, r):
 #         swaption_priceNF = LMMSwaptionPricer(strike, a, b, num_paths,
 #                                             fwd0, fwdsNF, taus, PAYSwaption)
 
-#         swaptionVol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
+#         swaption_vol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
 
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
@@ -175,11 +175,11 @@ def getForwardCurve(numFwds, r):
 #                                     float_freq_type,
 #                                     float_dc_type)
 
-#         model = Black(swaptionVol)
+#         model = Black(swaption_vol)
 #         blackSwaptionPrice = swaption.value(value_dt, libor_curve, model)
 
 #         print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
-#               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF, swaptionVol,
+#               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF, swaption_vol,
 #                  swaption_price1F, swaption_priceNF, blackSwaptionPrice))
 
 # #        print(swaption)
@@ -207,8 +207,8 @@ def getForwardCurve(numFwds, r):
 #     K = r
 #     capletPricesBlack = LMMPriceCapsBlack(fwd0, zetas, numFwds, K, taus)
 
-#     numFactors = 1
-#     numeraireIndex = 1
+#     num_factors = 1
+#     numeraire_index = 1
 #     use_sobol = 1
 
 #     # Examine variance for different seeds
@@ -217,7 +217,7 @@ def getForwardCurve(numFwds, r):
 #         print("=============================================================")
 #         print("Seed:", seed)
 
-#         fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
+#         fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraire_index, fwd0,
 #                                    zetas, taus, use_sobol, seed)
 
 #         sumCap1F = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwds1F, taus, 1)
@@ -270,17 +270,17 @@ def test_HullBookExamples():
     ###########################################################################
 
     use_sobol = 1
-    numeraireIndex = 0
+    numeraire_index = 0
 
     # We need the volatility for the forward rates out to the one starting in
     # 10 years. So we have 11 elements. The one starting today has zero vol.
-    numFactors = 1
+    num_factors = 1
     gammas1FList = [0.00, 0.1550, 0.2063674, 0.1720986, 0.1721993, 0.1524579,
                     0.1414779, 0.1297711, 0.1381053, 0.135955, 0.1339842]
     gammas1F = np.array(gammas1FList)
 
     # One factor model
-    fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraireIndex, fwd0,
+    fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraire_index, fwd0,
                                   gammas1F, taus, use_sobol, seed)
 
 #    LMMPrintForwards(fwds1F)
@@ -312,13 +312,13 @@ def test_HullBookExamples():
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
-    numFactors = 1
+    num_factors = 1
     lambdas1FList = [[0.0, 0.1550, 0.2064, 0.1721, 0.1722, 0.1525,
                       0.1415, 0.1298, 0.1381, 0.1360, 0.1340]]
     lambdas1F = np.array(lambdas1FList)
 
     # One factor model
-    fwdsMF = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+    fwdsMF = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
                                   fwd0, lambdas1F, taus, use_sobol, seed)
 
     vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
@@ -347,7 +347,7 @@ def test_HullBookExamples():
         test_cases.print("FINANCEPY GETS:", vStickyCaplets)
         test_cases.print("HULL GETS:", hullStickyCaplets1F)
 
-    numFactors = 2
+    num_factors = 2
     lambdas2FList = [[0.00, 0.1410, 0.1952, 0.1678, 0.1711, 0.1525,
                       0.1406, 0.1265, 0.1306, 0.1236, 0.1163],
                      [0.00, -0.0645, -0.0670, -0.0384, -0.0196, 0.00,
@@ -355,7 +355,7 @@ def test_HullBookExamples():
     lambdas2F = np.array(lambdas2FList)
 
     # Two factor model
-    fwds2F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+    fwds2F = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
                                   fwd0, lambdas2F, taus, use_sobol, seed)
 
     vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
@@ -383,7 +383,7 @@ def test_HullBookExamples():
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
 
-    numFactors = 3
+    num_factors = 3
     lambdas3FList = [[0.00, 0.1365, 0.1928, 0.1672, 0.1698, 0.1485,
                       0.1395, 0.1261, 0.1290, 0.1197, 0.1097],
                      [0.0, -0.0662, -0.0702, -0.0406, -0.0206, 0.00,
@@ -393,7 +393,7 @@ def test_HullBookExamples():
     lambdas3F = np.array(lambdas3FList)
 
     # Three factor model
-    fwds3F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+    fwds3F = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
                                   fwd0, lambdas3F, taus, use_sobol, seed)
 
     hullRatchetCaplets3F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,

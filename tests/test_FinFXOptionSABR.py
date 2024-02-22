@@ -28,8 +28,8 @@ volatility = 0.10
 
 notional = 1000000.0
 
-dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
 model = BlackScholes(volatility)
 
@@ -51,8 +51,8 @@ def test_european_call():
                                   "USD")
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueEuropean, 4) == 0.0251
@@ -67,8 +67,8 @@ def test_european_call():
                                   "USD")
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueEuropean, 4) == 0.5277
@@ -85,8 +85,8 @@ def test_american_call():
                                   "USD")
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueAmerican, 4) == 0.0255
@@ -101,8 +101,8 @@ def test_american_call():
                                   "USD")
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueAmerican, 4) == 0.5500
@@ -119,8 +119,8 @@ def test_european_put():
                                   "USD")
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueEuropean, 4) == 0.0797
@@ -135,8 +135,8 @@ def test_european_put():
                                   "USD")
     valueEuropean = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueEuropean, 4) == 0.0000
@@ -153,8 +153,8 @@ def test_american_put():
                                   "USD")
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueAmerican, 4) == 0.0798
@@ -169,8 +169,8 @@ def test_american_put():
                                   "USD")
     valueAmerican = call_option.value(value_dt,
                                       spot_fx_rate,
-                                      dom_discount_curve,
-                                      for_discount_curve,
+                                      domestic_curve,
+                                      foreign_curve,
                                       model)['v']
 
     assert round(valueAmerican, 4) == 0.0000

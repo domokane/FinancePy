@@ -158,7 +158,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
     if vol_function_type_value == VolFuncTypes.SSVI.value:
         vol = vol_function_ssvi(params, f, k, t)
         return vol
-    
+
     return 0.0
 
 ###############################################################################
@@ -194,7 +194,7 @@ def _delta_fit(k, *args):
 ###############################################################################
 
 
-#@njit(float64(float64, float64, float64, float64, int64, int64, float64,
+# @njit(float64(float64, float64, float64, float64, int64, int64, float64,
 #              float64, float64[:]), fastmath=True)
 def _solver_for_smile_strike(s, t, r, q,
                              option_type_value,
@@ -238,8 +238,8 @@ class EquityVolSurface:
                  expiry_dts: (list),
                  strikes: (list, np.ndarray),
                  volatility_grid: (list, np.ndarray),
-                 volatility_function_type = VolFuncTypes.CLARK,
-                 fin_solver_type = FinSolverTypes.NELDER_MEAD):
+                 vol_func_type=VolFuncTypes.CLARK,
+                 fin_solver_type=FinSolverTypes.NELDER_MEAD):
         """ Create the EquitySurface object by passing in market vol data
         for a list of strikes and expiry dates. """
 
@@ -251,13 +251,13 @@ class EquityVolSurface:
         self._discount_curve = discount_curve
         self._dividend_curve = dividend_curve
 
-        num_expiry_dates = len(expiry_dts)
+        num_expiry_dts = len(expiry_dts)
         num_strikes = len(strikes)
         n = len(volatility_grid)
         m = len(volatility_grid[0])
 
-        if n != num_expiry_dates:
-            raise FinError("1st dim of vol grid is not num_expiry_dates")
+        if n != num_expiry_dts:
+            raise FinError("1st dim of vol grid is not num_expiry_dts")
 
         if m != num_strikes:
             raise FinError("2nd dim of the vol matrix is not num_strikes")
@@ -266,16 +266,16 @@ class EquityVolSurface:
         self._num_strikes = len(strikes)
 
         self._expiry_dts = expiry_dts
-        self._num_expiry_dates = len(expiry_dts)
+        self._num_expiry_dts = len(expiry_dts)
 
         self._volatility_grid = volatility_grid
-        self._volatility_function_type = volatility_function_type
+        self._vol_func_type = vol_func_type
 
         self._build_vol_surface(fin_solver_type=fin_solver_type)
 
 ###############################################################################
 
-    def vol_from_strike_dt(self, K, expiry_dt):
+    def vol_from_strike_date(self, K, expiry_dt):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -288,12 +288,12 @@ class EquityVolSurface:
 
         t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
-        vol_type_value = self._volatility_function_type.value
+        vol_type_value = self._vol_func_type.value
 
         index0 = 0  # lower index in bracket
         index1 = 0  # upper index in bracket
 
-        num_curves = self._num_expiry_dates
+        num_curves = self._num_expiry_dts
 
         if num_curves == 1:
 
@@ -365,7 +365,7 @@ class EquityVolSurface:
 
     #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
-    #     vol_type_value = self._volatility_function_type.value
+    #     vol_type_value = self._vol_func_type.value
 
     #     s = self._spot_fx_rate
 
@@ -453,7 +453,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def vol_from_delta_dt(self, call_delta, expiry_dt, delta_method=None):
+    def vol_from_delta_date(self, call_delta, expiry_dt, delta_method=None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -466,14 +466,14 @@ class EquityVolSurface:
 
         t_exp = (expiry_dt - self._value_dt) / gDaysInYear
 
-        vol_type_value = self._volatility_function_type.value
+        vol_type_value = self._vol_func_type.value
 
         s = self._stock_price
 
         index0 = 0  # lower index in bracket
         index1 = 0  # upper index in bracket
 
-        num_curves = self._num_expiry_dates
+        num_curves = self._num_expiry_dts
 
         # If there is only one time horizon then assume flat vol to this time
         if num_curves == 1:
@@ -567,46 +567,46 @@ class EquityVolSurface:
 
         s = self._stock_price
 
-        num_expiry_dates = self._num_expiry_dates
+        num_expiry_dts = self._num_expiry_dts
 
-        if self._volatility_function_type == VolFuncTypes.CLARK:
+        if self._vol_func_type == VolFuncTypes.CLARK:
             num_parameters = 3
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.SABR_BETA_ONE:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.SABR_BETA_ONE:
             num_parameters = 3
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.SABR_BETA_HALF:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.SABR_BETA_HALF:
             num_parameters = 3
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.BBG:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.BBG:
             num_parameters = 3
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.SABR:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.SABR:
             num_parameters = 4
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.CLARK5:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.CLARK5:
             num_parameters = 5
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.SVI:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.SVI:
             num_parameters = 5
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
-        elif self._volatility_function_type == VolFuncTypes.SSVI:
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
+        elif self._vol_func_type == VolFuncTypes.SSVI:
             num_parameters = 5
-            self._parameters = np.zeros([num_expiry_dates, num_parameters])
+            self._parameters = np.zeros([num_expiry_dts, num_parameters])
             self._parameters[:, 0] = 0.2  # sigma
             self._parameters[:, 1] = 0.8  # gamma
             self._parameters[:, 2] = -0.7  # rho
             self._parameters[:, 3] = 0.3
             self._parameters[:, 4] = 0.048
         else:
-            print(self._volatility_function_type)
+            print(self._vol_func_type)
             raise FinError("Unknown Model Type")
 
-        self._t_exp = np.zeros(num_expiry_dates)
+        self._t_exp = np.zeros(num_expiry_dts)
 
-        self._F0T = np.zeros(num_expiry_dates)
-        self._r = np.zeros(num_expiry_dates)
-        self._q = np.zeros(num_expiry_dates)
+        self._F0T = np.zeros(num_expiry_dts)
+        self._r = np.zeros(num_expiry_dts)
+        self._q = np.zeros(num_expiry_dts)
 
         #######################################################################
         # TODO: ADD SPOT DAYS
@@ -614,7 +614,7 @@ class EquityVolSurface:
 
         spot_dt = self._value_dt
 
-        for i in range(0, num_expiry_dates):
+        for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / gDaysInYear
@@ -632,13 +632,13 @@ class EquityVolSurface:
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
         #######################################################################
 
-        vol_type_value = self._volatility_function_type.value
+        vol_type_value = self._vol_func_type.value
 
         x_inits = []
         x_init = np.zeros(num_parameters)
         x_inits.append(x_init)
 
-        for i in range(0, num_expiry_dates):
+        for i in range(0, num_expiry_dts):
 
             t = self._t_exp[i]
             r = self._r[i]
@@ -671,7 +671,7 @@ class EquityVolSurface:
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
-        for i in range(0, self._num_expiry_dates):
+        for i in range(0, self._num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
             print("==========================================================")
@@ -680,7 +680,7 @@ class EquityVolSurface:
 
                 strike = self._strikes[j]
 
-                fitted_vol = self.vol_from_strike_dt(strike,
+                fitted_vol = self.vol_from_strike_date(strike,
                                                      expiry_dt)
 
                 mkt_vol = self._volatility_grid[i][j]
@@ -701,7 +701,7 @@ class EquityVolSurface:
 
         dbns = []
 
-        for iTenor in range(0, self._num_expiry_dates):
+        for iTenor in range(0, self._num_expiry_dts):
 
             f = self._F0T[iTenor]
             t = self._t_exp[iTenor]
@@ -721,7 +721,7 @@ class EquityVolSurface:
 
                 k = lowS + iK*dS
 
-                vol = vol_function(self._volatility_function_type.value,
+                vol = vol_function(self._vol_func_type.value,
                                    self._parameters[iTenor],
                                    f, k, t)
 
@@ -744,10 +744,10 @@ class EquityVolSurface:
         """ Generates a plot of each of the vol discount implied by the market
         and fitted. """
 
-        lowK = self._strikes[0] * 0.9
-        highK = self._strikes[-1] * 1.1
+        low_k = self._strikes[0] * 0.9
+        high_k = self._strikes[-1] * 1.1
 
-        for tenor_index in range(0, self._num_expiry_dates):
+        for tenor_index in range(0, self._num_expiry_dts):
 
             expiry_dt = self._expiry_dts[tenor_index]
             plt.figure()
@@ -756,13 +756,13 @@ class EquityVolSurface:
             fitted_vols = []
 
             num_intervals = 30
-            K = lowK
-            dK = (highK - lowK)/num_intervals
+            K = low_k
+            dK = (high_k - low_k)/num_intervals
 
             for _ in range(0, num_intervals):
 
                 ks.append(K)
-                fitted_vol = self.vol_from_strike_dt(K, expiry_dt) * 100.
+                fitted_vol = self.vol_from_strike_date(K, expiry_dt) * 100.
                 fitted_vols.append(fitted_vol)
                 K = K + dK
 
@@ -776,7 +776,7 @@ class EquityVolSurface:
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = str(self._volatility_function_type)
+            title = str(self._vol_func_type)
             plt.title(title)
             plt.legend()
 
@@ -786,9 +786,9 @@ class EquityVolSurface:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self._value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
-        s += label_to_string("VOL FUNCTION", self._volatility_function_type)
+        s += label_to_string("VOL FUNCTION", self._vol_func_type)
 
-        for i in range(0, self._num_expiry_dates):
+        for i in range(0, self._num_expiry_dts):
             s += label_to_string("EXPIRY DATE", self._expiry_dts[i])
 
         for i in range(0, self._num_strikes):

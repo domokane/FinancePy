@@ -32,10 +32,10 @@ class IborBasisSwap:
     def __init__(self,
                  effective_dt: Date,  # Date interest starts to accrue
                  term_dt_or_tenor: (Date, str),  # Date contract ends
-                 leg1Type: SwapTypes,
-                 leg1FreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 leg1DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 leg1Spread: float = 0.0,
+                 leg_1_type: SwapTypes,
+                 leg_1_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 leg_1_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 leg_1_spread: float = 0.0,
                  leg2FreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  leg2DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
                  leg2Spread: float = 0.0,
@@ -54,7 +54,7 @@ class IborBasisSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -68,18 +68,18 @@ class IborBasisSwap:
             raise FinError("Start date after maturity date")
 
         leg2Type = SwapTypes.PAY
-        if leg1Type == SwapTypes.PAY:
+        if leg_1_type == SwapTypes.PAY:
             leg2Type = SwapTypes.RECEIVE
 
         payment_lag = 0
         principal = 0.0
 
-        self._floatLeg1 = SwapFloatLeg(effective_dt,
+        self._float_leg_1 = SwapFloatLeg(effective_dt,
                                        self._termination_dt,
-                                       leg1Type,
-                                       leg1Spread,
-                                       leg1FreqType,
-                                       leg1DayCountType,
+                                       leg_1_type,
+                                       leg_1_spread,
+                                       leg_1_freq_type,
+                                       leg_1_day_count_type,
                                        notional,
                                        principal,
                                        payment_lag,
@@ -87,7 +87,7 @@ class IborBasisSwap:
                                        bd_type,
                                        dg_type)
 
-        self._floatLeg2 = SwapFloatLeg(effective_dt,
+        self._float_leg_2 = SwapFloatLeg(effective_dt,
                                        self._termination_dt,
                                        leg2Type,
                                        leg2Spread,
@@ -105,30 +105,30 @@ class IborBasisSwap:
     def value(self,
               value_dt: Date,
               discount_curve: DiscountCurve,
-              index_curveLeg1: DiscountCurve = None,
-              index_curveLeg2: DiscountCurve = None,
-              firstFixingRateLeg1=None,
-              firstFixingRateLeg2=None):
+              index_curve_leg_1: DiscountCurve = None,
+              index_curve_leg_2: DiscountCurve = None,
+              first_fixing_rate_leg_1=None,
+              first_fixing_rate_leg_2=None):
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve and an index curve for the Ibors on each swap leg. """
 
-        if index_curveLeg1 is None:
-            index_curveLeg1 = discount_curve
+        if index_curve_leg_1 is None:
+            index_curve_leg_1 = discount_curve
 
-        if index_curveLeg2 is None:
-            index_curveLeg2 = discount_curve
+        if index_curve_leg_2 is None:
+            index_curve_leg_2 = discount_curve
 
-        floatLeg1Value = self._floatLeg1.value(value_dt,
+        float_leg_1Value = self._float_leg_1.value(value_dt,
                                                discount_curve,
-                                               index_curveLeg1,
-                                               firstFixingRateLeg1)
+                                               index_curve_leg_1,
+                                               first_fixing_rate_leg_1)
 
-        floatLeg2Value = self._floatLeg2.value(value_dt,
+        float_leg_2Value = self._float_leg_2.value(value_dt,
                                                discount_curve,
-                                               index_curveLeg2,
-                                               firstFixingRateLeg2)
+                                               index_curve_leg_2,
+                                               first_fixing_rate_leg_2)
 
-        value = floatLeg1Value + floatLeg2Value
+        value = float_leg_1Value + float_leg_2Value
         return value
 
 ###############################################################################
@@ -137,7 +137,7 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg1.print_valuation()
+        self._float_leg_1.print_valuation()
 
 ###############################################################################
 
@@ -145,7 +145,7 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg2.print_valuation()
+        self._float_leg_2.print_valuation()
 
 ###############################################################################
 
@@ -153,16 +153,16 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatLeg1.print_payments()
-        self._floatLeg2.print_payments()
+        self._float_leg_1.print_payments()
+        self._float_leg_2.print_payments()
 
 ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self._floatLeg1.__repr__()
+        s += self._float_leg_1.__repr__()
         s += "\n"
-        s += self._floatLeg2.__repr__()
+        s += self._float_leg_2.__repr__()
         return s
 
 ###############################################################################

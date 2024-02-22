@@ -3,7 +3,7 @@ from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
@@ -299,9 +299,9 @@ class BondZero:
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
-        if type(clean_price) is float or type(clean_price) is np.float64:
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif type(clean_price) is list or type(clean_price) is np.ndarray:
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
             raise FinError("Unknown type for clean_price "
@@ -359,7 +359,7 @@ class BondZero:
 
         dc = DayCount(self._dc_type)
         cal = Calendar(self._cal_type)
-        exDividend_dt = cal.add_business_days(
+        ex_dividend_dt = cal.add_business_days(
             self._ncd, -self._ex_div_days)
 
         (acc_factor, num, _) = dc.year_frac(self._pcd,
@@ -367,7 +367,7 @@ class BondZero:
                                             self._ncd,
                                             FrequencyTypes.ZERO)
 
-        if settle_dt > exDividend_dt:
+        if settle_dt > ex_dividend_dt:
             acc_factor = acc_factor - 1.0
 
         self._alpha = 1.0 - acc_factor
@@ -391,9 +391,9 @@ class BondZero:
             clean_price: float,
             discount_curve: DiscountCurve,
             swapFloatDayCountConventionType=DayCountTypes.ACT_360,
-            swapFloatFrequencyType=FrequencyTypes.SEMI_ANNUAL,
-            swapFloatCalendarType=CalendarTypes.WEEKEND,
-            swapFloatBusDayAdjustRuleType=BusDayAdjustTypes.FOLLOWING,
+            swap_float_freq_type=FrequencyTypes.SEMI_ANNUAL,
+            swap_float_cal_type=CalendarTypes.WEEKEND,
+            swap_float_bus_day_adjust_rule_type=BusDayAdjustTypes.FOLLOWING,
             swapFloatDateGenRuleType=DateGenRuleTypes.BACKWARD):
         """ Calculate the par asset swap spread of the bond. The discount curve
         is a Ibor curve that is passed in. This function is vectorised with
@@ -404,7 +404,7 @@ class BondZero:
         accrued_amount = self._accrued_interest * self._par
         bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
-        pvIbor = 0.0
+        pv_ibor = 0.0
         prev_dt = self._pcd
 
         for dt in self._cpn_dts[1:]:
@@ -412,18 +412,18 @@ class BondZero:
             # coupons paid on the settlement date are paid to the seller
             if dt > settle_dt:
                 df = discount_curve.df(dt)
-                # pvIbor += df * self._cpn / self._freq
+                # pv_ibor += df * self._cpn / self._freq
 
-        pvIbor += df * self._par
+        pv_ibor += df * self._par
 
         # Calculate the PV01 of the floating leg of the asset swap
         # I assume here that the coupon starts accruing on the settlement date
         prev_dt = self._pcd
         schedule = Schedule(settle_dt,
                             self._maturity_dt,
-                            swapFloatFrequencyType,
-                            swapFloatCalendarType,
-                            swapFloatBusDayAdjustRuleType,
+                            swap_float_freq_type,
+                            swap_float_cal_type,
+                            swap_float_bus_day_adjust_rule_type,
                             swapFloatDateGenRuleType)
 
         day_count = DayCount(swapFloatDayCountConventionType)
@@ -436,7 +436,7 @@ class BondZero:
             pv01 = pv01 + year_frac * df
             prev_dt = dt
 
-        asw = (pvIbor - bond_price / self._par) / pv01
+        asw = (pv_ibor - bond_price / self._par) / pv01
         return asw
 
     ###########################################################################
@@ -457,7 +457,7 @@ class BondZero:
             if dt > settle_dt:
                 t = (dt - settle_dt) / gDaysInYear
 
-                t = np.maximum(t, gSmall)
+                t = np.maximum(t, g_small)
 
                 df = discount_curve.df(dt)
                 # determine the Ibor implied zero rate
@@ -550,11 +550,11 @@ class BondZero:
         end payment present values. """
 
         pv = 0.0
-        prevQ = 1.0
-        prevDf = 1.0
+        prev_q = 1.0
+        prev_df = 1.0
 
-        defaultingPrincipalPVPayStart = 0.0
-        defaultingPrincipalPVPayEnd = 0.0
+        defaulting_principal_pv_pay_start = 0.0
+        defaulting_principal_pv_pay_end = 0.0
 
         for dt in self._cpn_dts[1:]:
 
@@ -567,17 +567,17 @@ class BondZero:
                 # Any default results in all subsequent coupons being lost
                 # with zero recovery
 
-                dq = q - prevQ
+                dq = q - prev_q
 
-                defaultingPrincipalPVPayStart += -dq * recovery_rate * prevDf
-                defaultingPrincipalPVPayStart += -dq * recovery_rate * df
+                defaulting_principal_pv_pay_start += -dq * recovery_rate * prev_df
+                defaulting_principal_pv_pay_start += -dq * recovery_rate * df
 
                 # Add on PV of principal if default occurs in coupon period
-                prevQ = q
-                prevDf = df
+                prev_q = q
+                prev_df = df
 
-        pv = pv + 0.50 * defaultingPrincipalPVPayStart
-        pv = pv + 0.50 * defaultingPrincipalPVPayEnd
+        pv = pv + 0.50 * defaulting_principal_pv_pay_start
+        pv = pv + 0.50 * defaulting_principal_pv_pay_end
         pv = pv + df * q * self._par
         pv *= self._par
         return pv

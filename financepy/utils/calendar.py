@@ -183,37 +183,37 @@ class Calendar:
 
     def add_business_days(self,
                           start_dt: Date,
-                          numDays: int):
-        """ Returns a new date that is numDays business days after Date.
+                          num_days: int):
+        """ Returns a new date that is num_days business days after Date.
         All holidays in the chosen calendar are assumed not business days. """
 
         # TODO: REMOVE DATETIME DEPENDENCE HERE ???
 
-        if isinstance(numDays, int) is False:
+        if isinstance(num_days, int) is False:
             raise FinError("Num days must be an integer")
 
         dt = datetime.date(start_dt._y, start_dt._m, start_dt._d)
         d = dt.day
         m = dt.month
         y = dt.year
-        newDt = Date(d, m, y)
+        new_dt = Date(d, m, y)
 
         s = +1
-        if numDays < 0:
-            numDays = -1 * numDays
+        if num_days < 0:
+            num_days = -1 * num_days
             s = -1
 
-        while numDays > 0:
+        while num_days > 0:
             dt = dt + s * datetime.timedelta(days=1)
             d = dt.day
             m = dt.month
             y = dt.year
-            newDt = Date(d, m, y)
+            new_dt = Date(d, m, y)
 
-            if self.is_business_day(newDt) is True:
-                numDays -= 1
+            if self.is_business_day(new_dt) is True:
+                num_days -= 1
 
-        return newDt
+        return new_dt
 
 ###############################################################################
 
@@ -1064,15 +1064,15 @@ class Calendar:
         calendar. Useful for diagnostics. """
         start_dt = Date(1, 1, year)
         end_dt = Date(1, 1, year + 1)
-        holidayList = []
+        holiday_list = []
         while start_dt < end_dt:
             if self.is_business_day(start_dt) is False and \
                     start_dt.is_weekend() is False:
-                holidayList.append(start_dt.__str__())
+                holiday_list.append(start_dt.__str__())
 
             start_dt = start_dt.add_days(1)
 
-        return holidayList
+        return holiday_list
 
 ###############################################################################
 
@@ -1085,9 +1085,9 @@ class Calendar:
             raise FinError(
                 "Unable to determine Easter monday in year " + str(year))
 
-        emDays = easterMondayDay[year - 1901]
+        em_days = easterMondayDay[year - 1901]
         start_dt = Date(1, 1, year)
-        em = start_dt.add_days(emDays-1)
+        em = start_dt.add_days(em_days-1)
         return em
 
 ###############################################################################

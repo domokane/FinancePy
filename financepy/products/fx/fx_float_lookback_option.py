@@ -6,7 +6,7 @@ import numpy as np
 from enum import Enum
 
 from ...utils.math import N
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.fx.fx_option import FXOption
@@ -96,8 +96,8 @@ class FXFloatLookbackOption(FXOption):
                 raise FinError(
                     "s_max must be greater than or equal to the stock price.")
 
-        if abs(r - q) < gSmall:
-            q = r + gSmall
+        if abs(r - q) < g_small:
+            q = r + g_small
 
         dq = np.exp(-q * t)
         df = np.exp(-r * t)

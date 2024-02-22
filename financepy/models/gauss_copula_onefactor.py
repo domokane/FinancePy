@@ -7,10 +7,10 @@ import numpy as np
 
 ##########################################################################
 
-from ..utils.math import norminvcdf, N, INVROOT2PI
+from ..utils.math import norminvcdf, N, inv_root_two_pi
 from ..utils.error import FinError
 from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
-from .loss_dbn_builder import indep_loss_dbn_heterogeneous_adj_binomial
+from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
 from .loss_dbn_builder import portfolio_gcd
 
 ###############################################################################
@@ -76,7 +76,7 @@ def loss_dbn_recursion_gcd(num_credits,
         z += dz
 
     for i_loss_unit in range(0, int(num_loss_units)):
-        uncond_loss_dbn[i_loss_unit] *= INVROOT2PI * dz
+        uncond_loss_dbn[i_loss_unit] *= inv_root_two_pi * dz
 
     return uncond_loss_dbn
 
@@ -121,10 +121,10 @@ def homog_basket_loss_dbn(survival_probs,
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     loss_dbn = loss_dbn_recursion_gcd(num_credits,
-                                     default_probs,
-                                     loss_units,
-                                     beta_vector,
-                                     num_integration_steps)
+                                      default_probs,
+                                      loss_units,
+                                      beta_vector,
+                                      num_integration_steps)
 
     return loss_dbn
 
@@ -150,13 +150,13 @@ def tranche_surv_prob_recursion(k1,
     if k1 >= k2:
         raise FinError("K1 >= K2")
 
-    commonRecoveryFlag = 1
+    common_recovery_flag = 1
 
     loss_amounts = np.zeros(num_credits)
     for i_credit in range(0, num_credits):
         loss_amounts[i_credit] = (1.0 - recovery_rates[i_credit]) / num_credits
         if loss_amounts[i_credit] != loss_amounts[0]:
-            commonRecoveryFlag = 0
+            common_recovery_flag = 0
 
     gcd = 0.0
 
@@ -168,7 +168,7 @@ def tranche_surv_prob_recursion(k1,
     if m > 0.8:
         num_integration_steps *= 2
 
-    if commonRecoveryFlag == 1:
+    if common_recovery_flag == 1:
         gcd = loss_amounts[0]
     else:
         gcd = portfolio_gcd(loss_amounts)
@@ -186,18 +186,18 @@ def tranche_surv_prob_recursion(k1,
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     loss_dbn = loss_dbn_recursion_gcd(num_credits,
-                                     default_probs,
-                                     loss_units,
-                                     beta_vector,
-                                     num_integration_steps)
+                                      default_probs,
+                                      loss_units,
+                                      beta_vector,
+                                      num_integration_steps)
 
-    trancheEL = 0.0
+    tranche_el = 0.0
     for i_loss_unit in range(0, int(num_loss_units)):
         loss = i_loss_unit * gcd
-        trancheLoss = min(loss, k2) - min(loss, k1)
-        trancheEL = trancheEL + trancheLoss * loss_dbn[i_loss_unit]
+        tranche_loss = min(loss, k2) - min(loss, k1)
+        tranche_el = tranche_el + tranche_loss * loss_dbn[i_loss_unit]
 
-    q = 1.0 - trancheEL / (k2 - k1)
+    q = 1.0 - tranche_el / (k2 - k1)
     return q
 
 ###############################################################################
@@ -214,13 +214,16 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
         if mu > k2:
             gauss_approx_tranche_loss += (mu - k2)
     else:
-        
+
         d1 = (mu - k1) / sigma
         d2 = (mu - k2) / sigma
 
-        gauss_approx_tranche_loss = ((mu - k1) * N(d1) - (mu - k2) * N(d2) 
-        + sigma * np.exp(-0.5 * d1 * d1) * INVROOT2PI 
-        - sigma * np.exp(-0.5 * d2 * d2) * INVROOT2PI)
+        expd1 = np.exp(-0.5 * d1 * d1)
+        expd2 = np.exp(-0.5 * d2 * d2)
+
+        gauss_approx_tranche_loss = ((mu - k1) * N(d1) - (mu - k2) * N(d2)
+                                     + sigma * expd1 * inv_root_two_pi
+                                     - sigma * expd2 * inv_root_two_pi)
 
     return gauss_approx_tranche_loss
 
@@ -284,7 +287,7 @@ def tranch_surv_prob_gaussian(k1,
         v += el * gauss_wt
         z += dz
 
-    v *= INVROOT2PI * dz
+    v *= inv_root_two_pi * dz
     q = 1.0 - v / (k2 - k1)
     return q
 
@@ -314,18 +317,19 @@ def loss_dbn_hetero_adj_binomial(num_credits,
     dz = 2.0 * abs(MIN_Z) / num_integration_steps
     z = MIN_Z
 
-    for i_step in range(0, num_integration_steps):
+    for _ in range(0, num_integration_steps):
+
         for i_credit in range(0, num_credits):
             beta = beta_vector[i_credit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[i_credit] - beta * z) / denom
             cond_default_probs[i_credit] = N(argz)
 
-        indep_dbn = indep_loss_dbn_heterogeneous_adj_binomial(num_credits,
-                                                              cond_default_probs,
-                                                              loss_ratio)
+        indep_dbn = indep_loss_dbn_hetero_adj_binomial(num_credits,
+                                                       cond_default_probs,
+                                                       loss_ratio)
 
-        gauss_wt = np.exp(-(z**2) / 2.0)
+        gauss_wt = np.exp(-z*z / 2.0)
 
         for i_loss_unit in range(0, num_loss_units):
             uncond_loss_dbn[i_loss_unit] += indep_dbn[i_loss_unit] * gauss_wt
@@ -333,7 +337,7 @@ def loss_dbn_hetero_adj_binomial(num_credits,
         z = z + dz
 
     for i_loss_unit in range(0, num_loss_units):
-        uncond_loss_dbn[i_loss_unit] *= INVROOT2PI * dz
+        uncond_loss_dbn[i_loss_unit] *= inv_root_two_pi * dz
 
     return uncond_loss_dbn
 
@@ -364,31 +368,31 @@ def tranche_surv_prob_adj_binomial(k1,
     for i_credit in range(0, num_credits):
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
-    totalLoss = 0.0
+    total_loss = 0.0
     for i_credit in range(0, num_credits):
-        totalLoss += (1.0 - recovery_rates[i_credit])
-    totalLoss /= num_credits
+        total_loss += (1.0 - recovery_rates[i_credit])
+    total_loss /= num_credits
 
-    avgLoss = totalLoss / num_credits
+    avg_loss = total_loss / num_credits
 
     loss_ratio = np.zeros(num_credits)
     for i_credit in range(0, num_credits):
         loss_ratio[i_credit] = (
-            1.0 - recovery_rates[i_credit]) / num_credits / avgLoss
+            1.0 - recovery_rates[i_credit]) / num_credits / avg_loss
 
     loss_dbn = loss_dbn_hetero_adj_binomial(num_credits,
-                                           default_probs,
-                                           loss_ratio,
-                                           beta_vector,
-                                           num_integration_steps)
-    trancheEL = 0.0
+                                            default_probs,
+                                            loss_ratio,
+                                            beta_vector,
+                                            num_integration_steps)
+    tranche_el = 0.0
     num_loss_units = num_credits + 1
     for i_loss_unit in range(0, num_loss_units):
-        loss = i_loss_unit * avgLoss
-        trancheLoss = min(loss, k2) - min(loss, k1)
-        trancheEL += trancheLoss * loss_dbn[i_loss_unit]
+        loss = i_loss_unit * avg_loss
+        tranche_loss = min(loss, k2) - min(loss, k1)
+        tranche_el += tranche_loss * loss_dbn[i_loss_unit]
 
-    q = 1.0 - trancheEL / (k2 - k1)
+    q = 1.0 - tranche_el / (k2 - k1)
     return q
 
 ###############################################################################

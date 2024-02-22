@@ -11,9 +11,9 @@ from ..utils.math import pair_gcd
 
 
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
-def indep_loss_dbn_heterogeneous_adj_binomial(num_credits,
-                                              cond_probs,
-                                              loss_ratio):
+def indep_loss_dbn_hetero_adj_binomial(num_credits,
+                                       cond_probs,
+                                       loss_ratio):
 
     # Algorithm due to D. O'Kane.
 
@@ -99,8 +99,8 @@ def portfolio_gcd(actual_losses):
         num2 = int(actual_losses[i_credit] * scaling)
         temp = pair_gcd(temp, num2)
 
-    portfolioGCD = float(temp / scaling)
-    return portfolioGCD
+    portfolio_gcd = float(temp / scaling)
+    return portfolio_gcd
 
 ###############################################################################
 

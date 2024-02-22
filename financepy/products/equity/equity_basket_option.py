@@ -133,8 +133,8 @@ class EquityBasketOption:
         for ia in range(0, self._num_assets):
             smean = smean + s[ia] * a[ia]
 
-        lnS0k = np.log(smean / self._strike_price)
-        sqrtT = np.sqrt(t_exp)
+        ln_s0_k = np.log(smean / self._strike_price)
+        sqrt_t = np.sqrt(t_exp)
 
         # Moment matching - starting with dividend
         qnum = 0.0
@@ -148,23 +148,23 @@ class EquityBasketOption:
         vnum = 0.0
         for ia in range(0, self._num_assets):
             for ja in range(0, ia):
-                rhoSigmaSigma = v[ia] * v[ja] * correlations[ia, ja]
-                expTerm = (qs[ia] + qs[ja] - rhoSigmaSigma) * t_exp
-                vnum = vnum + a[ia] * a[ja] * s[ia] * s[ja] * np.exp(-expTerm)
+                rho_sigma_sigma = v[ia] * v[ja] * correlations[ia, ja]
+                exp_term = (qs[ia] + qs[ja] - rho_sigma_sigma) * t_exp
+                vnum = vnum + a[ia] * a[ja] * s[ia] * s[ja] * np.exp(-exp_term)
 
         vnum *= 2.0
 
         for ia in range(0, self._num_assets):
-            rhoSigmaSigma = v[ia] ** 2
-            expTerm = (2.0 * qs[ia] - rhoSigmaSigma) * t_exp
-            vnum = vnum + ((a[ia] * s[ia]) ** 2) * np.exp(-expTerm)
+            rho_sigma_sigma = v[ia] ** 2
+            exp_term = (2.0 * qs[ia] - rho_sigma_sigma) * t_exp
+            vnum = vnum + ((a[ia] * s[ia]) ** 2) * np.exp(-exp_term)
 
         vhat2 = np.log(vnum / qnum / qnum) / t_exp
 
-        den = np.sqrt(vhat2) * sqrtT
+        den = np.sqrt(vhat2) * sqrt_t
         mu = r - qhat
-        d1 = (lnS0k + (mu + vhat2 / 2.0) * t_exp) / den
-        d2 = (lnS0k + (mu - vhat2 / 2.0) * t_exp) / den
+        d1 = (ln_s0_k + (mu + vhat2 / 2.0) * t_exp) / den
+        d2 = (ln_s0_k + (mu - vhat2 / 2.0) * t_exp) / den
 
         if self._option_type == OptionTypes.EUROPEAN_CALL:
             v = smean * np.exp(-qhat * t_exp) * N(d1)

@@ -75,10 +75,10 @@ def test_nelson_siegel_svensson():
     assert round(fitted_curve._curve_fit._tau_2, 4) == 100.0000
 
 
-def test_interpolated_yield():
+def test_interp_yield():
     curveFitMethod = CurveFitBSpline()
     fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
     maturity_dt = Date(19, 9, 2030)
-    interpolated_yield = fitted_curve.interpolated_yield(maturity_dt)
-    assert round(float(interpolated_yield), 8) == 0.02601858
+    interp_yield = fitted_curve.interp_yield(maturity_dt)
+    assert round(float(interp_yield), 8) == 0.02601858

@@ -26,7 +26,7 @@ def build_Ibor_Curve(value_dt):
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
-    payFixed = SwapTypes.PAY
+    pay_fixed = SwapTypes.PAY
 
     spot_days = 2
     settle_dt = value_dt.add_weekdays(spot_days)
@@ -74,7 +74,7 @@ def build_Ibor_Curve(value_dt):
     depos.append(depo5)
 
     fras = []
-    fixedDCCType = DayCountTypes.ACT_365F
+    fixed_dcc_type = DayCountTypes.ACT_365F
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swaps = []
@@ -85,9 +85,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(36)
@@ -95,9 +95,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(48)
@@ -105,9 +105,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(60)
@@ -115,9 +115,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(72)
@@ -125,9 +125,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap5)
 
     maturity_dt = settle_dt.add_months(84)
@@ -135,9 +135,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap6)
 
     maturity_dt = settle_dt.add_months(96)
@@ -145,9 +145,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap7)
 
     maturity_dt = settle_dt.add_months(108)
@@ -155,9 +155,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap8)
 
     maturity_dt = settle_dt.add_months(120)
@@ -165,9 +165,9 @@ def build_Ibor_Curve(value_dt):
         settle_dt,
         maturity_dt,
         swap_rate,
-        payFixed,
+        pay_fixed,
         fixed_freq_type,
-        fixedDCCType)
+        fixed_dcc_type)
     swaps.append(swap9)
 
     libor_curve = IborSingleCurve(value_dt,

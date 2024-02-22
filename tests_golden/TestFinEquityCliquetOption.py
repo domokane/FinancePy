@@ -21,12 +21,12 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 def test_EquityCliquetOption():
 
     start_dt = Date(1, 1, 2014)
-    final_expiry_date = Date(1, 1, 2017)
+    final_expiry_dt = Date(1, 1, 2017)
     freq_type = FrequencyTypes.QUARTERLY
     option_type = OptionTypes.EUROPEAN_CALL
 
     cliquetOption = EquityCliquetOption(start_dt,
-                                        final_expiry_date,
+                                        final_expiry_dt,
                                         option_type,
                                         freq_type)
 

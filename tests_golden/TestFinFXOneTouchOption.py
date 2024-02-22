@@ -33,8 +33,8 @@ def test_FinFXOneTouchOption():
     num_paths = 50000
     num_steps_per_year = 252 * 2
 
-    domCurve = DiscountCurveFlat(value_dt, domesticRate)
-    forCurve = DiscountCurveFlat(value_dt, foreignRate)
+    dom_curve = DiscountCurveFlat(value_dt, domesticRate)
+    for_curve = DiscountCurveFlat(value_dt, foreignRate)
 
     spot_fx_rate = 1.050
     payment_size = 1.5
@@ -56,14 +56,14 @@ def test_FinFXOneTouchOption():
 
         v = option.value(value_dt,
                          spot_fx_rate,
-                         domCurve,
-                         forCurve,
+                         dom_curve,
+                         for_curve,
                          model)
 
         v_mc = option.value_mc(value_dt,
                                spot_fx_rate,
-                               domCurve,
-                               forCurve,
+                               dom_curve,
+                               for_curve,
                                model,
                                num_steps_per_year,
                                num_paths)
@@ -92,14 +92,14 @@ def test_FinFXOneTouchOption():
 
         v = option.value(value_dt,
                          spot_fx_rate,
-                         domCurve,
-                         forCurve,
+                         dom_curve,
+                         for_curve,
                          model)
 
         v_mc = option.value_mc(value_dt,
                                spot_fx_rate,
-                               domCurve,
-                               forCurve,
+                               dom_curve,
+                               for_curve,
                                model,
                                num_steps_per_year,
                                num_paths)
@@ -132,8 +132,8 @@ def test_BBGOneTouchOption():
     num_paths = 50000
     num_steps_per_year = 252
 
-    domCurve = DiscountCurveFlat(value_dt, domRate)
-    forCurve = DiscountCurveFlat(value_dt, forRate)
+    dom_curve = DiscountCurveFlat(value_dt, domRate)
+    for_curve = DiscountCurveFlat(value_dt, forRate)
 
     payment_size = 1000000 # EUR
 
@@ -146,34 +146,34 @@ def test_BBGOneTouchOption():
 
     v = option.value(value_dt,
                      spot_fx_rate,
-                     domCurve,
-                     forCurve,
+                     dom_curve,
+                     for_curve,
                      model)
 
     v_mc = option.value_mc(value_dt,
                            spot_fx_rate,
-                           domCurve,
-                           forCurve,
+                           dom_curve,
+                           for_curve,
                            model,
                            num_steps_per_year,
                            num_paths)
 
     d = option.delta(value_dt,
                      spot_fx_rate,
-                     domCurve,
-                     forCurve,
+                     dom_curve,
+                     for_curve,
                      model)
 
     g = option.gamma(value_dt,
                      spot_fx_rate,
-                     domCurve,
-                     forCurve,
+                     dom_curve,
+                     for_curve,
                      model)
 
     v = option.vega(value_dt,
                      spot_fx_rate,
-                     domCurve,
-                     forCurve,
+                     dom_curve,
+                     for_curve,
                      model)
 
     # I SHOULD GET 49.4934% OR 494,934 in EUR

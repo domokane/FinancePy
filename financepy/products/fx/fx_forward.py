@@ -50,23 +50,27 @@ class FXForward:
         self._strike_fx_rate = strike_fx_rate
 
         self._currency_pair = currency_pair
-        self._forName = self._currency_pair[0:3]
-        self._domName = self._currency_pair[3:6]
+        self._for_name = self._currency_pair[0:3]
+        self._dom_name = self._currency_pair[3:6]
 
-        if notional_currency != self._domName and notional_currency != self._forName:
+        if notional_currency != self._dom_name and notional_currency != self._for_name:
             raise FinError("Notional currency not in currency pair.")
 
         self._notional = notional
         self._notional_currency = notional_currency
         self._spot_days = spot_days
+        self._notional_dom = None
+        self._notional_for = None
+        self._cash_dom = None
+        self._cash_for = None
 
 ###############################################################################
 
     def value(self,
               value_dt,
               spot_fx_rate,  # 1 unit of foreign in domestic
-              dom_discount_curve,
-              for_discount_curve):
+              domestic_curve,
+              foreign_curve):
         """ Calculate the value of an FX forward contract where the current
         FX rate is the spot_fx_rate. """
 
@@ -76,11 +80,11 @@ class FXForward:
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_dt != value_dt:
+        if domestic_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if for_discount_curve._value_dt != value_dt:
+        if foreign_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
@@ -97,28 +101,28 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        newFwdFXRate = self.forward(value_dt,
-                                    spot_fx_rate,
-                                    dom_discount_curve,
-                                    for_discount_curve)
+        newfwd_fx_rate = self.forward(value_dt,
+                                      spot_fx_rate,
+                                      domestic_curve,
+                                      foreign_curve)
 
-        dom_df = dom_discount_curve._df(t)
+        dom_df = domestic_curve._df(t)
 
-        if self._notional_currency == self._domName:
+        if self._notional_currency == self._dom_name:
             self._notional_dom = self._notional
             self._notional_for = self._notional / self._strike_fx_rate
-        elif self._notional_currency == self._forName:
+        elif self._notional_currency == self._for_name:
             self._notional_dom = self._notional * self._strike_fx_rate
             self._notional_for = self._notional
         else:
             raise FinError("Invalid notional currency.")
 
-        if self._notional_currency == self._forName:
-            v = (newFwdFXRate - self._strike_fx_rate)
+        if self._notional_currency == self._for_name:
+            v = (newfwd_fx_rate - self._strike_fx_rate)
             v = v * self._notional * dom_df
-        elif self._notional_currency == self._domName:
-            v = (newFwdFXRate - self._strike_fx_rate)
-            v = v * self._notional * dom_df * newFwdFXRate
+        elif self._notional_currency == self._dom_name:
+            v = (newfwd_fx_rate - self._strike_fx_rate)
+            v = v * self._notional * dom_df * newfwd_fx_rate
 
         self._cash_dom = v * self._notional_dom / self._strike_fx_rate
         self._cash_for = v * self._notional_for / spot_fx_rate
@@ -128,16 +132,16 @@ class FXForward:
                 "cash_for": self._cash_for,
                 "not_dom": self._notional_dom,
                 "not_for": self._notional_for,
-                "ccy_dom": self._domName,
-                "ccy_for": self._forName}
+                "ccy_dom": self._dom_name,
+                "ccy_for": self._for_name}
 
 ###############################################################################
 
     def forward(self,
                 value_dt,
                 spot_fx_rate,  # 1 unit of foreign in domestic
-                dom_discount_curve,
-                for_discount_curve):
+                domestic_curve,
+                foreign_curve):
         """ Calculate the FX Forward rate that makes the value of the FX
         contract equal to zero. """
 
@@ -154,11 +158,11 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        for_df = for_discount_curve._df(t)
-        dom_df = dom_discount_curve._df(t)
+        for_df = foreign_curve._df(t)
+        dom_df = domestic_curve._df(t)
 
-        fwdFXRate = spot_fx_rate * for_df / dom_df
-        return fwdFXRate
+        fwd_fx_rate = spot_fx_rate * for_df / dom_df
+        return fwd_fx_rate
 
 ###############################################################################
 

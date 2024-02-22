@@ -4,10 +4,9 @@
 
 # https://people.math.ethz.ch/~hjfurrer/teaching/LongstaffSchwartzAmericanOptionsLeastSquareMonteCarlo.pdf
 
-import numpy as np
-
 from enum import Enum, auto
 
+import numpy as np
 from ..utils.global_types import OptionTypes
 from ..utils.polyfit import fit_poly, eval_polynomial
 from ..models.finite_difference import option_payoff

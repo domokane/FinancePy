@@ -62,19 +62,19 @@ class CDSIndexPortfolio:
         intrinsic_rpv01 = 0.0
 
         for m in range(0, num_credits):
-            retValue = cds_contract.risky_pv01(value_dt,
+            ret_value = cds_contract.risky_pv01(value_dt,
                                                issuer_curves[m])
 
-            cleanRPV01 = retValue['clean_rpv01']
+            clean_rpv01 = ret_value['clean_rpv01']
 
-            intrinsic_rpv01 += cleanRPV01
+            intrinsic_rpv01 += clean_rpv01
 
         intrinsic_rpv01 /= num_credits
         return (intrinsic_rpv01)
 
     ###########################################################################
 
-    def intrinsic_protection_leg_pv(self,
+    def intrinsic_prot_leg_pv(self,
                                     value_dt,
                                     step_in_dt,
                                     maturity_dt,
@@ -93,10 +93,10 @@ class CDSIndexPortfolio:
                            1.0)
 
         for m in range(0, num_credits):
-            protectionPV = cds_contract.protection_leg_pv(value_dt,
+            prot_pv = cds_contract.prot_leg_pv(value_dt,
                                                           issuer_curves[m])
 
-            intrinsic_prot_pv += protectionPV
+            intrinsic_prot_pv += prot_pv
 
         intrinsic_prot_pv /= num_credits
         return intrinsic_prot_pv
@@ -112,7 +112,7 @@ class CDSIndexPortfolio:
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spread. """
 
-        intrinsic_prot_pv = self.intrinsic_protection_leg_pv(value_dt,
+        intrinsic_prot_pv = self.intrinsic_prot_leg_pv(value_dt,
                                                              step_in_dt,
                                                              maturity_dt,
                                                              issuer_curves)
@@ -166,13 +166,13 @@ class CDSIndexPortfolio:
                            maturity_dt,
                            0.0)
 
-        totalSpread = 0.0
+        total_spd = 0.0
 
         for m in range(0, num_credits):
             spread = cds_contract.par_spread(value_dt, issuer_curves[m])
-            totalSpread += spread
+            total_spd += spread
 
-        return totalSpread
+        return total_spd
 
     ###########################################################################
 
@@ -332,7 +332,7 @@ class CDSIndexPortfolio:
                                                      libor_curve,
                                                      recovery_rate)
 
-                    index_protection_pv = cds_index.protection_leg_pv(value_dt,
+                    index_prot_pv = cds_index.prot_leg_pv(value_dt,
                                                                     adjusted_issuer_curve,
                                                                     index_recovery_rate)
 
@@ -340,7 +340,7 @@ class CDSIndexPortfolio:
                                                       adjusted_issuer_curve)['clean_rpv01']
 
                     sum_rpv01 += clean_rpv01
-                    sum_prot += index_protection_pv
+                    sum_prot += index_prot_pv
 
                 sum_rpv01 /= num_credits
                 sum_prot /= num_credits
@@ -446,20 +446,20 @@ class CDSIndexPortfolio:
                     raise FinError("Max Iterations exceeded")
 
                 sum_rpv01 = 0.0
-                sumProt = 0.0
+                sum_prot = 0.0
 
                 for i_credit in range(0, num_credits):
                     q1 = adjusted_issuer_curves[i_credit]._values[i_maturity]
                     q2 = adjusted_issuer_curves[i_credit]._values[i_maturity + 1]
                     q12 = q2 / q1
 
-                    q12NEW = pow(q12, ratio)
-                    q2NEW = q1 * q12NEW
+                    q12_new = pow(q12, ratio)
+                    q2_new = q1 * q12_new
 
-                    adjusted_issuer_curves[i_credit]._values[i_maturity + 1] = q2NEW
+                    adjusted_issuer_curves[i_credit]._values[i_maturity + 1] = q2_new
 
                     #                    if i_maturity == 0 and index_cpns[0] == 0.006:
-                    #                        print(i_credit, q1, q2NEW)
+                    #                        print(i_credit, q1, q2_new)
 
                     index_maturity_dt = index_maturity_dts[i_maturity]
 
@@ -470,27 +470,27 @@ class CDSIndexPortfolio:
                                     0,
                                     1.0)
 
-                    indexProtPV = cds_index.protection_leg_pv(value_dt,
+                    index_prot_pv = cds_index.prot_leg_pv(value_dt,
                                                               adjusted_issuer_curves[i_credit],
                                                               index_recovery_rate)
 
-                    rpv01Ret = cds_index.risky_pv01(value_dt,
+                    rpv01_ret = cds_index.risky_pv01(value_dt,
                                                     adjusted_issuer_curves[i_credit])
 
-                    cleanRPV01 = rpv01Ret['clean_rpv01']
+                    clean_rpv01 = rpv01_ret['clean_rpv01']
 
-                    sum_rpv01 += cleanRPV01
-                    sumProt += indexProtPV
+                    sum_rpv01 += clean_rpv01
+                    sum_prot += index_prot_pv
 
                 sum_rpv01 /= num_credits
-                sumProt /= num_credits
+                sum_prot /= num_credits
 
-                spd = sumProt / sum_rpv01
+                spd = sum_prot / sum_rpv01
 
-                sumPrem = sum_rpv01 * index_cpns[i_maturity]
+                sum_prem = sum_rpv01 * index_cpns[i_maturity]
 
-                numerator = index_up_fronts[i_maturity] + sumPrem
-                denominator = sumProt
+                numerator = index_up_fronts[i_maturity] + sum_prem
+                denominator = sum_prot
 
                 ratio = numerator / denominator
                 alpha *= ratio

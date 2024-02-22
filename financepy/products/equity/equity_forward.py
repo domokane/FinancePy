@@ -71,15 +71,15 @@ class EquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        fwdStockPrice = self.forward(value_dt,
+        fwd_stock_price = self.forward(value_dt,
                                      stock_price,
                                      discount_curve,
                                      dividend_curve)
 
-        discountDF = discount_curve._df(t)
+        discount_df = discount_curve._df(t)
 
-        v = (fwdStockPrice - self._forward_price)
-        v = v * self._notional * discountDF
+        v = (fwd_stock_price - self._forward_price)
+        v = v * self._notional * discount_df
 
         if self._long_short == FinLongShort.SHORT:
             v = v * (-1.0)
@@ -108,11 +108,11 @@ class EquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        discountDF = discount_curve._df(t)
+        discount_df = discount_curve._df(t)
         dividendDF = dividend_curve._df(t)
 
-        fwdStockPrice = stock_price * dividendDF / discountDF
-        return fwdStockPrice
+        fwd_stock_price = stock_price * dividendDF / discount_df
+        return fwd_stock_price
 
 ###############################################################################
 

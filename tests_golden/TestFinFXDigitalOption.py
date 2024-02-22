@@ -2,22 +2,20 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from financepy.utils.global_types import OptionTypes
+from financepy.products.fx.fx_digital_option import FXDigitalOption
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
+import numpy as np
+import time
 import sys
 sys.path.append("..")
-
-import time
-import numpy as np
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.fx.fx_digital_option import FXDigitalOption
-from financepy.utils.global_types import OptionTypes
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -47,8 +45,8 @@ def test_FinFXDigitalOption():
 
     notional = 1.0
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -63,8 +61,8 @@ def test_FinFXDigitalOption():
 
     value = digital_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
 ###############################################################################

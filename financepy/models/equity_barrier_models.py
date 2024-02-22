@@ -15,41 +15,64 @@ from ..utils.math import N
 
 @vectorize([float64(float64, float64, float64, float64, float64, float64,
                     float64, int64, int64)], fastmath=True, cache=True)
-def value_bs(t, k, h, s, r, q, v, option_type, nobs):
-    """ This values a single option. Because of its structure it cannot
+def value_barrier(t, k, h, s, r, q, v, option_type, nobs):
+    """ This values a single barrier option. Because of its structure it cannot
     easily be vectorised which is why it has been wrapped.
     # number of observations per year
     """
-    lnS0k = np.log(s / k)
-    sqrtT = np.sqrt(t)
+    ln_s0_k = np.log(s / k)
+    sqrt_t = np.sqrt(t)
 
-    sigma_rt_t = v * sqrtT
+    sigma_rt_t = v * sqrt_t
     v2 = v * v
     mu = r - q
-    d1 = (lnS0k + (mu + v2 / 2.0) * t) / sigma_rt_t
-    d2 = (lnS0k + (mu - v2 / 2.0) * t) / sigma_rt_t
+    d1 = (ln_s0_k + (mu + v2 / 2.0) * t) / sigma_rt_t
+    d2 = (ln_s0_k + (mu - v2 / 2.0) * t) / sigma_rt_t
     df = np.exp(-r * t)
     dq = np.exp(-q * t)
 
     c = s * dq * N(d1) - k * df * N(d2)
     p = k * df * N(-d2) - s * dq * N(-d1)
 
-    if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and s <= h:
-        return 0.0
-    elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and s >= h:
-        return 0.0
-    elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and s >= h:
-        return 0.0
-    elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and s <= h:
-        return 0.0
-    elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and s <= h:
-        return c
-    elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value and s >= h:
-        return c
-    elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value and s >= h:
-        return p
-    elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= h:
-        return p
+    if s >= h:
+
+        if option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
+            return 0.0
+        if option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
+            return 0.0
+        if option_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
+            return c
+        if option_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
+            return p
+
+    else:
+
+        if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
+            return 0.0
+        elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
+            return 0.0
+        elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
+            return c
+        elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
+            return p
+
+    if 1 == 0:
+        if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and s <= h:
+            return 0.0
+        elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and s >= h:
+            return 0.0
+        elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and s >= h:
+            return 0.0
+        elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and s <= h:
+            return 0.0
+        elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and s <= h:
+            return c
+        elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value and s >= h:
+            return c
+        elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value and s >= h:
+            return p
+        elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= h:
+            return p
 
     num_observations = 1 + t * nobs
 
@@ -75,8 +98,7 @@ def value_bs(t, k, h, s, r, q, v, option_type, nobs):
     elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
         h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
     else:
-        raise FinError("Unknown barrier option type." +
-                       str(option_type))
+        raise FinError("Unknown barrier option type." + str(option_type))
 
     h = h_adj
 
@@ -87,94 +109,93 @@ def value_bs(t, k, h, s, r, q, v, option_type, nobs):
     y = np.log(h * h / (s * k)) / sigma_rt_t + ll * sigma_rt_t
     x1 = np.log(s / h) / sigma_rt_t + ll * sigma_rt_t
     y1 = np.log(h / s) / sigma_rt_t + ll * sigma_rt_t
-    hOverS = h / s
+    h_over_s = h / s
 
     if option_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
         if h >= k:
             c_do = s * dq * N(x1) - k * df * N(x1 - sigma_rt_t) \
-                   - s * dq * pow(hOverS, 2.0 * ll) * N(y1) \
-                   + k * df * pow(hOverS, 2.0 * ll - 2.0) * N(y1 - sigma_rt_t)
+                - s * dq * pow(h_over_s, 2.0 * ll) * N(y1) \
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(y1 - sigma_rt_t)
             price = c_do
         else:
-            c_di = s * dq * pow(hOverS, 2.0 * ll) * N(y) \
-                   - k * df * pow(hOverS, 2.0 * ll - 2.0) * N(y - sigma_rt_t)
+            c_di = s * dq * pow(h_over_s, 2.0 * ll) * N(y) \
+                - k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(y - sigma_rt_t)
             price = c - c_di
     elif option_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
         if h <= k:
-            c_di = s * dq * pow(hOverS, 2.0 * ll) * N(y) \
-                   - k * df * pow(hOverS, 2.0 * ll - 2.0) * N(y - sigma_rt_t)
+            c_di = s * dq * pow(h_over_s, 2.0 * ll) * N(y) \
+                - k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(y - sigma_rt_t)
             price = c_di
         else:
             c_do = s * dq * N(x1) \
-                   - k * df * N(x1 - sigma_rt_t) \
-                   - s * dq * pow(hOverS, 2.0 * ll) * N(y1) \
-                   + k * df * pow(hOverS, 2.0 * ll - 2.0) * N(y1 - sigma_rt_t)
+                - k * df * N(x1 - sigma_rt_t) \
+                - s * dq * pow(h_over_s, 2.0 * ll) * N(y1) \
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(y1 - sigma_rt_t)
             price = c - c_do
     elif option_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
         if h >= k:
             c_ui = s * dq * N(x1) - k * df * N(x1 - sigma_rt_t) \
-                   - s * dq * pow(hOverS, 2.0 * ll) * (N(-y) - N(-y1)) \
-                   + k * df * pow(hOverS, 2.0 * ll - 2.0) * \
-                   (N(-y + sigma_rt_t) - N(-y1 + sigma_rt_t))
+                - s * dq * pow(h_over_s, 2.0 * ll) * (N(-y) - N(-y1)) \
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * \
+                (N(-y + sigma_rt_t) - N(-y1 + sigma_rt_t))
             price = c_ui
         else:
             price = c
     elif option_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
         if h > k:
             c_ui = s * dq * N(x1) - k * df * N(x1 - sigma_rt_t) \
-                   - s * dq * pow(hOverS, 2.0 * ll) * (N(-y) - N(-y1)) \
-                   + k * df * pow(hOverS, 2.0 * ll - 2.0) * \
-                   (N(-y + sigma_rt_t) - N(-y1 + sigma_rt_t))
+                - s * dq * pow(h_over_s, 2.0 * ll) * (N(-y) - N(-y1)) \
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * \
+                (N(-y + sigma_rt_t) - N(-y1 + sigma_rt_t))
             price = c - c_ui
         else:
             price = 0.0
     elif option_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
         if h > k:
-            p_ui = -s * dq * pow(hOverS, 2.0 * ll) * N(-y) \
-                   + k * df * pow(hOverS, 2.0 * ll - 2.0) * N(-y + sigma_rt_t)
+            p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * N(-y) \
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(-y + sigma_rt_t)
             price = p_ui
         else:
             p_uo = -s * dq * N(-x1) \
-                   + k * df * N(-x1 + sigma_rt_t) \
-                   + s * dq * pow(hOverS, 2.0 * ll) * N(-y1) \
-                   - k * df * pow(hOverS, 2.0 * ll - 2.0) * \
-                   N(-y1 + sigma_rt_t)
+                + k * df * N(-x1 + sigma_rt_t) \
+                + s * dq * pow(h_over_s, 2.0 * ll) * N(-y1) \
+                   - k * df * pow(h_over_s, 2.0 * ll - 2.0) * \
+                N(-y1 + sigma_rt_t)
             price = p - p_uo
     elif option_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
         if h >= k:
-            p_ui = -s * dq * pow(hOverS, 2.0 * ll) * N(-y) \
-                   + k * df * pow(hOverS, 2.0 * ll - 2.0) * N(-y + sigma_rt_t)
+            p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * N(-y) \
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(-y + sigma_rt_t)
             price = p - p_ui
         else:
             p_uo = -s * dq * N(-x1) \
-                   + k * df * N(-x1 + sigma_rt_t) \
-                   + s * dq * pow(hOverS, 2.0 * ll) * N(-y1) \
-                   - k * df * pow(hOverS, 2.0 * ll - 2.0) * \
-                   N(-y1 + sigma_rt_t)
+                + k * df * N(-x1 + sigma_rt_t) \
+                + s * dq * pow(h_over_s, 2.0 * ll) * N(-y1) \
+                   - k * df * pow(h_over_s, 2.0 * ll - 2.0) * \
+                N(-y1 + sigma_rt_t)
             price = p_uo
     elif option_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
         if h >= k:
             price = 0.0
         else:
             p_di = -s * dq * N(-x1) \
-                   + k * df * N(-x1 + sigma_rt_t) \
-                   + s * dq * pow(hOverS, 2.0 * ll) * (N(y) - N(y1)) \
-                   - k * df * pow(hOverS, 2.0 * ll - 2.0) * \
-                   (N(y - sigma_rt_t) - N(y1 - sigma_rt_t))
+                + k * df * N(-x1 + sigma_rt_t) \
+                + s * dq * pow(h_over_s, 2.0 * ll) * (N(y) - N(y1)) \
+                   - k * df * pow(h_over_s, 2.0 * ll - 2.0) * \
+                (N(y - sigma_rt_t) - N(y1 - sigma_rt_t))
             price = p - p_di
     elif option_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
         if h >= k:
             price = p
         else:
             p_di = -s * dq * N(-x1) \
-                   + k * df * N(-x1 + sigma_rt_t) \
-                   + s * dq * pow(hOverS, 2.0 * ll) * (N(y) - N(y1)) \
-                   - k * df * pow(hOverS, 2.0 * ll - 2.0) * \
-                   (N(y - sigma_rt_t) - N(y1 - sigma_rt_t))
+                + k * df * N(-x1 + sigma_rt_t) \
+                + s * dq * pow(h_over_s, 2.0 * ll) * (N(y) - N(y1)) \
+                   - k * df * pow(h_over_s, 2.0 * ll - 2.0) * \
+                (N(y - sigma_rt_t) - N(y1 - sigma_rt_t))
             price = p_di
     else:
-        raise FinError("Unknown barrier option type." +
-                       str(option_type))
+        raise FinError("Unknown barrier option type." + str(option_type))
 
     return price
 

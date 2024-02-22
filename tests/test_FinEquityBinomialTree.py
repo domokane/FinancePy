@@ -18,7 +18,7 @@ dividend_yield = 0.04
 volatility = 0.40
 
 value_dt = Date(1, 1, 2016)
-expiry_date = Date(1, 1, 2017)
+expiry_dt = Date(1, 1, 2017)
 
 model = BlackScholes(volatility)
 discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
@@ -44,7 +44,7 @@ def test_european_put():
         num_steps,
         value_dt,
         payoff,
-        expiry_date,
+        expiry_dt,
         payoff,
         exercise,
         params)
@@ -65,7 +65,7 @@ def test_american_put():
         num_steps,
         value_dt,
         payoff,
-        expiry_date,
+        expiry_dt,
         payoff,
         exercise,
         params)
@@ -86,7 +86,7 @@ def test_european_call():
         num_steps,
         value_dt,
         payoff,
-        expiry_date,
+        expiry_dt,
         payoff,
         exercise,
         params)
@@ -107,7 +107,7 @@ def test_american_call():
         num_steps,
         value_dt,
         payoff,
-        expiry_date,
+        expiry_dt,
         payoff,
         exercise,
         params)

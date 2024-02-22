@@ -31,7 +31,7 @@ class EquityVarianceSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(maturity_dt_or_tenor) == Date:
+        if isinstance(maturity_dt_or_tenor, Date):
             maturity_dt = maturity_dt_or_tenor
         else:
             maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
@@ -57,8 +57,8 @@ class EquityVarianceSwap:
 
     def value(self,
               value_dt,
-              realisedVar,
-              fair_strikeVar,
+              realised_var,
+              fair_strike_var,
               libor_curve):
         """ Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
@@ -67,10 +67,10 @@ class EquityVarianceSwap:
         t1 = (value_dt - self._start_dt) / gDaysInYear
         t2 = (self._maturity_dt - self._start_dt) / gDaysInYear
 
-        expectedVariance = t1 * realisedVar/t2
-        expectedVariance += (t2-t1) * fair_strikeVar / t2
+        expected_variance = t1 * realised_var/t2
+        expected_variance += (t2-t1) * fair_strike_var / t2
 
-        payoff = expectedVariance - self._strike_variance
+        payoff = expected_variance - self._strike_variance
 
         df = libor_curve.df(self._maturity_dt)
         v = payoff * self._notional * df
@@ -80,14 +80,14 @@ class EquityVarianceSwap:
 
     def fair_strike_approx(self,
                            value_dt,
-                           fwdStockPrice,
+                           fwd_stock_price,
                            strikes,
                            volatilities):
         """ This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol. """
 
-        f = fwdStockPrice
+        f = fwd_stock_price
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
@@ -147,7 +147,7 @@ class EquityVarianceSwap:
         Goldman Sachs Research notes March 1999. See Appendix A. This aim is
         to use calls and puts to approximate the payoff of a log contract """
 
-        minStrike = sstar - (num_put_options+1) * strike_spacing
+        min_strike = sstar - (num_put_options+1) * strike_spacing
 
         self._put_wts = []
         self._put_strikes = []
@@ -155,7 +155,7 @@ class EquityVarianceSwap:
         self._call_strikes = []
 
         # if the lower strike is < 0 we go to as low as the strike spacing
-        if minStrike < strike_spacing:
+        if min_strike < strike_spacing:
             k = sstar
             klist = [sstar]
             while k >= strike_spacing:
@@ -164,16 +164,16 @@ class EquityVarianceSwap:
             put_k = np.array(klist)
             self._num_put_options = len(put_k) - 1
         else:
-            put_k = np.linspace(sstar, minStrike, num_put_options+2)
+            put_k = np.linspace(sstar, min_strike, num_put_options+2)
 
         self._put_strikes = put_k
 
         max_strike = sstar + (num_call_options+1) * strike_spacing
-        callK = np.linspace(sstar, max_strike, num_call_options+2)
+        call_k = np.linspace(sstar, max_strike, num_call_options+2)
 
-        self._call_strikes = callK
+        self._call_strikes = call_k
 
-        optionTotal = 2.0*(r*t_mat - (s0*g/sstar-1.0) - np.log(sstar/s0))/t_mat
+        option_total = 2.0*(r*t_mat - (s0*g/sstar-1.0) - np.log(sstar/s0))/t_mat
 
         self._call_wts = np.zeros(num_call_options)
         self._put_wts = np.zeros(num_put_options)
@@ -189,8 +189,8 @@ class EquityVarianceSwap:
 
         sum_wts = 0.0
         for n in range(0, self._num_call_options):
-            kp = callK[n+1]
-            k = callK[n]
+            kp = call_k[n+1]
+            k = call_k[n]
             self._call_wts[n] = (f(kp)-f(k))/(kp-k) - sum_wts
             sum_wts += self._call_wts[n]
 
@@ -206,7 +206,7 @@ class EquityVarianceSwap:
 
         pi_call = 0.0
         for n in range(0, num_call_options):
-            k = callK[n]
+            k = call_k[n]
             vol = volatility_curve.volatility(k)
             opt = EquityVanillaOption(self._maturity_dt, k, call_type)
             model = BlackScholes(vol)
@@ -215,8 +215,8 @@ class EquityVarianceSwap:
             pi_call += v * self._call_wts[n]
 
         pi = pi_call + pi_put
-        optionTotal += g * pi
-        var = optionTotal
+        option_total += g * pi
+        var = option_total
 
         return var
 
@@ -232,18 +232,18 @@ class EquityVarianceSwap:
             if closePrices[i] <= 0.0:
                 raise FinError("Stock prices must be greater than zero")
 
-        cumX2 = 0.0
+        cum_x2 = 0.0
 
         if use_logs is True:
             for i in range(1, num_observations):
                 x = np.log(closePrices[i]/closePrices[i-1])
-                cumX2 += x*x
+                cum_x2 += x*x
         else:
             for i in range(1, num_observations):
                 x = (closePrices[i]-closePrices[i-1])/closePrices[i-1]
-                cumX2 += x*x
+                cum_x2 += x*x
 
-        var = cumX2 * 252.0 / num_observations
+        var = cum_x2 * 252.0 / num_observations
         return var
 
 ###############################################################################

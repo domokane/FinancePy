@@ -10,7 +10,7 @@ from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
 
 
 tradeDate = Date(1, 3, 2007)
-step_in_date = tradeDate.add_days(1)
+step_in_dt = tradeDate.add_days(1)
 value_dt = tradeDate.add_days(1)
 
 libor_curve = build_Ibor_Curve(tradeDate)
@@ -58,7 +58,7 @@ def test_homogeneous():
                                              num_credits)
 
     intrinsicSpd = cdsIndex.intrinsic_spread(value_dt,
-                                             step_in_date,
+                                             step_in_dt,
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
 
@@ -120,7 +120,7 @@ def test_heterogeneous():
                                                   libor_curve)
 
     intrinsicSpd = cdsIndex.intrinsic_spread(value_dt,
-                                             step_in_date,
+                                             step_in_dt,
                                              trancheMaturity,
                                              issuer_curves) * 10000.0
 

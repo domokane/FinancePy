@@ -14,7 +14,6 @@ from math import exp, sqrt
 
 
 def value_mc1(s0, t, k, r, q, v, num_paths, seed):
-
     v_sqrt_t = v * sqrt(t)
     st = s0 * exp((r - q - v*v / 2.0) * t)
 

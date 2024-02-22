@@ -70,7 +70,7 @@ class IborFuture:
                       fra_rate,
                       self._dc_type,
                       notional=self._contract_size,
-                      payFixedRate=False)
+                      pay_fixed_rate=False)
 
         return fra
 
@@ -78,8 +78,8 @@ class IborFuture:
 
     def futures_rate(self, futures_price):
         """ Calculate implied futures rate from the futures price."""
-        futuresRate = (100.0 - futures_price) / 100.0
-        return futuresRate
+        futures_rate = (100.0 - futures_price) / 100.0
+        return futures_rate
 
 ###############################################################################
 

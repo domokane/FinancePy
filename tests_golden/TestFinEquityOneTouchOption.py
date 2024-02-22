@@ -25,7 +25,7 @@ def test_EquityOneTouchOption():
     # Agreement not exact at t is not exactly 0.50
 
     value_dt = Date(1, 1, 2016)
-    expiry_date = Date(2, 7, 2016)
+    expiry_dt = Date(2, 7, 2016)
     interest_rate = 0.10
     volatility = 0.20
     barrier_level = 100.0  # H
@@ -50,7 +50,7 @@ def test_EquityOneTouchOption():
 
     for downType in downTypes:
 
-        option = EquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_dt,
                                       downType,
                                       barrier_level,
                                       payment_size)
@@ -84,7 +84,7 @@ def test_EquityOneTouchOption():
 
     for upType in upTypes:
 
-        option = EquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_dt,
                                       upType,
                                       barrier_level,
                                       payment_size)
@@ -120,7 +120,7 @@ def test_EquityOneTouchOption():
     test_cases.header("TYPE", "VALUE", "VALUE_MC")
     for downType in downTypes:
 
-        option = EquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_dt,
                                       downType,
                                       barrier_level)
 
@@ -150,7 +150,7 @@ def test_EquityOneTouchOption():
 
     for upType in upTypes:
 
-        option = EquityOneTouchOption(expiry_date,
+        option = EquityOneTouchOption(expiry_dt,
                                       upType,
                                       barrier_level)
 

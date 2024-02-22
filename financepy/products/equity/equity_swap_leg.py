@@ -43,7 +43,7 @@ class EquitySwapLeg:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             termination_dt = term_dt_or_tenor
         else:
             termination_dt = effective_dt.add_tenor(term_dt_or_tenor)
@@ -83,8 +83,8 @@ class EquitySwapLeg:
         self._dg_type = dg_type
         self._end_of_month = end_of_month
 
-        self._start_accd_dates = []
-        self._end_accd_dates = []
+        self._start_accd_dts = []
+        self._end_accd_dts = []
         self._payment_dts = []
         self._pmnts = []
         self._year_fracs = []
@@ -108,27 +108,27 @@ class EquitySwapLeg:
                             self._dg_type,
                             end_of_month=self._end_of_month)
 
-        scheduleDates = schedule._adjusted_dts
+        schedule_dts = schedule._adjusted_dts
 
-        if len(scheduleDates) < 2:
+        if len(schedule_dts) < 2:
             raise FinError("Schedule has none or only one date")
 
-        self._start_accd_dates = []
-        self._end_accd_dates = []
+        self._start_accd_dts = []
+        self._end_accd_dts = []
         self._payment_dts = []
         self._year_fracs = []
         self._accrued_days = []
 
-        prev_dt = scheduleDates[0]
+        prev_dt = schedule_dts[0]
 
         day_counter = DayCount(self._dc_type)
         calendar = Calendar(self._cal_type)
 
         # All of the lists end up with the same length
-        for next_dt in scheduleDates[1:]:
+        for next_dt in schedule_dts[1:]:
 
-            self._start_accd_dates.append(prev_dt)
-            self._end_accd_dates.append(next_dt)
+            self._start_accd_dts.append(prev_dt)
+            self._end_accd_dts.append(next_dt)
 
             if self._payment_lag == 0:
                 payment_dt = next_dt
@@ -188,31 +188,31 @@ class EquitySwapLeg:
         self._pmnt_pvs = []
         self._cumulative_pvs = []
 
-        dfValue = discount_curve.df(value_dt)
+        df_value = discount_curve.df(value_dt)
         leg_pv, eq_term_rate = 0.0, 0.0
         last_notional = self._notional
-        numPayments = len(self._payment_dts)
+        num_payments = len(self._payment_dts)
 
         index_basis = index_curve._dc_type
         index_day_counter = DayCount(index_basis)
 
-        for iPmnt in range(0, numPayments):
+        for i_pmnt in range(0, num_payments):
 
-            pmntDate = self._payment_dts[iPmnt]
+            pmnt_dt = self._payment_dts[i_pmnt]
 
-            if pmntDate > value_dt:
+            if pmnt_dt > value_dt:
 
-                startAccruedDt = self._start_accd_dates[iPmnt]
-                endAccruedDt = self._end_accd_dates[iPmnt]
-                index_alpha = index_day_counter.year_frac(startAccruedDt,
-                                                          endAccruedDt)[0]
+                start_accrued_dt = self._start_accd_dts[i_pmnt]
+                end_accrued_dt = self._end_accd_dts[i_pmnt]
+                index_alpha = index_day_counter.year_frac(start_accrued_dt,
+                                                          end_accrued_dt)[0]
 
-                df_start = index_curve.df(startAccruedDt)
-                df_end = index_curve.df(endAccruedDt)
+                df_start = index_curve.df(start_accrued_dt)
+                df_end = index_curve.df(end_accrued_dt)
                 fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
-                div_start = dividend_curve.df(startAccruedDt)
-                div_end = dividend_curve.df(endAccruedDt)
+                div_start = dividend_curve.df(start_accrued_dt)
+                div_end = dividend_curve.df(end_accrued_dt)
                 div_fwd_rate = (div_start / div_end - 1.0) / index_alpha
 
                 # Equity discount derived from index and div curves
@@ -223,13 +223,13 @@ class EquitySwapLeg:
                 self._eq_fwd_rates.append(eq_fwd_rate)
 
                 # Iterative update of the term rate
-                eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[iPmnt]) * (1 + eq_term_rate)  - 1
+                eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[i_pmnt]) * (1 + eq_term_rate)  - 1
 
                 next_price = self._current_price * (1 + eq_term_rate)
                 next_notional = next_price * self._quantity
                 pmntAmount = next_notional - last_notional
 
-                df_pmnt = discount_curve.df(pmntDate) / dfValue
+                df_pmnt = discount_curve.df(pmnt_dt) / df_value
                 pmnt_pv = pmntAmount * df_pmnt
                 leg_pv += pmnt_pv
 
@@ -282,8 +282,8 @@ class EquitySwapLeg:
             rows.append([
                 i_flow + 1,
                 self._payment_dts[i_flow],
-                self._start_accd_dates[i_flow],
-                self._end_accd_dates[i_flow],
+                self._start_accd_dts[i_flow],
+                self._end_accd_dts[i_flow],
                 self._accrued_days[i_flow],
                 round(self._year_fracs[i_flow], 4),
             ])

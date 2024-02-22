@@ -32,14 +32,14 @@ class OISBasisSwap:
     def __init__(self,
                  effective_dt: Date,  # Date interest starts to accrue
                  term_dt_or_tenor: (Date, str),  # Date contract ends
-                 iborType: SwapTypes,
-                 iborFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 iborDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 iborSpread: float = 0.0,
-                 oisFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 oisDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 oisSpread: float = 0.0,
-                 oisPaymentLag: int = 0,
+                 ibor_type: SwapTypes,
+                 ibor_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 ibor_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 ibor_spread: float = 0.0,
+                 ois_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+                 ois_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+                 ois_spread: float = 0.0,
+                 ois_payment_lag: int = 0,
                  notional: float = ONE_MILLION,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -55,7 +55,7 @@ class OISBasisSwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -63,23 +63,23 @@ class OISBasisSwap:
 
         calendar = Calendar(cal_type)
         self._maturity_dt = calendar.adjust(self._termination_dt,
-                                              bd_type)
+                                            bd_type)
 
         if effective_dt > self._maturity_dt:
             raise FinError("Start date after maturity date")
 
-        oisType = SwapTypes.PAY
-        if iborType == SwapTypes.PAY:
-            oisType = SwapTypes.RECEIVE
+        ois_type = SwapTypes.PAY
+        if ibor_type == SwapTypes.PAY:
+            ois_type = SwapTypes.RECEIVE
 
         principal = 0.0
 
-        self._floatIborLeg = SwapFloatLeg(effective_dt,
+        self._float_ibor_leg = SwapFloatLeg(effective_dt,
                                           self._termination_dt,
-                                          iborType,
-                                          iborSpread,
-                                          iborFreqType,
-                                          iborDayCountType,
+                                          ibor_type,
+                                          ibor_spread,
+                                          ibor_freq_type,
+                                          ibor_day_count_type,
                                           notional,
                                           principal,
                                           0,
@@ -87,15 +87,15 @@ class OISBasisSwap:
                                           bd_type,
                                           dg_type)
 
-        self._floatOISLeg = SwapFloatLeg(effective_dt,
+        self._float_ois_leg = SwapFloatLeg(effective_dt,
                                          self._termination_dt,
-                                         oisType,
-                                         oisSpread,
-                                         oisFreqType,
-                                         oisDayCountType,
+                                         ois_type,
+                                         ois_spread,
+                                         ois_freq_type,
+                                         ois_day_count_type,
                                          notional,
                                          principal,
-                                         oisPaymentLag,
+                                         ois_payment_lag,
                                          cal_type,
                                          bd_type,
                                          dg_type)
@@ -105,30 +105,30 @@ class OISBasisSwap:
     def value(self,
               value_dt: Date,
               discount_curve: DiscountCurve,
-              indexIborCurve: DiscountCurve = None,
-              indexOISCurve: DiscountCurve = None,
-              firstFixingRateLeg1=None,
-              firstFixingRateLeg2=None):
+              index_ibor_curve: DiscountCurve = None,
+              index_ois_curve: DiscountCurve = None,
+              first_fixing_rate_leg_1=None,
+              first_fixing_rate_leg_2=None):
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve and an index curve for the Ibors on each swap leg. """
 
-        if indexIborCurve is None:
-            indexIborCurve = discount_curve
+        if index_ibor_curve is None:
+            index_ibor_curve = discount_curve
 
-        if indexOISCurve is None:
-            indexOISCurve = discount_curve
+        if index_ois_curve is None:
+            index_ois_curve = discount_curve
 
-        floatIborLegValue = self._floatIborLeg.value(value_dt,
+        float_ibor_leg_value = self._float_ibor_leg.value(value_dt,
                                                      discount_curve,
-                                                     indexIborCurve,
-                                                     firstFixingRateLeg1)
+                                                     index_ibor_curve,
+                                                     first_fixing_rate_leg_1)
 
-        floatOISLegValue = self._floatOISLeg.value(value_dt,
+        float_ois_leg_value = self._float_ois_leg.value(value_dt,
                                                    discount_curve,
-                                                   indexOISCurve,
-                                                   firstFixingRateLeg2)
+                                                   index_ois_curve,
+                                                   first_fixing_rate_leg_2)
 
-        value = floatIborLegValue + floatOISLegValue
+        value = float_ibor_leg_value + float_ois_leg_value
         return value
 
 ###############################################################################
@@ -137,16 +137,16 @@ class OISBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._floatIborLeg.print_payments()
-        self._floatOISLeg.print_payments()
+        self._float_ibor_leg.print_payments()
+        self._float_ois_leg.print_payments()
 
 ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self._floatIborLeg.__repr__()
+        s += self._float_ibor_leg.__repr__()
         s += "\n"
-        s += self._floatOISLeg.__repr__()
+        s += self._float_ois_leg.__repr__()
         return s
 
 ###############################################################################

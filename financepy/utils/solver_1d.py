@@ -28,8 +28,8 @@ results = namedtuple('results', 'root function_calls iterations converged')
 @njit(cache=True, fastmath=True)
 def _results(r):
     r"""Select from a tuple of(root, funccalls, iterations, flag)"""
-    x, funcalls, iterations, flag = r
-    return x  # results(x, funcalls, iterations, flag == 0)
+    x, fun_calls, iterations, flag = r
+    return x  # results(x, fun_calls, iterations, flag == 0)
 
 ###############################################################################
 # DO NOT TOUCH THIS FUNCTION AS IT IS USED IN FX VOL CALIBRATION !!!!!!!!!
@@ -86,7 +86,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
     # Convert to float (don't use float(x0); this works also for complex x0)
     eps = 1e-4
     p0 = 1.0 * x0
-    funcalls = 0
+    fun_calls = 0
     status = _ECONVERR
 
     p1 = x0 * (1.0 + eps)
@@ -97,9 +97,9 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
         p1 = p1 - eps
 
     q0 = func(p0, *args)
-    funcalls += 1
+    fun_calls += 1
     q1 = func(p1, *args)
-    funcalls += 1
+    fun_calls += 1
 
     if np.abs(q1) < np.abs(q0):
         p0, p1, q0, q1 = p1, p0, q1, q0
@@ -126,7 +126,7 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
         p0, q0 = p1, q1
         p1 = p
         q1 = func(p1, *args)
-        funcalls += 1
+        fun_calls += 1
 
     if disp and status == _ECONVERR:
         msg = "Failed to converge"
@@ -298,18 +298,18 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
 
     # Convert to float (don't use float(x0); this works also for complex x0)
     p0 = 1.0 * x0
-    funcalls = 0
+    fun_calls = 0
     if fprime is not None:
         # Newton-Raphson method
         for itr in range(maxiter):
             # first evaluate fval
             fval = func(p0, args)
-            funcalls += 1
+            fun_calls += 1
             # If fval is 0, a root has been found, then terminate
             if fval == 0:
                 return p0
             fder = fprime(p0, args)
-            funcalls += 1
+            fun_calls += 1
 
 #            print("==>", itr, p0, fval, fder)
 
@@ -322,7 +322,7 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
             newton_step = fval / fder
             if fprime2:
                 fder2 = fprime2(p0, args)
-                funcalls += 1
+                fun_calls += 1
                 # Halley's method:
                 #   newton_step /= (1.0 - 0.5 * newton_step * fder2 / fder)
                 # Only do it if denominator stays close enough to 1
@@ -347,9 +347,9 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
             p1 = x0 * (1 + eps)
             p1 += (eps if p1 >= 0 else -eps)
         q0 = func(p0, args)
-        funcalls += 1
+        fun_calls += 1
         q1 = func(p1, args)
-        funcalls += 1
+        fun_calls += 1
         if abs(q1) < abs(q0):
             p0, p1, q0, q1 = p1, p0, q1, q0
         for itr in range(maxiter):
@@ -371,7 +371,7 @@ def newton(func, x0, fprime=None, args=None, tol=1.48e-8, maxiter=50,
             p0, q0 = p1, q1
             p1 = p
             q1 = func(p1, *args)
-            funcalls += 1
+            fun_calls += 1
 
     if disp:
         print("Failed to converge after ", str(itr+1),
@@ -534,7 +534,7 @@ def brent_max(func, a, b, args, xtol=1e-5, maxiter=500):
 # @jit(fastmath=True, cache=True)
 
 
-def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
+def bisection(func, x1, x2, args, xtol=1e-6, maxiter=100):
     """ Bisection algorithm. You need to supply root brackets x1 and x2. """
 
     if np.abs(x1-x2) < 1e-10:
@@ -555,7 +555,7 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
         print("Root not bracketed")
         return None
 
-    for i in range(0, maxIter):
+    for i in range(0, maxiter):
 
         xmid = (x1 + x2)/2.0
         fmid = func(xmid, args)
@@ -568,7 +568,7 @@ def bisection(func, x1, x2, args, xtol=1e-6, maxIter=100):
         if np.abs(fmid) < xtol:
             return xmid
 
-    print("Bisection exceeded number of iterations", maxIter)
+    print("Bisection exceeded number of iterations", maxiter)
     return None
 
 ###############################################################################

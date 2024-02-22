@@ -43,10 +43,10 @@ class FinInflationSwap():
                  start_dt: Date,  # The date the FRA starts to accrue
                  # End of the Ibor rate period
                  maturity_dt_or_tenor: (Date, str),
-                 fraRate: float,  # The fixed contractual FRA rate
+                 fra_rate: float,  # The fixed contractual FRA rate
                  day_count_type: DayCountTypes,  # For interest period
                  notional: float = 100.0,
-                 payFixedRate: bool = True,  # True if the FRA rate is being paid
+                 pay_fixed_rate: bool = True,  # True if the FRA rate is being paid
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING):
         """ Create a Forward Rate Agreeement object. """
@@ -72,8 +72,8 @@ class FinInflationSwap():
 
         self._start_dt = start_dt
         self._maturity_dt = maturity_dt
-        self._fraRate = fraRate
-        self._payFixedRate = payFixedRate
+        self._fra_rate = fra_rate
+        self._pay_fixed_rate = pay_fixed_rate
         self._dc_type = day_count_type
         self._notional = notional
 
@@ -89,14 +89,14 @@ class FinInflationSwap():
         df1 = libor_curve.df(self._start_dt)
         df2 = libor_curve.df(self._maturity_dt)
         libor_fwd = (df1 / df2 - 1.0) / acc_factor
-        v = acc_factor * (libor_fwd - self._fraRate) * df2
+        v = acc_factor * (libor_fwd - self._fra_rate) * df2
 
 #        print(df1, df2, acc_factor, libor_fwd, v)
         # Forward value the FRA to the value date
         df_to_value_dt = libor_curve.df(value_dt)
         v = v * self._notional / df_to_value_dt
 
-        if self._payFixedRate:
+        if self._pay_fixed_rate:
             v *= -1.0
         return v
 
@@ -109,7 +109,7 @@ class FinInflationSwap():
         dc = DayCount(self._dc_type)
         df1 = libor_curve.df(self._start_dt)
         acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        df2 = df1 / (1.0 + acc_factor * self._fraRate)
+        df2 = df1 / (1.0 + acc_factor * self._fra_rate)
         return df2
 
     ###########################################################################
@@ -120,9 +120,9 @@ class FinInflationSwap():
         flow_settle = self._notional
         dc = DayCount(self._dc_type)
         acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        flow_maturity = (1.0 + acc_factor * self._fraRate) * self._notional
+        flow_maturity = (1.0 + acc_factor * self._fra_rate) * self._notional
 
-        if self._payFixedRate is True:
+        if self._pay_fixed_rate is True:
             print(self._start_dt, -flow_settle)
             print(self._maturity_dt, flow_maturity)
         else:
@@ -135,9 +135,9 @@ class FinInflationSwap():
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START ACCD DATE", self._start_dt)
         s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("FRA RATE", self._fraRate)
+        s += label_to_string("FRA RATE", self._fra_rate)
         s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("PAY FIXED RATE", self._payFixedRate)
+        s += label_to_string("PAY FIXED RATE", self._pay_fixed_rate)
         s += label_to_string("DAY COUNT TYPE", self._dc_type)
         s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
         s += label_to_string("CALENDAR", self._cal_type)

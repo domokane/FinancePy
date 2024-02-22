@@ -2,16 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+from financepy.utils.global_types import OptionTypes
+from financepy.utils.date import Date
+import numpy as np
 import sys
 sys.path.append("..")
 
-import numpy as np
-from financepy.utils.date import Date
-from financepy.utils.global_types import OptionTypes
-from financepy.products.fx.fx_vanilla_option import FXVanillaOption
-from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -39,8 +39,8 @@ def test_FinFXOptionSABR():
 
     notional = 1000000.0
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
 
     model = BlackScholes(volatility)
 
@@ -63,8 +63,8 @@ def test_FinFXOptionSABR():
 
         valueEuropean = call_option.value(value_dt,
                                           spot_fx_rate,
-                                          dom_discount_curve,
-                                          for_discount_curve,
+                                          domestic_curve,
+                                          foreign_curve,
                                           model)['v']
 
         call_option = FXVanillaOption(expiry_dt,
@@ -76,8 +76,8 @@ def test_FinFXOptionSABR():
 
         valueAmerican = call_option.value(value_dt,
                                           spot_fx_rate,
-                                          dom_discount_curve,
-                                          for_discount_curve,
+                                          domestic_curve,
+                                          foreign_curve,
                                           model)['v']
 
         diff = (valueAmerican - valueEuropean)
@@ -101,8 +101,8 @@ def test_FinFXOptionSABR():
 
         valueEuropean = call_option.value(value_dt,
                                           spot_fx_rate,
-                                          dom_discount_curve,
-                                          for_discount_curve,
+                                          domestic_curve,
+                                          foreign_curve,
                                           model)['v']
 
         call_option = FXVanillaOption(expiry_dt,
@@ -114,16 +114,16 @@ def test_FinFXOptionSABR():
 
         valueAmerican = call_option.value(value_dt,
                                           spot_fx_rate,
-                                          dom_discount_curve,
-                                          for_discount_curve,
+                                          domestic_curve,
+                                          foreign_curve,
                                           model)['v']
 
         diff = (valueAmerican - valueEuropean)
         test_cases.print("PUT:",
-                        "%9.6f" % spot_fx_rate,
-                        "%9.7f" % valueEuropean,
-                        "%9.7f" % valueAmerican,
-                        "%9.7f" % diff)
+                         "%9.6f" % spot_fx_rate,
+                         "%9.7f" % valueEuropean,
+                         "%9.7f" % valueAmerican,
+                         "%9.7f" % diff)
 
 ###############################################################################
 

@@ -23,7 +23,7 @@ class CurveFitPolynomial():
         self._power = power
         self._coeffs = []
 
-    def _interpolated_yield(self, t):
+    def _interp_yield(self, t):
         yld = np.polyval(self._coeffs, t)
         return yld
 
@@ -54,7 +54,7 @@ class CurveFitNelsonSiegel():
         """ Fairly permissive bounds. Only tau_1 is 1-100 """
         self._bounds = bounds
 
-    def _interpolated_yield(self, t, beta_1=None, beta_2=None,
+    def _interp_yield(self, t, beta_1=None, beta_2=None,
                             beta_3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
@@ -112,7 +112,7 @@ class CurveFitNelsonSiegelSvensson():
         the user does not provide any bounds. Especially for tau_2. """
         self._bounds = bounds
 
-    def _interpolated_yield(self, t, beta_1=None, beta_2=None, beta_3=None,
+    def _interp_yield(self, t, beta_1=None, beta_2=None, beta_3=None,
                             beta_4=None, tau_1=None, tau_2=None):
 
         # Careful if we get a time zero point
@@ -171,7 +171,7 @@ class CurveFitBSpline():
         self._knots = knots
         self._spline = None
 
-    def _interpolated_yield(self, t):
+    def _interp_yield(self, t):
         t = np.maximum(t, 1e-10)
         yld = splev(t, self._spline)
         return yld

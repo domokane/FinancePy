@@ -34,7 +34,6 @@ from enum import Enum
 
 
 class FinLossDistributionBuilder(Enum):
-    ''' Method for constructing loss distributions numerically '''
     RECURSION = 1
     ADJUSTED_BINOMIAL = 2
     GAUSSIAN = 3
@@ -53,7 +52,7 @@ class CDSTranche:
                  k2: float,
                  notional: float = ONE_MILLION,
                  running_cpn: float = 0.0,
-                 long_protection: bool = True,
+                 long_protect: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
                  dc_type: DayCountTypes = DayCountTypes.ACT_360,
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -72,7 +71,7 @@ class CDSTranche:
         self._maturity_dt = maturity_dt
         self._notional = notional
         self._running_cpn = running_cpn
-        self._long_protection = long_protection
+        self._long_protect = long_protect
         self._dc_type = dc_type
         self._dg_type = dg_type
         self._cal_type = cal_type
@@ -85,7 +84,7 @@ class CDSTranche:
                                  self._maturity_dt,
                                  self._running_cpn,
                                  notional,
-                                 self._long_protection,
+                                 self._long_protect,
                                  self._freq_type,
                                  self._dc_type,
                                  self._cal_type,
@@ -160,11 +159,11 @@ class CDSTranche:
             for j in range(0, num_credits):
 
                 issuer_curve = issuer_curves[j]
-                vTimes = issuer_curve._times
-                qRow = issuer_curve._values
+                v_times = issuer_curve._times
+                q_row = issuer_curve._values
                 recovery_rates[j] = issuer_curve._recovery_rate
                 q_vector[j] = interpolate(
-                    t, vTimes, qRow, InterpTypes.FLAT_FWD_RATES.value)
+                    t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
 
@@ -198,10 +197,10 @@ class CDSTranche:
 
             elif model == FinLossDistributionBuilder.LHP:
 
-                qt1[i] = tr_surv_prob_lhp(0.0, k1, num_credits, 
+                qt1[i] = tr_surv_prob_lhp(0.0, k1, num_credits,
                                           q_vector, recovery_rates, beta_1)
 
-                qt2[i] = tr_surv_prob_lhp(0.0, k2, num_credits, 
+                qt2[i] = tr_surv_prob_lhp(0.0, k2, num_credits,
                                           q_vector, recovery_rates, beta_2)
 
             else:
@@ -226,21 +225,22 @@ class CDSTranche:
         tranche_curve._times = tranche_times
         tranche_curve._values = tranche_surv_curve
 
-        protLegPV = self._cds_contract.protection_leg_pv(
+        prot_leg_pv = self._cds_contract.prot_leg_pv(
             value_dt, tranche_curve, curve_recovery)
         risky_pv01 = self._cds_contract.risky_pv01(
             value_dt, tranche_curve)['clean_rpv01']
 
-        mtm = self._notional * (protLegPV - upfront - risky_pv01 * running_cpn)
+        mtm = self._notional * (prot_leg_pv - upfront -
+                                risky_pv01 * running_cpn)
 
-        if not self._long_protection:
+        if not self._long_protect:
             mtm *= -1.0
 
         tranche_output = np.zeros(4)
         tranche_output[0] = mtm
         tranche_output[1] = risky_pv01 * self._notional * running_cpn
-        tranche_output[2] = protLegPV * self._notional
-        tranche_output[3] = protLegPV / risky_pv01
+        tranche_output[2] = prot_leg_pv * self._notional
+        tranche_output[3] = prot_leg_pv / risky_pv01
 
         return tranche_output
 

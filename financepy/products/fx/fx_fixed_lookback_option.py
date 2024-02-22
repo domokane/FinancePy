@@ -7,7 +7,7 @@ import numpy as np
 
 
 from ...utils.math import N
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...utils.helpers import check_argument_types
@@ -49,8 +49,8 @@ class FXFixedLookbackOption:
     def value(self,
               value_dt: Date,
               stock_price: float,
-              dom_discount_curve: DiscountCurve,
-              for_discount_curve: DiscountCurve,
+              domestic_curve: DiscountCurve,
+              foreign_curve: DiscountCurve,
               volatility: float,
               stock_min_max: float):
         """ Value FX Fixed Lookback Option using Black Scholes model and
@@ -62,20 +62,20 @@ class FXFixedLookbackOption:
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if dom_discount_curve._value_dt != value_dt:
+        if domestic_curve._value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if for_discount_curve._value_dt != value_dt:
+        if foreign_curve._value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
         t = (self._expiry_dt - value_dt) / gDaysInYear
 
-        df = dom_discount_curve.df(self._expiry_dt)
+        df = domestic_curve.df(self._expiry_dt)
         r = -np.log(df)/t
 
-        dq = for_discount_curve.df(self._expiry_dt)
+        dq = foreign_curve.df(self._expiry_dt)
         q = -np.log(dq)/t
 
         v = volatility
@@ -97,8 +97,8 @@ class FXFixedLookbackOption:
 
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
-        if abs(r - q) < gSmall:
-            q = r + gSmall
+        if abs(r - q) < g_small:
+            q = r + g_small
 
         df = exp(-r * t)
         dq = exp(-q * t)
@@ -151,7 +151,7 @@ class FXFixedLookbackOption:
                     term = -expbt * N(-f1)
                 else:
                     term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 *
-                                                   b * sqrt(t) / v) - expbt * N(-f1)
+                                                    b * sqrt(t) / v) - expbt * N(-f1)
 
                 v = df * (k - s_min) - s0 * dq * N(-f1) + \
                     s_min * df * N(-f2) + s0 * df * u * term

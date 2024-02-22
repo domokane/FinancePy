@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import N
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -102,8 +102,8 @@ class EquityFloatLookbackOption(EquityOption):
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
 
-        if abs(r - q) < gSmall:
-            q = r + gSmall
+        if abs(r - q) < g_small:
+            q = r + g_small
 
         dq = np.exp(-q * t)
         df = np.exp(-r * t)

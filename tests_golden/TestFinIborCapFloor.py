@@ -342,8 +342,8 @@ def test_IborCapFloorQLExample():
                        last_fixing, freq_type, dc_type, notional,
                        cal_type, bd_type, dg_type)
 
-    blackVol = 0.547295
-    model = Black(blackVol)
+    black_vol = 0.547295
+    model = Black(black_vol)
 
     start = time.time()
     numRepeats = 10

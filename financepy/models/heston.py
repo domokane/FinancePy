@@ -45,8 +45,8 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
 
     np.random.seed(seed)
     num_steps = int(t / dt)
-    sPaths = np.zeros(shape=(num_paths, num_steps))
-    sPaths[:, 0] = s0
+    s_paths = np.zeros(shape=(num_paths, num_steps))
+    s_paths[:, 0] = s0
     sdt = np.sqrt(dt)
     rhohat = np.sqrt(1.0 - rho * rho)
     sigma2 = sigma * sigma
@@ -67,7 +67,7 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
                     rtvplus * zV + 0.25 * sigma2 * (zV * zV - dt)
                 s += (r - q) * s * dt + rtvplus * s * \
                     zS + 0.5 * s * vplus * (zV * zV - dt)
-                sPaths[i_path, i_step] = s
+                s_paths[i_path, i_step] = s
 
     elif scheme == HestonNumericalScheme.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
@@ -82,7 +82,7 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
                 x += (r - q - 0.5 * vplus) * dt + rtvplus * zS
                 v += kappa * (theta - vplus) * dt + sigma * \
                     rtvplus * zV + sigma2 * (zV * zV - dt) / 4.0
-                sPaths[i_path, i_step] = exp(x)
+                s_paths[i_path, i_step] = exp(x)
 
     elif scheme == HestonNumericalScheme.QUADEXP.value:
         # Due to Leif Andersen(2006)
@@ -136,12 +136,12 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths,
 
                 x += mu * dt + K0 + (K1 * vn + K2 * vnp) + \
                     np.sqrt(K3 * vn + K4 * vnp) * zS
-                sPaths[i_path, i_step] = exp(x)
+                s_paths[i_path, i_step] = exp(x)
                 vn = vnp
     else:
         raise FinError("Unknown FinHestonNumericalSchme")
 
-    return sPaths
+    return s_paths
 
 ###############################################################################
 
@@ -180,24 +180,24 @@ class Heston():
         dt = 1.0 / num_steps_per_year
         schemeValue = float(scheme.value)
 
-        sPaths = get_paths(stock_price,
-                           interest_rate,
-                           dividend_yield,
-                           self._v0,
-                           self._kappa,
-                           self._theta,
-                           self._sigma,
-                           self._rho,
-                           tau,
-                           dt,
-                           num_paths,
-                           seed,
-                           schemeValue)
+        s_paths = get_paths(stock_price,
+                            interest_rate,
+                            dividend_yield,
+                            self._v0,
+                            self._kappa,
+                            self._theta,
+                            self._sigma,
+                            self._rho,
+                            tau,
+                            dt,
+                            num_paths,
+                            seed,
+                            schemeValue)
 
         if option._option_type == OptionTypes.EUROPEAN_CALL:
-            path_payoff = np.maximum(sPaths[:, -1] - K, 0.0)
+            path_payoff = np.maximum(s_paths[:, -1] - K, 0.0)
         elif option._option_type == OptionTypes.EUROPEAN_PUT:
-            path_payoff = np.maximum(K - sPaths[:, -1], 0.0)
+            path_payoff = np.maximum(K - s_paths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")
 
@@ -224,9 +224,9 @@ class Heston():
 
         r = interest_rate
         q = dividend_yield
-        S0 = stock_price
+        s0 = stock_price
         K = option._strike_price
-        F = S0 * exp((r - q) * tau)
+        F = s0 * exp((r - q) * tau)
         V = sigma * sigma
 
         def phi(k_in,):
@@ -250,7 +250,7 @@ class Heston():
         x = log(F / K)
         I1 = phi_transform(x) / (2.0 * pi)
         v1 = F * exp(-r * tau) - np.sqrt(K * F) * exp(-r * tau) * I1
-#        v2 = S0 * exp(-q*tau) - K * exp(-r*tau) * I1
+#        v2 = s0 * exp(-q*tau) - K * exp(-r*tau) * I1
         return v1
 
 ###############################################################################
@@ -283,16 +283,16 @@ class Heston():
             q = V * tau / 2.0
             Q = np.exp(-e * q)
             H = np.exp((2.0 * kappa * theta / V) * (q * g - np.log((1.0 -
-                h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
+                                                                    h * Q) / (1.0 - h))) + v0 * g * (1.0 - Q) / (1.0 - h * Q))
             integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
             return integrand.real
 
-        S0 = stock_price
-        F = S0 * exp((r - q) * tau)
+        s0 = stock_price
+        F = s0 * exp((r - q) * tau)
         K = option._strike_price
         X = log(F / K)
         integral = integrate.quad(f, 0.0, np.inf)[0] * (1.0 / pi)
-        v = S0 * exp(-q * tau) - K * exp(-r * tau) * integral
+        v = s0 * exp(-q * tau) - K * exp(-r * tau) * integral
         return (v)
 
 ###############################################################################
@@ -316,7 +316,7 @@ class Heston():
 
         q = dividend_yield
         r = interest_rate
-        S0 = stock_price
+        s0 = stock_price
         K = option._strike_price
         V = sigma**2
 
@@ -330,13 +330,13 @@ class Heston():
                 A = kappa * ((beta - d) * tau - 2.0 *
                              np.log((1.0 - g * Q) / (1.0 - g))) / V
                 v = np.exp(A * theta + B * v0 + 1j * u *
-                           np.log(S0 / (K * np.exp(-(r - q) * tau)))) / (u * 1j)
+                           np.log(s0 / (K * np.exp(-(r - q) * tau)))) / (u * 1j)
                 return v.real
 
             area = 0.50 + (1.0 / pi) * integrate.quad(integrand, 0, np.inf)[0]
             return area
 
-        v = S0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - \
+        v = s0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - \
             exp(-r * tau) * K * f(-1.0, kappa)
 
         return v
@@ -363,9 +363,9 @@ class Heston():
 
         q = dividend_yield
         r = interest_rate
-        S0 = stock_price
+        s0 = stock_price
         K = option._strike_price
-        F = S0 * exp((r - q) * tau)
+        F = s0 * exp((r - q) * tau)
         x0 = log(F / K)
 
         def ff(j):
@@ -388,7 +388,7 @@ class Heston():
             area = 0.50 + 1.0 / pi * integrate.quad(integrand, 0.0, np.inf)[0]
             return area
 
-        v = S0 * exp(-q * tau) * ff(1) - K * exp(-r * tau) * ff(0)
+        v = s0 * exp(-q * tau) * ff(1) - K * exp(-r * tau) * ff(0)
         return v
 
 ###############################################################################

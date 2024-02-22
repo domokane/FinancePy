@@ -27,7 +27,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 def testBlackScholes():
 
     value_dt = Date(8, 5, 2015)
-    expiry_date = Date(15, 1, 2016)
+    expiry_dt = Date(15, 1, 2016)
 
     strike_price = 130.0
     stock_price = 127.62
@@ -38,13 +38,13 @@ def testBlackScholes():
     option_type = OptionTypes.AMERICAN_CALL
     euOptionType = OptionTypes.EUROPEAN_CALL
 
-    amOption = EquityAmericanOption(expiry_date, strike_price,
+    amOption = EquityAmericanOption(expiry_dt, strike_price,
                                     option_type)
 
-    ameuOption = EquityAmericanOption(expiry_date, strike_price,
+    ameuOption = EquityAmericanOption(expiry_dt, strike_price,
                                       euOptionType)
 
-    euOption = EquityVanillaOption(expiry_date, strike_price,
+    euOption = EquityVanillaOption(expiry_dt, strike_price,
                                    euOptionType)
 
     discount_curve = DiscountCurveFlat(value_dt, interest_rate,

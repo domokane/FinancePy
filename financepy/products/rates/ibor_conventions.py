@@ -15,15 +15,15 @@ from ...utils.calendar import CalendarTypes
 class IborConventions():
 
     def __init__(self,
-                 currencyName: str,
-                 indexName: str = "LIBOR"):
+                 currency_name: str,
+                 index_name: str = "LIBOR"):
 
-        if currencyName == "USD" and indexName == "LIBOR":
-            self._spotLag = 2
+        if currency_name == "USD" and index_name == "LIBOR":
+            self._spot_lag = 2
             self._dc_type = DayCountTypes.THIRTY_E_360_ISDA
             self._cal_type = CalendarTypes.TARGET
-        elif currencyName == "EUR" and indexName == "EURIBOR":
-            self._spotLag = 2
+        elif currency_name == "EUR" and index_name == "EURIBOR":
+            self._spot_lag = 2
             self._dc_type = DayCountTypes.THIRTY_E_360_ISDA
             self._cal_type = CalendarTypes.TARGET
         else:

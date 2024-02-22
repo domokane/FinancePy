@@ -14,7 +14,7 @@ sys.path.append("./..")
 underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
 
 value_dt = Date(1, 1, 2015)
-expiry_date = Date(1, 1, 2016)
+expiry_dt = Date(1, 1, 2016)
 stock_price = 100.0
 volatility = 0.30
 interest_rate = 0.05
@@ -30,7 +30,7 @@ num_paths = 40000
 def test_value():
 
     call_option = EquityDigitalOption(
-        expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
     value = call_option.value(
         value_dt,
         stock_price,
@@ -51,7 +51,7 @@ def test_value():
 
 def test_greeks():
     call_option = EquityDigitalOption(
-        expiry_date, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
 
     delta = call_option.delta(
         value_dt,

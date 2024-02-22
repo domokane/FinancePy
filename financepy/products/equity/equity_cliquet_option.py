@@ -102,10 +102,10 @@ class EquityCliquetOption(EquityOption):
 
         self._v_options = []
         self._dfs = []
-        self._actualDates = []
+        self._actual_dts = []
 
-        CALL = OptionTypes.EUROPEAN_CALL
-        PUT = OptionTypes.EUROPEAN_PUT
+        call_type = OptionTypes.EUROPEAN_CALL
+        put_type = OptionTypes.EUROPEAN_PUT
 
         if isinstance(model, BlackScholes):
 
@@ -132,13 +132,13 @@ class EquityCliquetOption(EquityOption):
 
                     q = -np.log(dqMat/dq)/tau
 
-                    if self._option_type == CALL:
+                    if self._option_type == call_type:
                         v_fwd_opt = s * dq * \
-                            bs_value(1.0, tau, 1.0, r, q, v, CALL.value)
+                            bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
                         v_cliquet += v_fwd_opt
-                    elif self._option_type == PUT:
+                    elif self._option_type == put_type:
                         v_fwd_opt = s * dq * \
-                            bs_value(1.0, tau, 1.0, r, q, v, PUT.value)
+                            bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
                         v_cliquet += v_fwd_opt
                     else:
                         raise FinError("Unknown option type")
@@ -147,7 +147,7 @@ class EquityCliquetOption(EquityOption):
 
                     self._dfs.append(df)
                     self._v_options.append(v)
-                    self._actualDates.append(dt)
+                    self._actual_dts.append(dt)
                     tprev = t_exp
         else:
             raise FinError("Unknown Model Type")
@@ -159,7 +159,7 @@ class EquityCliquetOption(EquityOption):
     def print_payments(self):
         num_options = len(self._v_options)
         for i in range(0, num_options):
-            print(self._actualDates[i], self._dfs[i], self._v_options[i])
+            print(self._actual_dts[i], self._dfs[i], self._v_options[i])
 
 ###############################################################################
 

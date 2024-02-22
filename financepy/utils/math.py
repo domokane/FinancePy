@@ -9,7 +9,7 @@ import numpy as np
 from .error import FinError
 
 PI = 3.14159265358979323846
-INVROOT2PI = 0.3989422804014327
+inv_root_two_pi = 0.3989422804014327
 
 ONE_MILLION = 1000000
 TEN_MILLION = 10000000
@@ -24,9 +24,8 @@ ONE_BILLION = 1000000000
 def accrued_interpolator(t_set: float,  # Settlement time in years
                          cpn_times: np.ndarray,
                          cpn_amounts: np.ndarray):
-    """ Fast calculation of accrued interest using an Actual/Actual type of
-    convention. This does not calculate according to other conventions. """
-
+    """Fast calculation of accrued interest using an Actual/Actual type of
+    convention. This does not calculate according to other conventions."""
     num_cpns = len(cpn_times)
 
     for i in range(1, num_cpns):
@@ -125,7 +124,7 @@ def maxaxis(s: np.ndarray):
 
     shp = s.shape
 
-    maxVector = np.empty(shp[0])
+    max_vector = np.empty(shp[0])
 
     for i in range(0, shp[0]):
         xmax = s[i, 0]
@@ -134,9 +133,9 @@ def maxaxis(s: np.ndarray):
             if x > xmax:
                 xmax = x
 
-        maxVector[i] = xmax
+        max_vector[i] = xmax
 
-    return maxVector
+    return max_vector
 
 ###############################################################################
 
@@ -147,7 +146,7 @@ def minaxis(s: np.ndarray):
     2D Numpy Array """
     shp = s.shape
 
-    minVector = np.empty(shp[0])
+    min_vector = np.empty(shp[0])
 
     for i in range(0, shp[0]):
         xmin = s[i, 0]
@@ -156,9 +155,9 @@ def minaxis(s: np.ndarray):
             if x < xmin:
                 xmin = x
 
-        minVector[i] = xmin
+        min_vector[i] = xmin
 
-    return minVector
+    return min_vector
 
 ###############################################################################
 
@@ -220,8 +219,8 @@ def pair_gcd(v1: float,
         v2 = v1 - factor * v2
         v1 = temp
 
-    pairGCD = abs(v1)
-    return pairGCD
+    pair_gcd = abs(v1)
+    return pair_gcd
 
 ###############################################################################
 
@@ -231,8 +230,8 @@ def nprime(x: float):
     """Calculate the first derivative of the Cumulative Normal CDF which is
     simply the PDF of the Normal Distribution """
 
-    InvRoot2Pi = 0.3989422804014327
-    return np.exp(-x * x / 2.0) * InvRoot2Pi
+    inv_root_two_pi = 0.3989422804014327
+    return np.exp(-x * x / 2.0) * inv_root_two_pi
 
 ###############################################################################
 
@@ -267,7 +266,7 @@ def frange(start: int,
 def normpdf(x: float):
     """ Calculate the probability density function for a Gaussian (Normal)
     function at value x"""
-    return np.exp(-x * x / 2.0) * INVROOT2PI
+    return np.exp(-x * x / 2.0) * inv_root_two_pi
 
 ###############################################################################
 
@@ -292,7 +291,7 @@ def N(x):
 
     if x >= 0.0:
         c = (a1 * k + a2 * k2 + a3 * k3 + a4 * k4 + a5 * k5)
-        phi = 1.0 - c * np.exp(-x*x/2.0) * INVROOT2PI
+        phi = 1.0 - c * np.exp(-x*x/2.0) * inv_root_two_pi
     else:
         phi = 1.0 - N(-x)
 
@@ -338,7 +337,7 @@ def normcdf_integrate(x: float):
     x = x + dx
     fx = np.exp(-x * x / 2.0)
     integral += fx / 2.0
-    integral *= INVROOT2PI * dx
+    integral *= inv_root_two_pi * dx
     return integral
 
 ###############################################################################
@@ -527,7 +526,7 @@ def norminvcdf(p):
         q = np.sqrt(-2.0 * np.log(p))
         inverse_cdf = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
                        * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q
-                           + 1.0)
+                                    + 1.0)
     elif p <= p_high:
         # Rational approximation for lower region
         q = p - 0.5
@@ -538,7 +537,7 @@ def norminvcdf(p):
         # Rational approximation for upper region
         q = np.sqrt(-2.0 * np.log(1 - p))
         inverse_cdf = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5)
-                       * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+                        * q + c6) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
 
     return inverse_cdf
 

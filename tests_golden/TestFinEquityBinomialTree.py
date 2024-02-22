@@ -30,7 +30,7 @@ def test_FinBinomialTree():
     volatility = 0.40
 
     value_dt = Date(1, 1, 2016)
-    expiry_date = Date(1, 1, 2017)
+    expiry_dt = Date(1, 1, 2017)
 
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
@@ -43,7 +43,7 @@ def test_FinBinomialTree():
     test_cases.banner("================== EUROPEAN PUT =======================")
 
     put_option = EquityVanillaOption(
-        expiry_date,
+        expiry_dt,
         strike_price,
         OptionTypes.EUROPEAN_PUT)
     value = put_option.value(value_dt, stock_price,
@@ -74,7 +74,7 @@ def test_FinBinomialTree():
             num_steps,
             value_dt,
             payoff,
-            expiry_date,
+            expiry_dt,
             payoff,
             exercise,
             params)
@@ -101,7 +101,7 @@ def test_FinBinomialTree():
             num_steps,
             value_dt,
             payoff,
-            expiry_date,
+            expiry_dt,
             payoff,
             exercise,
             params)
@@ -113,7 +113,7 @@ def test_FinBinomialTree():
         "================== EUROPEAN CALL =======================")
 
     call_option = EquityVanillaOption(
-        expiry_date,
+        expiry_dt,
         strike_price,
         OptionTypes.EUROPEAN_CALL)
     value = call_option.value(value_dt, stock_price,
@@ -144,7 +144,7 @@ def test_FinBinomialTree():
             num_steps,
             value_dt,
             payoff,
-            expiry_date,
+            expiry_dt,
             payoff,
             exercise,
             params)
@@ -173,7 +173,7 @@ def test_FinBinomialTree():
             num_steps,
             value_dt,
             payoff,
-            expiry_date,
+            expiry_dt,
             payoff,
             exercise,
             params)

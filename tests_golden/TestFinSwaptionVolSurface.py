@@ -26,7 +26,7 @@ PLOT_GRAPHS = False
 ###############################################################################
 
 
-def test_FinSwaptionVolSurface1(verboseCalibration):
+def test_FinSwaptionVolSurface1(verbose):
 
     ###########################################################################
 
@@ -110,9 +110,9 @@ if __name__ == '__main__':
 
     start = time.time()
 
-    verboseCalibration = False
+    verbose = False
 
-    test_FinSwaptionVolSurface1(verboseCalibration)
+    test_FinSwaptionVolSurface1(verbose)
 
     end = time.time()
 

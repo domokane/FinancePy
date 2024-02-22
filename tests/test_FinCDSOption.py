@@ -10,9 +10,9 @@ from financepy.products.credit.cds_option import CDSOption
 # This reproduces example on page 38 of Open Gamma note on CDS Option
 tradeDate = Date(5, 2, 2014)
 _, issuer_curve = buildFullIssuerCurve(tradeDate)
-step_in_date = tradeDate.add_days(1)
-value_dt = step_in_date
-expiry_date = Date(20, 3, 2014)
+step_in_dt = tradeDate.add_days(1)
+value_dt = step_in_dt
+expiry_dt = Date(20, 3, 2014)
 maturity_dt = Date(20, 6, 2019)
 notional = 100.0
 
@@ -28,7 +28,7 @@ def test_cds_option():
     ]
 
     for strike, result in strike_result:
-        cdsOption = CDSOption(expiry_date,
+        cdsOption = CDSOption(expiry_dt,
                               maturity_dt,
                               strike / 10000.0,
                               notional)

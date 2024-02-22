@@ -2,23 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+from financepy.products.rates.ibor_cap_floor import IborCapFloor
+from financepy.products.rates.ibor_lmm_products import IborLMMProducts
+from financepy.utils.global_types import FinCapFloorTypes
+from financepy.products.rates.ibor_swaption import IborSwaption
+from financepy.products.rates.ibor_swaption import SwapTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.black import Black
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.date import Date
+from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 import numpy as np
 
 import sys
 sys.path.append("..")
-
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.models.black import Black
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.utils.global_types import FinCapFloorTypes
-from financepy.products.rates.ibor_lmm_products import IborLMMProducts
-from financepy.products.rates.ibor_cap_floor import IborCapFloor
-from FinTestCases import FinTestCases, globalTestCaseMode
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -44,7 +43,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                                          0.04,
 #                                          FrequencyTypes.ANNUAL)
 
-#     swaptionVol = 15.54
+#     swaption_vol = 15.54
 
 #     liborSwaption = IborSwaption(settle_dt,
 #                                      exercise_dt,
@@ -54,7 +53,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                                      FrequencyTypes.ANNUAL,
 #                                      DayCountTypes.ACT_360)
 
-#     model = Black(swaptionVol/100.0)
+#     model = Black(swaption_vol/100.0)
 #     v_BLK = liborSwaption.value(value_dt, discount_curve, model)
 
 #     dt = 0.5
@@ -79,9 +78,9 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #     strike = r
 #     PAYSwaption = 1
 #     use_sobol = 0
-#     numeraireIndex = 0
+#     numeraire_index = 0
 
-#     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraireIndex, fwd0,
+#     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraire_index, fwd0,
 #                                zetas, taus, use_sobol, seed)
 
 #     for iExp in range(1, 10):
@@ -96,7 +95,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #         swaption_priceNF = LMMSwaptionPricer(strike, a, b, num_paths,
 #                                             fwd0, fwdsNF, taus, PAYSwaption)
 
-#         swaptionVol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
+#         swaption_vol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
 
 #         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
@@ -128,13 +127,13 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                                     float_freq_type,
 #                                     float_dc_type)
 
-#         model = Black(swaptionVol)
+#         model = Black(swaption_vol)
 #         blackSwaptionPrice = swaption.value(value_dt, libor_curve, model)
 
 #         test_cases.print("K:%6.5f t_exp:%8.2f FwdVol:%9.5f SimVol1F:%9.5f " +
 #                         " SimVolNF:%9.5f RebVol:%9.5f SimPx1F:%9.5f SimPxNF:%9.5f Black Px:%9.5f"
 #               % (strike, t_exp, fwd_rateVol, swapVolSim1F, swapVolSimNF,
-#                  swaptionVol, swaption_price1F, swaption_priceNF,
+#                  swaption_vol, swaption_price1F, swaption_priceNF,
 #                  blackSwaptionPrice))
 
 ###############################################################################
@@ -185,16 +184,16 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #     capVolDates = []
 #     capletVolTenor = "1Y"
 #     capletDt = value_dt
-#     numForwards = endYear - startYear
+#     num_fwds = endYear - startYear
 
-#     # Capvol dates has numForwards + 1 elements including today
+#     # Capvol dates has num_fwds + 1 elements including today
 #     capVolDates.append(value_dt)
-#     for i in range(0, numForwards):
+#     for i in range(0, num_fwds):
 #         capletDt = capletDt.add_tenor(capletVolTenor)
 #         capVolDates.append(capletDt)
 
-#     # Capvol dates has numForwards + 1 elements including zero today
-#     capVolatilities = [capVol] * (numForwards+1)
+#     # Capvol dates has num_fwds + 1 elements including zero today
+#     capVolatilities = [capVol] * (num_fwds+1)
 #     capVolatilities[0] = 0.0
 #     capVolatilities = np.array(capVolatilities)/100.0
 
@@ -211,16 +210,16 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #     lambdas2F = np.array(lambdas2FList)
 
 #     # Simulate paths of future Libor rates
-#     numFactors = 1
+#     num_factors = 1
 
 #     test_cases.header("NUMPATHS", "VLMM", "VBLK", "ERROR")
 
 #     for num_paths in [10000, 20000, 50000, 100000, 200000, 400000, 1000000]:
 
-#         if numFactors == 1:
+#         if num_factors == 1:
 #             lmmProducts.simulate1F(discount_curve, volCurve, num_paths, 0, True)
-#         elif numFactors == 2:
-#             lmmProducts.simulateMF(discount_curve, numFactors, lambdas2F,
+#         elif num_factors == 2:
+#             lmmProducts.simulateMF(discount_curve, num_factors, lambdas2F,
 #                                    num_paths, 0, True)
 
 #         v_lmm = lmmProducts.valueCapFloor(settle_dt,

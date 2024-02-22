@@ -94,6 +94,7 @@ class IborSwaption():
         self._fwd_swap_rate = None
         self._forward_df = None
         self._underlying_swap = None
+        self._swap_type = None
 
 ###############################################################################
 
@@ -214,21 +215,21 @@ class IborSwaption():
 
         elif isinstance(model, HWTree):
 
-            swaptionPx = model.european_bond_option_jamshidian(t_exp,
-                                                               strike_price,
-                                                               face_amount,
-                                                               cpn_times,
-                                                               cpn_flows,
-                                                               df_times,
-                                                               df_values)
+            swaption_px = model.european_bond_option_jamshidian(t_exp,
+                                                                strike_price,
+                                                                face_amount,
+                                                                cpn_times,
+                                                                cpn_flows,
+                                                                df_times,
+                                                                df_values)
 
             if self._fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaptionPx['put']
+                swaption_price = swaption_px['put']
             elif self._fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = swaptionPx['call']
+                swaption_price = swaption_px['call']
             else:
                 raise FinError("Unknown swaption option type" +
-                               str(self._swapType))
+                               str(self._swap_type))
 
             # Cancel the multiplication at the end below
             swaption_price /= pv01
@@ -236,36 +237,36 @@ class IborSwaption():
         elif isinstance(model, BKTree):
 
             model.build_tree(t_mat, df_times, df_values)
-            swaptionPx = model.bermudan_swaption(t_exp,
-                                                 t_mat,
-                                                 strike_price,
-                                                 face_amount,
-                                                 cpn_times,
-                                                 cpn_flows,
-                                                 FinExerciseTypes.EUROPEAN)
+            swaption_px = model.bermudan_swaption(t_exp,
+                                                  t_mat,
+                                                  strike_price,
+                                                  face_amount,
+                                                  cpn_times,
+                                                  cpn_flows,
+                                                  FinExerciseTypes.EUROPEAN)
 
             if self._fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaptionPx['pay']
+                swaption_price = swaption_px['pay']
             elif self._fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = swaptionPx['rec']
+                swaption_price = swaption_px['rec']
 
             swaption_price /= pv01
 
         elif isinstance(model, BDTTree):
 
             model.build_tree(t_mat, df_times, df_values)
-            swaptionPx = model.bermudan_swaption(t_exp,
-                                                 t_mat,
-                                                 strike_price,
-                                                 face_amount,
-                                                 cpn_times,
-                                                 cpn_flows,
-                                                 FinExerciseTypes.EUROPEAN)
+            swaption_px = model.bermudan_swaption(t_exp,
+                                                  t_mat,
+                                                  strike_price,
+                                                  face_amount,
+                                                  cpn_times,
+                                                  cpn_flows,
+                                                  FinExerciseTypes.EUROPEAN)
 
             if self._fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaptionPx['pay']
+                swaption_price = swaption_px['pay']
             elif self._fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = swaptionPx['rec']
+                swaption_price = swaption_px['rec']
 
             swaption_price /= pv01
         else:
@@ -345,8 +346,8 @@ class IborSwaption():
         # The exchange of cash occurs on the settlement date but we need to
         # value the swaption on the provided valuation date - which could be
         # the settlement date or may be a different date.
-        dfValuation = discount_curve.df(value_dt)
-        swaption_price = swaption_price * self._pv01 * self._notional / dfValuation
+        df_value_dt = discount_curve.df(value_dt)
+        swaption_price = swaption_price * self._pv01 * self._notional / df_value_dt
         return swaption_price
 
 ###############################################################################

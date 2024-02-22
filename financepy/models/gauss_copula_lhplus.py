@@ -73,17 +73,17 @@ class LHPlusModel():
         cdf0 = 1.0
         cdf1 = 0.0
         exp_min_lk = 0.0
-        checkSum = 0.0
+        check_sum = 0.0
 
         for _ in range(0, num_steps):
             k0 += dK
             cdf1 = self.prob_loss_gt_k(k0)
             pdf = cdf0 - cdf1
             cdf0 = cdf1
-            checkSum += pdf
+            check_sum += pdf
             exp_min_lk += pdf * k0
 
-        checkSum += cdf1
+        check_sum += cdf1
         exp_min_lk += cdf1 * K
 
         return exp_min_lk

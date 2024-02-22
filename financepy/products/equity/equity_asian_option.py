@@ -25,7 +25,6 @@ from ...utils.math import N
 ###############################################################################
 
 class AsianOptionValuationMethods(Enum):
-    ''' Types of Asian Option valuation methods '''
     GEOMETRIC = 1,
     TURNBULL_WAKEMAN = 2,
     CURRAN = 3
@@ -461,7 +460,7 @@ class EquityAsianOption:
 
         K = self._strike_price
         n = self._num_observations
-        S0 = stock_price
+        s0 = stock_price
 
         multiplier = 1.0
 
@@ -482,12 +481,12 @@ class EquityAsianOption:
         sigSq = volatility ** 2
         meanGeo = (r - q - sigSq / 2.0) * (t0 + (t_exp - t0) / 2.0)
         varGeo = sigSq * (t0 + (t_exp - t0) * (2 * n - 1) / (6 * n))
-        EG = S0 * np.exp(meanGeo + varGeo / 2.0)
+        EG = s0 * np.exp(meanGeo + varGeo / 2.0)
 
         if np.abs(varGeo) < 1e-10:
             raise FinError("Asian option geometric variance is zero.")
 
-        d1 = (meanGeo + np.log(S0 / K) + varGeo) / np.sqrt(varGeo)
+        d1 = (meanGeo + np.log(s0 / K) + varGeo) / np.sqrt(varGeo)
         d2 = d1 - np.sqrt(varGeo)
 
         # the Geometric price is the lower bound
@@ -525,7 +524,7 @@ class EquityAsianOption:
 
         volatility = model._volatility
 
-        S0 = stock_price
+        s0 = stock_price
         b = r - q
         sigma2 = volatility**2
         K = self._strike_price
@@ -551,8 +550,8 @@ class EquityAsianOption:
         w = (1.0 - np.exp((2 * b + sigma2) * h * n)) / \
             (1.0 - np.exp((2 * b + sigma2) * h))
 
-        FA = (S0 / n) * np.exp(b * t0) * u
-        EA2 = (S0 * S0 / n / n) * np.exp((2.0 * b + sigma2) * t0)
+        FA = (s0 / n) * np.exp(b * t0) * u
+        EA2 = (s0 * s0 / n / n) * np.exp((2.0 * b + sigma2) * t0)
         EA2 = EA2 * (w + 2.0 / (1.0 - np.exp((b + sigma2) * h)) * (u - w))
         sigmaA = np.sqrt((np.log(EA2) - 2.0 * np.log(FA)) / t_exp)
 
@@ -613,7 +612,7 @@ class EquityAsianOption:
         sigma2 = volatility**2
         a1 = b + sigma2
         a2 = 2 * b + sigma2
-        S0 = stock_price
+        s0 = stock_price
 
         dt = t_exp - t0
 
@@ -623,10 +622,10 @@ class EquityAsianOption:
                 np.exp(sigma2 * t0) * (1.0 + sigma2 * dt)
             M2 = M2 / sigma2 / sigma2 / dt / dt
         else:
-            M1 = S0 * (np.exp(b * t_exp) - np.exp(b * t0)) / (b * dt)
+            M1 = s0 * (np.exp(b * t_exp) - np.exp(b * t0)) / (b * dt)
             M2 = np.exp(a2 * t_exp) / a1 / a2 / dt / dt + \
                 (np.exp(a2 * t0) / b / dt / dt) * (1.0/a2 - np.exp(b*dt) / a1)
-            M2 = 2.0 * M2 * S0 * S0
+            M2 = 2.0 * M2 * s0 * s0
 
         F0 = M1
         sigma2 = (1.0 / t_exp) * np.log(M2 / M1 / M1)

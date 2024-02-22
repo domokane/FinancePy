@@ -61,7 +61,7 @@ class EquitySwap:
 
         check_argument_types(self.__init__, locals())
 
-        if type(term_dt_or_tenor) == Date:
+        if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
             self._termination_dt = effective_dt.add_tenor(
@@ -120,7 +120,7 @@ class EquitySwap:
               index_curve: DiscountCurve = None,
               dividend_curve: DiscountCurve = None,
               current_price: float = None,
-              firstFixingRate=None):
+              first_fixing_rate=None):
         """ Value the Equity swap on a valuation date. """
 
         self._equity_leg_value = self._equity_leg.value(value_dt,
@@ -133,7 +133,7 @@ class EquitySwap:
         self._rate_leg_value = self._rate_leg.value(value_dt,
                                                     discount_curve,
                                                     index_curve,
-                                                    firstFixingRate)
+                                                    first_fixing_rate)
 
         return self._equity_leg_value + self._rate_leg_value
 
@@ -154,15 +154,15 @@ class EquitySwap:
         rate_freq = annual_frequency(self._rate_leg._freq_type)
 
         multiple = int(rate_freq // eq_freq)
-        isMultiple = int(rate_freq % eq_freq) == 0
+        is_multiple = int(rate_freq % eq_freq) == 0
 
-        if (eq_freq is None or rate_freq is None) or (not isMultiple):
+        if (eq_freq is None or rate_freq is None) or (not is_multiple):
             raise FinError("Invalid frequency type assigned!")
 
         self._rate_leg._notional_array = []
-        for lastNotional in self._equity_leg._last_notionals:
+        for last_notional in self._equity_leg._last_notionals:
             for _ in range(multiple):
-                self._rate_leg._notional_array.append(lastNotional)
+                self._rate_leg._notional_array.append(last_notional)
 
     ###########################################################################
 

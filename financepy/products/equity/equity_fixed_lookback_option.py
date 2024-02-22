@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import N
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -104,8 +104,8 @@ class EquityFixedLookbackOption(EquityOption):
 
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
-        if abs(r - q) < gSmall:
-            q = r + gSmall
+        if abs(r - q) < g_small:
+            q = r + g_small
 
         df = np.exp(-r * t)
         dq = np.exp(-q * t)
@@ -113,38 +113,38 @@ class EquityFixedLookbackOption(EquityOption):
         u = v * v / 2.0 / b
         w = 2.0 * b / (v * v)
         expbt = np.exp(b * t)
-        sqrtT = np.sqrt(t)
+        sqrt_t = np.sqrt(t)
 
         # Taken from Hull Page 536 (6th edition) and Haug Page 143
         if self._option_type == OptionTypes.EUROPEAN_CALL:
 
             if k > s_max:
 
-                d1 = (np.log(s0 / k) + (b + v * v/2.0) * t) / v / sqrtT
-                d2 = d1 - v * sqrtT
+                d1 = (np.log(s0 / k) + (b + v * v/2.0) * t) / v / sqrt_t
+                d2 = d1 - v * sqrt_t
 
                 if s0 == k:
-                    term = -N(d1 - 2.0 * b * sqrtT / v) + expbt * N(d1)
+                    term = -N(d1 - 2.0 * b * sqrt_t / v) + expbt * N(d1)
                 elif s0 < k and w > 100.0:
                     term = expbt * N(d1)
                 else:
-                    term = -np.power(s0 / k, -w) * N(d1 - 2 * b * sqrtT / v) \
+                    term = -np.power(s0 / k, -w) * N(d1 - 2 * b * sqrt_t / v) \
                         + expbt * N(d1)
 
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
             else:
 
-                e1 = (np.log(s0/s_max) + (r - q + v*v/2) * t) / v / sqrtT
-                e2 = e1 - v * sqrtT
+                e1 = (np.log(s0/s_max) + (r - q + v*v/2) * t) / v / sqrt_t
+                e2 = e1 - v * sqrt_t
 
                 if s0 == s_max:
-                    term = -N(e1 - 2.0 * b * sqrtT / v) + expbt * N(e1)
+                    term = -N(e1 - 2.0 * b * sqrt_t / v) + expbt * N(e1)
                 elif s0 < s_max and w > 100.0:
                     term = expbt * N(e1)
                 else:
                     term = (-(s0 / s_max)**(-w)) * \
-                        N(e1 - 2.0 * b * sqrtT / v) + expbt * N(e1)
+                        N(e1 - 2.0 * b * sqrt_t / v) + expbt * N(e1)
 
                 v = df * (s_max - k) + s0 * dq * N(e1) - \
                     s_max * df * N(e2) + s0 * df * u * term
@@ -153,15 +153,15 @@ class EquityFixedLookbackOption(EquityOption):
 
             if k >= s_min:
 
-                f1 = (np.log(s0/s_min) + (b + v * v / 2.0) * t) / v / sqrtT
-                f2 = f1 - v * sqrtT
+                f1 = (np.log(s0/s_min) + (b + v * v / 2.0) * t) / v / sqrt_t
+                f2 = f1 - v * sqrt_t
 
                 if s0 == s_min:
-                    term = N(-f1 + 2.0 * b * sqrtT / v) - expbt * N(-f1)
+                    term = N(-f1 + 2.0 * b * sqrt_t / v) - expbt * N(-f1)
                 elif s0 > s_min and w < -100.0:
                     term = -expbt * N(-f1)
                 else:
-                    term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 * b * sqrtT / v) \
+                    term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 * b * sqrt_t / v) \
                         - expbt * N(-f1)
 
                 v = df * (k - s_min) - s0 * dq * N(-f1) + \
@@ -169,15 +169,15 @@ class EquityFixedLookbackOption(EquityOption):
 
             else:
 
-                d1 = (np.log(s0 / k) + (b + v * v / 2) * t) / v / sqrtT
-                d2 = d1 - v * sqrtT
+                d1 = (np.log(s0 / k) + (b + v * v / 2) * t) / v / sqrt_t
+                d2 = d1 - v * sqrt_t
 
                 if s0 == k:
-                    term = N(-d1 + 2.0 * b * sqrtT / v) - expbt * N(-d1)
+                    term = N(-d1 + 2.0 * b * sqrt_t / v) - expbt * N(-d1)
                 elif s0 > k and w < -100.0:
                     term = -expbt * N(-d1)
                 else:
-                    term = ((s0 / k)**(-w)) * N(-d1 + 2.0 * b * sqrtT / v) \
+                    term = ((s0 / k)**(-w)) * N(-d1 + 2.0 * b * sqrt_t / v) \
                         - expbt * N(-d1)
 
                 v = k * df * N(-d2) - s0 * dq * N(-d1) + s0 * df * u * term
@@ -204,7 +204,7 @@ class EquityFixedLookbackOption(EquityOption):
         Black-Scholes model that assumes the stock follows a GBM process. """
 
         t = (self._expiry_dt - value_dt) / gDaysInYear
-        
+
         df = discount_curve.df(self._expiry_dt)
         r = discount_curve.cc_rate(self._expiry_dt)
         q = dividend_curve.cc_rate(self._expiry_dt)

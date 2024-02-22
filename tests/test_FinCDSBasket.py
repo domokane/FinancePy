@@ -12,7 +12,7 @@ from os.path import dirname, join
 
 
 tradeDate = Date(1, 3, 2007)
-step_in_date = tradeDate.add_days(1)
+step_in_dt = tradeDate.add_days(1)
 value_dt = tradeDate.add_days(1)
 
 libor_curve = build_Ibor_Curve(tradeDate)
@@ -33,25 +33,25 @@ basket = CDSBasket(value_dt,
 
 def test_inhomogeneous_curve():
     intrinsicSpd = cdsIndex.intrinsic_spread(value_dt,
-                                             step_in_date,
+                                             step_in_dt,
                                              basketMaturity,
                                              issuer_curves) * 10000.0
     assert round(intrinsicSpd, 4) == 32.0971
 
     totalSpd = cdsIndex.total_spread(value_dt,
-                                     step_in_date,
+                                     step_in_dt,
                                      basketMaturity,
                                      issuer_curves) * 10000.0
     assert round(totalSpd, 4) == 161.3169
 
     minSpd = cdsIndex.min_spread(value_dt,
-                                 step_in_date,
+                                 step_in_dt,
                                  basketMaturity,
                                  issuer_curves) * 10000.0
     assert round(minSpd, 4) == 10.6722
 
     maxSpd = cdsIndex.max_spread(value_dt,
-                                 step_in_date,
+                                 step_in_dt,
                                  basketMaturity,
                                  issuer_curves) * 10000.0
     assert round(maxSpd, 4) == 81.1466

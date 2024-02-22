@@ -11,20 +11,20 @@ from financepy.products.equity.equity_forward import EquityForward
 def test_equity_forward():
 
     value_dt = Date(13, 2, 2018)
-    expiry_date = value_dt.add_months(12)
+    expiry_dt = value_dt.add_months(12)
 
     stock_price = 130.0
     forward_price = 125.0  # Locked
     discount_rate = 0.05
     dividend_rate = 0.02
 
-    expiry_date = value_dt.add_months(12)
+    expiry_dt = value_dt.add_months(12)
     notional = 100.0
 
     discount_curve = DiscountCurveFlat(value_dt, discount_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
 
-    equityForward = EquityForward(expiry_date,
+    equityForward = EquityForward(expiry_dt,
                                   forward_price,
                                   notional,
                                   FinLongShort.LONG)

@@ -12,9 +12,9 @@ from numba import njit
 _ECONVERGED = 0
 _ECONVERR = -1
 
-_iter = 100
-_xtol = 2e-12
-_rtol = 4*np.finfo(float).eps
+_ITER = 100
+_XTOL = 2e-12
+_RTOL = 4*np.finfo(float).eps
 
 
 results = namedtuple('results', 'root function_calls iterations converged')

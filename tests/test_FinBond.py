@@ -280,7 +280,7 @@ def test_bond_cfets():
     df = pd.read_csv(path,
                      parse_dates=['settlement_date', 'issue_date',
                                   'maturity_date'])
-
+    
     for row in df.itertuples(index=False):
 
         issue_dt = Date(row.issue_date.day,
@@ -325,7 +325,7 @@ def test_bond_cfets():
 
 def test_key_rate_durations_bloomberg_example():
 
-    dc_type, freq_type, settlementDays, exDiv, calendar = \
+    dc_type, freq_type, settle_days, exDiv, calendar = \
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     # interest accrues on this date. Issue date is 01/08/2022
@@ -334,7 +334,7 @@ def test_key_rate_durations_bloomberg_example():
     coupon = 2.75/100.0
     ex_div_days = 0
 
-    dc_type, freq_type, settlementDays, exDiv, calendar =\
+    dc_type, freq_type, settle_days, exDiv, calendar =\
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_dt, maturity_dt, coupon,

@@ -6,10 +6,11 @@ import numpy as np
 from ..utils.math import band_matrix_multiplication
 from ..utils.math import solve_tridiagonal_matrix
 from ..utils.math import transpose_tridiagonal_matrix
-from financepy.utils.global_types import OptionTypes
-
+from ..utils.global_types import OptionTypes
 
 # @njit
+
+
 def dx(x, wind=0):
     # Intermediate rows
     # Note: As first and last rows are handled separately

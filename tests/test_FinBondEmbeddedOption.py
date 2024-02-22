@@ -44,20 +44,20 @@ discount_curve_matlab = IborSingleCurve(value_dt, [], [], swaps)
 
 bond_matlab = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-call_dates = []
+call_dts = []
 call_prices = []
-put_dates = []
+put_dts = []
 put_prices = []
 
-put_date = Date(1, 1, 2008)
+put_dt = Date(1, 1, 2008)
 for _ in range(0, 24):
-    put_dates.append(put_date)
+    put_dts.append(put_dt)
     put_prices.append(100)
-    put_date = put_date.add_months(1)
+    put_dt = put_dt.add_months(1)
 puttable_bond_matlab = BondEmbeddedOption(issue_dt, maturity_dt, coupon,
                                          freq_type, dc_type,
-                                         call_dates, call_prices,
-                                         put_dates, put_prices)
+                                         call_dts, call_prices,
+                                         put_dts, put_prices)
 
 
 def test_matlab_clean_price_from_discount_curve():
@@ -110,19 +110,19 @@ bond_quantlib = Bond(issue_dt, maturity_dt,
                      coupon, freq_type, dc_type)
 
 nextCallDate = Date(15, 9, 2016)
-call_dates = [nextCallDate]
+call_dts = [nextCallDate]
 call_prices = [100.0]
-put_dates = []
+put_dts = []
 put_prices = []
 for _ in range(1, 24):
     nextCallDate = nextCallDate.add_months(3)
-    call_dates.append(nextCallDate)
+    call_dts.append(nextCallDate)
     call_prices.append(100.0)
 
 puttable_bond_quantlib = BondEmbeddedOption(issue_dt, maturity_dt, coupon,
                                            freq_type, dc_type,
-                                           call_dates, call_prices,
-                                           put_dates, put_prices)
+                                           call_dts, call_prices,
+                                           put_dts, put_prices)
 
 
 def test_quantlib_clean_price_from_discount_curve():

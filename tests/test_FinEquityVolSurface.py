@@ -2,13 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-import numpy as np
 
 
 def test_equity_vol_surface():
@@ -54,18 +54,18 @@ def test_equity_vol_surface():
 
     expiry_dt = expiry_dts[0]
     delta = 0.10
-    vol = equitySurface.vol_from_delta_dt(delta, expiry_dt)
+    vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
     assert round(vol[0], 4) == 0.1544
     assert round(vol[1], 4) == 4032.9156
 
     expiry_dt = expiry_dts[1]
     delta = 0.20
-    vol = equitySurface.vol_from_delta_dt(delta, expiry_dt)
+    vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
     assert round(vol[0], 4) == 0.1555
     assert round(vol[1], 4) == 4019.3793
 
     expiry_dt = expiry_dts[6]
     delta = 0.90
-    vol = equitySurface.vol_from_delta_dt(delta, expiry_dt)
+    vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
     assert round(vol[0], 4) == 0.3498
     assert round(vol[1], 4) == 2199.6665

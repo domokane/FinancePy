@@ -20,8 +20,8 @@ import numpy as np
 def test_dirty_priceCDSIndexOption():
 
     tradeDate = Date(1, 8, 2007)
-    step_in_date = tradeDate.add_days(1)
-    value_dt = step_in_date
+    step_in_dt = tradeDate.add_days(1)
+    value_dt = step_in_dt
 
     libor_curve = build_Ibor_Curve(tradeDate)
 
@@ -46,10 +46,10 @@ def test_dirty_priceCDSIndexOption():
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(step_in_date, maturity3Y, spd3Y)
-        cds5Y = CDS(step_in_date, maturity5Y, spd5Y)
-        cds7Y = CDS(step_in_date, maturity7Y, spd7Y)
-        cds10Y = CDS(step_in_date, maturity10Y, spd10Y)
+        cds3Y = CDS(step_in_dt, maturity3Y, spd3Y)
+        cds5Y = CDS(step_in_dt, maturity5Y, spd5Y)
+        cds7Y = CDS(step_in_dt, maturity7Y, spd7Y)
+        cds10Y = CDS(step_in_dt, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
         issuer_curve = CDSCurve(value_dt,
@@ -71,7 +71,7 @@ def test_dirty_priceCDSIndexOption():
 
     index_coupon = 0.004
     volatility = 0.50
-    expiry_date = Date(1, 2, 2008)
+    expiry_dt = Date(1, 2, 2008)
     maturity_dt = Date(20, 12, 2011)
     notional = 10000.0
     tolerance = 1e-6
@@ -108,7 +108,7 @@ def test_dirty_priceCDSIndexOption():
 
         #######################################################################
 
-        option = CDSIndexOption(expiry_date,
+        option = CDSIndexOption(expiry_dt,
                                 maturity_dt,
                                 index_coupon,
                                 strike / 10000.0,

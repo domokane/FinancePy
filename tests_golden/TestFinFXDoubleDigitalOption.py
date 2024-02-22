@@ -2,17 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+from financepy.products.fx.fx_double_digital_option import FXDoubleDigitalOption
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.date import Date
+from FinTestCases import FinTestCases, globalTestCaseMode
 import time
 import numpy as np
 
 import sys
 sys.path.append("..")
-
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.fx.fx_double_digital_option import FXDoubleDigitalOption
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -23,7 +22,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 def test_FinFXDoubleDigitalOption():
 
     value_dt = Date(10, 4, 2020)
-    expiry_date = Date(18, 9, 2020)
+    expiry_dt = Date(18, 9, 2020)
 
     forName = "EUR"
     domName = "USD"
@@ -33,8 +32,8 @@ def test_FinFXDoubleDigitalOption():
     currency_pair = forName + domName  # Always FORDOM
     spot_fx_rate = 1.20
 
-    dom_discount_curve = DiscountCurveFlat(value_dt, domCCRate)
-    for_discount_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
+    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
 
     volatility = 0.20
 
@@ -46,7 +45,7 @@ def test_FinFXDoubleDigitalOption():
     model = BlackScholes(volatility)
 
     double_digital_option = FXDoubleDigitalOption(
-        expiry_date,
+        expiry_dt,
         upper_strike,
         lower_strike,
         currency_pair,
@@ -59,8 +58,8 @@ def test_FinFXDoubleDigitalOption():
     value = double_digital_option.value(
         value_dt,
         spot_fx_rate,
-        dom_discount_curve,
-        for_discount_curve,
+        domestic_curve,
+        foreign_curve,
         model)
 
 ###############################################################################

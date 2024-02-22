@@ -9,7 +9,7 @@ from financepy.utils.global_types import TouchOptionTypes
 from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
 
 value_dt = Date(1, 1, 2016)
-expiry_date = Date(2, 7, 2016)
+expiry_dt = Date(2, 7, 2016)
 interest_rate = 0.10
 volatility = 0.20
 barrier_level = 100.0  # H
@@ -27,7 +27,7 @@ payment_size = 15.0
 def test_DOWN_AND_IN_CASH_AT_HIT():
     stock_price = 105.0
     downType = TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -52,7 +52,7 @@ def test_DOWN_AND_IN_CASH_AT_HIT():
 def test_DOWN_AND_IN_CASH_AT_EXPIRY():
     stock_price = 105.0
     downType = TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -77,7 +77,7 @@ def test_DOWN_AND_IN_CASH_AT_EXPIRY():
 def test_DOWN_AND_OUT_CASH_OR_NOTHING():
     stock_price = 105.0
     downType = TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -102,7 +102,7 @@ def test_DOWN_AND_OUT_CASH_OR_NOTHING():
 def test_UP_AND_IN_CASH_AT_HIT():
     stock_price = 95.0
     downType = TouchOptionTypes.UP_AND_IN_CASH_AT_HIT
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -127,7 +127,7 @@ def test_UP_AND_IN_CASH_AT_HIT():
 def test_UP_AND_IN_CASH_AT_EXPIRY():
     stock_price = 95.0
     downType = TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -152,7 +152,7 @@ def test_UP_AND_IN_CASH_AT_EXPIRY():
 def test_UP_AND_OUT_CASH_OR_NOTHING():
     stock_price = 95.0
     downType = TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -177,7 +177,7 @@ def test_UP_AND_OUT_CASH_OR_NOTHING():
 def test_DOWN_AND_IN_ASSET_AT_HIT():
     stock_price = 105.0
     downType = TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -202,7 +202,7 @@ def test_DOWN_AND_IN_ASSET_AT_HIT():
 def test_DOWN_AND_IN_ASSET_AT_EXPIRY():
     stock_price = 105.0
     downType = TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -227,7 +227,7 @@ def test_DOWN_AND_IN_ASSET_AT_EXPIRY():
 def test_DOWN_AND_OUT_ASSET_OR_NOTHING():
     stock_price = 105.0
     downType = TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -252,7 +252,7 @@ def test_DOWN_AND_OUT_ASSET_OR_NOTHING():
 def test_UP_AND_IN_ASSET_AT_HIT():
     stock_price = 95.0
     downType = TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -277,7 +277,7 @@ def test_UP_AND_IN_ASSET_AT_HIT():
 def test_UP_AND_IN_ASSET_AT_EXPIRY():
     stock_price = 95.0
     downType = TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)
@@ -302,7 +302,7 @@ def test_UP_AND_IN_ASSET_AT_EXPIRY():
 def test_UP_AND_OUT_ASSET_OR_NOTHING():
     stock_price = 95.0
     downType = TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING
-    option = EquityOneTouchOption(expiry_date,
+    option = EquityOneTouchOption(expiry_dt,
                                   downType,
                                   barrier_level,
                                   payment_size)

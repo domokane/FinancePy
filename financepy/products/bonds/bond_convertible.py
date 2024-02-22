@@ -105,10 +105,10 @@ def _value_convertible(t_mat,
     dt = t_mat / (num_times - 1)
 
     tree_times = np.linspace(0.0, t_mat, num_times)
-    treeDfs = np.zeros(num_times)
+    tree_dfs = np.zeros(num_times)
     for i in range(0, num_times):
         df = _uinterpolate(tree_times[i], df_times, df_values, interp)
-        treeDfs[i] = df
+        tree_dfs[i] = df
 
     h = credit_spread / (1.0 - recovery_rate)
     survival_prob = exp(-h * dt)
@@ -119,11 +119,11 @@ def _value_convertible(t_mat,
     for i in range(0, num_cpns):
         flow_time = cpn_times[i]
         n = int(round(flow_time / dt, 0))
-        treeTime = tree_times[n]
+        tree_time = tree_times[n]
         df_flow = _uinterpolate(flow_time, df_times, df_values, interp)
         df_flow *= exp(-h * flow_time)
-        df_tree = _uinterpolate(treeTime, df_times, df_values, interp)
-        df_tree *= exp(-h * treeTime)
+        df_tree = _uinterpolate(tree_time, df_times, df_values, interp)
+        df_tree *= exp(-h * tree_time)
         tree_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
     # map call onto tree - must have no calls at high value
@@ -143,16 +143,16 @@ def _value_convertible(t_mat,
         tree_put_value[n] = put_prices[i]
 
     # map discrete dividend yields onto tree dates when they are made
-    treeDividendYield = np.zeros(num_times)
+    tree_dividend_yld = np.zeros(num_times)
     numDividends = len(dividend_times)
     for i in range(0, numDividends):
         dividend_time = dividend_times[i]
         n = int(round(dividend_time / dt, 0))
-        treeDividendYield[n] = dividend_yields[i]
+        tree_dividend_yld[n] = dividend_yields[i]
 
     # Set up the tree of stock prices using a 2D matrix - half the matrix is
     # unused but this may be a cost worth bearing for simpler code. Review.
-    treeStockValue = np.zeros(shape=(num_times, num_levels))
+    tree_stock_value = np.zeros(shape=(num_times, num_levels))
     e = stock_volatility ** 2 - h
     if e < 0.0:
         raise FinError("Volatility squared minus the hazard rate is negative.")
@@ -160,47 +160,47 @@ def _value_convertible(t_mat,
     u = exp(sqrt(e * dt))
     d = 1.0 / u
     u2 = u * u
-    treeStockValue[0, 0] = stock_price
+    tree_stock_value[0, 0] = stock_price
     for i_time in range(1, num_times):
-        s = treeStockValue[i_time - 1, 0] * d
-        treeStockValue[i_time, 0] = s
+        s = tree_stock_value[i_time - 1, 0] * d
+        tree_stock_value[i_time, 0] = s
 
         for i_node in range(1, i_time + 1):
             s = s * u2
-            treeStockValue[i_time, i_node] = s
+            tree_stock_value[i_time, i_node] = s
 
         # we now reduce all stocks by the same yield amount at the same date
-        y = treeDividendYield[i_time]
+        y = tree_dividend_yld[i_time]
         for i_node in range(0, i_time + 1):
-            treeStockValue[i_time, i_node] *= (1.0 - y)
+            tree_stock_value[i_time, i_node] *= (1.0 - y)
 
     # set up the tree of conversion values. Before allowed to convert the
     # conversion value must be set equal to zero
 
-    treeConvertValue = np.zeros(shape=(num_times, num_levels))
+    tree_convert_value = np.zeros(shape=(num_times, num_levels))
     for i_time in range(0, num_times):
         if tree_times[i_time] >= start_convert_time:
             for i_node in range(0, i_time + 1):
-                s = treeStockValue[i_time, i_node]
-                treeConvertValue[i_time, i_node] = s * conv_ratio * 1.0
+                s = tree_stock_value[i_time, i_node]
+                tree_convert_value[i_time, i_node] = s * conv_ratio * 1.0
 
-    #    print_tree(treeConvertValue)
+    #    print_tree(tree_convert_value)
 
-    treeConvBondValue = np.zeros(shape=(num_times, num_levels))
+    tree_convert_bond_value = np.zeros(shape=(num_times, num_levels))
 
     # store probability of up move as a function of time on the tree
-    treeProbsUp = np.zeros(num_times)
-    treeProbsDn = np.zeros(num_times)
+    tree_probs_up = np.zeros(num_times)
+    tree_probs_dn = np.zeros(num_times)
     q = 0.0  # we have discrete dividends paid as dividend yields only
     for i_time in range(1, num_times):
-        a = treeDfs[i_time - 1] / treeDfs[i_time] * exp(-q * dt)
-        treeProbsUp[i_time] = (a - d * survival_prob) / (u - d)
-        treeProbsDn[i_time] = (u * survival_prob - a) / (u - d)
+        a = tree_dfs[i_time - 1] / tree_dfs[i_time] * exp(-q * dt)
+        tree_probs_up[i_time] = (a - d * survival_prob) / (u - d)
+        tree_probs_dn[i_time] = (u * survival_prob - a) / (u - d)
     #        r = log(a)/dt
     #        n_min = r*r / stock_volatility / stock_volatility
 
-    if np.any(treeProbsUp > 1.0):
-        raise FinError("pUp > 1.0. Increase time steps.")
+    if np.any(tree_probs_up > 1.0):
+        raise FinError("p_up > 1.0. Increase time steps.")
 
     ###########################################################################
     # work backwards by first setting values at bond maturity date
@@ -209,43 +209,46 @@ def _value_convertible(t_mat,
     flow = tree_flows[num_times - 1]
     bullet_pv = (1.0 + flow) * face_amount
     for i_node in range(0, num_levels):
-        convValue = treeConvertValue[num_times - 1, i_node]
-        treeConvBondValue[num_times - 1, i_node] = max(bullet_pv, convValue)
+        convValue = tree_convert_value[num_times - 1, i_node]
+        tree_convert_bond_value[num_times - 1,
+                                i_node] = max(bullet_pv, convValue)
 
     #  begin backward steps from expiry
     for i_time in range(num_times - 2, -1, -1):
 
-        pUp = treeProbsUp[i_time + 1]
-        pDn = treeProbsDn[i_time + 1]
+        p_up = tree_probs_up[i_time + 1]
+        p_dn = tree_probs_dn[i_time + 1]
         pDef = 1.0 - survival_prob
-        df = treeDfs[i_time + 1] / treeDfs[i_time]
+        df = tree_dfs[i_time + 1] / tree_dfs[i_time]
         call = tree_call_value[i_time]
         put = tree_put_value[i_time]
         flow = tree_flows[i_time]
 
         for i_node in range(0, i_time + 1):
-            futValueUp = treeConvBondValue[i_time + 1, i_node + 1]
-            futValueDn = treeConvBondValue[i_time + 1, i_node]
-            hold = pUp * futValueUp + pDn * futValueDn  # pUp already embeds Q
-            holdPV = df * hold + pDef * df * recovery_rate * face_amount \
+            fut_value_up = tree_convert_bond_value[i_time + 1, i_node + 1]
+            fut_value_dn = tree_convert_bond_value[i_time + 1, i_node]
+            hold = p_up * fut_value_up + p_dn * fut_value_dn  # p_up already embeds Q
+            hold_pv = df * hold + pDef * df * recovery_rate * face_amount \
                 + flow * face_amount
-            conv = treeConvertValue[i_time, i_node]
-            value = min(max(holdPV, conv, put), call)
-            treeConvBondValue[i_time, i_node] = value
+            conv = tree_convert_value[i_time, i_node]
+            value = min(max(hold_pv, conv, put), call)
+            tree_convert_bond_value[i_time, i_node] = value
 
         bullet_pv = df * bullet_pv * survival_prob
         bullet_pv += pDef * df * recovery_rate * face_amount
         bullet_pv += flow * face_amount
 
-    price = treeConvBondValue[0, 0]
-    delta = (treeConvBondValue[1, 1] - treeConvBondValue[1, 0]) / \
-            (treeStockValue[1, 1] - treeStockValue[1, 0])
-    delta_up = (treeConvBondValue[2, 3] - treeConvBondValue[2, 2]) / \
-              (treeStockValue[2, 3] - treeStockValue[2, 2])
-    delta_dn = (treeConvBondValue[2, 2] - treeConvBondValue[2, 1]) / \
-              (treeStockValue[2, 2] - treeStockValue[2, 1])
-    gamma = (delta_up - delta_dn) / (treeStockValue[1, 1] - treeStockValue[1, 0])
-    theta = (treeConvBondValue[2, 2] - treeConvBondValue[0, 0]) / (2.0 * dt)
+    price = tree_convert_bond_value[0, 0]
+    delta = (tree_convert_bond_value[1, 1] - tree_convert_bond_value[1, 0]) / \
+            (tree_stock_value[1, 1] - tree_stock_value[1, 0])
+    delta_up = (tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]) / \
+        (tree_stock_value[2, 3] - tree_stock_value[2, 2])
+    delta_dn = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]) / \
+        (tree_stock_value[2, 2] - tree_stock_value[2, 1])
+    gamma = (delta_up - delta_dn) / \
+        (tree_stock_value[1, 1] - tree_stock_value[1, 0])
+    theta = (tree_convert_bond_value[2, 2] -
+             tree_convert_bond_value[0, 0]) / (2.0 * dt)
     results = np.array([price, bullet_pv, delta, gamma, theta])
     return results
 

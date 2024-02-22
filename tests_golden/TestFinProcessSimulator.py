@@ -23,7 +23,7 @@ def test_FinProcessSimulator():
     import time
 
     num_paths = 20000
-    numAnnSteps = 100
+    num_annual_steps = 100
     seed = 1919
     t = 1.0
     modelSim = FinProcessSimulator()
@@ -41,7 +41,7 @@ def test_FinProcessSimulator():
         ProcessTypes.GBM,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -63,7 +63,7 @@ def test_FinProcessSimulator():
         ProcessTypes.GBM,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -87,7 +87,7 @@ def test_FinProcessSimulator():
         ProcessTypes.HESTON,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -111,7 +111,7 @@ def test_FinProcessSimulator():
         ProcessTypes.HESTON,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -135,7 +135,7 @@ def test_FinProcessSimulator():
         ProcessTypes.HESTON,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -157,7 +157,7 @@ def test_FinProcessSimulator():
         ProcessTypes.VASICEK,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -179,7 +179,7 @@ def test_FinProcessSimulator():
         ProcessTypes.VASICEK,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()
@@ -201,7 +201,7 @@ def test_FinProcessSimulator():
         ProcessTypes.CIR,
         t,
         model_params,
-        numAnnSteps,
+        num_annual_steps,
         num_paths,
         seed)
     end = time.time()

@@ -12,7 +12,7 @@ from financepy.models.process_simulator import ProcessTypes
 
 
 value_dt = Date(1, 1, 2015)
-expiry_date = Date(1, 1, 2016)
+expiry_dt = Date(1, 1, 2016)
 currency_pair = "USDJPY"
 volatility = 0.20
 dom_interest_rate = 0.05
@@ -24,8 +24,8 @@ notional_currency = "USD"
 drift = dom_interest_rate - forInterestRate
 scheme = FinGBMNumericalScheme.ANTITHETIC
 process_type = ProcessTypes.GBM
-dom_discount_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-for_discount_curve = DiscountCurveFlat(value_dt, forInterestRate)
+domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
+foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
 model = BlackScholes(volatility)
 num_observations_per_year = 100
 
@@ -37,7 +37,7 @@ def test_DOWN_AND_OUT_CALL():
     spot_fx_rate = 50
     option_type = FinFXBarrierTypes.DOWN_AND_OUT_CALL
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -48,26 +48,26 @@ def test_DOWN_AND_OUT_CALL():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 0.0000
@@ -80,7 +80,7 @@ def test_DOWN_AND_IN_CALL():
     spot_fx_rate = 100
     option_type = FinFXBarrierTypes.DOWN_AND_IN_CALL
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -91,26 +91,26 @@ def test_DOWN_AND_IN_CALL():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 9.2270
@@ -123,7 +123,7 @@ def test_UP_AND_OUT_CALL():
     spot_fx_rate = 50
     option_type = FinFXBarrierTypes.UP_AND_OUT_CALL
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -134,26 +134,26 @@ def test_UP_AND_OUT_CALL():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 0.0003
@@ -166,7 +166,7 @@ def test_UP_AND_IN_CALL():
     spot_fx_rate = 100
     option_type = FinFXBarrierTypes.UP_AND_IN_CALL
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -177,26 +177,26 @@ def test_UP_AND_IN_CALL():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 9.2067
@@ -209,7 +209,7 @@ def test_UP_AND_OUT_PUT():
     spot_fx_rate = 50
     option_type = FinFXBarrierTypes.UP_AND_OUT_PUT
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -220,26 +220,26 @@ def test_UP_AND_OUT_PUT():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 46.1145
@@ -252,7 +252,7 @@ def test_UP_AND_IN_PUT():
     spot_fx_rate = 100
     option_type = FinFXBarrierTypes.UP_AND_IN_PUT
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -263,26 +263,26 @@ def test_UP_AND_IN_PUT():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 2.7444
@@ -295,7 +295,7 @@ def test_DOWN_AND_OUT_PUT():
     spot_fx_rate = 50
     option_type = FinFXBarrierTypes.DOWN_AND_OUT_PUT
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -306,26 +306,26 @@ def test_DOWN_AND_OUT_PUT():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 0.0000
@@ -338,7 +338,7 @@ def test_DOWN_AND_IN_PUT():
     spot_fx_rate = 100
     option_type = FinFXBarrierTypes.DOWN_AND_IN_PUT
 
-    barrier_option = FXBarrierOption(expiry_date,
+    barrier_option = FXBarrierOption(expiry_dt,
                                      K,
                                      currency_pair,
                                      option_type,
@@ -349,26 +349,26 @@ def test_DOWN_AND_IN_PUT():
 
     value = barrier_option.value(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     delta = barrier_option.delta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     vega = barrier_option.vega(value_dt,
                                spot_fx_rate,
-                               dom_discount_curve,
-                               for_discount_curve,
+                               domestic_curve,
+                               foreign_curve,
                                model)
 
     theta = barrier_option.theta(value_dt,
                                  spot_fx_rate,
-                                 dom_discount_curve,
-                                 for_discount_curve,
+                                 domestic_curve,
+                                 foreign_curve,
                                  model)
 
     assert round(value, 4) == 6.3301

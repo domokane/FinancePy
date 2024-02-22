@@ -2,8 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from financepy.models.cir_mc import CIRNumericalScheme
-from financepy.models.cir_mc import zero_price_mc, zero_price
+from financepy.models.cir_montecarlo import CIRNumericalScheme
+from financepy.models.cir_montecarlo import zero_price_mc, zero_price
 import numpy as np
 
 r0 = 0.05

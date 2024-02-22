@@ -57,6 +57,7 @@ class IborCapVolCurve():
 
         self._cap_sigmas = np.array(cap_sigmas)
         self._caplet_gammas = []
+        self._caplet_vols = []
 
         # Basic validation of dates
         prev_dt = self._curve_dt
@@ -90,7 +91,7 @@ class IborCapVolCurve():
 
         day_counter = DayCount(self._dc_type)
         prev_dt = self._curve_dt
-        numCaps = len(self._cap_maturity_dts)
+        num_caps = len(self._cap_maturity_dts)
 
         for dt in self._cap_maturity_dts:
             t = (dt - self._curve_dt) / gDaysInYear
@@ -99,25 +100,25 @@ class IborCapVolCurve():
             self._taus.append(tau)
             prev_dt = dt
 
-        fwd_rateVol = self._cap_sigmas[0]
-        self._caplet_gammas = np.zeros(numCaps)
+        fwd_rate_vol = self._cap_sigmas[0]
+        self._caplet_gammas = np.zeros(num_caps)
         self._caplet_gammas[0] = 0.0
-        cumIbor2Tau = (fwd_rateVol**2) * self._taus[0]
+        cum_ibor2_tau = (fwd_rate_vol**2) * self._taus[0]
 
-        sumTau = 0.0
+        sum_tau = 0.0
         for i in range(1, len(self._cap_maturity_dts)):
             t = self._times[i]
             tau = self._taus[i]
-            sumTau += tau
-            volCap = self._cap_sigmas[i]
-            volIbor2 = ((volCap**2) * sumTau - cumIbor2Tau) / tau
+            sum_tau += tau
+            vol_cap = self._cap_sigmas[i]
+            vol_ibor2 = ((vol_cap**2) * sum_tau - cum_ibor2_tau) / tau
 
-            if volIbor2 < 0.0:
+            if vol_ibor2 < 0.0:
                 raise FinError("Error due to negative caplet variance.")
 
-            volIbor = np.sqrt(volIbor2)
-            self._caplet_gammas[i] = volIbor
-            cumIbor2Tau += volIbor2 * self._taus[i]
+            vol_ibor = np.sqrt(vol_ibor2)
+            self._caplet_gammas[i] = vol_ibor
+            cum_ibor2_tau += vol_ibor2 * self._taus[i]
 
 ###############################################################################
 
@@ -188,10 +189,10 @@ class IborCapVolCurve():
         for i in range(0, num_times):
             t = self._times[i]
             tau = self._taus[i]
-            volCap = self._cap_sigmas[i]
-            fwdIborVol = self._capletVols[i]
+            vol_cap = self._cap_sigmas[i]
+            fwd_ibor_vol = self._caplet_vols[i]
             s += label_to_string("%7.4f  %6.4f  %9.4f  %9.4f"
-                                 % (t, tau, volCap*100.0, fwdIborVol*100.0))
+                                 % (t, tau, vol_cap*100.0, fwd_ibor_vol*100.0))
 
         return s
 

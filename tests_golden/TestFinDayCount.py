@@ -25,10 +25,10 @@ def test_FinDayCount():
 
         start_dt = Date(1, 1, 2019)
         next_dt = start_dt
-        numDays = 20
+        num_days = 20
         day_count = DayCount(day_count_method)
 
-        for _ in range(0, numDays):
+        for _ in range(0, num_days):
             next_dt = next_dt.add_days(7)
             dcf = day_count.year_frac(
                 start_dt, next_dt, next_dt, finFreq)

@@ -35,17 +35,17 @@ def test_HullBookExamples(capsys):
     ###########################################################################
 
     use_sobol = 1
-    numeraireIndex = 0
+    numeraire_index = 0
 
     # We need the volatility for the forward rates out to the one starting in
     # 10 years. So we have 11 elements. The one starting today has zero vol.
-    numFactors = 1
+    num_factors = 1
     gammas1FList = [0.00, 0.1550, 0.2063674, 0.1720986, 0.1721993, 0.1524579,
                     0.1414779, 0.1297711, 0.1381053, 0.135955, 0.1339842]
     gammas1F = np.array(gammas1FList)
 
     # One factor model
-    fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraireIndex, fwd0,
+    fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraire_index, fwd0,
                                   gammas1F, taus, use_sobol, seed)
 
 #    LMMPrintForwards(fwds1F)
@@ -68,13 +68,13 @@ def test_HullBookExamples(capsys):
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
-    numFactors = 1
+    num_factors = 1
     lambdas1FList = [[0.0, 0.1550, 0.2064, 0.1721, 0.1722, 0.1525,
                       0.1415, 0.1298, 0.1381, 0.1360, 0.1340]]
     lambdas1F = np.array(lambdas1FList)
 
     # One factor model
-    fwdsMF = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+    fwdsMF = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
                                   fwd0, lambdas1F, taus, use_sobol, seed)
 
     vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
@@ -93,7 +93,7 @@ def test_HullBookExamples(capsys):
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
-    numFactors = 3
+    num_factors = 3
     lambdas3FList = [[0.00, 0.1365, 0.1928, 0.1672, 0.1698, 0.1485,
                       0.1395, 0.1261, 0.1290, 0.1197, 0.1097],
                      [0.0, -0.0662, -0.0702, -0.0406, -0.0206, 0.00,
@@ -103,7 +103,7 @@ def test_HullBookExamples(capsys):
     lambdas3F = np.array(lambdas3FList)
 
     # Three factor model
-    fwds3F = lmm_simulate_fwds_mf(numFwds, numFactors, num_paths, numeraireIndex,
+    fwds3F = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
                                   fwd0, lambdas3F, taus, use_sobol, seed)
 
     hullRatchetCaplets3F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,

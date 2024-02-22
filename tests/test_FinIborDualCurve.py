@@ -33,99 +33,99 @@ def buildOIS(value_dt):
 
     swaps = []
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-    fixedDCCType = DayCountTypes.ACT_365F
+    fixed_dcc_type = DayCountTypes.ACT_365F
 
     swap_rate = 0.000022
     maturity_dt = settle_dt.add_months(24)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
-               fixed_freq_type, fixedDCCType)
+               fixed_freq_type, fixed_dcc_type)
     swaps.append(swap)
 
     swap_rate += 0.000
     fixed_leg_type = SwapTypes.PAY
     maturity_dt = settle_dt.add_months(36)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
-               fixed_freq_type, fixedDCCType)
+               fixed_freq_type, fixed_dcc_type)
     swaps.append(swap)
 
     swap_rate += 0.000
     maturity_dt = settle_dt.add_months(48)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     swap_rate = 0.02
     maturity_dt = settle_dt.add_months(60)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(72)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(84)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(96)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(108)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(120)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(132)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(144)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(180)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(240)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(300)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     maturity_dt = settle_dt.add_months(360)
     swap = OIS(settle_dt, maturity_dt, fixed_leg_type, swap_rate,
                fixed_freq_type,
-               fixedDCCType)
+               fixed_dcc_type)
     swaps.append(swap)
 
     oisCurve = OISCurve(value_dt,

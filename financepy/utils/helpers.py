@@ -9,7 +9,7 @@ from typing import Union
 from prettytable import PrettyTable
 
 from .date import Date
-from .global_vars import gDaysInYear, gSmall
+from .global_vars import gDaysInYear, g_small
 from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
@@ -30,7 +30,7 @@ def grid_index(t, grid_times):
     n = len(grid_times)
     for i in range(0, n):
         grid_time = grid_times[i]
-        if abs(grid_time - t) < gSmall:
+        if abs(grid_time - t) < g_small:
             print(t, grid_times, i)
             return i
 
@@ -95,7 +95,7 @@ def times_from_dates(dt: (Date, list),
         dc_counter = DayCount(day_count_type)
 
     if isinstance(dt, Date):
-        num_dates = 1
+        num_dts = 1
         times = [None]
         if dc_counter is None:
             times[0] = (dt - value_dt) / gDaysInYear
@@ -105,9 +105,9 @@ def times_from_dates(dt: (Date, list),
         return times[0]
 
     elif isinstance(dt, list) and isinstance(dt[0], Date):
-        num_dates = len(dt)
+        num_dts = len(dt)
         times = []
-        for i in range(0, num_dates):
+        for i in range(0, num_dts):
             if dc_counter is None:
                 t = (dt[i] - value_dt) / gDaysInYear
             else:
@@ -146,7 +146,7 @@ def check_vector_differences(x: np.ndarray,
 ###############################################################################
 
 
-def check_date(d: Date):
+def check_dt(d: Date):
     """ Check that input d is a Date. """
 
     if isinstance(d, Date) is False:
@@ -221,7 +221,7 @@ def input_time(dt: Date,
     def check(t):
         if t < 0.0:
             raise FinError("Date " + str(dt) +
-                           " is before curve date " + str(curve._curve_date))
+                           " is before curve date " + str(curve._curve_dt))
         elif t < small:
             t = small
         return t
@@ -299,11 +299,11 @@ def normalise_weights(wt_vector: np.ndarray):
     """ Normalise a vector of weights so that they sum up to 1.0. """
 
     n = len(wt_vector)
-    sumWts = 0.0
+    sum_wts = 0.0
     for i in range(0, n):
-        sumWts += wt_vector[i]
+        sum_wts += wt_vector[i]
     for i in range(0, n):
-        wt_vector[i] = wt_vector[i] / sumWts
+        wt_vector[i] = wt_vector[i] / sum_wts
     return wt_vector
 
 
@@ -472,7 +472,7 @@ def accrued_tree(grid_times: np.ndarray,
         cpn_time = grid_times[i_grid]
         cpn_flow = grid_flows[i_grid]
 
-        if grid_flows[i_grid] > gSmall:
+        if grid_flows[i_grid] > g_small:
             cpn_times = np.append(cpn_times, cpn_time)
             cpn_flows = np.append(cpn_flows, cpn_flow)
 

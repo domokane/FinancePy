@@ -15,7 +15,7 @@ from ..utils.helpers import uniform_to_default_time
 
 
 def default_times_gc(issuer_curves,
-                     correlation_matrix,
+                     corr_matrix,
                      num_trials,
                      seed):
     """ Generate a matrix of default times by credit and trial using a
@@ -24,7 +24,7 @@ def default_times_gc(issuer_curves,
     np.random.seed(seed)
     num_credits = len(issuer_curves)
     x = np.random.normal(0.0, 1.0, size=(num_credits, num_trials))
-    c = np.linalg.cholesky(correlation_matrix)
+    c = np.linalg.cholesky(corr_matrix)
     y = np.dot(c, x)
 
     corr_times = np.empty(shape=(num_credits, 2 * num_trials))

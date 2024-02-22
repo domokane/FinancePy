@@ -53,14 +53,14 @@ class BondFuture:
 
         issue_dt = Date(new_mat._d, new_mat._m, 2000)
 
-        newBond = Bond(issue_dt,
+        new_bond = Bond(issue_dt,
                        new_mat,
                        bond._cpn,
                        bond._freq_type,
                        bond._dc_type,
                        ex_div_days)
 
-        p = newBond.clean_price_from_ytm(self._first_delivery_dt,
+        p = new_bond.clean_price_from_ytm(self._first_delivery_dt,
                                          self._cpn)
 
         # Convention is to round the conversion factor to 4dp
@@ -105,17 +105,18 @@ class BondFuture:
                             futures_price: float):
         """ Determination of CTD as deliverable bond with the lowest cost to buy
         versus what is received when the bond is delivered. """
-        ctdBond = None
-        ctdNet = -self._contract_size * 100
+        ctd_bond = None
+        ctd_net = -self._contract_size * 100
         for bondCleanPrice, bond in zip(bond_clean_prices, bonds):
-            receiveOnFuture = self.principal_invoice_price(bond, futures_price)
-            payForBond = self._contract_size * bondCleanPrice / 100.0
-            net = receiveOnFuture - payForBond
-            if net > ctdNet:
-                ctdBond = bond
-                ctdNet = net
+            receive_on_future = self.principal_invoice_price(
+                bond, futures_price)
+            pay_for_bond = self._contract_size * bondCleanPrice / 100.0
+            net = receive_on_future - pay_for_bond
+            if net > ctd_net:
+                ctd_bond = bond
+                ctd_net = net
 
-        return ctdBond
+        return ctd_bond
 
 ###############################################################################
 
@@ -124,10 +125,10 @@ class BondFuture:
                            bond_clean_price: float,
                            futures_price: float):
         """ Determination of what is received when the bond is delivered. """
-        receiveOnFuture = self.principal_invoice_price(bond, futures_price)
-        payForBond = self._contract_size * bond_clean_price / 100.0
-        net = receiveOnFuture - payForBond
-        return net, payForBond, receiveOnFuture
+        receive_on_future = self.principal_invoice_price(bond, futures_price)
+        pay_for_bond = self._contract_size * bond_clean_price / 100.0
+        net = receive_on_future - pay_for_bond
+        return net, pay_for_bond, receive_on_future
 
 ###############################################################################
 

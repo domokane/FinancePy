@@ -420,18 +420,18 @@ def test_dirty_priceCDS1():
     accrued_interest = cds_contract.accrued_interest()
     test_cases.print("ACCRUED_COUPON", accrued_interest)
 
-    prot_pv = cds_contract.protection_leg_pv(
+    prot_pv = cds_contract.prot_leg_pv(
         value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PROTECTION_PV", prot_pv)
+    test_cases.print("prot_PV", prot_pv)
 
     premPV = cds_contract.premium_leg_pv(
         value_dt, issuer_curve, cdsRecovery)
     test_cases.print("PREMIUM_PV", premPV)
 
-    dirtyRPV01, cleanRPV01 = cds_contract.risky_pv01(
+    dirty_rpv01, clean_rpv01 = cds_contract.risky_pv01(
         value_dt, issuer_curve)
-    test_cases.print("DIRTY_RPV01", dirtyRPV01)
-    test_cases.print("CLEAN_RPV01", cleanRPV01)
+    test_cases.print("DIRTY_RPV01", dirty_rpv01)
+    test_cases.print("CLEAN_RPV01", clean_rpv01)
 
     # cds_contract.print_payments(issuer_curve)
 
@@ -635,9 +635,9 @@ def test_dirty_priceCDSModelCheck():
     accrued_interest = cds_contract.accrued_interest()
     test_cases.print("ACCRUED_COUPON", accrued_interest)
 
-    prot_pv = cds_contract.protection_leg_pv(
+    prot_pv = cds_contract.prot_leg_pv(
         value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PROTECTION_PV", prot_pv)
+    test_cases.print("prot_PV", prot_pv)
 
     premPV = cds_contract.premium_leg_pv(
         value_dt, issuer_curve, cdsRecovery)

@@ -3,11 +3,11 @@
 ##############################################################################
 
 
-import numpy as np
 from enum import Enum
+import numpy as np
 
 
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...products.equity.equity_option import EquityOption
@@ -87,8 +87,8 @@ class EquityDigitalOption(EquityOption):
 
         s0 = s
         X = self._barrier
-        lnS0k = np.log(s0 / X)
-        sqrtT = np.sqrt(t)
+        ln_s0_k = np.log(s0 / X)
+        sqrt_t = np.sqrt(t)
 
         df = discount_curve.df(self._expiry_dt)
         r = -np.log(df)/t
@@ -98,12 +98,12 @@ class EquityDigitalOption(EquityOption):
 
         volatility = model._volatility
 
-        if abs(volatility) < gSmall:
-            volatility = gSmall
+        if abs(volatility) < g_small:
+            volatility = g_small
 
-        d1 = (lnS0k + (r - q + volatility*volatility / 2.0) * t)
-        d1 = d1 / volatility / sqrtT
-        d2 = d1 - volatility * sqrtT
+        d1 = (ln_s0_k + (r - q + volatility*volatility / 2.0) * t)
+        d1 = d1 / volatility / sqrt_t
+        d2 = d1 - volatility * sqrt_t
 
         if self._digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
 

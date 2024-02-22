@@ -26,12 +26,12 @@ def _f(df, *args):
     curve = args[0]
     value_dt = args[1]
     bond = args[2]
-    marketCleanPrice = args[3]
+    mkt_clean_price = args[3]
     num_points = len(curve._times)
     curve._values[num_points - 1] = df
-    bondDiscountPrice = bond.clean_price_from_discount_curve(
+    bond_discount_price = bond.clean_price_from_discount_curve(
         value_dt, curve)
-    obj_fn = bondDiscountPrice - marketCleanPrice
+    obj_fn = bond_discount_price - mkt_clean_price
     return obj_fn
 
 ###############################################################################
@@ -186,9 +186,9 @@ class BondZeroCurve(DiscountCurve):
         # TODO
         header = "TIMES,DISCOUNT FACTORS"
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        valueTable = [self._times, self._values]
+        value_table = [self._times, self._values]
         precision = "10.7f"
-        s += table_to_string(header, valueTable, precision)
+        s += table_to_string(header, value_table, precision)
         return s
 
 ###############################################################################

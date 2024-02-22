@@ -1,6 +1,6 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 
 import numpy as np
@@ -9,7 +9,7 @@ from .interpolator import Interpolator, InterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import gDaysInYear, gSmall
+from ...utils.global_vars import gDaysInYear, g_small
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.math import test_monotonicity
@@ -89,7 +89,7 @@ class DiscountCurve:
     ###########################################################################
 
     def _zero_to_df(self,
-                    value_dt: Date,  # TODO: why is value_date not used ?
+                    value_dt: Date,  # TODO: why is value_dt not used ?
                     rates: (float, np.ndarray),
                     times: (float, np.ndarray),
                     freq_type: FrequencyTypes,
@@ -101,7 +101,7 @@ class DiscountCurve:
         if isinstance(times, float):
             times = np.array([times])
 
-        t = np.maximum(times, gSmall)
+        t = np.maximum(times, g_small)
 
         f = annual_frequency(freq_type)
 
@@ -147,17 +147,17 @@ class DiscountCurve:
         if len(date_list) != len(df_list):
             raise FinError("Date list and df list do not have same length")
 
-        num_dts = len(date_list)
+        num_dates = len(date_list)
         zero_rates = []
 
         times = times_from_dates(
             date_list, self._value_dt, dc_type)
 
-        for i in range(0, num_dts):
+        for i in range(0, num_dates):
 
             df = df_list[i]
 
-            t = max(times[i], gSmall)
+            t = max(times[i], g_small)
 
             if freq_type == FrequencyTypes.CONTINUOUS:
                 r = -np.log(df) / t
@@ -269,7 +269,7 @@ class DiscountCurve:
                 pv01 += alpha * df
                 prev_dt = next_dt
 
-            if abs(pv01) < gSmall:
+            if abs(pv01) < g_small:
                 par_rate = 0.0
             else:
                 df_start = self.df(effective_dt)
@@ -424,9 +424,9 @@ class DiscountCurve:
 
         day_count = DayCount(dc_type)
 
-        num_dts = len(start_dts)
+        num_dates = len(start_dts)
         fwd_rates = []
-        for i in range(0, num_dts):
+        for i in range(0, num_dates):
             dt1 = start_dts[i]
 
             if isinstance(date_or_tenor, str):

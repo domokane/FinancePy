@@ -39,8 +39,8 @@ def test_HullWhiteExampleOne():
     a = 0.1
     num_time_steps = 3
     model = HWTree(sigma, a, num_time_steps)
-    treeMat = (end_dt - start_dt)/gDaysInYear
-    model.build_tree(treeMat, times, dfs)
+    tree_mat = (end_dt - start_dt)/gDaysInYear
+    model.build_tree(tree_mat, times, dfs)
 #   print_tree(model._Q)
 #   print("")
 #   print_tree(model._rt)
