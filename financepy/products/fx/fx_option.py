@@ -49,7 +49,7 @@ class FXOption:
                               domestic_curve,
                               foreign_curve, model)
 
-        if type(v_bumped) is dict:
+        if isinstance(v_bumped, dict):
             delta = (v_bumped['value'] - v['value']) / bump
         else:
             delta = (v_bumped - v) / bump

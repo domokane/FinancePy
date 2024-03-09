@@ -16,8 +16,6 @@ from ..utils.helpers import label_to_string
 ###############################################################################
 
 ###############################################################################
-###############################################################################
-
 
 @njit
 def _x(rho, z):
@@ -26,6 +24,7 @@ def _x(rho, z):
     b = 1.0 - rho
     return np.log(a / b)
 
+###############################################################################
 
 @njit
 def vol_function_shifted_sabr(params, f, k, t):
@@ -66,9 +65,9 @@ def vol_function_shifted_sabr(params, f, k, t):
         vz = alpha * z * (1.0 + (a + b + c) * t) / \
             (d * (1.0 + v + w) * _x(rho, z))
         return vz
-    else:
-        v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
-        return v0
+
+    v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
+    return v0
 
 ###############################################################################
 
@@ -112,7 +111,6 @@ class SABRShifted():
                 v = vol_function_shifted_sabr(params, f, x, t)
                 vols.append(v)
             return np.array(vols)
-
         elif isinstance(t, np.ndarray):
             vols = []
             for x in t:

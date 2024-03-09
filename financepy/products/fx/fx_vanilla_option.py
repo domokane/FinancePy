@@ -292,12 +292,11 @@ class FXVanillaOption():
         k = self._strike_fx_rate
         f0t = s0 * np.exp((r_d-r_f)*tdel)
 
-        if type(model) == BlackScholes or \
-           type(model) == SABR:
+        if isinstance(model, BlackScholes) or isinstance(model, SABR):
 
             if isinstance(model, BlackScholes):
                 volatility = model._volatility
-            elif type(model) == SABR:
+            elif isinstance(model, SABR):
 
                 params_list = np.array([model._alpha,
                                         model._beta,

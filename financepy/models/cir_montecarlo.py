@@ -148,10 +148,10 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
-        for i_path in range(0, num_paths):
+        for _ in range(0, num_paths):
 
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps-1)
 
             for i_step in range(1, num_steps):
                 r = r + a * (b - r) * dt + \
@@ -166,7 +166,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         for i_path in range(0, num_paths):
 
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 mean = x * r + b * y
@@ -183,7 +183,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         for i_path in range(0, num_paths):
 
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 r = r + a * (b - r) * dt + \
@@ -199,7 +199,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         for i_path in range(0, num_paths):
 
             r = r0
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 beta = z[i_step - 1] / sqrt_dt
@@ -254,7 +254,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
             r = r0
             rsum = r
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 r_prev = r
@@ -274,7 +274,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
             r = r0
             rsum = r0
 
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 mean = x * r + b * y
@@ -295,7 +295,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
             r = r0
             rsum = r
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 r_prev = r
@@ -315,7 +315,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
             r = r0
             rsum = r
-            z = np.random.normal(0.0, 1.0, size=(num_steps - 1))
+            z = np.random.normal(0.0, 1.0, size=num_steps - 1)
 
             for i_step in range(1, num_steps):
                 beta = z[i_step - 1] / sqrt_dt

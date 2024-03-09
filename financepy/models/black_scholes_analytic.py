@@ -53,8 +53,7 @@ def bs_delta(s, t, k, r, q, v, option_type_value):
     elif option_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
-        raise FinError("Unknown option type value")
-        return 0.0
+        raise FinError("Error: Unknown option type value")
 
     k = np.maximum(k, g_small)
     t = np.maximum(t, g_small)
@@ -247,17 +246,17 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     else:
         intrinsic_value = np.exp(-r*t) * max(k - fwd, 0.0)
 
-    divAdjStockPrice = s * np.exp(-q * t)
+    div_adj_stock_price = s * np.exp(-q * t)
     df = np.exp(-r * t)
 
     # Flip ITM call option to be OTM put and vice-versa using put call parity
     if intrinsic_value > 0.0:
 
         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
-            price = price - (divAdjStockPrice - k * df)
+            price = price - (div_adj_stock_price - k * df)
             option_type_value = OptionTypes.EUROPEAN_PUT.value
         else:
-            price = price + (divAdjStockPrice - k * df)
+            price = price + (div_adj_stock_price - k * df)
             option_type_value = OptionTypes.EUROPEAN_CALL.value
 
         # Update intrinsic based on new option type
@@ -280,7 +279,7 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     if option_type_value == OptionTypes.EUROPEAN_CALL.value:
         call = price
     else:
-        call = price + (divAdjStockPrice - k * df)
+        call = price + (div_adj_stock_price - k * df)
 
     # Notation in SSRN-id567721.pdf
     X = k * np.exp(-r*t)
@@ -315,10 +314,9 @@ def bs_implied_volatility(s, t, k, r, q, price, option_type_value):
     hsigma = 0.0
     gamma = 2.0
     arg = (2*call+X-S)**2 - gamma * (S+X)*(S-X)*(S-X) / pi / S
-
     arg = max(arg, 0.0)
 
-    hsigma = (2 * call + X - S + np.sqrt(arg))
+    hsigma = 2.0 * call + X - S + np.sqrt(arg)
     hsigma = hsigma * np.sqrt(2.0*pi) / 2.0 / (S+X)
     hsigma = hsigma / np.sqrt(t)
 

@@ -127,7 +127,7 @@ class FXDigitalOption:
         s0 = spot_fx_rate
         K = self._strike_fx_rate
 
-        if type(model) == BlackScholes:
+        if isinstance(model, BlackScholes):
 
             volatility = model._volatility
             ln_s0_k = np.log(s0 / K)

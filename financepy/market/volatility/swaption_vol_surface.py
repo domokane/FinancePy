@@ -167,8 +167,8 @@ def _solve_to_horizon(t, f,
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
 
-    print("t: %9.5f alpha:%9.5f beta: %9.5f rho: %9.5f nu: %9.5f" %
-          (t, xopt[0], 0.5, xopt[1], xopt[2]))
+    # print("t: %9.5f alpha:%9.5f beta: %9.5f rho: %9.5f nu: %9.5f" %
+    #      (t, xopt[0], 0.5, xopt[1], xopt[2]))
 
     params = np.array(xopt)
     return params
@@ -414,13 +414,13 @@ class SwaptionVolSurface():
 
         self._build_vol_surface(fin_solver_type=fin_solver_type)
 
-        self._F0T = []
-        self._stock_price = None
-        self._atm_method = None
-        self._atm_vols = []
-        self._delta_method = None
-        self._strikes = []
-        self._vol_grid = []
+#        self._F0T = []
+#        self._stock_price = None
+#        self._atm_method = None
+#        self._atm_vols = []
+#        self._delta_method = None
+#        self._strikes = []
+#        self._vol_grid = []
 
 ###############################################################################
 
@@ -796,6 +796,9 @@ class SwaptionVolSurface():
         which sets out the quality of fit to the ATM and 10 and 25 delta market
         strangles and risk reversals. """
 
+        if self._vol_grid == []:
+            raise FinError("Error: Vol Grid is empty")
+
         if verbose:
 
             print("==========================================================")
@@ -811,11 +814,8 @@ class SwaptionVolSurface():
             for j in range(0, self._num_strikes):
 
                 strike = self._strike_grid[j][i]
-
                 fitted_vol = self.vol_from_strike_dt(strike, expiry_dt)
-
                 mkt_vol = self._vol_grid[j][i]
-
                 diff = fitted_vol - mkt_vol
 
                 print("%s %12.3f %7.4f %7.4f %7.5f" %

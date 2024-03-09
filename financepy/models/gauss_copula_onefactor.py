@@ -1,11 +1,11 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 from numba import njit, float64, int64
 import numpy as np
 
-##########################################################################
+###############################################################################
 
 from ..utils.math import norminvcdf, N, inv_root_two_pi
 from ..utils.error import FinError
@@ -43,8 +43,8 @@ def loss_dbn_recursion_gcd(num_credits,
         raise FinError("Beta vector length must equal num credits.")
 
     num_loss_units = 1
-    for i in range(0, len(loss_units)):
-        num_loss_units += int(loss_units[i])
+    for lu in loss_units:
+        num_loss_units += int(lu)
 
     uncond_loss_dbn = np.zeros(num_loss_units)
 
@@ -70,13 +70,13 @@ def loss_dbn_recursion_gcd(num_credits,
 
         gauss_wt = np.exp(-(z*z)/2.0)
 
-        for i_loss_unit in range(0, num_loss_units):
-            uncond_loss_dbn[i_loss_unit] += indep_dbn[i_loss_unit] * gauss_wt
+        for i_unit in range(0, num_loss_units):
+            uncond_loss_dbn[i_unit] += indep_dbn[i_unit] * gauss_wt
 
         z += dz
 
-    for i_loss_unit in range(0, int(num_loss_units)):
-        uncond_loss_dbn[i_loss_unit] *= inv_root_two_pi * dz
+    for i_unit in range(0, int(num_loss_units)):
+        uncond_loss_dbn[i_unit] *= inv_root_two_pi * dz
 
     return uncond_loss_dbn
 
@@ -103,8 +103,8 @@ def homog_basket_loss_dbn(survival_probs,
             raise FinError("Losses are not homogeneous")
 
     m = 0.0
-    for i in range(0, len(beta_vector)):
-        m += beta_vector[i]
+    for beta in beta_vector:
+        m += beta
     m /= len(beta_vector)
 
     # High beta requires more integration steps
@@ -207,12 +207,12 @@ def tranche_surv_prob_recursion(k1,
 def gauss_approx_tranche_loss(k1, k2, mu, sigma):
 
     if abs(sigma) < 1e-6:
-        gauss_approx_tranche_loss = 0.0
+        tranche_loss = 0.0
         if mu > k1:
-            gauss_approx_tranche_loss += (mu - k1)
+            tranche_loss += (mu - k1)
 
         if mu > k2:
-            gauss_approx_tranche_loss += (mu - k2)
+            tranche_loss += (mu - k2)
     else:
 
         d1 = (mu - k1) / sigma
@@ -221,11 +221,11 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
         expd1 = np.exp(-0.5 * d1 * d1)
         expd2 = np.exp(-0.5 * d2 * d2)
 
-        gauss_approx_tranche_loss = ((mu - k1) * N(d1) - (mu - k2) * N(d2)
-                                     + sigma * expd1 * inv_root_two_pi
-                                     - sigma * expd2 * inv_root_two_pi)
+        tranche_loss = ((mu - k1) * N(d1) - (mu - k2) * N(d2)
+                        + sigma * expd1 * inv_root_two_pi
+                        - sigma * expd2 * inv_root_two_pi)
 
-    return gauss_approx_tranche_loss
+    return tranche_loss
 
 ###############################################################################
 

@@ -31,7 +31,7 @@ class DiscountCurve:
 
     def __init__(self,
                  value_dt: Date,
-                 df_dts: list,
+                 df_dates: list,
                  df_values: np.ndarray,
                  interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
         """ Create the discount curve from a vector of times and discount
@@ -43,26 +43,26 @@ class DiscountCurve:
         check_argument_types(self.__init__, locals())
 
         # Validate curve
-        if len(df_dts) < 1:
+        if len(df_dates) < 1:
             raise FinError("Times has zero length")
 
-        if len(df_dts) != len(df_values):
+        if len(df_dates) != len(df_values):
             raise FinError("Times and Values are not the same")
 
         self._times = [0.0]
         self._dfs = [1.0]
-        self._df_dts = df_dts
+        self._df_dates = df_dates
 
-        num_points = len(df_dts)
+        num_points = len(df_dates)
 
         start_index = 0
         if num_points > 0:
-            if df_dts[0] == value_dt:
+            if df_dates[0] == value_dt:
                 self._dfs[0] = df_values[0]
                 start_index = 1
 
         for i in range(start_index, num_points):
-            t = (df_dts[i] - value_dt) / gDaysInYear
+            t = (df_dates[i] - value_dt) / gDaysInYear
             self._times.append(t)
             self._dfs.append(df_values[i])
 
@@ -298,8 +298,8 @@ class DiscountCurve:
 
         if isinstance(dfs, float):
             return dfs
-        else:
-            return np.array(dfs)
+
+        return np.array(dfs)
 
     ###########################################################################
 
@@ -452,10 +452,10 @@ class DiscountCurve:
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        num_points = len(self._df_dts)
+        num_points = len(self._df_dates)
         s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._df_dts[i],
+            s += label_to_string("%12s" % self._df_dates[i],
                                  "%12.8f" % self._dfs[i])
 
         return s

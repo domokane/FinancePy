@@ -46,6 +46,7 @@ class FinProcessSimulator():
             return paths
 
         elif process_type == ProcessTypes.HESTON:
+
             (stock_price, drift, v0, kappa, theta,
              sigma, rho, scheme) = model_params
             paths = get_heston_paths(num_paths,
@@ -63,6 +64,7 @@ class FinProcessSimulator():
             return paths
 
         elif process_type == ProcessTypes.VASICEK:
+
             (r0, kappa, theta, sigma, scheme) = model_params
             paths = get_vasicek_paths(
                 num_paths,

@@ -54,10 +54,11 @@ def variancer(a, sigma, t):
 
 @njit(fastmath=True, cache=True)
 def zero_price(r0, a, b, sigma, t):
-    B = (1.0 - exp(-a * t)) / a
-    A = exp((b - sigma * sigma / 2.0 / a / a) *
-            (B - t) - B * B * sigma * sigma / 4.0 / a)
-    zcb = A * exp(-r0 * B)
+    ''' Generate zero price analytically using Vasicek model '''
+    bb = (1.0 - exp(-a * t)) / a
+    aa = exp((b - sigma * sigma / 2.0 / a / a) *
+            (bb - t) - bb * bb * sigma * sigma / 4.0 / a)
+    zcb = aa * exp(-r0 * bb)
     return zcb
 
 ###############################################################################
@@ -65,6 +66,7 @@ def zero_price(r0, a, b, sigma, t):
 
 @njit(float64[:](float64, float64, float64, float64, float64, float64, int64))
 def rate_path_mc(r0, a, b, sigma, t, dt, seed):
+    ''' Generate a path of short rates using Vasicek model '''
 
     np.random.seed(seed)
     num_steps = int(t / dt)
@@ -91,7 +93,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 @njit(float64(float64, float64, float64, float64, float64,
               float64, int64, int64), fastmath=True, cache=True)
 def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
-
+    ''' Generate zero price by Monte Carlo using Vasicek model '''
     np.random.seed(seed)
     num_steps = int(t / dt)
     sigmasqrt_dt = sigma * sqrt(dt)

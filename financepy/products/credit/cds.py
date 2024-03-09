@@ -212,7 +212,7 @@ class CDS:
 
         check_argument_types(self.__init__, locals())
 
-        if type(maturity_dt_or_tenor) == Date:
+        if isinstance(maturity_dt_or_tenor, Date):
             maturity_dt = maturity_dt_or_tenor
         else:
             # To get the next CDS date we move on by the tenor and then roll to

@@ -2,13 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
 import time
+
 import numpy as np
 from financepy.models.vasicek_mc import zero_price, zero_price_mc
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

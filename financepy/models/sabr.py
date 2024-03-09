@@ -34,8 +34,7 @@ def vol_function_sabr(params, f, k, t):
     rho = params[2]
     nu = params[3]
 
-    if alpha < 1e-10:
-        alpha = 1e-10
+    alpha = max(1e-10, alpha)
 
     # Negative strikes or forwards
     if k <= 0:
@@ -44,16 +43,16 @@ def vol_function_sabr(params, f, k, t):
     if f <= 0:
         raise FinError("Forward must be positive")
 
-    logfk = np.log(f / k)
+    ln_f_over_k = np.log(f / k)
     b = 1.0 - beta
     fkb = (f*k)**b
     a = b**2 * alpha**2 / (24.0 * fkb)
     b = 0.25 * rho * beta * nu * alpha / fkb**0.5
     c = (2.0 - 3.0*rho**2.0) * nu**2.0 / 24
     d = fkb**0.5
-    v = b**2 * logfk**2 / 24.0
-    w = b**4 * logfk**4 / 1920.0
-    z = nu * fkb**0.5 * logfk / alpha
+    v = b**2 * ln_f_over_k**2 / 24.0
+    w = b**4 * ln_f_over_k**4 / 1920.0
+    z = nu * fkb**0.5 * ln_f_over_k / alpha
 
     eps = 1e-07
 
@@ -100,8 +99,8 @@ def vol_function_sabr_beta_one(params, f, k, t):
         x = np.log((np.sqrt(1.0 - 2.0*rho*z + z**2.0) + z - rho)/(1.0 - rho))
         sigma = num*z/(denom*x)
 
-    else:
-        # when the option is at the money
+    else: # when the option is at the money
+
         num_term1 = 0.0
         num_term2 = rho * nu * alpha / 4.0
         num_term3 = nu * nu * ((2.0 - 3.0 * (rho**2.0)) / 24.0)
@@ -122,11 +121,9 @@ def vol_function_sabr_beta_half(params, f, k, t):
     alpha = params[0]
     rho = params[1]
     nu = params[2]
-
     beta = 0.50
 
-    if alpha < 1e-10:
-        alpha = 1e-10
+    alpha = max(1e-10, alpha)
 
     # Negative strikes or forwards
     if k <= 0:
@@ -204,9 +201,9 @@ class SABR():
                 v = vol_function_sabr(params, f, k, x)
                 vols.append(v)
             return np.array(vols)
-        else:
-            v = vol_function_sabr(params, f, k, t)
-            return v
+        
+        v = vol_function_sabr(params, f, k, t)
+        return v
 
 ###############################################################################
 

@@ -31,17 +31,17 @@ class StudentTCopula():
         for i_trial in range(0, num_trials):
             chi2 = np.random.chisquare(degrees_of_freedom)
             c = sqrt(chi2 / degrees_of_freedom)
-            for iCredit in range(0, num_credits):
-                issuer_curve = issuer_curves[iCredit]
-                g = y[iCredit, i_trial] / c
+            for i_credit in range(0, num_credits):
+                issuer_curve = issuer_curves[i_credit]
+                g = y[i_credit, i_trial] / c
                 u1 = student.cdf(g, degrees_of_freedom)
                 u2 = 1.0 - u1
-                times = issuer_curve._times
-                values = issuer_curve._values
+                times = issuer_curve.times()
+                values = issuer_curve.values()
                 t1 = uniform_to_default_time(u1, times, values)
                 t2 = uniform_to_default_time(u2, times, values)
-                corr_times[iCredit, i_trial] = t1
-                corr_times[iCredit, i_trial + num_trials] = t2
+                corr_times[i_credit, i_trial] = t1
+                corr_times[i_credit, i_trial + num_trials] = t2
 
         return corr_times
 

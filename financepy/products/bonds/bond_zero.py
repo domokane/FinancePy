@@ -478,9 +478,9 @@ class BondZero:
         """ Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed. """
 
-        if type(clean_price) is float or type(clean_price) is np.float64:
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif type(clean_price) is list or type(clean_price) is np.ndarray:
+        elif isinstance(clean_price, list) or isinstanc(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
             raise FinError("Unknown type for clean_price "

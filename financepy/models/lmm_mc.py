@@ -15,7 +15,7 @@ from ..models.sobol import get_uniform_sobol
 # TO DO: TERMINAL MEASURE
 # TO DO:: CALIBRATION
 
-useParallel = False
+USE_PARALLEL = False
 
 ###############################################################################
 
@@ -42,7 +42,7 @@ def lmm_print_forwards(fwds):
 
     num_paths = len(fwds)
     num_times = len(fwds[0])
-    numFwds = len(fwds[0][0])
+    num_fwds = len(fwds[0][0])
 
     if num_paths > 10:
         return
@@ -55,7 +55,7 @@ def lmm_print_forwards(fwds):
             for ifwd in range(0, it):
                 print("%8s" % ("-"), end=""),
 
-            for ifwd in range(it, numFwds):
+            for ifwd in range(it, num_fwds):
                 print("%8.4f" % (fwds[ip][it][ifwd]*100.0), end=""),
 
             print("")
@@ -241,7 +241,7 @@ def lmm_fwd_fwd_correlation(num_fwds, num_paths, i_time, fwds):
 
 @njit(float64[:](float64[:], float64[:], int64, float64, float64[:]),
       cache=True, fastmath=True)
-def lmm_price_caps_black(fwd0, volCaplet, p, K, taus):
+def lmm_price_caps_black(fwd0, vol_caplet, p, K, taus):
     """ Price a strip of capfloorlets using Black's model using the time grid
     of the LMM model. The prices can be compared with the LMM model prices. """
 
@@ -263,7 +263,7 @@ def lmm_price_caps_black(fwd0, volCaplet, p, K, taus):
 
         K = fwd0[i]
         t_exp += taus[i]
-        vol = volCaplet[i]
+        vol = vol_caplet[i]
         F = fwd0[i]
         d1 = (np.log(F/K) + vol * vol * t_exp / 2.0) / vol / np.sqrt(t_exp)
         d2 = d1 - vol * np.sqrt(t_exp)
@@ -658,7 +658,7 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
                 else:
                     raise FinError("is_cap should be 0 or 1")
 
-            period_roll = (1.0 + libor * taus[j])
+            period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_fwds):
@@ -720,7 +720,7 @@ def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
                 float_flows[j] = float_flows[j-1] * \
                     period_roll + libor * taus[j]
 
-            period_roll = (1.0 + libor * taus[j])
+            period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
@@ -845,7 +845,7 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
             else:
                 rachet_caplets[j] = max(libor - K, 0.0) * taus[j]
 
-            period_roll = (1.0 + libor * taus[j])
+            period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
@@ -907,7 +907,7 @@ def lmm_flexi_cap_pricer(maxCaplets, K, num_periods, num_paths,
                     flexi_caplets[j] = max(libor - K, 0.0) * taus[j]
                     num_caplets_left -= 1
 
-            period_roll = (1.0 + libor * taus[j])
+            period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):

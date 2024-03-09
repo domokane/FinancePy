@@ -80,6 +80,16 @@ class CDSCurve:
 
 ###############################################################################
 
+    def times(self):
+        return self._times;
+
+###############################################################################
+
+    def values(self):
+        return self._values;
+
+###############################################################################
+
     def _validate(self, cds_contracts):
         """ Ensure that contracts are in increasing maturity. """
 
