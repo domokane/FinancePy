@@ -57,7 +57,7 @@ def test_BondFuture():
     test_cases.header("Bond Maturity", "Coupon", "Conversion Factor")
     for bond in bonds:
         cf = bondFutureContract.conversion_factor(bond)
-        test_cases.print(bond._maturity_dt, bond._cpn * 100, cf)
+        test_cases.print(bond.maturity_dt, bond.cpn * 100, cf)
 
     # Example from
     # https://www.cmegroup.com/education/files/understanding-treasury-futures.pdf
@@ -131,12 +131,12 @@ def test_BondFuture():
 
     test_cases.header("BOND MATURITY", "COUPON", "PRICE")
     for bond, clean_price in zip(bonds, prices):
-        test_cases.print(str(bond._maturity_dt), str(bond._cpn), clean_price)
+        test_cases.print(str(bond.maturity_dt), str(bond.cpn), clean_price)
 
     test_cases.header("BOND MATURITY", "COUPON", "YIELD")
     for bond, clean_price in zip(bonds, prices):
         yld = bond.yield_to_maturity(settle_dt, clean_price)
-        test_cases.print(str(bond._maturity_dt), str(bond._cpn), yld)
+        test_cases.print(str(bond.maturity_dt), str(bond.cpn), yld)
 
     first_delivery_dt = Date(1, 12, 2017)
     last_delivery_dt = Date(28, 12, 2017)
@@ -153,7 +153,7 @@ def test_BondFuture():
     test_cases.header("BOND MATURITY", "COUPON", "CF")
     for bond in bonds:
         cf = bondFutureContract.conversion_factor(bond)
-        test_cases.print(str(bond._maturity_dt), str(bond._cpn), cf)
+        test_cases.print(str(bond.maturity_dt), str(bond.cpn), cf)
 
     # Get the Invoice Prices
     futures_price = 125.265625
@@ -161,20 +161,20 @@ def test_BondFuture():
     test_cases.header("BOND MATURITY", "PRINCIPAL INVOICE PRICE")
     for bond in bonds:
         pip = bondFutureContract.principal_invoice_price(bond, futures_price)
-        test_cases.print(str(bond._maturity_dt), pip)
+        test_cases.print(str(bond.maturity_dt), pip)
 
     test_cases.header("BOND MATURITY", "TOTAL INVOICE AMOUNT")
     for bond in bonds:
         tia = bondFutureContract.total_invoice_amount(
             settle_dt, bond, futures_price)
-        test_cases.print(str(bond._maturity_dt), tia)
+        test_cases.print(str(bond.maturity_dt), tia)
 
     ctd = bondFutureContract.cheapest_to_deliver(bonds,
                                                  prices,
                                                  futures_price)
 
     test_cases.header("CTD MATURITY", "CTD COUPON")
-    test_cases.print(str(ctd._maturity_dt), ctd._cpn)
+    test_cases.print(str(ctd.maturity_dt), ctd.cpn)
 
 ##########################################################################
 

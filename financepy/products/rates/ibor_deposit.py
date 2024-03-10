@@ -53,37 +53,39 @@ class IborDeposit:
 
         check_argument_types(self.__init__, locals())
 
-        self._cal_type = cal_type
-        self._bd_type = bd_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
 
         if type(maturity_dt_or_tenor) == Date:
             maturity_dt = maturity_dt_or_tenor
         else:
             maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
 
-        calendar = Calendar(self._cal_type)
+        calendar = Calendar(self.cal_type)
 
         maturity_dt = calendar.adjust(maturity_dt,
-                                        self._bd_type)
+                                      self.bd_type)
+
         if start_dt > maturity_dt:
             raise FinError("Start date cannot be after maturity date")
 
-        self._start_dt = start_dt
-        self._maturity_dt = maturity_dt
-        self._deposit_rate = deposit_rate
-        self._dc_type = dc_type
-        self._notional = notional
+        self.start_dt = start_dt
+        self.maturity_dt = maturity_dt
+        self.deposit_rate = deposit_rate
+        self.dc_type = dc_type
+        self.notional = notional
 
     ###########################################################################
+
 
     def _maturity_df(self):
         """ Returns the maturity date discount factor that would allow the
         Libor curve to reprice the contractual market deposit rate. Note that
         this is a forward discount factor that starts on settlement date."""
 
-        dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        df = 1.0 / (1.0 + acc_factor * self._deposit_rate)
+        dc = DayCount(self.dc_type)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        df = 1.0 / (1.0 + acc_factor * self.deposit_rate)
         return df
 
     ###########################################################################
@@ -95,15 +97,15 @@ class IborDeposit:
         valuation date and a Libor curve. This is simply the PV of the future
         repayment plus interest discounted on the current Libor curve. """
 
-        if value_dt > self._maturity_dt:
+        if value_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        df_settle = libor_curve.df(self._start_dt)
-        df_maturity = libor_curve.df(self._maturity_dt)
+        dc = DayCount(self.dc_type)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        df_settle = libor_curve.df(self.start_dt)
+        df_maturity = libor_curve.df(self.maturity_dt)
 
-        value = (1.0 + acc_factor * self._deposit_rate) * self._notional
+        value = (1.0 + acc_factor * self.deposit_rate) * self.notional
 
         # Need to take into account spot days being zero so depo settling fwd
         value = value * df_maturity / df_settle
@@ -116,23 +118,23 @@ class IborDeposit:
                        value_dt: Date):
         """ Print the date and size of the future repayment. """
 
-        dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        flow = (1.0 + acc_factor * self._deposit_rate) * self._notional
-        print(self._maturity_dt, flow)
+        dc = DayCount(self.dc_type)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        flow = (1.0 + acc_factor * self.deposit_rate) * self.notional
+        print(self.maturity_dt, flow)
 
     ###########################################################################
 
     def __repr__(self):
         """ Print the contractual details of the Libor deposit. """
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._start_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("DEPOSIT RATE", self._deposit_rate)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
+        s += label_to_string("START DATE", self.start_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("NOTIONAL", self.notional)
+        s += label_to_string("DEPOSIT RATE", self.deposit_rate)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
         return s
 
     ###########################################################################

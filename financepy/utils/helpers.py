@@ -3,9 +3,10 @@
 ##############################################################################
 
 import sys
+from typing import Union
+
 import numpy as np
 from numba import njit, float64
-from typing import Union
 from prettytable import PrettyTable
 
 from .date import Date
@@ -66,13 +67,13 @@ def pv01_times(t: float,
     with the first coupon date. """
 
     dt = 1.0 / f
-    pv01_times = []
+    ptimes = []
 
     while t >= 0.0:
-        pv01_times.append(t)
+        ptimes.append(t)
         t -= dt
 
-    return pv01_times
+    return ptimes
 
 
 ###############################################################################
@@ -230,7 +231,7 @@ def input_time(dt: Date,
         t = dt
         return check(t)
     elif isinstance(dt, Date):
-        t = (dt - curve._value_dt) / gDaysInYear
+        t = (dt - curve.value_dt) / gDaysInYear
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt
@@ -264,16 +265,15 @@ def listdiff(a: np.ndarray,
 
 
 @njit(fastmath=True, cache=True)
-def dotproduct(xVector: np.ndarray,
-               yVector: np.ndarray):
+def dotproduct(x_vector: np.ndarray,
+               y_vector: np.ndarray):
     """ Fast calculation of dot product using Numba. """
 
     dotprod = 0.0
-    n = len(xVector)
+    n = len(x_vector)
     for i in range(0, n):
-        dotprod += xVector[i] * yVector[i]
+        dotprod += x_vector[i] * y_vector[i]
     return dotprod
-
 
 ###############################################################################
 
@@ -321,18 +321,18 @@ def label_to_string(label: str,
     #        ...
     label = str(label)
 
-    if list_format and type(value) is list and len(value) > 0:
+    if list_format and isinstance(value, list) and len(value) > 0:
         s = label + ": "
-        labelSpacing = " " * len(s)
+        label_spacing = " " * len(s)
         s += str(value[0])
 
         for v in value[1:]:
-            s += "\n" + labelSpacing + str(v)
+            s += "\n" + label_spacing + str(v)
         s += separator
 
         return s
-    else:
-        return f"{label}: {value}{separator}"
+
+    return f"{label}: {value}{separator}"
 
 ###############################################################################
 
@@ -349,12 +349,12 @@ def table_to_string(header: str,
 
     s = header + "\n"
     for i in range(num_rows):
-        for vList in value_table:
+        for v_list in value_table:
             # isinstance is needed instead of type in case of pandas floats
-            if (isinstance(vList[i], float)):
-                s += format(vList[i], float_precision) + ", "
+            if isinstance(v_list[i], float):
+                s += format(v_list[i], float_precision) + ", "
             else:
-                s += str(vList[i]) + ", "
+                s += str(v_list[i]) + ", "
         s = s[:-2] + "\n"
 
     return s[:-1]
@@ -484,7 +484,7 @@ def accrued_tree(grid_times: np.ndarray,
         for i in range(0, num_cpns):
             if t > cpn_times[i - 1] and t <= cpn_times[i]:
                 den = cpn_times[i] - cpn_times[i - 1]
-                num = (t - cpn_times[i - 1])
+                num = t - cpn_times[i - 1]
                 accrued[i_grid] = face * num * cpn_flows[i] / den
                 break
 
@@ -504,7 +504,7 @@ def check_argument_types(func, values):
             value = values[value_name]
             usable_type = to_usable_type(annotation_type)
 
-        if (not isinstance(value, usable_type)):
+        if not isinstance(value, usable_type):
 
             print("ERROR with function arguments for", func.__name__)
             print("This is in module", func.__module__)

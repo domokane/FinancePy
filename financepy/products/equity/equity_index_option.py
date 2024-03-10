@@ -52,13 +52,15 @@ class EquityIndexOption:
               model: Model,
               ):
         """ Equity Index Option valuation using Black model. """
+
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
-        if discount_curve._value_dt != value_dt:
+        if discount_curve.value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
+
         if isinstance(self._expiry_dt, Date):
             t_exp = (self._expiry_dt - value_dt) / gDaysInYear
         elif isinstance(self._expiry_dt, list):
@@ -69,20 +71,28 @@ class EquityIndexOption:
             t_exp = np.array(t_exp)
         else:
             raise FinError("Valuation date must be Date or list of Date")
+
         self._t_exp = t_exp
+
         if np.any(forward_price <= 0.0):
             raise FinError("Forward price must be greater than zero.")
+
         if np.any(t_exp < 0.0):
             raise FinError("Time to expiry must be positive.")
+
         t_exp = np.maximum(t_exp, 1e-10)
+
         df = discount_curve.df(self._expiry_dt) / \
             discount_curve.df(value_dt)
+
         k = self._strike_price
+
         if isinstance(model, Black):
             value = model.value(forward_price, k, t_exp,
                                 df, self._option_type)
         else:
             raise FinError("Unknown Model Type")
+
         value = value * self._num_options
         return value
 

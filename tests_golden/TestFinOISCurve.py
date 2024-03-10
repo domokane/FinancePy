@@ -570,14 +570,14 @@ def test_bloombergPricingExample():
     test_cases.header("VALUATION TO TODAY DATE", " PV")
     test_cases.print("VALUE:", swaps[0].value(value_dt, oisCurve, None))
     test_cases.print(
-        "FIXED:", -swaps[0]._fixed_leg.value(value_dt, oisCurve))
-    test_cases.print("FLOAT:", swaps[0]._float_leg.value(
+        "FIXED:", -swaps[0].fixed_leg.value(value_dt, oisCurve))
+    test_cases.print("FLOAT:", swaps[0].float_leg.value(
         value_dt, oisCurve, None))
 
     test_cases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
     test_cases.print("VALUE:", swaps[0].value(settle_dt, oisCurve, None))
-    test_cases.print("FIXED:", -swaps[0]._fixed_leg.value(settle_dt, oisCurve))
-    test_cases.print("FLOAT:", swaps[0]._float_leg.value(
+    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(settle_dt, oisCurve))
+    test_cases.print("FLOAT:", swaps[0].float_leg.value(
         settle_dt, oisCurve, None))
 
     # swaps[0].print_fixed_leg_pv()

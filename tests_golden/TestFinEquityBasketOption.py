@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import numpy as np
 from financepy.products.equity.equity_basket_option import EquityBasketOption
 from financepy.utils.global_types import OptionTypes
@@ -9,9 +12,6 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

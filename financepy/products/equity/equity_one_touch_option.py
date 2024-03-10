@@ -164,11 +164,11 @@ class EquityOneTouchOption(EquityOption):
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve._value_dt != value_dt:
+        if discount_curve.value_dt != value_dt:
             raise FinError(
                 "Discount Curve date not same as option valuation date")
 
-        if dividend_curve._value_dt != value_dt:
+        if dividend_curve.value_dt != value_dt:
             raise FinError(
                 "Dividend Curve date not same as option valuation date")
 

@@ -46,21 +46,21 @@ class DiscountCurveFlat(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self._value_dt = value_dt
-        self._flat_rate = flat_rate
-        self._freq_type = freq_type
-        self._dc_type = dc_type
+        self.value_dt = value_dt
+        self.flat_rate = flat_rate
+        self.freq_type = freq_type
+        self.dc_type = dc_type
 
         # This is used by some inherited functions, so we choose the simplest
-        self._interp_type = InterpTypes.FLAT_FWD_RATES
+        self.interp_type = InterpTypes.FLAT_FWD_RATES
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
-        dts = self._value_dt.add_years(years)
+        dts = self.value_dt.add_years(years)
 
         # Set up a grid of times and discount factors for functions
         self._dfs = self.df(dts)
-        self._times = times_from_dates(dts, self._value_dt, dc_type)
+        self._times = times_from_dates(dts, self.value_dt, dc_type)
 
 ###############################################################################
 
@@ -69,11 +69,11 @@ class DiscountCurveFlat(DiscountCurve):
         """ Create a new FinDiscountCurveFlat object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
-        rate_bumped = self._flat_rate + bump_size
-        disc_curve = DiscountCurveFlat(self._value_dt,
+        rate_bumped = self.flat_rate + bump_size
+        disc_curve = DiscountCurveFlat(self.value_dt,
                                        rate_bumped,
-                                       freq_type=self._freq_type,
-                                       dc_type=self._dc_type)
+                                       freq_type=self.freq_type,
+                                       dc_type=self.dc_type)
         return disc_curve
 
 ###############################################################################
@@ -88,14 +88,14 @@ class DiscountCurveFlat(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dts,
-                                    self._value_dt,
-                                    self._dc_type)
+                                    self.value_dt,
+                                    self.dc_type)
 
-        dfs = self._zero_to_df(self._value_dt,
-                               self._flat_rate,
+        dfs = self._zero_to_df(self.value_dt,
+                               self.flat_rate,
                                dc_times,
-                               self._freq_type,
-                               self._dc_type)
+                               self.freq_type,
+                               self.dc_type)
 
         if isinstance(dts, Date):
             return dfs[0]
@@ -106,9 +106,10 @@ class DiscountCurveFlat(DiscountCurve):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("FLAT RATE", (self._flat_rate))
-        s += label_to_string("FREQUENCY", (self._freq_type))
-        s += label_to_string("DAY COUNT", (self._dc_type))
+        s += label_to_string("VALUE DATE", (self.value_dt))
+        s += label_to_string("FLAT RATE", (self.flat_rate))
+        s += label_to_string("FREQUENCY", (self.freq_type))
+        s += label_to_string("DAY COUNT", (self.dc_type))
         return s
 
 ###############################################################################

@@ -248,7 +248,7 @@ class BondZero:
         forward bond price if the settlement date is after the valuation date.
         """
 
-        if settle_dt < discount_curve._value_dt:
+        if settle_dt < discount_curve.value_dt:
             raise FinError("Bond settles before Discount curve date")
 
         if settle_dt > self._maturity_dt:

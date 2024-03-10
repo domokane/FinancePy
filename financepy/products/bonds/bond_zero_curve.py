@@ -51,16 +51,16 @@ class BondZeroCurve(DiscountCurve):
         if len(bonds) != len(clean_prices):
             raise FinError("Num bonds does not equal number of prices.")
 
-        self._settle_dt = value_dt
-        self._value_dt = value_dt
-        self._bonds = bonds
-        self._clean_prices = np.array(clean_prices)
-        self._discount_curve = None
-        self._interp_type = interp_type
+        self.settle_dt = value_dt
+        self.value_dt = value_dt
+        self.bonds = bonds
+        self.clean_prices = np.array(clean_prices)
+        self.discount_curve = None
+        self.interp_type = interp_type
 
         times = []
-        for bond in self._bonds:
-            t_mat = (bond._maturity_dt - self._settle_dt)/gDaysInYear
+        for bond in self.bonds:
+            t_mat = (bond.maturity_dt - self.settle_dt) / gDaysInYear
             times.append(t_mat)
 
         times = np.array(times)
@@ -68,7 +68,6 @@ class BondZeroCurve(DiscountCurve):
             raise FinError("Times are not sorted in increasing order")
 
         self._yearsToMaturity = np.array(times)
-
         self._bootstrap_zero_rates()
 
 ###############################################################################
@@ -79,12 +78,12 @@ class BondZeroCurve(DiscountCurve):
         self._values = np.array([1.0])
         df = 1.0
 
-        for i in range(0, len(self._bonds)):
-            bond = self._bonds[i]
-            maturity_dt = bond._maturity_dt
-            clean_price = self._clean_prices[i]
-            t_mat = (maturity_dt - self._settle_dt) / gDaysInYear
-            argtuple = (self, self._settle_dt, bond, clean_price)
+        for i in range(0, len(self.bonds)):
+            bond = self.bonds[i]
+            maturity_dt = bond.maturity_dt
+            clean_price = self.clean_prices[i]
+            t_mat = (maturity_dt - self.settle_dt) / gDaysInYear
+            argtuple = (self, self.settle_dt, bond, clean_price)
             self._times = np.append(self._times, t_mat)
             self._values = np.append(self._values, df)
 
@@ -114,7 +113,7 @@ class BondZeroCurve(DiscountCurve):
     def df(self,
            dt: Date):
         t = input_time(dt, self)
-        z = interpolate(t, self._times, self._values, self._interp_type.value)
+        z = interpolate(t, self._times, self._values, self.interp_type.value)
         return z
 
 ###############################################################################
@@ -122,7 +121,7 @@ class BondZeroCurve(DiscountCurve):
     def survival_prob(self,
                       dt: Date):
         t = input_time(dt, self)
-        q = interpolate(t, self._times, self._values, self._interp_type.value)
+        q = interpolate(t, self._times, self._values, self.interp_type.value)
         return q
 
 ###############################################################################

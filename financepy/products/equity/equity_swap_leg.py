@@ -162,7 +162,7 @@ class EquitySwapLeg:
         if discount_curve is None:
             raise FinError("Discount curve not provided!")
 
-        if discount_curve._value_dt != value_dt:
+        if discount_curve.value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 

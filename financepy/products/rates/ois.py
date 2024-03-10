@@ -88,19 +88,19 @@ class OIS:
         check_argument_types(self.__init__, locals())
 
         if isinstance(term_dt_or_tenor, Date):
-            self._termination_dt = term_dt_or_tenor
+            self.termination_dt = term_dt_or_tenor
         else:
-            self._termination_dt = effective_dt.add_tenor(
+            self.termination_dt = effective_dt.add_tenor(
                 term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self.termination_dt,
                                             bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_dt = effective_dt
+        self.effective_dt = effective_dt
 
         float_leg_type = SwapTypes.PAY
         if fixed_leg_type == SwapTypes.PAY:
@@ -108,8 +108,8 @@ class OIS:
 
         principal = 0.0
 
-        self._fixed_leg = SwapFixedLeg(effective_dt,
-                                       self._termination_dt,
+        self.fixed_leg = SwapFixedLeg(effective_dt,
+                                       self.termination_dt,
                                        fixed_leg_type,
                                        fixed_coupon,
                                        fixed_freq_type,
@@ -121,8 +121,8 @@ class OIS:
                                        bd_type,
                                        dg_type)
 
-        self._float_leg = SwapFloatLeg(effective_dt,
-                                       self._termination_dt,
+        self.float_leg = SwapFloatLeg(effective_dt,
+                                       self.termination_dt,
                                        float_leg_type,
                                        float_spread,
                                        float_freq_type,
@@ -143,10 +143,10 @@ class OIS:
         """ Value the interest rate swap on a value date given a single Ibor
         discount curve. """
 
-        fixed_leg_value = self._fixed_leg.value(value_dt,
+        fixed_leg_value = self.fixed_leg.value(value_dt,
                                                 ois_curve)
 
-        float_leg_value = self._float_leg.value(value_dt,
+        float_leg_value = self.float_leg.value(value_dt,
                                                 ois_curve,
                                                 ois_curve,
                                                 first_fixing_rate)
@@ -159,8 +159,8 @@ class OIS:
     def pv01(self, value_dt, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
-        pv = self._fixed_leg.value(value_dt, discount_curve)
-        pv01 = pv / self._fixed_leg._cpn / self._fixed_leg._notional
+        pv = self.fixed_leg.value(value_dt, discount_curve)
+        pv01 = pv / self.fixed_leg.cpn / self.fixed_leg.notional
 
         # Needs to be positive even if it is a payer leg and/or coupon < 0
         pv01 = np.abs(pv01)
@@ -178,12 +178,12 @@ class OIS:
 
         pv01 = self.pv01(value_dt, ois_curve)
 
-        float_leg_value = self._float_leg.value(value_dt,
+        float_leg_value = self.float_leg.value(value_dt,
                                                 ois_curve,
                                                 ois_curve,
                                                 first_fixing_rate)
 
-        cpn = float_leg_value / pv01 / self._fixed_leg._notional
+        cpn = float_leg_value / pv01 / self.fixed_leg.notional
         return cpn
 
 ###############################################################################
@@ -192,7 +192,7 @@ class OIS:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._fixed_leg.print_valuation()
+        self.fixed_leg.print_valuation()
 
 ###############################################################################
 
@@ -200,7 +200,7 @@ class OIS:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._float_leg.print_valuation()
+        self.float_leg.print_valuation()
 
 ###############################################################################
 
@@ -208,16 +208,16 @@ class OIS:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._fixed_leg.print_payments()
-        self._float_leg.print_payments()
+        self.fixed_leg.print_payments()
+        self.float_leg.print_payments()
 
 ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self._fixed_leg.__repr__()
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += self.fixed_leg._repr__()
         s += "\n"
-        s += self._float_leg.__repr__()
+        s += self.float_leg._repr__()
         return s
 
 ###############################################################################

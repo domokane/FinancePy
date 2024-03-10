@@ -62,10 +62,10 @@ class DiscountCurveZeros(DiscountCurve):
             raise FinError("Unknown Cap Floor DayCountRule type " +
                            str(dc_type))
 
-        self._value_dt = value_dt
-        self._freq_type = freq_type
-        self._dc_type = dc_type
-        self._interp_type = interp_type
+        self.value_dt = value_dt
+        self.freq_type = freq_type
+        self.dc_type = dc_type
+        self.interp_type = interp_type
 
         self._zero_rates = np.array(zero_rates)
         self._zero_dts = zero_dts
@@ -76,14 +76,14 @@ class DiscountCurveZeros(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-        dfs = self._zero_to_df(self._value_dt,
+        dfs = self._zero_to_df(self.value_dt,
                                self._zero_rates,
                                self._times,
-                               self._freq_type,
-                               self._dc_type)
+                               self.freq_type,
+                               self.dc_type)
 
         self._dfs = np.array(dfs)
-        self._interpolator = Interpolator(self._interp_type)
+        self._interpolator = Interpolator(self.interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
 # ###############################################################################
@@ -110,10 +110,10 @@ class DiscountCurveZeros(DiscountCurve):
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUATION DATE", self._value_dt)
-        s += label_to_string("FREQUENCY TYPE", (self._freq_type))
-        s += label_to_string("DAY COUNT TYPE", (self._dc_type))
-        s += label_to_string("INTERP TYPE", (self._interp_type))
+        s += label_to_string("VALUATION DATE", self.value_dt)
+        s += label_to_string("FREQUENCY TYPE", (self.freq_type))
+        s += label_to_string("DAY COUNT TYPE", (self.dc_type))
+        s += label_to_string("INTERP TYPE", (self.interp_type))
 
         s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._times)

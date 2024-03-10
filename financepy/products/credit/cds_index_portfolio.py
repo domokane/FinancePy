@@ -256,18 +256,18 @@ class CDSIndexPortfolio:
                 "Number of credits in index must be > 1 and not "
                 + str(num_credits))
 
-        libor_curve = issuer_curves[0]._libor_curve
+        libor_curve = issuer_curves[0].libor_curve
         num_index_maturity_points = len(index_cpns)
 
         cds_maturity_dts = []
-        for cds in issuer_curves[0]._cds_contracts:
+        for cds in issuer_curves[0].cds_contracts:
             cds_dts = cds._maturity_dt
             cds_maturity_dts.append(cds_dts)
 
         num_cds_mat_points = len(cds_maturity_dts)
 
         for issuer_curve in issuer_curves:
-            n = len(issuer_curve._cds_contracts)
+            n = len(issuer_curve.cds_contracts)
             if n != len(cds_maturity_dts):
                 raise FinError(
                     "All issuer discount must be from same cds maturities")
@@ -318,8 +318,8 @@ class CDSIndexPortfolio:
 
                 for i_credit in range(0, num_credits):
 
-                    cds_contracts = issuer_curves[i_credit]._cds_contracts
-                    recovery_rate = issuer_curves[i_credit]._recovery_rate
+                    cds_contracts = issuer_curves[i_credit].cds_contracts
+                    recovery_rate = issuer_curves[i_credit].recovery_rate
                     adjusted_cds_contracts = []
 
                     for j in range(0, num_cds_mat_points):
@@ -358,14 +358,14 @@ class CDSIndexPortfolio:
 
         for i_credit in range(0, num_credits):
 
-            recovery_rate = issuer_curves[i_credit]._recovery_rate
+            recovery_rate = issuer_curves[i_credit].recovery_rate
 
             adjusted_cds_contracts = []
             adjusted_spreads = []
 
             for j in range(0, num_cds_mat_points):
 
-                unadjusted_spread = issuer_curves[i_credit]._cds_contracts[j]._running_cpn
+                unadjusted_spread = issuer_curves[i_credit].cds_contracts[j]._running_cpn
 
                 adjusted_spread = unadjusted_spread * cds_spread_multipliers[j]
 
@@ -413,7 +413,7 @@ class CDSIndexPortfolio:
         if num_credits < 1:
             raise FinError("Number of credits must be greater than 1")
 
-        libor_curve = issuer_curves[0]._libor_curve
+        libor_curve = issuer_curves[0].libor_curve
         num_index_maturity_points = len(index_cpns)
 
         #        hazardRateMultipliers = [1.0] * numIndexMaturityPoints

@@ -44,11 +44,11 @@ class BondOption():
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_dt = expiry_dt
-        self._strike_price = strike_price
-        self._bond = bond
-        self._option_type = option_type
-        self._par = 100.0
+        self.expiry_dt = expiry_dt
+        self.strike_price = strike_price
+        self.bond = bond
+        self.option_type = option_type
+        self.par = 100.0
 
 ###############################################################################
 
@@ -60,21 +60,21 @@ class BondOption():
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
         model which are all implemented as short rate tree models. """
 
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        t_mat = (self._bond._maturity_dt - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        t_mat = (self.bond.maturity_dt - value_dt) / gDaysInYear
 
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
         # We need all the flows in case the option is American
         # and some occur before expiry
-        flow_dts = self._bond._cpn_dts
-        flow_amounts = self._bond._flow_amounts
+        flow_dts = self.bond.cpn_dts
+        flow_amounts = self.bond.flow_amounts
 
         cpn_times = []
         cpn_flows = []
 
-        num_flows = len(self._bond._cpn_dts)
+        num_flows = len(self.bond.cpn_dts)
 
         # Want the first flow to be the previous coupon date
         # This is needed to calculate accrued correctly
@@ -107,35 +107,35 @@ class BondOption():
 
         exercise_type = FinExerciseTypes.AMERICAN
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL \
-                or self._option_type == OptionTypes.EUROPEAN_PUT:
+        if self.option_type == OptionTypes.EUROPEAN_CALL \
+                or self.option_type == OptionTypes.EUROPEAN_PUT:
             exercise_type = FinExerciseTypes.EUROPEAN
 
         # This is wasteful if model is Jamshidian but how to do neat design
         model.build_tree(t_mat, df_times, df_values)
 
-        v = model.bond_option(t_exp, self._strike_price, self._par,
+        v = model.bond_option(t_exp, self.strike_price, self.par,
                               cpn_times, cpn_flows, exercise_type)
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL \
-                or self._option_type == OptionTypes.AMERICAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL \
+                or self.option_type == OptionTypes.AMERICAN_CALL:
             return v['call']
-        elif self._option_type == OptionTypes.EUROPEAN_PUT \
-                or self._option_type == OptionTypes.AMERICAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT \
+                or self.option_type == OptionTypes.AMERICAN_PUT:
             return v['put']
         else:
-            print(self._option_type)
+            print(self.option_type)
             raise FinError("Unknown option type.")
 
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("STRIKE", self._strike_price)
-        s += label_to_string("OPTION TYPE", self._option_type)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("STRIKE", self.strike_price)
+        s += label_to_string("OPTION TYPE", self.option_type)
         s += "Underlying Bond\n"
-        s += str(self._bond)
+        s += str(self.bond)
         return s
 
 ###############################################################################

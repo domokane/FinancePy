@@ -282,56 +282,34 @@ class Date():
         if ss < 0 or ss > 59:
             raise FinError("Seconds must be in range 0-59")
 
-        self._y = y
-        self._m = m
-        self._d = d
+        self.y = y
+        self.m = m
+        self.d = d
 
-        self._hh = hh
-        self._mm = mm
-        self._ss = ss
+        self.hh = hh
+        self.mm = mm
+        self.ss = ss
 
-        self._excel_dt = 0  # This is a float as it includes intraday time
+        self.excel_dt = 0  # This is a float as it includes intraday time
 
         # update the Excel date used for doing lots of financial calculations
         self._refresh()
 
-        day_fraction = self._hh/24.0
-        day_fraction += self._mm/24.0/60.0
-        day_fraction += self._ss/24.0/60.0/60.0
+        day_fraction = self.hh/24.0
+        day_fraction += self.mm/24.0/60.0
+        day_fraction += self.ss/24.0/60.0/60.0
 
-        self._excel_dt += day_fraction  # This is float - holds intraday time
-
-    ###########################################################################
-
-    def d(self):
-        ''' Get day of month as integer '''
-        return self._d
-
-    def m(self):
-        ''' Get month of year as integer '''
-        return self._m
-
-    def y(self):
-        ''' Get year as integer '''
-        return self._y
-
-    def excel_dt(self):
-        ''' get this date in form of Excel date i.e. as an integer'''
-        return self._excel_dt
-
-    def weekday(self):
-        ''' get day of week as integer '''
-        return self._weekday
+        self.excel_dt += day_fraction  # This is float - holds intraday time
 
     ###########################################################################
 
     @classmethod
-    def from_string(cls, date_string, formatString):
+    def from_string(cls, date_string, format_string):
         """  Create a Date from a date and format string.
         Example Input:
         start_dt = Date('1-1-2018', '%d-%m-%Y') """
 
-        d, m, y = parse_dt(date_string, formatString)
+        d, m, y = parse_dt(date_string, format_string)
         return cls(d, m, y)
 
     ###########################################################################
@@ -360,60 +338,60 @@ class Date():
     def _refresh(self):
         """ Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention. """
-        idx = date_index(self._d, self._m, self._y)
+        idx = date_index(self.d, self.m, self.y)
         days_since_first_jan_1900 = g_dt_counter_list[idx]
         wd = weekday(days_since_first_jan_1900)
-        self._excel_dt = days_since_first_jan_1900
-        self._weekday = wd
+        self.excel_dt = days_since_first_jan_1900
+        self.weekday = wd
 
     ###########################################################################
 
     @vectorisation_helper
     def __gt__(self, other):
-        return self._excel_dt > other._excel_dt
+        return self.excel_dt > other.excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __lt__(self, other):
-        return self._excel_dt < other._excel_dt
+        return self.excel_dt < other.excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __ge__(self, other):
-        return self._excel_dt >= other._excel_dt
+        return self.excel_dt >= other.excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __le__(self, other):
-        return self._excel_dt <= other._excel_dt
+        return self.excel_dt <= other.excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __sub__(self, other):
-        return self._excel_dt - other._excel_dt
+        return self.excel_dt - other.excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __rsub__(self, other):
-        return self._excel_dt - other._excel_dt
+        return self.excel_dt - other.excel_dt
 
     ###########################################################################
 
     @vectorisation_helper
     def __eq__(self, other):
-        return self._excel_dt == other._excel_dt
+        return self.excel_dt == other.excel_dt
 
     ###########################################################################
 
     def is_weekend(self):
         """ returns True if the date falls on a weekend. """
 
-        if self._weekday == Date.SAT or self._weekday == Date.SUN:
+        if self.weekday == Date.SAT or self.weekday == Date.SUN:
             return True
 
         return False
@@ -423,9 +401,9 @@ class Date():
     def is_eom(self):
         """ returns True if this date falls on a month end. """
 
-        y = self._y
-        m = self._m
-        d = self._d
+        y = self.y
+        m = self.m
+        d = self.d
 
         leap_year = is_leap_year(y)
 
@@ -443,8 +421,8 @@ class Date():
     def eom(self):
         """ returns last date of month of this date. """
 
-        y = self._y
-        m = self._m
+        y = self.y
+        m = self.m
 
         leap_year = is_leap_year(y)
 
@@ -465,7 +443,7 @@ class Date():
         if hours < 0:
             raise FinError("Number of hours must be positive")
 
-        start_hour = self._hh
+        start_hour = self.hh
         final_hour = start_hour + hours
         days = int(final_hour/24)
         hour = final_hour % 24
@@ -474,7 +452,7 @@ class Date():
         dt_1 = self.add_days(days)
 
         # On that date we then move to the correct hour
-        dt_2 = Date(dt_1.d(), dt_1.m(), dt_1.y(), hour, dt_1._mm, dt_1._ss)
+        dt_2 = Date(dt_1.d(), dt_1.m(), dt_1.y(), hour, dt_1.mm, dt_1.ss)
         return dt_2
 
     ###########################################################################
@@ -484,7 +462,7 @@ class Date():
         """ Returns a new date that is num_days after the Date. I also make
         it possible to go backwards a number of days. """
 
-        idx = date_index(self._d, self._m, self._y)
+        idx = date_index(self.d, self.m, self.y)
 
         step = +1
         if num_days < 0:
@@ -526,15 +504,15 @@ class Date():
             num_weeks = int(num_days / 5)
             remaining_days = num_days % 5
 
-            if self._weekday == Date.SAT:
+            if self.weekday == Date.SAT:
                 weekend_adjust = 1
-            elif self._weekday == Date.SUN:
+            elif self.weekday == Date.SUN:
                 weekend_adjust = 0
             else:
                 weekend_adjust = 2
 
             if positive_num_days is True:
-                if self._weekday + remaining_days > self.FRI:
+                if self.weekday + remaining_days > self.FRI:
                     # add weekend
                     remaining_days += weekend_adjust
 
@@ -542,7 +520,7 @@ class Date():
 
             else:
 
-                if self._weekday - remaining_days < self.MON:
+                if self.weekday - remaining_days < self.MON:
                     # add weekend
                     remaining_days += weekend_adjust
 
@@ -560,7 +538,7 @@ class Date():
                 else:
                     end_dt = end_dt.add_days(-1)
 
-                if end_dt.weekday() == Date.SAT or end_dt.weekday() == Date.SUN:
+                if end_dt.weekday == Date.SAT or end_dt.weekday == Date.SUN:
                     pass
                 else:
                     num_days_left -= 1
@@ -598,9 +576,9 @@ class Date():
 
             mmi = int(mmi)
 
-            d = self._d
-            m = self._m + mmi
-            y = self._y
+            d = self.d
+            m = self.m + mmi
+            y = self.y
 
             while m > 12:
                 m = m - 12
@@ -677,9 +655,9 @@ class Date():
 
         next_dt = self.add_months(mm)
 
-        y = next_dt.y()
-        m = next_dt.m()
-        d = next_dt.d()
+        y = next_dt.y
+        m = next_dt.m
+        d = next_dt.d
 
         d_cds = 20
         y_cds = y
@@ -688,19 +666,19 @@ class Date():
         if m == 12 and d >= 20:
             m_cds = 3
             y_cds = y + 1
-        elif m == 10 or m == 11 or m == 12:
+        elif m in (10, 11, 12):
             m_cds = 12
         elif m == 9 and d >= 20:
             m_cds = 12
-        elif m == 7 or m == 8 or m == 9:
+        elif m in (7, 8, 9):
             m_cds = 9
         elif m == 6 and d >= 20:
             m_cds = 9
-        elif m == 4 or m == 5 or m == 6:
+        elif m in (4, 5, 6):
             m_cds = 6
         elif m == 3 and d >= 20:
             m_cds = 6
-        elif m == 1 or m == 2 or m == 3:
+        elif m in (1, 2, 3):
             m_cds = 3
 
         cds_dt = Date(d_cds, m_cds, y_cds)
@@ -723,7 +701,7 @@ class Date():
 
         for d in range(d_start, d_end+1):
             imm_dt = Date(d, m, y)
-            if imm_dt.weekday() == self.WED:
+            if imm_dt.weekday == self.WED:
                 return d
 
         # Should never reach this line but just to be defensive
@@ -737,28 +715,28 @@ class Date():
             IMM contract the IMM date is the First Delivery Date of the
             futures contract. """
 
-        y = self._y
-        m = self._m
-        d = self._d
+        y = self.y
+        m = self.m
+        d = self.d
 
         y_imm = y
 
         if m == 12 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 3
             y_imm = y + 1
-        elif m == 10 or m == 11 or m == 12:
+        elif m in (10, 11, 12):
             m_imm = 12
         elif m == 9 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 12
-        elif m == 7 or m == 8 or m == 9:
+        elif m in (7, 8, 9):
             m_imm = 9
         elif m == 6 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 9
-        elif m == 4 or m == 5 or m == 6:
+        elif m in (4, 5, 6):
             m_imm = 6
         elif m == 3 and d >= self.third_wednesday_of_month(m, y):
             m_imm = 6
-        elif m == 1 or m == 2 or m == 3:
+        elif m in (1, 2, 3):
             m_imm = 3
 
         d_imm = self.third_wednesday_of_month(m_imm, y_imm)
@@ -824,7 +802,7 @@ class Date():
             else:
                 raise FinError("Unknown tenor type in " + tenor)
 
-            new_dt = Date(self._d, self._m, self._y)
+            new_dt = Date(self.d, self.m, self.y)
 
             if period_type == DAYS:
                 for _ in range(0, abs(num_periods)):
@@ -837,9 +815,9 @@ class Date():
                     new_dt = new_dt.add_months(math.copysign(1, num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day we add this logic
-                y = new_dt.y()
-                m = new_dt.m()
-                d = min(self.d(), new_dt.eom()._d)
+                y = new_dt.y
+                m = new_dt.m
+                d = min(self.d, new_dt.eom().d)
                 new_dt = Date(d, m, y)
 
             elif period_type == YEARS:
@@ -859,7 +837,7 @@ class Date():
         """ Returns a datetime of the date """
 
         # Remember that datetime likes inputs in opposite order
-        return datetime.date(self._y, self._m, self._d)
+        return datetime.date(self.y, self.m, self.d)
 
     ###########################################################################
     # TODO: Find elegant way to return long and short strings
@@ -869,13 +847,13 @@ class Date():
         """ returns a formatted string of the date """
         date_str = ""
 
-        if self._d < 10:
-            date_str += "0" + str(self._d) + ""
+        if self.d < 10:
+            date_str += "0" + str(self.d) + ""
         else:
-            date_str += "" + str(self._d) + ""
+            date_str += "" + str(self.d) + ""
 
-        date_str += short_month_names[self._m - 1]
-        date_str += "" + str(self._y)
+        date_str += short_month_names[self.m - 1]
+        date_str += "" + str(self.y)
         return date_str
 
     ###########################################################################
@@ -885,22 +863,22 @@ class Date():
 
         global g_date_type_format
 
-        day_name_str = short_day_names[self._weekday]
+        day_name_str = short_day_names[self.weekday]
 
-        if self._d < 10:
-            day_str = "0" + str(self._d)
+        if self.d < 10:
+            day_str = "0" + str(self.d)
         else:
-            day_str = "" + str(self._d)
+            day_str = "" + str(self.d)
 
-        if self._m < 10:
-            short_month_str = "0" + str(self._m)
+        if self.m < 10:
+            short_month_str = "0" + str(self.m)
         else:
-            short_month_str = str(self._m)
+            short_month_str = str(self.m)
 
-        long_month_str = short_month_names[self._m - 1]
+        long_month_str = short_month_names[self.m - 1]
 
-        short_year_str = str(self._y)[2:]
-        long_year_str = str(self._y)
+        short_year_str = str(self.y)[2:]
+        long_year_str = str(self.y)
 
         if g_date_type_format == DateFormatTypes.UK_LONGEST:
 
@@ -960,20 +938,20 @@ class Date():
 
             sep = "/"
 
-            if self._hh < 10:
-                hour_str = "0" + str(self._hh)
+            if self.hh < 10:
+                hour_str = "0" + str(self.hh)
             else:
-                hour_str = str(self._hh)
+                hour_str = str(self.hh)
 
-            if self._mm < 10:
-                minute_str = "0" + str(self._mm)
+            if self.mm < 10:
+                minute_str = "0" + str(self.mm)
             else:
-                minute_str = str(self._mm)
+                minute_str = str(self.mm)
 
-            if self._ss < 10:
-                second_str = "0" + str(self._ss)
+            if self.ss < 10:
+                second_str = "0" + str(self.ss)
             else:
-                second_str = str(self._ss)
+                second_str = str(self.ss)
 
             time_str = hour_str + ":" + minute_str + ":" + second_str
             date_str = day_str + sep + short_month_str + sep + long_year_str
@@ -1017,7 +995,7 @@ def daily_working_day_schedule(start_dt: Date,
 def datediff(d1: Date,
              d2: Date):
     """ Calculate the number of days between two Findates. """
-    dd = d2.excel_dt() - d1.excel_dt()
+    dd = d2.excel_dt - d1.excel_dt
     return int(dd)
 
 ###############################################################################

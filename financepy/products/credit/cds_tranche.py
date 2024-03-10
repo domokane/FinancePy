@@ -161,7 +161,7 @@ class CDSTranche:
                 issuer_curve = issuer_curves[j]
                 v_times = issuer_curve._times
                 q_row = issuer_curve._values
-                recovery_rates[j] = issuer_curve._recovery_rate
+                recovery_rates[j] = issuer_curve.recovery_rate
                 q_vector[j] = interpolate(
                     t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value)
 
@@ -219,7 +219,7 @@ class CDSTranche:
             tranche_times[i] = t
 
         curve_recovery = 0.0  # For tranches only
-        libor_curve = issuer_curves[0]._libor_curve
+        libor_curve = issuer_curves[0].libor_curve
         tranche_curve = CDSCurve(
             value_dt, [], libor_curve, curve_recovery)
         tranche_curve._times = tranche_times

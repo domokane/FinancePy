@@ -43,40 +43,40 @@ class SwapFloatLeg:
         check_argument_types(self.__init__, locals())
 
         if type(end_dt) == Date:
-            self._termination_dt = end_dt
+            self.termination_dt = end_dt
         else:
-            self._termination_dt = effective_dt.add_tenor(end_dt)
+            self.termination_dt = effective_dt.add_tenor(end_dt)
 
         calendar = Calendar(cal_type)
 
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self.termination_dt,
                                             bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_dt = effective_dt
-        self._end_dt = end_dt
-        self._leg_type = leg_type
-        self._freq_type = freq_type
-        self._payment_lag = payment_lag
-        self._principal = 0.0
-        self._notional = notional
-        self._notional_array = []
-        self._spread = spread
+        self.effective_dt = effective_dt
+        self.end_dt = end_dt
+        self.leg_type = leg_type
+        self.freq_type = freq_type
+        self.payment_lag = payment_lag
+        self.principal = 0.0
+        self.notional = notional
+        self.notional_array = []
+        self.spread = spread
 
-        self._dc_type = dc_type
-        self._cal_type = cal_type
-        self._bd_type = bd_type
-        self._dg_type = dg_type
-        self._end_of_month = end_of_month
+        self.dc_type = dc_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
+        self.dg_type = dg_type
+        self.end_of_month = end_of_month
 
-        self._start_accrued_dts = []
-        self._end_accrued_dts = []
-        self._payment_dts = []
-        self._payments = []
-        self._year_fracs = []
-        self._accrued_days = []
+        self.start_accrued_dts = []
+        self.end_accrued_dts = []
+        self.payment_dts = []
+        self.payments = []
+        self.year_fracs = []
+        self.accrued_days = []
 
         self.generate_payment_dts()
 
@@ -86,49 +86,49 @@ class SwapFloatLeg:
         """ Generate the floating leg payment dates and accrual factors. The
         coupons cannot be generated yet as we do not have the index curve. """
 
-        schedule = Schedule(self._effective_dt,
-                            self._termination_dt,
-                            self._freq_type,
-                            self._cal_type,
-                            self._bd_type,
-                            self._dg_type,
-                            end_of_month=self._end_of_month)
+        schedule = Schedule(self.effective_dt,
+                            self.termination_dt,
+                            self.freq_type,
+                            self.cal_type,
+                            self.bd_type,
+                            self.dg_type,
+                            end_of_month=self.end_of_month)
 
-        schedule_dts = schedule._adjusted_dts
+        schedule_dts = schedule.adjusted_dts
 
         if len(schedule_dts) < 2:
             raise FinError("Schedule has none or only one date")
 
-        self._start_accrued_dts = []
-        self._end_accrued_dts = []
-        self._payment_dts = []
-        self._year_fracs = []
-        self._accrued_days = []
+        self.start_accrued_dts = []
+        self.end_accrued_dts = []
+        self.payment_dts = []
+        self.year_fracs = []
+        self.accrued_days = []
 
         prev_dt = schedule_dts[0]
 
-        day_counter = DayCount(self._dc_type)
-        calendar = Calendar(self._cal_type)
+        day_counter = DayCount(self.dc_type)
+        calendar = Calendar(self.cal_type)
 
         # All of the lists end up with the same length
         for next_dt in schedule_dts[1:]:
 
-            self._start_accrued_dts.append(prev_dt)
-            self._end_accrued_dts.append(next_dt)
+            self.start_accrued_dts.append(prev_dt)
+            self.end_accrued_dts.append(next_dt)
 
-            if self._payment_lag == 0:
+            if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
                 payment_dt = calendar.add_business_days(next_dt,
-                                                        self._payment_lag)
+                                                        self.payment_lag)
 
-            self._payment_dts.append(payment_dt)
+            self.payment_dts.append(payment_dt)
 
             (year_frac, num, _) = day_counter.year_frac(prev_dt,
                                                         next_dt)
 
-            self._year_fracs.append(year_frac)
-            self._accrued_days.append(num)
+            self.year_fracs.append(year_frac)
+            self.accrued_days.append(num)
 
             prev_dt = next_dt
 
@@ -150,32 +150,32 @@ class SwapFloatLeg:
         if index_curve is None:
             index_curve = discount_curve
 
-        self._rates = []
-        self._payments = []
-        self._payment_dfs = []
-        self._payment_pvs = []
-        self._cumulative_pvs = []
+        self.rates = []
+        self.payments = []
+        self.payment_dfs = []
+        self.payment_pvs = []
+        self.cumulative_pvs = []
 
         df_value = discount_curve.df(value_dt)
         leg_pv = 0.0
-        num_payments = len(self._payment_dts)
+        num_payments = len(self.payment_dts)
         first_payment = False
 
-        if not len(self._notional_array):
-            self._notional_array = [self._notional] * num_payments
+        if not len(self.notional_array):
+            self.notional_array = [self.notional] * num_payments
 
-        index_basis = index_curve._dc_type
+        index_basis = index_curve.dc_type
         index_day_counter = DayCount(index_basis)
 
         for i_pmnt in range(0, num_payments):
 
-            pmnt_dt = self._payment_dts[i_pmnt]
+            pmnt_dt = self.payment_dts[i_pmnt]
 
             if pmnt_dt > value_dt:
 
-                start_accrued_dt = self._start_accrued_dts[i_pmnt]
-                end_accrued_dt = self._end_accrued_dts[i_pmnt]
-                pay_alpha = self._year_fracs[i_pmnt]
+                start_accrued_dt = self.start_accrued_dts[i_pmnt]
+                end_accrued_dt = self.end_accrued_dts[i_pmnt]
+                pay_alpha = self.year_fracs[i_pmnt]
 
                 (index_alpha, num, _) = index_day_counter.year_frac(start_accrued_dt,
                                                                     end_accrued_dt)
@@ -191,34 +191,34 @@ class SwapFloatLeg:
                     df_end = index_curve.df(end_accrued_dt)
                     fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
-                pmntAmount = (fwd_rate + self._spread) * \
-                    pay_alpha * self._notional_array[i_pmnt]
+                pmntAmount = (fwd_rate + self.spread) * \
+                    pay_alpha * self.notional_array[i_pmnt]
 
                 df_pmnt = discount_curve.df(pmnt_dt) / df_value
                 pmnt_pv = pmntAmount * df_pmnt
                 leg_pv += pmnt_pv
 
-                self._rates.append(fwd_rate)
-                self._payments.append(pmntAmount)
-                self._payment_dfs.append(df_pmnt)
-                self._payment_pvs.append(pmnt_pv)
-                self._cumulative_pvs.append(leg_pv)
+                self.rates.append(fwd_rate)
+                self.payments.append(pmntAmount)
+                self.payment_dfs.append(df_pmnt)
+                self.payment_pvs.append(pmnt_pv)
+                self.cumulative_pvs.append(leg_pv)
 
             else:
 
-                self._rates.append(0.0)
-                self._payments.append(0.0)
-                self._payment_dfs.append(0.0)
-                self._payment_pvs.append(0.0)
-                self._cumulative_pvs.append(leg_pv)
+                self.rates.append(0.0)
+                self.payments.append(0.0)
+                self.payment_dfs.append(0.0)
+                self.payment_pvs.append(0.0)
+                self.cumulative_pvs.append(leg_pv)
 
         if pmnt_dt > value_dt:
-            payment_pv = self._principal * df_pmnt * self._notional_array[-1]
-            self._payment_pvs[-1] += payment_pv
+            payment_pv = self.principal * df_pmnt * self.notional_array[-1]
+            self.payment_pvs[-1] += payment_pv
             leg_pv += payment_pv
-            self._cumulative_pvs[-1] = leg_pv
+            self.cumulative_pvs[-1] = leg_pv
 
-        if self._leg_type == SwapTypes.PAY:
+        if self.leg_type == SwapTypes.PAY:
             leg_pv = leg_pv * (-1.0)
 
         return leg_pv
@@ -230,13 +230,13 @@ class SwapFloatLeg:
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
-        print("SPREAD (bp):", self._spread * 10000)
-        print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._dc_type))
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
+        print("SPREAD (bp):", self.spread * 10000)
+        print("FREQUENCY:", str(self.freq_type))
+        print("DAY COUNT:", str(self.dc_type))
 
-        if len(self._payment_dts) == 0:
+        if len(self.payment_dts) == 0:
             print("Payments Dates not calculated.")
             return
 
@@ -244,15 +244,15 @@ class SwapFloatLeg:
                   "ACCR_END", "DAYS", "YEARFRAC"]
 
         rows = []
-        num_flows = len(self._payment_dts)
+        num_flows = len(self.payment_dts)
         for i_flow in range(0, num_flows):
             rows.append([
                 i_flow + 1,
-                self._payment_dts[i_flow],
-                self._start_accrued_dts[i_flow],
-                self._end_accrued_dts[i_flow],
-                self._accrued_days[i_flow],
-                round(self._year_fracs[i_flow], 4),
+                self.payment_dts[i_flow],
+                self.start_accrued_dts[i_flow],
+                self.end_accrued_dts[i_flow],
+                self.accrued_days[i_flow],
+                round(self.year_fracs[i_flow], 4),
             ])
 
         table = format_table(header, rows)
@@ -266,13 +266,13 @@ class SwapFloatLeg:
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
-        print("SPREAD (BPS):", self._spread * 10000)
-        print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._dc_type))
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
+        print("SPREAD (BPS):", self.spread * 10000)
+        print("FREQUENCY:", str(self.freq_type))
+        print("DAY COUNT:", str(self.dc_type))
 
-        if len(self._payments) == 0:
+        if len(self.payments) == 0:
             print("Payments not calculated.")
             return
 
@@ -280,17 +280,17 @@ class SwapFloatLeg:
                   "IBOR", "PMNT", "DF", "PV", "CUM_PV"]
 
         rows = []
-        num_flows = len(self._payment_dts)
+        num_flows = len(self.payment_dts)
         for i_flow in range(0, num_flows):
             rows.append([
                 i_flow + 1,
-                self._payment_dts[i_flow],
-                round(self._notional_array[i_flow], 0),
-                round(self._rates[i_flow] * 100.0, 4),
-                round(self._payments[i_flow], 2),
-                round(self._payment_dfs[i_flow], 4),
-                round(self._payment_pvs[i_flow], 2),
-                round(self._cumulative_pvs[i_flow], 2),
+                self.payment_dts[i_flow],
+                round(self.notional_array[i_flow], 0),
+                round(self.rates[i_flow] * 100.0, 4),
+                round(self.payments[i_flow], 2),
+                round(self.payment_dfs[i_flow], 4),
+                round(self.payment_pvs[i_flow], 2),
+                round(self.cumulative_pvs[i_flow], 2),
             ])
 
         table = format_table(header, rows)
@@ -300,17 +300,17 @@ class SwapFloatLeg:
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._effective_dt)
-        s += label_to_string("TERMINATION DATE", self._termination_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("SWAP TYPE", self._leg_type)
-        s += label_to_string("SPREAD (BPS)", self._spread*10000)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT", self._dc_type)
-        s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_type)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("START DATE", self.effective_dt)
+        s += label_to_string("TERMINATION DATE", self.termination_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("NOTIONAL", self.notional)
+        s += label_to_string("SWAP TYPE", self.leg_type)
+        s += label_to_string("SPREAD (BPS)", self.spread*10000)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAY COUNT", self.dc_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 

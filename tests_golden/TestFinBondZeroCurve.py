@@ -41,7 +41,7 @@ def test_BondZeroCurve():
         date_string = bondRow['maturity']
         mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
         maturity_dt = from_datetime(mat_date_time)
-        issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+        issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
         coupon = bondRow['coupon']/100.0
         clean_price = bondRow['mid']
         bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)

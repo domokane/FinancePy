@@ -7,7 +7,7 @@ import numpy as np
 
 ###############################################################################
 
-from ..utils.math import norminvcdf, N, inv_root_two_pi
+from ..utils.math import norminvcdf, N, INV_ROOT_2_PI
 from ..utils.error import FinError
 from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
 from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
@@ -76,7 +76,7 @@ def loss_dbn_recursion_gcd(num_credits,
         z += dz
 
     for i_unit in range(0, int(num_loss_units)):
-        uncond_loss_dbn[i_unit] *= inv_root_two_pi * dz
+        uncond_loss_dbn[i_unit] *= INV_ROOT_2_PI * dz
 
     return uncond_loss_dbn
 
@@ -222,8 +222,8 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
         expd2 = np.exp(-0.5 * d2 * d2)
 
         tranche_loss = ((mu - k1) * N(d1) - (mu - k2) * N(d2)
-                        + sigma * expd1 * inv_root_two_pi
-                        - sigma * expd2 * inv_root_two_pi)
+                        + sigma * expd1 * INV_ROOT_2_PI
+                        - sigma * expd2 * INV_ROOT_2_PI)
 
     return tranche_loss
 
@@ -287,7 +287,7 @@ def tranch_surv_prob_gaussian(k1,
         v += el * gauss_wt
         z += dz
 
-    v *= inv_root_two_pi * dz
+    v *= INV_ROOT_2_PI * dz
     q = 1.0 - v / (k2 - k1)
     return q
 
@@ -337,7 +337,7 @@ def loss_dbn_hetero_adj_binomial(num_credits,
         z = z + dz
 
     for i_loss_unit in range(0, num_loss_units):
-        uncond_loss_dbn[i_loss_unit] *= inv_root_two_pi * dz
+        uncond_loss_dbn[i_loss_unit] *= INV_ROOT_2_PI * dz
 
     return uncond_loss_dbn
 

@@ -199,7 +199,7 @@ def test_IntraDay():
     d2 = Date(25, 10, 2019, 0, 0, 0)
     diff = d2 - d1
     test_cases.print(d1, d2, diff)
-    test_cases.print(d1._excel_dt, d2._excel_dt, diff)
+    test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
     ###########################################################################
 
@@ -207,7 +207,7 @@ def test_IntraDay():
     d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
     test_cases.print(d1, d2, diff)
-    test_cases.print(d1._excel_dt, d2._excel_dt, diff)
+    test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
     ###########################################################################
 
@@ -215,7 +215,7 @@ def test_IntraDay():
     d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
     test_cases.print(d1, d2, diff)
-    test_cases.print(d1._excel_dt, d2._excel_dt, diff)
+    test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
     ###########################################################################
 
@@ -223,7 +223,7 @@ def test_IntraDay():
     d2 = Date(20, 10, 2019, 10, 25, 40)
     diff = d2 - d1
     test_cases.print(d1, d2, diff)
-    test_cases.print(d1._excel_dt, d2._excel_dt, diff)
+    test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
 ###############################################################################
 

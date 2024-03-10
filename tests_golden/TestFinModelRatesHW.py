@@ -136,14 +136,14 @@ def test_HullWhiteBondOption():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._cpn / bond._freq
+    cpn = bond.cpn / bond.freq
 
-    num_flows = len(bond._cpn_dts)
+    num_flows = len(bond.cpn_dts)
 
     for i in range(1, num_flows):
 
-        pcd = bond._cpn_dts[i-1]
-        ncd = bond._cpn_dts[i]
+        pcd = bond.cpn_dts[i-1]
+        ncd = bond.cpn_dts[i]
 
         if ncd > settle_dt:
 
@@ -234,9 +234,9 @@ def test_HullWhiteCallableBond():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._cpn / bond._freq
+    cpn = bond.cpn / bond.freq
 
-    for flow_dt in bond._cpn_dts[1:]:
+    for flow_dt in bond.cpn_dts[1:]:
 
         if flow_dt > settle_dt:
             flow_time = (flow_dt - settle_dt) / gDaysInYear
@@ -304,7 +304,7 @@ def test_HullWhiteCallableBond():
     dfs = []
     times = []
 
-    for dt in bond._cpn_dts:
+    for dt in bond.cpn_dts:
         if dt > settle_dt:
             t = (dt - settle_dt) / gDaysInYear
             df = curve.df(dt)

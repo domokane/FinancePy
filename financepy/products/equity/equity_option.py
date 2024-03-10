@@ -156,8 +156,8 @@ class EquityOption:
         next_dt = value_dt.add_days(1)
 
         # Need to do this carefully. This is a bit hacky.
-        discount_curve._value_dt = next_dt
-        dividend_curve._value_dt = next_dt
+        discount_curve.value_dt = next_dt
+        dividend_curve.value_dt = next_dt
         bump = (next_dt - value_dt) / gDaysInYear
 
         v_bumped = self.value(next_dt, stock_price,
@@ -165,8 +165,8 @@ class EquityOption:
                               dividend_curve, model)
 
         # restore valuation dates
-        discount_curve._value_dt = value_dt
-        dividend_curve._value_dt = value_dt
+        discount_curve.value_dt = value_dt
+        dividend_curve.value_dt = value_dt
 
         theta = (v_bumped - v) / bump
         return theta

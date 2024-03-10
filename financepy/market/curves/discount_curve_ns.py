@@ -43,13 +43,13 @@ class DiscountCurveNS(DiscountCurve):
         if tau <= 0:
             raise FinError("Tau must be positive")
 
-        self._value_dt = value_dt
+        self.value_dt = value_dt
         self._beta_0 = beta_0
         self._beta_1 = beta_1
         self._beta_2 = beta_2
         self._tau = tau
-        self._freq_type = freq_type
-        self._dc_type = dc_type
+        self.freq_type = freq_type
+        self.dc_type = dc_type
 
     ###########################################################################
 
@@ -73,18 +73,18 @@ class DiscountCurveNS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_dt,
-                                    self._dc_type)
+                                    self.value_dt,
+                                    self.dc_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
 
         # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(self._value_dt,
+        dfs = self._zero_to_df(self.value_dt,
                                zero_rates,
                                dc_times,
-                               self._freq_type,
-                               self._dc_type)
+                               self.freq_type,
+                               self.dc_type)
 
         # Convert these to zero rates in the required frequency and day count
         zero_rates = self._df_to_zero(dfs,
@@ -122,16 +122,16 @@ class DiscountCurveNS(DiscountCurve):
 
         # Get day count times to use with curve day count convention
         dc_times = times_from_dates(dates,
-                                    self._value_dt,
-                                    self._dc_type)
+                                    self.value_dt,
+                                    self.dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self._value_dt,
+        df = self._zero_to_df(self.value_dt,
                               zero_rates,
                               dc_times,
-                              self._freq_type,
-                              self._dc_type)
+                              self.freq_type,
+                              self.dc_type)
 
         if isinstance(dates, Date):
             return df[0]
@@ -148,8 +148,8 @@ class DiscountCurveNS(DiscountCurve):
         s += label_to_string("beta_1", self._beta_1)
         s += label_to_string("beta_2", self._beta_2)
         s += label_to_string("TAU", self._tau)
-        s += label_to_string("FREQUENCY", (self._freq_type))
-        s += label_to_string("DAY_COUNT", (self._dc_type))
+        s += label_to_string("FREQUENCY", (self.freq_type))
+        s += label_to_string("DAY_COUNT", (self.dc_type))
         return s
 
     ###########################################################################

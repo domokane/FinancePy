@@ -23,16 +23,14 @@ from enum import Enum
 def is_last_day_of_feb(dt: Date):
     ''' Returns True if we are on the last day of February '''
 
-    if dt.m() == 2:
-        is_leap = is_leap_year(dt._y)
-        if is_leap is True and dt.d() == 29:
+    if dt.m == 2:
+        is_leap = is_leap_year(dt.y)
+        if is_leap is True and dt.d == 29:
             return True
-        if is_leap is False and dt.d() == 28:
+        if is_leap is False and dt.d == 28:
             return True
     else:
         return False
-
-###############################################################################
 
 ###############################################################################
 #    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA2000)
@@ -67,14 +65,13 @@ class DayCount:
     """ Calculate the fractional day count between two dates according to a
     specified day count convention. """
 
-    def __init__(self,
-                 dccType: DayCountTypes):
+    def __init__(self, dcc_type: DayCountTypes):
         """ Create Day Count convention by passing in the Day Count Type. """
 
-        if dccType not in DayCountTypes:
+        if dcc_type not in DayCountTypes:
             raise FinError("Need to pass FinDayCountType")
 
-        self._type = dccType
+        self._type = dcc_type
 
 ###############################################################################
 
@@ -83,7 +80,7 @@ class DayCount:
                   dt2: Date,  # Settlement (for bonds) or period end(swaps)
                   dt3: Date = None,  # End of coupon period for accrued
                   freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                  isTerminationDate: bool = False):  # Is dt2 a term date
+                  is_termination_date: bool = False):  # Is dt2 a term date
         """ This method performs two functions:
 
         1) It calculates the year fraction between dates dt1 and dt2 using the
@@ -108,13 +105,13 @@ class DayCount:
         http://data.cbonds.info/files/cbondscalc/Calculator.pdf
         """
 
-        d1 = dt1.d()
-        m1 = dt1.m()
-        y1 = dt1.y()
+        d1 = dt1.d
+        m1 = dt1.m
+        y1 = dt1.y
 
-        d2 = dt2.d()
-        m2 = dt2.m()
-        y2 = dt2.y()
+        d2 = dt2.d
+        m2 = dt2.m
+        y2 = dt2.y
 
         num = 0
         den = 0
@@ -167,7 +164,7 @@ class DayCount:
                 d2 = 30
 
             last_day_of_feb2 = is_last_day_of_feb(dt2)
-            if last_day_of_feb2 is True and isTerminationDate is False:
+            if last_day_of_feb2 is True and is_termination_date is False:
                 d2 = 30
 
             num = 360 * (y2 - y1) + 30 * (m2 - m1) + (d2 - d1)
@@ -255,7 +252,7 @@ class DayCount:
             if dt3 is None:
                 y3 = y2
             else:
-                y3 = dt3._y
+                y3 = dt3.y
 
             num = dt2 - dt1
             den = 365

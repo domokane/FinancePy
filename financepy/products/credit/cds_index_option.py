@@ -11,7 +11,7 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import gDaysInYear
-from ...utils.math import ONE_MILLION, inv_root_two_pi, N
+from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, N
 from ...utils.error import FinError
 from ...products.credit.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
@@ -144,7 +144,7 @@ class CDSIndexOption:
         time_to_expiry = (self._expiry_dt - value_dt) / gDaysInYear
 #        timeToMaturity = (self._maturity_dt - value_dt) / gDaysInYear
         df_to_expiry = issuer_curves[0].df(time_to_expiry)
-        libor_curve = issuer_curves[0]._libor_curve
+        libor_curve = issuer_curves[0].libor_curve
 
         k = self._strike_coupon
         c = self._index_coupon
@@ -171,7 +171,7 @@ class CDSIndexOption:
 
             issuer_curve = issuer_curves[i_credit]
             q = issuer_curve.survival_prob(time_to_expiry)
-            dh1 = (1.0 - issuer_curve._recovery_rate) * (1.0 - q)
+            dh1 = (1.0 - issuer_curve.recovery_rate) * (1.0 - q)
 
             s = self._cds_contract.par_spread(value_dt, issuer_curve)
             rpv01 = self._cds_contract.risky_pv01(value_dt, issuer_curve)
@@ -345,8 +345,8 @@ class CDSIndexOption:
             int_h += h * pdf
             int_max_h += maxh * pdf
 
-        int_h *= inv_root_two_pi * dz
-        int_max_h *= inv_root_two_pi * dz * df_to_expiry
+        int_h *= INV_ROOT_2_PI * dz
+        int_max_h *= INV_ROOT_2_PI * dz * df_to_expiry
         return int_h, int_max_h
 
 ###############################################################################

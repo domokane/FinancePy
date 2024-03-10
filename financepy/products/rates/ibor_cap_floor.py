@@ -110,7 +110,7 @@ class IborCapFloor():
                             self._bd_type,
                             self._dg_type)
 
-        self._capFloorLetDates = schedule._adjusted_dts
+        self._capFloorLetDates = schedule.adjusted_dts
 
 ##########################################################################
 

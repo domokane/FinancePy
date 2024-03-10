@@ -410,7 +410,7 @@ class CDS:
 
         # we create a deep copy to avoid state issues
         bumpedIssuerCurve = deepcopy(issuer_curve)
-        for cds in bumpedIssuerCurve._cds_contracts:
+        for cds in bumpedIssuerCurve.cds_contracts:
             cds._running_cpn += bump
 
         bumpedIssuerCurve._build_curve()
@@ -449,29 +449,29 @@ class CDS:
 
         bump = 0.0001  # 1 basis point
 
-        for depo in new_issuer_curve._libor_curve._used_deposits:
+        for depo in new_issuer_curve.libor_curve._used_deposits:
 
-            depo._deposit_rate += bump
+            depo.deposit_rate += bump
 
-        for fra in new_issuer_curve._libor_curve._used_fras:
+        for fra in new_issuer_curve.libor_curve._used_fras:
 
-            fra._fra_rate += bump
+            fra.fra_rate += bump
 
-        for swap in new_issuer_curve._libor_curve._used_swaps:
+        for swap in new_issuer_curve.libor_curve._used_swaps:
 
-            cpn = swap._fixed_leg._cpn
-            swap._fixed_leg._cpn = cpn + bump
+            cpn = swap.fixed_leg.cpn
+            swap.fixed_leg.cpn = cpn + bump
 
             # Need to regenerate fixed leg payments with bumped cpn
             # I could call swap._fixed_leg.generate_payments() but it is
             # overkill as it has to do all the schedule generation which is
             # not needed as the dates are unchanged
-            num_payments = len(swap._fixed_leg._payments)
+            num_payments = len(swap.fixed_leg.payments)
             for i in range(0, num_payments):
-                old_pmt = swap._fixed_leg._payments[i]
-                swap._fixed_leg._payments[i] = old_pmt * (cpn + bump) / cpn
+                old_pmt = swap.fixed_leg.payments[i]
+                swap.fixed_leg.payments[i] = old_pmt * (cpn + bump) / cpn
 
-        new_issuer_curve._libor_curve._build_curve()
+        new_issuer_curve.libor_curve._build_curve()
         new_issuer_curve._build_curve()
 
         v1 = self.value(value_dt,
@@ -581,7 +581,7 @@ class CDS:
         teff = (self._step_in_dt - value_dt) / gDaysInYear
         t_mat = (self._maturity_dt - value_dt) / gDaysInYear
 
-        libor_curve = issuer_curve._libor_curve
+        libor_curve = issuer_curve.libor_curve
 
         v = _prot_leg_pv_numba(teff,
                                      t_mat,
@@ -604,7 +604,7 @@ class CDS:
         """ The risky_pv01 is the present value of a risky one dollar paid on
         the premium leg of a CDS contract. """
 
-        libor_curve = issuer_curve._libor_curve
+        libor_curve = issuer_curve.libor_curve
 
         payment_times = []
         for date in self._payment_dts:

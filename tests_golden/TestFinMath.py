@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import time
 import numpy as np
 from financepy.utils.math import normcdf_integrate
@@ -9,9 +12,6 @@ from financepy.utils.math import N
 from financepy.utils.math import normcdf_slow
 from financepy.utils.math import norminvcdf
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

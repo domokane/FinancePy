@@ -134,12 +134,12 @@ class BondEmbeddedOption:
         model and a discount curve. """
 
         # Generate bond coupon flow schedule
-        cpn = self._bond._cpn/self._bond._freq
+        cpn = self._bond.cpn/self._bond.freq
 
         cpn_times = []
         cpn_amounts = []
 
-        for flow_dt in self._bond._cpn_dts[1:]:
+        for flow_dt in self._bond.cpn_dts[1:]:
             if flow_dt > settle_dt:
                 cpn_time = (flow_dt - settle_dt) / gDaysInYear
                 cpn_times.append(cpn_time)
@@ -166,7 +166,7 @@ class BondEmbeddedOption:
         put_times = np.array(put_times)
         put_prices = np.array(self._put_prices)
 
-        maturity_dt = self._bond._maturity_dt
+        maturity_dt = self._bond.maturity_dt
         t_mat = (maturity_dt - settle_dt) / gDaysInYear
         df_times = discount_curve._times
         df_values = discount_curve._dfs

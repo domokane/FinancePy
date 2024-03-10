@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
 from math import sqrt
 from numpy import ndarray
 from numba import njit, float64, int32

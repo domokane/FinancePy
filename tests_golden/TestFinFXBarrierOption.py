@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -10,8 +13,6 @@ from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
-import sys
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -27,16 +28,16 @@ def test_FinFXBarrierOption():
     currency_pair = "USDJPY"
     volatility = 0.20
     dom_interest_rate = 0.05
-    forInterestRate = 0.02
+    for_interest_rate = 0.02
     option_type = FinFXBarrierTypes.DOWN_AND_OUT_CALL
     notional = 100.0
     notional_currency = "USD"
 
-    drift = dom_interest_rate - forInterestRate
+    drift = dom_interest_rate - for_interest_rate
     scheme = FinGBMNumericalScheme.ANTITHETIC
     process_type = ProcessTypes.GBM
     domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
+    foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
     model = BlackScholes(volatility)
 
     ###########################################################################

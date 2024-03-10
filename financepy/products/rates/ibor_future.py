@@ -45,16 +45,16 @@ class IborFuture:
         if futureTenor != "3M" and futureTenor != "3m":
             raise FinError("Only 3M IMM futures handled currently.")
 
-        self._delivery_dt = today_dt.next_imm_date()
+        self.delivery_dt = today_dt.next_imm_date()
 
         for iFut in range(0, future_number - 1):
-            self._delivery_dt = self._delivery_dt.next_imm_date()
+            self.delivery_dt = self.delivery_dt.next_imm_date()
 
-        self._end_of_interest_period = self._delivery_dt.next_imm_date()
+        self.end_of_interest_period = self.delivery_dt.next_imm_date()
 
-        self._last_trading_dt = self._delivery_dt.add_days(-2)
-        self._dc_type = dc_type
-        self._contract_size = contract_size
+        self.last_trading_dt = self.delivery_dt.add_days(-2)
+        self.dc_type = dc_type
+        self.contract_size = contract_size
 
 ###############################################################################
 
@@ -65,11 +65,11 @@ class IborFuture:
 
         fra_rate = self.fra_rate(futures_price, convexity)
 
-        fra = IborFRA(self._delivery_dt,
-                      self._end_of_interest_period,
+        fra = IborFRA(self.delivery_dt,
+                      self.end_of_interest_period,
                       fra_rate,
-                      self._dc_type,
-                      notional=self._contract_size,
+                      self.dc_type,
+                      notional=self.contract_size,
                       pay_fixed_rate=False)
 
         return fra
@@ -110,8 +110,8 @@ class IborFuture:
 
         a = mean_reversion
         t0 = 0.0
-        t1 = (self._last_trading_dt - value__dt) / gDaysInYear
-        t2 = (self._end_of_interest_period - value__dt) / gDaysInYear
+        t1 = (self.last_trading_dt - value__dt) / gDaysInYear
+        t2 = (self.end_of_interest_period - value__dt) / gDaysInYear
 
         # Hull White model for short rate dr = (theta(t)-ar) dt + sigma * dz
         # This reduces to Ho-Lee when a = 0 so to avoid divergences I provide
@@ -135,11 +135,11 @@ class IborFuture:
         """ Print a list of the unadjusted coupon payment _dts used in
         analytic calculations for the bond. """
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("LAST TRADING DATE", self._last_trading_dt)
-        s += label_to_string("DELIVERY DATE", self._delivery_dt)
-        s += label_to_string("END INTEREST PERIOD", self._end_of_interest_period)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("CONTRACT SIZE", self._contract_size)
+        s += label_to_string("LAST TRADING DATE", self.last_trading_dt)
+        s += label_to_string("DELIVERY DATE", self.delivery_dt)
+        s += label_to_string("END INTEREST PERIOD", self.end_of_interest_period)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("CONTRACT SIZE", self.contract_size)
         return s
 
 ##########################################################################

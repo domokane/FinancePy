@@ -37,7 +37,7 @@ def test_IborBermudanSwaptionBKModel():
 
     swap_fixed_coupon = 0.060
     swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-    swapFixedDayCountType = DayCountTypes.ACT_365F
+    swap_fixed_day_count_type = DayCountTypes.ACT_365F
 
     libor_curve = DiscountCurveFlat(value_dt,
                                     0.0625,
@@ -49,7 +49,7 @@ def test_IborBermudanSwaptionBKModel():
                           SwapTypes.PAY,
                           swap_fixed_coupon,
                           swap_fixed_freq_type,
-                          swapFixedDayCountType)
+                          swap_fixed_day_count_type)
 
     fwdSwapValue = fwdPAYSwap.value(settle_dt, libor_curve, libor_curve)
 
@@ -66,7 +66,7 @@ def test_IborBermudanSwaptionBKModel():
                                        fixed_leg_type,
                                        swap_fixed_coupon,
                                        swap_fixed_freq_type,
-                                       swapFixedDayCountType)
+                                       swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     europeanSwaptionRec = IborSwaption(settle_dt,
@@ -75,7 +75,7 @@ def test_IborBermudanSwaptionBKModel():
                                        fixed_leg_type,
                                        swap_fixed_coupon,
                                        swap_fixed_freq_type,
-                                       swapFixedDayCountType)
+                                       swap_fixed_day_count_type)
 
     ###########################################################################
     ###########################################################################
@@ -175,7 +175,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
@@ -187,7 +187,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     test_cases.banner(
         "======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE BK MODEL ========")
@@ -239,7 +239,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
@@ -251,7 +251,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     test_cases.banner(
         "======= ZERO VOLATILITY BERMUDAN SWAPTION BERMUDAN EXERCISE BK MODEL ========")
@@ -350,7 +350,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
@@ -360,7 +360,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     test_cases.banner(
         "======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE BDT MODEL ========")
@@ -410,7 +410,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
@@ -420,7 +420,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     test_cases.banner(
         "======= ZERO VOLATILITY BERMUDAN SWAPTION BERMUDAN EXERCISE BDT MODEL ========")
@@ -519,7 +519,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
@@ -529,7 +529,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     test_cases.banner(
         "======= 0% VOLATILITY BERMUDAN SWAPTION EUROPEAN EXERCISE HW MODEL ========")
@@ -578,7 +578,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     fixed_leg_type = SwapTypes.RECEIVE
     bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
@@ -588,7 +588,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  exercise_type,
                                                  swap_fixed_coupon,
                                                  swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+                                                 swap_fixed_day_count_type)
 
     test_cases.banner(
         "======= ZERO VOLATILITY BERMUDAN SWAPTION BERMUDAN EXERCISE HW MODEL ========")

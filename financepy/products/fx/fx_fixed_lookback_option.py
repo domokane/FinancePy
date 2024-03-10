@@ -62,11 +62,11 @@ class FXFixedLookbackOption:
         if value_dt > self._expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve._value_dt != value_dt:
+        if domestic_curve.value_dt != value_dt:
             raise FinError(
                 "Domestic Curve valuation date not same as option value date")
 
-        if foreign_curve._value_dt != value_dt:
+        if foreign_curve.value_dt != value_dt:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 

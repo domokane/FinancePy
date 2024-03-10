@@ -31,7 +31,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##########################################################################
 
-def build_Ibor_Curve(value_dt):
+def build_ibor_curve(value_dt):
     depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
     deposit_rate = 0.050
@@ -222,7 +222,6 @@ def build_Ibor_Curve(value_dt):
 
     return libor_curve
 
-
 ##########################################################################
 
 
@@ -248,7 +247,7 @@ def test_bond():
             date_string = bond['maturity']
             mat_dt_time = dt.datetime.strptime(date_string, '%d-%b-%y')
             maturity_dt = from_datetime(mat_dt_time)
-            issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+            issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
 
             coupon = bond['coupon'] / 100.0
             clean_price = bond['mid']
@@ -331,7 +330,7 @@ def test_bond():
     test_cases.print("Discounted on Bond Curve ASW:", asw * 10000)
 
     # When the libor curve is the Libor curve then the ASW is positive
-    libor_curve = build_Ibor_Curve(settle_dt)
+    libor_curve = build_ibor_curve(settle_dt)
     asw = bond.asset_swap_spread(settle_dt, clean_price, libor_curve)
     oas = bond.option_adjusted_spread(
         settle_dt, clean_price, libor_curve)
@@ -487,7 +486,7 @@ def test_bond():
 ###############################################################################
 
 
-def test_BondExDividend():
+def test_bond_ex_dividend():
 
     issue_dt = Date(7, 9, 2000)
     maturity_dt = Date(7, 9, 2020)
@@ -518,8 +517,7 @@ def test_BondExDividend():
     face = 100.0
     ex_div_days = 7
 
-    bond = Bond(issue_dt, maturity_dt, coupon,
-                freq_type, dc_type, ex_div_days)
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
     settle_dt = Date(25, 8, 2010)
 
@@ -527,17 +525,15 @@ def test_BondExDividend():
 
     for _ in range(0, 13):
         settle_dt = settle_dt.add_days(1)
-        accrued = bond.accrued_interest(
-            settle_dt, face)
-        dirty_price = bond.dirty_price_from_ytm(
-            settle_dt, ytm)
+        accrued = bond.accrued_interest(settle_dt, face)
+        dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
         clean_price = dirty_price - accrued
         test_cases.print(settle_dt, dirty_price, accrued, clean_price)
 
 ###############################################################################
 
 
-def test_BondPaymentDates():
+def test_bond_payment_dates():
 
     from financepy.products.bonds.bond import Bond
     from financepy.utils import Date, DayCountTypes, FrequencyTypes
@@ -558,7 +554,7 @@ def test_BondPaymentDates():
 ###############################################################################
 
 
-def test_Bond_ror():
+def test_bond_ror():
 
     test_case_file = 'test_cases_bond_ror.csv'
     df = pd.read_csv('.//data//' + test_case_file, parse_dates=['buy_date',
@@ -591,7 +587,7 @@ def test_Bond_ror():
 
 ###############################################################################
 
-def test_Bond_eom():
+def test_bond_eom():
 
     # Bonds that mature on an EOM date have flows on EOM dates
     issue_dt = Date(30, 11, 2022)
@@ -634,7 +630,7 @@ def test_key_rate_durations():
 ###############################################################################
 
 
-def test_key_rate_durations_Bloomberg_example():
+def test_key_rate_durations_bloomberg_example():
 
     dc_type, frequencyType, settle_days, exDiv, calendar =\
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
@@ -736,11 +732,11 @@ def test_div_dts():
 
 test_bond()
 test_oas()
-test_BondExDividend()
-test_BondPaymentDates()
-test_Bond_ror()
-test_Bond_eom()
+test_bond_ex_dividend()
+test_bond_payment_dates()
+test_bond_ror()
+test_bond_eom()
 test_key_rate_durations()
-test_key_rate_durations_Bloomberg_example()
+test_key_rate_durations_bloomberg_example()
 
 test_cases.compareTestCases()

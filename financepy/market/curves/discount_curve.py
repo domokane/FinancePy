@@ -72,19 +72,15 @@ class DiscountCurve:
             print(self._times)
             raise FinError("Times are not sorted in increasing order")
 
-        self._value_dt = value_dt
-        self._dfs = np.array(self._dfs)
-        self._interp_type = interp_type
-        self._freq_type = FrequencyTypes.CONTINUOUS
+        self.value_dt = value_dt
+        self.interp_type = interp_type
+        self.freq_type = FrequencyTypes.CONTINUOUS
         # This needs to be thought about - I just assign an arbitrary value
-        self._dc_type = DayCountTypes.ACT_ACT_ISDA
-        self._interpolator = Interpolator(self._interp_type)
+        self.dc_type = DayCountTypes.ACT_ACT_ISDA
+
+        self._dfs = np.array(self._dfs)
+        self._interpolator = Interpolator(self.interp_type)
         self._interpolator.fit(self._times, self._dfs)
-
-    ###########################################################################
-
-    def value_dt(self):
-        return self._value_dt
 
     ###########################################################################
 
@@ -151,7 +147,7 @@ class DiscountCurve:
         zero_rates = []
 
         times = times_from_dates(
-            date_list, self._value_dt, dc_type)
+            date_list, self.value_dt, dc_type)
 
         for i in range(0, num_dates):
 
@@ -225,7 +221,7 @@ class DiscountCurve:
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 
-        if effective_dt < self._value_dt:
+        if effective_dt < self.value_dt:
             raise FinError("Swap starts before the curve valuation date.")
 
         if isinstance(freq_type, FrequencyTypes) is False:
@@ -293,7 +289,7 @@ class DiscountCurve:
         vector of dates. The day count determines how dates get converted to
         years. I allow this to default to ACT_ACT_ISDA unless specified. '''
 
-        times = times_from_dates(dt, self._value_dt, day_count)
+        times = times_from_dates(dt, self.value_dt, day_count)
         dfs = self._df(times)
 
         if isinstance(dfs, float):
@@ -308,14 +304,14 @@ class DiscountCurve:
         """ Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. """
 
-        if self._interp_type is InterpTypes.FLAT_FWD_RATES or \
-                self._interp_type is InterpTypes.LINEAR_ZERO_RATES or \
-                self._interp_type is InterpTypes.LINEAR_FWD_RATES:
+        if self.interp_type is InterpTypes.FLAT_FWD_RATES or \
+                self.interp_type is InterpTypes.LINEAR_ZERO_RATES or \
+                self.interp_type is InterpTypes.LINEAR_FWD_RATES:
 
             df = interpolate(t,
                              self._times,
                              self._dfs,
-                             self._interp_type.value)
+                             self.interp_type.value)
 
         else:
 
@@ -396,7 +392,7 @@ class DiscountCurve:
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        disc_curve = DiscountCurve(self._value_dt,
+        disc_curve = DiscountCurve(self.value_dt,
                                    times,
                                    values,
                                    self._interp_type)

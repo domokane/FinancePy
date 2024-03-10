@@ -63,39 +63,39 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
 ###############################################################################
 
 
-if 1 == 0:
+# if 1 == 0:
 
-    txt = "NOV-15-2017      11875.00\n\
-    MAY-15-2018      11875.00\n\
-    NOV-15-2018      11875.00\n\
-    MAY-15-2019      11875.00\n\
-    NOV-15-2019      11875.00\n\
-    MAY-15-2020      11875.00\n\
-    NOV-15-2020      11875.00\n\
-    MAY-15-2021      11875.00\n\
-    NOV-15-2021      11875.00\n\
-    MAY-15-2022      11875.00\n\
-    NOV-15-2022      11875.00\n\
-    MAY-15-2023      11875.00\n\
-    NOV-15-2023      11875.00\n\
-    MAY-15-2024      11875.00\n\
-    NOV-15-2024      11875.00\n\
-    MAY-15-2025      11875.00\n\
-    NOV-15-2025      11875.00\n\
-    MAY-15-2026      11875.00\n\
-    NOV-15-2026      11875.00\n\
-    MAY-15-2027    1011875.00"
+#     TXT = "NOV-15-2017      11875.00\n\
+#     MAY-15-2018      11875.00\n\
+#     NOV-15-2018      11875.00\n\
+#     MAY-15-2019      11875.00\n\
+#     NOV-15-2019      11875.00\n\
+#     MAY-15-2020      11875.00\n\
+#     NOV-15-2020      11875.00\n\
+#     MAY-15-2021      11875.00\n\
+#     NOV-15-2021      11875.00\n\
+#     MAY-15-2022      11875.00\n\
+#     NOV-15-2022      11875.00\n\
+#     MAY-15-2023      11875.00\n\
+#     NOV-15-2023      11875.00\n\
+#     MAY-15-2024      11875.00\n\
+#     NOV-15-2024      11875.00\n\
+#     MAY-15-2025      11875.00\n\
+#     NOV-15-2025      11875.00\n\
+#     MAY-15-2026      11875.00\n\
+#     NOV-15-2026      11875.00\n\
+#     MAY-15-2027    1011875.00"
 
-    latex_str = convertToLatexTable(txt, " ", ["Dates","Flows"])
-    print(latex_str)
+#     latex_str = convertToLatexTable(TXT, " ", ["Dates","Flows"])
+#     print(latex_str)
 
-    txt="OBJECT TYPE: Bond\n\
-    ISSUE DATE: MAY-15-2010\n\
-    MATURITY DATE: MAY-15-2027\n\
-    COUPON: 0.02375\n\
-    FREQUENCY: FrequencyTypes.SEMI_ANNUAL\n\
-    DAY COUNT TYPE: DayCountTypes.ACT_ACT_ICMA\n\
-    FACE AMOUNT: 1000000"
+#     txt="OBJECT TYPE: Bond\n\
+#     ISSUE DATE: MAY-15-2010\n\
+#     MATURITY DATE: MAY-15-2027\n\
+#     COUPON: 0.02375\n\
+#     FREQUENCY: FrequencyTypes.SEMI_ANNUAL\n\
+#     DAY COUNT TYPE: DayCountTypes.ACT_ACT_ICMA\n\
+#     FACE AMOUNT: 1000000"
 
-    latex_str = convertToLatexTable(txt, ":", ["FIELD", "VALUE"])
-    print(latex_str)
+#     latex_str = convertToLatexTable(TXT, ":", ["FIELD", "VALUE"])
+#     print(latex_str)

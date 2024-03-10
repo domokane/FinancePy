@@ -37,7 +37,7 @@ def test_dt_adjust():
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dts:
+    for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
 
     test_cases.banner("")
@@ -54,7 +54,7 @@ def test_dt_adjust():
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dts:
+    for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
 
     test_cases.banner("")
@@ -71,7 +71,7 @@ def test_dt_adjust():
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dts:
+    for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
 
     test_cases.banner("")
@@ -92,7 +92,7 @@ def test_dt_adjust():
                         bd_type,
                         dg_type)
 
-    for dt in schedule._adjusted_dts:
+    for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
 
 ###############################################################################

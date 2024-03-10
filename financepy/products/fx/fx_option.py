@@ -122,8 +122,8 @@ class FXOption:
 
         next_dt = value_dt.add_days(1)
 
-        domestic_curve._value_dt = next_dt
-        foreign_curve._value_dt = next_dt
+        domestic_curve.value_dt = next_dt
+        foreign_curve.value_dt = next_dt
 
         v_bumped = self.value(next_dt, spot_fx_rate, domestic_curve,
                               foreign_curve, model)
@@ -135,8 +135,9 @@ class FXOption:
         else:
             theta = (v_bumped - v) / bump
 
-        domestic_curve._value_dt = value_dt
-        foreign_curve._value_dt = value_dt
+        # Don't forget to reset the value dates
+        domestic_curve.value_dt = value_dt
+        foreign_curve.value_dt = value_dt
 
         return theta
 

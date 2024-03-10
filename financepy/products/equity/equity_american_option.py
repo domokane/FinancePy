@@ -58,11 +58,11 @@ class EquityAmericanOption(EquityOption):
         """ Valuation of an American option using a CRR tree to take into
         account the value of early exercise. """
 
-        if discount_curve.value_dt() != value_dt:
+        if discount_curve.value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date")
 
-        if dividend_curve.value_dt() != value_dt:
+        if dividend_curve.value_dt != value_dt:
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 

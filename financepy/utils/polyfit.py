@@ -18,14 +18,14 @@ import matplotlib.pyplot as plt
 
 @numba.njit("f8[:,:](f8[:], i8)")
 def _coeff_mat(x, deg):
-    mat_ = np.zeros(shape=(x.shape[0], deg + 1))
+    mat = np.zeros(shape=(x.shape[0], deg + 1))
     c = np.ones_like(x)
-    mat_[:, 0] = c
-    mat_[:, 1] = x
+    mat[:, 0] = c
+    mat[:, 1] = x
     if deg > 1:
         for n in range(2, deg + 1):
-            mat_[:, n] = x**n
-    return mat_
+            mat[:, n] = x**n
+    return mat
 
 ###############################################################################
 
@@ -33,8 +33,8 @@ def _coeff_mat(x, deg):
 @numba.njit("f8[:](f8[:,:], f8[:])")
 def _fit_x(a, b):
     # linalg solves ax = b
-    det_ = np.linalg.lstsq(a, b)[0]
-    return det_
+    det = np.linalg.lstsq(a, b)[0]
+    return det
 
 ###############################################################################
 
@@ -65,16 +65,16 @@ def eval_polynomial(P, x):
 ###############################################################################
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    # Create Dummy Data and use existing numpy polyfit as test
-    x = np.linspace(0, 2, 20)
-    y = np.cos(x) + 0.3*np.random.rand(20)
-    p = np.poly1d(np.polyfit(x, y, 3))
+#     # Create Dummy Data and use existing numpy polyfit as test
+#     x = np.linspace(0, 2, 20)
+#     y = np.cos(x) + 0.3*np.random.rand(20)
+#     p = np.poly1d(np.polyfit(x, y, 3))
 
-    t = np.linspace(0, 2, 200)
-    plt.plot(x, y, 'o', t, p(t), '-')
+#     t = np.linspace(0, 2, 200)
+#     plt.plot(x, y, 'o', t, p(t), '-')
 
-    # Now plot using the Numba (amazing) functions
-    p_coeffs = fit_poly(x, y, deg=3)
-    plt.plot(x, y, 'o', t, eval_polynomial(p_coeffs, t), '-')
+#     # Now plot using the Numba (amazing) functions
+#     p_coeffs = fit_poly(x, y, deg=3)
+#     plt.plot(x, y, 'o', t, eval_polynomial(p_coeffs, t), '-')

@@ -30,21 +30,21 @@ def dumpSchedule(desc, schedule):
 
     test_cases.header("NUM", "TYPE", "DATE", "YEAR", "DIFF")
 
-    num_flows = len(schedule._adjusted_dts)
-    effDate = schedule._adjusted_dts[0]
+    num_flows = len(schedule.adjusted_dts)
+    effDate = schedule.adjusted_dts[0]
     years = 0.0
     diff = 0.0
     test_cases.print(0, "EFCT DATE", str(effDate), years, diff)
 
-    prev_dt = schedule._adjusted_dts[0]
+    prev_dt = schedule.adjusted_dts[0]
     for i_flow in range(1, num_flows-1):
-        adjustedDate = schedule._adjusted_dts[i_flow]
+        adjustedDate = schedule.adjusted_dts[i_flow]
         years = (adjustedDate - effDate) / 365.0
         diff = (adjustedDate - prev_dt) / 365.0
         test_cases.print(i_flow, "FLOW DATE", str(adjustedDate), years, diff)
         prev_dt = adjustedDate
 
-    termDate = schedule._adjusted_dts[-1]
+    termDate = schedule.adjusted_dts[-1]
     years = (termDate - effDate) / 365.0
     diff = (termDate - prev_dt) / 365.0
 
@@ -359,13 +359,13 @@ def test_FinScheduleAlignment(eomFlag):
                       adjust_termination_dt,
                       eomFlag)
 
-#    print(sched1._adjusted_dts[-1])
-#    print(sched2._adjusted_dts[len(sched1._adjusted_dts)-1])
+#    print(sched1.adjusted_dts[-1])
+#    print(sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
 
 # THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
 
     compare = (
-        sched1._adjusted_dts[-1] == sched2._adjusted_dts[len(sched1._adjusted_dts)-1])
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
 
 
 #    print(compare, eomFlag)
@@ -411,7 +411,7 @@ def test_FinScheduleAlignmentLeapYearEOM():
 #    print(sched2._adjusted_dts[:len(sched1._adjusted_dts)])
 
     compare = (
-        sched1._adjusted_dts[-1] == sched2._adjusted_dts[len(sched1._adjusted_dts)-1])
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
     assert(compare == eomFlag)
 
 ###############################################################################
@@ -457,7 +457,7 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
 #    print(sched2._adjusted_dts[:len(sched1._adjusted_dts)])
 
     compare = (
-        sched1._adjusted_dts[-1] == sched2._adjusted_dts[len(sched1._adjusted_dts)-1])
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
     assert( compare == True )
 
 ###############################################################################
@@ -498,11 +498,11 @@ def test_FinScheduleAlignmentEff31():
                       adjust_termination_dt,
                       eomFlag)
 
-#    print(sched1._adjusted_dts)
-#    print(sched2._adjusted_dts[:len(sched1._adjusted_dts)])
+#    print(sched1.adjusted_dts)
+#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1._adjusted_dts[-1] == sched2._adjusted_dts[len(sched1._adjusted_dts)-1])
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
     assert(compare == True)
 
 ###############################################################################

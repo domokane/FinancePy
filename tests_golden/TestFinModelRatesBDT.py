@@ -125,18 +125,18 @@ def test_BDTExampleTwo():
 
     cpn_times = []
     cpn_flows = []
-    cpn = bond._cpn / bond._freq
-    num_flows = len(bond._cpn_dts)
+    cpn = bond.cpn / bond.freq
+    num_flows = len(bond.cpn_dts)
 
     for i in range(1, num_flows):
-        pcd = bond._cpn_dts[i-1]
-        ncd = bond._cpn_dts[i]
+        pcd = bond.cpn_dts[i-1]
+        ncd = bond.cpn_dts[i]
         if pcd < settle_dt and ncd > settle_dt:
             flow_time = (pcd - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
-    for flow_dt in bond._cpn_dts:
+    for flow_dt in bond.cpn_dts:
         if flow_dt > settle_dt:
             flow_time = (flow_dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
@@ -226,7 +226,7 @@ def test_BDTExampleThree():
         for years_to_maturity in [4.0, 5.0, 10.0, 20.0]:
 
             maturity_dt = settle_dt.add_years(years_to_maturity)
-            issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+            issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
 
             if years_to_maturity == 4.0 or years_to_maturity == 5.0:
                 sigma = 0.2012
@@ -247,8 +247,8 @@ def test_BDTExampleThree():
 
                 cpn_times = []
                 cpn_flows = []
-                cpn = bond._cpn / bond._freq
-                for flow_dt in bond._cpn_dts:
+                cpn = bond.cpn / bond.freq
+                for flow_dt in bond.cpn_dts:
                     if flow_dt > expiry_dt:
                         flow_time = (flow_dt - settle_dt) / gDaysInYear
                         cpn_times.append(flow_time)

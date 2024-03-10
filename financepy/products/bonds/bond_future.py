@@ -26,11 +26,11 @@ class BondFuture:
 
         check_argument_types(self.__init__, locals())
 
-        self._ticker_name = ticker_name
-        self._first_delivery_dt = first_delivery_dt  # This is the IMM date
-        self._last_delivery_dt = last_delivery_dt
-        self._contract_size = contract_size
-        self._cpn = cpn
+        self.ticker_name = ticker_name
+        self.first_delivery_dt = first_delivery_dt  # This is the IMM date
+        self.last_delivery_dt = last_delivery_dt
+        self.contract_size = contract_size
+        self.cpn = cpn
 
 ###############################################################################
 
@@ -46,22 +46,22 @@ class BondFuture:
         # https://www.cmegroup.com//trading//interest-rates//us-treasury-futures-conversion-factor-lookup-tables.html
         # for a reference.
 
-        t_mat = (bond._maturity_dt - self._first_delivery_dt) / gDaysInYear
+        t_mat = (bond.maturity_dt - self.first_delivery_dt) / gDaysInYear
         roundedt_matInMonths = int(t_mat * 4.0) * 3
-        new_mat = self._first_delivery_dt.add_months(roundedt_matInMonths)
+        new_mat = self.first_delivery_dt.add_months(roundedt_matInMonths)
         ex_div_days = 0
 
-        issue_dt = Date(new_mat._d, new_mat._m, 2000)
+        issue_dt = Date(new_mat.d, new_mat.m, 2000)
 
         new_bond = Bond(issue_dt,
                        new_mat,
-                       bond._cpn,
-                       bond._freq_type,
-                       bond._dc_type,
+                       bond.cpn,
+                       bond.freq_type,
+                       bond.dc_type,
                        ex_div_days)
 
-        p = new_bond.clean_price_from_ytm(self._first_delivery_dt,
-                                         self._cpn)
+        p = new_bond.clean_price_from_ytm(self.first_delivery_dt,
+                                          self.cpn)
 
         # Convention is to round the conversion factor to 4dp
         p = round(p, 4)
@@ -74,7 +74,7 @@ class BondFuture:
                                 futures_price: float):
         """ The principal invoice price as defined by the CME."""
         cf = self.conversion_factor(bond)
-        pip = self._contract_size * (futures_price * cf) / 100.0
+        pip = self.contract_size * (futures_price * cf) / 100.0
         pip = round(pip, 2)
         return pip
 
@@ -92,7 +92,7 @@ class BondFuture:
         accrued_interest = bond._accrued_interest
 
         pip = self.principal_invoice_price(bond, futures_price)
-        accrued = accrued_interest * self._contract_size / 100.0
+        accrued = accrued_interest * self.contract_size / 100.0
         tia = pip + accrued
         tia = round(tia, 2)
         return tia
@@ -106,11 +106,11 @@ class BondFuture:
         """ Determination of CTD as deliverable bond with the lowest cost to buy
         versus what is received when the bond is delivered. """
         ctd_bond = None
-        ctd_net = -self._contract_size * 100
+        ctd_net = -self.contract_size * 100
         for bondCleanPrice, bond in zip(bond_clean_prices, bonds):
             receive_on_future = self.principal_invoice_price(
                 bond, futures_price)
-            pay_for_bond = self._contract_size * bondCleanPrice / 100.0
+            pay_for_bond = self.contract_size * bondCleanPrice / 100.0
             net = receive_on_future - pay_for_bond
             if net > ctd_net:
                 ctd_bond = bond
@@ -126,7 +126,7 @@ class BondFuture:
                            futures_price: float):
         """ Determination of what is received when the bond is delivered. """
         receive_on_future = self.principal_invoice_price(bond, futures_price)
-        pay_for_bond = self._contract_size * bond_clean_price / 100.0
+        pay_for_bond = self.contract_size * bond_clean_price / 100.0
         net = receive_on_future - pay_for_bond
         return net, pay_for_bond, receive_on_future
 
@@ -135,10 +135,10 @@ class BondFuture:
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("TICKER NAME", self._ticker_name)
-        s += label_to_string("FIRST DELIVERY DATE", self._first_delivery_dt)
-        s += label_to_string("LAST DELIVERY DATE", self._last_delivery_dt)
-        s += label_to_string("CONTRACT SIZE", self._contract_size)
-        s += label_to_string("COUPON", self._cpn)
+        s += label_to_string("FIRST DELIVERY DATE", self.first_delivery_dt)
+        s += label_to_string("LAST DELIVERY DATE", self.last_delivery_dt)
+        s += label_to_string("CONTRACT SIZE", self.contract_size)
+        s += label_to_string("COUPON", self.cpn)
         return s
 
 ###############################################################################

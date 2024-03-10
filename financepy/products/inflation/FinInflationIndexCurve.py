@@ -60,7 +60,7 @@ class FinInflationIndexCurve():
 
         lagMonthsAgoDt = dt.add_months(-self._lag_in_months)
 
-        cpi_first_dt = Date(1, lagMonthsAgoDt._m, lagMonthsAgoDt._y)
+        cpi_first_dt = Date(1, lagMonthsAgoDt.m, lagMonthsAgoDt.y)
         cpi_second_dt = cpi_first_dt.add_months(1)
 
         cpi_first_time = (cpi_first_dt - self._base_dt) / gDaysInYear
@@ -74,9 +74,9 @@ class FinInflationIndexCurve():
                                    self._index_times,
                                    self._index_values)
 
-        d = dt._d
-        m = dt._m
-        y = dt._y
+        d = dt.d
+        m = dt.m
+        y = dt.y
         num_days = days_in_month(m, y)
         v = cpi_first_value + (d - 1) * (cpi_second_value -
                                        cpi_first_value) / num_days

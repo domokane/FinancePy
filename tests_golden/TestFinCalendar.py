@@ -35,7 +35,7 @@ def test_Calendar():
         while next_dt < end_dt:
             next_dt = next_dt.add_days(1)
 
-            if next_dt._d == 1 and next_dt._m == 1:
+            if next_dt.d == 1 and next_dt.m == 1:
                 test_cases.banner("================================")
 #                print("=========================")
 

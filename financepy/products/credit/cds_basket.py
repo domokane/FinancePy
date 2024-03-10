@@ -138,7 +138,7 @@ class CDSBasket:
                         asset_index = i_credit
                         break
 
-                prot_trial = (1.0 - issuer_curves[asset_index]._recovery_rate)
+                prot_trial = (1.0 - issuer_curves[asset_index].recovery_rate)
                 prot_trial *= libor_curve._df(min_tau)
 
             else:
@@ -273,7 +273,7 @@ class CDSBasket:
 
             for i_credit in range(0, num_credits):
                 issuer_curve = issuer_curves[i_credit]
-                recovery_rates[i_credit] = issuer_curve._recovery_rate
+                recovery_rates[i_credit] = issuer_curve.recovery_rate
                 issuer_surv_probs[i_credit] = interpolate(
                     t, issuer_curve._times, issuer_curve._values,
                     InterpTypes.FLAT_FWD_RATES.value)
@@ -290,7 +290,7 @@ class CDSBasket:
             basket_times[i_time] = t
 
         curve_recovery = recovery_rates[0]
-        libor_curve = issuer_curves[0]._libor_curve
+        libor_curve = issuer_curves[0].libor_curve
         basket_curve = CDSCurve(value_dt, [], libor_curve, curve_recovery)
         basket_curve._times = basket_times
         basket_curve._values = basket_surv_curve

@@ -11,11 +11,11 @@ import sys
 
 # iPython dependency is only loaded if required.
 
-ipython = None
+IPYTHON = None
 
 try:
     from IPython import get_ipython
-    ipython = get_ipython()
+    IPYTHON = get_ipython()
 except Exception:
     pass
 
@@ -24,10 +24,10 @@ def _hide_traceback(exc_tuple=None, filename=None, tb_offset=None,
                     exception_only=False, running_compiled_code=False):
     ''' Avoid long error message '''
     etype, value, _ = sys.exc_info()
-    ip = ipython.InteractiveTB
+    ip = IPYTHON.InteractiveTB
 
     if ipython is not None:
-        msg = ipython._showtraceback(etype, value,
+        msg = IPYTHON._showtraceback(etype, value,
                                      ip.get_exception_only(etype, value))
     else:
         msg = None

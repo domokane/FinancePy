@@ -2,15 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

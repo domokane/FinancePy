@@ -9,7 +9,7 @@ import numpy as np
 from .error import FinError
 
 PI = 3.14159265358979323846
-inv_root_two_pi = 0.3989422804014327
+INV_ROOT_2_PI = 0.3989422804014327
 
 ONE_MILLION = 1000000
 TEN_MILLION = 10000000
@@ -41,11 +41,6 @@ def accrued_interpolator(t_set: float,  # Settlement time in years
 
     # TODO: NEED TO REVISIT THIS TODO
     return 0.0
-    print("t", t_set)
-    print("CPN TIMES", cpn_times)
-    print("CPN AMNTS", cpn_amounts)
-
-    raise FinError("Failed to calculate accrued")
 
 ###############################################################################
 
@@ -130,9 +125,8 @@ def maxaxis(s: np.ndarray):
         xmax = s[i, 0]
         for j in range(1, shp[1]):
             x = s[i, j]
-            if x > xmax:
-                xmax = x
-
+            xmax = max(xmax, x)
+            
         max_vector[i] = xmax
 
     return max_vector
@@ -152,9 +146,8 @@ def minaxis(s: np.ndarray):
         xmin = s[i, 0]
         for j in range(1, shp[1]):
             x = s[i, j]
-            if x < xmin:
-                xmin = x
-
+            xmin = min(xmin, x)
+            
         min_vector[i] = xmin
 
     return min_vector
@@ -219,8 +212,8 @@ def pair_gcd(v1: float,
         v2 = v1 - factor * v2
         v1 = temp
 
-    pair_gcd = abs(v1)
-    return pair_gcd
+    gcd = abs(v1)
+    return gcd
 
 ###############################################################################
 
@@ -230,8 +223,7 @@ def nprime(x: float):
     """Calculate the first derivative of the Cumulative Normal CDF which is
     simply the PDF of the Normal Distribution """
 
-    inv_root_two_pi = 0.3989422804014327
-    return np.exp(-x * x / 2.0) * inv_root_two_pi
+    return np.exp(-x * x / 2.0) * INV_ROOT_2_PI
 
 ###############################################################################
 
@@ -266,7 +258,7 @@ def frange(start: int,
 def normpdf(x: float):
     """ Calculate the probability density function for a Gaussian (Normal)
     function at value x"""
-    return np.exp(-x * x / 2.0) * inv_root_two_pi
+    return np.exp(-x * x / 2.0) * INV_ROOT_2_PI
 
 ###############################################################################
 
@@ -291,7 +283,7 @@ def N(x):
 
     if x >= 0.0:
         c = (a1 * k + a2 * k2 + a3 * k3 + a4 * k4 + a5 * k5)
-        phi = 1.0 - c * np.exp(-x*x/2.0) * inv_root_two_pi
+        phi = 1.0 - c * np.exp(-x*x/2.0) * INV_ROOT_2_PI
     else:
         phi = 1.0 - N(-x)
 
@@ -337,7 +329,7 @@ def normcdf_integrate(x: float):
     x = x + dx
     fx = np.exp(-x * x / 2.0)
     integral += fx / 2.0
-    integral *= inv_root_two_pi * dx
+    integral *= INV_ROOT_2_PI * dx
     return integral
 
 ###############################################################################
@@ -352,7 +344,7 @@ def normcdf_slow(z: float):
     a = [0.0] * 25
     bp = 0.0
 
-    RTWO = 1.4142135623731
+    root_2 = 1.4142135623731
 
     a[0] = 0.6101430819232
     a[1] = -0.434841272712578
@@ -380,7 +372,7 @@ def normcdf_slow(z: float):
     a[23] = 2.0899837844334E-17
     a[24] = -5.900526869409E-18
 
-    xa = abs(z) / RTWO
+    xa = abs(z) / root_2
 
     if xa > 100:
         p = 0
@@ -448,11 +440,11 @@ def phi3(b1: float,
     from -7 and the integration steps are dx = 0.001. This may be excessive."""
 
     dx = 0.001
-    lowerLimit = -7
-    upperlimit = b1
-    num_points = int((b1 - lowerLimit) / dx)
-    dx = (upperlimit - lowerLimit) / num_points
-    x = lowerLimit
+    lower_limit = -7
+    upper_limit = b1
+    num_points = int((b1 - lower_limit) / dx)
+    dx = (upper_limit - lower_limit) / num_points
+    x = lower_limit
 
     r12p = np.sqrt(1.0 - r12 * r12)
     r13p = np.sqrt(1.0 - r13 * r13)
@@ -668,8 +660,8 @@ def npv(irr: float, times_cfs: list):
 
 
 @njit(fastmath=True, cache=True)
-def band_matrix_multiplication(A, m1, m2, b):
-    n = A.shape[0]
+def band_matrix_multiplication(a, m1, m2, b):
+    n = a.shape[0]
     x = np.zeros(n)
 
     jl = np.arange(n) - m1
@@ -681,7 +673,7 @@ def band_matrix_multiplication(A, m1, m2, b):
     for i in range(n):
         for j in range(jl[i], ju[i] + 1):
             k = j - i + m1
-            x[i] += A[i, k] * b[j]
+            x[i] += a[i, k] * b[j]
 
     return x
 
@@ -689,7 +681,7 @@ def band_matrix_multiplication(A, m1, m2, b):
 
 
 @njit(fastmath=True, cache=True)
-def solve_tridiagonal_matrix(A, r):
+def solve_tridiagonal_matrix(a_matrix, r):
     """
     Solve A u = r for vector u when A is tridiagonal
 
@@ -700,7 +692,7 @@ def solve_tridiagonal_matrix(A, r):
 
     Note that a[0] and c[-1] are not used, and so can be any value.
     """
-    a, b, c = A.T
+    a, b, c = a_matrix.T
 
     if b[0] == 0:
         raise ValueError("First entry is zero, rewrite as set of N-1 eqns")
@@ -731,7 +723,7 @@ def solve_tridiagonal_matrix(A, r):
 
 
 @njit(fastmath=True, cache=True)
-def transpose_tridiagonal_matrix(A):
-    out = np.zeros_like(A)
-    out[:, 0], out[:, 1], out[:, 2] = A[:, 2], A[:, 1], A[:, 0]
+def transpose_tridiagonal_matrix(a_matrix):
+    out = np.zeros_like(a_matrix)
+    out[:, 0], out[:, 1], out[:, 2] = a_matrix[:, 2], a_matrix[:, 1], a_matrix[:, 0]
     return out

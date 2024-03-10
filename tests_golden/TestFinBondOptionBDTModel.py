@@ -57,8 +57,7 @@ def test_BondOption():
 
     test_cases.header("LABEL", "VALUE")
 
-    price = bond.dirty_price_from_discount_curve(
-        settle_dt, discount_curve)
+    price = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
     test_cases.print("Fixed Income Price:", price)
 
     num_time_steps = 100
@@ -346,8 +345,7 @@ def test_BondOptionZEROVOLConvergence():
     # Build discount curve
     settle_dt = Date(1, 12, 2019)  # CHANGED
     rate = 0.05
-    discount_curve = DiscountCurveFlat(
-        settle_dt, rate, FrequencyTypes.ANNUAL)
+    discount_curve = DiscountCurveFlat(settle_dt, rate, FrequencyTypes.ANNUAL)
 
     # Bond details
     issue_dt = Date(1, 9, 2015)

@@ -63,19 +63,19 @@ class IborSwap:
         check_argument_types(self.__init__, locals())
 
         if isinstance(term_dt_or_tenor, Date):
-            self._termination_dt = term_dt_or_tenor
+            self.termination_dt = term_dt_or_tenor
         else:
-            self._termination_dt = effective_dt.add_tenor(
+            self.termination_dt = effective_dt.add_tenor(
                 term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self.termination_dt,
                                             bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_dt = effective_dt
+        self.effective_dt = effective_dt
 
         float_leg_type = SwapTypes.PAY
         if fixed_leg_type == SwapTypes.PAY:
@@ -84,8 +84,8 @@ class IborSwap:
         payment_lag = 0
         principal = 0.0
 
-        self._fixed_leg = SwapFixedLeg(effective_dt,
-                                       self._termination_dt,
+        self.fixed_leg = SwapFixedLeg(effective_dt,
+                                       self.termination_dt,
                                        fixed_leg_type,
                                        fixed_coupon,
                                        fixed_freq_type,
@@ -97,8 +97,8 @@ class IborSwap:
                                        bd_type,
                                        dg_type)
 
-        self._float_leg = SwapFloatLeg(effective_dt,
-                                       self._termination_dt,
+        self.float_leg = SwapFloatLeg(effective_dt,
+                                       self.termination_dt,
                                        float_leg_type,
                                        float_spread,
                                        float_freq_type,
@@ -123,10 +123,10 @@ class IborSwap:
         if index_curve is None:
             index_curve = discount_curve
 
-        fixed_leg_value = self._fixed_leg.value(value_dt,
+        fixed_leg_value = self.fixed_leg.value(value_dt,
                                                 discount_curve)
 
-        float_leg_value = self._float_leg.value(value_dt,
+        float_leg_value = self.float_leg.value(value_dt,
                                                 discount_curve,
                                                 index_curve,
                                                 first_fixing_rate)
@@ -139,8 +139,8 @@ class IborSwap:
     def pv01(self, value_dt, discount_curve):
         """ Calculate the value of 1 basis point coupon on the fixed leg. """
 
-        pv = self._fixed_leg.value(value_dt, discount_curve)
-        pv01 = pv / self._fixed_leg._cpn / self._fixed_leg._notional
+        pv = self.fixed_leg.value(value_dt, discount_curve)
+        pv01 = pv / self.fixed_leg.cpn / self.fixed_leg.notional
         # Needs to be positive even if it is a payer leg
         pv01 = np.abs(pv01)
         return pv01
@@ -166,23 +166,23 @@ class IborSwap:
         if abs(pv01) < g_small:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        if value_dt < self._effective_dt:
-            df0 = discount_curve.df(self._effective_dt)
+        if value_dt < self.effective_dt:
+            df0 = discount_curve.df(self.effective_dt)
         else:
             df0 = discount_curve.df(value_dt)
 
         float_leg_pv = 0.0
 
         if index_curve is None:
-            df_t = discount_curve.df(self._maturity_dt)
+            df_t = discount_curve.df(self.maturity_dt)
             float_leg_pv = (df0 - df_t)
         else:
-            float_leg_pv = self._float_leg.value(value_dt,
-                                                 discount_curve,
-                                                 index_curve,
-                                                 first_fixing)
+            float_leg_pv = self.float_leg.value(value_dt,
+                                                discount_curve,
+                                                index_curve,
+                                                first_fixing)
 
-            float_leg_pv /= self._fixed_leg._notional
+            float_leg_pv /= self.fixed_leg.notional
 
         cpn = float_leg_pv / pv01
         return cpn
@@ -206,12 +206,12 @@ class IborSwap:
         """ The swap may have started in the past but we can only value
         payments that have occurred after the valuation date. """
         start_index = 0
-        while self._fixed_leg._payment_dts[start_index] < value_dt:
+        while self.fixed_leg.payment_dts[start_index] < value_dt:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
-        if value_dt <= self._effective_dt:
+        if value_dt <= self.effective_dt:
             start_index = 1
 
         """ Now PV fixed leg flows. """
@@ -219,7 +219,7 @@ class IborSwap:
         df = 1.0
         alpha = 1.0 / m
 
-        for _ in self._fixed_leg._payment_dts[start_index:]:
+        for _ in self.fixed_leg.payment_dts[start_index:]:
             df = df / (1.0 + alpha * flat_swap_rate)
             flat_pv01 += df * alpha
 
@@ -231,7 +231,7 @@ class IborSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._fixed_leg.print_valuation()
+        self.fixed_leg.print_valuation()
 
     ###########################################################################
 
@@ -239,7 +239,7 @@ class IborSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._float_leg.print_valuation()
+        self.float_leg.print_valuation()
 
     ###########################################################################
 
@@ -247,17 +247,17 @@ class IborSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._fixed_leg.print_payments()
-        self._float_leg.print_payments()
+        self.fixed_leg.print_payments()
+        self.float_leg.print_payments()
 
     ###########################################################################
 
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self._fixed_leg.__repr__()
+        s += self.fixed_leg.__repr__()
         s += "\n"
-        s += self._float_leg.__repr__()
+        s += self.float_leg.__repr__()
         return s
 
     ###########################################################################
