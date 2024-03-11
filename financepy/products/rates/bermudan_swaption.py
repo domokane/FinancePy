@@ -2,8 +2,6 @@
 # # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 # ##############################################################################
 
-import numpy as np
-
 from ...utils.date import Date
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
@@ -22,6 +20,7 @@ from ...products.rates.ibor_swap import IborSwap
 from ...models.bdt_tree import BDTTree
 from ...models.bk_tree import BKTree
 from ...models.hw_tree import HWTree
+
 
 ###############################################################################
 
@@ -87,7 +86,7 @@ class IborBermudanSwaption:
         self.cpn_times = None
         self.cpn_flows = None
 
-###############################################################################
+    ###############################################################################
 
     def value(self,
               value_dt,
@@ -101,18 +100,18 @@ class IborBermudanSwaption:
 
         # The underlying is a swap in which we pay the fixed amount
         self.underlying_swap = IborSwap(self.exercise_dt,
-                                         self.maturity_dt,
-                                         self.fixed_leg_type,
-                                         self.fixed_coupon,
-                                         self.fixed_freq_type,
-                                         self.fixed_dc_type,
-                                         self.notional,
-                                         float_spread,
-                                         self.float_freq_type,
-                                         self.float_dc_type,
-                                         self.cal_type,
-                                         self.bd_type,
-                                         self.dg_type)
+                                        self.maturity_dt,
+                                        self.fixed_leg_type,
+                                        self.fixed_coupon,
+                                        self.fixed_freq_type,
+                                        self.fixed_dc_type,
+                                        self.notional,
+                                        float_spread,
+                                        self.float_freq_type,
+                                        self.float_dc_type,
+                                        self.cal_type,
+                                        self.bd_type,
+                                        self.dg_type)
 
         #  I need to do this to generate the fixed leg flows
         self.pv01 = self.underlying_swap.pv01(value_dt, discount_curve)
@@ -138,7 +137,7 @@ class IborBermudanSwaption:
 
             if flow_dt > self.exercise_dt:
                 cpn_time = (flow_dt - value_dt) / gDaysInYear
-                cpn_flow = swap.fixed_leg.payments[i_flow-1] / self.notional
+                cpn_flow = swap.fixed_leg.payments[i_flow - 1] / self.notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
 
@@ -184,7 +183,7 @@ class IborBermudanSwaption:
 
         return v
 
-###############################################################################
+    ###############################################################################
 
     def print_swaption_value(self):
 
@@ -200,7 +199,7 @@ class IborBermudanSwaption:
         for i in range(0, n):
             print("CALL TIME: ", self.call_times[i])
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -216,7 +215,7 @@ class IborBermudanSwaption:
         s += label_to_string("NOTIONAL", self.notional)
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         print(self)

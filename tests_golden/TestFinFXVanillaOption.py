@@ -167,12 +167,12 @@ def test_FinFXVanillaOptionBloombergExample():
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
     # DOM = USD , FOR = EUR
-    forName = "EUR"
-    domName = "USD"
+    for_name = "EUR"
+    dom_name = "USD"
     forDepoRate = 0.05  # EUR
     domDepoRate = 0.02  # USD
 
-    currency_pair = forName + domName  # Always FORDOM
+    currency_pair = for_name + dom_name  # Always FORDOM
     spot_fx_rate = 1.30
     strike_fx_rate = 1.3650
     volatility = 0.20
@@ -476,13 +476,13 @@ def test_FinFXVanillaOptionSABRExample():
     """
     # define option
     value_dt = Date(5, 4, 2023)
-    forName = "USD"
-    domName = "JPY"
-    forCCRate = 0.0381  # USD
-    domCCRate = 0.000396  # JPY
-    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
-    currency_pair = forName + domName
+    for_name = "USD"
+    dom_name = "JPY"
+    for_cc_rate = 0.0381  # USD
+    dom_cc_rate = 0.000396  # JPY
+    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    currency_pair = for_name + dom_name
     spot_fx_rate = 131.32
     strike_price = 130
     expiry_dt = value_dt.add_tenor("10M")

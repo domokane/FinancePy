@@ -38,33 +38,33 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         value_dt = Date(10, 4, 2020)
 
-        forName = "EUR"
-        domName = "USD"
-        forCCRate = 0.03460  # EUR
-        domCCRate = 0.02940  # USD
+        for_name = "EUR"
+        dom_name = "USD"
+        for_cc_rate = 0.03460  # EUR
+        dom_cc_rate = 0.02940  # USD
 
-        domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-        foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
+        domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+        foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
-        currency_pair = forName + domName
+        currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
-        marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-        riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
-        marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
-        riskReversal10DeltaVols = [-1.258, -
+        mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
+        rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        mkt_strangle_10d_vols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
+        rsk_reversal_10d_vols = [-1.258, -
                                    1.297, -1.332, -1.408, -1.359, -1.208]
 
-        notional_currency = forName
+        notional_currency = for_name
 
         atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
         vol_functionType = VolFuncTypes.CLARK5
         alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FXVolSurfacePlus(value_dt,
+        fx_market_plus = FXVolSurfacePlus(value_dt,
                                         spot_fx_rate,
                                         currency_pair,
                                         notional_currency,
@@ -72,24 +72,24 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                                         foreign_curve,
                                         tenors,
                                         atm_vols,
-                                        marketStrangle25DeltaVols,
-                                        riskReversal25DeltaVols,
-                                        marketStrangle10DeltaVols,
-                                        riskReversal10DeltaVols,
+                                        mkt_strangle_25d_vols,
+                                        rsk_reversal_25d_vols,
+                                        mkt_strangle_10d_vols,
+                                        rsk_reversal_10d_vols,
                                         alpha,
                                         atm_method,
                                         delta_method,
                                         vol_functionType)
 
-        fxMarketPlus.check_calibration(False)
+        fx_market_plus.check_calibration(False)
 
         if 1 == 0:  # PLOT_GRAPHS:
 
-            fxMarketPlus.plot_vol_curves()
+            fx_market_plus.plot_vol_curves()
 
             plt.figure()
 
-            dbns = fxMarketPlus.implied_dbns(0.5, 2.0, 1000)
+            dbns = fx_market_plus.implied_dbns(0.5, 2.0, 1000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
@@ -108,33 +108,33 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
     value_dt = Date(10, 4, 2020)
 
-    forName = "EUR"
-    domName = "JPY"
-    forCCRate = 0.0294  # EUR
-    domCCRate = 0.0171  # USD
+    for_name = "EUR"
+    dom_name = "JPY"
+    for_cc_rate = 0.0294  # EUR
+    dom_cc_rate = 0.0171  # USD
 
-    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
-    currency_pair = forName + domName
+    currency_pair = for_name + dom_name
     spot_fx_rate = 90.72
 
     tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
     atm_vols = [21.50, 20.50, 19.85, 18.00, 15.95, 14.009]
-    marketStrangle25DeltaVols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
-    riskReversal25DeltaVols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
-    marketStrangle10DeltaVols = [3.704, 4.047, 4.396, 4.932, 5.726, 5.709]
-    riskReversal10DeltaVols = [-15.855, -
+    mkt_strangle_25d_vols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
+    rsk_reversal_25d_vols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
+    mkt_strangle_10d_vols = [3.704, 4.047, 4.396, 4.932, 5.726, 5.709]
+    rsk_reversal_10d_vols = [-15.855, -
                                16.467, -17.114, -17.882, -18.855, -18.217]
     alpha = 0.50  # Equally fit 10 and 25 Delta
 
-    notional_currency = forName
+    notional_currency = for_name
 
     atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
     vol_functionType = VolFuncTypes.CLARK5
 
-    fxMarketPlus = FXVolSurfacePlus(value_dt,
+    fx_market_plus = FXVolSurfacePlus(value_dt,
                                     spot_fx_rate,
                                     currency_pair,
                                     notional_currency,
@@ -142,23 +142,23 @@ def test_FinFXMktVolSurface2(verboseCalibration):
                                     foreign_curve,
                                     tenors,
                                     atm_vols,
-                                    marketStrangle25DeltaVols,
-                                    riskReversal25DeltaVols,
-                                    marketStrangle10DeltaVols,
-                                    riskReversal10DeltaVols,
+                                    mkt_strangle_25d_vols,
+                                    rsk_reversal_25d_vols,
+                                    mkt_strangle_10d_vols,
+                                    rsk_reversal_10d_vols,
                                     alpha,
                                     atm_method,
                                     delta_method,
                                     vol_functionType)
 
-#        fxMarketPlus.check_calibration(True)
+#        fx_market_plus.check_calibration(True)
 
     if PLOT_GRAPHS:
-        fxMarketPlus.plot_vol_curves()
+        fx_market_plus.plot_vol_curves()
 
         plt.figure()
 
-        dbns = fxMarketPlus.implied_dbns(30, 120, 1000)
+        dbns = fx_market_plus.implied_dbns(30, 120, 1000)
 
         for i in range(0, len(dbns)):
             plt.plot(dbns[i]._x, dbns[i]._densitydx)
@@ -179,25 +179,25 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         value_dt = Date(10, 4, 2020)
 
-        forName = "EUR"
-        domName = "USD"
-        forCCRate = 0.03460  # EUR
-        domCCRate = 0.02940  # USD
+        for_name = "EUR"
+        dom_name = "USD"
+        for_cc_rate = 0.03460  # EUR
+        dom_cc_rate = 0.02940  # USD
 
-        domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-        foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
+        domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+        foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
-        currency_pair = forName + domName
+        currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
         tenors = ['1Y', '2Y']
         atm_vols = [18.250, 17.677]
-        marketStrangle25DeltaVols = [0.95, 0.85]
-        riskReversal25DeltaVols = [-0.60, -0.562]
-        marketStrangle10DeltaVols = [3.806, 3.208]
-        riskReversal10DeltaVols = [-1.359, -1.208]
+        mkt_strangle_25d_vols = [0.95, 0.85]
+        rsk_reversal_25d_vols = [-0.60, -0.562]
+        mkt_strangle_10d_vols = [3.806, 3.208]
+        rsk_reversal_10d_vols = [-1.359, -1.208]
 
-        notional_currency = forName
+        notional_currency = for_name
 
         # I HAVE NO YET MADE DELTA METHOD A VECTOR FOR EACH TERM AS I WOULD
         # NEED TO DO AS DESCRIBED IN CLARK PAGE 70
@@ -207,7 +207,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         vol_functionType = VolFuncTypes.CLARK5
         alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FXVolSurfacePlus(value_dt,
+        fx_market_plus = FXVolSurfacePlus(value_dt,
                                         spot_fx_rate,
                                         currency_pair,
                                         notional_currency,
@@ -215,24 +215,24 @@ def test_FinFXMktVolSurface3(verboseCalibration):
                                         foreign_curve,
                                         tenors,
                                         atm_vols,
-                                        marketStrangle25DeltaVols,
-                                        riskReversal25DeltaVols,
-                                        marketStrangle10DeltaVols,
-                                        riskReversal10DeltaVols,
+                                        mkt_strangle_25d_vols,
+                                        rsk_reversal_25d_vols,
+                                        mkt_strangle_10d_vols,
+                                        rsk_reversal_10d_vols,
                                         alpha,
                                         atm_method,
                                         delta_method,
                                         vol_functionType)
 
-        fxMarketPlus.check_calibration(False)
+        fx_market_plus.check_calibration(False)
 
         if 1 == 0:  # PLOT_GRAPHS:
 
-            fxMarketPlus.plot_vol_curves()
+            fx_market_plus.plot_vol_curves()
 
             plt.figure()
 
-            dbns = fxMarketPlus.implied_dbns(0.5, 2.0, 1000)
+            dbns = fx_market_plus.implied_dbns(0.5, 2.0, 1000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
@@ -251,7 +251,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             for k in strikes:
                 volSmile = []
                 for dt in dates:
-                    vol = fxMarketPlus.volatility_from_strike_dt(k, dt)
+                    vol = fx_market_plus.volatility_from_strike_dt(k, dt)
                     volSmile.append(vol*100.0)
 
                     print(k, dt, vol*100.0)
@@ -280,7 +280,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             for delta in deltas:
                 volSmile = []
                 for dt in dates:
-                    (vol, k) = fxMarketPlus.vol_from_delta_dt(delta, dt)
+                    (vol, k) = fx_market_plus.vol_from_delta_dt(delta, dt)
                     volSmile.append(vol*100.0)
                     print(delta, k, dt, vol*100.0)
 
@@ -316,36 +316,36 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
         value_dt = Date(10, 4, 2020)
 
-        forName = "EUR"
-        domName = "USD"
-        forCCRate = 0.03460  # EUR
-        domCCRate = 0.02940  # USD
+        for_name = "EUR"
+        dom_name = "USD"
+        for_cc_rate = 0.03460  # EUR
+        dom_cc_rate = 0.02940  # USD
 
-        domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-        foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
+        domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+        foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
-        currency_pair = forName + domName
+        currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
-        marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-        riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
-        marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
-        riskReversal10DeltaVols = [-1.258, -
+        mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
+        rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        mkt_strangle_10d_vols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
+        rsk_reversal_10d_vols = [-1.258, -
                                    1.297, -1.332, -1.408, -1.359, -1.208]
 
-        marketStrangle25DeltaVols = None
-        riskReversal25DeltaVols = None
+        mkt_strangle_25d_vols = None
+        rsk_reversal_25d_vols = None
 
-        notional_currency = forName
+        notional_currency = for_name
 
         atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
         vol_functionType = VolFuncTypes.CLARK
         alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FXVolSurfacePlus(value_dt,
+        fx_market_plus = FXVolSurfacePlus(value_dt,
                                         spot_fx_rate,
                                         currency_pair,
                                         notional_currency,
@@ -353,16 +353,16 @@ def test_FinFXMktVolSurface4(verboseCalibration):
                                         foreign_curve,
                                         tenors,
                                         atm_vols,
-                                        marketStrangle25DeltaVols,
-                                        riskReversal25DeltaVols,
-                                        marketStrangle10DeltaVols,
-                                        riskReversal10DeltaVols,
+                                        mkt_strangle_25d_vols,
+                                        rsk_reversal_25d_vols,
+                                        mkt_strangle_10d_vols,
+                                        rsk_reversal_10d_vols,
                                         alpha,
                                         atm_method,
                                         delta_method,
                                         vol_functionType)
 
-        fxMarketPlus.check_calibration(False)
+        fx_market_plus.check_calibration(False)
 
         years = [1.0/12.0, 2./12., 0.25, 0.5, 1.0, 2.0]
 
@@ -375,7 +375,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
             for delta in deltas:
                 volSmile = []
                 for dt in dates:
-                    (vol, k) = fxMarketPlus.vol_from_delta_dt(delta, dt)
+                    (vol, k) = fx_market_plus.vol_from_delta_dt(delta, dt)
                     volSmile.append(vol*100.0)
                     print(delta, k, dt, vol*100.0)
 
@@ -411,36 +411,35 @@ def test_FinFXMktVolSurface5(verboseCalibration):
 
         value_dt = Date(10, 4, 2020)
 
-        forName = "EUR"
-        domName = "USD"
-        forCCRate = 0.03460  # EUR
-        domCCRate = 0.02940  # USD
+        for_name = "EUR"
+        dom_name = "USD"
+        for_cc_rate = 0.03460  # EUR
+        dom_cc_rate = 0.02940  # USD
 
-        domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-        foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
+        domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+        foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
-        currency_pair = forName + domName
+        currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
-        marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-        riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
-        marketStrangle10DeltaVols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
-        riskReversal10DeltaVols = [-1.258, -
-                                   1.297, -1.332, -1.408, -1.359, -1.208]
+        mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
+        rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        mkt_strangle_10d_vols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
+        rsk_reversal_10d_vols = [-1.258, -1.297, -1.332, -1.408, -1.359, -1.208]
 
-        marketStrangle10DeltaVols = None
-        riskReversal10DeltaVols = None
+        mkt_strangle_10d_vols = None
+        rsk_reversal_10d_vols = None
 
-        notional_currency = forName
+        notional_currency = for_name
 
         atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
         vol_functionType = VolFuncTypes.CLARK
         alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
-        fxMarketPlus = FXVolSurfacePlus(value_dt,
+        fx_market_plus = FXVolSurfacePlus(value_dt,
                                         spot_fx_rate,
                                         currency_pair,
                                         notional_currency,
@@ -448,16 +447,16 @@ def test_FinFXMktVolSurface5(verboseCalibration):
                                         foreign_curve,
                                         tenors,
                                         atm_vols,
-                                        marketStrangle25DeltaVols,
-                                        riskReversal25DeltaVols,
-                                        marketStrangle10DeltaVols,
-                                        riskReversal10DeltaVols,
+                                        mkt_strangle_25d_vols,
+                                        rsk_reversal_25d_vols,
+                                        mkt_strangle_10d_vols,
+                                        rsk_reversal_10d_vols,
                                         alpha,
                                         atm_method,
                                         delta_method,
                                         vol_functionType)
 
-        fxMarketPlus.check_calibration(False)
+        fx_market_plus.check_calibration(False)
 
 ###############################################################################
 

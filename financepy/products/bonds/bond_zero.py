@@ -145,7 +145,7 @@ class BondZero:
                                                 convention)
 
         principal = dirty_price * face / self.par
-        principal = principal - self.accrued_interest
+        principal = principal - self.accrued_int
         return principal
 
     ###########################################################################
@@ -600,7 +600,7 @@ class BondZero:
                                                            survival_curve,
                                                            recovery_rate)
 
-        clean_price = dirty_price - self.accrued_interest
+        clean_price = dirty_price - self.accrued_int
         return clean_price
 
     ###########################################################################

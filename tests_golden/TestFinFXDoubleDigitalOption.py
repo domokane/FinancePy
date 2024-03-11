@@ -25,16 +25,16 @@ def test_FinFXDoubleDigitalOption():
     value_dt = Date(10, 4, 2020)
     expiry_dt = Date(18, 9, 2020)
 
-    forName = "EUR"
-    domName = "USD"
-    forCCRate = 0.03460  # EUR
-    domCCRate = 0.02940  # USD
+    for_name = "EUR"
+    dom_name = "USD"
+    for_cc_rate = 0.03460  # EUR
+    dom_cc_rate = 0.02940  # USD
 
-    currency_pair = forName + domName  # Always FORDOM
+    currency_pair = for_name + dom_name  # Always FORDOM
     spot_fx_rate = 1.20
 
-    domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-    foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
     volatility = 0.20
 

@@ -101,36 +101,36 @@ def obj_fast(params, *args):
 
     sigma_k_25d_c_ms = vol_function(vol_type_value, params, f, k_25d_c_ms, t)
 
-    V_25D_C_MS = bs_value(s, t, k_25d_c_ms, r_d, r_f, sigma_k_25d_c_ms,
+    V_25d_C_MS = bs_value(s, t, k_25d_c_ms, r_d, r_f, sigma_k_25d_c_ms,
                           OptionTypes.EUROPEAN_CALL.value)
 
     sigma_k_25d_p_ms = vol_function(vol_type_value, params, f, k_25d_p_ms, t)
 
-    V_25D_P_MS = bs_value(s, t, k_25d_p_ms, r_d, r_f, sigma_k_25d_p_ms,
+    V_25d_P_MS = bs_value(s, t, k_25d_p_ms, r_d, r_f, sigma_k_25d_p_ms,
                           OptionTypes.EUROPEAN_PUT.value)
 
-    v_25d_ms = V_25D_C_MS + V_25D_P_MS
+    v_25d_ms = V_25d_C_MS + V_25d_P_MS
     term2 = (v_25d_ms - v_25d_ms_target)**2
 
     ###########################################################################
     # Match the risk reversal volatility
     ###########################################################################
 
-    K_25D_C = solver_for_smile_strike_fast(s, t, r_d, r_f,
+    K_25d_C = solver_for_smile_strike_fast(s, t, r_d, r_f,
                                            OptionTypes.EUROPEAN_CALL.value,
                                            vol_type_value, +0.2500,
                                            delta_method_value, k_25d_c_ms,
                                            params)
 
-    sigma_k_25d_c = vol_function(vol_type_value, params, f, K_25D_C, t)
+    sigma_k_25d_c = vol_function(vol_type_value, params, f, K_25d_C, t)
 
-    K_25D_P = solver_for_smile_strike_fast(s, t, r_d, r_f,
+    K_25d_P = solver_for_smile_strike_fast(s, t, r_d, r_f,
                                            OptionTypes.EUROPEAN_PUT.value,
                                            vol_type_value, -0.2500,
                                            delta_method_value, k_25d_p_ms,
                                            params)
 
-    sigma_k_25d_p = vol_function(vol_type_value, params, f, K_25D_P, t)
+    sigma_k_25d_p = vol_function(vol_type_value, params, f, K_25d_P, t)
 
     sigma_25d_rr = (sigma_k_25d_c - sigma_k_25d_p)
     term3 = (sigma_25d_rr - target_rr_vol)**2
@@ -172,14 +172,14 @@ def solve_to_horizon_fast(s, t,
                                   vol_25d_ms)
 
     # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
-    V_25D_C_MS = bs_value(s, t, k_25d_c_ms, rd, rf, vol_25d_ms,
+    V_25d_C_MS = bs_value(s, t, k_25d_c_ms, rd, rf, vol_25d_ms,
                           OptionTypes.EUROPEAN_CALL.value)
 
-    V_25D_P_MS = bs_value(s, t, k_25d_p_ms, rd, rf, vol_25d_ms,
+    V_25d_P_MS = bs_value(s, t, k_25d_p_ms, rd, rf, vol_25d_ms,
                           OptionTypes.EUROPEAN_PUT.value)
 
     # Market price of strangle in the domestic currency
-    v_25d_ms = V_25D_C_MS + V_25D_P_MS
+    v_25d_ms = V_25d_C_MS + V_25d_P_MS
 
     # Determine parameters of vol surface using minimisation
     tol = 1e-8
@@ -195,19 +195,19 @@ def solve_to_horizon_fast(s, t,
 
     params = np.array(xopt)
 
-    K_25D_C = solver_for_smile_strike_fast(s, t, rd, rf,
+    K_25d_C = solver_for_smile_strike_fast(s, t, rd, rf,
                                            OptionTypes.EUROPEAN_CALL.value,
                                            vol_type_value, +0.2500,
                                            delta_method_value, k_25d_c_ms,
                                            params)
 
-    K_25D_P = solver_for_smile_strike_fast(s, t, rd, rf,
+    K_25d_P = solver_for_smile_strike_fast(s, t, rd, rf,
                                            OptionTypes.EUROPEAN_PUT.value,
                                            vol_type_value, -0.2500,
                                            delta_method_value, k_25d_p_ms,
                                            params)
 
-    ret = (params, k_25d_c_ms, k_25d_p_ms, K_25D_C, K_25D_P)
+    ret = (params, k_25d_c_ms, k_25d_p_ms, K_25d_C, K_25d_P)
     return ret
 
 ###############################################################################
@@ -401,8 +401,8 @@ class FXVolSurface():
                  foreign_curve: DiscountCurve,
                  tenors: (list),
                  atm_vols: (list, np.ndarray),
-                 ms25DeltaVols: (list, np.ndarray),
-                 rr25DeltaVols: (list, np.ndarray),
+                 ms25deltaVols: (list, np.ndarray),
+                 rr25deltaVols: (list, np.ndarray),
                  atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
                  delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
                  vol_func_type: VolFuncTypes = VolFuncTypes.CLARK):
@@ -412,58 +412,58 @@ class FXVolSurface():
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
-        self._spot_fx_rate = spot_fx_rate
-        self._currency_pair = currency_pair
+        self.spot_fx_rate = spot_fx_rate
+        self.currency_pair = currency_pair
 
         if len(currency_pair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._for_name = self._currency_pair[0:3]
-        self._dom_name = self._currency_pair[3:6]
+        self.for_name = self.currency_pair[0:3]
+        self.dom_name = self.currency_pair[3:6]
 
-        self._notional_currency = notional_currency
-        self._domestic_curve = domestic_curve
-        self._foreign_curve = foreign_curve
-        self._num_vol_curves = len(tenors)
+        self.notional_currency = notional_currency
+        self.domestic_curve = domestic_curve
+        self.foreign_curve = foreign_curve
+        self.num_vol_curves = len(tenors)
 
-        if len(atm_vols) != self._num_vol_curves:
+        if len(atm_vols) != self.num_vol_curves:
             raise FinError("Number ATM vols must equal number of tenors")
 
-        if len(atm_vols) != self._num_vol_curves:
+        if len(atm_vols) != self.num_vol_curves:
             raise FinError("Number ATM vols must equal number of tenors")
 
-        if len(ms25DeltaVols) != self._num_vol_curves:
-            raise FinError("Number MS25D vols must equal number of tenors")
+        if len(ms25deltaVols) != self.num_vol_curves:
+            raise FinError("Number MS25d vols must equal number of tenors")
 
-        if len(rr25DeltaVols) != self._num_vol_curves:
-            raise FinError("Number RR25D vols must equal number of tenors")
+        if len(rr25deltaVols) != self.num_vol_curves:
+            raise FinError("Number RR25d vols must equal number of tenors")
 
-        self._tenors = tenors
-        self._atm_vols = np.array(atm_vols)/100.0
-        self._ms25DeltaVols = np.array(ms25DeltaVols)/100.0
-        self._rr25DeltaVols = np.array(rr25DeltaVols)/100.0
+        self.tenors = tenors
+        self.atm_vols = np.array(atm_vols)/100.0
+        self.ms25deltaVols = np.array(ms25deltaVols)/100.0
+        self.rr25deltaVols = np.array(rr25deltaVols)/100.0
 
-        self._atm_method = atm_method
-        self._delta_method = delta_method
+        self.atm_method = atm_method
+        self.delta_method = delta_method
 
-        if self._delta_method == FinFXDeltaMethod.SPOT_DELTA:
-            self._delta_method_string = "pips_spot_delta"
-        elif self._delta_method == FinFXDeltaMethod.FORWARD_DELTA:
-            self._delta_method_string = "pips_fwd_delta"
-        elif self._delta_method == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ:
-            self._delta_method_string = "pct_spot_delta_prem_adj"
-        elif self._delta_method == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ:
-            self._delta_method_string = "pct_fwd_delta_prem_adj"
+        if self.delta_method == FinFXDeltaMethod.SPOT_DELTA:
+            self.delta_method_string = "pips_spot_delta"
+        elif self.delta_method == FinFXDeltaMethod.FORWARD_DELTA:
+            self.delta_method_string = "pips_fwd_delta"
+        elif self.delta_method == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ:
+            self.delta_method_string = "pct_spot_delta_prem_adj"
+        elif self.delta_method == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ:
+            self.delta_method_string = "pct_fwd_delta_prem_adj"
         else:
             raise FinError("Unknown Delta Type")
 
-        self._vol_func_type = vol_func_type
-        self._tenor_index = 0
+        self.vol_func_type = vol_func_type
+        self.tenor_index = 0
 
-        self._expiry_dts = []
-        for i in range(0, self._num_vol_curves):
+        self.expiry_dts = []
+        for i in range(0, self.num_vol_curves):
             expiry_dt = value_dt.add_tenor(tenors[i])
-            self._expiry_dts.append(expiry_dt)
+            self.expiry_dts.append(expiry_dt)
 
         self.build_vol_surface()
 
@@ -474,57 +474,57 @@ class FXVolSurface():
         surface given the option strike and expiry date. Linear interpolation
         is done in variance x time. """
 
-        vol_type_value = self._vol_func_type.value
+        vol_type_value = self.vol_func_type.value
 
         index0 = 0
         index1 = 0
 
         t = (expiry_dt - self.value_dt) / gDaysInYear
 
-        num_curves = self._num_vol_curves
+        num_curves = self.num_vol_curves
 
         if num_curves == 1:
 
             # The volatility term structure is flat if there is only one expiry
-            fwd = self._F0T[0]
-            t_exp = self._t_exp[0]
-            vol = vol_function(vol_type_value, self._parameters[0],
+            fwd = self.fwd[0]
+            t_exp = self.t_exp[0]
+            vol = vol_function(vol_type_value, self.parameters[0],
                                fwd, K, t_exp)
             return vol
 
         # If the time is below first time then assume a flat vol
-        if t <= self._t_exp[0]:
+        if t <= self.t_exp[0]:
 
-            fwd = self._F0T[0]
-            t_exp = self._t_exp[0]
-            vol = vol_function(vol_type_value, self._parameters[0],
+            fwd = self.fwd[0]
+            t_exp = self.t_exp[0]
+            vol = vol_function(vol_type_value, self.parameters[0],
                                fwd, K, t_exp)
             return vol
 
         # If the time is beyond the last time then extrapolate with a flat vol
-        if t > self._t_exp[-1]:
+        if t > self.t_exp[-1]:
 
-            fwd = self._F0T[-1]
-            t_exp = self._t_exp[-1]
-            vol = vol_function(vol_type_value, self._parameters[-1],
+            fwd = self.fwd[-1]
+            t_exp = self.t_exp[-1]
+            vol = vol_function(vol_type_value, self.parameters[-1],
                                fwd, K, t_exp)
             return vol
 
         for i in range(1, num_curves):
 
-            if t <= self._t_exp[i] and t > self._t_exp[i-1]:
+            if t <= self.t_exp[i] and t > self.t_exp[i-1]:
                 index0 = i-1
                 index1 = i
                 break
 
-        fwd0 = self._F0T[index0]
-        t0 = self._t_exp[index0]
-        vol0 = vol_function(vol_type_value, self._parameters[index0],
+        fwd0 = self.fwd[index0]
+        t0 = self.t_exp[index0]
+        vol0 = vol_function(vol_type_value, self.parameters[index0],
                             fwd0, K, t0)
 
-        fwd1 = self._F0T[index1]
-        t1 = self._t_exp[index1]
-        vol1 = vol_function(vol_type_value, self._parameters[index1],
+        fwd1 = self.fwd[index1]
+        t1 = self.t_exp[index1]
+        vol1 = vol_function(vol_type_value, self.parameters[index1],
                             fwd1, K, t1)
 
         vart0 = vol0*vol0*t0
@@ -541,39 +541,39 @@ class FXVolSurface():
 
     def build_vol_surface(self):
 
-        s = self._spot_fx_rate
-        num_vol_curves = self._num_vol_curves
+        s = self.spot_fx_rate
+        num_vol_curves = self.num_vol_curves
 
-        if self._vol_func_type == VolFuncTypes.CLARK:
+        if self.vol_func_type == VolFuncTypes.CLARK:
             num_parameters = 3
-        elif self._vol_func_type == VolFuncTypes.SABR:
+        elif self.vol_func_type == VolFuncTypes.SABR:
             num_parameters = 4
-        elif self._vol_func_type == VolFuncTypes.SABR_BETA_ONE:
+        elif self.vol_func_type == VolFuncTypes.SABR_BETA_ONE:
             num_parameters = 3
-        elif self._vol_func_type == VolFuncTypes.SABR_BETA_HALF:
+        elif self.vol_func_type == VolFuncTypes.SABR_BETA_HALF:
             num_parameters = 3
-        elif self._vol_func_type == VolFuncTypes.BBG:
+        elif self.vol_func_type == VolFuncTypes.BBG:
             num_parameters = 3
-        elif self._vol_func_type == VolFuncTypes.CLARK5:
+        elif self.vol_func_type == VolFuncTypes.CLARK5:
             num_parameters = 5
         else:
-            print(self._vol_func_type)
+            print(self.vol_func_type)
             raise FinError("Unknown Model Type")
 
-        self._parameters = np.zeros([num_vol_curves, num_parameters])
+        self.parameters = np.zeros([num_vol_curves, num_parameters])
 
-        self._F0T = np.zeros(num_vol_curves)
-        self._rd = np.zeros(num_vol_curves)
-        self._rf = np.zeros(num_vol_curves)
-        self._k_atm = np.zeros(num_vol_curves)
-        self._deltaATM = np.zeros(num_vol_curves)
+        self.fwd = np.zeros(num_vol_curves)
+        self.rd = np.zeros(num_vol_curves)
+        self.rf = np.zeros(num_vol_curves)
+        self.k_atm = np.zeros(num_vol_curves)
+        self.delta_atm = np.zeros(num_vol_curves)
 
-        self._k_25d_c = np.zeros(num_vol_curves)
-        self._k_25d_p = np.zeros(num_vol_curves)
-        self._k_25d_c_ms = np.zeros(num_vol_curves)
-        self._k_25d_p_ms = np.zeros(num_vol_curves)
-        self._v_25d_ms = np.zeros(num_vol_curves)
-        self._t_exp = np.zeros(num_vol_curves)
+        self.k_25d_c = np.zeros(num_vol_curves)
+        self.k_25d_p = np.zeros(num_vol_curves)
+        self.k_25d_c_ms = np.zeros(num_vol_curves)
+        self.k_25d_p_ms = np.zeros(num_vol_curves)
+        self.v_25d_ms = np.zeros(num_vol_curves)
+        self.t_exp = np.zeros(num_vol_curves)
 
         #######################################################################
         # TODO: ADD SPOT DAYS
@@ -582,29 +582,29 @@ class FXVolSurface():
 
         for i in range(0, num_vol_curves):
 
-            expiry_dt = self._expiry_dts[i]
+            expiry_dt = self.expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / gDaysInYear
 
-            dom_df = self._domestic_curve._df(t_exp)
-            for_df = self._foreign_curve._df(t_exp)
+            dom_df = self.domestic_curve._df(t_exp)
+            for_df = self.foreign_curve._df(t_exp)
             f = s * for_df/dom_df
 
-            self._t_exp[i] = t_exp
-            self._rd[i] = -np.log(dom_df) / t_exp
-            self._rf[i] = -np.log(for_df) / t_exp
-            self._F0T[i] = f
+            self.t_exp[i] = t_exp
+            self.rd[i] = -np.log(dom_df) / t_exp
+            self.rf[i] = -np.log(for_df) / t_exp
+            self.fwd[i] = f
 
-            atm_vol = self._atm_vols[i]
+            atm_vol = self.atm_vols[i]
 
             # This follows exposition in Clarke Page 52
-            if self._atm_method == FinFXATMMethod.SPOT:
-                self._k_atm[i] = s
-            elif self._atm_method == FinFXATMMethod.FWD:
-                self._k_atm[i] = f
-            elif self._atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL:
-                self._k_atm[i] = f * np.exp(atm_vol*atm_vol*t_exp/2.0)
-            elif self._atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ:
-                self._k_atm[i] = f * np.exp(-atm_vol*atm_vol*t_exp/2.0)
+            if self.atm_method == FinFXATMMethod.SPOT:
+                self.k_atm[i] = s
+            elif self.atm_method == FinFXATMMethod.FWD:
+                self.k_atm[i] = f
+            elif self.atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL:
+                self.k_atm[i] = f * np.exp(atm_vol*atm_vol*t_exp/2.0)
+            elif self.atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ:
+                self.k_atm[i] = f * np.exp(-atm_vol*atm_vol*t_exp/2.0)
             else:
                 raise FinError("Unknown Delta Type")
 
@@ -615,22 +615,22 @@ class FXVolSurface():
         x_inits = []
         for i in range(0, num_vol_curves):
 
-            atm_vol = self._atm_vols[i]
-            ms25 = self._ms25DeltaVols[i]
-            rr25 = self._rr25DeltaVols[i]
+            atm_vol = self.atm_vols[i]
+            ms25 = self.ms25deltaVols[i]
+            rr25 = self.rr25deltaVols[i]
             s25 = atm_vol + ms25 + rr25/2.0
             s50 = atm_vol
             s75 = atm_vol + ms25 - rr25/2.0
 
-            if self._vol_func_type == VolFuncTypes.CLARK:
+            if self.vol_func_type == VolFuncTypes.CLARK:
 
-                # Fit to 25D
+                # Fit to 25d
                 c0 = np.log(atm_vol)
                 c1 = 2.0 * np.log(s75/s25)
                 c2 = 8.0 * np.log(s25*s75/atm_vol/atm_vol)
                 x_init = [c0, c1, c2]
 
-            elif self._vol_func_type == VolFuncTypes.SABR:
+            elif self.vol_func_type == VolFuncTypes.SABR:
                 # SABR parameters are alpha, nu, rho
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
@@ -640,32 +640,32 @@ class FXVolSurface():
 
                 x_init = [alpha, beta, rho, nu]
 
-            elif self._vol_func_type == VolFuncTypes.SABR_BETA_ONE:
+            elif self.vol_func_type == VolFuncTypes.SABR_BETA_ONE:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 rho = -0.112
                 nu = 0.817
                 x_init = [alpha, nu, rho]
 
-            elif self._vol_func_type == VolFuncTypes.SABR_BETA_HALF:
+            elif self.vol_func_type == VolFuncTypes.SABR_BETA_HALF:
                 # SABR parameters are alpha, nu, rho
                 alpha = 0.174
                 rho = -0.112
                 nu = 0.817
                 x_init = [alpha, rho, nu]
 
-            elif self._vol_func_type == VolFuncTypes.BBG:
+            elif self.vol_func_type == VolFuncTypes.BBG:
 
-                # BBG Params if we fit to 25D
+                # BBG Params if we fit to 25d
                 a = 8.0*s75-16.0*s50+8.0*s25
                 b = -6.0*s75+16.0*s50-10.0*s25
                 c = s75-3.0*s50+3.0*s25
 
                 x_init = [a, b, c]
 
-            elif self._vol_func_type == VolFuncTypes.CLARK5:
+            elif self.vol_func_type == VolFuncTypes.CLARK5:
 
-                # Fit to 25D
+                # Fit to 25d
                 c0 = np.log(atm_vol)
                 c1 = 2.0 * np.log(s75/s25)
                 c2 = 8.0 * np.log(s25*s75/atm_vol/atm_vol)
@@ -676,18 +676,18 @@ class FXVolSurface():
 
             x_inits.append(x_init)
 
-        delta_method_value = self._delta_method.value
-        vol_type_value = self._vol_func_type.value
+        delta_method_value = self.delta_method.value
+        vol_type_value = self.vol_func_type.value
 
         for i in range(0, num_vol_curves):
 
-            t = self._t_exp[i]
-            r_d = self._rd[i]
-            r_f = self._rf[i]
-            k_atm = self._k_atm[i]
-            atm_vol = self._atm_vols[i]
-            ms_25d_vol = self._ms25DeltaVols[i]
-            rr_25d_vol = self._rr25DeltaVols[i]
+            t = self.t_exp[i]
+            r_d = self.rd[i]
+            r_f = self.rf[i]
+            k_atm = self.k_atm[i]
+            atm_vol = self.atm_vols[i]
+            ms_25d_vol = self.ms25deltaVols[i]
+            rr_25d_vol = self.rr25deltaVols[i]
 
 #            print(t, rd, rf, k_atm, atm_vol, ms_25d_vol, rr_25d_vol)
 
@@ -696,9 +696,9 @@ class FXVolSurface():
                                         delta_method_value, vol_type_value,
                                         x_inits[i])
 
-            (self._parameters[i, :],
-             self._k_25d_c_ms[i], self._k_25d_p_ms[i],
-             self._k_25d_c[i], self._k_25d_p[i]) = res
+            (self.parameters[i, :],
+             self.k_25d_c_ms[i], self.k_25d_p_ms[i],
+             self.k_25d_c[i], self.k_25d_p[i]) = res
 
 ###############################################################################
 
@@ -711,22 +711,30 @@ class FXVolSurface():
         target value of delta allowing the volatility to be a function of the
         strike. """
 
-        s0 = self._spot_fx_rate
-        t_del = self._t_exp[tenor_index]
-        r_d = self._rd[tenor_index]
-        r_f = self._rf[tenor_index]
+        s0 = self.spot_fx_rate
+        t_del = self.t_exp[tenor_index]
+        r_d = self.rd[tenor_index]
+        r_f = self.rf[tenor_index]
 
         inverse_delta_target = norminvcdf(np.abs(delta_target))
-        argtuple = (self, s0, t_del, r_d, r_f, option_type_value,
-                    inverse_delta_target, tenor_index)
 
-        vol_type_value = self._vol_func_type.value
+        argtuple = (self, s0, t_del, r_d, r_f, 
+                    option_type_value,
+                    inverse_delta_target, 
+                    tenor_index)
 
-        argtuple = (vol_type_value, s0, t_del, r_d, r_f, option_type_value,
-                    self._delta_method.value,
-                    inverse_delta_target, self._parameters[tenor_index])
+        vol_type_value = self.vol_func_type.value
 
-        K = newton_secant(delta_fit, x0=initialValue, args=argtuple,
+        argtuple = (vol_type_value, 
+                    s0, t_del, r_d, r_f, 
+                    option_type_value,
+                    self.delta_method.value,
+                    inverse_delta_target, 
+                    self.parameters[tenor_index])
+
+        K = newton_secant(delta_fit, 
+                          x0=initialValue, 
+                          args=argtuple,
                           tol=1e-5, maxiter=50)
 
         return K
@@ -739,39 +747,39 @@ class FXVolSurface():
 
             print("==========================================================")
             print("VALUE DATE:", self.value_dt)
-            print("SPOT FX RATE:", self._spot_fx_rate)
-            print("ATM METHOD:", self._atm_method)
-            print("DELTA METHOD:", self._delta_method)
+            print("SPOT FX RATE:", self.spot_fx_rate)
+            print("ATM METHOD:", self.atm_method)
+            print("DELTA METHOD:", self.delta_method)
             print("==========================================================")
 
         K_dummy = 999
 
-        for i in range(0, self._num_vol_curves):
+        for i in range(0, self.num_vol_curves):
 
-            expiry_dt = self._expiry_dts[i]
+            expiry_dt = self.expiry_dts[i]
 
             if verbose:
-                print("TENOR:", self._tenors[i])
+                print("TENOR:", self.tenors[i])
                 print("EXPIRY DATE:", expiry_dt)
-                print("IN ATM VOL: %9.6f %%" % (100.0*self._atm_vols[i]))
-                print("IN MKT STRANGLE 25D VOL: %9.6f %%" %
-                      (100.0*self._ms25DeltaVols[i]))
-                print("IN RSK REVERSAL 25D VOL: %9.6f %%" %
-                      (100.0*self._rr25DeltaVols[i]))
+                print("IN ATM VOL: %9.6f %%" % (100.0*self.atm_vols[i]))
+                print("IN MKT STRANGLE 25d VOL: %9.6f %%" %
+                      (100.0*self.ms25deltaVols[i]))
+                print("IN RSK REVERSAL 25d VOL: %9.6f %%" %
+                      (100.0*self.rr25deltaVols[i]))
 
             call = FXVanillaOption(expiry_dt,
                                    K_dummy,
-                                   self._currency_pair,
+                                   self.currency_pair,
                                    OptionTypes.EUROPEAN_CALL,
                                    1.0,
-                                   self._notional_currency, )
+                                   self.notional_currency, )
 
             put = FXVanillaOption(expiry_dt,
                                   K_dummy,
-                                  self._currency_pair,
+                                  self.currency_pair,
                                   OptionTypes.EUROPEAN_PUT,
                                   1.0,
-                                  self._notional_currency)
+                                  self.notional_currency)
 
             ###################################################################
             # AT THE MONEY
@@ -779,49 +787,50 @@ class FXVolSurface():
 
             if verbose:
                 print("======================================================")
-                print("T_(YEARS): ", self._t_exp[i])
-                print("CNT_CPD_RD:%9.6f %%" % (self._rd[i]*100))
-                print("CNT_CPD_RF:%9.6f %%" % (self._rf[i]*100))
-                print("FWD_RATE:  %9.6f" % (self._F0T[i]))
+                print("T_(YEARS): ", self.t_exp[i])
+                print("CNT_CPD_RD:%9.6f %%" % (self.rd[i]*100))
+                print("CNT_CPD_RF:%9.6f %%" % (self.rf[i]*100))
+                print("FWD_RATE:  %9.6f" % (self.fwd[i]))
 
-            sigma_atm_out = vol_function(self._vol_func_type.value,
-                                         self._parameters[i],
-                                         self._F0T[i],
-                                         self._k_atm[i],
-                                         self._t_exp[i])
+            sigma_atm_out = vol_function(self.vol_func_type.value,
+                                         self.parameters[i],
+                                         self.fwd[i],
+                                         self.k_atm[i],
+                                         self.t_exp[i])
 
             if verbose:
                 print("======================================================")
-                print("VOL FUNCTION", self._vol_func_type)
-                print("VOL_PARAMETERS:", self._parameters[i])
+                print("VOL FUNCTION", self.vol_func_type)
+                print("VOL_PARAMETERS:", self.parameters[i])
                 print("======================================================")
-                print("OUT_k_atm:  %9.6f" % (self._k_atm[i]))
+                print("OUT_K_ATM:  %9.6f" % (self.k_atm[i]))
                 print("OUT_ATM_VOL: %9.6f %%"
                       % (100.0*sigma_atm_out))
 
-            diff = sigma_atm_out - self._atm_vols[i]
+            diff = sigma_atm_out - self.atm_vols[i]
 
             if np.abs(diff) > tol:
+
                 print("FAILED FIT TO ATM VOL IN: %9.6f  OUT: %9.6f  DIFF: %9.6f" %
-                      (self._atm_vols[i]*100.0, sigma_atm_out*100.0,
+                      (self.atm_vols[i]*100.0, sigma_atm_out*100.0,
                        diff * 100.0))
 
-            call._strike_fx_rate = self._k_atm[i]
-            put._strike_fx_rate = self._k_atm[i]
+            call.strike_fx_rate = self.k_atm[i]
+            put.strike_fx_rate = self.k_atm[i]
 
             model = BlackScholes(sigma_atm_out)
 
             delta_call = call.delta(self.value_dt,
-                                    self._spot_fx_rate,
-                                    self._domestic_curve,
-                                    self._foreign_curve,
-                                    model)[self._delta_method_string]
+                                    self.spot_fx_rate,
+                                    self.domestic_curve,
+                                    self.foreign_curve,
+                                    model)[self.delta_method_string]
 
             delta_put = put.delta(self.value_dt,
-                                  self._spot_fx_rate,
-                                  self._domestic_curve,
-                                  self._foreign_curve,
-                                  model)[self._delta_method_string]
+                                  self.spot_fx_rate,
+                                  self.domestic_curve,
+                                  self.foreign_curve,
+                                  model)[self.delta_method_string]
 
             if verbose:
                 print("CALL_DELTA: % 9.6f  PUT_DELTA: % 9.6f  NET_DELTA: % 9.6f"
@@ -832,48 +841,48 @@ class FXVolSurface():
             # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.25/-0.25
             ###################################################################
 
-            ms_vol = self._atm_vols[i] + self._ms25DeltaVols[i]
+            ms_vol = self.atm_vols[i] + self.ms25deltaVols[i]
 
             if verbose:
 
                 print("======================================================")
                 print("MKT STRANGLE VOL IN: %9.6f %%"
-                      % (100.0*self._ms25DeltaVols[i]))
+                      % (100.0*self.ms25deltaVols[i]))
 
-            call._strike_fx_rate = self._k_25d_c_ms[i]
-            put._strike_fx_rate = self._k_25d_p_ms[i]
+            call.strike_fx_rate = self.k_25d_c_ms[i]
+            put.strike_fx_rate = self.k_25d_p_ms[i]
 
             model = BlackScholes(ms_vol)
 
             delta_call = call.delta(self.value_dt,
-                                    self._spot_fx_rate,
-                                    self._domestic_curve,
-                                    self._foreign_curve,
-                                    model)[self._delta_method_string]
+                                    self.spot_fx_rate,
+                                    self.domestic_curve,
+                                    self.foreign_curve,
+                                    model)[self.delta_method_string]
 
             delta_put = put.delta(self.value_dt,
-                                  self._spot_fx_rate,
-                                  self._domestic_curve,
-                                  self._foreign_curve,
-                                  model)[self._delta_method_string]
+                                  self.spot_fx_rate,
+                                  self.domestic_curve,
+                                  self.foreign_curve,
+                                  model)[self.delta_method_string]
 
             if verbose:
                 print("k_25d_c_ms: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
-                      % (self._k_25d_c_ms[i], 100.0*ms_vol, delta_call))
+                      % (self.k_25d_c_ms[i], 100.0*ms_vol, delta_call))
 
                 print("k_25d_p_ms: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
-                      % (self._k_25d_p_ms[i], 100.0*ms_vol, delta_put))
+                      % (self.k_25d_p_ms[i], 100.0*ms_vol, delta_put))
 
             call_value = call.value(self.value_dt,
-                                    self._spot_fx_rate,
-                                    self._domestic_curve,
-                                    self._foreign_curve,
+                                    self.spot_fx_rate,
+                                    self.domestic_curve,
+                                    self.foreign_curve,
                                     model)['v']
 
             put_value = put.value(self.value_dt,
-                                  self._spot_fx_rate,
-                                  self._domestic_curve,
-                                  self._foreign_curve,
+                                  self.spot_fx_rate,
+                                  self.domestic_curve,
+                                  self.foreign_curve,
                                   model)['v']
 
             mkt_strangle_value = call_value + put_value
@@ -888,121 +897,121 @@ class FXVolSurface():
             ###################################################################
 
             # CALL
-            sigma_k_25d_c_ms = vol_function(self._vol_func_type.value,
-                                            self._parameters[i],
-                                            self._F0T[i],
-                                            self._k_25d_c_ms[i],
-                                            self._t_exp[i])
+            sigma_k_25d_c_ms = vol_function(self.vol_func_type.value,
+                                            self.parameters[i],
+                                            self.fwd[i],
+                                            self.k_25d_c_ms[i],
+                                            self.t_exp[i])
 
             model = BlackScholes(sigma_k_25d_c_ms)
             call_value = call.value(self.value_dt,
-                                    self._spot_fx_rate,
-                                    self._domestic_curve,
-                                    self._foreign_curve,
+                                    self.spot_fx_rate,
+                                    self.domestic_curve,
+                                    self.foreign_curve,
                                     model)['v']
 
             # THIS IS NOT GOING TO BE 0.25 AS WE HAVE USED A DIFFERENT SKEW VOL
             delta_call = call.delta(self.value_dt,
-                                    self._spot_fx_rate,
-                                    self._domestic_curve,
-                                    self._foreign_curve,
-                                    model)[self._delta_method_string]
+                                    self.spot_fx_rate,
+                                    self.domestic_curve,
+                                    self.foreign_curve,
+                                    model)[self.delta_method_string]
 
             # PUT
-            sigma_k_25d_p_ms = vol_function(self._vol_func_type.value,
-                                            self._parameters[i],
-                                            self._F0T[i],
-                                            self._k_25d_p_ms[i],
-                                            self._t_exp[i])
+            sigma_k_25d_p_ms = vol_function(self.vol_func_type.value,
+                                            self.parameters[i],
+                                            self.fwd[i],
+                                            self.k_25d_p_ms[i],
+                                            self.t_exp[i])
 
             model = BlackScholes(sigma_k_25d_p_ms)
             put_value = put.value(self.value_dt,
-                                  self._spot_fx_rate,
-                                  self._domestic_curve,
-                                  self._foreign_curve,
+                                  self.spot_fx_rate,
+                                  self.domestic_curve,
+                                  self.foreign_curve,
                                   model)['v']
 
             # THIS IS NOT GOING TO BE -0.25 AS WE HAVE USED A DIFFERENT SKEW VOL
             delta_put = put.delta(self.value_dt,
-                                  self._spot_fx_rate,
-                                  self._domestic_curve,
-                                  self._foreign_curve,
-                                  model)[self._delta_method_string]
+                                  self.spot_fx_rate,
+                                  self.domestic_curve,
+                                  self.foreign_curve,
+                                  model)[self.delta_method_string]
 
             mkt_strangle_value_skew = call_value + put_value
 
             if verbose:
                 print("k_25d_c_ms: %9.6f  SURFACE_VOL: %9.6f %%   DELTA: %9.6f"
-                      % (self._k_25d_c_ms[i], 100.0*sigma_k_25d_c_ms, delta_call))
+                      % (self.k_25d_c_ms[i], 100.0*sigma_k_25d_c_ms, delta_call))
 
                 print("k_25d_p_ms: %9.6f  SURFACE_VOL: %9.6f %%   DELTA: %9.6f"
-                      % (self._k_25d_p_ms[i], 100.0*sigma_k_25d_p_ms, delta_put))
+                      % (self.k_25d_p_ms[i], 100.0*sigma_k_25d_p_ms, delta_put))
 
                 print("CALL_VALUE: %9.6f  PUT_VALUE: %9.6f  MS_SKEW_VALUE: % 9.6f"
                       % (call_value, put_value, mkt_strangle_value_skew))
 
             diff = mkt_strangle_value - mkt_strangle_value_skew
             if np.abs(diff) > tol:
-                print("FAILED FIT TO 25D MS VAL: %9.6f  OUT: %9.6f  DIFF: % 9.6f" %
+                print("FAILED FIT TO 25d MS VAL: %9.6f  OUT: %9.6f  DIFF: % 9.6f" %
                       (mkt_strangle_value, mkt_strangle_value_skew, diff))
 
             ###################################################################
             # NOW WE SHIFT STRIKES SO THAT DELTAS NOW EQUAL 0.25, -0.25
             ###################################################################
 
-            call._strike_fx_rate = self._k_25d_c[i]
-            put._strike_fx_rate = self._k_25d_p[i]
+            call.strike_fx_rate = self.k_25d_c[i]
+            put.strike_fx_rate = self.k_25d_p[i]
 
-            sigma_k_25d_c = vol_function(self._vol_func_type.value,
-                                         self._parameters[i],
-                                         self._F0T[i],
-                                         self._k_25d_c[i],
-                                         self._t_exp[i])
+            sigma_k_25d_c = vol_function(self.vol_func_type.value,
+                                         self.parameters[i],
+                                         self.fwd[i],
+                                         self.k_25d_c[i],
+                                         self.t_exp[i])
 
             model = BlackScholes(sigma_k_25d_c)
 
             # THIS DELTA SHOULD BE +0.25
             delta_call = call.delta(self.value_dt,
-                                    self._spot_fx_rate,
-                                    self._domestic_curve,
-                                    self._foreign_curve,
-                                    model)[self._delta_method_string]
+                                    self.spot_fx_rate,
+                                    self.domestic_curve,
+                                    self.foreign_curve,
+                                    model)[self.delta_method_string]
 
-            sigma_k_25d_p = vol_function(self._vol_func_type.value,
-                                         self._parameters[i],
-                                         self._F0T[i],
-                                         self._k_25d_p[i],
-                                         self._t_exp[i])
+            sigma_k_25d_p = vol_function(self.vol_func_type.value,
+                                         self.parameters[i],
+                                         self.fwd[i],
+                                         self.k_25d_p[i],
+                                         self.t_exp[i])
 
             model = BlackScholes(sigma_k_25d_p)
 
             # THIS DELTA SHOULD BE -0.25
             delta_put = put.delta(self.value_dt,
-                                  self._spot_fx_rate,
-                                  self._domestic_curve,
-                                  self._foreign_curve,
-                                  model)[self._delta_method_string]
+                                  self.spot_fx_rate,
+                                  self.domestic_curve,
+                                  self.foreign_curve,
+                                  model)[self.delta_method_string]
 
             if verbose:
-                print("K_25D_C: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
-                      % (self._k_25d_c[i], 100.0*sigma_k_25d_c, delta_call))
+                print("K_25d_C: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
+                      % (self.k_25d_c[i], 100.0*sigma_k_25d_c, delta_call))
 
-                print("K_25D_P: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
-                      % (self._k_25d_p[i], 100.0*sigma_k_25d_p, delta_put))
+                print("K_25d_P: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
+                      % (self.k_25d_p[i], 100.0*sigma_k_25d_p, delta_put))
 
             sigma_RR = sigma_k_25d_c - sigma_k_25d_p
 
             if verbose:
                 print("==========================================================")
                 print("RR = VOL_K_25_C - VOL_K_25_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
-                      % (100.0 * self._rr25DeltaVols[i], 100.0*sigma_RR))
+                      % (100.0 * self.rr25deltaVols[i], 100.0*sigma_RR))
                 print("==========================================================")
 
-            diff = sigma_RR - self._rr25DeltaVols[i]
+            diff = sigma_RR - self.rr25deltaVols[i]
 
             if np.abs(diff) > tol:
-                print("FAILED FIT TO 25D RRV IN: % 9.6f  OUT: % 9.6f  DIFF: % 9.6f" %
-                      (self._rr25DeltaVols[i]*100.0,
+                print("FAILED FIT TO 25d RRV IN: % 9.6f  OUT: % 9.6f  DIFF: % 9.6f" %
+                      (self.rr25deltaVols[i]*100.0,
                        sigma_RR*100.0,
                        diff*100.0))
 
@@ -1014,15 +1023,15 @@ class FXVolSurface():
 
         dbns = []
 
-        for i_tenor in range(0, len(self._tenors)):
+        for i_tenor in range(0, len(self.tenors)):
 
-            f = self._F0T[i_tenor]
-            t_exp = self._t_exp[i_tenor]
+            f = self.fwd[i_tenor]
+            t_exp = self.t_exp[i_tenor]
 
             dFX = (high_fx - low_fx) / num_intervals
 
-            dom_df = self._domestic_curve.df(t_exp)
-            for_df = self._foreign_curve.df(t_exp)
+            dom_df = self.domestic_curve.df(t_exp)
+            for_df = self.foreign_curve.df(t_exp)
 
             r_d = -np.log(dom_df) / t_exp
             r_f = -np.log(for_df) / t_exp
@@ -1034,8 +1043,8 @@ class FXVolSurface():
 
                 k = low_fx + iK*dFX
 
-                vol = vol_function(self._vol_func_type.value,
-                                   self._parameters[i_tenor],
+                vol = vol_function(self.vol_func_type.value,
+                                   self.parameters[i_tenor],
                                    f, k, t_exp)
 
                 Ks.append(k)
@@ -1044,7 +1053,7 @@ class FXVolSurface():
             Ks = np.array(Ks)
             vols = np.array(vols)
 
-            density = option_implied_dbn(self._spot_fx_rate, t_exp,
+            density = option_implied_dbn(self.spot_fx_rate, t_exp,
                                          r_d, r_f, Ks, vols)
 
             dbn = FinDistribution(Ks, density)
@@ -1058,25 +1067,25 @@ class FXVolSurface():
 
         plt.figure()
 
-        vol_type_val = self._vol_func_type.value
+        vol_type_val = self.vol_func_type.value
 
-        for tenor_index in range(0, self._num_vol_curves):
+        for tenor_index in range(0, self.num_vol_curves):
 
-            atm_vol = self._atm_vols[tenor_index]*100
-            ms_vol = self._ms25DeltaVols[tenor_index]*100
-            rr_vol = self._rr25DeltaVols[tenor_index]*100
+            atm_vol = self.atm_vols[tenor_index]*100
+            ms_vol = self.ms25deltaVols[tenor_index]*100
+            rr_vol = self.rr25deltaVols[tenor_index]*100
 
-            low_k = self._k_25d_p[tenor_index] * 0.75
-            high_k = self._k_25d_c[tenor_index] * 1.25
+            low_k = self.k_25d_p[tenor_index] * 0.75
+            high_k = self.k_25d_c[tenor_index] * 1.25
 
             strikes = []
             vols = []
             num_intervals = 30
             k = low_k
             dk = (high_k - low_k)/num_intervals
-            params = self._parameters[tenor_index]
-            t = self._t_exp[tenor_index]
-            f = self._F0T[tenor_index]
+            params = self.parameters[tenor_index]
+            t = self.t_exp[tenor_index]
+            f = self.fwd[tenor_index]
 
             for _ in range(0, num_intervals):
                 sigma = vol_function(vol_type_val, params, f, K, t) * 100.0
@@ -1084,7 +1093,7 @@ class FXVolSurface():
                 vols.append(sigma)
                 k = k + dk
 
-            label_str = self._tenors[tenor_index]
+            label_str = self.tenors[tenor_index]
             label_str += " ATM: " + str(atm_vol)[0:6]
             label_str += " MS: " + str(ms_vol)[0:6]
             label_str += " RR: " + str(rr_vol)[0:6]
@@ -1093,11 +1102,11 @@ class FXVolSurface():
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = "25D FIT:" + self._currency_pair + \
-                " " + str(self._vol_func_type)
+            title = "25d FIT:" + self.currency_pair + \
+                " " + str(self.vol_func_type)
 
             key_strikes = []
-            key_strikes.append(self._k_atm[tenor_index])
+            key_strikes.append(self.k_atm[tenor_index])
 
             key_vols = []
             for K in key_strikes:
@@ -1107,10 +1116,10 @@ class FXVolSurface():
             plt.plot(key_strikes, key_vols, 'ko', markersize=4)
 
             key_strikes = []
-            key_strikes.append(self._k_25d_p[tenor_index])
-            key_strikes.append(self._k_25d_p_ms[tenor_index])
-            key_strikes.append(self._k_25d_c[tenor_index])
-            key_strikes.append(self._k_25d_c_ms[tenor_index])
+            key_strikes.append(self.k_25d_p[tenor_index])
+            key_strikes.append(self.k_25d_p_ms[tenor_index])
+            key_strikes.append(self.k_25d_c[tenor_index])
+            key_strikes.append(self.k_25d_c_ms[tenor_index])
 
             key_vols = []
 
@@ -1126,38 +1135,38 @@ class FXVolSurface():
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
         s += label_to_string("VALUE DATE", self.value_dt)
-        s += label_to_string("FX RATE", self._spot_fx_rate)
-        s += label_to_string("CCY PAIR", self._currency_pair)
-        s += label_to_string("NOTIONAL CCY", self._notional_currency)
-        s += label_to_string("NUM TENORS", self._num_vol_curves)
-        s += label_to_string("ATM METHOD", self._atm_method)
-        s += label_to_string("DELTA METHOD", self._delta_method)
-        s += label_to_string("VOL FUNCTION", self._vol_func_type)
+        s += label_to_string("FX RATE", self.spot_fx_rate)
+        s += label_to_string("CCY PAIR", self.currency_pair)
+        s += label_to_string("NOTIONAL CCY", self.notional_currency)
+        s += label_to_string("NUM TENORS", self.num_vol_curves)
+        s += label_to_string("ATM METHOD", self.atm_method)
+        s += label_to_string("DELTA METHOD", self.delta_method)
+        s += label_to_string("VOL FUNCTION", self.vol_func_type)
 
-        for i in range(0, self._num_vol_curves):
+        for i in range(0, self.num_vol_curves):
 
             s += "\n"
 
-            s += label_to_string("TENOR", self._tenors[i])
-            s += label_to_string("EXPIRY DATE", self._expiry_dts[i])
-            s += label_to_string("TIME (YRS)", self._t_exp[i])
-            s += label_to_string("FWD FX", self._F0T[i])
+            s += label_to_string("TENOR", self.tenors[i])
+            s += label_to_string("EXPIRY DATE", self.expiry_dts[i])
+            s += label_to_string("TIME (YRS)", self.t_exp[i])
+            s += label_to_string("FWD FX", self.fwd[i])
 
-            s += label_to_string("ATM VOLS", self._atm_vols[i]*100.0)
-            s += label_to_string("MS VOLS", self._ms25DeltaVols[i]*100.0)
-            s += label_to_string("RR VOLS", self._rr25DeltaVols[i]*100.0)
+            s += label_to_string("ATM VOLS", self.atm_vols[i]*100.0)
+            s += label_to_string("MS VOLS", self.ms25deltaVols[i]*100.0)
+            s += label_to_string("RR VOLS", self.rr25deltaVols[i]*100.0)
 
-            s += label_to_string("ATM Strike", self._k_atm[i])
-            s += label_to_string("ATM Delta", self._deltaATM[i])
+            s += label_to_string("ATM Strike", self.k_atm[i])
+            s += label_to_string("ATM Delta", self.delta_atm[i])
 
-            s += label_to_string("k_atm", self._k_atm[i])
-            s += label_to_string("MS 25D Call Strike", self._k_25d_c_ms[i])
-            s += label_to_string("MS 25D Put Strike", self._k_25d_p_ms[i])
-            s += label_to_string("SKEW 25D CALL STRIKE", self._k_25d_c[i])
-            s += label_to_string("SKEW 25D PUT STRIKE", self._k_25d_p[i])
-            s += label_to_string("PARAMS", self._parameters[i])
+            s += label_to_string("k_atm", self.k_atm[i])
+            s += label_to_string("MS 25d Call Strike", self.k_25d_c_ms[i])
+            s += label_to_string("MS 25d Put Strike", self.k_25d_p_ms[i])
+            s += label_to_string("SKEW 25d CALL STRIKE", self.k_25d_c[i])
+            s += label_to_string("SKEW 25d PUT STRIKE", self.k_25d_p[i])
+            s += label_to_string("PARAMS", self.parameters[i])
 
         return s
 

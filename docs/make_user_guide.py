@@ -600,10 +600,10 @@ def parse_function(lines, start_line, end_line, class_name=""):
                 comment_init = '"""'
 
             start_comment_row = row_num
-            for row_num in range(row_num+1, end_line):
-                line = lines[row_num]
+            for row_num2 in range(row_num+1, end_line):
+                line = lines[row_num2]
                 if line.find(comment_init) > 0:
-                    end_comment_row = row_num
+                    end_comment_row = row_num2
                     end_comment = True
                     break
             break

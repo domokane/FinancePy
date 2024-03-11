@@ -27,29 +27,28 @@ def test_FinOptionImpliedDbn():
         # print("EURUSD EXAMPLE CLARK")
 
         value_dt = Date(10, 4, 2020)
+        for_name = "EUR"
+        dom_name = "USD"
+        for_cc_rate = 0.03460  # EUR
+        dom_cc_rate = 0.02940  # USD
 
-        forName = "EUR"
-        domName = "USD"
-        forCCRate = 0.03460  # EUR
-        domCCRate = 0.02940  # USD
+        domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
+        foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
 
-        domestic_curve = DiscountCurveFlat(value_dt, domCCRate)
-        foreign_curve = DiscountCurveFlat(value_dt, forCCRate)
-
-        currency_pair = forName + domName
+        currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
         tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
         atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
-        marketStrangle25DeltaVols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-        riskReversal25DeltaVols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
+        rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
 
-        notional_currency = forName
+        notional_currency = for_name
 
         atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
 
-        fxMarket = FXVolSurface(value_dt,
+        fx_market = FXVolSurface(value_dt,
                                 spot_fx_rate,
                                 currency_pair,
                                 notional_currency,
@@ -57,40 +56,40 @@ def test_FinOptionImpliedDbn():
                                 foreign_curve,
                                 tenors,
                                 atm_vols,
-                                marketStrangle25DeltaVols,
-                                riskReversal25DeltaVols,
+                                mkt_strangle_25d_vols,
+                                rsk_reversal_25d_vols,
                                 atm_method,
                                 delta_method)
 
-#        fxMarket.check_calibration(True)
+#        fx_market.check_calibration(True)
 
         PLOT_GRAPHS = False
         if PLOT_GRAPHS:
-            fxMarket.plot_vol_curves()
+            fx_market.plot_vol_curves()
 
-        for iTenor in range(0, len(fxMarket._tenors)):
+        for iTenor in range(0, len(fx_market.tenors)):
 
-            F = fxMarket._F0T[iTenor]
-            t_exp = fxMarket._t_exp[iTenor]
+            F = fx_market.fwd[iTenor]
+            t_exp = fx_market.t_exp[iTenor]
 
-            startFX = F * 0.05
-            endFX = F * 5.0
+            start_fx = F * 0.05
+            end_fx = F * 5.0
 
             num_steps = 10000
-            dFX = (endFX - startFX) / num_steps
+            dFX = (end_fx - start_fx) / num_steps
 
 #            dom_df = domestic_curve._df(t_exp)
 #            for_df = foreign_curve._df(t_exp)
 #            r_d = -np.log(dom_df) / t_exp
 #            r_f = -np.log(for_df) / t_exp
 
-            params = fxMarket._parameters[iTenor]
+            params = fx_market.parameters[iTenor]
 
             strikes = []
             vols = []
 
             for iK in range(0, num_steps):
-                strike = startFX + iK*dFX
+                strike = start_fx + iK*dFX
                 vol = vol_function_clark(params, F, strike, t_exp)
                 strikes.append(strike)
                 vols.append(vol)

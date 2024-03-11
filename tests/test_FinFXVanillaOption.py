@@ -185,12 +185,12 @@ def test_FinFXVanillaOptionBloombergExample():
     # In BS the FX rate is the price in domestic of one unit of foreign
     # In case of EURUSD = 1.3 the domestic currency is USD and foreign is EUR
     # DOM = USD , FOR = EUR
-    forName = "EUR"
-    domName = "USD"
+    for_name = "EUR"
+    dom_name = "USD"
     forDepoRate = 0.05  # EUR
     domDepoRate = 0.02  # USD
 
-    currency_pair = forName + domName  # Always FORDOM
+    currency_pair = for_name + dom_name  # Always FORDOM
     spot_fx_rate = 1.30
     strike_fx_rate = 1.3650
     volatility = 0.20

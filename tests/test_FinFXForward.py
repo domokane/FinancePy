@@ -18,9 +18,9 @@ def test_FinFXForward():
     expiry_dt = value_dt.add_months(12)
     # Forward is on EURUSD which is expressed as number of USD per EUR
     # ccy1 = EUR and ccy2 = USD
-    forName = "EUR"
-    domName = "USD"
-    currency_pair = forName + domName  # Always ccy1ccy2
+    for_name = "EUR"
+    dom_name = "USD"
+    currency_pair = for_name + dom_name  # Always ccy1ccy2
     spot_fx_rate = 1.300  # USD per EUR
     strike_fx_rate = 1.365  # USD per EUR
     ccy1InterestRate = 0.02  # USD Rates
@@ -51,7 +51,7 @@ def test_FinFXForward():
     domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     notional = 100.0
-    notional_currency = forName
+    notional_currency = for_name
 
     fxForward = FXForward(expiry_dt,
                           strike_fx_rate,

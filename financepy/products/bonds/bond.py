@@ -179,12 +179,12 @@ class Bond:
         # dg_type = DateGenRuleTypes.BACKWARD
 
         self.cpn_dts = Schedule(self.issue_dt,
-                                 self.maturity_dt,
-                                 self.freq_type,
-                                 CalendarTypes.NONE,
-                                 self.bd_type,
-                                 self.dg_type,
-                                 end_of_month=self.end_of_month).generate()
+                                self.maturity_dt,
+                                self.freq_type,
+                                CalendarTypes.NONE,
+                                self.bd_type,
+                                self.dg_type,
+                                end_of_month=self.end_of_month).generate()
 
     ###########################################################################
 
@@ -345,7 +345,7 @@ class Bond:
                                                 convention)
 
         principal = dirty_price * face / self.par
-        principal = principal - self.accrued_interest
+        principal = principal - self.accrued_int
         return principal
 
     ###########################################################################
@@ -457,10 +457,10 @@ class Bond:
             for tenor, cpn in zip(key_rate_tenors, rates):
                 mat_dt = settle_dt.add_years(tenor)
 
-                par_bond = Bond(settle_dt, 
-                                mat_dt, 
+                par_bond = Bond(settle_dt,
+                                mat_dt,
                                 cpn,
-                                self.freq_type, 
+                                self.freq_type,
                                 self.dc_type)
 
                 par_bonds.append(par_bond)
@@ -511,7 +511,7 @@ class Bond:
 
             # calculate the full price of the bond
             # using the discount curve with the key rate shifted up
-            p_up = self.dirty_price_from_discount_curve(settle_dt, 
+            p_up = self.dirty_price_from_discount_curve(settle_dt,
                                                         par_crv_up)
 
             # create a curve again with the key rate shifted down
@@ -677,10 +677,10 @@ class Bond:
         else:
             raise FinError("Unknown type for clean_price "
                            + str(type(clean_price)))
-        
+
         self.accrued_interest(settle_dt, 1.0)
 
-        accrued_amount = self.accrued_int* self.par
+        accrued_amount = self.accrued_int * self.par
         dirty_prices = (clean_prices + accrued_amount)
         ytms = []
 
@@ -722,8 +722,8 @@ class Bond:
     ###########################################################################
 
     def accrued_interest(self,
-                              settle_dt: Date,
-                              face: float = 100.0):
+                         settle_dt: Date,
+                         face: float = 100.0):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
@@ -777,7 +777,7 @@ class Bond:
 
         clean_price = np.array(clean_price)
         self.accrued_interest(settle_dt, 1.0)
-        accrued_amount = self.accrued_int* self.par
+        accrued_amount = self.accrued_int * self.par
         bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pv_ibor = 0.0
@@ -870,7 +870,7 @@ class Bond:
 
         self.accrued_interest(settle_dt, 1.0)
 
-        accrued_amount = self.accrued_int* self.par
+        accrued_amount = self.accrued_int * self.par
         dirty_prices = clean_prices + accrued_amount
 
         oass = []
@@ -994,7 +994,7 @@ class Bond:
                                                            survival_curve,
                                                            recovery_rate)
 
-        clean_price = dirty_price - self.accrued_interest
+        clean_price = dirty_price - self.accrued_int
         return clean_price
 
     ###########################################################################
@@ -1021,7 +1021,7 @@ class Bond:
         # The coupon or par payments on buying date belong to the buyer. The
         # coupon or par payments on selling date are given to the new buyer.
         dts_cfs = [(d, c * self.par)
-                     for (d, c) in dts_cfs if (d >= begin_dt) and (d < end_dt)]
+                   for (d, c) in dts_cfs if (d >= begin_dt) and (d < end_dt)]
 
         dts_cfs.append((begin_dt, -buy_price))
         dts_cfs.append((end_dt, sell_price))

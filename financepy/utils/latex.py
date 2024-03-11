@@ -49,8 +49,8 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
                 return ""
 
         col_str = cols[0]
-        for i in range(1, num_cols):
-            col_str += " & " + cols[i]
+        for j in range(1, num_cols):
+            col_str += " & " + cols[j]
 
         table_str += col_str + "\\\ \n"
 

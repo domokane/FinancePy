@@ -1081,15 +1081,15 @@ class Calendar:
     def easter_monday(self,
                       year: float):
         """ Get the day in a given year that is Easter Monday. This is not
-        easy to compute so we rely on a pre-calculated array. """
+        easy to compute, so we rely on a pre-calculated array. """
 
         if year > 2100:
             raise FinError(
                 "Unable to determine Easter monday in year " + str(year))
 
-        emdays = easterMondayDay[year - 1901]
+        em_days = easterMondayDay[year - 1901]
         start_dt = Date(1, 1, year)
-        em = start_dt.add_days(emdays-1)
+        em = start_dt.add_days(em_days-1)
         return em
 
 ###############################################################################

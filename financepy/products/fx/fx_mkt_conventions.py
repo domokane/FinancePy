@@ -122,12 +122,12 @@ class FinFXRate():
         if ccy1 in ccyNames:
             self.ccy1 = ccy1
         else:
-            raise FinError("Unknown currency code ", ccy1)
+            raise FinError("Unknown currency code:" + ccy1)
 
         if ccy2 in ccyNames:
             self.ccy2 = ccy2
         else:
-            raise FinError("Unknown currency code ", ccy2)
+            raise FinError("Unknown currency code:" + ccy2)
 
         self.ccy2 = ccy2
         self.rate = None
