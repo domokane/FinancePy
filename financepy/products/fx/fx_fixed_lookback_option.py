@@ -40,9 +40,9 @@ class FXFixedLookbackOption:
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_dt = expiry_dt
-        self._option_type = option_type
-        self._option_strike = option_strike
+        self.expiry_dt = expiry_dt
+        self.option_type = option_type
+        self.option_strike = option_strike
 
 ##########################################################################
 
@@ -59,7 +59,7 @@ class FXFixedLookbackOption:
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
@@ -70,26 +70,26 @@ class FXFixedLookbackOption:
             raise FinError(
                 "Foreign Curve valuation date not same as option value date")
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
 
-        df = domestic_curve.df(self._expiry_dt)
+        df = domestic_curve.df(self.expiry_dt)
         r = -np.log(df)/t
 
-        dq = foreign_curve.df(self._expiry_dt)
+        dq = foreign_curve.df(self.expiry_dt)
         q = -np.log(dq)/t
 
         v = volatility
         s0 = stock_price
-        k = self._option_strike
+        k = self.option_strike
         s_min = 0.0
         s_max = 0.0
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_max = stock_min_max
             if s_max < s0:
                 raise FinError(
                     "The Smax value must be >= the stock price.")
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = stock_min_max
             if s_min > s0:
                 raise FinError(
@@ -108,7 +108,7 @@ class FXFixedLookbackOption:
         expbt = exp(b * t)
 
         # Taken from Hull Page 536 (6th edition) and Haug Page 143
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
 
             if k > s_max:
                 d1 = (log(s0/k) + (b+v*v/2.0)*t)/v/sqrt(t)
@@ -139,7 +139,7 @@ class FXFixedLookbackOption:
                 v = df * (s_max - k) + s0 * dq * N(e1) - \
                     s_max * df * N(e2) + s0 * df * u * term
 
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
 
             if k >= s_min:
                 f1 = (log(s0 / s_min) + (b + v * v / 2.0) * t) / v / sqrt(t)
@@ -171,7 +171,7 @@ class FXFixedLookbackOption:
 
         else:
             raise FinError("Unknown lookback option type:" +
-                           str(self._option_type))
+                           str(self.option_type))
 
         return v
 
@@ -189,7 +189,7 @@ class FXFixedLookbackOption:
                  seed: int = 4242):
         """ Value FX Fixed Lookback option using Monte Carlo. """
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
         s_0 = spot_fx_rate
 
         df = domestic_curve._df(t)
@@ -202,18 +202,18 @@ class FXFixedLookbackOption:
 
         num_time_steps = int(t * num_steps_per_year)
 
-        option_type = self._option_type
-        k = self._option_strike
+        option_type = self.option_type
+        k = self.option_strike
 
         s_min = 0.0
         s_max = 0.0
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_max = spot_fx_rate_min_max
             if s_max < s_0:
                 raise FinError(
                     "Smax must be greater than or equal to the stock price.")
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = spot_fx_rate_min_max
             if s_min > s_0:
                 raise FinError(

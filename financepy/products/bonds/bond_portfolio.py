@@ -26,18 +26,18 @@ from .bond import YTMCalcType
 #         check_argument_types(self.__init__, locals())
 
 #         self.calculateFlows()
-#         self._par = 100.0
+#         self.par = 100.0
 
 # ###############################################################################
 
 #     def _calculate_flows(self):
 #         """ Determine the bond cashflow payment amounts without principal """
 
-#         self._flow_amounts = [0.0]
+#         self.flow_amounts = [0.0]
 
-#         for _ in self._cpn_dts[1:]:
-#             cpn = self._cpn / self._freq
-#             self._flow_amounts.append(cpn)
+#         for _ in self.cpn_dts[1:]:
+#             cpn = self.cpn / self.freq
+#             self.flow_amounts.append(cpn)
 
 # ###############################################################################
 
@@ -65,7 +65,7 @@ from .bond import YTMCalcType
 
 #         dd = self.dollar_duration(settle_dt, ytm, convention)
 #         fp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-#         md = dd * (1.0 + ytm / self._freq) / fp
+#         md = dd * (1.0 + ytm / self.freq) / fp
 #         return md
 
 # ###############################################################################
@@ -95,7 +95,7 @@ from .bond import YTMCalcType
 #         p0 = self.dirty_price_from_ytm(settle_dt, ytm - dy, convention)
 #         p1 = self.dirty_price_from_ytm(settle_dt, ytm, convention)
 #         p2 = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
-#         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
+#         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self.par
 #         return conv
 
 # ###############################################################################
@@ -109,7 +109,7 @@ from .bond import YTMCalcType
 
 #         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm,
 #                                                 convention)
-#         accrued_amount = self._accrued_interest * self._par
+#         accrued_amount = self.accrued_int* self.par
 #         clean_price = dirty_price - accrued_amount
 #         return clean_price
 
@@ -140,7 +140,7 @@ from .bond import YTMCalcType
 #         """ Calculate the current yield of the bond which is the
 #         coupon divided by the clean price (not the full price)"""
 
-#         y = self._cpn * self._par / clean_price
+#         y = self.cpn * self.par / clean_price
 #         return y
 
 # ###############################################################################
@@ -160,7 +160,7 @@ from .bond import YTMCalcType
 #                          num_ex_dividend_days: int = 0,
 #                          cal_type: CalendarTypes = CalendarTypes.WEEKEND):
 
-#         return self._accrued_interest
+#         return self.accrued_interest
 
 # ###############################################################################
 
@@ -170,16 +170,16 @@ from .bond import YTMCalcType
 #         """ Print a list of the unadjusted coupon payment dates used in
 #         analytic calculations for the bond. """
 
-#         flow = self._cpn / self._freq
+#         flow = self.cpn / self.freq
 
-#         for dt in self._cpn_dts[1:-1]:
+#         for dt in self.cpn_dts[1:-1]:
 #             # coupons paid on a settlement date are included
 #             if dt >= settle_dt:
 #                 print("%12s" % dt, " %12.2f " % flow)
 
 #         redemption_amount = face * (1.0 + flow)
 
-#         print("%12s" % self._cpn_dts[-1], " %12.2f " % redemption_amount)
+#         print("%12s" % self.cpn_dts[-1], " %12.2f " % redemption_amount)
 
 # ###############################################################################
 
@@ -196,8 +196,8 @@ from .bond import YTMCalcType
 #         more accuracy. I reduce any error by averaging period start and period
 #         end payment present values. """
 
-#         f = self._freq
-#         c = self._cpn
+#         f = self.freq
+#         c = self.cpn
 
 #         pv = 0.0
 #         prevQ = 1.0
@@ -206,7 +206,7 @@ from .bond import YTMCalcType
 #         defaultingPrincipalPVPayStart = 0.0
 #         defaultingPrincipalPVPayEnd = 0.0
 
-#         for dt in self._cpn_dts[1:]:
+#         for dt in self.cpn_dts[1:]:
 
 #             # coupons paid on a settlement date are included
 #             if dt >= settle_dt:
@@ -230,8 +230,8 @@ from .bond import YTMCalcType
 
 #         pv = pv + 0.50 * defaultingPrincipalPVPayStart
 #         pv = pv + 0.50 * defaultingPrincipalPVPayEnd
-#         pv = pv + df * q * self._par
-#         pv *= self._par
+#         pv = pv + df * q * self.par
+#         pv *= self.par
 #         return pv
 
 # ###############################################################################
@@ -252,7 +252,7 @@ from .bond import YTMCalcType
 #                                                            survival_curve,
 #                                                            recovery_rate)
 
-#         clean_price = dirty_price - self._accrued_interest
+#         clean_price = dirty_price - self.accrued_interest
 #         return clean_price
 
 # ###############################################################################
@@ -260,11 +260,11 @@ from .bond import YTMCalcType
 #     def __repr__(self):
 
 #         s = label_to_string("OBJECT TYPE", type(self).__name__)
-#         s += label_to_string("ISSUE DATE", self._issue_dt)
-#         s += label_to_string("MATURITY DATE", self._maturity_dt)
-#         s += label_to_string("COUPON", self._cpn)
-#         s += label_to_string("FREQUENCY", self._freq_type)
-#         s += label_to_string("DAY COUNT TYPE", self._dc_type)
+#         s += label_to_string("ISSUE DATE", self.issue_dt)
+#         s += label_to_string("MATURITY DATE", self.maturity_dt)
+#         s += label_to_string("COUPON", self.cpn)
+#         s += label_to_string("FREQUENCY", self.freq_type)
+#         s += label_to_string("DAY COUNT TYPE", self.dc_type)
 #         return s
 
 # ###############################################################################

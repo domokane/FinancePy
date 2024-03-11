@@ -81,11 +81,11 @@ class EquityChooserOption(EquityOption):
         if choose_dt > put_expiry_dt:
             raise FinError("Expiry date must precede put option expiry date")
 
-        self._chooseDate = choose_dt
-        self._call_expiry_dt = call_expiry_dt
-        self._put_expiry_dt = put_expiry_dt
-        self._call_strike = float(call_strike_price)
-        self._put_strike = float(put_strike_price)
+        self.chooseDate = choose_dt
+        self.call_expiry_dt = call_expiry_dt
+        self.put_expiry_dt = put_expiry_dt
+        self.call_strike = float(call_strike_price)
+        self.put_strike = float(put_strike_price)
 
     ###########################################################################
 
@@ -98,16 +98,16 @@ class EquityChooserOption(EquityOption):
         """ Value the complex chooser option using an approach by Rubinstein
         (1991). See also Haug page 129 for complex chooser options. """
 
-        if value_dt > self._chooseDate:
+        if value_dt > self.chooseDate:
             raise FinError("Value date after choose date.")
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._call_expiry_dt:
+        if value_dt > self.call_expiry_dt:
             raise FinError("Valuation date after call expiry date.")
 
-        if value_dt > self._put_expiry_dt:
+        if value_dt > self.put_expiry_dt:
             raise FinError("Valuation date after put expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -120,26 +120,26 @@ class EquityChooserOption(EquityOption):
 
         DEBUG_MODE = False
 
-        t = (self._chooseDate - value_dt) / gDaysInYear
-        tc = (self._call_expiry_dt - value_dt) / gDaysInYear
-        tp = (self._put_expiry_dt - value_dt) / gDaysInYear
+        t = (self.chooseDate - value_dt) / gDaysInYear
+        tc = (self.call_expiry_dt - value_dt) / gDaysInYear
+        tp = (self.put_expiry_dt - value_dt) / gDaysInYear
 
-        rt = discount_curve.cc_rate(self._chooseDate)
-        rtc = discount_curve.cc_rate(self._call_expiry_dt)
-        rtp = discount_curve.cc_rate(self._put_expiry_dt)
+        rt = discount_curve.cc_rate(self.chooseDate)
+        rtc = discount_curve.cc_rate(self.call_expiry_dt)
+        rtp = discount_curve.cc_rate(self.put_expiry_dt)
 
-        q = dividend_curve.cc_rate(self._chooseDate)
+        q = dividend_curve.cc_rate(self.chooseDate)
 
         t = max(t, g_small)
         tc = max(tc, g_small)
         tp = max(tp, g_small)
 
-        v = model._volatility
+        v = model.volatility
         v = max(v, g_small)
 
         s0 = stock_price
-        xc = self._call_strike
-        xp = self._put_strike
+        xc = self.call_strike
+        xp = self.put_strike
         bt = rt - q
         btc = rtc - q
         btp = rtp - q
@@ -193,13 +193,13 @@ class EquityChooserOption(EquityOption):
                  seed: int = 4242):
         """ Value the complex chooser option Monte Carlo. """
 
-        dft = discount_curve.df(self._chooseDate)
-        dftc = discount_curve.df(self._call_expiry_dt)
-        dftp = discount_curve.df(self._put_expiry_dt)
+        dft = discount_curve.df(self.chooseDate)
+        dftc = discount_curve.df(self.call_expiry_dt)
+        dftp = discount_curve.df(self.put_expiry_dt)
 
-        t = (self._chooseDate - value_dt) / gDaysInYear
-        tc = (self._call_expiry_dt - value_dt) / gDaysInYear
-        tp = (self._put_expiry_dt - value_dt) / gDaysInYear
+        t = (self.chooseDate - value_dt) / gDaysInYear
+        tc = (self.call_expiry_dt - value_dt) / gDaysInYear
+        tp = (self.put_expiry_dt - value_dt) / gDaysInYear
 
         rt = -np.log(dft) / t
         rtc = -np.log(dftc) / tc
@@ -209,16 +209,16 @@ class EquityChooserOption(EquityOption):
         tc = max(tc, 1e-6)
         tp = max(tp, 1e-6)
 
-        v = model._volatility
+        v = model.volatility
         v = max(v, 1e-6)
 
         # SHOULD THIS CARE ABOUT TERM STRUCTURE OF Q
-        dq = dividend_curve.df(self._chooseDate)
+        dq = dividend_curve.df(self.chooseDate)
         q = -np.log(dq) / t
 
         #        q = dividend_yield
-        kc = self._call_strike
-        kp = self._put_strike
+        kc = self.call_strike
+        kp = self.put_strike
 
         np.random.seed(seed)
         sqrt_dt = np.sqrt(t)
@@ -252,11 +252,11 @@ class EquityChooserOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("CHOOSER DATE", self._chooseDate)
-        s += label_to_string("CALL EXPIRY DATE", self._call_expiry_dt)
-        s += label_to_string("CALL STRIKE PRICE", self._call_strike)
-        s += label_to_string("PUT EXPIRY DATE", self._put_expiry_dt)
-        s += label_to_string("PUT STRIKE PRICE", self._put_strike, "")
+        s += label_to_string("CHOOSER DATE", self.chooseDate)
+        s += label_to_string("CALL EXPIRY DATE", self.call_expiry_dt)
+        s += label_to_string("CALL STRIKE PRICE", self.call_strike)
+        s += label_to_string("PUT EXPIRY DATE", self.put_expiry_dt)
+        s += label_to_string("PUT STRIKE PRICE", self.put_strike, "")
         return s
 
     ###########################################################################

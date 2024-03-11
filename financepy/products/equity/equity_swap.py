@@ -62,29 +62,29 @@ class EquitySwap:
         check_argument_types(self.__init__, locals())
 
         if isinstance(term_dt_or_tenor, Date):
-            self._termination_dt = term_dt_or_tenor
+            self.termination_dt = term_dt_or_tenor
         else:
-            self._termination_dt = effective_dt.add_tenor(
+            self.termination_dt = effective_dt.add_tenor(
                 term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self.termination_dt,
                                               bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_dt = effective_dt
+        self.effective_dt = effective_dt
 
         # There is no exchange of principal
-        self._principal = 0.0
+        self.principal = 0.0
 
         rate_leg_type = SwapTypes.PAY
         if eq_leg_type == SwapTypes.PAY:
             rate_leg_type = SwapTypes.RECEIVE
 
-        self._equity_leg = EquitySwapLeg(effective_dt,
-                                         self._maturity_dt,
+        self.equity_leg = EquitySwapLeg(effective_dt,
+                                         self.maturity_dt,
                                          eq_leg_type,
                                          eq_freq_type,
                                          eq_dc_type,
@@ -98,14 +98,14 @@ class EquitySwap:
                                          end_of_month)
 
         # Fixed Rate Leg not implemented yet
-        self._rate_leg = SwapFloatLeg(effective_dt,
-                                      self._maturity_dt,
+        self.rate_leg = SwapFloatLeg(effective_dt,
+                                      self.maturity_dt,
                                       rate_leg_type,
                                       rate_spread,
                                       rate_freq_type,
                                       rate_dc_type,
-                                      self._equity_leg._notional,
-                                      self._principal,
+                                      self.equity_leg.notional,
+                                      self.principal,
                                       rate_payment_lag,
                                       cal_type,
                                       bd_type,
@@ -123,19 +123,19 @@ class EquitySwap:
               first_fixing_rate=None):
         """ Value the Equity swap on a valuation date. """
 
-        self._equity_leg_value = self._equity_leg.value(value_dt,
+        self.equity_leg_value = self.equity_leg.value(value_dt,
                                                         discount_curve,
                                                         index_curve,
                                                         dividend_curve,
                                                         current_price)
-        self._fill_rate_notional_array()
+        self.fill_rate_notional_array()
 
-        self._rate_leg_value = self._rate_leg.value(value_dt,
+        self.rate_leg_value = self.rate_leg.value(value_dt,
                                                     discount_curve,
                                                     index_curve,
                                                     first_fixing_rate)
 
-        return self._equity_leg_value + self._rate_leg_value
+        return self.equity_leg_value + self.rate_leg_value
 
     ###########################################################################
 
@@ -150,8 +150,8 @@ class EquitySwap:
         """
 
         # Assumption: Rate frequency type is a multiple of Equity's
-        eq_freq = annual_frequency(self._equity_leg._freq_type)
-        rate_freq = annual_frequency(self._rate_leg._freq_type)
+        eq_freq = annual_frequency(self.equity_leg.freq_type)
+        rate_freq = annual_frequency(self.rate_leg.freq_type)
 
         multiple = int(rate_freq // eq_freq)
         is_multiple = int(rate_freq % eq_freq) == 0
@@ -159,18 +159,18 @@ class EquitySwap:
         if (eq_freq is None or rate_freq is None) or (not is_multiple):
             raise FinError("Invalid frequency type assigned!")
 
-        self._rate_leg._notional_array = []
-        for last_notional in self._equity_leg._last_notionals:
+        self.rate_leg.notional_array = []
+        for last_notional in self.equity_leg.last_notionals:
             for _ in range(multiple):
-                self._rate_leg._notional_array.append(last_notional)
+                self.rate_leg.notional_array.append(last_notional)
 
     ###########################################################################
 
     def __repr__(self):
         s = "EQUITY LEG:\n"
-        s += self._equity_leg.__repr__()
+        s += self.equity_leg._repr__()
         s += "\nRATE LEG:\n"
-        s += self._rate_leg.__repr__()
+        s += self.rate_leg._repr__()
 
         return s
 

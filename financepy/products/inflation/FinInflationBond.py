@@ -49,30 +49,30 @@ class FinInflationBond(Bond):
 
         # If the maturity date falls on the last day of the month we assume
         # that earlier flows also fall on month ends
-        self._end_of_month = False
+        self.end_of_month = False
         if maturity_dt.is_eom():
-            self._end_of_month = True
+            self.end_of_month = True
 
-        self._issue_dt = issue_dt
-        self._maturity_dt = maturity_dt
-        self._cpn = cpn
-        self._freq_type = freq_type
-        self._dc_type = dc_type
-        self._freq = annual_frequency(freq_type)
-        self._ex_div_days = ex_div_days  # This is the bond holding size
-        self._base_cpi_value = base_cpi_value  # CPI value at issue date of bond
-        self._par = 100.0  # This is how price is quoted
-        self._redemption = 1.0  # Amount paid at maturity
-        self._num_ex_dividend_days = num_ex_dividend_days
-        self._inflation_accrued_interest = 0.0
-        self._cal_type = cal_type
-        self._cpn_dts = []
-        self._flow_amounts = []
+        self.issue_dt = issue_dt
+        self.maturity_dt = maturity_dt
+        self.cpn = cpn
+        self.freq_type = freq_type
+        self.dc_type = dc_type
+        self.freq = annual_frequency(freq_type)
+        self.ex_div_days = ex_div_days  # This is the bond holding size
+        self.base_cpi_value = base_cpi_value  # CPI value at issue date of bond
+        self.par = 100.0  # This is how price is quoted
+        self.redemption = 1.0  # Amount paid at maturity
+        self.num_ex_dividend_days = num_ex_dividend_days
+        self.inflation_accrued_int = 0.0
+        self.cal_type = cal_type
+        self.cpn_dts = []
+        self.flow_amounts = []
 
-        self._settle_dt = Date(1, 1, 1900)
-        self._accrued_interest = None
-        self._accrued_days = 0.0
-        self._alpha = 0.0
+        self.settle_dt = Date(1, 1, 1900)
+        self.accrued_int= None
+        self.accrued_days = 0.0
+        self.alpha = 0.0
 
         self._calculate_cpn_dts()
         self._calculate_flows()
@@ -88,11 +88,11 @@ class FinInflationBond(Bond):
         """ Calculate the principal value of the bond based on the face
         amount and the CPI growth. """
 
-        index_ratio = reference_cpi / self._base_cpi_value
+        index_ratio = reference_cpi / self.base_cpi_value
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm,
                                                 convention)
-        principal = dirty_price * face / self._par
-        principal = principal - self._accrued_interest
+        principal = dirty_price * face / self.par
+        principal = principal - self.accrued_int
         principal *= index_ratio
         return principal
 
@@ -106,7 +106,7 @@ class FinInflationBond(Bond):
         """ Calculate the flat clean price value of the bond based on the clean
         price amount and the CPI growth to the last coupon date. """
 
-        index_ratio = last_cpn_cpi / self._base_cpi_value
+        index_ratio = last_cpn_cpi / self.base_cpi_value
         clean_price = self.clean_price_from_ytm(
             settle_dt, ytm, convention)
         flat_price = clean_price
@@ -125,21 +125,21 @@ class FinInflationBond(Bond):
         """
 
         self.accrued_interest(settle_dt, face)
-        index_ratio = reference_cpi / self._base_cpi_value
-        self._inflation_accrued_interest = self._accrued_interest * index_ratio
-        return self._inflation_accrued_interest
+        index_ratio = reference_cpi / self.base_cpi_value
+        self.inflation_accrued_int = self.accrued_int * index_ratio
+        return self.inflation_accrued_int
 
 ###############################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("ISSUE DATE", self._issue_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("COUPON", self._cpn)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("EX-DIV DAYS", self._ex_div_days)
-        s += label_to_string("BASE CPI VALUE", self._base_cpi_value, "")
+        s += label_to_string("ISSUE DATE", self.issue_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("COUPON", self.cpn)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("EX-DIV DAYS", self.ex_div_days)
+        s += label_to_string("BASE CPI VALUE", self.base_cpi_value, "")
         return s
 
 ###############################################################################

@@ -51,9 +51,9 @@ class DiscountCurvePWL(DiscountCurve):
                                     self.value_dt,
                                     self.dc_type)
 
-        self._times = np.array(dc_times)
+        self.times = np.array(dc_times)
 
-        if test_monotonicity(self._times) is False:
+        if test_monotonicity(self.times) is False:
             raise FinError("Times are not sorted in increasing order")
 
     ###########################################################################
@@ -78,16 +78,16 @@ class DiscountCurvePWL(DiscountCurve):
             l_index = 0
             found = 0
 
-            num_times = len(self._times)
+            num_times = len(self.times)
             for i in range(1, num_times):
-                if self._times[i] > t:
+                if self.times[i] > t:
                     l_index = i - 1
                     found = 1
                     break
 
-            t0 = self._times[l_index]
+            t0 = self.times[l_index]
             r0 = self._zero_rates[l_index]
-            t1 = self._times[l_index + 1]
+            t1 = self.times[l_index + 1]
             r1 = self._zero_rates[l_index + 1]
 
             if found == 1:
@@ -131,8 +131,8 @@ class DiscountCurvePWL(DiscountCurve):
     #     """ Returns the discount factor at time t taking into account the
     #     piecewise flat zero rate curve and the compunding frequency. """
 
-    #     r = self._zero_rate(t, self._freq_type)
-    #     df = zero_to_df(r, t, self._freq_type)
+    #     r = self._zero_rate(t, self.freq_type)
+    #     df = zero_to_df(r, t, self.freq_type)
     #     return df
 
     ###########################################################################
@@ -143,7 +143,7 @@ class DiscountCurvePWL(DiscountCurve):
         s += label_to_string("DATE", "ZERO RATE")
         for i in range(0, len(self._zero_dts)):
             s += label_to_string(self._zero_dts[i], self._zero_rates[i])
-        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("FREQUENCY", self.freq_type)
         return s
 
     ###########################################################################

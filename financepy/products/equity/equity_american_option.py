@@ -42,10 +42,10 @@ class EquityAmericanOption(EquityOption):
                 option_type != OptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type" + str(option_type))
 
-        self._expiry_dt = expiry_dt
-        self._strike_price = strike_price
-        self._option_type = option_type
-        self._num_options = num_options
+        self.expiry_dt = expiry_dt
+        self.strike_price = strike_price
+        self.option_type = option_type
+        self.num_options = num_options
 
 ###############################################################################
 
@@ -67,7 +67,7 @@ class EquityAmericanOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date")
 
         if isinstance(value_dt, Date):
-            t_exp = (self._expiry_dt - value_dt) / gDaysInYear
+            t_exp = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t_exp = value_dt
 
@@ -82,14 +82,14 @@ class EquityAmericanOption(EquityOption):
 
         t_exp = np.maximum(t_exp, 1e-10)
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
         s = stock_price
-        k = self._strike_price
+        k = self.strike_price
 
-        v = model.value(s, t_exp, k, r, q, self._option_type)
-        v = v * self._num_options
+        v = model.value(s, t_exp, k, r, q, self.option_type)
+        v = v * self.num_options
 
         if isinstance(s, float):
             return v
@@ -100,10 +100,10 @@ class EquityAmericanOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("STRIKE PRICE", self._strike_price)
-        s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("NUMBER", self._num_options, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("STRIKE PRICE", self.strike_price)
+        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("NUMBER", self.num_options, "")
         return s
 
 ###############################################################################

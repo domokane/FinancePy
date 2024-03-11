@@ -34,24 +34,24 @@ class BondAnnuity:
 
         check_argument_types(self.__init__, locals())
 
-        self._maturity_dt = maturity_dt
-        self._cpn = cpn
-        self._freq_type = freq_type
-        self._freq = annual_frequency(freq_type)
+        self.maturity_dt = maturity_dt
+        self.cpn = cpn
+        self.freq_type = freq_type
+        self.freq = annual_frequency(freq_type)
 
         # ISDA Style conventions
-        self._cal_type = cal_type
-        self._bd_type = bd_type
-        self._dg_type = dg_type
-        self._dc_type = dc_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
+        self.dg_type = dg_type
+        self.dc_type = dc_type
 
-        self._par = 100.0
+        self.par = 100.0
 
-        self._cpn_dts = []
-        self._settle_dt = Date(1, 1, 1900)
-        self._accrued_interest = None
-        self._accrued_days = 0.0
-        self._alpha = 0.0
+        self.cpn_dts = []
+        self.settle_dt = Date(1, 1, 1900)
+        self.accrued_int= None
+        self.accrued_days = 0.0
+        self.alpha = 0.0
 
     ###########################################################################
 
@@ -63,7 +63,7 @@ class BondAnnuity:
 
         dirty_price = self.dirty_price_from_discount_curve(settle_dt,
                                                            discount_curve)
-        accrued = self._accrued_interest * self._par
+        accrued = self.accrued_int* self.par
         clean_price = dirty_price - accrued
         return clean_price
 
@@ -78,15 +78,15 @@ class BondAnnuity:
         self.calculate_payments(settle_dt, 1.0)
         pv = 0.0
 
-        num_flows = len(self._cpn_dts)
+        num_flows = len(self.cpn_dts)
 
         for i in range(1, num_flows):
-            dt = self._cpn_dts[i]
+            dt = self.cpn_dts[i]
             df = discount_curve.df(dt)
-            flow = self._flow_amounts[i]
+            flow = self.flow_amounts[i]
             pv = pv + flow * df
 
-        return pv * self._par
+        return pv * self.par
 
     ###########################################################################
 
@@ -95,36 +95,36 @@ class BondAnnuity:
                            face: (float)):
         ''' Calculate bond payments '''
         # No need to generate flows if settlement date has not changed
-        if settle_dt == self._settle_dt:
+        if settle_dt == self.settle_dt:
             return
 
-        if settle_dt == self._maturity_dt:
+        if settle_dt == self.maturity_dt:
             raise FinError("Settlement date is maturity date.")
 
-        self._settle_dt = settle_dt
+        self.settle_dt = settle_dt
         bd_type = BusDayAdjustTypes.FOLLOWING
         dg_type = DateGenRuleTypes.BACKWARD
 
-        self._cpn_dts = Schedule(settle_dt,
-                                 self._maturity_dt,
-                                 self._freq_type,
-                                 self._cal_type,
+        self.cpn_dts = Schedule(settle_dt,
+                                 self.maturity_dt,
+                                 self.freq_type,
+                                 self.cal_type,
                                  bd_type,
                                  dg_type).generate()
 
-        self._pcd = self._cpn_dts[0]
-        self._ncd = self._cpn_dts[1]
+        self.pcd = self.cpn_dts[0]
+        self.ncd = self.cpn_dts[1]
         self.accrued_interest(settle_dt, 1.0)
 
-        self._flow_amounts = [0.0]
-        basis = DayCount(self._dc_type)
+        self.flow_amounts = [0.0]
+        basis = DayCount(self.dc_type)
 
-        prev_dt = self._pcd
+        prev_dt = self.pcd
 
-        for next_dt in self._cpn_dts[1:]:
+        for next_dt in self.cpn_dts[1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
-            flow = self._cpn * alpha * face
-            self._flow_amounts.append(flow)
+            flow = self.cpn * alpha * face
+            self.flow_amounts.append(flow)
             prev_dt = next_dt
 
     ###########################################################################
@@ -135,24 +135,24 @@ class BondAnnuity:
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. """
 
-        if settle_dt != self._settle_dt:
+        if settle_dt != self.settle_dt:
             self.calculate_payments(settle_dt, 1.0)
 
-        if len(self._cpn_dts) == 0:
+        if len(self.cpn_dts) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        dc = DayCount(self._dc_type)
+        dc = DayCount(self.dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(self._pcd,
+        (acc_factor, num, _) = dc.year_frac(self.pcd,
                                             settle_dt,
-                                            self._ncd,
-                                            self._freq)
+                                            self.ncd,
+                                            self.freq)
 
-        self._alpha = 1.0 - acc_factor * self._freq
+        self.alpha = 1.0 - acc_factor * self.freq
 
-        self._accrued_interest = acc_factor * face * self._cpn
-        self._accrued_days = num
-        return self._accrued_interest
+        self.accrued_int= acc_factor * face * self.cpn
+        self.accrued_days = num
+        return self.accrued_interest
 
     ###########################################################################
 
@@ -164,10 +164,10 @@ class BondAnnuity:
 
         self.calculate_payments(settle_dt, face)
 
-        num_flows = len(self._cpn_dts)
+        num_flows = len(self.cpn_dts)
         for i in range(1, num_flows):
-            dt = self._cpn_dts[i]
-            flow = self._flow_amounts[i]
+            dt = self.cpn_dts[i]
+            flow = self.flow_amounts[i]
             print(dt, ",", flow)
 
     ###########################################################################
@@ -177,11 +177,11 @@ class BondAnnuity:
         analytic calculations for the bond. """
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS_DAY_RULE", self._bd_type)
-        s += label_to_string("DATE_GEN_RULE", self._dg_type)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUS_DAY_RULE", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
 
         return s
 

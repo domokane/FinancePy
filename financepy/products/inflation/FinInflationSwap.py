@@ -56,26 +56,26 @@ class FinInflationSwap():
 
         check_argument_types(self.__init__, locals())
 
-        self._cal_type = cal_type
-        self._bd_type = bd_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
 
         if type(maturity_dt_or_tenor) == Date:
             maturity_dt = maturity_dt_or_tenor
         else:
             maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
-            calendar = Calendar(self._cal_type)
+            calendar = Calendar(self.cal_type)
             maturity_dt = calendar.adjust(maturity_dt,
-                                            self._bd_type)
+                                            self.bd_type)
 
         if start_dt > maturity_dt:
             raise FinError("Settlement date after maturity date")
 
-        self._start_dt = start_dt
-        self._maturity_dt = maturity_dt
-        self._fra_rate = fra_rate
-        self._pay_fixed_rate = pay_fixed_rate
-        self._dc_type = day_count_type
-        self._notional = notional
+        self.start_dt = start_dt
+        self.maturity_dt = maturity_dt
+        self.fra_rate = fra_rate
+        self.pay_fixed_rate = pay_fixed_rate
+        self.dc_type = day_count_type
+        self.notional = notional
 
     ###########################################################################
 
@@ -84,19 +84,19 @@ class FinInflationSwap():
         market FRA rate. The same curve is used for calculating the forward
         Ibor and for doing discounting on the expected forward payment. """
 
-        dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        df1 = libor_curve.df(self._start_dt)
-        df2 = libor_curve.df(self._maturity_dt)
+        dc = DayCount(self.dc_type)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        df1 = libor_curve.df(self.start_dt)
+        df2 = libor_curve.df(self.maturity_dt)
         libor_fwd = (df1 / df2 - 1.0) / acc_factor
-        v = acc_factor * (libor_fwd - self._fra_rate) * df2
+        v = acc_factor * (libor_fwd - self.fra_rate) * df2
 
 #        print(df1, df2, acc_factor, libor_fwd, v)
         # Forward value the FRA to the value date
         df_to_value_dt = libor_curve.df(value_dt)
-        v = v * self._notional / df_to_value_dt
+        v = v * self.notional / df_to_value_dt
 
-        if self._pay_fixed_rate:
+        if self.pay_fixed_rate:
             v *= -1.0
         return v
 
@@ -106,10 +106,10 @@ class FinInflationSwap():
         """ Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate. """
 
-        dc = DayCount(self._dc_type)
-        df1 = libor_curve.df(self._start_dt)
-        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        df2 = df1 / (1.0 + acc_factor * self._fra_rate)
+        dc = DayCount(self.dc_type)
+        df1 = libor_curve.df(self.start_dt)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        df2 = df1 / (1.0 + acc_factor * self.fra_rate)
         return df2
 
     ###########################################################################
@@ -117,30 +117,30 @@ class FinInflationSwap():
     def print_payments(self, value_dt):
         """ Determine the value of the Deposit given a Ibor curve. """
 
-        flow_settle = self._notional
-        dc = DayCount(self._dc_type)
-        acc_factor = dc.year_frac(self._start_dt, self._maturity_dt)[0]
-        flow_maturity = (1.0 + acc_factor * self._fra_rate) * self._notional
+        flow_settle = self.notional
+        dc = DayCount(self.dc_type)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        flow_maturity = (1.0 + acc_factor * self.fra_rate) * self.notional
 
-        if self._pay_fixed_rate is True:
-            print(self._start_dt, -flow_settle)
-            print(self._maturity_dt, flow_maturity)
+        if self.pay_fixed_rate is True:
+            print(self.start_dt, -flow_settle)
+            print(self.maturity_dt, flow_maturity)
         else:
-            print(self._start_dt, flow_settle)
-            print(self._maturity_dt, -flow_maturity)
+            print(self.start_dt, flow_settle)
+            print(self.maturity_dt, -flow_maturity)
 
     ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START ACCD DATE", self._start_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("FRA RATE", self._fra_rate)
-        s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("PAY FIXED RATE", self._pay_fixed_rate)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
-        s += label_to_string("CALENDAR", self._cal_type)
+        s += label_to_string("START ACCD DATE", self.start_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("FRA RATE", self.fra_rate)
+        s += label_to_string("NOTIONAL", self.notional)
+        s += label_to_string("PAY FIXED RATE", self.pay_fixed_rate)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
+        s += label_to_string("CALENDAR", self.cal_type)
         return s
 
     ###########################################################################

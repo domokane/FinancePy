@@ -96,13 +96,13 @@ class CDSCurve:
         if len(cds_contracts) == 0:
             raise FinError("No CDS contracts have been supplied.")
 
-        maturity_dt = cds_contracts[0]._maturity_dt
+        maturity_dt = cds_contracts[0].maturity_dt
 
         for cds in cds_contracts[1:]:
-            if cds._maturity_dt <= maturity_dt:
+            if cds.maturity_dt <= maturity_dt:
                 raise FinError("CDS contracts not in increasing maturity.")
 
-            maturity_dt = cds._maturity_dt
+            maturity_dt = cds.maturity_dt
 
 ###############################################################################
 
@@ -169,7 +169,7 @@ class CDSCurve:
 
         for i in range(0, num_times):
 
-            maturity_dt = self.cds_contracts[i]._maturity_dt
+            maturity_dt = self.cds_contracts[i].maturity_dt
 
             argtuple = (self,
                         self.value_dt,

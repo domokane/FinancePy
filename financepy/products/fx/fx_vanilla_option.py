@@ -123,7 +123,7 @@ def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 
 #     model = FinFXModelBlackScholes(volatility)
 
-#     self._strike_fx_rate = K
+#     self.strike_fx_rate = K
 
 #     deltaDict = self.delta(value_dt,
 #                            stock_price,
@@ -150,7 +150,7 @@ def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, option_type_value):
 #     deltaType = args[6]
 #     volatility = args[7]
 
-#     self._strike_fx_rate = K
+#     self.strike_fx_rate = K
 
 #     deltaDict = self.fast_delta(value_dt,
 #                                stock_price,
@@ -210,24 +210,24 @@ class FXVanillaOption():
         if len(currency_pair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._expiry_dt = expiry_dt
-        self._delivery_dt = delivery_dt
+        self.expiry_dt = expiry_dt
+        self.delivery_dt = delivery_dt
 
         if np.any(strike_fx_rate < 0.0):
             raise FinError("Negative strike.")
 
-        self._strike_fx_rate = strike_fx_rate
+        self.strike_fx_rate = strike_fx_rate
 
-        self._currency_pair = currency_pair
-        self._for_name = self._currency_pair[0:3]
-        self._dom_name = self._currency_pair[3:6]
+        self.currency_pair = currency_pair
+        self.for_name = self.currency_pair[0:3]
+        self.dom_name = self.currency_pair[3:6]
 
-        if prem_currency != self._dom_name and prem_currency != self._for_name:
+        if prem_currency != self.dom_name and prem_currency != self.for_name:
             raise FinError("Premium currency not in currency pair.")
 
-        self._prem_currency = prem_currency
+        self.prem_currency = prem_currency
 
-        self._notional = notional
+        self.notional = notional
 
         if option_type != OptionTypes.EUROPEAN_CALL and \
            option_type != OptionTypes.EUROPEAN_PUT and\
@@ -235,8 +235,8 @@ class FXVanillaOption():
            option_type != OptionTypes.AMERICAN_PUT:
             raise FinError("Unknown Option Type:" + option_type)
 
-        self._option_type = option_type
-        self._spot_days = spot_days
+        self.option_type = option_type
+        self.spot_days = spot_days
 
 ###############################################################################
 
@@ -254,7 +254,7 @@ class FXVanillaOption():
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
@@ -266,61 +266,61 @@ class FXVanillaOption():
                 "Foreign Curve valuation date not same as valuation date")
 
         if isinstance(value_dt, Date):
-            spot_dt = value_dt.add_weekdays(self._spot_days)
-            tdel = (self._delivery_dt - spot_dt) / gDaysInYear
-            t_exp = (self._expiry_dt - value_dt) / gDaysInYear
+            spot_dt = value_dt.add_weekdays(self.spot_days)
+            t_del = (self.delivery_dt - spot_dt) / gDaysInYear
+            t_exp = (self.expiry_dt - value_dt) / gDaysInYear
         else:
-            tdel = value_dt
-            t_exp = tdel
+            t_del = value_dt
+            t_exp = t_del
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")
 
-        if tdel < 0.0:
+        if t_del < 0.0:
             raise FinError("Time to expiry must be positive.")
 
-        tdel = np.maximum(tdel, 1e-10)
+        t_del = np.maximum(t_del, 1e-10)
 
-        # TODO RESOLVE TDEL versus TEXP
-        dom_df = domestic_curve._df(tdel)
-        for_df = foreign_curve._df(tdel)
+        # TODO RESOLVE t_del versus TEXP
+        dom_df = domestic_curve._df(t_del)
+        for_df = foreign_curve._df(t_del)
 
-        r_d = -np.log(dom_df) / tdel
-        r_f = -np.log(for_df) / tdel
+        r_d = -np.log(dom_df) / t_del
+        r_f = -np.log(for_df) / t_del
 
         s0 = spot_fx_rate
-        k = self._strike_fx_rate
-        f0t = s0 * np.exp((r_d-r_f)*tdel)
+        k = self.strike_fx_rate
+        f0t = s0 * np.exp((r_d-r_f)*t_del)
 
         if isinstance(model, BlackScholes) or isinstance(model, SABR):
 
             if isinstance(model, BlackScholes):
-                volatility = model._volatility
+                volatility = model.volatility
             elif isinstance(model, SABR):
 
-                params_list = np.array([model._alpha,
-                                        model._beta,
-                                        model._rho,
-                                        model._nu])
+                params_list = np.array([model.alpha,
+                                        model.beta,
+                                        model.rho,
+                                        model.nu])
 
-                volatility = vol_function_sabr(params_list, f0t, k, tdel)
+                volatility = vol_function_sabr(params_list, f0t, k, t_del)
 
             if np.any(volatility < 0.0):
                 raise FinError("Volatility should not be negative.")
 
             v = np.maximum(volatility, 1e-10)
 
-            if self._option_type == OptionTypes.EUROPEAN_CALL:
+            if self.option_type == OptionTypes.EUROPEAN_CALL:
 
                 vdf = bs_value(s0, t_exp, k, r_d, r_f, v,
                                OptionTypes.EUROPEAN_CALL.value)
 
-            elif self._option_type == OptionTypes.EUROPEAN_PUT:
+            elif self.option_type == OptionTypes.EUROPEAN_PUT:
 
                 vdf = bs_value(s0, t_exp, k, r_d, r_f, v,
                                OptionTypes.EUROPEAN_PUT.value)
 
-            elif self._option_type == OptionTypes.AMERICAN_CALL:
+            elif self.option_type == OptionTypes.AMERICAN_CALL:
 
                 num_steps_per_year = 100
 
@@ -329,7 +329,7 @@ class FXVanillaOption():
                                        t_exp, OptionTypes.AMERICAN_CALL.value,
                                        k)['value']
 
-            elif self._option_type == OptionTypes.AMERICAN_PUT:
+            elif self.option_type == OptionTypes.AMERICAN_PUT:
 
                 num_steps_per_year = 100
 
@@ -344,23 +344,23 @@ class FXVanillaOption():
         # the option may be quoted in either currency terms and so we calculate
         # these
 
-        if self._prem_currency == self._dom_name:
-            notional_dom = self._notional
-            notional_for = self._notional / self._strike_fx_rate
-        elif self._prem_currency == self._for_name:
-            notional_dom = self._notional * self._strike_fx_rate
-            notional_for = self._notional
+        if self.prem_currency == self.dom_name:
+            notional_dom = self.notional
+            notional_for = self.notional / self.strike_fx_rate
+        elif self.prem_currency == self.for_name:
+            notional_dom = self.notional * self.strike_fx_rate
+            notional_for = self.notional
         else:
             raise FinError("Invalid notional currency.")
 
         vdf = vdf
         pips_dom = vdf
-        pips_for = vdf / (spot_fx_rate * self._strike_fx_rate)
+        pips_for = vdf / (spot_fx_rate * self.strike_fx_rate)
 
-        cash_dom = vdf * notional_dom / self._strike_fx_rate
+        cash_dom = vdf * notional_dom / self.strike_fx_rate
         cash_for = vdf * notional_for / spot_fx_rate
 
-        pct_dom = vdf / self._strike_fx_rate
+        pct_dom = vdf / self.strike_fx_rate
         pct_for = vdf / spot_fx_rate
 
         return {'v': vdf,
@@ -372,8 +372,8 @@ class FXVanillaOption():
                 "pct_for": pct_for,
                 "not_dom": notional_dom,
                 "not_for": notional_for,
-                "ccy_dom": self._dom_name,
-                "ccy_for": self._for_name}
+                "ccy_dom": self.dom_name,
+                "ccy_for": self.for_name}
 
 ###############################################################################
 
@@ -424,33 +424,33 @@ class FXVanillaOption():
         by Iain Clark, published by Wiley Finance. """
 
         if isinstance(value_dt, Date):
-            spot_dt = value_dt.add_weekdays(self._spot_days)
-            tdel = (self._delivery_dt - spot_dt) / gDaysInYear
-            t_exp = (self._expiry_dt - value_dt) / gDaysInYear
+            spot_dt = value_dt.add_weekdays(self.spot_days)
+            t_del = (self.delivery_dt - spot_dt) / gDaysInYear
+            t_exp = (self.expiry_dt - value_dt) / gDaysInYear
         else:
-            tdel = value_dt
-            t_exp = tdel
+            t_del = value_dt
+            t_exp = t_del
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
 
-        if np.any(tdel < 0.0):
+        if np.any(t_del < 0.0):
             raise FinError("Time to expiry must be positive.")
 
-        tdel = np.maximum(tdel, 1e-10)
+        t_del = np.maximum(t_del, 1e-10)
 
-        dom_df = domestic_curve._df(tdel)
-        r_d = -np.log(dom_df)/tdel
+        dom_df = domestic_curve._df(t_del)
+        r_d = -np.log(dom_df)/t_del
 
-        for_df = foreign_curve._df(tdel)
-        r_f = -np.log(for_df)/tdel
+        for_df = foreign_curve._df(t_del)
+        r_f = -np.log(for_df)/t_del
 
         s0 = spot_fx_rate
-        K = self._strike_fx_rate
+        K = self.strike_fx_rate
 
         if isinstance(model, BlackScholes):
 
-            v = model._volatility
+            v = model.volatility
 
             if np.any(v < 0.0):
                 raise FinError("Volatility should not be negative.")
@@ -458,13 +458,13 @@ class FXVanillaOption():
             v = np.maximum(v, g_small)
 
             pips_spot_delta = bs_delta(
-                s0, t_exp, K, r_d, r_f, v, self._option_type.value)
-            pips_fwd_delta = pips_spot_delta * np.exp(r_f*tdel)
+                s0, t_exp, K, r_d, r_f, v, self.option_type.value)
+            pips_fwd_delta = pips_spot_delta * np.exp(r_f*t_del)
             vpctf = bs_value(s0, t_exp, K, r_d, r_f, v,
-                             self._option_type.value) / s0
+                             self.option_type.value) / s0
             pct_spot_delta_prem_adj = pips_spot_delta - vpctf
             pct_fwd_delta_prem_adj = np.exp(
-                r_f*tdel) * (pips_spot_delta - vpctf)
+                r_f*t_del) * (pips_spot_delta - vpctf)
 
         return {"pips_spot_delta": pips_spot_delta,
                 "pips_fwd_delta": pips_fwd_delta,
@@ -483,21 +483,21 @@ class FXVanillaOption():
         the volatility surface. Avoids discount curve interpolation so it
         should be slightly faster than the full calculation of delta. """
 
-#        spot_dt = value_dt.add_weekdays(self._spot_days)
-#        tdel = (self._delivery_dt - value_dt) / gDaysInYear
-#        tdel = np.maximum(tdel, g_small)
+#        spot_dt = value_dt.add_weekdays(self.spot_days)
+#        t_del = (self.delivery_dt - value_dt) / gDaysInYear
+#        t_del = np.maximum(t_del, g_small)
 
-#        r_d = -np.log(dom_df)/tdel
-#         r_f = -np.log(for_df)/tdel
-        k = self._strike_fx_rate
+#        r_d = -np.log(dom_df)/t_del
+#         r_f = -np.log(for_df)/t_del
+        k = self.strike_fx_rate
 
 #        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
 
         pips_spot_delta = bs_delta(s, t, k, rd, rf, vol,
-                                   self._option_type.value)
+                                   self.option_type.value)
         pips_fwd_delta = pips_spot_delta * np.exp(rf*t)
 
-        vpctf = bs_value(s, t, k, rd, rf, vol, self._option_type.value) / s
+        vpctf = bs_value(s, t, k, rd, rf, vol, self.option_type.value) / s
 
         pct_spot_delta_prem_adj = pips_spot_delta - vpctf
         pct_fwd_delta_prem_adj = np.exp(rf*t) * (pips_spot_delta - vpctf)
@@ -519,7 +519,7 @@ class FXVanillaOption():
         """
 
         if isinstance(value_dt, Date):
-            t = (self._expiry_dt - value_dt) / gDaysInYear
+            t = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -531,18 +531,18 @@ class FXVanillaOption():
 
         t = np.maximum(t, 1e-10)
 
-        dom_df = domestic_curve.df(t)
+        dom_df = domestic_curve._df(t)
         r_d = -np.log(dom_df)/t
 
-        for_df = foreign_curve.df(t)
+        for_df = foreign_curve._df(t)
         r_f = -np.log(for_df)/t
 
-        K = self._strike_fx_rate
+        K = self.strike_fx_rate
         s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
 
-            volatility = model._volatility
+            volatility = model.volatility
 
             if np.any(volatility) < 0.0:
                 raise FinError("Volatility should not be negative.")
@@ -574,7 +574,7 @@ class FXVanillaOption():
         """
 
         if isinstance(value_dt, Date):
-            t = (self._expiry_dt - value_dt) / gDaysInYear
+            t = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -592,12 +592,12 @@ class FXVanillaOption():
         for_df = foreign_curve._df(t)
         r_f = -np.log(for_df)/t
 
-        K = self._strike_fx_rate
+        K = self.strike_fx_rate
         s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
 
-            volatility = model._volatility
+            volatility = model.volatility
 
             if np.any(volatility) < 0.0:
                 raise FinError("Volatility should not be negative.")
@@ -627,7 +627,7 @@ class FXVanillaOption():
         """ This function calculates the time decay of the FX option. """
 
         if isinstance(value_dt, Date):
-            t = (self._expiry_dt - value_dt) / gDaysInYear
+            t = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -645,12 +645,12 @@ class FXVanillaOption():
         for_df = foreign_curve._df(t)
         r_f = -np.log(for_df)/t
 
-        K = self._strike_fx_rate
+        K = self.strike_fx_rate
         s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
 
-            vol = model._volatility
+            vol = model.volatility
 
             if np.any(vol) < 0.0:
                 raise FinError("Volatility should not be negative.")
@@ -665,11 +665,11 @@ class FXVanillaOption():
             d1 = (ln_s0_k + (mu + v2 / 2.0) * t) / den
             d2 = (ln_s0_k + (mu - v2 / 2.0) * t) / den
 
-            if self._option_type == OptionTypes.EUROPEAN_CALL:
+            if self.option_type == OptionTypes.EUROPEAN_CALL:
                 v = - s0 * np.exp(-r_f * t) * nprime(d1) * vol / 2.0 / sqrt_t
                 v = v + r_f * s0 * np.exp(-r_f * t) * N(d1)
                 v = v - r_d * K * np.exp(-r_d * t) * N(d2)
-            elif self._option_type == OptionTypes.EUROPEAN_PUT:
+            elif self.option_type == OptionTypes.EUROPEAN_PUT:
                 v = - s0 * np.exp(-r_f * t) * nprime(d1) * vol / 2.0 / sqrt_t
                 v = v + r_d * K * np.exp(-r_d * t) * N(-d2)
                 v = v - r_f * s0 * np.exp(-r_f * t) * N(-d1)
@@ -717,22 +717,22 @@ class FXVanillaOption():
         for speed of execution."""
 
         if isinstance(model, BlackScholes):
-            volatility = model._volatility
+            volatility = model.volatility
         else:
             raise FinError("Model Type invalid")
 
         np.random.seed(seed)
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
 
-        dom_Df = domestic_curve.df(self._expiry_dt)
-        for_Df = foreign_curve.df(self._expiry_dt)
+        dom_Df = domestic_curve.df(self.expiry_dt)
+        for_Df = foreign_curve.df(self.expiry_dt)
 
         r_d = -np.log(dom_Df)/t
         r_f = -np.log(for_Df)/t
 
         mu = r_d - r_f
         v2 = volatility**2
-        K = self._strike_fx_rate
+        K = self.strike_fx_rate
         sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
@@ -742,10 +742,10 @@ class FXVanillaOption():
         s_1 = s * m
         s_2 = s / m
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             payoff_a_1 = np.maximum(s_1 - K, 0.0)
             payoff_a_2 = np.maximum(s_2 - K, 0.0)
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             payoff_a_1 = np.maximum(K - s_1, 0.0)
             payoff_a_2 = np.maximum(K - s_2, 0.0)
         else:
@@ -759,13 +759,13 @@ class FXVanillaOption():
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("CURRENCY PAIR", self._currency_pair)
-        s += label_to_string("PREMIUM CCY", self._prem_currency)
-        s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
-        s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("SPOT DAYS", self._spot_days)
-        s += label_to_string("NOTIONAL", self._notional, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("CURRENCY PAIR", self.currency_pair)
+        s += label_to_string("PREMIUM CCY", self.prem_currency)
+        s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
+        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("SPOT DAYS", self.spot_days)
+        s += label_to_string("NOTIONAL", self.notional, "")
         return s
 
 ###############################################################################

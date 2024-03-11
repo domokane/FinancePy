@@ -86,13 +86,11 @@ class BondFuture:
                              futures_price: float):
         ' The total invoice amount paid to take delivery of bond. '
 
-        if bond._accrued_interest is None:
+        if bond.accrued_int is None:
             bond.calculate_cpn_dts(settle_dt)
 
-        accrued_interest = bond._accrued_interest
-
         pip = self.principal_invoice_price(bond, futures_price)
-        accrued = accrued_interest * self.contract_size / 100.0
+        accrued = bond.accrued_int * self.contract_size / 100.0
         tia = pip + accrued
         tia = round(tia, 2)
         return tia
@@ -133,8 +131,8 @@ class BondFuture:
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("TICKER NAME", self._ticker_name)
+        s = label_to_string("OBJECT TYPE", type(self).name__)
+        s += label_to_string("TICKER NAME", self.ticker_name)
         s += label_to_string("FIRST DELIVERY DATE", self.first_delivery_dt)
         s += label_to_string("LAST DELIVERY DATE", self.last_delivery_dt)
         s += label_to_string("CONTRACT SIZE", self.contract_size)

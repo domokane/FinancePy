@@ -817,7 +817,7 @@ def fwd_dirty_bond_price(r_t, *args):
         if tcpn > t_exp:
             ptcpn = _uinterpolate(tcpn, df_times, df_values, INTERP)
             zcb = p_fast(t_exp, tcpn, r_t, dt, pt_exp, ptdelta, ptcpn,
-                         self._sigma, self._a)
+                         self.sigma, self.a)
             pv = pv + zcb * cpn
 #            print("TCPN", tcpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
 
@@ -860,19 +860,19 @@ class HWTree():
         if a < 0.0:
             raise FinError("Mean reversion speed parameter should be >= 0.")
 
-        self._sigma = sigma
-        self._a = a
-        self._num_time_steps = num_time_steps
-        self._european_calc_type = european_calc_type
+        self.sigma = sigma
+        self.a = a
+        self.num_time_steps = num_time_steps
+        self.european_calc_type = european_calc_type
 
-        self._Q = None
-        self._r = None
-        self._tree_times = None
-        self._pu = None
-        self._pm = None
-        self._pd = None
-        self._discount_curve = None
-        self._tree_built = False
+        self.Q = None
+        self.r = None
+        self.tree_times = None
+        self.pu = None
+        self.pm = None
+        self.pd = None
+        self.discount_curve = None
+        self.tree_built = False
 
 ###############################################################################
 
@@ -893,8 +893,8 @@ class HWTree():
         pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP)
         pt_mat = _uinterpolate(t_mat, df_times, df_values, INTERP)
 
-        sigma = self._sigma
-        a = self._a
+        sigma = self.sigma
+        a = self.a
 
         if abs(a) < SMALL:
             a = SMALL
@@ -963,7 +963,7 @@ class HWTree():
                 ptcpn = _uinterpolate(tcpn, df_times, df_values, INTERP)
 
                 strike = p_fast(t_exp, tcpn, rstar, dt, pt_exp, ptdelta,
-                                ptcpn, self._sigma, self._a)
+                                ptcpn, self.sigma, self.a)
 
                 v = self.option_on_zcb(t_exp, tcpn, strike, 1.0,
                                        df_times, df_values)
@@ -993,13 +993,13 @@ class HWTree():
         corresponding bond price. User provides bond object and option details.
         """
 
-        dt = self._dt
+        dt = self.dt
         tdelta = t_exp + dt
 
-        pt_exp = _uinterpolate(t_exp, self._df_times, self._dfs, INTERP)
-        ptdelta = _uinterpolate(tdelta, self._df_times, self._dfs, INTERP)
+        pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, INTERP)
+        ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, INTERP)
 
-        _, num_nodes = self._Q.shape
+        _, num_nodes = self.Q.shape
         expiry_step = int(t_exp/dt+0.50)
 
         call_value = 0.0
@@ -1010,8 +1010,8 @@ class HWTree():
 
         for k in range(0, num_nodes):
 
-            q = self._Q[expiry_step, k]
-            r_t = self._r_t[expiry_step, k]
+            q = self.Q[expiry_step, k]
+            r_t = self.r_t[expiry_step, k]
 
             pv = 0.0
 
@@ -1022,11 +1022,11 @@ class HWTree():
 
                 if tcpn >= t_exp:
 
-                    ptcpn = _uinterpolate(tcpn, self._df_times, self._dfs,
+                    ptcpn = _uinterpolate(tcpn, self.df_times, self.dfs,
                                           INTERP)
 
                     zcb = p_fast(t_exp, tcpn, r_t, dt, pt_exp, ptdelta, ptcpn,
-                                 self._sigma, self._a)
+                                 self.sigma, self.a)
 
                     pv += cpn * zcb
 
@@ -1067,20 +1067,20 @@ class HWTree():
         if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        if self._tree_times is None:
+        if self.tree_times is None:
             raise FinError("Tree has not been constructed.")
 
-        if self._tree_times[-1] < t_exp:
+        if self.tree_times[-1] < t_exp:
             raise FinError("Tree expiry must be >= option expiry date.")
 
-        dt = self._dt
+        dt = self.dt
         tdelta = t_exp + dt
 
-        pt_exp = _uinterpolate(t_exp, self._df_times, self._dfs, INTERP)
-        ptdelta = _uinterpolate(tdelta, self._df_times, self._dfs, INTERP)
-        pt_mat = _uinterpolate(t_mat, self._df_times, self._dfs, INTERP)
+        pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, INTERP)
+        ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, INTERP)
+        pt_mat = _uinterpolate(t_mat, self.df_times, self.dfs, INTERP)
 
-        _, num_nodes = self._Q.shape
+        _, num_nodes = self.Q.shape
         expiry_step = int(t_exp/dt+0.50)
 
         call_value = 0.0
@@ -1088,12 +1088,12 @@ class HWTree():
 
         for k in range(0, num_nodes):
 
-            q = self._Q[expiry_step, k]
-            r_t = self._r_t[expiry_step, k]
+            q = self.Q[expiry_step, k]
+            r_t = self.r_t[expiry_step, k]
 
             zcb = p_fast(t_exp, t_mat,
                          r_t, dt, pt_exp, ptdelta, pt_mat,
-                         self._sigma, self._a)
+                         self.sigma, self.a)
 
             put_payoff = max(strike_price - zcb * face_amount, 0.0)
             call_payoff = max(zcb * face_amount - strike_price, 0.0)
@@ -1126,11 +1126,11 @@ class HWTree():
             = bermudan_swaption_tree_fast(t_exp, t_mat, strike, face,
                                           cpn_times, cpn_flows,
                                           exercise_typeInt,
-                                          self._df_times, self._dfs,
-                                          self._tree_times, self._Q,
-                                          self._pu, self._pm, self._pd,
-                                          self._r_t,
-                                          self._dt, self._a)
+                                          self.df_times, self.dfs,
+                                          self.tree_times, self.Q,
+                                          self.pu, self.pm, self.pd,
+                                          self.r_t,
+                                          self.dt, self.a)
 
         return {'pay': pay_value, 'rec': rec_value}
 
@@ -1147,20 +1147,20 @@ class HWTree():
 
         if exercise_typeInt == 1:
 
-            if self._european_calc_type == FinHWEuropeanCalcType.JAMSHIDIAN:
+            if self.european_calc_type == FinHWEuropeanCalcType.JAMSHIDIAN:
 
                 v = self.european_bond_option_jamshidian(t_exp,
                                                          strike_price,
                                                          face_amount,
                                                          cpn_times,
                                                          cpn_flows,
-                                                         self._df_times,
-                                                         self._dfs)
+                                                         self.df_times,
+                                                         self.dfs)
 
                 call_value = v['call']
                 put_value = v['put']
 
-            elif self._european_calc_type == FinHWEuropeanCalcType.EXPIRY_ONLY:
+            elif self.european_calc_type == FinHWEuropeanCalcType.EXPIRY_ONLY:
 
                 v = self.european_bond_option_expiry_only(t_exp,
                                                           strike_price,
@@ -1171,19 +1171,19 @@ class HWTree():
                 call_value = v['call']
                 put_value = v['put']
 
-            elif self._european_calc_type == FinHWEuropeanCalcType.EXPIRY_TREE:
+            elif self.european_calc_type == FinHWEuropeanCalcType.EXPIRY_TREE:
 
                 call_value, put_value \
                     = american_bond_option_tree_fast(t_exp,
                                                      strike_price, face_amount,
                                                      cpn_times, cpn_flows,
                                                      exercise_typeInt,
-                                                     self._sigma, self._a,
-                                                     self._Q,
-                                                     self._pu, self._pm, self._pd,
-                                                     self._r_t, self._dt,
-                                                     self._tree_times,
-                                                     self._df_times, self._dfs)
+                                                     self.sigma, self.a,
+                                                     self.Q,
+                                                     self.pu, self.pm, self.pd,
+                                                     self.r_t, self.dt,
+                                                     self.tree_times,
+                                                     self.df_times, self.dfs)
 
             else:
                 raise FinError("Unknown HW model implementation choice.")
@@ -1195,12 +1195,12 @@ class HWTree():
                                                  strike_price, face_amount,
                                                  cpn_times, cpn_flows,
                                                  exercise_typeInt,
-                                                 self._sigma, self._a,
-                                                 self._Q,
-                                                 self._pu, self._pm, self._pd,
-                                                 self._r_t, self._dt,
-                                                 self._tree_times,
-                                                 self._df_times, self._dfs)
+                                                 self.sigma, self.a,
+                                                 self.Q,
+                                                 self.pu, self.pm, self.pd,
+                                                 self.r_t, self.dt,
+                                                 self.tree_times,
+                                                 self.df_times, self.dfs)
 
         return {'call': call_value, 'put': put_value}
 
@@ -1232,12 +1232,12 @@ class HWTree():
                                              call_times, call_prices,
                                              put_times, put_prices,
                                              face_amount,
-                                             self._sigma, self._a,
-                                             self._Q,
-                                             self._pu, self._pm, self._pd,
-                                             self._r_t, self._dt,
-                                             self._tree_times,
-                                             self._df_times, self._dfs)
+                                             self.sigma, self.a,
+                                             self.Q,
+                                             self.pu, self.pm, self.pd,
+                                             self.r_t, self.dt,
+                                             self.tree_times,
+                                             self.df_times, self.dfs)
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}
@@ -1251,17 +1251,17 @@ class HWTree():
         if t_mat == 0.0:
             return 1.0
 
-        _, num_nodes = self._Q.shape
-        fn1 = t_mat/self._dt
-        fn2 = float(int(t_mat/self._dt))
+        _, num_nodes = self.Q.shape
+        fn1 = t_mat/self.dt
+        fn2 = float(int(t_mat/self.dt))
         if abs(fn1 - fn2) > 1e-6:
             raise FinError("Time not on tree time grid")
 
-        time_step = int(t_mat / self._dt) + 1
+        time_step = int(t_mat / self.dt) + 1
 
         p = 0.0
         for i in range(0, num_nodes):
-            ad = self._Q[time_step, i]
+            ad = self.Q[time_step, i]
             p += ad
         zero_rate = -np.log(p)/t_mat
         return p, zero_rate
@@ -1280,25 +1280,25 @@ class HWTree():
         # I wish to add on an additional time to the tree so that the second
         # last time corresponds to a maturity tree_mat. For this reason I scale
         # up the maturity date of the tree as follows
-        tree_maturity = tree_mat * (self._num_time_steps+1)/self._num_time_steps
+        tree_maturity = tree_mat * (self.num_time_steps + 1) / self.num_time_steps
 
         # The vector of times goes out to this maturity
-        tree_times = np.linspace(0.0, tree_maturity, self._num_time_steps + 2)
-        self._tree_times = tree_times
+        tree_times = np.linspace(0.0, tree_maturity, self.num_time_steps + 2)
+        self.tree_times = tree_times
 
-        df_tree = np.zeros(shape=self._num_time_steps+2)
+        df_tree = np.zeros(shape=self.num_time_steps+2)
         df_tree[0] = 1.0
 
-        for i in range(1, self._num_time_steps+2):
+        for i in range(1, self.num_time_steps+2):
             t = tree_times[i]
             df_tree[i] = _uinterpolate(t, df_times, df_values, INTERP)
 
-        self._df_times = df_times
-        self._dfs = df_values
+        self.df_times = df_times
+        self.dfs = df_values
 
-        self._Q, self._pu, self._pm, self._pd, self._r_t, self._dt \
-            = build_tree_fast(self._a, self._sigma,
-                              tree_times, self._num_time_steps, df_tree)
+        self.Q, self.pu, self.pm, self.pd, self.r_t, self.dt \
+            = build_tree_fast(self.a, self.sigma,
+                              tree_times, self.num_time_steps, df_tree)
 
         return
 
@@ -1307,11 +1307,11 @@ class HWTree():
     def __repr__(self):
         """ Return string with class details. """
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("Sigma", self._sigma)
-        s += label_to_string("a", self._a)
-        s += label_to_string("num_time_steps", self._num_time_steps)
-        s += label_to_string("european_calc_types", self._european_calc_type)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("Sigma", self.sigma)
+        s += label_to_string("a", self.a)
+        s += label_to_string("num_time_steps", self.num_time_steps)
+        s += label_to_string("european_calc_types", self.european_calc_type)
         return s
 
 ###############################################################################

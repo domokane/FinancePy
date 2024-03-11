@@ -46,12 +46,12 @@ def test_BKExampleOne():
     # Agrees with Figure 28.10 - Not exact as we have dt not exactly 0.50
     if num_time_steps < 5:
         test_cases.header("LABEL", "VALUE")
-        test_cases.print("QTREE", model._Q)
-        test_cases.print("RTREE", model._rt)
+        test_cases.print("QTREE", model.Q)
+        test_cases.print("RTREE", model.rt)
 #        print_tree(model._rt)
-        test_cases.print("PU AT LAST TIME", model._pu)
-        test_cases.print("PDM AT LAST TIME", model._pm)
-        test_cases.print("PD AT LAST TIME", model._pd)
+        test_cases.print("PU AT LAST TIME", model.pu)
+        test_cases.print("PDM AT LAST TIME", model.pm)
+        test_cases.print("PD AT LAST TIME", model.pd)
 
 ###############################################################################
 
@@ -139,9 +139,9 @@ def test_BKExampleTwo():
 
     if 1 == 0:
         print("RT")
-        print_tree(model._rt, 5)
+        print_tree(model.rt, 5)
         print("Q")
-        print_tree(model._Q, 5)
+        print_tree(model.Q, 5)
 
 ###############################################################################
 

@@ -118,8 +118,11 @@ def times_from_dates(dt: (Date, list),
         return np.array(times)
 
     elif isinstance(dt, np.ndarray):
+
         raise FinError("You passed an ndarray instead of dates.")
+
     else:
+
         raise FinError("Discount factor must take dates.")
 
     return None

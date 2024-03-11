@@ -52,15 +52,15 @@ class BlackScholes(Model):
 
         check_argument_types(self.__init__, locals())
 
-        self._volatility = volatility
-        self._bs_type = bs_type
-        self._num_steps_per_year = num_steps_per_year
-        self._num_paths = num_paths
-        self._seed = seed
-        self._use_sobol = use_sobol
-        self._params = params if params else {}
-        self._poly_degree = None
-        self._fit_type = None
+        self.volatility = volatility
+        self.bs_type = bs_type
+        self.num_steps_per_year = num_steps_per_year
+        self.num_paths = num_paths
+        self.seed = seed
+        self.use_sobol = use_sobol
+        self.params = params if params else {}
+        self.poly_degree = None
+        self.fit_type = None
 
     ###########################################################################
 
@@ -75,79 +75,79 @@ class BlackScholes(Model):
         if option_type == OptionTypes.EUROPEAN_CALL \
                 or option_type == OptionTypes.EUROPEAN_PUT:
 
-            if self._bs_type is BlackScholesTypes.DEFAULT:
-                self._bs_type = BlackScholesTypes.ANALYTICAL
+            if self.bs_type is BlackScholesTypes.DEFAULT:
+                self.bs_type = BlackScholesTypes.ANALYTICAL
 
-            if self._bs_type == BlackScholesTypes.ANALYTICAL:
+            if self.bs_type == BlackScholesTypes.ANALYTICAL:
 
                 v = bs_value(spot_price,
                              time_to_expiry,
                              strike_price,
                              risk_free_rate,
                              dividend_rate,
-                             self._volatility,
+                             self.volatility,
                              option_type.value)
 
                 return v
 
-            elif self._bs_type == BlackScholesTypes.CRR_TREE:
+            elif self.bs_type == BlackScholesTypes.CRR_TREE:
 
                 v = crr_tree_val_avg(spot_price,
                                      risk_free_rate,
                                      dividend_rate,
-                                     self._volatility,
-                                     self._num_steps_per_year,
+                                     self.volatility,
+                                     self.num_steps_per_year,
                                      time_to_expiry,
                                      option_type.value,
                                      strike_price)['value']
 
                 return v
 
-            elif self._bs_type == BlackScholesTypes.FINITE_DIFFERENCE:
+            elif self.bs_type == BlackScholesTypes.FINITE_DIFFERENCE:
 
                 v = black_scholes_fd(spot_price=spot_price,
                                      time_to_expiry=time_to_expiry,
                                      strike_price=strike_price,
                                      risk_free_rate=risk_free_rate,
                                      dividend_yield=dividend_rate,
-                                     volatility=self._volatility,
+                                     volatility=self.volatility,
                                      option_type=option_type.value,
-                                     **self._params)
+                                     **self.params)
 
                 return v
 
-            elif self._bs_type == BlackScholesTypes.PSOR:
+            elif self.bs_type == BlackScholesTypes.PSOR:
 
                 v = black_scholes_fd_PSOR(spot_price=spot_price,
                                           time_to_expiry=time_to_expiry,
                                           strike_price=strike_price,
                                           risk_free_rate=risk_free_rate,
                                           dividend_yield=dividend_rate,
-                                          volatility=self._volatility,
+                                          volatility=self.volatility,
                                           option_type=option_type.value,
-                                          **self._params)
+                                          **self.params)
 
                 return v
 
-            elif self._bs_type == BlackScholesTypes.LSMC:
+            elif self.bs_type == BlackScholesTypes.LSMC:
 
                 print("LSMC Model", self)
-                poly_degree = self._poly_degree
-                fit_type = self._fit_type
+                poly_degree = self.poly_degree
+                fit_type = self.fit_type
 
                 v = equity_lsmc(spot_price=spot_price,
                                 risk_free_rate=risk_free_rate,
                                 dividend_yield=dividend_rate,
-                                sigma=self._volatility,
-                                num_steps_per_year=self._num_steps_per_year,
-                                num_paths=self._num_paths,
+                                sigma=self.volatility,
+                                num_steps_per_year=self.num_steps_per_year,
+                                num_paths=self.num_paths,
                                 time_to_expiry=time_to_expiry,
                                 option_type_value=option_type.value,
                                 strike_price=strike_price,
                                 poly_degree=poly_degree,
                                 fit_type_value=fit_type.value,
-                                use_sobol=self._use_sobol,
-                                seed=self._seed)
+                                use_sobol=self.use_sobol,
+                                seed=self.seed)
 
                 return v
 
@@ -158,10 +158,10 @@ class BlackScholes(Model):
         elif option_type == OptionTypes.AMERICAN_CALL \
                 or option_type == OptionTypes.AMERICAN_PUT:
 
-            if self._bs_type is BlackScholesTypes.DEFAULT:
-                self._bs_type = BlackScholesTypes.CRR_TREE
+            if self.bs_type is BlackScholesTypes.DEFAULT:
+                self.bs_type = BlackScholesTypes.CRR_TREE
 
-            if self._bs_type == BlackScholesTypes.BARONE_ADESI:
+            if self.bs_type == BlackScholesTypes.BARONE_ADESI:
 
                 if option_type == OptionTypes.AMERICAN_CALL:
                     phi = +1
@@ -173,25 +173,25 @@ class BlackScholes(Model):
                               strike_price,
                               risk_free_rate,
                               dividend_rate,
-                              self._volatility,
+                              self.volatility,
                               phi)
 
                 return v
 
-            elif self._bs_type == BlackScholesTypes.CRR_TREE:
+            elif self.bs_type == BlackScholesTypes.CRR_TREE:
 
                 v = crr_tree_val_avg(spot_price,
                                      risk_free_rate,
                                      dividend_rate,
-                                     self._volatility,
-                                     self._num_steps_per_year,
+                                     self.volatility,
+                                     self.num_steps_per_year,
                                      time_to_expiry,
                                      option_type.value,
                                      strike_price)['value']
 
                 return v
 
-            elif self._bs_type == BlackScholesTypes.LSMC:
+            elif self.bs_type == BlackScholesTypes.LSMC:
 
                 poly_degree = 3
                 fit_type = FIT_TYPES.HERMITE_E
@@ -199,48 +199,48 @@ class BlackScholes(Model):
                 v = equity_lsmc(spot_price=spot_price,
                                 risk_free_rate=risk_free_rate,
                                 dividend_yield=dividend_rate,
-                                sigma=self._volatility,
-                                num_paths=self._num_paths,
-                                num_steps_per_year=self._num_steps_per_year,
+                                sigma=self.volatility,
+                                num_paths=self.num_paths,
+                                num_steps_per_year=self.num_steps_per_year,
                                 time_to_expiry=time_to_expiry,
                                 option_type_value=option_type.value,
                                 strike_price=strike_price,
                                 poly_degree=poly_degree,
                                 fit_type_value=fit_type.value,
-                                use_sobol=self._use_sobol,
-                                seed=self._seed)
+                                use_sobol=self.use_sobol,
+                                seed=self.seed)
 
                 return v
-            elif self._bs_type == BlackScholesTypes.Bjerksund_Stensland:
+            elif self.bs_type == BlackScholesTypes.Bjerksund_Stensland:
                 v = bjerksund_stensland_value(spot_price,
                                               time_to_expiry,
                                               strike_price,
                                               risk_free_rate,
                                               dividend_rate,
-                                              self._volatility,
+                                              self.volatility,
                                               option_type.value)
                 return v
 
-            elif self._bs_type == BlackScholesTypes.FINITE_DIFFERENCE:
+            elif self.bs_type == BlackScholesTypes.FINITE_DIFFERENCE:
                 v = black_scholes_fd(spot_price=spot_price,
                                      time_to_expiry=time_to_expiry,
                                      strike_price=strike_price,
                                      risk_free_rate=risk_free_rate,
                                      dividend_yield=dividend_rate,
-                                     volatility=self._volatility,
+                                     volatility=self.volatility,
                                      option_type=option_type.value,
-                                     **self._params)
+                                     **self.params)
                 return v
 
-            elif self._bs_type == BlackScholesTypes.PSOR:
+            elif self.bs_type == BlackScholesTypes.PSOR:
                 v = black_scholes_fd_PSOR(spot_price=spot_price,
                                           time_to_expiry=time_to_expiry,
                                           strike_price=strike_price,
                                           risk_free_rate=risk_free_rate,
                                           dividend_yield=dividend_rate,
-                                          volatility=self._volatility,
+                                          volatility=self.volatility,
                                           option_type=option_type.value,
-                                          **self._params
+                                          **self.params
                                           )
                 return v
 

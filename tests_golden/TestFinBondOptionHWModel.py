@@ -535,7 +535,7 @@ def test_BondOptionDerivaGem():
                                                  times, dfs)
     # print("Jamshidian:", vjam)
 
-    model._num_time_steps = 100
+    model.num_time_steps = 100
     model.build_tree(t_mat, times, dfs)
     exerciseType = FinExerciseTypes.EUROPEAN
 

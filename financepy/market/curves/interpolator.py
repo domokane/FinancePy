@@ -199,7 +199,7 @@ class Interpolator():
 
         self._interp_type = interpolator_type
         self._interp_fn = None
-        self._times = None
+        self.times = None
         self._dfs = None
         self._refit_curve = False
 
@@ -209,7 +209,7 @@ class Interpolator():
             times: np.ndarray,
             dfs: np.ndarray):
 
-        self._times = times
+        self.times = times
         self._dfs = dfs
 
         if len(times) == 1:
@@ -218,62 +218,62 @@ class Interpolator():
         if self._interp_type == InterpTypes.PCHIP_LOG_DISCOUNT:
 
             log_dfs = np.log(self._dfs)
-            self._interp_fn = PchipInterpolator(self._times, log_dfs)
+            self._interp_fn = PchipInterpolator(self.times, log_dfs)
 
         elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
 
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            g_small_vector = np.ones(len(self.times)) * g_small
+            zero_rates = -np.log(self._dfs) / (self.times + g_small_vector)
 
-            if self._times[0] == 0.0:
+            if self.times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = PchipInterpolator(self._times, zero_rates)
+            self._interp_fn = PchipInterpolator(self.times, zero_rates)
 
         # if self._interp_type == InterpTypes.FINCUBIC_LOG_DISCOUNT:
 
         #     """ Second derivatives at left is zero and first derivative at
         #     right is clamped to zero. """
         #     log_dfs = np.log(self._dfs)
-        #     self._interp_fn = CubicSpline(self._times, log_dfs,
+        #     self._interp_fn = CubicSpline(self.times, log_dfs,
         #                                  bc_type=((2, 0.0), (1, 0.0)))
 
         elif self._interp_type == InterpTypes.FINCUBIC_ZERO_RATES:
 
             """ Second derivatives at left is zero and first derivative at
             right is clamped to zero. """
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            g_small_vector = np.ones(len(self.times)) * g_small
+            zero_rates = -np.log(self._dfs) / (self.times + g_small_vector)
 
-            if self._times[0] == 0.0:
+            if self.times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = CubicSpline(self._times, zero_rates,
+            self._interp_fn = CubicSpline(self.times, zero_rates,
                                           bc_type=((2, 0.0), (1, 0.0)))
 
         elif self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
 
             """ Second derivatives are clamped to zero at end points """
             log_dfs = np.log(self._dfs)
-            self._interp_fn = CubicSpline(self._times, log_dfs,
+            self._interp_fn = CubicSpline(self.times, log_dfs,
                                           bc_type='natural')
 
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
             """ Second derivatives are clamped to zero at end points """
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            g_small_vector = np.ones(len(self.times)) * g_small
+            zero_rates = -np.log(self._dfs) / (self.times + g_small_vector)
 
-            if self._times[0] == 0.0:
+            if self.times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = CubicSpline(self._times, zero_rates,
+            self._interp_fn = CubicSpline(self.times, zero_rates,
                                           bc_type='natural')
 
     #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
     #
     #            log_dfs = np.log(self._dfs)
-    #            self._interp_fn = interp1d(self._times, log_dfs,
+    #            self._interp_fn = interp1d(self.times, log_dfs,
     #                                      fill_value="extrapolate")
 
     ###########################################################################
@@ -339,7 +339,7 @@ class Interpolator():
 
         else:
 
-            out = _vinterpolate(tvec, self._times, self._dfs,
+            out = _vinterpolate(tvec, self.times, self._dfs,
                                 self._interp_type.value)
 
         if isinstance(t, (float, np.float64)):

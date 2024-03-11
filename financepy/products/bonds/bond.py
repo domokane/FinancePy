@@ -162,9 +162,9 @@ class Bond:
         self.ncd = None
 
         # Private
-        self._accrued_interest = None
-        self._accrued_days = 0.0
-        self._alpha = 0.0
+        self.accrued_int = None
+        self.accrued_days = 0.0
+        self.alpha = 0.0
 
     ###########################################################################
 
@@ -277,34 +277,34 @@ class Bond:
 
         if convention == YTMCalcType.UK_DMO:
             if n == 0:
-                dp = (v ** (self._alpha)) * (1.0 + pay_first_cpn * c / f)
+                dp = (v ** (self.alpha)) * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
-                dp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
-        #                print(term1, term2, term3, term4, v, self._alpha, dp)
+                dp = (v ** (self.alpha)) * (term1 + term2 + term3 + term4)
+        #                print(term1, term2, term3, term4, v, self.alpha, dp)
         elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
-                dp = (v ** (self._alpha)) * (1.0 + c / f)
+                dp = (v ** (self.alpha)) * (1.0 + c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
-                vw = 1.0 / (1.0 + self._alpha * ytm / f)
+                vw = 1.0 / (1.0 + self.alpha * ytm / f)
                 dp = (vw) * (term1 + term2 + term3 + term4)
         elif convention == YTMCalcType.US_STREET:
             if n == 0:
-                vw = 1.0 / (1.0 + self._alpha * ytm / f)
+                vw = 1.0 / (1.0 + self.alpha * ytm / f)
                 dp = vw * (1.0 + c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
-                dp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
+                dp = (v ** (self.alpha)) * (term1 + term2 + term3 + term4)
         elif convention == YTMCalcType.CFETS:
             if n == 0:
                 last_year = self.maturity_dt.add_tenor("-12M")
@@ -323,7 +323,7 @@ class Bond:
                 term2 = (c / f) * v
                 term3 = (c / f) * v * v * (1.0 - v ** (n - 1)) / (1.0 - v)
                 term4 = (v ** n)
-                dp = (v ** (self._alpha)) * (term1 + term2 + term3 + term4)
+                dp = (v ** (self.alpha)) * (term1 + term2 + term3 + term4)
         else:
             raise FinError("Unknown yield convention")
 
@@ -345,7 +345,7 @@ class Bond:
                                                 convention)
 
         principal = dirty_price * face / self.par
-        principal = principal - self._accrued_interest
+        principal = principal - self.accrued_interest
         return principal
 
     ###########################################################################
@@ -580,8 +580,8 @@ class Bond:
         function is vectorised with respect to the yield input. """
 
         dp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        accrued = self.accrued_interest(settle_dt, self.par)
-        cp = dp - accrued
+        accrued_int = self.accrued_interest(settle_dt, self.par)
+        cp = dp - accrued_int
         return cp
 
     ###########################################################################
@@ -598,7 +598,7 @@ class Bond:
         dirty_price = self.dirty_price_from_discount_curve(settle_dt,
                                                            discount_curve)
 
-        clean_price = dirty_price - self._accrued_interest
+        clean_price = dirty_price - self.accrued_int
         return clean_price
 
     ###########################################################################
@@ -680,7 +680,7 @@ class Bond:
         
         self.accrued_interest(settle_dt, 1.0)
 
-        accrued_amount = self._accrued_interest * self.par
+        accrued_amount = self.accrued_int* self.par
         dirty_prices = (clean_prices + accrued_amount)
         ytms = []
 
@@ -747,17 +747,17 @@ class Bond:
                                             self.ncd,
                                             self.freq_type)
 
-        self._alpha = 1.0 - acc_factor * self.freq
+        self.alpha = 1.0 - acc_factor * self.freq
 
         if settle_dt > self.ex_div_dt:
-            self._accrued_interest = acc_factor - 1.0 / self.freq
+            self.accrued_int = acc_factor - 1.0 / self.freq
         else:
-            self._accrued_interest = acc_factor
+            self.accrued_int = acc_factor
 
-        self._accrued_interest *= self.cpn * face
-        self._accrued_days = num
+        self.accrued_int *= self.cpn * face
+        self.accrued_days = num
 
-        return self._accrued_interest
+        return self.accrued_int
 
     ###########################################################################
 
@@ -777,7 +777,7 @@ class Bond:
 
         clean_price = np.array(clean_price)
         self.accrued_interest(settle_dt, 1.0)
-        accrued_amount = self._accrued_interest * self.par
+        accrued_amount = self.accrued_int* self.par
         bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pv_ibor = 0.0
@@ -870,7 +870,7 @@ class Bond:
 
         self.accrued_interest(settle_dt, 1.0)
 
-        accrued_amount = self._accrued_interest * self.par
+        accrued_amount = self.accrued_int* self.par
         dirty_prices = clean_prices + accrued_amount
 
         oass = []

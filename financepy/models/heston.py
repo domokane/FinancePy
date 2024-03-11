@@ -174,9 +174,9 @@ class Heston():
                  seed,
                  scheme=HestonNumericalScheme.EULERLOG):
 
-        tau = (option._expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / gDaysInYear
 
-        K = option._strike_price
+        K = option.strike_price
         dt = 1.0 / num_steps_per_year
         schemeValue = float(scheme.value)
 
@@ -194,9 +194,9 @@ class Heston():
                             seed,
                             schemeValue)
 
-        if option._option_type == OptionTypes.EUROPEAN_CALL:
+        if option.option_type == OptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(s_paths[:, -1] - K, 0.0)
-        elif option._option_type == OptionTypes.EUROPEAN_PUT:
+        elif option.option_type == OptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - s_paths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")
@@ -214,7 +214,7 @@ class Heston():
                     interest_rate,
                     dividend_yield):
 
-        tau = (option._expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -225,7 +225,7 @@ class Heston():
         r = interest_rate
         q = dividend_yield
         s0 = stock_price
-        K = option._strike_price
+        K = option.strike_price
         F = s0 * exp((r - q) * tau)
         V = sigma * sigma
 
@@ -262,7 +262,7 @@ class Heston():
                           interest_rate,
                           dividend_yield):
 
-        tau = (option._expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -289,7 +289,7 @@ class Heston():
 
         s0 = stock_price
         F = s0 * exp((r - q) * tau)
-        K = option._strike_price
+        K = option.strike_price
         X = log(F / K)
         integral = integrate.quad(f, 0.0, np.inf)[0] * (1.0 / pi)
         v = s0 * exp(-q * tau) - K * exp(-r * tau) * integral
@@ -306,7 +306,7 @@ class Heston():
                     interest_rate,
                     dividend_yield):
 
-        tau = (option._expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -317,7 +317,7 @@ class Heston():
         q = dividend_yield
         r = interest_rate
         s0 = stock_price
-        K = option._strike_price
+        K = option.strike_price
         V = sigma**2
 
         def f(s, b):
@@ -353,7 +353,7 @@ class Heston():
                        interest_rate,
                        dividend_yield):
 
-        tau = (option._expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / gDaysInYear
 
         rho = self._rho
         sigma = self._sigma
@@ -364,7 +364,7 @@ class Heston():
         q = dividend_yield
         r = interest_rate
         s0 = stock_price
-        K = option._strike_price
+        K = option.strike_price
         F = s0 * exp((r - q) * tau)
         x0 = log(F / K)
 

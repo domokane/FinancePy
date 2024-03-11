@@ -51,8 +51,8 @@ class EquityFloatLookbackOption(EquityOption):
         if option_type != OptionTypes.EUROPEAN_CALL and option_type != OptionTypes.EUROPEAN_PUT:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
-        self._expiry_dt = expiry_dt
-        self._option_type = option_type
+        self.expiry_dt = expiry_dt
+        self.option_type = option_type
 
 ###############################################################################
 
@@ -69,7 +69,7 @@ class EquityFloatLookbackOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -80,23 +80,23 @@ class EquityFloatLookbackOption(EquityOption):
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
-        df = discount_curve.df(self._expiry_dt)
+        t = (self.expiry_dt - value_dt) / gDaysInYear
+        df = discount_curve.df(self.expiry_dt)
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
         v = volatility
         s0 = stock_price
         smin = 0.0
         smax = 0.0
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > s0:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < s0:
                 raise FinError(
@@ -113,7 +113,7 @@ class EquityFloatLookbackOption(EquityOption):
         expbt = np.exp(b * t)
 
         # Taken from Haug Page 142
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
 
             a1 = (np.log(s0 / smin) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
             a2 = a1 - v * np.sqrt(t)
@@ -128,7 +128,7 @@ class EquityFloatLookbackOption(EquityOption):
 
             v = s0 * dq * N(a1) - smin * df * N(a2) + s0 * df * u * term
 
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
 
             b1 = (np.log(s0 / smax) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
             b2 = b1 - v * np.sqrt(t)
@@ -145,7 +145,7 @@ class EquityFloatLookbackOption(EquityOption):
 
         else:
             raise FinError("Unknown lookback option type:" +
-                           str(self._option_type))
+                           str(self.option_type))
 
         return v
 
@@ -164,24 +164,24 @@ class EquityFloatLookbackOption(EquityOption):
         """ Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process. """
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
         num_time_steps = int(t * num_steps_per_year)
 
-        df = discount_curve.df(self._expiry_dt)
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        df = discount_curve.df(self.expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
         mu = r - q
 
-        option_type = self._option_type
+        option_type = self.option_type
         smin = 0.0
         smax = 0.0
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > stock_price:
                 raise FinError(
                     "Smin must be less than or equal to the stock price.")
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < stock_price:
                 raise FinError(
@@ -216,8 +216,8 @@ class EquityFloatLookbackOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("OPTION TYPE", self._option_type, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("OPTION TYPE", self.option_type, "")
         return s
 
 ###############################################################################

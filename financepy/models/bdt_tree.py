@@ -656,21 +656,21 @@ class BDTTree():
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
 
-        self._sigma = sigma
+        self.sigma = sigma
 
         if num_time_steps < 3:
             raise FinError("Drift fitting requires at least 3 time steps.")
 
-        self._num_time_steps = num_time_steps
+        self.num_time_steps = num_time_steps
 
-        self._Q = None
-        self._rt = None
-        self._tree_times = None
-        self._df_times = None
-        self._pu = 0.50
-        self._pd = 0.50
-        self._discount_curve = None
-        self._dt = None
+        self.Q = None
+        self.rt = None
+        self.tree_times = None
+        self.df_times = None
+        self.pu = 0.50
+        self.pd = 0.50
+        self.discount_curve = None
+        self.dt = None
 
 
 ###############################################################################
@@ -687,23 +687,23 @@ class BDTTree():
         interp = InterpTypes.FLAT_FWD_RATES.value
 
         tree_maturity = tree_mat * \
-            (self._num_time_steps+1)/self._num_time_steps
-        tree_times = np.linspace(0.0, tree_maturity, self._num_time_steps + 2)
-        self._tree_times = tree_times
+            (self.num_time_steps+1)/self.num_time_steps
+        tree_times = np.linspace(0.0, tree_maturity, self.num_time_steps + 2)
+        self.tree_times = tree_times
 
-        df_tree = np.zeros(shape=(self._num_time_steps+2))
+        df_tree = np.zeros(shape=(self.num_time_steps+2))
         df_tree[0] = 1.0
 
-        for i in range(1, self._num_time_steps+2):
+        for i in range(1, self.num_time_steps+2):
             t = tree_times[i]
             df_tree[i] = _uinterpolate(t, df_times, df_values, interp)
 
-        self._df_times = df_times
-        self._dfs = df_values
+        self.df_times = df_times
+        self.dfs = df_values
 
-        self._Q, self._rt, self._dt \
-            = build_tree_fast(self._sigma,
-                              tree_times, self._num_time_steps, df_tree)
+        self.Q, self.rt, self.dt \
+            = build_tree_fast(self.sigma,
+                              tree_times, self.num_time_steps, df_tree)
 
         return
 
@@ -731,10 +731,10 @@ class BDTTree():
                                              strike_price, face_amount,
                                              cpn_times, cpn_flows,
                                              exercise_typeInt,
-                                             self._df_times, self._dfs,
-                                             self._tree_times, self._Q,
-                                             self._rt,
-                                             self._dt)
+                                             self.df_times, self.dfs,
+                                             self.tree_times, self.Q,
+                                             self.rt,
+                                             self.dt)
 
         return {'call': call_value, 'put': put_value}
 
@@ -763,10 +763,10 @@ class BDTTree():
                                           strike, face_amount,
                                           cpn_times, cpn_flows,
                                           exercise_type_int,
-                                          self._df_times, self._dfs,
-                                          self._tree_times, self._Q,
-                                          self._rt,
-                                          self._dt)
+                                          self.df_times, self.dfs,
+                                          self.tree_times, self.Q,
+                                          self.rt,
+                                          self.dt)
 
         return {'pay': pay_value, 'rec': rec_value}
 
@@ -790,11 +790,11 @@ class BDTTree():
         v = callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
                                              call_times, call_prices,
                                              put_times, put_prices, face_amount,
-                                             self._sigma,
-                                             self._Q,
-                                             self._rt, self._dt,
-                                             self._tree_times,
-                                             self._df_times, self._dfs)
+                                             self.sigma,
+                                             self.Q,
+                                             self.rt, self.dt,
+                                             self.tree_times,
+                                             self.df_times, self.dfs)
 
         return {'bondwithoption': v['bondwithoption'],
                 'bondpure': v['bondpure']}
@@ -805,8 +805,8 @@ class BDTTree():
         """ Return string with class details. """
 
         s = "Black-Derman-Toy Model\n"
-        s += label_to_string("Sigma", self._sigma)
-        s += label_to_string("num_time_steps", self._num_time_steps)
+        s += label_to_string("Sigma", self.sigma)
+        s += label_to_string("num_time_steps", self.num_time_steps)
         return s
 
 ###############################################################################

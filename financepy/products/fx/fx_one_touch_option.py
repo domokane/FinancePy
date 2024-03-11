@@ -141,10 +141,10 @@ class FXOneTouchOption(FXOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_dt = expiry_dt
-        self._option_type = option_type
-        self._barrier_rate = float(barrier_rate)
-        self._payment_size = payment_size
+        self.expiry_dt = expiry_dt
+        self.option_type = option_type
+        self.barrier_rate = float(barrier_rate)
+        self.payment_size = payment_size
 
 ###############################################################################
 
@@ -161,7 +161,7 @@ class FXOneTouchOption(FXOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
@@ -174,23 +174,23 @@ class FXOneTouchOption(FXOption):
 
         print("USE WITH CAUTION. MORE TESTING REQUIRED.")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
         t = max(t, 1e-6)
 
         s0 = spot_fx_rate
-        H = self._barrier_rate
-        K = self._payment_size
+        H = self.barrier_rate
+        K = self.payment_size
 
         sqrt_t = np.sqrt(t)
 
-        df = domestic_curve.df(self._expiry_dt)
-        r_d = domestic_curve.cc_rate(self._expiry_dt)
-        r_f = foreign_curve.cc_rate(self._expiry_dt)
+        df = domestic_curve.df(self.expiry_dt)
+        r_d = domestic_curve.cc_rate(self.expiry_dt)
+        r_f = foreign_curve.cc_rate(self.expiry_dt)
 
-        v = model._volatility
+        v = model.volatility
         v = max(v, 1e-6)
 
         # Using notation in Haug page 177
@@ -205,7 +205,7 @@ class FXOneTouchOption(FXOption):
             print("mu", mu)
             print("lam", lam)
 
-        if self._option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
+        if self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
             if np.any(s0 <= H):
@@ -219,7 +219,7 @@ class FXOneTouchOption(FXOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
             # HAUG 2
 
             if np.any(s0 >= H):
@@ -233,7 +233,7 @@ class FXOneTouchOption(FXOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
             # HAUG 3
 
             if np.any(s0 <= H):
@@ -248,7 +248,7 @@ class FXOneTouchOption(FXOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
             # HAUG 4
 
             if np.any(s0 >= H):
@@ -263,7 +263,7 @@ class FXOneTouchOption(FXOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
             # HAUG 5
 
             if np.any(s0 <= H):
@@ -279,7 +279,7 @@ class FXOneTouchOption(FXOption):
             v = (B2 + B4)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
             # HAUG 6
 
             if np.any(s0 >= H):
@@ -296,7 +296,7 @@ class FXOneTouchOption(FXOption):
             v = (B2 + B4)
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 7
 
             if np.any(s0 <= H):
@@ -312,7 +312,7 @@ class FXOneTouchOption(FXOption):
             v = (A2 + A4)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
             if np.any(s0 >= H):
@@ -328,7 +328,7 @@ class FXOneTouchOption(FXOption):
             v = (A2 + A4)
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
             # HAUG 9
 
             if np.any(s0 <= H):
@@ -345,7 +345,7 @@ class FXOneTouchOption(FXOption):
             v = (B2 - B4)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
             # HAUG 10
 
             if np.any(s0 >= H):
@@ -362,7 +362,7 @@ class FXOneTouchOption(FXOption):
             v = (B2 - B4)
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if np.any(s0 <= H):
@@ -379,7 +379,7 @@ class FXOneTouchOption(FXOption):
             v = (A2 - A4)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 12
 
             if np.any(s0 >= H):
@@ -405,10 +405,10 @@ class FXOneTouchOption(FXOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("BARRIER LEVEL", self._barrier_rate)
-        s += label_to_string("PAYMENT SIZE", self._payment_size, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("BARRIER LEVEL", self.barrier_rate)
+        s += label_to_string("PAYMENT SIZE", self.payment_size, "")
         return s
 
 ###############################################################################
@@ -435,29 +435,29 @@ class FXOneTouchOption(FXOption):
 
         print("THIS NEEDS TO BE CHECKED")
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
 
-        df_d = dom_curve.df(self._expiry_dt)
+        df_d = dom_curve.df(self.expiry_dt)
         r_d = -np.log(df_d)/t
 
-        df_f = for_curve.df(self._expiry_dt)
+        df_f = for_curve.df(self.expiry_dt)
         r_f = -np.log(df_f)/t
 
         num_time_steps = int(t * num_steps_per_year) + 1
         dt = t / num_time_steps
 
-        v = model._volatility
+        v = model.volatility
         s0 = stock_price
         mu = r_d - r_f
 
         s = get_paths(num_paths, num_time_steps, t, mu, s0, v, seed)
 
-        H = self._barrier_rate
-        X = self._payment_size
+        H = self.barrier_rate
+        X = self.payment_size
 
         v = 0.0
 
-        if self._option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
+        if self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
             if s0 <= H:
@@ -467,7 +467,7 @@ class FXOneTouchOption(FXOption):
             v = v * X
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
             # HAUG 2
 
             if s0 >= H:
@@ -477,7 +477,7 @@ class FXOneTouchOption(FXOption):
             v = v * X
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
             # HAUG 3
 
             if s0 <= H:
@@ -486,7 +486,7 @@ class FXOneTouchOption(FXOption):
             v = _barrier_pay_one_at_hit_pv_down(s, H, r_d, dt) * H
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
             # HAUG 4
 
             if s0 >= H:
@@ -495,7 +495,7 @@ class FXOneTouchOption(FXOption):
             v = _barrier_pay_one_at_hit_pv_up(s, H, r_d, dt) * H
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
             # HAUG 5
 
             if s0 <= H:
@@ -505,7 +505,7 @@ class FXOneTouchOption(FXOption):
             v = v * X * np.exp(- r_d * t)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
             # HAUG 6
 
             if s0 >= H:
@@ -515,7 +515,7 @@ class FXOneTouchOption(FXOption):
             v = v * X * np.exp(- r_d * t)
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 7
 
             if s0 <= H:
@@ -524,7 +524,7 @@ class FXOneTouchOption(FXOption):
             v = _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt) * H
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
+        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
             if s0 >= H:
@@ -533,7 +533,7 @@ class FXOneTouchOption(FXOption):
             v = _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt) * H
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
             # HAUG 9
 
             if s0 <= H:
@@ -543,7 +543,7 @@ class FXOneTouchOption(FXOption):
             v = v * X * np.exp(-r_d*t)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
             # HAUG 10
 
             if s0 >= H:
@@ -553,7 +553,7 @@ class FXOneTouchOption(FXOption):
             v = v * X * np.exp(-r_d*t)
             return v
 
-        elif self._option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if s0 <= H:
@@ -563,7 +563,7 @@ class FXOneTouchOption(FXOption):
             v = v * np.exp(-r_d*t)
             return v
 
-        elif self._option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
+        elif self.option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 12
 
             if s0 >= H:

@@ -270,7 +270,7 @@ def test_performCDSIndexHazardRateAdjustment():
 #        for cds in cds_contracts:
 #            unadjustedSpread = cds.par_spread(value_dt,issuer_curves[m])
 #            adjustedSpread = cds.par_spread(value_dt,adjustedIssuerCurves[m])
-#            test_cases.print(m,str(cds._maturity_dt),"%10.3f"%(unadjustedSpread*10000),"%10.3f" %(adjustedSpread*10000))
+#            test_cases.print(m,str(cds.maturity_dt),"%10.3f"%(unadjustedSpread*10000),"%10.3f" %(adjustedSpread*10000))
 
     cdsIndex = CDSIndexPortfolio()
 

@@ -56,21 +56,21 @@ class EquityCliquetOption(EquityOption):
         if final_expiry_dt < start_dt:
             raise FinError("Expiry date precedes start date")
 
-        self._start_dt = start_dt
-        self._final_expiry_dt = final_expiry_dt
-        self._option_type = option_type
-        self._freq_type = freq_type
-        self._dc_type = day_count_type
-        self._cal_type = cal_type
-        self._bd_type = bd_type
-        self._dg_type = dg_type
+        self.start_dt = start_dt
+        self.final_expiry_dt = final_expiry_dt
+        self.option_type = option_type
+        self.freq_type = freq_type
+        self.dc_type = day_count_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
+        self.dg_type = dg_type
 
-        self._expiry_dts = Schedule(self._start_dt,
-                                    self._final_expiry_dt,
-                                    self._freq_type,
-                                    self._cal_type,
-                                    self._bd_type,
-                                    self._dg_type).generate()
+        self.expiry_dts = Schedule(self.start_dt,
+                                    self.final_expiry_dt,
+                                    self.freq_type,
+                                    self.cal_type,
+                                    self.bd_type,
+                                    self.dg_type).generate()
 
 ###############################################################################
 
@@ -94,26 +94,26 @@ class EquityCliquetOption(EquityOption):
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        if value_dt > self._final_expiry_dt:
+        if value_dt > self.final_expiry_dt:
             raise FinError("Value date after final expiry date.")
 
         s = stock_price
         v_cliquet = 0.0
 
-        self._v_options = []
+        self.v_options = []
         self._dfs = []
-        self._actual_dts = []
+        self.actual_dts = []
 
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
         if isinstance(model, BlackScholes):
 
-            v = model._volatility
+            v = model.volatility
             v = max(v, 1e-6)
             tprev = 0.0
 
-            for dt in self._expiry_dts:
+            for dt in self.expiry_dts:
 
                 if dt > value_dt:
 
@@ -132,11 +132,11 @@ class EquityCliquetOption(EquityOption):
 
                     q = -np.log(dqMat/dq)/tau
 
-                    if self._option_type == call_type:
+                    if self.option_type == call_type:
                         v_fwd_opt = s * dq * \
                             bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
                         v_cliquet += v_fwd_opt
-                    elif self._option_type == put_type:
+                    elif self.option_type == put_type:
                         v_fwd_opt = s * dq * \
                             bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
                         v_cliquet += v_fwd_opt
@@ -146,8 +146,8 @@ class EquityCliquetOption(EquityOption):
 #                    print(dt, r, df, q, v_fwd_opt, v_cliquet)
 
                     self._dfs.append(df)
-                    self._v_options.append(v)
-                    self._actual_dts.append(dt)
+                    self.v_options.append(v)
+                    self.actual_dts.append(dt)
                     tprev = t_exp
         else:
             raise FinError("Unknown Model Type")
@@ -157,23 +157,23 @@ class EquityCliquetOption(EquityOption):
 ###############################################################################
 
     def print_payments(self):
-        num_options = len(self._v_options)
+        num_options = len(self.v_options)
         for i in range(0, num_options):
-            print(self._actual_dts[i], self._dfs[i], self._v_options[i])
+            print(self.actual_dts[i], self._dfs[i], self.v_options[i])
 
 ###############################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._start_dt)
-        s += label_to_string("FINAL EXPIRY DATE", self._final_expiry_dt)
-        s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("FREQUENCY TYPE", self._freq_type)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("CALENDAR TYPE", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self._bd_type)
+        s += label_to_string("START DATE", self.start_dt)
+        s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
+        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("FREQUENCY TYPE", self.freq_type)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("CALENDAR TYPE", self.cal_type)
+        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
         s += label_to_string("DATE GEN RULE TYPE",
-                             self._dg_type, "")
+                             self.dg_type, "")
         return s
 
 ###############################################################################

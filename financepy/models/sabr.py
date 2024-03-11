@@ -168,17 +168,17 @@ class SABR():
         also provide functions below to assist with the calibration of the
         value of alpha. """
 
-        self._alpha = alpha
-        self._beta = beta
-        self._rho = rho
-        self._nu = nu
+        self.alpha = alpha
+        self.beta = beta
+        self.rho = rho
+        self.nu = nu
 
 ###############################################################################
 
     def black_vol(self, f, k, t):
         """ Black volatility from SABR model using Hagan et al. approx. """
 
-        params = np.array([self._alpha, self._beta, self._rho, self._nu])
+        params = np.array([self.alpha, self.beta, self.rho, self.nu])
 
         # I wish to enable vectorisations
         if isinstance(f, np.ndarray):
@@ -209,7 +209,7 @@ class SABR():
 
     def black_vol_with_alpha(self, alpha, f, k, t):
 
-        self._alpha = alpha[0]
+        self.alpha = alpha[0]
         black_vol = self.black_vol(f, k, t)
         return black_vol
 
@@ -258,7 +258,7 @@ class SABR():
         # The starting point is based on assuming that the strike is ATM
         self.set_alpha_from_atm_black_vol(black_vol, strike, time_to_expiry)
 
-        init_alpha = self._alpha
+        init_alpha = self.alpha
 
         if init_alpha != black_vol:
             # Objective function
@@ -272,7 +272,7 @@ class SABR():
         else:
             alpha = init_alpha
 
-        self._alpha = alpha
+        self.alpha = alpha
 
 ###############################################################################
 
@@ -282,13 +282,13 @@ class SABR():
         and al. equation (3.3). We take the smallest real root as the preferred
         solution. This is useful for calibrating the model when beta has been
         chosen."""
-        beta = self._beta
-        rho = self._rho
-        nu = self._nu
+        beta = self.beta
+        rho = self.rho
+        nu = self.nu
         t_exp = time_to_expiry
         K = atm_strike
 
-        coeff0 = -black_vol * (K**(1.0 - self._beta))
+        coeff0 = -black_vol * (K**(1.0 - self.beta))
         coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
         coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K**(1.0 - beta)))
         coeff3 = (((1.0 - beta)**2) * t_exp) / (24.0 * (K**(2.0 - 2.0 * beta)))
@@ -297,17 +297,17 @@ class SABR():
 
         # Selecting the smallest positive real root
         alpha = np.min([coeff.real for coeff in roots if coeff.real > 0])
-        self._alpha = alpha
+        self.alpha = alpha
 
 ###############################################################################
 
     def __repr__(self):
         """ Return string with class details. """
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("Alpha", self._alpha)
-        s += label_to_string("Beta", self._beta)
-        s += label_to_string("Nu", self._nu)
-        s += label_to_string("Rho", self._rho)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("Alpha", self.alpha)
+        s += label_to_string("Beta", self.beta)
+        s += label_to_string("Nu", self.nu)
+        s += label_to_string("Rho", self.rho)
         return s
 
 ###############################################################################

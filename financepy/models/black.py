@@ -33,12 +33,12 @@ class Black():
     def __init__(self, volatility, implementation_type=BlackTypes.ANALYTICAL,
                  num_steps=0):
         """ Create FinModel black using parameters. """
-        self._volatility = volatility
-        self._implementation_type = implementation_type
-        self._num_steps = num_steps
-        self._seed = 0
-        self._param1 = 0
-        self._param2 = 0
+        self.volatility = volatility
+        self.implementation_type = implementation_type
+        self.num_steps = num_steps
+        self.seed = 0
+        self.param1 = 0
+        self.param2 = 0
 
 ###############################################################################
 
@@ -54,11 +54,11 @@ class Black():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        v = self._volatility
+        v = self.volatility
         r = -np.log(df)/t
         if option_type in (OptionTypes.EUROPEAN_CALL,
                            OptionTypes.EUROPEAN_PUT):
-            if self._implementation_type == BlackTypes.ANALYTICAL:
+            if self.implementation_type == BlackTypes.ANALYTICAL:
                 value = black_value(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
@@ -67,7 +67,7 @@ class Black():
                              OptionTypes.AMERICAN_PUT):
 
             results = crr_tree_val_avg(f, 0.0, 0.0, v,
-                                       self._num_steps, t,
+                                       self.num_steps, t,
                                        option_type.value, k)
             value = results['value']
         else:
@@ -89,20 +89,20 @@ class Black():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        v = self._volatility
+        v = self.volatility
         r = -np.log(df)/t
 
         if option_type in (OptionTypes.EUROPEAN_CALL,
                            OptionTypes.EUROPEAN_PUT):
-            if self._implementation_type == BlackTypes.ANALYTICAL:
+            if self.implementation_type == BlackTypes.ANALYTICAL:
                 return black_delta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL,
                              OptionTypes.AMERICAN_PUT):
-            if self._implementation_type == BlackTypes.CRR_TREE:
+            if self.implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
-                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                    f, 0.0, 0.0, v, self.num_steps, t, option_type.value, k)
                 return results['delta']
             else:
                 raise FinError("Implementation not available for this product")
@@ -124,20 +124,20 @@ class Black():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        v = self._volatility
+        v = self.volatility
         r = -np.log(df)/t
 
         if option_type in (OptionTypes.EUROPEAN_CALL,
                            OptionTypes.EUROPEAN_PUT):
-            if self._implementation_type == BlackTypes.ANALYTICAL:
+            if self.implementation_type == BlackTypes.ANALYTICAL:
                 return black_gamma(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL,
                              OptionTypes.AMERICAN_PUT):
-            if self._implementation_type == BlackTypes.CRR_TREE:
+            if self.implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
-                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                    f, 0.0, 0.0, v, self.num_steps, t, option_type.value, k)
                 return results['gamma']
             else:
                 raise FinError("Implementation not available for this product")
@@ -158,20 +158,20 @@ class Black():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        v = self._volatility
+        v = self.volatility
         r = -np.log(df)/t
 
         if option_type in (OptionTypes.EUROPEAN_CALL,
                            OptionTypes.EUROPEAN_PUT):
-            if self._implementation_type == BlackTypes.ANALYTICAL:
+            if self.implementation_type == BlackTypes.ANALYTICAL:
                 theta = black_theta(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL,
                              OptionTypes.AMERICAN_PUT):
-            if self._implementation_type == BlackTypes.CRR_TREE:
+            if self.implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
-                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                    f, 0.0, 0.0, v, self.num_steps, t, option_type.value, k)
                 return results['theta']
             else:
                 raise FinError("Implementation not available for this product")
@@ -194,23 +194,23 @@ class Black():
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
-        v = self._volatility
+        v = self.volatility
         r = -np.log(df)/t
 
         if option_type in (OptionTypes.EUROPEAN_CALL,
                            OptionTypes.EUROPEAN_PUT):
-            if self._implementation_type == BlackTypes.ANALYTICAL:
+            if self.implementation_type == BlackTypes.ANALYTICAL:
                 vega = black_vega(f, t, k, r, v, option_type)
             else:
                 raise FinError("Implementation not available for this product")
         elif option_type in (OptionTypes.AMERICAN_CALL,
                              OptionTypes.AMERICAN_PUT):
-            if self._implementation_type == BlackTypes.CRR_TREE:
+            if self.implementation_type == BlackTypes.CRR_TREE:
                 bump_size = 0.01
                 results = crr_tree_val_avg(
-                    f, 0.0, 0.0, v, self._num_steps, t, option_type.value, k)
+                    f, 0.0, 0.0, v, self.num_steps, t, option_type.value, k)
                 results_volshift = crr_tree_val_avg(
-                    f, 0.0, 0.0, v+bump_size, self._num_steps, t,
+                    f, 0.0, 0.0, v+bump_size, self.num_steps, t,
                     option_type.value, k)
                 vega = (results_volshift['value'] -
                         results['value']) / bump_size
@@ -225,10 +225,10 @@ class Black():
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VOLATILITY", self._volatility)
-        s += label_to_string("IMPLEMENTATION", self._implementation_type)
-        s += label_to_string("NUMSTEPS", self._num_steps)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("VOLATILITY", self.volatility)
+        s += label_to_string("IMPLEMENTATION", self.implementation_type)
+        s += label_to_string("NUMSTEPS", self.num_steps)
         return s
 
 ###############################################################################

@@ -6,7 +6,7 @@ import glob
 from os.path import dirname, basename, join
 
 import sys
-sys.path.append("./..")
+sys.path.append("..")
 
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError

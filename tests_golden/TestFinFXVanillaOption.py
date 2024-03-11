@@ -4,6 +4,10 @@
 
 import numpy as np
 import time
+
+import sys
+sys.path.append("..")
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.models.sabr import SABR
@@ -15,8 +19,6 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)

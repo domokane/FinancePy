@@ -19,13 +19,13 @@ class IborConventions():
                  index_name: str = "LIBOR"):
 
         if currency_name == "USD" and index_name == "LIBOR":
-            self._spot_lag = 2
-            self._dc_type = DayCountTypes.THIRTY_E_360_ISDA
-            self._cal_type = CalendarTypes.TARGET
+            self.spot_lag = 2
+            self.dc_type = DayCountTypes.THIRTY_E_360_ISDA
+            self.cal_type = CalendarTypes.TARGET
         elif currency_name == "EUR" and index_name == "EURIBOR":
-            self._spot_lag = 2
-            self._dc_type = DayCountTypes.THIRTY_E_360_ISDA
-            self._cal_type = CalendarTypes.TARGET
+            self.spot_lag = 2
+            self.dc_type = DayCountTypes.THIRTY_E_360_ISDA
+            self.cal_type = CalendarTypes.TARGET
         else:
             pass
 

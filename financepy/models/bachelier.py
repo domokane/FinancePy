@@ -23,7 +23,7 @@ class Bachelier():
 
     def __init__(self, volatility):
         """Create FinModel black using parameters."""
-        self._volatility = volatility
+        self.volatility = volatility
 
 ###############################################################################
 
@@ -38,7 +38,7 @@ class Bachelier():
         t = time_to_expiry
         k = strike_rate
         root_t = np.sqrt(t)
-        v = self._volatility
+        v = self.volatility
         d = (f-k) / (v * root_t)
 
         if call_or_put == OptionTypes.EUROPEAN_CALL:
@@ -51,8 +51,8 @@ class Bachelier():
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VOLATILITY", self._volatility)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("VOLATILITY", self.volatility)
         return s
 
 ###############################################################################

@@ -266,8 +266,8 @@ def test_FinCDSTranche():
                     method,
                     period,
                     num_points,
-                    tranche._k1,
-                    tranche._k2,
+                    tranche.k1,
+                    tranche.k2,
                     v[3] * 10000)
 
 ##########################################################################
@@ -313,8 +313,8 @@ def test_FinCDSTranche():
                     method,
                     period,
                     num_points,
-                    tranche._k1,
-                    tranche._k2,
+                    tranche.k1,
+                    tranche.k2,
                     v[3] * 10000)
 
     test_cases.banner(

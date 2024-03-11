@@ -26,12 +26,12 @@ def test_from_string():
 
 
 def test_weekday():
-    assert Date(3, 3, 2021)._weekday == Date.WED
+    assert Date(3, 3, 2021).weekday == Date.WED
 
 
 def test_excel_representation():
-    assert Date(5, 1, 1900)._excel_dt == 5
-    assert Date(1, 3, 2020)._excel_dt == 43891
+    assert Date(5, 1, 1900).excel_dt == 5
+    assert Date(1, 3, 2020).excel_dt == 43891
 
 
 # tests not refactored below

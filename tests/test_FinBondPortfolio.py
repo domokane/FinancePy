@@ -19,7 +19,7 @@ def test_1():
     coupon = 0.045
     clean_price = 101.99500000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -35,7 +35,7 @@ def test_2():
     coupon = 0.045
     clean_price = 101.99500000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -51,7 +51,7 @@ def test_3():
     coupon = 0.080000
     clean_price = 107.92000000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -67,7 +67,7 @@ def test_4():
     coupon = 0.022500
     clean_price = 102.9750
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -83,7 +83,7 @@ def test_5():
     coupon = 0.0500000000
     clean_price = 109.35500000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -99,7 +99,7 @@ def test_6():
     coupon = 0.0275000000
     clean_price = 105.62500000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -115,7 +115,7 @@ def test_7():
     coupon = 0.0475000000
     clean_price = 112.98000000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -131,7 +131,7 @@ def test_8():
     coupon = 0.0800000000
     clean_price = 124.47000000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -147,7 +147,7 @@ def test_9():
     coupon = 0.0200000000
     clean_price = 104.98000000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -163,7 +163,7 @@ def test_10():
     coupon = 0.0400000000
     clean_price = 113.49500000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)
@@ -179,7 +179,7 @@ def test_11():
     coupon = 0.0875000000
     clean_price = 138.57000000
 
-    issue_dt = Date(maturity_dt._d, maturity_dt._m, 2000)
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(issue_dt, maturity_dt,
                 coupon, freq_type, dc_type)

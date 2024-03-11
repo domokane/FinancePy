@@ -56,13 +56,13 @@ class IborIborSwap:
                 term_dt_or_tenor)
 
         calendar = CalendarTypes(cal_type)
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self._termination_dt,
                                             bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_dt = effective_dt
+        self.effective_dt = effective_dt
         self._notional = notional
         self._basisSwapSpread = basisSwapSpread
         self._payFreqType = payFreqType
@@ -90,7 +90,7 @@ class IborIborSwap:
         self._payfirst_fixing_rate = None
         self._recfirst_fixing_rate = None
 
-        self._value_dt = None
+        self.value_dt = None
 
 ##########################################################################
 
@@ -98,7 +98,7 @@ class IborIborSwap:
         """ Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
 
-        floatDates = FinSchedule(self._effective_dt,
+        floatDates = FinSchedule(self.effective_dt,
                                  self._termination_dt,
                                  freq_type,
                                  self._cal_type,
@@ -151,7 +151,7 @@ class IborIborSwap:
         case if we set the valuation date to be the swap's actual settlement
         date. """
 
-        self._value_dt = value_dt
+        self.value_dt = value_dt
         self._floatYearFracs = []
         self._float_flows = []
         self._floatRates = []
@@ -170,7 +170,7 @@ class IborIborSwap:
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
-        if value_dt <= self._effective_dt:
+        if value_dt <= self.effective_dt:
             start_index = 1
 
         self._floatStartIndex = start_index
@@ -184,7 +184,7 @@ class IborIborSwap:
         next_dt = self._adjustedFloatDates[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
         # Cannot be pcd as has past
-        df1_index = index_curve.df(self._effective_dt)
+        df1_index = index_curve.df(self.effective_dt)
         df2_index = index_curve.df(next_dt)
 
         floatRate = 0.0
@@ -248,12 +248,12 @@ class IborIborSwap:
         forward libor rates, implied cash amounts, their present value and
         their cumulative PV using the last valuation performed. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
         print("SPREAD COUPON (%):", self._float_spread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._float_freq_type))
         print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
-        print("VALUATION DATE", self._value_dt)
+        print("VALUATION DATE", self.value_dt)
 
         if len(self._float_flows) == 0:
             print("Floating Flows not calculated.")
@@ -271,7 +271,7 @@ class IborIborSwap:
         # By definition the discount factor is 1.0 on the valuation date
 
         print("%15s %10s %10s %12s %12.8f %12s %12s" %
-              (self._value_dt,
+              (self.value_dt,
                "-",
                "-",
                "-",
@@ -296,9 +296,9 @@ class IborIborSwap:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._effective_dt)
+        s += label_to_string("START DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self._termination_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("SWAP TYPE", self._swap_type)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)

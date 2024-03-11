@@ -44,13 +44,13 @@ class FinInflationIndexCurve():
         if lag_in_months < 0:
             raise FinError("Lag must be positive.")
 
-        self._index_dts = np.array(index_dts)
-        self._index_values = np.array(index_values)
-        self._lag_in_months = lag_in_months
-        self._base_dt = index_dts[0]
-        self._index_times = times_from_dates(index_dts, self._base_dt)
+        self.index_dts = np.array(index_dts)
+        self.index_values = np.array(index_values)
+        self.lag_in_months = lag_in_months
+        self.base_dt = index_dts[0]
+        self.index_times = times_from_dates(index_dts, self.base_dt)
 
-        if test_monotonicity(self._index_times) is False:
+        if test_monotonicity(self.index_times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
 ###############################################################################
@@ -58,21 +58,21 @@ class FinInflationIndexCurve():
     def index_value(self, dt: Date):
         """ Calculate index value by interpolating the CPI curve """
 
-        lagMonthsAgoDt = dt.add_months(-self._lag_in_months)
+        lagMonthsAgoDt = dt.add_months(-self.lag_in_months)
 
         cpi_first_dt = Date(1, lagMonthsAgoDt.m, lagMonthsAgoDt.y)
         cpi_second_dt = cpi_first_dt.add_months(1)
 
-        cpi_first_time = (cpi_first_dt - self._base_dt) / gDaysInYear
-        cpi_second_time = (cpi_second_dt - self._base_dt) / gDaysInYear
+        cpi_first_time = (cpi_first_dt - self.base_dt) / gDaysInYear
+        cpi_second_time = (cpi_second_dt - self.base_dt) / gDaysInYear
 
         cpi_first_value = np.interp(cpi_first_time,
-                                  self._index_times,
-                                  self._index_values)
+                                  self.index_times,
+                                  self.index_values)
 
         cpi_second_value = np.interp(cpi_second_time,
-                                   self._index_times,
-                                   self._index_values)
+                                   self.index_times,
+                                   self.index_values)
 
         d = dt.d
         m = dt.m
@@ -88,7 +88,7 @@ class FinInflationIndexCurve():
         """ Calculate index value by interpolating the CPI curve """
 
         vt = self.index_value(dt)
-        v0 = self.index_value(self._base_dt)
+        v0 = self.index_value(self.base_dt)
         index_ratio = vt / v0
         return index_ratio
 
@@ -97,14 +97,14 @@ class FinInflationIndexCurve():
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("BASE DATE", self._base_dt)
-        s += label_to_string("INDEX LAG", self._lag_in_months)
+        s += label_to_string("BASE DATE", self.base_dt)
+        s += label_to_string("INDEX LAG", self.lag_in_months)
 
         s += label_to_string("DATES", "ZERO RATES")
-        num_points = len(self._index_values)
+        num_points = len(self.index_values)
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._index_dts[i],
-                                 "%10.7f" % self._index_values[i])
+            s += label_to_string("%12s" % self.index_dts[i],
+                                 "%10.7f" % self.index_values[i])
 
         return s
 

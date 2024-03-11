@@ -60,13 +60,13 @@ class FinIborIborXCcySwap:
                 term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self._termination_dt,
                                             bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        self._effective_dt = effective_dt
+        self.effective_dt = effective_dt
         self._notional = notional
 
         self._fixed_coupon = fixed_coupon
@@ -93,7 +93,7 @@ class FinIborIborXCcySwap:
         self._adjustedMaturityDate = self._adjusted_fixed_dts[-1]
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
-        self._lastPaymentDate = self._maturity_dt
+        self._lastPaymentDate = self.maturity_dt
         if self._adjusted_fixed_dts[-1] > self._lastPaymentDate:
             self._lastPaymentDate = self._adjusted_fixed_dts[-1]
 
@@ -112,7 +112,7 @@ class FinIborIborXCcySwap:
         self._fixedFlowPVs = []
 
         self._first_fixing_rate = None
-        self._value_dt = None
+        self.value_dt = None
         self._fixedStartIndex = None
 
         self._calc_fixed_leg_flows()
@@ -151,7 +151,7 @@ class FinIborIborXCcySwap:
         """ Generate the fixed leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjusted_fixed_dts = FinSchedule(
-            self._effective_dt,
+            self.effective_dt,
             self._termination_dt,
             self._fixed_freq_type,
             self._cal_type,
@@ -164,7 +164,7 @@ class FinIborIborXCcySwap:
         """ Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjustedFloatDates = FinSchedule(
-            self._effective_dt,
+            self.effective_dt,
             self._termination_dt,
             self._float_freq_type,
             self._cal_type,
@@ -210,12 +210,12 @@ class FinIborIborXCcySwap:
 
         pv01 = self.pv01(value_dt, discount_curve)
 
-        if value_dt < self._effective_dt:
-            df0 = discount_curve.df(self._effective_dt)
+        if value_dt < self.effective_dt:
+            df0 = discount_curve.df(self.effective_dt)
         else:
             df0 = discount_curve.df(value_dt)
 
-        dfT = discount_curve.df(self._maturity_dt)
+        dfT = discount_curve.df(self.maturity_dt)
 
         if abs(pv01) < g_small:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
@@ -227,7 +227,7 @@ class FinIborIborXCcySwap:
 
     def fixed_leg_value(self, value_dt, discount_curve, principal=0.0):
 
-        self._value_dt = value_dt
+        self.value_dt = value_dt
 
         self._fixed_year_fracs = []
         self._fixed_flows = []
@@ -245,7 +245,7 @@ class FinIborIborXCcySwap:
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
-        if value_dt <= self._effective_dt:
+        if value_dt <= self.effective_dt:
             start_index = 1
 
         self._fixedStartIndex = start_index
@@ -323,7 +323,7 @@ class FinIborIborXCcySwap:
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
-        if value_dt <= self._effective_dt:
+        if value_dt <= self.effective_dt:
             start_index = 1
 
         """ Now PV fixed leg flows. """
@@ -352,7 +352,7 @@ class FinIborIborXCcySwap:
         case if we set the valuation date to be the swap's actual settlement
         date. """
 
-        self._value_dt = value_dt
+        self.value_dt = value_dt
         self._float_year_fracs = []
         self._float_flows = []
         self._floatRates = []
@@ -371,7 +371,7 @@ class FinIborIborXCcySwap:
 
         """ If the swap has yet to settle then we do not include the
         start date of the swap as a coupon payment date. """
-        if value_dt <= self._effective_dt:
+        if value_dt <= self.effective_dt:
             start_index = 1
 
         self._floatStartIndex = start_index
@@ -385,7 +385,7 @@ class FinIborIborXCcySwap:
         next_dt = self._adjustedFloatDates[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
         # Cannot be pcd as has past
-        df1_index = index_curve.df(self._effective_dt)
+        df1_index = index_curve.df(self.effective_dt)
         df2_index = index_curve.df(next_dt)
 
         floatRate = 0.0
@@ -449,12 +449,12 @@ class FinIborIborXCcySwap:
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
         print("COUPON (%):", self._fixed_coupon * 100)
         print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
         print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
-        print("VALUATION DATE", self._value_dt)
+        print("VALUATION DATE", self.value_dt)
 
         if len(self._fixed_flows) == 0:
             print("Fixed Flows not calculated.")
@@ -471,7 +471,7 @@ class FinIborIborXCcySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
         print("%15s %10s %12s %12.8f %12s %12s" %
-              (self._value_dt,
+              (self.value_dt,
                "-",
                "-",
                1.0,
@@ -496,8 +496,8 @@ class FinIborIborXCcySwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
         print("COUPON (%):", self._fixed_coupon * 100)
         print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
         print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
@@ -527,12 +527,12 @@ class FinIborIborXCcySwap:
         forward libor rates, implied cash amounts, their present value and
         their cumulative PV using the last valuation performed. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
         print("SPREAD COUPON (%):", self._float_spread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._float_freq_type))
         print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
-        print("VALUATION DATE", self._value_dt)
+        print("VALUATION DATE", self.value_dt)
 
         if len(self._float_flows) == 0:
             print("Floating Flows not calculated.")
@@ -550,7 +550,7 @@ class FinIborIborXCcySwap:
         # By definition the discount factor is 1.0 on the valuation date
 
         print("%15s %10s %10s %12s %12.8f %12s %12s" %
-              (self._value_dt,
+              (self.value_dt,
                "-",
                "-",
                "-",
@@ -575,9 +575,9 @@ class FinIborIborXCcySwap:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self._effective_dt)
+        s += label_to_string("START DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self._termination_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self._notional)
         s += label_to_string("SWAP TYPE", self._swap_type)
         s += label_to_string("FIXED COUPON", self._fixed_coupon)

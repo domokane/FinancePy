@@ -452,7 +452,7 @@ class Date():
         dt_1 = self.add_days(days)
 
         # On that date we then move to the correct hour
-        dt_2 = Date(dt_1.d(), dt_1.m(), dt_1.y(), hour, dt_1.mm, dt_1.ss)
+        dt_2 = Date(dt_1.d, dt_1.m, dt_1.y, hour, dt_1.mm, dt_1.ss)
         return dt_2
 
     ###########################################################################

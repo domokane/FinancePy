@@ -86,7 +86,7 @@ class IborCapVolCurve():
         notation to Hull's book (page 32.11). The first volatility in the
         vector of caplet vols is zero. """
 
-        self._times = []
+        self.times = []
         self._taus = []
 
         day_counter = DayCount(self._dc_type)
@@ -95,7 +95,7 @@ class IborCapVolCurve():
 
         for dt in self._cap_maturity_dts:
             t = (dt - self._curve_dt) / gDaysInYear
-            self._times.append(t)
+            self.times.append(t)
             tau = day_counter.year_frac(prev_dt, dt)[0]
             self._taus.append(tau)
             prev_dt = dt
@@ -107,7 +107,7 @@ class IborCapVolCurve():
 
         sum_tau = 0.0
         for i in range(1, len(self._cap_maturity_dts)):
-            t = self._times[i]
+            t = self.times[i]
             tau = self._taus[i]
             sum_tau += tau
             vol_cap = self._cap_sigmas[i]
@@ -133,19 +133,19 @@ class IborCapVolCurve():
         else:
             t = dt
 
-        if t <= self._times[1]:
+        if t <= self.times[1]:
             return self._caplet_gammas[1]
 
         if 1 == 0:
-            print(self._times)
+            print(self.times)
             print(self._caplet_gammas)
             print(t)
 
-        num_vols = len(self._times)
+        num_vols = len(self.times)
         vol = self._caplet_gammas[1]
 
         for i in range(1, num_vols):
-            if self._times[i] >= t:
+            if self.times[i] >= t:
                 vol = self._caplet_gammas[i]
                 return vol
 
@@ -163,16 +163,16 @@ class IborCapVolCurve():
         else:
             t = dt
 
-        num_vols = len(self._times)
+        num_vols = len(self.times)
         vol = self._cap_sigmas[0]
 
         if 1 == 0:
-            print(self._times)
+            print(self.times)
             print(self._caplet_gammas)
             print(t)
 
         for i in range(1, num_vols):
-            if self._times[i] >= t:
+            if self.times[i] >= t:
                 vol = self._cap_sigmas[i]
                 return vol
 
@@ -184,10 +184,10 @@ class IborCapVolCurve():
         """ Output the contents of the FinCapVolCurve class object. """
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        num_times = len(self._times)
+        num_times = len(self.times)
         s += " TIME     TAU    CAP VOL    CAPLET VOL"
         for i in range(0, num_times):
-            t = self._times[i]
+            t = self.times[i]
             tau = self._taus[i]
             vol_cap = self._cap_sigmas[i]
             fwd_ibor_vol = self._caplet_vols[i]

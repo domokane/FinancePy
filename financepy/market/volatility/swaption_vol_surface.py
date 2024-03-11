@@ -281,7 +281,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 # @njit(float64(float64, float64, float64, float64, int64, float64,
 #               int64, float64), fastmath=True)
 # def solve_for_strike(spot_fx_rate,
-#                    tdel, rd, rf,
+#                    t_del, rd, rf,
 #                    option_type_value,
 #                    delta_target,
 #                    delta_method_value,
@@ -303,8 +303,8 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
 
-#         dom_df = np.exp(-rd*tdel)
-#         for_df = np.exp(-rf*tdel)
+#         dom_df = np.exp(-rd*t_del)
+#         for_df = np.exp(-rf*t_del)
 
 #         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
@@ -312,7 +312,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #             phi = -1.0
 
 #         F0T = spot_fx_rate * for_df / dom_df
-#         vsqrtt = volatility * np.sqrt(tdel)
+#         vsqrtt = volatility * np.sqrt(t_del)
 #         arg = delta_target*phi/for_df  # CHECK THIS !!!
 #         norm_inv_delta = norminvcdf(arg)
 #         K = F0T * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt/2.0))
@@ -320,8 +320,8 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
 
-#         dom_df = np.exp(-rd*tdel)
-#         for_df = np.exp(-rf*tdel)
+#         dom_df = np.exp(-rd*t_del)
+#         for_df = np.exp(-rf*t_del)
 
 #         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
@@ -329,7 +329,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #             phi = -1.0
 
 #         F0T = spot_fx_rate * for_df / dom_df
-#         vsqrtt = volatility * np.sqrt(tdel)
+#         vsqrtt = volatility * np.sqrt(t_del)
 #         arg = delta_target*phi
 #         norm_inv_delta = norminvcdf(arg)
 #         K = F0T * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt/2.0))
@@ -337,7 +337,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     elif delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
 
-#         argtuple = (spot_fx_rate, tdel, rd, rf, volatility,
+#         argtuple = (spot_fx_rate, t_del, rd, rf, volatility,
 #                     delta_method_value, option_type_value, delta_target)
 
 #         K = newton_secant(_g, x0=spot_fx_rate, args=argtuple,
@@ -347,7 +347,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
 
-#         argtuple = (spot_fx_rate, tdel, rd, rf, volatility,
+#         argtuple = (spot_fx_rate, t_del, rd, rf, volatility,
 #                     delta_method_value, option_type_value, delta_target)
 
 #         K = newton_secant(_g, x0=spot_fx_rate, args=argtuple,
@@ -382,7 +382,7 @@ class SwaptionVolSurface():
 
         check_argument_types(self.__init__, locals())
 
-        self._value_dt = value_dt
+        self.value_dt = value_dt
 
         if len(strike_grid.shape) != 2:
             raise FinError("Strike grid must be a 2D grid of values")
@@ -435,7 +435,7 @@ class SwaptionVolSurface():
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+        t_exp = (expiry_dt - self.value_dt) / gDaysInYear
 
         vol_type_value = self._vol_func_type.value
 
@@ -514,7 +514,7 @@ class SwaptionVolSurface():
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+    #     t_exp = (expiry_dt - self.value_dt) / gDaysInYear
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -562,7 +562,7 @@ class SwaptionVolSurface():
     #     t0 = self._t_exp[index0]
     #     t1 = self._t_exp[index1]
 
-    #     initial_guess = self._K_ATM[index0]
+    #     initial_guess = self._k_atm[index0]
 
     #     K0 = _solver_for_smile_strike(s, t_exp, self._rd[index0], self._rf[index0],
     #                               OptionTypes.EUROPEAN_CALL.value,
@@ -616,7 +616,7 @@ class SwaptionVolSurface():
     #     interpolation is done in variance space and then converted back to a
     #     lognormal volatility."""
 
-    #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+    #     t_exp = (expiry_dt - self.value_dt) / gDaysInYear
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -665,7 +665,7 @@ class SwaptionVolSurface():
     #     t0 = self._t_exp[index0]
     #     t1 = self._t_exp[index1]
 
-    #     initial_guess = self._K_ATM[index0]
+    #     initial_guess = self._k_atm[index0]
 
     #     K0 = _solver_for_smile_strike(s, t_exp, self._rd[index0], self._rf[index0],
     #                               OptionTypes.EUROPEAN_CALL.value,
@@ -758,7 +758,7 @@ class SwaptionVolSurface():
         for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
-            t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+            t_exp = (expiry_dt - self.value_dt) / gDaysInYear
             self._t_exp[i] = t_exp
 
         #######################################################################
@@ -802,7 +802,7 @@ class SwaptionVolSurface():
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self._value_dt)
+            print("VALUE DATE:", self.value_dt)
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
@@ -921,7 +921,7 @@ class SwaptionVolSurface():
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self._value_dt)
+        s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("ATM METHOD", self._atm_method)
         s += label_to_string("DELTA METHOD", self._delta_method)

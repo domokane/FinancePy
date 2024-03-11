@@ -214,10 +214,10 @@ class OIS:
 ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self)._name__)
-        s += self.fixed_leg._repr__()
+        s = label_to_string("OBJECT TYPE", type(self).name__)
+        s += self.fixed_leg.repr__()
         s += "\n"
-        s += self.float_leg._repr__()
+        s += self.float_leg.repr__()
         return s
 
 ###############################################################################

@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 import numpy as np
 import time
 from financepy.models.heston import Heston, HestonNumericalScheme
@@ -9,8 +12,6 @@ from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
-import sys
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)

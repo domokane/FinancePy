@@ -81,24 +81,24 @@ def test_BondYieldCurve():
 ###############################################################################
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("values", fitted_curve1._curve_fit._coeffs)
+    test_cases.print("values", fitted_curve1.curve_fit.coeffs)
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("values", fitted_curve2._curve_fit._coeffs)
+    test_cases.print("values", fitted_curve2.curve_fit.coeffs)
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("beta_1", fitted_curve3._curve_fit._beta_1)
-    test_cases.print("beta_2", fitted_curve3._curve_fit._beta_2)
-    test_cases.print("beta_3", fitted_curve3._curve_fit._beta_3)
-    test_cases.print("tau", fitted_curve3._curve_fit._tau)
+    test_cases.print("beta_1", fitted_curve3.curve_fit.beta_1)
+    test_cases.print("beta_2", fitted_curve3.curve_fit.beta_2)
+    test_cases.print("beta_3", fitted_curve3.curve_fit.beta_3)
+    test_cases.print("tau", fitted_curve3.curve_fit.tau)
 
     test_cases.header("PARAMETER", "VALUE")
-    test_cases.print("beta_1", fitted_curve4._curve_fit._beta_1)
-    test_cases.print("beta_2", fitted_curve4._curve_fit._beta_2)
-    test_cases.print("beta_3", fitted_curve4._curve_fit._beta_3)
-    test_cases.print("beta_4", fitted_curve4._curve_fit._beta_4)
-    test_cases.print("tau_1", fitted_curve4._curve_fit._tau_1)
-    test_cases.print("tau_2", fitted_curve4._curve_fit._tau_2)
+    test_cases.print("beta_1", fitted_curve4.curve_fit.beta_1)
+    test_cases.print("beta_2", fitted_curve4.curve_fit.beta_2)
+    test_cases.print("beta_3", fitted_curve4.curve_fit.beta_3)
+    test_cases.print("beta_4", fitted_curve4.curve_fit.beta_4)
+    test_cases.print("tau_1", fitted_curve4.curve_fit.tau_1)
+    test_cases.print("tau_2", fitted_curve4.curve_fit.tau_2)
 
 ###############################################################################
 

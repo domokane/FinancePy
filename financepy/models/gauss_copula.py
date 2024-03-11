@@ -35,8 +35,8 @@ def default_times_gc(issuer_curves,
             g = y[i_credit, i_trial]
             u1 = 1.0 - N(g)
             u2 = 1.0 - u1
-            times = issuer_curve.times()
-            values = issuer_curve.values()
+            times = issuer_curve._times
+            values = issuer_curve._values
             t1 = uniform_to_default_time(u1, times, values)
             t2 = uniform_to_default_time(u2, times, values)
             corr_times[i_credit, i_trial] = t1

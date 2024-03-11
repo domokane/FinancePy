@@ -64,32 +64,32 @@ class CDSTranche:
         if k1 >= k2:
             raise FinError("K1 must be less than K2")
 
-        self._k1 = k1
-        self._k2 = k2
+        self.k1 = k1
+        self.k2 = k2
 
-        self._step_in_dt = step_in_dt
-        self._maturity_dt = maturity_dt
-        self._notional = notional
-        self._running_cpn = running_cpn
-        self._long_protect = long_protect
-        self._dc_type = dc_type
-        self._dg_type = dg_type
-        self._cal_type = cal_type
-        self._freq_type = freq_type
-        self._bd_type = bd_type
+        self.step_in_dt = step_in_dt
+        self.maturity_dt = maturity_dt
+        self.notional = notional
+        self.running_cpn = running_cpn
+        self.long_protect = long_protect
+        self.dc_type = dc_type
+        self.dg_type = dg_type
+        self.cal_type = cal_type
+        self.freq_type = freq_type
+        self.bd_type = bd_type
 
         notional = 1.0
 
-        self._cds_contract = CDS(self._step_in_dt,
-                                 self._maturity_dt,
-                                 self._running_cpn,
+        self.cds_contract = CDS(self.step_in_dt,
+                                 self.maturity_dt,
+                                 self.running_cpn,
                                  notional,
-                                 self._long_protect,
-                                 self._freq_type,
-                                 self._dc_type,
-                                 self._cal_type,
-                                 self._bd_type,
-                                 self._dg_type)
+                                 self.long_protect,
+                                 self.freq_type,
+                                 self.dc_type,
+                                 self.cal_type,
+                                 self.bd_type,
+                                 self.dg_type)
 
     ###########################################################################
 
@@ -104,9 +104,9 @@ class CDSTranche:
                  model=FinLossDistributionBuilder.RECURSION):
 
         num_credits = len(issuer_curves)
-        k1 = self._k1
-        k2 = self._k2
-        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
+        k1 = self.k1
+        k2 = self.k2
+        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
 
         if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
@@ -126,7 +126,7 @@ class CDSTranche:
 
         recovery_rates = np.zeros(num_credits)
 
-        payment_dts = self._cds_contract._payment_dts
+        payment_dts = self.cds_contract.payment_dts
         num_payments = len(payment_dts)
         num_times = num_payments + 1
 
@@ -225,21 +225,21 @@ class CDSTranche:
         tranche_curve._times = tranche_times
         tranche_curve._values = tranche_surv_curve
 
-        prot_leg_pv = self._cds_contract.prot_leg_pv(
+        prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, tranche_curve, curve_recovery)
-        risky_pv01 = self._cds_contract.risky_pv01(
+        risky_pv01 = self.cds_contract.risky_pv01(
             value_dt, tranche_curve)['clean_rpv01']
 
-        mtm = self._notional * (prot_leg_pv - upfront -
+        mtm = self.notional * (prot_leg_pv - upfront -
                                 risky_pv01 * running_cpn)
 
-        if not self._long_protect:
+        if not self.long_protect:
             mtm *= -1.0
 
         tranche_output = np.zeros(4)
         tranche_output[0] = mtm
-        tranche_output[1] = risky_pv01 * self._notional * running_cpn
-        tranche_output[2] = prot_leg_pv * self._notional
+        tranche_output[1] = risky_pv01 * self.notional * running_cpn
+        tranche_output[2] = prot_leg_pv * self.notional
         tranche_output[3] = prot_leg_pv / risky_pv01
 
         return tranche_output

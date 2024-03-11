@@ -2,6 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import sys
+sys.path.append("..")
+
+import numpy as np
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_digital_option import FXDigitalOption
 from financepy.models.black_scholes import BlackScholes
@@ -12,11 +18,6 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
-import numpy as np
-import time
-import sys
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

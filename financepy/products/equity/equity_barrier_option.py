@@ -39,16 +39,16 @@ class EquityBarrierOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_dt = expiry_dt
-        self._strike_price = float(strike_price)
-        self._barrier_level = float(barrier_level)
-        self._num_obs_per_year = int(num_obs_per_year)
+        self.expiry_dt = expiry_dt
+        self.strike_price = float(strike_price)
+        self.barrier_level = float(barrier_level)
+        self.num_obs_per_year = int(num_obs_per_year)
 
         if option_type not in EquityBarrierTypes:
             raise FinError("Option Type " + str(option_type) + " unknown.")
 
-        self._option_type = option_type
-        self._notional = notional
+        self.option_type = option_type
+        self.notional = notional
 
 ###############################################################################
 
@@ -68,7 +68,7 @@ class EquityBarrierOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -89,22 +89,22 @@ class EquityBarrierOption(EquityOption):
 
         values = []
 
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
         if t_exp < 0:
             raise FinError("Option expires before value date.")
 
         values = value_barrier(t_exp,
-                               self._strike_price,
-                               self._barrier_level,
+                               self.strike_price,
+                               self.barrier_level,
                                stock_prices,
-                               discount_curve.cc_rate(self._expiry_dt),
-                               dividend_curve.cc_rate(self._expiry_dt),
-                               model._volatility,
-                               self._option_type.value,
-                               self._num_obs_per_year)
+                               discount_curve.cc_rate(self.expiry_dt),
+                               dividend_curve.cc_rate(self.expiry_dt),
+                               model.volatility,
+                               self.option_type.value,
+                               self.num_obs_per_year)
 
-        values = values * self._notional
+        values = values * self.notional
 
         if isinstance(stock_price, float):
             return values[0]
@@ -240,12 +240,12 @@ class EquityBarrierOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("STRIKE PRICE", self._strike_price)
-        s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("BARRIER LEVEL", self._barrier_level)
-        s += label_to_string("NUM OBSERVATIONS", self._num_obs_per_year)
-        s += label_to_string("NOTIONAL", self._notional, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("STRIKE PRICE", self.strike_price)
+        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("BARRIER LEVEL", self.barrier_level)
+        s += label_to_string("NUM OBSERVATIONS", self.num_obs_per_year)
+        s += label_to_string("NOTIONAL", self.notional, "")
         return s
 
 ###############################################################################

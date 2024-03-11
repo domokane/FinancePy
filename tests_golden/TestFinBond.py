@@ -215,7 +215,7 @@ def build_ibor_curve(value_dt):
 
         df0 = 1.0
         for t in times[1:]:
-            df1 = libor_curve.df(t)
+            df1 = libor_curve._df(t)
             fwd = (df0 / df1 - 1.0) / dt
             print(t, df1, fwd)
             df0 = df1
@@ -255,12 +255,12 @@ def test_bond():
                         coupon, freq_type, dc_type, ex_div_days)
 
             ytm = bond.yield_to_maturity(settle_dt, clean_price)
-            accrued_interest = bond._accrued_interest
-            accd_days = bond._accrued_days
+            accrued_int = bond.accrued_int
+            accd_days = bond.accrued_days
 
             test_cases.print("%18s" % maturity_dt, "%8.4f" % coupon,
                             "%10.4f" % clean_price, "%6.0f" % accd_days,
-                            "%10.4f" % accrued_interest, "%8.4f" % ytm)
+                            "%10.4f" % accrued_int, "%8.4f" % ytm)
 
     ###########################################################################
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
@@ -408,7 +408,7 @@ def test_bond():
     accrued_interest = bond.accrued_interest(settle_dt, face)
     test_cases.print("Accrued = ", accrued_interest)
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     test_cases.print("Accrued Days = ", accddays)
 
     duration = bond.dollar_duration(settle_dt, ytm, YTMCalcType.US_STREET)
@@ -464,7 +464,7 @@ def test_bond():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price", clean_price)
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     test_cases.print("Accrued Days", accddays)
 
     accrued_interest = bond.accrued_interest(settle_dt, face)
@@ -548,7 +548,7 @@ def test_bond_payment_dates():
 
     if 1 == 0:
         print(bond._flow_amounts)
-        print(bond._cpn_dts)
+        print(bond.cpn_dts)
         print(bond._payment_dts)
 
 ###############################################################################

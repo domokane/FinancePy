@@ -59,21 +59,21 @@ class BondFRN:
 
         check_argument_types(self.__init__, locals())
 
-        self._issue_dt = issue_dt
-        self._maturity_dt = maturity_dt
-        self._quoted_margin = quoted_margin
-        self._freq_type = freq_type
-        self._dc_type = dc_type
-        self._freq = annual_frequency(freq_type)
-        self._cal_type = cal_type
+        self.issue_dt = issue_dt
+        self.maturity_dt = maturity_dt
+        self.quoted_margin = quoted_margin
+        self.freq_type = freq_type
+        self.dc_type = dc_type
+        self.freq = annual_frequency(freq_type)
+        self.cal_type = cal_type
 
-        self._settle_dt = Date(1, 1, 1900)
-        self._accrued_interest = None
-        self._accrued_days = 0.0
+        self.settle_dt = Date(1, 1, 1900)
+        self.accrued_int= None
+        self.accrued_days = 0.0
 
-        self._cpn_dts = []
-        self._flow_amounts = []
-        self._par = 100.0  # This is how price is quoted
+        self.cpn_dts = []
+        self.flow_amounts = []
+        self.par = 100.0  # This is how price is quoted
 
         self._calculate_cpn_dts()
 
@@ -87,10 +87,10 @@ class BondFRN:
         bd_type = BusDayAdjustTypes.NONE
         dg_type = DateGenRuleTypes.BACKWARD
 
-        self._cpn_dts = Schedule(self._issue_dt,
-                                 self._maturity_dt,
-                                 self._freq_type,
-                                 self._cal_type,
+        self.cpn_dts = Schedule(self.issue_dt,
+                                 self.maturity_dt,
+                                 self.freq_type,
+                                 self.cal_type,
                                  bd_type,
                                  dg_type).generate()
 
@@ -111,25 +111,25 @@ class BondFRN:
 
         self.accrued_interest(settle_dt, next_cpn, 1.0)
 
-        day_counter = DayCount(self._dc_type)
+        day_counter = DayCount(self.dc_type)
 
-        q = self._quoted_margin
-        num_flows = len(self._cpn_dts)
+        q = self.quoted_margin
+        num_flows = len(self.cpn_dts)
 
         # We discount using Libor over the period from settlement to the ncd
-        (alpha, _, _) = day_counter.year_frac(settle_dt, self._ncd)
+        (alpha, _, _) = day_counter.year_frac(settle_dt, self.ncd)
         df = 1.0 / (1.0 + alpha * (current_ibor + dm))
 
         # A full coupon is paid
-        (alpha, _, _) = day_counter.year_frac(self._pcd, self._ncd)
+        (alpha, _, _) = day_counter.year_frac(self.pcd, self.ncd)
         pv = next_cpn * alpha * df
 
         # Now do all subsequent coupons that fall after the ncd
         for i_flow in range(1, num_flows):
 
-            if self._cpn_dts[i_flow] > self._ncd:
-                pcd = self._cpn_dts[i_flow - 1]
-                ncd = self._cpn_dts[i_flow]
+            if self.cpn_dts[i_flow] > self.ncd:
+                pcd = self.cpn_dts[i_flow - 1]
+                ncd = self.cpn_dts[i_flow]
                 (alpha, _, _) = day_counter.year_frac(pcd, ncd)
 
                 df = df / (1.0 + alpha * (future_ibor + dm))
@@ -137,7 +137,7 @@ class BondFRN:
                 pv = pv + c * alpha * df
 
         pv += df
-        pv = pv * self._par
+        pv = pv * self.par
         return pv
 
     ###########################################################################
@@ -159,8 +159,8 @@ class BondFRN:
                                                future_ibor,
                                                dm)
 
-        accrued = self._accrued_interest
-        principal = dirty_price * face / self._par - accrued
+        accrued = self.accrued_int
+        principal = dirty_price * face / self.par - accrued
         return principal
 
     ###########################################################################
@@ -245,7 +245,7 @@ class BondFRN:
                                       future_ibor,
                                       dm)
 
-        md = dd * (1.0 + (next_cpn + dm) / self._freq) / fp
+        md = dd * (1.0 + (next_cpn + dm) / self.freq) / fp
         return md
 
     ###########################################################################
@@ -341,7 +341,7 @@ class BondFRN:
                                       future_ibor,
                                       dm)
 
-        conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self._par
+        conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self.par
         return conv
 
     ###########################################################################
@@ -368,8 +368,8 @@ class BondFRN:
                                                future_ibor,
                                                dm)
 
-        accrued = self._accrued_interest(settle_dt, next_cpn, 1.0)
-        accrued = accrued * self._par
+        accrued = self.accrued_interest(settle_dt, next_cpn, 1.0)
+        accrued = accrued * self.par
 
         clean_price = dirty_price - accrued
         return clean_price
@@ -388,7 +388,7 @@ class BondFRN:
         self.accrued_interest(settle_dt, next_cpn, 1.0)
 
         # Needs to be adjusted to par notional
-        accrued = self._accrued_interest * self._par
+        accrued = self.accrued_int* self.par
 
         dirty_price = clean_price + accrued
 
@@ -415,29 +415,29 @@ class BondFRN:
         previous coupon date and the settlement date. Ex-dividend dates are
         not handled. Contact me if you need this functionality. """
 
-        num_flows = len(self._cpn_dts)
+        num_flows = len(self.cpn_dts)
 
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        dc = DayCount(self._dc_type)
+        dc = DayCount(self.dc_type)
 
         for i in range(1, num_flows):
-            if self._cpn_dts[i] > settle_dt:
-                self._pcd = self._cpn_dts[i - 1]
-                self._ncd = self._cpn_dts[i]
+            if self.cpn_dts[i] > settle_dt:
+                self.pcd = self.cpn_dts[i - 1]
+                self.ncd = self.cpn_dts[i]
                 break
 
-        (acc_factor, num, _) = dc.year_frac(self._pcd,
+        (acc_factor, num, _) = dc.year_frac(self.pcd,
                                             settle_dt,
-                                            self._ncd,
-                                            self._freq_type)
+                                            self.ncd,
+                                            self.freq_type)
 
-        self._alpha = 1.0 - acc_factor * self._freq
+        self.alpha = 1.0 - acc_factor * self.freq
 
-        self._accrued_interest = acc_factor * face * next_cpn
-        self._accrued_days = num
-        return self._accrued_interest
+        self.accrued_int= acc_factor * face * next_cpn
+        self.accrued_days = num
+        return self.accrued_interest
 
     ###########################################################################
 
@@ -445,22 +445,22 @@ class BondFRN:
                        settle_dt: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-        self._calculate_cpn_dts()
-        for dt in self._cpn_dts[1:-1]:
+        self.calculate_cpn_dts()
+        for dt in self.cpn_dts[1:-1]:
             print(dt)
 
-        print(self._cpn_dts[-1])
+        print(self.cpn_dts[-1])
 
     ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("ISSUE DATE", self._issue_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
+        s += label_to_string("ISSUE DATE", self.issue_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("QUOTED MARGIN (bp)",
-                             self._quoted_margin * 10000.0)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
+                             self.quoted_margin * 10000.0)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
         return s
 
     ###########################################################################

@@ -245,7 +245,7 @@ class EquityVolSurface:
 
         check_argument_types(self.__init__, locals())
 
-        self._value_dt = value_dt
+        self.value_dt = value_dt
         self._stock_price = stock_price
 
         self._discount_curve = discount_curve
@@ -286,7 +286,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+        t_exp = (expiry_dt - self.value_dt) / gDaysInYear
 
         vol_type_value = self._vol_func_type.value
 
@@ -363,7 +363,7 @@ class EquityVolSurface:
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+    #     t_exp = (expiry_dt - self.value_dt) / gDaysInYear
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -411,7 +411,7 @@ class EquityVolSurface:
     #     t0 = self._t_exp[index0]
     #     t1 = self._t_exp[index1]
 
-    #     initial_guess = self._K_ATM[index0]
+    #     initial_guess = self._k_atm[index0]
 
     #     K0 = _solver_for_smile_strike(s, t_exp, self._rd[index0], self._rf[index0],
     #                               OptionTypes.EUROPEAN_CALL.value,
@@ -453,7 +453,7 @@ class EquityVolSurface:
 
 ###############################################################################
 
-    def vol_from_delta_date(self, call_delta, expiry_dt, delta_method=None):
+    def vol_from_delta_dt(self, call_delta, expiry_dt, delta_method=None):
         """ Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -464,7 +464,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self._value_dt) / gDaysInYear
+        t_exp = (expiry_dt - self.value_dt) / gDaysInYear
 
         vol_type_value = self._vol_func_type.value
 
@@ -612,7 +612,7 @@ class EquityVolSurface:
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        spot_dt = self._value_dt
+        spot_dt = self.value_dt
 
         for i in range(0, num_expiry_dts):
 
@@ -667,7 +667,7 @@ class EquityVolSurface:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self._value_dt)
+            print("VALUE DATE:", self.value_dt)
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
@@ -784,7 +784,7 @@ class EquityVolSurface:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self._value_dt)
+        s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("VOL FUNCTION", self._vol_func_type)
 

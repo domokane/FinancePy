@@ -43,8 +43,8 @@ class FXDoubleDigitalOption:
         if delivery_dt < expiry_dt:
             raise FinError("Delivery date must be on or after expiry date.")
 
-        self._expiry_dt = expiry_dt
-        self._delivery_dt = delivery_dt
+        self.expiry_dt = expiry_dt
+        self.delivery_dt = delivery_dt
 
         if np.any(upper_strike < 0.0):
             raise FinError("Negative upper strike.")
@@ -52,24 +52,24 @@ class FXDoubleDigitalOption:
         if np.any(lower_strike < 0.0):
             raise FinError("Negative lower strike.")
 
-        self._upper_strike = upper_strike
-        self._lower_strike = lower_strike
+        self.upper_strike = upper_strike
+        self.lower_strike = lower_strike
 
         if len(currency_pair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._currency_pair = currency_pair
-        self._for_name = self._currency_pair[0:3]
-        self._dom_name = self._currency_pair[3:6]
+        self.currency_pair = currency_pair
+        self.for_name = self.currency_pair[0:3]
+        self.dom_name = self.currency_pair[3:6]
 
-        if prem_currency != self._dom_name and prem_currency != self._for_name:
+        if prem_currency != self.dom_name and prem_currency != self.for_name:
             raise FinError("Notional currency not in currency pair.")
 
-        self._prem_currency = prem_currency
+        self.prem_currency = prem_currency
 
-        self._notional = notional
+        self.notional = notional
 
-        self._spot_days = spot_days
+        self.spot_days = spot_days
 
 ###############################################################################
 
@@ -89,7 +89,7 @@ class FXDoubleDigitalOption:
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
@@ -101,51 +101,51 @@ class FXDoubleDigitalOption:
                 "Foreign Curve valuation date not same as valuation date")
 
         if isinstance(value_dt, Date):
-            spot_dt = value_dt.add_weekdays(self._spot_days)
-            tdel = (self._delivery_dt - spot_dt) / gDaysInYear
-            t_exp = (self._expiry_dt - value_dt) / gDaysInYear
+            spot_dt = value_dt.add_weekdays(self.spot_days)
+            t_del = (self.delivery_dt - spot_dt) / gDaysInYear
+            t_exp = (self.expiry_dt - value_dt) / gDaysInYear
         else:
-            tdel = value_dt
-            t_exp = tdel
+            t_del = value_dt
+            t_exp = t_del
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("spot_fx_rate must be greater than zero.")
 
-        if np.any(tdel < 0.0):
+        if np.any(t_del < 0.0):
             raise FinError("Option time to maturity is less than zero.")
 
-        tdel = np.maximum(tdel, 1e-10)
+        t_del = np.maximum(t_del, 1e-10)
 
-        # TODO RESOLVE TDEL versus TEXP
-        dom_df = domestic_curve._df(tdel)
-        for_df = foreign_curve._df(tdel)
+        # TODO RESOLVE t_del versus TEXP
+        dom_df = domestic_curve._df(t_del)
+        for_df = foreign_curve._df(t_del)
 
-        r_d = -np.log(dom_df) / tdel
-        r_f = -np.log(for_df) / tdel
+        r_d = -np.log(dom_df) / t_del
+        r_f = -np.log(for_df) / t_del
 
         s0 = spot_fx_rate
-        K1 = self._lower_strike
-        K2 = self._upper_strike
+        K1 = self.lower_strike
+        K2 = self.upper_strike
 
         if isinstance(model, BlackScholes):
 
-            volatility = model._volatility
+            volatility = model.volatility
             ln_s0_k1 = np.log(s0 / K1)
             ln_s0_k2 = np.log(s0 / K2)
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = r_d - r_f
-            lower_d2 = (ln_s0_k1 + (mu - v2 / 2.0) * tdel) / den
-            upper_d2 = (ln_s0_k2 + (mu - v2 / 2.0) * tdel) / den
+            lower_d2 = (ln_s0_k1 + (mu - v2 / 2.0) * t_del) / den
+            upper_d2 = (ln_s0_k2 + (mu - v2 / 2.0) * t_del) / den
 
-            if self._prem_currency == self._for_name:
-                lower_digital = s0 * np.exp(-r_f * tdel) * n_vect(-lower_d2)
-                upper_digital = s0 * np.exp(-r_f * tdel) * n_vect(-upper_d2)
-            elif self._prem_currency == self._dom_name:
-                lower_digital = np.exp(-r_f * tdel) * n_vect(-lower_d2)
-                upper_digital = np.exp(-r_f * tdel) * n_vect(-upper_d2)
+            if self.prem_currency == self.for_name:
+                lower_digital = s0 * np.exp(-r_f * t_del) * n_vect(-lower_d2)
+                upper_digital = s0 * np.exp(-r_f * t_del) * n_vect(-upper_d2)
+            elif self.prem_currency == self.dom_name:
+                lower_digital = np.exp(-r_f * t_del) * n_vect(-lower_d2)
+                upper_digital = np.exp(-r_f * t_del) * n_vect(-upper_d2)
 
-            v = (upper_digital - lower_digital) * self._notional
+            v = (upper_digital - lower_digital) * self.notional
 
         return v
 

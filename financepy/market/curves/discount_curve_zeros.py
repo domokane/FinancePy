@@ -70,8 +70,7 @@ class DiscountCurveZeros(DiscountCurve):
         self._zero_rates = np.array(zero_rates)
         self._zero_dts = zero_dts
 
-        self._times = times_from_dates(
-            zero_dts, value_dt, dc_type)
+        self._times = times_from_dates(zero_dts, value_dt, dc_type)
 
         if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
@@ -91,15 +90,15 @@ class DiscountCurveZeros(DiscountCurve):
 #     def bump(self, bump_size):
 #         """ Calculate the continuous forward rate at the forward date. """
 
-#         times = self._times.copy()
+#         times = self.times.copy()
 #         discount_factors = self._discount_factors.copy()
 
-#         n = len(self._times)
+#         n = len(self.times)
 #         for i in range(0, n):
 #             t = times[i]
 #             discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
 
-#         disc_curve = FinDiscountCurve(self._value_dt, times,
+#         disc_curve = FinDiscountCurve(self.value_dt, times,
 #                                      discount_factors,
 #                                      self._interp_type)
 
@@ -116,7 +115,7 @@ class DiscountCurveZeros(DiscountCurve):
         s += label_to_string("INTERP TYPE", (self.interp_type))
 
         s += label_to_string("DATES", "ZERO RATES")
-        num_points = len(self._times)
+        num_points = len(self.times)
         for i in range(0, num_points):
             s += label_to_string("%12s" % self._zero_dts[i],
                                  "%10.7f" % self._zero_rates[i])

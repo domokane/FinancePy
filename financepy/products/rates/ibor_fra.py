@@ -64,9 +64,9 @@ class IborFRA:
             maturity_dt = maturity_dt_or_tenor
         else:
             maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
-            calendar = Calendar(self._cal_type)
+            calendar = Calendar(self.cal_type)
             maturity_dt = calendar.adjust(maturity_dt,
-                                            self._bd_type)
+                                            self.bd_type)
 
         if start_dt > maturity_dt:
             raise FinError("Settlement date after maturity date")

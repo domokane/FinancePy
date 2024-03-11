@@ -125,15 +125,15 @@ def test_bloombergPricingExample():
     # Pay fixed so make fixed leg value negative
     assert round(swaps[0].value(
         value_dt, libor_curve, libor_curve, None), 4) == 0.0
-    assert round(-swaps[0]._fixed_leg.value(
+    assert round(-swaps[0].fixed_leg.value(
         value_dt, libor_curve), 4) == 53707.6667
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         value_dt, libor_curve, libor_curve, None), 4) == 53707.6667
 
     # Pay fixed so make fixed leg value negative
     assert round(swaps[0].value(
         settle_dt, libor_curve, libor_curve, None), 4) == 0.0
-    assert round(-swaps[0]._fixed_leg.value(
+    assert round(-swaps[0].fixed_leg.value(
         settle_dt, libor_curve), 4) == 53714.5507
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         settle_dt, libor_curve, libor_curve, None), 4) == 53714.5507

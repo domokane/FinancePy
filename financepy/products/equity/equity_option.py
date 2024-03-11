@@ -101,7 +101,7 @@ class EquityOption:
         v = self.value(value_dt, stock_price, discount_curve,
                        dividend_curve, model)
 
-        model = BlackScholes(model._volatility + bump)
+        model = BlackScholes(model.volatility + bump)
 
         v_bumped = self.value(value_dt, stock_price, discount_curve,
                               dividend_curve, model)
@@ -126,7 +126,7 @@ class EquityOption:
                            dividend_curve,
                            model)
 
-        model = BlackScholes(model._volatility + bump)
+        model = BlackScholes(model.volatility + bump)
 
         deltaBumped = self.delta(value_dt,
                                  stock_price,

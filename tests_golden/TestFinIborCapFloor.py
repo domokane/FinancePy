@@ -234,10 +234,10 @@ def test_IborCapFloorVolCurve():
 
     # Value cap by breaking it down into caplets using caplet vols
     vCaplets = 0.0
-    capletstart_dt = capFloor._capFloorLetDates[1]
+    capletstart_dt = capFloor.capFloorLetDates[1]
     test_cases.header("START", "END", "VOL", "VALUE")
 
-    for caplet_end_dt in capFloor._capFloorLetDates[2:]:
+    for caplet_end_dt in capFloor.capFloorLetDates[2:]:
         vol = volCurve.caplet_vol(caplet_end_dt)
         modelCaplet = Black(vol)
         vCaplet = capFloor.value_caplet_floor_let(value_dt,

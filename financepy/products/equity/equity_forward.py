@@ -29,10 +29,10 @@ class EquityForward():
 
         check_argument_types(self.__init__, locals())
 
-        self._expiry_dt = expiry_dt
-        self._forward_price = forward_price
-        self._notional = notional
-        self._long_short = long_short
+        self.expiry_dt = expiry_dt
+        self.forward_price = forward_price
+        self.notional = notional
+        self.long_short = long_short
 
 ###############################################################################
 
@@ -47,7 +47,7 @@ class EquityForward():
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -59,7 +59,7 @@ class EquityForward():
                 "Dividend Curve valuation date not same as option value date")
 
         if isinstance(value_dt, Date):
-            t = (self._expiry_dt - value_dt) / gDaysInYear
+            t = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -78,10 +78,10 @@ class EquityForward():
 
         discount_df = discount_curve._df(t)
 
-        v = (fwd_stock_price - self._forward_price)
-        v = v * self._notional * discount_df
+        v = (fwd_stock_price - self.forward_price)
+        v = v * self.notional * discount_df
 
-        if self._long_short == FinLongShort.SHORT:
+        if self.long_short == FinLongShort.SHORT:
             v = v * (-1.0)
 
         return v
@@ -96,7 +96,7 @@ class EquityForward():
         """ Calculate the forward price of the equity forward contract. """
 
         if isinstance(value_dt, Date):
-            t = (self._expiry_dt - value_dt) / gDaysInYear
+            t = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -109,19 +109,19 @@ class EquityForward():
         t = np.maximum(t, 1e-10)
 
         discount_df = discount_curve._df(t)
-        dividendDF = dividend_curve._df(t)
+        dividend_df = dividend_curve._df(t)
 
-        fwd_stock_price = stock_price * dividendDF / discount_df
+        fwd_stock_price = stock_price * dividend_df / discount_df
         return fwd_stock_price
 
 ###############################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("FORWARD PRICE", self._forward_price)
-        s += label_to_string("LONG OR SHORT", self._long_short)
-        s += label_to_string("NOTIONAL", self._notional, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("FORWARD PRICE", self.forward_price)
+        s += label_to_string("LONG OR SHORT", self.long_short)
+        s += label_to_string("NOTIONAL", self.notional, "")
         return s
 
 ###############################################################################

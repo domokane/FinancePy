@@ -111,23 +111,23 @@
 #                 "Unknown Date Gen Rule type " +
 #                 str(dg_type))
 
-#         self._exercise_dt = exercise_dt
-#         self._maturity_dt = maturity_dt
-#         self._fixed_coupon = fixed_coupon
-#         self._fixed_freq_type = fixed_freq_type
-#         self._fixed_dc_type = fixed_dc_type
-#         self._notional = notional
-#         self._float_freq_type = float_freq_type
-#         self._float_dc_type = float_dc_type
+#         self.exercise_dt = exercise_dt
+#         self.maturity_dt = maturity_dt
+#         self.fixed_coupon = fixed_coupon
+#         self.fixed_freq_type = fixed_freq_type
+#         self.fixed_dc_type = fixed_dc_type
+#         self.notional = notional
+#         self.float_freq_type = float_freq_type
+#         self.float_dc_type = float_dc_type
 
-#         self._cal_type = cal_type
-#         self._bd_type = bd_type
-#         self._dg_type = dg_type
+#         self.cal_type = cal_type
+#         self.bd_type = bd_type
+#         self.dg_type = dg_type
 
-#         self._pv01 = None
-#         self._fwd_swap_rate = None
-#         self._forward_df = None
-#         self._underlying_swap = None
+#         self.pv01 = None
+#         self.fwd_swap_rate = None
+#         self.forward_df = None
+#         self.underlying_swap = None
 
 # ###############################################################################
 
@@ -142,28 +142,28 @@
 #         pay_fixedFlag = True
 
 #         # The underlying is a swap in which we pay the fixed amount
-#         swap = IborSwap(self._exercise_dt,
-#                             self._maturity_dt,
-#                             self._fixed_coupon,
-#                             self._fixed_freq_type,
-#                             self._fixed_dc_type,
-#                             self._notional,
+#         swap = IborSwap(self.exercise_dt,
+#                             self.maturity_dt,
+#                             self.fixed_coupon,
+#                             self.fixed_freq_type,
+#                             self.fixed_dc_type,
+#                             self.notional,
 #                             float_spread,
-#                             self._float_freq_type,
-#                             self._float_dc_type,
+#                             self.float_freq_type,
+#                             self.float_dc_type,
 #                             pay_fixedFlag,
-#                             self._cal_type,
-#                             self._bd_type,
-#                             self._dg_type)
+#                             self.cal_type,
+#                             self.bd_type,
+#                             self.dg_type)
 
 #         swap.generate_flows()
 #         cpn_times = []
 #         cpn_amounts = []
 
-#         for i_flow in range(1, len(self._swap._adjusted_fixed_dts)):
-#             flow_dt= swap._adjusted_fixed_dts[i_flow]
+#         for i_flow in range(1, len(self.swap.adjusted_fixed_dts)):
+#             flow_dt= swap.adjusted_fixed_dts[i_flow]
 #             cpn_time = (flow_dt - settle_dt) / gDaysInYear
-#             cpn_flow = swap._fixed_flows[i_flow-1] / self._notional
+#             cpn_flow = swap.fixed_flows[i_flow-1] / self.notional
 #             cpn_times.append(cpn_time)
 #             cpn_amounts.append(cpn_flow)
 
@@ -172,14 +172,14 @@
 
 #         # Generate bond call times and prices
 #         call_times = []
-#         for dt in self._call_dts:
+#         for dt in self.call_dts:
 #             call_time = (dt - settle_dt) / gDaysInYear
 #             call_times.append(call_time)
 #         call_times = np.array(call_times)
-#         call_prices = np.array(self._call_prices)
+#         call_prices = np.array(self.call_prices)
 
 #         # Generate bond put times and prices
-#         if self._swaptionType == IborSwaptionType.PAY:
+#         if self.swaptionType == IborSwaptionType.PAY:
 #             call_price = 100.0
 #             putPrice = 1e10
 #         else:
@@ -187,20 +187,20 @@
 #             putPrice = 100.0
 
 #         put_times = []
-#         for put_dt in swap._adjusted_fixed_dts[1:]:
-#             if put_dt <= self._exercise_dt:
+#         for put_dt in swap.adjusted_fixed_dts[1:]:
+#             if put_dt <= self.exercise_dt:
 #                 put_time = (put_dt - settle_dt) / gDaysInYear
 #                 put_times.append(put_time)
 
 #         put_times = np.array(put_times)
-#         put_prices = np.array(self._put_prices)
+#         put_prices = np.array(self.put_prices)
 
-#         maturity_dt = self._bond._maturity_dt
+#         maturity_dt = self.bond.maturity_dt
 #         t_mat = (maturity_dt - settle_dt) / gDaysInYear
 #         df_times = discount_curve._times
 #         df_values = discount_curve._values
 
-#         face = self._bond._face
+#         face = self.bond.face
 
 #         if type(model) is HWTree:
 
@@ -212,12 +212,12 @@
 #             v1 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
-#             model._num_time_steps += 1
+#             model.num_time_steps += 1
 #             model.buildTree(t_mat, df_times, df_values)
 #             v2 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices, face)
-#             model._num_time_steps -= 1
+#             model.num_time_steps -= 1
 
 #             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
 #             v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
@@ -234,13 +234,13 @@
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
-#             model._num_time_steps += 1
+#             model.num_time_steps += 1
 #             model.buildTree(t_mat, df_times, df_values)
 #             v2 = model.callableputtable_bond_Tree(cpn_times, cpn_amounts,
 #                                                  call_times, call_prices,
 #                                                  put_times, put_prices,
 #                                                  face)
-#             model._num_time_steps -= 1
+#             model.num_time_steps -= 1
 
 #             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
 #             v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
@@ -253,22 +253,22 @@
 
 #     def __repr__(self):
 
-#         s = label_to_string("MATURITY DATE", self._maturity_dt)
-#         s += label_to_string("EXERCISE DATE", self._exercise_dt)
-#         s += label_to_string("COUPON", self._cpn)
-#         s += label_to_string("FREQUENCY", self._freq_type)
-#         s += label_to_string("DAY COUNT TYPE", self._dc_type)
-#         s += label_to_string("FACE AMOUNT", self._face)
-#         s += label_to_string("CONVERSION RATIO", self._conversion_ratio)
-#         s += label_to_string("START CONVERT DATE", self._start_convert_dt)
+#         s = label_to_string("MATURITY DATE", self.maturity_dt)
+#         s += label_to_string("EXERCISE DATE", self.exercise_dt)
+#         s += label_to_string("COUPON", self.cpn)
+#         s += label_to_string("FREQUENCY", self.freq_type)
+#         s += label_to_string("DAY COUNT TYPE", self.dc_type)
+#         s += label_to_string("FACE AMOUNT", self.face)
+#         s += label_to_string("CONVERSION RATIO", self.conversion_ratio)
+#         s += label_to_string("START CONVERT DATE", self.start_convert_dt)
 
-#         for i in range(0, len(self._call_dts)):
-#             s += label_to_string("CALL DATE AND PRICE", self._call_dts[i],
-#                                self._call_prices[i])
+#         for i in range(0, len(self.call_dts)):
+#             s += label_to_string("CALL DATE AND PRICE", self.call_dts[i],
+#                                self.call_prices[i])
 
-#         for i in range(0, len(self._put_dts)):
-#             s += label_to_string("PUT DATE AND PRICE", self._put_dts[i],
-#                                self._put_prices[i])
+#         for i in range(0, len(self.put_dts)):
+#             s += label_to_string("PUT DATE AND PRICE", self.put_dts[i],
+#                                self.put_prices[i])
 
 #         return s
 

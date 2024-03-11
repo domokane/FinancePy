@@ -52,9 +52,9 @@ class DiscountCurvePWF(DiscountCurve):
                                     self.value_dt,
                                     self.dc_type)
 
-        self._times = np.array(dc_times)
+        self.times = np.array(dc_times)
 
-        if test_monotonicity(self._times) is False:
+        if test_monotonicity(self.times) is False:
             raise FinError("Times are not sorted in increasing order")
 
     ###########################################################################
@@ -77,9 +77,9 @@ class DiscountCurvePWF(DiscountCurve):
             l_index = 0
             found = 0
 
-            num_times = len(self._times)
+            num_times = len(self.times)
             for i in range(1, num_times):
-                if self._times[i] > t:
+                if self.times[i] > t:
                     l_index = i - 1
                     found = 1
                     break
@@ -151,7 +151,7 @@ class DiscountCurvePWF(DiscountCurve):
         s += label_to_string("DATE", "ZERO RATE")
         for i in range(0, len(self._zero_dts)):
             s += label_to_string(self._zero_dts[i], self._zero_rates[i])
-        s += label_to_string("FREQUENCY", (self._freq_type))
+        s += label_to_string("FREQUENCY", (self.freq_type))
         return s
 
     ###########################################################################

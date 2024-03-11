@@ -62,19 +62,19 @@ def test_BKExampleTwo():
     cpn_times = []
     cpn_flows = []
 
-    cpn = bond._cpn / bond._freq
+    cpn = bond.cpn / bond.freq
 
-    num_flows = len(bond._cpn_dts)
+    num_flows = len(bond.cpn_dts)
 
     for i in range(1, num_flows):
-        pcd = bond._cpn_dts[i-1]
-        ncd = bond._cpn_dts[i]
+        pcd = bond.cpn_dts[i-1]
+        ncd = bond.cpn_dts[i]
         if pcd < settle_dt and ncd > settle_dt:
             flow_time = (pcd - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
-    for flow_dt in bond._cpn_dts:
+    for flow_dt in bond.cpn_dts:
         if flow_dt > settle_dt:
             flow_time = (flow_dt - settle_dt) / gDaysInYear
             cpn_times.append(flow_time)

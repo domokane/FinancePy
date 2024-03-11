@@ -265,13 +265,13 @@ class EquityCompoundOption(EquityOption):
             raise FinError(
                 "Underlying Option must be European or American call or put.")
 
-        self._c_expiry_dt = c_expiry_dt
-        self._c_strike_price = float(c_strike_price)
-        self._c_option_type = c_option_type
+        self.c_expiry_dt = c_expiry_dt
+        self.c_strike_price = float(c_strike_price)
+        self.c_option_type = c_option_type
 
-        self._u_expiry_dt = u_expiry_dt
-        self._u_strike_price = float(u_strike_price)
-        self._u_option_type = u_option_type
+        self.u_expiry_dt = u_expiry_dt
+        self.u_strike_price = float(u_strike_price)
+        self.u_option_type = u_option_type
 
 ###############################################################################
 
@@ -290,10 +290,10 @@ class EquityCompoundOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._c_expiry_dt:
+        if value_dt > self.c_expiry_dt:
             raise FinError("Valuation date after underlying expiry date.")
 
-        if value_dt > self._u_expiry_dt:
+        if value_dt > self.u_expiry_dt:
             raise FinError("Valuation date after compound expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -305,10 +305,10 @@ class EquityCompoundOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date")
 
         # If the option has any American feature then use the tree
-        if self._c_option_type == OptionTypes.AMERICAN_CALL or\
-            self._u_option_type == OptionTypes.AMERICAN_CALL or\
-            self._c_option_type == OptionTypes.AMERICAN_PUT or\
-                self._u_option_type == OptionTypes.AMERICAN_PUT:
+        if self.c_option_type == OptionTypes.AMERICAN_CALL or\
+            self.u_option_type == OptionTypes.AMERICAN_CALL or\
+            self.c_option_type == OptionTypes.AMERICAN_PUT or\
+                self.u_option_type == OptionTypes.AMERICAN_PUT:
 
             v = self._value_tree(value_dt,
                                  stock_price,
@@ -319,32 +319,32 @@ class EquityCompoundOption(EquityOption):
 
             return v[0]
 
-        tc = (self._c_expiry_dt - value_dt) / gDaysInYear
-        tu = (self._u_expiry_dt - value_dt) / gDaysInYear
+        tc = (self.c_expiry_dt - value_dt) / gDaysInYear
+        tu = (self.u_expiry_dt - value_dt) / gDaysInYear
 
         s0 = stock_price
 
-        df = discount_curve.df(self._u_expiry_dt)
+        df = discount_curve.df(self.u_expiry_dt)
         ru = -np.log(df)/tu
 
         # CHECK INTEREST RATES AND IF THERE SHOULD BE TWO RU AND RC ?????
         tc = np.maximum(tc, g_small)
         tu = np.maximum(tc, tu)
 
-        dq = dividend_curve.df(self._u_expiry_dt)
+        dq = dividend_curve.df(self.u_expiry_dt)
         q = -np.log(dq)/tu
 
-        v = np.maximum(model._volatility, g_small)
+        v = np.maximum(model.volatility, g_small)
 
-        kc = self._c_strike_price
-        ku = self._u_strike_price
+        kc = self.c_strike_price
+        ku = self.u_strike_price
 
         sstar = self._implied_stock_price(s0,
-                                          self._c_expiry_dt,
-                                          self._u_expiry_dt,
+                                          self.c_expiry_dt,
+                                          self.u_expiry_dt,
                                           kc,
                                           ku,
-                                          self._u_option_type,
+                                          self.u_option_type,
                                           ru, q, model)
 
         a1 = (log(s0 / sstar) + (ru - q + (v**2) / 2.0) * tc) / v / sqrt(tc)
@@ -362,16 +362,16 @@ class EquityCompoundOption(EquityOption):
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        if self._c_option_type == call_type and self._u_option_type == call_type:
+        if self.c_option_type == call_type and self.u_option_type == call_type:
             v = s0 * dqu * phi2(a1, b1, c) - ku * dfu * \
                 phi2(a2, b2, c) - dfc * kc * N(a2)
-        elif self._c_option_type == put_type and self._u_option_type == call_type:
+        elif self.c_option_type == put_type and self.u_option_type == call_type:
             v = ku * dfu * phi2(-a2, b2, -c) - s0 * dqu * \
                 phi2(-a1, b1, -c) + dfc * kc * N(-a2)
-        elif self._c_option_type == call_type and self._u_option_type == put_type:
+        elif self.c_option_type == call_type and self.u_option_type == put_type:
             v = ku * dfu * phi2(-a2, -b2, c) - s0 * dqu * \
                 phi2(-a1, -b1, c) - dfc * kc * N(-a2)
-        elif self._c_option_type == put_type and self._u_option_type == put_type:
+        elif self.c_option_type == put_type and self.u_option_type == put_type:
             v = s0 * dqu * phi2(a1, -b1, -c) - ku * dfu * \
                 phi2(a2, -b2, -c) + dfc * kc * N(a2)
         else:
@@ -390,31 +390,31 @@ class EquityCompoundOption(EquityOption):
                     num_steps=200):
         """ This function is called if the option has American features. """
 
-        if value_dt > self._c_expiry_dt:
+        if value_dt > self.c_expiry_dt:
             raise FinError("Value date is after expiry date.")
 
-        tc = (self._c_expiry_dt - value_dt) / gDaysInYear
-        tu = (self._u_expiry_dt - value_dt) / gDaysInYear
+        tc = (self.c_expiry_dt - value_dt) / gDaysInYear
+        tu = (self.u_expiry_dt - value_dt) / gDaysInYear
 
-        df = discount_curve.df(self._u_expiry_dt)
+        df = discount_curve.df(self.u_expiry_dt)
         r = -np.log(df)/tu
 
-        dq = dividend_curve.df(self._u_expiry_dt)
+        dq = dividend_curve.df(self.u_expiry_dt)
         q = -np.log(dq)/tu
 
-        r = discount_curve.zero_rate(self._u_expiry_dt)
+        r = discount_curve.zero_rate(self.u_expiry_dt)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
         v1 = _value_once(stock_price,
                          r,
                          q,
                          volatility,
                          tc, tu,
-                         self._c_option_type,
-                         self._u_option_type,
-                         self._c_strike_price,
-                         self._u_strike_price,
+                         self.c_option_type,
+                         self.u_option_type,
+                         self.c_strike_price,
+                         self.u_strike_price,
                          num_steps)
 
         return v1
@@ -448,12 +448,12 @@ class EquityCompoundOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("CPD EXPIRY DATE", self._c_expiry_dt)
-        s += label_to_string("CPD STRIKE PRICE", self._c_strike_price)
-        s += label_to_string("CPD OPTION TYPE", self._c_option_type)
-        s += label_to_string("UND EXPIRY DATE", self._u_expiry_dt)
-        s += label_to_string("UND STRIKE PRICE", self._u_strike_price)
-        s += label_to_string("UND OPTION TYPE", self._u_option_type)
+        s += label_to_string("CPD EXPIRY DATE", self.c_expiry_dt)
+        s += label_to_string("CPD STRIKE PRICE", self.c_strike_price)
+        s += label_to_string("CPD OPTION TYPE", self.c_option_type)
+        s += label_to_string("UND EXPIRY DATE", self.u_expiry_dt)
+        s += label_to_string("UND STRIKE PRICE", self.u_strike_price)
+        s += label_to_string("UND OPTION TYPE", self.u_option_type)
         return s
 
 ###############################################################################

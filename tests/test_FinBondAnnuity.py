@@ -36,10 +36,10 @@ def test_SemiAnnual_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     assert len(annuity._flow_amounts) == 2 * 1 + 1
-    assert len(annuity._cpn_dts) == 2 * 1 + 1
+    assert len(annuity.cpn_dts) == 2 * 1 + 1
 
-    assert annuity._cpn_dts[0] == settle_dt
-    assert annuity._cpn_dts[-1] == maturity_dt
+    assert annuity.cpn_dts[0] == settle_dt
+    assert annuity.cpn_dts[-1] == maturity_dt
 
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 25278.0
@@ -73,10 +73,10 @@ def test_Quarterly_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     assert len(annuity._flow_amounts) == 10 * 4 + 1
-    assert len(annuity._cpn_dts) == 10 * 4 + 1
+    assert len(annuity.cpn_dts) == 10 * 4 + 1
 
-    assert annuity._cpn_dts[0] == settle_dt
-    assert annuity._cpn_dts[-1] == maturity_dt
+    assert annuity.cpn_dts[0] == settle_dt
+    assert annuity.cpn_dts[-1] == maturity_dt
 
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 12778.0
@@ -109,10 +109,10 @@ def test_Monthly_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     assert len(annuity._flow_amounts) == 10*12 + 1
-    assert len(annuity._cpn_dts) == 10*12 + 1
+    assert len(annuity.cpn_dts) == 10*12 + 1
 
-    assert annuity._cpn_dts[0] == settle_dt
-    assert annuity._cpn_dts[-1] == maturity_dt
+    assert annuity.cpn_dts[0] == settle_dt
+    assert annuity.cpn_dts[-1] == maturity_dt
 
     assert annuity._flow_amounts[0] == 0.0
     assert round(annuity._flow_amounts[-1]) == 4028.0
@@ -144,10 +144,10 @@ def test_ForwardGen_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     assert len(annuity._flow_amounts) == 10 * 1 + 1
-    assert len(annuity._cpn_dts) == 10 * 1 + 1
+    assert len(annuity.cpn_dts) == 10 * 1 + 1
 
-    assert annuity._cpn_dts[0] == settle_dt
-    assert annuity._cpn_dts[-1] == maturity_dt
+    assert annuity.cpn_dts[0] == settle_dt
+    assert annuity.cpn_dts[-1] == maturity_dt
 
     assert round(annuity._flow_amounts[0]) == 0.0
     assert round(annuity._flow_amounts[-1]) == 50694.0
@@ -179,10 +179,10 @@ def test_ForwardGenWithLongEndStub_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     assert len(annuity._flow_amounts) == 10 * 2 + 1
-    assert len(annuity._cpn_dts) == 10 * 2 + 1
+    assert len(annuity.cpn_dts) == 10 * 2 + 1
 
-    assert annuity._cpn_dts[0] == settle_dt
-    assert annuity._cpn_dts[-1] == maturity_dt
+    assert annuity.cpn_dts[0] == settle_dt
+    assert annuity.cpn_dts[-1] == maturity_dt
 
     assert round(annuity._flow_amounts[0]) == 0.0
     assert round(annuity._flow_amounts[-1]) == 25417.0

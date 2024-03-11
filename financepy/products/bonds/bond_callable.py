@@ -62,24 +62,24 @@ class BondEmbeddedOption:
 
         check_argument_types(self.__init__, locals())
 
-        self._issue_dt = issue_dt
-        self._maturity_dt = maturity_dt
-        self._cpn = coupon
-        self._freq_type = freq_type
-        self._dc_type = dc_type
+        self.issue_dt = issue_dt
+        self.maturity_dt = maturity_dt
+        self.cpn = coupon
+        self.freq_type = freq_type
+        self.dc_type = dc_type
 
-        self._ex_div_days = 0
+        self.ex_div_days = 0
 
-        self._bond = Bond(issue_dt,
+        self.bond = Bond(issue_dt,
                           maturity_dt,
                           coupon,
                           freq_type,
                           dc_type,
-                          self._ex_div_days)
+                          self.ex_div_days)
 
         # Validate call and put schedules
         for dt in call_dts:
-            if dt > self._maturity_dt:
+            if dt > self.maturity_dt:
                 raise FinError("Call date after bond maturity date")
 
         if len(call_dts) > 0:
@@ -91,7 +91,7 @@ class BondEmbeddedOption:
                     dtprev = dt
 
         for dt in put_dts:
-            if dt > self._maturity_dt:
+            if dt > self.maturity_dt:
                 raise FinError("Put date after bond maturity date")
 
         if len(put_dts) > 0:
@@ -116,12 +116,12 @@ class BondEmbeddedOption:
         if len(put_dts) != len(put_prices):
             raise FinError("Number of put dates and put prices not the same")
 
-        self._call_dts = call_dts
-        self._call_prices = call_prices
-        self._put_dts = put_dts
-        self._put_prices = put_prices
-        self._par = 100.0
-        self._bond._calculate_cpn_dts()
+        self.call_dts = call_dts
+        self.call_prices = call_prices
+        self.put_dts = put_dts
+        self.put_prices = put_prices
+        self.par = 100.0
+        self.bond._calculate_cpn_dts()
 
 ###############################################################################
 
@@ -134,12 +134,12 @@ class BondEmbeddedOption:
         model and a discount curve. """
 
         # Generate bond coupon flow schedule
-        cpn = self._bond.cpn/self._bond.freq
+        cpn = self.bond.cpn/self.bond.freq
 
         cpn_times = []
         cpn_amounts = []
 
-        for flow_dt in self._bond.cpn_dts[1:]:
+        for flow_dt in self.bond.cpn_dts[1:]:
             if flow_dt > settle_dt:
                 cpn_time = (flow_dt - settle_dt) / gDaysInYear
                 cpn_times.append(cpn_time)
@@ -150,28 +150,28 @@ class BondEmbeddedOption:
 
         # Generate bond call times and prices
         call_times = []
-        for dt in self._call_dts:
+        for dt in self.call_dts:
             if dt > settle_dt:
                 call_time = (dt - settle_dt) / gDaysInYear
                 call_times.append(call_time)
         call_times = np.array(call_times)
-        call_prices = np.array(self._call_prices)
+        call_prices = np.array(self.call_prices)
 
         # Generate bond put times and prices
         put_times = []
-        for dt in self._put_dts:
+        for dt in self.put_dts:
             if dt > settle_dt:
                 put_time = (dt - settle_dt) / gDaysInYear
                 put_times.append(put_time)
         put_times = np.array(put_times)
-        put_prices = np.array(self._put_prices)
+        put_prices = np.array(self.put_prices)
 
-        maturity_dt = self._bond.maturity_dt
+        maturity_dt = self.bond.maturity_dt
         t_mat = (maturity_dt - settle_dt) / gDaysInYear
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
-        face_amount = self._par
+        face_amount = self.par
 
         if isinstance(model, HWTree):
 
@@ -184,13 +184,13 @@ class BondEmbeddedOption:
                                                    call_times, call_prices,
                                                    put_times, put_prices,
                                                    face_amount)
-            model._num_time_steps += 1
+            model.num_time_steps += 1
             model.build_tree(t_mat, df_times, df_values)
             v2 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
                                                    call_times, call_prices,
                                                    put_times, put_prices,
                                                    face_amount)
-            model._num_time_steps -= 1
+            model.num_time_steps -= 1
 
             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
             v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
@@ -207,13 +207,13 @@ class BondEmbeddedOption:
                                                    call_times, call_prices,
                                                    put_times, put_prices,
                                                    face_amount)
-            model._num_time_steps += 1
+            model.num_time_steps += 1
             model.build_tree(t_mat, df_times, df_values)
             v2 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
                                                    call_times, call_prices,
                                                    put_times, put_prices,
                                                    face_amount)
-            model._num_time_steps -= 1
+            model.num_time_steps -= 1
 
             v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
             v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
@@ -226,21 +226,21 @@ class BondEmbeddedOption:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("ISSUE DATE", self._issue_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("COUPON", self._cpn)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT TYPE", self._dc_type)
-        s += label_to_string("EX-DIV DAYS", self._ex_div_days)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("ISSUE DATE", self.issue_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("COUPON", self.cpn)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("EX-DIV DAYS", self.ex_div_days)
 
-        s += label_to_string("NUM CALL DATES", len(self._call_dts))
-        for i in range(0, len(self._call_dts)):
-            s += "%12s %12.6f\n" % (self._call_dts[i], self._call_prices[i])
+        s += label_to_string("NUM CALL DATES", len(self.call_dts))
+        for i in range(0, len(self.call_dts)):
+            s += "%12s %12.6f\n" % (self.call_dts[i], self.call_prices[i])
 
-        s += label_to_string("NUM PUT DATES", len(self._put_dts))
-        for i in range(0, len(self._put_dts)):
-            s += "%12s %12.6f\n" % (self._put_dts[i], self._put_prices[i])
+        s += label_to_string("NUM PUT DATES", len(self.put_dts))
+        for i in range(0, len(self.put_dts)):
+            s += "%12s %12.6f\n" % (self.put_dts[i], self.put_prices[i])
 
         return s
 

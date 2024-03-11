@@ -73,7 +73,7 @@ def test_OISFRAsOnly():
     """ Check calibration """
     for fra in fras:
         v = fra.value(settle_dt, libor_curve)
-        test_cases.print("FRA:", fra._maturity_dt, v)
+        test_cases.print("FRA:", fra.maturity_dt, v)
 
 ###############################################################################
 
@@ -229,12 +229,12 @@ def test_OISDepositsFRAsSwaps():
     test_cases.header("DATE", "DF")
 
     for deposit in depos:
-        df = libor_curve.df(deposit._maturity_dt)
-        test_cases.print(str(deposit._maturity_dt), df)
+        df = libor_curve.df(deposit.maturity_dt)
+        test_cases.print(str(deposit.maturity_dt), df)
 
     for swap in swaps:
-        df = libor_curve.df(swap._maturity_dt)
-        test_cases.print(str(swap._maturity_dt), df)
+        df = libor_curve.df(swap.maturity_dt)
+        test_cases.print(str(swap.maturity_dt), df)
 
 
 ###############################################################################
@@ -364,12 +364,12 @@ def test_OISDepositsFuturesSwaps():
         print(end_dt, df)
 
         for fra in fras:
-            end_dt = fra._maturity_dt
+            end_dt = fra.maturity_dt
             df = libor_curve.df(end_dt)
             print(end_dt, df)
 
         for swap in swaps:
-            end_dt = swap._maturity_dt
+            end_dt = swap.maturity_dt
             df = libor_curve.df(end_dt)
             print(end_dt, df)
 

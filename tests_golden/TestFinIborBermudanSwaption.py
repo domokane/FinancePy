@@ -87,7 +87,7 @@ def test_IborBermudanSwaptionBKModel():
 
     test_cases.banner("======= ZERO VOLATILITY ========")
     model = Black(0.0000001)
-    test_cases.print("Black Model", model._volatility)
+    test_cases.print("Black Model", model.volatility)
 
     valuePay = europeanSwaptionPay.value(settle_dt, libor_curve, model)
     test_cases.print("EUROPEAN BLACK PAY VALUE ZERO VOL:", valuePay)
@@ -101,7 +101,7 @@ def test_IborBermudanSwaptionBKModel():
     test_cases.banner("======= 20%% BLACK VOLATILITY ========")
 
     model = Black(0.20)
-    test_cases.print("Black Model", model._volatility)
+    test_cases.print("Black Model", model.volatility)
 
     valuePay = europeanSwaptionPay.value(settle_dt, libor_curve, model)
     test_cases.print("EUROPEAN BLACK PAY VALUE:", valuePay)

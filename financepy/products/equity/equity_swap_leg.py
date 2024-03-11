@@ -49,10 +49,10 @@ class EquitySwapLeg:
             termination_dt = effective_dt.add_tenor(term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_dt = calendar.adjust(termination_dt,
+        self.maturity_dt = calendar.adjust(termination_dt,
                                             bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Effective date after maturity date")
 
         if quantity < 0:
@@ -67,29 +67,29 @@ class EquitySwapLeg:
                          FrequencyTypes.SIMPLE):
             raise FinError("Cannot generate payment schedule for this frequency!")
 
-        self._effective_dt = effective_dt
-        self._termination_dt = termination_dt
-        self._leg_type = leg_type
-        self._freq_type = freq_type
-        self._payment_lag = payment_lag
-        self._strike = strike
-        self._quantity = quantity
-        self._notional = strike * quantity
-        self._return_type = return_type
+        self.effective_dt = effective_dt
+        self.termination_dt = termination_dt
+        self.leg_type = leg_type
+        self.freq_type = freq_type
+        self.payment_lag = payment_lag
+        self.strike = strike
+        self.quantity = quantity
+        self.notional = strike * quantity
+        self.return_type = return_type
 
-        self._dc_type = dc_type
-        self._cal_type = cal_type
-        self._bd_type = bd_type
-        self._dg_type = dg_type
-        self._end_of_month = end_of_month
+        self.dc_type = dc_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
+        self.dg_type = dg_type
+        self.end_of_month = end_of_month
 
-        self._start_accd_dts = []
-        self._end_accd_dts = []
-        self._payment_dts = []
-        self._pmnts = []
-        self._year_fracs = []
-        self._accrued_days = []
-        self._rates = []
+        self.start_accd_dts = []
+        self.end_accd_dts = []
+        self.payment_dts = []
+        self.pmnts = []
+        self.year_fracs = []
+        self.accrued_days = []
+        self.rates = []
 
         self.generate_payment_dts()
 
@@ -100,49 +100,49 @@ class EquitySwapLeg:
         to swap float leg, payment values can't be generated, as we do not have
         index curve, dividend curve and equity price. """
 
-        schedule = Schedule(self._effective_dt,
-                            self._maturity_dt,
-                            self._freq_type,
-                            self._cal_type,
-                            self._bd_type,
-                            self._dg_type,
-                            end_of_month=self._end_of_month)
+        schedule = Schedule(self.effective_dt,
+                            self.maturity_dt,
+                            self.freq_type,
+                            self.cal_type,
+                            self.bd_type,
+                            self.dg_type,
+                            end_of_month=self.end_of_month)
 
-        schedule_dts = schedule._adjusted_dts
+        schedule_dts = schedule.adjusted_dts
 
         if len(schedule_dts) < 2:
             raise FinError("Schedule has none or only one date")
 
-        self._start_accd_dts = []
-        self._end_accd_dts = []
-        self._payment_dts = []
-        self._year_fracs = []
-        self._accrued_days = []
+        self.start_accd_dts = []
+        self.end_accd_dts = []
+        self.payment_dts = []
+        self.year_fracs = []
+        self.accrued_days = []
 
         prev_dt = schedule_dts[0]
 
-        day_counter = DayCount(self._dc_type)
-        calendar = Calendar(self._cal_type)
+        day_counter = DayCount(self.dc_type)
+        calendar = Calendar(self.cal_type)
 
         # All of the lists end up with the same length
         for next_dt in schedule_dts[1:]:
 
-            self._start_accd_dts.append(prev_dt)
-            self._end_accd_dts.append(next_dt)
+            self.start_accd_dts.append(prev_dt)
+            self.end_accd_dts.append(next_dt)
 
-            if self._payment_lag == 0:
+            if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
                 payment_dt = calendar.add_business_days(next_dt,
-                                                        self._payment_lag)
+                                                        self.payment_lag)
 
-            self._payment_dts.append(payment_dt)
+            self.payment_dts.append(payment_dt)
 
             (year_frac, num, _) = day_counter.year_frac(prev_dt,
                                                         next_dt)
 
-            self._year_fracs.append(year_frac)
-            self._accrued_days.append(num)
+            self.year_fracs.append(year_frac)
+            self.accrued_days.append(num)
 
             prev_dt = next_dt
 
@@ -175,35 +175,35 @@ class EquitySwapLeg:
 
         # Current price can't be different than strike at effective date
         if current_price is not None:
-            self._current_price = current_price
+            self.current_price = current_price
         else:
-            self._current_price = self._strike
+            self.current_price = self.strike
 
-        self._fwd_rates = []
-        self._div_fwd_rates = []
-        self._eq_fwd_rates = []
-        self._last_notionals = []
-        self._pmnts = []
-        self._pmnt_dfs = []
-        self._pmnt_pvs = []
-        self._cumulative_pvs = []
+        self.fwd_rates = []
+        self.div_fwd_rates = []
+        self.eq_fwd_rates = []
+        self.last_notionals = []
+        self.pmnts = []
+        self.pmnt_dfs = []
+        self.pmnt_pvs = []
+        self.cumulative_pvs = []
 
         df_value = discount_curve.df(value_dt)
         leg_pv, eq_term_rate = 0.0, 0.0
-        last_notional = self._notional
-        num_payments = len(self._payment_dts)
+        last_notional = self.notional
+        num_payments = len(self.payment_dts)
 
-        index_basis = index_curve._dc_type
+        index_basis = index_curve.dc_type
         index_day_counter = DayCount(index_basis)
 
         for i_pmnt in range(0, num_payments):
 
-            pmnt_dt = self._payment_dts[i_pmnt]
+            pmnt_dt = self.payment_dts[i_pmnt]
 
             if pmnt_dt > value_dt:
 
-                start_accrued_dt = self._start_accd_dts[i_pmnt]
-                end_accrued_dt = self._end_accd_dts[i_pmnt]
+                start_accrued_dt = self.start_accd_dts[i_pmnt]
+                end_accrued_dt = self.end_accd_dts[i_pmnt]
                 index_alpha = index_day_counter.year_frac(start_accrued_dt,
                                                           end_accrued_dt)[0]
 
@@ -218,41 +218,41 @@ class EquitySwapLeg:
                 # Equity discount derived from index and div curves
                 eq_fwd_rate = ((df_start / df_end) * (div_start / div_end) - 1) / index_alpha
 
-                self._fwd_rates.append(fwd_rate)
-                self._div_fwd_rates.append(div_fwd_rate)
-                self._eq_fwd_rates.append(eq_fwd_rate)
+                self.fwd_rates.append(fwd_rate)
+                self.div_fwd_rates.append(div_fwd_rate)
+                self.eq_fwd_rates.append(eq_fwd_rate)
 
                 # Iterative update of the term rate
-                eq_term_rate = (1 + eq_fwd_rate * self._year_fracs[i_pmnt]) * (1 + eq_term_rate)  - 1
+                eq_term_rate = (1 + eq_fwd_rate * self.year_fracs[i_pmnt]) * (1 + eq_term_rate)  - 1
 
-                next_price = self._current_price * (1 + eq_term_rate)
-                next_notional = next_price * self._quantity
+                next_price = self.current_price * (1 + eq_term_rate)
+                next_notional = next_price * self.quantity
                 pmntAmount = next_notional - last_notional
 
                 df_pmnt = discount_curve.df(pmnt_dt) / df_value
                 pmnt_pv = pmntAmount * df_pmnt
                 leg_pv += pmnt_pv
 
-                self._last_notionals.append(last_notional)
-                self._pmnts.append(pmntAmount)
-                self._pmnt_dfs.append(df_pmnt)
-                self._pmnt_pvs.append(pmnt_pv)
-                self._cumulative_pvs.append(leg_pv)
+                self.last_notionals.append(last_notional)
+                self.pmnts.append(pmntAmount)
+                self.pmnt_dfs.append(df_pmnt)
+                self.pmnt_pvs.append(pmnt_pv)
+                self.cumulative_pvs.append(leg_pv)
 
             else:
 
-                self._fwd_rates.append(0.0)
-                self._div_fwd_rates.append(0.0)
-                self._eq_fwd_rates.append(0.0)
-                self._last_notionals.append(self._notional)
-                self._pmnts.append(0.0)
-                self._pmnt_dfs.append(0.0)
-                self._pmnt_pvs.append(0.0)
-                self._cumulative_pvs.append(leg_pv)
+                self.fwd_rates.append(0.0)
+                self.div_fwd_rates.append(0.0)
+                self.eq_fwd_rates.append(0.0)
+                self.last_notionals.append(self.notional)
+                self.pmnts.append(0.0)
+                self.pmnt_dfs.append(0.0)
+                self.pmnt_pvs.append(0.0)
+                self.cumulative_pvs.append(leg_pv)
 
             last_notional = next_notional
 
-        if self._leg_type == SwapTypes.PAY:
+        if self.leg_type == SwapTypes.PAY:
             leg_pv = leg_pv * (-1.0)
 
         return leg_pv
@@ -264,12 +264,12 @@ class EquitySwapLeg:
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        print("START DATE:", self._effective_dt)
-        print("MATURITY DATE:", self._maturity_dt)
-        print("FREQUENCY:", str(self._freq_type))
-        print("DAY COUNT:", str(self._dc_type))
+        print("START DATE:", self.effective_dt)
+        print("MATURITY DATE:", self.maturity_dt)
+        print("FREQUENCY:", str(self.freq_type))
+        print("DAY COUNT:", str(self.dc_type))
 
-        if len(self._payment_dts) == 0:
+        if len(self.payment_dts) == 0:
             print("Payments Dates not calculated.")
             return
 
@@ -277,15 +277,15 @@ class EquitySwapLeg:
                   "YEARFRAC"]
 
         rows = []
-        num_flows = len(self._payment_dts)
+        num_flows = len(self.payment_dts)
         for i_flow in range(0, num_flows):
             rows.append([
                 i_flow + 1,
-                self._payment_dts[i_flow],
-                self._start_accd_dts[i_flow],
-                self._end_accd_dts[i_flow],
-                self._accrued_days[i_flow],
-                round(self._year_fracs[i_flow], 4),
+                self.payment_dts[i_flow],
+                self.start_accd_dts[i_flow],
+                self.end_accd_dts[i_flow],
+                self.accrued_days[i_flow],
+                round(self.year_fracs[i_flow], 4),
             ])
 
         table = format_table(header, rows)
@@ -301,7 +301,7 @@ class EquitySwapLeg:
 
         self.print_pmnts()
 
-        if len(self._pmnts) == 0:
+        if len(self.pmnts) == 0:
             print("Payments not calculated.")
             return
 
@@ -310,17 +310,17 @@ class EquitySwapLeg:
                   "PV", "CUM_PV"]
 
         rows = []
-        num_flows = len(self._payment_dts)
+        num_flows = len(self.payment_dts)
         for i_flow in range(0, num_flows):
             rows.append([
                 i_flow + 1,
-                self._payment_dts[i_flow],
-                round(self._last_notionals[i_flow], 0),
-                round(self._eq_fwd_rates[i_flow] * 100.0, 4),
-                round(self._pmnts[i_flow], 2),
-                round(self._pmnt_dfs[i_flow], 4),
-                round(self._pmnt_pvs[i_flow], 2),
-                round(self._cumulative_pvs[i_flow], 2),
+                self.payment_dts[i_flow],
+                round(self.last_notionals[i_flow], 0),
+                round(self.eq_fwd_rates[i_flow] * 100.0, 4),
+                round(self.pmnts[i_flow], 2),
+                round(self.pmnt_dfs[i_flow], 4),
+                round(self.pmnt_pvs[i_flow], 2),
+                round(self.cumulative_pvs[i_flow], 2),
             ])
 
         table = format_table(header, rows)
@@ -331,16 +331,16 @@ class EquitySwapLeg:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EFFECTIVE DATE", self._effective_dt)
-        s += label_to_string("MATURITY DATE", self._maturity_dt)
-        s += label_to_string("NOTIONAL", self._strike * self._quantity)
-        s += label_to_string("SWAP TYPE", self._leg_type)
-        s += label_to_string("RETURN TYPE", self._return_type)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAY COUNT", self._dc_type)
-        s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_type)
-        s += label_to_string("DATE GEN TYPE", self._dg_type)
+        s += label_to_string("EFFECTIVE DATE", self.effective_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("NOTIONAL", self.strike * self.quantity)
+        s += label_to_string("SWAP TYPE", self.leg_type)
+        s += label_to_string("RETURN TYPE", self.return_type)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAY COUNT", self.dc_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("DATE GEN TYPE", self.dg_type)
         return s
 
 

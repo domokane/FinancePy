@@ -55,16 +55,16 @@ class IborBasisSwap:
         check_argument_types(self.__init__, locals())
 
         if isinstance(term_dt_or_tenor, Date):
-            self._termination_dt = term_dt_or_tenor
+            self.termination_dt = term_dt_or_tenor
         else:
-            self._termination_dt = effective_dt.add_tenor(
+            self.termination_dt = effective_dt.add_tenor(
                 term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self._maturity_dt = calendar.adjust(self._termination_dt,
+        self.maturity_dt = calendar.adjust(self.termination_dt,
                                               bd_type)
 
-        if effective_dt > self._maturity_dt:
+        if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
         leg2Type = SwapTypes.PAY
@@ -74,8 +74,8 @@ class IborBasisSwap:
         payment_lag = 0
         principal = 0.0
 
-        self._float_leg_1 = SwapFloatLeg(effective_dt,
-                                       self._termination_dt,
+        self.float_leg_1 = SwapFloatLeg(effective_dt,
+                                       self.termination_dt,
                                        leg_1_type,
                                        leg_1_spread,
                                        leg_1_freq_type,
@@ -87,8 +87,8 @@ class IborBasisSwap:
                                        bd_type,
                                        dg_type)
 
-        self._float_leg_2 = SwapFloatLeg(effective_dt,
-                                       self._termination_dt,
+        self.float_leg_2 = SwapFloatLeg(effective_dt,
+                                       self.termination_dt,
                                        leg2Type,
                                        leg2Spread,
                                        leg2FreqType,
@@ -118,12 +118,12 @@ class IborBasisSwap:
         if index_curve_leg_2 is None:
             index_curve_leg_2 = discount_curve
 
-        float_leg_1Value = self._float_leg_1.value(value_dt,
+        float_leg_1Value = self.float_leg_1.value(value_dt,
                                                discount_curve,
                                                index_curve_leg_1,
                                                first_fixing_rate_leg_1)
 
-        float_leg_2Value = self._float_leg_2.value(value_dt,
+        float_leg_2Value = self.float_leg_2.value(value_dt,
                                                discount_curve,
                                                index_curve_leg_2,
                                                first_fixing_rate_leg_2)
@@ -137,7 +137,7 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._float_leg_1.print_valuation()
+        self.float_leg_1.print_valuation()
 
 ###############################################################################
 
@@ -145,7 +145,7 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._float_leg_2.print_valuation()
+        self.float_leg_2.print_valuation()
 
 ###############################################################################
 
@@ -153,16 +153,16 @@ class IborBasisSwap:
         """ Prints the fixed leg amounts without any valuation details. Shows
         the dates and sizes of the promised fixed leg flows. """
 
-        self._float_leg_1.print_payments()
-        self._float_leg_2.print_payments()
+        self.float_leg_1.print_payments()
+        self.float_leg_2.print_payments()
 
 ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self._float_leg_1.__repr__()
+        s += self.float_leg_1._repr__()
         s += "\n"
-        s += self._float_leg_2.__repr__()
+        s += self.float_leg_2._repr__()
         return s
 
 ###############################################################################

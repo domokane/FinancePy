@@ -37,11 +37,11 @@ class CDSIndexPortfolio:
 
         check_argument_types(self.__init__, locals())
 
-        self._dc_type = day_count_type
-        self._dg_type = dg_type
-        self._cal_type = cal_type
-        self._freq_type = freq_type
-        self._bd_type = bd_type
+        self.dc_type = day_count_type
+        self.dg_type = dg_type
+        self.cal_type = cal_type
+        self.freq_type = freq_type
+        self.bd_type = bd_type
 
     ###########################################################################
 
@@ -261,7 +261,7 @@ class CDSIndexPortfolio:
 
         cds_maturity_dts = []
         for cds in issuer_curves[0].cds_contracts:
-            cds_dts = cds._maturity_dt
+            cds_dts = cds.maturity_dt
             cds_maturity_dts.append(cds_dts)
 
         num_cds_mat_points = len(cds_maturity_dts)
@@ -323,9 +323,9 @@ class CDSIndexPortfolio:
                     adjusted_cds_contracts = []
 
                     for j in range(0, num_cds_mat_points):
-                        cds_spread = cds_contracts[j]._running_cpn
+                        cds_spread = cds_contracts[j].running_cpn
                         adjusted_cds_spreads[j] = cds_spread * cds_spread_multipliers[j]
-                        curve_cds_contracts[j]._running_cpn = adjusted_cds_spreads[j]
+                        curve_cds_contracts[j].running_cpn = adjusted_cds_spreads[j]
 
                     adjusted_issuer_curve = CDSCurve(value_dt,
                                                      curve_cds_contracts,
@@ -333,11 +333,11 @@ class CDSIndexPortfolio:
                                                      recovery_rate)
 
                     index_prot_pv = cds_index.prot_leg_pv(value_dt,
-                                                                    adjusted_issuer_curve,
-                                                                    index_recovery_rate)
+                                                          adjusted_issuer_curve,
+                                                          index_recovery_rate)
 
                     clean_rpv01 = cds_index.risky_pv01(value_dt,
-                                                      adjusted_issuer_curve)['clean_rpv01']
+                                                       adjusted_issuer_curve)['clean_rpv01']
 
                     sum_rpv01 += clean_rpv01
                     sum_prot += index_prot_pv
@@ -365,7 +365,7 @@ class CDSIndexPortfolio:
 
             for j in range(0, num_cds_mat_points):
 
-                unadjusted_spread = issuer_curves[i_credit].cds_contracts[j]._running_cpn
+                unadjusted_spread = issuer_curves[i_credit].cds_contracts[j].running_cpn
 
                 adjusted_spread = unadjusted_spread * cds_spread_multipliers[j]
 
@@ -505,11 +505,11 @@ class CDSIndexPortfolio:
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("DAYCOUNT", self._dc_type)
-        s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_type)
-        s += label_to_string("DATEGENRULE", self._dg_type)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAYCOUNT", self.dc_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUSDAYRULE", self.bd_type)
+        s += label_to_string("DATEGENRULE", self.dg_type)
         return s
 
     ###########################################################################

@@ -364,11 +364,11 @@ class EquityAsianOption:
         if start_averaging_dt > expiry_dt:
             raise FinError("Averaging starts after expiry date")
 
-        self._startAveragingDate = start_averaging_dt
-        self._expiry_dt = expiry_dt
-        self._strike_price = float(strike_price)
-        self._option_type = option_type
-        self._num_observations = num_obs
+        self.startAveragingDate = start_averaging_dt
+        self.expiry_dt = expiry_dt
+        self.strike_price = float(strike_price)
+        self.option_type = option_type
+        self.num_observations = num_obs
 
 ###############################################################################
 
@@ -394,7 +394,7 @@ class EquityAsianOption:
         Note that the accrued average is only required if the value date is
         inside the averaging period for the option. """
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -443,23 +443,23 @@ class EquityAsianOption:
         model for the Arithmetic Average option but can be used as a control
         variate for other approaches. """
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - value_dt) / gDaysInYear
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tau = (self._expiry_dt - self._startAveragingDate) / gDaysInYear
+        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
 #        print("r:", r, "q:", q)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
-        K = self._strike_price
-        n = self._num_observations
+        K = self.strike_price
+        n = self.num_observations
         s0 = stock_price
 
         multiplier = 1.0
@@ -492,13 +492,13 @@ class EquityAsianOption:
         # the Geometric price is the lower bound
         call_g = np.exp(-r * t_exp) * (EG * N(d1) - K * N(d2))
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             v = call_g
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             put_g = call_g - (EG - K) * np.exp(-r * t_exp)
             v = put_g
         else:
-            raise FinError("Unknown option type " + str(self._option_type))
+            raise FinError("Unknown option type " + str(self.option_type))
 
         v = v * multiplier
         return v
@@ -509,27 +509,27 @@ class EquityAsianOption:
                       dividend_curve, model, accrued_average):
         """ Valuation of an Asian option using the result by Vorst. """
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - value_dt) / gDaysInYear
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tau = (self._expiry_dt - self._startAveragingDate) / gDaysInYear
+        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
 
         multiplier = 1.0
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
         s0 = stock_price
         b = r - q
         sigma2 = volatility**2
-        K = self._strike_price
+        K = self.strike_price
 
-        n = self._num_observations
+        n = self.num_observations
 
         if t0 < 0:  # we are in the averaging period
 
@@ -559,9 +559,9 @@ class EquityAsianOption:
               t_exp / 2.0) / (sigmaA*np.sqrt(t_exp))
         d2 = d1 - sigmaA * np.sqrt(t_exp)
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             v = np.exp(-r * t_exp) * (FA * N(d1) - K * N(d2))
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             v = np.exp(-r * t_exp) * (K * N(-d2) - FA * N(-d1))
         else:
             return None
@@ -577,21 +577,21 @@ class EquityAsianOption:
         which uses the edgeworth expansion to find the first two moments of the
         arithmetic average. """
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
-        t0 = (self._startAveragingDate - value_dt) / gDaysInYear
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tau = (self._expiry_dt - self._startAveragingDate) / gDaysInYear
+        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
 
-        K = self._strike_price
+        K = self.strike_price
         multiplier = 1.0
-        n = self._num_observations
+        n = self.num_observations
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
         if t0 < 0:  # we are in the averaging period
 
@@ -634,10 +634,10 @@ class EquityAsianOption:
         d1 = (np.log(F0 / K) + sigma2 * t_exp / 2) / sigma / np.sqrt(t_exp)
         d2 = d1 - sigma * np.sqrt(t_exp)
 
-        if self._option_type == OptionTypes.EUROPEAN_CALL:
+        if self.option_type == OptionTypes.EUROPEAN_CALL:
             call = np.exp(-r * t_exp) * (F0 * N(d1) - K * N(d2))
             v = call
-        elif self._option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.option_type == OptionTypes.EUROPEAN_PUT:
             put = np.exp(-r * t_exp) * (K * N(-d2) - F0 * N(-d1))
             v = put
         else:
@@ -662,26 +662,26 @@ class EquityAsianOption:
         as it is both slow and has limited variance reduction. """
 
         # Basic validation
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
-        if value_dt > self._startAveragingDate and accrued_average is None:
+        if value_dt > self.startAveragingDate and accrued_average is None:
             raise FinError(errorStr)
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - value_dt) / gDaysInYear
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tau = (self._expiry_dt - self._startAveragingDate) / gDaysInYear
+        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
-        K = self._strike_price
-        n = self._num_observations
+        K = self.strike_price
+        n = self.num_observations
 
-        v = _value_mc_numba(t0, t_exp, tau, K, n, self._option_type,
+        v = _value_mc_numba(t0, t_exp, tau, K, n, self.option_type,
                             stock_price,
                             r,
                             q,
@@ -707,20 +707,20 @@ class EquityAsianOption:
         a lot of Numpy vectorisation. It is also helped by Numba. """
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - value_dt) / gDaysInYear
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tau = (self._expiry_dt - self._startAveragingDate) / gDaysInYear
+        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
 
-        K = self._strike_price
-        n = self._num_observations
+        K = self.strike_price
+        n = self.num_observations
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
         v = _value_mc_fast_numba(t0, t_exp, tau,
-                                 K, n, self._option_type.value,
+                                 K, n, self.option_type.value,
                                  stock_price,
                                  r,
                                  q,
@@ -747,17 +747,17 @@ class EquityAsianOption:
         price. This uses Numpy and Numba. This is the standard MC pricer. """
 
         # the years to the start of the averaging period
-        t0 = (self._startAveragingDate - value_dt) / gDaysInYear
-        t_exp = (self._expiry_dt - value_dt) / gDaysInYear
-        tau = (self._expiry_dt - self._startAveragingDate) / gDaysInYear
+        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
 
-        K = self._strike_price
-        n = self._num_observations
+        K = self.strike_price
+        n = self.num_observations
 
-        r = discount_curve.cc_rate(self._expiry_dt)
-        q = dividend_curve.cc_rate(self._expiry_dt)
+        r = discount_curve.cc_rate(self.expiry_dt)
+        q = dividend_curve.cc_rate(self.expiry_dt)
 
-        volatility = model._volatility
+        volatility = model.volatility
 
         # For control variate we price a Geometric average option exactly
         v_g_exact = self._value_geometric(value_dt,
@@ -772,7 +772,7 @@ class EquityAsianOption:
                                     tau,
                                     K,
                                     n,
-                                    self._option_type,
+                                    self.option_type,
                                     stock_price,
                                     r,
                                     q,
@@ -788,11 +788,11 @@ class EquityAsianOption:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START AVERAGING DATE", self._startAveragingDate)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("STRIKE PRICE", self._strike_price)
-        s += label_to_string("OPTION TYPE", self._option_type)
-        s += label_to_string("NUM OBSERVATIONS", self._num_observations, "")
+        s += label_to_string("START AVERAGING DATE", self.startAveragingDate)
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("STRIKE PRICE", self.strike_price)
+        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("NUM OBSERVATIONS", self.num_observations, "")
         return s
 
 ###############################################################################

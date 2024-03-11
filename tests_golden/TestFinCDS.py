@@ -94,7 +94,7 @@ def test_CDSCurveRepricing():
     test_cases.header("CDS_MATURITY_dt", "PAR_SPREAD")
     for cds in cds_contracts:
         spd = cds.par_spread(value_dt, issuer_curve, recovery_rate)
-        test_cases.print(str(cds._maturity_dt), spd * 10000.0)
+        test_cases.print(str(cds.maturity_dt), spd * 10000.0)
 
 ##########################################################################
 
@@ -726,11 +726,12 @@ def test_CDSDateGeneration():
                        DateGenRuleTypes.BACKWARD)
 
     test_cases.header("Flow Date", "AccrualFactor", "Flow")
-    num_flows = len(cds_contract._payment_dts)
+    num_flows = len(cds_contract.payment_dts)
     for n in range(0, num_flows):
         test_cases.print(str(
-            cds_contract._payment_dts[n]), cds_contract._accrual_factors[n],
-            cds_contract._flows[n])
+            cds_contract.payment_dts[n]), 
+            cds_contract.accrual_factors[n],
+            cds_contract.flows[n])
 
 ##########################################################################
 

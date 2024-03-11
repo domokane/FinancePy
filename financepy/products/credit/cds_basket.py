@@ -50,27 +50,27 @@ class CDSBasket:
 
         check_argument_types(self.__init__, locals())
 
-        self._step_in_dt = step_in_dt
-        self._maturity_dt = maturity_dt
-        self._notional = notional
-        self._running_cpn = running_cpn / 10000.0
-        self._long_protect = long_protect
-        self._dc_type = dc_type
-        self._dg_type = dg_type
-        self._cal_type = cal_type
-        self._freq_type = freq_type
-        self._bd_type = bd_type
+        self.step_in_dt = step_in_dt
+        self.maturity_dt = maturity_dt
+        self.notional = notional
+        self.running_cpn = running_cpn / 10000.0
+        self.long_protect = long_protect
+        self.dc_type = dc_type
+        self.dg_type = dg_type
+        self.cal_type = cal_type
+        self.freq_type = freq_type
+        self.bd_type = bd_type
 
-        self._cds_contract = CDS(self._step_in_dt,
-                                 self._maturity_dt,
-                                 self._running_cpn,
+        self.cds_contract = CDS(self.step_in_dt,
+                                 self.maturity_dt,
+                                 self.running_cpn,
                                  1.0,
-                                 self._long_protect,
-                                 self._freq_type,
-                                 self._dc_type,
-                                 self._cal_type,
-                                 self._bd_type,
-                                 self._dg_type)
+                                 self.long_protect,
+                                 self.freq_type,
+                                 self.dc_type,
+                                 self.cal_type,
+                                 self.bd_type,
+                                 self.dg_type)
 
 ###############################################################################
 
@@ -86,9 +86,9 @@ class CDSBasket:
         num_credits = default_times.shape[0]
         num_trials = default_times.shape[1]
 
-        payment_dts = self._cds_contract._payment_dts
+        payment_dts = self.cds_contract.payment_dts
         num_payments = len(payment_dts)
-        day_count = DayCount(self._dc_type)
+        day_count = DayCount(self.dc_type)
 
         avg_acc_factor = 0.0
 
@@ -106,7 +106,7 @@ class CDSBasket:
 
         avg_acc_factor /= num_payments
 
-        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
 
         rpv01 = 0.0
         prot = 0.0
@@ -184,9 +184,9 @@ class CDSBasket:
                                             libor_curve)
 
         spd = prot_pv / rpv01
-        value = self._notional * (prot_pv - self._running_cpn * rpv01)
+        value = self.notional * (prot_pv - self.running_cpn * rpv01)
 
-        if not self._long_protect:
+        if not self.long_protect:
             value = value * -1.0
 
         return (value, rpv01, spd)
@@ -224,9 +224,9 @@ class CDSBasket:
                                             libor_curve)
 
         spd = prot_pv / rpv01
-        value = self._notional * (prot_pv - self._running_cpn * rpv01)
+        value = self.notional * (prot_pv - self.running_cpn * rpv01)
 
-        if not self._long_protect:
+        if not self.long_protect:
             value = value * -1.0
 
         return (value, rpv01, spd)
@@ -251,12 +251,12 @@ class CDSBasket:
         if n_to_default < 1 or n_to_default > num_credits:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        t_mat = (self._maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
 
         if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
 
-        payment_dts = self._cds_contract._payment_dts
+        payment_dts = self.cds_contract.payment_dts
         num_times = len(payment_dts)
 
         issuer_surv_probs = np.zeros(num_credits)
@@ -295,21 +295,21 @@ class CDSBasket:
         basket_curve._times = basket_times
         basket_curve._values = basket_surv_curve
 
-        prot_leg_pv = self._cds_contract.prot_leg_pv(
+        prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, basket_curve, curve_recovery)
-        risky_pv01 = self._cds_contract.risky_pv01(
+        risky_pv01 = self.cds_contract.risky_pv01(
             value_dt, basket_curve)['clean_rpv01']
 
         # Long protection
-        mtm = self._notional * (prot_leg_pv - risky_pv01 * self._running_cpn)
+        mtm = self.notional * (prot_leg_pv - risky_pv01 * self.running_cpn)
 
-        if not self._long_protect:
+        if not self.long_protect:
             mtm *= -1.0
 
         basket_output = np.zeros(4)
         basket_output[0] = mtm
-        basket_output[1] = risky_pv01 * self._notional * self._running_cpn
-        basket_output[2] = prot_leg_pv * self._notional
+        basket_output[1] = risky_pv01 * self.notional * self.running_cpn
+        basket_output[2] = prot_leg_pv * self.notional
         basket_output[3] = prot_leg_pv / risky_pv01
 
         return basket_output
@@ -319,20 +319,20 @@ class CDSBasket:
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
         cash flows """
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("STEP-IN DATE", self._step_in_dt)
-        s += label_to_string("MATURITY", self._maturity_dt)
-        s += label_to_string("NOTIONAL", self._notional)
+        s = label_to_string("OBJECT TYPE", type(self).name__)
+        s += label_to_string("STEP-IN DATE", self.step_in_dt)
+        s += label_to_string("MATURITY", self.maturity_dt)
+        s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("RUNNING COUPON",
-                             self._running_cpn*10000, "bp\n")
-        s += label_to_string("DAYCOUNT", self._dc_type)
-        s += label_to_string("FREQUENCY", self._freq_type)
-        s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUSDAYRULE", self._bd_type)
-        s += label_to_string("DATEGENRULE", self._dg_type)
+                             self.running_cpn*10000, "bp\n")
+        s += label_to_string("DAYCOUNT", self.dc_type)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUSDAYRULE", self.bd_type)
+        s += label_to_string("DATEGENRULE", self.dg_type)
 
 #       header = "PAYMENT_dt, YEAR_FRAC, FLOW"
-#       value_table = [self._payment_dts, self._accrual_factors, self._flows]
+#       value_table = [self.payment_dts, self.accrual_factors, self.flows]
 #       precision = "12.6f"
 #       s += tableToString(header, value_table, precision)
 

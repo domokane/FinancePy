@@ -99,12 +99,12 @@ def test_equity_swap_not_in_inception():
 
     # Rate determined at last reset date, from that date to maturity
     index_curve_first = DiscountCurveFlat(effective_dt, discount_rate)
-    index_alpha_first = DayCount(index_curve_first._dc_type).year_frac(effective_dt, maturity_dt)[0]
+    index_alpha_first = DayCount(index_curve_first.dc_type).year_frac(effective_dt, maturity_dt)[0]
     firstFixing = ((index_curve_first.df(effective_dt) / index_curve_first.df(maturity_dt))  - 1.0 ) / index_alpha_first
 
     # Rate between valuation date to maturity
     index_curve_period = DiscountCurveFlat(value_dt, discount_rate)
-    index_alpha_period = DayCount(index_curve_period._dc_type).year_frac(value_dt, maturity_dt)[0]
+    index_alpha_period = DayCount(index_curve_period.dc_type).year_frac(value_dt, maturity_dt)[0]
     periodFixing = ((index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt))  - 1.0 ) / index_alpha_period
 
     # This is the price at which abs_value(equity leg) == abs_value(float leg)

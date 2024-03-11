@@ -119,13 +119,13 @@ def test_bloombergPricingExample():
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
     assert round(swaps[0].value(value_dt, oisCurve, None), 4) == 0.0
-    assert round(-swaps[0]._fixed_leg.value(value_dt,
+    assert round(-swaps[0].fixed_leg.value(value_dt,
                                             oisCurve), 4) == 53708.2780
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         value_dt, oisCurve, None), 4) == 53708.2780
 
     assert round(swaps[0].value(settle_dt, oisCurve, None), 4) == 0.0
-    assert round(-swaps[0]._fixed_leg.value(settle_dt,
+    assert round(-swaps[0].fixed_leg.value(settle_dt,
                                             oisCurve), 4) == 53714.3020
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         settle_dt, oisCurve, None), 4) == 53714.3020

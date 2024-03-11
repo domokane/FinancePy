@@ -183,7 +183,7 @@ def build_Ibor_Curve(value_dt):
 
         df0 = 1.0
         for t in times[1:]:
-            df1 = libor_curve.df(t)
+            df1 = libor_curve._df(t)
             fwd = (df0 / df1 - 1.0) / dt
             print(t, df1, fwd)
             df0 = df1
@@ -241,13 +241,13 @@ def test_BondFRN():
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    lastCouponDt = bond._pcd
+    lastCouponDt = bond.pcd
     test_cases.print("Last Coupon Date = ", str(lastCouponDt))
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     test_cases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond._accrued_interest
+    accdAmount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accdAmount)
 
     principal = bond.principal(settle_dt,
@@ -348,13 +348,13 @@ def test_BondFRN():
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    lastCouponDt = bond._pcd
+    lastCouponDt = bond.pcd
     test_cases.print("Last Coupon Date = ", str(lastCouponDt))
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     test_cases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond._accrued_interest
+    accdAmount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accdAmount)
 
     principal = bond.principal(settle_dt,

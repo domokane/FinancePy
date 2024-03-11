@@ -23,15 +23,15 @@ class EquityModel:
 
 #         check_argument_types(self.__init__, locals())
 
-#         self._volatility = volatility
-#         self._implementation = implementation
-#         self._parameters = parameters
+#         self.volatility = volatility
+#         self.implementation = implementation
+#         self.parameters = parameters
 
 #     def __repr__(self):
 #         s = label_to_string("OBJECT TYPE", type(self).__name__)
-#         s += label_to_string("VOLATILITY", self._volatility)
-#         s += label_to_string("IMPLEMENTATION", self._implementation)
-#         s += label_to_string("PARAMETERS", self._parameters)
+#         s += label_to_string("VOLATILITY", self.volatility)
+#         s += label_to_string("IMPLEMENTATION", self.implementation)
+#         s += label_to_string("PARAMETERS", self.parameters)
 #         return s
 
 ###############################################################################
@@ -39,16 +39,16 @@ class EquityModel:
 
 class EquityModelHeston(EquityModel):
     def __init__(self, volatility, mean_reversion):
-        self._parentType = EquityModel
-        self._volatility = volatility
-        self._mean_reversion = mean_reversion
-        self._implementation = 0
+        self.parentType = EquityModel
+        self.volatility = volatility
+        self.mean_reversion = mean_reversion
+        self.implementation = 0
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VOLATILITY", self._volatility)
-        s += label_to_string("MEAN REVERSION", self._mean_reversion)
-        s += label_to_string("IMPLEMENTATION", self._implementation)
+        s += label_to_string("VOLATILITY", self.volatility)
+        s += label_to_string("MEAN REVERSION", self.mean_reversion)
+        s += label_to_string("IMPLEMENTATION", self.implementation)
         return s
 
 ###############################################################################

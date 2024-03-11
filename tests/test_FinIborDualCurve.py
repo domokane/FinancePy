@@ -241,16 +241,16 @@ def test_bloombergPricingExample():
 
     assert round(swaps[0].value(
         value_dt, libor_curve, libor_curve, None), 4) == 0.0
-    assert round(swaps[0]._fixed_leg.value(
+    assert round(swaps[0].fixed_leg.value(
         value_dt, libor_curve), 4) == -53707.6667
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         value_dt, libor_curve, libor_curve, None), 4) == 53707.6667
 
     assert round(swaps[0].value(
         settle_dt, libor_curve, libor_curve, None), 4) == 0.0
-    assert round(swaps[0]._fixed_leg.value(
+    assert round(swaps[0].fixed_leg.value(
         settle_dt, libor_curve), 4) == -53714.5507
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         settle_dt, libor_curve, libor_curve, None), 4) == 53714.5507
 
     oisCurve = buildOIS(value_dt)
@@ -260,14 +260,14 @@ def test_bloombergPricingExample():
 
     assert round(swaps[0].value(
         value_dt, oisCurve, liborDualCurve, None), 4) == 0.0
-    assert round(swaps[0]._fixed_leg.value(
+    assert round(swaps[0].fixed_leg.value(
         value_dt, oisCurve), 4) == -55524.5642
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         value_dt, oisCurve, liborDualCurve, None), 4) == 55524.5642
 
     assert round(swaps[0].value(
         settle_dt, oisCurve, liborDualCurve, None), 4) == 0.0
-    assert round(swaps[0]._fixed_leg.value(
+    assert round(swaps[0].fixed_leg.value(
         settle_dt, oisCurve), 4) == -55524.5709
-    assert round(swaps[0]._float_leg.value(
+    assert round(swaps[0].float_leg.value(
         settle_dt, oisCurve, liborDualCurve, None), 4) == 55524.5709

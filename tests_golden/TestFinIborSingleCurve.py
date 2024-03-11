@@ -455,17 +455,17 @@ def test_ibor_depositsFuturesSwaps():
         print(end_dt, df)
 
         for depo in depos:
-            end_dt = depo._maturity_dt
+            end_dt = depo.maturity_dt
             df = libor_curve.df(end_dt)
             print(end_dt, df)
 
         for fra in fras:
-            end_dt = fra._maturity_dt
+            end_dt = fra.maturity_dt
             df = libor_curve.df(end_dt)
             print(end_dt, df)
 
         for swap in swaps:
-            end_dt = swap._maturity_dt
+            end_dt = swap.maturity_dt
             df = libor_curve.df(end_dt)
             print(end_dt, df)
 

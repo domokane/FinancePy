@@ -90,11 +90,11 @@ class IborSwaption():
         self.bd_type = bd_type
         self.dg_type = dg_type
 
-        self._pv01 = None
-        self._fwd_swap_rate = None
-        self._forward_df = None
-        self._underlying_swap = None
-        self._swap_type = None
+        self.pv01 = None
+        self.fwd_swap_rate = None
+        self.forward_df = None
+        self.underlying_swap = None
+        self.swap_type = None
 
 ###############################################################################
 
@@ -272,10 +272,10 @@ class IborSwaption():
         else:
             raise FinError("Unknown swaption model " + str(model))
 
-        self._pv01 = pv01
-        self._fwd_swap_rate = s
-        self._forward_df = discount_curve.df(self.exercise_dt)
-        self._underlying_swap = swap
+        self.pv01 = pv01
+        self.fwd_swap_rate = s
+        self.forward_df = discount_curve.df(self.exercise_dt)
+        self.underlying_swap = swap
 
         # The exchange of cash occurs on the settlement date. However the
         # actual value is that on the specified valuation date which could
@@ -337,17 +337,17 @@ class IborSwaption():
             raise FinError("Cash settled swaptions must be priced using"
                            + " Black's model.")
 
-        self._fwd_swap_rate = swap_rate
-        self._forward_df = discount_curve.df(self.exercise_dt)
-        self._underlying_swap = swap
+        self.fwd_swap_rate = swap_rate
+        self.forward_df = discount_curve.df(self.exercise_dt)
+        self.underlying_swap = swap
         # The annuity needs to be discounted to today using the correct df
-        self._pv01 = pv01 * self._forward_df
+        self.pv01 = pv01 * self.forward_df
 
         # The exchange of cash occurs on the settlement date but we need to
         # value the swaption on the provided valuation date - which could be
         # the settlement date or may be a different date.
         df_value_dt = discount_curve.df(value_dt)
-        swaption_price = swaption_price * self._pv01 * self.notional / df_value_dt
+        swaption_price = swaption_price * self.pv01 * self.notional / df_value_dt
         return swaption_price
 
 ###############################################################################
@@ -389,10 +389,10 @@ class IborSwaption():
         s += label_to_string("FLOAT DAY COUNT",
                              str(self.float_dc_type))
 
-        if self._pv01 is not None:
-            s += label_to_string("PV01", self._pv01)
-            s += label_to_string("FWD SWAP RATE", self._fwd_swap_rate*100)
-            s += label_to_string("FWD DF TO EXPIRY", self._forward_df, "")
+        if self.pv01 is not None:
+            s += label_to_string("PV01", self.pv01)
+            s += label_to_string("FWD SWAP RATE", self.fwd_swap_rate*100)
+            s += label_to_string("FWD DF TO EXPIRY", self.forward_df, "")
 
         return s
 

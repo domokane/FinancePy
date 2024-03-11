@@ -19,19 +19,19 @@ class FinCurveFitMethod():
 class CurveFitPolynomial():
 
     def __init__(self, power=3):
-        self._parent_type = FinCurveFitMethod
-        self._power = power
-        self._coeffs = []
+        self.parent_type = FinCurveFitMethod
+        self.power = power
+        self.coeffs = []
 
     def _interp_yield(self, t):
-        yld = np.polyval(self._coeffs, t)
+        yld = np.polyval(self.coeffs, t)
         return yld
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("Power", self._power)
+        s += label_to_string("Power", self.power)
 
-        for c in self._coeffs:
+        for c in self.coeffs:
             s += label_to_string("Coefficient", c)
 
         return s
@@ -46,13 +46,13 @@ class CurveFitPolynomial():
 class CurveFitNelsonSiegel():
 
     def __init__(self, tau=None, bounds=[(-1, -1, -1, 0.5), (1, 1, 1, 100)]):
-        self._parent_type = FinCurveFitMethod
-        self._beta_1 = None
-        self._beta_2 = None
-        self._beta_3 = None
-        self._tau = tau
+        self.parent_type = FinCurveFitMethod
+        self.beta_1 = None
+        self.beta_2 = None
+        self.beta_3 = None
+        self.tau = tau
         """ Fairly permissive bounds. Only tau_1 is 1-100 """
-        self._bounds = bounds
+        self.bounds = bounds
 
     def _interp_yield(self, t, beta_1=None, beta_2=None,
                             beta_3=None, tau=None):
@@ -60,16 +60,16 @@ class CurveFitNelsonSiegel():
         t = np.maximum(t, 1e-10)
 
         if beta_1 is None:
-            beta_1 = self._beta_1
+            beta_1 = self.beta_1
 
         if beta_2 is None:
-            beta_2 = self._beta_2
+            beta_2 = self.beta_2
 
         if beta_3 is None:
-            beta_3 = self._beta_3
+            beta_3 = self.beta_3
 
         if tau is None:
-            tau = self._tau
+            tau = self.tau
 
         theta = t / tau
         exp_term = np.exp(-theta)
@@ -80,10 +80,10 @@ class CurveFitNelsonSiegel():
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("beta_1", self._beta_1)
-        s += label_to_string("beta_2", self._beta_2)
-        s += label_to_string("beta_3", self._beta_3)
-        s += label_to_string("Tau", self._tau)
+        s += label_to_string("beta_1", self.beta_1)
+        s += label_to_string("beta_2", self.beta_2)
+        s += label_to_string("beta_3", self.beta_3)
+        s += label_to_string("Tau", self.tau)
         return s
 
     def _print(self):
@@ -100,17 +100,17 @@ class CurveFitNelsonSiegelSvensson():
         """ Create object to store calibration and functional form of NSS
         parametric fit. """
 
-        self._parent_type = FinCurveFitMethod
-        self._beta_1 = None
-        self._beta_2 = None
-        self._beta_3 = None
-        self._beta_4 = None
-        self._tau_1 = tau_1
-        self._tau_2 = tau_2
+        self.parent_type = FinCurveFitMethod
+        self.beta_1 = None
+        self.beta_2 = None
+        self.beta_3 = None
+        self.beta_4 = None
+        self.tau_1 = tau_1
+        self.tau_2 = tau_2
 
         """ I impose some bounds to help ensure a sensible result if
         the user does not provide any bounds. Especially for tau_2. """
-        self._bounds = bounds
+        self.bounds = bounds
 
     def _interp_yield(self, t, beta_1=None, beta_2=None, beta_3=None,
                             beta_4=None, tau_1=None, tau_2=None):
@@ -119,22 +119,22 @@ class CurveFitNelsonSiegelSvensson():
         t = np.maximum(t, 1e-10)
 
         if beta_1 is None:
-            beta_1 = self._beta_1
+            beta_1 = self.beta_1
 
         if beta_2 is None:
-            beta_2 = self._beta_2
+            beta_2 = self.beta_2
 
         if beta_3 is None:
-            beta_3 = self._beta_3
+            beta_3 = self.beta_3
 
         if beta_4 is None:
-            beta_4 = self._beta_4
+            beta_4 = self.beta_4
 
         if tau_1 is None:
-            tau_1 = self._tau_1
+            tau_1 = self.tau_1
 
         if tau_2 is None:
-            tau_2 = self._tau_2
+            tau_2 = self.tau_2
 
         theta1 = t / tau_1
         theta2 = t / tau_2
@@ -148,12 +148,12 @@ class CurveFitNelsonSiegelSvensson():
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("beta_1", self._beta_1)
-        s += label_to_string("beta_2", self._beta_2)
-        s += label_to_string("beta_3", self._beta_3)
-        s += label_to_string("beta_4", self._beta_3)
-        s += label_to_string("tau_1", self._tau_1)
-        s += label_to_string("tau_2", self._tau_2)
+        s += label_to_string("beta_1", self.beta_1)
+        s += label_to_string("beta_2", self.beta_2)
+        s += label_to_string("beta_3", self.beta_3)
+        s += label_to_string("beta_4", self.beta_3)
+        s += label_to_string("tau_1", self.tau_1)
+        s += label_to_string("tau_2", self.tau_2)
         return s
 
     def _print(self):
@@ -166,21 +166,21 @@ class CurveFitNelsonSiegelSvensson():
 class CurveFitBSpline():
 
     def __init__(self, power=3, knots=[1, 3, 5, 10]):
-        self._parent_type = FinCurveFitMethod
-        self._power = power
-        self._knots = knots
-        self._spline = None
+        self.parent_type = FinCurveFitMethod
+        self.power = power
+        self.knots = knots
+        self.spline = None
 
     def _interp_yield(self, t):
         t = np.maximum(t, 1e-10)
-        yld = splev(t, self._spline)
+        yld = splev(t, self.spline)
         return yld
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("Power", self._power)
-        s += label_to_string("Knots", self._knots)
-        s += label_to_string("Spline", self._spline)
+        s += label_to_string("Power", self.power)
+        s += label_to_string("Knots", self.knots)
+        s += label_to_string("Spline", self.spline)
         return s
 
     def _print(self):

@@ -51,10 +51,10 @@ class EquityDigitalOption(EquityOption):
         if call_put_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
             raise FinError("Option type must be EUROPEAN CALL or PUT")
 
-        self._expiry_dt = expiry_dt
-        self._barrier = float(barrier)
-        self._call_put_type = call_put_type
-        self._digital_type = digital_type
+        self.expiry_dt = expiry_dt
+        self.barrier = float(barrier)
+        self.call_put_type = call_put_type
+        self.digital_type = digital_type
 
 ###############################################################################
 
@@ -71,7 +71,7 @@ class EquityDigitalOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
@@ -82,21 +82,21 @@ class EquityDigitalOption(EquityOption):
             raise FinError(
                 "Dividend Curve valuation date not same as option value date")
 
-        t = (self._expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / gDaysInYear
         t = max(t, 1e-6)
 
         s0 = s
-        X = self._barrier
+        X = self.barrier
         ln_s0_k = np.log(s0 / X)
         sqrt_t = np.sqrt(t)
 
-        df = discount_curve.df(self._expiry_dt)
+        df = discount_curve.df(self.expiry_dt)
         r = -np.log(df)/t
 
-        dq = dividend_curve.df(self._expiry_dt)
+        dq = dividend_curve.df(self.expiry_dt)
         q = -np.log(dq)/t
 
-        volatility = model._volatility
+        volatility = model.volatility
 
         if abs(volatility) < g_small:
             volatility = g_small
@@ -105,18 +105,18 @@ class EquityDigitalOption(EquityOption):
         d1 = d1 / volatility / sqrt_t
         d2 = d1 - volatility * sqrt_t
 
-        if self._digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
+        if self.digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
 
-            if self._call_put_type == OptionTypes.EUROPEAN_CALL:
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 v = np.exp(-r * t) * n_vect(d2)
-            elif self._call_put_type == OptionTypes.EUROPEAN_PUT:
+            elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
                 v = np.exp(-r * t) * n_vect(-d2)
 
-        elif self._digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
+        elif self.digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
 
-            if self._call_put_type == OptionTypes.EUROPEAN_CALL:
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 v = s0 * np.exp(-q * t) * n_vect(d1)
-            elif self._call_put_type == OptionTypes.EUROPEAN_PUT:
+            elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
                 v = s0 * np.exp(-q * t) * n_vect(-d1)
 
         else:
@@ -139,15 +139,15 @@ class EquityDigitalOption(EquityOption):
         handles both a cash-or-nothing and an asset-or-nothing option."""
 
         np.random.seed(seed)
-        t = (self._expiry_dt - value_dt) / gDaysInYear
-        df = discount_curve.df(self._expiry_dt)
+        t = (self.expiry_dt - value_dt) / gDaysInYear
+        df = discount_curve.df(self.expiry_dt)
         r = -np.log(df)/t
 
-        dq = dividend_curve.df(self._expiry_dt)
+        dq = dividend_curve.df(self.expiry_dt)
         q = -np.log(dq)/t
 
-        volatility = model._volatility
-        K = self._barrier
+        volatility = model.volatility
+        K = self.barrier
         sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
@@ -158,18 +158,18 @@ class EquityDigitalOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        if self._digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
-            if self._call_put_type == OptionTypes.EUROPEAN_CALL:
+        if self.digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 payoff_a_1 = np.heaviside(s_1 - K, 0.0)
                 payoff_a_2 = np.heaviside(s_2 - K, 0.0)
-            elif self._call_put_type == OptionTypes.EUROPEAN_PUT:
+            elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
                 payoff_a_1 = np.heaviside(K - s_1, 0.0)
                 payoff_a_2 = np.heaviside(K - s_2, 0.0)
-        elif self._digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
-            if self._call_put_type == OptionTypes.EUROPEAN_CALL:
+        elif self.digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 payoff_a_1 = s_1 * np.heaviside(s_1 - K, 0.0)
                 payoff_a_2 = s_2 * np.heaviside(s_2 - K, 0.0)
-            elif self._call_put_type == OptionTypes.EUROPEAN_PUT:
+            elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
                 payoff_a_1 = s_1 * np.heaviside(K - s_1, 0.0)
                 payoff_a_2 = s_2 * np.heaviside(K - s_2, 0.0)
 
@@ -181,10 +181,10 @@ class EquityDigitalOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("BARRIER LEVEL", self._barrier)
-        s += label_to_string("CALL-PUT TYPE", self._call_put_type)
-        s += label_to_string("DIGITAL TYPE", self._digital_type, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("BARRIER LEVEL", self.barrier)
+        s += label_to_string("CALL-PUT TYPE", self.call_put_type)
+        s += label_to_string("DIGITAL TYPE", self.digital_type, "")
         return s
 
 ###############################################################################

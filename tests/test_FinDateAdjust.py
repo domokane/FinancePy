@@ -28,7 +28,7 @@ def test_date_adjust_no_adj():
                         bd_type,
                         dg_type)
 
-    assert schedule._adjusted_dts == [
+    assert schedule.adjusted_dts == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
             28, 2, 2009), Date(28, 8, 2009),
         Date(28, 2, 2010), Date(28, 8, 2010), Date(28, 2, 2011)]
@@ -48,7 +48,7 @@ def test_date_adjust_noweekend_following():
                         bd_type,
                         dg_type)
 
-    assert schedule._adjusted_dts == [
+    assert schedule.adjusted_dts == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
             2, 3, 2009), Date(28, 8, 2009),
         Date(1, 3, 2010), Date(30, 8, 2010), Date(28, 2, 2011)]
@@ -68,7 +68,7 @@ def test_date_adjust_noweekend_modfollowing():
                         bd_type,
                         dg_type)
 
-    assert schedule._adjusted_dts == [
+    assert schedule.adjusted_dts == [
         Date(28, 2, 2008), Date(28, 8, 2008), Date(
             27, 2, 2009), Date(28, 8, 2009),
         Date(26, 2, 2010), Date(30, 8, 2010), Date(28, 2, 2011)]
@@ -88,6 +88,6 @@ def test_date_adjust_noweekend_usholidays_modfollowing():
                         bd_type,
                         dg_type)
 
-    assert schedule._adjusted_dts == [
+    assert schedule.adjusted_dts == [
         Date(4, 7, 2008), Date(5, 1, 2009), Date(6, 7, 2009), Date(4, 1, 2010),
         Date(6, 7, 2010), Date(4, 1, 2011), Date(5, 7, 2011)]

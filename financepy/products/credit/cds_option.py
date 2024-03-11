@@ -69,18 +69,18 @@ class CDSOption:
         if strike_coupon < 0.0:
             raise FinError("Strike must be greater than zero")
 
-        self._expiry_dt = expiry_dt
-        self._maturity_dt = maturity_dt
-        self._strike_coupon = strike_coupon
-        self._long_protection = long_protection
-        self._knockout_flag = knockout_flag
-        self._notional = notional
+        self.expiry_dt = expiry_dt
+        self.maturity_dt = maturity_dt
+        self.strike_coupon = strike_coupon
+        self.long_protection = long_protection
+        self.knockout_flag = knockout_flag
+        self.notional = notional
 
-        self._freq_type = freq_type
-        self._dc_type = dc_type
-        self._cal_type = cal_type
-        self._bd_type = bd_type
-        self._dg_type = dg_type
+        self.freq_type = freq_type
+        self.dc_type = dc_type
+        self.cal_type = cal_type
+        self.bd_type = bd_type
+        self.dg_type = dg_type
 
 ###############################################################################
 
@@ -92,7 +92,7 @@ class CDSOption:
         Front End Protection.
         TODO - Should the CDS be created in the init method ? """
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Expiry date is now or in the past")
 
         if volatility < 0.0:
@@ -101,23 +101,23 @@ class CDSOption:
         # The underlying is a forward starting option that steps in on
         # the expiry date and matures on the expiry date with a coupon
         # set equal to the option spread strike
-        cds = CDS(self._expiry_dt,
-                  self._maturity_dt,
-                  self._strike_coupon,
-                  self._notional,
-                  self._long_protection,
-                  self._freq_type,
-                  self._dc_type,
-                  self._cal_type,
-                  self._bd_type,
-                  self._dg_type)
+        cds = CDS(self.expiry_dt,
+                  self.maturity_dt,
+                  self.strike_coupon,
+                  self.notional,
+                  self.long_protection,
+                  self.freq_type,
+                  self.dc_type,
+                  self.cal_type,
+                  self.bd_type,
+                  self.dg_type)
 
-        strike = self._strike_coupon
+        strike = self.strike_coupon
         forward_spread = cds.par_spread(value_dt, issuer_curve)
         forward_rpv01 = cds.risky_pv01(
             value_dt, issuer_curve)['dirty_rpv01']
 
-        time_to_expiry = (self._expiry_dt - value_dt) / gDaysInYear
+        time_to_expiry = (self.expiry_dt - value_dt) / gDaysInYear
         log_moneyness = log(forward_spread / strike)
 
         half_vol_squared_t = 0.5 * volatility * volatility * time_to_expiry
@@ -126,7 +126,7 @@ class CDSOption:
         d1 = (log_moneyness + half_vol_squared_t) / vol_sqrt_t
         d2 = (log_moneyness - half_vol_squared_t) / vol_sqrt_t
 
-        if self._long_protection:
+        if self.long_protection:
             option_value = forward_spread * N(d1) - strike * N(d2)
         else:
             option_value = strike * N(-d2) - forward_spread * N(-d1)
@@ -136,15 +136,15 @@ class CDSOption:
         # If the option does not knock out on a default before expiry then we
         # need to include the cost of protection which is provided between
         # the value date and the expiry date
-        if self._knockout_flag is False and self._long_protection is True:
+        if self.knockout_flag is False and self.long_protection is True:
             df = issuer_curve.getDF(time_to_expiry)
             q = issuer_curve.getSurvProb(time_to_expiry)
-            recovery = issuer_curve._recovery_rate
+            recovery = issuer_curve.recovery_rate
             front_end_protection = df * (1.0 - q) * (1.0 - recovery)
             option_value += front_end_protection
 
         # we return the option price in dollars
-        return option_value * self._notional
+        return option_value * self.notional
 
 ###############################################################################
 

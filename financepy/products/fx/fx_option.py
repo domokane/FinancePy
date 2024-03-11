@@ -99,7 +99,7 @@ class FXOption:
                        model)
 
         vp = self.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve,
-                        BlackScholes(model._volatility + bump))
+                        BlackScholes(model.volatility + bump))
 
         if isinstance(v, dict):
             vega = (vp['value'] - v['value'])  # / bump

@@ -22,13 +22,13 @@ class BlackShifted():
 
     def __init__(self, volatility, shift, implementation=0):
         """ Create FinModel black using parameters. """
-        self._volatility = volatility
-        self._shift = shift
-        self._implementation = 0
-        self._num_steps = 0
-        self._seed = 0
-        self._param1 = 0
-        self._param2 = 0
+        self.volatility = volatility
+        self.shift = shift
+        self.implementation = 0
+        self.num_steps = 0
+        self.seed = 0
+        self.param1 = 0
+        self.param2 = 0
 
 ###############################################################################
 
@@ -42,12 +42,12 @@ class BlackShifted():
         measure following a change of measure. The sign of the shift is the
         same as Matlab. """
 
-        s = self._shift
+        s = self.shift
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
         sqrt_t = np.sqrt(t)
-        vol = self._volatility
+        vol = self.volatility
 
         d1 = np.log((f+s)/(k+s)) + vol * vol * t / 2
         d1 = d1 / (vol * sqrt_t)
@@ -63,11 +63,11 @@ class BlackShifted():
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VOLATILITY", self._volatility)
-        s += label_to_string("SHIFT", self._shift)
-        s += label_to_string("IMPLEMENTATION", self._implementation)
-        s += label_to_string("NUMSTEPS", self._num_steps)
+        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s += label_to_string("VOLATILITY", self.volatility)
+        s += label_to_string("SHIFT", self.shift)
+        s += label_to_string("IMPLEMENTATION", self.implementation)
+        s += label_to_string("NUMSTEPS", self.num_steps)
         return s
 
 ###############################################################################

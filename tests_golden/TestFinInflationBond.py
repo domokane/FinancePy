@@ -82,10 +82,10 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     test_cases.print("Accrued Days = ", accddays)
 
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_int
     test_cases.print("REAL Accrued Interest = ", accrued_interest)
 
     ###########################################################################
@@ -99,11 +99,11 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.inflation_accrued_interest(settle_dt,
-                                                    face,
-                                                    refCPIValue)
+    inflation_accd = bond.inflation_accrued_interest(settle_dt,
+                                                     face,
+                                                     refCPIValue)
 
-    test_cases.print("Inflation Accrued = ", inflationAccd)
+    test_cases.print("Inflation Accrued = ", inflation_accd)
 
     lastCpnCPIValue = 244.61839
 

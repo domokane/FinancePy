@@ -16,8 +16,8 @@ issue_dt = Date(15, 2, 2004)
 def test_bond_future_1():
     bond = Bond(issue_dt, Date(15, 8, 2011), 0.0500, freq, basis)
 
-    assert bond._maturity_dt == Date(15, 8, 2011)
-    assert bond._cpn * 100 == 5.0
+    assert bond.maturity_dt == Date(15, 8, 2011)
+    assert bond.cpn * 100 == 5.0
 
     first_delivery_date = Date(1, 3, 2002)
     last_delivery_date = Date(28, 3, 2002)
@@ -36,7 +36,7 @@ def test_bond_future_1():
 
 def test_bond_future_2():
     bond = Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis)
-    assert bond._maturity_dt == Date(15, 8, 2027)
+    assert bond.maturity_dt == Date(15, 8, 2027)
 
     settle_dt = Date(10, 10, 2017)
     price = 99 + 1 / 32
@@ -139,4 +139,4 @@ def test_future_bond_ctd():
                                                  prices,
                                                  futures_price)
 
-    assert round(ctd._cpn, 4) == 0.0238
+    assert round(ctd.cpn, 4) == 0.0238

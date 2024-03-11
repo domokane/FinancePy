@@ -49,10 +49,10 @@ def test_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     test_cases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dts)
+    num_flows = len(annuity.cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dts[i]
-        flow = annuity._flow_amounts[i]
+        dt = annuity.cpn_dts[i]
+        flow = annuity.flow_amounts[i]
         test_cases.print(dt, flow)
 
 #    print("===============================================================")
@@ -78,10 +78,10 @@ def test_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     test_cases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dts)
+    num_flows = len(annuity.cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dts[i]
-        flow = annuity._flow_amounts[i]
+        dt = annuity.cpn_dts[i]
+        flow = annuity.flow_amounts[i]
         test_cases.print(dt, flow)
 
 #    print("==================================================================")
@@ -107,10 +107,10 @@ def test_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     test_cases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dts)
+    num_flows = len(annuity.cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dts[i]
-        flow = annuity._flow_amounts[i]
+        dt = annuity.cpn_dts[i]
+        flow = annuity.flow_amounts[i]
         test_cases.print(dt, flow)
 
 #    print("==================================================================")
@@ -136,10 +136,10 @@ def test_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     test_cases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dts)
+    num_flows = len(annuity.cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dts[i]
-        flow = annuity._flow_amounts[i]
+        dt = annuity.cpn_dts[i]
+        flow = annuity.flow_amounts[i]
         test_cases.print(dt, flow)
 
 #    print("==================================================================")
@@ -165,10 +165,10 @@ def test_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     test_cases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dts)
+    num_flows = len(annuity.cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dts[i]
-        flow = annuity._flow_amounts[i]
+        dt = annuity.cpn_dts[i]
+        flow = annuity.flow_amounts[i]
         test_cases.print(dt, flow)
 
 #    print("==================================================================")
@@ -194,10 +194,10 @@ def test_BondAnnuity():
     annuity.calculate_payments(settle_dt, face)
 
     test_cases.header("Date", "Flow")
-    num_flows = len(annuity._cpn_dts)
+    num_flows = len(annuity.cpn_dts)
     for i in range(1, num_flows):
-        dt = annuity._cpn_dts[i]
-        flow = annuity._flow_amounts[i]
+        dt = annuity.cpn_dts[i]
+        flow = annuity.flow_amounts[i]
         test_cases.print(dt, flow)
 
 ##########################################################################

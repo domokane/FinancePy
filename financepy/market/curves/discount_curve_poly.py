@@ -132,7 +132,7 @@ class DiscountCurvePoly(DiscountCurve):
         s += label_to_string("POWER", "COEFFICIENT")
         for i in range(0, len(self._coefficients)):
             s += label_to_string(str(i), self._coefficients[i])
-        s += label_to_string("FREQUENCY", self._freq_type)
+        s += label_to_string("FREQUENCY", self.freq_type)
 
         return s
 

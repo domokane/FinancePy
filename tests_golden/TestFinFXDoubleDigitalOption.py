@@ -2,16 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import time
+import sys
+sys.path.append("..")
+
+import numpy as np
+
 from financepy.products.fx.fx_double_digital_option import FXDoubleDigitalOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, globalTestCaseMode
-import time
-import numpy as np
-
-import sys
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)

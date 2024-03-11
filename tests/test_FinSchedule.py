@@ -14,8 +14,8 @@ termination_date_adjust = True
 
 
 def check_frequency(schedule, start=0):
-    dates = schedule._adjusted_dts
-    diff_d1d2 = (schedule._termination_dt - schedule._effective_dt) / 365.0
+    dates = schedule.adjusted_dts
+    diff_d1d2 = (schedule.termination_dt - schedule.effective_dt) / 365.0
 
     for i in range(start, len(dates) - 2):
         diff = (dates[i+1] - dates[i]) / 365.0
@@ -40,7 +40,7 @@ def test_backward_frequencies():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 5
     check_frequency(schedule)
 
@@ -52,7 +52,7 @@ def test_backward_frequencies():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 9
     check_frequency(schedule)
 
@@ -64,7 +64,7 @@ def test_backward_frequencies():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 25
     check_frequency(schedule)
 

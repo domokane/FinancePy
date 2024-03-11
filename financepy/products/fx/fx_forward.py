@@ -45,24 +45,24 @@ class FXForward:
         if len(currency_pair) != 6:
             raise FinError("Currency pair must be 6 characters.")
 
-        self._expiry_dt = expiry_dt
-        self._delivery_dt = delivery_dt
-        self._strike_fx_rate = strike_fx_rate
+        self.expiry_dt = expiry_dt
+        self.delivery_dt = delivery_dt
+        self.strike_fx_rate = strike_fx_rate
 
-        self._currency_pair = currency_pair
-        self._for_name = self._currency_pair[0:3]
-        self._dom_name = self._currency_pair[3:6]
+        self.currency_pair = currency_pair
+        self.for_name = self.currency_pair[0:3]
+        self.dom_name = self.currency_pair[3:6]
 
-        if notional_currency != self._dom_name and notional_currency != self._for_name:
+        if notional_currency != self.dom_name and notional_currency != self.for_name:
             raise FinError("Notional currency not in currency pair.")
 
-        self._notional = notional
-        self._notional_currency = notional_currency
-        self._spot_days = spot_days
-        self._notional_dom = None
-        self._notional_for = None
-        self._cash_dom = None
-        self._cash_for = None
+        self.notional = notional
+        self.notional_currency = notional_currency
+        self.spot_days = spot_days
+        self.notional_dom = None
+        self.notional_for = None
+        self.cash_dom = None
+        self.cash_for = None
 
 ###############################################################################
 
@@ -77,7 +77,7 @@ class FXForward:
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self._expiry_dt:
+        if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
@@ -89,7 +89,7 @@ class FXForward:
                 "Foreign Curve valuation date not same as option value date")
 
         if isinstance(value_dt, Date):
-            t = (self._expiry_dt - value_dt) / gDaysInYear
+            t = (self.expiry_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -108,32 +108,32 @@ class FXForward:
 
         dom_df = domestic_curve._df(t)
 
-        if self._notional_currency == self._dom_name:
-            self._notional_dom = self._notional
-            self._notional_for = self._notional / self._strike_fx_rate
-        elif self._notional_currency == self._for_name:
-            self._notional_dom = self._notional * self._strike_fx_rate
-            self._notional_for = self._notional
+        if self.notional_currency == self.dom_name:
+            self.notional_dom = self.notional
+            self.notional_for = self.notional / self.strike_fx_rate
+        elif self.notional_currency == self.for_name:
+            self.notional_dom = self.notional * self.strike_fx_rate
+            self.notional_for = self.notional
         else:
             raise FinError("Invalid notional currency.")
 
-        if self._notional_currency == self._for_name:
-            v = (newfwd_fx_rate - self._strike_fx_rate)
-            v = v * self._notional * dom_df
-        elif self._notional_currency == self._dom_name:
-            v = (newfwd_fx_rate - self._strike_fx_rate)
-            v = v * self._notional * dom_df * newfwd_fx_rate
+        if self.notional_currency == self.for_name:
+            v = (newfwd_fx_rate - self.strike_fx_rate)
+            v = v * self.notional * dom_df
+        elif self.notional_currency == self.dom_name:
+            v = (newfwd_fx_rate - self.strike_fx_rate)
+            v = v * self.notional * dom_df * newfwd_fx_rate
 
-        self._cash_dom = v * self._notional_dom / self._strike_fx_rate
-        self._cash_for = v * self._notional_for / spot_fx_rate
+        self.cash_dom = v * self.notional_dom / self.strike_fx_rate
+        self.cash_for = v * self.notional_for / spot_fx_rate
 
         return {"value": v,
-                "cash_dom": self._cash_dom,
-                "cash_for": self._cash_for,
-                "not_dom": self._notional_dom,
-                "not_for": self._notional_for,
-                "ccy_dom": self._dom_name,
-                "ccy_for": self._for_name}
+                "cash_dom": self.cash_dom,
+                "cash_for": self.cash_for,
+                "not_dom": self.notional_dom,
+                "not_for": self.notional_for,
+                "ccy_dom": self.dom_name,
+                "ccy_for": self.for_name}
 
 ###############################################################################
 
@@ -146,7 +146,7 @@ class FXForward:
         contract equal to zero. """
 
         if isinstance(value_dt, Date):
-            t = (self._delivery_dt - value_dt) / gDaysInYear
+            t = (self.delivery_dt - value_dt) / gDaysInYear
         else:
             t = value_dt
 
@@ -168,12 +168,12 @@ class FXForward:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self._expiry_dt)
-        s += label_to_string("STRIKE FX RATE", self._strike_fx_rate)
-        s += label_to_string("CURRENCY PAIR", self._currency_pair)
-        s += label_to_string("NOTIONAL", self._notional)
-        s += label_to_string("NOTIONAL CCY", self._notional_currency)
-        s += label_to_string("SPOT DAYS", self._spot_days, "")
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
+        s += label_to_string("CURRENCY PAIR", self.currency_pair)
+        s += label_to_string("NOTIONAL", self.notional)
+        s += label_to_string("NOTIONAL CCY", self.notional_currency)
+        s += label_to_string("SPOT DAYS", self.spot_days, "")
         return s
 
 ###############################################################################
