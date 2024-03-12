@@ -203,11 +203,11 @@ def american_bond_option_tree_fast(t_exp,
     # Flows that fall on the expiry date included. The tree only goes out to
     # the expiry date so coupons after this date do not go onto the tree.
     for i in range(0, num_cpns):
-        tcpn = cpn_times[i]
-        if tcpn <= t_exp:
-            n = int(tcpn/dt + 0.50)
+        t_cpn = cpn_times[i]
+        if t_cpn <= t_exp:
+            n = int(t_cpn/dt + 0.50)
             ttree = _tree_times[n]
-            df_flow = _uinterpolate(tcpn, _df_times, _df_values, INTERP)
+            df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP)
             df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP)
             tree_flows[n] += cpn_amounts[i] * 1.0 * df_flow / df_tree
 
@@ -435,10 +435,10 @@ def bermudan_swaption_tree_fast(t_exp, t_mat, strike_price, face_amount,
 
     # Tree flows go all the way out to the bond maturity date
     for i in range(0, num_cpns):
-        tcpn = cpn_times[i]
-        n = int(round(tcpn/_dt, 0))
+        t_cpn = cpn_times[i]
+        n = int(round(t_cpn/_dt, 0))
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(tcpn, _df_times, _df_values, INTERP)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP)
         fixed_leg_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
         float_leg_values[n] = strike_price * df_flow / df_tree
@@ -634,10 +634,10 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
 
     num_cpns = len(cpn_times)
     for i in range(0, num_cpns):
-        tcpn = cpn_times[i]
-        n = int(round(tcpn/dt, 0))
+        t_cpn = cpn_times[i]
+        n = int(round(t_cpn/dt, 0))
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(tcpn, _df_times, _df_values, INTERP)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP)
         tree_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
@@ -811,20 +811,20 @@ def fwd_dirty_bond_price(r_t, *args):
 
     for i in range(1, num_flows):
 
-        tcpn = cpn_times[i]
+        t_cpn = cpn_times[i]
         cpn = cpn_amounts[i]
 
-        if tcpn > t_exp:
-            ptcpn = _uinterpolate(tcpn, df_times, df_values, INTERP)
-            zcb = p_fast(t_exp, tcpn, r_t, dt, pt_exp, ptdelta, ptcpn,
+        if t_cpn > t_exp:
+            pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP)
+            zcb = p_fast(t_exp, t_cpn, r_t, dt, pt_exp, ptdelta, pt_cpn,
                          self.sigma, self.a)
             pv = pv + zcb * cpn
-#            print("TCPN", tcpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
+#            print("TCPN", t_cpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
 
-    if tcpn >= t_exp:
+    if t_cpn >= t_exp:
         pv = pv + zcb
 
-#    print("TCPN", tcpn, "ZCB", zcb, "PRI", 1.0, "PV", pv)
+#    print("TCPN", t_cpn, "ZCB", zcb, "PRI", 1.0, "PV", pv)
 
     accd = accrued_interpolator(t_exp, cpn_times, cpn_amounts)
 #    print("Accrued:", accd)
@@ -959,17 +959,17 @@ class HWTree():
         # Adjust strike to handle
         for i in range(0, num_cpns):
 
-            tcpn = cpn_times[i]
+            t_cpn = cpn_times[i]
             cpn = cpn_amounts[i]
 
-            if tcpn >= t_exp:  # coupons on the expiry date are included
+            if t_cpn >= t_exp:  # coupons on the expiry date are included
 
-                ptcpn = _uinterpolate(tcpn, df_times, df_values, INTERP)
+                pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP)
 
-                strike = p_fast(t_exp, tcpn, rstar, dt, pt_exp, ptdelta,
-                                ptcpn, self.sigma, self.a)
+                strike = p_fast(t_exp, t_cpn, rstar, dt, pt_exp, ptdelta,
+                                pt_cpn, self.sigma, self.a)
 
-                v = self.option_on_zcb(t_exp, tcpn, strike, 1.0,
+                v = self.option_on_zcb(t_exp, t_cpn, strike, 1.0,
                                        df_times, df_values)
 
                 call = v['call']
@@ -1021,15 +1021,15 @@ class HWTree():
 
             for i in range(0, num_cpns):
 
-                tcpn = cpn_times[i]
+                t_cpn = cpn_times[i]
                 cpn = cpn_amounts[i]
 
-                if tcpn >= t_exp:
+                if t_cpn >= t_exp:
 
-                    ptcpn = _uinterpolate(tcpn, self.df_times, self.dfs,
+                    pt_cpn = _uinterpolate(t_cpn, self.df_times, self.dfs,
                                           INTERP)
 
-                    zcb = p_fast(t_exp, tcpn, r_t, dt, pt_exp, ptdelta, ptcpn,
+                    zcb = p_fast(t_exp, t_cpn, r_t, dt, pt_exp, ptdelta, pt_cpn,
                                  self.sigma, self.a)
 
                     pv += cpn * zcb

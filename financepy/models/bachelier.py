@@ -51,7 +51,7 @@ class Bachelier():
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         return s
 

@@ -482,7 +482,7 @@ class BondZero:
 
         if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstanc(clean_price, np.ndarray):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
             raise FinError("Unknown type for clean_price "

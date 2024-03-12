@@ -445,7 +445,7 @@ class BondFRN:
                        settle_dt: Date):
         """ Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond. """
-        self.calculate_cpn_dts()
+        self._calculate_cpn_dts()
         for dt in self.cpn_dts[1:-1]:
             print(dt)
 

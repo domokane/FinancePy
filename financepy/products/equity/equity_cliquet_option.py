@@ -115,7 +115,7 @@ class EquityCliquetOption(EquityOption):
 
             v = model.volatility
             v = max(v, 1e-6)
-            tprev = 0.0
+            t_prev = 0.0
 
             for dt in self.expiry_dts:
 
@@ -126,10 +126,10 @@ class EquityCliquetOption(EquityOption):
                     r = -np.log(df) / t_exp
 
                     # option life
-                    tau = t_exp - tprev
+                    tau = t_exp - t_prev
 
                     # The deflator is out to the option reset time
-                    dq = dividend_curve._df(tprev)
+                    dq = dividend_curve._df(t_prev)
 
                     # The option dividend is over the option life
                     dqMat = dividend_curve._df(t_exp)
@@ -152,7 +152,7 @@ class EquityCliquetOption(EquityOption):
                     self._dfs.append(df)
                     self.v_options.append(v)
                     self.actual_dts.append(dt)
-                    tprev = t_exp
+                    t_prev = t_exp
         else:
             raise FinError("Unknown Model Type")
 

@@ -5,6 +5,7 @@
 # TODO: Add __repr__ method
 
 from math import sqrt
+
 import numpy as np
 
 from ...models.gauss_copula_onefactor import tranch_surv_prob_gaussian

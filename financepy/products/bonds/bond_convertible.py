@@ -570,7 +570,7 @@ class BondConvertible:
         previous coupon date and the settlement date. """
 
         if settle_dt != self.settle_dt:
-            self.calculate_cpn_dts(settle_dt)
+            self._calculate_cpn_dts(settle_dt)
 
         if len(self.cpn_dts) == 0:
             raise FinError("Accrued interest - not enough flow dates.")

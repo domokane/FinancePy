@@ -83,24 +83,24 @@ class BondEmbeddedOption:
                 raise FinError("Call date after bond maturity date")
 
         if len(call_dts) > 0:
-            dtprev = call_dts[0]
+            dt_prev = call_dts[0]
             for dt in call_dts[1:]:
-                if dt <= dtprev:
+                if dt <= dt_prev:
                     raise FinError("Call dates not increasing")
                 else:
-                    dtprev = dt
+                    dt_prev = dt
 
         for dt in put_dts:
             if dt > self.maturity_dt:
                 raise FinError("Put date after bond maturity date")
 
         if len(put_dts) > 0:
-            dtprev = put_dts[0]
+            dt_prev = put_dts[0]
             for dt in put_dts[1:]:
-                if dt <= dtprev:
+                if dt <= dt_prev:
                     raise FinError("Put dates not increasing")
                 else:
-                    dtprev = dt
+                    dt_prev = dt
 
         for px in call_prices:
             if px < 0.0:
@@ -192,10 +192,10 @@ class BondEmbeddedOption:
                                                    face_amount)
             model.num_time_steps -= 1
 
-            v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
-            v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
+            v_bond_with_option = (v1['bondwithoption'] + v2['bondwithoption']) / 2
+            v_bond_pure = (v1['bondpure'] + v2['bondpure']) / 2
 
-            return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
+            return {'bondwithoption': v_bond_with_option, 'bondpure': v_bond_pure}
 
         elif isinstance(model, BKTree):
 
@@ -215,10 +215,10 @@ class BondEmbeddedOption:
                                                    face_amount)
             model.num_time_steps -= 1
 
-            v_bondwithoption = (v1['bondwithoption'] + v2['bondwithoption'])/2
-            v_bondpure = (v1['bondpure'] + v2['bondpure'])/2
+            v_bond_with_option = (v1['bondwithoption'] + v2['bondwithoption']) / 2
+            v_bond_pure = (v1['bondpure'] + v2['bondpure']) / 2
 
-            return {'bondwithoption': v_bondwithoption, 'bondpure': v_bondpure}
+            return {'bondwithoption': v_bond_with_option, 'bondpure': v_bond_pure}
         else:
             raise FinError("Unknown model type")
 
@@ -226,7 +226,7 @@ class BondEmbeddedOption:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self)._name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("COUPON", self.cpn)

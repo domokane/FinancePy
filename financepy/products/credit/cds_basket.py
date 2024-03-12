@@ -319,7 +319,7 @@ class CDSBasket:
     def __repr__(self):
         """ print out details of the CDS contract and all of the calculated
         cash flows """
-        s = label_to_string("OBJECT TYPE", type(self).name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)

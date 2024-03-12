@@ -168,10 +168,10 @@ def bermudan_swaption_tree_fast(t_exp, t_mat,
 
     # swap fixed leg flows go all the way out to the swap maturity date
     for i in range(0, num_cpns):
-        tcpn = cpn_times[i]
-        n = int(tcpn/_dt + 0.50)
+        t_cpn = cpn_times[i]
+        n = int(t_cpn/_dt + 0.50)
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
         fixed_leg_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
         float_leg_values[n] = strike_price  # * df_flow / df_tree
@@ -195,12 +195,12 @@ def bermudan_swaption_tree_fast(t_exp, t_mat,
 
         fixed_pv = 0.0
         for n in range(0, num_cpns):
-            tcpn = cpn_times[n]
-            df = _uinterpolate(tcpn, _df_times, _df_values, interp)
+            t_cpn = cpn_times[n]
+            df = _uinterpolate(t_cpn, _df_times, _df_values, interp)
             flow = cpn_flows[n]
             pv_flow = flow * df
             fixed_pv += pv_flow
-            print("++", n, tcpn, df, flow, fixed_pv)
+            print("++", n, t_cpn, df, flow, fixed_pv)
         fixed_pv += df
         df_tree = _uinterpolate(t_exp, _df_times, _df_values, interp)
         floatpv = df_tree
@@ -394,14 +394,14 @@ def american_bond_option_tree_fast(t_exp, t_mat,
     # Tree flows go all the way out to the bond maturity date
     # Do not include first coupon as it is the previous coupon and is negative
     for i in range(1, num_cpns):
-        tcpn = cpn_times[i]
+        t_cpn = cpn_times[i]
 
-        if tcpn < 0.0:
+        if t_cpn < 0.0:
             raise FinError("Coupon times must be positive.")
 
-        n = int(tcpn/_dt + 0.50)
+        n = int(t_cpn/_dt + 0.50)
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
         tree_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
@@ -615,10 +615,10 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
 
     num_cpns = len(cpn_times)
     for i in range(0, num_cpns):
-        tcpn = cpn_times[i]
-        n = int(tcpn/_dt + 0.50)
+        t_cpn = cpn_times[i]
+        n = int(t_cpn/_dt + 0.50)
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(tcpn, _df_times, _df_values, interp)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, interp)
         df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
         tree_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
