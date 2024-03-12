@@ -45,13 +45,13 @@ def test_bond_frn_1():
 
     assert round(dirty_price, 4) == 97.0266
 
-    lastCouponDt = bond._pcd
+    lastCouponDt = bond.pcd
     assert lastCouponDt == Date(10, 5, 2017)
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     assert accddays == 71
 
-    accdAmount = bond._accrued_interest
+    accdAmount = bond.accrued_int
     assert round(accdAmount, 4) == 0.0023
 
     principal = bond.principal(settle_dt,
@@ -147,13 +147,13 @@ def test_bond_frn_2():
 
     assert round(dirty_price, 4) == 93.1315
 
-    lastCouponDt = bond._pcd
+    lastCouponDt = bond.pcd
     assert lastCouponDt == Date(3, 2, 2014)
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     assert accddays == 55
 
-    accdAmount = bond._accrued_interest
+    accdAmount = bond.accrued_int
     assert round(accdAmount, 4) == 0.0005
 
     principal = bond.principal(settle_dt,

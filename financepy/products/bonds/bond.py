@@ -766,11 +766,11 @@ class Bond:
             settle_dt: Date,
             clean_price: float,
             discount_curve: DiscountCurve,
-            swapFloatDayCountConventionType=DayCountTypes.ACT_360,
-            swapFloatFrequencyType=FrequencyTypes.SEMI_ANNUAL,
-            swapFloatCalendarType=CalendarTypes.WEEKEND,
-            swapFloatBusDayAdjustRuleType=BusDayAdjustTypes.FOLLOWING,
-            swapFloatDateGenRuleType=DateGenRuleTypes.BACKWARD):
+            swap_float_day_count_convention_type=DayCountTypes.ACT_360,
+            swap_float_frequency_type=FrequencyTypes.SEMI_ANNUAL,
+            swap_float_calendar_type=CalendarTypes.WEEKEND,
+            swap_float_bus_day_adjust_rule_type=BusDayAdjustTypes.FOLLOWING,
+            swap_float_date_gen_rule_type=DateGenRuleTypes.BACKWARD):
         """ Calculate the par asset swap spread of the bond. The discount curve
         is an Ibor curve that is passed in. This function is vectorised with
         respect to the clean price. """
@@ -797,12 +797,12 @@ class Bond:
         prev_dt = self.pcd
         schedule = Schedule(settle_dt,
                             self.maturity_dt,
-                            swapFloatFrequencyType,
-                            swapFloatCalendarType,
-                            swapFloatBusDayAdjustRuleType,
-                            swapFloatDateGenRuleType)
+                            swap_float_frequency_type,
+                            swap_float_calendar_type,
+                            swap_float_bus_day_adjust_rule_type,
+                            swap_float_date_gen_rule_type)
 
-        day_count = DayCount(swapFloatDayCountConventionType)
+        day_count = DayCount(swap_float_day_count_convention_type)
 
         prev_dt = self.pcd
         pv01 = 0.0

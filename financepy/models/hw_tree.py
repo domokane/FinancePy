@@ -873,6 +873,10 @@ class HWTree():
         self.pd = None
         self.discount_curve = None
         self.tree_built = False
+        self.df_times = None
+        self.dfs = None
+        self.r_t = None
+        self.dt = None
 
 ###############################################################################
 
@@ -900,7 +904,7 @@ class HWTree():
             a = SMALL
 
         sigmap = (sigma/a) * (1.0 - np.exp(-a*(t_mat-t_exp)))
-        sigmap *= np.sqrt((1.0-np.exp(-2.0*a*t_exp))/2.0/a)
+        sigmap = sigmap * np.sqrt((1.0-np.exp(-2.0*a*t_exp))/2.0/a)
 
         if abs(sigmap) < SMALL:
             sigmap = SMALL

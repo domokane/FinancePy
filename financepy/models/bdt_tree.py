@@ -667,6 +667,7 @@ class BDTTree():
         self.rt = None
         self.tree_times = None
         self.df_times = None
+        self.dfs = None
         self.pu = 0.50
         self.pd = 0.50
         self.discount_curve = None

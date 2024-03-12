@@ -67,7 +67,7 @@ errorStr = "In averaging period so need to enter accrued average."
 def _value_mc_numba(t0,
                     t,
                     tau,
-                    K,
+                    k,
                     n,
                     option_type,
                     stock_price,
@@ -88,7 +88,7 @@ def _value_mc_numba(t0,
             raise FinError(errorStr)
 
         # we adjust the strike to account for the accrued coupon
-        K = (K * tau + accrued_average * t0) / t
+        k = (k * tau + accrued_average * t0) / t
         # the number of options is rescaled also
         multiplier = t / tau
         # there is no pre-averaging time
@@ -132,11 +132,11 @@ def _value_mc_numba(t0,
         s_2_arithmetic /= n
 
         if option_type == OptionTypes.EUROPEAN_CALL:
-            payoff_a += max(s_1_arithmetic - K, 0.0)
-            payoff_a += max(s_2_arithmetic - K, 0.0)
+            payoff_a += max(s_1_arithmetic - k, 0.0)
+            payoff_a += max(s_2_arithmetic - k, 0.0)
         elif option_type == OptionTypes.EUROPEAN_PUT:
-            payoff_a += max(K - s_1_arithmetic, 0.0)
-            payoff_a += max(K - s_2_arithmetic, 0.0)
+            payoff_a += max(k - s_1_arithmetic, 0.0)
+            payoff_a += max(k - s_2_arithmetic, 0.0)
         else:
             return None
 
@@ -151,7 +151,7 @@ def _value_mc_numba(t0,
 def _value_mc_fast_numba(t0: float,
                          t: float,
                          tau: float,
-                         K: float,
+                         k: float,
                          n: int,
                          option_type: int,
                          stock_price: float,
@@ -177,7 +177,7 @@ def _value_mc_fast_numba(t0: float,
             raise FinError(errorStr)
 
         # we adjust the strike to account for the accrued coupon
-        K = (K * tau + accrued_average * t0) / t
+        k = (k * tau + accrued_average * t0) / t
         # the number of options is rescaled also
         multiplier = t / tau
         # there is no pre-averaging time
@@ -220,11 +220,11 @@ def _value_mc_fast_numba(t0: float,
             s_2_arithmetic[ip] += s_2[ip] / n
 
     if option_type == OptionTypes.EUROPEAN_CALL.value:
-        payoff_a_1 = np.maximum(s_1_arithmetic - K, 0.0)
-        payoff_a_2 = np.maximum(s_2_arithmetic - K, 0.0)
+        payoff_a_1 = np.maximum(s_1_arithmetic - k, 0.0)
+        payoff_a_2 = np.maximum(s_2_arithmetic - k, 0.0)
     elif option_type == OptionTypes.EUROPEAN_PUT.value:
-        payoff_a_1 = np.maximum(K - s_1_arithmetic, 0.0)
-        payoff_a_2 = np.maximum(K - s_2_arithmetic, 0.0)
+        payoff_a_1 = np.maximum(k - s_1_arithmetic, 0.0)
+        payoff_a_2 = np.maximum(k - s_2_arithmetic, 0.0)
     else:
         raise FinError("Unknown option type.")
 
@@ -364,7 +364,7 @@ class EquityAsianOption:
         if start_averaging_dt > expiry_dt:
             raise FinError("Averaging starts after expiry date")
 
-        self.startAveragingDate = start_averaging_dt
+        self.start_averaging_date = start_averaging_dt
         self.expiry_dt = expiry_dt
         self.strike_price = float(strike_price)
         self.option_type = option_type
@@ -447,9 +447,9 @@ class EquityAsianOption:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
+        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
 
         r = discount_curve.cc_rate(self.expiry_dt)
         q = dividend_curve.cc_rate(self.expiry_dt)
@@ -513,9 +513,9 @@ class EquityAsianOption:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
+        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
 
         multiplier = 1.0
 
@@ -580,9 +580,9 @@ class EquityAsianOption:
         if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
-        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
+        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
 
         K = self.strike_price
         multiplier = 1.0
@@ -665,13 +665,13 @@ class EquityAsianOption:
         if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
-        if value_dt > self.startAveragingDate and accrued_average is None:
+        if value_dt > self.start_averaging_date and accrued_average is None:
             raise FinError(errorStr)
 
         # the years to the start of the averaging period
-        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
+        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
 
         r = discount_curve.cc_rate(self.expiry_dt)
         q = dividend_curve.cc_rate(self.expiry_dt)
@@ -707,9 +707,9 @@ class EquityAsianOption:
         a lot of Numpy vectorisation. It is also helped by Numba. """
 
         # the years to the start of the averaging period
-        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
+        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
 
         K = self.strike_price
         n = self.num_observations
@@ -747,9 +747,9 @@ class EquityAsianOption:
         price. This uses Numpy and Numba. This is the standard MC pricer. """
 
         # the years to the start of the averaging period
-        t0 = (self.startAveragingDate - value_dt) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.startAveragingDate) / gDaysInYear
+        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
 
         K = self.strike_price
         n = self.num_observations
@@ -788,7 +788,7 @@ class EquityAsianOption:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START AVERAGING DATE", self.startAveragingDate)
+        s += label_to_string("START AVERAGING DATE", self.start_averaging_date)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
         s += label_to_string("OPTION TYPE", self.option_type)

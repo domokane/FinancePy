@@ -62,6 +62,12 @@ class BondMortgage:
                                   self.bd_type,
                                   self.dg_type)
 
+        self.mortgage_type = None
+        self.interest_flows = None
+        self.principal_flows = None
+        self.principal_remaining = None
+        self.total_flows = None
+
 ###############################################################################
 
     def repayment_amount(self,

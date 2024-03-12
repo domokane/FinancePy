@@ -894,6 +894,9 @@ class BKTree():
         self.pm = None
         self.pd = None
         self.discount_curve = None
+        self.df_times = None
+        self.dfs = None
+        self.dt = None
 
 ###############################################################################
 

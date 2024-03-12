@@ -65,6 +65,10 @@ class EquityCliquetOption(EquityOption):
         self.bd_type = bd_type
         self.dg_type = dg_type
 
+        self.v_options = None
+        self._dfs = None
+        self.actual_dts = None
+
         self.expiry_dts = Schedule(self.start_dt,
                                     self.final_expiry_dt,
                                     self.freq_type,

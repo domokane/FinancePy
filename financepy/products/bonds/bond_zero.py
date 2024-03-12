@@ -84,9 +84,11 @@ class BondZero:
         self.cal_type = CalendarTypes.WEEKEND
         self.ex_div_days = 0
 
-        self.accrued_int= None
-        self.accrued_days = 0.0
-        self.alpha = 0.0
+        self.accrued_int = None
+        self.accrued_days = None
+        self.alpha = None
+        self.pcd = None
+        self.ncd = None
 
     ###########################################################################
 
@@ -160,8 +162,8 @@ class BondZero:
         dy = 0.0001  # 1 basis point
         p0 = self.dirty_price_from_ytm(settle_dt, ytm - dy, convention)
         p2 = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
-        durn = -(p2 - p0) / dy / 2.0
-        return durn
+        d = -(p2 - p0) / dy / 2.0
+        return d
 
     ###########################################################################
 

@@ -116,7 +116,7 @@ def test_bloomberg_us_treasury_example():
     accrued_interest = bond.accrued_interest(settle_dt, face)
     assert round(accrued_interest, 4) == 0.4324
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     assert round(accddays, 4) == 67.0
 
     duration = bond.dollar_duration(settle_dt, ytm)
@@ -168,7 +168,7 @@ def test_bloomberg_apple_corp_example():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     assert round(clean_price, 4) == 101.5832
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     assert accddays == 68
 
     accrued_interest = bond.accrued_interest(settle_dt, face)

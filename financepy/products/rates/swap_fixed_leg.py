@@ -157,21 +157,21 @@ class SwapFixedLeg:
         leg_pv = 0.0
         num_payments = len(self.payment_dts)
 
-        df_pmnt = 0.0
+        df_payment = 0.0
 
         for i_pmnt in range(0, num_payments):
 
-            pmnt_dt = self.payment_dts[i_pmnt]
+            payment_dt = self.payment_dts[i_pmnt]
             pmnt_amount = self.payments[i_pmnt]
 
-            if pmnt_dt > value_dt:
+            if payment_dt > value_dt:
 
-                df_pmnt = discount_curve.df(pmnt_dt) / df_value
-                pmnt_pv = pmnt_amount * df_pmnt
-                leg_pv += pmnt_pv
+                df_payment = discount_curve.df(payment_dt) / df_value
+                payment_pv = pmnt_amount * df_payment
+                leg_pv += payment_pv
 
-                self.payment_dfs.append(df_pmnt)
-                self.payment_pvs.append(pmnt_amount*df_pmnt)
+                self.payment_dfs.append(df_payment)
+                self.payment_pvs.append(pmnt_amount*df_payment)
                 self.cumulative_pvs.append(leg_pv)
 
             else:
@@ -180,8 +180,8 @@ class SwapFixedLeg:
                 self.payment_pvs.append(0.0)
                 self.cumulative_pvs.append(0.0)
 
-        if pmnt_dt > value_dt:
-            payment_pv = self.principal * df_pmnt * notional
+        if payment_dt > value_dt:
+            payment_pv = self.principal * df_payment * notional
             self.payment_pvs[-1] += payment_pv
             leg_pv += payment_pv
             self.cumulative_pvs[-1] = leg_pv

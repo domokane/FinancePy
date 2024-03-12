@@ -25,7 +25,7 @@ def test_1():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.001500
+    assert round(bond.accrued_int, 4) == 0.001500
     assert round(ytm * 100, 4) == 0.2203
 
 
@@ -41,7 +41,7 @@ def test_2():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.001500
+    assert round(bond.accrued_int, 4) == 0.001500
     assert round(ytm * 100, 4) == 0.2203
 
 
@@ -57,7 +57,7 @@ def test_3():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0382
+    assert round(bond.accrued_int, 4) == 0.0382
     assert round(ytm * 100, 4) == 0.2380
 
 
@@ -73,7 +73,7 @@ def test_4():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0008
+    assert round(bond.accrued_int, 4) == 0.0008
     assert round(ytm * 100, 4) == 0.2172
 
 
@@ -89,7 +89,7 @@ def test_5():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0017
+    assert round(bond.accrued_int, 4) == 0.0017
     assert round(ytm * 100, 4) == 0.2297
 
 
@@ -105,7 +105,7 @@ def test_6():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0044
+    assert round(bond.accrued_int, 4) == 0.0044
     assert round(ytm * 100, 4) == 0.3334
 
 
@@ -121,7 +121,7 @@ def test_7():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0016
+    assert round(bond.accrued_int, 4) == 0.0016
     assert round(ytm * 100, 4) == 0.3485
 
 
@@ -137,7 +137,7 @@ def test_8():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0228
+    assert round(bond.accrued_int, 4) == 0.0228
     assert round(ytm * 100, 4) == 0.3405
 
 
@@ -153,7 +153,7 @@ def test_9():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0033
+    assert round(bond.accrued_int, 4) == 0.0033
     assert round(ytm * 100, 4) == 0.4930
 
 
@@ -169,7 +169,7 @@ def test_10():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0013
+    assert round(bond.accrued_int, 4) == 0.0013
     assert round(ytm * 100, 4) == 0.5559
 
 
@@ -185,5 +185,5 @@ def test_11():
                 coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settlement, clean_price)
-    assert round(bond._accrued_interest, 4) == 0.0060
+    assert round(bond.accrued_int, 4) == 0.0060
     assert round(ytm * 100, 4) == 0.7652

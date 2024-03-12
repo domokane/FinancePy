@@ -127,9 +127,9 @@ class CDSBasket:
 
             if min_tau < t_mat:
 
-                num_pmnts_index = int(min_tau / avg_acc_factor)
-                rpv01_trial = rpv01_to_times[num_pmnts_index]
-                rpv01_trial += (min_tau - num_pmnts_index * avg_acc_factor)
+                num_payment_amounts_index = int(min_tau / avg_acc_factor)
+                rpv01_trial = rpv01_to_times[num_payment_amounts_index]
+                rpv01_trial += (min_tau - num_payment_amounts_index * avg_acc_factor)
 
                 # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
                 asset_index = 0
@@ -143,7 +143,7 @@ class CDSBasket:
 
             else:
 
-                num_pmnts_index = int(t_mat / avg_acc_factor)
+                num_payment_amounts_index = int(t_mat / avg_acc_factor)
                 rpv01_trial = rpv01_to_times[-1]
                 prot_trial = 0.0
 

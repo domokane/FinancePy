@@ -86,10 +86,19 @@ class EquitySwapLeg:
         self.start_accd_dts = []
         self.end_accd_dts = []
         self.payment_dts = []
-        self.pmnts = []
+        self.payment_amounts = []
         self.year_fracs = []
         self.accrued_days = []
         self.rates = []
+
+        self.fwd_rates = []
+        self.div_fwd_rates = []
+        self.eq_fwd_rates = []
+        self.last_notionals = []
+        self.payment_dfs = []
+        self.payment_pvs = []
+        self.cumulative_pvs = []
+        self.current_price = None
 
         self.generate_payment_dts()
 
@@ -124,7 +133,7 @@ class EquitySwapLeg:
         day_counter = DayCount(self.dc_type)
         calendar = Calendar(self.cal_type)
 
-        # All of the lists end up with the same length
+        # All the lists end up with the same length
         for next_dt in schedule_dts[1:]:
 
             self.start_accd_dts.append(prev_dt)
@@ -183,14 +192,15 @@ class EquitySwapLeg:
         self.div_fwd_rates = []
         self.eq_fwd_rates = []
         self.last_notionals = []
-        self.pmnts = []
-        self.pmnt_dfs = []
-        self.pmnt_pvs = []
+        self.payment_amounts = []
+        self.payment_dfs = []
+        self.payment_pvs = []
         self.cumulative_pvs = []
 
         df_value = discount_curve.df(value_dt)
         leg_pv, eq_term_rate = 0.0, 0.0
         last_notional = self.notional
+        next_notional = last_notional
         num_payments = len(self.payment_dts)
 
         index_basis = index_curve.dc_type
@@ -198,9 +208,9 @@ class EquitySwapLeg:
 
         for i_pmnt in range(0, num_payments):
 
-            pmnt_dt = self.payment_dts[i_pmnt]
+            payment_dt = self.payment_dts[i_pmnt]
 
-            if pmnt_dt > value_dt:
+            if payment_dt > value_dt:
 
                 start_accrued_dt = self.start_accd_dts[i_pmnt]
                 end_accrued_dt = self.end_accd_dts[i_pmnt]
@@ -227,16 +237,16 @@ class EquitySwapLeg:
 
                 next_price = self.current_price * (1 + eq_term_rate)
                 next_notional = next_price * self.quantity
-                pmntAmount = next_notional - last_notional
+                payment_amount = next_notional - last_notional
 
-                df_pmnt = discount_curve.df(pmnt_dt) / df_value
-                pmnt_pv = pmntAmount * df_pmnt
-                leg_pv += pmnt_pv
+                df_payment = discount_curve.df(payment_dt) / df_value
+                payment_pv = payment_amount * df_payment
+                leg_pv += payment_pv
 
                 self.last_notionals.append(last_notional)
-                self.pmnts.append(pmntAmount)
-                self.pmnt_dfs.append(df_pmnt)
-                self.pmnt_pvs.append(pmnt_pv)
+                self.payment_amounts.append(payment_amount)
+                self.payment_dfs.append(df_payment)
+                self.payment_pvs.append(payment_pv)
                 self.cumulative_pvs.append(leg_pv)
 
             else:
@@ -245,9 +255,9 @@ class EquitySwapLeg:
                 self.div_fwd_rates.append(0.0)
                 self.eq_fwd_rates.append(0.0)
                 self.last_notionals.append(self.notional)
-                self.pmnts.append(0.0)
-                self.pmnt_dfs.append(0.0)
-                self.pmnt_pvs.append(0.0)
+                self.payment_amounts.append(0.0)
+                self.payment_dfs.append(0.0)
+                self.payment_pvs.append(0.0)
                 self.cumulative_pvs.append(leg_pv)
 
             last_notional = next_notional
@@ -259,7 +269,7 @@ class EquitySwapLeg:
 
 ##########################################################################
 
-    def print_pmnts(self):
+    def print_payment_amounts(self):
         """ Prints the payment dates, accrual factors, discount factors,
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
@@ -299,9 +309,9 @@ class EquitySwapLeg:
         cash amounts, their present value and their cumulative PV using the
         last valuation performed. """
 
-        self.print_pmnts()
+        self.print_payment_amounts()
 
-        if len(self.pmnts) == 0:
+        if len(self.payment_amounts) == 0:
             print("Payments not calculated.")
             return
 
@@ -317,9 +327,9 @@ class EquitySwapLeg:
                 self.payment_dts[i_flow],
                 round(self.last_notionals[i_flow], 0),
                 round(self.eq_fwd_rates[i_flow] * 100.0, 4),
-                round(self.pmnts[i_flow], 2),
-                round(self.pmnt_dfs[i_flow], 4),
-                round(self.pmnt_pvs[i_flow], 2),
+                round(self.payment_amounts[i_flow], 2),
+                round(self.payment_dfs[i_flow], 4),
+                round(self.payment_pvs[i_flow], 2),
                 round(self.cumulative_pvs[i_flow], 2),
             ])
 

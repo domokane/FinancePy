@@ -63,10 +63,10 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     assert round(clean_price, 4) == 104.0350
 
-    accddays = bond._accrued_days
+    accddays = bond.accrued_days
     assert accddays == 6.0
 
-    accrued_interest = bond._accrued_interest
+    accrued_interest = bond.accrued_int
     assert round(accrued_interest, 4) == 0.0204
 
     # Inflation functions that calculate nominal yield with CPI adjustment

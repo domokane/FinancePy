@@ -53,6 +53,10 @@ class BondAnnuity:
         self.accrued_days = 0.0
         self.alpha = 0.0
 
+        self.pcd = None
+        self.ncd = None
+        self.flow_amounts = None
+
     ###########################################################################
 
     def clean_price_from_discount_curve(self,

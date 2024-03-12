@@ -128,7 +128,7 @@ class EquitySwap:
                                                         index_curve,
                                                         dividend_curve,
                                                         current_price)
-        self.fill_rate_notional_array()
+        self._fill_rate_notional_array()
 
         self.rate_leg_value = self.rate_leg.value(value_dt,
                                                     discount_curve,

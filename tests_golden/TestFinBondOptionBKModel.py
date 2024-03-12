@@ -374,7 +374,7 @@ def test_BondOptionZEROVOLConvergence():
         expiry_dt, discount_curve)
 #    print("BOND FwdCleanBondPx", fwdCleanValue)
 #    print("BOND FwdFullBondPx", fwdFullValue)
-#    print("BOND Accrued:", bond._accrued_interest)
+#    print("BOND Accrued:", bond.accrued_int)
 
     spotCleanValue = bond.clean_price_from_discount_curve(
         settle_dt, discount_curve)

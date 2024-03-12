@@ -326,7 +326,7 @@ class BondConvertible:
         users to supply the issue date and without that I do not know how
         far to go back in the cashflow date schedule. """
 
-        self.accrued_int= None
+        self.accrued_int = None
         self.accrued_days = 0.0
         self.alpha = 0.0
 
@@ -341,6 +341,7 @@ class BondConvertible:
             return
 
         self.settle_dt = settle_dt
+
         bd_type = BusDayAdjustTypes.NONE
         dg_type = DateGenRuleTypes.BACKWARD
 
@@ -353,6 +354,8 @@ class BondConvertible:
 
         self.pcd = self.cpn_dts[0]
         self.ncd = self.cpn_dts[1]
+
+        self.accrued_int = None
         self.accrued_interest(settle_dt, 1.0)
 
     ###########################################################################
@@ -551,7 +554,7 @@ class BondConvertible:
     def accrued_days(self,
                      settle_dt: Date):
         """ Calculate number days from previous coupon date to settlement."""
-        self.calculate_cpn_dts(settle_dt)
+        self._calculate_cpn_dts(settle_dt)
 
         if len(self.cpn_dts) <= 2:
             raise FinError("Accrued interest - not enough flow dates.")
@@ -581,9 +584,9 @@ class BondConvertible:
 
         self.alpha = 1.0 - acc_factor * self.freq
 
-        self.accrued = acc_factor * face * self.cpn
+        self.accrued_int = acc_factor * face * self.cpn
         self.accrued_days = num
-        return self.accrued_interest
+        return self.accrued_int
 
     ###########################################################################
 

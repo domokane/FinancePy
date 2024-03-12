@@ -460,6 +460,18 @@ class FXVolSurface():
         self.vol_func_type = vol_func_type
         self.tenor_index = 0
 
+        self.k_25d_c = None
+        self.k_25d_p = None
+        self.k_25d_c_ms = None
+        self.k_25d_p_ms = None
+        self.v_25d_ms = None
+        self.t_exp = None
+        self.k_atm = None
+        self.rd = None
+        self.rf = None
+        self.fwd = None
+        self.parameters = None
+
         self.expiry_dts = []
         for i in range(0, self.num_vol_curves):
             expiry_dt = value_dt.add_tenor(tenors[i])

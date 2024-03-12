@@ -421,7 +421,7 @@ def test_clean_price():
     assert round(p, 4) == 119.1509
 
 
-def test_accrued_days():
+def testaccrued_days():
     accrued_days = cds_contract1.accrued_days()
     assert accrued_days == 51.0
 

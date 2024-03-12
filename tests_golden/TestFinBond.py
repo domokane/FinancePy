@@ -547,7 +547,7 @@ def test_bond_payment_dates():
     bond._calculate_payment_dts()
 
     if 1 == 0:
-        print(bond._flow_amounts)
+        print(bond.flow_amounts)
         print(bond.cpn_dts)
         print(bond._payment_dts)
 

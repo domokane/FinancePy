@@ -169,9 +169,9 @@ class SwapFloatLeg:
 
         for i_pmnt in range(0, num_payments):
 
-            pmnt_dt = self.payment_dts[i_pmnt]
+            payment_dt = self.payment_dts[i_pmnt]
 
-            if pmnt_dt > value_dt:
+            if payment_dt > value_dt:
 
                 start_accrued_dt = self.start_accrued_dts[i_pmnt]
                 end_accrued_dt = self.end_accrued_dts[i_pmnt]
@@ -191,17 +191,17 @@ class SwapFloatLeg:
                     df_end = index_curve.df(end_accrued_dt)
                     fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
-                pmntAmount = (fwd_rate + self.spread) * \
+                payment_amount = (fwd_rate + self.spread) * \
                     pay_alpha * self.notional_array[i_pmnt]
 
-                df_pmnt = discount_curve.df(pmnt_dt) / df_value
-                pmnt_pv = pmntAmount * df_pmnt
-                leg_pv += pmnt_pv
+                df_payment = discount_curve.df(payment_dt) / df_value
+                payment_pv = payment_amount * df_payment
+                leg_pv += payment_pv
 
                 self.rates.append(fwd_rate)
-                self.payments.append(pmntAmount)
-                self.payment_dfs.append(df_pmnt)
-                self.payment_pvs.append(pmnt_pv)
+                self.payments.append(payment_amount)
+                self.payment_dfs.append(df_payment)
+                self.payment_pvs.append(payment_pv)
                 self.cumulative_pvs.append(leg_pv)
 
             else:
@@ -212,8 +212,8 @@ class SwapFloatLeg:
                 self.payment_pvs.append(0.0)
                 self.cumulative_pvs.append(leg_pv)
 
-        if pmnt_dt > value_dt:
-            payment_pv = self.principal * df_pmnt * self.notional_array[-1]
+        if payment_dt > value_dt:
+            payment_pv = self.principal * df_payment * self.notional_array[-1]
             self.payment_pvs[-1] += payment_pv
             leg_pv += payment_pv
             self.cumulative_pvs[-1] = leg_pv
