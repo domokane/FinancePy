@@ -36,7 +36,7 @@ def _f(df, *args):
     index_curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    index_curve.interpolator.fit(index_curve._times, index_curve._dfs)
+    index_curve._interpolator.fit(index_curve._times, index_curve._dfs)
     v_swap = swap.value(value_dt, discount_curve, index_curve, None)
 
     notional = swap.fixed_leg.notional
@@ -57,7 +57,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve.interpolator.fit(curve._times, curve._dfs)
+    curve._interpolator.fit(curve._times, curve._dfs)
     v_fra = fra.value(value_dt, discount_curve, curve)
     v_fra /= fra.notional
     return v_fra
@@ -84,8 +84,8 @@ class IborDualCurve(DiscountCurve):
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
-        linear interpolation for swap rates on coupon dates and to then assume
-        flat forwards between these coupon dates.
+        linear interpolation for swap rates on cpn dates and to then assume
+        flat forwards between these cpn dates.
 
         The curve will assign a discount factor of 1.0 to the valuation date.
         """
@@ -95,8 +95,8 @@ class IborDualCurve(DiscountCurve):
         self.value_dt = value_dt
         self.discount_curve = discount_curve
         self._validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
-        self.interp_type = interp_type
-        self._check_refit = check_refit
+        self._interp_type = interp_type
+        self.check_refit = check_refit
         self._build_curve()
 
 ###############################################################################
@@ -224,7 +224,7 @@ class IborDualCurve(DiscountCurve):
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
                         raise FinError(
-                            "Swap coupons are not on the same date grid.")
+                            "Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -291,7 +291,7 @@ class IborDualCurve(DiscountCurve):
         of interpolation approaches between the swap rates and other rates. It
         involves the use of a solver. """
 
-        self.interpolator = Interpolator(self.interp_type)
+        self._interpolator = Interpolator(self._interp_type)
 
         self._times = np.array([])
         self._dfs = np.array([])
@@ -301,7 +301,7 @@ class IborDualCurve(DiscountCurve):
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
-        self.interpolator.fit(self._times, self._dfs)
+        self._interpolator.fit(self._times, self._dfs)
 
         # A deposit is not margined and not indexed to Libor so should
         # probably not be used to build an indexed Libor curve from
@@ -312,7 +312,7 @@ class IborDualCurve(DiscountCurve):
             t_mat = (depo.maturity_dt - self.value_dt) / gDaysInYear
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self.interpolator.fit(self._times, self._dfs)
+            self._interpolator.fit(self._times, self._dfs)
 
         oldt_mat = t_mat
 
@@ -352,7 +352,7 @@ class IborDualCurve(DiscountCurve):
                                      tol=SWAP_TOL, maxiter=50, fprime2=None,
                                      full_output=False)
 
-        if self._check_refit is True:
+        if self.check_refit is True:
             self._check_refits(1e-10, SWAP_TOL, 1e-5)
 
 ###############################################################################
@@ -362,7 +362,7 @@ class IborDualCurve(DiscountCurve):
     #     the linear swap rate method that is fast and exact as it does not
     #     require the use of a solver. It is also market standard. """
 
-    #     self.interpolator = Interpolator(self.interp_type)
+    #     self._interpolator = Interpolator(self._interp_type)
 
     #     self._times = np.array([])
     #     self._dfs = np.array([])
@@ -372,7 +372,7 @@ class IborDualCurve(DiscountCurve):
     #     df_mat = 1.0
     #     self._times = np.append(self._times, 0.0)
     #     self._dfs = np.append(self._dfs, df_mat)
-    #     self.interpolator.fit(self._times, self._dfs)
+    #     self._interpolator.fit(self._times, self._dfs)
 
     #     for depo in self.used_deposits:
     #         df_settle = self.df(depo.effective_dt)
@@ -380,7 +380,7 @@ class IborDualCurve(DiscountCurve):
     #         t_mat = (depo.maturity_dt - self.value_dt) / gDaysInYear
     #         self._times = np.append(self._times, t_mat)
     #         self._dfs = np.append(self._dfs, df_mat)
-    #         self.interpolator.fit(self._times, self._dfs)
+    #         self._interpolator.fit(self._times, self._dfs)
 
     #     oldt_mat = t_mat
 
@@ -396,11 +396,11 @@ class IborDualCurve(DiscountCurve):
     #             df_mat = fra.maturity_df(self)
     #             self._times = np.append(self._times, t_mat)
     #             self._dfs = np.append(self._dfs, df_mat)
-    #             self.interpolator.fit(self._times, self._dfs)
+    #             self._interpolator.fit(self._times, self._dfs)
     #         else:
     #             self._times = np.append(self._times, t_mat)
     #             self._dfs = np.append(self._dfs, df_mat)
-    #             self.interpolator.fit(self._times, self._dfs)
+    #             self._interpolator.fit(self._times, self._dfs)
 
     #             argtuple = (self.discount_curve, self, self.value_dt, fra)
     #             df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
@@ -431,7 +431,7 @@ class IborDualCurve(DiscountCurve):
     #     cpn_dts = longest_swap.adjusted_fixed_dts
     #     num_flows = len(cpn_dts)
 
-    #     # Find where first coupon without discount factor starts
+    #     # Find where first cpn without discount factor starts
     #     start_index = 0
     #     for i in range(0, num_flows):
     #         if cpn_dts[i] > last_dt:
@@ -445,11 +445,11 @@ class IborDualCurve(DiscountCurve):
     #     swap_rates = []
     #     swap_times = []
 
-    #     # I use the last coupon date for the swap rate interpolation as this
+    #     # I use the last cpn date for the swap rate interpolation as this
     #     # may be different from the maturity date due to a holiday adjustment
-    #     # and the swap rates need to align with the coupon payment dates
+    #     # and the swap rates need to align with the cpn payment dates
     #     for swap in self.used_swaps:
-    #         swap_rate = swap.fixed_coupon
+    #         swap_rate = swap.fixed_cpn
     #         maturity_dt = swap.adjusted_fixed_dts[-1]
     #         tswap = (maturity_dt - self.value_dt) / gDaysInYear
     #         swap_times.append(tswap)
@@ -491,7 +491,7 @@ class IborDualCurve(DiscountCurve):
 
     #         self._times = np.append(self._times, t_mat)
     #         self._dfs = np.append(self._dfs, df_mat)
-    #         self.interpolator.fit(self._times, self._dfs)
+    #         self._interpolator.fit(self._times, self._dfs)
 
     #         pv01 += acc * df_mat
 
@@ -537,19 +537,19 @@ class IborDualCurve(DiscountCurve):
 
         for depo in self.used_deposits:
             s += label_to_string("DEPOSIT", "")
-            s += depo._repr__()
+            s += depo.__repr__()
 
         for fra in self.used_fras:
             s += label_to_string("FRA", "")
-            s += fra._repr__()
+            s += fra.__repr__()
 
         for swap in self.used_swaps:
             s += label_to_string("SWAP", "")
-            s += swap._repr__()
+            s += swap.__repr__()
 
         num_points = len(self._times)
 
-        s += label_to_string("INTERP TYPE", self.interp_type)
+        s += label_to_string("INTERP TYPE", self._interp_type)
         s += label_to_string("GRID TIMES", "GRID DFS")
 
         for i in range(0, num_points):

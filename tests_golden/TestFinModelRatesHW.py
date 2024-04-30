@@ -96,12 +96,12 @@ def test_HullWhiteExampleTwo():
 
         model = HWTree(sigma, a, num_time_steps)
         model.build_tree(t_exp, times, dfs)
-        vTree1 = model.option_on_zero_coupon_bond_tree(
+        vTree1 = model.option_on_zero_cpn_bond_tree(
             t_exp, t_mat, strike, face)
 
         model = HWTree(sigma, a, num_time_steps+1)
         model.build_tree(t_exp, times, dfs)
-        vTree2 = model.option_on_zero_coupon_bond_tree(
+        vTree2 = model.option_on_zero_cpn_bond_tree(
             t_exp, t_mat, strike, face)
 
         end = time.time()
@@ -114,7 +114,7 @@ def test_HullWhiteExampleTwo():
         diffP = vTreePut - vAnal['put']
 
         test_cases.print(num_time_steps, period, vTreeCall, vAnal['call'],
-                        vTreePut, vAnal['put'], diffC, diffP)
+                         vTreePut, vAnal['put'], diffC, diffP)
 
  #   plt.plot(num_steps_list, treeVector)
  #   plt.plot(num_steps_list, analVector)
@@ -123,16 +123,16 @@ def test_HullWhiteExampleTwo():
 
 
 def test_HullWhiteBondOption():
-    # Valuation of a European option on a coupon bearing bond
+    # Valuation of a European option on a cpn bearing bond
 
     settle_dt = Date(1, 12, 2019)
     issue_dt = Date(1, 12, 2018)
     expiry_dt = settle_dt.add_tenor("18m")
     maturity_dt = settle_dt.add_tenor("10Y")
-    coupon = 0.05
+    cpn = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, cpn, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
@@ -222,15 +222,15 @@ def test_HullWhiteBondOption():
 
 
 def test_HullWhiteCallableBond():
-    # Valuation of a European option on a coupon bearing bond
+    # Valuation of a European option on a cpn bearing bond
 
     settle_dt = Date(1, 12, 2019)
     issue_dt = Date(1, 12, 2018)
     maturity_dt = settle_dt.add_tenor("10Y")
-    coupon = 0.05
+    cpn = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, cpn, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []

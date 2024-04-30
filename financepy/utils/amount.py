@@ -20,24 +20,23 @@ class Amount:
 
         check_argument_types(self.__init__, locals())
 
-        self._notional = notional
-        self._currency_type = currency_type
+        self.notional = notional
+        self.currency_type = currency_type
 
     def __repr__(self):
-        """ Print out the details of the schedule and the actual dates. This
-        can be used for providing transparency on schedule calculations. """
+        """ Print out amount object. """
 
         s = ""
-        if self._currency_type != CurrencyTypes.NONE:
-            s += self._currency_type.name
+        if self.currency_type != CurrencyTypes.NONE:
+            s += self.currency_type.name
             s += " "
 
-        s += '{:,.2f}'.format(self._notional)
+        s += '{:,.2f}'.format(self.notional)
 
         return s
 
     def amount(self):
-        return self._notional
+        return self.notional
 
     def _print(self):
         """ Print out the details of the schedule and the actual dates. This

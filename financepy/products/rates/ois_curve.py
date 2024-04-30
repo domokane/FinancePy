@@ -60,7 +60,7 @@ def _f(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve.interpolator.fit(curve._times, curve._dfs)
+    curve._interpolator.fit(curve._times, curve._dfs)
     v_swap = swap.value(value_dt, curve, None)
     notional = swap.fixed_leg.notional
     v_swap /= notional
@@ -78,7 +78,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve.interpolator.fit(curve._times, curve._dfs)
+    curve._interpolator.fit(curve._times, curve._dfs)
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
     return v_fra
@@ -112,8 +112,8 @@ class OISCurve(DiscountCurve):
         valuation date and a set of OIS rates. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
-        linear interpolation for swap rates on coupon dates and to then assume
-        flat forwards between these coupon dates.
+        linear interpolation for swap rates on cpn dates and to then assume
+        flat forwards between these cpn dates.
 
         The curve will assign a discount factor of 1.0 to the valuation date.
         """
@@ -122,9 +122,9 @@ class OISCurve(DiscountCurve):
 
         self.value_dt = value_dt
         self._validate_inputs(ois_deposits, ois_fras, ois_swaps)
-        self.interp_type = interp_type
+        self._interp_type = interp_type
         self.check_refit = check_refit
-        self.interpolator = None
+        self._interpolator = None
         self._build_curve()
 
 ###############################################################################
@@ -248,7 +248,7 @@ class OISCurve(DiscountCurve):
 #                num_flows = len(swapCpnDates)
 #                for i_flow in range(0, num_flows):
 #                    if swapCpnDates[i_flow] != longest_swapCpnDates[i_flow]:
-#                        raise FinError("Swap coupons are not on the same date grid.")
+#                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -302,7 +302,7 @@ class OISCurve(DiscountCurve):
         self.used_fras = ois_fras
         self.used_swaps = ois_swaps
 
-       # Need the floating leg basis for the curve
+        # Need the floating leg basis for the curve
         if len(self.used_swaps) > 0:
             self.dc_type = ois_swaps[0].float_leg.dc_type
         else:
@@ -316,7 +316,7 @@ class OISCurve(DiscountCurve):
         of interpolation approaches between the swap rates and other rates. It
         involves the use of a solver. """
 
-        self.interpolator = Interpolator(self.interp_type)
+        self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
         self._dfs = np.array([])
 
@@ -325,7 +325,7 @@ class OISCurve(DiscountCurve):
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
-        self.interpolator.fit(self._times, self._dfs)
+        self._interpolator.fit(self._times, self._dfs)
 
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
@@ -333,7 +333,7 @@ class OISCurve(DiscountCurve):
             t_mat = (depo.maturity_dt - self.value_dt) / gDaysInYear
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self.interpolator.fit(self._times, self._dfs)
+            self._interpolator.fit(self._times, self._dfs)
 
         old_t_mat = t_mat
 
@@ -382,7 +382,7 @@ class OISCurve(DiscountCurve):
         the linear swap rate method that is fast and exact as it does not
         require the use of a solver. It is also market standard. """
 
-        self.interpolator = Interpolator(self.interp_type)
+        self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
         self._dfs = np.array([])
 
@@ -398,7 +398,7 @@ class OISCurve(DiscountCurve):
             t_mat = (depo.maturity_dt - self.value_dt) / gDaysInYear
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self.interpolator.fit(self._times, self._dfs)
+            self._interpolator.fit(self._times, self._dfs)
 
         old_t_mat = t_mat
 
@@ -414,11 +414,11 @@ class OISCurve(DiscountCurve):
                 df_mat = fra.maturity_df(self)
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
-                self.interpolator.fit(self._times, self._dfs)
+                self._interpolator.fit(self._times, self._dfs)
             else:
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
-                self.interpolator.fit(self._times, self._dfs)
+                self._interpolator.fit(self._times, self._dfs)
 
                 argtuple = (self, self.value_dt, fra)
                 df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
@@ -449,7 +449,7 @@ class OISCurve(DiscountCurve):
         cpn_dts = longest_swap.adjusted_fixed_dts
         num_flows = len(cpn_dts)
 
-        # Find where first coupon without discount factor starts
+        # Find where first cpn without discount factor starts
         start_index = 0
         for i in range(0, num_flows):
             if cpn_dts[i] > last_dt:
@@ -463,11 +463,11 @@ class OISCurve(DiscountCurve):
         swap_rates = []
         swap_times = []
 
-        # I use the last coupon date for the swap rate interpolation as this
+        # I use the last cpn date for the swap rate interpolation as this
         # may be different from the maturity date due to a holiday adjustment
-        # and the swap rates need to align with the coupon payment dates
+        # and the swap rates need to align with the cpn payment dates
         for swap in self.used_swaps:
-            swap_rate = swap.fixed_coupon
+            swap_rate = swap.fixed_cpn
             maturity_dt = swap.adjusted_fixed_dts[-1]
             tswap = (maturity_dt - self.value_dt) / gDaysInYear
             swap_times.append(tswap)
@@ -509,7 +509,7 @@ class OISCurve(DiscountCurve):
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self.interpolator.fit(self._times, self._dfs)
+            self._interpolator.fit(self._times, self._dfs)
 
             pv01 += acc * df_mat
 
@@ -607,19 +607,19 @@ class OISCurve(DiscountCurve):
 
         for depo in self.used_deposits:
             s += label_to_string("DEPOSIT", "")
-            s += depo._repr__()
+            s += depo.__repr__()
 
         for fra in self.used_fras:
             s += label_to_string("FRA", "")
-            s += fra._repr__()
+            s += fra.__repr__()
 
         for swap in self.used_swaps:
             s += label_to_string("SWAP", "")
-            s += swap._repr__()
+            s += swap.__repr__()
 
         num_points = len(self._times)
 
-        s += label_to_string("INTERP TYPE", self.interp_type)
+        s += label_to_string("INTERP TYPE", self._interp_type)
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):

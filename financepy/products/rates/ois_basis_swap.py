@@ -26,8 +26,8 @@ class OISBasisSwap:
     from a start date to a specified maturity date.
 
     The value of the contract is the NPV of the two coupon streams. Discounting
-    is done on a supplied discount curve which is separate from the discount from
-    which the implied index rates are extracted. """
+    is done on a supplied discount curve which is separate from the discount
+    from which the implied index rates are extracted. """
 
     def __init__(self,
                  effective_dt: Date,  # Date interest starts to accrue
@@ -63,7 +63,7 @@ class OISBasisSwap:
 
         calendar = Calendar(cal_type)
         self.maturity_dt = calendar.adjust(self.termination_dt,
-                                            bd_type)
+                                           bd_type)
 
         if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
@@ -75,30 +75,30 @@ class OISBasisSwap:
         principal = 0.0
 
         self.float_ibor_leg = SwapFloatLeg(effective_dt,
+                                           self.termination_dt,
+                                           ibor_type,
+                                           ibor_spread,
+                                           ibor_freq_type,
+                                           ibor_day_count_type,
+                                           notional,
+                                           principal,
+                                           0,
+                                           cal_type,
+                                           bd_type,
+                                           dg_type)
+
+        self.float_ois_leg = SwapFloatLeg(effective_dt,
                                           self.termination_dt,
-                                          ibor_type,
-                                          ibor_spread,
-                                          ibor_freq_type,
-                                          ibor_day_count_type,
+                                          ois_type,
+                                          ois_spread,
+                                          ois_freq_type,
+                                          ois_day_count_type,
                                           notional,
                                           principal,
-                                          0,
+                                          ois_payment_lag,
                                           cal_type,
                                           bd_type,
                                           dg_type)
-
-        self.float_ois_leg = SwapFloatLeg(effective_dt,
-                                         self.termination_dt,
-                                         ois_type,
-                                         ois_spread,
-                                         ois_freq_type,
-                                         ois_day_count_type,
-                                         notional,
-                                         principal,
-                                         ois_payment_lag,
-                                         cal_type,
-                                         bd_type,
-                                         dg_type)
 
 ###############################################################################
 
@@ -119,14 +119,14 @@ class OISBasisSwap:
             index_ois_curve = discount_curve
 
         float_ibor_leg_value = self.float_ibor_leg.value(value_dt,
-                                                     discount_curve,
-                                                     index_ibor_curve,
-                                                     first_fixing_rate_leg_1)
+                                                         discount_curve,
+                                                         index_ibor_curve,
+                                                         first_fixing_rate_leg_1)
 
         float_ois_leg_value = self.float_ois_leg.value(value_dt,
-                                                   discount_curve,
-                                                   index_ois_curve,
-                                                   first_fixing_rate_leg_2)
+                                                       discount_curve,
+                                                       index_ois_curve,
+                                                       first_fixing_rate_leg_2)
 
         value = float_ibor_leg_value + float_ois_leg_value
         return value

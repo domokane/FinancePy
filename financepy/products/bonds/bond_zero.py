@@ -48,7 +48,7 @@ def _g(oas, *args):
 
 
 class BondZero:
-    """ A zero coupon bond is a bond which doesn't pay any periodic payments.
+    """ A zero cpn bond is a bond which doesn't pay any periodic payments.
     Instead, it is issued at a discount. The entire face value of the bond is
     paid out at maturity. It is issued as a deep discount bond.
 
@@ -80,7 +80,7 @@ class BondZero:
         self.freq_type = FrequencyTypes.ZERO
         self.cpn_dts = [issue_dt, maturity_dt]
         self.payment_dts = [issue_dt, maturity_dt]
-        self.flow_amounts = [0.0, 0.0]  # coupon payments are zero
+        self.flow_amounts = [0.0, 0.0]  # cpn payments are zero
         self.cal_type = CalendarTypes.WEEKEND
         self.ex_div_days = 0
 
@@ -101,14 +101,14 @@ class BondZero:
         a number of standard conventions for calculating the YTM. """
 
         if convention != YTMCalcType.ZERO:
-            raise FinError("Need to use YTMCalcType.ZERO for zero coupon bond")
+            raise FinError("Need to use YTMCalcType.ZERO for zero cpn bond")
 
         self.accrued_interest(settle_dt, 1.0)
 
         ytm = np.array(ytm)  # VECTORIZED
         ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
 
-        # n is the number of flows after the next coupon
+        # n is the number of flows after the next cpn
         n = 0
         for dt in self.cpn_dts:
             if dt > settle_dt:
@@ -116,8 +116,8 @@ class BondZero:
         n = n - 1
 
         if n < 0:
-            raise FinError("No coupons left")
-        # A zero coupon bond has a price equal to the discounted principal
+            raise FinError("No cpns left")
+        # A zero cpn bond has a price equal to the discounted principal
         # assuming an annualised rate raised to the power of years
 
         dc = DayCount(self.dc_type)
@@ -262,7 +262,7 @@ class BondZero:
 
         for dt in self.cpn_dts[1:]:
 
-            # coupons paid on the settlement date are paid to the seller
+            # cpns paid on the settlement date are paid to the seller
             if dt > settle_dt:
                 df = discount_curve.df(dt)
                 flow = 0
@@ -279,8 +279,8 @@ class BondZero:
     def current_yield(self, clean_price):
         """
         Calculate the current yield of the bond which is the
-        coupon divided by the clean price (not the full price).
-        The coupon of a zero coupon bond is defined as:
+        cpn divided by the clean price (not the full price).
+        The cpn of a zero cpn bond is defined as:
         (par - issue_price) / tenor
         """
         dc = DayCount(self.dc_type)
@@ -288,8 +288,8 @@ class BondZero:
                                    self.maturity_dt,
                                    self.maturity_dt,
                                    FrequencyTypes.ZERO)
-        virtual_coupon = (self.par - self.issue_price) / tenor
-        y = virtual_coupon / clean_price
+        virtual_cpn = (self.par - self.issue_price) / tenor
+        y = virtual_cpn / clean_price
         return y
 
     ###########################################################################
@@ -338,12 +338,12 @@ class BondZero:
     def accrued_interest(self,
                          settle_dt: Date,
                          face: (float)):
-        """ Calculate the amount of coupon that has accrued between the
-        previous coupon date and the settlement date. Note that for some day
+        """ Calculate the amount of cpn that has accrued between the
+        previous cpn date and the settlement date. Note that for some day
         count schemes (such as 30E/360) this is not actually the number of days
-        between the previous coupon payment date and settlement date. If the
-        bond trades with ex-coupon dates then you need to supply the number of
-        days before the coupon date the ex-coupon date is. You can specify the
+        between the previous cpn payment date and settlement date. If the
+        bond trades with ex-cpn dates then you need to supply the number of
+        days before the cpn date the ex-cpn date is. You can specify the
         calendar to be used - NONE means only calendar days, WEEKEND is only
         weekends or you can specify a country calendar for business days."""
 
@@ -353,7 +353,7 @@ class BondZero:
             raise FinError("Accrued interest - not enough flow dates.")
 
         for i_flow in range(1, num_flows):
-            # coupons paid on the settlement date are paid to the seller
+            # cpns paid on the settlement date are paid to the seller
             if self.cpn_dts[i_flow] > settle_dt:
                 self.pcd = self.cpn_dts[i_flow - 1]
                 self.ncd = self.cpn_dts[i_flow]
@@ -411,7 +411,7 @@ class BondZero:
 
         for dt in self.cpn_dts[1:]:
 
-            # coupons paid on the settlement date are paid to the seller
+            # cpns paid on the settlement date are paid to the seller
             if dt > settle_dt:
                 df = discount_curve.df(dt)
                 # pv_ibor += df * self.cpn / self.freq
@@ -419,7 +419,7 @@ class BondZero:
         pv_ibor += df * self.par
 
         # Calculate the PV01 of the floating leg of the asset swap
-        # I assume here that the coupon starts accruing on the settlement date
+        # I assume here that the cpn starts accruing on the settlement date
         prev_dt = self.pcd
         schedule = Schedule(settle_dt,
                             self.maturity_dt,
@@ -455,7 +455,7 @@ class BondZero:
         pv = 0.0
         for dt in self.cpn_dts[1:]:
 
-            # coupons paid on the settlement date are paid to the seller
+            # cpns paid on the settlement date are paid to the seller
             if dt > settle_dt:
                 t = (dt - settle_dt) / gDaysInYear
 
@@ -518,7 +518,7 @@ class BondZero:
     def bond_payments(self,
                       settle_dt: Date,
                       face: (float)):
-        """ Print a list of the unadjusted coupon payment dates used in
+        """ Print a list of the unadjusted cpn payment dates used in
         analytic calculations for the bond. """
         flow_str = ''
         flow_str += ("%12s %12.2f \n"
@@ -531,7 +531,7 @@ class BondZero:
     def print_bond_payments(self,
                             settle_dt: Date,
                             face: (float) = 100.0):
-        """ Print a list of the unadjusted coupon payment dates used in
+        """ Print a list of the unadjusted cpn payment dates used in
         analytic calculations for the bond. """
 
         print(self.bond_payments(settle_dt, face))
@@ -544,9 +544,9 @@ class BondZero:
                                         survival_curve: DiscountCurve,
                                         recovery_rate: float):
         """ Calculate discounted present value of flows assuming default model.
-        The survival curve treats the coupons as zero recovery payments while
+        The survival curve treats the cpns as zero recovery payments while
         the recovery fraction of the par amount is paid at default. For the
-        defaulting principal we discretize the time steps using the coupon
+        defaulting principal we discretize the time steps using the cpn
         payment times. A finer discretization may handle the time value with
         more accuracy. I reduce any error by averaging period start and period
         end payment present values. """
@@ -560,13 +560,13 @@ class BondZero:
 
         for dt in self.cpn_dts[1:]:
 
-            # coupons paid on the settlement date are paid to the seller
+            # cpns paid on the settlement date are paid to the seller
             if dt > settle_dt:
                 df = discount_curve.df(dt)
                 q = survival_curve.survival_prob(dt)
 
-                # Add PV of coupon conditional on surviving to payment date
-                # Any default results in all subsequent coupons being lost
+                # Add PV of cpn conditional on surviving to payment date
+                # Any default results in all subsequent cpns being lost
                 # with zero recovery
 
                 dq = q - prev_q
@@ -574,7 +574,7 @@ class BondZero:
                 defaulting_principal_pv_pay_start += -dq * recovery_rate * prev_df
                 defaulting_principal_pv_pay_start += -dq * recovery_rate * df
 
-                # Add on PV of principal if default occurs in coupon period
+                # Add on PV of principal if default occurs in cpn period
                 prev_q = q
                 prev_df = df
 
@@ -592,7 +592,7 @@ class BondZero:
                                         survival_curve: DiscountCurve,
                                         recovery_rate: float):
         """ Calculate clean price value of flows assuming default model.
-        The survival curve treats the coupons as zero recovery payments while
+        The survival curve treats the cpns as zero recovery payments while
         the recovery fraction of the par amount is paid at default. """
 
         self.accrued_interest(settle_dt, 1.0)
@@ -619,7 +619,7 @@ class BondZero:
         a BUY YTM and a SELL YTM of this bond.
 
         This function computes the full prices at buying and selling, plus the
-        coupon payments during the period.
+        cpn payments during the period.
 
         It returns a tuple which includes a simple rate of return, a compounded
         IRR and the PnL.
@@ -631,8 +631,8 @@ class BondZero:
 
         dates_cfs = zip(self.cpn_dts, self.flow_amounts)
 
-        # The coupon or par payments on buying date belong to the buyer.
-        # The coupon or par payments on selling date are given to the new buyer
+        # The cpn or par payments on buying date belong to the buyer.
+        # The cpn or par payments on selling date are given to the new buyer
         dates_cfs = [(d, c * self.par)
                      for (d, c) in dates_cfs if (d >= begin_dt) and (d < end_dt)]
 
@@ -671,7 +671,7 @@ class BondZero:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("COUPON (%)", 0)
+        s += label_to_string("cpn (%)", 0)
         s += label_to_string("ISSUE PRICE", self.issue_price)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("DAY COUNT TYPE", self.dc_type)
@@ -680,7 +680,7 @@ class BondZero:
     ###########################################################################
 
     def _print(self):
-        """ Print a list of the unadjusted coupon payment dates used in
+        """ Print a list of the unadjusted cpn payment dates used in
         analytic calculations for the bond. """
         print(self)
 

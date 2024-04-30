@@ -73,13 +73,13 @@ class DiscountCurve:
             raise FinError("Times are not sorted in increasing order")
 
         self.value_dt = value_dt
-        self.interp_type = interp_type
         self.freq_type = FrequencyTypes.CONTINUOUS
         # This needs to be thought about - I just assign an arbitrary value
         self.dc_type = DayCountTypes.ACT_ACT_ISDA
 
         self._dfs = np.array(self._dfs)
-        self._interpolator = Interpolator(self.interp_type)
+        self._interp_type = interp_type
+        self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
     ###########################################################################
@@ -304,14 +304,14 @@ class DiscountCurve:
         """ Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates. """
 
-        if self.interp_type is InterpTypes.FLAT_FWD_RATES or \
-                self.interp_type is InterpTypes.LINEAR_ZERO_RATES or \
-                self.interp_type is InterpTypes.LINEAR_FWD_RATES:
+        if self._interp_type is InterpTypes.FLAT_FWD_RATES or \
+                self._interp_type is InterpTypes.LINEAR_ZERO_RATES or \
+                self._interp_type is InterpTypes.LINEAR_FWD_RATES:
 
             df = interpolate(t,
                              self._times,
                              self._dfs,
-                             self.interp_type.value)
+                             self._interp_type.value)
 
         else:
 

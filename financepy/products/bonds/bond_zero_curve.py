@@ -56,7 +56,7 @@ class BondZeroCurve(DiscountCurve):
         self.bonds = bonds
         self.clean_prices = np.array(clean_prices)
         self.discount_curve = None
-        self.interp_type = interp_type
+        self._interp_type = interp_type
 
         times = []
         for bond in self.bonds:
@@ -113,7 +113,7 @@ class BondZeroCurve(DiscountCurve):
     def df(self,
            dt: Date):
         t = input_time(dt, self)
-        z = interpolate(t, self._times, self._values, self.interp_type.value)
+        z = interpolate(t, self._times, self._values, self._interp_type.value)
         return z
 
 ###############################################################################
@@ -121,7 +121,7 @@ class BondZeroCurve(DiscountCurve):
     def survival_prob(self,
                       dt: Date):
         t = input_time(dt, self)
-        q = interpolate(t, self._times, self._values, self.interp_type.value)
+        q = interpolate(t, self._times, self._values, self._interp_type.value)
         return q
 
 ###############################################################################

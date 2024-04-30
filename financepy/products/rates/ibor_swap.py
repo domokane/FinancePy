@@ -33,7 +33,7 @@ class IborSwap:
     The floating rate is not known fully until the end of the preceding payment
     period. It is set in advance and paid in arrears.
 
-    The value of the contract is the NPV of the two coupon streams. Discounting
+    The value of the contract is the NPV of the two cpn streams. Discounting
     is done on a supplied discount curve which is separate from the curve from
     which the implied index rates are extracted. """
 
@@ -41,7 +41,7 @@ class IborSwap:
                  effective_dt: Date,  # Date interest starts to accrue
                  term_dt_or_tenor: (Date, str),  # Date contract ends
                  fixed_leg_type: SwapTypes,
-                 fixed_coupon: float,  # Fixed coupon (annualised)
+                 fixed_cpn: float,  # Fixed cpn (annualised)
                  fixed_freq_type: FrequencyTypes,
                  fixed_dc_type: DayCountTypes,
                  notional: float = ONE_MILLION,
@@ -52,7 +52,7 @@ class IborSwap:
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create an interest rate swap contract giving the contract start
-        date, its maturity, fixed coupon, fixed leg frequency, fixed leg day
+        date, its maturity, fixed cpn, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
@@ -69,8 +69,7 @@ class IborSwap:
                 term_dt_or_tenor)
 
         calendar = Calendar(cal_type)
-        self.maturity_dt = calendar.adjust(self.termination_dt,
-                                            bd_type)
+        self.maturity_dt = calendar.adjust(self.termination_dt, bd_type)
 
         if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
@@ -87,7 +86,7 @@ class IborSwap:
         self.fixed_leg = SwapFixedLeg(effective_dt,
                                        self.termination_dt,
                                        fixed_leg_type,
-                                       fixed_coupon,
+                                       fixed_cpn,
                                        fixed_freq_type,
                                        fixed_dc_type,
                                        notional,
@@ -137,7 +136,7 @@ class IborSwap:
     ###########################################################################
 
     def pv01(self, value_dt, discount_curve):
-        """ Calculate the value of 1 basis point coupon on the fixed leg. """
+        """ Calculate the value of 1 basis point cpn on the fixed leg. """
 
         pv = self.fixed_leg.value(value_dt, discount_curve)
         pv01 = pv / self.fixed_leg.cpn / self.fixed_leg.notional
@@ -152,7 +151,7 @@ class IborSwap:
                   discount_curve: DiscountCurve,
                   index_curve: DiscountCurve = None,
                   first_fixing: float = None):
-        """ Calculate the fixed leg coupon that makes the swap worth zero.
+        """ Calculate the fixed leg cpn that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
         is then a forward swap rate and so we use a forward discount
@@ -210,7 +209,7 @@ class IborSwap:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. """
+        start date of the swap as a cpn payment date. """
         if value_dt <= self.effective_dt:
             start_index = 1
 
@@ -255,15 +254,15 @@ class IborSwap:
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self.fixed_leg._repr__()
+        s += self.fixed_leg.__repr__()
         s += "\n"
-        s += self.float_leg._repr__()
+        s += self.float_leg.__repr__()
         return s
 
     ###########################################################################
 
     def _print(self):
-        """ Print a list of the unadjusted coupon payment dates used in
+        """ Print a list of the unadjusted cpn payment dates used in
         analytic calculations for the bond. """
         print(self)
 

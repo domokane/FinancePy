@@ -40,7 +40,7 @@ class IborBermudanSwaption:
                  maturity_dt: Date,
                  fixed_leg_type: SwapTypes,
                  exercise_type: FinExerciseTypes,
-                 fixed_coupon: float,
+                 fixed_cpn: float,
                  fixed_freq_type: FrequencyTypes,
                  fixed_dc_type: DayCountTypes,
                  notional=ONE_MILLION,
@@ -70,7 +70,7 @@ class IborBermudanSwaption:
         self.fixed_leg_type = fixed_leg_type
         self.exercise_type = exercise_type
 
-        self.fixed_coupon = fixed_coupon
+        self.fixed_cpn = fixed_cpn
         self.fixed_freq_type = fixed_freq_type
         self.fixed_dc_type = fixed_dc_type
         self.notional = notional
@@ -105,7 +105,7 @@ class IborBermudanSwaption:
         self.underlying_swap = IborSwap(self.exercise_dt,
                                         self.maturity_dt,
                                         self.fixed_leg_type,
-                                        self.fixed_coupon,
+                                        self.fixed_cpn,
                                         self.fixed_freq_type,
                                         self.fixed_dc_type,
                                         self.notional,
@@ -186,7 +186,7 @@ class IborBermudanSwaption:
 
         return v
 
-    ###############################################################################
+    ###########################################################################
 
     def print_swaption_value(self):
 
@@ -202,7 +202,7 @@ class IborBermudanSwaption:
         for i in range(0, n):
             print("CALL TIME: ", self.call_times[i])
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -210,7 +210,7 @@ class IborBermudanSwaption:
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", self.fixed_leg_type)
         s += label_to_string("EXERCISE TYPE", self.exercise_type)
-        s += label_to_string("FIXED COUPON", self.fixed_coupon)
+        s += label_to_string("FIXED COUPON", self.fixed_cpn)
         s += label_to_string("FIXED FREQUENCY", self.fixed_freq_type)
         s += label_to_string("FIXED DAYCOUNT TYPE", self.fixed_dc_type)
         s += label_to_string("FLOAT FREQUENCY", self.float_freq_type)
@@ -218,7 +218,7 @@ class IborBermudanSwaption:
         s += label_to_string("NOTIONAL", self.notional)
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         print(self)

@@ -68,8 +68,9 @@ class BondFRN:
         self.cal_type = cal_type
 
         self.settle_dt = Date(1, 1, 1900)
-        self.accrued_int= None
+        self.accrued = None
         self.accrued_days = 0.0
+        self.accrual_factor = 0.0
 
         self.cpn_dts = []
         self.flow_amounts = []
@@ -88,11 +89,11 @@ class BondFRN:
         dg_type = DateGenRuleTypes.BACKWARD
 
         self.cpn_dts = Schedule(self.issue_dt,
-                                 self.maturity_dt,
-                                 self.freq_type,
-                                 self.cal_type,
-                                 bd_type,
-                                 dg_type).generate()
+                                self.maturity_dt,
+                                self.freq_type,
+                                self.cal_type,
+                                bd_type,
+                                dg_type).generate()
 
     ###########################################################################
 
@@ -109,8 +110,6 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin. """
 
-        self.accrued_interest(settle_dt, next_cpn, 1.0)
-
         day_counter = DayCount(self.dc_type)
 
         q = self.quoted_margin
@@ -118,6 +117,7 @@ class BondFRN:
 
         # We discount using Libor over the period from settlement to the ncd
         (alpha, _, _) = day_counter.year_frac(settle_dt, self.ncd)
+
         df = 1.0 / (1.0 + alpha * (current_ibor + dm))
 
         # A full coupon is paid
@@ -128,6 +128,7 @@ class BondFRN:
         for i_flow in range(1, num_flows):
 
             if self.cpn_dts[i_flow] > self.ncd:
+
                 pcd = self.cpn_dts[i_flow - 1]
                 ncd = self.cpn_dts[i_flow]
                 (alpha, _, _) = day_counter.year_frac(pcd, ncd)
@@ -159,8 +160,8 @@ class BondFRN:
                                                future_ibor,
                                                dm)
 
-        accrued = self.accrued_int
-        principal = dirty_price * face / self.par - accrued
+        self.accrued = self.accrual_factor * next_cpn * 1.0
+        principal = dirty_price * face / self.par - self.accrued
         return principal
 
     ###########################################################################
@@ -204,7 +205,6 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
-        self.accrued_interest(settle_dt, next_cpn, 1.0)
         dy = 0.0001
 
         p0 = self.dirty_price_from_dm(settle_dt,
@@ -368,10 +368,11 @@ class BondFRN:
                                                future_ibor,
                                                dm)
 
-        accrued = self.accrued_interest(settle_dt, next_cpn, 1.0)
-        accrued = accrued * self.par
+        self.accrued_interest(settle_dt, next_cpn)
 
-        clean_price = dirty_price - accrued
+        self.accrued = self.accrual_factor * next_cpn * self.par
+
+        clean_price = dirty_price - self.accrued
         return clean_price
 
     ###########################################################################
@@ -385,12 +386,12 @@ class BondFRN:
         """ Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver. """
 
-        self.accrued_interest(settle_dt, next_cpn, 1.0)
+        self.accrued_interest(settle_dt, next_cpn)
 
-        # Needs to be adjusted to par notional
-        accrued = self.accrued_int* self.par
+        # Accrued needs to be adjusted to par notional
+        self.accrued = self.accrual_factor * next_cpn * self.par
 
-        dirty_price = clean_price + accrued
+        dirty_price = clean_price + self.accrued
 
         argtuple = (self, settle_dt, next_cpn, current_ibor,
                     future_ibor, dirty_price)
@@ -409,8 +410,7 @@ class BondFRN:
 
     def accrued_interest(self,
                          settle_dt: Date,
-                         next_cpn: float,
-                         face: (float)):
+                         next_cpn: float):
         """ Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Ex-dividend dates are
         not handled. Contact me if you need this functionality. """
@@ -434,10 +434,8 @@ class BondFRN:
                                             self.freq_type)
 
         self.alpha = 1.0 - acc_factor * self.freq
-
-        self.accrued_int= acc_factor * face * next_cpn
+        self.accrual_factor = acc_factor
         self.accrued_days = num
-        return self.accrued_interest
 
     ###########################################################################
 

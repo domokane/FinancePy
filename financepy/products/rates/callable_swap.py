@@ -52,14 +52,14 @@
 
 
 # class IborBermudanSwaption
-#     """ Class for fixed coupon bonds with embedded call or put optionality. """
+#     """ Class for fixed cpn bonds with embedded call or put optionality. """
 
 #     def __init__(self,
 #                  exercise_dt,
 #                  exercise_type,
 #                  maturity_dt,
 #                  swaptionType,
-#                  fixed_coupon,
+#                  fixed_cpn,
 #                  fixed_freq_type,
 #                  fixed_dc_type,
 #                  notional=ONE_MILLION,
@@ -69,7 +69,7 @@
 #                  bd_type=BusDayAdjustTypes.FOLLOWING,
 #                  dg_type=DateGenRuleTypes.BACKWARD):
 #         """ Create a Bermudan swaption contract. This is an option to enter
-#         into a swap at a fixed coupon on all of the fixed leg coupon dates
+#         into a swap at a fixed cpn on all of the fixed leg cpn dates
 #         until the exercise date. """
 
 #         if exercise_dt > maturity_dt:
@@ -113,7 +113,7 @@
 
 #         self.exercise_dt = exercise_dt
 #         self.maturity_dt = maturity_dt
-#         self.fixed_coupon = fixed_coupon
+#         self.fixed_cpn = fixed_cpn
 #         self.fixed_freq_type = fixed_freq_type
 #         self.fixed_dc_type = fixed_dc_type
 #         self.notional = notional
@@ -144,7 +144,7 @@
 #         # The underlying is a swap in which we pay the fixed amount
 #         swap = IborSwap(self.exercise_dt,
 #                             self.maturity_dt,
-#                             self.fixed_coupon,
+#                             self.fixed_cpn,
 #                             self.fixed_freq_type,
 #                             self.fixed_dc_type,
 #                             self.notional,
@@ -255,7 +255,7 @@
 
 #         s = label_to_string("MATURITY DATE", self.maturity_dt)
 #         s += label_to_string("EXERCISE DATE", self.exercise_dt)
-#         s += label_to_string("COUPON", self.cpn)
+#         s += label_to_string("cpn", self.cpn)
 #         s += label_to_string("FREQUENCY", self.freq_type)
 #         s += label_to_string("DAY COUNT TYPE", self.dc_type)
 #         s += label_to_string("FACE AMOUNT", self.face)

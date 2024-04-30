@@ -47,7 +47,7 @@ class CDSOption:
     def __init__(self,
                  expiry_dt: Date,
                  maturity_dt: Date,
-                 strike_coupon: float,
+                 strike_cpn: float,
                  notional: float = ONE_MILLION,
                  long_protection: bool = True,
                  knockout_flag: bool = True,
@@ -66,12 +66,12 @@ class CDSOption:
         if maturity_dt < expiry_dt:
             raise FinError("Maturity date must be after option expiry date")
 
-        if strike_coupon < 0.0:
+        if strike_cpn < 0.0:
             raise FinError("Strike must be greater than zero")
 
         self.expiry_dt = expiry_dt
         self.maturity_dt = maturity_dt
-        self.strike_coupon = strike_coupon
+        self.strike_cpn = strike_cpn
         self.long_protection = long_protection
         self.knockout_flag = knockout_flag
         self.notional = notional
@@ -103,7 +103,7 @@ class CDSOption:
         # set equal to the option spread strike
         cds = CDS(self.expiry_dt,
                   self.maturity_dt,
-                  self.strike_coupon,
+                  self.strike_cpn,
                   self.notional,
                   self.long_protection,
                   self.freq_type,
@@ -112,7 +112,7 @@ class CDSOption:
                   self.bd_type,
                   self.dg_type)
 
-        strike = self.strike_coupon
+        strike = self.strike_cpn
         forward_spread = cds.par_spread(value_dt, issuer_curve)
         forward_rpv01 = cds.risky_pv01(
             value_dt, issuer_curve)['dirty_rpv01']

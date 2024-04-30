@@ -48,11 +48,11 @@ def test_HullWhiteExampleTwo():
 
     model = HWTree(sigma, a, num_time_steps)
     model.build_tree(t_exp, times, dfs)
-    vTree1 = model.option_on_zero_coupon_bond_tree(t_exp, t_mat, strike, face)
+    vTree1 = model.option_on_zero_cpn_bond_tree(t_exp, t_mat, strike, face)
 
     model = HWTree(sigma, a, num_time_steps+1)
     model.build_tree(t_exp, times, dfs)
-    vTree2 = model.option_on_zero_coupon_bond_tree(t_exp, t_mat, strike, face)
+    vTree2 = model.option_on_zero_cpn_bond_tree(t_exp, t_mat, strike, face)
 
     vTreeCall = (vTree1['call'] + vTree2['call']) / 2.0
     vTreePut = (vTree1['put'] + vTree2['put']) / 2.0

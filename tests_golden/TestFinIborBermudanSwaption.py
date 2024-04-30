@@ -35,7 +35,7 @@ def test_IborBermudanSwaptionBKModel():
     exercise_dt = settle_dt.add_years(1)
     swap_maturity_dt = settle_dt.add_years(4)
 
-    swap_fixed_coupon = 0.060
+    swap_fixed_cpn = 0.060
     swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     swap_fixed_day_count_type = DayCountTypes.ACT_365F
 
@@ -47,7 +47,7 @@ def test_IborBermudanSwaptionBKModel():
     fwdPAYSwap = IborSwap(exercise_dt,
                           swap_maturity_dt,
                           SwapTypes.PAY,
-                          swap_fixed_coupon,
+                          swap_fixed_cpn,
                           swap_fixed_freq_type,
                           swap_fixed_day_count_type)
 
@@ -64,7 +64,7 @@ def test_IborBermudanSwaptionBKModel():
                                        exercise_dt,
                                        swap_maturity_dt,
                                        fixed_leg_type,
-                                       swap_fixed_coupon,
+                                       swap_fixed_cpn,
                                        swap_fixed_freq_type,
                                        swap_fixed_day_count_type)
 
@@ -73,7 +73,7 @@ def test_IborBermudanSwaptionBKModel():
                                        exercise_dt,
                                        swap_maturity_dt,
                                        fixed_leg_type,
-                                       swap_fixed_coupon,
+                                       swap_fixed_cpn,
                                        swap_fixed_freq_type,
                                        swap_fixed_day_count_type)
 
@@ -173,7 +173,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -185,7 +185,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -237,7 +237,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -249,7 +249,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -348,7 +348,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -358,7 +358,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -408,7 +408,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -418,7 +418,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -517,7 +517,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -527,7 +527,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -576,7 +576,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 
@@ -586,7 +586,7 @@ def test_IborBermudanSwaptionBKModel():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swap_fixed_day_count_type)
 

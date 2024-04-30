@@ -168,9 +168,9 @@ class EquitySwap:
 
     def __repr__(self):
         s = "EQUITY LEG:\n"
-        s += self.equity_leg._repr__()
+        s += self.equity_leg.__repr__()
         s += "\nRATE LEG:\n"
-        s += self.rate_leg._repr__()
+        s += self.rate_leg.__repr__()
 
         return s
 

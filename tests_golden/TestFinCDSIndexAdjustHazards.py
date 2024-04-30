@@ -100,9 +100,9 @@ def buildIssuerCurve(tradeDate, libor_curve):
 
     cdsMarketContracts = []
 
-    cds_coupon = 0.0048375
+    cds_cpn = 0.0048375
     maturity_dt = Date(29, 6, 2010)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40

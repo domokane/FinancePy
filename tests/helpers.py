@@ -90,9 +90,9 @@ def buildIssuerCurve(tradeDate, libor_curve):
 
     cdsMarketContracts = []
 
-    cds_coupon = 0.0048375
+    cds_cpn = 0.0048375
     maturity_dt = Date(29, 6, 2010)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
@@ -257,44 +257,44 @@ def buildFullIssuerCurve(value_dt):
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     cdsMarketContracts = []
-    cds_coupon = 0.005743
+    cds_cpn = 0.005743
     maturity_dt = value_dt.next_cds_date(6)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.007497
+    cds_cpn = 0.007497
     maturity_dt = value_dt.next_cds_date(12)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.011132
+    cds_cpn = 0.011132
     maturity_dt = value_dt.next_cds_date(24)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.013932
+    cds_cpn = 0.013932
     maturity_dt = value_dt.next_cds_date(36)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.015764
+    cds_cpn = 0.015764
     maturity_dt = value_dt.next_cds_date(48)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.017366
+    cds_cpn = 0.017366
     maturity_dt = value_dt.next_cds_date(60)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.020928
+    cds_cpn = 0.020928
     maturity_dt = value_dt.next_cds_date(84)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.022835
+    cds_cpn = 0.022835
     maturity_dt = value_dt.next_cds_date(120)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40

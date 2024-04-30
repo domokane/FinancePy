@@ -178,8 +178,8 @@ def american_bond_option_tree_fast(t_exp,
                                    _dt,
                                    _tree_times,
                                    _df_times, _df_values):
-    """ Value an option on a bond with coupons that can have European or
-    American exercise. Some minor issues to do with handling coupons on
+    """ Value an option on a bond with cpns that can have European or
+    American exercise. Some minor issues to do with handling cpns on
     the option expiry date need to be solved. """
 
     DEBUG = False
@@ -195,13 +195,13 @@ def american_bond_option_tree_fast(t_exp,
 
     ###########################################################################
 
-    # Want to add coupons before expiry to the grid so that we can value
+    # Want to add cpns before expiry to the grid so that we can value
     # their impact on the decision to exercise the option early
     tree_flows = np.zeros(num_time_steps)
     num_cpns = len(cpn_times)
 
     # Flows that fall on the expiry date included. The tree only goes out to
-    # the expiry date so coupons after this date do not go onto the tree.
+    # the expiry date so cpns after this date do not go onto the tree.
     for i in range(0, num_cpns):
         t_cpn = cpn_times[i]
         if t_cpn <= t_exp:
@@ -217,7 +217,7 @@ def american_bond_option_tree_fast(t_exp,
     # result in some convergence noise issues as it is inconsistent
     ###########################################################################
 
-    # I star_t the tree with the previous coupon time and amount
+    # I star_t the tree with the previous cpn time and amount
     # (does not matter)
     mapped_times = np.zeros(0)   # CHANGE
     mapped_amounts = np.zeros(0)  # CHANGE
@@ -417,7 +417,7 @@ def bermudan_swaption_tree_fast(t_exp, t_mat, strike_price, face_amount,
                                 exercise_typeInt,
                                 _df_times, _df_values,
                                 _tree_times, _Q, _pu, _pm, _pd, _r_t, _dt, _a):
-    """ Option to enter into a swap that can be exercised on coupon payment
+    """ Option to enter into a swap that can be exercised on cpn payment
     dates after the star_t of the exercise period. Due to multiple exercise
     times we need to extend tree out to bond maturity and take into account
     cash flows through time. """
@@ -607,8 +607,8 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
                                      _sigma, _a, _Q,  # IS SIGMA USED ?
                                      _pu, _pm, _pd, _r_t, _dt, _tree_times,
                                      _df_times, _df_values):
-    """ Value an option on a bond with coupons that can have European or
-    American exercise. Some minor issues to do with handling coupons on
+    """ Value an option on a bond with cpns that can have European or
+    American exercise. Some minor issues to do with handling cpns on
     the option expiry date need to be solved. """
 
 #    print("Coupon Times:", cpn_times)
@@ -618,7 +618,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
 #    print("DF Values:", _df_values)
 
     if np.any(cpn_times < 0.0):
-        raise FinError("No coupon times can be before the value date.")
+        raise FinError("No cpn times can be before the value date.")
 
     num_time_steps, num_nodes = _Q.shape
     dt = _dt
@@ -627,7 +627,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
     maturity_step = int(t_mat/dt + 0.50)
 
     ###########################################################################
-    # Map coupons onto tree while preserving their present value
+    # Map cpns onto tree while preserving their present value
     ###########################################################################
 
     tree_flows = np.zeros(num_time_steps)
@@ -772,7 +772,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
                 vd = call_put_bond_values[m+1, kN-1]
 
             vhold = (pu*vu + pm*vm + pd*vd) * df
-            # Need to make add on coupons paid if we hold
+            # Need to make add on cpns paid if we hold
             vhold = vhold + flow
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
             call_put_bond_values[m, kN] = value
@@ -784,7 +784,7 @@ def callable_puttable_bond_tree_fast(cpn_times, cpn_flows,
 
 
 def fwd_dirty_bond_price(r_t, *args):
-    """ Price a coupon bearing bond on the option expiry date and return
+    """ Price a cpn bearing bond on the option expiry date and return
     the difference from a strike price. This is used in a root search to
     find the future expiry time short rate that makes the bond price equal
     to the option strike price. It is a key step in the Jamshidian bond
@@ -884,7 +884,7 @@ class HWTree():
                       t_exp, t_mat,
                       strike, face_amount,
                       df_times, df_values):
-        """ Price an option on a zero coupon bond using analytical solution of
+        """ Price an option on a zero cpn bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date. """
 
@@ -929,7 +929,7 @@ class HWTree():
                                         df_times,
                                         df_values):
         """ Valuation of a European bond option using the Jamshidian
-        deconstruction of the bond into a strip of zero coupon bonds with the
+        deconstruction of the bond into a strip of zero cpn bonds with the
         short rate that would make the bond option be at the money forward. """
 
 #        print(df_times)
@@ -947,7 +947,7 @@ class HWTree():
                                 args=argtuple, tol=1e-10, maxiter=50,
                                 fprime2=None)
 
-        # Now we price a series of zero coupon bonds using this short rate
+        # Now we price a series of zero cpn bonds using this short rate
         dt = 1e-6
 
         pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP)
@@ -962,7 +962,7 @@ class HWTree():
             t_cpn = cpn_times[i]
             cpn = cpn_amounts[i]
 
-            if t_cpn >= t_exp:  # coupons on the expiry date are included
+            if t_cpn >= t_exp:  # cpns on the expiry date are included
 
                 pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP)
 
@@ -991,9 +991,9 @@ class HWTree():
                                          face_amount,
                                          cpn_times,
                                          cpn_amounts):
-        """ Price a European option on a coupon-paying bond using a tree to
+        """ Price a European option on a cpn-paying bond using a tree to
         generate short rates at the expiry date and then to use the analytical
-        solution of zero coupon bond prices in the HW model to calculate the
+        solution of zero cpn bond prices in the HW model to calculate the
         corresponding bond price. User provides bond object and option details.
         """
 
@@ -1057,12 +1057,12 @@ class HWTree():
 
 ###############################################################################
 
-    def option_on_zero_coupon_bond_tree(self,
+    def option_on_zero_cpn_bond_tree(self,
                                         t_exp,
                                         t_mat,
                                         strike_price,
                                         face_amount):
-        """ Price an option on a zero coupon bond using a HW trinomial
+        """ Price an option on a zero cpn bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build. """
 
         if t_exp > t_mat:
@@ -1218,8 +1218,8 @@ class HWTree():
                                     put_times,
                                     put_prices,
                                     face_amount):
-        """ Value an option on a bond with coupons that can have European or
-        American exercise. Some minor issues to do with handling coupons on
+        """ Value an option on a bond with cpns that can have European or
+        American exercise. Some minor issues to do with handling cpns on
         the option expiry date need to be solved. Also this function should be
         moved out of the class so it can be sped up using NUMBA. """
 

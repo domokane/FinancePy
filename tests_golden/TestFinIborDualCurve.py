@@ -351,13 +351,13 @@ def test_swapValuationExample():
     fixed_freq_type = FrequencyTypes.ANNUAL
 
     float_spread = 0.0
-    floatDCCType = DayCountTypes.ACT_360
+    float_dcc_type = DayCountTypes.ACT_360
     float_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     offMarketSwap = IborSwap(start_dt, maturity_dt, fixed_leg_type,
                              fixedRate, fixed_freq_type, fixed_dcc_type,
                              notional,
-                             float_spread, float_freq_type, floatDCCType)
+                             float_spread, float_freq_type, float_dcc_type)
 
     interp_type = InterpTypes.LINEAR_ZERO_RATES
 

@@ -22,7 +22,7 @@ class FXForward:
 
     def __init__(self,
                  expiry_dt: Date,
-                 strike_fx_rate: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
+                 strike_fx_rate: float,  # PRICE OF 1 UNIT OF FOR IN DOM CCY
                  currency_pair: str,  # FOR DOM
                  notional: float,
                  notional_currency: str,  # must be FOR or DOM

@@ -25,11 +25,11 @@ maturity_dt = Date(20, 6, 2010)
 cdsRecovery = 0.40
 notional = 10.0 * ONE_MILLION
 long_protection = True
-index_coupon = 0.004
+index_cpn = 0.004
 
 cdsIndexContract = CDS(step_in_dt,
                        maturity_dt,
-                       index_coupon,
+                       index_cpn,
                        notional,
                        long_protection)
 

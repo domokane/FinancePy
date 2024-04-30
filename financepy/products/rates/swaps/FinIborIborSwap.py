@@ -22,7 +22,7 @@ class IborIborSwap:
     par. The contract is entered into at zero initial cost. The contract lasts
     from a start date to a specified maturity date.
 
-    The value of the contract is the NPV of the two coupon streams. Discounting
+    The value of the contract is the NPV of the two cpn streams. Discounting
     is done on a supplied discount curve which is separate from the discount from
     which the implied index rates are extracted. """
 
@@ -63,7 +63,7 @@ class IborIborSwap:
             raise FinError("Start date after maturity date")
 
         self.effective_dt = effective_dt
-        self._notional = notional
+        self.notional = notional
         self._basisSwapSpread = basisSwapSpread
         self._payFreqType = payFreqType
         self._recFreqType = recFreqType
@@ -169,7 +169,7 @@ class IborIborSwap:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
-        start date of the swap as a coupon payment date. """
+        start date of the swap as a cpn payment date. """
         if value_dt <= self.effective_dt:
             start_index = 1
 
@@ -191,10 +191,10 @@ class IborIborSwap:
 
         if self._first_fixing_rate is None:
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
-            flow = (fwd_rate + self._float_spread) * alpha * self._notional
+            flow = (fwd_rate + self._float_spread) * alpha * self.notional
             floatRate = fwd_rate
         else:
-            flow = self._first_fixing_rate * alpha * self._notional
+            flow = self._first_fixing_rate * alpha * self.notional
             floatRate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
@@ -217,7 +217,7 @@ class IborIborSwap:
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
-            flow = (fwd_rate + self._float_spread) * alpha * self._notional
+            flow = (fwd_rate + self._float_spread) * alpha * self.notional
 
             # All discounting is done forward to the valuation date
             df_discount = discount_curve.df(next_dt) / self._df_value_dt
@@ -233,7 +233,7 @@ class IborIborSwap:
             self._float_flow_pvs.append(flow * df_discount)
             self._floatTotalPV.append(pv)
 
-        flow = principal * self._notional
+        flow = principal * self.notional
         pv = pv + flow * df_discount
         self._float_flows[-1] += flow
         self._float_flow_pvs[-1] += flow * df_discount
@@ -250,7 +250,7 @@ class IborIborSwap:
 
         print("START DATE:", self.effective_dt)
         print("MATURITY DATE:", self.maturity_dt)
-        print("SPREAD COUPON (%):", self._float_spread * 100)
+        print("SPREAD cpn (%):", self._float_spread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._float_freq_type))
         print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
         print("VALUATION DATE", self.value_dt)
@@ -299,9 +299,9 @@ class IborIborSwap:
         s += label_to_string("START DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self._termination_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("NOTIONAL", self._notional)
+        s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("SWAP TYPE", self._swap_type)
-        s += label_to_string("FIXED COUPON", self._fixed_coupon)
+        s += label_to_string("FIXED COUPON", self._fixed_cpn)
         s += label_to_string("FLOAT SPREAD", self._float_spread)
         s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)
         s += label_to_string("FLOAT FREQUENCY", self._float_freq_type)
@@ -315,7 +315,7 @@ class IborIborSwap:
 ###############################################################################
 
     def _print(self):
-        """ Print a list of the unadjusted coupon payment dates used in
+        """ Print a list of the unadjusted cpn payment dates used in
         analytic calculations for the bond. """
         print(self)
 

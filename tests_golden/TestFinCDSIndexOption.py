@@ -170,15 +170,15 @@ def test_dirty_priceCDSIndexOption():
 
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
     index_maturity_dts = [Date(20, 12, 2009),
-                            Date(20, 12, 2011),
-                            Date(20, 12, 2013),
-                            Date(20, 12, 2016)]
+                          Date(20, 12, 2011),
+                          Date(20, 12, 2013),
+                          Date(20, 12, 2016)]
     index_recovery = 0.40
 
     test_cases.banner(
         "======================= CDS INDEX OPTION ==========================")
 
-    index_coupon = 0.004
+    index_cpn = 0.004
     volatility = 0.50
     expiry_dt = Date(1, 2, 2008)
     maturity_dt = Date(20, 12, 2011)
@@ -255,7 +255,7 @@ def test_dirty_priceCDSIndexOption():
 
             option = CDSIndexOption(expiry_dt,
                                     maturity_dt,
-                                    index_coupon,
+                                    index_cpn,
                                     strike / 10000.0,
                                     notional)
 

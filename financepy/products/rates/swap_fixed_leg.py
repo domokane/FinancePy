@@ -50,7 +50,7 @@ class SwapFixedLeg:
         calendar = Calendar(cal_type)
 
         self.maturity_dt = calendar.adjust(self.termination_dt,
-                                            bd_type)
+                                           bd_type)
 
         if effective_dt > self.maturity_dt:
             raise FinError("Effective date after maturity date")

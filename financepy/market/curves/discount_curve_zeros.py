@@ -65,7 +65,6 @@ class DiscountCurveZeros(DiscountCurve):
         self.value_dt = value_dt
         self.freq_type = freq_type
         self.dc_type = dc_type
-        self.interp_type = interp_type
 
         self._zero_rates = np.array(zero_rates)
         self._zero_dts = zero_dts
@@ -82,7 +81,9 @@ class DiscountCurveZeros(DiscountCurve):
                                self.dc_type)
 
         self._dfs = np.array(dfs)
-        self._interpolator = Interpolator(self.interp_type)
+
+        self._interp_type = interp_type
+        self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
 # ###############################################################################
@@ -112,10 +113,10 @@ class DiscountCurveZeros(DiscountCurve):
         s += label_to_string("VALUATION DATE", self.value_dt)
         s += label_to_string("FREQUENCY TYPE", (self.freq_type))
         s += label_to_string("DAY COUNT TYPE", (self.dc_type))
-        s += label_to_string("INTERP TYPE", (self.interp_type))
+        s += label_to_string("INTERP TYPE", (self._interp_type))
 
         s += label_to_string("DATES", "ZERO RATES")
-        num_points = len(self.times)
+        num_points = len(self._times)
         for i in range(0, num_points):
             s += label_to_string("%12s" % self._zero_dts[i],
                                  "%10.7f" % self._zero_rates[i])

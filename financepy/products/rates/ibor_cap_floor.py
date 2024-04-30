@@ -347,7 +347,7 @@ class IborCapFloor():
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START DATE", self.start_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("STRIKE COUPON", self.strike_rate * 100)

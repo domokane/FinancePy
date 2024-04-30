@@ -211,7 +211,7 @@ def test_IborSwaptionQLExample():
 
     exercise_dt = settle_dt.add_tenor("5Y")
     swap_maturity_dt = exercise_dt.add_tenor("5Y")
-    swap_fixed_coupon = 0.040852
+    swap_fixed_cpn = 0.040852
     swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     swapFloatFrequencyType = FrequencyTypes.QUARTERLY
@@ -223,7 +223,7 @@ def test_IborSwaptionQLExample():
                             exercise_dt,
                             swap_maturity_dt,
                             swaptionType,
-                            swap_fixed_coupon,
+                            swap_fixed_cpn,
                             swap_fixed_freq_type,
                             swapFixedDayCountType,
                             swapNotional,
@@ -324,7 +324,7 @@ def testFinIborCashSettledSwaption():
 
     exercise_dt = settle_dt.add_tenor("5Y")
     swap_maturity_dt = exercise_dt.add_tenor("5Y")
-    swap_fixed_coupon = 0.040852
+    swap_fixed_cpn = 0.040852
     swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     swapFixedDayCountType = DayCountTypes.THIRTY_E_360_ISDA
     swapFloatFrequencyType = FrequencyTypes.QUARTERLY
@@ -336,7 +336,7 @@ def testFinIborCashSettledSwaption():
                             exercise_dt,
                             swap_maturity_dt,
                             fixed_leg_type,
-                            swap_fixed_coupon,
+                            swap_fixed_cpn,
                             swap_fixed_freq_type,
                             swapFixedDayCountType,
                             swapNotional,
@@ -357,7 +357,7 @@ def testFinIborCashSettledSwaption():
     fwdSwap = IborSwap(exercise_dt,
                        swap_maturity_dt,
                        fixed_leg_type,
-                       swap_fixed_coupon,
+                       swap_fixed_cpn,
                        swap_fixed_freq_type,
                        swapFixedDayCountType)
 
@@ -394,7 +394,7 @@ def testIborSwaptionMatlabExamples():
     exercise_dt = Date(1, 1, 2016)
     maturity_dt = Date(1, 1, 2019)
 
-    fixed_coupon = 0.062
+    fixed_cpn = 0.062
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
@@ -405,7 +405,7 @@ def testIborSwaptionMatlabExamples():
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional)
@@ -443,7 +443,7 @@ def testIborSwaptionMatlabExamples():
     settle_dt = Date(1, 1, 2011)
     exercise_dt = Date(1, 1, 2012)
     maturity_dt = Date(1, 1, 2017)
-    fixed_coupon = 0.03
+    fixed_cpn = 0.03
 
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360
@@ -457,7 +457,7 @@ def testIborSwaptionMatlabExamples():
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional,
@@ -496,7 +496,7 @@ def testIborSwaptionMatlabExamples():
     settle_dt = Date(1, 1, 2016)
     exercise_dt = Date(1, 1, 2017)
     maturity_dt = Date(1, 1, 2020)
-    fixed_coupon = -0.003
+    fixed_cpn = -0.003
 
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
@@ -510,7 +510,7 @@ def testIborSwaptionMatlabExamples():
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional,
@@ -553,7 +553,7 @@ def testIborSwaptionMatlabExamples():
     settle_dt = value_dt
     exercise_dt = Date(1, 1, 2010)
     maturity_dt = Date(1, 1, 2012)
-    fixed_coupon = 0.04
+    fixed_cpn = 0.04
 
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
@@ -564,7 +564,7 @@ def testIborSwaptionMatlabExamples():
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional)
@@ -611,13 +611,13 @@ def testIborSwaptionMatlabExamples():
 
     model = BKTree(0.1, 0.05, 200)
 
-    fixed_coupon = 0.07
+    fixed_cpn = 0.07
     swaptionType = SwapTypes.PAY
     swaption = IborSwaption(settle_dt,
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional)
@@ -630,13 +630,13 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("MATLAB Prix:", v_matlab)
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
-    fixed_coupon = 0.0725
+    fixed_cpn = 0.0725
     swaptionType = SwapTypes.RECEIVE
     swaption = IborSwaption(settle_dt,
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional)
@@ -681,13 +681,13 @@ def testIborSwaptionMatlabExamples():
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
 
-    fixed_coupon = 0.062
+    fixed_cpn = 0.062
     swaptionType = SwapTypes.PAY
     swaption = IborSwaption(settle_dt,
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional)

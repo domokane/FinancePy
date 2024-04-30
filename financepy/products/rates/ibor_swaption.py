@@ -42,7 +42,7 @@ from ...utils.global_types import FinExerciseTypes
 
 class IborSwaption():
     """ This is the class for the European-style swaption, an option to enter
-    into a swap (payer or receiver of the fixed coupon), that starts in the
+    into a swap (payer or receiver of the fixed cpn), that starts in the
     future and with a fixed maturity, at a swap rate fixed today. """
 
     def __init__(self,
@@ -50,7 +50,7 @@ class IborSwaption():
                  exercise_dt: Date,
                  maturity_dt: Date,
                  fixed_leg_type: SwapTypes,
-                 fixed_coupon: float,
+                 fixed_cpn: float,
                  fixed_freq_type: FrequencyTypes,
                  fixed_dc_type: DayCountTypes,
                  notional: float = ONE_MILLION,
@@ -61,7 +61,7 @@ class IborSwaption():
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
-        swap including the fixed coupon and the details of the fixed and the
+        swap including the fixed cpn and the details of the fixed and the
         floating leg payment schedules. Bermudan style swaption should be
         priced using the IborBermudanSwaption class. """
 
@@ -80,7 +80,7 @@ class IborSwaption():
 
         self.notional = notional
 
-        self.fixed_coupon = fixed_coupon
+        self.fixed_cpn = fixed_cpn
         self.fixed_freq_type = fixed_freq_type
         self.fixed_dc_type = fixed_dc_type
         self.float_freq_type = float_freq_type
@@ -114,7 +114,7 @@ class IborSwaption():
         swap = IborSwap(self.exercise_dt,
                         self.maturity_dt,
                         self.fixed_leg_type,
-                        self.fixed_coupon,
+                        self.fixed_cpn,
                         self.fixed_freq_type,
                         self.fixed_dc_type,
                         self.notional,
@@ -125,7 +125,7 @@ class IborSwaption():
                         self.bd_type,
                         self.dg_type)
 
-        k = self.fixed_coupon
+        k = self.fixed_cpn
 
         # The pv01 is the value of the swap cash flows as of the curve date
         pv01 = swap.pv01(value_dt, discount_curve)
@@ -141,7 +141,7 @@ class IborSwaption():
         df = 1.0
 
         #######################################################################
-        # For the tree models we need to generate a vector of the coupons
+        # For the tree models we need to generate a vector of the cpns
         #######################################################################
 
         cpn_times = [t_exp]
@@ -169,7 +169,7 @@ class IborSwaption():
         df_values = discount_curve._dfs
 
         if np.any(cpn_times < 0.0):
-            raise FinError("No coupon times can be before the value date.")
+            raise FinError("No cpn times can be before the value date.")
 
         strike_price = 1.0
         face_amount = 1.0
@@ -302,7 +302,7 @@ class IborSwaption():
         swap = IborSwap(self.exercise_dt,
                         self.maturity_dt,
                         self.fixed_leg_type,
-                        self.fixed_coupon,
+                        self.fixed_cpn,
                         self.fixed_freq_type,
                         self.fixed_dc_type,
                         self.notional,
@@ -313,7 +313,7 @@ class IborSwaption():
                         self.bd_type,
                         self.dg_type)
 
-        k = self.fixed_coupon
+        k = self.fixed_cpn
         s = swap_rate
 
         pv01 = swap.cash_settled_pv01(value_dt,
@@ -379,7 +379,7 @@ class IborSwaption():
         s += label_to_string("SWAP FIXED LEG TYPE", str(self.fixed_leg_type))
         s += label_to_string("SWAP MATURITY DATE", self.maturity_dt)
         s += label_to_string("SWAP NOTIONAL", self.notional)
-        s += label_to_string("FIXED COUPON", self.fixed_coupon * 100)
+        s += label_to_string("FIXED cpn", self.fixed_cpn * 100)
         s += label_to_string("FIXED FREQUENCY",
                              str(self.fixed_freq_type))
         s += label_to_string("FIXED DAY COUNT",

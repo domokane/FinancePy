@@ -155,7 +155,7 @@ def getForwardCurve(numFwds, r):
 #         exercise_dt = settle_dt.add_months(a*3)
 #         maturity_dt = settle_dt.add_months(b*3)
 
-#         fixed_coupon = strike
+#         fixed_cpn = strike
 #         fixed_freq_type = FrequencyTypes.QUARTERLY
 #         fixed_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         float_freq_type = FrequencyTypes.QUARTERLY
@@ -168,7 +168,7 @@ def getForwardCurve(numFwds, r):
 #                                     exercise_dt,
 #                                     maturity_dt,
 #                                     swaptionType,
-#                                     fixed_coupon,
+#                                     fixed_cpn,
 #                                     fixed_freq_type,
 #                                     fixed_dc_type,
 #                                     notional,

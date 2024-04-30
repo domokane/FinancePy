@@ -59,11 +59,11 @@ class InflationSwapCurve(DiscountCurve):
     There are two main curve-building approaches:
 
     1) The first uses a bootstrap that interpolates swap rates linearly for
-    coupon dates that fall between the swap maturity dates. With this, we can
+    cpn dates that fall between the swap maturity dates. With this, we can
     solve for the discount factors iteratively without need of a solver. This
     will give us a set of discount factors on the grid dates that refit the
     market exactly. However, when extracting discount factors, we will then
-    assume flat forward rates between these coupon dates. There is no
+    assume flat forward rates between these cpn dates. There is no
     contradiction as it is as though we had been quoted a swap curve with all
     of the market swap rates, and with an additional set as though the market
     quoted swap rates at a higher frequency than the market.
@@ -88,8 +88,8 @@ class InflationSwapCurve(DiscountCurve):
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
-        linear interpolation for swap rates on coupon dates and to then assume
-        flat forwards between these coupon dates.
+        linear interpolation for swap rates on cpn dates and to then assume
+        flat forwards between these cpn dates.
 
         The curve will assign a discount factor of 1.0 to the valuation date.
         """
@@ -99,7 +99,7 @@ class InflationSwapCurve(DiscountCurve):
 
         self.value_dt = value_dt
         self.validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
-        self.interp_type = interp_type
+        self._interp_type = interp_type
         self.check_refit = check_refit
         self.build_curve()
 
@@ -199,7 +199,7 @@ class InflationSwapCurve(DiscountCurve):
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
                         raise FinError(
-                            "Swap coupons are not on the same date grid.")
+                            "Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -371,13 +371,13 @@ class InflationSwapCurve(DiscountCurve):
         # We use the longest swap assuming it has a superset of ALL of the
         # swap flow dates used in the curve construction
         longest_swap = self.used_swaps[-1]
-        coupon_dts = longest_swap.adjusted_fixed_dts
-        num_flows = len(coupon_dts)
+        cpn_dts = longest_swap.adjusted_fixed_dts
+        num_flows = len(cpn_dts)
 
-        # Find where first coupon without discount factor starts
+        # Find where first cpn without discount factor starts
         start_index = 0
         for i in range(0, num_flows):
-            if coupon_dts[i] > last_dt:
+            if cpn_dts[i] > last_dt:
                 start_index = i
                 found_start = True
                 break
@@ -388,11 +388,11 @@ class InflationSwapCurve(DiscountCurve):
         swap_rates = []
         swap_times = []
 
-        # I use the last coupon date for the swap rate interpolation as this
+        # I use the last cpn date for the swap rate interpolation as this
         # may be different from the maturity date due to a holiday adjustment
-        # and the swap rates need to align with the coupon payment dates
+        # and the swap rates need to align with the cpn payment dates
         for swap in self.used_swaps:
-            swap_rate = swap.fixed_coupon
+            swap_rate = swap.fixed_cpn
             maturity_dt = swap.adjusted_fixed_dts[-1]
             tswap = (maturity_dt - self.value_dt) / gDaysInYear
             swap_times.append(tswap)
@@ -401,7 +401,7 @@ class InflationSwapCurve(DiscountCurve):
         interpolated_swap_rates = [0.0]
         interpolated_swap_times = [0.0]
 
-        for dt in coupon_dts[1:]:
+        for dt in cpn_dts[1:]:
             swap_years = (dt - self.value_dt) / gDaysInYear
             swap_rate = np.interp(swap_years, swap_times, swap_rates)
             interpolated_swap_rates.append(swap_rate)
@@ -422,7 +422,7 @@ class InflationSwapCurve(DiscountCurve):
 #        print("SETTLE", df_settle)
 
         for i in range(1, start_index):
-            dt = coupon_dts[i]
+            dt = cpn_dts[i]
             df = self.df(dt)
             acc = accrual_factors[i-1]
             pv01 += acc * df
@@ -430,7 +430,7 @@ class InflationSwapCurve(DiscountCurve):
 
         for i in range(start_index, num_flows):
 
-            dt = coupon_dts[i]
+            dt = cpn_dts[i]
             t_mat = (dt - self.value_dt) / gDaysInYear
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i-1]
@@ -490,19 +490,19 @@ class InflationSwapCurve(DiscountCurve):
 
         for depo in self.used_deposits:
             s += label_to_string("DEPOSIT", "")
-            s += depo._repr__()
+            s += depo.__repr__()
 
         for fra in self.used_fras:
             s += label_to_string("FRA", "")
-            s += fra._repr__()
+            s += fra.__repr__()
 
         for swap in self.used_swaps:
             s += label_to_string("SWAP", "")
-            s += swap._repr__()
+            s += swap.__repr__()
 
         num_points = len(self._times)
 
-        s += label_to_string("INTERP TYPE", self.interp_type)
+        s += label_to_string("INTERP TYPE", self._interp_type)
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):

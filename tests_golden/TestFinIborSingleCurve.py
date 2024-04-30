@@ -407,18 +407,17 @@ def test_ibor_depositsFuturesSwaps():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     float_freq_type = FrequencyTypes.QUARTERLY
     notional = 1000000
-    principal = 0.0
     float_spread = 0.0
-    floatDCCType = DayCountTypes.ACT_360
+    float_dcc_type = DayCountTypes.ACT_360
     cal_type = CalendarTypes.UNITED_STATES
-    busDayAdjustRule = BusDayAdjustTypes.PRECEDING
+    bus_day_adjust_rule = BusDayAdjustTypes.PRECEDING
 
     swap_rate = 0.02776305
 
     swap = IborSwap(start_dt, "2Y", fixed_leg_type, swap_rate,
                     fixed_freq_type, fixed_dcc_type, notional,
-                    float_spread, float_freq_type, floatDCCType,
-                    cal_type, busDayAdjustRule)
+                    float_spread, float_freq_type, float_dcc_type,
+                    cal_type, bus_day_adjust_rule)
 
     swaps.append(swap)
 

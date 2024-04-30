@@ -285,11 +285,11 @@ class CDSIndexPortfolio:
         curve_cds_contracts = []
 
         for j in range(0, num_cds_mat_points):
-            cds_coupon = 1.0
+            cds_cpn = 1.0
 
             cds_contract = CDS(value_dt,
                                cds_maturity_dts[j],
-                               cds_coupon)
+                               cds_cpn)
 
             curve_cds_contracts.append(cds_contract)
 

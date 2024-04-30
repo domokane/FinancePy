@@ -22,7 +22,7 @@ settle_dt = value_dt
 exercise_dt = settle_dt.add_years(1)
 swap_maturity_dt = settle_dt.add_years(4)
 
-swap_fixed_coupon = 0.060
+swap_fixed_cpn = 0.060
 swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 swapFixedDayCountType = DayCountTypes.ACT_365F
 
@@ -43,7 +43,7 @@ def test_bk_european_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -55,7 +55,7 @@ def test_bk_european_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -91,7 +91,7 @@ def test_bk_bermudan_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -103,7 +103,7 @@ def test_bk_bermudan_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -139,7 +139,7 @@ def test_bdt_european_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -151,7 +151,7 @@ def test_bdt_european_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -183,7 +183,7 @@ def test_bdt_bermudan_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -195,7 +195,7 @@ def test_bdt_bermudan_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -227,7 +227,7 @@ def test_hw_european_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -239,7 +239,7 @@ def test_hw_european_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -273,7 +273,7 @@ def test_hw_bermudan_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 
@@ -285,7 +285,7 @@ def test_hw_bermudan_exercise():
                                                  swap_maturity_dt,
                                                  fixed_leg_type,
                                                  exercise_type,
-                                                 swap_fixed_coupon,
+                                                 swap_fixed_cpn,
                                                  swap_fixed_freq_type,
                                                  swapFixedDayCountType)
 

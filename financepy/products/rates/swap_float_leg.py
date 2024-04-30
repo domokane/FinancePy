@@ -300,7 +300,7 @@ class SwapFloatLeg:
 ###############################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self.termination_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)

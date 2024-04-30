@@ -55,7 +55,7 @@ class IborLMMProducts():
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
         """ Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
-        swap including the fixed coupon and the details of the fixed and the
+        swap including the fixed cpn and the details of the fixed and the
         floating leg payment schedules. """
 
         check_argument_types(self.__init__, locals())
@@ -101,7 +101,7 @@ class IborLMMProducts():
         self.vol_curves = None
         self.corr_matrix = None
         self.model_type = None
-        
+
 #        print("Num FORWARDS", self.num_fwds)
 
 ###############################################################################
@@ -284,7 +284,7 @@ class IborLMMProducts():
                        exercise_dt: Date,
                        maturity_dt: Date,
                        swaption_type: SwapTypes,
-                       fixed_coupon: float,
+                       fixed_cpn: float,
                        fixed_freq_type: FrequencyTypes,
                        fixed_dc_type: DayCountTypes,
                        notional: float = ONE_MILLION,
@@ -357,7 +357,7 @@ class IborLMMProducts():
             raise FinError("Swaption swap maturity date is today.")
 
 #        num_paths = 1000
-#        v = LMMSwaptionPricer(fixed_coupon, a, b, num_paths,
+#        v = LMMSwaptionPricer(fixed_cpn, a, b, num_paths,
 #                              fwd0, fwds, taus, is_payer)
         v = 0.0
         return v

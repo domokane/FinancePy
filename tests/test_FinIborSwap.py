@@ -26,7 +26,7 @@ def test_LiborSwap():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    fixed_coupon = 0.015
+    fixed_cpn = 0.015
     fixed_freq_type = FrequencyTypes.ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360
 
@@ -45,7 +45,7 @@ def test_LiborSwap():
     swap = IborSwap(start_dt,
                     end_dt,
                     fixed_leg_type,
-                    fixed_coupon,
+                    fixed_cpn,
                     fixed_freq_type,
                     fixed_dc_type,
                     notional,
@@ -79,13 +79,13 @@ def test_dp_example():
     dg_type = DateGenRuleTypes.BACKWARD
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_leg_type = SwapTypes.PAY
-    fixed_coupon = 0.0124
+    fixed_cpn = 0.0124
     notional = ONE_MILLION
 
     swap = IborSwap(start_dt,
                     end_dt,
                     fixed_leg_type,
-                    fixed_coupon=fixed_coupon,
+                    fixed_cpn=fixed_cpn,
                     fixed_freq_type=fixed_freq_type,
                     fixed_dc_type=fixed_dc_type,
                     float_freq_type=FrequencyTypes.SEMI_ANNUAL,

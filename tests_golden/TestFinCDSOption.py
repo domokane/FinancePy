@@ -161,44 +161,44 @@ def buildFullIssuerCurve(value_dt):
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     cdsMarketContracts = []
-    cds_coupon = 0.005743
+    cds_cpn = 0.005743
     maturity_dt = value_dt.next_cds_date(6)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.007497
+    cds_cpn = 0.007497
     maturity_dt = value_dt.next_cds_date(12)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.011132
+    cds_cpn = 0.011132
     maturity_dt = value_dt.next_cds_date(24)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.013932
+    cds_cpn = 0.013932
     maturity_dt = value_dt.next_cds_date(36)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.015764
+    cds_cpn = 0.015764
     maturity_dt = value_dt.next_cds_date(48)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.017366
+    cds_cpn = 0.017366
     maturity_dt = value_dt.next_cds_date(60)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.020928
+    cds_cpn = 0.020928
     maturity_dt = value_dt.next_cds_date(84)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds_coupon = 0.022835
+    cds_cpn = 0.022835
     maturity_dt = value_dt.next_cds_date(120)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
@@ -226,11 +226,11 @@ def test_dirty_priceCDSwaption():
     cdsRecovery = 0.40
     notional = 100.0
     long_protection = False
-    cds_coupon = 0.0  # NOT KNOWN
+    cds_cpn = 0.0  # NOT KNOWN
 
     cds_contract = CDS(step_in_dt,
                        maturity_dt,
-                       cds_coupon,
+                       cds_cpn,
                        notional,
                        long_protection)
 
@@ -278,7 +278,7 @@ def test_dirty_priceCDSwaption():
 
     cds_contract = CDS(expiry_dt,
                        maturity_dt,
-                       cds_coupon,
+                       cds_cpn,
                        notional,
                        long_protection)
 
@@ -312,11 +312,11 @@ def test_dirty_priceCDSwaption():
     test_cases.banner(
         "========================== CDS OPTIONS ============================")
 
-    cds_coupon = 0.01
+    cds_cpn = 0.01
     volatility = 0.3
     test_cases.print("Expiry Date:", str(expiry_dt))
     test_cases.print("Maturity Date:", str(maturity_dt))
-    test_cases.print("CDS Coupon:", cds_coupon)
+    test_cases.print("CDS Coupon:", cds_cpn)
 
     test_cases.header("STRIKE", "LONG PROTECTION", "DIRTY VALUE", "IMPLIED VOL")
 

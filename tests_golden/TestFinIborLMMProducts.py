@@ -36,7 +36,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #     exercise_dt = Date(1, 1, 2023)
 #     settle_dt = value_dt
 #     maturity_dt = Date(1, 1, endYear)
-#     fixed_coupon = 0.04
+#     fixed_cpn = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
 #     discount_curve = FinDiscountCurveFlat(value_dt,
@@ -49,7 +49,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                                      exercise_dt,
 #                                      maturity_dt,
 #                                      IborSwaptionTypes.PAY,
-#                                      fixed_coupon,
+#                                      fixed_cpn,
 #                                      FrequencyTypes.ANNUAL,
 #                                      DayCountTypes.ACT_360)
 
@@ -107,7 +107,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #         exercise_dt = settle_dt.add_months(a*3)
 #         maturity_dt = settle_dt.add_months(b*3)
 
-#         fixed_coupon = strike
+#         fixed_cpn = strike
 #         fixed_freq_type = FrequencyTypes.QUARTERLY
 #         fixed_dc_type = DayCountTypes.ACT_ACT_ISDA
 #         float_freq_type = FrequencyTypes.QUARTERLY
@@ -120,7 +120,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                                     exercise_dt,
 #                                     maturity_dt,
 #                                     swaptionType,
-#                                     fixed_coupon,
+#                                     fixed_cpn,
 #                                     fixed_freq_type,
 #                                     fixed_dc_type,
 #                                     notional,

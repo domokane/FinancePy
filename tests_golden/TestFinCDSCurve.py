@@ -37,7 +37,7 @@ def test_FinCDSCurve():
 
     fixedDCC = DayCountTypes.ACT_365F
     fixedFreq = FrequencyTypes.SEMI_ANNUAL
-    fixed_coupon = 0.05
+    fixed_cpn = 0.05
 
     for i in range(1, 11):
 
@@ -45,7 +45,7 @@ def test_FinCDSCurve():
         swap = IborSwap(curve_dt,
                         maturity_dt,
                         SwapTypes.PAY,
-                        fixed_coupon,
+                        fixed_cpn,
                         fixedFreq,
                         fixedDCC)
         swaps.append(swap)

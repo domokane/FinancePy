@@ -31,8 +31,8 @@ class CDSIndexOption:
     def __init__(self,
                  expiry_dt: Date,
                  maturity_dt: Date,
-                 index_coupon: float,
-                 strike_coupon: float,
+                 index_cpn: float,
+                 strike_cpn: float,
                  notional: float = ONE_MILLION,
                  long_protect: bool = True,
                  freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
@@ -40,8 +40,8 @@ class CDSIndexOption:
                  cal_type: CalendarTypes = CalendarTypes.WEEKEND,
                  bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
                  dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Initialisation of the class object. Note that a 
-        large number of the inputs are set to default values in line with 
+        """ Initialisation of the class object. Note that a
+        large number of the inputs are set to default values in line with
         the standard contract."""
 
         check_argument_types(self.__init__, locals())
@@ -49,28 +49,28 @@ class CDSIndexOption:
         if expiry_dt > maturity_dt:
             raise FinError("Expiry date after end date")
 
-        if index_coupon < 0.0:
-            raise FinError("Index coupon is negative")
+        if index_cpn < 0.0:
+            raise FinError("Index cpn is negative")
 
-        if strike_coupon < 0.0:
-            raise FinError("Index Option strike coupon is negative")
+        if strike_cpn < 0.0:
+            raise FinError("Index Option strike cpn is negative")
 
         self.expiry_dt = expiry_dt
         self.maturity_dt = maturity_dt
-        self.index_coupon = index_coupon
-        self.strike_coupon = strike_coupon 
+        self.index_cpn = index_cpn
+        self.strike_cpn = strike_cpn
         self.notional = notional
         self.long_protect = long_protect
 
         self.dc_type = dc_type
         self.dg_type = dg_type
         self.cal_type = cal_type
-        self.freq_type = freq_type 
+        self.freq_type = freq_type
         self.bd_type = bd_type
 
         self.cds_contract = CDS(self.expiry_dt,
                                  self.maturity_dt,
-                                 self.index_coupon,
+                                 self.index_cpn,
                                  1.0,
                                  self.long_protect,
                                  self.freq_type,
@@ -90,8 +90,8 @@ class CDSIndexOption:
         """ This approach uses two adjustments to black's option pricing
         model to value an option on a CDS index. """
 
-        k = self.strike_coupon
-        c = self.index_coupon
+        k = self.strike_cpn
+        c = self.index_cpn
         time_to_expiry = (self.expiry_dt - value_dt) / gDaysInYear
         df = libor_curve.df(self.expiry_dt)
         q_expiry_index = index_curve.survival_prob(
@@ -146,13 +146,13 @@ class CDSIndexOption:
         df_to_expiry = issuer_curves[0].df(time_to_expiry)
         libor_curve = issuer_curves[0].libor_curve
 
-        k = self.strike_coupon
-        c = self.index_coupon
+        k = self.strike_cpn
+        c = self.index_cpn
 
         strike_cds = CDS(
             self.expiry_dt,
             self.maturity_dt,
-            self.strike_coupon,
+            self.strike_cpn,
             1.0)
 
         strike_curve = CDSCurve(value_dt, [strike_cds], libor_curve,
@@ -210,7 +210,7 @@ class CDSIndexOption:
     def _solve_for_x(self,
                      value_dt,
                      sigma,
-                     index_coupon,
+                     index_cpn,
                      index_recovery,
                      libor_curve,
                      exp_h):
@@ -222,10 +222,10 @@ class CDSIndexOption:
         xacc = 0.000000001
         rtb = 999999
 
-        f = self._calc_obj_func(x1, value_dt, sigma, index_coupon,
+        f = self._calc_obj_func(x1, value_dt, sigma, index_cpn,
                                 index_recovery, libor_curve) - exp_h
 
-        fmid = self._calc_obj_func(x2, value_dt, sigma, index_coupon,
+        fmid = self._calc_obj_func(x2, value_dt, sigma, index_cpn,
                                    index_recovery, libor_curve) - exp_h
 
         if f * fmid >= 0.0:
@@ -242,7 +242,7 @@ class CDSIndexOption:
             dx = dx * 0.5
             xmid = rtb + dx
             fmid = self._calc_obj_func(xmid, value_dt, sigma,
-                                       index_coupon,
+                                       index_cpn,
                                        index_recovery, libor_curve) - exp_h
             if fmid <= 0.0:
                 rtb = xmid
@@ -257,7 +257,7 @@ class CDSIndexOption:
                                        x,
                                        value_dt,
                                        sigma,
-                                       index_coupon,  # TODO - do I need this input ?
+                                       index_cpn,  # TODO - do I need this input ?
                                        index_recovery,
                                        libor_curve):
         """ An internal function used in the Anderson valuation. """
@@ -269,7 +269,7 @@ class CDSIndexOption:
         values = self._calc_index_payer_option_price(value_dt,
                                                      x,
                                                      sigma,
-                                                     self.index_coupon,
+                                                     self.index_cpn,
                                                      strike_value,
                                                      libor_curve,
                                                      index_recovery)
@@ -282,7 +282,7 @@ class CDSIndexOption:
                                        value_dt,
                                        x,
                                        sigma,
-                                       index_coupon,
+                                       index_cpn,
                                        strike_value,
                                        libor_curve,
                                        index_recovery):
@@ -314,7 +314,7 @@ class CDSIndexOption:
 
         day_count = DayCount(self.dc_type)
 
-        #  Previous coupon date is last coupon date before valuation date
+        #  Previous cpn date is last cpn date before valuation date
         for dt in flow_dts:
             pcd = dt
             if dt > value_dt:
@@ -339,7 +339,7 @@ class CDSIndexOption:
                     surv_prob * fwd_dfs[i_flow]
 
             fwd_rpv01 += -accrual_factor_pcd_to_expiry
-            h = (s - index_coupon) * fwd_rpv01
+            h = (s - index_cpn) * fwd_rpv01
             maxh = max(h - strike_value, 0.0)
 
             int_h += h * pdf
@@ -357,7 +357,7 @@ class CDSIndexOption:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("INDEX COUPON", self.index_coupon*10000, "bp\n")
+        s += label_to_string("INDEX cpn", self.index_cpn*10000, "bp\n")
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("FREQUENCY", self.freq_type)

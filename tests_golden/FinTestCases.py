@@ -347,8 +347,8 @@ class FinTestCases():
 
                     if abs(change) > 50.0:
                         self.print_log("Row# ", row_num,
-                                      " WARNING: Calculation time has changed by %5.2f"
-                                      % change, " percent.")
+                                       " WARNING: Calculation time has changed by %5.2f"
+                                       % change, " percent.")
 
                     num_warnings += 1
 

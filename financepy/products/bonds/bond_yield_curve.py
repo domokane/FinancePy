@@ -67,7 +67,7 @@ class BondYieldCurve():
             xdata = self.yearsToMaturity
             ydata = self.ylds
 
-            popt, pcov = scipy.optimize.curve_fit(curve_fit._interp_yield,
+            popt, pcov = scipy.optimize.curve_fit(curve_fit.interp_yield,
                                                   xdata,
                                                   ydata,
                                                   bounds=curve_fit.bounds)
@@ -82,7 +82,7 @@ class BondYieldCurve():
             xdata = self.yearsToMaturity
             ydata = self.ylds
 
-            popt, pcov = scipy.optimize.curve_fit(curve_fit._interp_yield,
+            popt, pcov = scipy.optimize.curve_fit(curve_fit.interp_yield,
                                    xdata, ydata, bounds=curve_fit.bounds)
 
             curve_fit.beta_1 = popt[0]
@@ -107,7 +107,7 @@ class BondYieldCurve():
 ###############################################################################
 
     def interp_yield(self,
-                           maturity_dt: Date):
+                     maturity_dt: Date):
 
         if isinstance(maturity_dt, Date):
             t = (maturity_dt - self.settle_dt) / gDaysInYear
@@ -141,7 +141,7 @@ class BondYieldCurve():
                                           fit.tau_2)
 
         elif isinstance(fit, CurveFitBSpline):
-            yld = fit._interp_yield(t)
+            yld = fit.interp_yield(t)
 
         return yld
 

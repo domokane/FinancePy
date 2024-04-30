@@ -134,34 +134,34 @@ def test_IssuerCurveBuild():
 
     cds_contracts = []
 
-    cds_coupon = 0.005  # 50 bps
+    cds_cpn = 0.005  # 50 bps
     maturity_dt = value_dt.add_months(12)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
-    cds_coupon = 0.0055
+    cds_cpn = 0.0055
     maturity_dt = value_dt.add_months(24)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
-    cds_coupon = 0.0060
+    cds_cpn = 0.0060
     maturity_dt = value_dt.add_months(36)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
-    cds_coupon = 0.0065
+    cds_cpn = 0.0065
     maturity_dt = value_dt.add_months(60)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
-    cds_coupon = 0.0070
+    cds_cpn = 0.0070
     maturity_dt = value_dt.add_months(84)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
-    cds_coupon = 0.0073
+    cds_cpn = 0.0073
     maturity_dt = value_dt.add_months(120)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
     issuer_curve = CDSCurve(value_dt,
@@ -323,42 +323,42 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 
     cdsMarketContracts = []
 
-    cds_coupon = 0.04 + mktSpreadBump
+    cds_cpn = 0.04 + mktSpreadBump
 
     maturity_dt = value_dt.next_cds_date(6)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(12)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(24)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(36)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(48)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(60)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(84)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(120)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(180)
-    cds = CDS(value_dt, maturity_dt, cds_coupon)
+    cds = CDS(value_dt, maturity_dt, cds_cpn)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
@@ -381,9 +381,9 @@ def test_dirty_priceCDS1():
 
     libor_curve, issuer_curve = buildFullIssuerCurve1(0.0, 0.0)
 
-    # This is the 10 year contract at an off market coupon
+    # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2029)
-    cds_coupon = 0.0150
+    cds_cpn = 0.0150
     notional = ONE_MILLION
     long_protection = True
     tradeDate = Date(9, 8, 2019)
@@ -392,7 +392,7 @@ def test_dirty_priceCDS1():
 
     cds_contract = CDS(effective_dt,
                        maturity_dt,
-                       cds_coupon,
+                       cds_cpn,
                        notional,
                        long_protection)
 
@@ -544,32 +544,32 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     libor_curve = IborSingleCurve(value_dt, depos, [], swaps)
 
-    cds_coupon = 0.01 + mktSpreadBump
+    cds_cpn = 0.01 + mktSpreadBump
 
     cdsMarketContracts = []
     effective_dt = Date(21, 8, 2020)
-    cds = CDS(effective_dt, "6M", cds_coupon)
+    cds = CDS(effective_dt, "6M", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "1Y", cds_coupon)
+    cds = CDS(effective_dt, "1Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "2Y", cds_coupon)
+    cds = CDS(effective_dt, "2Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "3Y", cds_coupon)
+    cds = CDS(effective_dt, "3Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "4Y", cds_coupon)
+    cds = CDS(effective_dt, "4Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "5Y", cds_coupon)
+    cds = CDS(effective_dt, "5Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "7Y", cds_coupon)
+    cds = CDS(effective_dt, "7Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
-    cds = CDS(effective_dt, "10Y", cds_coupon)
+    cds = CDS(effective_dt, "10Y", cds_cpn)
     cdsMarketContracts.append(cds)
 
     recovery_rate = 0.40
@@ -598,9 +598,9 @@ def test_dirty_priceCDSModelCheck():
 
     libor_curve, issuer_curve = buildFullIssuerCurve2(0.0, 0.0)
 
-    # This is the 10 year contract at an off market coupon
+    # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2025)
-    cds_coupon = 0.050
+    cds_cpn = 0.050
     notional = ONE_MILLION
     long_protection = True
     tradeDate = Date(20, 8, 2020)
@@ -609,7 +609,7 @@ def test_dirty_priceCDSModelCheck():
 
     cds_contract = CDS(effective_dt,
                        maturity_dt,
-                       cds_coupon,
+                       cds_cpn,
                        notional,
                        long_protection)
 
@@ -680,9 +680,9 @@ def test_dirty_priceCDSConvergence():
 
     _, issuer_curve = buildFullIssuerCurve1(0.0, 0.0)
 
-    # This is the 10 year contract at an off market coupon
+    # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2029)
-    cds_coupon = 0.0150
+    cds_cpn = 0.0150
     notional = ONE_MILLION
     long_protection = False
     tradeDate = Date(9, 8, 2019)
@@ -690,7 +690,7 @@ def test_dirty_priceCDSConvergence():
 
     cds_contract = CDS(value_dt,
                        maturity_dt,
-                       cds_coupon,
+                       cds_cpn,
                        notional,
                        long_protection)
 
@@ -707,16 +707,16 @@ def test_dirty_priceCDSConvergence():
 
 def test_CDSDateGeneration():
 
-    # This is the 10 year contract at an off market coupon
+    # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2029)
-    cds_coupon = 0.0100
+    cds_cpn = 0.0100
 
     tradeDate = Date(9, 8, 2019)
     value_dt = tradeDate.add_days(1)
 
     cds_contract = CDS(value_dt,
                        maturity_dt,
-                       cds_coupon,
+                       cds_cpn,
                        ONE_MILLION,
                        True,
                        FrequencyTypes.QUARTERLY,
@@ -729,7 +729,7 @@ def test_CDSDateGeneration():
     num_flows = len(cds_contract.payment_dts)
     for n in range(0, num_flows):
         test_cases.print(str(
-            cds_contract.payment_dts[n]), 
+            cds_contract.payment_dts[n]),
             cds_contract.accrual_factors[n],
             cds_contract.flows[n])
 

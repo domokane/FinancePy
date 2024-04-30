@@ -45,7 +45,7 @@ def testBlackModelCheck():
     exercise_dt = Date(1, 1, 2021)
     maturity_dt = Date(1, 1, 2024)
 
-    fixed_coupon = 0.06
+    fixed_cpn = 0.06
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
     notional = 100.0
@@ -56,7 +56,7 @@ def testBlackModelCheck():
                             exercise_dt,
                             maturity_dt,
                             swaptionType,
-                            fixed_coupon,
+                            fixed_cpn,
                             fixed_freq_type,
                             fixed_dc_type,
                             notional)
@@ -108,7 +108,7 @@ def test_BDTExampleOne():
 
 
 def test_BDTExampleTwo():
-    # Valuation of a European option on a coupon bearing bond
+    # Valuation of a European option on a cpn bearing bond
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
 
@@ -118,10 +118,10 @@ def test_BDTExampleTwo():
     issue_dt = Date(1, 12, 2015)
     expiry_dt = settle_dt.add_tenor("18m")
     maturity_dt = settle_dt.add_tenor("10Y")
-    coupon = 0.05
+    cpn = 0.05
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+    bond = Bond(issue_dt, maturity_dt, cpn, freq_type, dc_type)
 
     cpn_times = []
     cpn_flows = []
@@ -209,7 +209,7 @@ def test_BDTExampleThree():
     dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
     curve = DiscountCurve(settle_dt, dates, dfs)
 
-    coupon = 0.06
+    cpn = 0.06
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
     strike_price = 100.0
@@ -243,7 +243,7 @@ def test_BDTExampleThree():
                 t_exp = (expiry_dt - settle_dt) / gDaysInYear
 
                 bond = Bond(issue_dt, maturity_dt,
-                            coupon, freq_type, dc_type)
+                            cpn, freq_type, dc_type)
 
                 cpn_times = []
                 cpn_flows = []

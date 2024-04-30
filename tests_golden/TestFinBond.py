@@ -102,7 +102,7 @@ def build_ibor_curve(value_dt):
         fixed_freq_type,
         fixed_dcc_type)
 
-    #    print(swap1._fixed_leg._payment_dts)
+    #    print(swap1.fixed_leg._payment_dts)
 
     swaps.append(swap1)
 
@@ -116,7 +116,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap2)
 
-    #    print(swap2._fixed_leg._payment_dts)
+    #    print(swap2.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(48)
     swap3 = IborSwap(
@@ -128,7 +128,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap3)
 
-    #    print(swap3._fixed_leg._payment_dts)
+    #    print(swap3.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(60)
     swap4 = IborSwap(
@@ -140,7 +140,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap4)
 
-    #    print(swap4._fixed_leg._payment_dts)
+    #    print(swap4.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(72)
     swap5 = IborSwap(
@@ -152,7 +152,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap5)
 
-    #    print(swap5._fixed_leg._payment_dts)
+    #    print(swap5.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(84)
     swap6 = IborSwap(
@@ -164,7 +164,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap6)
 
-    #    print(swap6._fixed_leg._payment_dts)
+    #    print(swap6.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(96)
     swap7 = IborSwap(
@@ -176,7 +176,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap7)
 
-    #    print(swap7._fixed_leg._payment_dts)
+    #    print(swap7.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(108)
     swap8 = IborSwap(
@@ -188,7 +188,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap8)
 
-    #    print(swap8._fixed_leg._payment_dts)
+    #    print(swap8.fixed_leg._payment_dts)
 
     maturity_dt = settle_dt.add_months(120)
     swap9 = IborSwap(
@@ -200,7 +200,7 @@ def build_ibor_curve(value_dt):
         fixed_dcc_type)
     swaps.append(swap9)
 
-    #    print(swap9._fixed_leg._payment_dts)
+    #    print(swap9.fixed_leg._payment_dts)
 
     libor_curve = IborSingleCurve(value_dt,
                                   depos,

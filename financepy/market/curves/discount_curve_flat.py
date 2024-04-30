@@ -52,7 +52,7 @@ class DiscountCurveFlat(DiscountCurve):
         self.dc_type = dc_type
 
         # This is used by some inherited functions, so we choose the simplest
-        self.interp_type = InterpTypes.FLAT_FWD_RATES
+        self._interp_type = InterpTypes.FLAT_FWD_RATES
 
         # Need to set up a grid of times and discount factors
         years = np.linspace(0.0, 10.0, 41)
