@@ -1,7 +1,7 @@
 # FinancePy
 A one-stop library for pricing and risk-managing options, futures and other financial instruments. See below for a comprehensive overview.
 
-# Getting Started
+## Getting Started
 FinancePy can be installed from pip using the following command:
 
 `pip install financepy`
@@ -10,7 +10,7 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
-# Versions
+## Versions
 1 May 2024 version 0.360 released
 - Fixed all notebooks to ensure they all work with current version
 - Unit tests complete with success
@@ -62,13 +62,13 @@ Version 0.240 has just been released and pushed to PyPI with changes
 - Negative terms in date class
 - Recovery rates do not default to standard value for CDS curves
 
-# DISCLAIMER
+## DISCLAIMER
 
 This software is distributed FREE AND WITHOUT ANY WARRANTY.
 
 Report any bugs or suggestions here as an issue.
 
-# CONTRIBUTORS WANTED !
+## CONTRIBUTORS WANTED !
 
 If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu.
 
