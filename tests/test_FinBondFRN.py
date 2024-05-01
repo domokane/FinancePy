@@ -219,3 +219,5 @@ def test_bond_frn_2():
                                                       dm)
 
     assert round(modified_duration, 4) == 6.0480
+
+test_bond_frn_1()

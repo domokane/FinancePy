@@ -49,7 +49,7 @@ class BondAnnuity:
 
         self.cpn_dts = []
         self.settle_dt = Date(1, 1, 1900)
-        self.accrued_int= None
+        self.accrued_int = None
         self.accrued_days = 0.0
         self.alpha = 0.0
 
@@ -154,9 +154,11 @@ class BondAnnuity:
 
         self.alpha = 1.0 - acc_factor * self.freq
 
-        self.accrued_int= acc_factor * face * self.cpn
+        self.accrual_factor = acc_factor
+        self.accrued_int = acc_factor * face * self.cpn
         self.accrued_days = num
-        return self.accrued_interest
+
+        return self.accrued_int
 
     ###########################################################################
 

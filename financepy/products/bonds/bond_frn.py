@@ -71,6 +71,7 @@ class BondFRN:
         self.accrued = None
         self.accrued_days = 0.0
         self.accrual_factor = 0.0
+        self.accrued_int = 0.0
 
         self.cpn_dts = []
         self.flow_amounts = []
@@ -436,6 +437,9 @@ class BondFRN:
         self.alpha = 1.0 - acc_factor * self.freq
         self.accrual_factor = acc_factor
         self.accrued_days = num
+        self.accrued_int = acc_factor * next_cpn * 1.0
+
+        return self.accrued_int
 
     ###########################################################################
 

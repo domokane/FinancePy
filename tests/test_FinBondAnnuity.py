@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+sys.path.append("..")
+
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.day_count import DayCountTypes
@@ -188,3 +191,5 @@ def test_ForwardGenWithLongEndStub_BondAnnuity():
     assert round(annuity.flow_amounts[-1]) == 25417.0
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
+
+test_SemiAnnual_BondAnnuity()

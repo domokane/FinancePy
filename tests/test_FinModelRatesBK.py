@@ -29,19 +29,19 @@ def test_BKExampleOne():
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(t_mat, times, dfs)
 
-    assert [round(x, 4) for x in model._Q[2]] == \
+    assert [round(x, 4) for x in model.Q[2]] == \
         [0.0190, 0.2126, 0.5009, 0.2112, 0.0187]
 
-    assert [round(x, 4) for x in model._rt[2]] == \
+    assert [round(x, 4) for x in model.rt[2]] == \
         [0.0259, 0.0351, 0.0477, 0.0648, 0.0881]
 
-    assert [round(x, 4) for x in model._pu] == \
+    assert [round(x, 4) for x in model.pu] == \
         [0.0808, 0.2278, 0.1667, 0.1177, 0.8606]
 
-    assert [round(x, 4) for x in model._pm] == \
+    assert [round(x, 4) for x in model.pm] == \
         [0.0586, 0.6545, 0.6667, 0.6545, 0.0586]
 
-    assert [round(x, 4) for x in model._pd] == \
+    assert [round(x, 4) for x in model.pd] == \
         [0.8606, 0.1177, 0.1667, 0.2278, 0.0808]
 
 
@@ -119,3 +119,5 @@ def test_BKExampleTwo():
 
     assert round(v['call'], 4) == 0.6998
     assert round(v['put'], 4) == 7.9605
+
+test_BKExampleOne()

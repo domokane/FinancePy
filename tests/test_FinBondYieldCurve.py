@@ -44,7 +44,7 @@ def test_poly():
     curveFitMethod = CurveFitPolynomial(5)
     fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    coeffs = fitted_curve._curve_fit._coeffs
+    coeffs = fitted_curve.curve_fit.coeffs
     assert round(coeffs[0] * 1e9, 4) == -1.4477
     assert round(coeffs[1] * 1e7, 4) == 1.7840
     assert round(coeffs[2] * 1e6, 4) == -7.4147
@@ -57,22 +57,22 @@ def test_nelson_siegel():
     curveFitMethod = CurveFitNelsonSiegel()
     fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    assert round(fitted_curve._curve_fit._beta_1, 3) == -0.094
-    assert round(fitted_curve._curve_fit._beta_2, 3) == 0.092
-    assert round(fitted_curve._curve_fit._beta_3, 3) == 0.259
-    assert round(fitted_curve._curve_fit._tau, 1) == 35.8
+    assert round(fitted_curve.curve_fit.beta_1, 3) == -0.094
+    assert round(fitted_curve.curve_fit.beta_2, 3) == 0.092
+    assert round(fitted_curve.curve_fit.beta_3, 3) == 0.259
+    assert round(fitted_curve.curve_fit.tau, 1) == 35.8
 
 
 def test_nelson_siegel_svensson():
     curveFitMethod = CurveFitNelsonSiegelSvensson()
     fitted_curve = BondYieldCurve(settlement, bonds, ylds, curveFitMethod)
 
-    assert round(fitted_curve._curve_fit._beta_1, 4) == 0.0460
-    assert round(fitted_curve._curve_fit._beta_2, 4) == -0.0433
-    assert round(fitted_curve._curve_fit._beta_3, 4) == -0.0523
-    assert round(fitted_curve._curve_fit._beta_4, 4) == -0.0376
-    assert round(fitted_curve._curve_fit._tau_1, 3) == 3.177
-    assert round(fitted_curve._curve_fit._tau_2, 4) == 100.0000
+    assert round(fitted_curve.curve_fit.beta_1, 4) == 0.0460
+    assert round(fitted_curve.curve_fit.beta_2, 4) == -0.0433
+    assert round(fitted_curve.curve_fit.beta_3, 4) == -0.0523
+    assert round(fitted_curve.curve_fit.beta_4, 4) == -0.0376
+    assert round(fitted_curve.curve_fit.tau_1, 3) == 3.177
+    assert round(fitted_curve.curve_fit.tau_2, 4) == 100.0000
 
 
 def test_interp_yield():

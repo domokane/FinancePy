@@ -310,7 +310,7 @@ def test_FinSchedule():
                         DateGenRuleTypes.BACKWARD)
 
 #    print(schedule)
-#    print(schedule._adjusted_dts)
+#    print(schedule.adjusted_dts)
 
 ###############################################################################
 
@@ -407,8 +407,8 @@ def test_FinScheduleAlignmentLeapYearEOM():
                       adjust_termination_dt,
                       eomFlag)
 
-#    print(sched1._adjusted_dts)
-#    print(sched2._adjusted_dts[:len(sched1._adjusted_dts)])
+#    print(sched1.adjusted_dts)
+#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
         sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
@@ -453,8 +453,8 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
                       adjust_termination_dt,
                       eomFlag)
 
-#    print(sched1._adjusted_dts)
-#    print(sched2._adjusted_dts[:len(sched1._adjusted_dts)])
+#    print(sched1.adjusted_dts)
+#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
         sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])

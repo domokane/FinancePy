@@ -86,7 +86,7 @@ def test_forward_frequencies():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 3
     check_frequency(schedule)
 
@@ -97,7 +97,7 @@ def test_forward_frequencies():
                         cal_type,
                         bd_type,
                         dg_type)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 5
     check_frequency(schedule)
 
@@ -109,7 +109,7 @@ def test_forward_frequencies():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 25
     check_frequency(schedule)
 
@@ -131,7 +131,7 @@ def test_backward_front_stub():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 9
     check_frequency(schedule, start=1)
 
@@ -151,7 +151,7 @@ def test_backward_front_stub():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 9
     check_frequency(schedule, start=1)
 
@@ -174,7 +174,7 @@ def test_forward_end_stub():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 5
     check_frequency(schedule)
 
@@ -192,7 +192,7 @@ def test_forward_end_stub():
                         cal_type,
                         bd_type,
                         dg_type)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 9
     check_frequency(schedule)
 
@@ -212,6 +212,6 @@ def test_forward_end_stub():
                         bd_type,
                         dg_type,
                         termination_date_adjust)
-    adjusted_dts = schedule._adjusted_dts
+    adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 5
     check_frequency(schedule)
