@@ -1,4 +1,16 @@
-# Latest News and Version
+# FinancePy
+A one-stop library for pricing and risk-managing options, futures and other financial instruments. See below for a comprehensive overview.
+
+# Getting Started
+FinancePy can be installed from pip using the following command:
+
+`pip install financepy`
+
+To upgrade an existing installation type:
+
+`pip install --upgrade financepy`
+
+# Versions
 1 May 2024 version 0.360 released
 - Fixed all notebooks to ensure they all work with current version
 - Unit tests complete with success
@@ -61,18 +73,6 @@ Report any bugs or suggestions here as an issue.
 If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu.
 
 If you are a user and require some additional functionality, then please add it as an issue.
-
-# Quick Start Guide
-
-FinancePy can be installed from pip using the following command:
-
-`pip install financepy`
-
-To upgrade an existing installation type:
-
-`pip install --upgrade financepy`
-
-I have encountered problems using Anaconda3-2020.07 due to some Numba and LLVMLite problems. However, Anaconda3-2020.02 works.
 
 ## Using FinancePy in a Jupyter Notebook
 
