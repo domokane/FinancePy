@@ -10,6 +10,10 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
+The notebooks folder contains over 60 example notebooks on how to use the library. 
+
+There is also a pdf manual at the top of the project listing all of the functionality.
+
 ## Versions
 1 May 2024 version 0.360 released
 - Fixed all notebooks to ensure they all work with current version
