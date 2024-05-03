@@ -72,19 +72,11 @@ This software is distributed FREE AND WITHOUT ANY WARRANTY.
 
 Report any bugs or suggestions here as an issue.
 
-## CONTRIBUTORS WANTED !
+## Contributing
 
 If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu.
 
 If you are a user and require some additional functionality, then please add it as an issue.
-
-## Using FinancePy in a Jupyter Notebook
-
-Once financepy has been installed, it is easy to get started.
-
-Just download the project and examine the set of Jupyter Notebooks in the notebook folder.
-
-A pdf manual describing all the functions can be found in the project directory.
 
 ## Overview
 
