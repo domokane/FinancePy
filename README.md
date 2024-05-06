@@ -15,7 +15,7 @@ The notebooks folder contains over 60 example notebooks on how to use the librar
 There is also a pdf manual at the top of the project listing all of the functionality.
 
 ## Disclaimer
-This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or suggestions here as an issue.
+This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or concerns here as an issue.
 
 ## Contributing
 If you have a knowledge of Quantitative Finance and Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. There are a number of requirements:
