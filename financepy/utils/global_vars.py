@@ -8,5 +8,7 @@
 gDaysInYear = 365.0  # .242
 g_small = 1e-12
 gNotebookMode = False
+gBasisPoint = 1e-4
+gPercent = 1e-2
 
 ###############################################################################

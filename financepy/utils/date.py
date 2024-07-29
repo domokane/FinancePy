@@ -7,7 +7,9 @@ from functools import partial
 from enum import Enum
 from math import copysign
 
+from typing import Union
 from numba import njit
+from enum import Enum
 import numpy as np
 import datetime
 
@@ -15,6 +17,8 @@ import datetime
 
 # from financepy.utils.error import FinError
 from .error import FinError
+from .tenor import Tenor, TenorUnit
+
 
 ###############################################################################
 
@@ -407,6 +411,11 @@ class Date:
 
     ###########################################################################
 
+    def __hash__(self):
+        return hash(self.excel_dt)
+
+    ###########################################################################
+
     def is_weekend(self):
         """returns True if the date falls on a weekend."""
 
@@ -758,7 +767,7 @@ class Date:
 
     ###########################################################################
 
-    def add_tenor(self, tenor: (list, str)):
+    def add_tenor(self, tenor: Union[list, str, Tenor]):
         """Return the date following the Date by a period given by the
         tenor which is a string consisting of a number and a letter, the
         letter being d, w, m , y for day, week, month or year. This is case
@@ -771,13 +780,13 @@ class Date:
         if isinstance(tenor, list) is True:
             list_flag = True
             for ten in tenor:
-                if isinstance(ten, str) is False:
-                    raise FinError("Tenor must be a string e.g. '5Y'")
+                if isinstance(ten, str) is False and isinstance(ten, Tenor) is False:
+                    raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
         else:
-            if isinstance(tenor, str) is True:
+            if isinstance(tenor, str) is True or isinstance(tenor, Tenor) is True:
                 tenor = [tenor]
             else:
-                raise FinError("Tenor must be a string e.g. '5Y'")
+                raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
 
         new_dts = []
 
@@ -815,15 +824,15 @@ class Date:
 
             new_dt = Date(self.d, self.m, self.y)
 
-            if period_type == DAYS:
-                for _ in range(0, abs(num_periods)):
-                    new_dt = new_dt.add_days(math.copysign(1, num_periods))
-            elif period_type == WEEKS:
-                for _ in range(0, abs(num_periods)):
-                    new_dt = new_dt.add_days(math.copysign(7, num_periods))
-            elif period_type == MONTHS:
-                for _ in range(0, abs(num_periods)):
-                    new_dt = new_dt.add_months(math.copysign(1, num_periods))
+            if tenor_obj._units == TenorUnit.DAYS:
+                for _ in range(0, abs(tenor_obj._num_periods)):
+                    new_dt = new_dt.add_days(math.copysign(1, tenor_obj._num_periods))
+            elif tenor_obj._units == TenorUnit.WEEKS:
+                for _ in range(0, abs(tenor_obj._num_periods)):
+                    new_dt = new_dt.add_days(math.copysign(7, tenor_obj._num_periods))
+            elif tenor_obj._units == TenorUnit.MONTHS:
+                for _ in range(0, abs(tenor_obj._num_periods)):
+                    new_dt = new_dt.add_months(math.copysign(1, tenor_obj._num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day we add this logic
                 y = new_dt.y
@@ -831,9 +840,11 @@ class Date:
                 d = min(self.d, new_dt.eom().d)
                 new_dt = Date(d, m, y)
 
-            elif period_type == YEARS:
-                for _ in range(0, abs(num_periods)):
-                    new_dt = new_dt.add_months(math.copysign(12, num_periods))
+            elif tenor_obj._units == TenorUnit.YEARS:
+                for _ in range(0, abs(tenor_obj._num_periods)):
+                    new_dt = new_dt.add_months(
+                        math.copysign(12, tenor_obj._num_periods)
+                    )
 
             new_dts.append(new_dt)
 

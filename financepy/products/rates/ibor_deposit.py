@@ -9,6 +9,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount
 from ...utils.day_count import DayCountTypes
+from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 
 
@@ -114,8 +115,53 @@ class IborDeposit:
 
     ###########################################################################
 
-    def print_payments(self,
-                       value_dt: Date):
+    def valuation_details(self,
+                          valuation_date: Date,
+                          discount_curve: DiscountCurve,
+                          index_curve: DiscountCurve = None):
+        """
+        A long-hand method that returns various details relevant to valuation in a dictionary
+        Slower than value(...) so should not be used when performance is important
+
+        We want thre output dictionary to have  the same labels for different bechmarks
+        (depos, fras, swaps) because we want to present them together so please do not stick new outputs into 
+        one of them only
+
+        TODO: make a test of this
+        """
+        if valuation_date > self.maturity_dt:
+            raise FinError("Start date after maturity date")
+
+        dc = DayCount(self.dc_type)
+        acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
+        df_settle = discount_curve.df(self.start_dt)
+        df_maturity = discount_curve.df(self.maturity_dt)
+
+        value = (1.0 + acc_factor * self.deposit_rate) * self.notional
+
+        # Need to take into account spot days being zero so depo settling fwd
+        value = value * df_maturity / df_settle  # VP: ??? this looks like a start_date - forward value? not spot value? why?
+
+        out = {
+            'type': type(self).__name__,
+            'start_date': self.start_dt,
+            'maturity_date': self.maturity_dt,
+            'day_count_type': self.dc_type.name,
+            'notional': self.notional,
+            'contract_rate': self.deposit_rate,
+            'market_rate': (df_settle / df_maturity - 1)/acc_factor,
+            # for depo pvbp is actually negative: rates up, value down. but probably makes sense to report as positive, asif for a spot-starting fra
+            'spot_pvbp': acc_factor * df_maturity,
+            'fwd_pvbp': acc_factor * df_maturity/df_settle,
+            'unit_value': value/self.notional,
+            'value': value,
+            # ignoring bus day adj type, calendar for now
+        }
+        return out
+    ###########################################################################
+
+    def print_flows(self,
+                    valuation_date: Date):
         """ Print the date and size of the future repayment. """
 
         dc = DayCount(self.dc_type)

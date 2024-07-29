@@ -127,6 +127,36 @@ def test_DateTenors():
     tenor = "-20Y"
     assert start_dt.add_tenor(tenor) == Date(23, 2, 1998)
 
+    tenor = "-5d"
+    assert start_dt.add_tenor(tenor) == Date(18, 2, 2018)
+
+    tenor = "-7D"
+    assert start_dt.add_tenor(tenor) == Date(16, 2, 2018)
+
+    tenor = "-1W"
+    assert start_dt.add_tenor(tenor) == Date(16, 2, 2018)
+
+    tenor = "-4W"
+    assert start_dt.add_tenor(tenor) == Date(26, 1, 2018)
+
+    tenor = "-1M"
+    assert start_dt.add_tenor(tenor) == Date(23, 1, 2018)
+
+    tenor = "-24M"
+    assert start_dt.add_tenor(tenor) == Date(23, 2, 2016)
+
+    tenor = "-2Y"
+    assert start_dt.add_tenor(tenor) == Date(23, 2, 2016)
+
+    tenor = "-10y"
+    assert start_dt.add_tenor(tenor) == Date(23, 2, 2008)
+
+    tenor = "-0m"
+    assert start_dt.add_tenor(tenor) == Date(23, 2, 2018)
+
+    tenor = "-20Y"
+    assert start_dt.add_tenor(tenor) == Date(23, 2, 1998)
+
 
 def test_DateRange():
 
