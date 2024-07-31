@@ -17,7 +17,7 @@ from financepy.utils.math import corr_matrix_generator
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 def testFinGBMProcess():
-
+ 
     num_assets = 3
     num_paths = 5
     num_time_steps = 1
