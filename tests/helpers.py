@@ -415,7 +415,7 @@ def loadHomogeneousCDSCurves(value_dt,
     return issuer_curves
 
 
-def buildIborSingleCurve(value_dt):
+def buildIborSingleCurve(value_dt, last_tenor='51Y'):
 
     settle_dt = value_dt.add_days(2)
     dcType = DayCountTypes.ACT_360
@@ -633,6 +633,9 @@ def buildIborSingleCurve(value_dt):
 
     ########################################
 
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+    last_maturity_date = settle_dt.add_tenor(last_tenor)
+    swaps_to_use = [s for s in swaps if s.fixed_leg.maturity_dt <= last_maturity_date]
+
+    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps_to_use)
 
     return libor_curve

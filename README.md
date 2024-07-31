@@ -14,15 +14,18 @@ The notebooks folder contains over 60 example notebooks on how to use the librar
 
 There is also a pdf manual at the top of the project listing all of the functionality.
 
-## DISCLAIMER
-This software is distributed FREE AND WITHOUT ANY WARRANTY.
-
-Report any bugs or suggestions here as an issue.
+## Disclaimer
+This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or concerns here as an issue.
 
 ## Contributing
+If you have a knowledge of Quantitative Finance and Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. There are a number of requirements:
 
-If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu.
+* The code should be Pep8 compliant.
+* Comments are required for every class and function, and they should give a clear description.
+* At least one broad test case and a set of unit tests must be provided for every function.
+* Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability and speed are the priorities.
 
+## Users
 If you are a user and require some additional functionality, then please add it as an issue.
 
 ## Overview
@@ -62,8 +65,6 @@ Important Note:
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
 
-## The Library Design
-
 The underlying Python library is split into a number of major modules:
 
 * Utils - These are utility functions used to assist you with modelling a security. These include dates (Date), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
@@ -90,15 +91,6 @@ FinancePy depends on Numpy, Numba, Scipy and basic python libraries such as os, 
 ## Changelog
 
 See the changelog for a detailed history of changes.
-
-## Contributions
-
-Contributions are very welcome. There are a number of requirements:
-
-* The code should be Pep8 compliant.
-* Comments are required for every class and function, and they should be a clear description.
-* At least one broad test case and a set of unit tests must be provided for every function.
-* Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability is the priority.
 
 ## License
 

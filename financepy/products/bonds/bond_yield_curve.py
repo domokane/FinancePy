@@ -148,7 +148,8 @@ class BondYieldCurve():
 ###############################################################################
 
     def plot(self,
-             title):
+             title,
+             ylabel = 'Yield To Maturity (%)'):
         """ Display yield curve. """
 
         plt.figure(figsize=(12, 6))
@@ -156,7 +157,7 @@ class BondYieldCurve():
         bond_ylds_scaled = scale(self.ylds, 100.0)
         plt.plot(self.yearsToMaturity, bond_ylds_scaled, 'o')
         plt.xlabel('Time to Maturity (years)')
-        plt.ylabel('Yield To Maturity (%)')
+        plt.ylabel(ylabel)
 
         tmax = np.max(self.yearsToMaturity)
         t = np.linspace(0.0, int(tmax+0.5), 100)

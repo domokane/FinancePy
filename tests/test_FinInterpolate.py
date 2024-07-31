@@ -21,7 +21,7 @@ yValues = np.array(yValues)
 xInterpolateValues = np.linspace(0.0, 10.0, 20)
 
 
-def test_FinInterpolate():
+def test_FinInterpolate_Runs():
     for interp_type in InterpTypes:
 
         yInterpValues = []
@@ -32,6 +32,22 @@ def test_FinInterpolate():
         for x in xInterpolateValues:
             y_int = interpolator.interpolate(x)
             yInterpValues.append(y_int)
+
+
+def test_FinInterpolate_Recovers_Inputs():
+    for interp_type in InterpTypes:
+
+        yInterpValues = []
+
+        interpolator = Interpolator(interp_type)
+        interpolator.fit(xValues, yValues)
+
+        for x in xValues:
+            y_int = interpolator.interpolate(x)
+            yInterpValues.append(y_int)
+
+        yInterpValues = np.array(yInterpValues)
+        assert np.linalg.norm(yValues - yInterpValues)/np.linalg.norm(yValues) <= 1e-6
 
 
 def test_FLAT_FWD_RATES():
@@ -232,3 +248,72 @@ def test_PCHIP_LOG_DISCOUNT():
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 6.8421
     assert round(y_int, 4) == 0.5551
+
+
+def test_LINEAR_ONFWD_RATES_empty_fit():
+    interp_type = InterpTypes.LINEAR_ONFWD_RATES
+
+    interpolator = Interpolator(interp_type)
+    interpolator.fit([], [])
+    assert round(interpolator.interpolate(1.0), 4) == 1.0
+
+
+def test_LINEAR_ONFWD_RATES_single_value_at_origin():
+    interp_type = InterpTypes.LINEAR_ONFWD_RATES
+
+    interpolator = Interpolator(interp_type)
+    interpolator.fit([0.0], [1.0])
+    assert round(interpolator.interpolate(1.0), 4) == 1.0
+
+
+def test_LINEAR_ONFWD_RATES_single_value_not_at_origin():
+    interp_type = InterpTypes.LINEAR_ONFWD_RATES
+
+    interpolator = Interpolator(interp_type)
+    interpolator.fit([0.1], [0.9])
+    assert round(interpolator.interpolate(0.0), 4) == 1.0
+    assert round(interpolator.interpolate(0.05), 4) == 0.9487
+    assert round(interpolator.interpolate(0.1), 4) == 0.9
+    assert round(interpolator.interpolate(1.0), 4) == 0.3487
+
+
+def test_LINEAR_ONFWD_RATES_two_values_including_origin():
+    interp_type = InterpTypes.LINEAR_ONFWD_RATES
+
+    interpolator = Interpolator(interp_type)
+    interpolator.fit([0.0, 0.1], [1.0, 0.9])
+    assert round(interpolator.interpolate(0.0), 4) == 1.0
+    assert round(interpolator.interpolate(0.05), 4) == 0.9487
+    assert round(interpolator.interpolate(0.1), 4) == 0.9
+    assert round(interpolator.interpolate(1.0), 4) == 0.3487
+
+
+def test_LINEAR_ONFWD_RATES():
+    interp_type = InterpTypes.LINEAR_ONFWD_RATES
+
+    interpolator = Interpolator(interp_type)
+    interpolator.fit(xValues, yValues)
+
+    index = 3
+    x = xInterpolateValues[index]
+    y_int = interpolator.interpolate(x)
+    assert round(y_int, 4) == 0.8583
+    print(y_int)
+
+    index = 8
+    x = xInterpolateValues[index]
+    y_int = interpolator.interpolate(x)
+    assert round(y_int, 4) == 0.6802
+
+    index = 13
+    x = xInterpolateValues[index]
+    y_int = interpolator.interpolate(x)
+    assert round(y_int, 4) == 0.5537
+
+
+if __name__ == '__main__':
+    # test_LINEAR_ONFWD_RATES_empty_fit()
+    # test_LINEAR_ONFWD_RATES_single_value_at_origin()
+    # test_LINEAR_ONFWD_RATES_single_value_not_at_origin()
+    test_LINEAR_ONFWD_RATES_two_values_including_origin()
+    # test_LINEAR_ONFWD_RATES()

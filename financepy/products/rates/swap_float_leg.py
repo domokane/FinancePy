@@ -1,6 +1,8 @@
 ##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
+import numpy as np
+import pandas as pd
 
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -138,7 +140,8 @@ class SwapFloatLeg:
               value_dt: Date,  # This should be the settlement date
               discount_curve: DiscountCurve,
               index_curve: DiscountCurve,
-              first_fixing_rate: float = None):
+              first_fixing_rate: float = None,
+              pv_only=True):
         """ Value the floating leg with payments from an index curve and
         discounting based on a supplied discount curve as of the valuation date
         supplied. For an existing swap, the user must enter the next fixing
@@ -221,7 +224,34 @@ class SwapFloatLeg:
         if self.leg_type == SwapTypes.PAY:
             leg_pv = leg_pv * (-1.0)
 
-        return leg_pv
+        if pv_only:
+            return leg_pv
+        else:
+            return leg_pv, self._cashflow_report_from_cached_values()
+
+##########################################################################
+
+    def _cashflow_report_from_cached_values(self):
+        """After calling value(...) function, internal members store cashflow-by-cashflow values
+        Return them in a dataframe
+
+        Returns:
+            pd.DataFrame: cashflow values and related data
+        """
+
+        leg_type_sign = -1 if self.leg_type == SwapTypes.PAY else 1
+        df = pd.DataFrame()
+        df['payment_date'] = self.payment_dts
+        df['start_accrual_date'] = self.start_accrued_dts
+        df['end_accrual_date'] = self.end_accrued_dts
+        df['year_frac'] = self.year_fracs
+        df['rate'] = self.rates
+        df['payment'] = np.array(self.payments) * leg_type_sign
+        df['payment_df'] = self.payment_dfs
+        df['payment_pv'] = np.array(self.payment_pvs) * leg_type_sign
+        df['leg'] = 'FLOAT'
+
+        return df
 
 ##########################################################################
 
