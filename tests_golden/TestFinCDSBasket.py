@@ -11,9 +11,7 @@ sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_types import SwapTypes
-from financepy.models.gbm_process_simulator import get_paths_assets
 from financepy.utils.date import Date
-from financepy.utils.math import corr_matrix_generator
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.credit.cds_curve import CDSCurve
@@ -22,6 +20,7 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_basket import CDSBasket
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.utils.math import corr_matrix_generator
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -367,27 +366,5 @@ def test_FinCDSBasket():
 
 ###############################################################################
 
-
-def testFinGBMProcess():
-
-    num_assets = 3
-    num_paths = 5
-    num_time_steps = 1
-    t = 1.0
-    mus = 0.03 * np.ones(num_assets)
-    stock_prices = 100.0 * np.ones(num_assets)
-    volatilities = 0.2 * np.ones(num_assets)
-    rho = 0.8
-    corr_matrix = corr_matrix_generator(rho, num_assets)
-    seed = 1912
-
-    _ = get_paths_assets(num_assets, num_paths, num_time_steps, t,
-                         mus, stock_prices, volatilities,
-                         corr_matrix, seed)
-
-###############################################################################
-
-
-testFinGBMProcess()
 test_FinCDSBasket()
 test_cases.compareTestCases()

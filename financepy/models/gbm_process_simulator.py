@@ -46,14 +46,14 @@ def get_paths(num_paths,
                        float64[:], float64[:, :], int64),
       cache=True, fastmath=True)
 def get_paths_assets(num_assets,
-                     num_paths,
-                     num_time_steps,
-                     t,
-                     mus,
-                     stock_prices,
-                     volatilities,
-                     corr_matrix,
-                     seed):
+                      num_paths,
+                      num_time_steps,
+                      t,
+                      mus,
+                      stock_prices,
+                      volatilities,
+                      corr_matrix,
+                      seed):
     """ Get the simulated GBM process for a number of assets and paths and num
     time steps. Inputs include the number of assets, paths, the vector of mus,
     stock prices, volatilities, a correlation matrix and a seed. """
@@ -103,13 +103,13 @@ def get_paths_assets(num_assets,
 #                   cache=True, fastmath=True)
 @njit
 def get_assets(num_assets,
-               num_paths,
-               t,
-               mus,
-               stock_prices,
-               volatilities,
-               corr_matrix,
-               seed):
+                num_paths,
+                t,
+                mus,
+                stock_prices,
+                volatilities,
+                corr_matrix,
+                seed):
     """ Get the simulated GBM process for a number of assets and paths for one
     time step. Inputs include the number of assets, paths, the vector of mus,
     stock prices, volatilities, a correlation matrix and a seed. """
@@ -163,27 +163,27 @@ class FinGBMProcess():
 ###############################################################################
 
     def get_paths_assets(self,
-                         num_assets,
-                         num_paths,
-                         num_time_steps,
-                         t,
-                         mus,
-                         stock_prices,
-                         volatilities,
-                         corr_matrix,
-                         seed):
+                          num_assets,
+                          num_paths,
+                          num_time_steps,
+                          t,
+                          mus,
+                          stock_prices,
+                          volatilities,
+                          corr_matrix,
+                          seed):
         """ Get a matrix of simulated GBM asset values by asset, path and time
         step. Inputs are the number of assets, paths and time steps, the time-
         horizon and the initial asset values, volatilities and betas. """
 
         if num_time_steps == 2:
             paths = get_assets(num_assets, num_paths,
-                               t, mus, stock_prices,
-                               volatilities, corr_matrix, seed)
+                                t, mus, stock_prices,
+                                volatilities, corr_matrix, seed)
         else:
             paths = get_paths_assets(num_assets, num_paths, num_time_steps,
-                                     t, mus, stock_prices,
-                                     volatilities, corr_matrix, seed)
+                                      t, mus, stock_prices,
+                                      volatilities, corr_matrix, seed)
         return paths
 
 ###############################################################################
