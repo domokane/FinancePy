@@ -2,19 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import os
 import sys
 sys.path.append("..")
 
+import datetime as dt
+
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.bond import Bond
-
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
-
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-import datetime as dt
-import os
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

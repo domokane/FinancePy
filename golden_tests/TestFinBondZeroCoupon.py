@@ -2,7 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import os
 import sys
+
 import pandas as pd
 sys.path.append("..")
 
@@ -50,8 +52,9 @@ def test_bond_zero():
 
 
 def test_bond_zero_ror():
-    test_case_file = 'test_cases_bond_zero_ror.csv'
-    df = pd.read_csv('.//data//' + test_case_file, parse_dates=['buy_date', 'sell_date'])
+
+    path = os.path.join(os.path.dirname(__file__), './/data//test_cases_bond_ror.csv')
+    df = pd.read_csv(path, parse_dates=['buy_date', 'sell_date'])
     # A 1-year bond with zero coupon per year. code: 092103011
     bond = BondZero(
         issue_dt=Date(23, 7, 2021),

@@ -556,9 +556,8 @@ def test_bond_payment_dates():
 
 def test_bond_ror():
 
-    test_case_file = 'test_cases_bond_ror.csv'
-    df = pd.read_csv('.//data//' + test_case_file, parse_dates=['buy_date',
-                                                                'sell_date'])
+    path = os.path.join(os.path.dirname(__file__), './/data//test_cases_bond_ror.csv')
+    df = pd.read_csv(path, parse_dates=['buy_date','sell_date'])
     # A 10-year bond with 1 coupon per year. code: 210215
 
     bond = Bond(
