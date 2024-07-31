@@ -31,7 +31,7 @@ def value_barrier(t, k, h, s, r, q, v, option_type, nobs):
     df = np.exp(-r * t)
     dq = np.exp(-q * t)
 
-    c = s * dq * N(d1) - k * df * N(d2)
+    c = s * dq * N(+d1) - k * df * N(+d2)
     p = k * df * N(-d2) - s * dq * N(-d1)
 
     if s >= h:

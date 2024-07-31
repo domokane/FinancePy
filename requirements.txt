@@ -4,6 +4,5 @@ numpy==1.26.4
 scipy==1.13.1
 llvmlite==0.43.0
 ipython==8.25.0
-matplotlib==3.8.4
 pandas==2.1.2
 prettytable==3.9.0

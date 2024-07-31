@@ -94,18 +94,21 @@ class Black():
 
         if option_type in (OptionTypes.EUROPEAN_CALL,
                            OptionTypes.EUROPEAN_PUT):
+
             if self.implementation_type == BlackTypes.ANALYTICAL:
                 return black_delta(f, t, k, r, v, option_type)
-            else:
-                raise FinError("Implementation not available for this product")
+
+            raise FinError("Implementation not available for this product")
+
         elif option_type in (OptionTypes.AMERICAN_CALL,
                              OptionTypes.AMERICAN_PUT):
             if self.implementation_type == BlackTypes.CRR_TREE:
                 results = crr_tree_val_avg(
                     f, 0.0, 0.0, v, self.num_steps, t, option_type.value, k)
                 return results['delta']
-            else:
-                raise FinError("Implementation not available for this product")
+
+            raise FinError("Implementation not available for this product")
+
         else:
             raise FinError(
                 "Option type must be a European/American Call or Put")

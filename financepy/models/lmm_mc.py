@@ -122,15 +122,15 @@ def lmm_swaption_vol_approx(a, b, fwd0, taus, zetas, rho):
             term = wti * wtj * fi * fj * rho[i][j] * intsigmaij / (sab**2)
             swaption_var += term
 
-    taua = 0.0
+    tau_a = 0.0
     for i in range(0, a):
-        taua += taus[i]
+        tau_a += taus[i]
 
-    taub = 0.0
+    tau_b = 0.0
     for i in range(0, b):
-        taub += taus[i]
+        tau_b += taus[i]
 
-    swaption_vol = np.sqrt(swaption_var/taua)
+    swaption_vol = np.sqrt(swaption_var/tau_a)
     return swaption_vol
 
 
@@ -166,6 +166,7 @@ def lmm_sim_swaption_vol(a, b, fwd0, fwds, taus):
         df = 1.0
 
         for k in range(a, b):
+
             f = fwds[i_path, a, k]
             tau = taus[k]
             df = df / (1.0 + tau * f)
@@ -241,14 +242,14 @@ def lmm_fwd_fwd_correlation(num_fwds, num_paths, i_time, fwds):
 
 @njit(float64[:](float64[:], float64[:], int64, float64, float64[:]),
       cache=True, fastmath=True)
-def lmm_price_caps_black(fwd0, vol_caplet, p, K, taus):
+def lmm_price_caps_black(fwd0, vol_caplet, p, k, taus):
     """ Price a strip of capfloorlets using Black's model using the time grid
     of the LMM model. The prices can be compared with the LMM model prices. """
 
     caplet = np.zeros(p+1)
     disc_fwd = np.zeros(p+1)
 
-    if K <= 0.0:
+    if k <= 0.0:
         raise FinError("Negative strike not allowed.")
 
     # Set up initial term structure
@@ -261,13 +262,13 @@ def lmm_price_caps_black(fwd0, vol_caplet, p, K, taus):
 
     for i in range(1, p):  # 1 to p-1
 
-        K = fwd0[i]
+        k = fwd0[i]
         t_exp += taus[i]
         vol = vol_caplet[i]
-        F = fwd0[i]
-        d1 = (np.log(F/K) + vol * vol * t_exp / 2.0) / vol / np.sqrt(t_exp)
+        f = fwd0[i]
+        d1 = (np.log(f/k) + vol * vol * t_exp / 2.0) / vol / np.sqrt(t_exp)
         d2 = d1 - vol * np.sqrt(t_exp)
-        caplet[i] = (F * N(d1) - K * N(d2)) * taus[i] * disc_fwd[i]
+        caplet[i] = (f * N(d1) - k * N(d2)) * taus[i] * disc_fwd[i]
 
     return caplet
 
@@ -318,7 +319,7 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
     half_num_paths = int(num_paths/2)
 
     fwd = np.empty((num_paths, num_fwds, num_fwds))
-    fwdB = np.zeros(num_fwds)
+    fwd_b = np.zeros(num_fwds)
 
     disc_fwd = np.zeros(num_fwds)
 
@@ -369,13 +370,13 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
 
                 zi = zetas[i]
 
-                muA = 0.0
+                mu_a = 0.0
                 for k in range(j, i+1):
                     rho = corr[j][k-j, i-j]
                     fk = fwd[i_path, j-1, k]
                     zk = zetas[k]
                     tk = taus[k]
-                    muA += zi * fk * tk * zk * rho / (1.0 + fk * tk)
+                    mu_a += zi * fk * tk * zk * rho / (1.0 + fk * tk)
 
                 w = 0.0
                 for k in range(0, num_fwds-j):
@@ -385,19 +386,19 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
                 avgg += w
                 stdg += w*w
 
-                fwdB[i] = fwd[i_path, j-1, i] \
-                    * np.exp(muA * dt - 0.5 * (zi**2) * dt + zi * w * sqrt_dt)
+                fwd_b[i] = fwd[i_path, j-1, i] \
+                    * np.exp(mu_a * dt - 0.5 * (zi**2) * dt + zi * w * sqrt_dt)
 
-                muB = 0.0
+                mu_b = 0.0
                 for k in range(j, i+1):
                     rho = corr[j][k-j, i-j]
-                    fk = fwdB[k]
+                    fk = fwd_b[k]
                     zk = zetas[k]
                     tk = taus[k]
-                    muB += zi * fk * tk * zk * rho / (1.0 + fk * tk)
+                    mu_b += zi * fk * tk * zk * rho / (1.0 + fk * tk)
 
-                muAvg = 0.5*(muA + muB)
-                x = np.exp(muAvg * dt - 0.5 * (zi**2) * dt + zi * w * sqrt_dt)
+                mu_avg = 0.5*(mu_a + mu_b)
+                x = np.exp(mu_avg * dt - 0.5 * (zi**2) * dt + zi * w * sqrt_dt)
                 fwd[i_path, j, i] = fwd[i_path, j-1, i] * x
 
     return fwd

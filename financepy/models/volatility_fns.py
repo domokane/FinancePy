@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
+
 import numpy as np
 from numba import njit, float64
 
@@ -11,9 +13,6 @@ from ..utils.error import FinError
 ###############################################################################
 # Parametric functions for option volatility to use in a Black-Scholes model
 ###############################################################################
-
-from enum import Enum
-
 
 class VolFuncTypes(Enum):
     CLARK = 0
@@ -242,9 +241,7 @@ def vol_function_ssvi(params, f, k, t):
     x = np.log(f/k)
 
     vart = ssvi_local_varg(x, gamma, sigma, rho, t)
-
-    if vart < 0.0:
-        vart = 0.0
+    vart = max(vart, 0.0);
 
     sigma = np.sqrt(vart)
 
