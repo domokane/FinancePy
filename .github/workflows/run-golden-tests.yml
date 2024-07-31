@@ -22,9 +22,9 @@ jobs:
        python setup.py install
    - name: Run tests
      run: 
-       python tests_golden/run_all_tests.py
+       python golden_tests/run_all_tests.py
    - name: Archive code coverage results
      uses: actions/upload-artifact@v2
      with:
         name: result-differences-file-upload
-        path: tests_golden/differences/*.testLog
+        path: golden_tests/differences/*.testLog
