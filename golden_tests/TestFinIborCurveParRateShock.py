@@ -1,26 +1,23 @@
-import pytest
-import pandas as pd
+import sys
+sys.path.append("..")
 
 from financepy.utils.global_types import SwapTypes
-from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_vars import gBasisPoint
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_single_curve_par_shocker import IborSingleCurveParShocker
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.calendar import Calendar, CalendarTypes
+from financepy.utils.calendar import CalendarTypes
 
 
 def test_ibor_curve_par_rate_shocker():
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
-    interp_type = InterpTypes.FLAT_FWD_RATES
 
     depoDCCType = DayCountTypes.ACT_360
     depos = []
@@ -84,6 +81,5 @@ def test_ibor_curve_par_rate_shocker():
         assert round(actual_fwd_rate_changes[1], 3) == round(expected_fwd_rate_changes[benchmark_idx][1], 3)
 
 
-if __name__ == '__main__':
-    test_ibor_curve_par_rate_shocker();
+test_ibor_curve_par_rate_shocker();
 

@@ -89,8 +89,11 @@ def test_dataframe_to_benchmarks():
     asof = Date(6, 10, 2001)
 
     df = pd.read_csv(full_filename_path, index_col=0)
-    df['start_date'] = pd.to_datetime(df['start_date'], errors='ignore')  # allow tenors
-    df['maturity_date'] = pd.to_datetime(df['maturity_date'], errors='ignore')  # allow tenors
+    # df['start_date'] = pd.to_datetime(df['start_date'], errors='ignore')  # allow tenors
+    # df['maturity_date'] = pd.to_datetime(df['maturity_date'], errors='ignore')  # allow tenors
+
+    df['start_date'] = pd.to_datetime(df['start_date'], format='%d-%b-%y')  # allow tenors
+    df['maturity_date'] = pd.to_datetime(df['maturity_date'], format='%d-%b-%y')  # allow tenors
 
     benchmarks = dataframe_to_benchmarks(
         df, asof_date=asof, calendar_type=CalendarTypes.UNITED_KINGDOM)

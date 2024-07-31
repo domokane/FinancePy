@@ -1,8 +1,9 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
-from helpers import *
+import sys
+sys.path.append("..")
+
 from financepy.utils.date import Date
 from financepy.utils.global_vars import gBasisPoint
 from financepy.utils.global_types import SwapTypes
@@ -18,7 +19,7 @@ import financepy.products.rates.ibor_curve_risk_engine as re
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
-DIAGNOSTICS_MODE = True
+DIAGNOSTICS_MODE = False
 
 
 def test_par_rate_risk_report_cubic_zero():
@@ -308,10 +309,9 @@ def _generate_base_curve(valuation_date, cal, interp_type, depoDCCType, fraDCCTy
 
     return settlement_date, base_curve
 
-
-if DIAGNOSTICS_MODE and __name__ == '__main__':
+if 1==1:
     test_par_rate_risk_report_cubic_zero()
-    # test_forward_rate_risk_report()
-    # test_forward_rate_custom_grid_risk_report()
-    # test_carry_rolldown_report()
-    # test_parallel_shift_ladder_report()
+    test_forward_rate_risk_report()
+    test_forward_rate_custom_grid_risk_report()
+    test_carry_rolldown_report()
+    test_parallel_shift_ladder_report()

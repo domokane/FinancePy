@@ -6,16 +6,14 @@ sys.path.append("..")
 
 
 from financepy.utils.date import Date
-from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import Calendar, CalendarTypes
+from financepy.utils.calendar import CalendarTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 
 from financepy.products.rates.ibor_benchmarks_report import ibor_benchmarks_report, dataframe_to_benchmarks
@@ -89,8 +87,9 @@ def test_dataframe_to_benchmarks():
     asof = Date(6, 10, 2001)
 
     df = pd.read_csv(full_filename_path, index_col=0)
-    df['start_date'] = pd.to_datetime(df['start_date'], errors='ignore')  # allow tenors
-    df['maturity_date'] = pd.to_datetime(df['maturity_date'], errors='ignore')  # allow tenors
+
+    df['start_date'] = pd.to_datetime(df['start_date'], format='%d-%b-%y')  # allow tenors
+    df['maturity_date'] = pd.to_datetime(df['maturity_date'], format='%d-%b-%y')  # allow tenors
 
     benchmarks = dataframe_to_benchmarks(
         df, asof_date=asof, calendar_type=CalendarTypes.UNITED_KINGDOM)
