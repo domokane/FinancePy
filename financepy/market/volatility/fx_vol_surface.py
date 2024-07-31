@@ -1042,8 +1042,8 @@ class FXVolSurface():
 
             dFX = (high_fx - low_fx) / num_intervals
 
-            dom_df = self.domestic_curve.df(t_exp)
-            for_df = self.foreign_curve.df(t_exp)
+            dom_df = self.domestic_curve._df(t_exp)
+            for_df = self.foreign_curve._df(t_exp)
 
             r_d = -np.log(dom_df) / t_exp
             r_f = -np.log(for_df) / t_exp
@@ -1100,8 +1100,8 @@ class FXVolSurface():
             f = self.fwd[tenor_index]
 
             for _ in range(0, num_intervals):
-                sigma = vol_function(vol_type_val, params, f, K, t) * 100.0
-                strikes.append(K)
+                sigma = vol_function(vol_type_val, params, f, k, t) * 100.0
+                strikes.append(k)
                 vols.append(sigma)
                 k = k + dk
 

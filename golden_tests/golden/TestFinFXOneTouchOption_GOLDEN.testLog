@@ -1,0 +1,10 @@
+File Created on:20230823_143038
+HEADER,================================= CASH ONLY,
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,                    TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT ,  1.01538,  0.98444,
+RESULTS,                 TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY ,  0.97722,  0.94698,
+RESULTS,               TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING ,  0.44963,  0.47986,
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,                      TouchOptionTypes.UP_AND_IN_CASH_AT_HIT ,  1.12853,  1.12132,
+RESULTS,                   TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY ,  1.08667,  1.08004,
+RESULTS,                 TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING ,  0.34018,  0.34680,

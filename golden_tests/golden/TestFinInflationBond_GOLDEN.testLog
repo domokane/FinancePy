@@ -1,0 +1,24 @@
+File Created on:20230823_143046
+BANNER,BLOOMBERG US TIPS EXAMPLE
+HEADER,FIELD,VALUE,
+RESULTS,Current Yield = ,0.01201518,
+RESULTS,UK DMO REAL Yield To Maturity = ,-0.00100000,
+RESULTS,US STREET REAL Yield To Maturity = ,-0.00100000,
+RESULTS,US TREASURY REAL Yield To Maturity = ,-0.00100000,
+RESULTS,Dirty Price from REAL YTM = ,104.05540085,
+RESULTS,Clean Price from Real YTM = ,104.03502041,
+RESULTS,Accrued Days = ,6.00000000,
+RESULTS,REAL Accrued Interest = ,0.02038043,
+RESULTS,Clean Price from Real YTM = ,104.03502041,
+RESULTS,Inflation Accrued = ,0.02286377,
+RESULTS,Flat Price from Real YTM = ,116.69230692,
+RESULTS,Inflation Principal = ,116.71160311,
+RESULTS,Dollar Duration = ,305.92972171,
+RESULTS,Modified Duration = ,2.94006577,
+RESULTS,Macauley Duration = ,2.93859573,
+RESULTS,Convexity = ,0.10195467,
+BANNER,=============================
+BANNER,QUANT FINANCE US TIPS EXAMPLE
+BANNER,=============================
+HEADER,FIELD,VALUE,
+RESULTS,Current Yield = ,0.00120152,

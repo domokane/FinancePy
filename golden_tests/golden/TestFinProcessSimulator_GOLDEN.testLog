@@ -1,0 +1,18 @@
+File Created on:20230823_143101
+BANNER,######################## GBM NORMAL ###############################
+HEADER,PROCESS,TIME,
+RESULTS,GBM NORMAL,0.07077622,
+BANNER,######################## GBM ANTITHETIC ###########################
+RESULTS,GBM ANTITHETIC,0.09690809,
+BANNER,###################### HESTON EULER ###############################
+RESULTS,HESTON EULER,0.11363363,
+BANNER,###################### HESTON EULERLOG ############################
+RESULTS,HESTON EULERLOG,0.12326646,
+BANNER,###################### HESTON QUADEXP #############################
+RESULTS,HESTON QUADEXP,0.20139360,
+BANNER,######################## VASICEK NORMAL ###########################
+RESULTS,VASICEK_NORMAL,0.05554318,
+BANNER,####################### VASICEK ANTITHETIC ########################
+RESULTS,VASICEK_NORMAL ANTI,0.05823064,
+BANNER,############################# CIR #################################
+RESULTS,CIR,0.06811237,

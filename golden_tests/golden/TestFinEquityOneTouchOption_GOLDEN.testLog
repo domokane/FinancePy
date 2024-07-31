@@ -1,0 +1,18 @@
+File Created on:20230823_143026
+HEADER,================================= CASH ONLY,
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,                    TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT , 10.15381, 10.20050,
+RESULTS,                 TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY ,  9.77218,  9.82371,
+RESULTS,               TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING ,  4.49627,  4.44473,
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,                      TouchOptionTypes.UP_AND_IN_CASH_AT_HIT , 11.28531, 11.07631,
+RESULTS,                   TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY , 10.86668, 10.67302,
+RESULTS,                 TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING ,  3.40176,  3.59542,
+BANNER,================= ASSET ONLY
+HEADER,TYPE,VALUE,VALUE_MC,
+RESULTS,                   TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT , 67.69205, 68.00333,
+RESULTS,                TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY , 66.91760, 68.84921,
+RESULTS,              TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING , 36.51916, 36.33674,
+RESULTS,                     TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT , 75.23538, 73.84206,
+RESULTS,                  TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY , 74.38596, 74.80159,
+RESULTS,                TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING , 19.19968, 20.16362,
