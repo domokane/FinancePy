@@ -36,7 +36,7 @@ def benchmarks_report(benchmarks,
         if df_bmi is None:
             df_bmi = pd.DataFrame.from_dict(res, orient='index').T
         else:
-            df_bmi = df_bmi._append(res, ignore_index=True)
+            df_bmi = df_bmi.append(res, ignore_index=True)
 
     if include_objects:
         df_bmi['benchmark_objects'] = benchmarks
