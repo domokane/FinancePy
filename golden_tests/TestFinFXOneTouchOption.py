@@ -72,7 +72,7 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
-        print(downType, v, v_mc)
+#        print(downType, v, v_mc)
 
     spot_fx_rate = 0.950
     payment_size = 1.5
@@ -108,7 +108,7 @@ def test_FinFXOneTouchOption():
                         "%9.5f" % v,
                         "%9.5f" % v_mc)
 
-        print(upType, v, v_mc)
+#        print(upType, v, v_mc)
 
 
 ###############################################################################
@@ -181,12 +181,13 @@ def test_BBGOneTouchOption():
     # GAMMA IS 916,285
     # DELTA IS -9560266
 
-    print(optionType)
-    print("Value:", v)
-    print("Value MC:", v_mc)
-    print("Delta: ", d)
-    print("Gamma:", g)
-    print("Vega:", v)
+    if 1==0:
+        print(optionType)
+        print("Value:", v)
+        print("Value MC:", v_mc)
+        print("Delta: ", d)
+        print("Gamma:", g)
+        print("Vega:", v)
 
 ###############################################################################
 

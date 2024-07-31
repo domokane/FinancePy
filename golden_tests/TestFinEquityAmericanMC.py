@@ -235,7 +235,6 @@ def testEquityAmericanOption():
         end = time.time()
         duration = end - start
         test_cases.print("AMERICAN_PUT", num_steps, results, duration)
-        print("PUT LSMC Results", results)
 
 #    FinTest.TestReport(filename)
 

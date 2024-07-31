@@ -64,13 +64,13 @@ def test_EquityBarrierOption():
     for option_type in EquityBarrierTypes:
         for stock_price in [80, 100, 120]:
 
-            B = 110.0
-            K = 100.0
+            b = 110.0
+            k = 100.0
 
             option = EquityBarrierOption(expiry_dt,
-                                         K,
+                                         k,
                                          option_type,
-                                         B,
+                                         b,
                                          num_observations_per_year)
 
             value = option.value(value_dt,
@@ -81,28 +81,27 @@ def test_EquityBarrierOption():
 
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
-
-            test_value_mc = option.value_mc(t_exp,
-                                     K,
-                                     option_type.value,
-                                     B,
-                                     notional,
-                                     stock_price,
-                                     discount_curve.cc_rate(expiry_dt),
-                                     process_type,
-                                     model_params)
-
+            value_mc = option.value_mc(t_exp,
+                                       k,
+                                       option_type.value,
+                                       b,
+                                       notional,
+                                       stock_price,
+                                       discount_curve.cc_rate(expiry_dt),
+                                       process_type,
+                                       model_params)
+            
             end = time.time()
             time_elapsed = round(end - start, 3)
-            diff = test_value_mc - value
+            diff = value_mc - value
 
             test_cases.print(
                 option_type,
-                K,
-                B,
+                k,
+                b,
                 stock_price,
                 value,
-                test_value_mc,
+                value_mc,
                 diff,
                 time_elapsed)
 
@@ -111,40 +110,42 @@ def test_EquityBarrierOption():
             B = 100.0
             K = 110.0
 
-            option = EquityBarrierOption(
-                expiry_dt, K, option_type, B, num_observations_per_year)
-            value = option.value(
-                value_dt,
-                stock_price,
-                discount_curve,
-                dividend_curve,
-                model)
+            option = EquityBarrierOption(expiry_dt, 
+                                         k, 
+                                         option_type, 
+                                         b, 
+                                         num_observations_per_year)
+
+            value = option.value(value_dt,
+                                 stock_price,
+                                 discount_curve,
+                                 dividend_curve,
+                                 model)
             start = time.time()
             model_params = (stock_price, drift, volatility, scheme)
 
             test_value_mc = option.value_mc(t_exp,
-                                     K,
-                                     option_type.value,
-                                     B,
-                                     notional,
-                                     stock_price,
-                                     discount_curve.cc_rate(expiry_dt),
-                                     process_type,
-                                     model_params)
+                                            K,
+                                            option_type.value,
+                                            B,
+                                            notional,
+                                            stock_price,
+                                            discount_curve.cc_rate(expiry_dt),
+                                            process_type,
+                                            model_params)
 
             end = time.time()
             time_elapsed = round(end - start, 3)
             diff = test_value_mc - value
 
-            test_cases.print(
-                option_type,
-                K,
-                B,
-                stock_price,
-                value,
-                test_value_mc,
-                diff,
-                time_elapsed)
+            test_cases.print(option_type,
+                             K,
+                             B,
+                             stock_price,
+                             value,
+                             test_value_mc,
+                             diff,
+                             time_elapsed)
 
         end = time.time()
 
@@ -162,40 +163,35 @@ def test_EquityBarrierOption():
             barrier_option = EquityBarrierOption(
                 expiry_dt, 100.0, option_type, B, num_observations_per_year)
 
-            value = barrier_option.value(
-                value_dt,
-                stock_price,
-                discount_curve,
-                dividend_curve,
-                model)
-            delta = barrier_option.delta(
-                value_dt,
-                stock_price,
-                discount_curve,
-                dividend_curve,
-                model)
-            vega = barrier_option.vega(
-                value_dt,
-                stock_price,
-                discount_curve,
-                dividend_curve,
-                model)
-            theta = barrier_option.theta(
-                value_dt,
-                stock_price,
-                discount_curve,
-                dividend_curve,
-                model)
+            value = barrier_option.value(value_dt,
+                                         stock_price,
+                                         discount_curve,
+                                         dividend_curve,
+                                         model)
+            delta = barrier_option.delta(value_dt,
+                                         stock_price,
+                                         discount_curve,
+                                         dividend_curve,
+                                         model)
+            vega = barrier_option.vega(value_dt,
+                                       stock_price,
+                                       discount_curve,
+                                       dividend_curve,
+                                       model)
+            theta = barrier_option.theta(value_dt,
+                                         stock_price,
+                                         discount_curve,
+                                         dividend_curve,
+                                         model)
 
-            test_cases.print(
-                option_type,
-                K,
-                B,
-                stock_price,
-                value,
-                delta,
-                vega,
-                theta)
+            test_cases.print(option_type,
+                             K,
+                             B,
+                             stock_price,
+                             value,
+                             delta,
+                             vega,
+                             theta)
 
 ###############################################################################
 

@@ -217,7 +217,7 @@ def test_BDTExampleThree():
     # Andersen paper
     num_time_steps = 200
 
-    test_cases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "t_mat",
+    test_cases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat",
                      "V_Fixed", "V_pay", "V_rec")
 
     for exercise_type in [FinExerciseTypes.EUROPEAN,

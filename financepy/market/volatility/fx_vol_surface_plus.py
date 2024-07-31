@@ -2061,7 +2061,7 @@ class FXVolSurfacePlus():
 
 ###############################################################################
 
-    def implied_dbns(self, lowFX, highFX, num_intervals):
+    def implied_dbns(self, low_fx, high_fx, num_intervals):
         """ Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon. """
 
@@ -2072,10 +2072,10 @@ class FXVolSurfacePlus():
             f = self.fwd[iTenor]
             t = self.t_exp[iTenor]
 
-            dFX = (highFX - lowFX) / num_intervals
+            dFX = (high_fx - low_fx) / num_intervals
 
-            dom_df = self.domestic_curve.df(t)
-            for_df = self.foreign_curve.df(t)
+            dom_df = self.domestic_curve._df(t)
+            for_df = self.foreign_curve._df(t)
 
             r_d = -np.log(dom_df) / t
             r_f = -np.log(for_df) / t
@@ -2085,7 +2085,7 @@ class FXVolSurfacePlus():
 
             for iK in range(0, num_intervals):
 
-                k = lowFX + iK*dFX
+                k = low_fx + iK*dFX
 
                 vol = vol_function(self.vol_func_type.value,
                                    self.parameters[iTenor],

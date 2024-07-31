@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy import optimize
 
+
 from ...utils.date import datediff
 from ...utils.global_vars import gDaysInYear
 from ...products.rates.ibor_single_curve import IborSingleCurve
@@ -193,3 +194,5 @@ class IborSingleCurveSmoothingCalibrator(object):
         df = pd.concat((df1, df2), axis=0, sort=False).reset_index(drop=True)
         df['smoothness'] = smoothness
         return df
+
+

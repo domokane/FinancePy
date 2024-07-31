@@ -7,7 +7,7 @@ from financepy.models.bdt_tree import BDTTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.bk_tree import BKTree
 from financepy.models.black import Black
-from financepy.products.rates.bermudan_swaption import IborBermudanSwaption
+from financepy.products.rates.ibor_bermudan_swaption import IborBermudanSwaption
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.utils.global_types import FinExerciseTypes

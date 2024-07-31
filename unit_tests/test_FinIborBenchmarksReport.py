@@ -1,6 +1,10 @@
 import pandas as pd
 from os.path import dirname, join
 
+import sys
+sys.path.append("..")
+
+
 from financepy.utils.date import Date
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
@@ -96,6 +100,6 @@ def test_dataframe_to_benchmarks():
     assert len(benchmarks['IborSwap']) == 10
 
 
-# if __name__ == '__main__':
-#     test_ibor_benchmarks_report()
-#     test_dataframe_to_benchmarks()
+if __name__ == '__main__':
+     test_ibor_benchmarks_report()
+     test_dataframe_to_benchmarks()

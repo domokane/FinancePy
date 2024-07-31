@@ -172,8 +172,6 @@ class FXOneTouchOption(FXOption):
 
         DEBUG_MODE = False
 
-        print("USE WITH CAUTION. MORE TESTING REQUIRED.")
-
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
@@ -433,7 +431,7 @@ class FXOneTouchOption(FXOption):
         result as we only observe the barrier a finite number of times. The
         convergence is slow. """
 
-        print("THIS NEEDS TO BE CHECKED")
+        # "THIS NEEDS TO BE CHECKED"
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
 
