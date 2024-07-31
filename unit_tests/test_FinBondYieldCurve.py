@@ -15,7 +15,7 @@ from financepy.products.bonds.curve_fits import CurveFitBSpline
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegel
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegelSvensson
 
-path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
+path = os.path.join(os.path.dirname(__file__), './data/gilt_bond_prices.txt')
 bondDataFrame = pd.read_csv(path, sep='\t')
 bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
 

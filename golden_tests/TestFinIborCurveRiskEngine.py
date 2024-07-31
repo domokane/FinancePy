@@ -18,7 +18,7 @@ import financepy.products.rates.ibor_curve_risk_engine as re
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
-DIAGNOSTICS_MODE = False
+DIAGNOSTICS_MODE = True
 
 
 def test_par_rate_risk_report_cubic_zero():
@@ -309,9 +309,9 @@ def _generate_base_curve(valuation_date, cal, interp_type, depoDCCType, fraDCCTy
     return settlement_date, base_curve
 
 
-if __name__ == '__main__':
+if DIAGNOSTICS_MODE and __name__ == '__main__':
     test_par_rate_risk_report_cubic_zero()
-    test_forward_rate_risk_report()
-    test_forward_rate_custom_grid_risk_report()
-    test_carry_rolldown_report()
-    test_parallel_shift_ladder_report()
+    # test_forward_rate_risk_report()
+    # test_forward_rate_custom_grid_risk_report()
+    # test_carry_rolldown_report()
+    # test_parallel_shift_ladder_report()

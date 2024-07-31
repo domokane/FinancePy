@@ -48,7 +48,7 @@ def test_z_spread_actual_curve():
 
 
 def _test_z_spread_for_curve(base_curve: DiscountCurve):
-    path = os.path.join(os.path.dirname(__file__), './data/giltBondPrices.txt')
+    path = os.path.join(os.path.dirname(__file__), './data/gilt_bond_prices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
     bondDataFrame['maturity'] = pd.to_datetime(bondDataFrame['maturity'])
@@ -78,6 +78,6 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
     assert bondDataFrame['z_spread'].isnull().values.any() == False
 
 
-if DIAGNOSTICS_MODE and __name__ == '__main__':
+if __name__ == '__main__':
     test_z_spread_flat_curve()
     test_z_spread_actual_curve()

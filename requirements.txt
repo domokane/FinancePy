@@ -1,9 +1,9 @@
 ##### Imports required by core library
-numba==0.55.2
-numpy==1.21.6
-scipy==1.10.0
-llvmlite==0.38.0
-ipython==8.10.0
-matplotlib==3.5.2
-pandas==1.5.3
-prettytable==3.6.0
+numba==0.60.0
+numpy==1.26.4
+scipy==1.13.1
+llvmlite==0.43.0
+ipython==8.25.0
+matplotlib==3.8.4
+pandas==2.1.2
+prettytable==3.9.0

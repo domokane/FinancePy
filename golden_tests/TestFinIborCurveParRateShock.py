@@ -84,5 +84,6 @@ def test_ibor_curve_par_rate_shocker():
         assert round(actual_fwd_rate_changes[1], 3) == round(expected_fwd_rate_changes[benchmark_idx][1], 3)
 
 
-test_ibor_curve_par_rate_shocker()
+if __name__ == '__main__':
+    test_ibor_curve_par_rate_shocker();
 
