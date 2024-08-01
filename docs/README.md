@@ -1,1 +1,0 @@
-This folder is where the project documentation is generated. This is done in Latex.
