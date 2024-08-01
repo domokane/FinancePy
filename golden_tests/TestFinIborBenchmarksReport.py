@@ -1,9 +1,8 @@
-import pandas as pd
-from os.path import dirname, join
-
 import sys
 sys.path.append("..")
 
+import pandas as pd
+from os.path import dirname, join
 
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
@@ -17,6 +16,10 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 
 from financepy.products.rates.ibor_benchmarks_report import ibor_benchmarks_report, dataframe_to_benchmarks
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 def test_ibor_benchmarks_report():
@@ -67,13 +70,13 @@ def test_ibor_benchmarks_report():
     curve = IborSingleCurve(valuation_date, depos, fras, swaps,
                             interp_type, check_refit=False, do_build=do_build)
 
-    bechmarks_report = ibor_benchmarks_report(curve)
+    benchmarks_report = ibor_benchmarks_report(curve)
 
-    # print(bechmarks_report)
+    # print(benchmarks_report)
 
     # Confirm that there are no NaNs. In particular this means that different types of benchmarks
     # return exactly the same keys, just like we want it, with a couple of exceptions
-    assert (bechmarks_report
+    assert (benchmarks_report
             .drop(columns=['fixed_freq_type', 'fixed_leg_type'])
             .isnull().values.any()
             ) == False
@@ -99,6 +102,10 @@ def test_dataframe_to_benchmarks():
     assert len(benchmarks['IborSwap']) == 10
 
 
-if __name__ == '__main__':
-     test_ibor_benchmarks_report()
-     test_dataframe_to_benchmarks()
+try:
+    test_ibor_benchmarks_report()
+    test_dataframe_to_benchmarks()
+except Exception as e:
+    print(f"Unexpected error:{e}", sys.exc_info()[0])
+    
+    

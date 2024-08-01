@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append("..")
 
+from helpers import buildIborSingleCurve
 from financepy.utils.date import Date
 from financepy.utils.global_vars import gBasisPoint
 from financepy.utils.global_types import SwapTypes
@@ -16,6 +17,10 @@ from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 import financepy.products.rates.ibor_curve_risk_engine as re
+
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework

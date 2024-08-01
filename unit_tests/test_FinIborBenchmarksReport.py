@@ -1,21 +1,16 @@
 import pandas as pd
 from os.path import dirname, join
 
-import sys
-sys.path.append("..")
-
 
 from financepy.utils.date import Date
-from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import Calendar, CalendarTypes
+from financepy.utils.calendar import CalendarTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 
 from financepy.products.rates.ibor_benchmarks_report import ibor_benchmarks_report, dataframe_to_benchmarks
@@ -69,22 +64,22 @@ def test_ibor_benchmarks_report():
     curve = IborSingleCurve(valuation_date, depos, fras, swaps,
                             interp_type, check_refit=False, do_build=do_build)
 
-    bechmarks_report = ibor_benchmarks_report(curve)
+    benchmarks_report = ibor_benchmarks_report(curve)
 
-    # print(bechmarks_report)
+    # print(benchmarks_report)
 
     # Confirm that there are no NaNs. In particular this means that different types of benchmarks
     # return exactly the same keys, just like we want it, with a couple of exceptions
-    assert (bechmarks_report
+    assert (benchmarks_report
             .drop(columns=['fixed_freq_type', 'fixed_leg_type'])
             .isnull().values.any()
             ) == False
 
 
 def test_dataframe_to_benchmarks():
-    path = dirname(__file__)
-    filename = "ibor_benchmarks_example.csv"
-    full_filename_path = join(path, "data", filename)
+#    path = dirname(__file__)
+#    filename = "ibor_benchmarks_example.csv"
+    full_filename_path = ".//data//ibor_benchmarks_example.csv"
 
     asof = Date(6, 10, 2001)
 

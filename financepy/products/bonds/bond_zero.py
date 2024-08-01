@@ -348,11 +348,15 @@ class BondZero:
         weekends or you can specify a country calendar for business days."""
 
         num_flows = len(self.cpn_dts)
-
+        
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
+        if settle_dt > self.maturity_dt:
+            raise FinError("Bond Zero settlement after maturity date")
+                    
         for i_flow in range(1, num_flows):
+
             # cpns paid on the settlement date are paid to the seller
             if self.cpn_dts[i_flow] > settle_dt:
                 self.pcd = self.cpn_dts[i_flow - 1]
@@ -361,13 +365,15 @@ class BondZero:
 
         dc = DayCount(self.dc_type)
         cal = Calendar(self.cal_type)
-        ex_dividend_dt = cal.add_business_days(
-            self.ncd, -self.ex_div_days)
+
+        ex_dividend_dt = cal.add_business_days(self.ncd, -self.ex_div_days)
+
 
         (acc_factor, num, _) = dc.year_frac(self.pcd,
                                             settle_dt,
                                             self.ncd,
                                             FrequencyTypes.ZERO)
+
 
         if settle_dt > ex_dividend_dt:
             acc_factor = acc_factor - 1.0
@@ -671,7 +677,7 @@ class BondZero:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("cpn (%)", 0)
+        s += label_to_string("COUPON (%)", 0)
         s += label_to_string("ISSUE PRICE", self.issue_price)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("DAY COUNT TYPE", self.dc_type)

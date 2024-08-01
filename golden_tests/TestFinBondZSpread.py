@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import sys
+sys.path.append("..")
 
 from financepy.utils.global_vars import gPercent
 from financepy.utils.calendar import CalendarTypes
@@ -18,6 +20,10 @@ from financepy.products.rates.ibor_benchmarks_report import dataframe_to_benchma
 # Set to True to run this file spandalone and see some useful info
 DIAGNOSTICS_MODE = False
 
+from FinTestCases import FinTestCases, globalTestCaseMode
+
+test_cases = FinTestCases(__file__, globalTestCaseMode)
+
 
 def test_z_spread_flat_curve():
 
@@ -30,6 +36,7 @@ def test_z_spread_actual_curve():
 
     path = os.path.join(os.path.dirname(__file__), './data/GBP_OIS_20120919.csv')
     dfbm = pd.read_csv(path, index_col=0)
+        
     dfbm['base_date'] = pd.to_datetime(dfbm['base_date'], errors='ignore', format='%d/%m/%Y')
     dfbm['start_date'] = pd.to_datetime(dfbm['start_date'], errors='ignore', format='%d/%m/%Y')  # allow tenors
     dfbm['maturity_date'] = pd.to_datetime(dfbm['maturity_date'], errors='ignore', format='%d/%m/%Y')  # allow tenors
@@ -51,7 +58,8 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
     path = os.path.join(os.path.dirname(__file__), './data/gilt_bond_prices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
-    bondDataFrame['maturity'] = pd.to_datetime(bondDataFrame['maturity'])
+    
+    bondDataFrame['maturity'] = pd.to_datetime(bondDataFrame['maturity'], format="%d-%b-%y")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
 

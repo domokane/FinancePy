@@ -241,6 +241,9 @@ class Bond:
         function is vectorised with respect to the yield input. It implements
         a number of standard conventions for calculating the YTM. """
 
+        if settle_dt > self.maturity_dt:
+            raise FinError("Bond settlement is after maturity date")
+
         if convention not in YTMCalcType:
             raise FinError("Yield convention unknown." + str(convention))
 
