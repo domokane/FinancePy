@@ -77,9 +77,9 @@ def test_ibor_benchmarks_report():
 
 
 def test_dataframe_to_benchmarks():
-#    path = dirname(__file__)
-#    filename = "ibor_benchmarks_example.csv"
-    full_filename_path = ".//data//ibor_benchmarks_example.csv"
+    path = dirname(__file__)
+    filename = "ibor_benchmarks_example.csv"
+    full_filename_path = join(path, "data", filename)
 
     asof = Date(6, 10, 2001)
 
