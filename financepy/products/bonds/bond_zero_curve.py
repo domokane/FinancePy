@@ -32,6 +32,7 @@ def _f(df, *args):
     bond_discount_price = bond.clean_price_from_discount_curve(
         value_dt, curve)
     obj_fn = bond_discount_price - mkt_clean_price
+        
     return obj_fn
 
 ###############################################################################
@@ -76,17 +77,21 @@ class BondZeroCurve(DiscountCurve):
 
         self._times = np.array([0.0])
         self._values = np.array([1.0])
-        df = 1.0
 
         for i in range(0, len(self.bonds)):
+
             bond = self.bonds[i]
             maturity_dt = bond.maturity_dt
             clean_price = self.clean_prices[i]
             t_mat = (maturity_dt - self.settle_dt) / gDaysInYear
+
+            # Let's give it a good starting guess
+            df = np.exp(-t_mat * bond.cpn)
+
             argtuple = (self, self.settle_dt, bond, clean_price)
             self._times = np.append(self._times, t_mat)
             self._values = np.append(self._values, df)
-
+            
             optimize.newton(_f, x0=df, fprime=None, args=argtuple,
                             tol=1e-8, maxiter=100, fprime2=None)
 
