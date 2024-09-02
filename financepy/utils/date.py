@@ -13,7 +13,7 @@ from enum import Enum
 import numpy as np
 import datetime
 
-# import math
+import math
 
 # from financepy.utils.error import FinError
 from .error import FinError
@@ -790,37 +790,40 @@ class Date:
 
         new_dts = []
 
-        for tenor_str in tenor:
+        for tenor_string in tenor:
+            tenor_obj = Tenor.as_tenor(str_or_tenor=tenor_string)
 
-            tenor_str = tenor_str.upper()
-            DAYS = 1
-            WEEKS = 2
-            MONTHS = 3
-            YEARS = 4
+        # for tenor_str in tenor:
 
-            period_type = 0
-            num_periods = 0
+        #     tenor_str = tenor_str.upper()
+        #     DAYS = 1
+        #     WEEKS = 2
+        #     MONTHS = 3
+        #     YEARS = 4
 
-            if tenor_str == "ON":  # overnight - should be used only if spot days = 0
-                period_type = DAYS
-                num_periods = 1
-            elif tenor_str == "TN":  # overnight - should be used when spot days > 0
-                period_type = DAYS
-                num_periods = 1
-            elif tenor_str[-1] == "D":
-                period_type = DAYS
-                num_periods = int(tenor_str[0:-1])
-            elif tenor_str[-1] == "W":
-                period_type = WEEKS
-                num_periods = int(tenor_str[0:-1])
-            elif tenor_str[-1] == "M":
-                period_type = MONTHS
-                num_periods = int(tenor_str[0:-1])
-            elif tenor_str[-1] == "Y":
-                period_type = YEARS
-                num_periods = int(tenor_str[0:-1])
-            else:
-                raise FinError("Unknown tenor type in " + tenor)
+        #     period_type = 0
+        #     num_periods = 0
+
+        #     if tenor_str == "ON":  # overnight - should be used only if spot days = 0
+        #         period_type = DAYS
+        #         num_periods = 1
+        #     elif tenor_str == "TN":  # overnight - should be used when spot days > 0
+        #         period_type = DAYS
+        #         num_periods = 1
+        #     elif tenor_str[-1] == "D":
+        #         period_type = DAYS
+        #         num_periods = int(tenor_str[0:-1])
+        #     elif tenor_str[-1] == "W":
+        #         period_type = WEEKS
+        #         num_periods = int(tenor_str[0:-1])
+        #     elif tenor_str[-1] == "M":
+        #         period_type = MONTHS
+        #         num_periods = int(tenor_str[0:-1])
+        #     elif tenor_str[-1] == "Y":
+        #         period_type = YEARS
+        #         num_periods = int(tenor_str[0:-1])
+        #     else:
+        #         raise FinError("Unknown tenor type in " + tenor)
 
             new_dt = Date(self.d, self.m, self.y)
 
