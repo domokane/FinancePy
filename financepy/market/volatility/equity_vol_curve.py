@@ -11,20 +11,17 @@ from ...utils.math import test_monotonicity
 # TODO: This should be deleted and replaced with equity_vol_surface
 
 
-class EquityVolCurve():
-    """ Class to manage a smile or skew in volatility at a single maturity
+class EquityVolCurve:
+    """Class to manage a smile or skew in volatility at a single maturity
     horizon. It fits the volatility using a polynomial. Includes analytics to
     extract the implied pdf of the underyling at maturity. THIS NEEDS TO BE
-    SUBSTITUTED WITH FINEQUITYVOLSURFACE. """
+    SUBSTITUTED WITH FINEQUITYVOLSURFACE."""
 
-###############################################################################
+    ###########################################################################
 
-    def __init__(self,
-                 curve_dt,
-                 expiry_dt,
-                 strikes,
-                 volatilities,
-                 polynomial=3):
+    def __init__(
+        self, curve_dt, expiry_dt, strikes, volatilities, polynomial=3
+    ):
 
         if expiry_dt <= curve_dt:
             raise FinError("Expiry date before curve date.")
@@ -52,11 +49,11 @@ class EquityVolCurve():
         self._z = np.polyfit(self._strikes, self._volatilities, polynomial)
         self._f = np.poly1d(self._z)
 
-###############################################################################
+    ###########################################################################
 
     def volatility(self, strike):
-        """ Return the volatility for a strike using a given polynomial
-        interpolation. """
+        """Return the volatility for a strike using a given polynomial
+        interpolation."""
 
         vol = self._f(strike)
 
@@ -65,12 +62,13 @@ class EquityVolCurve():
 
         return vol
 
-###############################################################################
+    ###########################################################################
 
     def calculate_pdf(self):
-        """ calculate the probability density function of the underlying using
+        """calculate the probability density function of the underlying using
         the volatility smile or skew curve following the approach set out in
-        Breedon and Litzenberger. """
+        Breedon and Litzenberger."""
         return
+
 
 ###############################################################################
