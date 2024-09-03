@@ -33,20 +33,21 @@ from ...products.credit.cds import CDS
 
 
 class CDSBasket:
+    """Class to deal with n-to-default CDS baskets."""
 
-    """ Class to deal with n-to-default CDS baskets. """
-
-    def __init__(self,
-                 step_in_dt: Date,
-                 maturity_dt: Date,
-                 notional: float = ONE_MILLION,
-                 running_cpn: float = 0.0,
-                 long_protect: bool = True,
-                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
+    def __init__(
+        self,
+        step_in_dt: Date,
+        maturity_dt: Date,
+        notional: float = ONE_MILLION,
+        running_cpn: float = 0.0,
+        long_protect: bool = True,
+        freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+    ):
 
         check_argument_types(self.__init__, locals())
 
@@ -61,27 +62,26 @@ class CDSBasket:
         self.freq_type = freq_type
         self.bd_type = bd_type
 
-        self.cds_contract = CDS(self.step_in_dt,
-                                 self.maturity_dt,
-                                 self.running_cpn,
-                                 1.0,
-                                 self.long_protect,
-                                 self.freq_type,
-                                 self.dc_type,
-                                 self.cal_type,
-                                 self.bd_type,
-                                 self.dg_type)
+        self.cds_contract = CDS(
+            self.step_in_dt,
+            self.maturity_dt,
+            self.running_cpn,
+            1.0,
+            self.long_protect,
+            self.freq_type,
+            self.dc_type,
+            self.cal_type,
+            self.bd_type,
+            self.dg_type,
+        )
 
-###############################################################################
+    ###########################################################################
 
-    def value_legs_mc(self,
-                      value_dt,
-                      n_to_default,
-                      default_times,
-                      issuer_curves,
-                      libor_curve):
-        """ Value the legs of the default basket using Monte Carlo. The default
-        times are an input so this valuation is not model dependent. """
+    def value_legs_mc(
+        self, value_dt, n_to_default, default_times, issuer_curves, libor_curve
+    ):
+        """Value the legs of the default basket using Monte Carlo. The default
+        times are an input so this valuation is not model dependent."""
 
         num_credits = default_times.shape[0]
         num_trials = default_times.shape[1]
@@ -101,8 +101,9 @@ class CDSBasket:
             dt1 = payment_dts[i_time]
             accrual_factor = day_count.year_frac(dt0, dt1)[0]
             avg_acc_factor += accrual_factor
-            rpv01_to_times[i_time] = rpv01_to_times[i_time - 1] + \
-                accrual_factor * libor_curve._df(t)
+            rpv01_to_times[i_time] = rpv01_to_times[
+                i_time - 1
+            ] + accrual_factor * libor_curve._df(t)
 
         avg_acc_factor /= num_payments
 
@@ -129,7 +130,9 @@ class CDSBasket:
 
                 num_payment_amounts_index = int(min_tau / avg_acc_factor)
                 rpv01_trial = rpv01_to_times[num_payment_amounts_index]
-                rpv01_trial += (min_tau - num_payment_amounts_index * avg_acc_factor)
+                rpv01_trial += (
+                    min_tau - num_payment_amounts_index * avg_acc_factor
+                )
 
                 # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
                 asset_index = 0
@@ -138,7 +141,7 @@ class CDSBasket:
                         asset_index = i_credit
                         break
 
-                prot_trial = (1.0 - issuer_curves[asset_index].recovery_rate)
+                prot_trial = 1.0 - issuer_curves[asset_index].recovery_rate
                 prot_trial *= libor_curve._df(min_tau)
 
             else:
@@ -154,34 +157,33 @@ class CDSBasket:
         prot = prot / num_trials
         return (rpv01, prot)
 
-###############################################################################
+    ###########################################################################
 
-    def value_gaussian_mc(self,
-                          value_dt,
-                          n_to_default,
-                          issuer_curves,
-                          corr_matrix,
-                          libor_curve,
-                          num_trials,
-                          seed):
-        """ Value the default basket using a Gaussian copula model. This
-        depends on the issuer discount and correlation matrix. """
+    def value_gaussian_mc(
+        self,
+        value_dt,
+        n_to_default,
+        issuer_curves,
+        corr_matrix,
+        libor_curve,
+        num_trials,
+        seed,
+    ):
+        """Value the default basket using a Gaussian copula model. This
+        depends on the issuer discount and correlation matrix."""
 
         num_credits = len(issuer_curves)
 
         if n_to_default > num_credits or n_to_default < 1:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        default_times = default_times_gc(issuer_curves,
-                                         corr_matrix,
-                                         num_trials,
-                                         seed)
+        default_times = default_times_gc(
+            issuer_curves, corr_matrix, num_trials, seed
+        )
 
-        rpv01, prot_pv = self.value_legs_mc(value_dt,
-                                            n_to_default,
-                                            default_times,
-                                            issuer_curves,
-                                            libor_curve)
+        rpv01, prot_pv = self.value_legs_mc(
+            value_dt, n_to_default, default_times, issuer_curves, libor_curve
+        )
 
         spd = prot_pv / rpv01
         value = self.notional * (prot_pv - self.running_cpn * rpv01)
@@ -191,18 +193,20 @@ class CDSBasket:
 
         return (value, rpv01, spd)
 
-###############################################################################
+    ###########################################################################
 
-    def value_student_t_mc(self,
-                           value_dt,
-                           n_to_default,
-                           issuer_curves,
-                           corr_matrix,
-                           degrees_of_freedom,
-                           libor_curve,
-                           num_trials,
-                           seed):
-        """ Value the default basket using the Student-T copula. """
+    def value_student_t_mc(
+        self,
+        value_dt,
+        n_to_default,
+        issuer_curves,
+        corr_matrix,
+        degrees_of_freedom,
+        libor_curve,
+        num_trials,
+        seed,
+    ):
+        """Value the default basket using the Student-T copula."""
 
         num_credits = len(issuer_curves)
 
@@ -211,17 +215,13 @@ class CDSBasket:
 
         model = StudentTCopula()
 
-        default_times = model.default_times(issuer_curves,
-                                            corr_matrix,
-                                            degrees_of_freedom,
-                                            num_trials,
-                                            seed)
+        default_times = model.default_times(
+            issuer_curves, corr_matrix, degrees_of_freedom, num_trials, seed
+        )
 
-        rpv01, prot_pv = self.value_legs_mc(value_dt,
-                                            n_to_default,
-                                            default_times,
-                                            issuer_curves,
-                                            libor_curve)
+        rpv01, prot_pv = self.value_legs_mc(
+            value_dt, n_to_default, default_times, issuer_curves, libor_curve
+        )
 
         spd = prot_pv / rpv01
         value = self.notional * (prot_pv - self.running_cpn * rpv01)
@@ -231,17 +231,19 @@ class CDSBasket:
 
         return (value, rpv01, spd)
 
-###############################################################################
+    ###########################################################################
 
-    def value_1f_gaussian_homo(self,
-                               value_dt,
-                               n_to_default,
-                               issuer_curves,
-                               beta_vector,
-                               libor_curve,
-                               num_points=50):
-        """ Value default basket using 1 factor Gaussian copula and analytical
-        approach which is only exact when all recovery rates are the same. """
+    def value_1f_gaussian_homo(
+        self,
+        value_dt,
+        n_to_default,
+        issuer_curves,
+        beta_vector,
+        libor_curve,
+        num_points=50,
+    ):
+        """Value default basket using 1 factor Gaussian copula and analytical
+        approach which is only exact when all recovery rates are the same."""
 
         num_credits = len(issuer_curves)
 
@@ -275,13 +277,15 @@ class CDSBasket:
                 issuer_curve = issuer_curves[i_credit]
                 recovery_rates[i_credit] = issuer_curve.recovery_rate
                 issuer_surv_probs[i_credit] = interpolate(
-                    t, issuer_curve._times, issuer_curve._values,
-                    InterpTypes.FLAT_FWD_RATES.value)
+                    t,
+                    issuer_curve._times,
+                    issuer_curve._values,
+                    InterpTypes.FLAT_FWD_RATES.value,
+                )
 
-            loss_dbn = homog_basket_loss_dbn(issuer_surv_probs,
-                                             recovery_rates,
-                                             beta_vector,
-                                             num_points)
+            loss_dbn = homog_basket_loss_dbn(
+                issuer_surv_probs, recovery_rates, beta_vector, num_points
+            )
 
             basket_surv_curve[i_time] = 1.0
             for i_to_default in range(n_to_default, num_credits + 1):
@@ -296,9 +300,11 @@ class CDSBasket:
         basket_curve._values = basket_surv_curve
 
         prot_leg_pv = self.cds_contract.prot_leg_pv(
-            value_dt, basket_curve, curve_recovery)
-        risky_pv01 = self.cds_contract.risky_pv01(
-            value_dt, basket_curve)['clean_rpv01']
+            value_dt, basket_curve, curve_recovery
+        )
+        risky_pv01 = self.cds_contract.risky_pv01(value_dt, basket_curve)[
+            "clean_rpv01"
+        ]
 
         # Long protection
         mtm = self.notional * (prot_leg_pv - risky_pv01 * self.running_cpn)
@@ -314,28 +320,30 @@ class CDSBasket:
 
         return basket_output
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
-        """ print out details of the CDS contract and all of the calculated
-        cash flows """
+        """print out details of the CDS contract and all of the calculated
+        cash flows"""
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("RUNNING COUPON",
-                             self.running_cpn*10000, "bp\n")
+        s += label_to_string(
+            "RUNNING COUPON", self.running_cpn * 10000, "bp\n"
+        )
         s += label_to_string("DAYCOUNT", self.dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUSDAYRULE", self.bd_type)
         s += label_to_string("DATEGENRULE", self.dg_type)
 
-#       header = "PAYMENT_dt, YEAR_FRAC, FLOW"
-#       value_table = [self.payment_dts, self.accrual_factors, self.flows]
-#       precision = "12.6f"
-#       s += tableToString(header, value_table, precision)
+        #  header = "PAYMENT_dt, YEAR_FRAC, FLOW"
+        #  value_table = [self.payment_dts, self.accrual_factors, self.flows]
+        #  precision = "12.6f"
+        #  s += tableToString(header, value_table, precision)
 
         return s
+
 
 ###############################################################################

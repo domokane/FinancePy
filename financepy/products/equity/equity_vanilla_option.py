@@ -49,6 +49,7 @@ def _f(v, args):
     obj_fn = obj_fn - price
     return obj_fn
 
+
 ###############################################################################
 
 
@@ -64,20 +65,23 @@ def _fvega(v, *args):
     fprime = bs_vega(s0, t_exp, k, r, q, v, self.option_type.value)
     return fprime
 
+
 ###############################################################################
 
 
-class EquityVanillaOption():
-    """ Class for managing plain vanilla European calls and puts on equities.
-    For American calls and puts see the EquityAmericanOption class. """
+class EquityVanillaOption:
+    """Class for managing plain vanilla European calls and puts on equities.
+    For American calls and puts see the EquityAmericanOption class."""
 
-    def __init__(self,
-                 expiry_dt: (Date, list),
-                 strike_price: (float, np.ndarray),
-                 option_type: (OptionTypes, list),
-                 num_options: float = 1.0):
-        """ Create the Equity Vanilla option object by specifying the expiry
-        date, the option strike, the option type and the number of options. """
+    def __init__(
+        self,
+        expiry_dt: (Date, list),
+        strike_price: (float, np.ndarray),
+        option_type: (OptionTypes, list),
+        num_options: float = 1.0,
+    ):
+        """Create the Equity Vanilla option object by specifying the expiry
+        date, the option strike, the option type and the number of options."""
 
         check_argument_types(self.__init__, locals())
 
@@ -97,14 +101,16 @@ class EquityVanillaOption():
         self.num_options = num_options
         self.t_exp = None
 
-###############################################################################
+    ###########################################################################
 
-    def intrinsic(self,
-                  value_dt: (Date, list),
-                  stock_price: (np.ndarray, float),
-                  discount_curve: DiscountCurve,
-                  dividend_curve: DiscountCurve):
-        """ Equity Vanilla Option valuation using Black-Scholes model. """
+    def intrinsic(
+        self,
+        value_dt: (Date, list),
+        stock_price: (np.ndarray, float),
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+    ):
+        """Equity Vanilla Option valuation using Black-Scholes model."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -126,28 +132,31 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
-        intrinsic_value = bs_intrinsic(s0, t_exp, k, r, q,
-                                       self.option_type_value)
+        intrinsic_value = bs_intrinsic(
+            s0, t_exp, k, r, q, self.option_type_value
+        )
 
         intrinsic_value = intrinsic_value * self.num_options
         return intrinsic_value
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt: (Date, list),
-              stock_price: (np.ndarray, float),
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model: Model):
-        """ Equity Vanilla Option valuation using Black-Scholes model. """
+    def value(
+        self,
+        value_dt: (Date, list),
+        stock_price: (np.ndarray, float),
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Equity Vanilla Option valuation using Black-Scholes model."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -160,11 +169,13 @@ class EquityVanillaOption():
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
-                "Discount Curve valuation date not same as option value date")
+                "Discount Curve valuation date not same as option value date"
+            )
 
         if dividend_curve.value_dt != value_dt:
             raise FinError(
-                "Dividend Curve valuation date not same as option value date")
+                "Dividend Curve valuation date not same as option value date"
+            )
 
         if isinstance(self.expiry_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -194,10 +205,10 @@ class EquityVanillaOption():
         df_expiry = discount_curve.df(self.expiry_dt)
         # df_value = discount_curve.df(value_dt)
         # df = df_expiry / df_value
-        r = -np.log(df_expiry)/t_exp
+        r = -np.log(df_expiry) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -212,15 +223,17 @@ class EquityVanillaOption():
         value = value * self.num_options
         return value
 
-###############################################################################
+    ###########################################################################
 
-    def delta(self,
-              value_dt: Date,
-              stock_price: float,
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model):
-        """ Calculate the analytical delta of a European vanilla option. """
+    def delta(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,
+    ):
+        """Calculate the analytical delta of a European vanilla option."""
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -239,10 +252,10 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -256,15 +269,17 @@ class EquityVanillaOption():
 
         return delta
 
-###############################################################################
+    ###########################################################################
 
-    def gamma(self,
-              value_dt: Date,
-              stock_price: float,
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model: Model):
-        """ Calculate the analytical gamma of a European vanilla option. """
+    def gamma(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Calculate the analytical gamma of a European vanilla option."""
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -282,10 +297,10 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -299,15 +314,17 @@ class EquityVanillaOption():
 
         return gamma
 
-###############################################################################
+    ###########################################################################
 
-    def vega(self,
-             value_dt: Date,
-             stock_price: float,
-             discount_curve: DiscountCurve,
-             dividend_curve: DiscountCurve,
-             model: Model):
-        """ Calculate the analytical vega of a European vanilla option. """
+    def vega(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Calculate the analytical vega of a European vanilla option."""
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -324,10 +341,10 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -341,15 +358,17 @@ class EquityVanillaOption():
 
         return vega
 
-###############################################################################
+    ###########################################################################
 
-    def theta(self,
-              value_dt: Date,
-              stock_price: float,
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model: Model):
-        """ Calculate the analytical theta of a European vanilla option. """
+    def theta(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Calculate the analytical theta of a European vanilla option."""
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -366,10 +385,10 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -381,15 +400,17 @@ class EquityVanillaOption():
 
         return theta
 
-###############################################################################
+    ###########################################################################
 
-    def rho(self,
-            value_dt: Date,
-            stock_price: float,
-            discount_curve: DiscountCurve,
-            dividend_curve: DiscountCurve,
-            model: Model):
-        """ Calculate the analytical rho of a European vanilla option. """
+    def rho(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Calculate the analytical rho of a European vanilla option."""
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -406,10 +427,10 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -421,15 +442,17 @@ class EquityVanillaOption():
 
         return rho
 
-###############################################################################
+    ###########################################################################
 
-    def vanna(self,
-              value_dt: Date,
-              stock_price: float,
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model: Model):
-        """ Calculate the analytical vanna of a European vanilla option. """
+    def vanna(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Calculate the analytical vanna of a European vanilla option."""
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -446,10 +469,10 @@ class EquityVanillaOption():
         t_exp = np.maximum(t_exp, 1e-10)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
 
@@ -461,16 +484,18 @@ class EquityVanillaOption():
 
         return vanna
 
-###############################################################################
+    ###########################################################################
 
-    def implied_volatility(self,
-                           value_dt: Date,
-                           stock_price: (float, list, np.ndarray),
-                           discount_curve: DiscountCurve,
-                           dividend_curve: DiscountCurve,
-                           price):
-        """ Calculate the Black-Scholes implied volatility of a European
-        vanilla option. """
+    def implied_volatility(
+        self,
+        value_dt: Date,
+        stock_price: (float, list, np.ndarray),
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        price,
+    ):
+        """Calculate the Black-Scholes implied volatility of a European
+        vanilla option."""
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
@@ -479,234 +504,259 @@ class EquityVanillaOption():
             return -999
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         k = self.strike_price
         s0 = stock_price
 
-        sigma = bs_implied_volatility(s0, t_exp, k, r, q, price,
-                                      self.option_type_value)
+        sigma = bs_implied_volatility(
+            s0, t_exp, k, r, q, price, self.option_type_value
+        )
 
         return sigma
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc_numpy_only(self,
-                            value_dt: Date,
-                            stock_price: float,
-                            discount_curve: DiscountCurve,
-                            dividend_curve: DiscountCurve,
-                            model: Model,
-                            num_paths: int = 10000,
-                            seed: int = 4242,
-                            use_sobol: int = 0):
-
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-
-        df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
-
-        dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
-
-        vol = model.volatility
-
-        v = _value_mc_numpy_only(stock_price,
-                                 t_exp,
-                                 self.strike_price,
-                                 self.option_type.value,
-                                 r,
-                                 q,
-                                 vol,
-                                 num_paths,
-                                 seed,
-                                 use_sobol)
-
-        return v
-
-###############################################################################
-
-    def value_mc_numba_only(self,
-                            value_dt: Date,
-                            stock_price: float,
-                            discount_curve: DiscountCurve,
-                            dividend_curve: DiscountCurve,
-                            model: Model,
-                            num_paths: int = 10000,
-                            seed: int = 4242,
-                            use_sobol: int = 0):
+    def value_mc_numpy_only(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+        use_sobol: int = 0,
+    ):
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         vol = model.volatility
 
-        v = _value_mc_numba_only(stock_price,
-                                 t_exp,
-                                 self.strike_price,
-                                 self.option_type_value,
-                                 r,
-                                 q,
-                                 vol,
-                                 num_paths,
-                                 seed,
-                                 use_sobol)
+        v = _value_mc_numpy_only(
+            stock_price,
+            t_exp,
+            self.strike_price,
+            self.option_type.value,
+            r,
+            q,
+            vol,
+            num_paths,
+            seed,
+            use_sobol,
+        )
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc_numba_parallel(self,
-                                value_dt: Date,
-                                stock_price: float,
-                                discount_curve: DiscountCurve,
-                                dividend_curve: DiscountCurve,
-                                model: Model,
-                                num_paths: int = 10000,
-                                seed: int = 4242,
-                                use_sobol: int = 0):
+    def value_mc_numba_only(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+        use_sobol: int = 0,
+    ):
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         vol = model.volatility
 
-        v = _value_mc_numba_parallel(stock_price,
-                                     t_exp,
-                                     self.strike_price,
-                                     self.option_type_value,
-                                     r,
-                                     q,
-                                     vol,
-                                     num_paths,
-                                     seed,
-                                     use_sobol)
-
-#        _value_mc_NUMBA_ONLY.parallel_diagnostics(level=4)
+        v = _value_mc_numba_only(
+            stock_price,
+            t_exp,
+            self.strike_price,
+            self.option_type_value,
+            r,
+            q,
+            vol,
+            num_paths,
+            seed,
+            use_sobol,
+        )
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc_numpy_numba(self,
-                             value_dt: Date,
-                             stock_price: float,
-                             discount_curve: DiscountCurve,
-                             dividend_curve: DiscountCurve,
-                             model: Model,
-                             num_paths: int = 10000,
-                             seed: int = 4242,
-                             use_sobol: int = 0):
+    def value_mc_numba_parallel(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+        use_sobol: int = 0,
+    ):
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         vol = model.volatility
 
-        v = _value_mc_numpy_numba(stock_price,
-                                  t_exp,
-                                  self.strike_price,
-                                  self.option_type_value,
-                                  r,
-                                  q,
-                                  vol,
-                                  num_paths,
-                                  seed,
-                                  use_sobol)
+        v = _value_mc_numba_parallel(
+            stock_price,
+            t_exp,
+            self.strike_price,
+            self.option_type_value,
+            r,
+            q,
+            vol,
+            num_paths,
+            seed,
+            use_sobol,
+        )
+
+        #        _value_mc_NUMBA_ONLY.parallel_diagnostics(level=4)
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc_nonumba_nonumpy(self,
-                                 value_dt: Date,
-                                 stock_price: float,
-                                 discount_curve: DiscountCurve,
-                                 dividend_curve: DiscountCurve,
-                                 model: Model,
-                                 num_paths: int = 10000,
-                                 seed: int = 4242,
-                                 use_sobol: int = 0):
+    def value_mc_numpy_numba(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+        use_sobol: int = 0,
+    ):
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         vol = model.volatility
 
-        v = _value_mc_nonumba_nonumpy(stock_price,
-                                      t_exp,
-                                      self.strike_price,
-                                      self.option_type.value,
-                                      r,
-                                      q,
-                                      vol,
-                                      num_paths,
-                                      seed,
-                                      use_sobol)
+        v = _value_mc_numpy_numba(
+            stock_price,
+            t_exp,
+            self.strike_price,
+            self.option_type_value,
+            r,
+            q,
+            vol,
+            num_paths,
+            seed,
+            use_sobol,
+        )
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc(self,
-                 value_dt: Date,
-                 stock_price: float,
-                 discount_curve: DiscountCurve,
-                 dividend_curve: DiscountCurve,
-                 model: Model,
-                 num_paths: int = 10000,
-                 seed: int = 4242,
-                 use_sobol: int = 0):
-        """ Value European style call or put option using Monte Carlo. This is
-        mainly for educational purposes. Sobol numbers can be used. """
+    def value_mc_nonumba_nonumpy(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+        use_sobol: int = 0,
+    ):
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
         vol = model.volatility
 
-        v = _value_mc_numba_only(stock_price,
-                                 t_exp,
-                                 self.strike_price,
-                                 self.option_type_value,
-                                 r,
-                                 q,
-                                 vol,
-                                 num_paths,
-                                 seed,
-                                 use_sobol)
+        v = _value_mc_nonumba_nonumpy(
+            stock_price,
+            t_exp,
+            self.strike_price,
+            self.option_type.value,
+            r,
+            q,
+            vol,
+            num_paths,
+            seed,
+            use_sobol,
+        )
 
         return v
 
-###############################################################################
+    ###########################################################################
+
+    def value_mc(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+        use_sobol: int = 0,
+    ):
+        """Value European style call or put option using Monte Carlo. This is
+        mainly for educational purposes. Sobol numbers can be used."""
+
+        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+
+        df = discount_curve.df(self.expiry_dt)
+        r = -np.log(df) / t_exp
+
+        dq = dividend_curve.df(self.expiry_dt)
+        q = -np.log(dq) / t_exp
+
+        vol = model.volatility
+
+        v = _value_mc_numba_only(
+            stock_price,
+            t_exp,
+            self.strike_price,
+            self.option_type_value,
+            r,
+            q,
+            vol,
+            num_paths,
+            seed,
+            use_sobol,
+        )
+
+        return v
+
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -716,10 +766,11 @@ class EquityVanillaOption():
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

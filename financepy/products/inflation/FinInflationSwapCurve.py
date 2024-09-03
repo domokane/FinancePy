@@ -21,7 +21,7 @@ SWAP_TOL = 1e-10
 
 
 def _f(df, *args):
-    """ Root search objective function for swaps """
+    """Root search objective function for swaps"""
     curve = args[0]
     value_dt = args[1]
     swap = args[2]
@@ -31,11 +31,12 @@ def _f(df, *args):
     v_swap /= swap.notional
     return v_swap
 
+
 ###############################################################################
 
 
 def _g(df, *args):
-    """ Root search objective function for swaps """
+    """Root search objective function for swaps"""
     curve = args[0]
     value_dt = args[1]
     fra = args[2]
@@ -45,11 +46,12 @@ def _g(df, *args):
     v_fra /= fra.notional
     return v_fra
 
+
 ###############################################################################
 
 
 class InflationSwapCurve(DiscountCurve):
-    """ Constructs a discount curve as implied by the prices of Ibor
+    """Constructs a discount curve as implied by the prices of Ibor
     deposits, FRAs and IRS. The curve date is the date on which we are
     performing the valuation based on the information available on the
     curve date. Typically it is the date on which an amount of 1 unit paid
@@ -75,16 +77,18 @@ class InflationSwapCurve(DiscountCurve):
     to provide a smoother or other functional curve shape which may have a more
     economically justifiable shape. However the root search makes it slower."""
 
-###############################################################################
+    ###########################################################################
 
-    def __init__(self,
-                 value_dt: Date,
-                 ibor_deposits: list,
-                 ibor_fras: list,
-                 ibor_swaps: list,
-                 interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-                 check_refit: bool = False):  # Set to True to test it works
-        """ Create an instance of a Ibor curve given a valuation date and
+    def __init__(
+        self,
+        value_dt: Date,
+        ibor_deposits: list,
+        ibor_fras: list,
+        ibor_swaps: list,
+        interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        check_refit: bool = False,
+    ):  # Set to True to test it works
+        """Create an instance of a Ibor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
@@ -103,19 +107,16 @@ class InflationSwapCurve(DiscountCurve):
         self.check_refit = check_refit
         self.build_curve()
 
-###############################################################################
+    ###########################################################################
 
     def _build_curve(self):
-        """ Build curve based on interpolation. """
+        """Build curve based on interpolation."""
         self.build_curve_using_solver()
 
-###############################################################################
+    ###########################################################################
 
-    def _validate_inputs(self,
-                         ibor_deposits,
-                         ibor_fras,
-                         ibor_swaps):
-        """ Validate the inputs for each of the Ibor products. """
+    def _validate_inputs(self, ibor_deposits, ibor_fras, ibor_swaps):
+        """Validate the inputs for each of the Ibor products."""
 
         num_depos = len(ibor_deposits)
         num_fras = len(ibor_fras)
@@ -151,7 +152,8 @@ class InflationSwapCurve(DiscountCurve):
         if num_depos > 1:
             if ibor_deposits[0].start_dt > self.value_dt:
                 raise FinError(
-                    "Valuation date must not be before first deposit settles.")
+                    "Valuation date must not be before first deposit settles."
+                )
 
         if num_fras > 0:
             for fra in ibor_fras:
@@ -199,7 +201,8 @@ class InflationSwapCurve(DiscountCurve):
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
                         raise FinError(
-                            "Swap cpns are not on the same date grid.")
+                            "Swap cpns are not on the same date grid."
+                        )
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -235,13 +238,13 @@ class InflationSwapCurve(DiscountCurve):
         self.used_swaps = ibor_swaps
         self.dc_type = None
 
-###############################################################################
+    ###########################################################################
 
     def _build_curve_using_solver(self):
-        """ Construct the discount curve using a bootstrap approach. This is
+        """Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
-        involves the use of a solver. """
+        involves the use of a solver."""
 
         self._times = np.array([])
         self._dfs = np.array([])
@@ -278,9 +281,15 @@ class InflationSwapCurve(DiscountCurve):
                 self._dfs = np.append(self._dfs, df_mat)
 
                 argtuple = (self, self.value_dt, fra)
-                df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
-                                         args=argtuple, tol=SWAP_TOL,
-                                         maxiter=50, fprime2=None)
+                df_mat = optimize.newton(
+                    _g,
+                    x0=df_mat,
+                    fprime=None,
+                    args=argtuple,
+                    tol=SWAP_TOL,
+                    maxiter=50,
+                    fprime2=None,
+                )
 
         for swap in self.used_swaps:
             # I use the lastPaymentDate in case a date has been adjusted fwd
@@ -293,19 +302,26 @@ class InflationSwapCurve(DiscountCurve):
 
             argtuple = (self, self.value_dt, swap)
 
-            df_mat = optimize.newton(_f, x0=df_mat, fprime=None, args=argtuple,
-                                     tol=SWAP_TOL, maxiter=50, fprime2=None,
-                                     full_output=False)
+            df_mat = optimize.newton(
+                _f,
+                x0=df_mat,
+                fprime=None,
+                args=argtuple,
+                tol=SWAP_TOL,
+                maxiter=50,
+                fprime2=None,
+                full_output=False,
+            )
 
         if self.check_refit is True:
             self.check_refits(1e-10, SWAP_TOL, 1e-5)
 
-###############################################################################
+    ###########################################################################
 
     def _build_curve_linear_swap_rate_interpolation(self):
-        """ Construct the discount curve using a bootstrap approach. This is
+        """Construct the discount curve using a bootstrap approach. This is
         the linear swap rate method that is fast and exact as it does not
-        require the use of a solver. It is also market standard. """
+        require the use of a solver. It is also market standard."""
 
         self._times = np.array([])
         self._dfs = np.array([])
@@ -342,18 +358,24 @@ class InflationSwapCurve(DiscountCurve):
                 self._dfs = np.append(self._dfs, df_mat)
 
                 argtuple = (self, self.value_dt, fra)
-                df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
-                                         args=argtuple, tol=SWAP_TOL,
-                                         maxiter=50, fprime2=None)
+                df_mat = optimize.newton(
+                    _g,
+                    x0=df_mat,
+                    fprime=None,
+                    args=argtuple,
+                    tol=SWAP_TOL,
+                    maxiter=50,
+                    fprime2=None,
+                )
 
         if len(self.used_swaps) == 0:
             if self.check_refit is True:
                 self.check_refits(1e-10, SWAP_TOL, 1e-5)
             return
 
-#        print("CURVE SO FAR")
-#        print(self._times)
-#        print(self._dfs)
+        #        print("CURVE SO FAR")
+        #        print(self._times)
+        #        print(self._dfs)
 
         #######################################################################
         # ADD SWAPS TO CURVE
@@ -410,8 +432,8 @@ class InflationSwapCurve(DiscountCurve):
         # Do I need this line ?
         interpolated_swap_rates[0] = interpolated_swap_rates[1]
 
-#        print("Interpolated swap times:", interpolated_swap_times)
-#        print("Interpolated swap rates:", interpolated_swap_rates)
+        #        print("Interpolated swap times:", interpolated_swap_times)
+        #        print("Interpolated swap rates:", interpolated_swap_rates)
 
         accrual_factors = longest_swap.fixed_year_fracs
 
@@ -419,43 +441,43 @@ class InflationSwapCurve(DiscountCurve):
         df = 1.0
         pv01 = 0.0
         df_settle = self.df(longest_swap.start_dt)
-#        print("SETTLE", df_settle)
+        #        print("SETTLE", df_settle)
 
         for i in range(1, start_index):
             dt = cpn_dts[i]
             df = self.df(dt)
-            acc = accrual_factors[i-1]
+            acc = accrual_factors[i - 1]
             pv01 += acc * df
-#            print("BEFORE", i, dt, df, acc, pv01)
+        #            print("BEFORE", i, dt, df, acc, pv01)
 
         for i in range(start_index, num_flows):
 
             dt = cpn_dts[i]
             t_mat = (dt - self.value_dt) / gDaysInYear
             swap_rate = interpolated_swap_rates[i]
-            acc = accrual_factors[i-1]
-            pv01_end = (acc * swap_rate + 1.0)
+            acc = accrual_factors[i - 1]
+            pv01_end = acc * swap_rate + 1.0
 
             df_mat = (df_settle - swap_rate * pv01) / pv01_end
 
-#            print("IN: %12s %12.10f %12.10f %12.10f %12.10f OUT: %14.12f" %
-#                  (dt, swap_rate, acc, pv01, pv01_end, df_mat))
+            #  print("IN: %12s %12.10f %12.10f %12.10f %12.10f OUT: %14.12f" %
+            #                  (dt, swap_rate, acc, pv01, pv01_end, df_mat))
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
 
             pv01 += acc * df_mat
 
-#        print(self._times)
-#        print(self._dfs)
+        #        print(self._times)
+        #        print(self._dfs)
 
         if self.check_refit is True:
             self.check_refits(1e-10, SWAP_TOL, 1e-5)
 
-###############################################################################
+    ###########################################################################
 
     def _check_refits(self, depo_tol, fra_tol, swap_tol):
-        """ Ensure that the Ibor curve refits the calibration instruments. """
+        """Ensure that the Ibor curve refits the calibration instruments."""
         for depo in self.used_deposits:
             v = depo.value(self.value_dt, self) / depo.notional
             if abs(v - 1.0) > depo_tol:
@@ -472,18 +494,21 @@ class InflationSwapCurve(DiscountCurve):
             # We value it as of the start date of the swap
             v = swap.value(swap.start_dt, self, self, None, principal=0.0)
             v = v / swap.notional
-#            print("REFIT SWAP VALUATION:", swap.adjustedMaturityDate, v)
             if abs(v) > swap_tol:
-                print("Swap with maturity " + str(swap.maturity_dt)
-                      + " Not Repriced. Has Value", v)
+                print(
+                    "Swap with maturity "
+                    + str(swap.maturity_dt)
+                    + " Not Repriced. Has Value",
+                    v,
+                )
                 swap.print_fixed_leg_pv()
                 swap.print_float_leg_pv()
                 raise FinError("Swap not repriced.")
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
-        """ Print out the details of the Ibor curve. """
+        """Print out the details of the Ibor curve."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUATION DATE", self.value_dt)
@@ -506,15 +531,17 @@ class InflationSwapCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string("% 10.6f" % self._times[i],
-                                 "%12.10f" % self._dfs[i])
+            s += label_to_string(
+                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
+            )
 
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

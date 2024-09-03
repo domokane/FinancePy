@@ -22,33 +22,39 @@ from ...utils.math import n_vect
 
 
 class FinDigitalOptionTypes(Enum):
-    CASH_OR_NOTHING = 1,
+    CASH_OR_NOTHING = (1,)
     ASSET_OR_NOTHING = 2
+
 
 ###############################################################################
 
 
 class EquityDigitalOption(EquityOption):
-    """ A EquityDigitalOption is an option in which the buyer receives some
+    """A EquityDigitalOption is an option in which the buyer receives some
     payment if the stock price has crossed a barrier ONLY at expiry and zero
     otherwise. There are two types: cash-or-nothing and the asset-or-nothing
     option. We do not care whether the stock price has crossed the barrier
     today, we only care about the barrier at option expiry. For a continuously-
-    monitored barrier, use the EquityOneTouchOption class. """
+    monitored barrier, use the EquityOneTouchOption class."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 barrier: float,
-                 call_put_type: OptionTypes,
-                 digital_type: FinDigitalOptionTypes):
-        """ Create the digital option by specifying the expiry date, the
+    def __init__(
+        self,
+        expiry_dt: Date,
+        barrier: float,
+        call_put_type: OptionTypes,
+        digital_type: FinDigitalOptionTypes,
+    ):
+        """Create the digital option by specifying the expiry date, the
         barrier price and the type of option which is either a EUROPEAN_CALL
         or a EUROPEAN_PUT or an AMERICAN_CALL or AMERICAN_PUT. There are two
-        types of underlying - cash or nothing and asset or nothing. """
+        types of underlying - cash or nothing and asset or nothing."""
 
         check_argument_types(self.__init__, locals())
 
-        if call_put_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
+        if call_put_type not in [
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT,
+        ]:
             raise FinError("Option type must be EUROPEAN CALL or PUT")
 
         self.expiry_dt = expiry_dt
@@ -56,15 +62,17 @@ class EquityDigitalOption(EquityOption):
         self.call_put_type = call_put_type
         self.digital_type = digital_type
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt: Date,
-              s: (float, np.ndarray),
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model):
-        """ Digital Option valuation using the Black-Scholes model assuming a
+    def value(
+        self,
+        value_dt: Date,
+        s: (float, np.ndarray),
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,
+    ):
+        """Digital Option valuation using the Black-Scholes model assuming a
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
         options."""
 
@@ -76,11 +84,13 @@ class EquityDigitalOption(EquityOption):
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
-                "Discount Curve valuation date not same as option value date")
+                "Discount Curve valuation date not same as option value date"
+            )
 
         if dividend_curve.value_dt != value_dt:
             raise FinError(
-                "Dividend Curve valuation date not same as option value date")
+                "Dividend Curve valuation date not same as option value date"
+            )
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
         t = max(t, 1e-6)
@@ -91,17 +101,17 @@ class EquityDigitalOption(EquityOption):
         sqrt_t = np.sqrt(t)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t
+        r = -np.log(df) / t
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t
+        q = -np.log(dq) / t
 
         volatility = model.volatility
 
         if abs(volatility) < g_small:
             volatility = g_small
 
-        d1 = (ln_s0_k + (r - q + volatility*volatility / 2.0) * t)
+        d1 = ln_s0_k + (r - q + volatility * volatility / 2.0) * t
         d1 = d1 / volatility / sqrt_t
         d2 = d1 - volatility * sqrt_t
 
@@ -124,27 +134,29 @@ class EquityDigitalOption(EquityOption):
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc(self,
-                 value_dt: Date,
-                 stock_price: float,
-                 discount_curve: DiscountCurve,
-                 dividend_curve: DiscountCurve,
-                 model,
-                 num_paths: int = 10000,
-                 seed: int = 4242):
-        """ Digital Option valuation using the Black-Scholes model and Monte
+    def value_mc(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+    ):
+        """Digital Option valuation using the Black-Scholes model and Monte
         Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
         handles both a cash-or-nothing and an asset-or-nothing option."""
 
         np.random.seed(seed)
         t = (self.expiry_dt - value_dt) / gDaysInYear
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t
+        r = -np.log(df) / t
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t
+        q = -np.log(dq) / t
 
         volatility = model.volatility
         K = self.barrier
@@ -177,7 +189,7 @@ class EquityDigitalOption(EquityOption):
         v = payoff * df / 2.0
         return v
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -187,10 +199,11 @@ class EquityDigitalOption(EquityOption):
         s += label_to_string("DIGITAL TYPE", self.digital_type, "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

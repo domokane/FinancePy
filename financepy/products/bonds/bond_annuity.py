@@ -18,19 +18,21 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class BondAnnuity:
-    """ An annuity is a vector of dates and flows generated according to ISDA
+    """An annuity is a vector of dates and flows generated according to ISDA
     standard rules which starts on the next date after the start date
     (effective date) and runs up to an end date with no principal repayment.
-    Dates are then adjusted according to a specified calendar. """
+    Dates are then adjusted according to a specified calendar."""
 
-    def __init__(self,
-                 maturity_dt: Date,
-                 cpn: float,
-                 freq_type: FrequencyTypes,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-                 dc_type: DayCountTypes = DayCountTypes.ACT_360):
+    def __init__(
+        self,
+        maturity_dt: Date,
+        cpn: float,
+        freq_type: FrequencyTypes,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+    ):
 
         check_argument_types(self.__init__, locals())
 
@@ -59,25 +61,26 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def clean_price_from_discount_curve(self,
-                                        settle_dt: Date,
-                                        discount_curve: DiscountCurve):
-        """ Calculate the bond price using some discount curve to present-value
-        the bond's cash flows. """
+    def clean_price_from_discount_curve(
+        self, settle_dt: Date, discount_curve: DiscountCurve
+    ):
+        """Calculate the bond price using some discount curve to present-value
+        the bond's cash flows."""
 
-        dirty_price = self.dirty_price_from_discount_curve(settle_dt,
-                                                           discount_curve)
-        accrued = self.accrued_int* self.par
+        dirty_price = self.dirty_price_from_discount_curve(
+            settle_dt, discount_curve
+        )
+        accrued = self.accrued_int * self.par
         clean_price = dirty_price - accrued
         return clean_price
 
     ###########################################################################
 
-    def dirty_price_from_discount_curve(self,
-                                        settle_dt: Date,
-                                        discount_curve: DiscountCurve):
-        """ Calculate the bond price using some discount curve to present-value
-        the bond's cash flows. """
+    def dirty_price_from_discount_curve(
+        self, settle_dt: Date, discount_curve: DiscountCurve
+    ):
+        """Calculate the bond price using some discount curve to present-value
+        the bond's cash flows."""
 
         self.calculate_payments(settle_dt, 1.0)
         pv = 0.0
@@ -94,10 +97,8 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def calculate_payments(self,
-                           settle_dt: Date,
-                           face: (float)):
-        ''' Calculate bond payments '''
+    def calculate_payments(self, settle_dt: Date, face: float):
+        """Calculate bond payments"""
         # No need to generate flows if settlement date has not changed
         if settle_dt == self.settle_dt:
             return
@@ -109,12 +110,14 @@ class BondAnnuity:
         bd_type = BusDayAdjustTypes.FOLLOWING
         dg_type = DateGenRuleTypes.BACKWARD
 
-        self.cpn_dts = Schedule(settle_dt,
-                                 self.maturity_dt,
-                                 self.freq_type,
-                                 self.cal_type,
-                                 bd_type,
-                                 dg_type).generate()
+        self.cpn_dts = Schedule(
+            settle_dt,
+            self.maturity_dt,
+            self.freq_type,
+            self.cal_type,
+            bd_type,
+            dg_type,
+        ).generate()
 
         self.pcd = self.cpn_dts[0]
         self.ncd = self.cpn_dts[1]
@@ -133,11 +136,9 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def accrued_interest(self,
-                         settle_dt: Date,
-                         face: (float)):
-        """ Calculate the amount of coupon that has accrued between the
-        previous coupon date and the settlement date. """
+    def accrued_interest(self, settle_dt: Date, face: float):
+        """Calculate the amount of coupon that has accrued between the
+        previous coupon date and the settlement date."""
 
         if settle_dt != self.settle_dt:
             self.calculate_payments(settle_dt, 1.0)
@@ -147,10 +148,9 @@ class BondAnnuity:
 
         dc = DayCount(self.dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(self.pcd,
-                                            settle_dt,
-                                            self.ncd,
-                                            self.freq)
+        (acc_factor, num, _) = dc.year_frac(
+            self.pcd, settle_dt, self.ncd, self.freq
+        )
 
         self.alpha = 1.0 - acc_factor * self.freq
 
@@ -162,11 +162,9 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def print_payments(self,
-                       settle_dt: Date,
-                       face: (float)):
-        """ Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. """
+    def print_payments(self, settle_dt: Date, face: float):
+        """Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond."""
 
         self.calculate_payments(settle_dt, face)
 
@@ -179,8 +177,8 @@ class BondAnnuity:
     ###########################################################################
 
     def __repr__(self):
-        """ Print a list of the unadjusted coupon payment dates used in
-        analytic calculations for the bond. """
+        """Print a list of the unadjusted coupon payment dates used in
+        analytic calculations for the bond."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
@@ -194,7 +192,8 @@ class BondAnnuity:
     ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

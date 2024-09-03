@@ -29,14 +29,12 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class FXFixedLookbackOption:
-    """ The Class for FX Fixed Strike Lookback options. """
+    """The Class for FX Fixed Strike Lookback options."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 option_type: OptionTypes,
-                 option_strike: float):
-        """ Create option with expiry date, option type and the option strike
-        """
+    def __init__(
+        self, expiry_dt: Date, option_type: OptionTypes, option_strike: float
+    ):
+        """Create option with expiry date, option type and the option strike"""
 
         check_argument_types(self.__init__, locals())
 
@@ -44,17 +42,19 @@ class FXFixedLookbackOption:
         self.option_type = option_type
         self.option_strike = option_strike
 
-##########################################################################
+    ##########################################################################
 
-    def value(self,
-              value_dt: Date,
-              stock_price: float,
-              domestic_curve: DiscountCurve,
-              foreign_curve: DiscountCurve,
-              volatility: float,
-              stock_min_max: float):
-        """ Value FX Fixed Lookback Option using Black Scholes model and
-        analytical formulae. """
+    def value(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        volatility: float,
+        stock_min_max: float,
+    ):
+        """Value FX Fixed Lookback Option using Black Scholes model and
+        analytical formulae."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -64,19 +64,21 @@ class FXFixedLookbackOption:
 
         if domestic_curve.value_dt != value_dt:
             raise FinError(
-                "Domestic Curve valuation date not same as option value date")
+                "Domestic Curve valuation date not same as option value date"
+            )
 
         if foreign_curve.value_dt != value_dt:
             raise FinError(
-                "Foreign Curve valuation date not same as option value date")
+                "Foreign Curve valuation date not same as option value date"
+            )
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = domestic_curve.df(self.expiry_dt)
-        r = -np.log(df)/t
+        r = -np.log(df) / t
 
         dq = foreign_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t
+        q = -np.log(dq) / t
 
         v = volatility
         s0 = stock_price
@@ -87,13 +89,11 @@ class FXFixedLookbackOption:
         if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_max = stock_min_max
             if s_max < s0:
-                raise FinError(
-                    "The Smax value must be >= the stock price.")
+                raise FinError("The Smax value must be >= the stock price.")
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = stock_min_max
             if s_min > s0:
-                raise FinError(
-                    "The s_min value must be <= the stock price.")
+                raise FinError("The s_min value must be <= the stock price.")
 
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
@@ -111,7 +111,7 @@ class FXFixedLookbackOption:
         if self.option_type == OptionTypes.EUROPEAN_CALL:
 
             if k > s_max:
-                d1 = (log(s0/k) + (b+v*v/2.0)*t)/v/sqrt(t)
+                d1 = (log(s0 / k) + (b + v * v / 2.0) * t) / v / sqrt(t)
                 d2 = d1 - v * sqrt(t)
 
                 if s0 == k:
@@ -119,13 +119,14 @@ class FXFixedLookbackOption:
                 elif s0 < k and w > 100:
                     term = expbt * N(d1)
                 else:
-                    term = (-(s0 / k)**(-w)) * N(d1 - 2.0 *
-                                                 b * sqrt(t) / v) + expbt * N(d1)
+                    term = (-((s0 / k) ** (-w))) * N(
+                        d1 - 2.0 * b * sqrt(t) / v
+                    ) + expbt * N(d1)
 
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
             else:
-                e1 = (log(s0/s_max) + (b+v*v/2.0)*t) / v / sqrt(t)
+                e1 = (log(s0 / s_max) + (b + v * v / 2.0) * t) / v / sqrt(t)
                 e2 = e1 - v * sqrt(t)
 
                 if s0 == s_max:
@@ -133,11 +134,16 @@ class FXFixedLookbackOption:
                 elif s0 < s_max and w > 100:
                     term = expbt * N(e1)
                 else:
-                    term = (-(s0 / s_max)**(-w)) * \
-                        N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
+                    term = (-((s0 / s_max) ** (-w))) * N(
+                        e1 - 2.0 * b * sqrt(t) / v
+                    ) + expbt * N(e1)
 
-                v = df * (s_max - k) + s0 * dq * N(e1) - \
-                    s_max * df * N(e2) + s0 * df * u * term
+                v = (
+                    df * (s_max - k)
+                    + s0 * dq * N(e1)
+                    - s_max * df * N(e2)
+                    + s0 * df * u * term
+                )
 
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
 
@@ -150,11 +156,16 @@ class FXFixedLookbackOption:
                 elif s0 > s_min and w < -100:
                     term = -expbt * N(-f1)
                 else:
-                    term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 *
-                                                    b * sqrt(t) / v) - expbt * N(-f1)
+                    term = ((s0 / s_min) ** (-w)) * N(
+                        -f1 + 2.0 * b * sqrt(t) / v
+                    ) - expbt * N(-f1)
 
-                v = df * (k - s_min) - s0 * dq * N(-f1) + \
-                    s_min * df * N(-f2) + s0 * df * u * term
+                v = (
+                    df * (k - s_min)
+                    - s0 * dq * N(-f1)
+                    + s_min * df * N(-f2)
+                    + s0 * df * u * term
+                )
 
             else:
                 d1 = (log(s0 / k) + (b + v * v / 2) * t) / v / sqrt(t)
@@ -164,39 +175,43 @@ class FXFixedLookbackOption:
                 elif s0 > k and w < -100:
                     term = -expbt * N(-d1)
                 else:
-                    term = ((s0 / k)**(-w)) * N(-d1 + 2.0 *
-                                                b * sqrt(t) / v) - expbt * N(-d1)
+                    term = ((s0 / k) ** (-w)) * N(
+                        -d1 + 2.0 * b * sqrt(t) / v
+                    ) - expbt * N(-d1)
 
                 v = k * df * N(-d2) - s0 * dq * N(-d1) + s0 * df * u * term
 
         else:
-            raise FinError("Unknown lookback option type:" +
-                           str(self.option_type))
+            raise FinError(
+                "Unknown lookback option type:" + str(self.option_type)
+            )
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc(self,
-                 value_dt: Date,
-                 spot_fx_rate: float,  # FORDOM
-                 domestic_curve: DiscountCurve,
-                 foreign_curve: DiscountCurve,
-                 volatility: float,
-                 spot_fx_rate_min_max: float,
-                 num_paths: int = 10000,
-                 num_steps_per_year: int = 252,
-                 seed: int = 4242):
-        """ Value FX Fixed Lookback option using Monte Carlo. """
+    def value_mc(
+        self,
+        value_dt: Date,
+        spot_fx_rate: float,  # FORDOM
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        volatility: float,
+        spot_fx_rate_min_max: float,
+        num_paths: int = 10000,
+        num_steps_per_year: int = 252,
+        seed: int = 4242,
+    ):
+        """Value FX Fixed Lookback option using Monte Carlo."""
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
         s_0 = spot_fx_rate
 
         df = domestic_curve._df(t)
-        r_d = -np.log(df)/t
+        r_d = -np.log(df) / t
 
         dq = foreign_curve._df(t)
-        r_f = -np.log(dq)/t
+        r_f = -np.log(dq) / t
 
         mu = r_d - r_f
 
@@ -212,21 +227,19 @@ class FXFixedLookbackOption:
             s_max = spot_fx_rate_min_max
             if s_max < s_0:
                 raise FinError(
-                    "Smax must be greater than or equal to the stock price.")
+                    "Smax must be greater than or equal to the stock price."
+                )
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = spot_fx_rate_min_max
             if s_min > s_0:
                 raise FinError(
-                    "s_min must be less than or equal to the stock price.")
+                    "s_min must be less than or equal to the stock price."
+                )
 
         model = FinGBMProcess()
-        s_all = model.get_paths(num_paths,
-                                num_time_steps,
-                                t,
-                                mu,
-                                s_0,
-                                volatility,
-                                seed)
+        s_all = model.get_paths(
+            num_paths, num_time_steps, t, mu, s_0, volatility, seed
+        )
 
         # Due to antithetics we have doubled the number of paths
         num_paths = 2 * num_paths
@@ -245,5 +258,5 @@ class FXFixedLookbackOption:
         else:
             raise FinError("Unknown lookback option type:" + str(option_type))
 
-        v = payoff.mean() * exp(-r_d*t)
+        v = payoff.mean() * exp(-r_d * t)
         return v

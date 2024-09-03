@@ -4,7 +4,6 @@
 
 import numpy as np
 import numba
-import matplotlib.pyplot as plt
 
 # Goal is to implement a numba compatible polyfit (note does not include
 # error handling)
@@ -27,6 +26,7 @@ def _coeff_mat(x, deg):
             mat[:, n] = x**n
     return mat
 
+
 ###############################################################################
 
 
@@ -35,6 +35,7 @@ def _fit_x(a, b):
     # linalg solves ax = b
     det = np.linalg.lstsq(a, b)[0]
     return det
+
 
 ###############################################################################
 
@@ -47,20 +48,22 @@ def fit_poly(x, y, deg):
     ret = p[::-1]
     return ret
 
+
 ###############################################################################
 
 
 @numba.njit(fastmath=True, cache=True)
 def eval_polynomial(P, x):
-    '''
+    """
     Compute polynomial P(x) where P is a vector of coefficients, highest
     order coefficient at P[0].  Uses Horner's Method.
-    '''
+    """
 
     result = np.zeros_like(x)
     for coeff in P:
         result = x * result + coeff
     return result
+
 
 ###############################################################################
 

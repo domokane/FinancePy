@@ -7,39 +7,46 @@ from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
 from ...products.rates.ibor_single_curve import IborSingleCurve
-from ...products.rates.ibor_benchmarks_report import benchmarks_report, ibor_benchmarks_report
+from ...products.rates.ibor_benchmarks_report import (
+    benchmarks_report,
+    ibor_benchmarks_report,
+)
 
 
 class IborSingleCurveParShocker:
-    '''
+    """
     A class to apply par-rate, ie benchmark, bumps to a Libor curve. Takes a base curve
     and provides methods to apply bumps that return bumped curves
-    '''
+    """
 
     def __init__(self, base_curve: IborSingleCurve):
-        '''
-        Init with a base curve to be bumped. Bumps do not affect this curve. 
+        """
+        Init with a base curve to be bumped. Bumps do not affect this curve.
 
-        '''
+        """
         self._base_curve = base_curve
-        self._benchmarks_report = ibor_benchmarks_report(self._base_curve, include_objects=True)
+        self._benchmarks_report = ibor_benchmarks_report(
+            self._base_curve, include_objects=True
+        )
 
     def benchmarks_report(self):
-        '''
+        """
         Access the benchmarks report that we create when the shocker is initialized
-        '''
+        """
         return self._benchmarks_report
 
     def n_benchmarks(self):
-        '''
+        """
         Total number of benchmarks
-        '''
+        """
         return len(self._benchmarks_report)
 
-    def apply_bump_to_benchmark(self, benchmark_idx: int, bump_size=1.0*gBasisPoint):
-        '''
+    def apply_bump_to_benchmark(
+        self, benchmark_idx: int, bump_size=1.0 * gBasisPoint
+    ):
+        """
         Apply a shock of a given size to a given bechmark. Indexing is per the benchmark report
-        '''
+        """
         composite_shock = np.zeros(self.n_benchmarks())
         composite_shock[benchmark_idx] = bump_size
         return self.apply_composite_bump(composite_shock)
@@ -57,7 +64,9 @@ class IborSingleCurveParShocker:
         bumped_fras = []
         bumped_swaps = []
 
-        for benchmark, bump_size in zip(self._benchmarks_report['benchmark_objects'].values, bump_sizes):
+        for benchmark, bump_size in zip(
+            self._benchmarks_report["benchmark_objects"].values, bump_sizes
+        ):
             bumped_benchmark = copy.deepcopy(benchmark)
             if isinstance(bumped_benchmark, IborDeposit):
                 bumped_benchmark.deposit_rate += bump_size
@@ -66,7 +75,9 @@ class IborSingleCurveParShocker:
                 bumped_benchmark.fra_rate += bump_size
                 bumped_fras.append(bumped_benchmark)
             if isinstance(bumped_benchmark, IborSwap):
-                bumped_benchmark.set_fixed_rate(bumped_benchmark.get_fixed_rate() + bump_size)
+                bumped_benchmark.set_fixed_rate(
+                    bumped_benchmark.get_fixed_rate() + bump_size
+                )
                 bumped_swaps.append(bumped_benchmark)
 
         # This assumes that the base curve was built using the default method as defined

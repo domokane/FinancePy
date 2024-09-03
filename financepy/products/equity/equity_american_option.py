@@ -11,6 +11,7 @@ from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
+
 # from ...models.black_scholes_analytic import baw_value
 from ...models.model import Model
 
@@ -22,24 +23,28 @@ from ...models.model import Model
 
 
 class EquityAmericanOption(EquityOption):
-    """ Class for American (and European) style options on simple vanilla
-    calls and puts - a tree valuation model is used that can handle both. """
+    """Class for American (and European) style options on simple vanilla
+    calls and puts - a tree valuation model is used that can handle both."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 strike_price: float,
-                 option_type: OptionTypes,
-                 num_options: float = 1.0):
-        """ Class for American style options on simple vanilla calls and puts.
+    def __init__(
+        self,
+        expiry_dt: Date,
+        strike_price: float,
+        option_type: OptionTypes,
+        num_options: float = 1.0,
+    ):
+        """Class for American style options on simple vanilla calls and puts.
         Specify the expiry date, strike price, whether the option is a call or
-        put and the number of options. """
+        put and the number of options."""
 
         check_argument_types(self.__init__, locals())
 
-        if option_type != OptionTypes.EUROPEAN_CALL and \
-            option_type != OptionTypes.EUROPEAN_PUT and \
-            option_type != OptionTypes.AMERICAN_CALL and \
-                option_type != OptionTypes.AMERICAN_PUT:
+        if (
+            option_type != OptionTypes.EUROPEAN_CALL
+            and option_type != OptionTypes.EUROPEAN_PUT
+            and option_type != OptionTypes.AMERICAN_CALL
+            and option_type != OptionTypes.AMERICAN_PUT
+        ):
             raise FinError("Unknown Option Type" + str(option_type))
 
         self.expiry_dt = expiry_dt
@@ -47,24 +52,28 @@ class EquityAmericanOption(EquityOption):
         self.option_type = option_type
         self.num_options = num_options
 
-###############################################################################
+    ###############################################################################
 
-    def value(self,
-              value_dt: Date,
-              stock_price: (np.ndarray, float),
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model: Model):
-        """ Valuation of an American option using a CRR tree to take into
-        account the value of early exercise. """
+    def value(
+        self,
+        value_dt: Date,
+        stock_price: (np.ndarray, float),
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Valuation of an American option using a CRR tree to take into
+        account the value of early exercise."""
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
-                "Discount Curve valuation date not same as option value date")
+                "Discount Curve valuation date not same as option value date"
+            )
 
         if dividend_curve.value_dt != value_dt:
             raise FinError(
-                "Dividend Curve valuation date not same as option value date")
+                "Dividend Curve valuation date not same as option value date"
+            )
 
         if isinstance(value_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / gDaysInYear
@@ -96,7 +105,7 @@ class EquityAmericanOption(EquityOption):
         else:
             return v[0]
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -106,10 +115,11 @@ class EquityAmericanOption(EquityOption):
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

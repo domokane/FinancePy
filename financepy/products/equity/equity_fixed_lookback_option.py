@@ -31,39 +31,43 @@ from ...utils.global_types import OptionTypes
 
 
 class EquityFixedLookbackOption(EquityOption):
-    """ This is an equity option in which the strike of the option is fixed but
+    """This is an equity option in which the strike of the option is fixed but
     the value of the stock price used to determine the payoff is the maximum
     in the case of a call option, and a minimum in the case of a put option."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 option_type: OptionTypes,
-                 strike_price: float):
-        """ Create the FixedLookbackOption by specifying the expiry date, the
-        option type and the option strike. """
+    def __init__(
+        self, expiry_dt: Date, option_type: OptionTypes, strike_price: float
+    ):
+        """Create the FixedLookbackOption by specifying the expiry date, the
+        option type and the option strike."""
 
         check_argument_types(self.__init__, locals())
 
-        if option_type != OptionTypes.EUROPEAN_CALL and option_type != OptionTypes.EUROPEAN_PUT:
+        if (
+            option_type != OptionTypes.EUROPEAN_CALL
+            and option_type != OptionTypes.EUROPEAN_PUT
+        ):
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt
         self.option_type = option_type
         self.strike_price = strike_price
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt: Date,
-              stock_price: float,
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              volatility: float,
-              stock_min_max: float):
-        """ Valuation of the Fixed Lookback option using Black-Scholes using
+    def value(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        volatility: float,
+        stock_min_max: float,
+    ):
+        """Valuation of the Fixed Lookback option using Black-Scholes using
         the formulae derived by Conze and Viswanathan (1991). One of the inputs
         is the minimum of maximum of the stock price since the start of the
-        option depending on whether the option is a call or a put. """
+        option depending on whether the option is a call or a put."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -73,19 +77,21 @@ class EquityFixedLookbackOption(EquityOption):
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
-                "Discount Curve valuation date not same as option value date")
+                "Discount Curve valuation date not same as option value date"
+            )
 
         if dividend_curve.value_dt != value_dt:
             raise FinError(
-                "Dividend Curve valuation date not same as option value date")
+                "Dividend Curve valuation date not same as option value date"
+            )
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t
+        r = -np.log(df) / t
 
         dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq)/t
+        q = -np.log(dq) / t
 
         v = volatility
         s0 = stock_price
@@ -120,7 +126,7 @@ class EquityFixedLookbackOption(EquityOption):
 
             if k > s_max:
 
-                d1 = (np.log(s0 / k) + (b + v * v/2.0) * t) / v / sqrt_t
+                d1 = (np.log(s0 / k) + (b + v * v / 2.0) * t) / v / sqrt_t
                 d2 = d1 - v * sqrt_t
 
                 if s0 == k:
@@ -128,14 +134,17 @@ class EquityFixedLookbackOption(EquityOption):
                 elif s0 < k and w > 100.0:
                     term = expbt * N(d1)
                 else:
-                    term = -np.power(s0 / k, -w) * N(d1 - 2 * b * sqrt_t / v) \
-                        + expbt * N(d1)
+                    term = -np.power(s0 / k, -w) * N(
+                        d1 - 2 * b * sqrt_t / v
+                    ) + expbt * N(d1)
 
                 v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
 
             else:
 
-                e1 = (np.log(s0/s_max) + (r - q + v*v/2) * t) / v / sqrt_t
+                e1 = (
+                    (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
+                )
                 e2 = e1 - v * sqrt_t
 
                 if s0 == s_max:
@@ -143,17 +152,22 @@ class EquityFixedLookbackOption(EquityOption):
                 elif s0 < s_max and w > 100.0:
                     term = expbt * N(e1)
                 else:
-                    term = (-(s0 / s_max)**(-w)) * \
-                        N(e1 - 2.0 * b * sqrt_t / v) + expbt * N(e1)
+                    term = (-((s0 / s_max) ** (-w))) * N(
+                        e1 - 2.0 * b * sqrt_t / v
+                    ) + expbt * N(e1)
 
-                v = df * (s_max - k) + s0 * dq * N(e1) - \
-                    s_max * df * N(e2) + s0 * df * u * term
+                v = (
+                    df * (s_max - k)
+                    + s0 * dq * N(e1)
+                    - s_max * df * N(e2)
+                    + s0 * df * u * term
+                )
 
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
 
             if k >= s_min:
 
-                f1 = (np.log(s0/s_min) + (b + v * v / 2.0) * t) / v / sqrt_t
+                f1 = (np.log(s0 / s_min) + (b + v * v / 2.0) * t) / v / sqrt_t
                 f2 = f1 - v * sqrt_t
 
                 if s0 == s_min:
@@ -161,11 +175,16 @@ class EquityFixedLookbackOption(EquityOption):
                 elif s0 > s_min and w < -100.0:
                     term = -expbt * N(-f1)
                 else:
-                    term = ((s0 / s_min)**(-w)) * N(-f1 + 2.0 * b * sqrt_t / v) \
-                        - expbt * N(-f1)
+                    term = ((s0 / s_min) ** (-w)) * N(
+                        -f1 + 2.0 * b * sqrt_t / v
+                    ) - expbt * N(-f1)
 
-                v = df * (k - s_min) - s0 * dq * N(-f1) + \
-                    s_min * df * N(-f2) + s0 * df * u * term
+                v = (
+                    df * (k - s_min)
+                    - s0 * dq * N(-f1)
+                    + s_min * df * N(-f2)
+                    + s0 * df * u * term
+                )
 
             else:
 
@@ -177,31 +196,35 @@ class EquityFixedLookbackOption(EquityOption):
                 elif s0 > k and w < -100.0:
                     term = -expbt * N(-d1)
                 else:
-                    term = ((s0 / k)**(-w)) * N(-d1 + 2.0 * b * sqrt_t / v) \
-                        - expbt * N(-d1)
+                    term = ((s0 / k) ** (-w)) * N(
+                        -d1 + 2.0 * b * sqrt_t / v
+                    ) - expbt * N(-d1)
 
                 v = k * df * N(-d2) - s0 * dq * N(-d1) + s0 * df * u * term
 
         else:
-            raise FinError("Unknown lookback option type:" +
-                           str(self.option_type))
+            raise FinError(
+                "Unknown lookback option type:" + str(self.option_type)
+            )
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc(self,
-                 value_dt: Date,
-                 stock_price: float,
-                 discount_curve: DiscountCurve,
-                 dividend_curve: DiscountCurve,
-                 volatility: float,
-                 stock_min_max: float,
-                 num_paths: int = 10000,
-                 num_steps_per_year: int = 252,
-                 seed: int = 4242):
-        """ Monte Carlo valuation of a fixed strike lookback option using a
-        Black-Scholes model that assumes the stock follows a GBM process. """
+    def value_mc(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        volatility: float,
+        stock_min_max: float,
+        num_paths: int = 10000,
+        num_steps_per_year: int = 252,
+        seed: int = 4242,
+    ):
+        """Monte Carlo valuation of a fixed strike lookback option using a
+        Black-Scholes model that assumes the stock follows a GBM process."""
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
 
@@ -222,20 +245,19 @@ class EquityFixedLookbackOption(EquityOption):
             s_max = stock_min_max
             if s_max < stock_price:
                 raise FinError(
-                    "Smax must be greater than or equal to the stock price.")
+                    "Smax must be greater than or equal to the stock price."
+                )
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = stock_min_max
             if s_min > stock_price:
                 raise FinError(
-                    "Smin must be less than or equal to the stock price.")
+                    "Smin must be less than or equal to the stock price."
+                )
 
         model = FinGBMProcess()
-        s_all = model.get_paths(num_paths,
-                                num_time_steps, t,
-                                mu,
-                                stock_price,
-                                volatility,
-                                seed)
+        s_all = model.get_paths(
+            num_paths, num_time_steps, t, mu, stock_price, volatility, seed
+        )
 
         # Due to antithetics we have doubled the number of paths
         num_paths = 2 * num_paths
@@ -257,7 +279,7 @@ class EquityFixedLookbackOption(EquityOption):
         v = payoff.mean() * df
         return v
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -266,10 +288,11 @@ class EquityFixedLookbackOption(EquityOption):
         s += label_to_string("OPTION TYPE", self.option_type, "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

@@ -10,13 +10,14 @@ from ...utils.helpers import label_to_string
 ###############################################################################
 
 
-class FinCurveFitMethod():
+class FinCurveFitMethod:
     pass
+
 
 ###############################################################################
 
 
-class CurveFitPolynomial():
+class CurveFitPolynomial:
 
     def __init__(self, power=3):
         self.parent_type = FinCurveFitMethod
@@ -37,13 +38,14 @@ class CurveFitPolynomial():
         return s
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################
 
 
-class CurveFitNelsonSiegel():
+class CurveFitNelsonSiegel:
 
     def __init__(self, tau=None, bounds=[(-1, -1, -1, 0.5), (1, 1, 1, 100)]):
         self.parent_type = FinCurveFitMethod
@@ -54,8 +56,7 @@ class CurveFitNelsonSiegel():
         """ Fairly permissive bounds. Only tau_1 is 1-100 """
         self.bounds = bounds
 
-    def interp_yield(self, t, beta_1=None, beta_2=None,
-                              beta_3=None, tau=None):
+    def interp_yield(self, t, beta_1=None, beta_2=None, beta_3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
 
@@ -87,18 +88,23 @@ class CurveFitNelsonSiegel():
         return s
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################
 
 
-class CurveFitNelsonSiegelSvensson():
+class CurveFitNelsonSiegelSvensson:
 
-    def __init__(self, tau_1=None, tau_2=None,
-                 bounds=[(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)]):
-        """ Create object to store calibration and functional form of NSS
-        parametric fit. """
+    def __init__(
+        self,
+        tau_1=None,
+        tau_2=None,
+        bounds=[(0, -1, -1, -1, 0, 1), (1, 1, 1, 1, 10, 100)],
+    ):
+        """Create object to store calibration and functional form of NSS
+        parametric fit."""
 
         self.parent_type = FinCurveFitMethod
         self.beta_1 = None
@@ -112,8 +118,16 @@ class CurveFitNelsonSiegelSvensson():
         the user does not provide any bounds. Especially for tau_2. """
         self.bounds = bounds
 
-    def interp_yield(self, t, beta_1=None, beta_2=None, beta_3=None,
-                            beta_4=None, tau_1=None, tau_2=None):
+    def interp_yield(
+        self,
+        t,
+        beta_1=None,
+        beta_2=None,
+        beta_3=None,
+        beta_4=None,
+        tau_1=None,
+        tau_2=None,
+    ):
 
         # Careful if we get a time zero point
         t = np.maximum(t, 1e-10)
@@ -157,13 +171,14 @@ class CurveFitNelsonSiegelSvensson():
         return s
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################
 
 
-class CurveFitBSpline():
+class CurveFitBSpline:
 
     def __init__(self, power=3, knots=[1, 3, 5, 10]):
         self.parent_type = FinCurveFitMethod
@@ -184,7 +199,8 @@ class CurveFitBSpline():
         return s
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

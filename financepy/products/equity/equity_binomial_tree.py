@@ -7,7 +7,7 @@ from math import exp, log, sqrt
 from enum import Enum
 
 import numpy as np
-from numba import jit, njit, float64, int64
+from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.global_vars import gDaysInYear
@@ -29,6 +29,7 @@ class EquityTreePayoffTypes(Enum):
 class EquityTreeExerciseTypes(Enum):
     EUROPEAN = 1
     AMERICAN = 2
+
 
 ###############################################################################
 
@@ -57,12 +58,14 @@ def _validate_payoff(payoff_type, payoff_params):
 
     if len(payoff_params) != num_params:
         raise FinError(
-            "Number of parameters required for " +
-            str(payoff_type) +
-            " must be " +
-            str(num_params))
+            "Number of parameters required for "
+            + str(payoff_type)
+            + " must be "
+            + str(num_params)
+        )
 
     return None
+
 
 ###############################################################################
 
@@ -77,11 +80,12 @@ def _payoff_value(s, payoff_type, payoff_params):
     elif payoff_type == EquityTreePayoffTypes.DIGITAL_OPTION.value:
         payoff = heaviside(payoff_params[0] * (s - payoff_params[1]))
     elif payoff_type == EquityTreePayoffTypes.POWER_CONTRACT.value:
-        payoff = payoff_params[0] * (s**payoff_params[1])
+        payoff = payoff_params[0] * (s ** payoff_params[1])
     elif payoff_type == EquityTreePayoffTypes.POWER_OPTION.value:
-        payoff = max(payoff_params[0] *
-                     ((s**payoff_params[2]) -
-                      payoff_params[1]), 0.0)
+        payoff = max(
+            payoff_params[0] * ((s ** payoff_params[2]) - payoff_params[1]),
+            0.0,
+        )
     elif payoff_type == EquityTreePayoffTypes.LOG_CONTRACT.value:
         payoff = log(s)
     elif payoff_type == EquityTreePayoffTypes.LOG_OPTION.value:
@@ -91,23 +95,26 @@ def _payoff_value(s, payoff_type, payoff_params):
 
     return payoff
 
+
 ###############################################################################
 
 
 @njit(fastmath=True, cache=True)
-def _value_once(stock_price,
-                r,
-                q,
-                volatility,
-                num_steps,
-                time_to_expiry,
-                payoff_type,
-                exercise_type,
-                payoff_params):
+def _value_once(
+    stock_price,
+    r,
+    q,
+    volatility,
+    num_steps,
+    time_to_expiry,
+    payoff_type,
+    exercise_type,
+    payoff_params,
+):
 
     num_steps = max(num_steps, 3)
 
-#        validate_payoff(payoff_type.value,payoff_params)
+    #        validate_payoff(payoff_type.value,payoff_params)
 
     payoff_typeValue = payoff_type.value
 
@@ -146,8 +153,9 @@ def _value_once(stock_price,
 
     for i_node in range(0, i_time + 1):
         s = stock_values[index + i_node]
-        option_values[index + i_node] =\
-            _payoff_value(s, payoff_typeValue, payoff_params)
+        option_values[index + i_node] = _payoff_value(
+            s, payoff_typeValue, payoff_params
+        )
 
     # begin backward steps from expiry
     for i_time in range(num_steps - 1, -1, -1):
@@ -170,80 +178,93 @@ def _value_once(stock_price,
             elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
                 s = stock_values[index + i_node]
                 exercise_value = _payoff_value(
-                    s, payoff_typeValue, payoff_params)
+                    s, payoff_typeValue, payoff_params
+                )
                 option_values[index + i_node] = max(exercise_value, hold_value)
 
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / \
-        (stock_values[2] - stock_values[1])
-    delta_up = (option_values[5] - option_values[4]) / \
-        (stock_values[5] - stock_values[4])
-    delta_dn = (option_values[4] - option_values[3]) / \
-        (stock_values[4] - stock_values[3])
+    delta = (option_values[2] - option_values[1]) / (
+        stock_values[2] - stock_values[1]
+    )
+    delta_up = (option_values[5] - option_values[4]) / (
+        stock_values[5] - stock_values[4]
+    )
+    delta_dn = (option_values[4] - option_values[3]) / (
+        stock_values[4] - stock_values[3]
+    )
     gamma = (delta_up - delta_dn) / (stock_values[2] - stock_values[1])
     theta = (option_values[4] - option_values[0]) / (2.0 * dt)
     results = np.array([price, delta, gamma, theta])
     return results
 
+
 ###############################################################################
 
 
-class EquityBinomialTree():
+class EquityBinomialTree:
 
     def __init__(self):
         pass
-#        self.m_option_values = np.zeros()
-#        self.m_stock_values = np.zeros()
-#        self.m_upProbabilities = np.zeros()
-#
-#       self.m_num_steps = 10
-#        self.m_num_nodes = 10
 
-###############################################################################
+    #        self.m_option_values = np.zeros()
+    #        self.m_stock_values = np.zeros()
+    #        self.m_upProbabilities = np.zeros()
+    #
+    #       self.m_num_steps = 10
+    #        self.m_num_nodes = 10
 
-    def value(self,
-              stock_price,
-              discount_curve,
-              dividend_curve,
-              volatility,
-              num_steps,
-              value_dt,
-              payoff,
-              expiry_dt,
-              payoff_type,
-              exercise_type,
-              payoff_params):
+    ###############################################################################
+
+    def value(
+        self,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        num_steps,
+        value_dt,
+        payoff,
+        expiry_dt,
+        payoff_type,
+        exercise_type,
+        payoff_params,
+    ):
 
         # do some validation
         t_exp = (expiry_dt - value_dt) / gDaysInYear
         r = discount_curve.zero_rate(expiry_dt)
 
         dq = dividend_curve.df(expiry_dt)
-        q = -np.log(dq)/t_exp
+        q = -np.log(dq) / t_exp
 
-        price1 = _value_once(stock_price,
-                             r,
-                             q,
-                             volatility,
-                             num_steps,
-                             t_exp,
-                             payoff_type,
-                             exercise_type,
-                             payoff_params)
+        price1 = _value_once(
+            stock_price,
+            r,
+            q,
+            volatility,
+            num_steps,
+            t_exp,
+            payoff_type,
+            exercise_type,
+            payoff_params,
+        )
 
         # Can I reuse the same tree ?
-        price2 = _value_once(stock_price,
-                             r,
-                             q,
-                             volatility,
-                             num_steps + 1,
-                             t_exp,
-                             payoff_type,
-                             exercise_type,
-                             payoff_params)
+        price2 = _value_once(
+            stock_price,
+            r,
+            q,
+            volatility,
+            num_steps + 1,
+            t_exp,
+            payoff_type,
+            exercise_type,
+            payoff_params,
+        )
 
         price = (price1 + price2) / 2.0
 
         return price
+
 
 ###############################################################################

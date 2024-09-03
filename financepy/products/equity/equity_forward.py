@@ -16,15 +16,17 @@ from ...utils.helpers import label_to_string, check_argument_types
 ###############################################################################
 
 
-class EquityForward():
-    """ Contract to buy or sell a stock in future at a price agreed today. """
+class EquityForward:
+    """Contract to buy or sell a stock in future at a price agreed today."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 forward_price: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
-                 notional: float,
-                 long_short: FinLongShort = FinLongShort.LONG):
-        """ Creates a EquityForward which allows the owner to buy the stock
+    def __init__(
+        self,
+        expiry_dt: Date,
+        forward_price: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
+        notional: float,
+        long_short: FinLongShort = FinLongShort.LONG,
+    ):
+        """Creates a EquityForward which allows the owner to buy the stock
         at a price agreed today. Need to specify if LONG or SHORT."""
 
         check_argument_types(self.__init__, locals())
@@ -34,15 +36,17 @@ class EquityForward():
         self.notional = notional
         self.long_short = long_short
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt,
-              stock_price,  # Current stock price
-              discount_curve,
-              dividend_curve):
-        """ Calculate the value of an equity forward contract from the stock
-        price and discount and dividend discount. """
+    def value(
+        self,
+        value_dt,
+        stock_price,  # Current stock price
+        discount_curve,
+        dividend_curve,
+    ):
+        """Calculate the value of an equity forward contract from the stock
+        price and discount and dividend discount."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -52,11 +56,13 @@ class EquityForward():
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
-                "Discount Curve valuation date not same as option value date")
+                "Discount Curve valuation date not same as option value date"
+            )
 
         if dividend_curve.value_dt != value_dt:
             raise FinError(
-                "Dividend Curve valuation date not same as option value date")
+                "Dividend Curve valuation date not same as option value date"
+            )
 
         if isinstance(value_dt, Date):
             t = (self.expiry_dt - value_dt) / gDaysInYear
@@ -71,14 +77,13 @@ class EquityForward():
 
         t = np.maximum(t, 1e-10)
 
-        fwd_stock_price = self.forward(value_dt,
-                                     stock_price,
-                                     discount_curve,
-                                     dividend_curve)
+        fwd_stock_price = self.forward(
+            value_dt, stock_price, discount_curve, dividend_curve
+        )
 
         discount_df = discount_curve._df(t)
 
-        v = (fwd_stock_price - self.forward_price)
+        v = fwd_stock_price - self.forward_price
         v = v * self.notional * discount_df
 
         if self.long_short == FinLongShort.SHORT:
@@ -86,14 +91,16 @@ class EquityForward():
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def forward(self,
-                value_dt,
-                stock_price,  # Current stock price
-                discount_curve,
-                dividend_curve):
-        """ Calculate the forward price of the equity forward contract. """
+    def forward(
+        self,
+        value_dt,
+        stock_price,  # Current stock price
+        discount_curve,
+        dividend_curve,
+    ):
+        """Calculate the forward price of the equity forward contract."""
 
         if isinstance(value_dt, Date):
             t = (self.expiry_dt - value_dt) / gDaysInYear
@@ -114,7 +121,7 @@ class EquityForward():
         fwd_stock_price = stock_price * dividend_df / discount_df
         return fwd_stock_price
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -124,10 +131,11 @@ class EquityForward():
         s += label_to_string("NOTIONAL", self.notional, "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

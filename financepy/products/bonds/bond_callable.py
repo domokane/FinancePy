@@ -31,6 +31,7 @@ class BondModelTypes(Enum):
     HULL_WHITE = 3
     BLACK_KARASINSKI = 4
 
+
 ###############################################################################
 
 
@@ -45,20 +46,22 @@ class BondOptionTypes(Enum):
 
 
 class BondEmbeddedOption:
-    """ Class for fixed coupon bonds with embedded call or put optionality. """
+    """Class for fixed coupon bonds with embedded call or put optionality."""
 
-    def __init__(self,
-                 issue_dt: Date,
-                 maturity_dt: Date,  # Date
-                 coupon: float,  # Annualised coupon - 0.03 = 3.00%
-                 freq_type: FrequencyTypes,
-                 dc_type: DayCountTypes,
-                 call_dts: List[Date],
-                 call_prices: List[float],
-                 put_dts: List[Date],
-                 put_prices: List[float]):
-        """ Create a BondEmbeddedOption object with a maturity date, coupon
-        and all the bond inputs. """
+    def __init__(
+        self,
+        issue_dt: Date,
+        maturity_dt: Date,  # Date
+        coupon: float,  # Annualised coupon - 0.03 = 3.00%
+        freq_type: FrequencyTypes,
+        dc_type: DayCountTypes,
+        call_dts: List[Date],
+        call_prices: List[float],
+        put_dts: List[Date],
+        put_prices: List[float],
+    ):
+        """Create a BondEmbeddedOption object with a maturity date, coupon
+        and all the bond inputs."""
 
         check_argument_types(self.__init__, locals())
 
@@ -70,12 +73,9 @@ class BondEmbeddedOption:
 
         self.ex_div_days = 0
 
-        self.bond = Bond(issue_dt,
-                          maturity_dt,
-                          coupon,
-                          freq_type,
-                          dc_type,
-                          self.ex_div_days)
+        self.bond = Bond(
+            issue_dt, maturity_dt, coupon, freq_type, dc_type, self.ex_div_days
+        )
 
         # Validate call and put schedules
         for dt in call_dts:
@@ -123,18 +123,15 @@ class BondEmbeddedOption:
         self.par = 100.0
         self.bond._calculate_cpn_dts()
 
-###############################################################################
+    ###############################################################################
 
-    def value(self,
-              settle_dt: Date,
-              discount_curve: DiscountCurve,
-              model):
-        """ Value the bond that settles on the specified date that can have
+    def value(self, settle_dt: Date, discount_curve: DiscountCurve, model):
+        """Value the bond that settles on the specified date that can have
         both embedded call and put options. This is done using the specified
-        model and a discount curve. """
+        model and a discount curve."""
 
         # Generate bond coupon flow schedule
-        cpn = self.bond.cpn/self.bond.freq
+        cpn = self.bond.cpn / self.bond.freq
 
         cpn_times = []
         cpn_amounts = []
@@ -175,54 +172,84 @@ class BondEmbeddedOption:
 
         if isinstance(model, HWTree):
 
-            """ We need to build the tree out to the bond maturity date. To be
+            """We need to build the tree out to the bond maturity date. To be
             more precise we only need to go out the the last option date but
-            we can do that refinement at a later date. """
+            we can do that refinement at a later date."""
 
             model.build_tree(t_mat, df_times, df_values)
-            v1 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
-                                                   call_times, call_prices,
-                                                   put_times, put_prices,
-                                                   face_amount)
+            v1 = model.callable_puttable_bond_tree(
+                cpn_times,
+                cpn_amounts,
+                call_times,
+                call_prices,
+                put_times,
+                put_prices,
+                face_amount,
+            )
             model.num_time_steps += 1
             model.build_tree(t_mat, df_times, df_values)
-            v2 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
-                                                   call_times, call_prices,
-                                                   put_times, put_prices,
-                                                   face_amount)
+            v2 = model.callable_puttable_bond_tree(
+                cpn_times,
+                cpn_amounts,
+                call_times,
+                call_prices,
+                put_times,
+                put_prices,
+                face_amount,
+            )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (v1['bondwithoption'] + v2['bondwithoption']) / 2
-            v_bond_pure = (v1['bondpure'] + v2['bondpure']) / 2
+            v_bond_with_option = (
+                v1["bondwithoption"] + v2["bondwithoption"]
+            ) / 2
+            v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
-            return {'bondwithoption': v_bond_with_option, 'bondpure': v_bond_pure}
+            return {
+                "bondwithoption": v_bond_with_option,
+                "bondpure": v_bond_pure,
+            }
 
         elif isinstance(model, BKTree):
 
-            """ Because we not have a closed form bond price we need to build
-            the tree out to the bond maturity which is after option expiry. """
+            """Because we not have a closed form bond price we need to build
+            the tree out to the bond maturity which is after option expiry."""
 
             model.build_tree(t_mat, df_times, df_values)
-            v1 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
-                                                   call_times, call_prices,
-                                                   put_times, put_prices,
-                                                   face_amount)
+            v1 = model.callable_puttable_bond_tree(
+                cpn_times,
+                cpn_amounts,
+                call_times,
+                call_prices,
+                put_times,
+                put_prices,
+                face_amount,
+            )
             model.num_time_steps += 1
             model.build_tree(t_mat, df_times, df_values)
-            v2 = model.callable_puttable_bond_tree(cpn_times, cpn_amounts,
-                                                   call_times, call_prices,
-                                                   put_times, put_prices,
-                                                   face_amount)
+            v2 = model.callable_puttable_bond_tree(
+                cpn_times,
+                cpn_amounts,
+                call_times,
+                call_prices,
+                put_times,
+                put_prices,
+                face_amount,
+            )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (v1['bondwithoption'] + v2['bondwithoption']) / 2
-            v_bond_pure = (v1['bondpure'] + v2['bondpure']) / 2
+            v_bond_with_option = (
+                v1["bondwithoption"] + v2["bondwithoption"]
+            ) / 2
+            v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
-            return {'bondwithoption': v_bond_with_option, 'bondpure': v_bond_pure}
+            return {
+                "bondwithoption": v_bond_with_option,
+                "bondpure": v_bond_pure,
+            }
         else:
             raise FinError("Unknown model type")
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
@@ -244,9 +271,10 @@ class BondEmbeddedOption:
 
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
         print(self)
+
 
 ###############################################################################

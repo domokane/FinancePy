@@ -16,8 +16,8 @@ from ...utils.global_vars import gDaysInYear
 ###############################################################################
 
 
-class FinInflationIndexCurve():
-    """ This is a curve calculated from a set of dates and CPI-like numbers. It
+class FinInflationIndexCurve:
+    """This is a curve calculated from a set of dates and CPI-like numbers. It
     should start at the issue date of the bond (or index). It also requires a
     lag in months. Here is a reference to the CPI curve used for TIPS.
 
@@ -25,12 +25,14 @@ class FinInflationIndexCurve():
 
     """
 
-###############################################################################
+    ###############################################################################
 
-    def __init__(self,
-                 index_dts: list,
-                 index_values: (list, np.ndarray),
-                 lag_in_months: int = 3):
+    def __init__(
+        self,
+        index_dts: list,
+        index_values: (list, np.ndarray),
+        lag_in_months: int = 3,
+    ):
 
         check_argument_types(self.__init__, locals())
 
@@ -53,10 +55,10 @@ class FinInflationIndexCurve():
         if test_monotonicity(self.index_times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-###############################################################################
+    ###########################################################################
 
     def index_value(self, dt: Date):
-        """ Calculate index value by interpolating the CPI curve """
+        """Calculate index value by interpolating the CPI curve"""
 
         lagMonthsAgoDt = dt.add_months(-self.lag_in_months)
 
@@ -66,33 +68,35 @@ class FinInflationIndexCurve():
         cpi_first_time = (cpi_first_dt - self.base_dt) / gDaysInYear
         cpi_second_time = (cpi_second_dt - self.base_dt) / gDaysInYear
 
-        cpi_first_value = np.interp(cpi_first_time,
-                                  self.index_times,
-                                  self.index_values)
+        cpi_first_value = np.interp(
+            cpi_first_time, self.index_times, self.index_values
+        )
 
-        cpi_second_value = np.interp(cpi_second_time,
-                                   self.index_times,
-                                   self.index_values)
+        cpi_second_value = np.interp(
+            cpi_second_time, self.index_times, self.index_values
+        )
 
         d = dt.d
         m = dt.m
         y = dt.y
         num_days = days_in_month(m, y)
-        v = cpi_first_value + (d - 1) * (cpi_second_value -
-                                       cpi_first_value) / num_days
+        v = (
+            cpi_first_value
+            + (d - 1) * (cpi_second_value - cpi_first_value) / num_days
+        )
         return v
 
-###############################################################################
+    ###########################################################################
 
     def index_ratio(self, dt: Date):
-        """ Calculate index value by interpolating the CPI curve """
+        """Calculate index value by interpolating the CPI curve"""
 
         vt = self.index_value(dt)
         v0 = self.index_value(self.base_dt)
         index_ratio = vt / v0
         return index_ratio
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -103,15 +107,17 @@ class FinInflationIndexCurve():
         s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self.index_values)
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self.index_dts[i],
-                                 "%10.7f" % self.index_values[i])
+            s += label_to_string(
+                "%12s" % self.index_dts[i], "%10.7f" % self.index_values[i]
+            )
 
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

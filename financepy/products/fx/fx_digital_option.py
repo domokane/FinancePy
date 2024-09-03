@@ -9,8 +9,10 @@ from ...utils.math import n_vect  # n_prime_vect
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
+
 # from ...products.equity.EquityOption import FinOption
 from ...utils.date import Date
+
 # from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
@@ -21,21 +23,23 @@ from ...utils.global_types import OptionTypes
 
 class FXDigitalOption:
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 strike_fx_rate: (float, np.ndarray),
-                 currency_pair: str,  # FORDOM
-                 option_type: (OptionTypes, list),
-                 notional: float,
-                 prem_currency: str,
-                 spot_days: int = 0):
-        """ Create the FX Digital Option object. Inputs include expiry date,
+    def __init__(
+        self,
+        expiry_dt: Date,
+        strike_fx_rate: (float, np.ndarray),
+        currency_pair: str,  # FORDOM
+        option_type: (OptionTypes, list),
+        notional: float,
+        prem_currency: str,
+        spot_days: int = 0,
+    ):
+        """Create the FX Digital Option object. Inputs include expiry date,
         strike, currency pair, option type (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
         currency rates must be entered in the price in domestic currency of
         one unit of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
-        same for the domestic currency. """
+        same for the domestic currency."""
 
         check_argument_types(self.__init__, locals())
 
@@ -66,26 +70,30 @@ class FXDigitalOption:
 
         self.notional = notional
 
-        if option_type != OptionTypes.DIGITAL_CALL and\
-           option_type != OptionTypes.DIGITAL_PUT:
+        if (
+            option_type != OptionTypes.DIGITAL_CALL
+            and option_type != OptionTypes.DIGITAL_PUT
+        ):
             raise FinError("Unknown Digital Option Type:" + option_type)
 
         self.option_type = option_type
         self.spot_days = spot_days
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt,
-              spot_fx_rate,  # 1 unit of foreign in domestic
-              domestic_curve,
-              foreign_curve,
-              model):
-        """ Valuation of a digital option using Black-Scholes model. This
+    def value(
+        self,
+        value_dt,
+        spot_fx_rate,  # 1 unit of foreign in domestic
+        domestic_curve,
+        foreign_curve,
+        model,
+    ):
+        """Valuation of a digital option using Black-Scholes model. This
         allows for 4 cases - first upper barriers that when crossed pay out
         cash (calls) and lower barriers than when crossed from above cause a
         cash payout (puts) PLUS the fact that the cash payment can be in
-        domestic or foreign currency. """
+        domestic or foreign currency."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -95,11 +103,13 @@ class FXDigitalOption:
 
         if domestic_curve.value_dt != value_dt:
             raise FinError(
-                "Domestic Curve valuation date not same as valuation date")
+                "Domestic Curve valuation date not same as valuation date"
+            )
 
         if foreign_curve.value_dt != value_dt:
             raise FinError(
-                "Foreign Curve valuation date not same as valuation date")
+                "Foreign Curve valuation date not same as valuation date"
+            )
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -135,17 +145,25 @@ class FXDigitalOption:
             mu = r_d - r_f
             d2 = (ln_s0_k + (mu - v2 / 2.0) * t_del) / den
 
-            if self.option_type == OptionTypes.DIGITAL_CALL and \
-                    self.for_name == self.prem_currency:
-                v = s0 * np.exp(-rf * t_del) * n_vect(d2)
-            elif self.option_type == OptionTypes.DIGITAL_PUT and \
-                    self.for_name == self.prem_currency:
-                v = s0 * np.exp(-rf * t_del) * n_vect(-d2)
-            elif self.option_type == OptionTypes.DIGITAL_CALL and \
-                    self.dom_name == self.prem_currency:
+            if (
+                self.option_type == OptionTypes.DIGITAL_CALL
+                and self.for_name == self.prem_currency
+            ):
+                v = s0 * np.exp(-r_f * t_del) * n_vect(d2)
+            elif (
+                self.option_type == OptionTypes.DIGITAL_PUT
+                and self.for_name == self.prem_currency
+            ):
+                v = s0 * np.exp(-r_f * t_del) * n_vect(-d2)
+            elif (
+                self.option_type == OptionTypes.DIGITAL_CALL
+                and self.dom_name == self.prem_currency
+            ):
                 v = np.exp(-r_d * t_del) * n_vect(d2)
-            elif self.option_type == OptionTypes.DIGITAL_PUT and \
-                    self.dom_name == self.prem_currency:
+            elif (
+                self.option_type == OptionTypes.DIGITAL_PUT
+                and self.dom_name == self.prem_currency
+            ):
                 v = np.exp(-r_d * t_del) * n_vect(-d2)
             else:
                 raise FinError("Unknown option type")
@@ -153,5 +171,6 @@ class FXDigitalOption:
             v = v * self.notional
 
         return v
+
 
 ###############################################################################

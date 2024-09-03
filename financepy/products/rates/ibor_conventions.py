@@ -12,11 +12,9 @@ from ...utils.calendar import CalendarTypes
 ##########################################################################
 
 
-class IborConventions():
+class IborConventions:
 
-    def __init__(self,
-                 currency_name: str,
-                 index_name: str = "LIBOR"):
+    def __init__(self, currency_name: str, index_name: str = "LIBOR"):
 
         if currency_name == "USD" and index_name == "LIBOR":
             self.spot_lag = 2
@@ -28,5 +26,6 @@ class IborConventions():
             self.cal_type = CalendarTypes.TARGET
         else:
             pass
+
 
 ###############################################################################

@@ -5,10 +5,10 @@
 
 ###############################################################################
 
-gDaysInYear = 365.0  # .242
+g_days_in_year = 365.0  # .242
 g_small = 1e-12
-gNotebookMode = False
-gBasisPoint = 1e-4
-gPercent = 1e-2
+g_notebook_mode = False
+g_basis_point = 1e-4
+g_percent = 1e-2
 
 ###############################################################################

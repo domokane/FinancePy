@@ -4,7 +4,8 @@
 
 # THIS IS IN PROGRESS
 from scipy.optimize._differentiable_functions import ScalarFunction
-from numba import njit, boolean, int64, float64, vectorize
+
+# from numba import njit, boolean, int64, float64, vectorize
 import numpy as np
 
 # ******NOTICE***************
@@ -28,8 +29,20 @@ Inf = np.inf
 _epsilon = 1e-20
 
 
-def fmin_cg(f, x0, fprime=None, fargs=(), gtol=1e-5, norm=Inf, epsilon=_epsilon,
-            maxiter=None, full_output=0, disp=1, retall=0, callback=None):
+def fmin_cg(
+    f,
+    x0,
+    fprime=None,
+    fargs=(),
+    gtol=1e-5,
+    norm=Inf,
+    epsilon=_epsilon,
+    maxiter=None,
+    full_output=0,
+    disp=1,
+    retall=0,
+    callback=None,
+):
     """
     Minimize a function using a nonlinear conjugate gradient algorithm.
     Parameters
@@ -163,25 +176,27 @@ def fmin_cg(f, x0, fprime=None, fargs=(), gtol=1e-5, norm=Inf, epsilon=_epsilon,
     >>> res2.x  # minimum found
     array([-1.80851064, -0.25531915])
     """
-    opts = {'gtol': gtol,
-            'norm': norm,
-            'eps': epsilon,
-            'disp': disp,
-            'maxiter': maxiter,
-            'return_all': retall}
+    opts = {
+        "gtol": gtol,
+        "norm": norm,
+        "eps": epsilon,
+        "disp": disp,
+        "maxiter": maxiter,
+        "return_all": retall,
+    }
 
     res = _minimize_cg(f, x0, fargs, fprime, callback=callback, **opts)
 
     if full_output:
-        retlist = res['x'], res['fun'], res['nfev'], res['njev'], res['status']
+        retlist = res["x"], res["fun"], res["nfev"], res["njev"], res["status"]
         if retall:
-            retlist += (res['allvecs'], )
+            retlist += (res["allvecs"],)
         return retlist
     else:
         if retall:
-            return res['x'], res['allvecs']
+            return res["x"], res["allvecs"]
         else:
-            return res['x']
+            return res["x"]
 
 
 def _check_unknown_options(unknown_options):
@@ -193,9 +208,16 @@ def _check_unknown_options(unknown_options):
         print("Unknown solver options")
 
 
-def _prepare_scalar_function(fun, x0, jac=None, args=(), bounds=None,
-                             epsilon=None, finite_diff_rel_step=None,
-                             hess=None):
+def _prepare_scalar_function(
+    fun,
+    x0,
+    jac=None,
+    args=(),
+    bounds=None,
+    epsilon=None,
+    finite_diff_rel_step=None,
+    hess=None,
+):
     """
     Creates a ScalarFunction object for use with scalar minimizers
     (BFGS/LBFGSB/SLSQP/TNC/CG/etc).
@@ -247,17 +269,17 @@ def _prepare_scalar_function(fun, x0, jac=None, args=(), bounds=None,
     """
     if callable(jac):
         grad = jac
-#    elif jac in FD_METHODS:
-#        # epsilon is set to None so that ScalarFunction is made to use
-#        # rel_step
-#        epsilon = None
-#        grad = jac
+    #    elif jac in FD_METHODS:
+    #        # epsilon is set to None so that ScalarFunction is made to use
+    #        # rel_step
+    #        epsilon = None
+    #        grad = jac
     else:
         # default (jac is None) is to do 2-point finite differences with
         # absolute step size. ScalarFunction has to be provided an
         # epsilon value that is not None to use absolute steps. This is
         # normally the case from most _minimize* methods.
-        grad = '2-point'
+        grad = "2-point"
         epsilon = epsilon
 
     if hess is None:
@@ -273,8 +295,16 @@ def _prepare_scalar_function(fun, x0, jac=None, args=(), bounds=None,
 
     # ScalarFunction caches. Reuse of fun(x) during grad
     # calculation reduces overall function evaluations.
-    sf = ScalarFunction(fun, x0, args, grad, hess,
-                        finite_diff_rel_step, bounds, epsilon=epsilon)
+    sf = ScalarFunction(
+        fun,
+        x0,
+        args,
+        grad,
+        hess,
+        finite_diff_rel_step,
+        bounds,
+        epsilon=epsilon,
+    )
 
     return sf
 
@@ -285,11 +315,11 @@ def vecnorm(x, ord=2):
     elif ord == -Inf:
         return np.amin(np.abs(x))
     else:
-        return np.sum(np.abs(x)**ord, axis=0)**(1.0 / ord)
+        return np.sum(np.abs(x) ** ord, axis=0) ** (1.0 / ord)
 
 
 class OptimizeResult(dict):
-    """ Represents the optimization result.
+    """Represents the optimization result.
     Attributes
     ----------
     x : ndarray
@@ -336,8 +366,9 @@ class OptimizeResult(dict):
     def __repr__(self):
         if self.keys():
             m = max(map(len, list(self.keys()))) + 1
-            return '\n'.join([k.rjust(m) + ': ' + repr(v)
-                              for k, v in sorted(self.items())])
+            return "\n".join(
+                [k.rjust(m) + ": " + repr(v) for k, v in sorted(self.items())]
+            )
         else:
             return self.__class__.__name__ + "()"
 
@@ -345,8 +376,9 @@ class OptimizeResult(dict):
         return list(self.keys())
 
 
-def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
-                         **kwargs):
+def _line_search_wolfe12(
+    f, fprime, xk, pk, gfk, old_fval, old_old_fval, **kwargs
+):
     """
     Same as line_search_wolfe1, but fall back to line_search_wolfe2 if
     suitable step length is not found, and raise an exception if a
@@ -357,11 +389,11 @@ def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
         If no suitable step size is found
     """
 
-    extra_condition = kwargs.pop('extra_condition', None)
+    extra_condition = kwargs.pop("extra_condition", None)
 
-    ret = line_search_wolfe1(f, fprime, xk, pk, gfk,
-                             old_fval, old_old_fval,
-                             **kwargs)
+    ret = line_search_wolfe1(
+        f, fprime, xk, pk, gfk, old_fval, old_old_fval, **kwargs
+    )
 
     if ret[0] is not None and extra_condition is not None:
         xp1 = xk + ret[0] * pk
@@ -372,15 +404,22 @@ def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
     if ret[0] is None:
         # line search failed: try different one.
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore', LineSearchWarning)
+            warnings.simplefilter("ignore", LineSearchWarning)
             kwargs2 = {}
-            for key in ('c1', 'c2', 'amax'):
+            for key in ("c1", "c2", "amax"):
                 if key in kwargs:
                     kwargs2[key] = kwargs[key]
-            ret = line_search_wolfe2(f, fprime, xk, pk, gfk,
-                                     old_fval, old_old_fval,
-                                     extra_condition=extra_condition,
-                                     **kwargs2)
+            ret = line_search_wolfe2(
+                f,
+                fprime,
+                xk,
+                pk,
+                gfk,
+                old_fval,
+                old_old_fval,
+                extra_condition=extra_condition,
+                **kwargs2
+            )
 
     if ret[0] is None:
         raise _LineSearchError()
@@ -388,10 +427,21 @@ def _line_search_wolfe12(f, fprime, xk, pk, gfk, old_fval, old_old_fval,
     return ret
 
 
-def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
-                 gtol=1e-5, norm=Inf, eps=_epsilon, maxiter=None,
-                 disp=False, return_all=False, finite_diff_rel_step=None,
-                 **unknown_options):
+def _minimize_cg(
+    fun,
+    x0,
+    args=(),
+    jac=None,
+    callback=None,
+    gtol=1e-5,
+    norm=Inf,
+    eps=_epsilon,
+    maxiter=None,
+    disp=False,
+    return_all=False,
+    finite_diff_rel_step=None,
+    **unknown_options
+):
     """
     Minimization of scalar function of one or more variables using the
     conjugate gradient algorithm.
@@ -428,8 +478,14 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
     if maxiter is None:
         maxiter = len(x0) * 200
 
-    sf = _prepare_scalar_function(fun, x0, jac=jac, args=args, epsilon=eps,
-                                  finite_diff_rel_step=finite_diff_rel_step)
+    sf = _prepare_scalar_function(
+        fun,
+        x0,
+        jac=jac,
+        args=args,
+        epsilon=eps,
+        finite_diff_rel_step=finite_diff_rel_step,
+    )
 
     f = sf.fun
     myfprime = sf.grad
@@ -441,9 +497,11 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
         try:
             old_fval = old_fval.item()
         except (ValueError, AttributeError):
-            raise ValueError("The user-provided "
-                             "objective function must "
-                             "return a scalar value.")
+            raise ValueError(
+                "The user-provided "
+                "objective function must "
+                "return a scalar value."
+            )
 
     k = 0
     xk = x0
@@ -491,10 +549,21 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
             return np.dot(pk, gfk) <= -sigma_3 * np.dot(gfk, gfk)
 
         try:
-            alpha_k, fc, gc, old_fval, old_old_fval, gfkp1 = \
-                _line_search_wolfe12(f, myfprime, xk, pk, gfk, old_fval,
-                                     old_old_fval, c2=0.4, amin=1e-100, amax=1e100,
-                                     extra_condition=descent_condition)
+            alpha_k, fc, gc, old_fval, old_old_fval, gfkp1 = (
+                _line_search_wolfe12(
+                    f,
+                    myfprime,
+                    xk,
+                    pk,
+                    gfk,
+                    old_fval,
+                    old_old_fval,
+                    c2=0.4,
+                    amin=1e-100,
+                    amax=1e100,
+                    extra_condition=descent_condition,
+                )
+            )
         except _LineSearchError:
             # Line search failed to find a better solution.
             warnflag = 2
@@ -505,7 +574,8 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
             alpha_k, xk, pk, gfk, gnorm = cached_step
         else:
             alpha_k, xk, pk, gfk, gnorm = polak_ribiere_powell_step(
-                alpha_k, gfkp1)
+                alpha_k, gfkp1
+            )
 
         if retall:
             allvecs.append(xk)
@@ -515,15 +585,15 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
 
     fval = old_fval
     if warnflag == 2:
-        msg = _status_message['pr_loss']
+        msg = _status_message["pr_loss"]
     elif k >= maxiter:
         warnflag = 1
-        msg = _status_message['maxiter']
+        msg = _status_message["maxiter"]
     elif np.isnan(gnorm) or np.isnan(fval) or np.isnan(xk).any():
         warnflag = 3
-        msg = _status_message['nan']
+        msg = _status_message["nan"]
     else:
-        msg = _status_message['success']
+        msg = _status_message["success"]
 
     if disp:
         print("%s%s" % ("Warning: " if warnflag != 0 else "", msg))
@@ -532,10 +602,17 @@ def _minimize_cg(fun, x0, args=(), jac=None, callback=None,
         print("         Function evaluations: %d" % sf.nfev)
         print("         Gradient evaluations: %d" % sf.ngev)
 
-    result = OptimizeResult(fun=fval, jac=gfk, nfev=sf.nfev,
-                            njev=sf.ngev, status=warnflag,
-                            success=(warnflag == 0), message=msg, x=xk,
-                            nit=k)
+    result = OptimizeResult(
+        fun=fval,
+        jac=gfk,
+        nfev=sf.nfev,
+        njev=sf.ngev,
+        status=warnflag,
+        success=(warnflag == 0),
+        message=msg,
+        x=xk,
+        nit=k,
+    )
     if retall:
-        result['allvecs'] = allvecs
+        result["allvecs"] = allvecs
     return result

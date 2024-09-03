@@ -5,9 +5,9 @@
 
 from .error import FinError
 from .date import Date
-from .calendar import (Calendar, CalendarTypes)
-from .calendar import (BusDayAdjustTypes, DateGenRuleTypes)
-from .frequency import (annual_frequency, FrequencyTypes)
+from .calendar import Calendar, CalendarTypes
+from .calendar import BusDayAdjustTypes, DateGenRuleTypes
+from .frequency import annual_frequency, FrequencyTypes
 from .helpers import label_to_string
 from .helpers import check_argument_types
 
@@ -18,25 +18,27 @@ from .helpers import check_argument_types
 
 
 class Schedule:
-    """ A schedule is a set of dates generated according to ISDA standard
+    """A schedule is a set of dates generated according to ISDA standard
     rules which starts on the next date after the effective date and runs up to
     a termination date. Dates are adjusted to a provided calendar. The zeroth
     element is the previous coupon date (PCD) and the first element is the
     Next Coupon Date (NCD). We reference ISDA 2006."""
 
-    def __init__(self,
-                 effective_dt: Date,  # Also known as the start date
-                 # This is UNADJUSTED (set flag to adjust it)
-                 termination_dt: Date,
-                 freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-                 adjust_termination_dt: bool = True,  # Default is to adjust
-                 end_of_month: bool = False,  # All flow dates are EOM if True
-                 first_dt=None,  # First coupon date
-                 next_to_last_dt=None):  # Penultimate coupon date
-        """ Create Schedule object which calculates a sequence of dates
+    def __init__(
+        self,
+        effective_dt: Date,  # Also known as the start date
+        # This is UNADJUSTED (set flag to adjust it)
+        termination_dt: Date,
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+        adjust_termination_dt: bool = True,  # Default is to adjust
+        end_of_month: bool = False,  # All flow dates are EOM if True
+        first_dt=None,  # First coupon date
+        next_to_last_dt=None,
+    ):  # Penultimate coupon date
+        """Create Schedule object which calculates a sequence of dates
         following the ISDA convention for fixed income products, mainly swaps.
 
         If the date gen rule type is FORWARD we get the unadjusted dates by
@@ -69,7 +71,7 @@ class Schedule:
         Inputs first_dt and next_to_last_dt are for managing long payment
         stubs at the start and end of the swap but *have not yet been
         implemented*. All stubs are currently short, either at the start or
-        end of swap. """
+        end of swap."""
 
         check_argument_types(self.__init__, locals())
 
@@ -86,18 +88,25 @@ class Schedule:
                 self.first_dt = first_dt
                 print("FIRST DATE NOT IMPLEMENTED")  # TODO
             else:
-                raise FinError("First date must be after effective date and" +
-                               " before termination date")
+                raise FinError(
+                    "First date must be after effective date and"
+                    + " before termination date"
+                )
 
         if next_to_last_dt is None:
             self.next_to_last_dt = termination_dt
         else:
-            if next_to_last_dt > effective_dt and next_to_last_dt < termination_dt:
+            if (
+                next_to_last_dt > effective_dt
+                and next_to_last_dt < termination_dt
+            ):
                 self.next_to_last_dt = next_to_last_dt
                 print("NEXT TO LAST DATE NOT IMPLEMENTED")  # TODO
             else:
-                raise FinError("Next to last date must be after effective date and" +
-                               " before termination date")
+                raise FinError(
+                    "Next to last date must be after effective "
+                    + "date and before termination date"
+                )
 
         self.freq_type = freq_type
         self.cal_type = cal_type
@@ -118,7 +127,7 @@ class Schedule:
     ###########################################################################
 
     def schedule_dts(self):
-        """ Returns a list of the schedule of Dates. """
+        """Returns a list of the schedule of Dates."""
 
         if self.adjusted_dts is None:
             self.generate()
@@ -128,9 +137,9 @@ class Schedule:
     ###########################################################################
 
     def generate(self):
-        """ Generate schedule of dates according to specified date generation
+        """Generate schedule of dates according to specified date generation
         rules and also adjust these dates for holidays according to the
-        specified business day convention and the specified calendar. """
+        specified business day convention and the specified calendar."""
 
         calendar = Calendar(self.cal_type)
         frequency = annual_frequency(self.freq_type)
@@ -167,8 +176,9 @@ class Schedule:
             # We adjust all flows after the effective date and before the
             # termination date to fall on business days according to their cal
             for i in range(1, flow_num - 1):
-                dt = calendar.adjust(unadjusted_schedule_dts[flow_num - i - 1],
-                                     self.bd_type)
+                dt = calendar.adjust(
+                    unadjusted_schedule_dts[flow_num - i - 1], self.bd_type
+                )
 
                 self.adjusted_dts.append(dt)
 
@@ -191,8 +201,7 @@ class Schedule:
 
             # The effective date is not adjusted as it is given
             for i in range(1, flow_num):
-                dt = calendar.adjust(unadjusted_schedule_dts[i],
-                                     self.bd_type)
+                dt = calendar.adjust(unadjusted_schedule_dts[i], self.bd_type)
 
                 self.adjusted_dts.append(dt)
 
@@ -206,8 +215,9 @@ class Schedule:
         # We change it if the adjust_termination_dt flag is True.
         if self.adjust_termination_dt is True:
 
-            self.termination_dt = calendar.adjust(self.termination_dt,
-                                                   self.bd_type)
+            self.termination_dt = calendar.adjust(
+                self.termination_dt, self.bd_type
+            )
 
             self.adjusted_dts[-1] = self.termination_dt
 
@@ -239,8 +249,8 @@ class Schedule:
     ###########################################################################
 
     def __repr__(self):
-        """ Print out the details of the schedule and the actual dates. This
-        can be used for providing transparency on schedule calculations. """
+        """Print out the details of the schedule and the actual dates. This
+        can be used for providing transparency on schedule calculations."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EFFECTIVE DATE", self.effective_dt)
@@ -259,16 +269,18 @@ class Schedule:
 
             if len(self.adjusted_dts) > 1:
                 s += "\n"
-                s += label_to_string("FLW", self.adjusted_dts[1:], "",
-                                     list_format=True)
+                s += label_to_string(
+                    "FLW", self.adjusted_dts[1:], "", list_format=True
+                )
 
         return s
 
     ###########################################################################
 
     def _print(self):
-        """ Print out the details of the schedule and the actual dates. This
-        can be used for providing transparency on schedule calculations. """
+        """Print out the details of the schedule and the actual dates. This
+        can be used for providing transparency on schedule calculations."""
         print(self)
+
 
 ###############################################################################

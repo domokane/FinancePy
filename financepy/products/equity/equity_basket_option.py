@@ -26,19 +26,21 @@ from ...utils.math import N
 
 
 class EquityBasketOption:
-    """ A EquityBasketOption is a contract to buy a put or a call option on
+    """A EquityBasketOption is a contract to buy a put or a call option on
     an equally weighted portfolio of different stocks, each with its own price,
     volatility and dividend yield. An analytical and monte-carlo pricing model
-    have been implemented for a European style option. """
+    have been implemented for a European style option."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 strike_price: float,
-                 option_type: OptionTypes,
-                 num_assets: int):
-        """ Define the EquityBasket option by specifying its expiry date,
+    def __init__(
+        self,
+        expiry_dt: Date,
+        strike_price: float,
+        option_type: OptionTypes,
+        num_assets: int,
+    ):
+        """Define the EquityBasket option by specifying its expiry date,
         its strike price, whether it is a put or call, and the number of
-        underlying stocks in the basket. """
+        underlying stocks in the basket."""
 
         check_argument_types(self.__init__, locals())
 
@@ -47,37 +49,39 @@ class EquityBasketOption:
         self.option_type = option_type
         self.num_assets = num_assets
 
-###############################################################################
+    ###########################################################################
 
-    def _validate(self,
-                  stock_prices,
-                  dividend_yields,
-                  volatilities,
-                  correlations):
+    def _validate(
+        self, stock_prices, dividend_yields, volatilities, correlations
+    ):
 
         if len(stock_prices) != self.num_assets:
             raise FinError(
-                "Stock prices must have a length " + str(self.num_assets))
+                "Stock prices must have a length " + str(self.num_assets)
+            )
 
         if len(dividend_yields) != self.num_assets:
             raise FinError(
-                "Dividend yields must have a length " + str(self.num_assets))
+                "Dividend yields must have a length " + str(self.num_assets)
+            )
 
         if len(volatilities) != self.num_assets:
             raise FinError(
-                "Volatilities must have a length " + str(self.num_assets))
+                "Volatilities must have a length " + str(self.num_assets)
+            )
 
         if correlations.ndim != 2:
-            raise FinError(
-                "Correlation must be a 2D matrix ")
+            raise FinError("Correlation must be a 2D matrix ")
 
         if correlations.shape[0] != self.num_assets:
             raise FinError(
-                "Correlation cols must have a length " + str(self.num_assets))
+                "Correlation cols must have a length " + str(self.num_assets)
+            )
 
         if correlations.shape[1] != self.num_assets:
             raise FinError(
-                "correlation rows must have a length " + str(self.num_assets))
+                "correlation rows must have a length " + str(self.num_assets)
+            )
 
         for i in range(0, self.num_assets):
             if correlations[i, i] != 1.0:
@@ -93,19 +97,21 @@ class EquityBasketOption:
                 if correlations[i, j] != correlations[j, i]:
                     raise FinError("Correlation matrix must be symmetric")
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt: Date,
-              stock_prices: np.ndarray,
-              discount_curve: DiscountCurve,
-              dividend_curves: (list),
-              volatilities: np.ndarray,
-              correlations: np.ndarray):
-        """ Basket valuation using a moment matching method to approximate the
+    def value(
+        self,
+        value_dt: Date,
+        stock_prices: np.ndarray,
+        discount_curve: DiscountCurve,
+        dividend_curves: list,
+        volatilities: np.ndarray,
+        correlations: np.ndarray,
+    ):
+        """Basket valuation using a moment matching method to approximate the
         effective variance of the underlying basket value. This approach is
         able to handle a full rank correlation structure between the individual
-        assets. """
+        assets."""
 
         t_exp = (self.expiry_dt - value_dt) / gDaysInYear
 
@@ -120,10 +126,7 @@ class EquityBasketOption:
         v = volatilities
         s = stock_prices
 
-        self._validate(stock_prices,
-                       qs,
-                       volatilities,
-                       correlations)
+        self._validate(stock_prices, qs, volatilities, correlations)
 
         a = np.ones(self.num_assets) * (1.0 / self.num_assets)
 
@@ -177,22 +180,24 @@ class EquityBasketOption:
 
         return v
 
-###############################################################################
+    ###########################################################################
 
-    def value_mc(self,
-                 value_dt: Date,
-                 stock_prices: np.ndarray,
-                 discount_curve: DiscountCurve,
-                 dividend_curves: (list),
-                 volatilities: np.ndarray,
-                 corr_matrix: np.ndarray,
-                 num_paths: int = 10000,
-                 seed: int = 4242):
-        """ Valuation of the EquityBasketOption using a Monte-Carlo simulation
+    def value_mc(
+        self,
+        value_dt: Date,
+        stock_prices: np.ndarray,
+        discount_curve: DiscountCurve,
+        dividend_curves: list,
+        volatilities: np.ndarray,
+        corr_matrix: np.ndarray,
+        num_paths: int = 10000,
+        seed: int = 4242,
+    ):
+        """Valuation of the EquityBasketOption using a Monte-Carlo simulation
         of stock prices assuming a GBM distribution. Cholesky decomposition is
         used to handle a full rank correlation structure between the individual
         assets. The num_paths and seed are pre-set to default values but can be
-        overwritten. """
+        overwritten."""
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
@@ -207,15 +212,14 @@ class EquityBasketOption:
             q = -np.log(dq) / t_exp
             dividend_yields.append(q)
 
-        self._validate(stock_prices,
-                       dividend_yields,
-                       volatilities,
-                       corr_matrix)
+        self._validate(
+            stock_prices, dividend_yields, volatilities, corr_matrix
+        )
 
         num_assets = len(stock_prices)
 
         df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df)/t_exp
+        r = -np.log(df) / t_exp
 
         mus = r - dividend_yields
         k = self.strike_price
@@ -225,15 +229,17 @@ class EquityBasketOption:
         model = FinGBMProcess()
         np.random.seed(seed)
 
-        s_all = model.get_paths_assets(num_assets,
-                                       num_paths,
-                                       num_time_steps,
-                                       t_exp,
-                                       mus,
-                                       stock_prices,
-                                       volatilities,
-                                       corr_matrix,
-                                       seed)
+        s_all = model.get_paths_assets(
+            num_assets,
+            num_paths,
+            num_time_steps,
+            t_exp,
+            mus,
+            stock_prices,
+            volatilities,
+            corr_matrix,
+            seed,
+        )
 
         if self.option_type == OptionTypes.EUROPEAN_CALL:
             payoff = np.maximum(np.mean(s_all, axis=1) - k, 0.0)
@@ -246,7 +252,7 @@ class EquityBasketOption:
         v = payoff * np.exp(-r * t_exp)
         return v
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -256,10 +262,11 @@ class EquityBasketOption:
         s += label_to_string("NUM ASSETS", self.num_assets, "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

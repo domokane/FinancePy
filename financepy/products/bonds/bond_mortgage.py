@@ -21,25 +21,28 @@ class BondMortgageTypes(Enum):
     REPAYMENT = 1
     INTEREST_ONLY = 2
 
+
 ###############################################################################
 
 
 class BondMortgage:
-    """ A mortgage is a vector of dates and flows generated in order to repay
+    """A mortgage is a vector of dates and flows generated in order to repay
     a fixed amount given a known interest rate. Payments are all the same
     amount but with a varying mixture of interest and repayment of principal.
     """
 
-    def __init__(self,
-                 start_dt: Date,
-                 end_dt: Date,
-                 principal: float,
-                 freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-                 dc_type: DayCountTypes = DayCountTypes.ACT_360):
-        """ Create the mortgage using start and end dates and principal. """
+    def __init__(
+        self,
+        start_dt: Date,
+        end_dt: Date,
+        principal: float,
+        freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+    ):
+        """Create the mortgage using start and end dates and principal."""
 
         check_argument_types(self.__init__, locals())
 
@@ -55,12 +58,14 @@ class BondMortgage:
         self.dg_type = dg_type
         self.dc_type = dc_type
 
-        self.schedule = Schedule(start_dt,
-                                  end_dt,
-                                  self.freq_type,
-                                  self.cal_type,
-                                  self.bd_type,
-                                  self.dg_type)
+        self.schedule = Schedule(
+            start_dt,
+            end_dt,
+            self.freq_type,
+            self.cal_type,
+            self.bd_type,
+            self.dg_type,
+        )
 
         self.mortgage_type = None
         self.interest_flows = None
@@ -68,26 +73,25 @@ class BondMortgage:
         self.principal_remaining = None
         self.total_flows = None
 
-###############################################################################
+    ###########################################################################
 
-    def repayment_amount(self,
-                         zero_rate: float):
-        """ Determine monthly repayment amount based on current zero rate. """
+    def repayment_amount(self, zero_rate: float):
+        """Determine monthly repayment amount based on current zero rate."""
 
         frequency = annual_frequency(self.freq_type)
 
         num_flows = len(self.schedule.adjusted_dts)
-        p = (1.0 + zero_rate/frequency) ** (num_flows-1)
+        p = (1.0 + zero_rate / frequency) ** (num_flows - 1)
         m = zero_rate * p / (p - 1.0) / frequency
         m = m * self.principal
         return m
 
-###############################################################################
+    ###########################################################################
 
-    def generate_flows(self,
-                       zero_rate: float,
-                       mortgage_type: BondMortgageTypes):
-        """ Generate the bond flow amounts. """
+    def generate_flows(
+        self, zero_rate: float, mortgage_type: BondMortgageTypes
+    ):
+        """Generate the bond flow amounts."""
 
         self.mortgage_type = mortgage_type
         self.interest_flows = [0]
@@ -115,7 +119,7 @@ class BondMortgage:
             self.principal_remaining.append(principal)
             self.total_flows.append(monthly_flow)
 
-###############################################################################
+    ###########################################################################
 
     def print_leg(self):
         print("START DATE:", self.start_dt)
@@ -128,20 +132,25 @@ class BondMortgage:
 
         num_flows = len(self.schedule.adjusted_dts)
 
-        print("%15s %12s %12s %12s %12s" %
-              ("PAYMENT DATE", "INTEREST", "PRINCIPAL",
-               "OUTSTANDING", "TOTAL"))
+        print(
+            "%15s %12s %12s %12s %12s"
+            % ("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING", "TOTAL")
+        )
 
         print("")
         for i in range(0, num_flows):
-            print("%15s %12.2f %12.2f %12.2f %12.2f" %
-                  (self.schedule.adjusted_dts[i],
-                   self.interest_flows[i],
-                   self.principal_flows[i],
-                   self.principal_remaining[i],
-                   self.total_flows[i]))
+            print(
+                "%15s %12.2f %12.2f %12.2f %12.2f"
+                % (
+                    self.schedule.adjusted_dts[i],
+                    self.interest_flows[i],
+                    self.principal_flows[i],
+                    self.principal_remaining[i],
+                    self.total_flows[i],
+                )
+            )
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -154,10 +163,11 @@ class BondMortgage:
         s += label_to_string("DATEGENRULE", self.dg_type)
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

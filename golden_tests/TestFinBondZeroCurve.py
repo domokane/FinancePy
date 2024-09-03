@@ -4,10 +4,9 @@
 
 import os
 import sys
-sys.path.append("..")
-
 import datetime as dt
 
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.bond import Bond

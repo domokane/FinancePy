@@ -8,6 +8,8 @@ import os
 import sys
 sys.path.append("..")
 
+import pandas as pd
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegelSvensson
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegel
@@ -20,7 +22,6 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
 
-
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
@@ -31,7 +32,6 @@ def test_BondYieldCurve():
 
     ###########################################################################
 
-    import pandas as pd
     path = os.path.join(os.path.dirname(__file__), './data/gilt_bond_prices.txt')
     bondDataFrame = pd.read_csv(path, sep='\t')
     bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])

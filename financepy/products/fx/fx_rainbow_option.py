@@ -66,17 +66,19 @@ def payoff_value(s, payoff_typeValue, payoff_params):
 ###############################################################################
 
 
-def value_mc_fast(t,
-                  stock_prices,
-                  discount_curve,
-                  dividend_yields,
-                  volatilities,
-                  betas,
-                  num_assets,
-                  payoff_type,
-                  payoff_params,
-                  num_paths=10000,
-                  seed=4242):
+def value_mc_fast(
+    t,
+    stock_prices,
+    discount_curve,
+    dividend_yields,
+    volatilities,
+    betas,
+    num_assets,
+    payoff_type,
+    payoff_params,
+    num_paths=10000,
+    seed=4242,
+):
 
     np.random.seed(seed)
     df = discount_curve.df(t)
@@ -85,24 +87,36 @@ def value_mc_fast(t,
     model = FinGBMProcess()
 
     num_time_steps = 2
-    s_all = model.get_paths_assets(num_assets, num_paths, num_time_steps,
-                                   t, mus, stock_prices, volatilities, betas, seed)
+    s_all = model.get_paths_assets(
+        num_assets,
+        num_paths,
+        num_time_steps,
+        t,
+        mus,
+        stock_prices,
+        volatilities,
+        betas,
+        seed,
+    )
 
     payoff = payoff_value(s_all, payoff_type.value, payoff_params)
     payoff = np.mean(payoff)
     v = payoff * np.exp(-r * t)
     return v
 
+
 ###############################################################################
 
 
 class FXRainbowOption(FXOption):
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 payoff_type: FXRainbowOptionTypes,
-                 payoff_params: List[float],
-                 num_assets: int):
+    def __init__(
+        self,
+        expiry_dt: Date,
+        payoff_type: FXRainbowOptionTypes,
+        payoff_params: List[float],
+        num_assets: int,
+    ):
 
         check_argument_types(self.__init__, locals())
 
@@ -113,35 +127,34 @@ class FXRainbowOption(FXOption):
         self.payoff_params = payoff_params
         self.num_assets = num_assets
 
-    ###############################################################################
+    ###########################################################################
 
-    def validate(self,
-                 stock_prices,
-                 dividend_yields,
-                 volatilities,
-                 betas):
+    def validate(self, stock_prices, dividend_yields, volatilities, betas):
 
         if len(stock_prices) != self.num_assets:
             raise FinError(
                 "Stock prices must be a vector of length "
-                + str(self.num_assets))
+                + str(self.num_assets)
+            )
 
         if len(dividend_yields) != self.num_assets:
             raise FinError(
                 "Dividend yields must be a vector of length "
-                + str(self.num_assets))
+                + str(self.num_assets)
+            )
 
         if len(volatilities) != self.num_assets:
             raise FinError(
                 "Volatilities must be a vector of length "
-                + str(self.num_assets))
+                + str(self.num_assets)
+            )
 
         if len(betas) != self.num_assets:
             raise FinError(
-                "Betas must be a vector of length "
-                + str(self.num_assets))
+                "Betas must be a vector of length " + str(self.num_assets)
+            )
 
-    ###############################################################################
+    ###########################################################################
 
     def validate_payoff(self, payoff_type, payoff_params, num_assets):
 
@@ -164,26 +177,31 @@ class FXRainbowOption(FXOption):
 
         if len(payoff_params) != num_params:
             raise FinError(
-                "Number of parameters required for " +
-                str(payoff_type) +
-                " must be " +
-                str(num_params))
+                "Number of parameters required for "
+                + str(payoff_type)
+                + " must be "
+                + str(num_params)
+            )
 
-        if payoff_type == FXRainbowOptionTypes.CALL_ON_NTH \
-                or payoff_type == FXRainbowOptionTypes.PUT_ON_NTH:
+        if (
+            payoff_type == FXRainbowOptionTypes.CALL_ON_NTH
+            or payoff_type == FXRainbowOptionTypes.PUT_ON_NTH
+        ):
             n = payoff_params[0]
             if n < 1 or n > num_assets:
                 raise FinError("Nth parameter must be 1 to " + str(num_assets))
 
     ###########################################################################
 
-    def value(self,
-              value_dt,
-              stock_prices,
-              domestic_curve,
-              foreign_curve,
-              volatilities,
-              betas):
+    def value(
+        self,
+        value_dt,
+        stock_prices,
+        domestic_curve,
+        foreign_curve,
+        volatilities,
+        betas,
+    ):
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -193,11 +211,13 @@ class FXRainbowOption(FXOption):
 
         if domestic_curve.value_dt != value_dt:
             raise FinError(
-                "Domestic Curve valuation date not same as option value date")
+                "Domestic Curve valuation date not same as option value date"
+            )
 
         if foreign_curve.value_dt != value_dt:
             raise FinError(
-                "Foreign Curve valuation date not same as option value date")
+                "Foreign Curve valuation date not same as option value date"
+            )
 
         if self.num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -205,10 +225,7 @@ class FXRainbowOption(FXOption):
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        self.validate(stock_prices,
-                      foreign_curve,
-                      volatilities,
-                      betas)
+        self.validate(stock_prices, foreign_curve, volatilities, betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self.expiry_dt - value_dt) / gDaysInYear
@@ -239,63 +256,77 @@ class FXRainbowOption(FXOption):
         sqrtt = np.sqrt(t)
 
         if self.payoff_type == FXRainbowOptionTypes.CALL_ON_MAXIMUM:
-            v = s1 * dq1 * M(y1, d, rho1) + s2 * dq2 * M(y2, -d + v * sqrtt, rho2) \
-                - k * df * \
-                (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
+            v = (
+                s1 * dq1 * M(y1, d, rho1)
+                + s2 * dq2 * M(y2, -d + v * sqrtt, rho2)
+                - k
+                * df
+                * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
+            )
         elif self.payoff_type == FXRainbowOptionTypes.CALL_ON_MINIMUM:
-            v = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * np.sqrt(t), -rho2) \
+            v = (
+                s1 * dq1 * M(y1, -d, -rho1)
+                + s2 * dq2 * M(y2, d - v * np.sqrt(t), -rho2)
                 - k * df * M(y1 - v1 * np.sqrt(t), y2 - v2 * np.sqrt(t), rho)
+            )
         elif self.payoff_type == FXRainbowOptionTypes.PUT_ON_MAXIMUM:
             cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrtt)
-            cmax2 = s1 * dq1 * M(y1, d, rho1) \
-                + s2 * dq2 * M(y2, -d + v * sqrtt, rho2) \
+            cmax2 = (
+                s1 * dq1 * M(y1, d, rho1)
+                + s2 * dq2 * M(y2, -d + v * sqrtt, rho2)
                 - k * df * (1.0 - M(-y1 + v1 * sqrtt, -y2 + v2 * sqrtt, rho))
+            )
             v = k * df - cmax1 + cmax2
         elif self.payoff_type == FXRainbowOptionTypes.PUT_ON_MINIMUM:
             cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrtt)
-            cmin2 = s1 * dq1 * M(y1, -d, -rho1) + s2 * dq2 * M(y2, d - v * sqrtt, -rho2) - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt,
-                                                                                                      rho)
+            cmin2 = (
+                s1 * dq1 * M(y1, -d, -rho1)
+                + s2 * dq2 * M(y2, d - v * sqrtt, -rho2)
+                - k * df * M(y1 - v1 * sqrtt, y2 - v2 * sqrtt, rho)
+            )
             v = k * df - cmin1 + cmin2
         else:
             raise FinError("Unsupported FX Rainbow option type")
 
         return v
 
-    ###############################################################################
+    ###########################################################################
 
-    def value_mc(self,
-                 value_dt,
-                 expiry_dt,
-                 stock_prices,
-                 discount_curve,
-                 dividend_yields,
-                 volatilities,
-                 betas,
-                 num_paths=10000,
-                 seed=4242):
+    def value_mc(
+        self,
+        value_dt,
+        expiry_dt,
+        stock_prices,
+        discount_curve,
+        dividend_yields,
+        volatilities,
+        betas,
+        num_paths=10000,
+        seed=4242,
+    ):
 
-        self.validate(stock_prices,
-                      dividend_yields,
-                      volatilities,
-                      betas)
+        self.validate(stock_prices, dividend_yields, volatilities, betas)
 
         if value_dt > expiry_dt:
             raise FinError("Value date after expiry date.")
 
         t = (self.expiry_dt - value_dt) / gDaysInYear
 
-        v = value_mc_fast(t,
-                          stock_prices,
-                          discount_curve,
-                          dividend_yields,
-                          volatilities,
-                          betas,
-                          self.num_assets,
-                          self.payoff_type,
-                          self.payoff_params,
-                          num_paths,
-                          seed)
+        v = value_mc_fast(
+            t,
+            stock_prices,
+            discount_curve,
+            dividend_yields,
+            volatilities,
+            betas,
+            self.num_assets,
+            self.payoff_type,
+            self.payoff_params,
+            num_paths,
+            seed,
+        )
 
         return v
+
 
 ###############################################################################

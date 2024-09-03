@@ -2,11 +2,12 @@
 # Some code to convert output to latex tables
 ###############################################################################
 
+
 def convertToLatexTable(txt, sep=" ", header_list=[]):
 
     num_header_cols = len(header_list)
 
-    txt = txt.replace("_", "\_")
+    txt = txt.replace("_", r"\_")
     txt = txt.replace("\t", "")
     txt = txt.replace("      ", " ")
     txt = txt.replace("     ", " ")
@@ -27,7 +28,7 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
         header_str = header_list[0]
         for i in range(1, num_header_cols):
             header_str += " & " + header_list[i]
-        header_str += "\\\ \n"
+        header_str += r"\\\ \n"
         table_str += header_str
 
     rows = txt.split("\n")
@@ -43,22 +44,26 @@ def convertToLatexTable(txt, sep=" ", header_list=[]):
 
         if num_header_cols > 0:
             if num_cols != num_header_cols:
-                print("Num row cols " + str(num_cols) +
-                      " is not the same as the number of header cols "
-                      + str(num_header_cols))
+                print(
+                    "Num row cols "
+                    + str(num_cols)
+                    + " is not the same as the number of header cols "
+                    + str(num_header_cols)
+                )
                 return ""
 
         col_str = cols[0]
         for j in range(1, num_cols):
             col_str += " & " + cols[j]
 
-        table_str += col_str + "\\\ \n"
+        table_str += col_str + r"\\\ \n"
 
-    table_str += "\end{tabular}\n"
-    table_str += "\end{center}\n"
-    table_str += "\end{table}\n"
+    table_str += r"\end{tabular}\n"
+    table_str += r"\end{center}\n"
+    table_str += r"\end{table}\n"
 
     return table_str
+
 
 ###############################################################################
 

@@ -25,8 +25,8 @@ SWAP_TOL = 1e-10
 
 
 def _fois(oir, *args):
-    """ Extract the implied overnight index rate assuming it is flat over
-    period in question. """
+    """Extract the implied overnight index rate assuming it is flat over
+    period in question."""
 
     target_ois_rate = args[0]
     day_counter = args[1]
@@ -47,11 +47,12 @@ def _fois(oir, *args):
     diff = ois_rate - target_ois_rate
     return diff
 
+
 ###############################################################################
 
 
 def _f(df, *args):
-    """ Root search objective function for OIS """
+    """Root search objective function for OIS"""
 
     curve = args[0]
     value_dt = args[1]
@@ -66,11 +67,12 @@ def _f(df, *args):
     v_swap /= notional
     return v_swap
 
+
 ###############################################################################
 
 
 def _g(df, *args):
-    """ Root search objective function for swaps """
+    """Root search objective function for swaps"""
     curve = args[0]
     value_dt = args[1]
     fra = args[2]
@@ -83,11 +85,12 @@ def _g(df, *args):
     v_fra /= fra.notional
     return v_fra
 
+
 ###############################################################################
 
 
 class OISCurve(DiscountCurve):
-    """ Constructs a discount curve as implied by the prices of Overnight
+    """Constructs a discount curve as implied by the prices of Overnight
     Index Rate swaps. The curve date is the date on which we are
     performing the valuation based on the information available on the
     curve date. Typically it is the date on which an amount of 1 unit paid
@@ -99,16 +102,18 @@ class OISCurve(DiscountCurve):
     reason I call it a one-curve.
     """
 
-###############################################################################
+    ###############################################################################
 
-    def __init__(self,
-                 value_dt: Date,
-                 ois_deposits: list,
-                 ois_fras: list,
-                 ois_swaps: list,
-                 interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-                 check_refit: bool = False):  # Set to True to test it works
-        """ Create an instance of an overnight index rate swap curve given a
+    def __init__(
+        self,
+        value_dt: Date,
+        ois_deposits: list,
+        ois_fras: list,
+        ois_swaps: list,
+        interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        check_refit: bool = False,
+    ):  # Set to True to test it works
+        """Create an instance of an overnight index rate swap curve given a
         valuation date and a set of OIS rates. Some of these may
         be left None and the algorithm will just use what is provided. An
         interpolation method has also to be provided. The default is to use a
@@ -127,20 +132,17 @@ class OISCurve(DiscountCurve):
         self._interpolator = None
         self._build_curve()
 
-###############################################################################
+    ###############################################################################
 
     def _build_curve(self):
-        """ Build curve based on interpolation. """
+        """Build curve based on interpolation."""
 
         self._build_curve_using_1d_solver()
 
-###############################################################################
+    ###############################################################################
 
-    def _validate_inputs(self,
-                         ois_deposits,
-                         ois_fras,
-                         ois_swaps):
-        """ Validate the inputs for each of the Libor products. """
+    def _validate_inputs(self, ois_deposits, ois_fras, ois_swaps):
+        """Validate the inputs for each of the Libor products."""
 
         num_depos = len(ois_deposits)
         num_fras = len(ois_fras)
@@ -240,15 +242,15 @@ class OISCurve(DiscountCurve):
                 prev_dt = next_dt
 
         # TODO: REINSTATE THESE CHECKS ?
-            # Swaps must have same cash flows for linear swap bootstrap to work
-#            longest_swap = ois_swaps[-1]
-#            longest_swapCpnDates = longest_swap.adjusted_fixed_dts
-#            for swap in ois_swaps[0:-1]:
-#                swapCpnDates = swap.adjusted_fixed_dts
-#                num_flows = len(swapCpnDates)
-#                for i_flow in range(0, num_flows):
-#                    if swapCpnDates[i_flow] != longest_swapCpnDates[i_flow]:
-#                        raise FinError("Swap cpns are not on the same date grid.")
+        # Swaps must have same cash flows for linear swap bootstrap to work
+        #            longest_swap = ois_swaps[-1]
+        #            longest_swapCpnDates = longest_swap.adjusted_fixed_dts
+        #            for swap in ois_swaps[0:-1]:
+        #                swapCpnDates = swap.adjusted_fixed_dts
+        #                num_flows = len(swapCpnDates)
+        #                for i_flow in range(0, num_flows):
+        #                    if swapCpnDates[i_flow] != longest_swapCpnDates[i_flow]:
+        #                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -308,13 +310,13 @@ class OISCurve(DiscountCurve):
         else:
             self.dc_type = None
 
-###############################################################################
+    ###############################################################################
 
     def _build_curve_using_1d_solver(self):
-        """ Construct the discount curve using a bootstrap approach. This is
+        """Construct the discount curve using a bootstrap approach. This is
         the non-linear slower method that allows the user to choose a number
         of interpolation approaches between the swap rates and other rates. It
-        involves the use of a solver. """
+        involves the use of a solver."""
 
         self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
@@ -353,9 +355,15 @@ class OISCurve(DiscountCurve):
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
                 argtuple = (self, self.value_dt, fra)
-                df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
-                                         args=argtuple, tol=SWAP_TOL,
-                                         maxiter=50, fprime2=None)
+                df_mat = optimize.newton(
+                    _g,
+                    x0=df_mat,
+                    fprime=None,
+                    args=argtuple,
+                    tol=SWAP_TOL,
+                    maxiter=50,
+                    fprime2=None,
+                )
 
         for swap in self.used_swaps:
             # I use the lastPaymentDate in case a date has been adjusted fwd
@@ -368,19 +376,26 @@ class OISCurve(DiscountCurve):
 
             argtuple = (self, self.value_dt, swap)
 
-            df_mat = optimize.newton(_f, x0=df_mat, fprime=None, args=argtuple,
-                                     tol=SWAP_TOL, maxiter=50, fprime2=None,
-                                     full_output=False)
+            df_mat = optimize.newton(
+                _f,
+                x0=df_mat,
+                fprime=None,
+                args=argtuple,
+                tol=SWAP_TOL,
+                maxiter=50,
+                fprime2=None,
+                full_output=False,
+            )
 
         if self.check_refit is True:
             self.check_refits(1e-10, SWAP_TOL, 1e-5)
 
-###############################################################################
+    ###############################################################################
 
     def _build_curve_linear_swap_rate_interpolation(self):
-        """ Construct the discount curve using a bootstrap approach. This is
+        """Construct the discount curve using a bootstrap approach. This is
         the linear swap rate method that is fast and exact as it does not
-        require the use of a solver. It is also market standard. """
+        require the use of a solver. It is also market standard."""
 
         self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
@@ -421,9 +436,15 @@ class OISCurve(DiscountCurve):
                 self._interpolator.fit(self._times, self._dfs)
 
                 argtuple = (self, self.value_dt, fra)
-                df_mat = optimize.newton(_g, x0=df_mat, fprime=None,
-                                         args=argtuple, tol=SWAP_TOL,
-                                         maxiter=50, fprime2=None)
+                df_mat = optimize.newton(
+                    _g,
+                    x0=df_mat,
+                    fprime=None,
+                    args=argtuple,
+                    tol=SWAP_TOL,
+                    maxiter=50,
+                    fprime2=None,
+                )
 
         if len(self.used_swaps) == 0:
             if self.check_refit is True:
@@ -494,7 +515,7 @@ class OISCurve(DiscountCurve):
         for i in range(1, start_index):
             dt = cpn_dts[i]
             df = self.df(dt)
-            acc = accrual_factors[i-1]
+            acc = accrual_factors[i - 1]
             pv01 += acc * df
 
         for i in range(start_index, num_flows):
@@ -502,8 +523,8 @@ class OISCurve(DiscountCurve):
             dt = cpn_dts[i]
             t_mat = (dt - self.value_dt) / gDaysInYear
             swap_rate = interpolated_swap_rates[i]
-            acc = accrual_factors[i-1]
-            pv01_end = (acc * swap_rate + 1.0)
+            acc = accrual_factors[i - 1]
+            pv01_end = acc * swap_rate + 1.0
 
             df_mat = (df_settle - swap_rate * pv01) / pv01_end
 
@@ -516,10 +537,10 @@ class OISCurve(DiscountCurve):
         if self.check_refit is True:
             self.check_refits(1e-10, SWAP_TOL, 1e-5)
 
-###############################################################################
+    ###############################################################################
 
     def _check_refits(self, depo_tol, fra_tol, swap_tol):
-        """ Ensure that the Libor curve refits the calibration instruments. """
+        """Ensure that the Libor curve refits the calibration instruments."""
 
         for fra in self.used_fras:
             v = fra.value(self.value_dt, self) / fra.notional
@@ -529,17 +550,20 @@ class OISCurve(DiscountCurve):
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap.effective_dt, self,
-                           self, None, principal=0.0)
+            v = swap.value(swap.effective_dt, self, self, None, principal=0.0)
             v = v / swap.notional
             if abs(v) > swap_tol:
-                print("Swap with maturity " + str(swap.maturity_dt)
-                      + " Not Repriced. Has Value", v)
+                print(
+                    "Swap with maturity "
+                    + str(swap.maturity_dt)
+                    + " Not Repriced. Has Value",
+                    v,
+                )
                 swap.print_fixed_leg_pv()
                 swap.print_float_leg_pv()
                 raise FinError("Swap not repriced.")
 
-###############################################################################
+    ###############################################################################
 
     # def overnight_rate(self,
     #                   settle_dt: Date,
@@ -597,10 +621,10 @@ class OISCurve(DiscountCurve):
     #     else:
     #         return par_rates
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
-        """ Print out the details of the Libor curve. """
+        """Print out the details of the Libor curve."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUATION DATE", self.value_dt)
@@ -623,15 +647,17 @@ class OISCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string("% 10.6f" % self._times[i],
-                                 "%12.10f" % self._dfs[i])
+            s += label_to_string(
+                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
+            )
 
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

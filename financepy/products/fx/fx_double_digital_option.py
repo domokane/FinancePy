@@ -9,32 +9,35 @@ from ...utils.math import n_vect  # n_prime_vect
 
 from ...utils.global_vars import gDaysInYear
 from ...utils.error import FinError
+
 # from ...products.equity.EquityOption import FinOption
 from ...utils.date import Date
+
 # from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
-from ...utils.global_types import OptionTypes
 
 
 class FXDoubleDigitalOption:
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 upper_strike: (float, np.ndarray),
-                 lower_strike: (float, np.ndarray),
-                 currency_pair: str,  # FORDOM
-                 notional: float,
-                 prem_currency: str,
-                 spot_days: int = 0):
-        """ Create the FX Double Digital Option object. Inputs include
+    def __init__(
+        self,
+        expiry_dt: Date,
+        upper_strike: (float, np.ndarray),
+        lower_strike: (float, np.ndarray),
+        currency_pair: str,  # FORDOM
+        notional: float,
+        prem_currency: str,
+        spot_days: int = 0,
+    ):
+        """Create the FX Double Digital Option object. Inputs include
         expiry date, upper strike, lower strike, currency pair,
         option type notional and the currency of the notional.
         An adjustment for spot days is enabled. All currency rates
         must be entered in the price in domestic currency of one unit
         of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the
-        same for the domestic currency. """
+        same for the domestic currency."""
 
         check_argument_types(self.__init__, locals())
 
@@ -71,20 +74,22 @@ class FXDoubleDigitalOption:
 
         self.spot_days = spot_days
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt,
-              spot_fx_rate,  # 1 unit of foreign in domestic
-              domestic_curve,
-              foreign_curve,
-              model):
-        """ Valuation of a double digital option using Black-Scholes model.
+    def value(
+        self,
+        value_dt,
+        spot_fx_rate,  # 1 unit of foreign in domestic
+        domestic_curve,
+        foreign_curve,
+        model,
+    ):
+        """Valuation of a double digital option using Black-Scholes model.
         The option pays out the notional in the premium currency if the
         fx rate is between the upper and lower strike at maturity. The
         valuation is equivalent to the valuation of the difference of
         the value of two digital puts, one with the upper and the other
-        with the lower strike """
+        with the lower strike"""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -94,11 +99,13 @@ class FXDoubleDigitalOption:
 
         if domestic_curve.value_dt != value_dt:
             raise FinError(
-                "Domestic Curve valuation date not same as valuation date")
+                "Domestic Curve valuation date not same as valuation date"
+            )
 
         if foreign_curve.value_dt != value_dt:
             raise FinError(
-                "Foreign Curve valuation date not same as valuation date")
+                "Foreign Curve valuation date not same as valuation date"
+            )
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -148,5 +155,6 @@ class FXDoubleDigitalOption:
             v = (upper_digital - lower_digital) * self.notional
 
         return v
+
 
 ###############################################################################

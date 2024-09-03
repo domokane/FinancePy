@@ -21,21 +21,23 @@ from ...products.rates.ibor_fra import IborFRA
 
 
 class IborFuture:
-    """ Class for managing short term interest rate futures contracts. """
+    """Class for managing short term interest rate futures contracts."""
 
     # Reference
     # https://www.cmegroup.com/education/files/eurodollar-futures-the-basics-file01.pdf
 
-    def __init__(self,
-                 today_dt: Date,
-                 future_number: int,  # The number of the future after today_dt
-                 futureTenor: str = "3M",  # '1M', '2M', '3M'
-                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
-                 contract_size: float = ONE_MILLION):
-        """ Create an interest rate futures contract which has the same
+    def __init__(
+        self,
+        today_dt: Date,
+        future_number: int,  # The number of the future after today_dt
+        futureTenor: str = "3M",  # '1M', '2M', '3M'
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        contract_size: float = ONE_MILLION,
+    ):
+        """Create an interest rate futures contract which has the same
         conventions as those traded on the CME. The current _dt, the tenor of
         the future, the number of the future and the accrual convention and
-        the contract size should be provided. """
+        the contract size should be provided."""
 
         check_argument_types(self.__init__, locals())
 
@@ -56,51 +58,53 @@ class IborFuture:
         self.dc_type = dc_type
         self.contract_size = contract_size
 
-###############################################################################
+    ###########################################################################
 
     def to_fra(self, futures_price, convexity):
-        """ Convert the futures contract to a IborFRA object so it can be
+        """Convert the futures contract to a IborFRA object so it can be
         used to boostrap a Ibor curve. For this we need to adjust the futures
-        rate using the convexity correction. """
+        rate using the convexity correction."""
 
         fra_rate = self.fra_rate(futures_price, convexity)
 
-        fra = IborFRA(self.delivery_dt,
-                      self.end_of_interest_period,
-                      fra_rate,
-                      self.dc_type,
-                      notional=self.contract_size,
-                      pay_fixed_rate=False)
+        fra = IborFRA(
+            self.delivery_dt,
+            self.end_of_interest_period,
+            fra_rate,
+            self.dc_type,
+            notional=self.contract_size,
+            pay_fixed_rate=False,
+        )
 
         return fra
 
-###############################################################################
+    ###########################################################################
 
     def futures_rate(self, futures_price):
-        """ Calculate implied futures rate from the futures price."""
+        """Calculate implied futures rate from the futures price."""
         futures_rate = (100.0 - futures_price) / 100.0
         return futures_rate
 
-###############################################################################
+    ###########################################################################
 
     def fra_rate(self, futures_price, convexity):
-        """ Convert futures price and convexity to a FRA rate using the BBG
+        """Convert futures price and convexity to a FRA rate using the BBG
         negative convexity (in percent). This is then divided by 100 before
-        being added to the futures rate. """
+        being added to the futures rate."""
 
         futRate = (100.0 - futures_price) / 100.0
 
         if convexity < 0:
-            fra_rate = futRate + convexity/100.0
+            fra_rate = futRate + convexity / 100.0
         else:
-            fra_rate = futRate - convexity/100.0
+            fra_rate = futRate - convexity / 100.0
 
         return fra_rate
 
-###############################################################################
+    ###########################################################################
 
     def convexity(self, value__dt, volatility, mean_reversion):
-        """ Calculation of the convexity adjustment between FRAs and interest
+        """Calculation of the convexity adjustment between FRAs and interest
         rate futures using the Hull-White model as described in technical note
         in link below:
         http://www-2.rotman.utoronto.ca/~hull/TechnicalNotes/TechnicalNote1.pdf
@@ -129,17 +133,20 @@ class IborFuture:
 
         return c
 
-##########################################################################
+    ###########################################################################
 
     def __repr__(self):
-        """ Print a list of the unadjusted coupon payment _dts used in
-        analytic calculations for the bond. """
+        """Print a list of the unadjusted coupon payment _dts used in
+        analytic calculations for the bond."""
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("LAST TRADING DATE", self.last_trading_dt)
         s += label_to_string("DELIVERY DATE", self.delivery_dt)
-        s += label_to_string("END INTEREST PERIOD", self.end_of_interest_period)
+        s += label_to_string(
+            "END INTEREST PERIOD", self.end_of_interest_period
+        )
         s += label_to_string("DAY COUNT TYPE", self.dc_type)
         s += label_to_string("CONTRACT SIZE", self.contract_size)
         return s
 
-##########################################################################
+
+###############################################################################

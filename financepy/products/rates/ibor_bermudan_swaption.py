@@ -28,30 +28,32 @@ from ...models.hw_tree import HWTree
 
 
 class IborBermudanSwaption:
-    """ This is the class for the Bermudan-style swaption, an option to enter
+    """This is the class for the Bermudan-style swaption, an option to enter
     into a swap (payer or receiver of the fixed coupon), that starts in the
     future and with a fixed maturity, at a swap rate fixed today. This swaption
     can be exercised on any of the fixed coupon payment dates after the first
-    exercise date. """
+    exercise date."""
 
-    def __init__(self,
-                 settle_dt: Date,
-                 exercise_dt: Date,
-                 maturity_dt: Date,
-                 fixed_leg_type: SwapTypes,
-                 exercise_type: FinExerciseTypes,
-                 fixed_cpn: float,
-                 fixed_freq_type: FrequencyTypes,
-                 fixed_dc_type: DayCountTypes,
-                 notional=ONE_MILLION,
-                 float_freq_type=FrequencyTypes.QUARTERLY,
-                 float_dc_type=DayCountTypes.THIRTY_E_360,
-                 cal_type=CalendarTypes.WEEKEND,
-                 bd_type=BusDayAdjustTypes.FOLLOWING,
-                 dg_type=DateGenRuleTypes.BACKWARD):
-        """ Create a Bermudan swaption contract. This is an option to enter
+    def __init__(
+        self,
+        settle_dt: Date,
+        exercise_dt: Date,
+        maturity_dt: Date,
+        fixed_leg_type: SwapTypes,
+        exercise_type: FinExerciseTypes,
+        fixed_cpn: float,
+        fixed_freq_type: FrequencyTypes,
+        fixed_dc_type: DayCountTypes,
+        notional=ONE_MILLION,
+        float_freq_type=FrequencyTypes.QUARTERLY,
+        float_dc_type=DayCountTypes.THIRTY_E_360,
+        cal_type=CalendarTypes.WEEKEND,
+        bd_type=BusDayAdjustTypes.FOLLOWING,
+        dg_type=DateGenRuleTypes.BACKWARD,
+    ):
+        """Create a Bermudan swaption contract. This is an option to enter
         into a payer or receiver swap at a fixed coupon on all the fixed
-        # leg coupon dates until the exercise date inclusive. """
+        # leg coupon dates until the exercise date inclusive."""
 
         check_argument_types(self.__init__, locals())
 
@@ -89,32 +91,31 @@ class IborBermudanSwaption:
         self.cpn_flows = None
         self.call_times = None
 
-    ###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt,
-              discount_curve,
-              model):
-        """ Value the Bermudan swaption using the specified model and a
+    def value(self, value_dt, discount_curve, model):
+        """Value the Bermudan swaption using the specified model and a
         discount curve. The choices of model are the Hull-White model, the
-        Black-Karasinski model and the Black-Derman-Toy model. """
+        Black-Karasinski model and the Black-Derman-Toy model."""
 
         float_spread = 0.0
 
         # The underlying is a swap in which we pay the fixed amount
-        self.underlying_swap = IborSwap(self.exercise_dt,
-                                        self.maturity_dt,
-                                        self.fixed_leg_type,
-                                        self.fixed_cpn,
-                                        self.fixed_freq_type,
-                                        self.fixed_dc_type,
-                                        self.notional,
-                                        float_spread,
-                                        self.float_freq_type,
-                                        self.float_dc_type,
-                                        self.cal_type,
-                                        self.bd_type,
-                                        self.dg_type)
+        self.underlying_swap = IborSwap(
+            self.exercise_dt,
+            self.maturity_dt,
+            self.fixed_leg_type,
+            self.fixed_cpn,
+            self.fixed_freq_type,
+            self.fixed_dc_type,
+            self.notional,
+            float_spread,
+            self.float_freq_type,
+            self.float_dc_type,
+            self.cal_type,
+            self.bd_type,
+            self.dg_type,
+        )
 
         #  I need to do this to generate the fixed leg flows
         self.pv01 = self.underlying_swap.pv01(value_dt, discount_curve)
@@ -164,25 +165,31 @@ class IborBermudanSwaption:
         # the multi-callable nature of the Bermudan Swaption
         #######################################################################
 
-        if isinstance(model, BDTTree) or isinstance(model, BKTree) or isinstance(model, HWTree):
+        if (
+            isinstance(model, BDTTree)
+            or isinstance(model, BKTree)
+            or isinstance(model, HWTree)
+        ):
 
             model.build_tree(t_mat, df_times, df_values)
 
-            v = model.bermudan_swaption(t_exp,
-                                        t_mat,
-                                        strike_price,
-                                        face_amount,
-                                        cpn_times,
-                                        cpn_flows,
-                                        self.exercise_type)
+            v = model.bermudan_swaption(
+                t_exp,
+                t_mat,
+                strike_price,
+                face_amount,
+                cpn_times,
+                cpn_flows,
+                self.exercise_type,
+            )
         else:
 
             raise FinError("Invalid model choice for Bermudan Swaption")
 
         if self.fixed_leg_type == SwapTypes.RECEIVE:
-            v = self.notional * v['rec']
+            v = self.notional * v["rec"]
         elif self.fixed_leg_type == SwapTypes.PAY:
-            v = self.notional * v['pay']
+            v = self.notional * v["pay"]
 
         return v
 
@@ -222,5 +229,6 @@ class IborBermudanSwaption:
 
     def _print(self):
         print(self)
+
 
 ###############################################################################

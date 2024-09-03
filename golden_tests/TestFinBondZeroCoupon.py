@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-import os
 import sys
 
 import pandas as pd

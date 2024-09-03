@@ -18,18 +18,20 @@ from ...utils.helpers import label_to_string, check_argument_types
 
 
 class FXForward:
-    """ Contract to buy or sell currency at a forward rate decided today. """
+    """Contract to buy or sell currency at a forward rate decided today."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 strike_fx_rate: float,  # PRICE OF 1 UNIT OF FOR IN DOM CCY
-                 currency_pair: str,  # FOR DOM
-                 notional: float,
-                 notional_currency: str,  # must be FOR or DOM
-                 spot_days: int = 0):
-        """ Creates a FinFXForward which allows the owner to buy the FOR
+    def __init__(
+        self,
+        expiry_dt: Date,
+        strike_fx_rate: float,  # PRICE OF 1 UNIT OF FOR IN DOM CCY
+        currency_pair: str,  # FOR DOM
+        notional: float,
+        notional_currency: str,  # must be FOR or DOM
+        spot_days: int = 0,
+    ):
+        """Creates a FinFXForward which allows the owner to buy the FOR
         against the DOM currency at the strike_fx_rate and to pay it in the
-        notional currency. """
+        notional currency."""
 
         check_argument_types(self.__init__, locals())
 
@@ -53,7 +55,10 @@ class FXForward:
         self.for_name = self.currency_pair[0:3]
         self.dom_name = self.currency_pair[3:6]
 
-        if notional_currency != self.dom_name and notional_currency != self.for_name:
+        if (
+            notional_currency != self.dom_name
+            and notional_currency != self.for_name
+        ):
             raise FinError("Notional currency not in currency pair.")
 
         self.notional = notional
@@ -64,15 +69,17 @@ class FXForward:
         self.cash_dom = None
         self.cash_for = None
 
-###############################################################################
+    ###########################################################################
 
-    def value(self,
-              value_dt,
-              spot_fx_rate,  # 1 unit of foreign in domestic
-              domestic_curve,
-              foreign_curve):
-        """ Calculate the value of an FX forward contract where the current
-        FX rate is the spot_fx_rate. """
+    def value(
+        self,
+        value_dt,
+        spot_fx_rate,  # 1 unit of foreign in domestic
+        domestic_curve,
+        foreign_curve,
+    ):
+        """Calculate the value of an FX forward contract where the current
+        FX rate is the spot_fx_rate."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -82,11 +89,13 @@ class FXForward:
 
         if domestic_curve.value_dt != value_dt:
             raise FinError(
-                "Domestic Curve valuation date not same as option value date")
+                "Domestic Curve valuation date not same as option value date"
+            )
 
         if foreign_curve.value_dt != value_dt:
             raise FinError(
-                "Foreign Curve valuation date not same as option value date")
+                "Foreign Curve valuation date not same as option value date"
+            )
 
         if isinstance(value_dt, Date):
             t = (self.expiry_dt - value_dt) / gDaysInYear
@@ -101,10 +110,9 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        newfwd_fx_rate = self.forward(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve)
+        newfwd_fx_rate = self.forward(
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve
+        )
 
         dom_df = domestic_curve._df(t)
 
@@ -118,32 +126,36 @@ class FXForward:
             raise FinError("Invalid notional currency.")
 
         if self.notional_currency == self.for_name:
-            v = (newfwd_fx_rate - self.strike_fx_rate)
+            v = newfwd_fx_rate - self.strike_fx_rate
             v = v * self.notional * dom_df
         elif self.notional_currency == self.dom_name:
-            v = (newfwd_fx_rate - self.strike_fx_rate)
+            v = newfwd_fx_rate - self.strike_fx_rate
             v = v * self.notional * dom_df * newfwd_fx_rate
 
         self.cash_dom = v * self.notional_dom / self.strike_fx_rate
         self.cash_for = v * self.notional_for / spot_fx_rate
 
-        return {"value": v,
-                "cash_dom": self.cash_dom,
-                "cash_for": self.cash_for,
-                "not_dom": self.notional_dom,
-                "not_for": self.notional_for,
-                "ccy_dom": self.dom_name,
-                "ccy_for": self.for_name}
+        return {
+            "value": v,
+            "cash_dom": self.cash_dom,
+            "cash_for": self.cash_for,
+            "not_dom": self.notional_dom,
+            "not_for": self.notional_for,
+            "ccy_dom": self.dom_name,
+            "ccy_for": self.for_name,
+        }
 
-###############################################################################
+    ###########################################################################
 
-    def forward(self,
-                value_dt,
-                spot_fx_rate,  # 1 unit of foreign in domestic
-                domestic_curve,
-                foreign_curve):
-        """ Calculate the FX Forward rate that makes the value of the FX
-        contract equal to zero. """
+    def forward(
+        self,
+        value_dt,
+        spot_fx_rate,  # 1 unit of foreign in domestic
+        domestic_curve,
+        foreign_curve,
+    ):
+        """Calculate the FX Forward rate that makes the value of the FX
+        contract equal to zero."""
 
         if isinstance(value_dt, Date):
             t = (self.delivery_dt - value_dt) / gDaysInYear
@@ -164,7 +176,7 @@ class FXForward:
         fwd_fx_rate = spot_fx_rate * for_df / dom_df
         return fwd_fx_rate
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -176,10 +188,11 @@ class FXForward:
         s += label_to_string("SPOT DAYS", self.spot_days, "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

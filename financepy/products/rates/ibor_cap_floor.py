@@ -38,43 +38,45 @@ class IborCapFloorModelTypes(Enum):
     SHIFTED_BLACK = 2
     SABR = 3
 
+
 ##########################################################################
 
 
-class IborCapFloor():
-    """ Class for Caps and Floors. These are contracts which observe a Ibor
+class IborCapFloor:
+    """Class for Caps and Floors. These are contracts which observe a Ibor
     reset L on a future start date and then make a payoff at the end of the
     Ibor period which is Max[L-K,0] for a cap and Max[K-L,0] for a floor.
     This is then day count adjusted for the Ibor period and then scaled by
     the contract notional to produce a valuation. A number of models can be
     selected from."""
 
-    def __init__(self,
-                 start_dt: Date,
-                 maturity_dt_or_tenor: (Date, str),
-                 option_type: FinCapFloorTypes,
-                 strike_rate: float,
-                 last_fixing: Optional[float] = None,
-                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
-                 notional: float = ONE_MILLION,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Initialise IborCapFloor object. """
+    def __init__(
+        self,
+        start_dt: Date,
+        maturity_dt_or_tenor: (Date, str),
+        option_type: FinCapFloorTypes,
+        strike_rate: float,
+        last_fixing: Optional[float] = None,
+        freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360_ISDA,
+        notional: float = ONE_MILLION,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+    ):
+        """Initialise IborCapFloor object."""
 
         check_argument_types(self.__init__, locals())
 
         self.cal_type = cal_type
         self.bd_type = bd_type
 
-        if type(maturity_dt_or_tenor) == Date:
+        if type(maturity_dt_or_tenor) is Date:
             maturity_dt = maturity_dt_or_tenor
         else:
             maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)
             calendar = Calendar(self.cal_type)
-            maturity_dt = calendar.adjust(maturity_dt,
-                                            self.bd_type)
+            maturity_dt = calendar.adjust(maturity_dt, self.bd_type)
 
         if start_dt > maturity_dt:
             raise FinError("Start date must be before maturity date")
@@ -99,24 +101,26 @@ class IborCapFloor():
         self.value_dt = None
         self.day_counter = None
 
-###############################################################################
+    ###########################################################################
 
     def _generate_dts(self):
 
-        schedule = Schedule(self.start_dt,
-                            self.maturity_dt,
-                            self.freq_type,
-                            self.cal_type,
-                            self.bd_type,
-                            self.dg_type)
+        schedule = Schedule(
+            self.start_dt,
+            self.maturity_dt,
+            self.freq_type,
+            self.cal_type,
+            self.bd_type,
+            self.dg_type,
+        )
 
         self.capFloorLetDates = schedule.adjusted_dts
 
-##########################################################################
+    ###########################################################################
 
     def value(self, value_dt, libor_curve, model):
-        """ Value the cap or floor using the chosen model which specifies
-        the volatility of the Ibor rate to the cap start date. """
+        """Value the cap or floor using the chosen model which specifies
+        the volatility of the Ibor rate to the cap start date."""
 
         self.value_dt = value_dt
         self._generate_dts()
@@ -146,8 +150,7 @@ class IborCapFloor():
         end_dt = self.capFloorLetDates[1]
 
         if self.last_fixing is None:
-            fwd_rate = libor_curve.fwd_rate(start_dt, end_dt,
-                                            self.dc_type)
+            fwd_rate = libor_curve.fwd_rate(start_dt, end_dt, self.dc_type)
         else:
             fwd_rate = self.last_fixing
 
@@ -176,8 +179,7 @@ class IborCapFloor():
             alpha = self.day_counter.year_frac(start_dt, end_dt)[0]
 
             df = libor_curve.df(end_dt)
-            fwd_rate = libor_curve.fwd_rate(start_dt, end_dt,
-                                            self.dc_type)
+            fwd_rate = libor_curve.fwd_rate(start_dt, end_dt, self.dc_type)
 
             if self.option_type == FinCapFloorTypes.CAP:
                 intrinsic_value = df * alpha * max(fwd_rate - strike_rate, 0.0)
@@ -186,11 +188,9 @@ class IborCapFloor():
 
             intrinsic_value *= self.notional
 
-            cap_floor_let_value = self.value_caplet_floor_let(value_dt,
-                                                           start_dt,
-                                                           end_dt,
-                                                           libor_curve,
-                                                           model)
+            cap_floor_let_value = self.value_caplet_floor_let(
+                value_dt, start_dt, end_dt, libor_curve, model
+            )
 
             cap_floor_value += cap_floor_let_value
 
@@ -203,23 +203,18 @@ class IborCapFloor():
 
         return cap_floor_value
 
-###############################################################################
+    ###########################################################################
 
-    def value_caplet_floor_let(self,
-                               value_dt,
-                               caplet_start_dt,
-                               caplet_end_dt,
-                               libor_curve,
-                               model):
-        """ Value the caplet or floorlet using a specific model. """
+    def value_caplet_floor_let(
+        self, value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model
+    ):
+        """Value the caplet or floorlet using a specific model."""
 
         t_exp = (caplet_start_dt - self.start_dt) / gDaysInYear
 
-        alpha = self.day_counter.year_frac(caplet_start_dt,
-                                            caplet_end_dt)[0]
+        alpha = self.day_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
 
-        f = libor_curve.fwd_rate(caplet_start_dt, caplet_end_dt,
-                                 self.dc_type)
+        f = libor_curve.fwd_rate(caplet_start_dt, caplet_end_dt, self.dc_type)
 
         k = self.strike_rate
         df = libor_curve.df(caplet_end_dt)
@@ -230,79 +225,91 @@ class IborCapFloor():
         if isinstance(model, Black):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_CALL)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
+                )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_PUT)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
+                )
 
         elif isinstance(model, BlackShifted):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_CALL)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
+                )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_PUT)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
+                )
 
         elif isinstance(model, Bachelier):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_CALL)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
+                )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_PUT)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
+                )
 
         elif isinstance(model, SABR):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_CALL)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
+                )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_PUT)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
+                )
 
         elif isinstance(model, SABRShifted):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_CALL)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
+                )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(f, k, t_exp, df,
-                                                  OptionTypes.EUROPEAN_PUT)
+                cap_floor_let_value = model.value(
+                    f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
+                )
 
         elif isinstance(model, HWTree):
 
             t_mat = (caplet_end_dt - value_dt) / gDaysInYear
-            alpha = self.day_counter.year_frac(caplet_start_dt,
-                                                caplet_end_dt)[0]
-            strike_price = 1.0/(1.0 + alpha * self.strike_rate)
-            notional_adj = (1.0 + self.strike_rate * alpha)
+            alpha = self.day_counter.year_frac(caplet_start_dt, caplet_end_dt)[
+                0
+            ]
+            strike_price = 1.0 / (1.0 + alpha * self.strike_rate)
+            notional_adj = 1.0 + self.strike_rate * alpha
             face_amount = 1.0
             df_times = libor_curve._times
             df_values = libor_curve._dfs
 
-            v = model.option_on_zcb(t_exp, t_mat, strike_price, face_amount,
-                                    df_times, df_values)
+            v = model.option_on_zcb(
+                t_exp, t_mat, strike_price, face_amount, df_times, df_values
+            )
 
             # we divide by alpha to offset the multiplication above
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = v['put'] * notional_adj / alpha
+                cap_floor_let_value = v["put"] * notional_adj / alpha
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = v['call'] * notional_adj / alpha
+                cap_floor_let_value = v["call"] * notional_adj / alpha
 
         else:
             raise FinError("Unknown model type " + str(model))
 
-        cap_floor_let_value *= (self.notional * alpha)
+        cap_floor_let_value *= self.notional * alpha
 
         return cap_floor_let_value
 
-###############################################################################
+    ###########################################################################
 
     def print_leg(self):
-        """ Prints the cap floor payment amounts. """
+        """Prints the cap floor payment amounts."""
 
         print("START DATE:", self.start_dt)
         print("MATURITY DATE:", self.maturity_dt)
@@ -329,22 +336,35 @@ class IborCapFloor():
 
         for payment_dt in self.capFloorLetDates[i_flow:]:
             if i_flow == 0:
-                print("%15s %10s %9s %12s %12.6f %12s %12s" %
-                      (payment_dt, "-", "-", "-",
-                       self.cap_floor_let_dfs[i_flow], "-", "-"))
+                print(
+                    "%15s %10s %9s %12s %12.6f %12s %12s"
+                    % (
+                        payment_dt,
+                        "-",
+                        "-",
+                        "-",
+                        self.cap_floor_let_dfs[i_flow],
+                        "-",
+                        "-",
+                    )
+                )
             else:
-                print("%15s %10.7f %9.5f %12.2f %12.6f %12.2f %12.2f" %
-                      (payment_dt,
-                       self.cap_floor_let_alphas[i_flow],
-                       self.cap_floor_let_fwd_rates[i_flow]*100,
-                       self.cap_floor_let_intrinsic[i_flow],
-                       self.cap_floor_let_dfs[i_flow],
-                       self.cap_floor_let_values[i_flow],
-                       self.cap_floor_pv[i_flow]))
+                print(
+                    "%15s %10.7f %9.5f %12.2f %12.6f %12.2f %12.2f"
+                    % (
+                        payment_dt,
+                        self.cap_floor_let_alphas[i_flow],
+                        self.cap_floor_let_fwd_rates[i_flow] * 100,
+                        self.cap_floor_let_intrinsic[i_flow],
+                        self.cap_floor_let_dfs[i_flow],
+                        self.cap_floor_let_values[i_flow],
+                        self.cap_floor_pv[i_flow],
+                    )
+                )
 
             i_flow += 1
 
-###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -356,9 +376,10 @@ class IborCapFloor():
         s += label_to_string("DAY COUNT", str(self.dc_type), "")
         return s
 
-###############################################################################
+    ###########################################################################
 
     def _print(self):
         print(self)
+
 
 ###############################################################################
