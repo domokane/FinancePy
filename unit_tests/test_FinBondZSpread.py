@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-from financepy.utils.global_vars import gPercent
+from financepy.utils.global_vars import g_percent
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -22,7 +22,7 @@ DIAGNOSTICS_MODE = False
 def test_z_spread_flat_curve():
 
     settlement = Date(19, 9, 2012)
-    base_curve = DiscountCurveFlat(settlement, flat_rate=1*gPercent)
+    base_curve = DiscountCurveFlat(settlement, flat_rate=1*g_percent)
     return _test_z_spread_for_curve(base_curve)
 
 

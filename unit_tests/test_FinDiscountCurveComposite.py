@@ -4,7 +4,7 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.global_vars import gBasisPoint, gPercent
+from financepy.utils.global_vars import g_basis_point, g_percent
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from financepy.market.curves.composite_discount_curve import CompositeDiscountCurve
@@ -19,7 +19,7 @@ def test_composite_discount_curve_can_value_trades():
 
     bump_start_date = Date(6, 10, 2023)
     bump_end_date = Date(6, 10, 2024)
-    bump_size = 1.0 * gPercent
+    bump_size = 1.0 * g_percent
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
         base_curve.value_dt, bump_start_date, bump_end_date, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -44,7 +44,7 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
 
     bump_start_date = Date(6, 10, 2023)
     bump_end_date = Date(6, 10, 2024)
-    bump_size = 0.0 * gPercent
+    bump_size = 0.0 * g_percent
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
         base_curve.value_dt, bump_start_date, bump_end_date, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -70,7 +70,7 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
 
     bump_start_date = Date(6, 10, 2023)
     bump_end_date = Date(6, 10, 2024)
-    bump_size = 0.0 * gPercent
+    bump_size = 0.0 * g_percent
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
         base_curve.value_dt, bump_start_date, bump_end_date, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -96,7 +96,7 @@ def _create_test_swap(valuation_date):
     fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
     fixedFreqType = FrequencyTypes.SEMI_ANNUAL
 
-    trade = IborSwap(settlement_date.add_tenor('1Y'), "5Y", swapType, 2.0 * gPercent,
+    trade = IborSwap(settlement_date.add_tenor('1Y'), "5Y", swapType, 2.0 * g_percent,
                      fixedFreqType, fixedDCCType, cal_type=cal, notional=10000)
 
     return trade

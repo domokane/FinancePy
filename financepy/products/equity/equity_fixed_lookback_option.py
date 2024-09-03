@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import N
-from ...utils.global_vars import gDaysInYear, g_small
+from ...utils.global_vars import g_days_in_year, g_small
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -85,7 +85,7 @@ class EquityFixedLookbackOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t
@@ -226,7 +226,7 @@ class EquityFixedLookbackOption(EquityOption):
         """Monte Carlo valuation of a fixed strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
 
         df = discount_curve.df(self.expiry_dt)
         r = discount_curve.cc_rate(self.expiry_dt)

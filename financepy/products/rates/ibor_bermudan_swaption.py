@@ -10,7 +10,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import FinExerciseTypes
 from ...utils.global_types import SwapTypes
@@ -120,8 +120,8 @@ class IborBermudanSwaption:
         #  I need to do this to generate the fixed leg flows
         self.pv01 = self.underlying_swap.pv01(value_dt, discount_curve)
 
-        t_exp = (self.exercise_dt - value_dt) / gDaysInYear
-        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
+        t_exp = (self.exercise_dt - value_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
 
         #######################################################################
         # For the tree models we need to generate a vector of the coupons
@@ -140,7 +140,7 @@ class IborBermudanSwaption:
             flow_dt = self.underlying_swap.fixed_leg.payment_dts[i_flow]
 
             if flow_dt > self.exercise_dt:
-                cpn_time = (flow_dt - value_dt) / gDaysInYear
+                cpn_time = (flow_dt - value_dt) / g_days_in_year
                 cpn_flow = swap.fixed_leg.payments[i_flow - 1] / self.notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)

@@ -11,7 +11,7 @@ from scipy.interpolate import splrep
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import scale
 from ...utils.helpers import label_to_string
 
@@ -49,7 +49,7 @@ class BondYieldCurve:
         years_to_maturities = []
 
         for bond in bonds:
-            years_to_maturity = (bond.maturity_dt - settle_dt) / gDaysInYear
+            years_to_maturity = (bond.maturity_dt - settle_dt) / g_days_in_year
             years_to_maturities.append(years_to_maturity)
 
         self.yearsToMaturity = np.array(years_to_maturities)
@@ -107,7 +107,7 @@ class BondYieldCurve:
     def interp_yield(self, maturity_dt: Date):
 
         if isinstance(maturity_dt, Date):
-            t = (maturity_dt - self.settle_dt) / gDaysInYear
+            t = (maturity_dt - self.settle_dt) / g_days_in_year
         elif isinstance(maturity_dt, list):
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):

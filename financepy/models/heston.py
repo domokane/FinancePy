@@ -7,7 +7,7 @@ from scipy import integrate
 from math import exp, log, pi
 import numpy as np
 
-from ..utils.global_vars import gDaysInYear
+from ..utils.global_vars import g_days_in_year
 from ..utils.global_types import OptionTypes
 from ..utils.math import norminvcdf
 from ..utils.error import FinError
@@ -174,7 +174,7 @@ class Heston():
                  seed,
                  scheme=HestonNumericalScheme.EULERLOG):
 
-        tau = (option.expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / g_days_in_year
 
         K = option.strike_price
         dt = 1.0 / num_steps_per_year
@@ -214,7 +214,7 @@ class Heston():
                     interest_rate,
                     dividend_yield):
 
-        tau = (option.expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / g_days_in_year
 
         rho = self._rho
         sigma = self._sigma
@@ -262,7 +262,7 @@ class Heston():
                           interest_rate,
                           dividend_yield):
 
-        tau = (option.expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / g_days_in_year
 
         rho = self._rho
         sigma = self._sigma
@@ -306,7 +306,7 @@ class Heston():
                     interest_rate,
                     dividend_yield):
 
-        tau = (option.expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / g_days_in_year
 
         rho = self._rho
         sigma = self._sigma
@@ -353,7 +353,7 @@ class Heston():
                        interest_rate,
                        dividend_yield):
 
-        tau = (option.expiry_dt - value_dt) / gDaysInYear
+        tau = (option.expiry_dt - value_dt) / g_days_in_year
 
         rho = self._rho
         sigma = self._sigma

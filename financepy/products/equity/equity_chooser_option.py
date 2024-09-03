@@ -7,7 +7,7 @@ import numpy as np
 from scipy import optimize
 
 from ...utils.math import M
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.global_vars import g_small
 from ...utils.error import FinError
 
@@ -120,9 +120,9 @@ class EquityChooserOption(EquityOption):
 
         DEBUG_MODE = False
 
-        t = (self.chooseDate - value_dt) / gDaysInYear
-        tc = (self.call_expiry_dt - value_dt) / gDaysInYear
-        tp = (self.put_expiry_dt - value_dt) / gDaysInYear
+        t = (self.chooseDate - value_dt) / g_days_in_year
+        tc = (self.call_expiry_dt - value_dt) / g_days_in_year
+        tp = (self.put_expiry_dt - value_dt) / g_days_in_year
 
         rt = discount_curve.cc_rate(self.chooseDate)
         rtc = discount_curve.cc_rate(self.call_expiry_dt)
@@ -197,9 +197,9 @@ class EquityChooserOption(EquityOption):
         dftc = discount_curve.df(self.call_expiry_dt)
         dftp = discount_curve.df(self.put_expiry_dt)
 
-        t = (self.chooseDate - value_dt) / gDaysInYear
-        tc = (self.call_expiry_dt - value_dt) / gDaysInYear
-        tp = (self.put_expiry_dt - value_dt) / gDaysInYear
+        t = (self.chooseDate - value_dt) / g_days_in_year
+        tc = (self.call_expiry_dt - value_dt) / g_days_in_year
+        tp = (self.put_expiry_dt - value_dt) / g_days_in_year
 
         rt = -np.log(dft) / t
         rtc = -np.log(dftc) / tc

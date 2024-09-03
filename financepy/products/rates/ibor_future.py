@@ -10,7 +10,7 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.day_count import DayCountTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION
 from ...utils.date import Date
 
@@ -114,8 +114,8 @@ class IborFuture:
 
         a = mean_reversion
         t0 = 0.0
-        t1 = (self.last_trading_dt - value__dt) / gDaysInYear
-        t2 = (self.end_of_interest_period - value__dt) / gDaysInYear
+        t1 = (self.last_trading_dt - value__dt) / g_days_in_year
+        t2 = (self.end_of_interest_period - value__dt) / g_days_in_year
 
         # Hull White model for short rate dr = (theta(t)-ar) dt + sigma * dz
         # This reduces to Ho-Lee when a = 0 so to avoid divergences I provide

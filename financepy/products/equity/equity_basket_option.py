@@ -9,7 +9,7 @@
 
 import numpy as np
 
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...models.gbm_process_simulator import FinGBMProcess
 
 from ...utils.error import FinError
@@ -113,7 +113,7 @@ class EquityBasketOption:
         able to handle a full rank correlation structure between the individual
         assets."""
 
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
 
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
@@ -204,7 +204,7 @@ class EquityBasketOption:
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
 
         dividend_yields = []
         for curve in dividend_curves:

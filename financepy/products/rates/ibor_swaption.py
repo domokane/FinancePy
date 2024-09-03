@@ -17,7 +17,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
@@ -135,8 +135,8 @@ class IborSwaption:
         # date that makes the forward swap worth par including principal
         s = swap.swap_rate(value_dt, discount_curve)
 
-        t_exp = (self.exercise_dt - self.settle_dt) / gDaysInYear
-        t_mat = (self.maturity_dt - self.settle_dt) / gDaysInYear
+        t_exp = (self.exercise_dt - self.settle_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - self.settle_dt) / g_days_in_year
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
@@ -158,7 +158,7 @@ class IborSwaption:
             # Only flows occurring after option expiry are counted.
             # Flows on the expiry date are not included
             if flow_dt > self.exercise_dt:
-                cpn_time = (flow_dt - value_dt) / gDaysInYear
+                cpn_time = (flow_dt - value_dt) / g_days_in_year
                 cpn_flow = swap.fixed_leg.payments[i_flow] / self.notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
@@ -336,7 +336,7 @@ class IborSwaption:
             value_dt, swap_rate, self.fixed_freq_type
         )
 
-        t_exp = (self.exercise_dt - self.settle_dt) / gDaysInYear
+        t_exp = (self.exercise_dt - self.settle_dt) / g_days_in_year
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0

@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
@@ -60,8 +60,8 @@ class BondOption():
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
         model which are all implemented as short rate tree models. """
 
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        t_mat = (self.bond.maturity_dt - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_mat = (self.bond.maturity_dt - value_dt) / g_days_in_year
 
         df_times = discount_curve._times
         df_values = discount_curve._dfs
@@ -82,7 +82,7 @@ class BondOption():
             pcd = flow_dts[i-1]
             ncd = flow_dts[i]
             if pcd < value_dt and ncd > value_dt:
-                flow_time = (pcd - value_dt) / gDaysInYear
+                flow_time = (pcd - value_dt) / g_days_in_year
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
                 break
@@ -96,7 +96,7 @@ class BondOption():
         for i in range(1, num_flows):
             ncd = flow_dts[i]
             if ncd > value_dt:
-                flow_time = (ncd - value_dt) / gDaysInYear
+                flow_time = (ncd - value_dt) / g_days_in_year
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
 

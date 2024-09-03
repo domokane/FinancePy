@@ -8,7 +8,7 @@ import numpy as np
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black import Black, BlackTypes, black_value, implied_volatility
 from financepy.utils.date import Date
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 forward = 0.034

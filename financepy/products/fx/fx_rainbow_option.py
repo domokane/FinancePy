@@ -9,7 +9,7 @@ from typing import List
 
 from ...utils.date import Date
 from ...utils.math import N, M
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import FinGBMProcess
 from ...products.fx.fx_option import FXOption
@@ -228,7 +228,7 @@ class FXRainbowOption(FXOption):
         self.validate(stock_prices, foreign_curve, volatilities, betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
 
         df = domestic_curve.df(t)
         r = -np.log(df) / t
@@ -310,7 +310,7 @@ class FXRainbowOption(FXOption):
         if value_dt > expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
 
         v = value_mc_fast(
             t,

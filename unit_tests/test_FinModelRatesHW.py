@@ -3,7 +3,7 @@
 ##############################################################################
 
 from financepy.utils.global_types import FinExerciseTypes
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
@@ -37,8 +37,8 @@ def test_HullWhiteExampleTwo():
     expiry_dt = start_dt.add_tenor("3Y")
     maturity_dt = start_dt.add_tenor("9Y")
 
-    t_exp = (expiry_dt - start_dt)/gDaysInYear
-    t_mat = (maturity_dt - start_dt)/gDaysInYear
+    t_exp = (expiry_dt - start_dt)/g_days_in_year
+    t_mat = (maturity_dt - start_dt)/g_days_in_year
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)

@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.global_types import SwapTypes
-from financepy.utils.global_vars import gBasisPoint
+from financepy.utils.global_vars import g_basis_point
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
@@ -52,7 +52,7 @@ def test_ibor_curve_par_rate_shocker():
     mat_dates = curve_shocker.benchmarks_report()['maturity_date'].values
 
     # size of bump
-    par_rate_bump = 1*gBasisPoint
+    par_rate_bump = 1*g_basis_point
 
     # expected forward rate changes in the periods before and after the maturity date of the bumped benchmark
     # in basis points
@@ -78,8 +78,8 @@ def test_ibor_curve_par_rate_shocker():
         bumped_fwd_before = bumped_curve.fwd_rate(d1, d2)
         bumped_fwd_after = bumped_curve.fwd_rate(d2, d3)
 
-        actual_fwd_rate_changes = ((bumped_fwd_before-base_fwd_before)/gBasisPoint,
-                                   (bumped_fwd_after-base_fwd_after)/gBasisPoint)
+        actual_fwd_rate_changes = ((bumped_fwd_before-base_fwd_before)/g_basis_point,
+                                   (bumped_fwd_after-base_fwd_after)/g_basis_point)
 
         assert round(actual_fwd_rate_changes[0], 3) == round(expected_fwd_rate_changes[benchmark_idx][0], 3)
         assert round(actual_fwd_rate_changes[1], 3) == round(expected_fwd_rate_changes[benchmark_idx][1], 3)

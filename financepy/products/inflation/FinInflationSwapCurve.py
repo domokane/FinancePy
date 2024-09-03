@@ -9,7 +9,7 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types, _func_name
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...market.curves.interpolator import InterpTypes
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -258,7 +258,7 @@ class InflationSwapCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = (depo.maturity_dt - self.value_dt) / gDaysInYear
+            t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
 
@@ -266,8 +266,8 @@ class InflationSwapCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = (fra.start_dt - self.value_dt) / gDaysInYear
-            t_mat = (fra.maturity_dt - self.value_dt) / gDaysInYear
+            t_set = (fra.start_dt - self.value_dt) / g_days_in_year
+            t_mat = (fra.maturity_dt - self.value_dt) / g_days_in_year
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -295,7 +295,7 @@ class InflationSwapCurve(DiscountCurve):
             # I use the lastPaymentDate in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.lastPaymentDate
-            t_mat = (maturity_dt - self.value_dt) / gDaysInYear
+            t_mat = (maturity_dt - self.value_dt) / g_days_in_year
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -335,7 +335,7 @@ class InflationSwapCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = (depo.maturity_dt - self.value_dt) / gDaysInYear
+            t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
 
@@ -343,8 +343,8 @@ class InflationSwapCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = (fra.start_dt - self.value_dt) / gDaysInYear
-            t_mat = (fra.maturity_dt - self.value_dt) / gDaysInYear
+            t_set = (fra.start_dt - self.value_dt) / g_days_in_year
+            t_mat = (fra.maturity_dt - self.value_dt) / g_days_in_year
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -416,7 +416,7 @@ class InflationSwapCurve(DiscountCurve):
         for swap in self.used_swaps:
             swap_rate = swap.fixed_cpn
             maturity_dt = swap.adjusted_fixed_dts[-1]
-            tswap = (maturity_dt - self.value_dt) / gDaysInYear
+            tswap = (maturity_dt - self.value_dt) / g_days_in_year
             swap_times.append(tswap)
             swap_rates.append(swap_rate)
 
@@ -424,7 +424,7 @@ class InflationSwapCurve(DiscountCurve):
         interpolated_swap_times = [0.0]
 
         for dt in cpn_dts[1:]:
-            swap_years = (dt - self.value_dt) / gDaysInYear
+            swap_years = (dt - self.value_dt) / g_days_in_year
             swap_rate = np.interp(swap_years, swap_times, swap_rates)
             interpolated_swap_rates.append(swap_rate)
             interpolated_swap_times.append(swap_years)
@@ -453,7 +453,7 @@ class InflationSwapCurve(DiscountCurve):
         for i in range(start_index, num_flows):
 
             dt = cpn_dts[i]
-            t_mat = (dt - self.value_dt) / gDaysInYear
+            t_mat = (dt - self.value_dt) / g_days_in_year
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i - 1]
             pv01_end = acc * swap_rate + 1.0

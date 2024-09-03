@@ -13,7 +13,7 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import FinExerciseTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -39,7 +39,7 @@ def test_HullWhiteExampleOne():
     a = 0.1
     num_time_steps = 3
     model = HWTree(sigma, a, num_time_steps)
-    tree_mat = (end_dt - start_dt)/gDaysInYear
+    tree_mat = (end_dt - start_dt)/g_days_in_year
     model.build_tree(tree_mat, times, dfs)
 #   print_tree(model._Q)
 #   print("")
@@ -73,8 +73,8 @@ def test_HullWhiteExampleTwo():
     expiry_dt = start_dt.add_tenor("3Y")
     maturity_dt = start_dt.add_tenor("9Y")
 
-    t_exp = (expiry_dt - start_dt)/gDaysInYear
-    t_mat = (maturity_dt - start_dt)/gDaysInYear
+    t_exp = (expiry_dt - start_dt)/g_days_in_year
+    t_mat = (maturity_dt - start_dt)/g_days_in_year
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)
@@ -148,11 +148,11 @@ def test_HullWhiteBondOption():
         if ncd > settle_dt:
 
             if len(cpn_times) == 0:
-                flow_time = (pcd - settle_dt) / gDaysInYear
+                flow_time = (pcd - settle_dt) / g_days_in_year
                 cpn_times.append(flow_time)
                 cpn_flows.append(cpn)
 
-            flow_time = (ncd - settle_dt) / gDaysInYear
+            flow_time = (ncd - settle_dt) / g_days_in_year
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -171,7 +171,7 @@ def test_HullWhiteBondOption():
 
     #  Test convergence
     num_steps_list = range(50, 500, 50)
-    t_exp = (expiry_dt - settle_dt)/gDaysInYear
+    t_exp = (expiry_dt - settle_dt)/g_days_in_year
 
     vJam = model.european_bond_option_jamshidian(t_exp, strike_price, face,
                                                  cpn_times, cpn_flows,
@@ -239,7 +239,7 @@ def test_HullWhiteCallableBond():
     for flow_dt in bond.cpn_dts[1:]:
 
         if flow_dt > settle_dt:
-            flow_time = (flow_dt - settle_dt) / gDaysInYear
+            flow_time = (flow_dt - settle_dt) / g_days_in_year
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -270,7 +270,7 @@ def test_HullWhiteCallableBond():
 
     call_times = []
     for dt in call_dts:
-        t = (dt - settle_dt) / gDaysInYear
+        t = (dt - settle_dt) / g_days_in_year
         call_times.append(t)
 
     put_dts = []
@@ -293,12 +293,12 @@ def test_HullWhiteCallableBond():
 
     put_times = []
     for dt in put_dts:
-        t = (dt - settle_dt) / gDaysInYear
+        t = (dt - settle_dt) / g_days_in_year
         put_times.append(t)
 
     ###########################################################################
 
-    t_mat = (maturity_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / g_days_in_year
     curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     dfs = []
@@ -306,7 +306,7 @@ def test_HullWhiteCallableBond():
 
     for dt in bond.cpn_dts:
         if dt > settle_dt:
-            t = (dt - settle_dt) / gDaysInYear
+            t = (dt - settle_dt) / g_days_in_year
             df = curve.df(dt)
             times.append(t)
             dfs.append(df)
@@ -323,7 +323,7 @@ def test_HullWhiteCallableBond():
 
     # Test convergence
     num_steps_list = [100, 200, 500, 1000]
-    t_mat = (maturity_dt - settle_dt)/gDaysInYear
+    t_mat = (maturity_dt - settle_dt)/g_days_in_year
 
     test_cases.header("NUMSTEPS", "TIME", "BOND_ONLY", "CALLABLE_BOND")
 

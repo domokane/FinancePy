@@ -5,7 +5,7 @@
 import sys
 sys.path.append("..")
 
-from financepy.utils import gDaysInYear
+from financepy.utils import g_days_in_year
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -28,7 +28,7 @@ def test_EquityBarrierOption():
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     stock_price = 100.0
     volatility = 0.20
     interest_rate = 0.05

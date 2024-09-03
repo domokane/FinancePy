@@ -10,7 +10,7 @@ from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
@@ -491,7 +491,7 @@ class FXVolSurface():
         index0 = 0
         index1 = 0
 
-        t = (expiry_dt - self.value_dt) / gDaysInYear
+        t = (expiry_dt - self.value_dt) / g_days_in_year
 
         num_curves = self.num_vol_curves
 
@@ -595,7 +595,7 @@ class FXVolSurface():
         for i in range(0, num_vol_curves):
 
             expiry_dt = self.expiry_dts[i]
-            t_exp = (expiry_dt - spot_dt) / gDaysInYear
+            t_exp = (expiry_dt - spot_dt) / g_days_in_year
 
             dom_df = self.domestic_curve._df(t_exp)
             for_df = self.foreign_curve._df(t_exp)

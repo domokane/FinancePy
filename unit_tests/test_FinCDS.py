@@ -12,7 +12,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.discount_curve import DiscountCurve
@@ -361,7 +361,7 @@ cds_contract1 = CDS(effective_dt,
                     cds_cpn,
                     notional,
                     long_protection)
-t = (maturity_dt - value_dt1) / gDaysInYear
+t = (maturity_dt - value_dt1) / g_days_in_year
 z = libor_curve.df(maturity_dt)
 r1 = -np.log(z) / t
 print(t, z, r1, maturity_dt)
@@ -383,7 +383,7 @@ cds_contract2 = CDS(effective_dt,
                     cds_cpn,
                     notional,
                     long_protection)
-t = (maturity_dt - value_dt2) / gDaysInYear
+t = (maturity_dt - value_dt2) / g_days_in_year
 z = libor_curve.df(maturity_dt)
 r2 = -np.log(z) / t
 mktSpread2 = 0.01

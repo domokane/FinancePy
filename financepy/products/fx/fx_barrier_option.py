@@ -8,7 +8,7 @@ from enum import Enum
 
 from ...utils.error import FinError
 from ...utils.math import N
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...products.fx.fx_option import FXOption
 from ...models.process_simulator import FinProcessSimulator
 from ...utils.helpers import label_to_string, check_argument_types
@@ -91,7 +91,7 @@ class FXBarrierOption(FXOption):
         s0 = spot_fx_rate
         h = self.barrier_level
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
         ln_s0_k = log(float(s0) / K)
         sqrt_t = sqrt(t)
 
@@ -319,7 +319,7 @@ class FXBarrierOption(FXOption):
     ):
         """Value the FX Barrier Option using Monte Carlo."""
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
         num_time_steps = int(t * num_ann_steps)
         K = self.strike_fx_rate
         B = self.barrier_level

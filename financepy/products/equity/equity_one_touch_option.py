@@ -6,7 +6,7 @@
 import numpy as np
 
 
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.global_types import TouchOptionTypes
 from ...utils.error import FinError
 from ...products.equity.equity_option import EquityOption
@@ -181,7 +181,7 @@ class EquityOneTouchOption(EquityOption):
                 "Dividend Curve date not same as option valuation date"
             )
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
         t = max(t, 1e-6)
 
         s0 = stock_price
@@ -455,7 +455,7 @@ class EquityOneTouchOption(EquityOption):
         result as we only observe the barrier a finite number of times. The
         convergence is slow."""
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t

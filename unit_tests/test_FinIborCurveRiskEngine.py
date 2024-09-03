@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from helpers import *
 from financepy.utils.date import Date
-from financepy.utils.global_vars import gBasisPoint
+from financepy.utils.global_vars import g_basis_point
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
@@ -37,7 +37,7 @@ def test_par_rate_risk_report_cubic_zero():
                               fixedDCCType, fixedFreqType, settlement_date, base_curve)
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    par_rate_bump = 1*gBasisPoint
+    par_rate_bump = 1*g_basis_point
 
     # run the report
     base_values, risk_report = re.par_rate_risk_report(
@@ -69,7 +69,7 @@ def test_par_rate_risk_report_flat_forward():
                               fixed_day_count, fixed_freq_type, settlement_date, base_curve)
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    par_rate_bump = 1*gBasisPoint
+    par_rate_bump = 1*g_basis_point
 
     # run the report
     base_values, risk_report = re.par_rate_risk_report(
@@ -112,7 +112,7 @@ def test_forward_rate_risk_report():
     grid_last_date = max(t.maturity_dt for t in trades)
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    forward_rate_bump = 1*gBasisPoint
+    forward_rate_bump = 1*g_basis_point
 
     # run the report
     base_values, risk_report = re.forward_rate_risk_report(
@@ -155,7 +155,7 @@ def test_forward_rate_custom_grid_risk_report():
         '3M'), valuation_date.add_tenor('15M'), valuation_date.add_tenor('10Y')]
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    forward_rate_bump = 1*gBasisPoint
+    forward_rate_bump = 1*g_basis_point
 
     # run the report
     base_values, risk_report, *_ = re.forward_rate_risk_report_custom_grid(
@@ -230,7 +230,7 @@ def test_parallel_shift_ladder_report():
                               fixedDCCType, fixedFreqType, settlement_date, base_curve)
 
     # the curve shift grids on which we calculate the PV ladder
-    curve_shifts = np.linspace(-400*gBasisPoint, 400*gBasisPoint, 17, endpoint=True)
+    curve_shifts = np.linspace(-400*g_basis_point, 400*g_basis_point, 17, endpoint=True)
 
     # run the report
     base_values, risk_report = re.parallel_shift_ladder_report(

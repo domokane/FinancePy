@@ -10,7 +10,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, N
 from ...utils.error import FinError
 from ...products.credit.cds_curve import CDSCurve
@@ -93,7 +93,7 @@ class CDSIndexOption:
 
         k = self.strike_cpn
         c = self.index_cpn
-        time_to_expiry = (self.expiry_dt - value_dt) / gDaysInYear
+        time_to_expiry = (self.expiry_dt - value_dt) / g_days_in_year
         df = libor_curve.df(self.expiry_dt)
         q_expiry_index = index_curve.survival_prob(time_to_expiry)
 
@@ -138,8 +138,8 @@ class CDSIndexOption:
         credit triangle to compute the forward RPV01."""
 
         num_credits = len(issuer_curves)
-        time_to_expiry = (self.expiry_dt - value_dt) / gDaysInYear
-        #        timeToMaturity = (self.maturity_dt - value_dt) / gDaysInYear
+        time_to_expiry = (self.expiry_dt - value_dt) / g_days_in_year
+        #        timeToMaturity = (self.maturity_dt - value_dt) / g_days_in_year
         df_to_expiry = issuer_curves[0].df(time_to_expiry)
         libor_curve = issuer_curves[0].libor_curve
 
@@ -302,7 +302,7 @@ class CDSIndexOption:
 
         flow_dts = self.cds_contract.payment_dts
         num_flows = len(flow_dts)
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
         df_to_expiry = libor_curve.df(self.expiry_dt)
         lgd = 1.0 - index_recovery
 
@@ -312,7 +312,7 @@ class CDSIndexOption:
         for i_flow in range(0, num_flows):
             expiry_to_flow_times[i_flow] = (
                 flow_dts[i_flow] - self.expiry_dt
-            ) / gDaysInYear
+            ) / g_days_in_year
             fwd_dfs[i_flow] = libor_curve.df(flow_dts[i_flow]) / df_to_expiry
 
         int_h = 0.0

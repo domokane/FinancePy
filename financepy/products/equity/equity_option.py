@@ -5,7 +5,7 @@
 
 from enum import Enum
 
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...models.black_scholes import BlackScholes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.date import Date
@@ -159,7 +159,7 @@ class EquityOption:
     ):
         """Calculation of option theta by perturbing value date by one
         calendar date (not a business date) and then doing revaluation and
-        calculating the difference divided by dt = 1 / gDaysInYear."""
+        calculating the difference divided by dt = 1 / g_days_in_year."""
 
         v = self.value(
             value_dt, stock_price, discount_curve, dividend_curve, model
@@ -170,7 +170,7 @@ class EquityOption:
         # Need to do this carefully. This is a bit hacky.
         discount_curve.value_dt = next_dt
         dividend_curve.value_dt = next_dt
-        bump = (next_dt - value_dt) / gDaysInYear
+        bump = (next_dt - value_dt) / g_days_in_year
 
         v_bumped = self.value(
             next_dt, stock_price, discount_curve, dividend_curve, model

@@ -11,7 +11,7 @@ from numba import njit
 # TODO: Add Sobol to Monte Carlo
 
 from ...utils.math import covar
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.error import FinError
 
 from ...utils.global_types import OptionTypes
@@ -500,9 +500,9 @@ class EquityAsianOption:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
 
         r = discount_curve.cc_rate(self.expiry_dt)
         q = dividend_curve.cc_rate(self.expiry_dt)
@@ -573,9 +573,9 @@ class EquityAsianOption:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
 
         multiplier = 1.0
 
@@ -649,9 +649,9 @@ class EquityAsianOption:
         if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
-        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
 
         K = self.strike_price
         multiplier = 1.0
@@ -742,9 +742,9 @@ class EquityAsianOption:
             raise FinError(errorStr)
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
 
         r = discount_curve.cc_rate(self.expiry_dt)
         q = dividend_curve.cc_rate(self.expiry_dt)
@@ -789,9 +789,9 @@ class EquityAsianOption:
         a lot of Numpy vectorisation. It is also helped by Numba."""
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
 
         K = self.strike_price
         n = self.num_observations
@@ -837,9 +837,9 @@ class EquityAsianOption:
         price. This uses Numpy and Numba. This is the standard MC pricer."""
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / gDaysInYear
-        t_exp = (self.expiry_dt - value_dt) / gDaysInYear
-        tau = (self.expiry_dt - self.start_averaging_date) / gDaysInYear
+        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
 
         K = self.strike_price
         n = self.num_observations

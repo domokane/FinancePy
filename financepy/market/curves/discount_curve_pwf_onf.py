@@ -8,7 +8,7 @@ from scipy import interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import g_small, gBasisPoint
+from ...utils.global_vars import g_small, g_basis_point
 from ...utils.math import test_monotonicity
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
@@ -70,14 +70,14 @@ class DiscountCurvePWFONF(DiscountCurve):
     ###############################################################################
 
     @classmethod
-    def brick_wall_curve(cls, valuation_date: Date, start_date: Date, end_date: Date, level: float = 1.0*gBasisPoint):
+    def brick_wall_curve(cls, valuation_date: Date, start_date: Date, end_date: Date, level: float = 1.0*g_basis_point):
         """Generate a discount curve of the shape f(t) = level*1_{startdate < t <= enddate} where f(.) is the instantaneous forward rate
             Mostly useful for applying bumps to other discount_curve's, see composite_discount_curve.py
         Args:
             valuation_date (Date): valuation date for the discount_curve
             start_date (Date): start of the non-zero ON forward rate
             end_date (Date): end of the non-zero ON forward rate
-            level (float, optional): ON forward rate between the start and end dates. Defaults to 1.0*gBasisPoint.
+            level (float, optional): ON forward rate between the start and end dates. Defaults to 1.0*g_basis_point.
 
         Returns:
             DiscountCurve: discount curve of the required shape
@@ -89,7 +89,7 @@ class DiscountCurvePWFONF(DiscountCurve):
     ###############################################################################
 
     @classmethod
-    def flat_curve(cls, valuation_date: Date, level: float = 1.0*gBasisPoint):
+    def flat_curve(cls, valuation_date: Date, level: float = 1.0*g_basis_point):
         knot_dates = [valuation_date.add_tenor('1Y')]
         onfwd_rates = [level]
         return cls(valuation_date, knot_dates, onfwd_rates)

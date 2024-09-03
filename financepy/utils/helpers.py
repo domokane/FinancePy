@@ -10,7 +10,7 @@ from numba import njit, float64
 from prettytable import PrettyTable
 
 from .date import Date
-from .global_vars import gDaysInYear, g_small
+from .global_vars import g_days_in_year, g_small
 from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
@@ -99,7 +99,7 @@ def times_from_dates(dt: (Date, list),
         num_dts = 1
         times = [None]
         if dc_counter is None:
-            times[0] = (dt - value_dt) / gDaysInYear
+            times[0] = (dt - value_dt) / g_days_in_year
         else:
             times[0] = dc_counter.year_frac(value_dt, dt)[0]
 
@@ -110,7 +110,7 @@ def times_from_dates(dt: (Date, list),
         times = []
         for i in range(0, num_dts):
             if dc_counter is None:
-                t = (dt[i] - value_dt) / gDaysInYear
+                t = (dt[i] - value_dt) / g_days_in_year
             else:
                 t = dc_counter.year_frac(value_dt, dt[i])[0]
             times.append(t)
@@ -234,7 +234,7 @@ def input_time(dt: Date,
         t = dt
         return check(t)
     elif isinstance(dt, Date):
-        t = (dt - curve.value_dt) / gDaysInYear
+        t = (dt - curve.value_dt) / g_days_in_year
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt

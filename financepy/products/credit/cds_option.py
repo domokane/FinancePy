@@ -9,7 +9,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION, N
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
@@ -117,7 +117,7 @@ class CDSOption:
         forward_rpv01 = cds.risky_pv01(
             value_dt, issuer_curve)['dirty_rpv01']
 
-        time_to_expiry = (self.expiry_dt - value_dt) / gDaysInYear
+        time_to_expiry = (self.expiry_dt - value_dt) / g_days_in_year
         log_moneyness = log(forward_spread / strike)
 
         half_vol_squared_t = 0.5 * volatility * volatility * time_to_expiry

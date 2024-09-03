@@ -31,7 +31,7 @@ from ...models.lmm_mc import lmm_simulate_fwds_nf
 from ...models.lmm_mc import ModelLMMModelTypes
 from ...models.lmm_mc import lmm_cap_flr_pricer
 
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION
 
 from ...utils.global_types import SwapTypes
@@ -84,7 +84,7 @@ class IborLMMProducts:
 
         for next_dt in self.grid_dts[1:]:
             tau = basis.year_frac(prev_dt, next_dt)[0]
-            t = (next_dt - self.grid_dts[0]) / gDaysInYear
+            t = (next_dt - self.grid_dts[0]) / g_days_in_year
             self.accrual_factors.append(tau)
             self.grid_times.append(t)
             prev_dt = next_dt

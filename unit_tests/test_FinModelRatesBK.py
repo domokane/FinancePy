@@ -4,7 +4,7 @@
 
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.models.bk_tree import BKTree
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
@@ -25,7 +25,7 @@ def test_BKExampleOne():
     sigma = 0.25
     a = 0.22
     num_time_steps = 3
-    t_mat = (end_dt - start_dt)/gDaysInYear
+    t_mat = (end_dt - start_dt)/g_days_in_year
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(t_mat, times, dfs)
 
@@ -70,13 +70,13 @@ def test_BKExampleTwo():
         pcd = bond.cpn_dts[i-1]
         ncd = bond.cpn_dts[i]
         if pcd < settle_dt and ncd > settle_dt:
-            flow_time = (pcd - settle_dt) / gDaysInYear
+            flow_time = (pcd - settle_dt) / g_days_in_year
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
     for flow_dt in bond.cpn_dts:
         if flow_dt > settle_dt:
-            flow_time = (flow_dt - settle_dt) / gDaysInYear
+            flow_time = (flow_dt - settle_dt) / g_days_in_year
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -86,8 +86,8 @@ def test_BKExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    t_mat = (maturity_dt - settle_dt) / gDaysInYear
-    t_exp = (expiry_dt - settle_dt) / gDaysInYear
+    t_mat = (maturity_dt - settle_dt) / g_days_in_year
+    t_exp = (expiry_dt - settle_dt) / g_days_in_year
     times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05*times)

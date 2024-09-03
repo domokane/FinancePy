@@ -10,7 +10,7 @@ from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
@@ -1019,7 +1019,7 @@ class FXVolSurfacePlus():
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / gDaysInYear
+        t_exp = (expiry_dt - self.value_dt) / g_days_in_year
 
         vol_type_value = self.vol_func_type.value
 
@@ -1098,7 +1098,7 @@ class FXVolSurfacePlus():
         """ Interpolates the strike at a delta and expiry date. Linear
         time to expiry interpolation is used in strike."""
 
-        t_exp = (expiry_dt - self.value_dt) / gDaysInYear
+        t_exp = (expiry_dt - self.value_dt) / g_days_in_year
 
         vol_type_value = self.vol_func_type.value
 
@@ -1204,7 +1204,7 @@ class FXVolSurfacePlus():
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / gDaysInYear
+        t_exp = (expiry_dt - self.value_dt) / g_days_in_year
 
         vol_type_value = self.vol_func_type.value
 
@@ -1372,7 +1372,7 @@ class FXVolSurfacePlus():
         for i in range(0, num_vol_curves):
 
             expiry_dt = self.expiry_dts[i]
-            t_exp = (expiry_dt - spot_dt) / gDaysInYear
+            t_exp = (expiry_dt - spot_dt) / g_days_in_year
 
             dom_df = self.domestic_curve.df(expiry_dt)
             for_df = self.foreign_curve.df(expiry_dt)

@@ -11,7 +11,7 @@ from numba import njit
 
 
 from ...utils.math import N, phi2
-from ...utils.global_vars import gDaysInYear, g_small
+from ...utils.global_vars import g_days_in_year, g_small
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 
@@ -342,8 +342,8 @@ class EquityCompoundOption(EquityOption):
 
             return v[0]
 
-        tc = (self.c_expiry_dt - value_dt) / gDaysInYear
-        tu = (self.u_expiry_dt - value_dt) / gDaysInYear
+        tc = (self.c_expiry_dt - value_dt) / g_days_in_year
+        tu = (self.u_expiry_dt - value_dt) / g_days_in_year
 
         s0 = stock_price
 
@@ -438,8 +438,8 @@ class EquityCompoundOption(EquityOption):
         if value_dt > self.c_expiry_dt:
             raise FinError("Value date is after expiry date.")
 
-        tc = (self.c_expiry_dt - value_dt) / gDaysInYear
-        tu = (self.u_expiry_dt - value_dt) / gDaysInYear
+        tc = (self.c_expiry_dt - value_dt) / g_days_in_year
+        tu = (self.u_expiry_dt - value_dt) / g_days_in_year
 
         df = discount_curve.df(self.u_expiry_dt)
         r = -np.log(df) / tu

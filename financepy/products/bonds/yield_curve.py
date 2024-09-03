@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import scale
 from ...utils.helpers import label_to_string
 
@@ -55,7 +55,7 @@ class BondYieldCurve:
         for bond in bonds:
             years_to_maturity = (
                 bond._maturity_date - settlement_date
-            ) / gDaysInYear
+            ) / g_days_in_year
             yearsToMaturities.append(years_to_maturity)
         self._yearsToMaturity = np.array(yearsToMaturities)
 
@@ -118,7 +118,7 @@ class BondYieldCurve:
     def interpolated_yield(self, maturity_date: Date):
 
         if type(maturity_date) is Date:
-            t = (maturity_date - self._settlement_date) / gDaysInYear
+            t = (maturity_date - self._settlement_date) / g_days_in_year
         elif type(maturity_date) is list:
             t = maturity_date
         elif type(maturity_date) is np.ndarray:

@@ -6,6 +6,7 @@ import glob
 from os.path import dirname, basename, join
 
 import sys
+
 sys.path.append("..")
 
 from financepy.utils.date import set_date_format, DateFormatTypes
@@ -27,20 +28,23 @@ M = num_modules
 
 ###############################################################################
 
-for module_file_name in modules[N:M + 1]:
+for module_file_name in modules[N : M + 1]:
 
     try:
 
         module_text_name = basename(module_file_name[:-3])
-        print("TEST: %3d out of %3d: MODULE: %-35s " % (N + 1, num_modules,
-                                                        module_text_name),
-              end="")
+        print(
+            "TEST: %3d out of %3d: MODULE: %-35s "
+            % (N + 1, num_modules, module_text_name),
+            end="",
+        )
         module_name = __import__(module_text_name)
         num_errors = module_name.test_cases._global_num_errors
         num_warnings = module_name.test_cases._global_num_warnings
 
-        print("WARNINGS: %3d ERRORS: %3d " % (num_warnings, num_errors),
-              end="")
+        print(
+            "WARNINGS: %3d ERRORS: %3d " % (num_warnings, num_errors), end=""
+        )
 
         if num_errors > 0:
             for i in range(0, num_errors):

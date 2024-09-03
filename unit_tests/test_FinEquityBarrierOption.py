@@ -9,7 +9,7 @@ from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 
 value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 1, 2016)
@@ -47,7 +47,7 @@ def test_down_and_out_call():
         model)
 
     assert round(value, 4) == 0.0000
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional
                                     , stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -68,7 +68,7 @@ def test_down_and_in_call():
         model)
 
     assert round(value, 4) == 1.5307
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -89,7 +89,7 @@ def test_up_and_out_call():
         model)
 
     assert round(value, 4) == 0.1789
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -110,7 +110,7 @@ def test_up_and_in_call():
         model)
 
     assert round(value, 4) == 1.3519
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -131,7 +131,7 @@ def test_up_and_out_put():
         model)
 
     assert round(value, 4) == 18.1445
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -152,7 +152,7 @@ def test_up_and_in_put():
         model)
 
     assert round(value, 4) == 0.0933
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -173,7 +173,7 @@ def test_down_and_out_put():
         model)
 
     assert round(value, 4) == 0.0000
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)
@@ -194,7 +194,7 @@ def test_down_and_in_put():
         model)
 
     assert round(value, 4) == 18.2378
-    t_exp = (expiry_dt - value_dt) / gDaysInYear
+    t_exp = (expiry_dt - value_dt) / g_days_in_year
     model_params = (stock_price, drift, volatility, scheme)
     test_value_mc = option.value_mc(t_exp, K, option_type.value, B, notional,
                                     stock_price, discount_curve.cc_rate(expiry_dt), process_type, model_params)

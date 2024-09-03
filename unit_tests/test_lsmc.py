@@ -1,6 +1,6 @@
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 from financepy.models.equity_lsmc import equity_lsmc, FIT_TYPES
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
@@ -24,7 +24,7 @@ def test_american_call():
     # TODO MAKE WORK WITH EUROPEAN OPTIONS
     option_type = OptionTypes.AMERICAN_CALL
 
-    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
+    time_to_expiry = (expiry_dt - value_dt) / g_days_in_year
     num_steps_per_year = 500
     num_paths = 50_000
     poly_degree = 5
@@ -59,7 +59,7 @@ def test_american_put():
     # TODO MAKE WORK WITH EUROPEAN OPTIONS
     option_type = OptionTypes.AMERICAN_PUT
 
-    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
+    time_to_expiry = (expiry_dt - value_dt) / g_days_in_year
     num_steps_per_year = 500
     num_paths = 50_000
     poly_degree = 5
@@ -97,7 +97,7 @@ def test_call_option():
     num_paths = 50_000
     poly_degree = 5
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
+    time_to_expiry = (expiry_dt - value_dt) / g_days_in_year
     discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
@@ -129,7 +129,7 @@ def test_put_option():
     num_paths = 50_000
     poly_degree = 5
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_dt - value_dt) / gDaysInYear
+    time_to_expiry = (expiry_dt - value_dt) / g_days_in_year
     discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 

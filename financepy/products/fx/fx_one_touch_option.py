@@ -6,7 +6,7 @@
 import numpy as np
 
 
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.error import FinError
 from ...utils.global_types import TouchOptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
@@ -182,7 +182,7 @@ class FXOneTouchOption(FXOption):
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
         t = max(t, 1e-6)
 
         s0 = spot_fx_rate
@@ -472,7 +472,7 @@ class FXOneTouchOption(FXOption):
 
         # "THIS NEEDS TO BE CHECKED"
 
-        t = (self.expiry_dt - value_dt) / gDaysInYear
+        t = (self.expiry_dt - value_dt) / g_days_in_year
 
         df_d = dom_curve.df(self.expiry_dt)
         r_d = -np.log(df_d) / t

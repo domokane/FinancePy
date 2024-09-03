@@ -15,7 +15,7 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.schedule import Schedule
@@ -210,7 +210,7 @@ class IborCapFloor:
     ):
         """Value the caplet or floorlet using a specific model."""
 
-        t_exp = (caplet_start_dt - self.start_dt) / gDaysInYear
+        t_exp = (caplet_start_dt - self.start_dt) / g_days_in_year
 
         alpha = self.day_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
 
@@ -279,7 +279,7 @@ class IborCapFloor:
 
         elif isinstance(model, HWTree):
 
-            t_mat = (caplet_end_dt - value_dt) / gDaysInYear
+            t_mat = (caplet_end_dt - value_dt) / g_days_in_year
             alpha = self.day_counter.year_frac(caplet_start_dt, caplet_end_dt)[
                 0
             ]

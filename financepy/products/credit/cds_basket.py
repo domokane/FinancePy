@@ -12,7 +12,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.math import ONE_MILLION
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
@@ -96,7 +96,7 @@ class CDSBasket:
 
         for i_time in range(1, num_payments):
 
-            t = (payment_dts[i_time] - value_dt) / gDaysInYear
+            t = (payment_dts[i_time] - value_dt) / g_days_in_year
             dt0 = payment_dts[i_time - 1]
             dt1 = payment_dts[i_time]
             accrual_factor = day_count.year_frac(dt0, dt1)[0]
@@ -107,7 +107,7 @@ class CDSBasket:
 
         avg_acc_factor /= num_payments
 
-        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
 
         rpv01 = 0.0
         prot = 0.0
@@ -253,7 +253,7 @@ class CDSBasket:
         if n_to_default < 1 or n_to_default > num_credits:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
 
         if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
@@ -271,7 +271,7 @@ class CDSBasket:
 
         for i_time in range(0, num_times):
 
-            t = (payment_dts[i_time] - value_dt) / gDaysInYear
+            t = (payment_dts[i_time] - value_dt) / g_days_in_year
 
             for i_credit in range(0, num_credits):
                 issuer_curve = issuer_curves[i_credit]

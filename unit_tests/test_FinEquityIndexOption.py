@@ -8,7 +8,7 @@ from financepy.products.equity.equity_index_option import EquityIndexOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black import Black, BlackTypes
 from financepy.models.equity_crr_tree import crr_tree_val_avg
-from financepy.utils.global_vars import gDaysInYear
+from financepy.utils.global_vars import g_days_in_year
 
 
 def test_equity_european_index_option_price():
@@ -50,7 +50,7 @@ def test_equity_american_index_option_price():
     # in case of American exercise
     value_dt = Date(8, 5, 2015)
     expiry_dt = Date(7, 8, 2015, hh=6)
-    time_to_expiry = (expiry_dt-value_dt) / gDaysInYear
+    time_to_expiry = (expiry_dt-value_dt) / g_days_in_year
     discount_rate = 0.08
     volatility = 0.15
     discount_curve = DiscountCurveFlat(value_dt, discount_rate)

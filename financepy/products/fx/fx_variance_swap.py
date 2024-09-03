@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import ONE_MILLION
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.global_types import OptionTypes
 from .fx_vanilla_option import FXVanillaOption
 from ...models.black_scholes import BlackScholes
@@ -72,8 +72,8 @@ class FinFXVarianceSwap:
                 "Domestic Curve valuation date not same as option value date"
             )
 
-        t1 = (value_dt - self.effective_dt) / gDaysInYear
-        t2 = (self.maturity_dt - self.effective_dt) / gDaysInYear
+        t1 = (value_dt - self.effective_dt) / g_days_in_year
+        t2 = (self.maturity_dt - self.effective_dt) / g_days_in_year
 
         expected_var = t1 * realised_var / t2
         expected_var += (t2 - t1) * fair_strike_var / t2
@@ -97,7 +97,7 @@ class FinFXVarianceSwap:
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
-        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
 
         """ Calculate the slope of the volatility curve by taking the end
         points in the volatilities and strikes to calculate the gradient."""
@@ -133,7 +133,7 @@ class FinFXVarianceSwap:
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        t_mat = (self.maturity_dt - value_dt) / gDaysInYear
+        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
 
         df = discount_curve.df(t_mat)
         r = -np.log(df) / t_mat

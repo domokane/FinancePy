@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
-from ...utils.global_vars import gDaysInYear
+from ...utils.global_vars import g_days_in_year
 from ...utils.day_count import DayCount, DayCountTypes
 
 ##########################################################################
@@ -94,7 +94,7 @@ class IborCapVolCurve():
         num_caps = len(self._cap_maturity_dts)
 
         for dt in self._cap_maturity_dts:
-            t = (dt - self._curve_dt) / gDaysInYear
+            t = (dt - self._curve_dt) / g_days_in_year
             self.times.append(t)
             tau = day_counter.year_frac(prev_dt, dt)[0]
             self._taus.append(tau)
@@ -129,7 +129,7 @@ class IborCapVolCurve():
         The volatility interpolation is piecewise flat. """
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_dt) / gDaysInYear
+            t = (dt - self._curve_dt) / g_days_in_year
         else:
             t = dt
 
@@ -159,7 +159,7 @@ class IborCapVolCurve():
         is piecewise flat. """
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_dt) / gDaysInYear
+            t = (dt - self._curve_dt) / g_days_in_year
         else:
             t = dt
 
