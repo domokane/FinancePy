@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -28,70 +29,51 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 def build_Ibor_Curve(tradeDate):
 
     value_dt = tradeDate.add_days(1)
-    dcType = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.ACT_360
     depos = []
 
     depos = []
     fras = []
     swaps = []
 
-    dcType = DayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FrequencyTypes.SEMI_ANNUAL
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq = FrequencyTypes.SEMI_ANNUAL
     settle_dt = value_dt
 
     maturity_dt = settle_dt.add_months(12)
     swap1 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0502,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
+    )
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(24)
     swap2 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0502,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
+    )
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(36)
     swap3 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0501,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
+    )
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(48)
     swap4 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0502,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
+    )
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(60)
     swap5 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0501,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
+    )
     swaps.append(swap5)
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     return libor_curve
+
 
 ##########################################################################
 
@@ -109,11 +91,11 @@ def buildIssuerCurve(tradeDate, libor_curve):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(value_dt,
-                            cdsMarketContracts,
-                            libor_curve,
-                            recovery_rate)
+    issuer_curve = CDSCurve(
+        value_dt, cdsMarketContracts, libor_curve, recovery_rate
+    )
     return issuer_curve
+
 
 ##########################################################################
 
@@ -133,23 +115,23 @@ def test_valueCDSIndex():
     long_protection = True
     index_cpn = 0.004
 
-    cdsIndexContract = CDS(step_in_dt,
-                           maturity_dt,
-                           index_cpn,
-                           notional,
-                           long_protection)
+    cdsIndexContract = CDS(
+        step_in_dt, maturity_dt, index_cpn, notional, long_protection
+    )
 
-#    cdsIndexContract.print(value_dt)
+    #    cdsIndexContract.print(value_dt)
 
     test_cases.header("LABEL", "VALUE")
 
-    spd = cdsIndexContract.par_spread(
-        value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = (
+        cdsIndexContract.par_spread(value_dt, issuer_curve, cdsRecovery)
+        * 10000.0
+    )
     test_cases.print("PAR SPREAD", spd)
 
     v = cdsIndexContract.value(value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("DIRTY VALUE", v['dirty_pv'])
-    test_cases.print("CLEAN VALUE", v['clean_pv'])
+    test_cases.print("DIRTY VALUE", v["dirty_pv"])
+    test_cases.print("CLEAN VALUE", v["clean_pv"])
 
     p = cdsIndexContract.clean_price(value_dt, issuer_curve, cdsRecovery)
     test_cases.print("CLEAN PRICE", p)
@@ -160,18 +142,20 @@ def test_valueCDSIndex():
     accrued_interest = cdsIndexContract.accrued_interest()
     test_cases.print("ACCRUED COUPON", accrued_interest)
 
-    prot_pv = cdsIndexContract.prot_leg_pv(
-        value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cdsIndexContract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
 
     premPV = cdsIndexContract.premium_leg_pv(
-        value_dt, issuer_curve, cdsRecovery)
+        value_dt, issuer_curve, cdsRecovery
+    )
     test_cases.print("PREMIUM LEG PV", premPV)
 
     dirty_rpv01, clean_rpv01 = cdsIndexContract.risky_pv01(
-        value_dt, issuer_curve)
+        value_dt, issuer_curve
+    )
     test_cases.print("DIRTY RPV01", dirty_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
+
 
 #    cdsIndexContract.print_payments(issuer_curve)
 

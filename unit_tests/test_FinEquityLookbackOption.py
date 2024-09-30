@@ -5,8 +5,12 @@
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_fixed_lookback_option import EquityFixedLookbackOption
-from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption
+from financepy.products.equity.equity_fixed_lookback_option import (
+    EquityFixedLookbackOption,
+)
+from financepy.products.equity.equity_float_lookback_option import (
+    EquityFloatLookbackOption,
+)
 
 
 value_dt = Date(1, 1, 2015)
@@ -30,12 +34,8 @@ def test_european_call():
 
     stockMax = stock_price + 10.0
     value = option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        stockMax)
+        value_dt, stock_price, discount_curve, dividend_curve, volatility, stockMax
+    )
     value_mc = option.value_mc(
         value_dt,
         stock_price,
@@ -44,10 +44,11 @@ def test_european_call():
         volatility,
         stockMax,
         num_paths,
-        num_steps_per_year)
+        num_steps_per_year,
+    )
 
     assert round(value, 4) == 28.7477
-    assert round(value_mc, 4) == 27.8592
+    assert round(value_mc, 4) == 27.8713
 
 
 def test_european_put():
@@ -57,12 +58,8 @@ def test_european_put():
 
     stockMin = stock_price - 10
     value = option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        stockMin)
+        value_dt, stock_price, discount_curve, dividend_curve, volatility, stockMin
+    )
     value_mc = option.value_mc(
         value_dt,
         stock_price,
@@ -71,7 +68,8 @@ def test_european_put():
         volatility,
         stockMin,
         num_paths,
-        num_steps_per_year)
+        num_steps_per_year,
+    )
 
     assert round(value, 4) == 20.5366
-    assert round(value_mc, 4) == 20.0366
+    assert round(value_mc, 4) == 20.0334

@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -40,14 +41,17 @@ def test_BondEmbeddedOptionMATLAB():
     ###########################################################################
 
     fixed_leg_type = SwapTypes.PAY
-    dcType = DayCountTypes.THIRTY_E_360
-    fixedFreq = FrequencyTypes.ANNUAL
-    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type,
-                     0.0350, fixedFreq, dcType)
-    swap2 = IborSwap(settle_dt, "2Y", fixed_leg_type,
-                     0.0400, fixedFreq, dcType)
-    swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type,
-                     0.0450, fixedFreq, dcType)
+    dc_type = DayCountTypes.THIRTY_E_360
+    fixed_freq = FrequencyTypes.ANNUAL
+    swap1 = IborSwap(
+        settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type
+    )
+    swap2 = IborSwap(
+        settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type
+    )
+    swap3 = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type
+    )
     swaps = [swap1, swap2, swap3]
     discount_curve = IborSingleCurve(value_dt, [], [], swaps)
 
@@ -78,10 +82,17 @@ def test_BondEmbeddedOptionMATLAB():
     sigma = 0.01  # This volatility is very small for a BK process
     a = 0.1
 
-    puttable_bond = BondEmbeddedOption(issue_dt, maturity_dt, coupon,
-                                       freq_type, dc_type,
-                                       call_dts, call_prices,
-                                       put_dts, put_prices)
+    puttable_bond = BondEmbeddedOption(
+        issue_dt,
+        maturity_dt,
+        coupon,
+        freq_type,
+        dc_type,
+        call_dts,
+        call_prices,
+        put_dts,
+        put_prices,
+    )
 
     test_cases.header("TIME", "Numtime_steps", "BondWithOption", "BondPure")
 
@@ -93,14 +104,16 @@ def test_BondEmbeddedOptionMATLAB():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(period, num_time_steps, v['bondwithoption'],
-                         v['bondpure'])
+        test_cases.print(
+            period, num_time_steps, v["bondwithoption"], v["bondpure"]
+        )
 
-        values.append(v['bondwithoption'])
+        values.append(v["bondwithoption"])
 
     if plotGraphs:
         plt.figure()
         plt.plot(time_steps, values)
+
 
 ###############################################################################
 
@@ -118,8 +131,9 @@ def test_BondEmbeddedOptionQUANTLIB():
 
     ###########################################################################
 
-    discount_curve = DiscountCurveFlat(value_dt, 0.035,
-                                       FrequencyTypes.SEMI_ANNUAL)
+    discount_curve = DiscountCurveFlat(
+        value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL
+    )
 
     ###########################################################################
 
@@ -147,13 +161,20 @@ def test_BondEmbeddedOptionQUANTLIB():
     put_prices = []
 
     # the value used in blog of 12% bp vol is unrealistic
-    sigma = 0.12/0.035  # basis point volatility
+    sigma = 0.12 / 0.035  # basis point volatility
     a = 0.03
 
-    puttable_bond = BondEmbeddedOption(issue_dt, maturity_dt, coupon,
-                                       freq_type, dc_type,
-                                       call_dts, call_prices,
-                                       put_dts, put_prices)
+    puttable_bond = BondEmbeddedOption(
+        issue_dt,
+        maturity_dt,
+        coupon,
+        freq_type,
+        dc_type,
+        call_dts,
+        call_prices,
+        put_dts,
+        put_prices,
+    )
 
     test_cases.header("BOND PRICE", "PRICE")
     v = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
@@ -168,14 +189,16 @@ def test_BondEmbeddedOptionQUANTLIB():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(period, num_time_steps, v['bondwithoption'],
-                         v['bondpure'])
-        values.append(v['bondwithoption'])
+        test_cases.print(
+            period, num_time_steps, v["bondwithoption"], v["bondpure"]
+        )
+        values.append(v["bondwithoption"])
 
     if plotGraphs:
         plt.figure()
         plt.title("Puttable Bond Price Convergence")
         plt.plot(time_steps, values)
+
 
 ###############################################################################
 

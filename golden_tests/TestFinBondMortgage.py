@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -29,27 +30,33 @@ def test_BondMortgage():
 
     num_flows = len(mortgage.schedule.adjusted_dts)
 
-    test_cases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
-                      "TOTAL")
+    test_cases.header(
+        "PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING", "TOTAL"
+    )
 
     for i in range(0, num_flows):
-        test_cases.print(mortgage.schedule.adjusted_dts[i],
-                         mortgage.interest_flows[i],
-                         mortgage.principal_flows[i],
-                         mortgage.principal_remaining[i],
-                         mortgage.total_flows[i])
+        test_cases.print(
+            mortgage.schedule.adjusted_dts[i],
+            mortgage.interest_flows[i],
+            mortgage.principal_flows[i],
+            mortgage.principal_remaining[i],
+            mortgage.total_flows[i],
+        )
 
     mortgage.generate_flows(rate, BondMortgageTypes.INTEREST_ONLY)
 
-    test_cases.header("PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING",
-                      "TOTAL")
+    test_cases.header(
+        "PAYMENT DATE", "INTEREST", "PRINCIPAL", "OUTSTANDING", "TOTAL"
+    )
 
     for i in range(0, num_flows):
-        test_cases.print(mortgage.schedule.adjusted_dts[i],
-                         mortgage.interest_flows[i],
-                         mortgage.principal_flows[i],
-                         mortgage.principal_remaining[i],
-                         mortgage.total_flows[i])
+        test_cases.print(
+            mortgage.schedule.adjusted_dts[i],
+            mortgage.interest_flows[i],
+            mortgage.principal_flows[i],
+            mortgage.principal_remaining[i],
+            mortgage.total_flows[i],
+        )
 
 
 ###############################################################################

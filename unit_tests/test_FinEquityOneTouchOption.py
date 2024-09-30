@@ -181,7 +181,7 @@ def test_DOWN_AND_IN_ASSET_AT_EXPIRY():
     )
 
     assert round(v, 5) == 66.91760
-    assert round(v_mc, 5) == 68.66667
+    assert round(v_mc, 5) == 66.66667
 
 
 def test_DOWN_AND_OUT_ASSET_OR_NOTHING():

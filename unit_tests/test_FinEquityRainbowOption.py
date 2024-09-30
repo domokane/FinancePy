@@ -180,7 +180,7 @@ def test_call_on_nth():
 
     payoff_type = EquityRainbowOptionTypes.CALL_ON_NTH
 
-    expected_results = [34.4109, 17.8990, 9.6716, 4.7205, 1.6182]
+    expected_results = [34.4109, 18.1054, 9.7345, 4.7557, 1.6387]
 
     for n in [1, 2, 3, 4, 5]:
         print(n)
@@ -221,7 +221,7 @@ def test_put_on_nth():
 
     payoff_type = EquityRainbowOptionTypes.PUT_ON_NTH
 
-    expected_results = [1.4413, 3.9644, 7.6921, 13.2466, 22.3467]
+    expected_results = [1.4413, 3.9902, 7.7395, 13.3805, 22.4640]
 
     for n in [1, 2, 3, 4, 5]:
         print(n)

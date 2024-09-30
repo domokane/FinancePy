@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -30,12 +31,9 @@ def test_dt_adjust():
     dg_type = DateGenRuleTypes.BACKWARD
 
     test_cases.header("NO ADJUSTMENTS", "DATE")
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
@@ -47,12 +45,9 @@ def test_dt_adjust():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
@@ -64,19 +59,18 @@ def test_dt_adjust():
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
 
     test_cases.banner("")
-    test_cases.header("NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING",
-                     "DATE")
+    test_cases.header(
+        "NO WEEKENDS AND US HOLIDAYS AND MODIFIED FOLLOWING", "DATE"
+    )
+
     freq_type = FrequencyTypes.SEMI_ANNUAL
     cal_type = CalendarTypes.UNITED_STATES
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
@@ -85,15 +79,13 @@ def test_dt_adjust():
     start_dt = Date(4, 7, 2008)
     end_dt = Date(4, 7, 2011)
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
+
 
 ###############################################################################
 

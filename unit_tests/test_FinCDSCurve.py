@@ -21,18 +21,20 @@ def test_FinCDSCurve():
     fras = []
 
     fixedDCC = DayCountTypes.ACT_365F
-    fixedFreq = FrequencyTypes.SEMI_ANNUAL
+    fixed_freq = FrequencyTypes.SEMI_ANNUAL
     fixed_cpn = 0.05
 
     for i in range(1, 11):
 
         maturity_dt = curve_dt.add_months(12 * i)
-        swap = IborSwap(curve_dt,
-                        maturity_dt,
-                        SwapTypes.PAY,
-                        fixed_cpn,
-                        fixedFreq,
-                        fixedDCC)
+        swap = IborSwap(
+            curve_dt,
+            maturity_dt,
+            SwapTypes.PAY,
+            fixed_cpn,
+            fixed_freq,
+            fixedDCC,
+        )
         swaps.append(swap)
 
     libor_curve = IborSingleCurve(curve_dt, depos, fras, swaps)
@@ -46,11 +48,9 @@ def test_FinCDSCurve():
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(curve_dt,
-                            cds_contracts,
-                            libor_curve,
-                            recovery_rate,
-                            use_cache=False)
+    issuer_curve = CDSCurve(
+        curve_dt, cds_contracts, libor_curve, recovery_rate, use_cache=False
+    )
 
     assert round(issuer_curve._times[0], 4) == 0.0
     assert round(issuer_curve._times[5], 4) == 5.0027
@@ -63,19 +63,19 @@ def test_FinCDSCurve():
     maturity_dt = curve_dt.add_months(12 * i)
     cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
     v = cds.value(curve_dt, issuer_curve, recovery_rate)
-    assert round(v['dirty_pv'] * 1000, 4) == -0.0086
-    assert round(v['clean_pv'] * 1000, 4) == -0.0086
+    assert round(v["dirty_pv"] * 1000, 4) == -0.0086
+    assert round(v["clean_pv"] * 1000, 4) == -0.0086
 
     i = 5
     maturity_dt = curve_dt.add_months(12 * i)
     cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
     v = cds.value(curve_dt, issuer_curve, recovery_rate)
-    assert round(v['dirty_pv'] * 1000, 4) == -0.1640
-    assert round(v['clean_pv'] * 1000, 4) == -0.1640
+    assert round(v["dirty_pv"] * 1000, 4) == -0.1640
+    assert round(v["clean_pv"] * 1000, 4) == -0.1640
 
     i = 10
     maturity_dt = curve_dt.add_months(12 * i)
     cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
     v = cds.value(curve_dt, issuer_curve, recovery_rate)
-    assert round(v['dirty_pv'] * 1000, 4) == -1.1491
-    assert round(v['clean_pv'] * 1000, 4) == -1.1491
+    assert round(v["dirty_pv"] * 1000, 4) == -1.1491
+    assert round(v["clean_pv"] * 1000, 4) == -1.1491

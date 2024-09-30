@@ -12,9 +12,10 @@ import os
 
 
 import pandas as pd
-path = os.path.join(os.path.dirname(__file__), './data/gilt_bond_prices.txt')
-bondDataFrame = pd.read_csv(path, sep='\t')
-bondDataFrame['mid'] = 0.5*(bondDataFrame['bid'] + bondDataFrame['ask'])
+
+path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
+bond_dataframe = pd.read_csv(path, sep="\t")
+bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
 freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
@@ -23,13 +24,13 @@ settlement = Date(19, 9, 2012)
 bonds = []
 clean_prices = []
 
-for _, bondRow in bondDataFrame.iterrows():
-    date_string = bondRow['maturity']
-    mat_date_time = dt.datetime.strptime(date_string, '%d-%b-%y')
+for _, bondRow in bond_dataframe.iterrows():
+    date_string = bondRow["maturity"]
+    mat_date_time = dt.datetime.strptime(date_string, "%d-%b-%y")
     maturity_dt = from_datetime(mat_date_time)
     issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
-    coupon = bondRow['coupon']/100.0
-    clean_price = bondRow['mid']
+    coupon = bondRow["coupon"] / 100.0
+    clean_price = bondRow["mid"]
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
     bonds.append(bond)
     clean_prices.append(clean_price)

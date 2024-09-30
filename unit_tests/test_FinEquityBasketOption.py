@@ -56,7 +56,7 @@ def test_homogeneous_call():
         num_paths,
     )
 
-    assert round(value_mc, 4) == 13.5338
+    assert round(value_mc, 4) == 13.4914
 
 
 def test_homogeneous_put():

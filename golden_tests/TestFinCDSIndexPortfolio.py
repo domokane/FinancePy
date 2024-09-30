@@ -5,6 +5,7 @@
 import os
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -30,69 +31,50 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 def build_Ibor_Curve(tradeDate):
 
     value_dt = tradeDate.add_days(1)
-    dcType = DayCountTypes.ACT_360
+    dc_type = DayCountTypes.ACT_360
     depos = []
 
     depos = []
     fras = []
     swaps = []
 
-    dcType = DayCountTypes.THIRTY_E_360_ISDA
-    fixedFreq = FrequencyTypes.SEMI_ANNUAL
+    dc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq = FrequencyTypes.SEMI_ANNUAL
     settle_dt = value_dt
 
     maturity_dt = settle_dt.add_months(12)
     swap1 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0502,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
+    )
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(24)
     swap2 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0502,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
+    )
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(36)
     swap3 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0501,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
+    )
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(48)
     swap4 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0502,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
+    )
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(60)
     swap5 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        0.0501,
-        fixedFreq,
-        dcType)
+        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
+    )
     swaps.append(swap5)
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
     return libor_curve
+
 
 ##############################################################################
 
@@ -110,12 +92,12 @@ def buildIssuerCurve(tradeDate, libor_curve):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(value_dt,
-                            cdsMarketContracts,
-                            libor_curve,
-                            recovery_rate)
+    issuer_curve = CDSCurve(
+        value_dt, cdsMarketContracts, libor_curve, recovery_rate
+    )
 
     return issuer_curve
+
 
 ##########################################################################
 
@@ -133,9 +115,10 @@ def test_CDSIndexPortfolio():
     maturity7Y = tradeDate.next_cds_date(84)
     maturity10Y = tradeDate.next_cds_date(120)
 
-    path = os.path.join(os.path.dirname(__file__),
-                        './/data//CDX_NA_IG_S7_SPREADS.csv')
-    f = open(path, 'r')
+    path = os.path.join(
+        os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
+    )
+    f = open(path, "r")
     data = f.readlines()
     f.close()
     issuer_curves = []
@@ -155,10 +138,9 @@ def test_CDSIndexPortfolio():
         cds10Y = CDS(step_in_dt, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(value_dt,
-                                cds_contracts,
-                                libor_curve,
-                                recovery_rate)
+        issuer_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, recovery_rate
+        )
 
         issuer_curves.append(issuer_curve)
 
@@ -168,25 +150,33 @@ def test_CDSIndexPortfolio():
 
     cds_index = CDSIndexPortfolio()
 
-    averageSpd3Y = cds_index.average_spread(value_dt,
-                                           step_in_dt,
-                                           maturity3Y,
-                                           issuer_curves) * 10000.0
+    averageSpd3Y = (
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity3Y, issuer_curves
+        )
+        * 10000.0
+    )
 
-    averageSpd5Y = cds_index.average_spread(value_dt,
-                                           step_in_dt,
-                                           maturity5Y,
-                                           issuer_curves) * 10000.0
+    averageSpd5Y = (
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity5Y, issuer_curves
+        )
+        * 10000.0
+    )
 
-    averageSpd7Y = cds_index.average_spread(value_dt,
-                                           step_in_dt,
-                                           maturity7Y,
-                                           issuer_curves) * 10000.0
+    averageSpd7Y = (
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity7Y, issuer_curves
+        )
+        * 10000.0
+    )
 
-    averageSpd10Y = cds_index.average_spread(value_dt,
-                                            step_in_dt,
-                                            maturity10Y,
-                                            issuer_curves) * 10000.0
+    averageSpd10Y = (
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity10Y, issuer_curves
+        )
+        * 10000.0
+    )
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("AVERAGE SPD 3Y", averageSpd3Y)
@@ -201,25 +191,33 @@ def test_CDSIndexPortfolio():
 
     cds_index = CDSIndexPortfolio()
 
-    intrinsicSpd3Y = cds_index.intrinsic_spread(value_dt,
-                                               step_in_dt,
-                                               maturity3Y,
-                                               issuer_curves) * 10000.0
+    intrinsicSpd3Y = (
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity3Y, issuer_curves
+        )
+        * 10000.0
+    )
 
-    intrinsicSpd5Y = cds_index.intrinsic_spread(value_dt,
-                                               step_in_dt,
-                                               maturity5Y,
-                                               issuer_curves) * 10000.0
+    intrinsicSpd5Y = (
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity5Y, issuer_curves
+        )
+        * 10000.0
+    )
 
-    intrinsicSpd7Y = cds_index.intrinsic_spread(value_dt,
-                                               step_in_dt,
-                                               maturity7Y,
-                                               issuer_curves) * 10000.0
+    intrinsicSpd7Y = (
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity7Y, issuer_curves
+        )
+        * 10000.0
+    )
 
-    intrinsicSpd10Y = cds_index.intrinsic_spread(value_dt,
-                                                step_in_dt,
-                                                maturity10Y,
-                                                issuer_curves) * 10000.0
+    intrinsicSpd10Y = (
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity10Y, issuer_curves
+        )
+        * 10000.0
+    )
 
     ##########################################################################
     ##########################################################################

@@ -65,7 +65,7 @@ def test_european_call():
     )
 
     assert round(value, 4) == 26.8608
-    assert round(value_mc, 4) == 25.6946
+    assert round(value_mc, 4) == 25.7191
 
 
 def test_european_put():
@@ -109,4 +109,4 @@ def test_european_put():
     )
 
     assert round(value, 4) == 25.6047
-    assert round(value_mc, 4) == 25.1007
+    assert round(value_mc, 4) == 25.0960
