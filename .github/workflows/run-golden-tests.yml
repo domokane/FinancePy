@@ -10,9 +10,9 @@ jobs:
   runs-on: ubuntu-latest
   steps: 
    - name: checkout repo content
-     uses: actions/checkout@v2
+     uses: actions/checkout@v4
    - name: setup python
-     uses: actions/setup-python@v2
+     uses: actions/setup-python@v4
      with:
        python-version: ${{ env.PYTHON_VERSION }}
    - name: Install dependencies and package
@@ -24,7 +24,7 @@ jobs:
      run: 
        python golden_tests/run_all_tests.py
    - name: Archive code coverage results
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v4
      with:
         name: result-differences-file-upload
         path: golden_tests/differences/*.testLog
