@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.math import N
 from ...utils.global_vars import g_days_in_year, g_small
 from ...utils.error import FinError
-from ...models.gbm_process_simulator import FinGBMProcess
+from ...models.gbm_process_simulator import get_paths_times
 from ...products.fx.fx_option import FXOption
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
@@ -191,8 +191,7 @@ class FXFloatLookbackOption(FXOption):
                     "s_max must be greater than or equal to the stock price."
                 )
 
-        model = FinGBMProcess()
-        s_all = model.get_paths(
+        t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed
         )
 
@@ -201,10 +200,12 @@ class FXFloatLookbackOption(FXOption):
         payoff = np.zeros(num_paths)
 
         if option_type == OptionTypes.EUROPEAN_CALL:
+            # minimum on time dimension axis 1
             s_min_vector = np.min(s_all, axis=1)
             s_min_vector = np.minimum(s_min_vector, s_min)
             payoff = np.maximum(s_all[:, -1] - s_min_vector, 0.0)
         elif option_type == OptionTypes.EUROPEAN_PUT:
+            # maximum on time dimension axis 1
             s_max_vector = np.max(s_all, axis=1)
             s_max_vector = np.maximum(s_max_vector, s_max)
             payoff = np.maximum(s_max_vector - s_all[:, -1], 0.0)

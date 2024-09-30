@@ -7,31 +7,32 @@ with open("README.md", "r") as fh:
 
 with open("version.py", "r") as fh:
     version_number = fh.read()
-    start = version_number.find("\"")
-    end = version_number[start+1:].find("\"")
-    version_number_str = str(version_number[start+1:start+end+1])
-    version_number_str = version_number_str.replace('\n', '')
+    start = version_number.find('"')
+    end = version_number[start + 1 :].find('"')
+    version_number_str = str(version_number[start + 1 : start + end + 1])
+    version_number_str = version_number_str.replace("\n", "")
 
 print(">>>" + version_number_str + "<<<")
 
 ###############################################################################
 cr = "\n"
 
-with open('financepy//__init__.template', 'r') as file:
-    filedata = file.read()
+if 1 == 0:
+    with open("financepy//__init__.template", "r") as file:
+        filedata = file.read()
 
-# Replace the target string
-filedata = filedata.replace('__version__', "'" + str(__version__) + "'")
+    # Replace the target string
+    filedata = filedata.replace("__version__", "'" + str(__version__) + "'")
 
-now = datetime.now()
-dt_string = now.strftime("%d %b %Y at %H:%M")
+    now = datetime.now()
+    dt_string = now.strftime("%d %b %Y at %H:%M")
 
-# Replace the target string
-filedata = filedata.replace('__dateandtime__', dt_string)
+    # Replace the target string
+    filedata = filedata.replace("__dateandtime__", dt_string)
 
-# Write the file out again
-with open('./financepy//__init__.py', 'w') as file:
-    file.write(filedata)
+    # Write the file out again
+    with open("./financepy//__init__.py", "w") as file:
+        file.write(filedata)
 
 ###############################################################################
 
@@ -44,16 +45,27 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/domokane/FinancePy",
-    keywords=['FINANCE', 'OPTIONS', 'BONDS', 'VALUATION', 'DERIVATIVES'],
-    install_requires=['numpy', 'numba', 'scipy', 'llvmlite', 'ipython', 'matplotlib', 'pandas', 'prettytable'],
-    package_data={'': ['*.npz'], },
+    keywords=["FINANCE", "OPTIONS", "BONDS", "VALUATION", "DERIVATIVES"],
+    install_requires=[
+        "numpy",
+        "numba",
+        "scipy",
+        "llvmlite",
+        "ipython",
+        "matplotlib",
+        "pandas",
+        "prettytable",
+    ],
+    package_data={
+        "": ["*.npz"],
+    },
     include_package_date=True,
     packages=setuptools.find_packages(),
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Operating System :: OS Independent',
+        "Development Status :: 2 - Pre-Alpha",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
 )

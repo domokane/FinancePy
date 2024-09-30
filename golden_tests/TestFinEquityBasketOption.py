@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 import numpy as np
@@ -49,7 +50,8 @@ def test_EquityBasketOption():
     for beta in betaList:
         for num_paths in [10000]:
             call_option = EquityBasketOption(
-                expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
+                expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets
+            )
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -60,7 +62,8 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corr_matrix)
+                corr_matrix,
+            )
 
             vMC = call_option.value_mc(
                 value_dt,
@@ -69,7 +72,8 @@ def test_EquityBasketOption():
                 dividend_curves,
                 volatilities,
                 corr_matrix,
-                num_paths)
+                num_paths,
+            )
             end = time.time()
             duration = end - start
             test_cases.print(num_paths, beta, v, vMC, duration)
@@ -97,7 +101,8 @@ def test_EquityBasketOption():
         for num_paths in [10000]:
 
             call_option = EquityBasketOption(
-                expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
+                expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets
+            )
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -109,7 +114,8 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corr_matrix)
+                corr_matrix,
+            )
 
             vMC = call_option.value_mc(
                 value_dt,
@@ -118,7 +124,8 @@ def test_EquityBasketOption():
                 dividend_curves,
                 volatilities,
                 corr_matrix,
-                num_paths)
+                num_paths,
+            )
 
             end = time.time()
             duration = end - start
@@ -144,7 +151,8 @@ def test_EquityBasketOption():
     for beta in betaList:
         for num_paths in [10000]:
             call_option = EquityBasketOption(
-                expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
+                expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets
+            )
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -155,7 +163,8 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corr_matrix)
+                corr_matrix,
+            )
             vMC = call_option.value_mc(
                 value_dt,
                 stock_prices,
@@ -163,7 +172,8 @@ def test_EquityBasketOption():
                 dividend_curves,
                 volatilities,
                 corr_matrix,
-                num_paths)
+                num_paths,
+            )
             end = time.time()
             duration = end - start
             test_cases.print(num_paths, beta, v, vMC, duration)
@@ -190,7 +200,8 @@ def test_EquityBasketOption():
         for num_paths in [10000]:
 
             call_option = EquityBasketOption(
-                expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
+                expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets
+            )
             betas = np.ones(num_assets) * beta
             corr_matrix = beta_vector_to_corr_matrix(betas)
 
@@ -201,7 +212,8 @@ def test_EquityBasketOption():
                 discount_curve,
                 dividend_curves,
                 volatilities,
-                corr_matrix)
+                corr_matrix,
+            )
             vMC = call_option.value_mc(
                 value_dt,
                 stock_prices,
@@ -209,7 +221,8 @@ def test_EquityBasketOption():
                 dividend_curves,
                 volatilities,
                 corr_matrix,
-                num_paths)
+                num_paths,
+            )
             end = time.time()
             duration = end - start
             test_cases.print(num_paths, beta, v, vMC, duration)

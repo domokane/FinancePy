@@ -13,7 +13,7 @@ from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
-from ...models.gbm_process_simulator import get_paths
+from ...models.gbm_process_simulator import get_paths_times
 
 from numba import njit
 
@@ -470,7 +470,9 @@ class EquityOneTouchOption(EquityOption):
         s0 = stock_price
         mu = r - q
 
-        s = get_paths(num_paths, num_time_steps, t, mu, s0, v, seed)
+        time_grid, s = get_paths_times(
+            num_paths, num_time_steps, t, mu, s0, v, seed
+        )
 
         H = self.barrier_price
         X = self.payment_size

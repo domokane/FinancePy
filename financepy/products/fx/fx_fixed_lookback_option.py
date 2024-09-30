@@ -9,7 +9,7 @@ import numpy as np
 from ...utils.math import N
 from ...utils.global_vars import g_days_in_year, g_small
 from ...utils.error import FinError
-from ...models.gbm_process_simulator import FinGBMProcess
+from ...models.gbm_process_simulator import get_paths_times
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.global_types import OptionTypes
@@ -236,13 +236,10 @@ class FXFixedLookbackOption:
                     "s_min must be less than or equal to the stock price."
                 )
 
-        model = FinGBMProcess()
-        s_all = model.get_paths(
+        t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, s_0, volatility, seed
         )
 
-        # Due to antithetics we have doubled the number of paths
-        num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
         if option_type == OptionTypes.EUROPEAN_CALL:

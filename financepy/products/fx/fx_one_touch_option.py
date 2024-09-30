@@ -12,7 +12,7 @@ from ...utils.global_types import TouchOptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
-from ...models.gbm_process_simulator import get_paths
+from ...models.gbm_process_simulator import get_paths_times
 from ...products.fx.fx_option import FXOption
 
 from numba import njit
@@ -487,7 +487,9 @@ class FXOneTouchOption(FXOption):
         s0 = stock_price
         mu = r_d - r_f
 
-        s = get_paths(num_paths, num_time_steps, t, mu, s0, v, seed)
+        tgrid, s = get_paths_times(
+            num_paths, num_time_steps, t, mu, s0, v, seed
+        )
 
         H = self.barrier_rate
         X = self.payment_size

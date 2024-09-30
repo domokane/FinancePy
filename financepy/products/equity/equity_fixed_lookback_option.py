@@ -10,7 +10,7 @@ from ...utils.global_vars import g_days_in_year, g_small
 from ...utils.error import FinError
 from ...utils.date import Date
 
-from ...models.gbm_process_simulator import FinGBMProcess
+from ...models.gbm_process_simulator import get_paths_times
 from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
@@ -254,8 +254,7 @@ class EquityFixedLookbackOption(EquityOption):
                     "Smin must be less than or equal to the stock price."
                 )
 
-        model = FinGBMProcess()
-        s_all = model.get_paths(
+        s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed
         )
 

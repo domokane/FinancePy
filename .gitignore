@@ -8,6 +8,8 @@
 
 # PYTHON AND JUPYTER FILES
 build/
+*.png
+*.jpeg
 env/
 .venv/
 develop-eggs/

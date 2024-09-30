@@ -10,7 +10,8 @@
 import numpy as np
 
 from ...utils.global_vars import g_days_in_year
-from ...models.gbm_process_simulator import FinGBMProcess
+
+from ...models.gbm_process_simulator import get_assets_paths
 
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
@@ -224,15 +225,11 @@ class EquityBasketOption:
         mus = r - dividend_yields
         k = self.strike_price
 
-        num_time_steps = 2
-
-        model = FinGBMProcess()
         np.random.seed(seed)
 
-        s_all = model.get_paths_assets(
+        t_all, s_all = get_assets_paths(
             num_assets,
             num_paths,
-            num_time_steps,
             t_exp,
             mus,
             stock_prices,
@@ -242,9 +239,9 @@ class EquityBasketOption:
         )
 
         if self.option_type == OptionTypes.EUROPEAN_CALL:
-            payoff = np.maximum(np.mean(s_all, axis=1) - k, 0.0)
+            payoff = np.maximum(np.mean(s_all, axis=0) - k, 0.0)
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
-            payoff = np.maximum(k - np.mean(s_all, axis=1), 0.0)
+            payoff = np.maximum(k - np.mean(s_all, axis=0), 0.0)
         else:
             raise FinError("Unknown option type.")
 

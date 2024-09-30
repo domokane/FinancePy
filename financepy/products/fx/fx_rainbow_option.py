@@ -11,7 +11,7 @@ from ...utils.date import Date
 from ...utils.math import N, M
 from ...utils.global_vars import g_days_in_year
 from ...utils.error import FinError
-from ...models.gbm_process_simulator import FinGBMProcess
+from ...models.gbm_process_simulator import get_assets_paths_times
 from ...products.fx.fx_option import FXOption
 
 from ...utils.helpers import check_argument_types
@@ -84,10 +84,9 @@ def value_mc_fast(
     df = discount_curve.df(t)
     r = -np.log(df) / t
     mus = r - dividend_yields
-    model = FinGBMProcess()
 
     num_time_steps = 2
-    s_all = model.get_paths_assets(
+    s_all = get_assets_paths_times(
         num_assets,
         num_paths,
         num_time_steps,

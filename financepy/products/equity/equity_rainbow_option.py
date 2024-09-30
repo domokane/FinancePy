@@ -10,7 +10,7 @@ from typing import List
 from ...utils.math import N, M
 from ...utils.global_vars import g_days_in_year
 from ...utils.error import FinError
-from ...models.gbm_process_simulator import FinGBMProcess
+from ...models.gbm_process_simulator import get_assets_paths
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
@@ -35,27 +35,33 @@ def payoff_value(s, payoff_typeValue, payoff_params):
 
     if payoff_typeValue == EquityRainbowOptionTypes.CALL_ON_MINIMUM.value:
         k = payoff_params[0]
-        payoff = np.maximum(np.min(s, axis=1) - k, 0.0)
+        # average on asset
+        payoff = np.maximum(np.min(s, axis=0) - k, 0.0)
     elif payoff_typeValue == EquityRainbowOptionTypes.CALL_ON_MAXIMUM.value:
         k = payoff_params[0]
-        payoff = np.maximum(np.max(s, axis=1) - k, 0.0)
+        # average on asset
+        payoff = np.maximum(np.max(s, axis=0) - k, 0.0)
     elif payoff_typeValue == EquityRainbowOptionTypes.PUT_ON_MINIMUM.value:
         k = payoff_params[0]
-        payoff = np.maximum(k - np.min(s, axis=1), 0.0)
+        # average on asset
+        payoff = np.maximum(k - np.min(s, axis=0), 0.0)
     elif payoff_typeValue == EquityRainbowOptionTypes.PUT_ON_MAXIMUM.value:
         k = payoff_params[0]
-        payoff = np.maximum(k - np.max(s, axis=1), 0.0)
+        # average on asset
+        payoff = np.maximum(k - np.max(s, axis=0), 0.0)
     elif payoff_typeValue == EquityRainbowOptionTypes.CALL_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
-        ssorted = np.sort(s)
-        assetn = ssorted[:, -n]
+        # sort on asset
+        ssorted = np.sort(s, axis=0)
+        assetn = ssorted[-n, :]
         payoff = np.maximum(assetn - k, 0.0)
     elif payoff_typeValue == EquityRainbowOptionTypes.PUT_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
-        ssorted = np.sort(s)
-        assetn = ssorted[:, -n]
+        # sort on asset
+        ssorted = np.sort(s, axis=0)
+        assetn = ssorted[-n, :]
         payoff = np.maximum(k - assetn, 0.0)
     else:
         raise FinError("Unknown payoff type")
@@ -95,14 +101,9 @@ def value_mc_fast(
 
     mus = r - qs
 
-    model = FinGBMProcess()
-
-    num_time_steps = 2
-
-    s_all = model.get_paths_assets(
+    t_all, s_all = get_assets_paths(
         num_assets,
         num_paths,
-        num_time_steps,
         t,
         mus,
         stock_prices,
