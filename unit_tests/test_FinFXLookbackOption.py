@@ -29,12 +29,8 @@ def test_european_call():
     option = FXFloatLookbackOption(expiry_dt, option_type)
     stockMin = stock_price - 10
     value = option.value(
-        value_dt,
-        stock_price,
-        domestic_curve,
-        foreign_curve,
-        volatility,
-        stockMin)
+        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMin
+    )
 
     value_mc = option.value_mc(
         value_dt,
@@ -44,21 +40,18 @@ def test_european_call():
         volatility,
         stockMin,
         num_paths,
-        num_steps_per_year)
+        num_steps_per_year,
+    )
 
     assert round(value, 4) == 23.7455
-    assert round(value_mc, 4) == 23.3281
+    assert round(value_mc, 4) == 23.2553
 
     k = 100.0
     option = FXFixedLookbackOption(expiry_dt, option_type, k)
     stockMin = stock_price
     value = option.value(
-        value_dt,
-        stock_price,
-        domestic_curve,
-        foreign_curve,
-        volatility,
-        stockMin)
+        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMin
+    )
 
     value_mc = option.value_mc(
         value_dt,
@@ -68,7 +61,8 @@ def test_european_call():
         volatility,
         stockMin,
         num_paths,
-        num_steps_per_year)
+        num_steps_per_year,
+    )
 
     assert round(value, 4) == 26.8608
     assert round(value_mc, 4) == 25.6946
@@ -79,12 +73,8 @@ def test_european_put():
     option = FXFloatLookbackOption(expiry_dt, option_type)
     stockMax = stock_price + 10
     value = option.value(
-        value_dt,
-        stock_price,
-        domestic_curve,
-        foreign_curve,
-        volatility,
-        stockMax)
+        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMax
+    )
 
     value_mc = option.value_mc(
         value_dt,
@@ -94,21 +84,18 @@ def test_european_put():
         volatility,
         stockMax,
         num_paths,
-        num_steps_per_year)
+        num_steps_per_year,
+    )
 
     assert round(value, 4) == 25.2429
-    assert round(value_mc, 4) == 24.2806
+    assert round(value_mc, 4) == 24.3641
 
     k = 105.0
     option = FXFixedLookbackOption(expiry_dt, option_type, k)
     stockMin = stock_price - 10.0
     value = option.value(
-        value_dt,
-        stock_price,
-        domestic_curve,
-        foreign_curve,
-        volatility,
-        stockMin)
+        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMin
+    )
 
     value_mc = option.value_mc(
         value_dt,
@@ -118,7 +105,8 @@ def test_european_put():
         volatility,
         stockMin,
         num_paths,
-        num_steps_per_year)
+        num_steps_per_year,
+    )
 
     assert round(value, 4) == 25.6047
     assert round(value_mc, 4) == 25.1007

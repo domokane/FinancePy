@@ -38,7 +38,8 @@ def test_call_on_max():
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MAXIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_dt, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets
+    )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -49,7 +50,8 @@ def test_call_on_max():
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     v_MC = rainbowOption.value_mc(
         value_dt,
@@ -58,17 +60,19 @@ def test_call_on_max():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
     assert round(v, 4) == 21.4034
-    assert round(v_MC, 4) == 21.5586
+    assert round(v_MC, 4) == 21.3580
 
 
 def test_call_on_min():
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MINIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_dt, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets
+    )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -79,7 +83,8 @@ def test_call_on_min():
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     v_MC = rainbowOption.value_mc(
         value_dt,
@@ -88,17 +93,19 @@ def test_call_on_min():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
     assert round(v, 4) == 5.7817
-    assert round(v_MC, 4) == 5.8795
+    assert round(v_MC, 4) == 5.8022
 
 
 def test_put_on_max():
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MAXIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_dt, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets
+    )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -109,7 +116,8 @@ def test_put_on_max():
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     v_MC = rainbowOption.value_mc(
         value_dt,
@@ -118,17 +126,19 @@ def test_put_on_max():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
     assert round(v, 4) == 4.6493
-    assert round(v_MC, 4) == 4.6839
+    assert round(v_MC, 4) == 4.6484
 
 
 def test_put_on_min():
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MINIMUM
     payoff_params = [strike]
     rainbowOption = EquityRainbowOption(
-        expiry_dt, payoff_type, payoff_params, num_assets)
+        expiry_dt, payoff_type, payoff_params, num_assets
+    )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -139,7 +149,8 @@ def test_put_on_min():
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     v_MC = rainbowOption.value_mc(
         value_dt,
@@ -148,10 +159,11 @@ def test_put_on_min():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
     assert round(v, 4) == 14.8750
-    assert round(v_MC, 4) == 14.8747
+    assert round(v_MC, 4) == 14.7673
 
 
 def test_call_on_nth():
@@ -168,19 +180,14 @@ def test_call_on_nth():
 
     payoff_type = EquityRainbowOptionTypes.CALL_ON_NTH
 
-    expected_results = [
-        34.1760,
-        17.8990,
-        9.6716,
-        4.7205,
-        1.6182
-    ]
+    expected_results = [34.4109, 17.8990, 9.6716, 4.7205, 1.6182]
 
     for n in [1, 2, 3, 4, 5]:
         print(n)
         payoff_params = [n, strike]
         rainbowOption = EquityRainbowOption(
-            expiry_dt, payoff_type, payoff_params, num_assets)
+            expiry_dt, payoff_type, payoff_params, num_assets
+        )
 
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -192,9 +199,10 @@ def test_call_on_nth():
             dividend_curves,
             volatilities,
             corr_matrix,
-            num_paths)
+            num_paths,
+        )
 
-        assert round(v_MC, 4) == expected_results[n-1]
+        assert round(v_MC, 4) == expected_results[n - 1]
 
 
 def test_put_on_nth():
@@ -213,19 +221,14 @@ def test_put_on_nth():
 
     payoff_type = EquityRainbowOptionTypes.PUT_ON_NTH
 
-    expected_results = [
-        1.4277,
-        3.9644,
-        7.6921,
-        13.2466,
-        22.3467
-    ]
+    expected_results = [1.4413, 3.9644, 7.6921, 13.2466, 22.3467]
 
     for n in [1, 2, 3, 4, 5]:
         print(n)
         payoff_params = [n, strike]
         rainbowOption = EquityRainbowOption(
-            expiry_dt, payoff_type, payoff_params, num_assets)
+            expiry_dt, payoff_type, payoff_params, num_assets
+        )
 
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vector_to_corr_matrix(betas)
@@ -237,6 +240,7 @@ def test_put_on_nth():
             dividend_curves,
             volatilities,
             corr_matrix,
-            num_paths)
+            num_paths,
+        )
 
-        assert round(v_MC, 4) == expected_results[n-1]
+        assert round(v_MC, 4) == expected_results[n - 1]

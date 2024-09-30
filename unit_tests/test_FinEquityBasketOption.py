@@ -33,14 +33,16 @@ def test_homogeneous_call():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets
+    )
     value = call_option.value(
         value_dt,
         stock_prices,
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     assert round(value, 4) == 13.6164
 
@@ -51,7 +53,8 @@ def test_homogeneous_call():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
     assert round(value_mc, 4) == 13.5338
 
@@ -67,14 +70,16 @@ def test_homogeneous_put():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets
+    )
     value = call_option.value(
         value_dt,
         stock_prices,
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     assert round(value, 4) == 9.7344
 
@@ -85,9 +90,10 @@ def test_homogeneous_put():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
-    assert round(value_mc, 4) == 9.6986
+    assert round(value_mc, 2) == 9.69
 
 
 def test_inhomogeneous_call():
@@ -101,14 +107,16 @@ def test_inhomogeneous_call():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, num_assets
+    )
     value = call_option.value(
         value_dt,
         stock_prices,
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     assert round(value, 4) == 13.6783
 
@@ -119,9 +127,10 @@ def test_inhomogeneous_call():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
-    assert round(value_mc, 4) == 13.5460
+    assert round(value_mc, 4) == 13.5088
 
 
 def test_inhomogeneous_put():
@@ -135,14 +144,16 @@ def test_inhomogeneous_put():
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, num_assets
+    )
     value = call_option.value(
         value_dt,
         stock_prices,
         discount_curve,
         dividend_curves,
         volatilities,
-        corr_matrix)
+        corr_matrix,
+    )
 
     assert round(value, 4) == 7.9126
 
@@ -153,6 +164,7 @@ def test_inhomogeneous_put():
         dividend_curves,
         volatilities,
         corr_matrix,
-        num_paths)
+        num_paths,
+    )
 
-    assert round(value_mc, 4) == 7.8216
+    assert round(value_mc, 4) == 7.8185

@@ -35,9 +35,7 @@ class EquityFixedLookbackOption(EquityOption):
     the value of the stock price used to determine the payoff is the maximum
     in the case of a call option, and a minimum in the case of a put option."""
 
-    def __init__(
-        self, expiry_dt: Date, option_type: OptionTypes, strike_price: float
-    ):
+    def __init__(self, expiry_dt: Date, option_type: OptionTypes, strike_price: float):
         """Create the FixedLookbackOption by specifying the expiry date, the
         option type and the option strike."""
 
@@ -142,9 +140,7 @@ class EquityFixedLookbackOption(EquityOption):
 
             else:
 
-                e1 = (
-                    (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
-                )
+                e1 = (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
                 e2 = e1 - v * sqrt_t
 
                 if s0 == s_max:
@@ -203,9 +199,7 @@ class EquityFixedLookbackOption(EquityOption):
                 v = k * df * N(-d2) - s0 * dq * N(-d1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.option_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.option_type))
 
         return v
 
@@ -244,22 +238,16 @@ class EquityFixedLookbackOption(EquityOption):
         if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_max = stock_min_max
             if s_max < stock_price:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = stock_min_max
             if s_min > stock_price:
-                raise FinError(
-                    "Smin must be less than or equal to the stock price."
-                )
+                raise FinError("Smin must be less than or equal to the stock price.")
 
-        s_all = get_paths_times(
+        t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed
         )
 
-        # Due to antithetics we have doubled the number of paths
-        num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
         if option_type == OptionTypes.EUROPEAN_CALL:
