@@ -4,8 +4,12 @@
 
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.fx.fx_fixed_lookback_option import FXFixedLookbackOption
-from financepy.products.fx.fx_float_lookback_option import FXFloatLookbackOption
+from financepy.products.fx.fx_fixed_lookback_option import (
+    FXFixedLookbackOption,
+)
+from financepy.products.fx.fx_float_lookback_option import (
+    FXFloatLookbackOption,
+)
 from financepy.utils.global_types import OptionTypes
 
 
@@ -27,9 +31,14 @@ foreign_curve = DiscountCurveFlat(value_dt, foreignRate)
 def test_european_call():
     option_type = OptionTypes.EUROPEAN_CALL
     option = FXFloatLookbackOption(expiry_dt, option_type)
-    stockMin = stock_price - 10
+    stock_min = stock_price - 10
     value = option.value(
-        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMin
+        value_dt,
+        stock_price,
+        domestic_curve,
+        foreign_curve,
+        volatility,
+        stock_min,
     )
 
     value_mc = option.value_mc(
@@ -38,7 +47,7 @@ def test_european_call():
         domestic_curve,
         foreign_curve,
         volatility,
-        stockMin,
+        stock_min,
         num_paths,
         num_steps_per_year,
     )
@@ -48,9 +57,14 @@ def test_european_call():
 
     k = 100.0
     option = FXFixedLookbackOption(expiry_dt, option_type, k)
-    stockMin = stock_price
+    stock_min = stock_price
     value = option.value(
-        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMin
+        value_dt,
+        stock_price,
+        domestic_curve,
+        foreign_curve,
+        volatility,
+        stock_min,
     )
 
     value_mc = option.value_mc(
@@ -59,7 +73,7 @@ def test_european_call():
         domestic_curve,
         foreign_curve,
         volatility,
-        stockMin,
+        stock_min,
         num_paths,
         num_steps_per_year,
     )
@@ -71,9 +85,14 @@ def test_european_call():
 def test_european_put():
     option_type = OptionTypes.EUROPEAN_PUT
     option = FXFloatLookbackOption(expiry_dt, option_type)
-    stockMax = stock_price + 10
+    stock_max = stock_price + 10
     value = option.value(
-        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMax
+        value_dt,
+        stock_price,
+        domestic_curve,
+        foreign_curve,
+        volatility,
+        stock_max,
     )
 
     value_mc = option.value_mc(
@@ -82,7 +101,7 @@ def test_european_put():
         domestic_curve,
         foreign_curve,
         volatility,
-        stockMax,
+        stock_max,
         num_paths,
         num_steps_per_year,
     )
@@ -92,9 +111,14 @@ def test_european_put():
 
     k = 105.0
     option = FXFixedLookbackOption(expiry_dt, option_type, k)
-    stockMin = stock_price - 10.0
+    stock_min = stock_price - 10.0
     value = option.value(
-        value_dt, stock_price, domestic_curve, foreign_curve, volatility, stockMin
+        value_dt,
+        stock_price,
+        domestic_curve,
+        foreign_curve,
+        volatility,
+        stock_min,
     )
 
     value_mc = option.value_mc(
@@ -103,7 +127,7 @@ def test_european_put():
         domestic_curve,
         foreign_curve,
         volatility,
-        stockMin,
+        stock_min,
         num_paths,
         num_steps_per_year,
     )

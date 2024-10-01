@@ -24,20 +24,17 @@ def test_equity_forward():
     discount_curve = DiscountCurveFlat(value_dt, discount_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
 
-    equityForward = EquityForward(expiry_dt,
-                                  forward_price,
-                                  notional,
-                                  FinLongShort.LONG)
+    equityForward = EquityForward(
+        expiry_dt, forward_price, notional, FinLongShort.LONG
+    )
 
-    fwdPrice = equityForward.forward(value_dt,
-                                     stock_price,
-                                     discount_curve,
-                                     dividend_curve)
+    fwd_price = equityForward.forward(
+        value_dt, stock_price, discount_curve, dividend_curve
+    )
 
-    fwdValue = equityForward.value(value_dt,
-                                   stock_price,
-                                   discount_curve,
-                                   dividend_curve)
+    fwd_value = equityForward.value(
+        value_dt, stock_price, discount_curve, dividend_curve
+    )
 
-    assert round(fwdPrice, 4) == 133.9591
-    assert round(fwdValue, 4) == 852.2149
+    assert round(fwd_price, 4) == 133.9591
+    assert round(fwd_value, 4) == 852.2149

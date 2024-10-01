@@ -17,6 +17,7 @@ from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 import numpy as np
 
 import sys
+
 sys.path.append("..")
 
 
@@ -198,7 +199,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #     capVolatilities = np.array(capVolatilities)/100.0
 
 #     dc_type = DayCountTypes.ACT_ACT_ISDA
-#     volCurve = IborCapVolCurve(value_dt,
+#     vol_curve = IborCapVolCurve(value_dt,
 #                                    capVolDates,
 #                                    capVolatilities,
 #                                    dc_type)
@@ -217,7 +218,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #     for num_paths in [10000, 20000, 50000, 100000, 200000, 400000, 1000000]:
 
 #         if num_factors == 1:
-#             lmmProducts.simulate1F(discount_curve, volCurve, num_paths, 0, True)
+#             lmmProducts.simulate1F(discount_curve, vol_curve, num_paths, 0, True)
 #         elif num_factors == 2:
 #             lmmProducts.simulateMF(discount_curve, num_factors, lambdas2F,
 #                                    num_paths, 0, True)

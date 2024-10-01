@@ -5,6 +5,7 @@
 import numpy as np
 
 import sys
+
 sys.path.append("..")
 
 from financepy.utils.day_count import DayCountTypes
@@ -33,23 +34,36 @@ def test_FinCapVolCurve():
         capletDt = capletDt.add_tenor(capletVolTenor)
         capVolDates.append(capletDt)
 
-    capVolatilities = [0.0, 15.50, 18.25, 17.91, 17.74, 17.27,
-                       16.79, 16.30, 16.01, 15.76, 15.54]
-    capVolatilities = np.array(capVolatilities)/100.0
+    capVolatilities = [
+        0.0,
+        15.50,
+        18.25,
+        17.91,
+        17.74,
+        17.27,
+        16.79,
+        16.30,
+        16.01,
+        15.76,
+        15.54,
+    ]
+    capVolatilities = np.array(capVolatilities) / 100.0
 
     day_count_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = IborCapVolCurve(value_dt,
-                               capVolDates,
-                               capVolatilities,
-                               day_count_type)
+    vol_curve = IborCapVolCurve(
+        value_dt, capVolDates, capVolatilities, day_count_type
+    )
 
     test_cases.header("DATE", "CAPVOL", "CAPLETVOL")
     for dt in capVolDates:
-        capFloorVol = volCurve.cap_vol(dt)
-        capFloorLetVol = volCurve.caplet_vol(dt)
-        test_cases.print("%s" % dt,
-                        "%7.3f" % (capFloorVol*100.0),
-                        "%7.2f" % (capFloorLetVol*100.0))
+        capFloorVol = vol_curve.cap_vol(dt)
+        capFloorLetVol = vol_curve.caplet_vol(dt)
+        test_cases.print(
+            "%s" % dt,
+            "%7.3f" % (capFloorVol * 100.0),
+            "%7.2f" % (capFloorLetVol * 100.0),
+        )
+
 
 ##########################################################################
 

@@ -262,13 +262,15 @@ def test_IborCapFloorVolCurve():
     capVolatilities = np.array(capVolatilities) / 100.0
     capVolatilities[0] = 0.0
 
-    volCurve = IborCapVolCurve(value_dt, capVolDates, capVolatilities, dc_type)
+    vol_curve = IborCapVolCurve(
+        value_dt, capVolDates, capVolatilities, dc_type
+    )
 
-    #    print(volCurve._capletGammas)
+    #    print(vol_curve._capletGammas)
 
     # Value cap using a single flat cap volatility
     tcap = (maturity_dt - value_dt) / g_days_in_year
-    vol = volCurve.cap_vol(maturity_dt)
+    vol = vol_curve.cap_vol(maturity_dt)
     model = Black(vol)
     valueCap = capFloor.value(value_dt, libor_curve, model)
     #    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
@@ -279,7 +281,7 @@ def test_IborCapFloorVolCurve():
     test_cases.header("START", "END", "VOL", "VALUE")
 
     for caplet_end_dt in capFloor.capFloorLetDates[2:]:
-        vol = volCurve.caplet_vol(caplet_end_dt)
+        vol = vol_curve.caplet_vol(caplet_end_dt)
         modelCaplet = Black(vol)
         vCaplet = capFloor.value_caplet_floor_let(
             value_dt, capletstart_dt, caplet_end_dt, libor_curve, modelCaplet

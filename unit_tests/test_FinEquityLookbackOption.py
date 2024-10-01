@@ -32,9 +32,14 @@ def test_european_call():
     k = 100.0
     option = EquityFixedLookbackOption(expiry_dt, option_type, k)
 
-    stockMax = stock_price + 10.0
+    stock_max = stock_price + 10.0
     value = option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, volatility, stockMax
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        stock_max,
     )
     value_mc = option.value_mc(
         value_dt,
@@ -42,7 +47,7 @@ def test_european_call():
         discount_curve,
         dividend_curve,
         volatility,
-        stockMax,
+        stock_max,
         num_paths,
         num_steps_per_year,
     )
@@ -56,9 +61,14 @@ def test_european_put():
     k = 100.0
     option = EquityFixedLookbackOption(expiry_dt, option_type, k)
 
-    stockMin = stock_price - 10
+    stock_min = stock_price - 10
     value = option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, volatility, stockMin
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        volatility,
+        stock_min,
     )
     value_mc = option.value_mc(
         value_dt,
@@ -66,7 +76,7 @@ def test_european_put():
         discount_curve,
         dividend_curve,
         volatility,
-        stockMin,
+        stock_min,
         num_paths,
         num_steps_per_year,
     )

@@ -10,16 +10,16 @@ import numpy as np
 
 
 def vol_skew(K, atm_vol, atmK, skew):
-    v = atm_vol + skew * (K-atmK)
+    v = atm_vol + skew * (K - atmK)
     return v
 
 
 def test_equity_variance_swap():
     start_dt = Date(20, 3, 2018)
     tenor = "3M"
-    strike = 0.3*0.3
+    strike = 0.3 * 0.3
 
-    volSwap = EquityVarianceSwap(start_dt, tenor, strike)
+    vol_swap = EquityVarianceSwap(start_dt, tenor, strike)
 
     value_dt = Date(20, 3, 2018)
     stock_price = 100.0
@@ -30,10 +30,10 @@ def test_equity_variance_swap():
 
     atm_vol = 0.20
     atmK = 100.0
-    skew = -0.02/5.0  # defined as dsigma/dK
+    skew = -0.02 / 5.0  # defined as dsigma/dK
     strikes = np.linspace(50.0, 135.0, 18)
     vols = vol_skew(strikes, atm_vol, atmK, skew)
-    volCurve = EquityVolCurve(value_dt, maturity_dt, strikes, vols)
+    vol_curve = EquityVolCurve(value_dt, maturity_dt, strikes, vols)
 
     strike_spacing = 5.0
     num_call_options = 10
@@ -44,10 +44,18 @@ def test_equity_variance_swap():
 
     use_forward = False
 
-    k1 = volSwap.fair_strike(value_dt, stock_price, dividend_curve,
-                             volCurve, num_call_options, num_put_options,
-                             strike_spacing, discount_curve, use_forward)
+    k1 = vol_swap.fair_strike(
+        value_dt,
+        stock_price,
+        dividend_curve,
+        vol_curve,
+        num_call_options,
+        num_put_options,
+        strike_spacing,
+        discount_curve,
+        use_forward,
+    )
     assert round(k1, 4) == 0.0447
 
-    k2 = volSwap.fair_strike_approx(value_dt, stock_price, strikes, vols)
+    k2 = vol_swap.fair_strike_approx(value_dt, stock_price, strikes, vols)
     assert round(k2, 4) == 0.0424

@@ -36,8 +36,14 @@ def test_FinFXForward():
     fras = []
     swaps = []
     deposit_rate = ccy1InterestRate
-    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
-                       DayCountTypes.ACT_360, notional, cal_type)
+    depo = IborDeposit(
+        settle_dt,
+        maturity_dt,
+        deposit_rate,
+        DayCountTypes.ACT_360,
+        notional,
+        cal_type,
+    )
     depos.append(depo)
     foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
@@ -45,33 +51,38 @@ def test_FinFXForward():
     fras = []
     swaps = []
     deposit_rate = ccy2InterestRate
-    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate,
-                       DayCountTypes.ACT_360, notional, cal_type)
+    depo = IborDeposit(
+        settle_dt,
+        maturity_dt,
+        deposit_rate,
+        DayCountTypes.ACT_360,
+        notional,
+        cal_type,
+    )
     depos.append(depo)
     domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
     notional = 100.0
     notional_currency = for_name
 
-    fxForward = FXForward(expiry_dt,
-                          strike_fx_rate,
-                          currency_pair,
-                          notional,
-                          notional_currency)
+    fx_fwd = FXForward(
+        expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency
+    )
 
-    fwdValue = fxForward.value(value_dt, spot_fx_rate,
-                               domestic_curve, foreign_curve)
+    fwd_value = fx_fwd.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve
+    )
 
-    fwd_fx_rate = fxForward.forward(value_dt, spot_fx_rate,
-                                    domestic_curve,
-                                    foreign_curve)
+    fwd_fx_rate = fx_fwd.forward(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve
+    )
 
     assert round(fwd_fx_rate, 4) == 1.3388
 
-    assert round(fwdValue['value'], 4) == -2.4978
-    assert round(fwdValue['cash_dom'], 4) == -249.7797
-    assert round(fwdValue['cash_for'], 4) == -192.1382
-    assert fwdValue['not_dom'] == 136.5
-    assert fwdValue['not_for'] == 100.0
-    assert fwdValue['ccy_dom'] == 'USD'
-    assert fwdValue['ccy_for'] == 'EUR'
+    assert round(fwd_value["value"], 4) == -2.4978
+    assert round(fwd_value["cash_dom"], 4) == -249.7797
+    assert round(fwd_value["cash_for"], 4) == -192.1382
+    assert fwd_value["not_dom"] == 136.5
+    assert fwd_value["not_for"] == 100.0
+    assert fwd_value["ccy_dom"] == "USD"
+    assert fwd_value["ccy_for"] == "EUR"

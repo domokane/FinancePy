@@ -10,6 +10,7 @@ from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 import numpy as np
 import sys
+
 sys.path.append("..")
 
 
@@ -49,69 +50,70 @@ def test_FinFXAmericanOption():
 
     test_cases.header("SPOT FX RATE", "VALUE_BS", "VOL_IN", "IMPLD_VOL")
 
-    spot_fx_rates = np.arange(50, 200, 20)/100.0
+    spot_fx_rates = np.arange(50, 200, 20) / 100.0
 
     for spot_fx_rate in spot_fx_rates:
 
-        call_option = FXVanillaOption(expiry_dt,
-                                      strike_fx_rate,
-                                      currency_pair,
-                                      OptionTypes.EUROPEAN_CALL,
-                                      1000000,
-                                      "USD")
+        call_option = FXVanillaOption(
+            expiry_dt,
+            strike_fx_rate,
+            currency_pair,
+            OptionTypes.EUROPEAN_CALL,
+            1000000,
+            "USD",
+        )
 
-        valueEuropean = call_option.value(value_dt,
-                                          spot_fx_rate,
-                                          domestic_curve,
-                                          foreign_curve,
-                                          model)['v']
+        value_european = call_option.value(
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        )["v"]
 
-        call_option = FXVanillaOption(expiry_dt,
-                                      strike_fx_rate,
-                                      "EURUSD",
-                                      OptionTypes.AMERICAN_CALL,
-                                      1000000,
-                                      "USD")
+        call_option = FXVanillaOption(
+            expiry_dt,
+            strike_fx_rate,
+            "EURUSD",
+            OptionTypes.AMERICAN_CALL,
+            1000000,
+            "USD",
+        )
 
-        valueAmerican = call_option.value(value_dt,
-                                          spot_fx_rate,
-                                          domestic_curve,
-                                          foreign_curve,
-                                          model)['v']
+        value_american = call_option.value(
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        )["v"]
 
-        diff = (valueAmerican - valueEuropean)
-        test_cases.print(spot_fx_rate, valueEuropean, valueAmerican, diff)
+        diff = value_american - value_european
+        test_cases.print(spot_fx_rate, value_european, value_american, diff)
 
     for spot_fx_rate in spot_fx_rates:
 
-        call_option = FXVanillaOption(expiry_dt,
-                                      strike_fx_rate,
-                                      "EURUSD",
-                                      OptionTypes.EUROPEAN_PUT,
-                                      1000000,
-                                      "USD")
+        call_option = FXVanillaOption(
+            expiry_dt,
+            strike_fx_rate,
+            "EURUSD",
+            OptionTypes.EUROPEAN_PUT,
+            1000000,
+            "USD",
+        )
 
-        valueEuropean = call_option.value(value_dt,
-                                          spot_fx_rate,
-                                          domestic_curve,
-                                          foreign_curve,
-                                          model)['v']
+        value_european = call_option.value(
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        )["v"]
 
-        call_option = FXVanillaOption(expiry_dt,
-                                      strike_fx_rate,
-                                      "EURUSD",
-                                      OptionTypes.AMERICAN_PUT,
-                                      1000000,
-                                      "USD")
+        call_option = FXVanillaOption(
+            expiry_dt,
+            strike_fx_rate,
+            "EURUSD",
+            OptionTypes.AMERICAN_PUT,
+            1000000,
+            "USD",
+        )
 
-        valueAmerican = call_option.value(value_dt,
-                                          spot_fx_rate,
-                                          domestic_curve,
-                                          foreign_curve,
-                                          model)['v']
+        value_american = call_option.value(
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        )["v"]
 
-        diff = (valueAmerican - valueEuropean)
-        test_cases.print(spot_fx_rate, valueEuropean, valueAmerican, diff)
+        diff = value_american - value_european
+        test_cases.print(spot_fx_rate, value_european, value_american, diff)
+
 
 ###############################################################################
 

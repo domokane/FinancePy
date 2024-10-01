@@ -27,6 +27,7 @@ from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 import numpy as np
 import time as time
 import sys
+
 sys.path.append("..")
 
 
@@ -39,11 +40,12 @@ def getCorrelationMatrix(numFwds, beta, dt):
     correl = np.zeros((numFwds, numFwds))  # indexes from 1 to p-1
     for i in range(0, numFwds):
         correl[i][i] = 1.0
-        for j in range(i+1, numFwds):
+        for j in range(i + 1, numFwds):
             correl[i][j] = np.exp(-beta * (j - i) * dt)
             correl[j][i] = correl[i][j]
 
     return correl
+
 
 ###############################################################################
 
@@ -72,7 +74,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
         capVolatilities[0] = 0.0
 
     dc_type = DayCountTypes.ACT_ACT_ISDA
-    volCurve = IborCapVolCurve(value_dt,
+    vol_curve = IborCapVolCurve(value_dt,
                                    capVolDates,
                                    capVolatilities,
                                    dc_type)
@@ -81,7 +83,7 @@ def getCorrelationMatrix(numFwds, beta, dt):
     t = 0.0
     for ix in range(0, numFwds):
         t = t + dt
-        zetas[ix] = volCurve.capFloorletVol(t)
+        zetas[ix] = vol_curve.capFloorletVol(t)
 
     print(zetas)
     return zetas """
@@ -97,6 +99,7 @@ def getForwardCurve(numFwds, r):
 
     fwd0 = np.array(fwd0)
     return fwd0
+
 
 ###############################################################################
 
@@ -242,10 +245,10 @@ def getForwardCurve(numFwds, r):
 
 
 def test_HullBookExamples():
-    """ Examining examples on page 770 of Hull OFODS
-        Last cap product has caplet starting in 10 years so we have to model
-        the forward curve from time 0 out to 11 forwards, not 10 forwards.
-        We have to model forward rates 0-1, 1-2, 2-3, ..., 10-11 """
+    """Examining examples on page 770 of Hull OFODS
+    Last cap product has caplet starting in 10 years so we have to model
+    the forward curve from time 0 out to 11 forwards, not 10 forwards.
+    We have to model forward rates 0-1, 1-2, 2-3, ..., 10-11"""
 
     verbose = True
 
@@ -275,21 +278,55 @@ def test_HullBookExamples():
     # We need the volatility for the forward rates out to the one starting in
     # 10 years. So we have 11 elements. The one starting today has zero vol.
     num_factors = 1
-    gammas1FList = [0.00, 0.1550, 0.2063674, 0.1720986, 0.1721993, 0.1524579,
-                    0.1414779, 0.1297711, 0.1381053, 0.135955, 0.1339842]
+    gammas1FList = [
+        0.00,
+        0.1550,
+        0.2063674,
+        0.1720986,
+        0.1721993,
+        0.1524579,
+        0.1414779,
+        0.1297711,
+        0.1381053,
+        0.135955,
+        0.1339842,
+    ]
     gammas1F = np.array(gammas1FList)
 
     # One factor model
-    fwds1F = lmm_simulate_fwds_1f(numFwds, num_paths, numeraire_index, fwd0,
-                                  gammas1F, taus, use_sobol, seed)
+    fwds1F = lmm_simulate_fwds_1f(
+        numFwds,
+        num_paths,
+        numeraire_index,
+        fwd0,
+        gammas1F,
+        taus,
+        use_sobol,
+        seed,
+    )
 
-#    LMMPrintForwards(fwds1F)
+    #    LMMPrintForwards(fwds1F)
 
-    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
-                                                fwd0, fwds1F, taus) * 100.0
+    vRatchetCaplets = (
+        lmm_ratchet_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwds1F, taus
+        )
+        * 100.0
+    )
 
-    hullRatchetCaplets1F = [0.00, 0.196, 0.207, 0.201, 0.194, 0.187,
-                            0.1890, 0.172, 0.167, 0.160, 0.153]
+    hullRatchetCaplets1F = [
+        0.00,
+        0.196,
+        0.207,
+        0.201,
+        0.194,
+        0.187,
+        0.1890,
+        0.172,
+        0.167,
+        0.160,
+        0.153,
+    ]
     hullRatchetCaplets1F = np.array(hullRatchetCaplets1F)
 
     if verbose:
@@ -299,11 +336,26 @@ def test_HullBookExamples():
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
-    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
-                                              fwd0, fwds1F, taus) * 100.0
+    vStickyCaplets = (
+        lmm_sticky_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwds1F, taus
+        )
+        * 100.0
+    )
 
-    hullStickyCaplets1F = [0.0, 0.196, 0.336, 0.412, 0.458, 0.484,
-                           0.498, 0.502, 0.501, 0.497, 0.488]
+    hullStickyCaplets1F = [
+        0.0,
+        0.196,
+        0.336,
+        0.412,
+        0.458,
+        0.484,
+        0.498,
+        0.502,
+        0.501,
+        0.497,
+        0.488,
+    ]
 
     if verbose:
         test_cases.banner("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
@@ -313,19 +365,56 @@ def test_HullBookExamples():
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
     num_factors = 1
-    lambdas1FList = [[0.0, 0.1550, 0.2064, 0.1721, 0.1722, 0.1525,
-                      0.1415, 0.1298, 0.1381, 0.1360, 0.1340]]
+    lambdas1FList = [
+        [
+            0.0,
+            0.1550,
+            0.2064,
+            0.1721,
+            0.1722,
+            0.1525,
+            0.1415,
+            0.1298,
+            0.1381,
+            0.1360,
+            0.1340,
+        ]
+    ]
     lambdas1F = np.array(lambdas1FList)
 
     # One factor model
-    fwdsMF = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
-                                  fwd0, lambdas1F, taus, use_sobol, seed)
+    fwdsMF = lmm_simulate_fwds_mf(
+        numFwds,
+        num_factors,
+        num_paths,
+        numeraire_index,
+        fwd0,
+        lambdas1F,
+        taus,
+        use_sobol,
+        seed,
+    )
 
-    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
-                                                fwd0, fwdsMF, taus) * 100.0
+    vRatchetCaplets = (
+        lmm_ratchet_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwdsMF, taus
+        )
+        * 100.0
+    )
 
-    hullRatchetCaplets1F = [0.0, 0.196, 0.207, 0.201, 0.194, 0.187,
-                            0.1890, 0.172, 0.167, 0.160, 0.153]
+    hullRatchetCaplets1F = [
+        0.0,
+        0.196,
+        0.207,
+        0.201,
+        0.194,
+        0.187,
+        0.1890,
+        0.172,
+        0.167,
+        0.160,
+        0.153,
+    ]
 
     if verbose:
         test_cases.banner("RATCHET - NUM FACTORS 1F")
@@ -334,11 +423,26 @@ def test_HullBookExamples():
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
-    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
-                                              fwd0, fwdsMF, taus) * 100.0
+    vStickyCaplets = (
+        lmm_sticky_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwdsMF, taus
+        )
+        * 100.0
+    )
 
-    hullStickyCaplets1F = [0.00, 0.196, 0.336, 0.412, 0.458, 0.484, 0.498,
-                           0.502, 0.501, 0.497, 0.488]
+    hullStickyCaplets1F = [
+        0.00,
+        0.196,
+        0.336,
+        0.412,
+        0.458,
+        0.484,
+        0.498,
+        0.502,
+        0.501,
+        0.497,
+        0.488,
+    ]
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
 
@@ -348,20 +452,68 @@ def test_HullBookExamples():
         test_cases.print("HULL GETS:", hullStickyCaplets1F)
 
     num_factors = 2
-    lambdas2FList = [[0.00, 0.1410, 0.1952, 0.1678, 0.1711, 0.1525,
-                      0.1406, 0.1265, 0.1306, 0.1236, 0.1163],
-                     [0.00, -0.0645, -0.0670, -0.0384, -0.0196, 0.00,
-                      0.0161, 0.0289, 0.0448, 0.0565, 0.0665]]
+    lambdas2FList = [
+        [
+            0.00,
+            0.1410,
+            0.1952,
+            0.1678,
+            0.1711,
+            0.1525,
+            0.1406,
+            0.1265,
+            0.1306,
+            0.1236,
+            0.1163,
+        ],
+        [
+            0.00,
+            -0.0645,
+            -0.0670,
+            -0.0384,
+            -0.0196,
+            0.00,
+            0.0161,
+            0.0289,
+            0.0448,
+            0.0565,
+            0.0665,
+        ],
+    ]
     lambdas2F = np.array(lambdas2FList)
 
     # Two factor model
-    fwds2F = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
-                                  fwd0, lambdas2F, taus, use_sobol, seed)
+    fwds2F = lmm_simulate_fwds_mf(
+        numFwds,
+        num_factors,
+        num_paths,
+        numeraire_index,
+        fwd0,
+        lambdas2F,
+        taus,
+        use_sobol,
+        seed,
+    )
 
-    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
-                                                fwd0, fwds2F, taus) * 100.0
-    hullRatchetCaplets2F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,
-                            0.189, 0.180, 0.174, 0.168, 0.162]
+    vRatchetCaplets = (
+        lmm_ratchet_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwds2F, taus
+        )
+        * 100.0
+    )
+    hullRatchetCaplets2F = [
+        0.00,
+        0.194,
+        0.207,
+        0.205,
+        0.198,
+        0.193,
+        0.189,
+        0.180,
+        0.174,
+        0.168,
+        0.162,
+    ]
 
     if verbose:
         test_cases.banner("RATCHET - NUM FACTORS:2")
@@ -370,11 +522,26 @@ def test_HullBookExamples():
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
 
-    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
-                                              fwd0, fwds2F, taus) * 100.0
+    vStickyCaplets = (
+        lmm_sticky_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwds2F, taus
+        )
+        * 100.0
+    )
 
-    hullStickyCaplets2F = [0.00, 0.196, 0.334, 0.413, 0.462, 0.492,
-                           0.512, 0.520, 0.523, 0.523, 0.519]
+    hullStickyCaplets2F = [
+        0.00,
+        0.196,
+        0.334,
+        0.413,
+        0.462,
+        0.492,
+        0.512,
+        0.520,
+        0.523,
+        0.523,
+        0.519,
+    ]
 
     if verbose:
         test_cases.banner("STICKY RATCHET - NUM FACTORS:2")
@@ -384,23 +551,82 @@ def test_HullBookExamples():
     check_vector_differences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
 
     num_factors = 3
-    lambdas3FList = [[0.00, 0.1365, 0.1928, 0.1672, 0.1698, 0.1485,
-                      0.1395, 0.1261, 0.1290, 0.1197, 0.1097],
-                     [0.0, -0.0662, -0.0702, -0.0406, -0.0206, 0.00,
-                      0.0169, 0.0306, 0.0470, 0.0581, 0.0666],
-                     [0.0, 0.0319, 0.0225, 0.000, -0.0198, -0.0347,
-                      -0.0163, 0.000, 0.0151, 0.0280, 0.0384]]
+    lambdas3FList = [
+        [
+            0.00,
+            0.1365,
+            0.1928,
+            0.1672,
+            0.1698,
+            0.1485,
+            0.1395,
+            0.1261,
+            0.1290,
+            0.1197,
+            0.1097,
+        ],
+        [
+            0.0,
+            -0.0662,
+            -0.0702,
+            -0.0406,
+            -0.0206,
+            0.00,
+            0.0169,
+            0.0306,
+            0.0470,
+            0.0581,
+            0.0666,
+        ],
+        [
+            0.0,
+            0.0319,
+            0.0225,
+            0.000,
+            -0.0198,
+            -0.0347,
+            -0.0163,
+            0.000,
+            0.0151,
+            0.0280,
+            0.0384,
+        ],
+    ]
     lambdas3F = np.array(lambdas3FList)
 
     # Three factor model
-    fwds3F = lmm_simulate_fwds_mf(numFwds, num_factors, num_paths, numeraire_index,
-                                  fwd0, lambdas3F, taus, use_sobol, seed)
+    fwds3F = lmm_simulate_fwds_mf(
+        numFwds,
+        num_factors,
+        num_paths,
+        numeraire_index,
+        fwd0,
+        lambdas3F,
+        taus,
+        use_sobol,
+        seed,
+    )
 
-    hullRatchetCaplets3F = [0.00, 0.194, 0.207, 0.205, 0.198, 0.193,
-                            0.189, 0.180, 0.174, 0.168, 0.162]
+    hullRatchetCaplets3F = [
+        0.00,
+        0.194,
+        0.207,
+        0.205,
+        0.198,
+        0.193,
+        0.189,
+        0.180,
+        0.174,
+        0.168,
+        0.162,
+    ]
 
-    vRatchetCaplets = lmm_ratchet_caplet_pricer(spread, numFwds, num_paths,
-                                                fwd0, fwds3F, taus) * 100.0
+    vRatchetCaplets = (
+        lmm_ratchet_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwds3F, taus
+        )
+        * 100.0
+    )
 
     if verbose:
         test_cases.banner("RATCHET - NUM FACTORS:3")
@@ -409,11 +635,26 @@ def test_HullBookExamples():
 
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
 
-    vStickyCaplets = lmm_sticky_caplet_pricer(spread, numFwds, num_paths,
-                                              fwd0, fwds3F, taus) * 100.0
+    vStickyCaplets = (
+        lmm_sticky_caplet_pricer(
+            spread, numFwds, num_paths, fwd0, fwds3F, taus
+        )
+        * 100.0
+    )
 
-    hullStickyCaplets3F = [0.00, 0.195, 0.336, 0.418, 0.472, 0.506,
-                           0.524, 0.533, 0.537, 0.537, 0.534]
+    hullStickyCaplets3F = [
+        0.00,
+        0.195,
+        0.336,
+        0.418,
+        0.472,
+        0.506,
+        0.524,
+        0.533,
+        0.537,
+        0.537,
+        0.534,
+    ]
 
     if verbose:
         test_cases.banner("STICKY RATCHET - NUM FACTORS:3")
@@ -421,6 +662,7 @@ def test_HullBookExamples():
         test_cases.print("HULL GETS:", hullStickyCaplets3F)
 
     check_vector_differences(vStickyCaplets, hullStickyCaplets3F, 1e-2)
+
 
 ###############################################################################
 
@@ -461,6 +703,8 @@ def fwdfwdCorrelation(fwds):
     start = time.time()
     fwdCorr = lmm_fwd_fwd_correlation(numFwds, num_paths, 1, fwds)
     end = time.time()
+
+
 #    print("CORR Period:", end - start)
 #    print(fwdCorr)
 

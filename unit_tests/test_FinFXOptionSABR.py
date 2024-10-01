@@ -37,140 +37,140 @@ model = BlackScholes(volatility)
 # keeps the value unchanged
 notional = 1000000.0
 
-spot_fx_rates = np.arange(50, 200, 10)/100.0
+spot_fx_rates = np.arange(50, 200, 10) / 100.0
 
 
 def test_european_call():
     spot_fx_rate = 1.20
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.EUROPEAN_CALL,
-                                  notional,
-                                  "USD")
-    valueEuropean = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.EUROPEAN_CALL,
+        notional,
+        "USD",
+    )
+    value_european = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueEuropean, 4) == 0.0251
+    assert round(value_european, 4) == 0.0251
 
     spot_fx_rate = 1.80
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.EUROPEAN_CALL,
-                                  notional,
-                                  "USD")
-    valueEuropean = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.EUROPEAN_CALL,
+        notional,
+        "USD",
+    )
+    value_european = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueEuropean, 4) == 0.5277
+    assert round(value_european, 4) == 0.5277
 
 
 def test_american_call():
     spot_fx_rate = 1.20
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.AMERICAN_CALL,
-                                  1000000,
-                                  "USD")
-    valueAmerican = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.AMERICAN_CALL,
+        1000000,
+        "USD",
+    )
+    value_american = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueAmerican, 4) == 0.0255
+    assert round(value_american, 4) == 0.0255
 
     spot_fx_rate = 1.80
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.AMERICAN_CALL,
-                                  1000000,
-                                  "USD")
-    valueAmerican = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.AMERICAN_CALL,
+        1000000,
+        "USD",
+    )
+    value_american = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueAmerican, 4) == 0.5500
+    assert round(value_american, 4) == 0.5500
 
 
 def test_european_put():
     spot_fx_rate = 1.20
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.EUROPEAN_PUT,
-                                  notional,
-                                  "USD")
-    valueEuropean = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.EUROPEAN_PUT,
+        notional,
+        "USD",
+    )
+    value_european = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueEuropean, 4) == 0.0797
+    assert round(value_european, 4) == 0.0797
 
     spot_fx_rate = 1.80
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.EUROPEAN_PUT,
-                                  notional,
-                                  "USD")
-    valueEuropean = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.EUROPEAN_PUT,
+        notional,
+        "USD",
+    )
+    value_european = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueEuropean, 4) == 0.0000
+    assert round(value_european, 4) == 0.0000
 
 
 def test_american_put():
     spot_fx_rate = 1.20
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.AMERICAN_PUT,
-                                  1000000,
-                                  "USD")
-    valueAmerican = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.AMERICAN_PUT,
+        1000000,
+        "USD",
+    )
+    value_american = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueAmerican, 4) == 0.0798
+    assert round(value_american, 4) == 0.0798
 
     spot_fx_rate = 1.80
 
-    call_option = FXVanillaOption(expiry_dt,
-                                  strike_fx_rate,
-                                  "EURUSD",
-                                  OptionTypes.AMERICAN_PUT,
-                                  1000000,
-                                  "USD")
-    valueAmerican = call_option.value(value_dt,
-                                      spot_fx_rate,
-                                      domestic_curve,
-                                      foreign_curve,
-                                      model)['v']
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.AMERICAN_PUT,
+        1000000,
+        "USD",
+    )
+    value_american = call_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )["v"]
 
-    assert round(valueAmerican, 4) == 0.0000
+    assert round(value_american, 4) == 0.0000
