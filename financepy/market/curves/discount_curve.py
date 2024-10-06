@@ -131,8 +131,8 @@ class DiscountCurve:
 
     def _df_to_zero(
         self,
-        dfs: float | np.ndarray,
-        maturity_dts: Date | list,
+        dfs: (float, np.ndarray),
+        maturity_dts: (Date, list),
         freq_type: FrequencyTypes,
         dc_type: DayCountTypes,
     ):
@@ -183,7 +183,7 @@ class DiscountCurve:
 
     def zero_rate(
         self,
-        dts: list | Date,
+        dts: (list, Date),
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
@@ -210,7 +210,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def cc_rate(self, dts: list | Date, dc_type: DayCountTypes = DayCountTypes.SIMPLE):
+    def cc_rate(self, dts: (list, Date), dc_type: DayCountTypes = DayCountTypes.SIMPLE):
         """Calculation of zero rates with continuous compounding. This
         function can return a vector of cc rates given a vector of
         dates so must use Numpy functions."""
@@ -295,7 +295,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def df(self, dt: list | Date, day_count=DayCountTypes.ACT_ACT_ISDA):
+    def df(self, dt: (list, Date), day_count=DayCountTypes.ACT_ACT_ISDA):
         """Function to calculate a discount factor from a date or a
         vector of dates. The day count determines how dates get converted to
         years. I allow this to default to ACT_ACT_ISDA unless specified."""
@@ -310,7 +310,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _df(self, t: float | np.ndarray):
+    def _df(self, t: (float, np.ndarray)):
         """Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates."""
 
@@ -368,7 +368,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _fwd(self, times: np.ndarray | float):
+    def _fwd(self, times: (np.ndarray, float)):
         """Calculate the continuously compounded forward rate at the forward
         time provided. This is done by perturbing the time by a small amount
         and measuring the change in the log of the discount factor divided by
