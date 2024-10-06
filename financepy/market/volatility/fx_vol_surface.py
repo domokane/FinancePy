@@ -743,8 +743,8 @@ class FXVolSurface:
             expiry_dt = self.expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / g_days_in_year
 
-            dom_df = self.domestic_curve._df(t_exp)
-            for_df = self.foreign_curve._df(t_exp)
+            dom_df = self.domestic_curve.df_t(t_exp)
+            for_df = self.foreign_curve.df_t(t_exp)
             f = s * for_df / dom_df
 
             self.t_exp[i] = t_exp
@@ -1291,8 +1291,8 @@ class FXVolSurface:
 
             d_fx = (high_fx - low_fx) / num_intervals
 
-            dom_df = self.domestic_curve._df(t_exp)
-            for_df = self.foreign_curve._df(t_exp)
+            dom_df = self.domestic_curve.df_t(t_exp)
+            for_df = self.foreign_curve.df_t(t_exp)
 
             r_d = -np.log(dom_df) / t_exp
             r_f = -np.log(for_df) / t_exp

@@ -95,8 +95,8 @@ class FXBarrierOption(FXOption):
         ln_s0_k = log(float(s0) / K)
         sqrt_t = sqrt(t)
 
-        dq = foreign_curve._df(t)
-        df = domestic_curve._df(t)
+        dq = foreign_curve.df_t(t)
+        df = domestic_curve.df_t(t)
         r_d = -log(df) / t
         rf = -log(dq) / t
 

@@ -128,8 +128,8 @@ class FXDigitalOption:
         t_del = np.maximum(t_del, 1e-10)
 
         # TODO RESOLVE t_del versus TEXP
-        dom_df = domestic_curve._df(t_del)
-        for_df = foreign_curve._df(t_del)
+        dom_df = domestic_curve.df_t(t_del)
+        for_df = foreign_curve.df_t(t_del)
         r_d = -np.log(dom_df) / t_del
         r_f = -np.log(for_df) / t_del
 

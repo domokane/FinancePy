@@ -75,10 +75,10 @@ class FXFloatLookbackOption(FXOption):
 
         t = (self.expiry_dt - value_dt) / g_days_in_year
 
-        df = domestic_curve._df(t)
+        df = domestic_curve.df_t(t)
         r = -np.log(df) / t
 
-        dq = foreign_curve._df(t)
+        dq = foreign_curve.df_t(t)
         q = -np.log(dq) / t
 
         v = volatility
@@ -165,10 +165,10 @@ class FXFloatLookbackOption(FXOption):
     ):
         """Value FX floating lookback option using Monte Carlo"""
         t = (self.expiry_dt - value_dt) / g_days_in_year
-        df = domestic_curve._df(t)
+        df = domestic_curve.df_t(t)
         r = -np.log(df) / t
 
-        dq = foreign_curve._df(t)
+        dq = foreign_curve.df_t(t)
         q = -np.log(dq) / t
 
         num_time_steps = int(t * num_steps_per_year)

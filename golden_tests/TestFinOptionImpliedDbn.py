@@ -11,6 +11,7 @@ from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import numpy as np
 import sys
+
 sys.path.append("..")
 
 
@@ -38,7 +39,7 @@ def test_FinOptionImpliedDbn():
         currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
-        tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
+        tenors = ["1M", "2M", "3M", "6M", "1Y", "2Y"]
         atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
         mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
@@ -48,20 +49,22 @@ def test_FinOptionImpliedDbn():
         atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
 
-        fx_market = FXVolSurface(value_dt,
-                                spot_fx_rate,
-                                currency_pair,
-                                notional_currency,
-                                domestic_curve,
-                                foreign_curve,
-                                tenors,
-                                atm_vols,
-                                mkt_strangle_25d_vols,
-                                rsk_reversal_25d_vols,
-                                atm_method,
-                                delta_method)
+        fx_market = FXVolSurface(
+            value_dt,
+            spot_fx_rate,
+            currency_pair,
+            notional_currency,
+            domestic_curve,
+            foreign_curve,
+            tenors,
+            atm_vols,
+            mkt_strangle_25d_vols,
+            rsk_reversal_25d_vols,
+            atm_method,
+            delta_method,
+        )
 
-#        fx_market.check_calibration(True)
+        #        fx_market.check_calibration(True)
 
         PLOT_GRAPHS = False
         if PLOT_GRAPHS:
@@ -78,10 +81,10 @@ def test_FinOptionImpliedDbn():
             num_steps = 10000
             dFX = (end_fx - start_fx) / num_steps
 
-#            dom_df = domestic_curve._df(t_exp)
-#            for_df = foreign_curve._df(t_exp)
-#            r_d = -np.log(dom_df) / t_exp
-#            r_f = -np.log(for_df) / t_exp
+            #            dom_df = domestic_curve.df_t(t_exp)
+            #            for_df = foreign_curve.df_t(t_exp)
+            #            r_d = -np.log(dom_df) / t_exp
+            #            r_f = -np.log(for_df) / t_exp
 
             params = fx_market.parameters[iTenor]
 
@@ -89,13 +92,14 @@ def test_FinOptionImpliedDbn():
             vols = []
 
             for iK in range(0, num_steps):
-                strike = start_fx + iK*dFX
+                strike = start_fx + iK * dFX
                 vol = vol_function_clark(params, F, strike, t_exp)
                 strikes.append(strike)
                 vols.append(vol)
 
             strikes = np.array(strikes)
             vols = np.array(vols)
+
 
 #            dbn = optionImpliedDbn(spot_fx_rate, t_exp, rd, rf, strikes, vols)
 #            print("SUM:", dbn.sum())

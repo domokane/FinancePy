@@ -139,10 +139,10 @@ class EquityCliquetOption(EquityOption):
                     tau = t_exp - t_prev
 
                     # The deflator is out to the option reset time
-                    dq = dividend_curve._df(t_prev)
+                    dq = dividend_curve.df_t(t_prev)
 
                     # The option dividend is over the option life
-                    dqMat = dividend_curve._df(t_exp)
+                    dqMat = dividend_curve.df_t(t_exp)
 
                     q = -np.log(dqMat / dq) / tau
 

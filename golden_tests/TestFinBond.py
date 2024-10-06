@@ -201,7 +201,7 @@ def build_ibor_curve(value_dt):
 
         df0 = 1.0
         for t in times[1:]:
-            df1 = libor_curve._df(t)
+            df1 = libor_curve.df_t(t)
             fwd = (df0 / df1 - 1.0) / dt
             print(t, df1, fwd)
             df0 = df1

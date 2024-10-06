@@ -2631,8 +2631,8 @@ class FXVolSurfacePlus:
 
             d_fx = (high_fx - low_fx) / num_intervals
 
-            dom_df = self.domestic_curve._df(t)
-            for_df = self.foreign_curve._df(t)
+            dom_df = self.domestic_curve.df_t(t)
+            for_df = self.foreign_curve.df_t(t)
 
             r_d = -np.log(dom_df) / t
             r_f = -np.log(for_df) / t

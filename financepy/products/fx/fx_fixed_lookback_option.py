@@ -207,10 +207,10 @@ class FXFixedLookbackOption:
         t = (self.expiry_dt - value_dt) / g_days_in_year
         s_0 = spot_fx_rate
 
-        df = domestic_curve._df(t)
+        df = domestic_curve.df_t(t)
         r_d = -np.log(df) / t
 
-        dq = foreign_curve._df(t)
+        dq = foreign_curve.df_t(t)
         r_f = -np.log(dq) / t
 
         mu = r_d - r_f

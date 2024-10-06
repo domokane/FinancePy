@@ -23,18 +23,20 @@ from ...utils.helpers import label_to_string
 
 
 class DiscountCurve:
-    ''' This is a base discount curve which has an internal representation of
+    """This is a base discount curve which has an internal representation of
     a vector of times and discount factors and an interpolation scheme for
-    interpolating between these fixed points. '''
+    interpolating between these fixed points."""
 
     ###########################################################################
 
-    def __init__(self,
-                 value_dt: Date,
-                 df_dates: list,
-                 df_values: np.ndarray,
-                 interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
-        """ Create the discount curve from a vector of times and discount
+    def __init__(
+        self,
+        value_dt: Date,
+        df_dates: list,
+        df_values: np.ndarray,
+        interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+    ):
+        """Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
         are explicitly linking dates and discount factors, we do not need to
         specify any compounding convention or day count calculation since
@@ -84,13 +86,15 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _zero_to_df(self,
-                    value_dt: Date,  # TODO: why is value_dt not used ?
-                    rates: (float, np.ndarray),
-                    times: (float, np.ndarray),
-                    freq_type: FrequencyTypes,
-                    dc_type: DayCountTypes):
-        """ Convert a zero with a specified compounding frequency and day count
+    def _zero_to_df(
+        self,
+        value_dt: Date,  # TODO: why is value_dt not used ?
+        rates: (float, np.ndarray),
+        times: (float, np.ndarray),
+        freq_type: FrequencyTypes,
+        dc_type: DayCountTypes,
+    ):
+        """Convert a zero with a specified compounding frequency and day count
         convention to a discount factor for a single maturity date or a list of
         dates. The day count is used to calculate the elapsed year fraction."""
 
@@ -105,10 +109,12 @@ class DiscountCurve:
             df = np.exp(-rates * t)
         elif freq_type == FrequencyTypes.SIMPLE:
             df = 1.0 / (1.0 + rates * t)
-        elif freq_type == FrequencyTypes.ANNUAL or \
-                freq_type == FrequencyTypes.SEMI_ANNUAL or \
-                freq_type == FrequencyTypes.QUARTERLY or \
-                freq_type == FrequencyTypes.MONTHLY:
+        elif (
+            freq_type == FrequencyTypes.ANNUAL
+            or freq_type == FrequencyTypes.SEMI_ANNUAL
+            or freq_type == FrequencyTypes.QUARTERLY
+            or freq_type == FrequencyTypes.MONTHLY
+        ):
             df = 1.0 / np.power(1.0 + rates / f, f * t)
         else:
             raise FinError("Unknown Frequency type")
@@ -117,16 +123,18 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _df_to_zero(self,
-                    dfs: (float, np.ndarray),
-                    maturity_dts: (Date, list),
-                    freq_type: FrequencyTypes,
-                    dc_type: DayCountTypes):
-        """ Given a dates this first generates the discount factors. It then
+    def _df_to_zero(
+        self,
+        dfs: (float, np.ndarray),
+        maturity_dts: (Date, list),
+        freq_type: FrequencyTypes,
+        dc_type: DayCountTypes,
+    ):
+        """Given a dates this first generates the discount factors. It then
         converts the discount factors to a zero rate with a chosen compounding
         frequency which may be continuous, simple, or compounded at a specific
         frequency which are all choices of FrequencyTypes. Returns a list of
-        discount factor. """
+        discount factor."""
 
         f = annual_frequency(freq_type)
 
@@ -146,8 +154,7 @@ class DiscountCurve:
         num_dates = len(date_list)
         zero_rates = []
 
-        times = times_from_dates(
-            date_list, self.value_dt, dc_type)
+        times = times_from_dates(date_list, self.value_dt, dc_type)
 
         for i in range(0, num_dates):
 
@@ -168,14 +175,16 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def zero_rate(self,
-                  dts: (list, Date),
-                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                  dc_type: DayCountTypes = DayCountTypes.ACT_360):
-        """ Calculation of zero rates with specified frequency. This
+    def zero_rate(
+        self,
+        dts: (list, Date),
+        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+    ):
+        """Calculation of zero rates with specified frequency. This
         function can return a vector of zero rates given a vector of
         dates so must use Numpy functions. Default frequency is a
-        continuously compounded rate. """
+        continuously compounded rate."""
 
         if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
@@ -195,27 +204,28 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def cc_rate(self,
-                dts: (list, Date),
-                dc_type: DayCountTypes = DayCountTypes.SIMPLE):
-        """ Calculation of zero rates with continuous compounding. This
+    def cc_rate(
+        self, dts: (list, Date), dc_type: DayCountTypes = DayCountTypes.SIMPLE
+    ):
+        """Calculation of zero rates with continuous compounding. This
         function can return a vector of cc rates given a vector of
-        dates so must use Numpy functions. """
+        dates so must use Numpy functions."""
 
-        cc_rates = self.zero_rate(
-            dts, FrequencyTypes.CONTINUOUS, dc_type)
+        cc_rates = self.zero_rate(dts, FrequencyTypes.CONTINUOUS, dc_type)
         return cc_rates
 
     ###########################################################################
 
-    def swap_rate(self,
-                  effective_dt: Date,
-                  maturity_dt: (list, Date),
-                  freq_type=FrequencyTypes.ANNUAL,
-                  dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360):
-        """ Calculate the swap rate to maturity date. This is the rate paid by
+    def swap_rate(
+        self,
+        effective_dt: Date,
+        maturity_dt: (list, Date),
+        freq_type=FrequencyTypes.ANNUAL,
+        dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+    ):
+        """Calculate the swap rate to maturity date. This is the rate paid by
         a swap that has a price of par today. This is the same as a Libor swap
-        rate except that we do not do any business day adjustments. """
+        rate except that we do not do any business day adjustments."""
 
         # Note that this function does not call the IborSwap class to
         # calculate the swap rate since that will create a circular dependency.
@@ -247,9 +257,7 @@ class DiscountCurve:
             if maturity_dt <= effective_dt:
                 raise FinError("Maturity date is before the swap start date.")
 
-            schedule = Schedule(effective_dt,
-                                maturity_dt,
-                                freq_type)
+            schedule = Schedule(effective_dt, maturity_dt, freq_type)
 
             flow_dts = schedule.generate()
             flow_dts[0] = effective_dt
@@ -282,15 +290,13 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def df(self,
-           dt: (list, Date),
-           day_count=DayCountTypes.ACT_ACT_ISDA):
-        ''' Function to calculate a discount factor from a date or a
+    def df(self, dt: (list, Date), day_count=DayCountTypes.ACT_ACT_ISDA):
+        """Function to calculate a discount factor from a date or a
         vector of dates. The day count determines how dates get converted to
-        years. I allow this to default to ACT_ACT_ISDA unless specified. '''
+        years. I allow this to default to ACT_ACT_ISDA unless specified."""
 
         times = times_from_dates(dt, self.value_dt, day_count)
-        dfs = self._df(times)
+        dfs = self.df_t(times)
 
         if isinstance(dfs, float):
             return dfs
@@ -299,19 +305,19 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _df(self,
-            t: (float, np.ndarray)):
-        """ Hidden function to calculate a discount factor from a time or a
-        vector of times. Discourage usage in favour of passing in dates. """
+    def df_t(self, t: (float, np.ndarray)):
+        """Function to calculate a discount factor from a time or a
+        vector of times. Discourage usage in favour of passing in dates."""
 
-        if self._interp_type is InterpTypes.FLAT_FWD_RATES or \
-                self._interp_type is InterpTypes.LINEAR_ZERO_RATES or \
-                self._interp_type is InterpTypes.LINEAR_FWD_RATES:
+        if (
+            self._interp_type is InterpTypes.FLAT_FWD_RATES
+            or self._interp_type is InterpTypes.LINEAR_ZERO_RATES
+            or self._interp_type is InterpTypes.LINEAR_FWD_RATES
+        ):
 
-            df = interpolate(t,
-                             self._times,
-                             self._dfs,
-                             self._interp_type.value)
+            df = interpolate(
+                t, self._times, self._dfs, self._interp_type.value
+            )
 
         else:
 
@@ -321,25 +327,23 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def survival_prob(self,
-                      dt: Date):
-        """ This returns a survival probability to a specified date based on
+    def survival_prob(self, dt: Date):
+        """This returns a survival probability to a specified date based on
         the assumption that the continuously compounded rate is a default
         hazard rate in which case the survival probability is directly
-        analogous to a discount factor. """
+        analogous to a discount factor."""
 
         q = self.df(dt)
         return q
 
     ###########################################################################
 
-    def fwd(self,
-            dts: Date):
-        """ Calculate the continuously compounded forward rate at the forward
+    def fwd(self, dts: Date):
+        """Calculate the continuously compounded forward rate at the forward
         Date provided. This is done by perturbing the time by one day only
         and measuring the change in the log of the discount factor divided by
         the time increment dt. I am assuming continuous compounding over the
-        one date. """
+        one date."""
 
         if isinstance(dts, Date):
             dts_plus_one_days = [dts.add_days(1)]
@@ -361,9 +365,8 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _fwd(self,
-             times: (np.ndarray, float)):
-        """ Calculate the continuously compounded forward rate at the forward
+    def _fwd(self, times: (np.ndarray, float)):
+        """Calculate the continuously compounded forward rate at the forward
         time provided. This is done by perturbing the time by a small amount
         and measuring the change in the log of the discount factor divided by
         the time increment dt."""
@@ -371,18 +374,17 @@ class DiscountCurve:
         dt = 1e-6
         times = np.maximum(times, dt)
 
-        df1 = self._df(times - dt)
-        df2 = self._df(times + dt)
+        df1 = self.df_t(times - dt)
+        df2 = self.df_t(times + dt)
         fwd = np.log(df1 / df2) / (2.0 * dt)
         return fwd
 
     ###########################################################################
 
-    def bump(self,
-             bump_size: float):
-        """ Adjust the continuously compounded forward rates by a perturbation
+    def bump(self, bump_size: float):
+        """Adjust the continuously compounded forward rates by a perturbation
         upward equal to the bump size and return a curve objet with this bumped
-        curve. This is used for interest rate risk. """
+        curve. This is used for interest rate risk."""
 
         times = self._times.copy()
         values = self._dfs.copy()
@@ -392,23 +394,24 @@ class DiscountCurve:
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        disc_curve = DiscountCurve(self.value_dt,
-                                   times,
-                                   values,
-                                   self._interp_type)
+        disc_curve = DiscountCurve(
+            self.value_dt, times, values, self._interp_type
+        )
 
         return disc_curve
 
     ###########################################################################
 
-    def fwd_rate(self,
-                 start_dt: (list, Date),
-                 date_or_tenor: (Date, str),
-                 dc_type: DayCountTypes = DayCountTypes.ACT_360):
-        """ Calculate the forward rate between two forward dates according to
+    def fwd_rate(
+        self,
+        start_dt: (list, Date),
+        date_or_tenor: (Date, str),
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+    ):
+        """Calculate the forward rate between two forward dates according to
         the specified day count convention. This defaults to Actual 360. The
         first date is specified and the second is given as a date or as a tenor
-        which is added to the first date. """
+        which is added to the first date."""
 
         if isinstance(start_dt, Date):
             start_dts = []
@@ -451,15 +454,17 @@ class DiscountCurve:
         num_points = len(self._df_dates)
         s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._df_dates[i],
-                                 "%12.8f" % self._dfs[i])
+            s += label_to_string(
+                "%12s" % self._df_dates[i], "%12.8f" % self._dfs[i]
+            )
 
         return s
 
     ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

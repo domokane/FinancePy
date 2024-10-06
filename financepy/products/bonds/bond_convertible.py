@@ -488,7 +488,7 @@ class BondConvertible:
 
         discount_factors = []
         for t in cpn_times:
-            df = discount_curve._df(t)
+            df = discount_curve.df_t(t)
             discount_factors.append(df)
 
         discount_times = np.array(cpn_times)

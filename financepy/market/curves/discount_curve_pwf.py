@@ -20,18 +20,20 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class DiscountCurvePWF(DiscountCurve):
-    """ Curve is made up of a series of zero rates sections with each having
+    """Curve is made up of a series of zero rates sections with each having
     a piecewise flat zero rate. The default compounding assumption is
-    continuous. The class inherits methods from FinDiscountCurve. """
+    continuous. The class inherits methods from FinDiscountCurve."""
 
-    def __init__(self,
-                 value_dt: Date,
-                 zero_dts: list,
-                 zero_rates: (list, np.ndarray),
-                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                 day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
-        """ Creates a discount curve using a vector of times and zero rates
-        that assumes that the zero rates are piecewise flat. """
+    def __init__(
+        self,
+        value_dt: Date,
+        zero_dts: list,
+        zero_rates: (list, np.ndarray),
+        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+        day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+    ):
+        """Creates a discount curve using a vector of times and zero rates
+        that assumes that the zero rates are piecewise flat."""
 
         check_argument_types(self.__init__, locals())
 
@@ -48,9 +50,7 @@ class DiscountCurvePWF(DiscountCurve):
         self.freq_type = freq_type
         self.dc_type = day_count_type
 
-        dc_times = times_from_dates(zero_dts,
-                                    self.value_dt,
-                                    self.dc_type)
+        dc_times = times_from_dates(zero_dts, self.value_dt, self.dc_type)
 
         self.times = np.array(dc_times)
 
@@ -59,9 +59,8 @@ class DiscountCurvePWF(DiscountCurve):
 
     ###########################################################################
 
-    def _zero_rate(self,
-                   times: (float, np.ndarray, list)):
-        """ The piecewise flat zero rate is selected and returned. """
+    def _zero_rate(self, times: (float, np.ndarray, list)):
+        """The piecewise flat zero rate is selected and returned."""
 
         if isinstance(times, float):
             times = np.array([times])
@@ -97,9 +96,8 @@ class DiscountCurvePWF(DiscountCurve):
 
     ###########################################################################
 
-    def _fwd(self,
-             times: (np.ndarray, list)):
-        """ Calculate the continuously compounded forward rate at the forward
+    def _fwd(self, times: (np.ndarray, list)):
+        """Calculate the continuously compounded forward rate at the forward
         time provided. This is done by perturbing the time by a small amount
         and measuring the change in the log of the discount factor divided by
         the time increment dt."""
@@ -107,39 +105,34 @@ class DiscountCurvePWF(DiscountCurve):
         dt = 1e-6
         times = np.maximum(times, dt)
 
-        df1 = self._df(times - dt)
-        df2 = self._df(times + dt)
+        df1 = self.df_t(times - dt)
+        df2 = self.df_t(times + dt)
         fwd = np.log(df1 / df2) / (2.0 * dt)
 
         # Prevent the discontinuous spikes by capping them at the sum of short
         # plus the long end zero rate !
-        cap = (self._zero_rates[0] + self._zero_rates[-1])
+        cap = self._zero_rates[0] + self._zero_rates[-1]
         fwd = np.minimum(fwd, cap)
 
         return fwd
 
     ###########################################################################
 
-    def df(self,
-           dates: (Date, list)):
-        """ Return discount factors given a single or vector of dates. The
+    def df(self, dates: (Date, list)):
+        """Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
         also depends on the day count convention. This was set in the
-        construction of the curve to be ACT_ACT_ISDA. """
+        construction of the curve to be ACT_ACT_ISDA."""
 
         # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dates,
-                                    self.value_dt,
-                                    self.dc_type)
+        dc_times = times_from_dates(dates, self.value_dt, self.dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self.value_dt,
-                              zero_rates,
-                              dc_times,
-                              self.freq_type,
-                              self.dc_type)
+        df = self._zero_to_df(
+            self.value_dt, zero_rates, dc_times, self.freq_type, self.dc_type
+        )
 
         return df
 
@@ -157,7 +150,8 @@ class DiscountCurvePWF(DiscountCurve):
     ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

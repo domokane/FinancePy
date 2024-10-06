@@ -114,7 +114,7 @@ class FXForward:
             value_dt, spot_fx_rate, domestic_curve, foreign_curve
         )
 
-        dom_df = domestic_curve._df(t)
+        dom_df = domestic_curve.df_t(t)
 
         if self.notional_currency == self.dom_name:
             self.notional_dom = self.notional
@@ -170,8 +170,8 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        for_df = foreign_curve._df(t)
-        dom_df = domestic_curve._df(t)
+        for_df = foreign_curve.df_t(t)
+        dom_df = domestic_curve.df_t(t)
 
         fwd_fx_rate = spot_fx_rate * for_df / dom_df
         return fwd_fx_rate

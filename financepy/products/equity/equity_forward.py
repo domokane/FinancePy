@@ -81,7 +81,7 @@ class EquityForward:
             value_dt, stock_price, discount_curve, dividend_curve
         )
 
-        discount_df = discount_curve._df(t)
+        discount_df = discount_curve.df_t(t)
 
         v = fwd_stock_price - self.forward_price
         v = v * self.notional * discount_df
@@ -115,8 +115,8 @@ class EquityForward:
 
         t = np.maximum(t, 1e-10)
 
-        discount_df = discount_curve._df(t)
-        dividend_df = dividend_curve._df(t)
+        discount_df = discount_curve.df_t(t)
+        dividend_df = dividend_curve.df_t(t)
 
         fwd_stock_price = stock_price * dividend_df / discount_df
         return fwd_stock_price

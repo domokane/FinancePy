@@ -103,7 +103,7 @@ class CDSBasket:
             avg_acc_factor += accrual_factor
             rpv01_to_times[i_time] = rpv01_to_times[
                 i_time - 1
-            ] + accrual_factor * libor_curve._df(t)
+            ] + accrual_factor * libor_curve.df_t(t)
 
         avg_acc_factor /= num_payments
 
@@ -142,7 +142,7 @@ class CDSBasket:
                         break
 
                 prot_trial = 1.0 - issuer_curves[asset_index].recovery_rate
-                prot_trial *= libor_curve._df(min_tau)
+                prot_trial *= libor_curve.df_t(min_tau)
 
             else:
 

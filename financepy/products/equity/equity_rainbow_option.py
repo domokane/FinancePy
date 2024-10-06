@@ -88,12 +88,12 @@ def value_mc_fast(
 
     np.random.seed(seed)
 
-    df = discount_curve._df(t)
+    df = discount_curve.df_t(t)
     r = -log(df) / t
 
     qs = []
     for curve in dividend_curves:
-        dq = curve._df(t)
+        dq = curve.df_t(t)
         q = -np.log(dq) / t
         qs.append(q)
 

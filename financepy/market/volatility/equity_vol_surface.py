@@ -665,8 +665,8 @@ class EquityVolSurface:
             expiry_dt = self._expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / g_days_in_year
 
-            dis_df = self._discount_curve._df(t_exp)
-            div_df = self._dividend_curve._df(t_exp)
+            dis_df = self._discount_curve.df_t(t_exp)
+            div_df = self._dividend_curve.df_t(t_exp)
             f = s * div_df / dis_df
 
             self._t_exp[i] = t_exp
@@ -765,8 +765,8 @@ class EquityVolSurface:
 
             dS = (highS - lowS) / num_intervals
 
-            disDF = self._discount_curve._df(t)
-            div_df = self._dividend_curve._df(t)
+            disDF = self._discount_curve.df_t(t)
+            div_df = self._dividend_curve.df_t(t)
 
             r = -np.log(disDF) / t
             q = -np.log(div_df) / t
