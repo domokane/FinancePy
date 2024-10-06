@@ -165,8 +165,8 @@ class BondEmbeddedOption:
 
         maturity_dt = self.bond.maturity_dt
         t_mat = (maturity_dt - settle_dt) / g_days_in_year
-        df_times = discount_curve._times
-        df_values = discount_curve._dfs
+        df_times = discount_curve.times()
+        df_values = discount_curve.dfs()
 
         face_amount = self.par
 

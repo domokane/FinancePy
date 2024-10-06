@@ -154,8 +154,8 @@ class IborBermudanSwaption:
         # Allow exercise on coupon dates but control this later for europeans
         self.call_times = cpn_times
 
-        df_times = discount_curve._times
-        df_values = discount_curve._dfs
+        df_times = discount_curve.times()
+        df_values = discount_curve.dfs()
 
         face_amount = 1.0
         strike_price = 1.0  # Floating leg is assumed to price at par

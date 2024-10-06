@@ -88,9 +88,7 @@ class BondMortgage:
 
     ###########################################################################
 
-    def generate_flows(
-        self, zero_rate: float, mortgage_type: BondMortgageTypes
-    ):
+    def generate_flows(self, zero_rate: float, mortgage_type: BondMortgageTypes):
         """Generate the bond flow amounts."""
 
         self.mortgage_type = mortgage_type
@@ -122,6 +120,7 @@ class BondMortgage:
     ###########################################################################
 
     def print_leg(self):
+        "Print details of payment leg"
         print("START DATE:", self.start_dt)
         print("MATURITY DATE:", self.end_dt)
         print("MORTGAGE TYPE:", self.mortgage_type)

@@ -13,6 +13,7 @@ from ...utils.calendar import CalendarTypes
 
 
 class BondMarkets(Enum):
+    "Class containing bond market conventions"
     AUSTRIA = 1
     BELGIUM = 2
     CYPRUS = 3
@@ -51,13 +52,14 @@ class BondMarkets(Enum):
     NORWAY = 36
     SOUTH_AFRICA = 37
 
+
 ###############################################################################
 
 
 def get_bond_market_conventions(country):
-    """ Returns the day count convention for accrued interest, the frequency
+    """Returns the day count convention for accrued interest, the frequency
     and the number of days from trade date to settlement date.
-    This is for Treasury markets. And for secondary bond markets. """
+    This is for Treasury markets. And for secondary bond markets."""
 
     annual = FrequencyTypes.ANNUAL
     semi_annual = FrequencyTypes.SEMI_ANNUAL
@@ -65,7 +67,7 @@ def get_bond_market_conventions(country):
     thirtye360 = DayCountTypes.THIRTY_E_360
     thirty360 = DayCountTypes.THIRTY_360_BOND
 
-    # TODO: CHECK CONVENTIONS
+    # CHECK CONVENTIONS
     # RETURNS
     # ACCRUAL CONVENTION
     # COUPON FREQUENCY

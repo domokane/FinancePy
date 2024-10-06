@@ -53,6 +53,7 @@ class BondAnnuity:
         self.settle_dt = Date(1, 1, 1900)
         self.accrued_int = None
         self.accrued_days = 0.0
+        self.accrual_factor = 0.0
         self.alpha = 0.0
 
         self.pcd = None
@@ -67,9 +68,7 @@ class BondAnnuity:
         """Calculate the bond price using some discount curve to present-value
         the bond's cash flows."""
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
         accrued = self.accrued_int * self.par
         clean_price = dirty_price - accrued
         return clean_price
@@ -148,9 +147,7 @@ class BondAnnuity:
 
         dc = DayCount(self.dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(
-            self.pcd, settle_dt, self.ncd, self.freq
-        )
+        (acc_factor, num, _) = dc.year_frac(self.pcd, settle_dt, self.ncd, self.freq)
 
         self.alpha = 1.0 - acc_factor * self.freq
 

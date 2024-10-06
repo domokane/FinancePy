@@ -55,10 +55,7 @@ class FXForward:
         self.for_name = self.currency_pair[0:3]
         self.dom_name = self.currency_pair[3:6]
 
-        if (
-            notional_currency != self.dom_name
-            and notional_currency != self.for_name
-        ):
+        if notional_currency not in (self.dom_name, self.for_name):
             raise FinError("Notional currency not in currency pair.")
 
         self.notional = notional
@@ -93,9 +90,7 @@ class FXForward:
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
         if isinstance(value_dt, Date):
             t = (self.expiry_dt - value_dt) / g_days_in_year
