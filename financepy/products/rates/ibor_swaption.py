@@ -166,8 +166,8 @@ class IborSwaption:
         cpn_times = np.array(cpn_times)
         cpn_flows = np.array(cpn_flows)
 
-        df_times = discount_curve.times()
-        df_values = discount_curve.dfs()
+        df_times = discount_curve._times
+        df_values = discount_curve._dfs
 
         if np.any(cpn_times < 0.0):
             raise FinError("No cpn times can be before the value date.")

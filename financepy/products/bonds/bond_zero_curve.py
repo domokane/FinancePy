@@ -70,7 +70,7 @@ class BondZeroCurve(DiscountCurve):
         if test_monotonicity(times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-        self.years_to_maturity = np.array(times)
+        self.yearsToMaturity = np.array(times)
         self._bootstrap_zero_rates()
 
     ###########################################################################
@@ -180,7 +180,7 @@ class BondZeroCurve(DiscountCurve):
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel("Zero Rate (%)")
 
-        tmax = np.max(self.years_to_maturity)
+        tmax = np.max(self.yearsToMaturity)
         t = np.linspace(0.0, int(tmax + 0.5), 100)
 
         zero_rate = self.zero_rate(t)

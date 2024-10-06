@@ -23,24 +23,21 @@ modules = sorted(glob.glob(join(dirname(__file__), "Test*.py")))
 num_modules = len(modules)
 
 """ This is the index of the file - change this to start later in the list """
-start_module = 0
-end_module = num_modules
+N = 0
+M = num_modules
 
 ###############################################################################
 
-module_number = start_module
-
-for module_file_name in modules[start_module : end_module + 1]:
+for module_file_name in modules[N : M + 1]:
 
     try:
 
         module_text_name = basename(module_file_name[:-3])
         print(
             "TEST: %3d out of %3d: MODULE: %-35s "
-            % (module_number + 1, num_modules, module_text_name),
+            % (N + 1, num_modules, module_text_name),
             end="",
         )
-
         module_name = __import__(module_text_name)
         num_errors = module_name.test_cases._global_num_errors
         num_warnings = module_name.test_cases._global_num_warnings
@@ -54,23 +51,23 @@ for module_file_name in modules[start_module : end_module + 1]:
                 print("*", end="")
 
         print("")
-        module_number = module_number + 1
+        N = N + 1
 
     # Want testing to continue even if a module has an exception
     except FinError as err:
         print("FinError:", err._message, "************")
-        module_number = module_number + 1
+        N = N + 1
     except ValueError as err:
         print("Value Error:", err.args[0], "************")
-        module_number = module_number + 1
+        N = N + 1
     except NameError as err:
         print("Name Error:", err.args[0], "************")
-        module_number = module_number + 1
+        N = N + 1
     except TypeError as err:
         print("Type Error:", err.args[0], "************")
-        module_number = module_number + 1
+        N = N + 1
     except Exception:
         print("Unexpected error:", sys.exc_info()[0])
-        module_number = module_number + 1
+        N = N + 1
 
 ###############################################################################
