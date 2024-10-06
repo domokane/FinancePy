@@ -268,8 +268,8 @@ class EquityVolSurface:
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         expiry_dts: list,
-        strikes: (list, np.ndarray),
-        volatility_grid: (list, np.ndarray),
+        strikes: list | np.ndarray,
+        volatility_grid: list | np.ndarray,
         vol_func_type=VolFuncTypes.CLARK,
         fin_solver_type=FinSolverTypes.NELDER_MEAD,
     ):

@@ -30,7 +30,7 @@ class FinInflationIndexCurve:
     def __init__(
         self,
         index_dts: list,
-        index_values: (list, np.ndarray),
+        index_values: list | np.ndarray,
         lag_in_months: int = 3,
     ):
 

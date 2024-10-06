@@ -184,7 +184,7 @@ class FXVanillaOption:
         self,
         expiry_dt: Date,
         # 1 unit of foreign in domestic
-        strike_fx_rate: (float, np.ndarray),
+        strike_fx_rate: float | np.ndarray,
         currency_pair: str,  # FORDOM
         option_type: (OptionTypes, list),
         notional: float,

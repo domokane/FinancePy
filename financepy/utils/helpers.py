@@ -79,7 +79,7 @@ def pv01_times(t: float,
 ###############################################################################
 
 
-def times_from_dates(dt: (Date, list),
+def times_from_dates(dt: Date | list,
                      value_dt: Date,
                      day_count_type: DayCountTypes = None):
     """ If a single date is passed in then return the year from valuation date

@@ -57,7 +57,7 @@ class EquityBarrierOption(EquityOption):
     def value(
         self,
         value_dt: Date,
-        stock_price: (float, np.ndarray),
+        stock_price: float | np.ndarray,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model,

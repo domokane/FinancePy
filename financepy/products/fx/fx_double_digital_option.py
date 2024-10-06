@@ -23,8 +23,8 @@ class FXDoubleDigitalOption:
     def __init__(
         self,
         expiry_dt: Date,
-        upper_strike: (float, np.ndarray),
-        lower_strike: (float, np.ndarray),
+        upper_strike: float | np.ndarray,
+        lower_strike: float | np.ndarray,
         currency_pair: str,  # FORDOM
         notional: float,
         prem_currency: str,

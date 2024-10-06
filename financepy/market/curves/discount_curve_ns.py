@@ -97,7 +97,7 @@ class DiscountCurveNS(DiscountCurve):
     ###########################################################################
 
     def _zero_rate(self,
-                   times: (float, np.ndarray)):
+                   times: float | np.ndarray):
         """ Zero rate for Nelson-Siegel curve parametrisation. This means that
         the t vector must use the curve day count."""
 
@@ -113,7 +113,7 @@ class DiscountCurveNS(DiscountCurve):
     ###########################################################################
 
     def df(self,
-           dates: (Date, list)):
+           dates: Date | list):
         """ Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
