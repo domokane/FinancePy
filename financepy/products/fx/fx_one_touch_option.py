@@ -156,7 +156,7 @@ class FXOneTouchOption(FXOption):
     def value(
         self,
         value_dt: Date,
-        spot_fx_rate: float | np.ndarray,
+        spot_fx_rate: (float, np.ndarray),
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model,

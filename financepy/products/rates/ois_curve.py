@@ -568,7 +568,7 @@ class OISCurve(DiscountCurve):
     # def overnight_rate(self,
     #                   settle_dt: Date,
     #                   start_dt: Date,
-    #                   maturity_dt: Date | list,
+    #                   maturity_dt: (Date, list),
     #                   dc_type: DayCountTypes=DayCountTypes.THIRTY_E_360):
     #     """ get a vector of dates and values for the overnight rate implied by
     #     the OIS rate term structure. """

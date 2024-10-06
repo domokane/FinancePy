@@ -34,7 +34,7 @@ class InterpTypes(Enum):
 # TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ###############################################################################
 
-def interpolate(t: float | np.ndarray,  # time or array of times
+def interpolate(t: (float, np.ndarray),  # time or array of times
                 times: np.ndarray,  # Vector of times on grid
                 dfs: np.ndarray,  # Vector of discount factors
                 method: int):  # Interpolation method which is value of enum

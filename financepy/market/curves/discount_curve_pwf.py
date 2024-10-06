@@ -27,7 +27,7 @@ class DiscountCurvePWF(DiscountCurve):
     def __init__(self,
                  value_dt: Date,
                  zero_dts: list,
-                 zero_rates: list | np.ndarray,
+                 zero_rates: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Creates a discount curve using a vector of times and zero rates
@@ -121,7 +121,7 @@ class DiscountCurvePWF(DiscountCurve):
     ###########################################################################
 
     def df(self,
-           dates: Date | list):
+           dates: (Date, list)):
         """ Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It

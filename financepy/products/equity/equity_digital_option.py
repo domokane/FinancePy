@@ -67,7 +67,7 @@ class EquityDigitalOption(EquityOption):
     def value(
         self,
         value_dt: Date,
-        s: float | np.ndarray,
+        s: (float, np.ndarray),
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model,

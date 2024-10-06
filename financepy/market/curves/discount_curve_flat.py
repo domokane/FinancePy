@@ -32,7 +32,7 @@ class DiscountCurveFlat(DiscountCurve):
 
     def __init__(self,
                  value_dt: Date,
-                 flat_rate: float | np.ndarray,
+                 flat_rate: (float, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create a discount curve which is flat. This is very useful for
@@ -79,7 +79,7 @@ class DiscountCurveFlat(DiscountCurve):
 ###############################################################################
 
     def df(self,
-           dts: Date | list):
+           dts: (Date, list)):
         """ Return discount factors given a single or vector of dts. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency, and it defaults to continuous compounding. It

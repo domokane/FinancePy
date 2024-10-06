@@ -107,7 +107,7 @@ class DiscountCurveNSS(DiscountCurve):
     ###########################################################################
 
     def _zero_rate(self,
-                   times: float | np.ndarray):
+                   times: (float, np.ndarray)):
         """ Calculation of zero rates given a single time or a numpy vector of
         times. This function can return a single zero rate or a vector of zero
         rates. The compounding frequency must be provided. """
@@ -127,7 +127,7 @@ class DiscountCurveNSS(DiscountCurve):
     ###########################################################################
 
     def df(self,
-           dates: Date | list):
+           dates: (Date, list)):
         """ Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It

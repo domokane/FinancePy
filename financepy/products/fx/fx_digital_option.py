@@ -26,7 +26,7 @@ class FXDigitalOption:
     def __init__(
         self,
         expiry_dt: Date,
-        strike_fx_rate: float | np.ndarray,
+        strike_fx_rate: (float, np.ndarray),
         currency_pair: str,  # FORDOM
         option_type: (OptionTypes, list),
         notional: float,

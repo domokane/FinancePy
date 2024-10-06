@@ -42,7 +42,7 @@ class BlackScholesTypes(Enum):
 class BlackScholes(Model):
 
     def __init__(self,
-                 volatility: float | np.ndarray,
+                 volatility: (float, np.ndarray),
                  bs_type: BlackScholesTypes = BlackScholesTypes.DEFAULT,
                  num_steps_per_year=52,
                  num_paths=10000,

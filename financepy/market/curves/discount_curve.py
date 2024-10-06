@@ -97,17 +97,12 @@ class DiscountCurve:
     ###########################################################################
     def _zero_to_df(
         self,
-        value_dt: Date,
         rates: float | np.ndarray,
         times: float | np.ndarray,
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
     ):
         """Convert a zero rate with a specified compounding frequency to a discount
         factor for a single maturity date or a list of dates."""
-
-        # This is not used in the code so we set it to None
-        dc_type = None
 
         if isinstance(times, float):
             times = np.array([times])
@@ -136,8 +131,8 @@ class DiscountCurve:
 
     def _df_to_zero(
         self,
-        dfs: float | np.ndarray,
-        maturity_dts: Date | list,
+        dfs: (float, np.ndarray),
+        maturity_dts: (Date, list),
         freq_type: FrequencyTypes,
         dc_type: DayCountTypes,
     ):
@@ -315,7 +310,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def _df(self, t: float | np.ndarray):
+    def _df(self, t: (float, np.ndarray)):
         """Hidden function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates."""
 

@@ -75,8 +75,8 @@ class EquityVanillaOption:
 
     def __init__(
         self,
-        expiry_dt: Date | list,
-        strike_price: float | np.ndarray,
+        expiry_dt: (Date, list),
+        strike_price: (float, np.ndarray),
         option_type: (OptionTypes, list),
         num_options: float = 1.0,
     ):
@@ -105,7 +105,7 @@ class EquityVanillaOption:
 
     def intrinsic(
         self,
-        value_dt: Date | list,
+        value_dt: (Date, list),
         stock_price: (np.ndarray, float),
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
@@ -150,7 +150,7 @@ class EquityVanillaOption:
 
     def value(
         self,
-        value_dt: Date | list,
+        value_dt: (Date, list),
         stock_price: (np.ndarray, float),
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,

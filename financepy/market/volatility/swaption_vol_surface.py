@@ -387,7 +387,7 @@ class SwaptionVolSurface:
         self,
         value_dt: Date,
         expiry_dts: list,
-        fwd_swap_rates: list | np.ndarray,
+        fwd_swap_rates: (list, np.ndarray),
         strike_grid: np.ndarray,
         vol_grid: np.ndarray,
         vol_func_type: VolFuncTypes = VolFuncTypes.SABR,

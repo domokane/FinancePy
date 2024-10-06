@@ -27,7 +27,7 @@ class DiscountCurvePoly(DiscountCurve):
 
     def __init__(self,
                  value_dt: Date,
-                 coefficients: list | np.ndarray,
+                 coefficients: (list, np.ndarray),
                  freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
                  dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
         """ Create zero rate curve parametrised using a cubic curve from
@@ -83,7 +83,7 @@ class DiscountCurvePoly(DiscountCurve):
     ###########################################################################
 
     def _zero_rate(self,
-                   times: float | np.ndarray):
+                   times: (float, np.ndarray)):
         """ Calculate the zero rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
         use. The compounding frequency defaults to that specified in the
