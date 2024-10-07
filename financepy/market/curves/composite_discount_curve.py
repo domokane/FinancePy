@@ -44,7 +44,7 @@ class CompositeDiscountCurve(DiscountCurve):
 
     ###############################################################################
 
-    def _df(self, t: Union[float, np.ndarray]):
+    def df_t(self, t: Union[float, np.ndarray]):
         """
         Return discount factors given a single or vector of dates.
         ParentRate = Sum of children rates => Parent DF = product of children dfs
