@@ -12,12 +12,27 @@ from ..utils.error import FinError
 # OF ASSETS, PATHS AND TIME STEPS.
 ###############################################################################
 
+# Seed the random generator globally for reproducibility
+np.random.seed(42)
+
 
 @njit
-def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, seed):
+def get_paths_times(
+    num_paths, num_time_steps, t, mu, stock_price, volatility, seed
+):
     """Get the simulated GBM process for a single asset with even num paths and
     time steps. Inputs include the number of time steps, paths, the drift mu,
-    stock price, volatility and a seed."""
+    stock price, volatility and a seed.
+
+    Parameters:
+    - num_paths: int, number of paths (must be even)
+    - num_time_steps: int, number of time steps
+    - t: float, total time in years
+    - mu: float, annual drift (mean return)
+    - stock_price: float, initial stock price
+    - volatility: float, annual volatility
+    - seed: int, random seed for reproducibility
+    """
 
     if num_paths % 2 == 0:
         num_paths_even = num_paths // 2
@@ -27,9 +42,9 @@ def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, s
     np.random.seed(seed)
     dt = t / num_time_steps
     vsqrt_dt = volatility * np.sqrt(dt)
-    m = np.exp((mu - volatility * volatility / 2.0) * dt)
+    m = np.exp((mu - (volatility**2) / 2) * dt)
 
-    t_all = np.linspace(0, t, num_time_steps + 1)
+    t_all = np.linspace(0.0, t, num_time_steps + 1)
     s_all = np.empty((num_paths, num_time_steps + 1))
     s_all[:, 0] = stock_price
 
@@ -61,7 +76,19 @@ def get_assets_paths_times(
 ):
     """Get the simulated GBM process for a number of assets and paths and num
     time steps. Inputs include the number of assets, paths, the vector of mus,
-    stock prices, volatilities, a correlation matrix and a seed."""
+    stock prices, volatilities, a correlation matrix and a seed.
+
+    Parameters:
+    - num_assets: int, number of assets
+    - num_paths: int, number of paths (must be even)
+    - num_time_steps: int, number of time steps
+    - t: float, total time in years
+    - mus: ndarray, annual drift rates for each asset
+    - stock_prices: ndarray, initial stock prices for each asset
+    - volatilities: ndarray, annual volatilities for each asset
+    - corr_matrix: ndarray, correlation matrix between assets
+    - seed: int, random seed for reproducibility
+    """
 
     if num_paths % 2 == 0:
         num_paths_even = num_paths // 2
@@ -77,7 +104,10 @@ def get_assets_paths_times(
     if mus.shape[0] != num_assets:
         raise FinError("Drift mu vector incorrect size.")
 
-    if corr_matrix.shape[0] != num_assets and corr_matrix.shape[1] != num_assets:
+    if (
+        corr_matrix.shape[0] != num_assets
+        and corr_matrix.shape[1] != num_assets
+    ):
         raise FinError("Correlation matrix incorrect size.")
 
     np.random.seed(seed)
@@ -88,9 +118,13 @@ def get_assets_paths_times(
     s_all = np.empty((num_assets, num_paths, num_time_steps + 1))
     t_all = np.linspace(0, t, num_time_steps + 1)
 
-    g = np.random.standard_normal((num_paths_even, num_time_steps + 1, num_assets))
+    g = np.random.standard_normal(
+        (num_paths_even, num_time_steps + 1, num_assets)
+    )
     c = cholesky(corr_matrix)
     g_corr = np.empty((num_paths_even, num_time_steps + 1, num_assets))
+
+    # or use g_corr = np.einsum('ijk,kl->ijl', g, c)
 
     # Calculate the Cholesky dot product
     for ip in range(0, num_paths_even):
@@ -101,9 +135,7 @@ def get_assets_paths_times(
                     g_corr[ip][it][ia] += g[ip][it][ib] * c[ia][ib]
 
     for ia in range(0, num_assets):
-        for ip in range(0, num_paths_even):
-            s_all[ia, ip, 0] = stock_prices[ia]
-            s_all[ia, ip + num_paths_even, 0] = stock_prices[ia]
+        s_all[ia, :, 0] = stock_prices[ia]
 
     for ip in range(0, num_paths_even):
         ip_start = ip * 2
@@ -113,7 +145,9 @@ def get_assets_paths_times(
                 w = np.exp(z * vsqrt_dts[ia])
                 v = m[ia]
                 s_all[ia, ip_start, it] = s_all[ia, ip_start, it - 1] * v * w
-                s_all[ia, ip_start + 1, it] = s_all[ia, ip_start + 1, it - 1] * v / w
+                s_all[ia, ip_start + 1, it] = (
+                    s_all[ia, ip_start + 1, it - 1] * v / w
+                )
 
     return t_all, s_all
 
@@ -134,7 +168,18 @@ def get_assets_paths(
 ):
     """Get the simulated GBM process for a number of assets and paths for one
     time step. Inputs include the number of assets, paths, the vector of mus,
-    stock prices, volatilities, a correlation matrix and a seed."""
+    stock prices, volatilities, a correlation matrix and a seed.
+
+    Parameters:
+    - num_assets: int, number of assets
+    - num_paths: int, number of paths (must be even)
+    - t: float, total time in years
+    - mus: ndarray, annual drift rates for each asset
+    - stock_prices: ndarray, initial stock prices for each asset
+    - volatilities: ndarray, annual volatilities for each asset
+    - corr_matrix: ndarray, correlation matrix between assets
+    - seed: int, random seed for reproducibility
+    """
 
     if num_paths % 2 == 0:
         num_paths_even = num_paths // 2
@@ -150,7 +195,10 @@ def get_assets_paths(
     if mus.shape[0] != num_assets:
         raise FinError("Drift mu vector incorrect size.")
 
-    if corr_matrix.shape[0] != num_assets and corr_matrix.shape[1] != num_assets:
+    if (
+        corr_matrix.shape[0] != num_assets
+        or corr_matrix.shape[1] != num_assets
+    ):
         raise FinError("Correlation matrix incorrect size.")
 
     np.random.seed(seed)
