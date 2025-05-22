@@ -415,12 +415,16 @@ class IborSwap:
         mac_duration = 1 - (md1 - md2 / md3)
         return mac_duration
 
+    ###########################################################################
+
     def receiver_side_macaulay_duration(self):
         """Calculation of the Receiver's Macaulay Duration in an Interest Rate Swap
         Based on Bond Math: The Theory Behind the Formulas, Second Edition by
         Donald J. Smith
         """
         return self.buyer_side_macaulay_duration()*(-1)
+
+    ###########################################################################
 
     def buyer_side_modified_duration(self):
         """Computation of the Modified Duration for the Fixed-Rate
@@ -434,12 +438,15 @@ class IborSwap:
 
         return self.buyer_side_macaulay_duration()/(1+swap_rate_val/coupon_frequency)
 
+    ###########################################################################
+
     def receiver_side_modified_duration(self):
         """Computation of the Modified Duration for the Fixed-Rate
         Receiver's Perspective in Interest Rate Swap
         """
         return self.buyer_side_modified_duration()*(-1)
 
+    ###########################################################################
 
     def __repr__(self):
 
