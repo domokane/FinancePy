@@ -392,22 +392,24 @@ class IborSwap:
 
     ###########################################################################
 
-    def buyer_side_macaulay_duration(self):
+    def payer_side_macaulay_duration(self, value_dt, discount_curve, payment_periods: float):
         """Calculation of the Payer's Macaulay Duration in an Interest Rate Swap
         Based on Bond Math: The Theory Behind the Formulas, Second Edition by
         Donald J. Smith
         """
-        # Number of fixed leg payments
-        payment_period = len(self.fixed_leg.payments)
-
         # Get coupon frequency
         coupon_frequency = self.fixed_leg.freq_type.value
 
         # Get swap rate
-        swap_rate_val = self.swap_rate()
+        swap_rate_val = self.swap_rate(value_dt,discount_curve)
 
         y = swap_rate_val / coupon_frequency
-        N = payment_period
+        # payment_periods is the number of periods to maturity as of the beginning of the period;
+        # for instance, If the start date of the interest rate swap is 2024-01-01,
+        # the end date is 2025-12-31, the valuation date is 2024-03-31,
+        # and the frequency type is QUARTERLY,
+        # then the number of payment periods is 8; it is independent of the valuation date.
+        N = payment_periods
         c = swap_rate_val / coupon_frequency
         md1 = (1 + y) / y
         md2 = 1 + y + (N * (c - y))
@@ -417,16 +419,16 @@ class IborSwap:
 
     ###########################################################################
 
-    def receiver_side_macaulay_duration(self):
+    def receiver_side_macaulay_duration(self, value_dt, discount_curve,payment_periods: float):
         """Calculation of the Receiver's Macaulay Duration in an Interest Rate Swap
         Based on Bond Math: The Theory Behind the Formulas, Second Edition by
         Donald J. Smith
         """
-        return self.buyer_side_macaulay_duration()*(-1)
+        return self.payer_side_macaulay_duration(value_dt, discount_curve,payment_periods)*(-1)
 
     ###########################################################################
 
-    def buyer_side_modified_duration(self):
+    def payer_side_modified_duration(self, value_dt, discount_curve,payment_periods: float):
         """Computation of the Modified Duration for the Fixed-Rate
         Payer's Perspective in Interest Rate Swap
         """
@@ -434,17 +436,17 @@ class IborSwap:
         coupon_frequency = self.fixed_leg.freq_type.value
 
         # Get swap rate
-        swap_rate_val = self.swap_rate()
+        swap_rate_val = self.swap_rate(value_dt,discount_curve)
 
-        return self.buyer_side_macaulay_duration()/(1+swap_rate_val/coupon_frequency)
+        return self.payer_side_macaulay_duration(value_dt, discount_curve,payment_periods)/(1+swap_rate_val/coupon_frequency)
 
     ###########################################################################
 
-    def receiver_side_modified_duration(self):
+    def receiver_side_modified_duration(self, value_dt, discount_curve,payment_periods: float):
         """Computation of the Modified Duration for the Fixed-Rate
         Receiver's Perspective in Interest Rate Swap
         """
-        return self.buyer_side_modified_duration()*(-1)
+        return self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)*(-1)
 
     ###########################################################################
 
