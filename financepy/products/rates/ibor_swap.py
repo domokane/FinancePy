@@ -458,9 +458,42 @@ class IborSwap:
         """
         # Get coupon frequency
         coupon_frequency = self.fixed_leg.freq_type.value
+
         annualized_modi_dur = self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)/coupon_frequency
         return (-1)*(annualized_modi_dur*self.fixed_leg.notional*swap_rate_changes)
 
+    ###########################################################################
+
+    def receiver_side_profits(self,
+                             value_dt,
+                             discount_curve,payment_periods: float,
+                             swap_rate_changes: float):
+        """Computation of the Profits for the Fixed-Rate Receiver's Perspective in Interest Rate Swap
+        """
+        return self.payer_side_profits(value_dt, discount_curve,payment_periods,swap_rate_changes)*(-1)
+
+    ###########################################################################
+
+    def payer_side_BPV(self,  value_dt, discount_curve,payment_periods: float,):
+        """
+        calculate the basis‐point‐value (BPV) for the payer_side of the swap,
+        which is swap's modified duration times the notional principal,
+        times one basis point (0.0001)
+        """
+        bp=0.0001
+        return self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)*self.fixed_leg.notional*bp
+
+    ###########################################################################
+
+    def receiver_side_BPV(self,  value_dt, discount_curve,payment_periods: float,):
+        """
+        calculate the basis‐point‐value (BPV) for receiver_side of the swap,
+        which is swap's modified duration times the notional principal,
+        times one basis point (0.0001)
+        """
+        return self.payer_side_BPV(value_dt, discount_curve,payment_periods)*(-1)
+
+    ###########################################################################
 
     def __repr__(self):
 
