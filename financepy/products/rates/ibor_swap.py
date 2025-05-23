@@ -481,8 +481,11 @@ class IborSwap:
         times one basis point (0.0001)
         """
         bp=0.0001
+        # Get coupon frequency
+        coupon_frequency = self.fixed_leg.freq_type.value
         modi_dur = self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)
-        return modi_dur*self.fixed_leg.notional*bp
+        annualized_modi_dur= modi_dur/coupon_frequency
+        return annualized_modi_dur*self.fixed_leg.notional*bp
 
     ###########################################################################
 
