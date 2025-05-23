@@ -481,7 +481,8 @@ class IborSwap:
         times one basis point (0.0001)
         """
         bp=0.0001
-        return self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)*self.fixed_leg.notional*bp
+        modi_dur = self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)
+        return modi_dur*self.fixed_leg.notional*bp
 
     ###########################################################################
 
