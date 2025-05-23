@@ -450,6 +450,18 @@ class IborSwap:
 
     ###########################################################################
 
+    def payer_side_profits(self,
+                           value_dt,
+                           discount_curve,payment_periods: float,
+                           swap_rate_changes: float ):
+        """Computation of the Profits for the Fixed-Rate Payer's Perspective in Interest Rate Swap
+        """
+        # Get coupon frequency
+        coupon_frequency = self.fixed_leg.freq_type.value
+        annualized_modi_dur = self.payer_side_modified_duration(value_dt, discount_curve,payment_periods)/coupon_frequency
+        return (-1)*(annualized_modi_dur*self.fixed_leg.notional*swap_rate_changes)
+
+
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
