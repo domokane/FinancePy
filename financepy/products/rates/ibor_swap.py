@@ -593,7 +593,7 @@ class IborSwap:
             BPV=annualized_modi_dur*self.fixed_leg.notional*bp
 
         elif swap_type == SwapTypes.RECEIVE:
-            BPV=annualized_modi_dur*self.fixed_leg.notional*bp*(-1)
+            BPV=annualized_modi_dur*self.fixed_leg.notional*bp
 
         return BPV
 
