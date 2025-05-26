@@ -417,6 +417,44 @@ class IborSwap:
         mac_duration = 1 - (md1 - md2 / md3)
         return mac_duration
 
+
+    def macaulay_duration(self, value_dt, discount_curve, swap_type, payment_periods: float):
+        """Calculation of the Payer's Macaulay Duration in an Interest Rate Swap
+        Based on Bond Math: The Theory Behind the Formulas, Second Edition by
+        Donald J. Smith
+        """
+        # Get coupon frequency
+        coupon_frequency = self.fixed_leg.freq_type.value
+
+        # Get swap rate
+        swap_rate_val = self.swap_rate(value_dt,discount_curve)
+
+        y = swap_rate_val / coupon_frequency
+        # payment_periods is the number of periods to maturity as of the beginning of the period;
+        # for instance, If the start date of the interest rate swap is 2024-01-01,
+        # the end date is 2025-12-31, the valuation date is 2024-03-31,
+        # and the frequency type is QUARTERLY,
+        # then the number of payment periods is 8; it is independent of the valuation date.
+        N = payment_periods
+        c = swap_rate_val / coupon_frequency
+        md1 = (1 + y) / y
+        md2 = 1 + y + (N * (c - y))
+        md3 = c * ((1 + y) ** N - 1) + y
+
+        """
+        The party who pays the fixed rate(ie,SwapTypes.PAY) is known as the payer 
+        and the party who receives the fixed rate is known as the receiver. 
+        The fixed‐rate payer and floating‐rate receiver, 
+        sometimes is said to be the “buyer” of the swap, or is “long” the swap.             
+        """
+        if  swap_type == SwapTypes.PAY:
+            mac_duration = 1 - (md1 - md2 / md3)
+
+        elif  swap_type == SwapTypes.RECEIVE:
+            mac_duration = (1 - (md1 - md2 / md3))*(-1)
+
+        return mac_duration
+
     ###########################################################################
 
     def receiver_side_macaulay_duration(self, value_dt, discount_curve,payment_periods: float):
@@ -439,6 +477,27 @@ class IborSwap:
         swap_rate_val = self.swap_rate(value_dt,discount_curve)
 
         return self.payer_side_macaulay_duration(value_dt, discount_curve,payment_periods)/(1+swap_rate_val/coupon_frequency)
+
+    def modified_duration(self, value_dt, discount_curve, swap_type, payment_periods: float):
+        """Computation of the Modified Duration for the Fixed-Rate
+        Payer's Perspective in Interest Rate Swap
+        """
+        # Get coupon frequency
+        coupon_frequency = self.fixed_leg.freq_type.value
+
+        # Get swap rate
+        swap_rate_val = self.swap_rate(value_dt, discount_curve)
+
+        if swap_type == SwapTypes.PAY:
+            modified_duration = (self.macaulay_duration(value_dt, discount_curve, swap_type, payment_periods) /
+                                 (1 + swap_rate_val / coupon_frequency))
+
+        elif swap_type == SwapTypes.RECEIVE:
+            modified_duration = (self.macaulay_duration(value_dt, discount_curve, swap_type, payment_periods) /
+                                 (1 + swap_rate_val / coupon_frequency))
+
+        return modified_duration
+
 
     ###########################################################################
 
@@ -472,6 +531,25 @@ class IborSwap:
         """
         return self.payer_side_profits(value_dt, discount_curve,payment_periods,swap_rate_changes)*(-1)
 
+
+    def change_in_market_value(self,
+                               value_dt, discount_curve, swap_type, payment_periods: float,
+                               swap_rate_changes: float):
+        """Computation of the Profits for the Fixed-Rate Payer's Perspective in Interest Rate Swap
+        """
+        # Get coupon frequency
+        coupon_frequency = self.fixed_leg.freq_type.value
+
+        annualized_modi_dur = self.modified_duration(value_dt, discount_curve,swap_type,payment_periods)/coupon_frequency
+
+        if swap_type == SwapTypes.PAY:
+            delta_mv=(-1)*(annualized_modi_dur*self.fixed_leg.notional*swap_rate_changes)
+
+        elif swap_type == SwapTypes.RECEIVE:
+            delta_mv=(annualized_modi_dur*self.fixed_leg.notional*swap_rate_changes)
+
+        return delta_mv
+
     ###########################################################################
 
     def payer_side_BPV(self,  value_dt, discount_curve,payment_periods: float,):
@@ -498,6 +576,27 @@ class IborSwap:
         return self.payer_side_BPV(value_dt, discount_curve,payment_periods)*(-1)
 
     ###########################################################################
+
+    def basis_point_value (self,value_dt, discount_curve,swap_type, payment_periods: float):
+        """
+        calculate the basis‐point‐value (BPV) for the payer_side of the swap,
+        which is swap's modified duration times the notional principal,
+        times one basis point (0.0001)
+        """
+        bp=0.0001
+        # Get coupon frequency
+        coupon_frequency = self.fixed_leg.freq_type.value
+        modi_dur = self.modified_duration(value_dt, discount_curve, swap_type, payment_periods)
+        annualized_modi_dur= modi_dur/coupon_frequency
+
+        if swap_type == SwapTypes.PAY:
+            BPV=annualized_modi_dur*self.fixed_leg.notional*bp
+
+        elif swap_type == SwapTypes.RECEIVE:
+            BPV=annualized_modi_dur*self.fixed_leg.notional*bp*(-1)
+
+        return BPV
+
 
     def __repr__(self):
 
