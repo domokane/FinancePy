@@ -348,6 +348,39 @@ class Bond:
 
     ###########################################################################
 
+    def forward_price(
+        self,
+        settle_dt: Date,
+        forward_dt: Date,
+        clean_price: float,
+        repo_rate: float,
+    ):
+
+        if clean_price < 0 or repo_rate < 0:
+            raise ValueError("Prices and repo rate must be non-negative")
+
+        if settle_dt >= forward_dt:
+            raise ValueError("Settlement date must be before forward date")
+
+        dc = DayCount(DayCountTypes.ACT_ACT_ISDA)
+        t_fwd, _, _ = dc.year_frac(settle_dt, forward_dt)
+
+        accrued_settle = self.accrued_interest(settle_dt)
+        accrued_forward = self.accrued_interest(forward_dt)
+
+        fv_cpns = 0.0
+        for dt, amt in zip(self.cpn_dts[1:], self.flow_amounts[1:]):
+            if settle_dt < dt <= forward_dt:
+                t_cpn_to_forward, _, _ = dc.year_frac(dt, forward_dt)
+                fv_cpns += amt * self.par * (1 + repo_rate * t_cpn_to_forward)
+
+        full_price = clean_price + accrued_settle
+        fwd_price = full_price * (1.0 + repo_rate * t_fwd)
+        fwd_price = fwd_price - fv_cpns - accrued_forward
+        return fwd_price
+
+    ###########################################################################
+
     def principal(
         self, settle_dt: Date, ytm: float, face: float, convention: YTMCalcType
     ):
@@ -356,7 +389,6 @@ class Bond:
         future Ibor rates."""
 
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-
         principal = dirty_price * face / self.par
         principal = principal - self.accrued_int
         return principal
@@ -715,15 +747,20 @@ class Bond:
         for dirty_price in dirty_prices:
             argtuple = (self, settle_dt, dirty_price, convention)
 
-            ytm = optimize.newton(
-                _f,
-                x0=0.05,  # guess initial value of 5%
-                fprime=None,
-                args=argtuple,
-                tol=1e-8,
-                maxiter=50,
-                fprime2=None,
-            )
+            try:
+                ytm = optimize.brentq(
+                    _f,
+                    a=-0.5,
+                    b=5.0,
+                    args=argtuple,
+                    xtol=1e-8,
+                    maxiter=50,
+                )
+            except RuntimeError:
+                print(
+                    f"Warning: YTM calculation did not converge for price {dirty_price}"
+                )
+                ytm = np.nan
 
             ytms.append(ytm)
 
@@ -946,18 +983,23 @@ class Bond:
 
         for dirty_price in dirty_prices:
             argtuple = (self, settle_dt, dirty_price, discount_curve)
+            try:
+                oas = optimize.newton(
+                    _g,
+                    x0=0.01,  # initial value of 1%
+                    fprime=None,
+                    args=argtuple,
+                    tol=1e-8,
+                    maxiter=50,
+                    fprime2=None,
+                )
 
-            oas = optimize.newton(
-                _g,
-                x0=0.01,  # initial value of 1%
-                fprime=None,
-                args=argtuple,
-                tol=1e-8,
-                maxiter=50,
-                fprime2=None,
-            )
-
-            oass.append(oas)
+                oass.append(oas)
+            except RuntimeError:
+                print(
+                    f"Warning: OAS calculation did not converge for price {dirty_price}"
+                )
+                oass.append(np.nan)
 
         if len(oass) == 1:
             return oass[0]
