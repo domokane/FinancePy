@@ -32,7 +32,7 @@ class IborBasisSwap:
     def __init__(
         self,
         effective_dt: Date,  # Date interest starts to accrue
-        term_dt_or_tenor: (Date, str),  # Date contract ends
+        term_dt_or_tenor: Union[Date, str],  # Date contract ends
         leg_1_type: SwapTypes,
         leg_1_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         leg_1_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,

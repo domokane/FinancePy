@@ -4,8 +4,6 @@
 
 import sys
 
-sys.path.append("..")
-
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -13,10 +11,12 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond, YTMCalcType
 from financepy.products.bonds.bond_future import BondFuture
 
+import pandas as pd
+
+sys.path.append("..")
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-import pandas as pd
 
 ###############################################################################
 

@@ -22,7 +22,8 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class DiscountCurvePWFONF(DiscountCurve):
-    """Curve with piece-wise flat instantaneous (ON) fwd rates. Curve is made up of a series of sections with each having
+    """Curve with piece-wise flat instantaneous (ON) fwd rates.
+    Curve is made up of a series of sections with each having
     a flat instantaneous forward rate. The default compounding assumption is
     continuous. The class inherits methods from DiscountCurve."""
 
@@ -34,7 +35,8 @@ class DiscountCurvePWFONF(DiscountCurve):
     ):
         """
         Creates a discount curve using a vector of times and ON fwd rates
-        The fwd rate is right-continuous i.e. a given value in the input is applied to the left of that date until the previous date exclusive
+        The fwd rate is right-continuous i.e. a given value in the
+        input is applied to the left of that date until the previous date exclusive
         The last fwd rate is extrapolated into the future
         """
 
@@ -51,19 +53,15 @@ class DiscountCurvePWFONF(DiscountCurve):
         self._knot_dates = [max(d, value_dt) for d in knot_dates]
         self._onfwd_rates = np.atleast_1d(onfwd_rates)
 
-        self._freq_type = FrequencyTypes.CONTINUOUS
-        self._day_count_type = DayCountTypes.SIMPLE
+        self.freq_type = FrequencyTypes.CONTINUOUS
+        self.dc_type = DayCountTypes.SIMPLE
 
-        dc_times = times_from_dates(
-            self._knot_dates, self.value_dt, self._day_count_type
-        )
+        dc_times = times_from_dates(self._knot_dates, self.value_dt, self.dc_type)
 
         self._times = np.atleast_1d(dc_times)
 
         # it is easier to deal in log(dfs), log(df[Ti]) = -\int_0^T_i f(u) du
-        self._logdfs = -np.cumsum(
-            np.diff(self._times, prepend=0.0) * self._onfwd_rates
-        )
+        self._logdfs = -np.cumsum(np.diff(self._times, prepend=0.0) * self._onfwd_rates)
         self._logdfs_interp = interpolate.interp1d(
             np.concatenate(([0.0], self._times)),
             np.concatenate(([0.0], self._logdfs)),
@@ -103,9 +101,7 @@ class DiscountCurvePWFONF(DiscountCurve):
     ###############################################################################
 
     @classmethod
-    def flat_curve(
-        cls, valuation_date: Date, level: float = 1.0 * g_basis_point
-    ):
+    def flat_curve(cls, valuation_date: Date, level: float = 1.0 * g_basis_point):
         knot_dates = [valuation_date.add_tenor("1Y")]
         onfwd_rates = [level]
         return cls(valuation_date, knot_dates, onfwd_rates)
@@ -139,7 +135,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         zero_rates = self._zero_rate(t)
 
         df = self._zero_to_df(
-            self.value_dt, zero_rates, t, self._freq_type, self._day_count_type
+            self.value_dt, zero_rates, t, self.freq_type, self.dc_type
         )
 
         return df
@@ -152,7 +148,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         s += label_to_string("DATE", "ONWD RATE")
         for i in range(0, len(self._knot_dates)):
             s += label_to_string(self._knot_dates[i], self._onfwd_rates[i])
-        s += label_to_string("FREQUENCY", (self._freq_type))
+        s += label_to_string("FREQUENCY", (self.freq_type))
         return s
 
     ###############################################################################

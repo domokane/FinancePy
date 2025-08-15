@@ -65,7 +65,7 @@ class OIS:
     def __init__(
         self,
         effective_dt: Date,  # Date interest starts to accrue
-        term_dt_or_tenor: (Date, str),  # Date contract ends
+        term_dt_or_tenor: Union[Date, str],  # Date contract ends
         fixed_leg_type: SwapTypes,
         fixed_cpn: float,  # Fixed cpn (annualised)
         fixed_freq_type: FrequencyTypes,
@@ -141,9 +141,7 @@ class OIS:
 
     ###########################################################################
 
-    def value(
-        self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None
-    ):
+    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 

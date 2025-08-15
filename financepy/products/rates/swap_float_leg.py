@@ -31,7 +31,7 @@ class SwapFloatLeg:
     def __init__(
         self,
         effective_dt: Date,  # Date interest starts to accrue
-        end_dt: (Date, str),  # Date contract ends
+        end_dt: Union[Date, str],  # Date contract ends
         leg_type: SwapTypes,
         spread: float,
         freq_type: FrequencyTypes,
@@ -128,9 +128,7 @@ class SwapFloatLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 
@@ -205,9 +203,7 @@ class SwapFloatLeg:
                     fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
                 payment_amount = (
-                    (fwd_rate + self.spread)
-                    * pay_alpha
-                    * self.notional_array[i_pmnt]
+                    (fwd_rate + self.spread) * pay_alpha * self.notional_array[i_pmnt]
                 )
 
                 df_payment = discount_curve.df(payment_dt) / df_value

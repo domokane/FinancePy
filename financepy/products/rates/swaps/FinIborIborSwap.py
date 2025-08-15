@@ -16,7 +16,7 @@ from ...utils.FinMath import ONE_MILLION
 
 
 class IborIborSwap:
-    """ Class for managing an interest rate basis swap contract. This is a
+    """Class for managing an interest rate basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a
     floating leg payment in a different LIBOR tenor. There is no exchange of
     par. The contract is entered into at zero initial cost. The contract lasts
@@ -24,40 +24,40 @@ class IborIborSwap:
 
     The value of the contract is the NPV of the two cpn streams. Discounting
     is done on a supplied discount curve which is separate from the discount from
-    which the implied index rates are extracted. """
+    which the implied index rates are extracted."""
 
-    def __init__(self,
-                 effective_dt: Date,  # Date interest starts to accrue
-                 term_dt_or_tenor: (Date, str),  # Date contract ends
-                 payFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 payDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 recFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 recDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-                 basisSwapSpread: float = 0.0,
-                 notional: float = ONE_MILLION,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Create an Ibor basis swap contract giving the contract start
+    def __init__(
+        self,
+        effective_dt: Date,  # Date interest starts to accrue
+        term_dt_or_tenor: Union[Date, str],  # Date contract ends
+        payFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        payDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        recFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        recDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        basisSwapSpread: float = 0.0,
+        notional: float = ONE_MILLION,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+    ):
+        """Create an Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
         values that can be overwritten if needed. The start date is contractual
         and is the same as the settlement date for a new swap. It is the date
         on which interest starts to accrue. The end of the contract is the
         termination date. This is not adjusted for business days. The adjusted
-        termination date is called the maturity date. This is calculated. """
+        termination date is called the maturity date. This is calculated."""
 
         check_argument_types(self.__init__, locals())
 
         if isinstance(term_dt_or_tenor, Date):
             self._termination_dt = term_dt_or_tenor
         else:
-            self._termination_dt = effective_dt.add_tenor(
-                term_dt_or_tenor)
+            self._termination_dt = effective_dt.add_tenor(term_dt_or_tenor)
 
         calendar = CalendarTypes(cal_type)
-        self.maturity_dt = calendar.adjust(self._termination_dt,
-                                            bd_type)
+        self.maturity_dt = calendar.adjust(self._termination_dt, bd_type)
 
         if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
@@ -92,64 +92,66 @@ class IborIborSwap:
 
         self.value_dt = None
 
-##########################################################################
+    ##########################################################################
 
     def _generate_pay_float_leg_payment_dts(self, freq_type):
-        """ Generate the floating leg payment dates all the way back to
+        """Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
 
-        floatDates = FinSchedule(self.effective_dt,
-                                 self._termination_dt,
-                                 freq_type,
-                                 self._cal_type,
-                                 self._bd_type,
-                                 self._dg_type).generate()
+        floatDates = FinSchedule(
+            self.effective_dt,
+            self._termination_dt,
+            freq_type,
+            self._cal_type,
+            self._bd_type,
+            self._dg_type,
+        ).generate()
 
         return floatDates
 
-##########################################################################
+    ##########################################################################
 
-    def value(self,
-              value_dt,
-              discount_curve,
-              payIndexCurve,
-              recIndexCurve,
-              payfirst_fixing_rate=None,
-              recfirst_fixing_rate=None,
-              principal=0.0):
-        """ Value the LIBOR basis swap on a value date given a single Ibor
+    def value(
+        self,
+        value_dt,
+        discount_curve,
+        payIndexCurve,
+        recIndexCurve,
+        payfirst_fixing_rate=None,
+        recfirst_fixing_rate=None,
+        principal=0.0,
+    ):
+        """Value the LIBOR basis swap on a value date given a single Ibor
         discount curve and each of the index discount for the two floating legs
-        of the swap. """
+        of the swap."""
 
-        payFloatLegValue = self.float_leg_value(value_dt,
-                                                discount_curve,
-                                                payIndexCurve,
-                                                payfirst_fixing_rate,
-                                                principal)
+        payFloatLegValue = self.float_leg_value(
+            value_dt, discount_curve, payIndexCurve, payfirst_fixing_rate, principal
+        )
 
-        recFloatLegValue = self.float_leg_value(value_dt,
-                                                discount_curve,
-                                                recIndexCurve,
-                                                recfirst_fixing_rate,
-                                                principal)
+        recFloatLegValue = self.float_leg_value(
+            value_dt, discount_curve, recIndexCurve, recfirst_fixing_rate, principal
+        )
 
         value = recFloatLegValue - payFloatLegValue
         return value
 
-##########################################################################
+    ##########################################################################
 
-    def float_leg_value(self,
-                        value_dt,  # This should be the settlement date
-                        discount_curve,
-                        index_curve,
-                        first_fixing_rate=None,
-                        principal=0.0):
-        """ Value the floating leg with payments from an index curve and
+    def float_leg_value(
+        self,
+        value_dt,  # This should be the settlement date
+        discount_curve,
+        index_curve,
+        first_fixing_rate=None,
+        principal=0.0,
+    ):
+        """Value the floating leg with payments from an index curve and
         discounting based on a supplied discount curve. The valuation date can
         be the today date. In this case the price of the floating leg will not
         be par (assuming we added on a principal repayment). This is only the
         case if we set the valuation date to be the swap's actual settlement
-        date. """
+        date."""
 
         self.value_dt = value_dt
         self._floatYearFracs = []
@@ -212,7 +214,7 @@ class IborIborSwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjustedFloatDates[start_index + 1:]:
+        for next_dt in self._adjustedFloatDates[start_index + 1 :]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -241,12 +243,12 @@ class IborIborSwap:
 
         return pv
 
-##########################################################################
+    ##########################################################################
 
     def print_float_leg_pv(self):
-        """ Prints the floating leg dates, accrual factors, discount factors,
+        """Prints the floating leg dates, accrual factors, discount factors,
         forward libor rates, implied cash amounts, their present value and
-        their cumulative PV using the last valuation performed. """
+        their cumulative PV using the last valuation performed."""
 
         print("START DATE:", self.effective_dt)
         print("MATURITY DATE:", self.maturity_dt)
@@ -270,29 +272,29 @@ class IborIborSwap:
 
         # By definition the discount factor is 1.0 on the valuation date
 
-        print("%15s %10s %10s %12s %12.8f %12s %12s" %
-              (self.value_dt,
-               "-",
-               "-",
-               "-",
-               1.0,
-               "-",
-               "-"))
+        print(
+            "%15s %10s %10s %12s %12.8f %12s %12s"
+            % (self.value_dt, "-", "-", "-", 1.0, "-", "-")
+        )
 
         i_flow = 0
         for payment_dt in self._adjustedFloatDates[start_index:]:
-            print("%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f" %
-                  (payment_dt,
-                   self._floatYearFracs[i_flow],
-                   self._floatRates[i_flow]*100.0,
-                   self._float_flows[i_flow],
-                   self._floatDfs[i_flow],
-                   self._float_flow_pvs[i_flow],
-                   self._floatTotalPV[i_flow]))
+            print(
+                "%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f"
+                % (
+                    payment_dt,
+                    self._floatYearFracs[i_flow],
+                    self._floatRates[i_flow] * 100.0,
+                    self._float_flows[i_flow],
+                    self._floatDfs[i_flow],
+                    self._float_flow_pvs[i_flow],
+                    self._floatTotalPV[i_flow],
+                )
+            )
 
             i_flow += 1
 
-##########################################################################
+    ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -312,11 +314,12 @@ class IborIborSwap:
         s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
-        """ Print a list of the unadjusted cpn payment dates used in
-        analytic calculations for the bond. """
+        """Print a list of the unadjusted cpn payment dates used in
+        analytic calculations for the bond."""
         print(self)
+
 
 ###############################################################################

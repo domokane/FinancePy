@@ -16,18 +16,15 @@ def dx(x, wind=0):
     # Note: As first and last rows are handled separately
     # (at the end of this method)
     # we can use numpy roll without worrying about the end values
-    dxl = (x - np.roll(x, 1))
-    dxu = (np.roll(x, -1) - x)
+    dxl = x - np.roll(x, 1)
+    dxu = np.roll(x, -1) - x
     if wind < 0:
         # (-1/dxl, 1/dxl, 0)
         out = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
     elif wind == 0:
-        intermediate_rows = np.array(
-            (- dxu / dxl,
-             dxu / dxl - dxl / dxu,
-             dxl / dxu
-             )
-        ) / (dxl + dxu)
+        intermediate_rows = np.array((-dxu / dxl, dxu / dxl - dxl / dxu, dxl / dxu)) / (
+            dxl + dxu
+        )
         out = intermediate_rows.T
     else:
         # (0, -1/dxu, 1/dxu)
@@ -36,14 +33,14 @@ def dx(x, wind=0):
     # First row
     if wind >= 0:
         out[0] = (0, -1, 1)
-        out[0] /= (x[1] - x[0])
+        out[0] /= x[1] - x[0]
     else:
         out[0] = (0, 0, 0)
 
     # Last row
     if wind <= 0:
         out[-1] = (-1, 1, 0)
-        out[-1] /= (x[-1] - x[-2])
+        out[-1] /= x[-1] - x[-2]
     else:
         out[-1] = (0, 0, 0)
 
@@ -55,10 +52,9 @@ def dxx(x):
     # Note: As first and last rows are handled separately
     # (they overwritten at end of this method),
     # we can use numpy roll without worrying about the end values
-    dxl = (x - np.roll(x, 1))
-    dxu = (np.roll(x, -1) - x)
-    intermediate_rows = np.array(
-        [2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (dxu + dxl)
+    dxl = x - np.roll(x, 1)
+    dxu = np.roll(x, -1) - x
+    intermediate_rows = np.array([2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (dxu + dxl)
     out = intermediate_rows.T
 
     # First row
@@ -178,6 +174,7 @@ def smooth_call(xl, xu, strike):
     else:
         return 0.5 * (xu - strike) ** 2 / (xu - xl)
 
+
 ###############################################################################
 
 
@@ -212,8 +209,7 @@ def option_payoff(s, strike, smooth, dig, option_type):
     res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
 
     # Invert for put options
-    if option_type in {OptionTypes.AMERICAN_PUT.value,
-                       OptionTypes.EUROPEAN_PUT.value}:
+    if option_type in {OptionTypes.AMERICAN_PUT.value, OptionTypes.EUROPEAN_PUT.value}:
         res = 1 - res if dig else res - (s - strike)
 
     return np.atleast_2d(res)
@@ -221,18 +217,30 @@ def option_payoff(s, strike, smooth, dig, option_type):
 
 ###############################################################################
 
-def black_scholes_fd(spot_price, volatility, time_to_expiry,
-                     strike_price, risk_free_rate,
-                     dividend_yield, option_type,
-                     num_time_steps=None, num_samples=2000,
-                     num_std=5, theta=0.5, wind=0,
-                     digital=False,
-                     smooth=False, update=False):
+
+def black_scholes_fd(
+    spot_price,
+    volatility,
+    time_to_expiry,
+    strike_price,
+    risk_free_rate,
+    dividend_yield,
+    option_type,
+    num_time_steps=None,
+    num_samples=2000,
+    num_std=5,
+    theta=0.5,
+    wind=0,
+    digital=False,
+    smooth=False,
+    update=False,
+):
+
     if isinstance(option_type, OptionTypes):
         option_type = option_type.value
 
     # Define grid
-    std = volatility * (time_to_expiry ** 0.5)
+    std = volatility * (time_to_expiry**0.5)
     xu = num_std * std
     xl = -xu
     d_x = (xu - xl) / max(1, num_samples)
@@ -267,15 +275,17 @@ def black_scholes_fd(spot_price, volatility, time_to_expiry,
         if update or h == 0:
             # Explicit case
             if theta != 1:
-                Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1-theta, wind)
+                Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1 - theta, wind)
             # Implicit case
             if theta != 0:
                 Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
         res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
 
-        if option_type in {OptionTypes.AMERICAN_CALL.value,
-                           OptionTypes.AMERICAN_PUT.value}:
+        if option_type in {
+            OptionTypes.AMERICAN_CALL.value,
+            OptionTypes.AMERICAN_PUT.value,
+        }:
             idx = res[0] < payoff[0]
             res[0][idx] = payoff[0][idx]
 

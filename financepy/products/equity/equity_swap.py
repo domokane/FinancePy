@@ -36,7 +36,7 @@ class EquitySwap:
     def __init__(
         self,
         effective_dt: Date,  # Date contract starts or last Equity Reset
-        term_dt_or_tenor: (Date, str),  # Date contract ends
+        term_dt_or_tenor: Union[Date, str],  # Date contract ends
         eq_leg_type: SwapTypes,
         eq_freq_type: FrequencyTypes,
         eq_dc_type: DayCountTypes,

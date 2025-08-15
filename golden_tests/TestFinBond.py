@@ -9,8 +9,6 @@ import numpy as np
 
 import sys
 
-sys.path.append("..")
-
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.calendar import CalendarTypes
@@ -26,6 +24,7 @@ from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
 
+sys.path.append("..")
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

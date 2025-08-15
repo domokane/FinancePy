@@ -28,16 +28,14 @@ class CompositeDiscountCurve(DiscountCurve):
         """
 
         check_argument_types(self.__init__, locals())
-        assert (
-            len(child_curves) > 0
-        ), "Empty list of child curves is not supported"
+        assert len(child_curves) > 0, "Empty list of child curves is not supported"
 
         self._children = child_curves
 
         self.value_dt = self._children[0].value_dt
         assert all(
             c.value_dt == self.value_dt for c in self._children
-        ), "Child curves must all have the same vlauation date"
+        ), "Child curves must all have the same valuation date"
 
         # Read off the first child
         self.dc_type = self._children[0].dc_type

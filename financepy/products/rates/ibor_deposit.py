@@ -39,7 +39,7 @@ class IborDeposit:
     def __init__(
         self,
         start_dt: Date,  # When the interest starts to accrue
-        maturity_dt_or_tenor: (Date, str),  # Repayment of interest
+        maturity_dt_or_tenor: Union[Date, str],  # Repayment of interest
         deposit_rate: float,  # MM rate using simple interest
         dc_type: DayCountTypes,  # How year fraction is calculated
         notional: float = 100.0,  # Amount borrowed

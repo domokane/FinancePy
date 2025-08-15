@@ -1,2 +1,0 @@
-##### Imports used in Test files but not required by financepy
-matplotlib==3.8.4

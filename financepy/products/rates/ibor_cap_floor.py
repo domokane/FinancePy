@@ -53,7 +53,7 @@ class IborCapFloor:
     def __init__(
         self,
         start_dt: Date,
-        maturity_dt_or_tenor: (Date, str),
+        maturity_dt_or_tenor: Union[Date, str],
         option_type: FinCapFloorTypes,
         strike_rate: float,
         last_fixing: Optional[float] = None,
@@ -280,9 +280,7 @@ class IborCapFloor:
         elif isinstance(model, HWTree):
 
             t_mat = (caplet_end_dt - value_dt) / g_days_in_year
-            alpha = self.day_counter.year_frac(caplet_start_dt, caplet_end_dt)[
-                0
-            ]
+            alpha = self.day_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
             strike_price = 1.0 / (1.0 + alpha * self.strike_rate)
             notional_adj = 1.0 + self.strike_rate * alpha
             face_amount = 1.0

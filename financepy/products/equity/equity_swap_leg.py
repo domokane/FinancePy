@@ -30,7 +30,7 @@ class EquitySwapLeg:
     def __init__(
         self,
         effective_dt: Date,  # Contract starts or last equity reset
-        term_dt_or_tenor: (Date, str),  # Date contract ends
+        term_dt_or_tenor: Union[Date, str],  # Date contract ends
         leg_type: SwapTypes,
         freq_type: FrequencyTypes,
         dc_type: DayCountTypes,
@@ -73,9 +73,7 @@ class EquitySwapLeg:
             FrequencyTypes,
             FrequencyTypes.SIMPLE,
         ):
-            raise FinError(
-                "Cannot generate payment schedule for this frequency!"
-            )
+            raise FinError("Cannot generate payment schedule for this frequency!")
 
         self.effective_dt = effective_dt
         self.termination_dt = termination_dt
@@ -154,9 +152,7 @@ class EquitySwapLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 

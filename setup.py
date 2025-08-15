@@ -40,7 +40,6 @@ setuptools.setup(
     name="financepy",
     version=version_number_str,
     author="Dominic O'Kane",
-    author_email="dominic.okane@edhec.edu",
     description="A Finance Securities Valuation Library",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -54,7 +53,6 @@ setuptools.setup(
         "ipython",
         "matplotlib",
         "pandas",
-        "prettytable",
     ],
     package_data={
         "": ["*.npz"],
@@ -62,7 +60,7 @@ setuptools.setup(
     include_package_date=True,
     packages=setuptools.find_packages(),
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",

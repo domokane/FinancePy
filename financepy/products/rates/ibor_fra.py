@@ -48,7 +48,7 @@ class IborFRA:
         self,
         start_dt: Date,  # The date the FRA starts to accrue
         # End of the Ibor rate period
-        maturity_dt_or_tenor: (Date, str),
+        maturity_dt_or_tenor: Union[Date, str],
         fra_rate: float,  # The fixed contractual FRA rate
         dc_type: DayCountTypes,  # For interest period
         notional: float = 100.0,
@@ -175,9 +175,7 @@ class IborFRA:
         df_to_valuation_date = discount_curve.df(valuation_date)
         v = v * self.notional / df_to_valuation_date
 
-        if (
-            self.pay_fixed_rate is True
-        ):  # VP: ??? pay fixed should be positive notional
+        if self.pay_fixed_rate is True:  # VP: ??? pay fixed should be positive notional
             v *= -1.0
 
         out = {
@@ -186,20 +184,14 @@ class IborFRA:
             "maturity_date": self.maturity_dt,
             "day_count_type": self.dc_type.name,
             "fixed_leg_type": (
-                SwapTypes.PAY.name
-                if self.pay_fixed_rate
-                else SwapTypes.RECEIVE.name
+                SwapTypes.PAY.name if self.pay_fixed_rate else SwapTypes.RECEIVE.name
             ),
             "notional": self.notional,
             "contract_rate": self.fra_rate,
             "market_rate": liborFwd,
             "spot_pvbp": acc_factor * dfDiscount2,
-            "fwd_pvbp": acc_factor
-            * dfDiscount2
-            / discount_curve.df(self.start_dt),
-            "unit_value": acc_factor
-            * dfDiscount2
-            * (liborFwd - self.fra_rate),
+            "fwd_pvbp": acc_factor * dfDiscount2 / discount_curve.df(self.start_dt),
+            "unit_value": acc_factor * dfDiscount2 * (liborFwd - self.fra_rate),
             "value": v,
             # ignoring pay_fixed flag (which is wrong anyway I think),
             # bus day adj type, calendar for now

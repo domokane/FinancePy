@@ -43,7 +43,7 @@ class FinInflationSwap:
         self,
         start_dt: Date,  # The date the FRA starts to accrue
         # End of the Ibor rate period
-        maturity_dt_or_tenor: (Date, str),
+        maturity_dt_or_tenor: Union[Date, str],
         fra_rate: float,  # The fixed contractual FRA rate
         day_count_type: DayCountTypes,  # For interest period
         notional: float = 100.0,
