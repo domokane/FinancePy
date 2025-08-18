@@ -18,7 +18,6 @@ jobs:
    - name: Install dependencies and package
      run: |
        pip install -r requirements.txt
-       pip install -r requirements-dev.txt
        python setup.py install
    - name: Run tests
      run: 
@@ -28,3 +27,4 @@ jobs:
      with:
         name: result-differences-file-upload
         path: golden_tests/differences/*.testLog
+
