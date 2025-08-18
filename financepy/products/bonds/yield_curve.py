@@ -53,9 +53,7 @@ class BondYieldCurve:
 
         yearsToMaturities = []
         for bond in bonds:
-            years_to_maturity = (
-                bond._maturity_date - settlement_date
-            ) / g_days_in_year
+            years_to_maturity = (bond._maturity_dt - settlement_date) / g_days_in_year
             yearsToMaturities.append(years_to_maturity)
         self._yearsToMaturity = np.array(yearsToMaturities)
 
@@ -115,16 +113,16 @@ class BondYieldCurve:
 
     ###############################################################################
 
-    def interpolated_yield(self, maturity_date: Date):
+    def interpolated_yield(self, maturity_dt: Date):
 
-        if type(maturity_date) is Date:
-            t = (maturity_date - self._settlement_date) / g_days_in_year
-        elif type(maturity_date) is list:
-            t = maturity_date
-        elif type(maturity_date) is np.ndarray:
-            t = maturity_date
-        elif type(maturity_date) is float or type(maturity_date) is np.float64:
-            t = maturity_date
+        if type(maturity_dt) is Date:
+            t = (maturity_dt - self._settlement_date) / g_days_in_year
+        elif type(maturity_dt) is list:
+            t = maturity_dt
+        elif type(maturity_dt) is np.ndarray:
+            t = maturity_dt
+        elif type(maturity_dt) is float or type(maturity_dt) is np.float64:
+            t = maturity_dt
         else:
             raise FinError("Unknown date type.")
 

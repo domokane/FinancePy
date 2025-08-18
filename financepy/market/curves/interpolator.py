@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 from enum import Enum
 from numba import njit, float64, int64
 import numpy as np
@@ -34,13 +35,16 @@ class InterpTypes(Enum):
 # TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ###############################################################################
 
-def interpolate(t: (float, np.ndarray),  # time or array of times
-                times: np.ndarray,  # Vector of times on grid
-                dfs: np.ndarray,  # Vector of discount factors
-                method: int):  # Interpolation method which is value of enum
-    """ Fast interpolation of discount factors at time x given discount factors
+
+def interpolate(
+    t: Union[float, np.ndarray],  # time or array of times
+    times: np.ndarray,  # Vector of times on grid
+    dfs: np.ndarray,  # Vector of discount factors
+    method: int,
+):  # Interpolation method which is value of enum
+    """Fast interpolation of discount factors at time x given discount factors
     at times provided using one of the methods in the enum InterpTypes. The
-    value of x can be an array so that the function is vectorised. """
+    value of x can be an array so that the function is vectorised."""
 
     if isinstance(t, (float, np.float64)):
 
@@ -66,13 +70,17 @@ def interpolate(t: (float, np.ndarray),  # time or array of times
 ###############################################################################
 
 
-@njit(float64(float64, float64[:], float64[:], int64),
-      fastmath=True, cache=True, nogil=True)
+@njit(
+    float64(float64, float64[:], float64[:], int64),
+    fastmath=True,
+    cache=True,
+    nogil=True,
+)
 def _uinterpolate(t, times, dfs, method):
-    """ Return the interpolated value of y given x and a vector of x and y.
+    """Return the interpolated value of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
-    piecewise flat in the continuously compounded forward y rate. """
+    piecewise flat in the continuously compounded forward y rate."""
 
     small = 1e-10
     num_points = times.size
@@ -140,8 +148,7 @@ def _uinterpolate(t, times, dfs, method):
             rt1 = -np.log(dfs[i - 2])
             rt2 = -np.log(dfs[i - 1])
             dt = times[i - 1] - times[i - 2]
-            rtvalue = ((times[i - 1] - t) * rt1 +
-                       (t - times[i - 2]) * rt2) / dt
+            rtvalue = ((times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2) / dt
             yvalue = np.exp(-rtvalue)
 
         return yvalue
@@ -154,15 +161,13 @@ def _uinterpolate(t, times, dfs, method):
             yvalue = np.exp(-yvalue)
         elif i < num_points:
             # If you get a math domain error it is because you need negativ
-            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / \
-                (times[i - 1] - times[i - 2])
+            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
             fwd2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
             dt = times[i] - times[i - 1]
             fwd = ((times[i] - t) * fwd1 + (t - times[i - 1]) * fwd2) / dt
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
         else:
-            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / \
-                (times[i - 1] - times[i - 2])
+            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
 
         return yvalue
@@ -174,16 +179,18 @@ def _uinterpolate(t, times, dfs, method):
 
 ###############################################################################
 
-@njit(float64[:](float64[:], float64[:], float64[:], int64),
-      fastmath=True, cache=True, nogil=True)
-def _vinterpolate(xValues,
-                  xvector,
-                  dfs,
-                  method):
-    """ Return the interpolated values of y given x and a vector of x and y.
+
+@njit(
+    float64[:](float64[:], float64[:], float64[:], int64),
+    fastmath=True,
+    cache=True,
+    nogil=True,
+)
+def _vinterpolate(xValues, xvector, dfs, method):
+    """Return the interpolated values of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
     interpolation are linear in y (as a function of x), linear in log(y) and
-    piecewise flat in the continuously compounded forward y rate. """
+    piecewise flat in the continuously compounded forward y rate."""
 
     n = xValues.size
     yvalues = np.empty(n)
@@ -196,11 +203,9 @@ def _vinterpolate(xValues,
 ###############################################################################
 
 
-class Interpolator():
+class Interpolator:
 
-    def __init__(self,
-                 interpolator_type: InterpTypes,
-                 **kwargs: dict):
+    def __init__(self, interpolator_type: InterpTypes, **kwargs: dict):
 
         self._interp_type = interpolator_type
         self._interp_fn = None
@@ -211,9 +216,7 @@ class Interpolator():
 
     ###########################################################################
 
-    def fit(self,
-            times: np.ndarray,
-            dfs: np.ndarray):
+    def fit(self, times: np.ndarray, dfs: np.ndarray):
 
         self.times = times
         self._dfs = dfs
@@ -246,41 +249,40 @@ class Interpolator():
 
         elif self._interp_type == InterpTypes.FINCUBIC_ZERO_RATES:
 
-            """ Second derivatives at left is zero and first derivative at
-            right is clamped to zero. """
+            """Second derivatives at left is zero and first derivative at
+            right is clamped to zero."""
             g_small_vector = np.ones(len(self.times)) * g_small
             zero_rates = -np.log(self._dfs) / (self.times + g_small_vector)
 
             if self.times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = CubicSpline(self.times, zero_rates,
-                                          bc_type=((2, 0.0), (1, 0.0)))
+            self._interp_fn = CubicSpline(
+                self.times, zero_rates, bc_type=((2, 0.0), (1, 0.0))
+            )
 
         elif self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
 
-            """ Second derivatives are clamped to zero at end points """
+            """Second derivatives are clamped to zero at end points"""
             log_dfs = np.log(self._dfs)
-            self._interp_fn = CubicSpline(self.times, log_dfs,
-                                          bc_type='natural')
+            self._interp_fn = CubicSpline(self.times, log_dfs, bc_type="natural")
 
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
-            """ Second derivatives are clamped to zero at end points """
+            """Second derivatives are clamped to zero at end points"""
             g_small_vector = np.ones(len(self.times)) * g_small
             zero_rates = -np.log(self._dfs) / (self.times + g_small_vector)
 
             if self.times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = CubicSpline(self.times, zero_rates,
-                                          bc_type='natural')
+            self._interp_fn = CubicSpline(self.times, zero_rates, bc_type="natural")
 
-    #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
-    #
-    #            log_dfs = np.log(self._dfs)
-    #            self._interp_fn = interp1d(self.times, log_dfs,
-    #                                      fill_value="extrapolate")
+        #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
+        #
+        #            log_dfs = np.log(self._dfs)
+        #            self._interp_fn = interp1d(self.times, log_dfs,
+        #                                      fill_value="extrapolate")
 
         elif self._interp_type == InterpTypes.LINEAR_ONFWD_RATES:
             onf_times = []
@@ -290,15 +292,15 @@ class Interpolator():
                 if t == 0.0:
                     continue
                 if len(onf_times) == 0:
-                    onfr = -np.log(df)/t
+                    onfr = -np.log(df) / t
                     onf_times = [0.0, t]
                     onf_rates = [onfr, onfr]
                 else:
                     prev_t = onf_times[-1]
                     prev_r = onf_rates[-1]
-                    fwd_df = df/prev_df
+                    fwd_df = df / prev_df
                     onf_int = -np.log(fwd_df)
-                    r = 2*onf_int/(t-prev_t) - prev_r
+                    r = 2 * onf_int / (t - prev_t) - prev_r
 
                     onf_times.append(t)
                     onf_rates.append(r)
@@ -307,13 +309,15 @@ class Interpolator():
 
             if len(onf_times) == 0:
                 self._interp_fn = InterpolatedUnivariateSpline(
-                    [0.0, 0.1], [0.0, 0.0], k=1, ext=3)
+                    [0.0, 0.1], [0.0, 0.0], k=1, ext=3
+                )
             else:
                 self._interp_fn = InterpolatedUnivariateSpline(
-                    onf_times, onf_rates, k=1, ext=3)
+                    onf_times, onf_rates, k=1, ext=3
+                )
 
         elif self._interp_type == InterpTypes.TENSION_ZERO_RATES:
-            tension_sigma = self._optional_interp_params.get('sigma', 1.0)
+            tension_sigma = self._optional_interp_params.get("sigma", 1.0)
             gSmallVector = np.ones(len(self.times)) * g_small
             zero_rates = -np.log(self._dfs) / (self.times + gSmallVector)
 
@@ -324,11 +328,10 @@ class Interpolator():
 
     ###########################################################################
 
-    def interpolate(self,
-                    t: float):
-        """ Interpolation of discount factors at time x given discount factors
+    def interpolate(self, t: float):
+        """Interpolation of discount factors at time x given discount factors
         at times provided using one of the methods in the enum InterpTypes.
-        The value of x can be an array so that the function is vectorised. """
+        The value of x can be an array so that the function is vectorised."""
 
         if self._dfs is None:
             raise FinError("Dfs have not been set.")
@@ -355,15 +358,19 @@ class Interpolator():
         else:
             raise FinError("t is not a recognized type")
 
-        if self._interp_type in [InterpTypes.PCHIP_LOG_DISCOUNT,
-                                 InterpTypes.NATCUBIC_LOG_DISCOUNT]:
+        if self._interp_type in [
+            InterpTypes.PCHIP_LOG_DISCOUNT,
+            InterpTypes.NATCUBIC_LOG_DISCOUNT,
+        ]:
 
             out = np.exp(self._interp_fn(tvec))
 
-        elif self._interp_type in [InterpTypes.PCHIP_ZERO_RATES,
-                                   InterpTypes.FINCUBIC_ZERO_RATES,
-                                   InterpTypes.NATCUBIC_ZERO_RATES,
-                                   InterpTypes.TENSION_ZERO_RATES, ]:
+        elif self._interp_type in [
+            InterpTypes.PCHIP_ZERO_RATES,
+            InterpTypes.FINCUBIC_ZERO_RATES,
+            InterpTypes.NATCUBIC_ZERO_RATES,
+            InterpTypes.TENSION_ZERO_RATES,
+        ]:
 
             out = np.exp(-tvec * self._interp_fn(tvec))
 
@@ -373,9 +380,9 @@ class Interpolator():
                 # (not sure why we have if len(times) == 1: return in the fit(...) function but reluctant to change that)
                 # so work around this. already tested that _dfs is not None
                 if len(self._dfs) == 0 or self.times[0] == 0.0:
-                    out = [1.0]*len(tvec)
+                    out = [1.0] * len(tvec)
                 else:
-                    onf_rate = -np.log(self._dfs[0])/self.times[0]
+                    onf_rate = -np.log(self._dfs[0]) / self.times[0]
                     out = np.exp(-onf_rate * tvec)
             else:
                 # apparently UnivariateSpline.integral assumes the function is zero outside the data limits (WHY??????)
@@ -391,8 +398,7 @@ class Interpolator():
                 out = np.exp(log_dfs)
         else:
 
-            out = _vinterpolate(tvec, self.times, self._dfs,
-                                self._interp_type.value)
+            out = _vinterpolate(tvec, self.times, self._dfs, self._interp_type.value)
 
         if isinstance(t, (float, np.float64)):
             return out[0]

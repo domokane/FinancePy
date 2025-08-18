@@ -13,10 +13,10 @@ from re import sub
 
 with open("../version.py", "r") as fh:
     version_number = fh.read()
-    start = version_number.find("\"")
-    end = version_number[start+1:].find("\"")
-    VERSION = str(version_number[start+1:start+end+1])
-    VERSION = VERSION.replace('\n', '')
+    start = version_number.find('"')
+    end = version_number[start + 1 :].find('"')
+    VERSION = str(version_number[start + 1 : start + end + 1])
+    VERSION = VERSION.replace("\n", "")
 
 # file_name = "FinancePyManualV_" + str(VERSION)
 file_name = "FinancePyManual"
@@ -27,9 +27,9 @@ new_head_file = "./head_" + str(VERSION) + ".tex"
 
 shutil.copyfile(head_file, new_head_file)
 
-with fileinput.FileInput(new_head_file, inplace=True, backup='.bak') as file:
+with fileinput.FileInput(new_head_file, inplace=True, backup=".bak") as file:
     for line in file:
-        print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end='')
+        print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end="")
 
 VERBOSE = False
 parseDataMembers = False
@@ -131,6 +131,7 @@ def parse_markdown(lines):
 
     return parsed_lines
 
+
 ##########################################################################
 
 
@@ -143,6 +144,7 @@ def add_to_list(listName, item):
     listName.append(item)
     return listName
 
+
 ##########################################################################
 
 
@@ -153,64 +155,68 @@ def open_file(filename):
         opener = "open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
+
 ##########################################################################
 
 
 def build_head():
-    """ Start latex file with a header that sets all of the document
-    properties. """
+    """Start latex file with a header that sets all of the document
+    properties."""
 
-    f = open(new_head_file, 'r')
+    f = open(new_head_file, "r")
     lines = f.readlines()
     f.close()
 
-    f = open(user_guide_file_name, 'w', encoding="utf-8")
+    f = open(user_guide_file_name, "w", encoding="utf-8")
     f.writelines(lines)
     f.close()
+
 
 ##########################################################################
 
 
 def build_tail():
-    """ Add on end latex to close document. """
-    f = open(tail_file, 'r')
+    """Add on end latex to close document."""
+    f = open(tail_file, "r")
     lines = f.readlines()
     f.close()
 
-    f = open(user_guide_file_name, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, "a", encoding="utf-8")
     f.writelines(lines)
     f.close()
+
 
 ##########################################################################
 
 
 def build_intro(intro_file):
-    """ Add on end latex to close document. """
+    """Add on end latex to close document."""
     print("Building introduction from file:", intro_file)
 
-    f = open(intro_file, 'r')
+    f = open(intro_file, "r")
     lines = f.readlines()
     f.close()
 
     parsed_lines = parse_markdown(lines)
 
-    f = open(user_guide_file_name, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, "a", encoding="utf-8")
 
     f.write("\\chapter{Introduction to FinancePy}")
     f.writelines(parsed_lines)
     f.close()
 
+
 ##########################################################################
 
 
 def build_chapter(folder_name):
-    """ Parse a folder by loading up all of the modules in that folder that
-    start with the three letters - Fin. """
+    """Parse a folder by loading up all of the modules in that folder that
+    start with the three letters - Fin."""
 
     print("Building chapter in folder:", folder_name)
 
     read_me_file = folder_name + "//" + "README.md"
-    f = open(read_me_file, 'r', encoding="utf-8")
+    f = open(read_me_file, "r", encoding="utf-8")
     read_me_lines = f.readlines()
     f.close()
 
@@ -221,10 +227,10 @@ def build_chapter(folder_name):
     new_lines.append("\n")
     new_lines.append("\\chapter{" + chapter_name + "}")
     new_lines.append("\n")
-#    new_lines.append("\\section{Introduction}")
-#    new_lines.append("\n")
+    #    new_lines.append("\\section{Introduction}")
+    #    new_lines.append("\n")
 
-    f = open(user_guide_file_name, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, "a", encoding="utf-8")
     f.writelines(new_lines)
     f.close()
 
@@ -254,7 +260,7 @@ def build_chapter(folder_name):
 
     read_me_lines = parse_markdown(read_me_lines)
 
-    f = open(user_guide_file_name, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, "a", encoding="utf-8")
     f.writelines(read_me_lines)
     f.close()
 
@@ -263,7 +269,7 @@ def build_chapter(folder_name):
     for module in modules:
         module_name = module.split("\\")[-1]
         escaped_module_name = sub("_", "\\_", module_name[0:-3])
-        f = open(user_guide_file_name, 'a', encoding="utf-8")
+        f = open(user_guide_file_name, "a", encoding="utf-8")
         f.write("\\newpage\n")
         f.write("\\section{" + escaped_module_name + "}\n")
         f.write("\n")
@@ -275,7 +281,7 @@ def build_chapter(folder_name):
     for module in modules:
         module_name = module.split("\\")[-1]
         escaped_module_name = sub("_", "\\_", module_name[0:-3])
-        f = open(user_guide_file_name, 'a', encoding="utf-8")
+        f = open(user_guide_file_name, "a", encoding="utf-8")
         f.write("\n")
         f.write("\\newpage\n")
         f.write("\\section{" + escaped_module_name + "}\n")
@@ -283,14 +289,15 @@ def build_chapter(folder_name):
         f.close()
         parse_module(module)
 
+
 ##########################################################################
 
 
 def parse_module(module_name):
-    """ Parse a module looking for classes, functions and classes for
-    enumerated types. Functions inside classes are parsed inside the class. """
+    """Parse a module looking for classes, functions and classes for
+    enumerated types. Functions inside classes are parsed inside the class."""
     print(module_name)
-    f = open(module_name, 'r', encoding="utf-8")
+    f = open(module_name, "r", encoding="utf-8")
     lines = f.readlines()
     f.close()
 
@@ -330,26 +337,24 @@ def parse_module(module_name):
 
     # print("start_class_lines", start_class_lines)
 
-    f = open(user_guide_file_name, 'a', encoding="utf-8")
+    f = open(user_guide_file_name, "a", encoding="utf-8")
 
     for c in range(0, num_enums):
-        new_lines = parse_enum(lines, start_enum_lines[c],
-                               start_enum_lines[c + 1])
+        new_lines = parse_enum(lines, start_enum_lines[c], start_enum_lines[c + 1])
 
         for newLine in new_lines:
             f.writelines(newLine)
 
     for c in range(0, num_classes):
-        new_lines = parse_class(lines,
-                                start_class_lines[c],
-                                start_class_lines[c + 1])
+        new_lines = parse_class(lines, start_class_lines[c], start_class_lines[c + 1])
 
         for newLine in new_lines:
             f.writelines(newLine)
 
     for c in range(0, num_functions):
         new_lines = parse_function(
-            lines, start_function_lines[c], start_function_lines[c + 1])
+            lines, start_function_lines[c], start_function_lines[c + 1]
+        )
 
         for newLine in new_lines:
             f.writelines(newLine)
@@ -358,11 +363,12 @@ def parse_module(module_name):
 
     f.close()
 
+
 ##########################################################################
 
 
 def parse_class(lines, start_line, end_line):
-    """ Parse a Python class consisting of data members and functions. """
+    """Parse a Python class consisting of data members and functions."""
 
     n1 = lines[start_line].find("class")
 
@@ -372,7 +378,7 @@ def parse_class(lines, start_line, end_line):
     class_name = class_name.replace(":", "")
     class_name = class_name.replace("\n", "")
 
-#    print(class_name, start_line, end_line)
+    #    print(class_name, start_line, end_line)
 
     new_lines.append("\\subsection*{Class: " + class_name + "}")
     new_lines.append("\n")
@@ -481,7 +487,7 @@ def parse_class(lines, start_line, end_line):
     num_class_functions = 0
     start_class_function_lines = []
 
-#    print(start_line, end_line)
+    #    print(start_line, end_line)
     for row_num in range(start_line, end_line):
 
         line = lines[row_num]
@@ -498,19 +504,22 @@ def parse_class(lines, start_line, end_line):
         class_name = class_name[:end_class_name]
 
     for c in range(0, num_class_functions):
-        new_lines += parse_function(lines,
-                                    start_class_function_lines[c],
-                                    start_class_function_lines[c + 1],
-                                    class_name)
+        new_lines += parse_function(
+            lines,
+            start_class_function_lines[c],
+            start_class_function_lines[c + 1],
+            class_name,
+        )
         new_lines += "\n"
 
     return new_lines
+
 
 ##########################################################################
 
 
 def parse_function(lines, start_line, end_line, class_name=""):
-    """ Given a set of lines and a start line I extract the function definition
+    """Given a set of lines and a start line I extract the function definition
     and any comment that goes below.
     TODO: Add parsing of function arguments and any comments."""
 
@@ -524,7 +533,7 @@ def parse_function(lines, start_line, end_line, class_name=""):
         return ""
 
     n2 = function_line.find("(")
-    function_name = function_line[leftCol + 4:n2]
+    function_name = function_line[leftCol + 4 : n2]
 
     # If the function name starts with a _ and is not init then ignore it
     if function_name[0] == "_" and function_name != "__init__":
@@ -562,18 +571,21 @@ def parse_function(lines, start_line, end_line, class_name=""):
         # Replace '__init__' with the function's class name
         if function_name == "\\_\\_init\\_\\_":
             function_name = class_name
-            function_signature = function_signature.replace("\\_\\_init\\_\\_",
-                                                          class_name)
+            function_signature = function_signature.replace(
+                "\\_\\_init\\_\\_", class_name
+            )
 
             function_signature = function_signature.replace("def ", "")
 
             missingSpaces = len(class_name) - len("__init__")
             if missingSpaces >= 0:
                 function_signature = function_signature.replace(
-                    "\n ", "\n " + " " * (missingSpaces))
+                    "\n ", "\n " + " " * (missingSpaces)
+                )
             else:
                 function_signature = function_signature.replace(
-                    "\n" + " " * (-missingSpaces), "\n")
+                    "\n" + " " * (-missingSpaces), "\n"
+                )
 
         # Remove 'self' and any whitespace following it
         function_signature = function_signature.replace("self", "")
@@ -586,11 +598,11 @@ def parse_function(lines, start_line, end_line, class_name=""):
             function_signature = function_signature.replace("(\n", "(")
 
     function_comment = ""
-    start_comment_row = start_line+1
+    start_comment_row = start_line + 1
     end_comment_row = start_line
     end_comment = False
 
-    for row_num in range(start_line+1, end_line):
+    for row_num in range(start_line + 1, end_line):
         line = lines[row_num]
 
         if line.count("'''") == 1 or line.count('"""') == 1:
@@ -600,7 +612,7 @@ def parse_function(lines, start_line, end_line, class_name=""):
                 comment_init = '"""'
 
             start_comment_row = row_num
-            for row_num2 in range(row_num+1, end_line):
+            for row_num2 in range(row_num + 1, end_line):
                 line = lines[row_num2]
                 if line.find(comment_init) > 0:
                     end_comment_row = row_num2
@@ -643,11 +655,9 @@ def parse_function(lines, start_line, end_line, class_name=""):
 
     # LATEX FORMATTING
     if class_name != "":
-        func_description = r"\subsubsection*{{\bf " + \
-            function_name + "}}\n"
+        func_description = r"\subsubsection*{{\bf " + function_name + "}}\n"
     else:
-        func_description = r"\subsubsection*{{\bf " + \
-            function_name + "}}\n"
+        func_description = r"\subsubsection*{{\bf " + function_name + "}}\n"
 
     func_description += "{\\it "
     func_description += function_comment
@@ -664,18 +674,19 @@ def parse_function(lines, start_line, end_line, class_name=""):
     func_description += param_description
     return func_description
 
+
 ##########################################################################
 
 
 def parse_enum(lines, start_line, end_line):
-    """ Parse a Class that implements an Enumerated type. """
+    """Parse a Class that implements an Enumerated type."""
     enum_description = []
 
     enumLine = lines[start_line]
     n1 = enumLine.find("class")
     n2 = enumLine.find("(")
     # len("class ") == 6
-    enum_name = enumLine[n1 + 6:n2]
+    enum_name = enumLine[n1 + 6 : n2]
 
     enum_types = []
     for row_num in range(start_line + 1, end_line):
@@ -688,7 +699,7 @@ def parse_enum(lines, start_line, end_line):
         else:
             break
 
-    enum_description.append("\\subsubsection*{Enumerated Type: " + enum_name+"}")
+    enum_description.append("\\subsubsection*{Enumerated Type: " + enum_name + "}")
     enum_description.append("\n")
     enum_description.append("This enumerated type has the following values:\n")
     enum_description.append("\\begin{itemize}[nosep]")
@@ -702,19 +713,19 @@ def parse_enum(lines, start_line, end_line):
 
     return enum_description
 
+
 ##########################################################################
 
 
 def extract_params(function_signature):
-    """ Parse a function signature into a table containing each function
+    """Parse a function signature into a table containing each function
     argument's name, type, description and default value"""
     # A good example to look at for testing is `BondConvertible`
 
     function_signature = function_signature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
-    stripedSignature = function_signature.split(
-        "(", 1)[1].replace("):", "").strip()
+    stripedSignature = function_signature.split("(", 1)[1].replace("):", "").strip()
     if stripedSignature == "":
         # The function has no parameters
         return ""
@@ -733,12 +744,12 @@ def extract_params(function_signature):
         comment_location = line.find("#")
         pComment = "-"
         if comment_location != -1:
-            pComment = line[comment_location+1:].strip()
+            pComment = line[comment_location + 1 :].strip()
             line = line[:comment_location]
 
         line = line.strip()
         # Split by comma while leaving commas that are in square brackets '[]'.
-        # This allows us to parse 'Union[Date, str]' for maturity_date_or_tenor
+        # This allows us to parse 'Union[Date, str]' for maturity_dt_or_tenor
         if line.find("[") != -1 or line.find("(") != -1:
             # https://stackoverflow.com/questions/26808913/split-string-at-commas-except-when-in-bracket-environment
             params = []
@@ -772,33 +783,36 @@ def extract_params(function_signature):
             p_default = "-"
             default_location = param.find("=")
             if default_location != -1:
-                p_default = param[default_location+1:].strip()
+                p_default = param[default_location + 1 :].strip()
 
                 # Rip the type name out if it's an enumerated type
                 if p_default[0:3] == "Fin":
                     dotCol = p_default.find(".")
-                    p_default = p_default[dotCol+1:]
+                    p_default = p_default[dotCol + 1 :]
 
                 param = param[:default_location]
 
             # Find type
             p_type = "-"
-            typeLocation = param.find(':')
+            typeLocation = param.find(":")
             if typeLocation != -1:
-                p_type = param[typeLocation+1:].strip()
+                p_type = param[typeLocation + 1 :].strip()
                 p_type = parse_type(p_type)
                 param = param[:typeLocation].strip()
 
             # Everything remaining must be the name
             p_name = param
 
-            param_description += f"{p_name} & {p_type} & {pComment} & {p_default} \\\\\n"
+            param_description += (
+                f"{p_name} & {p_type} & {pComment} & {p_default} \\\\\n"
+            )
             param_description += "\\hline\n"
 
     param_description += "\\end{tabular}"
     param_description += "\\end{center}\n"
 
     return param_description
+
 
 ###############################################################################
 
@@ -811,18 +825,19 @@ def parse_type(p_type):
         lb = p_type.find("[")
         rb = p_type.find("]")
         cm = p_type.find(",")
-        s = p_type[lb+1:cm] + " or " + p_type[cm+1:rb]
+        s = p_type[lb + 1 : cm] + " or " + p_type[cm + 1 : rb]
     elif u == -1 and b != -1:
         # Problem as list has a comma in it and this has already been used to
         # split the line of arguments above
         lb = p_type.find("(")
         rb = p_type.find(")")
         cm = p_type.find(",")
-        s = p_type[lb+1:cm] + " or " + p_type[cm+1:rb]
+        s = p_type[lb + 1 : cm] + " or " + p_type[cm + 1 : rb]
     else:
         s = p_type
 
     return s
+
 
 ###############################################################################
 
@@ -841,10 +856,10 @@ if 1 == 1:
     build_chapter("..//financepy//products//fx")
     build_chapter("..//financepy//models")
 
-#    build_chapter("..//financepy//portfolio")
-#    build_chapter("..//financepy//risk")
-#    build_chapter(".//financepy//tests")
-#    build_chapter(".//financepy//docs")
+    #    build_chapter("..//financepy//portfolio")
+    #    build_chapter("..//financepy//risk")
+    #    build_chapter(".//financepy//tests")
+    #    build_chapter(".//financepy//docs")
     pass
 
 build_tail()
@@ -859,18 +874,18 @@ if 1 == 1:
     os.system("pdflatex " + user_guide_file_name)
 
     pdf_filename_1 = file_name + ".pdf"
-    pdf_filename_2 = '..\\' + pdf_filename_1
+    pdf_filename_2 = "..\\" + pdf_filename_1
 
     # TODO: Only works if you have financepy-examples-git
     # Maybe add `financepy-examples-git` as a submodule?
 
     print("Removing unneeded files.")
     os.remove(file_name + ".out")
-#    os.remove(file_name + ".tex")
+    #    os.remove(file_name + ".tex")
     os.remove(file_name + ".toc")
     os.remove(file_name + ".aux")
-#    os.remove(file_name + ".fls")
-#    os.remove(file_name + ".fdb_latexmk")
+    #    os.remove(file_name + ".fls")
+    #    os.remove(file_name + ".fdb_latexmk")
     os.remove(file_name + ".log")
     os.remove(new_head_file)
     os.remove(new_head_file + ".bak")

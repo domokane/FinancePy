@@ -4,6 +4,9 @@
 
 import time
 
+import sys
+
+sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 
@@ -16,8 +19,6 @@ from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
 
-import sys
-sys.path.append("..")
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
@@ -39,138 +40,115 @@ def testEquityAmericanOption():
 
     test_cases.banner("================== EUROPEAN PUT =======================")
 
-    put_option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
+    put_option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
     num_steps = 100
 
-    model = BlackScholes(volatility,
-                         BlackScholesTypes.CRR_TREE,
-                         num_steps)
+    model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
 
-    value = put_option.value(value_dt, stock_price,
-                             discount_curve, dividend_curve, model)
-    delta = put_option.delta(value_dt, stock_price,
-                             discount_curve, dividend_curve, model)
-    gamma = put_option.gamma(value_dt, stock_price,
-                             discount_curve, dividend_curve, model)
-    theta = put_option.theta(value_dt, stock_price,
-                             discount_curve, dividend_curve, model)
+    value = put_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    delta = put_option.delta(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    gamma = put_option.gamma(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    theta = put_option.theta(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     test_cases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     test_cases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
 
-    option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
-    test_cases.header("OPTION_TYPE", "NUMSTEPS",
-                     "VALUE DELTA GAMMA THETA", "TIME")
+    test_cases.header("OPTION_TYPE", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
     num_steps_list = [100]
 
     for num_steps in num_steps_list:
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.CRR_TREE,
-                             num_steps)
+        model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
 
         start = time.time()
-        results = option.value(value_dt, stock_price,
-                               discount_curve, dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         end = time.time()
         duration = end - start
         test_cases.print("EUROPEAN_PUT_TREE", num_steps, results, duration)
 
     test_cases.banner("================== AMERICAN PUT =======================")
 
-    option = EquityAmericanOption(
-        expiry_dt,
-        strike_price,
-        OptionTypes.AMERICAN_PUT)
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_PUT)
 
-    test_cases.header(
-        "OPTION_TYPE",
-        "NUMSTEPS",
-        "VALUE DELTA GAMMA THETA",
-        "TIME")
+    test_cases.header("OPTION_TYPE", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
     for num_steps in num_steps_list:
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.CRR_TREE,
-                             num_steps)
+        model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
 
         start = time.time()
-        results = option.value(value_dt, stock_price,
-                               discount_curve, dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         end = time.time()
         duration = end - start
         test_cases.print("AMERICAN_PUT", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== EUROPEAN CALL =======================")
+    test_cases.banner("================== EUROPEAN CALL =======================")
 
     call_option = EquityAmericanOption(
-        expiry_dt,
-        strike_price,
-        OptionTypes.EUROPEAN_CALL)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
+    )
 
-    value = call_option.value(value_dt, stock_price,
-                              discount_curve, dividend_curve, model)
-    delta = call_option.delta(value_dt, stock_price,
-                              discount_curve, dividend_curve, model)
-    gamma = call_option.gamma(value_dt, stock_price,
-                              discount_curve, dividend_curve, model)
-    theta = call_option.theta(value_dt, stock_price,
-                              discount_curve, dividend_curve, model)
+    value = call_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    delta = call_option.delta(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    gamma = call_option.gamma(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    theta = call_option.theta(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     test_cases.header("OPTION_TYPE", "VALUE", "DELTA", "GAMMA", "THETA")
     test_cases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
 
-    option = EquityAmericanOption(
-        expiry_dt,
-        strike_price,
-        OptionTypes.EUROPEAN_CALL)
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL)
 
-    test_cases.header(
-        "OPTION_TYPE",
-        "NUMSTEPS",
-        "VALUE DELTA GAMMA THETA",
-        "TIME")
+    test_cases.header("OPTION_TYPE", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
     for num_steps in num_steps_list:
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.CRR_TREE,
-                             num_steps)
+        model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
         start = time.time()
-        results = option.value(value_dt, stock_price, discount_curve,
-                               dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         end = time.time()
         duration = end - start
         test_cases.print("EUROPEAN_CALL_TREE", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN CALL =======================")
-    test_cases.header(
-        "OPTION_TYPE",
-        "NUMSTEPS",
-        "VALUE DELTA GAMMA THETA",
-        "TIME")
+    test_cases.banner("================== AMERICAN CALL =======================")
+    test_cases.header("OPTION_TYPE", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
-    option = EquityAmericanOption(expiry_dt, strike_price,
-                                  OptionTypes.AMERICAN_CALL)
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_CALL)
 
     for num_steps in num_steps_list:
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.CRR_TREE,
-                             num_steps)
+        model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
 
         start = time.time()
 
-        results = option.value(value_dt, stock_price, discount_curve,
-                               dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
 
         end = time.time()
         duration = end - start
@@ -179,62 +157,52 @@ def testEquityAmericanOption():
         # NO DO IT USING AMERICAN MONTE CARLO
         num_paths = 50000
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.LSMC,
-                             num_steps,
-                             num_paths)
+        model = BlackScholes(volatility, BlackScholesTypes.LSMC, num_steps, num_paths)
 
         start = time.time()
 
-        results = option.value(value_dt, stock_price, discount_curve,
-                               dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
 
         end = time.time()
         duration = end - start
         test_cases.print("AMERICAN_LSMC_CALL", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN PUT =======================")
-    test_cases.header(
-        "OPTION_TYPE",
-        "NUMSTEPS",
-        "VALUE DELTA GAMMA THETA",
-        "TIME")
+    test_cases.banner("================== AMERICAN PUT =======================")
+    test_cases.header("OPTION_TYPE", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
-    option = EquityAmericanOption(expiry_dt, strike_price,
-                                  OptionTypes.AMERICAN_PUT)
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_PUT)
 
     for num_steps in num_steps_list:
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.CRR_TREE,
-                             num_steps)
+        model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
 
         start = time.time()
 
-        results = option.value(value_dt, stock_price, discount_curve,
-                               dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
 
         end = time.time()
         duration = end - start
         test_cases.print("AMERICAN_TREE_PUT", num_steps, results, duration)
-#        print("PUT Tree Results", results)
+        #        print("PUT Tree Results", results)
 
         # NOW DO IT USING AMERICAN MONTE CARLO
 
-        model = BlackScholes(volatility,
-                             BlackScholesTypes.LSMC,
-                             num_steps,
-                             num_paths)
+        model = BlackScholes(volatility, BlackScholesTypes.LSMC, num_steps, num_paths)
 
         start = time.time()
 
-        results = option.value(value_dt, stock_price, discount_curve,
-                               dividend_curve, model)
+        results = option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
 
         end = time.time()
         duration = end - start
         test_cases.print("AMERICAN_PUT", num_steps, results, duration)
+
 
 #    FinTest.TestReport(filename)
 
@@ -270,29 +238,33 @@ def replicateLSPaper():
             for v in volatilities:
                 for t in times_to_expiry:
 
-                    v_ls = equity_lsmc(s,
-                                       r,  # continuously compounded
-                                       q,  # continuously compounded
-                                       v,  # Black scholes volatility
-                                       num_paths,
-                                       num_steps_per_year,
-                                       t,
-                                       option_type_value,
-                                       k,
-                                       poly_deg,
-                                       fit_type_value,
-                                       use_sobol,
-                                       seed)
+                    v_ls = equity_lsmc(
+                        s,
+                        r,  # continuously compounded
+                        q,  # continuously compounded
+                        v,  # Black scholes volatility
+                        num_paths,
+                        num_steps_per_year,
+                        t,
+                        option_type_value,
+                        k,
+                        poly_deg,
+                        fit_type_value,
+                        use_sobol,
+                        seed,
+                    )
 
-                    v_tree = crr_tree_val(s,
-                                          r,  # continuously compounded
-                                          q,  # continuously compounded
-                                          v,  # Black scholes volatility
-                                          2000,
-                                          t,
-                                          option_type_value,
-                                          k,
-                                          True)[0]
+                    v_tree = crr_tree_val(
+                        s,
+                        r,  # continuously compounded
+                        q,  # continuously compounded
+                        v,  # Black scholes volatility
+                        2000,
+                        t,
+                        option_type_value,
+                        k,
+                        True,
+                    )[0]
 
                     if option_type_value == OptionTypes.AMERICAN_CALL.value:
                         euro_option_type_value = OptionTypes.EUROPEAN_CALL.value
@@ -301,8 +273,11 @@ def replicateLSPaper():
 
                     v_eur = bs_value(s, t, k, r, q, v, euro_option_type_value)
 
-                    print("%5.1f %5.2f %4.1f %7.3f %7.3f %7.3f" %
-                          (s, v, t, v_tree, v_eur, v_ls))
+                    print(
+                        "%5.1f %5.2f %4.1f %7.3f %7.3f %7.3f"
+                        % (s, v, t, v_tree, v_eur, v_ls)
+                    )
+
 
 ###############################################################################
 

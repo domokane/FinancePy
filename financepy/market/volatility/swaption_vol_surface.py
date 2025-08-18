@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 from scipy.optimize import minimize
 
@@ -387,7 +389,7 @@ class SwaptionVolSurface:
         self,
         value_dt: Date,
         expiry_dts: list,
-        fwd_swap_rates: (list, np.ndarray),
+        fwd_swap_rates: Union[list, np.ndarray],
         strike_grid: np.ndarray,
         vol_grid: np.ndarray,
         vol_func_type: VolFuncTypes = VolFuncTypes.SABR,
@@ -407,14 +409,10 @@ class SwaptionVolSurface:
             raise FinError("Volatility grid must be a 2D grid of values")
 
         if len(strike_grid) != len(vol_grid):
-            raise FinError(
-                "Strike grid and volatility grid must have same size"
-            )
+            raise FinError("Strike grid and volatility grid must have same size")
 
         if len(strike_grid[0]) != len(vol_grid[0]):
-            raise FinError(
-                "Strike grid and volatility grid must have same size"
-            )
+            raise FinError("Strike grid and volatility grid must have same size")
 
         if len(expiry_dts) != len(vol_grid[0]):
             raise FinError("Expiry dates not same size as volatility grid")
@@ -494,15 +492,11 @@ class SwaptionVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(
-            vol_type_value, self._parameters[index0], fwd0, K, t0
-        )
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, K, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(
-                vol_type_value, self._parameters[index1], fwd1, K, t1
-            )
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, K, t1)
 
         else:
 

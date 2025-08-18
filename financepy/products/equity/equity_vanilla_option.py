@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 from numba import njit
 
@@ -75,9 +77,9 @@ class EquityVanillaOption:
 
     def __init__(
         self,
-        expiry_dt: (Date, list),
-        strike_price: (float, np.ndarray),
-        option_type: (OptionTypes, list),
+        expiry_dt: Union[Date, list],
+        strike_price: Union[float, np.ndarray],
+        option_type: Union[OptionTypes, list],
         num_options: float = 1.0,
     ):
         """Create the Equity Vanilla option object by specifying the expiry
@@ -105,7 +107,7 @@ class EquityVanillaOption:
 
     def intrinsic(
         self,
-        value_dt: (Date, list),
+        value_dt: Union[Date, list],
         stock_price: (np.ndarray, float),
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
@@ -139,9 +141,7 @@ class EquityVanillaOption:
 
         k = self.strike_price
 
-        intrinsic_value = bs_intrinsic(
-            s0, t_exp, k, r, q, self.option_type_value
-        )
+        intrinsic_value = bs_intrinsic(s0, t_exp, k, r, q, self.option_type_value)
 
         intrinsic_value = intrinsic_value * self.num_options
         return intrinsic_value
@@ -150,7 +150,7 @@ class EquityVanillaOption:
 
     def value(
         self,
-        value_dt: (Date, list),
+        value_dt: Union[Date, list],
         stock_price: (np.ndarray, float),
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
@@ -512,9 +512,7 @@ class EquityVanillaOption:
         k = self.strike_price
         s0 = stock_price
 
-        sigma = bs_implied_volatility(
-            s0, t_exp, k, r, q, price, self.option_type_value
-        )
+        sigma = bs_implied_volatility(s0, t_exp, k, r, q, price, self.option_type_value)
 
         return sigma
 

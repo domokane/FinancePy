@@ -8,10 +8,11 @@ import traceback
 
 import sys
 
+sys.path.append("..")
+
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 
-sys.path.append("..")
 
 # This only works if I have an init.py in the parent folder
 

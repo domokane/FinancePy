@@ -1,6 +1,9 @@
 ##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
+
+from typing import Union
+
 import pandas as pd
 
 from ...utils.global_types import SwapTypes
@@ -12,6 +15,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
+
 
 ###############################################################################
 
@@ -181,7 +185,7 @@ class IborFRA:
         out = {
             "type": type(self).__name__,
             "start_date": self.start_dt,
-            "maturity_date": self.maturity_dt,
+            "maturity_dt": self.maturity_dt,
             "day_count_type": self.dc_type.name,
             "fixed_leg_type": (
                 SwapTypes.PAY.name if self.pay_fixed_rate else SwapTypes.RECEIVE.name

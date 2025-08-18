@@ -3,6 +3,7 @@
 ##############################################################################
 
 # TODO Fix this
+from typing import Union
 
 from enum import Enum
 
@@ -43,7 +44,7 @@ class BlackScholes(Model):
 
     def __init__(
         self,
-        volatility: (float, np.ndarray),
+        volatility: Union[float, np.ndarray],
         bs_type: BlackScholesTypes = BlackScholesTypes.DEFAULT,
         num_steps_per_year=52,
         num_paths=10000,

@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 
 from enum import Enum
 import numpy as np
@@ -67,7 +68,7 @@ class EquityDigitalOption(EquityOption):
     def value(
         self,
         value_dt: Date,
-        s: (float, np.ndarray),
+        s: Union[float, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model,

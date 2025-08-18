@@ -79,7 +79,7 @@ def pv01_times(t: float, f: float):
 
 
 def times_from_dates(
-    dt: (Date, list), value_dt: Date, day_count_type: DayCountTypes = None
+    dt: Union[Date, list], value_dt: Date, day_count_type: DayCountTypes = None
 ):
     """If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
@@ -404,7 +404,7 @@ def format_table(header, rows):
     ]
 
     def format_cell(val, width):
-        if isinstance(val, (int, float)):
+        if isinstance(val, Union[int, float]):
             return f"{val:>{width}}"  # Right align
         return f"{str(val):<{width}}"  # Left align
 
@@ -431,7 +431,7 @@ def to_usable_type(t):
         origin = t.__origin__
         # t comes from the `typing` module
         if origin is list:
-            return (list, np.ndarray)
+            return Union[list, np.ndarray]
         elif origin is Union:
             types = t.__args__
             return tuple(to_usable_type(tp) for tp in types)

@@ -30,9 +30,7 @@ def test_z_spread_flat_curve():
 
 def test_z_spread_actual_curve():
 
-    path = os.path.join(
-        os.path.dirname(__file__), "./data/GBP_OIS_20120919.csv"
-    )
+    path = os.path.join(os.path.dirname(__file__), "./data/GBP_OIS_20120919.csv")
     dfbm = pd.read_csv(path, index_col=0)
     dfbm["base_date"] = pd.to_datetime(
         dfbm["base_date"], errors="ignore", format="%d/%m/%Y"
@@ -40,15 +38,13 @@ def test_z_spread_actual_curve():
     dfbm["start_date"] = pd.to_datetime(
         dfbm["start_date"], errors="ignore", format="%d/%m/%Y"
     )  # allow tenors
-    dfbm["maturity_date"] = pd.to_datetime(
-        dfbm["maturity_date"], errors="ignore", format="%d/%m/%Y"
+    dfbm["maturity_dt"] = pd.to_datetime(
+        dfbm["maturity_dt"], errors="ignore", format="%d/%m/%Y"
     )  # allow tenors
 
     valuation_date = from_datetime(dfbm.loc[0, "base_date"])
     cal = CalendarTypes.UNITED_KINGDOM
-    bms = dataframe_to_benchmarks(
-        dfbm, asof_date=valuation_date, calendar_type=cal
-    )
+    bms = dataframe_to_benchmarks(dfbm, asof_date=valuation_date, calendar_type=cal)
     depos = bms["IborDeposit"]
     fras = bms["IborFRA"]
     swaps = bms["IborSwap"]
@@ -62,13 +58,9 @@ def test_z_spread_actual_curve():
 
 
 def _test_z_spread_for_curve(base_curve: DiscountCurve):
-    path = os.path.join(
-        os.path.dirname(__file__), "./data/gilt_bond_prices.txt"
-    )
+    path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
-    bond_dataframe["mid"] = 0.5 * (
-        bond_dataframe["bid"] + bond_dataframe["ask"]
-    )
+    bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
     bond_dataframe["maturity"] = pd.to_datetime(bond_dataframe["maturity"])
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA

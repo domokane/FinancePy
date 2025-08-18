@@ -1,4 +1,4 @@
-﻿,base_date,type,start_date,maturity_date,day_count_type,notional,contract_rate,fixed_leg_type,fixed_freq_type,curve,currency
+﻿,base_date,type,start_date,maturity_dt,day_count_type,notional,contract_rate,fixed_leg_type,fixed_freq_type,curve,currency
 0,19/09/2012,IborDeposit,19/09/2012,19/12/2012,ACT_360,10000,0.003815,PAY,,OIS,GBP
 1,19/09/2012,IborFRA,19/12/2012,19/03/2013,ACT_360,10000,0.003322,PAY,,OIS,GBP
 2,19/09/2012,IborFRA,20/03/2013,20/06/2013,ACT_360,10000,0.003205,PAY,,OIS,GBP

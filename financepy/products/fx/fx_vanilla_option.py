@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 from scipy import optimize
 from numba import njit
@@ -47,9 +49,7 @@ def f(volatility, *args):
 
     model = BlackScholes(volatility)
 
-    vdf = self.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )["v"]
+    vdf = self.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)["v"]
 
     obj_fn = vdf - price
 
@@ -72,9 +72,7 @@ def fvega(volatility, *args):
 
     model = BlackScholes(volatility)
 
-    fprime = self.vega(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    fprime = self.vega(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     return fprime
 
@@ -184,9 +182,9 @@ class FXVanillaOption:
         self,
         expiry_dt: Date,
         # 1 unit of foreign in domestic
-        strike_fx_rate: (float, np.ndarray),
+        strike_fx_rate: Union[float, np.ndarray],
         currency_pair: str,  # FORDOM
-        option_type: (OptionTypes, list),
+        option_type: Union[OptionTypes, list],
         notional: float,
         prem_currency: str,
         spot_days: int = 0,
@@ -265,14 +263,10 @@ class FXVanillaOption:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
-            raise FinError(
-                "Domestic Curve valuation date not same as valuation date"
-            )
+            raise FinError("Domestic Curve valuation date not same as valuation date")
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as valuation date"
-            )
+            raise FinError("Foreign Curve valuation date not same as valuation date")
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -307,9 +301,7 @@ class FXVanillaOption:
                 volatility = model.volatility
             elif isinstance(model, SABR):
 
-                params_list = np.array(
-                    [model.alpha, model.beta, model.rho, model.nu]
-                )
+                params_list = np.array([model.alpha, model.beta, model.rho, model.nu])
 
                 volatility = vol_function_sabr(params_list, f0t, k, t_del)
 
@@ -436,9 +428,7 @@ class FXVanillaOption:
 
     ###########################################################################
 
-    def delta(
-        self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    ):
+    def delta(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
         """Calculation of the FX Option delta. There are several definitions
         of delta and so we are required to return a dictionary of values. The
         definitions can be found on Page 44 of Foreign Exchange Option Pricing
@@ -482,14 +472,9 @@ class FXVanillaOption:
                 s0, t_exp, K, r_d, r_f, v, self.option_type.value
             )
             pips_fwd_delta = pips_spot_delta * np.exp(r_f * t_del)
-            vpctf = (
-                bs_value(s0, t_exp, K, r_d, r_f, v, self.option_type.value)
-                / s0
-            )
+            vpctf = bs_value(s0, t_exp, K, r_d, r_f, v, self.option_type.value) / s0
             pct_spot_delta_prem_adj = pips_spot_delta - vpctf
-            pct_fwd_delta_prem_adj = np.exp(r_f * t_del) * (
-                pips_spot_delta - vpctf
-            )
+            pct_fwd_delta_prem_adj = np.exp(r_f * t_del) * (pips_spot_delta - vpctf)
 
         return {
             "pips_spot_delta": pips_spot_delta,
@@ -515,9 +500,7 @@ class FXVanillaOption:
 
         #        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
 
-        pips_spot_delta = bs_delta(
-            s, t, k, rd, rf, vol, self.option_type.value
-        )
+        pips_spot_delta = bs_delta(s, t, k, rd, rf, vol, self.option_type.value)
         pips_fwd_delta = pips_spot_delta * np.exp(rf * t)
 
         vpctf = bs_value(s, t, k, rd, rf, vol, self.option_type.value) / s

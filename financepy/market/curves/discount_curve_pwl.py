@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.date import Date
@@ -19,18 +21,20 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class DiscountCurvePWL(DiscountCurve):
-    """ Curve is made up of a series of sections assumed to each have a
+    """Curve is made up of a series of sections assumed to each have a
     piece-wise linear zero rate. The zero rate has a specified frequency
     which defaults to continuous. This curve inherits all of the extra methods
-    from FinDiscountCurve. """
+    from FinDiscountCurve."""
 
-    def __init__(self,
-                 value_dt: Date,
-                 zero_dts: (Date, list),
-                 zero_rates: (list, np.ndarray),
-                 freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-                 dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA):
-        """ Curve is defined by a vector of increasing times and zero rates."""
+    def __init__(
+        self,
+        value_dt: Date,
+        zero_dts: Union[Date, list],
+        zero_rates: Union[list, np.ndarray],
+        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+    ):
+        """Curve is defined by a vector of increasing times and zero rates."""
 
         check_argument_types(self.__init__, locals())
 
@@ -47,9 +51,7 @@ class DiscountCurvePWL(DiscountCurve):
         self.freq_type = freq_type
         self.dc_type = dc_type
 
-        dc_times = times_from_dates(zero_dts,
-                                    self.value_dt,
-                                    self.dc_type)
+        dc_times = times_from_dates(zero_dts, self.value_dt, self.dc_type)
 
         self.times = np.array(dc_times)
 
@@ -58,11 +60,10 @@ class DiscountCurvePWL(DiscountCurve):
 
     ###########################################################################
 
-    def _zero_rate(self,
-                   times: (list, np.ndarray)):
-        """ Calculate the piecewise linear zero rate. This is taken from the
+    def _zero_rate(self, times: Union[list, np.ndarray]):
+        """Calculate the piecewise linear zero rate. This is taken from the
         initial inputs. A simple linear interpolation scheme is used. If the
-        user supplies a frequency type then a conversion is done. """
+        user supplies a frequency type then a conversion is done."""
 
         if isinstance(times, float):
             times = np.array([times])
@@ -101,33 +102,28 @@ class DiscountCurvePWL(DiscountCurve):
 
     ###########################################################################
 
-    def df(self,
-           dates: (Date, list)):
-        """ Return discount factors given a single or vector of dates. The
+    def df(self, dates: Union[Date, list]):
+        """Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
         also depends on the day count convention. This was set in the
-        construction of the curve to be ACT_ACT_ISDA. """
+        construction of the curve to be ACT_ACT_ISDA."""
 
         # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dates,
-                                    self.value_dt,
-                                    self.dc_type)
+        dc_times = times_from_dates(dates, self.value_dt, self.dc_type)
 
         zero_rates = self._zero_rate(dc_times)
 
-        df = self._zero_to_df(self.value_dt,
-                              zero_rates,
-                              dc_times,
-                              self.freq_type,
-                              self.dc_type)
+        df = self._zero_to_df(
+            self.value_dt, zero_rates, dc_times, self.freq_type, self.dc_type
+        )
 
         return df
 
     ###########################################################################
 
     # def _df(self,
-    #         t: (float, np.ndarray)):
+    #         t: Union[float, np.ndarray]):
     #     """ Returns the discount factor at time t taking into account the
     #     piecewise flat zero rate curve and the compunding frequency. """
 
@@ -149,7 +145,8 @@ class DiscountCurvePWL(DiscountCurve):
     ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

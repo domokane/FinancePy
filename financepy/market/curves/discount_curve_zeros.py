@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.frequency import FrequencyTypes
@@ -20,25 +22,28 @@ from .interpolator import InterpTypes, Interpolator
 # TODO: Fix up __repr__ function
 ###############################################################################
 
+
 class DiscountCurveZeros(DiscountCurve):
-    """ This is a curve calculated from a set of dates and zero rates. As we
+    """This is a curve calculated from a set of dates and zero rates. As we
     have rates as inputs, we need to specify the corresponding compounding
     frequency. Also to go from rates and dates to discount factors we need to
     compute the year fraction correctly and for this we require a day count
     convention. Finally, we need to interpolate the zero rate for the times
     between the zero rates given and for this we must specify an interpolation
-    convention. The class inherits methods from FinDiscountCurve. """
+    convention. The class inherits methods from FinDiscountCurve."""
 
-###############################################################################
+    ###############################################################################
 
-    def __init__(self,
-                 value_dt: Date,
-                 zero_dts: list,
-                 zero_rates: (list, np.ndarray),
-                 freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                 dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
-                 interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES):
-        """ Create the discount curve from a vector of dates and zero rates
+    def __init__(
+        self,
+        value_dt: Date,
+        zero_dts: list,
+        zero_rates: Union[list, np.ndarray],
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+        interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+    ):
+        """Create the discount curve from a vector of dates and zero rates
         factors. The first date is the curve anchor. Then a vector of zero
         dates and then another same-length vector of rates. The rate is to the
         corresponding date. We must specify the compounding frequency of the
@@ -59,8 +64,7 @@ class DiscountCurveZeros(DiscountCurve):
             raise FinError("Unknown Frequency type " + str(freq_type))
 
         if dc_type not in DayCountTypes:
-            raise FinError("Unknown Cap Floor DayCountRule type " +
-                           str(dc_type))
+            raise FinError("Unknown Cap Floor DayCountRule type " + str(dc_type))
 
         self.value_dt = value_dt
         self.freq_type = freq_type
@@ -74,11 +78,9 @@ class DiscountCurveZeros(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-        dfs = self._zero_to_df(self.value_dt,
-                               self._zero_rates,
-                               self._times,
-                               self.freq_type,
-                               self.dc_type)
+        dfs = self._zero_to_df(
+            self.value_dt, self._zero_rates, self._times, self.freq_type, self.dc_type
+        )
 
         self._dfs = np.array(dfs)
 
@@ -86,26 +88,26 @@ class DiscountCurveZeros(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
 
-# ###############################################################################
+    # ###############################################################################
 
-#     def bump(self, bump_size):
-#         """ Calculate the continuous forward rate at the forward date. """
+    #     def bump(self, bump_size):
+    #         """ Calculate the continuous forward rate at the forward date. """
 
-#         times = self.times.copy()
-#         discount_factors = self._discount_factors.copy()
+    #         times = self.times.copy()
+    #         discount_factors = self._discount_factors.copy()
 
-#         n = len(self.times)
-#         for i in range(0, n):
-#             t = times[i]
-#             discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
+    #         n = len(self.times)
+    #         for i in range(0, n):
+    #             t = times[i]
+    #             discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
 
-#         disc_curve = FinDiscountCurve(self.value_dt, times,
-#                                      discount_factors,
-#                                      self._interp_type)
+    #         disc_curve = FinDiscountCurve(self.value_dt, times,
+    #                                      discount_factors,
+    #                                      self._interp_type)
 
-#         return disc_curve
+    #         return disc_curve
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
@@ -118,15 +120,17 @@ class DiscountCurveZeros(DiscountCurve):
         s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._times)
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._zero_dts[i],
-                                 "%10.7f" % self._zero_rates[i])
+            s += label_to_string(
+                "%12s" % self._zero_dts[i], "%10.7f" % self._zero_rates[i]
+            )
 
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

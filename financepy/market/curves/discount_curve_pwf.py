@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.date import Date
@@ -28,7 +30,7 @@ class DiscountCurvePWF(DiscountCurve):
         self,
         value_dt: Date,
         zero_dts: list,
-        zero_rates: (list, np.ndarray),
+        zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
     ):
@@ -118,7 +120,7 @@ class DiscountCurvePWF(DiscountCurve):
 
     ###########################################################################
 
-    def df(self, dates: (Date, list)):
+    def df(self, dates: Union[Date, list]):
         """Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It

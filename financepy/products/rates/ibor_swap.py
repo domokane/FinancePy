@@ -233,7 +233,7 @@ class IborSwap:
         out = {
             "type": type(self).__name__,
             "start_date": self.effective_dt,
-            "maturity_date": self.maturity_dt,
+            "maturity_dt": self.maturity_dt,
             "day_count_type": self.fixed_leg.dc_type.name,
             "fixed_leg_type": self.fixed_leg.leg_type.name,
             "fixed_freq_type": self.fixed_leg.freq_type.name,

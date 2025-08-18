@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 
@@ -26,9 +28,9 @@ class FXDigitalOption:
     def __init__(
         self,
         expiry_dt: Date,
-        strike_fx_rate: (float, np.ndarray),
+        strike_fx_rate: Union[float, np.ndarray],
         currency_pair: str,  # FORDOM
-        option_type: (OptionTypes, list),
+        option_type: Union[OptionTypes, list],
         notional: float,
         prem_currency: str,
         spot_days: int = 0,
@@ -102,14 +104,10 @@ class FXDigitalOption:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
-            raise FinError(
-                "Domestic Curve valuation date not same as valuation date"
-            )
+            raise FinError("Domestic Curve valuation date not same as valuation date")
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as valuation date"
-            )
+            raise FinError("Foreign Curve valuation date not same as valuation date")
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)

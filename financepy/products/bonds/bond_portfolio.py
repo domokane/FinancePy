@@ -20,7 +20,7 @@ from .bond import YTMCalcType
 
 #     def __init__(self,
 #                  bonds: (list),
-#                  bondWeights: (list, np.ndarray)):
+#                  bondWeights: Union[list, np.ndarray]):
 #         """ XXX """
 
 #         check_argument_types(self.__init__, locals())

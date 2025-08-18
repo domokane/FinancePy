@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import optimize
@@ -151,9 +150,7 @@ class BondZeroCurve(DiscountCurve):
 
     ###########################################################################
 
-    def fwd_rate(
-        self, date1: Date, date2: Date, day_count_type: DayCountTypes
-    ):
+    def fwd_rate(self, date1: Date, date2: Date, day_count_type: DayCountTypes):
         """Calculate the forward rate according to the specified
         day count convention."""
 

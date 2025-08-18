@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.calendar import Calendar
@@ -11,7 +13,6 @@ from ...utils.day_count import DayCount
 from ...utils.day_count import DayCountTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
-
 
 ###############################################################################
 
@@ -148,7 +149,7 @@ class IborDeposit:
         out = {
             "type": type(self).__name__,
             "start_date": self.start_dt,
-            "maturity_date": self.maturity_dt,
+            "maturity_dt": self.maturity_dt,
             "day_count_type": self.dc_type.name,
             "notional": self.notional,
             "contract_rate": self.deposit_rate,

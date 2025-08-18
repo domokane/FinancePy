@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 
 import sys
 
-sys.path.append("..")
-
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import SwapTypes
@@ -21,15 +19,16 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 
+sys.path.append("..")
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-plotGraphs = False
+plot_graphs = False
 
 ###############################################################################
 
 
-def test_BondEmbeddedOptionMATLAB():
+def test_BondEmbeddedOption_MATLAB():
     # https://fr.mathworks.com/help/fininst/optembndbybk.html
     # I FIND THAT THE PRICE CONVERGES TO 102.365 WHICH IS CLOSE TO 102.382
     # FOUND BY MATLAB ALTHOUGH THEY DO NOT EXAMINE THE ASYMPTOTIC PRICE
@@ -43,15 +42,9 @@ def test_BondEmbeddedOptionMATLAB():
     fixed_leg_type = SwapTypes.PAY
     dc_type = DayCountTypes.THIRTY_E_360
     fixed_freq = FrequencyTypes.ANNUAL
-    swap1 = IborSwap(
-        settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type
-    )
-    swap2 = IborSwap(
-        settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type
-    )
-    swap3 = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type
-    )
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type)
+    swap2 = IborSwap(settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type)
+    swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type)
     swaps = [swap1, swap2, swap3]
     discount_curve = IborSingleCurve(value_dt, [], [], swaps)
 
@@ -104,13 +97,11 @@ def test_BondEmbeddedOptionMATLAB():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(
-            period, num_time_steps, v["bondwithoption"], v["bondpure"]
-        )
+        test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
 
         values.append(v["bondwithoption"])
 
-    if plotGraphs:
+    if plot_graphs:
         plt.figure()
         plt.plot(time_steps, values)
 
@@ -118,7 +109,7 @@ def test_BondEmbeddedOptionMATLAB():
 ###############################################################################
 
 
-def test_BondEmbeddedOptionQUANTLIB():
+def test_BondEmbeddedOption_QUANTLIB():
 
     # Based on example at the nice blog on Quantlib at
     # http://gouthamanbalaraman.com/blog/callable-bond-quantlib-python.html
@@ -131,9 +122,7 @@ def test_BondEmbeddedOptionQUANTLIB():
 
     ###########################################################################
 
-    discount_curve = DiscountCurveFlat(
-        value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL
-    )
+    discount_curve = DiscountCurveFlat(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
 
     ###########################################################################
 
@@ -189,12 +178,10 @@ def test_BondEmbeddedOptionQUANTLIB():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(
-            period, num_time_steps, v["bondwithoption"], v["bondpure"]
-        )
+        test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
         values.append(v["bondwithoption"])
 
-    if plotGraphs:
+    if plot_graphs:
         plt.figure()
         plt.title("Puttable Bond Price Convergence")
         plt.plot(time_steps, values)
@@ -203,6 +190,6 @@ def test_BondEmbeddedOptionQUANTLIB():
 ###############################################################################
 
 
-test_BondEmbeddedOptionMATLAB()
-test_BondEmbeddedOptionQUANTLIB()
+test_BondEmbeddedOption_MATLAB()
+test_BondEmbeddedOption_QUANTLIB()
 test_cases.compareTestCases()

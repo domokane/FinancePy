@@ -35,9 +35,7 @@ def test_ibor_benchmarks_report():
     depos = []
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal
-    )
+    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal)
     depos.append(depo)
 
     fraDCCType = DayCountTypes.ACT_360
@@ -194,8 +192,8 @@ def test_dataframe_to_benchmarks():
     df["start_date"] = pd.to_datetime(
         df["start_date"], format="%d-%b-%y"
     )  # allow tenors
-    df["maturity_date"] = pd.to_datetime(
-        df["maturity_date"], format="%d-%b-%y"
+    df["maturity_dt"] = pd.to_datetime(
+        df["maturity_dt"], format="%d-%b-%y"
     )  # allow tenors
 
     benchmarks = dataframe_to_benchmarks(

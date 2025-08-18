@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane, Saeed Amen
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 from scipy.optimize import minimize
 
@@ -525,9 +527,9 @@ class FXVolSurface:
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         tenors: list,
-        atm_vols: [list, np.ndarray],
-        ms_25_delta_vols: (list, np.ndarray),
-        rr_25_delta_vols: (list, np.ndarray),
+        atm_vols: Union[list, np.ndarray],
+        ms_25_delta_vols: Union[list, np.ndarray],
+        rr_25_delta_vols: Union[list, np.ndarray],
         atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
         delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
         vol_func_type: VolFuncTypes = VolFuncTypes.CLARK,

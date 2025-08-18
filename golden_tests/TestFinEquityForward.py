@@ -17,7 +17,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def test_EquityForward():
+def test_equity_forward():
 
     value_dt = Date(13, 2, 2018)
     expiry_dt = value_dt.add_months(12)
@@ -35,17 +35,17 @@ def test_EquityForward():
     discount_curve = DiscountCurveFlat(value_dt, discount_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
 
-    equityForward = EquityForward(
+    equity_forward = EquityForward(
         expiry_dt, forward_price, notional, FinLongShort.LONG
     )
 
     test_cases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwd_price = equityForward.forward(
+    fwd_price = equity_forward.forward(
         value_dt, stock_price, discount_curve, dividend_curve
     )
 
-    fwd_value = equityForward.value(
+    fwd_value = equity_forward.value(
         value_dt, stock_price, discount_curve, dividend_curve
     )
 
@@ -56,5 +56,5 @@ def test_EquityForward():
 ###############################################################################
 
 
-test_EquityForward()
+test_equity_forward()
 test_cases.compareTestCases()

@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 from scipy.optimize import minimize
 
@@ -392,9 +394,7 @@ def _obj_gap(gaps, *args):
     # new volatility curve
 
     # Match the at-the-money option volatility
-    atm_curve_vol = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_atm, t
-    )
+    atm_curve_vol = vol_function(vol_type_value, params, strikes, gaps, f, k_atm, t)
 
     print("atm_curve_vol", atm_curve_vol)
 
@@ -458,9 +458,7 @@ def _obj_gap(gaps, *args):
         gaps,
     )
 
-    sigma_k_25d_c = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_25d_c, t
-    )
+    sigma_k_25d_c = vol_function(vol_type_value, params, strikes, gaps, f, k_25d_c, t)
 
     print("sigma_k_25d_c", sigma_k_25d_c)
 
@@ -479,9 +477,7 @@ def _obj_gap(gaps, *args):
         gaps,
     )
 
-    sigma_k_25d_p = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_25d_p, t
-    )
+    sigma_k_25d_p = vol_function(vol_type_value, params, strikes, gaps, f, k_25d_p, t)
 
     print("sigma_k_25d_p", sigma_k_25d_p)
 
@@ -546,9 +542,7 @@ def _obj_gap(gaps, *args):
         gaps,
     )
 
-    sigma_k_10d_c = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_10d_c, t
-    )
+    sigma_k_10d_c = vol_function(vol_type_value, params, strikes, gaps, f, k_10d_c, t)
 
     print("SIGMA_k_10d_c", sigma_k_10d_c)
 
@@ -570,9 +564,7 @@ def _obj_gap(gaps, *args):
     )
 
     print("k_10d_p", k_10d_p)
-    sigma_k_10d_p = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_10d_p, t
-    )
+    sigma_k_10d_p = vol_function(vol_type_value, params, strikes, gaps, f, k_10d_p, t)
 
     print("SIGMA_k_10d_p", sigma_k_10d_p)
 
@@ -938,9 +930,7 @@ def _solve_to_horizon(
 
 
 @njit(
-    float64(
-        int64, float64[:], float64[:], float64[:], float64, float64, float64
-    ),
+    float64(int64, float64[:], float64[:], float64[:], float64, float64, float64),
     cache=True,
     fastmath=True,
 )
@@ -1008,9 +998,7 @@ def _delta_fit(k, *args):
     f = s * np.exp((r_d - r_f) * t)
     v = vol_function(vol_type_value, params, strikes, gaps, f, k, t)
 
-    delta_out = fast_delta(
-        s, t, k, r_d, r_f, v, delta_type_value, option_type_value
-    )
+    delta_out = fast_delta(s, t, k, r_d, r_f, v, delta_type_value, option_type_value)
 
     inverse_delta_out = norminvcdf(np.abs(delta_out))
     inv_obj_fn = inverse_delta_target - inverse_delta_out
@@ -1077,9 +1065,7 @@ def _solver_for_smile_strike(
         gaps,
     )
 
-    K = newton_secant(
-        _delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50
-    )
+    K = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
 
     return K
 
@@ -1090,9 +1076,7 @@ def _solver_for_smile_strike(
 
 
 @njit(
-    float64(
-        float64, float64, float64, float64, int64, float64, int64, float64
-    ),
+    float64(float64, float64, float64, float64, int64, float64, int64, float64),
     fastmath=True,
 )
 def solve_for_strike(
@@ -1167,9 +1151,7 @@ def solve_for_strike(
             delta_target,
         )
 
-        K = newton_secant(
-            _g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50
-        )
+        K = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
 
         return K
 
@@ -1186,9 +1168,7 @@ def solve_for_strike(
             delta_target,
         )
 
-        K = newton_secant(
-            _g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50
-        )
+        K = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
 
         return K
 
@@ -1219,11 +1199,11 @@ class FXVolSurfacePlus:
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         tenors: list,
-        atm_vols: (list, np.ndarray),
-        ms_25_delta_vols: (list, np.ndarray),
-        rr_25_delta_vols: (list, np.ndarray),
-        ms_10_delta_vols: (list, np.ndarray),
-        rr_10_delta_vols: (list, np.ndarray),
+        atm_vols: Union[list, np.ndarray],
+        ms_25_delta_vols: Union[list, np.ndarray],
+        rr_25_delta_vols: Union[list, np.ndarray],
+        ms_10_delta_vols: Union[list, np.ndarray],
+        rr_10_delta_vols: Union[list, np.ndarray],
         alpha: float,
         atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
         delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
@@ -1317,9 +1297,7 @@ class FXVolSurfacePlus:
             raise FinError("You must provide both 25d RR + 25d MS or neither")
 
         if self.use_ms_10d_vol is False and self.use_ms_25d_vol is False:
-            raise FinError(
-                "No MS and RR. You must provide 10d or 25d MS + RR."
-            )
+            raise FinError("No MS and RR. You must provide 10d or 25d MS + RR.")
 
         self.ms_25_delta_vols = np.array(ms_25_delta_vols) / 100.0
         self.rr_25_delta_vols = np.array(rr_25_delta_vols) / 100.0
@@ -1686,9 +1664,7 @@ class FXVolSurfacePlus:
             kt = ((t_exp - t0) * k1 + (t1 - t_exp) * k0) / (t1 - t0)
 
             if vart < 0.0:
-                raise FinError(
-                    "Failed interpolation due to negative variance."
-                )
+                raise FinError("Failed interpolation due to negative variance.")
 
             volt = np.sqrt(vart / t_exp)
 
@@ -1701,9 +1677,7 @@ class FXVolSurfacePlus:
 
     ###########################################################################
 
-    def _build_vol_surface(
-        self, fin_solver_type=FinSolverTypes.NELDER_MEAD, tol=1e-8
-    ):
+    def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD, tol=1e-8):
         """Main function to construct the vol surface."""
 
         s = self.spot_fx_rate
@@ -2336,16 +2310,12 @@ class FXVolSurfacePlus:
                 sigma_rr = sigma_k_25d_c - sigma_k_25d_p
 
                 if verbose:
-                    print(
-                        "=========================================================="
-                    )
+                    print("==========================================================")
                     print(
                         "RR = VOL_k_25_c - VOL_k_25_p => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
                         % (100.0 * self.rr_25_delta_vols[i], 100.0 * sigma_rr)
                     )
-                    print(
-                        "=========================================================="
-                    )
+                    print("==========================================================")
 
                 diff = sigma_rr - self.rr_25_delta_vols[i]
 
@@ -2370,9 +2340,7 @@ class FXVolSurfacePlus:
 
                 if verbose:
 
-                    print(
-                        "=========================================================="
-                    )
+                    print("==========================================================")
                     print(
                         "MKT STRANGLE 10d VOL IN: %9.6f %%"
                         % (100.0 * self.ms_10_delta_vols[i])
@@ -2593,16 +2561,12 @@ class FXVolSurfacePlus:
                 sigma_rr = sigma_k_10d_c - sigma_k_10d_p
 
                 if verbose:
-                    print(
-                        "====================================================="
-                    )
+                    print("=====================================================")
                     print(
                         "RR = VOL_k_10d_c - VOL_k_10d_p => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
                         % (100.0 * self.rr_10_delta_vols[i], 100.0 * sigma_rr)
                     )
-                    print(
-                        "====================================================="
-                    )
+                    print("=====================================================")
 
                 diff = sigma_rr - self.rr_10_delta_vols[i]
 
@@ -2660,9 +2624,7 @@ class FXVolSurfacePlus:
             ks = np.array(ks)
             vols = np.array(vols)
 
-            density = option_implied_dbn(
-                self.spot_fx_rate, t, r_d, r_f, ks, vols
-            )
+            density = option_implied_dbn(self.spot_fx_rate, t, r_d, r_f, ks, vols)
 
             dbn = FinDistribution(ks, density)
             dbns.append(dbn)
@@ -2705,8 +2667,7 @@ class FXVolSurfacePlus:
             for _ in range(0, num_intervals):
 
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, k, t)
-                    * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, k, t) * 100.0
                 )
                 ks.append(k)
                 vols.append(sigma)
@@ -2723,9 +2684,7 @@ class FXVolSurfacePlus:
             plt.xlabel("Strike")
             plt.ylabel("Volatility")
 
-            title = (
-                "JNT FIT:" + self.currency_pair + " " + str(self.vol_func_type)
-            )
+            title = "JNT FIT:" + self.currency_pair + " " + str(self.vol_func_type)
 
             key_strikes = []
             key_strikes.append(self.k_atm[tenor_index])
@@ -2734,8 +2693,7 @@ class FXVolSurfacePlus:
             for K in key_strikes:
 
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, K, t)
-                    * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, K, t) * 100.0
                 )
 
                 key_vols.append(sigma)
@@ -2752,8 +2710,7 @@ class FXVolSurfacePlus:
             for K in key_strikes:
 
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, K, t)
-                    * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, K, t) * 100.0
                 )
 
                 key_vols.append(sigma)
@@ -2769,8 +2726,7 @@ class FXVolSurfacePlus:
             key_vols = []
             for K in key_strikes:
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, K, t)
-                    * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, K, t) * 100.0
                 )
                 key_vols.append(sigma)
 

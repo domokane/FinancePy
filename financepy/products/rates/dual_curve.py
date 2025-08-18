@@ -226,9 +226,7 @@ class IborDualCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError(
-                            "Swap cpns are not on the same date grid."
-                        )
+                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -347,7 +345,7 @@ class IborDualCurve(DiscountCurve):
                 )
 
         for swap in self.used_swaps:
-            # I use the lastPaymentDate in case a date has been adjusted fwd
+            # I use the last_payment_dt in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
             t_mat = (maturity_dt - self.value_dt) / g_days_in_year
@@ -525,10 +523,7 @@ class IborDualCurve(DiscountCurve):
                 raise FinError("Deposit not repriced.")
 
         for fra in self.used_fras:
-            v = (
-                fra.value(self.value_dt, self.discount_curve, self)
-                / fra.notional
-            )
+            v = fra.value(self.value_dt, self.discount_curve, self) / fra.notional
             if abs(v) > fra_tol:
                 print("Value", v)
                 raise FinError("FRA not repriced.")
@@ -574,9 +569,7 @@ class IborDualCurve(DiscountCurve):
         s += label_to_string("GRID TIMES", "GRID DFS")
 
         for i in range(0, num_points):
-            s += label_to_string(
-                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
-            )
+            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
         return s
 
     ###########################################################################

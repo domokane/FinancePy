@@ -82,12 +82,12 @@ def _cost_function(dfs, *args):
     cost = 0.0
     for depo in libor_curve.used_deposits:
         v = depo.value(value_dt, libor_curve) / depo.notional
-        #        print("DEPO:", depo.maturity_date, v)
+        #        print("DEPO:", depo.maturity_dt, v)
         cost += (v - 1.0) ** 2
 
     for fra in libor_curve.used_fras:
         v = fra.value(value_dt, libor_curve) / fra.notional
-        #        print("FRA:", fra.maturity_date, v)
+        #        print("FRA:", fra.maturity_dt, v)
         cost += v * v
 
     for swap in libor_curve.used_swaps:
@@ -96,7 +96,7 @@ def _cost_function(dfs, *args):
             / swap.fixed_leg.notional
             / swap.pv01(value_dt, libor_curve)
         )
-        #        print("SWAP:", swap.maturity_date, v)
+        #        print("SWAP:", swap.maturity_dt, v)
         cost += v * v
 
     print("Cost:", cost)
@@ -243,9 +243,7 @@ class IborSingleCurve(DiscountCurve):
                 start_dt = depo.start_dt
 
                 if start_dt < self.value_dt:
-                    raise FinError(
-                        "First deposit starts before valuation date."
-                    )
+                    raise FinError("First deposit starts before valuation date.")
 
                 if start_dt < depo_start_dt:
                     depo_start_dt = start_dt
@@ -336,9 +334,7 @@ class IborSingleCurve(DiscountCurve):
                 num_flows = len(swapCpnDates)
                 for i_flow in range(0, num_flows):
                     if swapCpnDates[i_flow] != longest_swapCpnDates[i_flow]:
-                        raise FinError(
-                            "Swap coupons are not on the same date grid."
-                        )
+                        raise FinError("Swap coupons are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -453,7 +449,7 @@ class IborSingleCurve(DiscountCurve):
                 )
 
         for swap in self.used_swaps:
-            # I use the lastPaymentDate in case a date has been adjusted fwd
+            # I use the last_payment_dt in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
             t_mat = (maturity_dt - self.value_dt) / g_days_in_year
@@ -518,11 +514,7 @@ class IborSingleCurve(DiscountCurve):
             for fra in libor_curve.used_fras:
                 # do not need to be too exact here
                 acc_factor = datediff(fra.start_dt, fra.maturity_dt)
-                v = (
-                    fra.value(value_dt, libor_curve)
-                    / fra.notional
-                    / acc_factor
-                )
+                v = fra.value(value_dt, libor_curve) / fra.notional / acc_factor
                 out[idx] = v
                 idx = idx + 1
 
@@ -758,9 +750,7 @@ class IborSingleCurve(DiscountCurve):
         for fra in self.used_fras:
             v = fra.value(self.value_dt, self, self) / fra.notional
             if abs(v) > fra_tol:
-                raise FinError(
-                    f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}"
-                )
+                raise FinError(f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}")
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap

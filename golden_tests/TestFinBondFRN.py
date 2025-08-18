@@ -204,71 +204,69 @@ def test_BondFRN():
 
     test_cases.header("FIELD", "VALUE")
     clean_price = 96.793
-    resetIbor = 0.0143456 - quoted_margin
+    reset_ibor = 0.0143456 - quoted_margin
     current_ibor = 0.0120534
     future_ibors = 0.0130522
 
     settle_dt = Date(21, 7, 2017)
 
     dm = bond.discount_margin(
-        settle_dt, resetIbor, current_ibor, future_ibors, clean_price
+        settle_dt, reset_ibor, current_ibor, future_ibors, clean_price
     )
 
     test_cases.print("Discount Margin (bp) = ", dm * 10000)
 
     dirty_price = bond.dirty_price_from_dm(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    lastCouponDt = bond.pcd
-    test_cases.print("Last Coupon Date = ", str(lastCouponDt))
+    last_coupon_dt = bond.pcd
+    test_cases.print("Last Coupon Date = ", str(last_coupon_dt))
 
     accddays = bond.accrued_days
     test_cases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond.accrued_int
-    test_cases.print("Accrued Amount = ", accdAmount)
+    accd_amount = bond.accrued_int
+    test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Dollar Principal = ", principal)
 
     duration = bond.dollar_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Dollar Rate Duration = ", duration)
 
     modified_duration = bond.modified_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Modified Rate Duration = ", modified_duration)
 
     macauley_duration = bond.macauley_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Macauley Duration = ", macauley_duration)
 
     convexity = bond.convexity_from_dm(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Convexity = ", convexity)
 
     duration = bond.dollar_credit_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Dollar Credit Duration = ", duration)
 
     modified_duration = bond.modified_credit_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Modified Credit Duration = ", modified_duration)
@@ -290,75 +288,71 @@ def test_BondFRN():
 
     test_cases.header("FIELD", "VALUE")
     clean_price = 93.08
-    resetIbor = 0.00537 - quoted_margin
+    reset_ibor = 0.00537 - quoted_margin
     current_ibor = 0.027558
     future_ibors = 0.03295
 
     dm = bond.discount_margin(
-        settle_dt, resetIbor, current_ibor, future_ibors, clean_price
+        settle_dt, reset_ibor, current_ibor, future_ibors, clean_price
     )
 
     test_cases.print("Discount Margin (bp) = ", dm * 10000)
 
     dirty_price = bond.dirty_price_from_dm(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    lastCouponDt = bond.pcd
-    test_cases.print("Last Coupon Date = ", str(lastCouponDt))
+    last_coupon_dt = bond.pcd
+    test_cases.print("Last Coupon Date = ", str(last_coupon_dt))
 
     accddays = bond.accrued_days
     test_cases.print("Accrued Days = ", accddays)
 
-    accdAmount = bond.accrued_int
-    test_cases.print("Accrued Amount = ", accdAmount)
+    accd_amount = bond.accrued_int
+    test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Dollar Principal = ", principal)
 
     duration = bond.dollar_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Dollar Rate Duration = ", duration)
 
     modified_duration = bond.modified_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Modified Rate Duration = ", modified_duration)
 
     macauley_duration = bond.macauley_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Macauley Duration = ", macauley_duration)
 
     convexity = bond.convexity_from_dm(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Convexity = ", convexity)
 
-    principal = bond.principal(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Principal = ", principal)
 
     duration = bond.dollar_credit_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Dollar Credit Duration = ", duration)
 
     modified_duration = bond.modified_credit_duration(
-        settle_dt, resetIbor, current_ibor, future_ibors, dm
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
     test_cases.print("Modified Credit Duration = ", modified_duration)

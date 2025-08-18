@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.error import FinError
@@ -30,7 +32,7 @@ class FinInflationIndexCurve:
     def __init__(
         self,
         index_dts: list,
-        index_values: (list, np.ndarray),
+        index_values: Union[list, np.ndarray],
         lag_in_months: int = 3,
     ):
 
@@ -68,9 +70,7 @@ class FinInflationIndexCurve:
         cpi_first_time = (cpi_first_dt - self.base_dt) / g_days_in_year
         cpi_second_time = (cpi_second_dt - self.base_dt) / g_days_in_year
 
-        cpi_first_value = np.interp(
-            cpi_first_time, self.index_times, self.index_values
-        )
+        cpi_first_value = np.interp(cpi_first_time, self.index_times, self.index_values)
 
         cpi_second_value = np.interp(
             cpi_second_time, self.index_times, self.index_values
@@ -80,10 +80,7 @@ class FinInflationIndexCurve:
         m = dt.m
         y = dt.y
         num_days = days_in_month(m, y)
-        v = (
-            cpi_first_value
-            + (d - 1) * (cpi_second_value - cpi_first_value) / num_days
-        )
+        v = cpi_first_value + (d - 1) * (cpi_second_value - cpi_first_value) / num_days
         return v
 
     ###########################################################################

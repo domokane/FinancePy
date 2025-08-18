@@ -28,9 +28,7 @@ def test_ibor_curve_par_rate_shocker():
     depos = []
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal
-    )
+    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal)
     depos.append(depo)
 
     fraDCCType = DayCountTypes.ACT_360
@@ -88,7 +86,7 @@ def test_ibor_curve_par_rate_shocker():
         InterpTypes.FLAT_FWD_RATES,
     )
     curve_shocker = IborSingleCurveParShocker(base_curve)
-    mat_dates = curve_shocker.benchmarks_report()["maturity_date"].values
+    mat_dates = curve_shocker.benchmarks_report()["maturity_dt"].values
 
     # size of bump
     par_rate_bump = 1 * g_basis_point

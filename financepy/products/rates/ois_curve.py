@@ -366,7 +366,7 @@ class OISCurve(DiscountCurve):
                 )
 
         for swap in self.used_swaps:
-            # I use the lastPaymentDate in case a date has been adjusted fwd
+            # I use the last_payment_dt in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
             t_mat = (maturity_dt - self.value_dt) / g_days_in_year
@@ -568,7 +568,7 @@ class OISCurve(DiscountCurve):
     # def overnight_rate(self,
     #                   settle_dt: Date,
     #                   start_dt: Date,
-    #                   maturity_dt: (Date, list),
+    #                   maturity_dt: Union[Date, list],
     #                   dc_type: DayCountTypes=DayCountTypes.THIRTY_E_360):
     #     """ get a vector of dates and values for the overnight rate implied by
     #     the OIS rate term structure. """
@@ -647,9 +647,7 @@ class OISCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string(
-                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
-            )
+            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
 
         return s
 

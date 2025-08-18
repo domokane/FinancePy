@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 
 import numpy as np
 
@@ -156,7 +157,7 @@ class FXOneTouchOption(FXOption):
     def value(
         self,
         value_dt: Date,
-        spot_fx_rate: (float, np.ndarray),
+        spot_fx_rate: Union[float, np.ndarray],
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model,
@@ -325,9 +326,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 + A4
             return v
 
@@ -343,9 +342,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 + A4
             return v
 
@@ -391,9 +388,7 @@ class FXOneTouchOption(FXOption):
             v = B2 - B4
             return v
 
-        elif (
-            self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING
-        ):
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if np.any(s0 <= H):
@@ -406,9 +401,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 - A4
             return v
 
@@ -425,9 +418,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 - A4
             return v
 
@@ -487,9 +478,7 @@ class FXOneTouchOption(FXOption):
         s0 = stock_price
         mu = r_d - r_f
 
-        tgrid, s = get_paths_times(
-            num_paths, num_time_steps, t, mu, s0, v, seed
-        )
+        tgrid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
 
         H = self.barrier_rate
         X = self.payment_size
@@ -592,9 +581,7 @@ class FXOneTouchOption(FXOption):
             v = v * X * np.exp(-r_d * t)
             return v
 
-        elif (
-            self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING
-        ):
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if s0 <= H:

@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+from enum import Enum
+
 import numpy as np
 
 from ...utils.error import FinError
@@ -19,8 +22,6 @@ from .swap_fixed_leg import SwapFixedLeg
 from .swap_float_leg import SwapFloatLeg
 
 ###############################################################################
-
-from enum import Enum
 
 
 class FinCompoundingTypes(Enum):

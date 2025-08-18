@@ -2,9 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 
 import numpy as np
-
 
 from ...utils.global_vars import g_days_in_year
 from ...utils.global_types import TouchOptionTypes
@@ -154,7 +154,7 @@ class EquityOneTouchOption(EquityOption):
     def value(
         self,
         value_dt: Date,
-        stock_price: (float, np.ndarray),
+        stock_price: Union[float, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model,
@@ -172,14 +172,10 @@ class EquityOneTouchOption(EquityOption):
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve date not same as option valuation date"
-            )
+            raise FinError("Discount Curve date not same as option valuation date")
 
         if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve date not same as option valuation date"
-            )
+            raise FinError("Dividend Curve date not same as option valuation date")
 
         t = (self.expiry_dt - value_dt) / g_days_in_year
         t = max(t, 1e-6)
@@ -326,9 +322,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 + A4
             return v
 
@@ -344,9 +338,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 + A4
             return v
 
@@ -392,9 +384,7 @@ class EquityOneTouchOption(EquityOption):
             v = B2 - B4
             return v
 
-        elif (
-            self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING
-        ):
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if np.any(s0 <= H):
@@ -407,9 +397,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 - A4
             return v
 
@@ -426,9 +414,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = (
-                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
             v = A2 - A4
             return v
 
@@ -470,9 +456,7 @@ class EquityOneTouchOption(EquityOption):
         s0 = stock_price
         mu = r - q
 
-        time_grid, s = get_paths_times(
-            num_paths, num_time_steps, t, mu, s0, v, seed
-        )
+        time_grid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
 
         H = self.barrier_price
         X = self.payment_size
@@ -575,9 +559,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X * np.exp(-r * t)
             return v
 
-        elif (
-            self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING
-        ):
+        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if s0 <= H:

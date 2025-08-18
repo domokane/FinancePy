@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from copy import deepcopy
 from math import exp, log
 
@@ -96,8 +98,7 @@ def _risky_pv01_numba(
     # cpn accrued from previous cpn to today paid in full at default
     # before cpn payment
     full_rpv01 = (
-        full_rpv01
-        + z1 * (qeff - q1) * accrual_factor_pcd_to_now * cpnAccruedIndicator
+        full_rpv01 + z1 * (qeff - q1) * accrual_factor_pcd_to_now * cpnAccruedIndicator
     )
 
     # future accrued from now to cpn payment date assuming default roughly
@@ -133,12 +134,8 @@ def _risky_pv01_numba(
                 h12 = -log(q2 / q1) / tau
                 r12 = -log(z2 / z1) / tau
                 alpha = h12 + r12
-                exp_term = (
-                    1.0 - exp(-alpha * tau) - alpha * tau * exp(-alpha * tau)
-                )
-                d_full_rpv01 = (
-                    q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
-                )
+                exp_term = 1.0 - exp(-alpha * tau) - alpha * tau * exp(-alpha * tau)
+                d_full_rpv01 = q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
             else:
                 d_full_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
 
@@ -205,9 +202,7 @@ def _prot_leg_pv_numba(
             h12 = -log(q2 / q1) / dt
             r12 = -log(z2 / z1) / dt
             exp_term = exp(-(r12 + h12) * dt)
-            dprot_pv = (
-                h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
-            )
+            dprot_pv = h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
             prot_pv += dprot_pv
             q1 = q2
             z1 = z2
@@ -240,7 +235,7 @@ class CDS:
     def __init__(
         self,
         step_in_dt: Date,  # Date protection starts
-        maturity_dt_or_tenor: (Date, str),  # Date or tenor
+        maturity_dt_or_tenor: Union[Date, str],  # Date or tenor
         running_cpn: float,  # Annualised cpn on premium fee leg
         notional: float = ONE_MILLION,
         long_protect: bool = True,
@@ -602,9 +597,7 @@ class CDS:
 
         fwd_df = 1.0
 
-        clean_pv = fwd_df * (
-            prot_pv - self.running_cpn * clean_rpv01 * self.notional
-        )
+        clean_pv = fwd_df * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
 
         clean_price = (self.notional - clean_pv) / self.notional * 100.0
 
@@ -717,9 +710,7 @@ class CDS:
     def premium_leg_pv(self, value_dt, issuer_curve, pv01_method=0):
         """Value of the premium leg of a CDS."""
 
-        full_rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)[
-            "dirty_rpv01"
-        ]
+        full_rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)["dirty_rpv01"]
 
         v = full_rpv01 * self.notional * self.running_cpn
         return v
@@ -768,9 +759,7 @@ class CDS:
         accurate approximation that avoids curve building."""
 
         if isinstance(value_dt, Date) is False:
-            raise FinError(
-                "Valuation date must be a Date and not " + str(value_dt)
-            )
+            raise FinError("Valuation date must be a Date and not " + str(value_dt))
 
         t_mat = (self.maturity_dt - value_dt) / g_days_in_year
         t_eff = (self.step_in_dt - value_dt) / g_days_in_year
@@ -807,9 +796,7 @@ class CDS:
         # bump CDS spread and calculate
         #######################################################################
 
-        h = (flat_cds_curve_spread + bump_size) / (
-            1.0 - contract_recovery_rate
-        )
+        h = (flat_cds_curve_spread + bump_size) / (1.0 - contract_recovery_rate)
         r = flat_cont_interest_rate
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
@@ -820,9 +807,7 @@ class CDS:
             * long_protect
             * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
         )
-        full_pv_credit_bumped = (
-            clean_pv_credit_bumped + fwd_df * long_protect * accrued
-        )
+        full_pv_credit_bumped = clean_pv_credit_bumped + fwd_df * long_protect * accrued
         credit01 = full_pv_credit_bumped - full_pv
 
         #######################################################################
@@ -845,9 +830,7 @@ class CDS:
             * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
         )
 
-        full_pv_ir_bumped = (
-            clean_pv_ir_bumped + fwd_df * long_protect * accrued
-        )
+        full_pv_ir_bumped = clean_pv_ir_bumped + fwd_df * long_protect * accrued
 
         ir01 = full_pv_ir_bumped - full_pv
 

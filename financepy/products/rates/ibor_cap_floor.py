@@ -7,6 +7,7 @@
 # TODO: Check that curve anchor date is valuation date ?
 
 from typing import Optional
+from typing import Union
 
 from ...utils.date import Date
 from ...utils.calendar import Calendar
