@@ -1,4 +1,4 @@
-use_banner = true
+use_banner = True
 
 if use_banner:
     cr = "\n"
