@@ -156,7 +156,7 @@ def test_ibor_benchmarks_report():
         fras,
         swaps,
         interp_type,
-        check_refit=False,
+        check_refit_flag=False,
         do_build=do_build,
     )
 

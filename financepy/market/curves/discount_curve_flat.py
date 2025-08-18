@@ -67,10 +67,12 @@ class DiscountCurveFlat(DiscountCurve):
 
     ###############################################################################
 
+    @property
     def times(self) -> np.ndarray:
         """Return the cached grid of times."""
         return self._times
 
+    @property
     def dfs(self) -> np.ndarray:
         """Return the cached grid of discount factors."""
         return self._dfs

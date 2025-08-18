@@ -75,7 +75,7 @@ def test_SmoothFitSimple(interp_type, report_progress=False):
         fras,
         swaps,
         interp_type,
-        check_refit=False,
+        check_refit_flag=False,
         do_build=do_build,
     )
 
@@ -240,7 +240,7 @@ def test_SmoothFit(interp_type, report_progress=False):
         fras,
         swaps,
         interp_type,
-        check_refit=False,
+        check_refit_flag=False,
         do_build=do_build,
         **optional_interp_params,
     )

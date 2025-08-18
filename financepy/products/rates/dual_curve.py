@@ -82,7 +82,7 @@ class IborDualCurve(DiscountCurve):
         ibor_fras: list,
         ibor_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        check_refit: bool = False,
+        check_refit_flag: bool = False,
     ):  # Set to True to test it works
         """Create an instance of a Ibor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
@@ -100,7 +100,7 @@ class IborDualCurve(DiscountCurve):
         self.discount_curve = discount_curve
         self._validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
         self._interp_type = interp_type
-        self.check_refit = check_refit
+        self.check_refit_flag = check_refit_flag
         self._build_curve()
 
     ###########################################################################
@@ -366,7 +366,7 @@ class IborDualCurve(DiscountCurve):
                 full_output=False,
             )
 
-        if self.check_refit is True:
+        if self.check_refit_flag is True:
             self._check_refits(1e-10, SWAP_TOL, 1e-5)
 
     ###########################################################################
@@ -422,7 +422,7 @@ class IborDualCurve(DiscountCurve):
     #                                     maxiter=50, fprime2=None)
 
     #     if len(self.used_swaps) == 0:
-    #         if self.check_refit is True:
+    #         if self.check_refit_flag is True:
     #             self.check_refits(1e-10, swap_tol, 1e-5)
     #         return
 
@@ -509,7 +509,7 @@ class IborDualCurve(DiscountCurve):
 
     #         pv01 += acc * df_mat
 
-    #     if self.check_refit is True:
+    #     if self.check_refit_flag is True:
     #         self.check_refits(1e-10, swap_tol, 1e-5)
 
     ###########################################################################

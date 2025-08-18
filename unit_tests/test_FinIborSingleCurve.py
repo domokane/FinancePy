@@ -389,7 +389,7 @@ def test_RepriceInputsForAllInterpChoices(interp_type):
         fras,
         swaps,
         interp_type,
-        check_refit=True,
+        check_refit_flag=True,
         **optional_interp_params
     )
 

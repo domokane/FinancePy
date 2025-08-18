@@ -30,9 +30,7 @@ def _f(dm, *args):
     future_ibor = args[4]
     dirty_price = args[5]
 
-    px = self.dirty_price_from_dm(
-        settle_dt, next_cpn, current_ibor, future_ibor, dm
-    )
+    px = self.dirty_price_from_dm(settle_dt, next_cpn, current_ibor, future_ibor, dm)
 
     obj_fn = px - dirty_price
     return obj_fn
@@ -78,6 +76,9 @@ class BondFRN:
         self.flow_amounts = []
         self.par = 100.0  # This is how price is quoted
 
+        self.pcd = None
+        self.ncd = None
+        self.alpha = 0.0  # This is the fraction of the coupon that has accrued
         self._calculate_cpn_dts()
 
     ###########################################################################
@@ -237,9 +238,7 @@ class BondFRN:
         """Calculate the Macauley duration of the FRN on a settlement date
         given its yield to maturity."""
 
-        dd = self.dollar_duration(
-            settle_dt, next_cpn, current_ibor, future_ibor, dm
-        )
+        dd = self.dollar_duration(settle_dt, next_cpn, current_ibor, future_ibor, dm)
 
         fp = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
@@ -265,9 +264,7 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin."""
 
-        dd = self.dollar_duration(
-            settle_dt, next_cpn, current_ibor, future_ibor, dm
-        )
+        dd = self.dollar_duration(settle_dt, next_cpn, current_ibor, future_ibor, dm)
 
         fp = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
@@ -456,9 +453,7 @@ class BondFRN:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string(
-            "QUOTED MARGIN (bp)", self.quoted_margin * 10000.0
-        )
+        s += label_to_string("QUOTED MARGIN (bp)", self.quoted_margin * 10000.0)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("DAY COUNT TYPE", self.dc_type)
         return s

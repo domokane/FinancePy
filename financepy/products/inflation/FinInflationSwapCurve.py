@@ -25,7 +25,7 @@ def _f(df, *args):
     curve = args[0]
     value_dt = args[1]
     swap = args[2]
-    num_points = len(curve._times)
+    num_points = len(curve.times)
     curve._dfs[num_points - 1] = df
     v_swap = swap.value(value_dt, curve, curve, None, 1.0)
     v_swap /= swap.notional
@@ -40,7 +40,7 @@ def _g(df, *args):
     curve = args[0]
     value_dt = args[1]
     fra = args[2]
-    num_points = len(curve._times)
+    num_points = len(curve.times)
     curve._dfs[num_points - 1] = df
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
@@ -86,7 +86,7 @@ class InflationSwapCurve(DiscountCurve):
         ibor_fras: list,
         ibor_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        check_refit: bool = False,
+        check_refit_flag: bool = False,
     ):  # Set to True to test it works
         """Create an instance of a Ibor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
@@ -104,8 +104,12 @@ class InflationSwapCurve(DiscountCurve):
         self.value_dt = value_dt
         self.validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
         self._interp_type = interp_type
-        self.check_refit = check_refit
+        self.check_refit_flag = check_refit_flag
         self.build_curve()
+
+        self.used_deposits = None
+        self.used_fras = None
+        self.used_swaps = ibor_swaps
 
     ###########################################################################
 
@@ -209,6 +213,7 @@ class InflationSwapCurve(DiscountCurve):
         last_deposit_maturity_dt = Date(1, 1, 1900)
         first_fra_maturity_dt = Date(1, 1, 1900)
         last_fra_maturity_dt = Date(1, 1, 1900)
+        first_swap_maturity_dt = Date(1, 1, 1900)
 
         if num_depos > 0:
             last_deposit_maturity_dt = ibor_deposits[-1].maturity_dt
@@ -311,7 +316,7 @@ class InflationSwapCurve(DiscountCurve):
                 full_output=False,
             )
 
-        if self.check_refit is True:
+        if self.check_refit_flag is True:
             self.check_refits(1e-10, SWAP_TOL, 1e-5)
 
     ###########################################################################
@@ -367,7 +372,7 @@ class InflationSwapCurve(DiscountCurve):
                 )
 
         if len(self.used_swaps) == 0:
-            if self.check_refit is True:
+            if self._check_refit_flag is True:
                 self.check_refits(1e-10, SWAP_TOL, 1e-5)
             return
 
@@ -469,7 +474,7 @@ class InflationSwapCurve(DiscountCurve):
         #        print(self._times)
         #        print(self._dfs)
 
-        if self.check_refit is True:
+        if self._check_refit_flag is True:
             self.check_refits(1e-10, SWAP_TOL, 1e-5)
 
     ###########################################################################

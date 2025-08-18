@@ -4,6 +4,8 @@ from financepy.utils.error import FinError
 
 
 class TenorUnit(Enum):
+    """Represents the different units of time in months for a tenor."""
+
     NONE = 0
     DAYS = 1
     WEEKS = 7
@@ -38,14 +40,10 @@ class Tenor:
 
         tenor_string = tenor_string.upper()
 
-        if (
-            tenor_string == "ON"
-        ):  # overnight - should be used only if spot days = 0
+        if tenor_string == "ON":  # overnight - should be used only if spot days = 0
             self._units = TenorUnit.DAYS
             self._num_periods = 1
-        elif (
-            tenor_string == "TN"
-        ):  # overnight - should be used when spot days > 0
+        elif tenor_string == "TN":  # overnight - should be used when spot days > 0
             self._units = TenorUnit.DAYS
             self._num_periods = 1
         elif tenor_string[-1] == "D":
@@ -63,13 +61,25 @@ class Tenor:
         else:
             raise FinError("Unknown tenor type in " + tenor_string)
 
+    @property
+    def units(self) -> TenorUnit:
+        """Returns the units of the tenor."""
+        return self._units
+
+    @property
+    def num_periods(self) -> int:
+        """Returns the number of periods in the tenor."""
+        return self._num_periods
+
     @classmethod
     def as_tenor(cls, str_or_tenor):
+        """Convert a string or Tenor object to a Tenor object."""
         if isinstance(str_or_tenor, Tenor):
             return str_or_tenor
         return Tenor(str_or_tenor)
 
     def is_valid(self):
+        """Check if the tenor is valid."""
         return self._units != TenorUnit.NONE
 
     def __mul__(self, other: int):
@@ -128,25 +138,20 @@ class Tenor:
 
         if self._units.value < new_units.value:
             raise FinError(
-                f"Cannot convert units from {self._units.name}"
-                + "to {new_units.name}"
+                f"Cannot convert units from {self._units.name}" + "to {new_units.name}"
             )
 
         res = Tenor()
         res._units = new_units
-        res._num_periods = (
-            self._num_periods * self._units.value / new_units.value
-        )
+        res._num_periods = self._num_periods * self._units.value / new_units.value
         return res
 
     @classmethod
     def convert_to_same_units(cls, t1_in, t2_in):
         (t1, t2) = (
-            (t1_in, t2_in)
-            if t1_in._units.value <= t2_in._units.value
-            else (t2_in, t1_in)
+            (t1_in, t2_in) if t1_in.units.value <= t2_in.units.value else (t2_in, t1_in)
         )
-        common_unit = t1._units
+        common_unit = t1.units
 
         t1 = t1.convert_to_unit(common_unit)
         t2 = t2.convert_to_unit(common_unit)
@@ -166,10 +171,7 @@ class Tenor:
             True or False depending if teh two tenors are equal
         """
 
-        return (
-            self._units == other._units
-            and self._num_periods == other._num_periods
-        )
+        return self._units == other._units and self._num_periods == other._num_periods
 
     def __repr__(self):
         if self.is_valid():

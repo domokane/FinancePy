@@ -336,7 +336,7 @@ class Date:
     ###########################################################################
 
     @classmethod
-    def from_date(cls, date: [datetime.date, np.datetime64]):
+    def from_date(cls, date: Union[datetime.date, np.datetime64]):
         """Create a Date from a python datetime.date object or from a
         Numpy datetime64 object.
         Example Input:
@@ -351,7 +351,7 @@ class Date:
                 1, "s"
             )
 
-            date = datetime.datetime.utcfromtime_stamp(time_stamp)
+            date = datetime.datetime.utcfromtimestamp(time_stamp)
             d, m, y = date.day, date.month, date.year
             return cls(d, m, y)
 
@@ -739,6 +739,7 @@ class Date:
         m = self.m
         d = self.d
 
+        m_imm = None
         y_imm = y
 
         if m == 12 and d >= self.third_wednesday_of_month(m, y):

@@ -8,8 +8,6 @@ from typing import List, Union
 
 ###############################################################################
 
-from ...utils.day_count import DayCountTypes
-from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
