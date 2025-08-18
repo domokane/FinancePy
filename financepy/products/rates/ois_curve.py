@@ -20,8 +20,6 @@ from ...products.rates.ois import OIS
 SWAP_TOL = 1e-10
 
 ##############################################################################
-# TODO: CHANGE times to df_times
-##############################################################################
 
 
 def _fois(oir, *args):
@@ -55,13 +53,14 @@ def _f(df, *args):
     """Root search objective function for OIS"""
 
     curve = args[0]
+
     value_dt = args[1]
     swap = args[2]
-    num_points = len(curve._times)
+    num_points = len(curve.times)
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve._times, curve._dfs)
+    curve._interpolator.fit(curve.times, curve.dfs)
     v_swap = swap.value(value_dt, curve, None)
     notional = swap.fixed_leg.notional
     v_swap /= notional
@@ -76,11 +75,12 @@ def _g(df, *args):
     curve = args[0]
     value_dt = args[1]
     fra = args[2]
-    num_points = len(curve._times)
+
+    num_points = len(curve.times)
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve._times, curve._dfs)
+    curve._interpolator.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
     return v_fra
@@ -94,7 +94,7 @@ class OISCurve(DiscountCurve):
     Index Rate swaps. The curve date is the date on which we are
     performing the valuation based on the information available on the
     curve date. Typically it is the date on which an amount of 1 unit paid
-    has a present value of 1. This class inherits from FinDiscountCurve
+    has a present value of 1. This class inherits from DiscountCurve
     and so it has all of the methods that that class has.
 
     The construction of the curve is assumed to depend on just the OIS curve,
@@ -111,7 +111,7 @@ class OISCurve(DiscountCurve):
         ois_fras: list,
         ois_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        check_refit: bool = False,
+        check_refit_flag: bool = False,
     ):  # Set to True to test it works
         """Create an instance of an overnight index rate swap curve given a
         valuation date and a set of OIS rates. Some of these may
@@ -128,9 +128,35 @@ class OISCurve(DiscountCurve):
         self.value_dt = value_dt
         self._validate_inputs(ois_deposits, ois_fras, ois_swaps)
         self._interp_type = interp_type
-        self.check_refit = check_refit
+        self._check_refit_flag = check_refit_flag
         self._interpolator = None
         self._build_curve()
+
+    ###############################################################################
+
+    @property
+    def times(self) -> np.ndarray:
+        """
+        Accessor for the internal array of times (in years) from the anchor date.
+
+        Returns
+        -------
+        np.ndarray
+            Copy of the internal times array.
+        """
+        return self._times.copy()
+
+    @property
+    def dfs(self) -> np.ndarray:
+        """
+        Accessor for the internal array of discount factors corresponding to times.
+
+        Returns
+        -------
+        np.ndarray
+            Copy of the internal discount factors array.
+        """
+        return self._dfs.copy()
 
     ###############################################################################
 
@@ -201,10 +227,6 @@ class OISCurve(DiscountCurve):
             for fra in ois_fras:
                 start_dt = fra.start_dt
                 if start_dt <= self.value_dt:
-                    raise FinError("FRAs starts before valuation date")
-
-                start_dt = fra.start_dt
-                if start_dt < self.value_dt:
                     raise FinError("FRAs starts before valuation date")
 
         if num_fras > 1:
@@ -331,7 +353,7 @@ class OISCurve(DiscountCurve):
 
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
-            df_mat = depo._maturity_df() * df_settle
+            df_mat = depo.maturity_df() * df_settle
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -387,8 +409,8 @@ class OISCurve(DiscountCurve):
                 full_output=False,
             )
 
-        if self.check_refit is True:
-            self.check_refits(1e-10, SWAP_TOL, 1e-5)
+        if self._check_refit_flag is True:
+            self.check_refits(SWAP_TOL, 1e-5)
 
     ###############################################################################
 
@@ -447,7 +469,7 @@ class OISCurve(DiscountCurve):
                 )
 
         if len(self.used_swaps) == 0:
-            if self.check_refit is True:
+            if self._check_refit_flag is True:
                 self.check_refits(1e-10, SWAP_TOL, 1e-5)
             return
 
@@ -534,13 +556,14 @@ class OISCurve(DiscountCurve):
 
             pv01 += acc * df_mat
 
-        if self.check_refit is True:
-            self.check_refits(1e-10, SWAP_TOL, 1e-5)
+        if self._check_refit_flag is True:
+            self.check_refits(SWAP_TOL, 1e-5)
 
     ###############################################################################
 
-    def _check_refits(self, depo_tol, fra_tol, swap_tol):
-        """Ensure that the Libor curve refits the calibration instruments."""
+    def check_refits(self, fra_tol, swap_tol):
+        """Ensure that the Libor curve refits the calibration instruments.
+        We omit deposits as these are fitted exactly in the bootstrap."""
 
         for fra in self.used_fras:
             v = fra.value(self.value_dt, self) / fra.notional

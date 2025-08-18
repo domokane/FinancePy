@@ -406,11 +406,11 @@ def test_ibor_depositsFRAsSwaps():
 
 
 def futureTofra_rate(price, convexity):
-    futRate = (100 - price) / 100
+    futures_rate = (100 - price) / 100
     if convexity < 0:
-        fra_rate = futRate + convexity / 100.0
+        fra_rate = futures_rate + convexity / 100.0
     else:
-        fra_rate = futRate - convexity / 100.0
+        fra_rate = futures_rate - convexity / 100.0
 
     return fra_rate
 

@@ -32,11 +32,11 @@ def _f(df, *args):
     value_dt = args[2]
     swap = args[3]
 
-    num_points = len(index_curve._times)
+    num_points = len(index_curve.times)
     index_curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    index_curve._interpolator.fit(index_curve._times, index_curve._dfs)
+    index_curve._interpolator.fit(index_curve.times, index_curve.dfs)
     v_swap = swap.value(value_dt, discount_curve, index_curve, None)
 
     notional = swap.fixed_leg.notional
@@ -54,11 +54,11 @@ def _g(df, *args):
     curve = args[1]
     value_dt = args[2]
     fra = args[3]
-    num_points = len(curve._times)
+    num_points = len(curve.times)
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve._times, curve._dfs)
+    curve._interpolator.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, discount_curve, curve)
     v_fra /= fra.notional
     return v_fra
@@ -310,7 +310,7 @@ class IborDualCurve(DiscountCurve):
         for depo in self.used_deposits:
 
             df_settle = self.df(depo.start_dt)
-            df_mat = depo._maturity_df() * df_settle
+            df_mat = depo.maturity_df() * df_settle
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)

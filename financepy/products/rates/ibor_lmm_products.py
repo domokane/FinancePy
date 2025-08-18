@@ -6,11 +6,11 @@
 # TODO: Extend to allow two fixed legs in underlying swap
 # TODO: Cash settled swaptions
 
-""" This module implements the LMM in the spot measure. It combines both model
+"""This module implements the LMM in the spot measure. It combines both model
 and product specific code - I am not sure if it is better to separate these. At
 the moment this seems to work ok.
 
-THIS IS STILL IN PROTOPTYPE MODE. DO NOT USE. """
+THIS IS STILL IN PROTOPTYPE MODE. DO NOT USE."""
 
 import numpy as np
 
@@ -135,9 +135,7 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(
-                start_dt, end_dt, self.float_dc_type
-            )
+            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -204,9 +202,7 @@ class IborLMMProducts:
         for i in range(1, self.num_fwds):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(
-                start_dt, end_dt, self.float_dc_type
-            )
+            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -266,9 +262,7 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.forward_rate(
-                start_dt, end_dt, self.float_dc_type
-            )
+            fwd_rate = discount_curve.forward_rate(start_dt, end_dt, self.float_dc_type)
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -402,7 +396,6 @@ class IborLMMProducts:
 
         num_fwds = len(cap_floor_dts)
         num_paths = self.num_paths
-        K = cap_floor_rate
 
         is_cap = 0
         if cap_floor_type == FinCapFloorTypes.CAP:
@@ -413,7 +406,7 @@ class IborLMMProducts:
         taus = self.accrual_factors
 
         v = lmm_cap_flr_pricer(
-            num_fwds, num_paths, K, fwd0, fwds, taus, is_cap
+            num_fwds, num_paths, cap_floor_rate, fwd0, fwds, taus, is_cap
         )
 
         # Sum the cap/floorlets to get cap/floor value

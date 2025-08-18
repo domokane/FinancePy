@@ -33,8 +33,8 @@ class DiscountCurve:
     def __init__(
         self,
         value_dt: Date,
-        df_dates: list,
-        df_values: np.ndarray,
+        df_dates: list = None,
+        df_values: np.ndarray = None,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
     ):
         """Create the discount curve from a vector of times and discount
@@ -46,11 +46,11 @@ class DiscountCurve:
         check_argument_types(self.__init__, locals())
 
         # Validate curve
-        if len(df_dates) < 1:
-            raise FinError("Times has zero length")
+        if df_dates is None:
+            df_dates = [value_dt]
 
-        if len(df_dates) != len(df_values):
-            raise FinError("Times and Values are not the same")
+        if df_values is None:
+            df_values = [1.0]
 
         self._times = [0.0]
         self._dfs = [1.0]
@@ -84,6 +84,18 @@ class DiscountCurve:
         self._interp_type = interp_type
         self._interpolator = Interpolator(self._interp_type)
         self._interpolator.fit(self._times, self._dfs)
+
+    ###############################################################################
+
+    @property
+    def times(self) -> np.ndarray:
+        """Return the internal array of times (in years) from the anchor date."""
+        return self._times.copy()  # return a copy to prevent external modification
+
+    @property
+    def dfs(self) -> np.ndarray:
+        """Return the internal array of discount factors corresponding to times."""
+        return self._dfs.copy()  # return a copy to prevent external modification
 
     ###########################################################################
 

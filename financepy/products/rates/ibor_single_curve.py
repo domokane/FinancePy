@@ -117,7 +117,7 @@ class IborSingleCurve(DiscountCurve):
     The curve date is the date on which we are performing the valuation based
     on the information available on the curve date. Typically it is the date on
     which an amount of 1 unit paid has a present value of 1. This class
-    inherits from FinDiscountCurve and so it has all of the methods that that
+    inherits from DiscountCurve and so it has all of the methods that that
     class has.
 
     There are two main curve-building approaches:
@@ -414,7 +414,7 @@ class IborSingleCurve(DiscountCurve):
 
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
-            df_mat = depo._maturity_df() * df_settle_dt
+            df_mat = depo.maturity_df() * df_settle_dt
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)

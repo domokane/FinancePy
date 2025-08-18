@@ -24,7 +24,7 @@ from ...market.curves.discount_curve import DiscountCurve
 class DiscountCurvePWF(DiscountCurve):
     """Curve is made up of a series of zero rates sections with each having
     a piecewise flat zero rate. The default compounding assumption is
-    continuous. The class inherits methods from FinDiscountCurve."""
+    continuous. The class inherits methods from DiscountCurve."""
 
     def __init__(
         self,
@@ -54,9 +54,9 @@ class DiscountCurvePWF(DiscountCurve):
 
         dc_times = times_from_dates(zero_dts, self.value_dt, self.dc_type)
 
-        self.times = np.array(dc_times)
+        self._times = np.array(dc_times)
 
-        if test_monotonicity(self.times) is False:
+        if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
     ###########################################################################
@@ -78,9 +78,9 @@ class DiscountCurvePWF(DiscountCurve):
             l_index = 0
             found = 0
 
-            num_times = len(self.times)
+            num_times = len(self._times)
             for i in range(1, num_times):
-                if self.times[i] > t:
+                if self._times[i] > t:
                     l_index = i - 1
                     found = 1
                     break

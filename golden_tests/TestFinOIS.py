@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from financepy.utils.math import ONE_MILLION
@@ -39,35 +40,36 @@ def test_FinFixedOIS():
     notional = ONE_MILLION
     payment_lag = 1
 
-    ois = OIS(effective_dt,
-              end_dt,
-              fixed_leg_type,
-              oisRate,
-              fixed_freq_type,
-              fixedDayCount,
-              notional,
-              payment_lag,
-              float_spread,
-              float_freq_type,
-              floatDayCount)
+    ois = OIS(
+        effective_dt,
+        end_dt,
+        fixed_leg_type,
+        oisRate,
+        fixed_freq_type,
+        fixedDayCount,
+        notional,
+        payment_lag,
+        float_spread,
+        float_freq_type,
+        floatDayCount,
+    )
 
-#    print(ois)
+    #    print(ois)
 
     value_dt = effective_dt
     marketRate = 0.05
-    oisCurve = DiscountCurveFlat(value_dt,
-                                 marketRate,
-                                 FrequencyTypes.ANNUAL)
+    ois_curve = DiscountCurveFlat(value_dt, marketRate, FrequencyTypes.ANNUAL)
 
-    v = ois.value(effective_dt, oisCurve)
+    v = ois.value(effective_dt, ois_curve)
 
-#    print(v)
+    #    print(v)
 
-#    ois._fixed_leg.print_valuation()
-#    ois._float_leg.print_valuation()
+    #    ois._fixed_leg.print_valuation()
+    #    ois._float_leg.print_valuation()
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("SWAP_VALUE", v)
+
 
 ###############################################################################
 

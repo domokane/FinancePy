@@ -80,7 +80,7 @@ class IborDeposit:
 
     ###########################################################################
 
-    def _maturity_df(self):
+    def maturity_df(self):
         """Returns the maturity date discount factor that would allow the
         Libor curve to reprice the contractual market deposit rate. Note that
         this is a forward discount factor that starts on settlement date."""
@@ -165,7 +165,7 @@ class IborDeposit:
 
     ###########################################################################
 
-    def print_flows(self, valuation_date: Date):
+    def print_flows(self, value_date: Date):
         """Print the date and size of the future repayment."""
 
         dc = DayCount(self.dc_type)

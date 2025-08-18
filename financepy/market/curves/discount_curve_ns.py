@@ -25,7 +25,7 @@ class DiscountCurveNS(DiscountCurve):
     The internal rate is a continuously compounded rate but you can calculate
     alternative frequencies by providing a corresponding compounding frequency.
     A day count convention is needed to ensure that dates are converted to the
-    correct time in years. The class inherits methods from FinDiscountCurve."""
+    correct time in years. The class inherits methods from DiscountCurve."""
 
     def __init__(
         self,
@@ -64,7 +64,7 @@ class DiscountCurveNS(DiscountCurve):
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
         """Calculation of zero rates with specified frequency according to
-        NS parametrisation. This method overrides that in FinDiscountCurve.
+        NS parametrisation. This method overrides that in DiscountCurve.
         The parametrisation is not strictly in terms of continuously compounded
         zero rates, this function allows other compounding and day counts.
         This function returns a single or vector of zero rates given a vector

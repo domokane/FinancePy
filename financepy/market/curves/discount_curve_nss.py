@@ -25,7 +25,7 @@ class DiscountCurveNSS(DiscountCurve):
     zero rate curve. The zero rate is assumed to be continuously compounded.
     This can be changed when calling for zero rates. A day count convention is
     needed to ensure that dates are converted to the correct time in years. The
-    class inherits methods from FinDiscountCurve."""
+    class inherits methods from DiscountCurve."""
 
     def __init__(
         self,
@@ -71,7 +71,7 @@ class DiscountCurveNSS(DiscountCurve):
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
         """Calculation of zero rates with specified frequency according to
-        NSS parametrisation. This method overrides that in FinDiscountCurve.
+        NSS parametrisation. This method overrides that in DiscountCurve.
         The NSS parametrisation is no strictly terms of continuously compounded
         zero rates, this function allows other compounding and day counts.
         This function returns a single or vector of zero rates given a vector

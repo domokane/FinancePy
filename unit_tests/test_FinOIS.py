@@ -29,22 +29,23 @@ def test_FinFixedOIS():
     notional = ONE_MILLION
     payment_lag = 1
 
-    ois = OIS(effective_dt,
-              end_dt,
-              fixed_leg_type,
-              oisRate,
-              fixed_freq_type,
-              fixedDayCount,
-              notional,
-              payment_lag,
-              float_spread,
-              float_freq_type,
-              floatDayCount)
+    ois = OIS(
+        effective_dt,
+        end_dt,
+        fixed_leg_type,
+        oisRate,
+        fixed_freq_type,
+        fixedDayCount,
+        notional,
+        payment_lag,
+        float_spread,
+        float_freq_type,
+        floatDayCount,
+    )
 
     value_dt = effective_dt
     marketRate = 0.05
-    oisCurve = DiscountCurveFlat(value_dt, marketRate,
-                                 FrequencyTypes.ANNUAL)
+    ois_curve = DiscountCurveFlat(value_dt, marketRate, FrequencyTypes.ANNUAL)
 
-    v = ois.value(effective_dt, oisCurve)
+    v = ois.value(effective_dt, ois_curve)
     assert round(v, 4) == 43915.6019

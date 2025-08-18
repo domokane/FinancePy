@@ -221,9 +221,9 @@ def buildOIS(value_dt):
     )
     swaps.append(swap)
 
-    oisCurve = OISCurve(value_dt, [], fras, swaps)
+    ois_curve = OISCurve(value_dt, [], fras, swaps)
 
-    return oisCurve
+    return ois_curve
 
 
 ###############################################################################
@@ -372,33 +372,35 @@ def test_bloombergPricingExample():
     #    swaps[0].print_fixed_leg_pv()
     #    swaps[0].print_float_leg_pv()
 
-    oisCurve = buildOIS(value_dt)
-    #    print(oisCurve)
+    ois_curve = buildOIS(value_dt)
+    #    print(ois_curve)
 
     liborDualCurve = IborDualCurve(
-        value_dt, oisCurve, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES, True
+        value_dt, ois_curve, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES, True
     )
     #    print(liborDualCurve)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
 
     test_cases.header("VALUATION TO TODAY DATE", " PV")
-    test_cases.print("VALUE:", swaps[0].value(value_dt, oisCurve, liborDualCurve, None))
-    test_cases.print("FIXED:", swaps[0].fixed_leg.value(value_dt, oisCurve))
     test_cases.print(
-        "FLOAT:", swaps[0].float_leg.value(value_dt, oisCurve, libor_curve, None)
+        "VALUE:", swaps[0].value(value_dt, ois_curve, liborDualCurve, None)
+    )
+    test_cases.print("FIXED:", swaps[0].fixed_leg.value(value_dt, ois_curve))
+    test_cases.print(
+        "FLOAT:", swaps[0].float_leg.value(value_dt, ois_curve, libor_curve, None)
     )
 
     test_cases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
     test_cases.print(
-        "VALUE:", swaps[0].value(settle_dt, oisCurve, liborDualCurve, None)
+        "VALUE:", swaps[0].value(settle_dt, ois_curve, liborDualCurve, None)
     )
-    test_cases.print("FIXED:", swaps[0].fixed_leg.value(settle_dt, oisCurve))
+    test_cases.print("FIXED:", swaps[0].fixed_leg.value(settle_dt, ois_curve))
     test_cases.print(
         "FLOAT:",
         swaps[0].float_leg.value(
             settle_dt,
-            oisCurve,
+            ois_curve,
             liborDualCurve,
             None,
         ),
@@ -416,7 +418,7 @@ def test_bloombergPricingExample():
         singleCurveFwds = libor_curve.fwd(dates)
         plt.plot(years, singleCurveFwds, label="Single Libor Curve")
 
-        oisCurveFwds = oisCurve.fwd(dates)
+        oisCurveFwds = ois_curve.fwd(dates)
         plt.plot(years, oisCurveFwds, label="OIS Curve")
 
         index_curveFwds = liborDualCurve.fwd(dates)

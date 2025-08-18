@@ -328,11 +328,11 @@ def test_OISDepositsFRAsSwaps():
 
 
 def futureTofra_rate(price, convexity):
-    futRate = (100 - price) / 100
+    futures_rate = (100 - price) / 100
     if convexity < 0:
-        fra_rate = futRate + convexity / 100.0
+        fra_rate = futures_rate + convexity / 100.0
     else:
-        fra_rate = futRate - convexity / 100.0
+        fra_rate = futures_rate - convexity / 100.0
 
     return fra_rate
 
@@ -590,46 +590,46 @@ def test_bloombergPricingExample():
     freq = FrequencyTypes.SEMI_ANNUAL
     spot_days = 2
     settle_dt = value_dt.add_weekdays(spot_days)
-    payRec = SwapTypes.PAY
+    pay_rec = SwapTypes.PAY
     lag = 1  # Not used
 
     swaps = []
-    swap = OIS(settle_dt, "2Y", payRec, (2.77417 + 2.77844) / 200, freq, accrual)
+    swap = OIS(settle_dt, "2Y", pay_rec, (2.77417 + 2.77844) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "3Y", payRec, (2.86098 + 2.86582) / 200, freq, accrual)
+    swap = OIS(settle_dt, "3Y", pay_rec, (2.86098 + 2.86582) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "4Y", payRec, (2.90240 + 2.90620) / 200, freq, accrual)
+    swap = OIS(settle_dt, "4Y", pay_rec, (2.90240 + 2.90620) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "5Y", payRec, (2.92944 + 2.92906) / 200, freq, accrual)
+    swap = OIS(settle_dt, "5Y", pay_rec, (2.92944 + 2.92906) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "6Y", payRec, (2.94001 + 2.94499) / 200, freq, accrual)
+    swap = OIS(settle_dt, "6Y", pay_rec, (2.94001 + 2.94499) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "7Y", payRec, (2.95352 + 2.95998) / 200, freq, accrual)
+    swap = OIS(settle_dt, "7Y", pay_rec, (2.95352 + 2.95998) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "8Y", payRec, (2.96830 + 2.97400) / 200, freq, accrual)
+    swap = OIS(settle_dt, "8Y", pay_rec, (2.96830 + 2.97400) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "9Y", payRec, (2.98403 + 2.98817) / 200, freq, accrual)
+    swap = OIS(settle_dt, "9Y", pay_rec, (2.98403 + 2.98817) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "10Y", payRec, (2.99716 + 3.00394) / 200, freq, accrual)
+    swap = OIS(settle_dt, "10Y", pay_rec, (2.99716 + 3.00394) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "11Y", payRec, (3.01344 + 3.01596) / 200, freq, accrual)
+    swap = OIS(settle_dt, "11Y", pay_rec, (3.01344 + 3.01596) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "12Y", payRec, (3.02276 + 3.02684) / 200, freq, accrual)
+    swap = OIS(settle_dt, "12Y", pay_rec, (3.02276 + 3.02684) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "15Y", payRec, (3.04092 + 3.04508) / 200, freq, accrual)
+    swap = OIS(settle_dt, "15Y", pay_rec, (3.04092 + 3.04508) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "20Y", payRec, (3.04417 + 3.05183) / 200, freq, accrual)
+    swap = OIS(settle_dt, "20Y", pay_rec, (3.04417 + 3.05183) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "25Y", payRec, (3.03219 + 3.03621) / 200, freq, accrual)
+    swap = OIS(settle_dt, "25Y", pay_rec, (3.03219 + 3.03621) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "30Y", payRec, (3.01030 + 3.01370) / 200, freq, accrual)
+    swap = OIS(settle_dt, "30Y", pay_rec, (3.01030 + 3.01370) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "40Y", payRec, (2.96946 + 2.97354) / 200, freq, accrual)
+    swap = OIS(settle_dt, "40Y", pay_rec, (2.96946 + 2.97354) / 200, freq, accrual)
     swaps.append(swap)
-    swap = OIS(settle_dt, "50Y", payRec, (2.91552 + 2.93748) / 200, freq, accrual)
+    swap = OIS(settle_dt, "50Y", pay_rec, (2.91552 + 2.93748) / 200, freq, accrual)
     swaps.append(swap)
 
-    oisCurve = OISCurve(value_dt, depos, fras, swaps)
+    ois_curve = OISCurve(value_dt, depos, fras, swaps)
 
     #    swaps[0]._fixed_leg.print_valuation()
     #    swaps[0]._float_leg.print_valuation()
@@ -637,14 +637,14 @@ def test_bloombergPricingExample():
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
 
     test_cases.header("VALUATION TO TODAY DATE", " PV")
-    test_cases.print("VALUE:", swaps[0].value(value_dt, oisCurve, None))
-    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(value_dt, oisCurve))
-    test_cases.print("FLOAT:", swaps[0].float_leg.value(value_dt, oisCurve, None))
+    test_cases.print("VALUE:", swaps[0].value(value_dt, ois_curve, None))
+    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(value_dt, ois_curve))
+    test_cases.print("FLOAT:", swaps[0].float_leg.value(value_dt, ois_curve, None))
 
     test_cases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
-    test_cases.print("VALUE:", swaps[0].value(settle_dt, oisCurve, None))
-    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(settle_dt, oisCurve))
-    test_cases.print("FLOAT:", swaps[0].float_leg.value(settle_dt, oisCurve, None))
+    test_cases.print("VALUE:", swaps[0].value(settle_dt, ois_curve, None))
+    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(settle_dt, ois_curve))
+    test_cases.print("FLOAT:", swaps[0].float_leg.value(settle_dt, ois_curve, None))
 
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()

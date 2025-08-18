@@ -1,0 +1,7 @@
+##### Imports required by core library plus any development tools
+numba==0.60.0
+numpy==1.26.4
+scipy==1.13.1
+llvmlite==0.43.0
+ipython==8.25.0
+pandas==2.3.1

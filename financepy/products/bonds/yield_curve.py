@@ -30,7 +30,7 @@ class BondYieldCurve:
     """Class to do fitting of the yield curve and to enable interpolation of
     yields. Because yields assume a flat term structure for each bond, this
     class does not allow discounting to be done and so does not inherit from
-    FinDiscountCurve. It should only be used for visualisation and simple
+    DiscountCurve. It should only be used for visualisation and simple
     interpolation but not for full term-structure-consistent pricing."""
 
     def __init__(

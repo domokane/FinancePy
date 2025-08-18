@@ -25,7 +25,7 @@ class DiscountCurvePoly(DiscountCurve):
     polynomial. The zero rate is assumed to be continuously compounded but
     this can be amended by providing a frequency when extracting zero rates.
     We also need to specify a Day count convention for time calculations.
-    The class inherits all of the methods from FinDiscountCurve."""
+    The class inherits all of the methods from DiscountCurve."""
 
     def __init__(
         self,
@@ -55,7 +55,7 @@ class DiscountCurvePoly(DiscountCurve):
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
         """Calculation of zero rates with specified frequency according to
-        polynomial parametrisation. This method overrides FinDiscountCurve.
+        polynomial parametrisation. This method overrides DiscountCurve.
         The parametrisation is not strictly in terms of continuously compounded
         zero rates, this function allows other compounding and day counts.
         This function returns a single or vector of zero rates given a vector

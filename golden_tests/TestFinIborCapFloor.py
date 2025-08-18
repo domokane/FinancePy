@@ -66,15 +66,9 @@ def test_ibor_depositsAndSwaps(value_dt):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(
-        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
-    )
-    swap2 = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
-    )
-    swap3 = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
-    )
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
+    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
+    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -132,9 +126,7 @@ def test_IborCapFloor():
         cvalue4 = capfloor.value(value_dt, libor_curve, model4)
         cvalue5 = capfloor.value(value_dt, libor_curve, model5)
         cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6
-        )
+        test_cases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6)
 
     test_cases.header(
         "LABEL",
@@ -156,9 +148,7 @@ def test_IborCapFloor():
         fvalue4 = capfloor.value(value_dt, libor_curve, model4)
         fvalue5 = capfloor.value(value_dt, libor_curve, model5)
         fvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6
-        )
+        test_cases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
 
     ###############################################################################
     # PUT CALL CHECK
@@ -233,9 +223,7 @@ def test_IborCapFloorVolCurve():
         value_dt, maturity_dt, capFloorType, k, None, frequency, dc_type
     )
 
-    capVolDates = Schedule(
-        value_dt, value_dt.add_tenor("10Y"), frequency
-    ).generate()
+    capVolDates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
 
     flat_rate = 0.04
     libor_curve = DiscountCurveFlat(value_dt, flat_rate, frequency, dc_type)
@@ -262,9 +250,7 @@ def test_IborCapFloorVolCurve():
     capVolatilities = np.array(capVolatilities) / 100.0
     capVolatilities[0] = 0.0
 
-    vol_curve = IborCapVolCurve(
-        value_dt, capVolDates, capVolatilities, dc_type
-    )
+    vol_curve = IborCapVolCurve(value_dt, capVolDates, capVolatilities, dc_type)
 
     #    print(vol_curve._capletGammas)
 
@@ -277,10 +263,10 @@ def test_IborCapFloorVolCurve():
 
     # Value cap by breaking it down into caplets using caplet vols
     vCaplets = 0.0
-    capletstart_dt = capFloor.capFloorLetDates[1]
+    capletstart_dt = capFloor.caplet_floorlet_dates[1]
     test_cases.header("START", "END", "VOL", "VALUE")
 
-    for caplet_end_dt in capFloor.capFloorLetDates[2:]:
+    for caplet_end_dt in capFloor.caplet_floorlet_dates[2:]:
         vol = vol_curve.caplet_vol(caplet_end_dt)
         modelCaplet = Black(vol)
         vCaplet = capFloor.value_caplet_floor_let(

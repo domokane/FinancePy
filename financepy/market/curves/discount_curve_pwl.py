@@ -24,7 +24,7 @@ class DiscountCurvePWL(DiscountCurve):
     """Curve is made up of a series of sections assumed to each have a
     piece-wise linear zero rate. The zero rate has a specified frequency
     which defaults to continuous. This curve inherits all of the extra methods
-    from FinDiscountCurve."""
+    from DiscountCurve."""
 
     def __init__(
         self,
@@ -53,7 +53,7 @@ class DiscountCurvePWL(DiscountCurve):
 
         dc_times = times_from_dates(zero_dts, self.value_dt, self.dc_type)
 
-        self.times = np.array(dc_times)
+        self._times = np.array(dc_times)
 
         if test_monotonicity(self.times) is False:
             raise FinError("Times are not sorted in increasing order")

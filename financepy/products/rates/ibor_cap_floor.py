@@ -92,12 +92,14 @@ class IborCapFloor:
         self.notional = notional
         self.dg_type = dg_type
 
-        self.cap_floor_let_values = []
-        self.cap_floor_let_alphas = []
-        self.cap_floor_let_fwd_rates = []
-        self.cap_floor_let_intrinsic = []
-        self.cap_floor_let_dfs = []
+        self.caplet_floorlet_values = []
+        self.caplet_floorlet_alphas = []
+        self.caplet_floorlet_fwd_rates = []
+        self.caplet_floorlet_intrinsic = []
+        self.caplet_floorlet_dfs = []
         self.cap_floor_pv = []
+
+        self.caplet_floorlet_dates = None
 
         self.value_dt = None
         self.day_counter = None
@@ -115,7 +117,7 @@ class IborCapFloor:
             self.dg_type,
         )
 
-        self.capFloorLetDates = schedule.adjusted_dts
+        self.caplet_floorlet_dates = schedule.adjusted_dts
 
     ###########################################################################
 
@@ -127,7 +129,7 @@ class IborCapFloor:
         self._generate_dts()
 
         self.day_counter = DayCount(self.dc_type)
-        num_options = len(self.capFloorLetDates)
+        num_options = len(self.caplet_floorlet_dates)
         strike_rate = self.strike_rate
 
         if strike_rate < 0.0:
@@ -136,19 +138,19 @@ class IborCapFloor:
         if num_options <= 1:
             raise FinError("Number of options in capfloor equals 1")
 
-        self.cap_floor_let_values = [0]
-        self.cap_floor_let_alphas = [0]
-        self.cap_floor_let_fwd_rates = [0]
-        self.cap_floor_let_intrinsic = [0]
-        self.cap_floor_let_dfs = [1.00]
+        self.caplet_floorlet_values = [0]
+        self.caplet_floorlet_alphas = [0]
+        self.caplet_floorlet_fwd_rates = [0]
+        self.caplet_floorlet_intrinsic = [0]
+        self.caplet_floorlet_dfs = [1.00]
         self.cap_floor_pv = [0.0]
 
         cap_floor_value = 0.0
-        cap_floor_let_value = 0.0
+        caplet_floorlet_value = 0.0
         # Value the first caplet or floorlet with known payoff
 
         start_dt = self.start_dt
-        end_dt = self.capFloorLetDates[1]
+        end_dt = self.caplet_floorlet_dates[1]
 
         if self.last_fixing is None:
             fwd_rate = libor_curve.fwd_rate(start_dt, end_dt, self.dc_type)
@@ -159,24 +161,24 @@ class IborCapFloor:
         df = libor_curve.df(end_dt)
 
         if self.option_type == FinCapFloorTypes.CAP:
-            cap_floor_let_value = df * alpha * max(fwd_rate - strike_rate, 0.0)
+            caplet_floorlet_value = df * alpha * max(fwd_rate - strike_rate, 0.0)
         elif self.option_type == FinCapFloorTypes.FLOOR:
-            cap_floor_let_value = df * alpha * max(strike_rate - fwd_rate, 0.0)
+            caplet_floorlet_value = df * alpha * max(strike_rate - fwd_rate, 0.0)
 
-        cap_floor_let_value *= self.notional
-        cap_floor_value += cap_floor_let_value
+        caplet_floorlet_value *= self.notional
+        cap_floor_value += caplet_floorlet_value
 
-        self.cap_floor_let_fwd_rates.append(fwd_rate)
-        self.cap_floor_let_values.append(cap_floor_let_value)
-        self.cap_floor_let_alphas.append(alpha)
-        self.cap_floor_let_intrinsic.append(cap_floor_let_value)
-        self.cap_floor_let_dfs.append(df)
+        self.caplet_floorlet_fwd_rates.append(fwd_rate)
+        self.caplet_floorlet_values.append(caplet_floorlet_value)
+        self.caplet_floorlet_alphas.append(alpha)
+        self.caplet_floorlet_intrinsic.append(caplet_floorlet_value)
+        self.caplet_floorlet_dfs.append(df)
         self.cap_floor_pv.append(cap_floor_value)
 
         for i in range(2, num_options):
 
-            start_dt = self.capFloorLetDates[i - 1]
-            end_dt = self.capFloorLetDates[i]
+            start_dt = self.caplet_floorlet_dates[i - 1]
+            end_dt = self.caplet_floorlet_dates[i]
             alpha = self.day_counter.year_frac(start_dt, end_dt)[0]
 
             df = libor_curve.df(end_dt)
@@ -189,17 +191,17 @@ class IborCapFloor:
 
             intrinsic_value *= self.notional
 
-            cap_floor_let_value = self.value_caplet_floor_let(
+            caplet_floorlet_value = self.value_caplet_floor_let(
                 value_dt, start_dt, end_dt, libor_curve, model
             )
 
-            cap_floor_value += cap_floor_let_value
+            cap_floor_value += caplet_floorlet_value
 
-            self.cap_floor_let_fwd_rates.append(fwd_rate)
-            self.cap_floor_let_values.append(cap_floor_let_value)
-            self.cap_floor_let_alphas.append(alpha)
-            self.cap_floor_let_intrinsic.append(intrinsic_value)
-            self.cap_floor_let_dfs.append(df)
+            self.caplet_floorlet_fwd_rates.append(fwd_rate)
+            self.caplet_floorlet_values.append(caplet_floorlet_value)
+            self.caplet_floorlet_alphas.append(alpha)
+            self.caplet_floorlet_intrinsic.append(intrinsic_value)
+            self.caplet_floorlet_dfs.append(df)
             self.cap_floor_pv.append(cap_floor_value)
 
         return cap_floor_value
@@ -223,58 +225,60 @@ class IborCapFloor:
         if k == 0.0:
             k = 1e-10
 
+        caplet_floorlet_value = 0.0
+
         if isinstance(model, Black):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
                 )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
                 )
 
         elif isinstance(model, BlackShifted):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
                 )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
                 )
 
         elif isinstance(model, Bachelier):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
                 )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
                 )
 
         elif isinstance(model, SABR):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
                 )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
                 )
 
         elif isinstance(model, SABRShifted):
 
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_CALL
                 )
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = model.value(
+                caplet_floorlet_value = model.value(
                     f, k, t_exp, df, OptionTypes.EUROPEAN_PUT
                 )
 
@@ -285,8 +289,9 @@ class IborCapFloor:
             strike_price = 1.0 / (1.0 + alpha * self.strike_rate)
             notional_adj = 1.0 + self.strike_rate * alpha
             face_amount = 1.0
-            df_times = libor_curve._times
-            df_values = libor_curve._dfs
+
+            df_times = libor_curve.times
+            df_values = libor_curve.dfs
 
             v = model.option_on_zcb(
                 t_exp, t_mat, strike_price, face_amount, df_times, df_values
@@ -294,16 +299,16 @@ class IborCapFloor:
 
             # we divide by alpha to offset the multiplication above
             if self.option_type == FinCapFloorTypes.CAP:
-                cap_floor_let_value = v["put"] * notional_adj / alpha
+                caplet_floorlet_value = v["put"] * notional_adj / alpha
             elif self.option_type == FinCapFloorTypes.FLOOR:
-                cap_floor_let_value = v["call"] * notional_adj / alpha
+                caplet_floorlet_value = v["call"] * notional_adj / alpha
 
         else:
             raise FinError("Unknown model type " + str(model))
 
-        cap_floor_let_value *= self.notional * alpha
+        caplet_floorlet_value *= self.notional * alpha
 
-        return cap_floor_let_value
+        return caplet_floorlet_value
 
     ###########################################################################
 
@@ -318,7 +323,7 @@ class IborCapFloor:
         print("DAY COUNT:", str(self.dc_type))
         print("VALUATION DATE", self.value_dt)
 
-        if len(self.cap_floor_let_values) == 0:
+        if len(self.caplet_floorlet_values) == 0:
             print("Caplets not calculated.")
             return
 
@@ -333,7 +338,7 @@ class IborCapFloor:
 
         i_flow = 0
 
-        for payment_dt in self.capFloorLetDates[i_flow:]:
+        for payment_dt in self.caplet_floorlet_dates[i_flow:]:
             if i_flow == 0:
                 print(
                     "%15s %10s %9s %12s %12.6f %12s %12s"
@@ -342,7 +347,7 @@ class IborCapFloor:
                         "-",
                         "-",
                         "-",
-                        self.cap_floor_let_dfs[i_flow],
+                        self.caplet_floorlet_dfs[i_flow],
                         "-",
                         "-",
                     )
@@ -352,11 +357,11 @@ class IborCapFloor:
                     "%15s %10.7f %9.5f %12.2f %12.6f %12.2f %12.2f"
                     % (
                         payment_dt,
-                        self.cap_floor_let_alphas[i_flow],
-                        self.cap_floor_let_fwd_rates[i_flow] * 100,
-                        self.cap_floor_let_intrinsic[i_flow],
-                        self.cap_floor_let_dfs[i_flow],
-                        self.cap_floor_let_values[i_flow],
+                        self.caplet_floorlet_alphas[i_flow],
+                        self.caplet_floorlet_fwd_rates[i_flow] * 100,
+                        self.caplet_floorlet_intrinsic[i_flow],
+                        self.caplet_floorlet_dfs[i_flow],
+                        self.caplet_floorlet_values[i_flow],
                         self.cap_floor_pv[i_flow],
                     )
                 )

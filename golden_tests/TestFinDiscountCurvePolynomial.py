@@ -16,7 +16,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ##############################################################################
 # TODO
-# Inherit from FinDiscountCurve and add df method
+# Inherit from DiscountCurve and add df method
 # Put in a convention for the rate
 # Use Frequency object
 ##############################################################################

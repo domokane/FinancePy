@@ -142,6 +142,8 @@ class OIS:
 
     ###########################################################################
 
+    ##########################################################################
+
     def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
@@ -215,9 +217,9 @@ class OIS:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += self.fixed_leg.repr__()
+        s += self.fixed_leg.__repr__()
         s += "\n"
-        s += self.float_leg.repr__()
+        s += self.float_leg.__repr__()
         return s
 
     ###########################################################################

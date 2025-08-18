@@ -30,7 +30,7 @@ class DiscountCurveZeros(DiscountCurve):
     compute the year fraction correctly and for this we require a day count
     convention. Finally, we need to interpolate the zero rate for the times
     between the zero rates given and for this we must specify an interpolation
-    convention. The class inherits methods from FinDiscountCurve."""
+    convention. The class inherits methods from DiscountCurve."""
 
     ###############################################################################
 
@@ -101,7 +101,7 @@ class DiscountCurveZeros(DiscountCurve):
     #             t = times[i]
     #             discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
 
-    #         disc_curve = FinDiscountCurve(self.value_dt, times,
+    #         disc_curve = DiscountCurve(self.value_dt, times,
     #                                      discount_factors,
     #                                      self._interp_type)
 
