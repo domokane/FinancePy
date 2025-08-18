@@ -44,7 +44,7 @@ def test_IborBermudanSwaptionBKModel():
         value_dt, 0.0625, FrequencyTypes.SEMI_ANNUAL, DayCountTypes.ACT_365F
     )
 
-    fwdPAYSwap = IborSwap(
+    fwd_pay_swap = IborSwap(
         exercise_dt,
         swap_maturity_dt,
         SwapTypes.PAY,
@@ -53,16 +53,16 @@ def test_IborBermudanSwaptionBKModel():
         swap_fixed_day_count_type,
     )
 
-    fwdSwapValue = fwdPAYSwap.value(settle_dt, libor_curve, libor_curve)
+    fwd_swap_value = fwd_pay_swap.value(settle_dt, libor_curve, libor_curve)
 
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("FWD SWAP VALUE", fwdSwapValue)
+    test_cases.print("FWD SWAP VALUE", fwd_swap_value)
 
-    # fwdPAYSwap.print_fixed_leg_pv()
+    # fwd_pay_swap.print_fixed_leg_pv()
 
     # Now we create the European swaptions
     fixed_leg_type = SwapTypes.PAY
-    europeanSwaptionPay = IborSwaption(
+    european_swaption_pay = IborSwaption(
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
@@ -73,7 +73,7 @@ def test_IborBermudanSwaptionBKModel():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    europeanSwaptionRec = IborSwaption(
+    european_swaption_rec = IborSwaption(
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
@@ -95,13 +95,13 @@ def test_IborBermudanSwaptionBKModel():
     model = Black(0.0000001)
     test_cases.print("Black Model", model.volatility)
 
-    valuePay = europeanSwaptionPay.value(settle_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BLACK PAY VALUE ZERO VOL:", valuePay)
+    value_pay = european_swaption_pay.value(settle_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BLACK PAY VALUE ZERO VOL:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(settle_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BLACK REC VALUE ZERO VOL:", valueRec)
+    value_rec = european_swaption_rec.value(settle_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BLACK REC VALUE ZERO VOL:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner("======= 20%% BLACK VOLATILITY ========")
@@ -109,13 +109,13 @@ def test_IborBermudanSwaptionBKModel():
     model = Black(0.20)
     test_cases.print("Black Model", model.volatility)
 
-    valuePay = europeanSwaptionPay.value(settle_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BLACK PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(settle_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BLACK PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(settle_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BLACK REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(settle_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BLACK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -140,13 +140,13 @@ def test_IborBermudanSwaptionBKModel():
     num_time_steps = 100
     model = BKTree(sigma, a, num_time_steps)
 
-    valuePay = europeanSwaptionPay.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BK PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BK PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BK REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner("======= 20% VOLATILITY EUROPEAN SWAPTION BK MODEL ========")
@@ -158,13 +158,13 @@ def test_IborBermudanSwaptionBKModel():
 
     test_cases.banner("BK MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
-    valuePay = europeanSwaptionPay.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BK PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BK PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BK REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -208,13 +208,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BKTree(sigma, a, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner(
@@ -227,13 +227,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BKTree(sigma, a, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -278,13 +278,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BKTree(sigma, a, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner(
@@ -297,13 +297,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BKTree(sigma, a, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BK REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BK REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -327,13 +327,13 @@ def test_IborBermudanSwaptionBKModel():
     num_time_steps = 200
     model = BDTTree(sigma, num_time_steps)
 
-    valuePay = europeanSwaptionPay.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BDT PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BDT PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BDT REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner("===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
@@ -345,13 +345,13 @@ def test_IborBermudanSwaptionBKModel():
 
     test_cases.banner("BDT MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
-    valuePay = europeanSwaptionPay.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BDT PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BDT PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN BDT REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -392,13 +392,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BDTTree(sigma, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner(
@@ -410,13 +410,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BDTTree(sigma, num_time_steps)
 
     test_cases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -459,13 +459,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BDTTree(sigma, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner(
@@ -478,13 +478,13 @@ def test_IborBermudanSwaptionBKModel():
     model = BDTTree(sigma, num_time_steps)
 
     #    print("BDT MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -508,13 +508,13 @@ def test_IborBermudanSwaptionBKModel():
     num_time_steps = 200
     model = HWTree(sigma, a, num_time_steps)
 
-    valuePay = europeanSwaptionPay.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN HW PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN HW PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN HW REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN HW REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner("===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
@@ -526,13 +526,13 @@ def test_IborBermudanSwaptionBKModel():
 
     test_cases.banner("HW MODEL SWAPTION CLASS EUROPEAN EXERCISE")
 
-    valuePay = europeanSwaptionPay.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN HW PAY VALUE:", valuePay)
+    value_pay = european_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN HW PAY VALUE:", value_pay)
 
-    valueRec = europeanSwaptionRec.value(value_dt, libor_curve, model)
-    test_cases.print("EUROPEAN HW REC VALUE:", valueRec)
+    value_rec = european_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("EUROPEAN HW REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -572,13 +572,13 @@ def test_IborBermudanSwaptionBKModel():
     model = HWTree(sigma, a, num_time_steps)
 
     test_cases.banner("BK MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner(
@@ -590,13 +590,13 @@ def test_IborBermudanSwaptionBKModel():
     model = HWTree(sigma, a, num_time_steps)
 
     test_cases.banner("BDT MODEL BERMUDAN SWAPTION CLASS EUROPEAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN BDT REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN BDT REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     ###########################################################################
@@ -639,13 +639,13 @@ def test_IborBermudanSwaptionBKModel():
     model = HWTree(sigma, a, num_time_steps)
 
     test_cases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN HW PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN HW PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN HW REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN HW REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
     test_cases.banner(
@@ -658,13 +658,13 @@ def test_IborBermudanSwaptionBKModel():
     model = HWTree(sigma, a, num_time_steps)
 
     test_cases.banner("HW MODEL BERMUDAN SWAPTION CLASS BERMUDAN EXERCISE")
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN HW PAY VALUE:", valuePay)
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN HW PAY VALUE:", value_pay)
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    test_cases.print("BERMUDAN HW REC VALUE:", valueRec)
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    test_cases.print("BERMUDAN HW REC VALUE:", value_rec)
 
-    pay_rec = valuePay - valueRec
+    pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
 

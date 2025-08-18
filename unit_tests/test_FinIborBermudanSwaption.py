@@ -26,10 +26,9 @@ swap_fixed_cpn = 0.060
 swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 swapFixedDayCountType = DayCountTypes.ACT_365F
 
-libor_curve = DiscountCurveFlat(value_dt,
-                                0.0625,
-                                FrequencyTypes.SEMI_ANNUAL,
-                                DayCountTypes.ACT_365F)
+libor_curve = DiscountCurveFlat(
+    value_dt, 0.0625, FrequencyTypes.SEMI_ANNUAL, DayCountTypes.ACT_365F
+)
 
 num_time_steps = 200
 
@@ -38,273 +37,297 @@ def test_bk_european_exercise():
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudan_swaption_pay = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_pay = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_rec = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
     model = BKTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 6313.7455
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 6313.7455
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert valueRec == 0.0
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert value_rec == 0.0
 
     # Used BK with constant short-rate volatility
     sigma = 0.2
     a = 0.01
     model = BKTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 15706.6985
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 15706.6985
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(valueRec, 4) == 9392.9531
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert round(value_rec, 4) == 9392.9531
 
 
 def test_bk_bermudan_exercise():
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudan_swaption_pay = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_pay = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_rec = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.000001
     a = 0.01
     model = BKTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 6313.7455
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 6313.7455
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert valueRec == 0.0
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert value_rec == 0.0
 
     # Used BK with constant short-rate volatility
     sigma = 0.20
     a = 0.01
     model = BKTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 19175.5406
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 19175.5406
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(valueRec, 4) == 12956.6057
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert round(value_rec, 4) == 12956.6057
 
 
 def test_bdt_european_exercise():
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudan_swaption_pay = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_pay = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_rec = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     sigma = 0.00001
     model = BDTTree(sigma, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 6313.5155
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 6313.5155
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert valueRec == 0.0
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert value_rec == 0.0
 
     sigma = 0.20
     model = BDTTree(sigma, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 15969.8968
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 15969.8968
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(valueRec, 4) == 9652.6912
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert round(value_rec, 4) == 9652.6912
 
 
 def test_bdt_bermudan_exercise():
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudan_swaption_pay = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_pay = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_rec = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     sigma = 0.00001
     model = BDTTree(sigma, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 6313.5155
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 6313.5155
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert valueRec == 0.0
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert value_rec == 0.0
 
     sigma = 0.20
     model = BDTTree(sigma, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 19446.0956
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 19446.0956
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(valueRec, 4) == 13256.8421
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert round(value_rec, 4) == 13256.8421
 
 
 def test_hw_european_exercise():
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudan_swaption_pay = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_pay = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_rec = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     sigma = 0.000001
     a = 0.01
     model = HWTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 6353.3815
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 6353.3815
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert valueRec == 0.0
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert value_rec == 0.0
 
     sigma = 0.01
     a = 0.01
     model = HWTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 13698.0155
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 13698.0155
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(valueRec, 4) == 7344.6339
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert round(value_rec, 4) == 7344.6339
 
 
 def test_hw_bermudan_exercise():
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudan_swaption_pay = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_pay = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     fixed_leg_type = SwapTypes.RECEIVE
     exercise_type = FinExerciseTypes.BERMUDAN
 
-    bermudan_swaption_rec = IborBermudanSwaption(settle_dt,
-                                                 exercise_dt,
-                                                 swap_maturity_dt,
-                                                 fixed_leg_type,
-                                                 exercise_type,
-                                                 swap_fixed_cpn,
-                                                 swap_fixed_freq_type,
-                                                 swapFixedDayCountType)
+    bermudan_swaption_rec = IborBermudanSwaption(
+        settle_dt,
+        exercise_dt,
+        swap_maturity_dt,
+        fixed_leg_type,
+        exercise_type,
+        swap_fixed_cpn,
+        swap_fixed_freq_type,
+        swapFixedDayCountType,
+    )
 
     sigma = 0.000001
     a = 0.01
     model = HWTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 6353.3815
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 6353.3815
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert valueRec == 0.0
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert value_rec == 0.0
 
     sigma = 0.01
     a = 0.01
     model = HWTree(sigma, a, num_time_steps)
 
-    valuePay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(valuePay, 4) == 16609.3646
+    value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
+    assert round(value_pay, 4) == 16609.3646
 
-    valueRec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(valueRec, 4) == 10406.4558
+    value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
+    assert round(value_rec, 4) == 10406.4558

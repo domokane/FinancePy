@@ -91,7 +91,7 @@ class IborSingleCurveParShocker:
             bumped_fras,
             bumped_swaps,
             interp_type=self._base_curve._interp_type,
-            check_refit_flag=self._base_curve._check_refit,
+            check_refit_flag=self._base_curve._check_refit_flag,
             do_build=True,
             **self._base_curve._optional_interp_params
         )

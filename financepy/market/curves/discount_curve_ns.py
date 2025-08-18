@@ -59,7 +59,7 @@ class DiscountCurveNS(DiscountCurve):
 
     def zero_rate(
         self,
-        dates: Union[list, Date],
+        dts: Union[list, Date],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
@@ -78,7 +78,7 @@ class DiscountCurveNS(DiscountCurve):
             raise FinError("Invalid Day Count type.")
 
         # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dates, self.value_dt, self.dc_type)
+        dc_times = times_from_dates(dts, self.value_dt, self.dc_type)
 
         # We now get the discount factors using these times
         zero_rates = self._zero_rate(dc_times)
@@ -89,7 +89,7 @@ class DiscountCurveNS(DiscountCurve):
         )
 
         # Convert these to zero rates in the required frequency and day count
-        zero_rates = self._df_to_zero(dfs, dates, freq_type, dc_type)
+        zero_rates = self._df_to_zero(dfs, dts, freq_type, dc_type)
 
         return zero_rates
 
