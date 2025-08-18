@@ -28,9 +28,9 @@ class IborSingleCurveSmoothingCalibrator(object):
         #
         self._curve = copy.deepcopy(ibor_curve)
 
-        self._collect_all_knot_dates()
+        self._collect_all_knot_dts()
 
-    def _collect_all_knot_dates(self):
+    def _collect_all_knot_dts(self):
         """
         Collect all dats on which the discount factors are explicitly required
         to price bechmarks. Interpolation only used for times in between knot dates
@@ -57,10 +57,8 @@ class IborSingleCurveSmoothingCalibrator(object):
         # remove duplicates
         dates = list(set(dates))
         dates.sort()
-        self._knot_dates = dates
-        self._knot_times = np.array(
-            [(d - dates[0]) / g_days_in_year for d in dates]
-        )
+        self._knot_dts = dates
+        self._knot_times = np.array([(d - dates[0]) / g_days_in_year for d in dates])
 
     def _repricing_objectives(self, curve_to_use=None):
 
@@ -71,9 +69,7 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         valuation_date = curve.value_dt
         out = np.zeros(
-            len(curve.used_deposits)
-            + len(curve.used_fras)
-            + len(curve.used_swaps)
+            len(curve.used_deposits) + len(curve.used_fras) + len(curve.used_swaps)
         )
 
         idx = 0
@@ -81,10 +77,7 @@ class IborSingleCurveSmoothingCalibrator(object):
             # do not need to be too exact here
             acc_factor = datediff(depo.start_dt, depo.maturity_dt)
             # as rate
-            r = (
-                -np.log(depo.value(valuation_date, curve) / depo.notional)
-                / acc_factor
-            )
+            r = -np.log(depo.value(valuation_date, curve) / depo.notional) / acc_factor
             out[idx] = r
             idx = idx + 1
 
@@ -163,7 +156,7 @@ class IborSingleCurveSmoothingCalibrator(object):
                 **init_curve._optional_interp_params
             )
 
-        dfs0 = init_curve.df(self._knot_dates)
+        dfs0 = init_curve.df(self._knot_dts)
 
         self._curve._times = self._knot_times
         self._curve._dfs = np.ones_like(self._knot_times, dtype=float)
@@ -208,8 +201,8 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         # decorate df2 with extra info
         df2["type"] = "d2yield_dt2"
-        df2["start_date"] = self._knot_dates[1:-1]
-        df2["maturity_dt"] = self._knot_dates[2:]
+        df2["start_dt"] = self._knot_dts[1:-1]
+        df2["maturity_dt"] = self._knot_dts[2:]
 
         df = pd.concat((df1, df2), axis=0, sort=False).reset_index(drop=True)
         df["smoothness"] = smoothness

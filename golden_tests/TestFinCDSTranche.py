@@ -47,33 +47,23 @@ def build_Ibor_Curve(tradeDate):
     settle_dt = value_dt
 
     maturity_dt = settle_dt.add_months(12)
-    swap1 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap1 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(24)
-    swap2 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap2 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(36)
-    swap3 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap3 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(48)
-    swap4 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap4 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(60)
-    swap5 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap5 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap5)
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
@@ -125,9 +115,7 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
     maturity5Y = value_dt.next_cds_date(60)
     maturity7Y = value_dt.next_cds_date(84)
     maturity10Y = value_dt.next_cds_date(120)
-    path = os.path.join(
-        os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
-    )
+    path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
     f = open(path, "r")
     data = f.readlines()
     f.close()
@@ -148,9 +136,7 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
         cds10Y = CDS(value_dt, maturity10Y, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, recovery_rate
-        )
+        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
@@ -220,9 +206,7 @@ def test_FinCDSTranche():
     )
 
     intrinsicSpd = (
-        cdsIndex.intrinsic_spread(
-            value_dt, step_in_dt, trancheMaturity, issuer_curves
-        )
+        cdsIndex.intrinsic_spread(value_dt, step_in_dt, trancheMaturity, issuer_curves)
         * 10000.0
     )
 
@@ -231,7 +215,7 @@ def test_FinCDSTranche():
     adjustedSpd = intrinsicSpd / 0.6
     test_cases.print("ADJUSTED  SPD TRANCHE MATURITY", adjustedSpd)
 
-    test_cases.header("METHOD", "TIME", "NumPoints", "K1", "K2", "Sprd")
+    test_cases.header("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
 
     for method in FinLossDistributionBuilder:
         for tranche in tranches:
@@ -273,9 +257,7 @@ def test_FinCDSTranche():
     issuer_curves = loadHeterogeneousSpreadCurves(value_dt, libor_curve)
 
     intrinsicSpd = (
-        cdsIndex.intrinsic_spread(
-            value_dt, step_in_dt, trancheMaturity, issuer_curves
-        )
+        cdsIndex.intrinsic_spread(value_dt, step_in_dt, trancheMaturity, issuer_curves)
         * 10000.0
     )
 
@@ -284,7 +266,7 @@ def test_FinCDSTranche():
     adjustedSpd = intrinsicSpd / 0.6
     test_cases.print("ADJUSTED  SPD TRANCHE MATURITY", adjustedSpd)
 
-    test_cases.header("METHOD", "TIME", "NumPoints", "K1", "K2", "Sprd")
+    test_cases.header("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
 
     for method in FinLossDistributionBuilder:
         for tranche in tranches:

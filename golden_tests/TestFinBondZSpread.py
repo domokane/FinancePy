@@ -43,8 +43,8 @@ def test_z_spread_actual_curve():
     dfbm["base_date"] = pd.to_datetime(
         dfbm["base_date"], errors="ignore", format="%d/%m/%Y"
     )
-    dfbm["start_date"] = pd.to_datetime(
-        dfbm["start_date"], errors="ignore", format="%d/%m/%Y"
+    dfbm["start_dt"] = pd.to_datetime(
+        dfbm["start_dt"], errors="ignore", format="%d/%m/%Y"
     )  # allow tenors
     dfbm["maturity_dt"] = pd.to_datetime(
         dfbm["maturity_dt"], errors="ignore", format="%d/%m/%Y"

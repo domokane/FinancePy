@@ -59,7 +59,7 @@ class DiscountCurveNS(DiscountCurve):
 
     def zero_rate(
         self,
-        dates: (list, Date),
+        dates: Union[list, Date],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):

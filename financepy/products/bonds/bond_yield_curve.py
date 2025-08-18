@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -33,7 +34,7 @@ class BondYieldCurve:
     interpolation but not for full term-structure-consistent pricing."""
 
     def __init__(
-        self, settle_dt: Date, bonds: list, ylds: (np.ndarray, list), curve_fit
+        self, settle_dt: Date, bonds: list, ylds: Union[np.ndarray, list], curve_fit
     ):
         """Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
@@ -112,9 +113,7 @@ class BondYieldCurve:
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):
             t = maturity_dt
-        elif isinstance(maturity_dt, float) or isinstance(
-            maturity_dt, np.float64
-        ):
+        elif isinstance(maturity_dt, float) or isinstance(maturity_dt, np.float64):
             t = maturity_dt
         else:
             raise FinError("Unknown date type.")
@@ -124,9 +123,7 @@ class BondYieldCurve:
         if isinstance(fit, CurveFitPolynomial):
             yld = fit.interp_yield(t)
         elif isinstance(fit, CurveFitNelsonSiegel):
-            yld = fit.interp_yield(
-                t, fit.beta_1, fit.beta_2, fit.beta_3, fit.tau
-            )
+            yld = fit.interp_yield(t, fit.beta_1, fit.beta_2, fit.beta_3, fit.tau)
 
         elif isinstance(fit, CurveFitNelsonSiegelSvensson):
             yld = fit.interp_yield(

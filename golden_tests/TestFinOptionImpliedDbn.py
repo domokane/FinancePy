@@ -6,6 +6,8 @@ import sys
 
 sys.path.append("..")
 
+import numpy as np
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
@@ -13,7 +15,6 @@ from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.models.volatility_fns import vol_function_clark
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-import numpy as np
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -67,14 +68,14 @@ def test_FinOptionImpliedDbn():
 
         #        fx_market.check_calibration(True)
 
-        PLOT_GRAPHS = False
-        if PLOT_GRAPHS:
+        plot_graphs = False
+        if plot_graphs:
             fx_market.plot_vol_curves()
 
-        for iTenor in range(0, len(fx_market.tenors)):
+        for i_tenor in range(0, len(fx_market.tenors)):
 
-            F = fx_market.fwd[iTenor]
-            t_exp = fx_market.t_exp[iTenor]
+            F = fx_market.fwd[i_tenor]
+            t_exp = fx_market.t_exp[i_tenor]
 
             start_fx = F * 0.05
             end_fx = F * 5.0
@@ -87,13 +88,13 @@ def test_FinOptionImpliedDbn():
             #            r_d = -np.log(dom_df) / t_exp
             #            r_f = -np.log(for_df) / t_exp
 
-            params = fx_market.parameters[iTenor]
+            params = fx_market.parameters[i_tenor]
 
             strikes = []
             vols = []
 
-            for iK in range(0, num_steps):
-                strike = start_fx + iK * dFX
+            for i_k in range(0, num_steps):
+                strike = start_fx + i_k * dFX
                 vol = vol_function_clark(params, F, strike, t_exp)
                 strikes.append(strike)
                 vols.append(vol)

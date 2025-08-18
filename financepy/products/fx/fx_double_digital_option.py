@@ -129,14 +129,14 @@ class FXDoubleDigitalOption:
         r_f = -np.log(for_df) / t_del
 
         s0 = spot_fx_rate
-        K1 = self.lower_strike
-        K2 = self.upper_strike
+        k_1 = self.lower_strike
+        k_2 = self.upper_strike
 
         if isinstance(model, BlackScholes):
 
             volatility = model.volatility
-            ln_s0_k1 = np.log(s0 / K1)
-            ln_s0_k2 = np.log(s0 / K2)
+            ln_s0_k1 = np.log(s0 / k_1)
+            ln_s0_k2 = np.log(s0 / k_2)
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = r_d - r_f

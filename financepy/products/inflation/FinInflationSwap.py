@@ -61,7 +61,7 @@ class FinInflationSwap:
         self.cal_type = cal_type
         self.bd_type = bd_type
 
-        if type(maturity_dt_or_tenor) is Date:
+        if isinstance(maturity_dt_or_tenor, Date):
             maturity_dt = maturity_dt_or_tenor
         else:
             maturity_dt = start_dt.add_tenor(maturity_dt_or_tenor)

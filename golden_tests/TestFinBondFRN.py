@@ -24,7 +24,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 def build_Ibor_Curve(value_dt):
 
-    depoDCCType = DayCountTypes.THIRTY_E_360_ISDA
+    depo_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     pay_fixed = SwapTypes.PAY
@@ -34,19 +34,19 @@ def build_Ibor_Curve(value_dt):
 
     deposit_rate = 0.050
     maturity_dt = settle_dt.add_months(1)
-    depo1 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depoDCCType)
+    depo1 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
 
     maturity_dt = settle_dt.add_months(3)
-    depo2 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depoDCCType)
+    depo2 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
 
     maturity_dt = settle_dt.add_months(6)
-    depo3 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depoDCCType)
+    depo3 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
 
     maturity_dt = settle_dt.add_months(9)
-    depo4 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depoDCCType)
+    depo4 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
 
     maturity_dt = settle_dt.add_months(12)
-    depo5 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depoDCCType)
+    depo5 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
 
     depos.append(depo1)
     depos.append(depo2)

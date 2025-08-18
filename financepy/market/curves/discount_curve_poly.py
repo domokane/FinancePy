@@ -50,7 +50,7 @@ class DiscountCurvePoly(DiscountCurve):
 
     def zero_rate(
         self,
-        dts: (list, Date),
+        dts: Union[list, Date],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
@@ -101,7 +101,7 @@ class DiscountCurvePoly(DiscountCurve):
 
     ###########################################################################
 
-    def df(self, dates: (list, Date)):
+    def df(self, dates: Union[list, Date]):
         """Calculate the fwd rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
         use. The compounding frequency defaults to that specified in the

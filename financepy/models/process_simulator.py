@@ -22,45 +22,50 @@ class ProcessTypes(Enum):
     CEV = 5
     JUMP_DIFFUSION = 6
 
+
 ###############################################################################
 
 
-class FinProcessSimulator():
+class FinProcessSimulator:
 
     def __init__(self):
         pass
 
     def get_process(
-            self,
-            process_type,
-            t,
-            model_params,
-            num_annual_steps,
-            num_paths,
-            seed):
+        self, process_type, t, model_params, num_annual_steps, num_paths, seed
+    ):
 
         if process_type == ProcessTypes.GBM:
             (stock_price, drift, volatility, scheme) = model_params
-            paths = get_gbm_paths(num_paths, num_annual_steps, t, drift,
-                                  stock_price, volatility, scheme.value, seed)
+            paths = get_gbm_paths(
+                num_paths,
+                num_annual_steps,
+                t,
+                drift,
+                stock_price,
+                volatility,
+                scheme.value,
+                seed,
+            )
             return paths
 
         elif process_type == ProcessTypes.HESTON:
 
-            (stock_price, drift, v0, kappa, theta,
-             sigma, rho, scheme) = model_params
-            paths = get_heston_paths(num_paths,
-                                     num_annual_steps,
-                                     t,
-                                     drift,
-                                     stock_price,
-                                     v0,
-                                     kappa,
-                                     theta,
-                                     sigma,
-                                     rho,
-                                     scheme.value,
-                                     seed)
+            (stock_price, drift, v0, kappa, theta, sigma, rho, scheme) = model_params
+            paths = get_heston_paths(
+                num_paths,
+                num_annual_steps,
+                t,
+                drift,
+                stock_price,
+                v0,
+                kappa,
+                theta,
+                sigma,
+                rho,
+                scheme.value,
+                seed,
+            )
             return paths
 
         elif process_type == ProcessTypes.VASICEK:
@@ -75,17 +80,28 @@ class FinProcessSimulator():
                 theta,
                 sigma,
                 scheme.value,
-                seed)
+                seed,
+            )
             return paths
 
         elif process_type == ProcessTypes.CIR:
             (r0, kappa, theta, sigma, scheme) = model_params
-            paths = get_cir_paths(num_paths, num_annual_steps, t,
-                                  r0, kappa, theta, sigma, scheme.value, seed)
+            paths = get_cir_paths(
+                num_paths,
+                num_annual_steps,
+                t,
+                r0,
+                kappa,
+                theta,
+                sigma,
+                scheme.value,
+                seed,
+            )
             return paths
 
         else:
             raise FinError("Unknown process" + str(process_type))
+
 
 ###############################################################################
 
@@ -95,24 +111,42 @@ class FinHestonNumericalScheme(Enum):
     EULERLOG = 2
     QUADEXP = 3
 
+
 ###############################################################################
 
 
-@njit(float64[:, :](int64, int64, float64, float64, float64, float64, float64,
-                    float64, float64, float64, int64, int64),
-      cache=True, fastmath=True)
-def get_heston_paths(num_paths,
-                     num_annual_steps,
-                     t,
-                     drift,
-                     s0,
-                     v0,
-                     kappa,
-                     theta,
-                     sigma,
-                     rho,
-                     scheme,
-                     seed):
+@njit(
+    float64[:, :](
+        int64,
+        int64,
+        float64,
+        float64,
+        float64,
+        float64,
+        float64,
+        float64,
+        float64,
+        float64,
+        int64,
+        int64,
+    ),
+    cache=True,
+    fastmath=True,
+)
+def get_heston_paths(
+    num_paths,
+    num_annual_steps,
+    t,
+    drift,
+    s0,
+    v0,
+    kappa,
+    theta,
+    sigma,
+    rho,
+    scheme,
+    seed,
+):
 
     np.random.seed(seed)
     dt = 1.0 / num_annual_steps
@@ -135,10 +169,16 @@ def get_heston_paths(num_paths,
                 zS = rho * z1 + rhohat * z2
                 v_plus = max(v, 0.0)
                 rtv_plus = sqrt(v_plus)
-                v += kappa * (theta - v_plus) * dt + sigma * \
-                    rtv_plus * zV + 0.25 * sigma2 * (zV * zV - dt)
-                s += drift * s * dt + rtv_plus * s * \
-                    zS + 0.5 * s * v_plus * (zV * zV - dt)
+                v += (
+                    kappa * (theta - v_plus) * dt
+                    + sigma * rtv_plus * zV
+                    + 0.25 * sigma2 * (zV * zV - dt)
+                )
+                s += (
+                    drift * s * dt
+                    + rtv_plus * s * zS
+                    + 0.5 * s * v_plus * (zV * zV - dt)
+                )
                 s_paths[i_path, i_step] = s
 
     elif scheme == FinHestonNumericalScheme.EULERLOG.value:
@@ -152,8 +192,11 @@ def get_heston_paths(num_paths,
                 v_plus = max(v, 0.0)
                 rtv_plus = sqrt(v_plus)
                 x += (drift - 0.5 * v_plus) * dt + rtv_plus * zS
-                v += kappa * (theta - v_plus) * dt + sigma * \
-                    rtv_plus * zV + sigma2 * (zV * zV - dt) / 4.0
+                v += (
+                    kappa * (theta - v_plus) * dt
+                    + sigma * rtv_plus * zV
+                    + sigma2 * (zV * zV - dt) / 4.0
+                )
                 s_paths[i_path, i_step] = exp(x)
 
     elif scheme == FinHestonNumericalScheme.QUADEXP.value:
@@ -163,14 +206,14 @@ def get_heston_paths(num_paths,
         gamma1 = 0.50
         gamma2 = 0.50
         K0 = -rho * kappa * theta * dt / sigma
-        K1 = gamma1 * dt * (kappa * rho / sigma - 0.5) - rho / sigma
-        K2 = gamma2 * dt * (kappa * rho / sigma - 0.5) + rho / sigma
+        k_1 = gamma1 * dt * (kappa * rho / sigma - 0.5) - rho / sigma
+        k_2 = gamma2 * dt * (kappa * rho / sigma - 0.5) + rho / sigma
         K3 = gamma1 * dt * (1.0 - rho * rho)
         K4 = gamma2 * dt * (1.0 - rho * rho)
-        A = K2 + 0.5 * K4
+        A = k_2 + 0.5 * K4
         mu = drift
         c1 = sigma2 * Q * (1.0 - Q) / kappa
-        c2 = theta * sigma2 * ((1.0 - Q)**2) / 2.0 / kappa
+        c2 = theta * sigma2 * ((1.0 - Q) ** 2) / 2.0 / kappa
 
         for i_path in range(0, num_paths):
             x = log(s0)
@@ -185,15 +228,14 @@ def get_heston_paths(num_paths,
                 u = np.random.uniform(0.0, 1.0)
 
                 if psi <= psic:
-                    b2 = 2.0 / psi - 1.0 + \
-                        sqrt((2.0 / psi) * (2.0 / psi - 1.0))
+                    b2 = 2.0 / psi - 1.0 + sqrt((2.0 / psi) * (2.0 / psi - 1.0))
                     a = m / (1.0 + b2)
                     b = sqrt(b2)
                     zV = norminvcdf(u)
-                    vnp = a * ((b + zV)**2)
-                    d = (1.0 - 2.0 * A * a)
+                    vnp = a * ((b + zV) ** 2)
+                    d = 1.0 - 2.0 * A * a
                     M = exp((A * b2 * a) / d) / sqrt(d)
-                    K0 = -log(M) - (K1 + 0.5 * K3) * vn
+                    K0 = -log(M) - (k_1 + 0.5 * K3) * vn
                 else:
                     p = (psi - 1.0) / (psi + 1.0)
                     beta = (1.0 - p) / m
@@ -204,16 +246,21 @@ def get_heston_paths(num_paths,
                         vnp = log((1.0 - p) / (1.0 - u)) / beta
 
                     M = p + beta * (1.0 - p) / (beta - A)
-                    K0 = -log(M) - (K1 + 0.5 * K3) * vn
+                    K0 = -log(M) - (k_1 + 0.5 * K3) * vn
 
-                x += mu * dt + K0 + (K1 * vn + K2 * vnp) + \
-                    sqrt(K3 * vn + K4 * vnp) * zS
+                x += (
+                    mu * dt
+                    + K0
+                    + (k_1 * vn + k_2 * vnp)
+                    + sqrt(K3 * vn + K4 * vnp) * zS
+                )
                 s_paths[i_path, i_step] = exp(x)
                 vn = vnp
     else:
         raise FinError("Unknown FinHestonNumericalSchme")
 
     return s_paths
+
 
 ###############################################################################
 
@@ -222,11 +269,15 @@ class FinGBMNumericalScheme(Enum):
     NORMAL = 1
     ANTITHETIC = 2
 
+
 ###############################################################################
 
 
-@njit(float64[:, :](int64, int64, float64, float64, float64,
-                    float64, int64, int64), cache=True, fastmath=True)
+@njit(
+    float64[:, :](int64, int64, float64, float64, float64, float64, int64, int64),
+    cache=True,
+    fastmath=True,
+)
 def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme, seed):
 
     np.random.seed(seed)
@@ -254,18 +305,18 @@ def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme
             for ip in range(0, num_paths):
                 w = np.exp(g1D[ip] * vsqrt_dt)
                 s_all[ip, it] = s_all[ip, it - 1] * m * w
-                s_all[ip + num_paths, it] = s_all[ip +
-                                                  num_paths, it - 1] * m / w
+                s_all[ip + num_paths, it] = s_all[ip + num_paths, it - 1] * m / w
 
     else:
 
         raise FinError("Unknown FinGBMNumericalScheme")
 
-#    m = np.mean(s_all[:, -1])
-#    v = np.var(s_all[:, -1]/s_all[:, 0])
-#    print("GBM", num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme, m,v)
+    #    m = np.mean(s_all[:, -1])
+    #    v = np.var(s_all[:, -1]/s_all[:, 0])
+    #    print("GBM", num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme, m,v)
 
     return s_all
+
 
 ###############################################################################
 
@@ -274,20 +325,20 @@ class FinVasicekNumericalScheme(Enum):
     NORMAL = 1
     ANTITHETIC = 2
 
+
 ###############################################################################
 
 
-@njit(float64[:, :](int64, int64, float64, float64, float64,
-                    float64, float64, int64, int64), cache=True, fastmath=True)
-def get_vasicek_paths(num_paths,
-                      num_annual_steps,
-                      t,
-                      r0,
-                      kappa,
-                      theta,
-                      sigma,
-                      scheme,
-                      seed):
+@njit(
+    float64[:, :](
+        int64, int64, float64, float64, float64, float64, float64, int64, int64
+    ),
+    cache=True,
+    fastmath=True,
+)
+def get_vasicek_paths(
+    num_paths, num_annual_steps, t, r0, kappa, theta, sigma, scheme, seed
+):
 
     np.random.seed(seed)
     dt = 1.0 / num_annual_steps
@@ -311,13 +362,12 @@ def get_vasicek_paths(num_paths,
             r2 = r0
             z = np.random.normal(0.0, 1.0, size=(num_steps))
             for i_step in range(1, num_steps + 1):
-                r1 = r1 + kappa * (theta - r1) * dt + \
-                    z[i_step - 1] * sigma_sqrt_dt
-                r2 = r2 + kappa * (theta - r2) * dt - \
-                    z[i_step - 1] * sigma_sqrt_dt
+                r1 = r1 + kappa * (theta - r1) * dt + z[i_step - 1] * sigma_sqrt_dt
+                r2 = r2 + kappa * (theta - r2) * dt - z[i_step - 1] * sigma_sqrt_dt
                 rate_path[i_path, i_step] = r1
                 rate_path[i_path + num_paths, i_step] = r2
     return rate_path
+
 
 ###############################################################################
 
@@ -329,20 +379,20 @@ class CIRNumericalScheme(Enum):
     KAHLJACKEL = 4
     EXACT = 5  # SAMPLES EXACT DISTRIBUTION
 
+
 ###############################################################################
 
 
-@njit(float64[:, :](int64, int64, float64, float64, float64,
-                    float64, float64, int64, int64), cache=True, fastmath=True)
-def get_cir_paths(num_paths,
-                  num_annual_steps,
-                  t,
-                  r0,
-                  kappa,
-                  theta,
-                  sigma,
-                  scheme,
-                  seed):
+@njit(
+    float64[:, :](
+        int64, int64, float64, float64, float64, float64, float64, int64, int64
+    ),
+    cache=True,
+    fastmath=True,
+)
+def get_cir_paths(
+    num_paths, num_annual_steps, t, r0, kappa, theta, sigma, scheme, seed
+):
 
     np.random.seed(seed)
     dt = 1.0 / num_annual_steps
@@ -358,8 +408,11 @@ def get_cir_paths(num_paths,
             for i_step in range(1, num_steps + 1):
                 rplus = max(r, 0.0)
                 sqrt_rplus = sqrt(rplus)
-                r = r + kappa * (theta - rplus) * dt + \
-                    sigma_sqrt_dt * z[i_step - 1] * sqrt_rplus
+                r = (
+                    r
+                    + kappa * (theta - rplus) * dt
+                    + sigma_sqrt_dt * z[i_step - 1] * sqrt_rplus
+                )
                 rate_path[i_path, i_step] = r
 
     elif scheme == CIRNumericalScheme.LOGNORMAL.value:
@@ -383,9 +436,12 @@ def get_cir_paths(num_paths,
             z = np.random.normal(0.0, 1.0, size=(num_steps))
             for i_step in range(1, num_steps + 1):
                 sqrt_rplus = sqrt(max(r, 0.0))
-                r = r + kappa * (theta - r) * dt + \
-                    z[i_step - 1] * sigma_sqrt_dt * sqrt_rplus
-                r = r + sigma2dt * (z[i_step - 1]**2 - 1.0)
+                r = (
+                    r
+                    + kappa * (theta - r) * dt
+                    + z[i_step - 1] * sigma_sqrt_dt * sqrt_rplus
+                )
+                r = r + sigma2dt * (z[i_step - 1] ** 2 - 1.0)
                 rate_path[i_path, i_step] = r
 
     elif scheme == CIRNumericalScheme.KAHLJACKEL.value:
@@ -397,12 +453,14 @@ def get_cir_paths(num_paths,
             for i_step in range(1, num_steps + 1):
                 beta = z[i_step - 1] / sqrt_dt
                 sqrt_rplus = sqrt(max(r, 0.0))
-                c = 1.0 + (sigma * beta - 2.0 * kappa *
-                           sqrt_rplus) * dt / 4.0 / sqrt_rplus
-                r = r + (kappa * (bhat - r) + sigma *
-                         beta * sqrt_rplus) * c * dt
+                c = (
+                    1.0
+                    + (sigma * beta - 2.0 * kappa * sqrt_rplus) * dt / 4.0 / sqrt_rplus
+                )
+                r = r + (kappa * (bhat - r) + sigma * beta * sqrt_rplus) * c * dt
                 rate_path[i_path, i_step] = r
 
     return rate_path
+
 
 ###############################################################################

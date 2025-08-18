@@ -18,11 +18,11 @@ def test_composite_discount_curve_can_value_trades():
     valuation_date = Date(6, 10, 2022)
     base_curve = DiscountCurveFlat(valuation_date, 0.02)
 
-    bump_start_date = Date(6, 10, 2023)
-    bump_end_date = Date(6, 10, 2024)
+    bump_start_dt = Date(6, 10, 2023)
+    bump_end_dt = Date(6, 10, 2024)
     bump_size = 1.0 * g_percent
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
-        base_curve.value_dt, bump_start_date, bump_end_date, bump_size
+        base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
@@ -43,11 +43,11 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
     valuation_date = Date(6, 10, 2022)
     base_curve = DiscountCurveFlat(valuation_date, 0.02)
 
-    bump_start_date = Date(6, 10, 2023)
-    bump_end_date = Date(6, 10, 2024)
+    bump_start_dt = Date(6, 10, 2023)
+    bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * g_percent
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
-        base_curve.value_dt, bump_start_date, bump_end_date, bump_size
+        base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
@@ -69,11 +69,11 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
     valuation_date = Date(6, 10, 2022)
     base_curve = buildIborSingleCurve(valuation_date, last_tenor="10Y")
 
-    bump_start_date = Date(6, 10, 2023)
-    bump_end_date = Date(6, 10, 2024)
+    bump_start_dt = Date(6, 10, 2023)
+    bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * g_percent
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
-        base_curve.value_dt, bump_start_date, bump_end_date, bump_size
+        base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 

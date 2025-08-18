@@ -166,9 +166,9 @@ class IborFRA:
         # Get the Libor index from the index curve
         dc = DayCount(self.dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
-        dfIndex1 = index_curve.df(self.start_dt)
-        dfIndex2 = index_curve.df(self.maturity_dt)
-        liborFwd = (dfIndex1 / dfIndex2 - 1.0) / acc_factor
+        df_index_1 = index_curve.df(self.start_dt)
+        df_index_2 = index_curve.df(self.maturity_dt)
+        liborFwd = (df_index_1 / df_index_2 - 1.0) / acc_factor
 
         # Get the discount factor from a discount curve
         dfDiscount2 = discount_curve.df(self.maturity_dt)
@@ -184,7 +184,7 @@ class IborFRA:
 
         out = {
             "type": type(self).__name__,
-            "start_date": self.start_dt,
+            "start_dt": self.start_dt,
             "maturity_dt": self.maturity_dt,
             "day_count_type": self.dc_type.name,
             "fixed_leg_type": (

@@ -28,11 +28,11 @@ def test_bloombergPricingExample():
     # We do the O/N rate which settles on trade date
     spot_days = 0
     settle_dt = value_dt.add_weekdays(spot_days)
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     deposit_rate = 0.0231381
     maturity_dt = settle_dt.add_months(3)
-    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate, depoDCCType)
+    depo = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
     depos.append(depo)
 
     futs = []
@@ -226,14 +226,8 @@ def test_bloombergPricingExample():
     principal = 0.0
 
     # Pay fixed so make fixed leg value negative
-    assert (
-        round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4)
-        == 0.0
-    )
-    assert (
-        round(-swaps[0].fixed_leg.value(value_dt, libor_curve), 4)
-        == 53707.6667
-    )
+    assert round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4) == 0.0
+    assert round(-swaps[0].fixed_leg.value(value_dt, libor_curve), 4) == 53707.6667
     assert (
         round(
             swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None),
@@ -243,19 +237,11 @@ def test_bloombergPricingExample():
     )
 
     # Pay fixed so make fixed leg value negative
-    assert (
-        round(swaps[0].value(settle_dt, libor_curve, libor_curve, None), 4)
-        == 0.0
-    )
-    assert (
-        round(-swaps[0].fixed_leg.value(settle_dt, libor_curve), 4)
-        == 53714.5507
-    )
+    assert round(swaps[0].value(settle_dt, libor_curve, libor_curve, None), 4) == 0.0
+    assert round(-swaps[0].fixed_leg.value(settle_dt, libor_curve), 4) == 53714.5507
     assert (
         round(
-            swaps[0].float_leg.value(
-                settle_dt, libor_curve, libor_curve, None
-            ),
+            swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None),
             4,
         )
         == 53714.5507
@@ -268,13 +254,11 @@ def test_RepriceInputsForAllInterpChoices(interp_type):
 
     cal = CalendarTypes.UNITED_KINGDOM
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal
-    )
+    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fraDCCType = DayCountTypes.ACT_360

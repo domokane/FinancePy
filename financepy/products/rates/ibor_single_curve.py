@@ -758,7 +758,7 @@ class IborSingleCurve(DiscountCurve):
             v = (
                 v / swap.fixed_leg.notional / swap.pv01(self.value_dt, self)
             )  # express in terms of the rate
-            #            print("REFIT SWAP VALUATION:", swap._adjustedMaturityDate, v)
+            #            print("REFIT SWAP VALUATION:", swap._adjusted_maturity_dt, v)
             if abs(v) > swap_tol:
                 print(
                     "Swap with maturity "

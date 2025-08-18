@@ -30,7 +30,7 @@ class DiscountCurvePWFONF(DiscountCurve):
     def __init__(
         self,
         value_dt: Date,
-        knot_dates: list,
+        knot_dts: list,
         onfwd_rates: Union[list, np.ndarray],
     ):
         """
@@ -44,19 +44,19 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         self.value_dt = value_dt
 
-        if len(knot_dates) != len(onfwd_rates):
+        if len(knot_dts) != len(onfwd_rates):
             raise FinError("Dates and rates vectors must have same length")
 
-        if len(knot_dates) == 0:
+        if len(knot_dts) == 0:
             raise FinError("Dates vector must have length > 0")
 
-        self._knot_dates = [max(d, value_dt) for d in knot_dates]
+        self._knot_dts = [max(d, value_dt) for d in knot_dts]
         self._onfwd_rates = np.atleast_1d(onfwd_rates)
 
         self.freq_type = FrequencyTypes.CONTINUOUS
         self.dc_type = DayCountTypes.SIMPLE
 
-        dc_times = times_from_dates(self._knot_dates, self.value_dt, self.dc_type)
+        dc_times = times_from_dates(self._knot_dts, self.value_dt, self.dc_type)
 
         self._times = np.atleast_1d(dc_times)
 
@@ -79,32 +79,32 @@ class DiscountCurvePWFONF(DiscountCurve):
     def brick_wall_curve(
         cls,
         valuation_date: Date,
-        start_date: Date,
-        end_date: Date,
+        start_dt: Date,
+        end_dt: Date,
         level: float = 1.0 * g_basis_point,
     ):
         """Generate a discount curve of the shape f(t) = level*1_{startdate < t <= enddate} where f(.) is the instantaneous forward rate
             Mostly useful for applying bumps to other discount_curve's, see composite_discount_curve.py
         Args:
             valuation_date (Date): valuation date for the discount_curve
-            start_date (Date): start of the non-zero ON forward rate
-            end_date (Date): end of the non-zero ON forward rate
+            start_dt (Date): start of the non-zero ON forward rate
+            end_dt (Date): end of the non-zero ON forward rate
             level (float, optional): ON forward rate between the start and end dates. Defaults to 1.0*g_basis_point.
 
         Returns:
             DiscountCurve: discount curve of the required shape
         """
-        knot_dates = [start_date, end_date, end_date.add_tenor("1D")]
+        knot_dts = [start_dt, end_dt, end_dt.add_tenor("1D")]
         onfwd_rates = [0.0, level, 0.0]
-        return cls(valuation_date, knot_dates, onfwd_rates)
+        return cls(valuation_date, knot_dts, onfwd_rates)
 
     ###############################################################################
 
     @classmethod
     def flat_curve(cls, valuation_date: Date, level: float = 1.0 * g_basis_point):
-        knot_dates = [valuation_date.add_tenor("1Y")]
+        knot_dts = [valuation_date.add_tenor("1Y")]
         onfwd_rates = [level]
-        return cls(valuation_date, knot_dates, onfwd_rates)
+        return cls(valuation_date, knot_dts, onfwd_rates)
 
     ###############################################################################
 
@@ -146,8 +146,8 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("DATE", "ONWD RATE")
-        for i in range(0, len(self._knot_dates)):
-            s += label_to_string(self._knot_dates[i], self._onfwd_rates[i])
+        for i in range(0, len(self._knot_dts)):
+            s += label_to_string(self._knot_dts[i], self._onfwd_rates[i])
         s += label_to_string("FREQUENCY", (self.freq_type))
         return s
 

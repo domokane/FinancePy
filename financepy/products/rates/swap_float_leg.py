@@ -52,7 +52,7 @@ class SwapFloatLeg:
 
         check_argument_types(self.__init__, locals())
 
-        if type(end_dt) is Date:
+        if isinstance(end_dt, Date):
             self.termination_dt = end_dt
         else:
             self.termination_dt = effective_dt.add_tenor(end_dt)
@@ -130,9 +130,7 @@ class SwapFloatLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 
@@ -175,7 +173,7 @@ class SwapFloatLeg:
         num_payments = len(self.payment_dts)
         first_payment = False
 
-        if not len(self.notional_array):
+        if not self.notional_array:
             self.notional_array = [self.notional] * num_payments
 
         index_basis = index_curve.dc_type
@@ -191,7 +189,7 @@ class SwapFloatLeg:
                 end_accrued_dt = self.end_accrued_dts[i_pmnt]
                 pay_alpha = self.year_fracs[i_pmnt]
 
-                (index_alpha, num, _) = index_day_counter.year_frac(
+                (index_alpha, _, _) = index_day_counter.year_frac(
                     start_accrued_dt, end_accrued_dt
                 )
 
@@ -207,9 +205,7 @@ class SwapFloatLeg:
                     fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
                 payment_amount = (
-                    (fwd_rate + self.spread)
-                    * pay_alpha
-                    * self.notional_array[i_pmnt]
+                    (fwd_rate + self.spread) * pay_alpha * self.notional_array[i_pmnt]
                 )
 
                 df_payment = discount_curve.df(payment_dt) / df_value

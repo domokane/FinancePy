@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import sys
+
 sys.path.append("..")
 
 
@@ -21,7 +22,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 # TODO: Add other discount discount
 ###############################################################################
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 
 def test_FinDiscountCurve():
@@ -29,7 +30,7 @@ def test_FinDiscountCurve():
     # Create a curve from times and discount factors
     start_dt = Date(1, 1, 2018)
     years = np.linspace(0, 10, 6)
-    rate = 0.05 + 0.005*years - 0.0003*years*years
+    rate = 0.05 + 0.005 * years - 0.0003 * years * years
     dfs = np.exp(-rate * years)
     dates = start_dt.add_years(years)
 
@@ -37,7 +38,7 @@ def test_FinDiscountCurve():
 
     test_cases.header("T", "DF", "ZERORATE", "CC_FWD", "MM_FWD", "SURVPROB")
 
-    plotYears = np.linspace(0, 12, 12*12+1)[1:]
+    plotYears = np.linspace(0, 12, 12 * 12 + 1)[1:]
     plotDates = start_dt.add_years(plotYears)
 
     # Examine dependency of curve on compounding rate
@@ -47,19 +48,19 @@ def test_FinDiscountCurve():
     zero_rates_M = curve.zero_rate(plotDates, FrequencyTypes.MONTHLY)
     zero_rates_C = curve.zero_rate(plotDates, FrequencyTypes.CONTINUOUS)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(6, 4))
-        plt.plot(plotYears, scale(zero_rates_A, 100), label='A')
-        plt.plot(plotYears, scale(zero_rates_S, 100), label='S')
-        plt.plot(plotYears, scale(zero_rates_Q, 100), label='Q')
-        plt.plot(plotYears, scale(zero_rates_M, 100), label='M')
-        plt.plot(plotYears, scale(zero_rates_C, 100), label='C')
+        plt.plot(plotYears, scale(zero_rates_A, 100), label="A")
+        plt.plot(plotYears, scale(zero_rates_S, 100), label="S")
+        plt.plot(plotYears, scale(zero_rates_Q, 100), label="Q")
+        plt.plot(plotYears, scale(zero_rates_M, 100), label="M")
+        plt.plot(plotYears, scale(zero_rates_C, 100), label="C")
         plt.ylim((5, 8))
 
-        plt.title('Discount Curves')
-        plt.xlabel('Time (years)')
-        plt.ylabel('Zero Rate (%)')
-        plt.legend(loc='lower right', frameon=False)
+        plt.title("Discount Curves")
+        plt.xlabel("Time (years)")
+        plt.ylabel("Zero Rate (%)")
+        plt.legend(loc="lower right", frameon=False)
 
     # Examine dependency of fwd curve on the interpolation scheme
 
@@ -68,20 +69,20 @@ def test_FinDiscountCurve():
         curve = DiscountCurve(start_dt, dates, dfs, interp)
         fwd_rates = curve.fwd(plotDates)
         zero_rates = curve.zero_rate(plotDates, FrequencyTypes.ANNUAL)
-        par_rates = curve.swap_rate(
-            start_dt, plotDates, FrequencyTypes.ANNUAL)
+        par_rates = curve.swap_rate(start_dt, plotDates, FrequencyTypes.ANNUAL)
 
-        if PLOT_GRAPHS:
+        if plot_graphs:
             plt.figure(figsize=(6, 4))
-            plt.plot(plotYears, scale(fwd_rates, 100), label='FWD RATES')
-            plt.plot(plotYears, scale(zero_rates, 100), label='ZERO RATES')
-            plt.plot(plotYears, scale(par_rates, 100), label='PAR RATES')
+            plt.plot(plotYears, scale(fwd_rates, 100), label="FWD RATES")
+            plt.plot(plotYears, scale(zero_rates, 100), label="ZERO RATES")
+            plt.plot(plotYears, scale(par_rates, 100), label="PAR RATES")
             plt.ylim((3.0, 8.5))
 
-            plt.title('Forward Curves using ' + str(interp))
-            plt.xlabel('Time (years)')
-            plt.ylabel('Fwd Rate (%)')
-            plt.legend(loc='lower right', frameon=False)
+            plt.title("Forward Curves using " + str(interp))
+            plt.xlabel("Time (years)")
+            plt.ylabel("Fwd Rate (%)")
+            plt.legend(loc="lower right", frameon=False)
+
 
 ###############################################################################
 

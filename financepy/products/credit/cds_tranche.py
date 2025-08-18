@@ -65,7 +65,7 @@ class CDSTranche:
         check_argument_types(self.__init__, locals())
 
         if k1 >= k2:
-            raise FinError("K1 must be less than K2")
+            raise FinError("k_1 must be less than k_2")
 
         self.k1 = k1
         self.k2 = k2
@@ -127,7 +127,7 @@ class CDSTranche:
             return output
 
         if k1 > k2:
-            raise FinError("K1 > K2")
+            raise FinError("k_1 > k_2")
 
         kappa = k2 / (k2 - k1)
 
@@ -250,19 +250,13 @@ class CDSTranche:
                 )
 
             else:
-                raise FinError(
-                    "Unknown model type only full and AdjBinomial allowed"
-                )
+                raise FinError("Unknown model type only full and AdjBinomial allowed")
 
             if qt1[i] > qt1[i - 1]:
-                raise FinError(
-                    "Tranche K1 survival probabilities not decreasing."
-                )
+                raise FinError("Tranche k_1 survival probabilities not decreasing.")
 
             if qt2[i] > qt2[i - 1]:
-                raise FinError(
-                    "Tranche K2 survival probabilities not decreasing."
-                )
+                raise FinError("Tranche k_2 survival probabilities not decreasing.")
 
             tranche_surv_curve[i] = kappa * qt2[i] + (1.0 - kappa) * qt1[i]
             tranche_times[i] = t
@@ -280,9 +274,7 @@ class CDSTranche:
             "clean_rpv01"
         ]
 
-        mtm = self.notional * (
-            prot_leg_pv - upfront - risky_pv01 * running_cpn
-        )
+        mtm = self.notional * (prot_leg_pv - upfront - risky_pv01 * running_cpn)
 
         if not self.long_protect:
             mtm *= -1.0

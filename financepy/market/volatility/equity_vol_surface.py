@@ -354,8 +354,8 @@ class EquityVolSurface:
                     index1 = i
                     break
 
-        fwd0 = self._F0T[index0]
-        fwd1 = self._F0T[index1]
+        fwd0 = self._fwd_0_T[index0]
+        fwd1 = self._fwd_0_T[index1]
 
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
@@ -456,7 +456,7 @@ class EquityVolSurface:
 
     #     if index1 != index0:
 
-    #         K1 = _solver_for_smile_strike(s, t_exp,
+    #         k_1 = _solver_for_smile_strike(s, t_exp,
     #                                   self._rd[index1],
     #                                   self._rf[index1],
     #                                   OptionTypes.EUROPEAN_CALL.value,
@@ -468,18 +468,18 @@ class EquityVolSurface:
     #                                   self._gaps[index1])
     #     else:
 
-    #         K1 = K0
+    #         k_1 = K0
 
     #     # In the expiry time dimension, both volatilities are interpolated
     #     # at the same strikes but different deltas.
 
     #     if np.abs(t1-t0) > 1e-6:
 
-    #         K = ((t_exp-t0) * K1 + (t1-t_exp) * K1) / (t1 - t0)
+    #         K = ((t_exp-t0) * k_1 + (t1-t_exp) * k_1) / (t1 - t0)
 
     #     else:
 
-    #         K = K1
+    #         K = k_1
 
     #     return K
 
@@ -534,8 +534,8 @@ class EquityVolSurface:
                     index1 = i
                     break
 
-        fwd0 = self._F0T[index0]
-        fwd1 = self._F0T[index1]
+        fwd0 = self._fwd_0_T[index0]
+        fwd1 = self._fwd_0_T[index1]
 
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
@@ -558,7 +558,7 @@ class EquityVolSurface:
 
         if index1 != index0:
 
-            K1 = _solver_for_smile_strike(
+            k_1 = _solver_for_smile_strike(
                 s,
                 t_exp,
                 self._r[index1],
@@ -570,7 +570,7 @@ class EquityVolSurface:
                 self._parameters[index1],
             )
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, K1, t1)
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k_1, t1)
         else:
             vol1 = vol0
 
@@ -582,7 +582,7 @@ class EquityVolSurface:
         if np.abs(t1 - t0) > 1e-6:
 
             vart = ((t_exp - t0) * vart1 + (t1 - t_exp) * vart0) / (t1 - t0)
-            kt = ((t_exp - t0) * K1 + (t1 - t_exp) * K0) / (t1 - t0)
+            kt = ((t_exp - t0) * k_1 + (t1 - t_exp) * K0) / (t1 - t0)
 
             if vart < 0.0:
                 raise FinError("Failed interpolation due to negative variance.")
@@ -640,7 +640,7 @@ class EquityVolSurface:
 
         self._t_exp = np.zeros(num_expiry_dts)
 
-        self._F0T = np.zeros(num_expiry_dts)
+        self._fwd_0_T = np.zeros(num_expiry_dts)
         self._r = np.zeros(num_expiry_dts)
         self._q = np.zeros(num_expiry_dts)
 
@@ -662,7 +662,7 @@ class EquityVolSurface:
             self._t_exp[i] = t_exp
             self._r[i] = -np.log(dis_df) / t_exp
             self._q[i] = -np.log(div_df) / t_exp
-            self._F0T[i] = f
+            self._fwd_0_T[i] = f
 
         #######################################################################
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
@@ -742,18 +742,18 @@ class EquityVolSurface:
 
     ###########################################################################
 
-    def implied_dbns(self, lowS, highS, num_intervals):
+    def implied_dbns(self, low_s, high_s, num_intervals):
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""
 
         dbns = []
 
-        for iTenor in range(0, self._num_expiry_dts):
+        for i_tenor in range(0, self._num_expiry_dts):
 
-            f = self._F0T[iTenor]
-            t = self._t_exp[iTenor]
+            f = self._fwd_0_T[i_tenor]
+            t = self._t_exp[i_tenor]
 
-            dS = (highS - lowS) / num_intervals
+            dS = (high_s - low_s) / num_intervals
 
             disDF = self._discount_curve.df_t(t)
             div_df = self._dividend_curve.df_t(t)
@@ -761,30 +761,30 @@ class EquityVolSurface:
             r = -np.log(disDF) / t
             q = -np.log(div_df) / t
 
-            Ks = []
+            k_s = []
             vols = []
 
-            for iK in range(0, num_intervals):
+            for i_k in range(0, num_intervals):
 
-                k = lowS + iK * dS
+                k = low_s + i_k * dS
 
                 vol = vol_function(
                     self._vol_func_type.value,
-                    self._parameters[iTenor],
+                    self._parameters[i_tenor],
                     f,
                     k,
                     t,
                 )
 
-                Ks.append(k)
+                k_s.append(k)
                 vols.append(vol)
 
-            Ks = np.array(Ks)
+            k_s = np.array(k_s)
             vols = np.array(vols)
 
-            density = option_implied_dbn(self._stock_price, t, r, q, Ks, vols)
+            density = option_implied_dbn(self._stock_price, t, r, q, k_s, vols)
 
-            dbn = FinDistribution(Ks, density)
+            dbn = FinDistribution(k_s, density)
             dbns.append(dbn)
 
         return dbns

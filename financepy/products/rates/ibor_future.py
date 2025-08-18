@@ -49,7 +49,7 @@ class IborFuture:
 
         self.delivery_dt = today_dt.next_imm_date()
 
-        for iFut in range(0, future_number - 1):
+        for i_fut in range(0, future_number - 1):
             self.delivery_dt = self.delivery_dt.next_imm_date()
 
         self.end_of_interest_period = self.delivery_dt.next_imm_date()
@@ -141,9 +141,7 @@ class IborFuture:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("LAST TRADING DATE", self.last_trading_dt)
         s += label_to_string("DELIVERY DATE", self.delivery_dt)
-        s += label_to_string(
-            "END INTEREST PERIOD", self.end_of_interest_period
-        )
+        s += label_to_string("END INTEREST PERIOD", self.end_of_interest_period)
         s += label_to_string("DAY COUNT TYPE", self.dc_type)
         s += label_to_string("CONTRACT SIZE", self.contract_size)
         return s

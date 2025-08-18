@@ -64,7 +64,7 @@ class IborIborSwap:
 
         self.effective_dt = effective_dt
         self.notional = notional
-        self._basisSwapSpread = basisSwapSpread
+        self._basis_swap_spread = basisSwapSpread
         self._payFreqType = payFreqType
         self._recFreqType = recFreqType
         self._payDayCountType = payDayCountType
@@ -76,7 +76,7 @@ class IborIborSwap:
         self._payFloatDates = self._generateFloatLegDates(self._payFreqType)
         self._recFloatDates = self._generateFloatLegDates(self._recFreqType)
 
-        self._adjustedMaturityDate = self._adjusted_fixed_dts[-1]
+        self._adjusted_maturity_dt = self._adjusted_fixed_dts[-1]
 
         self._payFloatYearFracs = []
         self._recFloatYearFracs = []
@@ -156,7 +156,7 @@ class IborIborSwap:
         self.value_dt = value_dt
         self._floatYearFracs = []
         self._float_flows = []
-        self._floatRates = []
+        self._float_rates = []
         self._floatDfs = []
         self._float_flow_pvs = []
         self._floatTotalPV = []
@@ -175,7 +175,7 @@ class IborIborSwap:
         if value_dt <= self.effective_dt:
             start_index = 1
 
-        self._floatStartIndex = start_index
+        self._float_start_index = start_index
 
         # Forward price to settlement date (if valuation is settlement date)
         self._df_value_dt = discount_curve.df(value_dt)
@@ -189,15 +189,15 @@ class IborIborSwap:
         df1_index = index_curve.df(self.effective_dt)
         df2_index = index_curve.df(next_dt)
 
-        floatRate = 0.0
+        float_rate = 0.0
 
         if self._first_fixing_rate is None:
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self.notional
-            floatRate = fwd_rate
+            float_rate = fwd_rate
         else:
             flow = self._first_fixing_rate * alpha * self.notional
-            floatRate = self._first_fixing_rate
+            float_rate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
         df_discount = discount_curve.df(next_dt) / self._df_value_dt
@@ -206,7 +206,7 @@ class IborIborSwap:
 
         self._floatYearFracs.append(alpha)
         self._float_flows.append(flow)
-        self._floatRates.append(floatRate)
+        self._float_rates.append(float_rate)
         self._floatDfs.append(df_discount)
         self._float_flow_pvs.append(flow * df_discount)
         self._floatTotalPV.append(pv)
@@ -230,7 +230,7 @@ class IborIborSwap:
 
             self._float_flows.append(flow)
             self._floatYearFracs.append(alpha)
-            self._floatRates.append(fwd_rate)
+            self._float_rates.append(fwd_rate)
             self._floatDfs.append(df_discount)
             self._float_flow_pvs.append(flow * df_discount)
             self._floatTotalPV.append(pv)
@@ -268,7 +268,7 @@ class IborIborSwap:
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
-        start_index = self._floatStartIndex
+        start_index = self._float_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
 
@@ -284,7 +284,7 @@ class IborIborSwap:
                 % (
                     payment_dt,
                     self._floatYearFracs[i_flow],
-                    self._floatRates[i_flow] * 100.0,
+                    self._float_rates[i_flow] * 100.0,
                     self._float_flows[i_flow],
                     self._floatDfs[i_flow],
                     self._float_flow_pvs[i_flow],

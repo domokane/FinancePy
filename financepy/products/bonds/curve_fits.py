@@ -18,6 +18,7 @@ class FinCurveFitMethod:
 
 
 class CurveFitPolynomial:
+    """Polynomial curve fitting."""
 
     def __init__(self, power=3):
         self.parent_type = FinCurveFitMethod

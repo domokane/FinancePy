@@ -253,9 +253,7 @@ class Date:
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
         if d >= g_start_year and d < g_end_year and y > 0 and y <= 31:
-            raise FinError(
-                "Date arguments must now be in the order Date(dd, mm, yyyy)"
-            )
+            raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
 
         if g_dt_counter_list is None:
             calculate_list()
@@ -349,9 +347,9 @@ class Date:
             return cls(d, m, y)
 
         if isinstance(date, np.datetime64):
-            time_stamp = (
-                date - np.datetime64("1970-01-01T00:00:00")
-            ) / np.timedelta64(1, "s")
+            time_stamp = (date - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
+                1, "s"
+            )
 
             date = datetime.datetime.utcfromtime_stamp(time_stamp)
             d, m, y = date.day, date.month, date.year
@@ -633,7 +631,7 @@ class Date:
 
     ###########################################################################
 
-    def add_years(self, yy: (np.ndarray, float)):
+    def add_years(self, yy: Union[np.ndarray, float]):
         """Returns a new date that is yy years after the Date. If yy is an
         integer or float you get back a single date. If yy is a list you get
         back a vector of dates."""
@@ -781,23 +779,13 @@ class Date:
         if isinstance(tenor, list) is True:
             list_flag = True
             for ten in tenor:
-                if (
-                    isinstance(ten, str) is False
-                    and isinstance(ten, Tenor) is False
-                ):
-                    raise FinError(
-                        "Tenor must be a string e.g. '5Y' or a Tenor object"
-                    )
+                if isinstance(ten, str) is False and isinstance(ten, Tenor) is False:
+                    raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
         else:
-            if (
-                isinstance(tenor, str) is True
-                or isinstance(tenor, Tenor) is True
-            ):
+            if isinstance(tenor, str) is True or isinstance(tenor, Tenor) is True:
                 tenor = [tenor]
             else:
-                raise FinError(
-                    "Tenor must be a string e.g. '5Y' or a Tenor object"
-                )
+                raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
 
         new_dts = []
 
@@ -809,19 +797,13 @@ class Date:
 
             if tenor_obj._units == TenorUnit.DAYS:
                 for _ in range(0, abs(tenor_obj._num_periods)):
-                    new_dt = new_dt.add_days(
-                        math.copysign(1, tenor_obj._num_periods)
-                    )
+                    new_dt = new_dt.add_days(math.copysign(1, tenor_obj._num_periods))
             elif tenor_obj._units == TenorUnit.WEEKS:
                 for _ in range(0, abs(tenor_obj._num_periods)):
-                    new_dt = new_dt.add_days(
-                        math.copysign(7, tenor_obj._num_periods)
-                    )
+                    new_dt = new_dt.add_days(math.copysign(7, tenor_obj._num_periods))
             elif tenor_obj._units == TenorUnit.MONTHS:
                 for _ in range(0, abs(tenor_obj._num_periods)):
-                    new_dt = new_dt.add_months(
-                        math.copysign(1, tenor_obj._num_periods)
-                    )
+                    new_dt = new_dt.add_months(math.copysign(1, tenor_obj._num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day
                 # we add this logic

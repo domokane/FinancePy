@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import sys
+
 sys.path.append("..")
 
 
@@ -26,7 +27,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 set_date_format(DateFormatTypes.UK_LONG)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ###############################################################################
 # TODO: Add other discount discount
@@ -49,23 +50,21 @@ def test_FinDiscountCurves():
     discount_factors = np.exp(-np.array(rates) * np.array(years2))
     curvesList = []
 
-    finDiscountCurve = DiscountCurve(value_dt, dates, discount_factors,
-                                     InterpTypes.FLAT_FWD_RATES)
+    finDiscountCurve = DiscountCurve(
+        value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES
+    )
     curvesList.append(finDiscountCurve)
 
     finDiscountCurveFlat = DiscountCurveFlat(value_dt, 0.05)
     curvesList.append(finDiscountCurveFlat)
 
-    finDiscountCurveNS = DiscountCurveNS(value_dt, 0.0305, -0.01,
-                                         0.08, 10.0)
+    finDiscountCurveNS = DiscountCurveNS(value_dt, 0.0305, -0.01, 0.08, 10.0)
     curvesList.append(finDiscountCurveNS)
 
-    finDiscountCurveNSS = DiscountCurveNSS(value_dt, 0.035, -0.02,
-                                           0.09, 0.1, 1.0, 2.0)
+    finDiscountCurveNSS = DiscountCurveNSS(value_dt, 0.035, -0.02, 0.09, 0.1, 1.0, 2.0)
     curvesList.append(finDiscountCurveNSS)
 
-    finDiscountCurvePoly = DiscountCurvePoly(value_dt, [0.05, 0.002,
-                                                          -0.00005])
+    finDiscountCurvePoly = DiscountCurvePoly(value_dt, [0.05, 0.002, -0.00005])
     curvesList.append(finDiscountCurvePoly)
 
     finDiscountCurvePWF = DiscountCurvePWF(value_dt, dates, rates)
@@ -103,13 +102,15 @@ def test_FinDiscountCurves():
             swap_rate = curve.swap_rate(value_dt, fwdMaturityDate)
             df = curve.df(fwdMaturityDate)
 
-            test_cases.print("%-20s" % name,
-                            "%-12s" % fwdMaturityDate,
-                            "%7.6f" % (zero_rate),
-                            "%8.7f" % (df),
-                            "%7.6f" % (fwd),
-                            "%7.6f" % (fwd_rate),
-                            "%7.6f" % (swap_rate))
+            test_cases.print(
+                "%-20s" % name,
+                "%-12s" % fwdMaturityDate,
+                "%7.6f" % (zero_rate),
+                "%8.7f" % (df),
+                "%7.6f" % (fwd),
+                "%7.6f" % (fwd_rate),
+                "%7.6f" % (swap_rate),
+            )
 
     # Examine vectorisation
     test_cases.banner("######################################################")
@@ -125,15 +126,17 @@ def test_FinDiscountCurves():
         df = curve.df(fwdMaturityDates)
 
         for i in range(0, len(fwdMaturityDates)):
-            test_cases.print("%-20s" % name,
-                            "%-12s" % fwdMaturityDate,
-                            "%7.6f" % (zero_rate[i]),
-                            "%8.7f" % (df[i]),
-                            "%7.6f" % (fwd[i]),
-                            "%7.6f" % (fwd_rate[i]),
-                            "%7.6f" % (swap_rate[i]))
+            test_cases.print(
+                "%-20s" % name,
+                "%-12s" % fwdMaturityDate,
+                "%7.6f" % (zero_rate[i]),
+                "%8.7f" % (df[i]),
+                "%7.6f" % (fwd[i]),
+                "%7.6f" % (fwd_rate[i]),
+                "%7.6f" % (swap_rate[i]),
+            )
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0
@@ -167,6 +170,7 @@ def test_FinDiscountCurves():
             plt.plot(years, dfs, label=name)
         plt.legend()
         plt.title("Discount Factors")
+
 
 ###############################################################################
 

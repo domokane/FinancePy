@@ -61,7 +61,7 @@ class DiscountCurvePWF(DiscountCurve):
 
     ###########################################################################
 
-    def _zero_rate(self, times: (float, np.ndarray, list)):
+    def _zero_rate(self, times: Union[float, np.ndarray, list]):
         """The piecewise flat zero rate is selected and returned."""
 
         if isinstance(times, float):
@@ -98,7 +98,7 @@ class DiscountCurvePWF(DiscountCurve):
 
     ###########################################################################
 
-    def _fwd(self, times: (np.ndarray, list)):
+    def _fwd(self, times: Union[np.ndarray, list]):
         """Calculate the continuously compounded forward rate at the forward
         time provided. This is done by perturbing the time by a small amount
         and measuring the change in the log of the discount factor divided by

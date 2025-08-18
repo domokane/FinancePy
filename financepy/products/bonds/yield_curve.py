@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,8 +37,8 @@ class BondYieldCurve:
         self,
         settlement_date: Date,
         bonds: list,
-        ylds: (np.ndarray, list),
-        curveFit,
+        ylds: Union[np.ndarray, list],
+        curve_fit,
     ):
         """Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
@@ -46,30 +47,30 @@ class BondYieldCurve:
         self._settlement_date = settlement_date
         self._bonds = bonds
         self._ylds = np.array(ylds)
-        self._curveFit = curveFit
+        self._curve_fit = curve_fit
 
-        fitType = type(self._curveFit)
-        fit = self._curveFit
+        fit_type = type(self._curve_fit)
+        fit = self._curve_fit
 
-        yearsToMaturities = []
+        years_to_maturities = []
         for bond in bonds:
             years_to_maturity = (bond._maturity_dt - settlement_date) / g_days_in_year
-            yearsToMaturities.append(years_to_maturity)
-        self._yearsToMaturity = np.array(yearsToMaturities)
+            years_to_maturities.append(years_to_maturity)
+        self._years_to_maturity = np.array(years_to_maturities)
 
-        if fitType is CurveFitPolynomial:
+        if fit_type is CurveFitPolynomial:
 
             d = fit._power
-            coeffs = np.polyfit(self._yearsToMaturity, self._ylds, deg=d)
+            coeffs = np.polyfit(self._years_to_maturity, self._ylds, deg=d)
             fit._coeffs = coeffs
 
-        elif fitType is CurveFitNelsonSiegel:
+        elif fit_type is CurveFitNelsonSiegel:
 
-            xdata = self._yearsToMaturity
+            xdata = self._years_to_maturity
             ydata = self._ylds
 
             popt, pcov = curve_fit(
-                self._curveFit._interpolated_yield,
+                self._curve_fit._interpolated_yield,
                 xdata,
                 ydata,
                 bounds=fit._bounds,
@@ -80,13 +81,13 @@ class BondYieldCurve:
             fit._beta3 = popt[2]
             fit._tau = popt[3]
 
-        elif fitType is CurveFitNelsonSiegelSvensson:
+        elif fit_type is CurveFitNelsonSiegelSvensson:
 
-            xdata = self._yearsToMaturity
+            xdata = self._years_to_maturity
             ydata = self._ylds
 
             popt, pcov = curve_fit(
-                self._curveFit._interpolated_yield,
+                self._curve_fit._interpolated_yield,
                 xdata,
                 ydata,
                 bounds=fit._bounds,
@@ -99,9 +100,9 @@ class BondYieldCurve:
             fit._tau1 = popt[4]
             fit._tau2 = popt[5]
 
-        elif fitType is CurveFitBSpline:
+        elif fit_type is CurveFitBSpline:
 
-            xdata = self._yearsToMaturity
+            xdata = self._years_to_maturity
             ydata = self._ylds
 
             """ Cubic splines as k=3 """
@@ -113,29 +114,36 @@ class BondYieldCurve:
 
     ###############################################################################
 
-    def interpolated_yield(self, maturity_dt: Date):
+    @property
+    def curve_fit(self):
+        """accessor function for curve_fit"""
+        return self._curve_fit
 
-        if type(maturity_dt) is Date:
+    ###############################################################################
+
+    def interpolated_yield(self, maturity_dt: Date):
+        """Interpolates the yield for a given maturity date."""
+        if isinstance(maturity_dt, Date):
             t = (maturity_dt - self._settlement_date) / g_days_in_year
-        elif type(maturity_dt) is list:
+        elif isinstance(maturity_dt, list):
             t = maturity_dt
-        elif type(maturity_dt) is np.ndarray:
+        elif isinstance(maturity_dt, np.ndarray):
             t = maturity_dt
-        elif type(maturity_dt) is float or type(maturity_dt) is np.float64:
+        elif isinstance(maturity_dt, (float, np.float64)):
             t = maturity_dt
         else:
             raise FinError("Unknown date type.")
 
-        fit = self._curveFit
+        fit = self._curve_fit
 
-        if type(fit) == CurveFitPolynomial:
+        if isinstance(fit, CurveFitPolynomial):
             yld = fit._interpolated_yield(t)
-        elif type(fit) == CurveFitNelsonSiegel:
+        elif isinstance(fit, CurveFitNelsonSiegel):
             yld = fit._interpolated_yield(
                 t, fit._beta1, fit._beta2, fit._beta3, fit._tau
             )
 
-        elif type(fit) == CurveFitNelsonSiegelSvensson:
+        elif isinstance(fit, CurveFitNelsonSiegelSvensson):
             yld = fit._interpolated_yield(
                 t,
                 fit._beta1,
@@ -146,7 +154,7 @@ class BondYieldCurve:
                 fit._tau2,
             )
 
-        elif type(fit) == CurveFitBSpline:
+        elif isinstance(fit, CurveFitBSpline):
             yld = fit._interpolated_yield(t)
 
         return yld
@@ -159,16 +167,16 @@ class BondYieldCurve:
         plt.figure(figsize=(12, 6))
         plt.title(title)
         bond_ylds_scaled = scale(self._ylds, 100.0)
-        plt.plot(self._yearsToMaturity, bond_ylds_scaled, "o")
+        plt.plot(self._years_to_maturity, bond_ylds_scaled, "o")
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel(ylabel)
 
-        tmax = np.max(self._yearsToMaturity)
+        tmax = np.max(self._years_to_maturity)
         t = np.linspace(0.0, int(tmax + 0.5), 100)
 
         yld = self.interpolated_yield(t)
         yld = scale(yld, 100.0)
-        plt.plot(t, yld, label=str(self._curveFit))
+        plt.plot(t, yld, label=str(self._curve_fit))
         plt.legend(loc="lower right")
         plt.ylim((min(yld) - 0.3, max(yld) * 1.1))
         plt.grid(True)
@@ -180,7 +188,7 @@ class BondYieldCurve:
         s += label_to_string("SETTLEMENT DATE", self._settlement_date)
         s += label_to_string("BOND", self._bonds)
         s += label_to_string("YIELDS", self._ylds)
-        s += label_to_string("CURVE FIT", self._curveFit)
+        s += label_to_string("CURVE FIT", self._curve_fit)
         return s
 
     ###############################################################################

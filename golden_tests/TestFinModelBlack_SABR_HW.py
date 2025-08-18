@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 import matplotlib.pyplot as plt
@@ -13,7 +14,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ###############################################################################
 
@@ -40,11 +41,12 @@ def test_FinSABR():
     vols1 = model1.black_vol(f, strikes, T)
     vols2 = model2.black_vol(f, strikes, T)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(strikes, vols1)
         plt.plot(strikes, vols2)
         plt.title("SABR")
+
 
 ###############################################################################
 
@@ -71,11 +73,12 @@ def test_FinShiftedSABRSimple():
     vols1 = model1.black_vol(f, strikes, T)
     vols2 = model2.black_vol(f, strikes, T)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(strikes, vols1)
         plt.plot(strikes, vols2)
         plt.title("Shifted SIMPLE SABR")
+
 
 ###############################################################################
 
@@ -97,10 +100,11 @@ def test_FinShiftedSABR():
 
     vols = model.black_vol(f, strikes, T)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(strikes, vols)
         plt.title("SHIFTED SABR")
+
 
 ###############################################################################
 

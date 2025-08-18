@@ -54,7 +54,7 @@ def par_rate_risk_report(
     n_trades = len(trades)
 
     risk_report = benchmarks_report[
-        ["type", "start_date", "maturity_dt", "market_rate"]
+        ["type", "start_dt", "maturity_dt", "market_rate"]
     ].copy()
 
     if trade_labels is None:
@@ -154,17 +154,17 @@ def forward_rate_risk_report_custom_grid(
             column of forward rate deltas per trade, and a total for all trades
 
     """
-    risk_report = pd.DataFrame(columns=["type", "start_date", "maturity_dt"])
-    risk_report["start_date"] = grid[:-1]
+    risk_report = pd.DataFrame(columns=["type", "start_dt", "maturity_dt"])
+    risk_report["start_dt"] = grid[:-1]
     risk_report["maturity_dt"] = grid[1:]
     risk_report["type"] = "IborFRA"
 
     asof = base_curve.value_dt
     if grid_labels is None:
-        start_in_days = [datediff(asof, d) for d in risk_report["start_date"]]
+        start_in_days = [datediff(asof, d) for d in risk_report["start_dt"]]
         tenor_in_days = [
             datediff(s, m)
-            for s, m in zip(risk_report["start_date"], risk_report["maturity_dt"])
+            for s, m in zip(risk_report["start_dt"], risk_report["maturity_dt"])
         ]
         grid_labels = [f"{sd}Dx{td}D" for sd, td in zip(start_in_days, tenor_in_days)]
     risk_report["bucket_label"] = grid_labels
@@ -187,13 +187,13 @@ def forward_rate_risk_report_custom_grid(
         first_period_carry[trade_label] = cf_report_first_period["payment_pv"].sum()
 
     for fwdrate_idx in range(len(risk_report)):
-        start_date = risk_report.loc[fwdrate_idx, "start_date"]
+        start_dt = risk_report.loc[fwdrate_idx, "start_dt"]
         maturity_dt = risk_report.loc[fwdrate_idx, "maturity_dt"]
-        base_rate = base_curve.fwd_rate(start_date, maturity_dt, DayCountTypes.SIMPLE)
+        base_rate = base_curve.fwd_rate(start_dt, maturity_dt, DayCountTypes.SIMPLE)
         risk_report.loc[fwdrate_idx, "market_rate"] = base_rate
 
         fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
-            base_curve.value_dt, start_date, maturity_dt, bump_size
+            base_curve.value_dt, start_dt, maturity_dt, bump_size
         )
         bumped_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 

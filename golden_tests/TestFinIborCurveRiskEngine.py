@@ -33,7 +33,7 @@ def test_par_rate_risk_report_cubic_zero():
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     fraDCCType = DayCountTypes.ACT_360
     swapType = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
@@ -43,7 +43,7 @@ def test_par_rate_risk_report_cubic_zero():
         valuation_date,
         cal,
         interp_type,
-        depoDCCType,
+        depo_dcc_type,
         fraDCCType,
         swapType,
         fixedDCCType,
@@ -156,7 +156,7 @@ def test_forward_rate_risk_report():
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     fraDCCType = DayCountTypes.ACT_360
     swapType = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
@@ -166,7 +166,7 @@ def test_forward_rate_risk_report():
         valuation_date,
         cal,
         interp_type,
-        depoDCCType,
+        depo_dcc_type,
         fraDCCType,
         swapType,
         fixedDCCType,
@@ -225,11 +225,7 @@ def test_forward_rate_risk_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.DV01_PREFIX + "total"].values)
-        print(
-            risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(
-                axis=0
-            )
-        )
+        print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
@@ -239,7 +235,7 @@ def test_forward_rate_custom_grid_risk_report():
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     fraDCCType = DayCountTypes.ACT_360
     swapType = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
@@ -249,7 +245,7 @@ def test_forward_rate_custom_grid_risk_report():
         valuation_date,
         cal,
         interp_type,
-        depoDCCType,
+        depo_dcc_type,
         fraDCCType,
         swapType,
         fixedDCCType,
@@ -290,11 +286,7 @@ def test_forward_rate_custom_grid_risk_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.DV01_PREFIX + "total"].values)
-        print(
-            risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(
-                axis=0
-            )
-        )
+        print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
@@ -304,7 +296,7 @@ def test_carry_rolldown_report():
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     fraDCCType = DayCountTypes.ACT_360
     swapType = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
@@ -314,7 +306,7 @@ def test_carry_rolldown_report():
         valuation_date,
         cal,
         interp_type,
-        depoDCCType,
+        depo_dcc_type,
         fraDCCType,
         swapType,
         fixedDCCType,
@@ -348,11 +340,7 @@ def test_carry_rolldown_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.ROLL_PREFIX + "total"].values)
-        print(
-            risk_report[roll_trade_labels + [re.ROLL_PREFIX + "total"]].sum(
-                axis=0
-            )
-        )
+        print(risk_report[roll_trade_labels + [re.ROLL_PREFIX + "total"]].sum(axis=0))
 
     expected_totals = [
         -21.07588523,
@@ -374,7 +362,7 @@ def test_parallel_shift_ladder_report():
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     fraDCCType = DayCountTypes.ACT_360
     swapType = SwapTypes.PAY
     fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
@@ -384,7 +372,7 @@ def test_parallel_shift_ladder_report():
         valuation_date,
         cal,
         interp_type,
-        depoDCCType,
+        depo_dcc_type,
         fraDCCType,
         swapType,
         fixedDCCType,
@@ -418,9 +406,7 @@ def test_parallel_shift_ladder_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.PV_PREFIX + "total"].values)
-        print(
-            risk_report[pv_trade_labels + [re.PV_PREFIX + "total"]].sum(axis=0)
-        )
+        print(risk_report[pv_trade_labels + [re.PV_PREFIX + "total"]].sum(axis=0))
 
         # risk_report.plot('shift_bp', re.PV_PREFIX + 'total')
         x = risk_report["shift_bp"].values
@@ -492,7 +478,7 @@ def _generate_base_curve(
     valuation_date,
     cal,
     interp_type,
-    depoDCCType,
+    depo_dcc_type,
     fraDCCType,
     swapType,
     fixedDCCType,
@@ -501,9 +487,7 @@ def _generate_base_curve(
     depos = []
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal
-    )
+    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fras = []

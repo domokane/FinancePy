@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.date import Date
@@ -57,7 +59,7 @@ class EquityAmericanOption(EquityOption):
     def value(
         self,
         value_dt: Date,
-        stock_price: (np.ndarray, float),
+        stock_price: Union[np.ndarray, float],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,

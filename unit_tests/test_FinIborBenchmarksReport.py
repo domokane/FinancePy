@@ -24,11 +24,11 @@ def test_ibor_benchmarks_report():
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
 
-    depoDCCType = DayCountTypes.ACT_360
+    depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depoDCCType, cal_type=cal)
+    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fraDCCType = DayCountTypes.ACT_360
@@ -181,12 +181,10 @@ def test_dataframe_to_benchmarks():
     asof = Date(6, 10, 2001)
 
     df = pd.read_csv(full_filename_path, index_col=0)
-    # df['start_date'] = pd.to_datetime(df['start_date'], errors='ignore')  # allow tenors
+    # df['start_dt'] = pd.to_datetime(df['start_dt'], errors='ignore')  # allow tenors
     # df['maturity_dt'] = pd.to_datetime(df['maturity_dt'], errors='ignore')  # allow tenors
 
-    df["start_date"] = pd.to_datetime(
-        df["start_date"], format="%d-%b-%y"
-    )  # allow tenors
+    df["start_dt"] = pd.to_datetime(df["start_dt"], format="%d-%b-%y")  # allow tenors
     df["maturity_dt"] = pd.to_datetime(
         df["maturity_dt"], format="%d-%b-%y"
     )  # allow tenors

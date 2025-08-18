@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 import matplotlib.pyplot as plt
@@ -14,7 +15,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ###############################################################################
 
@@ -53,11 +54,12 @@ def test_FinInterpolate():
 
         end = time.time()
 
-        if PLOT_GRAPHS:
+        if plot_graphs:
             plt.figure(figsize=(12, 10))
-            plt.plot(xValues, yValues, color='r', marker='o')
-            plt.plot(xInterpolateValues, yInterpValues, color='b',
-                     label=str(interp_type))
+            plt.plot(xValues, yValues, color="r", marker="o")
+            plt.plot(
+                xInterpolateValues, yInterpValues, color="b", label=str(interp_type)
+            )
             plt.legend()
 
     xp = np.array([0.2, 0.4, 0.45, 0.6, 0.82, 0.93, 0.99])
@@ -73,6 +75,7 @@ def test_FinInterpolate():
         interpolator.interpolate(0.8)
     end = time.time()
     test_cases.print("10000 Interpolations", end - start)
+
 
 ###############################################################################
 

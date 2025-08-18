@@ -3,6 +3,7 @@
 ##############################################################################
 
 import sys
+
 sys.path.append("..")
 
 import matplotlib.pyplot as plt
@@ -26,7 +27,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ###############################################################################
 
@@ -38,8 +39,7 @@ def testBlackModelCheck():
     # Expect a price around 122 cents which is what I find.
 
     value_dt = Date(1, 1, 2020)
-    libor_curve = DiscountCurveFlat(value_dt, 0.06,
-                                    FrequencyTypes.SEMI_ANNUAL)
+    libor_curve = DiscountCurveFlat(value_dt, 0.06, FrequencyTypes.SEMI_ANNUAL)
 
     settle_dt = Date(1, 1, 2020)
     exercise_dt = Date(1, 1, 2021)
@@ -52,19 +52,22 @@ def testBlackModelCheck():
 
     # Pricing a PAY
     swaptionType = SwapTypes.PAY
-    swaption = IborSwaption(settle_dt,
-                            exercise_dt,
-                            maturity_dt,
-                            swaptionType,
-                            fixed_cpn,
-                            fixed_freq_type,
-                            fixed_dc_type,
-                            notional)
+    swaption = IborSwaption(
+        settle_dt,
+        exercise_dt,
+        maturity_dt,
+        swaptionType,
+        fixed_cpn,
+        fixed_freq_type,
+        fixed_dc_type,
+        notional,
+    )
 
     model = Black(0.20)
     v = swaption.value(value_dt, libor_curve, model)
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("BLACK'S MODEL PRICE:", v*100)
+    test_cases.print("BLACK'S MODEL PRICE:", v * 100)
+
 
 ###############################################################################
 
@@ -84,10 +87,7 @@ def test_BDTExampleOne():
     test_cases.header("RATES")
     test_cases.print(zero_rates)
 
-    curve = DiscountCurveZeros(value_dt,
-                               zero_dts,
-                               zero_rates,
-                               FrequencyTypes.ANNUAL)
+    curve = DiscountCurveZeros(value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL)
 
     yieldVol = 0.16
 
@@ -103,6 +103,7 @@ def test_BDTExampleOne():
 
     model = BDTTree(yieldVol, num_time_steps)
     model.build_tree(t_mat, years, dfs)
+
 
 ###############################################################################
 
@@ -129,7 +130,7 @@ def test_BDTExampleTwo():
     num_flows = len(bond.cpn_dts)
 
     for i in range(1, num_flows):
-        pcd = bond.cpn_dts[i-1]
+        pcd = bond.cpn_dts[i - 1]
         ncd = bond.cpn_dts[i]
         if pcd < settle_dt and ncd > settle_dt:
             flow_time = (pcd - settle_dt) / g_days_in_year
@@ -152,7 +153,7 @@ def test_BDTExampleTwo():
     t_exp = (expiry_dt - settle_dt) / g_days_in_year
     times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
-    dfs = np.exp(-0.05*times)
+    dfs = np.exp(-0.05 * times)
 
     test_cases.header("LABEL", "VALUES")
     test_cases.print("TIMES:", times)
@@ -173,13 +174,14 @@ def test_BDTExampleTwo():
     for num_time_steps in num_steps_list:
         model = BDTTree(sigma, num_time_steps)
         model.build_tree(t_mat, times, dfs)
-        v = model.bond_option(t_exp, strike_price,
-                              face, cpn_times, cpn_flows, exercise_type)
+        v = model.bond_option(
+            t_exp, strike_price, face, cpn_times, cpn_flows, exercise_type
+        )
 
         test_cases.print(v)
-        treeVector.append(v['call'])
+        treeVector.append(v["call"])
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.plot(num_steps_list, treeVector)
 
     # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
@@ -189,6 +191,7 @@ def test_BDTExampleTwo():
         print_tree(model._rt, 5)
         print("Q")
         print_tree(model._Q, 5)
+
 
 ###############################################################################
 
@@ -206,7 +209,7 @@ def test_BDTExampleThree():
     times = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0])
     dates = settle_dt.add_years(times)
     rate = 0.06
-    dfs = 1.0 / (1.0 + rate/2.0)**(2.0*times)
+    dfs = 1.0 / (1.0 + rate / 2.0) ** (2.0 * times)
     curve = DiscountCurve(settle_dt, dates, dfs)
 
     cpn = 0.06
@@ -217,11 +220,11 @@ def test_BDTExampleThree():
     # Andersen paper
     num_time_steps = 200
 
-    test_cases.header("ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat",
-                     "V_Fixed", "V_pay", "V_rec")
+    test_cases.header(
+        "ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", "V_Fixed", "V_pay", "V_rec"
+    )
 
-    for exercise_type in [FinExerciseTypes.EUROPEAN,
-                          FinExerciseTypes.BERMUDAN]:
+    for exercise_type in [FinExerciseTypes.EUROPEAN, FinExerciseTypes.BERMUDAN]:
 
         for years_to_maturity in [4.0, 5.0, 10.0, 20.0]:
 
@@ -235,15 +238,16 @@ def test_BDTExampleThree():
             elif years_to_maturity == 20.0:
                 sigma = 0.1035
 
-            for expiryYears in range(int(years_to_maturity/2)-1, int(years_to_maturity)):
+            for expiryYears in range(
+                int(years_to_maturity / 2) - 1, int(years_to_maturity)
+            ):
 
                 expiry_dt = settle_dt.add_years(expiryYears)
 
                 t_mat = (maturity_dt - settle_dt) / g_days_in_year
                 t_exp = (expiry_dt - settle_dt) / g_days_in_year
 
-                bond = Bond(issue_dt, maturity_dt,
-                            cpn, freq_type, dc_type)
+                bond = Bond(issue_dt, maturity_dt, cpn, freq_type, dc_type)
 
                 cpn_times = []
                 cpn_flows = []
@@ -257,28 +261,32 @@ def test_BDTExampleThree():
                 cpn_times = np.array(cpn_times)
                 cpn_flows = np.array(cpn_flows)
 
-                price = bond.clean_price_from_discount_curve(
-                    settle_dt, curve)
+                price = bond.clean_price_from_discount_curve(settle_dt, curve)
 
                 model = BDTTree(sigma, num_time_steps)
                 model.build_tree(t_mat, times, dfs)
 
-                v = model.bermudan_swaption(t_exp,
-                                            t_mat,
-                                            strike_price,
-                                            face,
-                                            cpn_times,
-                                            cpn_flows,
-                                            exercise_type)
+                v = model.bermudan_swaption(
+                    t_exp,
+                    t_mat,
+                    strike_price,
+                    face,
+                    cpn_times,
+                    cpn_flows,
+                    exercise_type,
+                )
 
-                test_cases.print("%s" % exercise_type,
-                                "%9.5f" % sigma,
-                                "%9.5f" % num_time_steps,
-                                "%9.5f" % expiryYears,
-                                "%9.5f" % years_to_maturity,
-                                "%9.5f" % price,
-                                "%9.2f" % (v['pay']*100.0),
-                                "%9.2f" % (v['rec']*100.0))
+                test_cases.print(
+                    "%s" % exercise_type,
+                    "%9.5f" % sigma,
+                    "%9.5f" % num_time_steps,
+                    "%9.5f" % expiryYears,
+                    "%9.5f" % years_to_maturity,
+                    "%9.5f" % price,
+                    "%9.2f" % (v["pay"] * 100.0),
+                    "%9.2f" % (v["rec"] * 100.0),
+                )
+
 
 ###############################################################################
 # This has broken and needs to be repaired!!!!

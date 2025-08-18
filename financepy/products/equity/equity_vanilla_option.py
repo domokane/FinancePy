@@ -108,7 +108,7 @@ class EquityVanillaOption:
     def intrinsic(
         self,
         value_dt: Union[Date, list],
-        stock_price: (np.ndarray, float),
+        stock_price: Union[np.ndarray, float],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
     ):
@@ -151,7 +151,7 @@ class EquityVanillaOption:
     def value(
         self,
         value_dt: Union[Date, list],
-        stock_price: (np.ndarray, float),
+        stock_price: Union[np.ndarray, float],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,

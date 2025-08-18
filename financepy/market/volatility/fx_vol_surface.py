@@ -1269,7 +1269,7 @@ class FXVolSurface:
             r_d = -np.log(dom_df) / t_exp
             r_f = -np.log(for_df) / t_exp
 
-            Ks = []
+            k_s = []
             vols = []
 
             for ik in range(0, num_intervals):
@@ -1284,15 +1284,15 @@ class FXVolSurface:
                     t_exp,
                 )
 
-                Ks.append(k)
+                k_s.append(k)
                 vols.append(vol)
 
-            Ks = np.array(Ks)
+            k_s = np.array(k_s)
             vols = np.array(vols)
 
-            density = option_implied_dbn(self.spot_fx_rate, t_exp, r_d, r_f, Ks, vols)
+            density = option_implied_dbn(self.spot_fx_rate, t_exp, r_d, r_f, k_s, vols)
 
-            dbn = FinDistribution(Ks, density)
+            dbn = FinDistribution(k_s, density)
             dbns.append(dbn)
 
         return dbns

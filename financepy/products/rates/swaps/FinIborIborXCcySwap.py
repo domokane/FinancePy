@@ -356,7 +356,7 @@ class FinIborIborXCcySwap:
         self.value_dt = value_dt
         self._float_year_fracs = []
         self._float_flows = []
-        self._floatRates = []
+        self._float_rates = []
         self._float_dfs = []
         self._float_flow_pvs = []
         self._float_total_pv = []
@@ -375,7 +375,7 @@ class FinIborIborXCcySwap:
         if value_dt <= self.effective_dt:
             start_index = 1
 
-        self._floatStartIndex = start_index
+        self._float_start_index = start_index
 
         # Forward price to settlement date (if valuation is settlement date)
         self._df_value_dt = discount_curve.df(value_dt)
@@ -389,15 +389,15 @@ class FinIborIborXCcySwap:
         df1_index = index_curve.df(self.effective_dt)
         df2_index = index_curve.df(next_dt)
 
-        floatRate = 0.0
+        float_rate = 0.0
 
         if self._first_fixing_rate is None:
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self.notional
-            floatRate = fwd_rate
+            float_rate = fwd_rate
         else:
             flow = self._first_fixing_rate * alpha * self.notional
-            floatRate = self._first_fixing_rate
+            float_rate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
         df_discount = discount_curve.df(next_dt) / self._df_value_dt
@@ -406,7 +406,7 @@ class FinIborIborXCcySwap:
 
         self._float_year_fracs.append(alpha)
         self._float_flows.append(flow)
-        self._float_rates.append(floatRate)
+        self._float_rates.append(float_rate)
         self._float_dfs.append(df_discount)
         self._float_flow_pvs.append(flow * df_discount)
         self._float_total_pv.append(pv)
@@ -550,7 +550,7 @@ class FinIborIborXCcySwap:
         header += "         DF*FLOW       CUM_PV"
         print(header)
 
-        start_index = self._floatStartIndex
+        start_index = self._float_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
 
@@ -566,7 +566,7 @@ class FinIborIborXCcySwap:
                 % (
                     payment_dt,
                     self._float_year_fracs[i_flow],
-                    self._floatRates[i_flow] * 100.0,
+                    self._float_rates[i_flow] * 100.0,
                     self._float_flows[i_flow],
                     self._float_dfs[i_flow],
                     self._float_flow_pvs[i_flow],

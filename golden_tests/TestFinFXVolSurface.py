@@ -12,6 +12,7 @@ from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import sys
+
 sys.path.append("..")
 
 
@@ -20,7 +21,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 ###############################################################################
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ###############################################################################
 
@@ -47,7 +48,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
 
-        tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
+        tenors = ["1M", "2M", "3M", "6M", "1Y", "2Y"]
         atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
         mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
@@ -56,28 +57,30 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
         delta_method = FinFXDeltaMethod.SPOT_DELTA
-        vol_functionType = VolFuncTypes.CLARK
+        vol_function_type = VolFuncTypes.CLARK
 
-        fx_market = FXVolSurface(value_dt,
-                                spot_fx_rate,
-                                currency_pair,
-                                notional_currency,
-                                domestic_curve,
-                                foreign_curve,
-                                tenors,
-                                atm_vols,
-                                mkt_strangle_25d_vols,
-                                rsk_reversal_25d_vols,
-                                atm_method,
-                                delta_method,
-                                vol_functionType)
+        fx_market = FXVolSurface(
+            value_dt,
+            spot_fx_rate,
+            currency_pair,
+            notional_currency,
+            domestic_curve,
+            foreign_curve,
+            tenors,
+            atm_vols,
+            mkt_strangle_25d_vols,
+            rsk_reversal_25d_vols,
+            atm_method,
+            delta_method,
+            vol_function_type,
+        )
 
         fx_market.check_calibration(verboseCalibration)
 
         # EXPLORE AND TEST DIFFERENT CATEGORICAL PARAMETERS
         # for atm_method in FinFXATMMethod:
         #     for delta_method in FinFXDeltaMethod:
-        #         for vol_functionType in VolFuncTypes:
+        #         for vol_function_type in VolFuncTypes:
 
         #             fx_market = FinFXVolSurface(value_dt,
         #                                        spot_fx_rate,
@@ -91,11 +94,11 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         #                                        rsk_reversal_25d_vols,
         #                                        atm_method,
         #                                        delta_method,
-        #                                        vol_functionType)
+        #                                        vol_function_type)
 
         #             fx_market.check_calibration(verboseCalibration)
 
-        if PLOT_GRAPHS:
+        if plot_graphs:
 
             fx_market.plot_vol_curves()
 
@@ -103,7 +106,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
-                plt.title(vol_functionType)
+                plt.title(vol_function_type)
                 print("SUM:", dbns[i].sum())
 
     ###########################################################################
@@ -129,7 +132,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
     currency_pair = for_name + dom_name
     spot_fx_rate = 90.72
 
-    tenors = ['1M', '2M', '3M', '6M', '1Y', '2Y']
+    tenors = ["1M", "2M", "3M", "6M", "1Y", "2Y"]
     atm_vols = [21.50, 20.50, 19.85, 18.00, 15.95, 14.009]
     mkt_strangle_25d_vols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
     rsk_reversal_25d_vols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
@@ -139,23 +142,26 @@ def test_FinFXMktVolSurface2(verboseCalibration):
     atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
-    fx_market = FXVolSurface(value_dt,
-                            spot_fx_rate,
-                            currency_pair,
-                            notional_currency,
-                            domestic_curve,
-                            foreign_curve,
-                            tenors,
-                            atm_vols,
-                            mkt_strangle_25d_vols,
-                            rsk_reversal_25d_vols,
-                            atm_method,
-                            delta_method)
+    fx_market = FXVolSurface(
+        value_dt,
+        spot_fx_rate,
+        currency_pair,
+        notional_currency,
+        domestic_curve,
+        foreign_curve,
+        tenors,
+        atm_vols,
+        mkt_strangle_25d_vols,
+        rsk_reversal_25d_vols,
+        atm_method,
+        delta_method,
+    )
 
     fx_market.check_calibration(verboseCalibration)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market.plot_vol_curves()
+
 
 #   print("==================================================================")
 
@@ -180,7 +186,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
     currency_pair = for_name + dom_name
     spot_fx_rate = 1.3088
 
-    tenors = ['1M']
+    tenors = ["1M"]
     atm_vols = [21.6215]
     mkt_strangle_25d_vols = [0.7375]
     rsk_reversal_25d_vols = [-0.50]
@@ -190,22 +196,24 @@ def test_FinFXMktVolSurface3(verboseCalibration):
     atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA
 
-    fx_market = FXVolSurface(value_dt,
-                            spot_fx_rate,
-                            currency_pair,
-                            notional_currency,
-                            domestic_curve,
-                            foreign_curve,
-                            tenors,
-                            atm_vols,
-                            mkt_strangle_25d_vols,
-                            rsk_reversal_25d_vols,
-                            atm_method,
-                            delta_method)
+    fx_market = FXVolSurface(
+        value_dt,
+        spot_fx_rate,
+        currency_pair,
+        notional_currency,
+        domestic_curve,
+        foreign_curve,
+        tenors,
+        atm_vols,
+        mkt_strangle_25d_vols,
+        rsk_reversal_25d_vols,
+        atm_method,
+        delta_method,
+    )
 
     fx_market.check_calibration(verboseCalibration)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market.plot_vol_curves()
 
     ###########################################################################
@@ -229,7 +237,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
     currency_pair = for_name + dom_name
     spot_fx_rate = 90.68
 
-    tenors = ['1M']
+    tenors = ["1M"]
     atm_vols = [21.00]
     mkt_strangle_25d_vols = [0.184]
     rsk_reversal_25d_vols = [-5.30]
@@ -239,31 +247,34 @@ def test_FinFXMktVolSurface4(verboseCalibration):
     atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
     delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
 
-    fx_market = FXVolSurface(value_dt,
-                            spot_fx_rate,
-                            currency_pair,
-                            notional_currency,
-                            domestic_curve,
-                            foreign_curve,
-                            tenors,
-                            atm_vols,
-                            mkt_strangle_25d_vols,
-                            rsk_reversal_25d_vols,
-                            atm_method,
-                            delta_method)
+    fx_market = FXVolSurface(
+        value_dt,
+        spot_fx_rate,
+        currency_pair,
+        notional_currency,
+        domestic_curve,
+        foreign_curve,
+        tenors,
+        atm_vols,
+        mkt_strangle_25d_vols,
+        rsk_reversal_25d_vols,
+        atm_method,
+        delta_method,
+    )
 
     fx_market.check_calibration(verboseCalibration)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market.plot_vol_curves()
 
     #    test_cases.header("value", "delta")
     #    test_cases.print(value, delta)
 
+
 ###############################################################################
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     start = time.time()
 
@@ -277,5 +288,5 @@ if __name__ == '__main__':
     end = time.time()
 
     elapsed = end - start
-#    print("Elapsed Time:", elapsed)
+    #    print("Elapsed Time:", elapsed)
     test_cases.compareTestCases()

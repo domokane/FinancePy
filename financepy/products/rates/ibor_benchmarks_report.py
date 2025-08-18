@@ -90,7 +90,7 @@ def _date_or_tenor_to_date_or_tenor(date_or_tenor: Union[Date, str, datetime]):
 def _deposit_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
     cls = globals()[row["type"]]
     return cls(
-        start_dt=_date_or_tenor_to_date(row["start_date"], asof_date),
+        start_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
         maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
         deposit_rate=row["contract_rate"],
         dc_type=DayCountTypes[row["day_count_type"]],
@@ -102,7 +102,7 @@ def _deposit_from_df_row(row: pd.Series, asof_date: Date, calendar_type: Calenda
 def _fra_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
     cls = globals()[row["type"]]
     return cls(
-        start_dt=_date_or_tenor_to_date(row["start_date"], asof_date),
+        start_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
         maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
         fra_rate=row["contract_rate"],
         dc_type=DayCountTypes[row["day_count_type"]],
@@ -115,7 +115,7 @@ def _fra_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTyp
 def _swap_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
     cls = globals()[row["type"]]
     return cls(
-        effective_dt=_date_or_tenor_to_date(row["start_date"], asof_date),
+        effective_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
         term_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
         fixed_leg_type=SwapTypes[row["fixed_leg_type"]],
         fixed_cpn=row["contract_rate"],
@@ -136,15 +136,15 @@ def dataframe_to_benchmarks(
 ):
     """Crete IborBenchmarks from a dataframe. The dataframe should have at least these columns
     with these sample inputs:
-                type   start_date maturity_dt     day_count_type notional contract_rate fixed_leg_type fixed_freq_type
+                type   start_dt maturity_dt     day_count_type notional contract_rate fixed_leg_type fixed_freq_type
         0   IborDeposit  06-OCT-2001   09-OCT-2001            ACT_360    100.0         0.042            NaN             NaN
         1       IborFRA  09-JAN-2002   09-APR-2002            ACT_360    100.0         0.042            PAY             NaN
         2      IborSwap  09-OCT-2001   09-OCT-2002  THIRTY_E_360_ISDA  1000000         0.042            PAY     SEMI_ANNUAL
 
-    start_date and maturity_dt could be Date, string convertible to Tenor, or datetime
+    start_dt and maturity_dt could be Date, string convertible to Tenor, or datetime
     Args:
         df (pd.DataFrame): dataframe as bove, with benchmark info
-        asof_date (Date): if start_date is a tenor string, asof_date is used as an anchor for that
+        asof_date (Date): if start_dt is a tenor string, asof_date is used as an anchor for that
         calendar_type (CalendarTypes): What calendar to use
 
     Returns:
