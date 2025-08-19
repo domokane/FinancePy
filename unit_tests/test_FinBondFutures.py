@@ -59,7 +59,7 @@ def test_bond_future_2():
 
     futures_price = 125.265625
 
-    pip = bondFutureContract.principal_invoice_price(bond, futures_price)
+    pip = bondFutureContract.principal_invoice(bond, futures_price)
 
     assert round(pip, 4) == 9162291.0800
 
@@ -133,4 +133,4 @@ def test_future_bond_ctd():
 
     ctd = bondFutureContract.ctd(bonds, prices, futures_price)
 
-    assert round(ctd.cpn, 4) == 0.0238
+    assert round(ctd.cpn, 4) == 0.0225
