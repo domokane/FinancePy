@@ -132,7 +132,7 @@ def obj_fast(params, *args):
     # Match the risk reversal volatility
     ###########################################################################
 
-    K_25d_C = solver_for_smile_strike_fast(
+    k_25d_c = solver_for_smile_strike_fast(
         s,
         t,
         r_d,
@@ -145,9 +145,9 @@ def obj_fast(params, *args):
         params,
     )
 
-    sigma_k_25d_c = vol_function(vol_type_value, params, f, K_25d_C, t)
+    sigma_k_25d_c = vol_function(vol_type_value, params, f, k_25d_c, t)
 
-    K_25d_P = solver_for_smile_strike_fast(
+    k_25d_p = solver_for_smile_strike_fast(
         s,
         t,
         r_d,
@@ -160,7 +160,7 @@ def obj_fast(params, *args):
         params,
     )
 
-    sigma_k_25d_p = vol_function(vol_type_value, params, f, K_25d_P, t)
+    sigma_k_25d_p = vol_function(vol_type_value, params, f, k_25d_p, t)
 
     sigma_25d_rr = sigma_k_25d_c - sigma_k_25d_p
     term3 = (sigma_25d_rr - target_rr_vol) ** 2
@@ -253,7 +253,7 @@ def solve_to_horizon_fast(
 
     params = np.array(xopt)
 
-    K_25d_C = solver_for_smile_strike_fast(
+    k_25d_c = solver_for_smile_strike_fast(
         s,
         t,
         rd,
@@ -266,7 +266,7 @@ def solve_to_horizon_fast(
         params,
     )
 
-    K_25d_P = solver_for_smile_strike_fast(
+    k_25d_p = solver_for_smile_strike_fast(
         s,
         t,
         rd,
@@ -279,7 +279,7 @@ def solve_to_horizon_fast(
         params,
     )
 
-    ret = (params, k_25d_c_ms, k_25d_p_ms, K_25d_C, K_25d_P)
+    ret = (params, k_25d_c_ms, k_25d_p_ms, k_25d_c, k_25d_p)
     return ret
 
 
@@ -1217,33 +1217,33 @@ class FXVolSurface:
 
             if verbose:
                 print(
-                    "K_25d_C: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
+                    "k_25d_c: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
                     % (self.k_25d_c[i], 100.0 * sigma_k_25d_c, delta_call)
                 )
 
                 print(
-                    "K_25d_P: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
+                    "k_25d_p: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
                     % (self.k_25d_p[i], 100.0 * sigma_k_25d_p, delta_put)
                 )
 
-            sigma_RR = sigma_k_25d_c - sigma_k_25d_p
+            sigma_rr = sigma_k_25d_c - sigma_k_25d_p
 
             if verbose:
                 print("=========================================================")
                 print(
                     "RR = VOL_K_25_C - VOL_K_25_P => RR_IN: %9.6f %% RR_OUT: %9.6f %%"
-                    % (100.0 * self.rr_25_delta_vols[i], 100.0 * sigma_RR)
+                    % (100.0 * self.rr_25_delta_vols[i], 100.0 * sigma_rr)
                 )
                 print("=========================================================")
 
-            diff = sigma_RR - self.rr_25_delta_vols[i]
+            diff = sigma_rr - self.rr_25_delta_vols[i]
 
             if np.abs(diff) > tol:
                 print(
                     "FAILED FIT TO 25d RRV IN: % 9.6f OUT: % 9.6f DIFF: % 9.6f"
                     % (
                         self.rr_25_delta_vols[i] * 100.0,
-                        sigma_RR * 100.0,
+                        sigma_rr * 100.0,
                         diff * 100.0,
                     )
                 )
@@ -1344,8 +1344,8 @@ class FXVolSurface:
             key_strikes.append(self.k_atm[tenor_index])
 
             key_vols = []
-            for K in key_strikes:
-                sigma = vol_function(vol_type_val, params, f, K, t) * 100.0
+            for k in key_strikes:
+                sigma = vol_function(vol_type_val, params, f, k, t) * 100.0
                 key_vols.append(sigma)
 
             plt.plot(key_strikes, key_vols, "ko", markersize=4)

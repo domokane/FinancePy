@@ -151,7 +151,7 @@ class IborSingleCurveSmoothingCalibrator(object):
             init_curve = self._curve
         else:
             init_curve = copy.deepcopy(self._curve)
-            init_curve._check_refit = False
+            init_curve.check_refit_flag = False
             init_curve._build_curve_using_1d_solver(
                 **init_curve._optional_interp_params
             )

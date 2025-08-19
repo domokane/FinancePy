@@ -141,7 +141,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         x = np.exp(-a * dt)
         y = 1.0 - x
 
-        for i_path in range(0, num_paths):
+        for _ in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)

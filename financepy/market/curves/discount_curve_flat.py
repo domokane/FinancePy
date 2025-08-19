@@ -28,7 +28,7 @@ class DiscountCurveFlat(DiscountCurve):
     It is used for quick and dirty analysis and when limited information is
     available. It inherits several methods from DiscountCurve."""
 
-    ###############################################################################
+    ###########################################################################
 
     def __init__(
         self,
@@ -65,7 +65,7 @@ class DiscountCurveFlat(DiscountCurve):
         self._times = times_from_dates(dts, self.value_dt, dc_type)
         self._dfs = self.df(dts)
 
-    ###############################################################################
+    ###########################################################################
 
     @property
     def times(self) -> np.ndarray:
@@ -77,7 +77,7 @@ class DiscountCurveFlat(DiscountCurve):
         """Return the cached grid of discount factors."""
         return self._dfs
 
-    ###############################################################################
+    ###########################################################################
 
     def df(self, dts: Union[Date, list]):
         """Return discount factors given a single or vector of dts. The
@@ -90,7 +90,11 @@ class DiscountCurveFlat(DiscountCurve):
         dc_times = times_from_dates(dts, self.value_dt, self.dc_type)
 
         dfs = self._zero_to_df(
-            self.value_dt, self.flat_rate, dc_times, self.freq_type, self.dc_type
+            self.value_dt,
+            self.flat_rate,
+            dc_times,
+            self.freq_type,
+            self.dc_type,
         )
 
         if isinstance(dts, Date):
@@ -98,7 +102,7 @@ class DiscountCurveFlat(DiscountCurve):
 
         return np.array(dfs)
 
-    ###############################################################################
+    ###########################################################################
 
     def bump(self, bump_size: float):
         """Create a new FinDiscountCurveFlat object with the entire curve
@@ -106,11 +110,14 @@ class DiscountCurveFlat(DiscountCurve):
 
         rate_bumped = self.flat_rate + bump_size
         disc_curve = DiscountCurveFlat(
-            self.value_dt, rate_bumped, freq_type=self.freq_type, dc_type=self.dc_type
+            self.value_dt,
+            rate_bumped,
+            freq_type=self.freq_type,
+            dc_type=self.dc_type,
         )
         return disc_curve
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -120,7 +127,7 @@ class DiscountCurveFlat(DiscountCurve):
         s += label_to_string("DAY COUNT", (self.dc_type))
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

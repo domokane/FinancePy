@@ -99,6 +99,18 @@ class DiscountCurve:
 
     ###########################################################################
 
+    def set_df(self, index, df):
+        """Set the discount factor at a specific index."""
+
+        n_points = len(self._dfs)
+
+        if index < 0 or index >= n_points:
+            raise IndexError("Index out of bounds")
+
+        self._dfs[index] = df
+
+    ###########################################################################
+
     def _zero_to_df(
         self,
         value_dt: Date,  # TODO: why is value_dt not used ?
@@ -122,12 +134,12 @@ class DiscountCurve:
             df = np.exp(-rates * t)
         elif freq_type == FrequencyTypes.SIMPLE:
             df = 1.0 / (1.0 + rates * t)
-        elif (
-            freq_type == FrequencyTypes.ANNUAL
-            or freq_type == FrequencyTypes.SEMI_ANNUAL
-            or freq_type == FrequencyTypes.QUARTERLY
-            or freq_type == FrequencyTypes.MONTHLY
-        ):
+        elif freq_type in {
+            FrequencyTypes.ANNUAL,
+            FrequencyTypes.SEMI_ANNUAL,
+            FrequencyTypes.QUARTERLY,
+            FrequencyTypes.MONTHLY,
+        }:
             df = 1.0 / np.power(1.0 + rates / f, f * t)
         else:
             raise FinError("Unknown Frequency type")
@@ -217,15 +229,15 @@ class DiscountCurve:
 
         if isinstance(dts, Date):
             return zero_rates[0]
-        else:
-            return np.array(zero_rates)
 
-        return zero_rates
+        return np.array(zero_rates)
 
     ###########################################################################
 
     def cc_rate(
-        self, dts: Union[list, Date], dc_type: DayCountTypes = DayCountTypes.SIMPLE
+        self,
+        dts: Union[list, Date],
+        dc_type: DayCountTypes = DayCountTypes.SIMPLE,
     ):
         """Calculation of zero rates with continuous compounding. This
         function can return a vector of cc rates given a vector of
@@ -262,7 +274,8 @@ class DiscountCurve:
 
         if freq_type == FrequencyTypes.SIMPLE:
             raise FinError("Cannot calculate par rate with simple yield freq.")
-        elif freq_type == FrequencyTypes.CONTINUOUS:
+
+        if freq_type == FrequencyTypes.CONTINUOUS:
             raise FinError("Cannot calculate par rate with continuous freq.")
 
         if isinstance(maturity_dt, Date):
@@ -305,8 +318,8 @@ class DiscountCurve:
 
         if isinstance(maturity_dts, Date):
             return par_rates[0]
-        else:
-            return par_rates
+
+        return par_rates
 
     ###########################################################################
 
@@ -378,8 +391,8 @@ class DiscountCurve:
 
         if isinstance(dts, Date):
             return fwd[0]
-        else:
-            return np.array(fwd)
+
+        return np.array(fwd)
 
     ###########################################################################
 
@@ -461,8 +474,8 @@ class DiscountCurve:
 
         if isinstance(start_dt, Date):
             return fwd_rates[0]
-        else:
-            return np.array(fwd_rates)
+
+        return np.array(fwd_rates)
 
     ###########################################################################
 

@@ -200,12 +200,13 @@ class IborSwap:
         first_fixing_rate=None,
     ):
         """
-        A long-hand method that returns various details relevant to valuation in a dictionary
+        A long-hand method that returns various details relevant to valuation in
+        a dictionary
         Slower than value(...) so should not be used when performance is important
 
         We want the output dictionary to have  the same labels for different bechmarks
-        (depos, fras, swaps) because we want to present them together so please do not stick new outputs into
-        one of them only
+        (depos, fras, swaps) because we want to present them together so please
+        do not stick new outputs into one of them only
         """
         if index_curve is None:
             index_curve = discount_curve

@@ -757,7 +757,7 @@ class BDTTree:
         """Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree."""
 
-        exercise_typeInt = option_exercise_types_to_int(exercise_type)
+        exercise_type_int = option_exercise_types_to_int(exercise_type)
 
         t_mat = cpn_times[-1]
 
@@ -776,7 +776,7 @@ class BDTTree:
             face_amount,
             cpn_times,
             cpn_flows,
-            exercise_typeInt,
+            exercise_type_int,
             self.df_times,
             self.dfs,
             self.tree_times,

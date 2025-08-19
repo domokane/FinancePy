@@ -58,7 +58,8 @@ def _f(df, *args):
     value_dt = args[1]
     swap = args[2]
     num_points = len(curve.times)
-    curve._dfs[num_points - 1] = df
+    #    curve._dfs[num_points - 1] = df
+    curve.set_df(num_points - 1, df)
 
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
@@ -129,7 +130,7 @@ class OISCurve(DiscountCurve):
         self.value_dt = value_dt
         self._validate_inputs(ois_deposits, ois_fras, ois_swaps)
         self._interp_type = interp_type
-        self._check_refit_flag = check_refit_flag
+        self.check_refit_flag = check_refit_flag
         self._interpolator = None
         self._build_curve()
 
@@ -267,12 +268,12 @@ class OISCurve(DiscountCurve):
         # TODO: REINSTATE THESE CHECKS ?
         # Swaps must have same cash flows for linear swap bootstrap to work
         #            longest_swap = ois_swaps[-1]
-        #            longest_swapCpnDates = longest_swap.adjusted_fixed_dts
+        #            longest_swap_cpn_dates = longest_swap.adjusted_fixed_dts
         #            for swap in ois_swaps[0:-1]:
         #                swap_cpn_dts = swap.adjusted_fixed_dts
         #                num_flows = len(swap_cpn_dts)
         #                for i_flow in range(0, num_flows):
-        #                    if swap_cpn_dts[i_flow] != longest_swapCpnDates[i_flow]:
+        #                    if swap_cpn_dts[i_flow] != longest_swap_cpn_dates[i_flow]:
         #                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
@@ -410,8 +411,8 @@ class OISCurve(DiscountCurve):
                 full_output=False,
             )
 
-        if self._check_refit_flag is True:
-            self.check_refits(SWAP_TOL, 1e-5)
+        if self.check_refit_flag is True:
+            self.check_refit(SWAP_TOL, 1e-5)
 
     ###############################################################################
 
@@ -470,8 +471,8 @@ class OISCurve(DiscountCurve):
                 )
 
         if len(self.used_swaps) == 0:
-            if self._check_refit_flag is True:
-                self.check_refits(SWAP_TOL, 1e-5)
+            if self.check_refit_flag is True:
+                self.check_refit(SWAP_TOL, 1e-5)
             return
 
         #######################################################################
@@ -557,12 +558,12 @@ class OISCurve(DiscountCurve):
 
             pv01 += acc * df_mat
 
-        if self._check_refit_flag is True:
-            self.check_refits(SWAP_TOL, 1e-5)
+        if self.check_refit_flag is True:
+            self.check_refit(SWAP_TOL, 1e-5)
 
     ###############################################################################
 
-    def check_refits(self, fra_tol, swap_tol):
+    def check_refit(self, fra_tol, swap_tol):
         """Ensure that the Libor curve refits the calibration instruments.
         We omit deposits as these are fitted exactly in the bootstrap."""
 

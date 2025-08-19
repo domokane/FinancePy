@@ -13,6 +13,7 @@ from ...utils.calendar import CalendarTypes
 
 
 class IborConventions:
+    """Class to hold the conventions for Ibor rates."""
 
     def __init__(self, currency_name: str, index_name: str = "LIBOR"):
 

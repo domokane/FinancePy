@@ -112,6 +112,9 @@ def _solve_to_horizon(
     # Nelder-Mead (both SciPy and Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
+
+    xopt = None
+
     try:
         if fin_solver_type == FinSolverTypes.NELDER_MEAD_NUMBA:
             xopt = nelder_mead(
@@ -244,9 +247,8 @@ def _solver_for_smile_strike(
         parameters,
     )
 
-    K = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
-
-    return K
+    k = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
+    return k
 
 
 ###############################################################################
@@ -308,7 +310,7 @@ class EquityVolSurface:
 
     ###########################################################################
 
-    def vol_from_strike_date(self, K, expiry_dt):
+    def vol_from_strike_date(self, k, expiry_dt):
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -360,11 +362,11 @@ class EquityVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, K, t0)
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, K, t1)
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k, t1)
 
         else:
 
@@ -753,12 +755,12 @@ class EquityVolSurface:
             f = self._fwd_0_T[i_tenor]
             t = self._t_exp[i_tenor]
 
-            dS = (high_s - low_s) / num_intervals
+            ds = (high_s - low_s) / num_intervals
 
-            disDF = self._discount_curve.df_t(t)
+            dis_df = self._discount_curve.df_t(t)
             div_df = self._dividend_curve.df_t(t)
 
-            r = -np.log(disDF) / t
+            r = -np.log(dis_df) / t
             q = -np.log(div_df) / t
 
             k_s = []
@@ -766,7 +768,7 @@ class EquityVolSurface:
 
             for i_k in range(0, num_intervals):
 
-                k = low_s + i_k * dS
+                k = low_s + i_k * ds
 
                 vol = vol_function(
                     self._vol_func_type.value,
@@ -807,15 +809,15 @@ class EquityVolSurface:
             fitted_vols = []
 
             num_intervals = 30
-            K = low_k
-            dK = (high_k - low_k) / num_intervals
+            k = low_k
+            dk = (high_k - low_k) / num_intervals
 
             for _ in range(0, num_intervals):
 
-                ks.append(K)
-                fitted_vol = self.vol_from_strike_date(K, expiry_dt) * 100.0
+                ks.append(k)
+                fitted_vol = self.vol_from_strike_date(k, expiry_dt) * 100.0
                 fitted_vols.append(fitted_vol)
-                K = K + dK
+                k = k + dk
 
             label_str = "FITTED AT " + str(self._expiry_dts[tenor_index])
             plt.plot(ks, fitted_vols, label=label_str)

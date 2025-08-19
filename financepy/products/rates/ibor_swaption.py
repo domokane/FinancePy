@@ -166,8 +166,8 @@ class IborSwaption:
         cpn_times = np.array(cpn_times)
         cpn_flows = np.array(cpn_flows)
 
-        df_times = discount_curve._times
-        df_values = discount_curve._dfs
+        df_times = discount_curve.times
+        df_values = discount_curve.dfs
 
         if np.any(cpn_times < 0.0):
             raise FinError("No cpn times can be before the value date.")
@@ -320,6 +320,7 @@ class IborSwaption:
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
+        swaption_price = 0.0
 
         if isinstance(model, Black):
 
@@ -348,7 +349,7 @@ class IborSwaption:
     ###########################################################################
 
     def print_swap_fixed_leg(self):
-
+        """Print the present value of the fixed leg of the underlying swap."""
         if self.underlying_swap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
 
@@ -357,7 +358,7 @@ class IborSwaption:
     ###########################################################################
 
     def print_swap_float_leg(self):
-
+        """Print the present value of the floating leg of the underlying swap."""
         if self.underlying_swap is None:
             raise FinError("Underlying swap has not been set. Do a valuation.")
 

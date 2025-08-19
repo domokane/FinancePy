@@ -32,7 +32,7 @@ class DiscountCurveZeros(DiscountCurve):
     between the zero rates given and for this we must specify an interpolation
     convention. The class inherits methods from DiscountCurve."""
 
-    ###############################################################################
+    ###########################################################################
 
     def __init__(
         self,
@@ -64,7 +64,9 @@ class DiscountCurveZeros(DiscountCurve):
             raise FinError("Unknown Frequency type " + str(freq_type))
 
         if dc_type not in DayCountTypes:
-            raise FinError("Unknown Cap Floor DayCountRule type " + str(dc_type))
+            raise FinError(
+                "Unknown Cap Floor DayCountRule type " + str(dc_type)
+            )
 
         self.value_dt = value_dt
         self.freq_type = freq_type
@@ -79,7 +81,11 @@ class DiscountCurveZeros(DiscountCurve):
             raise FinError("Times or dates are not sorted in increasing order")
 
         dfs = self._zero_to_df(
-            self.value_dt, self._zero_rates, self._times, self.freq_type, self.dc_type
+            self.value_dt,
+            self._zero_rates,
+            self._times,
+            self.freq_type,
+            self.dc_type,
         )
 
         self._dfs = np.array(dfs)
@@ -88,10 +94,10 @@ class DiscountCurveZeros(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type)
         self.fit(self._times, self._dfs)
 
-    # ###############################################################################
+    # #########################################################################
 
     #     def bump(self, bump_size):
-    #         """ Calculate the continuous forward rate at the forward date. """
+    #         """ Calculate the continuous forward rate at the forward date."""
 
     #         times = self.times.copy()
     #         discount_factors = self._discount_factors.copy()
@@ -99,7 +105,7 @@ class DiscountCurveZeros(DiscountCurve):
     #         n = len(self.times)
     #         for i in range(0, n):
     #             t = times[i]
-    #             discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
+    #         discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
 
     #         disc_curve = DiscountCurve(self.value_dt, times,
     #                                      discount_factors,
@@ -107,7 +113,7 @@ class DiscountCurveZeros(DiscountCurve):
 
     #         return disc_curve
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -126,7 +132,7 @@ class DiscountCurveZeros(DiscountCurve):
 
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

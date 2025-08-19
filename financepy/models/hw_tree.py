@@ -121,13 +121,13 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
             pd[jN] = 1.0 / 6.0 + 0.50 * (ajdt * ajdt + ajdt)
 
     # Arrow-Debreu array
-    Q = np.zeros(shape=(num_time_steps + 2, 2 * N + 1))
+    qq = np.zeros(shape=(num_time_steps + 2, 2 * N + 1))
 
     # This is the drift adjustment to ensure no arbitrage at each time
     alpha = np.zeros(num_time_steps + 1)
 
     # Time zero is trivial for the Arrow-Debreu price
-    Q[0, N] = 1.0
+    qq[0, N] = 1.0
 
     # Big loop over time steps
     for m in range(0, num_time_steps + 1):
@@ -136,33 +136,33 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
         sum_qz = 0.0
         for j in range(-nm, nm + 1):
             rdt = j * dR * dt
-            sum_qz += Q[m, j + N] * np.exp(-rdt)
+            sum_qz += qq[m, j + N] * np.exp(-rdt)
         alpha[m] = np.log(sum_qz / discount_factors[m + 1]) / dt
 
         for j in range(-nm, nm + 1):
             jN = j + N
             r_t[m, jN] = alpha[m] + j * dR
 
-        # Loop over all nodes at time m to calculate next values of Q
+        # Loop over all nodes at time m to calculate next values of qq
         for j in range(-nm, nm + 1):
             jN = j + N
             rdt = r_t[m, jN] * dt
             z = np.exp(-rdt)
 
             if j == j_max:
-                Q[m + 1, jN] += Q[m, jN] * pu[jN] * z
-                Q[m + 1, jN - 1] += Q[m, jN] * pm[jN] * z
-                Q[m + 1, jN - 2] += Q[m, jN] * pd[jN] * z
+                qq[m + 1, jN] += qq[m, jN] * pu[jN] * z
+                qq[m + 1, jN - 1] += qq[m, jN] * pm[jN] * z
+                qq[m + 1, jN - 2] += qq[m, jN] * pd[jN] * z
             elif j == -j_max:
-                Q[m + 1, jN] += Q[m, jN] * pd[jN] * z
-                Q[m + 1, jN + 1] += Q[m, jN] * pm[jN] * z
-                Q[m + 1, jN + 2] += Q[m, jN] * pu[jN] * z
+                qq[m + 1, jN] += qq[m, jN] * pd[jN] * z
+                qq[m + 1, jN + 1] += qq[m, jN] * pm[jN] * z
+                qq[m + 1, jN + 2] += qq[m, jN] * pu[jN] * z
             else:
-                Q[m + 1, jN + 1] += Q[m, jN] * pu[jN] * z
-                Q[m + 1, jN] += Q[m, jN] * pm[jN] * z
-                Q[m + 1, jN - 1] += Q[m, jN] * pd[jN] * z
+                qq[m + 1, jN + 1] += qq[m, jN] * pu[jN] * z
+                qq[m + 1, jN] += qq[m, jN] * pm[jN] * z
+                qq[m + 1, jN - 1] += qq[m, jN] * pd[jN] * z
 
-    return (Q, pu, pm, pd, r_t, dt)
+    return (qq, pu, pm, pd, r_t, dt)
 
 
 ###############################################################################
@@ -175,10 +175,10 @@ def american_bond_option_tree_fast(
     face_amount,
     cpn_times,
     cpn_amounts,
-    exercise_typeInt,
+    exercise_type_int,
     _sigma,
     _a,
-    _Q,
+    _qq,
     _pu,
     _pm,
     _pd,
@@ -198,7 +198,7 @@ def american_bond_option_tree_fast(
         print("Coupon Times", cpn_times)
         print("Coupon Amounts", cpn_amounts)
 
-    num_time_steps, num_nodes = _Q.shape
+    num_time_steps, num_nodes = _qq.shape
     dt = _dt
     j_max = ceil(0.1835 / (_a * dt))
     expiry_step = int(t_exp / dt + 0.50)
@@ -413,7 +413,7 @@ def american_bond_option_tree_fast(
                 call_option_values[m, kN] = max(call_exercise, hold_call)
                 put_option_values[m, kN] = max(put_exercise, hold_put)
 
-            elif exercise_typeInt == 3 and m < expiry_step:  # AMERICAN
+            elif exercise_type_int == 3 and m < expiry_step:  # AMERICAN
 
                 call_option_values[m, kN] = max(call_exercise, hold_call)
                 put_option_values[m, kN] = max(put_exercise, hold_put)
@@ -443,11 +443,11 @@ def bermudan_swaption_tree_fast(
     face_amount,
     cpn_times,
     cpn_flows,
-    exercise_typeInt,
+    exercise_type_int,
     _df_times,
     _df_values,
     _tree_times,
-    _Q,
+    _qq,
     _pu,
     _pm,
     _pd,
@@ -460,7 +460,7 @@ def bermudan_swaption_tree_fast(
     times we need to extend tree out to bond maturity and take into account
     cash flows through time."""
 
-    num_time_steps, num_nodes = _Q.shape
+    num_time_steps, num_nodes = _qq.shape
     j_max = ceil(0.1835 / (_a * _dt))
     expiry_step = int(t_exp / _dt + 0.50)
     maturity_step = int(t_mat / _dt + 0.50)
@@ -617,12 +617,12 @@ def bermudan_swaption_tree_fast(
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 2 and flow > G_SMALL and m >= expiry_step:
+            elif exercise_type_int == 2 and flow > G_SMALL and m >= expiry_step:
 
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 3 and m >= expiry_step:
+            elif exercise_type_int == 3 and m >= expiry_step:
 
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
@@ -650,7 +650,7 @@ def callable_puttable_bond_tree_fast(
     face,
     _sigma,
     _a,
-    _Q,  # IS SIGMA USED ?
+    _qq,  # IS SIGMA USED ?
     _pu,
     _pm,
     _pd,
@@ -673,7 +673,7 @@ def callable_puttable_bond_tree_fast(
     if np.any(cpn_times < 0.0):
         raise FinError("No cpn times can be before the value date.")
 
-    num_time_steps, num_nodes = _Q.shape
+    num_time_steps, num_nodes = _qq.shape
     dt = _dt
     j_max = ceil(0.1835 / (_a * dt))
     t_mat = cpn_times[-1]
@@ -925,7 +925,7 @@ class HWTree:
         self.num_time_steps = num_time_steps
         self.european_calc_type = european_calc_type
 
-        self.Q = None
+        self.qq = None
         self.r = None
         self.tree_times = None
         self.pu = None
@@ -1063,7 +1063,7 @@ class HWTree:
         pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, INTERP)
         ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, INTERP)
 
-        _, num_nodes = self.Q.shape
+        _, num_nodes = self.qq.shape
         expiry_step = int(t_exp / dt + 0.50)
 
         call_value = 0.0
@@ -1074,7 +1074,7 @@ class HWTree:
 
         for k in range(0, num_nodes):
 
-            q = self.Q[expiry_step, k]
+            q = self.qq[expiry_step, k]
             r_t = self.r_t[expiry_step, k]
 
             pv = 0.0
@@ -1148,7 +1148,7 @@ class HWTree:
         ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, INTERP)
         pt_mat = _uinterpolate(t_mat, self.df_times, self.dfs, INTERP)
 
-        _, num_nodes = self.Q.shape
+        _, num_nodes = self.qq.shape
         expiry_step = int(t_exp / dt + 0.50)
 
         call_value = 0.0
@@ -1156,7 +1156,7 @@ class HWTree:
 
         for k in range(0, num_nodes):
 
-            q = self.Q[expiry_step, k]
+            q = self.qq[expiry_step, k]
             r_t = self.r_t[expiry_step, k]
 
             zcb = p_fast(
@@ -1179,7 +1179,7 @@ class HWTree:
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time."""
 
-        exercise_typeInt = option_exercise_types_to_int(exercise_type)
+        exercise_type_int = option_exercise_types_to_int(exercise_type)
 
         t_mat = cpn_times[-1]
 
@@ -1198,11 +1198,11 @@ class HWTree:
             face,
             cpn_times,
             cpn_flows,
-            exercise_typeInt,
+            exercise_type_int,
             self.df_times,
             self.dfs,
             self.tree_times,
-            self.Q,
+            self.qq,
             self.pu,
             self.pm,
             self.pd,
@@ -1223,9 +1223,9 @@ class HWTree:
         maturity. For European bond options, Jamshidian's model is
         faster and is used instead i.e. not this function."""
 
-        exercise_typeInt = option_exercise_types_to_int(exercise_type)
+        exercise_type_int = option_exercise_types_to_int(exercise_type)
 
-        if exercise_typeInt == 1:
+        if exercise_type_int == 1:
 
             if self.european_calc_type == FinHWEuropeanCalcType.JAMSHIDIAN:
 
@@ -1259,10 +1259,10 @@ class HWTree:
                     face_amount,
                     cpn_times,
                     cpn_flows,
-                    exercise_typeInt,
+                    exercise_type_int,
                     self.sigma,
                     self.a,
-                    self.Q,
+                    self.qq,
                     self.pu,
                     self.pm,
                     self.pd,
@@ -1284,10 +1284,10 @@ class HWTree:
                 face_amount,
                 cpn_times,
                 cpn_flows,
-                exercise_typeInt,
+                exercise_type_int,
                 self.sigma,
                 self.a,
-                self.Q,
+                self.qq,
                 self.pu,
                 self.pm,
                 self.pd,
@@ -1336,7 +1336,7 @@ class HWTree:
             face_amount,
             self.sigma,
             self.a,
-            self.Q,
+            self.qq,
             self.pu,
             self.pm,
             self.pd,
@@ -1358,7 +1358,7 @@ class HWTree:
         if t_mat == 0.0:
             return 1.0
 
-        _, num_nodes = self.Q.shape
+        _, num_nodes = self.qq.shape
         fn1 = t_mat / self.dt
         fn2 = float(int(t_mat / self.dt))
         if abs(fn1 - fn2) > 1e-6:
@@ -1368,7 +1368,7 @@ class HWTree:
 
         p = 0.0
         for i in range(0, num_nodes):
-            ad = self.Q[time_step, i]
+            ad = self.qq[time_step, i]
             p += ad
         zero_rate = -np.log(p) / t_mat
         return p, zero_rate
@@ -1403,7 +1403,7 @@ class HWTree:
         self.df_times = df_times
         self.dfs = df_values
 
-        self.Q, self.pu, self.pm, self.pd, self.r_t, self.dt = build_tree_fast(
+        self.qq, self.pu, self.pm, self.pd, self.r_t, self.dt = build_tree_fast(
             self.a, self.sigma, tree_times, self.num_time_steps, df_tree
         )
 

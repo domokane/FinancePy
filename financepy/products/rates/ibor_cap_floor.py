@@ -9,6 +9,8 @@
 from typing import Optional
 from typing import Union
 
+from enum import Enum
+
 from ...utils.date import Date
 from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
@@ -30,8 +32,6 @@ from ...models.hw_tree import HWTree
 from ...utils.global_types import FinCapFloorTypes, OptionTypes
 
 ##########################################################################
-
-from enum import Enum
 
 
 class IborCapFloorModelTypes(Enum):

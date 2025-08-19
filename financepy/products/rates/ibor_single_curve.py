@@ -2,9 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import copy
 import numpy as np
-from typing import Union
 from scipy import optimize
 
 from ...utils.error import FinError
@@ -36,7 +37,8 @@ def _f(
     value_dt = args[1]
     swap = args[2]
     num_points = len(curve.times)
-    curve._dfs[num_points - 1] = df
+    # curve._dfs[num_points - 1] = df
+    curve.set_df(num_points - 1, df)
 
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
@@ -55,8 +57,8 @@ def _g(df, *args):
     value_dt = args[1]
     fra = args[2]
     num_points = len(curve.times)
-    curve._dfs[num_points - 1] = df
-
+    #    curve._dfs[num_points - 1] = df
+    curve.set_df(num_points - 1, df)
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)
@@ -68,7 +70,8 @@ def _g(df, *args):
 
 
 def _cost_function(dfs, *args):
-    """Objective function for fitting all knot dfs at once to the benchmark securities  -- suitable for non-local interpolators"""
+    """Objective function for fitting all knot dfs at once to the benchmark
+    securities  -- suitable for non-local interpolators"""
 
     #    print("Discount factors:", dfs)
 
@@ -168,7 +171,7 @@ class IborSingleCurve(DiscountCurve):
 
         self.value_dt = value_dt
         self._interp_type = interp_type
-        self._check_refit_flag = check_refit_flag
+        self.check_refit_flag = check_refit_flag
         self._interpolator = Interpolator(self._interp_type, **kwargs)
         self._is_built = False
         self._optional_interp_params = kwargs
@@ -325,7 +328,7 @@ class IborSingleCurve(DiscountCurve):
             # Swaps must have same cash flows for bootstrap to work
             longest_swap = ibor_swaps[-1]
 
-            longest_swapCpnDates = longest_swap.fixed_leg.payment_dts
+            longest_swap_cpn_dates = longest_swap.fixed_leg.payment_dts
 
             for swap in ibor_swaps[0:-1]:
 
@@ -333,7 +336,7 @@ class IborSingleCurve(DiscountCurve):
 
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
-                    if swap_cpn_dts[i_flow] != longest_swapCpnDates[i_flow]:
+                    if swap_cpn_dts[i_flow] != longest_swap_cpn_dates[i_flow]:
                         raise FinError("Swap coupons are not on the same date grid.")
 
         #######################################################################
@@ -470,9 +473,9 @@ class IborSingleCurve(DiscountCurve):
                 full_output=False,
             )
 
-        if self._check_refit_flag is True:
-            # self._check_refits(1e-10, swaptol, 1e-5)
-            self._check_refits(1e-5, 1e-5, 1e-5)
+        if self.check_refit_flag is True:
+            # self.check_refit(1e-10, swaptol, 1e-5)
+            self.check_refit(1e-5, 1e-5, 1e-5)
 
     ###############################################################################
 
@@ -484,14 +487,15 @@ class IborSingleCurve(DiscountCurve):
 
         def _obj_f_curve_build_ls(dfs):
             """
-            Objective function for fitting all knot dfs at once to the benchmark securities  -- suitable for non-local interpolators
+            Objective function for fitting all knot dfs at once to the benchmark
+            securities  -- suitable for non-local interpolators
             """
 
             libor_curve = self
             value_dt = libor_curve.value_dt
             libor_curve._dfs[1:] = dfs
 
-            libor_curve._interpolator.fit(libor_curve.times, libor_curve.dfs)
+            libor_curve.fit(libor_curve.times, libor_curve.dfs)
 
             out = np.zeros(
                 len(libor_curve.used_deposits)
@@ -533,10 +537,10 @@ class IborSingleCurve(DiscountCurve):
         self._is_built = True
 
         if bootstrap_first:
-            orig_check_refit = self._check_refit_flag
-            self._check_refit_flag = False
+            orig_check_refit_flag = self.check_refit_flag
+            self.check_refit_flag = False
             self._build_curve_using_1d_solver(**kwargs)
-            self._check_refit = orig_check_refit
+            self.check_refit_flag = orig_check_refit_flag
         else:
             tmat = 0.0
             df_mat = 1.0
@@ -577,8 +581,8 @@ class IborSingleCurve(DiscountCurve):
         self._dfs[1:] = np.array(res.x)
         self.fit(self._times, self._dfs)
 
-        if self._check_refit is True:
-            self._check_refits(1e-5, 1e-5, 1e-5)
+        if self.check_refit_flag is True:
+            self.check_refit(1e-5, 1e-5, 1e-5)
 
     ###############################################################################
 
@@ -645,8 +649,8 @@ class IborSingleCurve(DiscountCurve):
                 )
 
         if len(self.used_swaps) == 0:
-            if self._check_refit_flag is True:
-                self._check_refits(1e-10, SWAP_TOL, 1e-5)
+            if self.check_refit_flag is True:
+                self.check_refit(1e-10, SWAP_TOL, 1e-5)
             return
 
         #######################################################################
@@ -733,12 +737,12 @@ class IborSingleCurve(DiscountCurve):
 
             pv01 += acc * df_mat
 
-        if self._check_refit_flag is True:
-            self._check_refits(1e-10, SWAP_TOL, 1e-5)
+        if self.check_refit_flag is True:
+            self.check_refit(1e-10, SWAP_TOL, 1e-5)
 
     ###############################################################################
 
-    def _check_refits(self, depo_tol, fra_tol, swap_tol):
+    def check_refit(self, depo_tol, fra_tol, swap_tol):
         """Ensure that the Ibor curve refits the calibration instruments."""
         for depo in self.used_deposits:
             v = depo.value(self.value_dt, self) / depo.notional

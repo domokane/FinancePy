@@ -26,7 +26,9 @@ def _x(rho, z):
 ##############################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(
+    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
+)
 def vol_function_sabr(params, f, k, t):
     """Black volatility implied by SABR model."""
 
@@ -58,17 +60,24 @@ def vol_function_sabr(params, f, k, t):
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        vz = (
+            alpha
+            * z
+            * (1.0 + (a + b + c) * t)
+            / (d * (1.0 + v + w) * _x(rho, z))
+        )
         return vz
-    else:
-        v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
-        return v0
+
+    v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
+    return v0
 
 
 ###############################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(
+    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
+)
 def vol_function_sabr_beta_one(params, f, k, t):
     """This is the SABR function with the exponent beta set equal to 1 so only
     3 parameters are free. The first parameter is alpha, then nu and the third
@@ -96,7 +105,9 @@ def vol_function_sabr_beta_one(params, f, k, t):
         log_m = np.log(m)
         z = nu / alpha * log_m
         denom = 1.0
-        x = np.log((np.sqrt(1.0 - 2.0 * rho * z + z**2.0) + z - rho) / (1.0 - rho))
+        x = np.log(
+            (np.sqrt(1.0 - 2.0 * rho * z + z**2.0) + z - rho) / (1.0 - rho)
+        )
         sigma = num * z / (denom * x)
 
     else:  # when the option is at the money
@@ -114,7 +125,9 @@ def vol_function_sabr_beta_one(params, f, k, t):
 ###############################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(
+    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
+)
 def vol_function_sabr_beta_half(params, f, k, t):
     """Black volatility implied by SABR model."""
 
@@ -146,7 +159,12 @@ def vol_function_sabr_beta_half(params, f, k, t):
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        vz = (
+            alpha
+            * z
+            * (1.0 + (a + b + c) * t)
+            / (d * (1.0 + v + w) * _x(rho, z))
+        )
         return vz
     else:
         v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
@@ -245,7 +263,9 @@ class SABR:
 
     ###############################################################################
 
-    def set_alpha_from_black_vol(self, black_vol, forward, strike, time_to_expiry):
+    def set_alpha_from_black_vol(
+        self, black_vol, forward, strike, time_to_expiry
+    ):
         """Estimate the value of the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
         to the input black vol. This uses a numerical 1D solver."""
@@ -262,12 +282,15 @@ class SABR:
             # Objective function
             def fn(x):
                 return np.sqrt(
-                    (black_vol - self.black_vol_with_alpha(x, f, k, t_exp)) ** 2
+                    (black_vol - self.black_vol_with_alpha(x, f, k, t_exp))
+                    ** 2
                 )
 
             bnds = ((0.0, None),)
             x0 = init_alpha
-            results = minimize(fn, x0, method="L-BFGS-B", bounds=bnds, tol=1e-8)
+            results = minimize(
+                fn, x0, method="L-BFGS-B", bounds=bnds, tol=1e-8
+            )
             alpha = results.x[0]
         else:
             alpha = init_alpha
@@ -276,7 +299,9 @@ class SABR:
 
     ###############################################################################
 
-    def set_alpha_from_atm_black_vol(self, black_vol, atm_strike, time_to_expiry):
+    def set_alpha_from_atm_black_vol(
+        self, black_vol, atm_strike, time_to_expiry
+    ):
         """We solve cubic equation for the unknown variable alpha for the
         special ATM case of the strike equalling the forward following Hagan
         and al. equation (3.3). We take the smallest real root as the preferred
@@ -291,7 +316,9 @@ class SABR:
         coeff0 = -black_vol * (K ** (1.0 - self.beta))
         coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
         coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K ** (1.0 - beta)))
-        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (24.0 * (K ** (2.0 - 2.0 * beta)))
+        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (
+            24.0 * (K ** (2.0 - 2.0 * beta))
+        )
         coeffs = [coeff3, coeff2, coeff1, coeff0]
         roots = np.roots(coeffs)
 

@@ -56,6 +56,7 @@ def interpolate(
 
         u = _uinterpolate(t, times, dfs, method)
         return u
+
     elif isinstance(t, np.ndarray):
 
         if np.any(t < 0.0):
@@ -65,8 +66,8 @@ def interpolate(
         v = _vinterpolate(t, times, dfs, method)
 
         return v
-    else:
-        raise FinError("Unknown input type" + type(t))
+
+    raise FinError("Unknown input type" + type(t))
 
 
 ###############################################################################
@@ -150,7 +151,9 @@ def _uinterpolate(t, times, dfs, method):
             rt1 = -np.log(dfs[i - 2])
             rt2 = -np.log(dfs[i - 1])
             dt = times[i - 1] - times[i - 2]
-            rtvalue = ((times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2) / dt
+            rtvalue = (
+                (times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2
+            ) / dt
             yvalue = np.exp(-rtvalue)
 
         return yvalue
@@ -163,13 +166,17 @@ def _uinterpolate(t, times, dfs, method):
             yvalue = np.exp(-yvalue)
         elif i < num_points:
             # If you get a math domain error it is because you need negativ
-            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (
+                times[i - 1] - times[i - 2]
+            )
             fwd2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
             dt = times[i] - times[i - 1]
             fwd = ((times[i] - t) * fwd1 + (t - times[i - 1]) * fwd2) / dt
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
         else:
-            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (
+                times[i - 1] - times[i - 2]
+            )
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
 
         return yvalue
@@ -236,8 +243,8 @@ class Interpolator:
 
         elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
 
-            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
-            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
+            g_small_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -256,8 +263,8 @@ class Interpolator:
 
             """Second derivatives at left is zero and first derivative at
             right is clamped to zero."""
-            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
-            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
+            g_small_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -270,18 +277,22 @@ class Interpolator:
 
             """Second derivatives are clamped to zero at end points"""
             log_dfs = np.log(self._dfs)
-            self._interp_fn = CubicSpline(self._times, log_dfs, bc_type="natural")
+            self._interp_fn = CubicSpline(
+                self._times, log_dfs, bc_type="natural"
+            )
 
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
             """Second derivatives are clamped to zero at end points"""
-            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
-            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
+            g_small_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = CubicSpline(self._times, zero_rates, bc_type="natural")
+            self._interp_fn = CubicSpline(
+                self._times, zero_rates, bc_type="natural"
+            )
 
         #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
         #
@@ -323,8 +334,8 @@ class Interpolator:
 
         elif self._interp_type == InterpTypes.TENSION_ZERO_RATES:
             tension_sigma = self._optional_interp_params.get("sigma", 1.0)
-            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
-            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
+            g_small_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -405,12 +416,14 @@ class Interpolator:
                 out = np.exp(log_dfs)
         else:
 
-            out = _vinterpolate(tvec, self._times, self._dfs, self._interp_type.value)
+            out = _vinterpolate(
+                tvec, self._times, self._dfs, self._interp_type.value
+            )
 
         if isinstance(t, (float, np.float64)):
             return out[0]
-        else:
-            return out
+
+        return out
 
     @classmethod
     def suitable_for_bootstrap(cls, interp_type):

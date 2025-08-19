@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
@@ -37,9 +39,9 @@ class IborBasisSwap:
         leg_1_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         leg_1_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         leg_1_spread: float = 0.0,
-        leg2FreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        leg2DayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        leg2Spread: float = 0.0,
+        leg_2_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        leg_2_day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        leg_2_spread: float = 0.0,
         notional: float = ONE_MILLION,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -67,9 +69,9 @@ class IborBasisSwap:
         if effective_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        leg2Type = SwapTypes.PAY
+        leg_2_type = SwapTypes.PAY
         if leg_1_type == SwapTypes.PAY:
-            leg2Type = SwapTypes.RECEIVE
+            leg_2_type = SwapTypes.RECEIVE
 
         payment_lag = 0
         principal = 0.0
@@ -92,10 +94,10 @@ class IborBasisSwap:
         self.float_leg_2 = SwapFloatLeg(
             effective_dt,
             self.termination_dt,
-            leg2Type,
-            leg2Spread,
-            leg2FreqType,
-            leg2DayCountType,
+            leg_2_type,
+            leg_2_spread,
+            leg_2_freq_type,
+            leg_2_day_count_type,
             notional,
             principal,
             payment_lag,
@@ -124,21 +126,21 @@ class IborBasisSwap:
         if index_curve_leg_2 is None:
             index_curve_leg_2 = discount_curve
 
-        float_leg_1Value = self.float_leg_1.value(
+        float_leg_1_value = self.float_leg_1.value(
             value_dt,
             discount_curve,
             index_curve_leg_1,
             first_fixing_rate_leg_1,
         )
 
-        float_leg_2Value = self.float_leg_2.value(
+        float_leg_2_value = self.float_leg_2.value(
             value_dt,
             discount_curve,
             index_curve_leg_2,
             first_fixing_rate_leg_2,
         )
 
-        value = float_leg_1Value + float_leg_2Value
+        value = float_leg_1_value + float_leg_2_value
         return value
 
     ###########################################################################

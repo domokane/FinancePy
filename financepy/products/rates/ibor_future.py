@@ -44,7 +44,7 @@ class IborFuture:
         if future_number < 1:
             raise FinError("Future number must be 1 or more")
 
-        if future_tenor != "3M" and future_tenor != "3m":
+        if future_tenor not in ["3M", "3m"]:
             raise FinError("Only 3M IMM futures handled currently.")
 
         self.delivery_dt = today_dt.next_imm_date()

@@ -100,8 +100,8 @@ class DiscountCurveNSS(DiscountCurve):
 
         if isinstance(dts, Date):
             return zero_rates[0]
-        else:
-            return np.array(zero_rates)
+
+        return np.array(zero_rates)
 
     ###########################################################################
 
@@ -142,8 +142,8 @@ class DiscountCurveNSS(DiscountCurve):
 
         if isinstance(dates, Date):
             return df[0]
-        else:
-            return df
+
+        return df
 
     ###########################################################################
 

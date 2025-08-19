@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# Copyright (C) 2018, 2019, 2020 Dominic O'kkane
 ##############################################################################
 
 from typing import Union
@@ -46,7 +46,7 @@ from ...utils.global_types import FinSolverTypes
 # problem with initial values ? optimiser can drive vol negative
 #
 # tried adding a function called gap but it screws up the pdf. Need it to
-# be smooth c3. abandoned for moment. Advise use quintic CLARK5 for best fit
+# be smooth c3. abandoned for moment. Advise use quintic CLARkk5 for best fit
 #
 # examine other functions for vol
 #
@@ -60,7 +60,7 @@ from ...utils.global_types import FinSolverTypes
 
 
 @njit(fastmath=True, cache=True)
-def _g(K, *args):
+def _g(kk, *args):
     """This is the objective function used in the determination of the FX
     option implied strike which is computed in the class below."""
 
@@ -74,7 +74,7 @@ def _g(K, *args):
     delta_target = args[7]
 
     delta_out = fast_delta(
-        s, t, K, r_d, r_f, volatility, delta_method_value, option_type_value
+        s, t, kk, r_d, r_f, volatility, delta_method_value, option_type_value
     )
 
     obj_fn = delta_target - delta_out
@@ -645,7 +645,7 @@ def _solve_to_horizon(
             vol_25d_ms,
         )
 
-        # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
+        # USE MARkkET STRANGLE VOL TO DETERMINE PRICE OF A MARkkET STRANGLE
         v_25d_c_ms = bs_value(
             s,
             t,
@@ -706,7 +706,7 @@ def _solve_to_horizon(
             vol_10d_ms,
         )
 
-        # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
+        # USE MARkkET STRANGLE VOL TO DETERMINE PRICE OF A MARkkET STRANGLE
         v_10d_c_ms = bs_value(
             s,
             t,
@@ -768,6 +768,9 @@ def _solve_to_horizon(
     # Nelder-Mead (both SciPy & Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
+
+    xopt = None
+
     try:
         if fin_solver_type == FinSolverTypes.NELDER_MEAD_NUMBA:
             xopt = nelder_mead(
@@ -980,7 +983,7 @@ def _delta_fit(k, *args):
     """This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol
-    and high K. It speeds up the code as it allows initial values close to
+    and high kk. It speeds up the code as it allows initial values close to
     the solution to be used."""
 
     vol_type_value = args[0]
@@ -1065,9 +1068,11 @@ def _solver_for_smile_strike(
         gaps,
     )
 
-    K = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
+    kk = newton_secant(
+        _delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50
+    )
 
-    return K
+    return kk
 
 
 ###############################################################################
@@ -1097,11 +1102,11 @@ def solve_for_strike(
     # =========================================================================
     # IMPORTANT NOTE:
     # =========================================================================
-    # For some delta quotation conventions I can solve for K explicitly.
+    # For some delta quotation conventions I can solve for kk explicitly.
     # Note that as I am using the function norminvdelta to calculate the
     # inverse value of delta, this may not, on a round trip using N(x), give
     # back the value x as it is calculated to a different number of decimal
-    # places. It should however agree to 6-7 decimal places. Which is OK.
+    # places. It should however agree to 6-7 decimal places. Which is Okk.
     # =========================================================================
 
     if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
@@ -1116,10 +1121,10 @@ def solve_for_strike(
 
         fwd_fx_rate = spot_fx_rate * for_df / dom_df
         vsqrtt = volatility * np.sqrt(t_del)
-        arg = delta_target * phi / for_df  # CHECK THIS !!!
+        arg = delta_target * phi / for_df  # CHECkk THIS !!!
         norminvdelta = norminvcdf(arg)
-        K = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
-        return K
+        kk = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
+        return kk
 
     if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
 
@@ -1135,8 +1140,8 @@ def solve_for_strike(
         vsqrtt = volatility * np.sqrt(t_del)
         arg = delta_target * phi
         norminvdelta = norminvcdf(arg)
-        K = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
-        return K
+        kk = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
+        return kk
 
     if delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
 
@@ -1151,9 +1156,9 @@ def solve_for_strike(
             delta_target,
         )
 
-        K = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
+        kk = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
 
-        return K
+        return kk
 
     if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
 
@@ -1168,9 +1173,9 @@ def solve_for_strike(
             delta_target,
         )
 
-        K = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
+        kk = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
 
-        return K
+        return kk
 
     raise FinError("Unknown FinFXDeltaMethod")
 
@@ -1335,7 +1340,7 @@ class FXVolSurfacePlus:
 
     ###########################################################################
 
-    def vol_from_strike_date(self, K, expiry_dt):
+    def vol_from_strike_date(self, kk, expiry_dt):
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -1393,7 +1398,7 @@ class FXVolSurfacePlus:
             self.strikes[index0],
             self.gaps[index0],
             fwd0,
-            K,
+            kk,
             t0,
         )
 
@@ -1405,7 +1410,7 @@ class FXVolSurfacePlus:
                 self.strikes[index1],
                 self.gaps[index1],
                 fwd1,
-                K,
+                kk,
                 t1,
             )
 
@@ -1527,13 +1532,13 @@ class FXVolSurfacePlus:
 
         if np.abs(t1 - t0) > 1e-6:
 
-            K = ((t_exp - t0) * k1 + (t1 - t_exp) * k0) / (t1 - t0)
+            kk = ((t_exp - t0) * k1 + (t1 - t_exp) * k0) / (t1 - t0)
 
         else:
 
-            K = k1
+            kk = k1
 
-        return K
+        return kk
 
     ###########################################################################
 
@@ -2043,12 +2048,9 @@ class FXVolSurfacePlus:
 
             if np.abs(diff) > tol:
                 print(
-                    "FAILED FIT TO ATM VOL IN: %9.6f  OUT: %9.6f  DIFF: %9.6f"
-                    % (
-                        self.atm_vols[i] * 100.0,
-                        sigma_atm_out * 100.0,
-                        diff * 100.0,
-                    )
+                    f"FAILED FIT TO ATM VOL IN: {self.atm_vols[i] * 100.0:9.6f}  "
+                    f"OUT: {sigma_atm_out * 100.0:9.6f}  "
+                    f"DIFF: {diff * 100.0:9.6f}"
                 )
 
             call.strike_fx_rate = self.k_atm[i]
@@ -2079,8 +2081,8 @@ class FXVolSurfacePlus:
                 )
 
             ###################################################################
-            # NOW WE ASSIGN THE SAME VOLATILITY TO THE MS STRIKES
-            # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.25/-0.25
+            # NOW WE ASSIGN THE SAME VOLATILITY TO THE MS STRIkkES
+            # THESE STRIkkES ARE DETERMINED BY SETTING DELTA TO 0.25/-0.25
             ###################################################################
 
             if self.use_ms_25d_vol is True:
@@ -2091,7 +2093,7 @@ class FXVolSurfacePlus:
 
                     print("==================================================")
                     print(
-                        "MKT STRANGLE 25d VOL IN: %9.6f %%"
+                        "MkkT STRANGLE 25d VOL IN: %9.6f %%"
                         % (100.0 * self.ms_25_delta_vols[i])
                     )
 
@@ -2118,13 +2120,15 @@ class FXVolSurfacePlus:
 
                 if verbose:
                     print(
-                        "k_25d_c_ms: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
-                        % (self.k_25d_c_ms[i], 100.0 * ms_vol, delta_call)
+                        f"k_25d_c_ms: {self.k_25d_c_ms[i]:9.6f}  "
+                        f"ATM + ms_vol: {100.0 * ms_vol:9.6f} %   "
+                        f"DELTA: {delta_call:9.6f}"
                     )
 
                     print(
-                        "k_25d_p_ms: %9.6f  ATM + ms_vol: %9.6f %%   DELTA: %9.6f"
-                        % (self.k_25d_p_ms[i], 100.0 * ms_vol, delta_put)
+                        f"k_25d_p_ms: {self.k_25d_p_ms[i]:9.6f}  "
+                        f"ATM + ms_vol: {100.0 * ms_vol:9.6f} %   "
+                        f"DELTA: {delta_put:9.6f}"
                     )
 
                 call_value = call.value(
@@ -2152,7 +2156,7 @@ class FXVolSurfacePlus:
                     )
 
                 ###############################################################
-                # NOW WE ASSIGN A DIFFERENT VOLATILITY TO THE MS STRIKES
+                # NOW WE ASSIGN A DIFFERENT VOLATILITY TO THE MS STRIkkES
                 # THE DELTAS WILL NO LONGER EQUAL 0.25, -0.25
                 ###############################################################
 
@@ -2176,7 +2180,7 @@ class FXVolSurfacePlus:
                     model,
                 )["v"]
 
-                # THIS IS NOT GOING TO BE 0.25 AS WE USED A DIFFERENT SKEW VOL
+                # THIS IS NOT GOING TO BE 0.25 AS WE USED A DIFFERENT SkkEW VOL
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
@@ -2205,7 +2209,7 @@ class FXVolSurfacePlus:
                     model,
                 )["v"]
 
-                # THIS IS NOT GOING TO BE -0.25 AS WE USED A DIFFERENT SKEW VOL
+                # THIS IS NOT GOING TO BE -0.25 AS WE USED A DIFFERENT SkkEW VOL
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
@@ -2236,7 +2240,7 @@ class FXVolSurfacePlus:
                     )
 
                     print(
-                        "CALL_VALUE: %9.6f  PUT_VALUE: %9.6f MS_SKEW_VALUE: % 9.6f"
+                        "CALL_VALUE: %9.6f  PUT_VALUE: %9.6f MS_SkkEW_VALUE: % 9.6f"
                         % (call_value, put_value, mkt_strangle_value_skew)
                     )
 
@@ -2248,7 +2252,7 @@ class FXVolSurfacePlus:
                     )
 
                 ###############################################################
-                # NOW WE SHIFT STRIKES SO THAT DELTAS NOW EQUAL 0.25, -0.25
+                # NOW WE SHIFT STRIkkES SO THAT DELTAS NOW EQUAL 0.25, -0.25
                 ###############################################################
 
                 call.strike_fx_rate = self.k_25d_c[i]
@@ -2330,8 +2334,8 @@ class FXVolSurfacePlus:
                     )
 
             ###################################################################
-            # NOW WE ASSIGN THE SAME VOLATILITY TO THE MS STRIKES
-            # THESE STRIKES ARE DETERMINED BY SETTING DELTA TO 0.10/-0.10
+            # NOW WE ASSIGN THE SAME VOLATILITY TO THE MS STRIkkES
+            # THESE STRIkkES ARE DETERMINED BY SETTING DELTA TO 0.10/-0.10
             ###################################################################
 
             if self.use_ms_10d_vol:
@@ -2342,7 +2346,7 @@ class FXVolSurfacePlus:
 
                     print("==========================================================")
                     print(
-                        "MKT STRANGLE 10d VOL IN: %9.6f %%"
+                        "MkkT STRANGLE 10d VOL IN: %9.6f %%"
                         % (100.0 * self.ms_10_delta_vols[i])
                     )
 
@@ -2403,7 +2407,7 @@ class FXVolSurfacePlus:
                     )
 
                 ###############################################################
-                # NOW WE ASSIGN A DIFFERENT VOLATILITY TO THE MS STRIKES
+                # NOW WE ASSIGN A DIFFERENT VOLATILITY TO THE MS STRIkkES
                 # THE DELTAS WILL NO LONGER EQUAL 0.25, -0.25
                 ###############################################################
 
@@ -2427,7 +2431,7 @@ class FXVolSurfacePlus:
                     model,
                 )["v"]
 
-                # THIS IS NOT GOING TO BE 0.10 AS WE HAVE USED A DIFFERENT SKEW VOL
+                # THIS IS NOT GOING TO BE 0.10 AS WE HAVE USED A DIFFERENT SkkEW VOL
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
@@ -2456,7 +2460,7 @@ class FXVolSurfacePlus:
                     model,
                 )["v"]
 
-                # THIS IS NOT GOING TO BE -0.10 AS WE HAVE USED A DIFFERENT SKEW VOL
+                # THIS IS NOT GOING TO BE -0.10 AS WE HAVE USED A DIFFERENT SkkEW VOL
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
@@ -2487,7 +2491,7 @@ class FXVolSurfacePlus:
                     )
 
                     print(
-                        "CALL_VALUE: %9.6f  PUT_VALUE: %9.6f  MS_SKEW_VALUE: % 9.6f"
+                        "CALL_VALUE: %9.6f  PUT_VALUE: %9.6f  MS_SkkEW_VALUE: % 9.6f"
                         % (call_value, put_value, mkt_strangle_value_skew)
                     )
 
@@ -2499,7 +2503,7 @@ class FXVolSurfacePlus:
                     )
 
                 ###############################################################
-                # NOW WE SHIFT STRIKES SO THAT DELTAS NOW EQUAL 0.10, -0.10
+                # NOW WE SHIFT STRIkkES SO THAT DELTAS NOW EQUAL 0.10, -0.10
                 ###############################################################
 
                 call.strike_fx_rate = self.k_10d_c[i]
@@ -2690,10 +2694,10 @@ class FXVolSurfacePlus:
             key_strikes.append(self.k_atm[tenor_index])
 
             key_vols = []
-            for K in key_strikes:
+            for kk in key_strikes:
 
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, K, t) * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
                 )
 
                 key_vols.append(sigma)
@@ -2707,10 +2711,10 @@ class FXVolSurfacePlus:
             key_strikes.append(self.k_25d_c_ms[tenor_index])
 
             key_vols = []
-            for K in key_strikes:
+            for kk in key_strikes:
 
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, K, t) * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
                 )
 
                 key_vols.append(sigma)
@@ -2724,9 +2728,9 @@ class FXVolSurfacePlus:
             key_strikes.append(self.k_10d_c_ms[tenor_index])
 
             key_vols = []
-            for K in key_strikes:
+            for kk in key_strikes:
                 sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, K, t) * 100.0
+                    vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
                 )
                 key_vols.append(sigma)
 
@@ -2770,14 +2774,14 @@ class FXVolSurfacePlus:
 
             s += label_to_string("MS 25d Call Strike", self.k_25d_c_ms[i])
             s += label_to_string("MS 25d Put Strike", self.k_25d_p_ms[i])
-            s += label_to_string("SKEW 25d CALL STRIKE", self.k_25d_c[i])
-            s += label_to_string("SKEW 25d PUT STRIKE", self.k_25d_p[i])
+            s += label_to_string("SkkEW 25d CALL STRIkkE", self.k_25d_c[i])
+            s += label_to_string("SkkEW 25d PUT STRIkkE", self.k_25d_p[i])
             s += label_to_string("PARAMS", self.parameters[i])
 
             s += label_to_string("MS 10d Call Strike", self.k_10d_c_ms[i])
             s += label_to_string("MS 10d Put Strike", self.k_10d_p_ms[i])
-            s += label_to_string("SKEW 10d CALL STRIKE", self.k_10d_c[i])
-            s += label_to_string("SKEW 10d PUT STRIKE", self.k_10d_p[i])
+            s += label_to_string("SkkEW 10d CALL STRIkkE", self.k_10d_c[i])
+            s += label_to_string("SkkEW 10d PUT STRIkkE", self.k_10d_p[i])
 
         return s
 

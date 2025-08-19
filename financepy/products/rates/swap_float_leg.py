@@ -1,10 +1,12 @@
 ###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
+
+from typing import Union
+
 import numpy as np
 import pandas as pd
 
-from typing import Union
 
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -69,7 +71,7 @@ class SwapFloatLeg:
         self.leg_type = leg_type
         self.freq_type = freq_type
         self.payment_lag = payment_lag
-        self.principal = 0.0
+        self.principal = principal
         self.notional = notional
         self.notional_array = []
         self.spread = spread
@@ -82,10 +84,15 @@ class SwapFloatLeg:
 
         self.start_accrued_dts = []
         self.end_accrued_dts = []
-        self.payment_dts = []
-        self.payments = []
         self.year_fracs = []
         self.accrued_days = []
+
+        self.rates = []
+        self.payment_dts = []
+        self.payments = []
+        self.payment_dfs = []
+        self.payment_pvs = []
+        self.cumulative_pvs = []
 
         self.generate_payment_dts()
 
@@ -237,8 +244,8 @@ class SwapFloatLeg:
 
         if pv_only:
             return leg_pv
-        else:
-            return leg_pv, self._cashflow_report_from_cached_values()
+
+        return leg_pv, self._cashflow_report_from_cached_values()
 
     ###########################################################################
 

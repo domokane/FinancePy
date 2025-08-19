@@ -38,9 +38,9 @@ class DiscountCurveNS(DiscountCurve):
         dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
     ):
         """Creation of a FinDiscountCurveNS object. Parameters are provided
-        individually for beta_0, beta_1, beta_2 and tau. The zero rates produced
-        by this parametrisation have an implicit compounding convention that
-        defaults to continuous but which can be overridden."""
+        individually for beta_0, beta_1, beta_2 and tau. The zero rates
+        produced by this parametrisation have an implicit compounding
+        convention that defaults to continuous but which can be overridden."""
 
         check_argument_types(self.__init__, locals())
 
@@ -128,8 +128,8 @@ class DiscountCurveNS(DiscountCurve):
 
         if isinstance(dates, Date):
             return df[0]
-        else:
-            return df
+
+        return df
 
     ###########################################################################
 

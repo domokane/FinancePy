@@ -33,7 +33,8 @@ def _f(df, *args):
     swap = args[3]
 
     num_points = len(index_curve.times)
-    index_curve._dfs[num_points - 1] = df
+    #    index_curve._dfs[num_points - 1] = df
+    index_curve.set_df(num_points - 1, df)
 
     # For discount that need a fit function, we fit it now
     index_curve.fit(index_curve.times, index_curve.dfs)
@@ -55,7 +56,7 @@ def _g(df, *args):
     value_dt = args[2]
     fra = args[3]
     num_points = len(curve.times)
-    curve._dfs[num_points - 1] = df
+    curve.set_df(num_points - 1, df)
 
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
@@ -367,7 +368,7 @@ class IborDualCurve(DiscountCurve):
             )
 
         if self.check_refit_flag is True:
-            self._check_refits(1e-10, SWAP_TOL, 1e-5)
+            self.check_refit(1e-10, SWAP_TOL, 1e-5)
 
     ###########################################################################
 
@@ -423,7 +424,7 @@ class IborDualCurve(DiscountCurve):
 
     #     if len(self.used_swaps) == 0:
     #         if self.check_refit_flag is True:
-    #             self.check_refits(1e-10, swap_tol, 1e-5)
+    #             self.check_refit(1e-10, swap_tol, 1e-5)
     #         return
 
     #     #######################################################################
@@ -510,11 +511,11 @@ class IborDualCurve(DiscountCurve):
     #         pv01 += acc * df_mat
 
     #     if self.check_refit_flag is True:
-    #         self.check_refits(1e-10, swap_tol, 1e-5)
+    #         self.check_refit(1e-10, swap_tol, 1e-5)
 
     ###########################################################################
 
-    def _check_refits(self, depo_tol, fra_tol, swap_tol):
+    def check_refit(self, depo_tol, fra_tol, swap_tol):
         """Ensure that the Ibor curve refits the calibration instruments."""
         for depo in self.used_deposits:
             v = depo.value(self.value_dt, self) / depo.notional

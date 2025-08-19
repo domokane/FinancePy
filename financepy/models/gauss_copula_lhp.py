@@ -15,7 +15,9 @@ from ..utils.error import FinError
 
 
 @njit(fastmath=True, cache=True)
-def tr_surv_prob_lhp(k1, k2, num_credits, survival_probs, recovery_rates, beta):
+def tr_surv_prob_lhp(
+    k1, k2, num_credits, survival_probs, recovery_rates, beta
+):
     """Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the large portfolio limit which
     assumes a homogenous portfolio with an infinite number of credits. This
@@ -51,7 +53,7 @@ def tr_surv_prob_lhp(k1, k2, num_credits, survival_probs, recovery_rates, beta):
 
 
 @njit(fastmath=True, cache=True)
-def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta, num_points):
+def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta):
 
     p = 0.0
     portfolio_el = 0.0
@@ -167,12 +169,12 @@ def lhp_analytical_density_base_corr(k, p, r, beta, dbeta_dk):
 
     c = norminvcdf(p)
     arga = k / (1.0 - r)
-    root1minusBetaSqd = np.sqrt(1.0 - beta * beta)
-    a = 1.0 / beta * (c - root1minusBetaSqd * norminvcdf(arga))
+    root_1_minus_beta_sqd = np.sqrt(1.0 - beta * beta)
+    a = 1.0 / beta * (c - root_1_minus_beta_sqd * norminvcdf(arga))
 
     da_dk = -c / beta / beta * dbeta_dk
     da_dk = da_dk + (
-        1.0 / root1minusBetaSqd + root1minusBetaSqd / beta / beta
+        1.0 / root_1_minus_beta_sqd + root_1_minus_beta_sqd / beta / beta
     ) * dbeta_dk * norminvcdf(arga)
     da_dk = da_dk - np.sqrt(1.0 - beta * beta) / beta / normpdf(
         norminvcdf(k / (1.0 - r))
@@ -249,9 +251,9 @@ def exp_min_lk(k, p, r, n, beta):
 
 
 @njit(fastmath=True, cache=True)
-def prob_l_greater_than_k(K, P, R, beta):
-    c = normpdf(P)
-    arga = K / (1.0 - R)
+def prob_l_greater_than_k(k, p, r, beta):
+    c = normpdf(p)
+    arga = k / (1.0 - r)
     a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
     prob = 1.0 - N(a)
     return prob

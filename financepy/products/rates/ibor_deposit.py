@@ -165,7 +165,7 @@ class IborDeposit:
 
     ###########################################################################
 
-    def print_flows(self, value_date: Date):
+    def print_flows(self, value_dt: Date):
         """Print the date and size of the future repayment."""
 
         dc = DayCount(self.dc_type)

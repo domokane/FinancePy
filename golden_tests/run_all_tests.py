@@ -45,13 +45,9 @@ def main(start_index=0, end_index=None):
             module = __import__(module_name)
 
             num_errors = getattr(module.test_cases, "_global_num_errors", 0)
-            num_warnings = getattr(
-                module.test_cases, "_global_num_warnings", 0
-            )
+            num_warnings = getattr(module.test_cases, "_global_num_warnings", 0)
 
-            print(
-                f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end=""
-            )
+            print(f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end="")
 
             if num_errors > 0:
                 print("*" * num_errors, end="")
@@ -61,11 +57,10 @@ def main(start_index=0, end_index=None):
         except (FinError, ValueError, NameError, TypeError) as e:
             # Handle known financepy or Python errors gracefully
             print(f"{type(e).__name__}: {e} ************")
-        except Exception:
+        except Exception as e:
             # Catch all other unexpected errors, print traceback for debugging
-            print("Unexpected error:")
+            print(f"Unexpected {type(e).__name__}: {e}")
             traceback.print_exc()
-        # Continue to next test module regardless of errors
 
 
 if __name__ == "__main__":

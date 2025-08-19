@@ -128,7 +128,7 @@ class IborFRA:
             df["payment_date"] = self.maturity_dt
             df["start_accrual_date"] = self.start_dt
             df["end_accrual_date"] = self.maturity_dt
-            df["year_frac"] = self.acc_factor
+            df["year_frac"] = acc_factor
             df["rate"] = libor_fwd - self.fra_rate
             df["payment"] = (
                 pay_fixed_sign
@@ -168,12 +168,11 @@ class IborFRA:
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df_index_1 = index_curve.df(self.start_dt)
         df_index_2 = index_curve.df(self.maturity_dt)
-        liborFwd = (df_index_1 / df_index_2 - 1.0) / acc_factor
+        libor_fwd = (df_index_1 / df_index_2 - 1.0) / acc_factor
 
         # Get the discount factor from a discount curve
-        dfDiscount2 = discount_curve.df(self.maturity_dt)
-
-        v = acc_factor * (liborFwd - self.fra_rate) * dfDiscount2
+        df_discount_2 = discount_curve.df(self.maturity_dt)
+        v = acc_factor * (libor_fwd - self.fra_rate) * df_discount_2
 
         # Forward value the FRA to the value date
         df_to_valuation_date = discount_curve.df(valuation_date)
@@ -192,10 +191,10 @@ class IborFRA:
             ),
             "notional": self.notional,
             "contract_rate": self.fra_rate,
-            "market_rate": liborFwd,
-            "spot_pvbp": acc_factor * dfDiscount2,
-            "fwd_pvbp": acc_factor * dfDiscount2 / discount_curve.df(self.start_dt),
-            "unit_value": acc_factor * dfDiscount2 * (liborFwd - self.fra_rate),
+            "market_rate": libor_fwd,
+            "spot_pvbp": acc_factor * df_discount_2,
+            "fwd_pvbp": acc_factor * df_discount_2 / discount_curve.df(self.start_dt),
+            "unit_value": acc_factor * df_discount_2 * (libor_fwd - self.fra_rate),
             "value": v,
             # ignoring pay_fixed flag (which is wrong anyway I think),
             # bus day adj type, calendar for now

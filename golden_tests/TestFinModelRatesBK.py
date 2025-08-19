@@ -145,7 +145,7 @@ def test_BKExampleTwo():
         print("RT")
         print_tree(model.rt, 5)
         print("Q")
-        print_tree(model.Q, 5)
+        print_tree(model.qq, 5)
 
 
 ###############################################################################

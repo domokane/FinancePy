@@ -17,6 +17,7 @@ import numba
 
 @numba.njit("f8[:,:](f8[:], i8)")
 def _coeff_mat(x, deg):
+    """Construct the coefficient matrix for polynomial fitting."""
     mat = np.zeros(shape=(x.shape[0], deg + 1))
     c = np.ones_like(x)
     mat[:, 0] = c
@@ -32,6 +33,7 @@ def _coeff_mat(x, deg):
 
 @numba.njit("f8[:](f8[:,:], f8[:])")
 def _fit_x(a, b):
+    """Fit the polynomial coefficients to the data points."""
     # linalg solves ax = b
     det = np.linalg.lstsq(a, b)[0]
     return det
@@ -42,6 +44,7 @@ def _fit_x(a, b):
 
 @numba.njit("f8[:](f8[:], f8[:], i8)")
 def fit_poly(x, y, deg):
+    """Fit a polynomial of degree `deg` to points (x, y)"""
     a = _coeff_mat(x, deg)
     p = _fit_x(a, y)
     # Reverse order so p[0] is coefficient of highest order
@@ -53,14 +56,14 @@ def fit_poly(x, y, deg):
 
 
 @numba.njit(fastmath=True, cache=True)
-def eval_polynomial(P, x):
+def eval_polynomial(p, x):
     """
-    Compute polynomial P(x) where P is a vector of coefficients, highest
-    order coefficient at P[0].  Uses Horner's Method.
+    Compute polynomial p(x) where p is a vector of coefficients, highest
+    order coefficient at p[0].  Uses Horner's Method.
     """
 
     result = np.zeros_like(x)
-    for coeff in P:
+    for coeff in p:
         result = x * result + coeff
     return result
 

@@ -2,8 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import numpy as np
 from typing import Union
+import numpy as np
 from scipy import interpolate
 
 from ...utils.date import Date
@@ -56,12 +56,16 @@ class DiscountCurvePWFONF(DiscountCurve):
         self.freq_type = FrequencyTypes.CONTINUOUS
         self.dc_type = DayCountTypes.SIMPLE
 
-        dc_times = times_from_dates(self._knot_dts, self.value_dt, self.dc_type)
+        dc_times = times_from_dates(
+            self._knot_dts, self.value_dt, self.dc_type
+        )
 
         self._times = np.atleast_1d(dc_times)
 
         # it is easier to deal in log(dfs), log(df[Ti]) = -\int_0^T_i f(u) du
-        self._logdfs = -np.cumsum(np.diff(self._times, prepend=0.0) * self._onfwd_rates)
+        self._logdfs = -np.cumsum(
+            np.diff(self._times, prepend=0.0) * self._onfwd_rates
+        )
         self._logdfs_interp = interpolate.interp1d(
             np.concatenate(([0.0], self._times)),
             np.concatenate(([0.0], self._logdfs)),
@@ -101,7 +105,9 @@ class DiscountCurvePWFONF(DiscountCurve):
     ###############################################################################
 
     @classmethod
-    def flat_curve(cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT):
+    def flat_curve(
+        cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT
+    ):
         knot_dts = [valuation_date.add_tenor("1Y")]
         onfwd_rates = [level]
         return cls(valuation_date, knot_dts, onfwd_rates)

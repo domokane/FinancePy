@@ -26,7 +26,9 @@ def _f(df, *args):
     value_dt = args[1]
     swap = args[2]
     num_points = len(curve.times)
-    curve._dfs[num_points - 1] = df
+    #    curve._dfs[num_points - 1] = df
+    curve.set_df(num_points - 1, df)
+
     v_swap = swap.value(value_dt, curve, curve, None, 1.0)
     v_swap /= swap.notional
     return v_swap
@@ -317,7 +319,7 @@ class InflationSwapCurve(DiscountCurve):
             )
 
         if self.check_refit_flag is True:
-            self.check_refits(SWAP_TOL, 1e-5)
+            self.check_refit(1e-5, SWAP_TOL, 1e-5)
 
     ###########################################################################
 
@@ -372,8 +374,8 @@ class InflationSwapCurve(DiscountCurve):
                 )
 
         if len(self.used_swaps) == 0:
-            if self._check_refit_flag is True:
-                self.check_refits(SWAP_TOL, 1e-5)
+            if self.check_refit_flag is True:
+                self.check_refit(1e-5, SWAP_TOL, 1e-5)
             return
 
         #        print("CURVE SO FAR")
@@ -474,12 +476,12 @@ class InflationSwapCurve(DiscountCurve):
         #        print(self.times)
         #        print(self.dfs)
 
-        if self._check_refit_flag is True:
-            self.check_refits(SWAP_TOL, 1e-5)
+        if self.check_refit_flag is True:
+            self.check_refit(1e-5, SWAP_TOL, 1e-5)
 
     ###########################################################################
 
-    def _check_refits(self, depo_tol, fra_tol, swap_tol):
+    def check_refit(self, depo_tol, fra_tol, swap_tol):
         """Ensure that the Ibor curve refits the calibration instruments."""
         for depo in self.used_deposits:
             v = depo.value(self.value_dt, self) / depo.notional
