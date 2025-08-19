@@ -7,8 +7,8 @@ import numpy as np
 from scipy import optimize
 
 from ...utils.math import M
-from ...utils.global_vars import g_days_in_year
-from ...utils.global_vars import g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 
 from ...products.equity.equity_option import EquityOption
@@ -31,9 +31,9 @@ N = norm.cdf
 
 
 def _f(ss, *args):
-    """ Complex chooser option solve for critical stock price that makes the
+    """Complex chooser option solve for critical stock price that makes the
     forward starting call and put options have the same price on the chooser
-    date. """
+    date."""
 
     t = args[0]
     tc = args[1]
@@ -45,33 +45,34 @@ def _f(ss, *args):
     v = args[7]
     q = args[8]
 
-    v_call = bs_value(ss, tc - t, kc, rtc, q, v,
-                      OptionTypes.EUROPEAN_CALL.value)
-    v_put = bs_value(ss, tp - t, kp, rtp, q, v,
-                     OptionTypes.EUROPEAN_PUT.value)
+    v_call = bs_value(ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+    v_put = bs_value(ss, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
     v = v_call - v_put
     return v
+
 
 ###############################################################################
 
 
 class EquityChooserOption(EquityOption):
-    """ A EquityChooserOption is an option which allows the holder to
+    """A EquityChooserOption is an option which allows the holder to
     either enter into a call or a put option on a later expiry date, with both
     strikes potentially different and both expiry dates potentially different.
     This is known as a complex chooser. All the option details are set at trade
-    initiation. """
+    initiation."""
 
-    def __init__(self,
-                 choose_dt: Date,
-                 call_expiry_dt: Date,
-                 put_expiry_dt: Date,
-                 call_strike_price: float,
-                 put_strike_price: float):
-        """ Create the EquityChooserOption by passing in the chooser date
+    def __init__(
+        self,
+        choose_dt: Date,
+        call_expiry_dt: Date,
+        put_expiry_dt: Date,
+        call_strike_price: float,
+        put_strike_price: float,
+    ):
+        """Create the EquityChooserOption by passing in the chooser date
         and then the put and call expiry dates as well as the corresponding put
-        and call strike prices. """
+        and call strike prices."""
 
         check_argument_types(self.__init__, locals())
 
@@ -89,14 +90,16 @@ class EquityChooserOption(EquityOption):
 
     ###########################################################################
 
-    def value(self,
-              value_dt: Date,
-              stock_price: float,
-              discount_curve: DiscountCurve,
-              dividend_curve: DiscountCurve,
-              model):
-        """ Value the complex chooser option using an approach by Rubinstein
-        (1991). See also Haug page 129 for complex chooser options. """
+    def value(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,
+    ):
+        """Value the complex chooser option using an approach by Rubinstein
+        (1991). See also Haug page 129 for complex chooser options."""
 
         if value_dt > self.chooseDate:
             raise FinError("Value date after choose date.")
@@ -112,17 +115,19 @@ class EquityChooserOption(EquityOption):
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
-                "Discount Curve valuation date not same as option value date")
+                "Discount Curve valuation date not same as option value date"
+            )
 
         if dividend_curve.value_dt != value_dt:
             raise FinError(
-                "Dividend Curve valuation date not same as option value date")
+                "Dividend Curve valuation date not same as option value date"
+            )
 
         DEBUG_MODE = False
 
-        t = (self.chooseDate - value_dt) / g_days_in_year
-        tc = (self.call_expiry_dt - value_dt) / g_days_in_year
-        tp = (self.put_expiry_dt - value_dt) / g_days_in_year
+        t = (self.chooseDate - value_dt) / G_DAYS_IN_YEARS
+        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         rt = discount_curve.cc_rate(self.chooseDate)
         rtc = discount_curve.cc_rate(self.call_expiry_dt)
@@ -130,12 +135,12 @@ class EquityChooserOption(EquityOption):
 
         q = dividend_curve.cc_rate(self.chooseDate)
 
-        t = max(t, g_small)
-        tc = max(tc, g_small)
-        tp = max(tp, g_small)
+        t = max(t, G_SMALL)
+        tc = max(tc, G_SMALL)
+        tp = max(tp, G_SMALL)
 
         v = model.volatility
-        v = max(v, g_small)
+        v = max(v, G_SMALL)
 
         s0 = stock_price
         xc = self.call_strike
@@ -148,8 +153,9 @@ class EquityChooserOption(EquityOption):
         if DEBUG_MODE:
             print("args", argtuple)
 
-        istar = optimize.newton(_f, x0=s0, args=argtuple, tol=1e-8,
-                                maxiter=50, fprime2=None)
+        istar = optimize.newton(
+            _f, x0=s0, args=argtuple, tol=1e-8, maxiter=50, fprime2=None
+        )
 
         if DEBUG_MODE:
             print("istar", istar)
@@ -183,23 +189,25 @@ class EquityChooserOption(EquityOption):
 
     ###########################################################################
 
-    def value_mc(self,
-                 value_dt: Date,
-                 stock_price: float,
-                 discount_curve: DiscountCurve,
-                 dividend_curve: DiscountCurve,
-                 model,
-                 num_paths: int = 10000,
-                 seed: int = 4242):
-        """ Value the complex chooser option Monte Carlo. """
+    def value_mc(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,
+        num_paths: int = 10000,
+        seed: int = 4242,
+    ):
+        """Value the complex chooser option Monte Carlo."""
 
         dft = discount_curve.df(self.chooseDate)
         dftc = discount_curve.df(self.call_expiry_dt)
         dftp = discount_curve.df(self.put_expiry_dt)
 
-        t = (self.chooseDate - value_dt) / g_days_in_year
-        tc = (self.call_expiry_dt - value_dt) / g_days_in_year
-        tp = (self.put_expiry_dt - value_dt) / g_days_in_year
+        t = (self.chooseDate - value_dt) / G_DAYS_IN_YEARS
+        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         rt = -np.log(dft) / t
         rtc = -np.log(dftc) / tc
@@ -231,15 +239,11 @@ class EquityChooserOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        v_call_1 = bs_value(s_1, tc - t, kc, rtc, q, v,
-                            OptionTypes.EUROPEAN_CALL.value)
-        v_put_1 = bs_value(s_1, tp - t, kp, rtp, q, v,
-                           OptionTypes.EUROPEAN_PUT.value)
+        v_call_1 = bs_value(s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+        v_put_1 = bs_value(s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
-        v_call_2 = bs_value(s_2, tc - t, kc, rtc, q, v,
-                            OptionTypes.EUROPEAN_CALL.value)
-        v_put_2 = bs_value(s_2, tp - t, kp, rtp, q, v,
-                           OptionTypes.EUROPEAN_PUT.value)
+        v_call_2 = bs_value(s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+        v_put_2 = bs_value(s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
         payoff_1 = np.maximum(v_call_1, v_put_1)
         payoff_2 = np.maximum(v_call_2, v_put_2)
@@ -262,7 +266,8 @@ class EquityChooserOption(EquityOption):
     ###########################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

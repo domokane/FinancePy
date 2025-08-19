@@ -2,11 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+import sys
+
+sys.path.append("..")
+
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.models.merton_firm_mkt import MertonFirmMkt
 from financepy.models.merton_firm import MertonFirm
-import sys
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -24,12 +26,14 @@ def test_FinModelMertonCredit():
     asset_growth_rate = [0.0306, 0.03, 0.031, 0.0302, 0.0305]
     years_to_maturity = 1.0  # np.linspace(0.1, 10, 100)
 
-    model = MertonFirmMkt(equity_value,
-                          bond_face,
-                          years_to_maturity,
-                          risk_free_rate,
-                          asset_growth_rate,
-                          equity_vol)
+    model = MertonFirmMkt(
+        equity_value,
+        bond_face,
+        years_to_maturity,
+        risk_free_rate,
+        asset_growth_rate,
+        equity_vol,
+    )
 
     test_cases.header("MERTON MARKET MODEL", "VALUE")
     test_cases.print("ASSET VALUE", model._A)
@@ -46,12 +50,14 @@ def test_FinModelMertonCredit():
     asset_value = model._A
     asset_vol = model._vA
 
-    model = MertonFirm(asset_value,
-                       bond_face,
-                       years_to_maturity,
-                       risk_free_rate,
-                       asset_growth_rate,
-                       asset_vol)
+    model = MertonFirm(
+        asset_value,
+        bond_face,
+        years_to_maturity,
+        risk_free_rate,
+        asset_growth_rate,
+        asset_vol,
+    )
 
     test_cases.header("BASIC MERTON MODEL", "VALUE")
 
@@ -74,12 +80,14 @@ def test_FinModelMertonCredit():
     asset_growth_rate = 0.05
     asset_vol = 0.20
 
-    model = MertonFirm(asset_value,
-                       bond_face,
-                       years_to_maturity,
-                       risk_free_rate,
-                       asset_growth_rate,
-                       asset_vol)
+    model = MertonFirm(
+        asset_value,
+        bond_face,
+        years_to_maturity,
+        risk_free_rate,
+        asset_growth_rate,
+        asset_vol,
+    )
 
     test_cases.header("BASIC MERTON MODEL", "VALUE")
 
@@ -90,10 +98,11 @@ def test_FinModelMertonCredit():
     test_cases.print("ASSET VOLATILITY", model._vA)
     test_cases.print("EQUITY VOL", model._vE)
 
-    test_cases.print("CREDIT SPREAD", model.credit_spread()*10000)
+    test_cases.print("CREDIT SPREAD", model.credit_spread() * 10000)
     test_cases.print("LEVERAGE", model.leverage())
     test_cases.print("PROD DEFAULT", model.prob_default())
     test_cases.print("DISTANCE DEFAULT", model.dist_default())
+
 
 ###############################################################################
 

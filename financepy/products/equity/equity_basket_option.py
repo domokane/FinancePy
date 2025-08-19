@@ -9,7 +9,7 @@
 
 import numpy as np
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 
 from ...models.gbm_process_simulator import get_assets_paths
 
@@ -52,24 +52,16 @@ class EquityBasketOption:
 
     ###########################################################################
 
-    def _validate(
-        self, stock_prices, dividend_yields, volatilities, correlations
-    ):
+    def _validate(self, stock_prices, dividend_yields, volatilities, correlations):
 
         if len(stock_prices) != self.num_assets:
-            raise FinError(
-                "Stock prices must have a length " + str(self.num_assets)
-            )
+            raise FinError("Stock prices must have a length " + str(self.num_assets))
 
         if len(dividend_yields) != self.num_assets:
-            raise FinError(
-                "Dividend yields must have a length " + str(self.num_assets)
-            )
+            raise FinError("Dividend yields must have a length " + str(self.num_assets))
 
         if len(volatilities) != self.num_assets:
-            raise FinError(
-                "Volatilities must have a length " + str(self.num_assets)
-            )
+            raise FinError("Volatilities must have a length " + str(self.num_assets))
 
         if correlations.ndim != 2:
             raise FinError("Correlation must be a 2D matrix ")
@@ -114,7 +106,7 @@ class EquityBasketOption:
         able to handle a full rank correlation structure between the individual
         assets."""
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
@@ -205,7 +197,7 @@ class EquityBasketOption:
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         dividend_yields = []
         for curve in dividend_curves:
@@ -213,9 +205,7 @@ class EquityBasketOption:
             q = -np.log(dq) / t_exp
             dividend_yields.append(q)
 
-        self._validate(
-            stock_prices, dividend_yields, volatilities, corr_matrix
-        )
+        self._validate(stock_prices, dividend_yields, volatilities, corr_matrix)
 
         num_assets = len(stock_prices)
 

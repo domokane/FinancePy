@@ -4,7 +4,7 @@
 
 
 from ...models.black_scholes import BlackScholes
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.date import Date
 
 ##########################################################################
@@ -115,12 +115,13 @@ class FXOption:
             next_dt, spot_fx_rate, domestic_curve, foreign_curve, model
         )
 
-        bump = 1.0 / g_days_in_year
+        # Careful the bump here is not BUMP
+        bump = 1.0 / G_DAYS_IN_YEARS
 
         if isinstance(v, dict):
             theta = (v_bumped["value"] - v["value"]) / bump
         else:
-            theta = (v_bumped - v) / BUMP
+            theta = (v_bumped - v) / bump
 
         # Don't forget to reset the value dates
         domestic_curve.value_dt = value_dt

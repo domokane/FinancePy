@@ -107,7 +107,7 @@ class FinProcessSimulator:
 
 
 class FinHestonNumericalScheme(Enum):
-    EULER = 1
+    euler = 1
     EULERLOG = 2
     QUADEXP = 3
 
@@ -157,7 +157,7 @@ def get_heston_paths(
     rhohat = sqrt(1.0 - rho * rho)
     sigma2 = sigma * sigma
 
-    if scheme == FinHestonNumericalScheme.EULER.value:
+    if scheme == FinHestonNumericalScheme.euler.value:
         # Basic scheme to first order with truncation on variance
         for i_path in range(0, num_paths):
             s = s0
@@ -373,7 +373,7 @@ def get_vasicek_paths(
 
 
 class CIRNumericalScheme(Enum):
-    EULER = 1
+    euler = 1
     LOGNORMAL = 2
     MILSTEIN = 3
     KAHLJACKEL = 4
@@ -400,7 +400,7 @@ def get_cir_paths(
     rate_path = np.empty(shape=(num_paths, num_steps + 1))
     rate_path[:, 0] = r0
 
-    if scheme == CIRNumericalScheme.EULER.value:
+    if scheme == CIRNumericalScheme.euler.value:
         sigma_sqrt_dt = sigma * sqrt(dt)
         for i_path in range(0, num_paths):
             r = r0

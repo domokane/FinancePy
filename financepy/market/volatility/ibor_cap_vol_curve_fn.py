@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 
 ###############################################################################
 # TODO: Market calibration (fitting)
@@ -31,7 +31,7 @@ class IborCapVolCurveFn:
         """Return the caplet volatility."""
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_dt) / g_days_in_year
+            t = (dt - self._curve_dt) / G_DAYS_IN_YEARS
         else:
             t = dt
 

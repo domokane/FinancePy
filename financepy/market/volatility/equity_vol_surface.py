@@ -12,7 +12,7 @@ from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.global_types import OptionTypes
 from ...models.option_implied_dbn import option_implied_dbn
 from ...utils.helpers import check_argument_types, label_to_string
@@ -319,7 +319,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
 
         vol_type_value = self._vol_func_type.value
 
@@ -394,7 +394,7 @@ class EquityVolSurface:
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -496,7 +496,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
 
         vol_type_value = self._vol_func_type.value
 
@@ -653,7 +653,7 @@ class EquityVolSurface:
         for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
-            t_exp = (expiry_dt - spot_dt) / g_days_in_year
+            t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEARS
 
             dis_df = self._discount_curve.df_t(t_exp)
             div_df = self._dividend_curve.df_t(t_exp)

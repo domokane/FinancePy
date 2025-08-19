@@ -14,7 +14,7 @@ from ..utils.math import N, accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
 from ..utils.global_types import FinExerciseTypes
-from ..utils.global_vars import g_small
+from ..utils.global_vars import G_SMALL
 
 INTERP = InterpTypes.FLAT_FWD_RATES.value
 
@@ -511,7 +511,7 @@ def bermudan_swaption_tree_fast(
 
         # This is a bit of a hack for when the interpolation does not put the
         # full accrued on flow date. Another scheme may work but so does this
-        if fixed_leg_flows[m] > g_small:
+        if fixed_leg_flows[m] > G_SMALL:
             accrued[m] = fixed_leg_flows[m] * face_amount
 
     ###########################################################################
@@ -617,7 +617,7 @@ def bermudan_swaption_tree_fast(
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_typeInt == 2 and flow > g_small and m >= expiry_step:
+            elif exercise_typeInt == 2 and flow > G_SMALL and m >= expiry_step:
 
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
@@ -756,7 +756,7 @@ def callable_puttable_bond_tree_fast(
             t = _tree_times[i]
             df = _uinterpolate(t, _df_times, _df_values, INTERP)
 
-            if flow > g_small:
+            if flow > G_SMALL:
                 pv = flow * df
                 px += pv
 

@@ -3,7 +3,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.global_types import SwapTypes
-from financepy.utils.global_vars import g_basis_point
+from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
@@ -33,49 +33,49 @@ def test_ibor_curve_par_rate_shocker():
     depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
-    fraDCCType = DayCountTypes.ACT_360
+    fra_dcc_type = DayCountTypes.ACT_360
     fras = []
     fra = IborFRA(
         settlement_date.add_tenor("3M"),
         "3M",
         4.20 / 100.0,
-        fraDCCType,
+        fra_dcc_type,
         cal_type=cal,
     )
     fras.append(fra)
 
     swaps = []
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap = IborSwap(
         settlement_date,
         "1Y",
-        swapType,
+        swap_type,
         4.20 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
     swap = IborSwap(
         settlement_date,
         "2Y",
-        swapType,
+        swap_type,
         4.30 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
     swap = IborSwap(
         settlement_date,
         "3Y",
-        swapType,
+        swap_type,
         4.70 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
@@ -91,7 +91,7 @@ def test_ibor_curve_par_rate_shocker():
     mat_dates = curve_shocker.benchmarks_report()["maturity_dt"].values
 
     # size of bump
-    par_rate_bump = 1 * g_basis_point
+    par_rate_bump = 1 * G_BASIS_POINT
 
     # expected forward rate changes in the periods before and after the maturity date of the bumped benchmark
     # in basis points
@@ -122,8 +122,8 @@ def test_ibor_curve_par_rate_shocker():
         bumped_fwd_after = bumped_curve.fwd_rate(d2, d3)
 
         actual_fwd_rate_changes = (
-            (bumped_fwd_before - base_fwd_before) / g_basis_point,
-            (bumped_fwd_after - base_fwd_after) / g_basis_point,
+            (bumped_fwd_before - base_fwd_before) / G_BASIS_POINT,
+            (bumped_fwd_after - base_fwd_after) / G_BASIS_POINT,
         )
 
         assert round(actual_fwd_rate_changes[0], 3) == round(

@@ -10,7 +10,7 @@ import numpy as np
 from numba import njit, float64, int64
 
 from ...utils.error import FinError
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.math import heaviside
 
 ###############################################################################
@@ -177,15 +177,11 @@ def _value_once(
                 option_values[index + i_node] = hold_value
             elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
                 s = stock_values[index + i_node]
-                exercise_value = _payoff_value(
-                    s, payoff_typeValue, payoff_params
-                )
+                exercise_value = _payoff_value(s, payoff_typeValue, payoff_params)
                 option_values[index + i_node] = max(exercise_value, hold_value)
 
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / (
-        stock_values[2] - stock_values[1]
-    )
+    delta = (option_values[2] - option_values[1]) / (stock_values[2] - stock_values[1])
     delta_up = (option_values[5] - option_values[4]) / (
         stock_values[5] - stock_values[4]
     )
@@ -231,7 +227,7 @@ class EquityBinomialTree:
     ):
 
         # do some validation
-        t_exp = (expiry_dt - value_dt) / g_days_in_year
+        t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
         r = discount_curve.zero_rate(expiry_dt)
 
         dq = dividend_curve.df(expiry_dt)

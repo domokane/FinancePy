@@ -3,7 +3,7 @@ from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
@@ -247,9 +247,7 @@ class BondZero:
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
         accrued = self.accrued_interest(settle_dt, self.par)
         clean_price = dirty_price - accrued
@@ -322,18 +320,12 @@ class BondZero:
         """Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         accrued_amount = self.accrued_interest(settle_dt, self.par)
         dirty_prices = clean_prices + accrued_amount
@@ -488,9 +480,9 @@ class BondZero:
 
             # cpns paid on the settlement date are paid to the seller
             if dt > settle_dt:
-                t = (dt - settle_dt) / g_days_in_year
+                t = (dt - settle_dt) / G_DAYS_IN_YEARS
 
-                t = np.maximum(t, g_small)
+                t = np.maximum(t, G_SMALL)
 
                 df = discount_curve.df(dt)
                 # determine the Ibor implied zero rate
@@ -513,18 +505,12 @@ class BondZero:
         """Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -608,9 +594,7 @@ class BondZero:
 
                 dq = q - prev_q
 
-                defaulting_principal_pv_pay_start += (
-                    -dq * recovery_rate * prev_df
-                )
+                defaulting_principal_pv_pay_start += -dq * recovery_rate * prev_df
                 defaulting_principal_pv_pay_start += -dq * recovery_rate * df
 
                 # Add on PV of principal if default occurs in cpn period

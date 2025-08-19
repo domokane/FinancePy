@@ -9,7 +9,7 @@ import numpy as np
 
 from ...utils.math import n_vect  # n_prime_vect
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 
 # from ...products.equity.EquityOption import FinOption
@@ -107,8 +107,8 @@ class FXDoubleDigitalOption:
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
-            t_del = (self.delivery_dt - spot_dt) / g_days_in_year
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_del = (self.delivery_dt - spot_dt) / G_DAYS_IN_YEARS
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_del = value_dt
             t_exp = t_del

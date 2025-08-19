@@ -5,7 +5,7 @@
 
 from enum import Enum
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...models.black_scholes import BlackScholes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.date import Date
@@ -55,9 +55,7 @@ class EquityOption:
     ):
         """Calculation of option delta by perturbation of stock price and
         revaluation."""
-        v = self.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         v_bumped = self.value(
             value_dt, stock_price + bump, discount_curve, dividend_curve, model
@@ -79,9 +77,7 @@ class EquityOption:
         """Calculation of option gamma by perturbation of stock price and
         revaluation."""
 
-        v = self.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         v_bumped_dn = self.value(
             value_dt, stock_price - bump, discount_curve, dividend_curve, model
@@ -108,9 +104,7 @@ class EquityOption:
 
         bump = 0.01
 
-        v = self.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         model = BlackScholes(model.volatility + bump)
 
@@ -134,9 +128,7 @@ class EquityOption:
         """Calculation of option vanna by perturbing delta with respect to the
         stock price volatility."""
 
-        delta = self.delta(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        delta = self.delta(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         model = BlackScholes(model.volatility + bump)
 
@@ -159,18 +151,16 @@ class EquityOption:
     ):
         """Calculation of option theta by perturbing value date by one
         calendar date (not a business date) and then doing revaluation and
-        calculating the difference divided by dt = 1 / g_days_in_year."""
+        calculating the difference divided by dt = 1 / G_DAYS_IN_YEARS."""
 
-        v = self.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         next_dt = value_dt.add_days(1)
 
         # Need to do this carefully. This is a bit hacky.
         discount_curve.value_dt = next_dt
         dividend_curve.value_dt = next_dt
-        bump = (next_dt - value_dt) / g_days_in_year
+        bump = (next_dt - value_dt) / G_DAYS_IN_YEARS
 
         v_bumped = self.value(
             next_dt, stock_price, discount_curve, dividend_curve, model
@@ -196,9 +186,7 @@ class EquityOption:
         """Calculation of option rho by perturbing interest rate and
         revaluation."""
 
-        v = self.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         v_bumped = self.value(
             value_dt,

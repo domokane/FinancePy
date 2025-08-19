@@ -8,7 +8,7 @@ from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.math import scale, test_monotonicity
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import input_time
 from ...utils.helpers import table_to_string
@@ -62,7 +62,7 @@ class BondZeroCurve(DiscountCurve):
 
         times = []
         for bond in self.bonds:
-            t_mat = (bond.maturity_dt - self.settle_dt) / g_days_in_year
+            t_mat = (bond.maturity_dt - self.settle_dt) / G_DAYS_IN_YEARS
             times.append(t_mat)
 
         times = np.array(times)
@@ -84,7 +84,7 @@ class BondZeroCurve(DiscountCurve):
             bond = self.bonds[i]
             maturity_dt = bond.maturity_dt
             clean_price = self.clean_prices[i]
-            t_mat = (maturity_dt - self.settle_dt) / g_days_in_year
+            t_mat = (maturity_dt - self.settle_dt) / G_DAYS_IN_YEARS
 
             # Let's give it a good starting guess
             df = np.exp(-t_mat * bond.cpn)

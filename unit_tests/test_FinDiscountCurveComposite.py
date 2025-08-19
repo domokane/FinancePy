@@ -4,7 +4,7 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.global_vars import g_basis_point, g_percent
+from financepy.utils.global_vars import G_BASIS_POINT, G_PERCENT
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from financepy.market.curves.composite_discount_curve import (
@@ -20,7 +20,7 @@ def test_composite_discount_curve_can_value_trades():
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
-    bump_size = 1.0 * g_percent
+    bump_size = 1.0 * G_PERCENT
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
         base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
@@ -45,7 +45,7 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
-    bump_size = 0.0 * g_percent
+    bump_size = 0.0 * G_PERCENT
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
         base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
@@ -71,7 +71,7 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
-    bump_size = 0.0 * g_percent
+    bump_size = 0.0 * G_PERCENT
     fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
         base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
@@ -94,17 +94,17 @@ def _create_test_swap(valuation_date):
     spot_days = 2
     cal = CalendarTypes.UNITED_KINGDOM
     settlement_date = valuation_date.add_weekdays(spot_days)
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     trade = IborSwap(
         settlement_date.add_tenor("1Y"),
         "5Y",
-        swapType,
-        2.0 * g_percent,
-        fixed_freqType,
-        fixedDCCType,
+        swap_type,
+        2.0 * G_PERCENT,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
         notional=10000,
     )

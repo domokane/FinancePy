@@ -2,14 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
+
 from .date import Date
 from .date import datediff
 from .date import is_leap_year
 from .error import FinError
 from .frequency import FrequencyTypes, annual_frequency
-from .global_vars import g_days_in_year
+from .global_vars import G_DAYS_IN_YEARS
 
-from enum import Enum
 
 # A useful source for these definitions can be found at
 # https://developers.opengamma.com/quantitative-research/Interest-Rate-Instruments-and-Market-Conventions.pdf
@@ -21,7 +22,7 @@ from enum import Enum
 
 
 def is_last_day_of_feb(dt: Date):
-    ''' Returns True if we are on the last day of February '''
+    """Returns True if we are on the last day of February"""
 
     if dt.m == 2:
         is_leap = is_leap_year(dt.y)
@@ -31,6 +32,7 @@ def is_last_day_of_feb(dt: Date):
             return True
     else:
         return False
+
 
 ###############################################################################
 #    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA2000)
@@ -46,6 +48,10 @@ def is_last_day_of_feb(dt: Date):
 
 
 class DayCountTypes(Enum):
+    """
+    Enumeration of day count types.
+    """
+
     ZERO = 0  # zero coupon bond
     THIRTY_360_BOND = 1
     THIRTY_E_360 = 2
@@ -56,32 +62,35 @@ class DayCountTypes(Enum):
     ACT_365F = 7
     ACT_360 = 8
     ACT_365L = 9
-    SIMPLE = 10  # actual divided by g_days_in_year
+    SIMPLE = 10  # actual divided by G_DAYS_IN_YEARS
+
 
 ###############################################################################
 
 
 class DayCount:
-    """ Calculate the fractional day count between two dates according to a
-    specified day count convention. """
+    """Calculate the fractional day count between two dates according to a
+    specified day count convention."""
 
     def __init__(self, dcc_type: DayCountTypes):
-        """ Create Day Count convention by passing in the Day Count Type. """
+        """Create Day Count convention by passing in the Day Count Type."""
 
         if dcc_type not in DayCountTypes:
             raise FinError("Need to pass FinDayCountType")
 
         self._type = dcc_type
 
-###############################################################################
+    ###############################################################################
 
-    def year_frac(self,
-                  dt1: Date,  # Start of coupon period
-                  dt2: Date,  # Settlement (for bonds) or period end(swaps)
-                  dt3: Date = None,  # End of coupon period for accrued
-                  freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-                  is_termination_date: bool = False):  # Is dt2 a term date
-        """ This method performs two functions:
+    def year_frac(
+        self,
+        dt1: Date,  # Start of coupon period
+        dt2: Date,  # Settlement (for bonds) or period end(swaps)
+        dt3: Date = None,  # End of coupon period for accrued
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+        is_termination_date: bool = False,
+    ):  # Is dt2 a term date
+        """This method performs two functions:
 
         1) It calculates the year fraction between dates dt1 and dt2 using the
         specified day count convention which is useful for calculating year
@@ -277,19 +286,19 @@ class DayCount:
         elif self._type == DayCountTypes.SIMPLE:
 
             num = dt2 - dt1
-            den = g_days_in_year
+            den = G_DAYS_IN_YEARS
             acc_factor = num / den
             return acc_factor, num, den
 
         else:
 
-            raise FinError(str(self._type) +
-                           " is not one of DayCountTypes")
+            raise FinError(str(self._type) + " is not one of DayCountTypes")
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
-        """ Returns the calendar type as a string. """
+        """Returns the calendar type as a string."""
         return str(self._type)
+
 
 ###############################################################################

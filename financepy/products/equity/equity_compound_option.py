@@ -11,7 +11,7 @@ from numba import njit
 
 
 from ...utils.math import N, phi2
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 
@@ -334,8 +334,8 @@ class EquityCompoundOption(EquityOption):
 
             return v[0]
 
-        tc = (self.c_expiry_dt - value_dt) / g_days_in_year
-        tu = (self.u_expiry_dt - value_dt) / g_days_in_year
+        tc = (self.c_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tu = (self.u_expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         s0 = stock_price
 
@@ -343,13 +343,13 @@ class EquityCompoundOption(EquityOption):
         ru = -np.log(df) / tu
 
         # CHECK INTEREST RATES AND IF THERE SHOULD BE TWO RU AND RC ?????
-        tc = np.maximum(tc, g_small)
+        tc = np.maximum(tc, G_SMALL)
         tu = np.maximum(tc, tu)
 
         dq = dividend_curve.df(self.u_expiry_dt)
         q = -np.log(dq) / tu
 
-        v = np.maximum(model.volatility, g_small)
+        v = np.maximum(model.volatility, G_SMALL)
 
         kc = self.c_strike_price
         ku = self.u_strike_price
@@ -426,8 +426,8 @@ class EquityCompoundOption(EquityOption):
         if value_dt > self.c_expiry_dt:
             raise FinError("Value date is after expiry date.")
 
-        tc = (self.c_expiry_dt - value_dt) / g_days_in_year
-        tu = (self.u_expiry_dt - value_dt) / g_days_in_year
+        tc = (self.c_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tu = (self.u_expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.u_expiry_dt)
         r = -np.log(df) / tu

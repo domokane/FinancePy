@@ -6,7 +6,7 @@
 import numpy as np
 
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 
@@ -132,7 +132,7 @@ class EquityCliquetOption(EquityOption):
                 if dt > value_dt:
 
                     df = discount_curve.df(dt)
-                    t_exp = (dt - value_dt) / g_days_in_year
+                    t_exp = (dt - value_dt) / G_DAYS_IN_YEARS
                     r = -np.log(df) / t_exp
 
                     # option life
@@ -148,16 +148,12 @@ class EquityCliquetOption(EquityOption):
 
                     if self.option_type == call_type:
                         v_fwd_opt = (
-                            s
-                            * dq
-                            * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
+                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
                         )
                         v_cliquet += v_fwd_opt
                     elif self.option_type == put_type:
                         v_fwd_opt = (
-                            s
-                            * dq
-                            * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
+                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
                         )
                         v_cliquet += v_fwd_opt
                     else:

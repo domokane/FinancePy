@@ -7,7 +7,7 @@ import scipy.optimize as optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, table_to_string
 from ...utils.day_count import DayCount
@@ -61,9 +61,7 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if value_dt != libor_curve.value_dt:
-            raise FinError(
-                "Curve does not have same valuation date as Issuer curve."
-            )
+            raise FinError("Curve does not have same valuation date as Issuer curve.")
 
         self.value_dt = value_dt
         self.cds_contracts = cds_contracts
@@ -115,7 +113,7 @@ class CDSCurve:
         supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / g_days_in_year
+            t = (dt - self.value_dt) / G_DAYS_IN_YEARS
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -133,9 +131,7 @@ class CDSCurve:
                 )
             return qs
         elif isinstance(t, float):
-            q = _uinterpolate(
-                t, self._times, self._values, self.interp_method.value
-            )
+            q = _uinterpolate(t, self._times, self._values, self.interp_method.value)
             return q
         else:
             raise FinError("Unknown time type")
@@ -147,7 +143,7 @@ class CDSCurve:
         function supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / g_days_in_year
+            t = (dt - self.value_dt) / G_DAYS_IN_YEARS
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -180,7 +176,7 @@ class CDSCurve:
                 self.recovery_rate,
             )
 
-            t_mat = (maturity_dt - self.value_dt) / g_days_in_year
+            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
             q = self._values[i]
 
             self._times = np.append(self._times, t_mat)

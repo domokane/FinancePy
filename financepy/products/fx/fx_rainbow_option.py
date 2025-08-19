@@ -9,7 +9,7 @@ from typing import List
 
 from ...utils.date import Date
 from ...utils.math import N, M
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_assets_paths_times
 from ...products.fx.fx_option import FXOption
@@ -132,26 +132,21 @@ class FXRainbowOption(FXOption):
 
         if len(stock_prices) != self.num_assets:
             raise FinError(
-                "Stock prices must be a vector of length "
-                + str(self.num_assets)
+                "Stock prices must be a vector of length " + str(self.num_assets)
             )
 
         if len(dividend_yields) != self.num_assets:
             raise FinError(
-                "Dividend yields must be a vector of length "
-                + str(self.num_assets)
+                "Dividend yields must be a vector of length " + str(self.num_assets)
             )
 
         if len(volatilities) != self.num_assets:
             raise FinError(
-                "Volatilities must be a vector of length "
-                + str(self.num_assets)
+                "Volatilities must be a vector of length " + str(self.num_assets)
             )
 
         if len(betas) != self.num_assets:
-            raise FinError(
-                "Betas must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Betas must be a vector of length " + str(self.num_assets))
 
     ###########################################################################
 
@@ -214,9 +209,7 @@ class FXRainbowOption(FXOption):
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
         if self.num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -227,7 +220,7 @@ class FXRainbowOption(FXOption):
         self.validate(stock_prices, foreign_curve, volatilities, betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = domestic_curve.df(t)
         r = -np.log(df) / t
@@ -258,9 +251,7 @@ class FXRainbowOption(FXOption):
             v = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrtt, rho2)
-                - k
-                * df
-                * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
+                - k * df * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
             )
         elif self.payoff_type == FXRainbowOptionTypes.CALL_ON_MINIMUM:
             v = (
@@ -309,7 +300,7 @@ class FXRainbowOption(FXOption):
         if value_dt > expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         v = value_mc_fast(
             t,

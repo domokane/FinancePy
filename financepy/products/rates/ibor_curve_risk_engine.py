@@ -6,7 +6,7 @@ from typing import List, Union
 from ...utils.tenor import Tenor
 from ...utils.date import Date, datediff
 from ...utils.day_count import DayCountTypes
-from ...utils.global_vars import g_basis_point
+from ...utils.global_vars import G_BASIS_POINT
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
@@ -25,7 +25,7 @@ def par_rate_risk_report(
     base_curve: IborSingleCurve,
     trades: list,
     trade_labels: list = None,
-    bump_size=1.0 * g_basis_point,
+    bump_size=1.0 * G_BASIS_POINT,
 ):
     """Calculate deltas (change in value to 1bp bump) of the trades to all
     benchmarks in the base curve. Supported trades are depos, fras, swaps.
@@ -39,7 +39,7 @@ def par_rate_risk_report(
         the output. Defaults to None in which case these are auto generted
         bump_size (float, optional): How big of a bump to apply to bechmarks.
         Output always expressed as change in value per 1 bp.
-        Defaults to 1.0*g_basis_point.
+        Defaults to 1.0*G_BASIS_POINT.
 
     Returns:
         (base_values, risk_report):
@@ -71,7 +71,7 @@ def par_rate_risk_report(
             trade_label = trade_labels[trade_idx]
             base_value = base_values[trade_label]
             bumped_value = trade.value(bumped_curve.value_dt, bumped_curve)
-            par_delta = (bumped_value - base_value) / bump_size * g_basis_point
+            par_delta = (bumped_value - base_value) / bump_size * G_BASIS_POINT
             risk_report.loc[benchmark_idx, trade_label] = par_delta
 
     risk_report["total"] = risk_report[trade_labels].sum(axis=1)
@@ -84,7 +84,7 @@ def forward_rate_risk_report(
     grid_bucket_tenor: str,
     trades: list,
     trade_labels: list = None,
-    bump_size=1.0 * g_basis_point,
+    bump_size=1.0 * G_BASIS_POINT,
 ):
     """Generate forward rate deltas (forward delta ladder) risk report, which
     is the sensitivity of trades to bucketed shocks of the instantaneous (ON)
@@ -101,7 +101,7 @@ def forward_rate_risk_report(
         output. Defaults to None in which case these are auto generted
         bump_size (float, optional): How big of a bump to apply to bechmarks.
         Output always expressed as change in value per 1 bp.
-        Defaults to 1.0*g_basis_point.
+        Defaults to 1.0*G_BASIS_POINT.
 
     Returns:
         (dict, Dataframe): (base_values, risk_report)
@@ -128,7 +128,7 @@ def forward_rate_risk_report_custom_grid(
     trades: list,
     grid_labels: list = None,
     trade_labels: list = None,
-    bump_size=1.0 * g_basis_point,
+    bump_size=1.0 * G_BASIS_POINT,
 ):
     """Generate forward rate deltas risk report, which is the sensitivity of
     trades to bucketed shocks of the instantaneous (ON) forward rates. Here
@@ -144,7 +144,7 @@ def forward_rate_risk_report_custom_grid(
         output. Defaults to None in which case these are auto generted
         bump_size (float, optional): How big of a bump to apply to bechmarks.
         Output always expressed as change in value per 1 bp.
-        Defaults to 1.0*g_basis_point.
+        Defaults to 1.0*G_BASIS_POINT.
 
     Returns:
         (dict, Dataframe): (base_values, risk_report)
@@ -201,7 +201,7 @@ def forward_rate_risk_report_custom_grid(
             trade_label = trade_labels[trade_idx]
             base_value = base_values[trade_label]
             bumped_value = trade.value(bumped_curve.value_dt, bumped_curve)
-            par_delta = (bumped_value - base_value) / bump_size * g_basis_point
+            par_delta = (bumped_value - base_value) / bump_size * G_BASIS_POINT
             risk_report.loc[fwdrate_idx, DV01_PREFIX + trade_label] = par_delta
 
     risk_report[DV01_PREFIX + "total"] = risk_report[
@@ -216,7 +216,7 @@ def carry_rolldown_report(
     grid_bucket_tenor: Union[str, Tenor],
     trades: list,
     trade_labels: list = None,
-    bump_size=1.0 * g_basis_point,
+    bump_size=1.0 * G_BASIS_POINT,
 ):
     """Generate carry and rolldown risk report based on the sensitivity of
     trades to bucketed shocks of the instantaneous (ON) forward rates. Here
@@ -233,7 +233,7 @@ def carry_rolldown_report(
         output. Defaults to None in which case these are auto generted
         bump_size (float, optional): How big of a bump to apply to bechmarks.
         Output always expressed as change in value per 1 bp.
-        Defaults to 1.0*g_basis_point.
+        Defaults to 1.0*G_BASIS_POINT.
 
     Returns:
         (dict, Dataframe): (base_values, risk_report)
@@ -260,7 +260,7 @@ def carry_rolldown_report(
         risk_report.loc[0, ROLL_PREFIX + label] = first_period_carry[label]
         rate_change = -risk_report["market_rate"].diff()
         risk_report.loc[1:, ROLL_PREFIX + label] = (
-            risk_report.loc[1:, DV01_PREFIX + label] * rate_change[1:] / g_basis_point
+            risk_report.loc[1:, DV01_PREFIX + label] * rate_change[1:] / G_BASIS_POINT
         )
 
     risk_report[ROLL_PREFIX + "total"] = risk_report[
@@ -277,12 +277,12 @@ def parallel_shift_ladder_report(
     trade_labels: list = None,
 ):
 
-    curve_shift_labels = [f"SHIFT:{s/g_basis_point:.1f}" for s in curve_shifts]
+    curve_shift_labels = [f"SHIFT:{s/G_BASIS_POINT:.1f}" for s in curve_shifts]
     risk_report = pd.DataFrame(
         columns=["shift_label", "shift_bp"],
         data=zip(
             curve_shift_labels,
-            curve_shifts / g_basis_point,
+            curve_shifts / G_BASIS_POINT,
         ),
     )
 

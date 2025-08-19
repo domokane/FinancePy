@@ -8,7 +8,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import g_small
+from ...utils.global_vars import G_SMALL
 from ...utils.helpers import label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
@@ -91,7 +91,7 @@ class DiscountCurvePoly(DiscountCurve):
         use. The compounding frequency defaults to that specified in the
         constructor of the curve object. Which may be annual to continuous."""
 
-        t = np.maximum(times, g_small)
+        t = np.maximum(times, G_SMALL)
 
         zero_rate = 0.0
         for n in range(0, len(self._coefficients)):

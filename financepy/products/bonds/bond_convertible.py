@@ -14,7 +14,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.math import test_monotonicity
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 
@@ -212,9 +212,7 @@ def _value_convertible(
     bullet_pv = (1.0 + flow) * face_amount
     for i_node in range(0, num_levels):
         convValue = tree_convert_value[num_times - 1, i_node]
-        tree_convert_bond_value[num_times - 1, i_node] = max(
-            bullet_pv, convValue
-        )
+        tree_convert_bond_value[num_times - 1, i_node] = max(bullet_pv, convValue)
 
     #  begin backward steps from expiry
     for i_time in range(num_times - 2, -1, -1):
@@ -230,13 +228,9 @@ def _value_convertible(
         for i_node in range(0, i_time + 1):
             fut_value_up = tree_convert_bond_value[i_time + 1, i_node + 1]
             fut_value_dn = tree_convert_bond_value[i_time + 1, i_node]
-            hold = (
-                p_up * fut_value_up + p_dn * fut_value_dn
-            )  # p_up already embeds Q
+            hold = p_up * fut_value_up + p_dn * fut_value_dn  # p_up already embeds Q
             hold_pv = (
-                df * hold
-                + pDef * df * recovery_rate * face_amount
-                + flow * face_amount
+                df * hold + pDef * df * recovery_rate * face_amount + flow * face_amount
             )
             conv = tree_convert_value[i_time, i_node]
             value = min(max(hold_pv, conv, put), call)
@@ -250,18 +244,14 @@ def _value_convertible(
     delta = (tree_convert_bond_value[1, 1] - tree_convert_bond_value[1, 0]) / (
         tree_stock_value[1, 1] - tree_stock_value[1, 0]
     )
-    delta_up = (
-        tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]
-    ) / (tree_stock_value[2, 3] - tree_stock_value[2, 2])
-    delta_dn = (
-        tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]
-    ) / (tree_stock_value[2, 2] - tree_stock_value[2, 1])
-    gamma = (delta_up - delta_dn) / (
-        tree_stock_value[1, 1] - tree_stock_value[1, 0]
+    delta_up = (tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]) / (
+        tree_stock_value[2, 3] - tree_stock_value[2, 2]
     )
-    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (
-        2.0 * dt
+    delta_dn = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]) / (
+        tree_stock_value[2, 2] - tree_stock_value[2, 1]
     )
+    gamma = (delta_up - delta_dn) / (tree_stock_value[1, 1] - tree_stock_value[1, 0])
+    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (2.0 * dt)
     results = np.array([price, bullet_pv, delta, gamma, theta])
     return results
 
@@ -417,7 +407,7 @@ class BondConvertible:
 
         self._calculate_cpn_dts(settle_dt)
 
-        t_mat = (self.maturity_dt - settle_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - settle_dt) / G_DAYS_IN_YEARS
 
         if t_mat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
@@ -429,7 +419,7 @@ class BondConvertible:
         cpn = self.cpn / self.freq
 
         for dt in self.cpn_dts[1:]:
-            flow_time = (dt - settle_dt) / g_days_in_year
+            flow_time = (dt - settle_dt) / G_DAYS_IN_YEARS
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -445,7 +435,7 @@ class BondConvertible:
         call_times = []
 
         for dt in self.call_dts:
-            call_time = (dt - settle_dt) / g_days_in_year
+            call_time = (dt - settle_dt) / G_DAYS_IN_YEARS
             call_times.append(call_time)
 
         call_times = np.array(call_times)
@@ -460,7 +450,7 @@ class BondConvertible:
         put_times = []
 
         for dt in self.put_dts:
-            put_time = (dt - settle_dt) / g_days_in_year
+            put_time = (dt - settle_dt) / G_DAYS_IN_YEARS
             put_times.append(put_time)
 
         put_times = np.array(put_times)
@@ -477,13 +467,13 @@ class BondConvertible:
 
         dividend_times = []
         for dt in dividend_dts:
-            dividend_time = (dt - settle_dt) / g_days_in_year
+            dividend_time = (dt - settle_dt) / G_DAYS_IN_YEARS
             dividend_times.append(dividend_time)
         dividend_times = np.array(dividend_times)
         dividend_yields = np.array(dividend_yields)
 
         # If it's before today it starts today
-        tconv = (self.start_convert_dt - settle_dt) / g_days_in_year
+        tconv = (self.start_convert_dt - settle_dt) / G_DAYS_IN_YEARS
         tconv = max(tconv, 0.0)
 
         discount_factors = []
@@ -598,9 +588,7 @@ class BondConvertible:
 
         dc = DayCount(self.dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(
-            self.pcd, settle_dt, self.ncd, self.freq
-        )
+        (acc_factor, num, _) = dc.year_frac(self.pcd, settle_dt, self.ncd, self.freq)
 
         self.alpha = 1.0 - acc_factor * self.freq
 

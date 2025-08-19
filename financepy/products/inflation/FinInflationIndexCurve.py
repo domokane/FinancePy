@@ -13,7 +13,7 @@ from ...utils.helpers import label_to_string
 from ...utils.helpers import times_from_dates
 from ...utils.helpers import check_argument_types
 from ...utils.date import days_in_month
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 
 ###############################################################################
 
@@ -67,8 +67,8 @@ class FinInflationIndexCurve:
         cpi_first_dt = Date(1, lagMonthsAgoDt.m, lagMonthsAgoDt.y)
         cpi_second_dt = cpi_first_dt.add_months(1)
 
-        cpi_first_time = (cpi_first_dt - self.base_dt) / g_days_in_year
-        cpi_second_time = (cpi_second_dt - self.base_dt) / g_days_in_year
+        cpi_first_time = (cpi_first_dt - self.base_dt) / G_DAYS_IN_YEARS
+        cpi_second_time = (cpi_second_dt - self.base_dt) / G_DAYS_IN_YEARS
 
         cpi_first_value = np.interp(cpi_first_time, self.index_times, self.index_values)
 

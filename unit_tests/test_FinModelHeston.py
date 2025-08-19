@@ -30,12 +30,13 @@ def test_heston():
     rho = -0.90000
     sigma = 0.75000
     strike_price = 105.00
-    hestonModel = Heston(v0, kappa, theta, sigma, rho)
+    heston_model = Heston(v0, kappa, theta, sigma, rho)
 
     call_option = EquityVanillaOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL)
+        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
+    )
 
-    value_mc_Heston = hestonModel.value_mc(
+    value_mc_heston = heston_model.value_mc(
         value_dt,
         call_option,
         stock_price,
@@ -43,18 +44,23 @@ def test_heston():
         dividend_yield,
         num_paths,
         num_steps,
-        seed)
-    valueGatheral = hestonModel.value_gatheral(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield)
-    valueLewisRouah = hestonModel.value_lewis_rouah(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield)
-    valueLewis = hestonModel.value_lewis(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield)
-    valueWeber = hestonModel.value_weber(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield)
+        seed,
+    )
+    value_gatheral = heston_model.value_gatheral(
+        value_dt, call_option, stock_price, interest_rate, dividend_yield
+    )
+    value_lewis_rouah = heston_model.value_lewis_rouah(
+        value_dt, call_option, stock_price, interest_rate, dividend_yield
+    )
+    value_lewis = heston_model.value_lewis(
+        value_dt, call_option, stock_price, interest_rate, dividend_yield
+    )
+    value_weber = heston_model.value_weber(
+        value_dt, call_option, stock_price, interest_rate, dividend_yield
+    )
 
-    assert round(value_mc_Heston, 4) == 1.7333
-    assert round(valueGatheral, 4) == 1.8416
-    assert round(valueLewisRouah, 4) == 1.8416
-    assert round(valueLewis, 4) == 1.8416
-    assert round(valueWeber, 4) == 1.8416
+    assert round(value_mc_heston, 4) == 1.7333
+    assert round(value_gatheral, 4) == 1.8416
+    assert round(value_lewis_rouah, 4) == 1.8416
+    assert round(value_lewis, 4) == 1.8416
+    assert round(value_weber, 4) == 1.8416

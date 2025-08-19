@@ -7,7 +7,7 @@ from enum import Enum
 from typing import List
 import numpy as np
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...models.hw_tree import HWTree
 from ...models.bk_tree import BKTree
 from ...utils.error import FinError
@@ -138,7 +138,7 @@ class BondEmbeddedOption:
 
         for flow_dt in self.bond.cpn_dts[1:]:
             if flow_dt > settle_dt:
-                cpn_time = (flow_dt - settle_dt) / g_days_in_year
+                cpn_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
                 cpn_times.append(cpn_time)
                 cpn_amounts.append(cpn)
 
@@ -149,7 +149,7 @@ class BondEmbeddedOption:
         call_times = []
         for dt in self.call_dts:
             if dt > settle_dt:
-                call_time = (dt - settle_dt) / g_days_in_year
+                call_time = (dt - settle_dt) / G_DAYS_IN_YEARS
                 call_times.append(call_time)
         call_times = np.array(call_times)
         call_prices = np.array(self.call_prices)
@@ -158,13 +158,13 @@ class BondEmbeddedOption:
         put_times = []
         for dt in self.put_dts:
             if dt > settle_dt:
-                put_time = (dt - settle_dt) / g_days_in_year
+                put_time = (dt - settle_dt) / G_DAYS_IN_YEARS
                 put_times.append(put_time)
         put_times = np.array(put_times)
         put_prices = np.array(self.put_prices)
 
         maturity_dt = self.bond.maturity_dt
-        t_mat = (maturity_dt - settle_dt) / g_days_in_year
+        t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
         df_times = discount_curve._times
         df_values = discount_curve._dfs
 
@@ -199,9 +199,7 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (
-                v1["bondwithoption"] + v2["bondwithoption"]
-            ) / 2
+            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -237,9 +235,7 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (
-                v1["bondwithoption"] + v2["bondwithoption"]
-            ) / 2
+            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {

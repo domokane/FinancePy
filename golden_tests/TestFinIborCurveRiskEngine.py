@@ -7,7 +7,7 @@ sys.path.append("..")
 
 from helpers import buildIborSingleCurve
 from financepy.utils.date import Date
-from financepy.utils.global_vars import g_basis_point
+from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
@@ -34,33 +34,33 @@ def test_par_rate_risk_report_cubic_zero():
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
-    fraDCCType = DayCountTypes.ACT_360
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    fra_dcc_type = DayCountTypes.ACT_360
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settlement_date, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
         depo_dcc_type,
-        fraDCCType,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        fra_dcc_type,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
     )
     trades = _generate_trades(
         valuation_date,
         cal,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
         settlement_date,
         base_curve,
     )
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    par_rate_bump = 1 * g_basis_point
+    par_rate_bump = 1 * G_BASIS_POINT
 
     # run the report
     base_values, risk_report = re.par_rate_risk_report(
@@ -108,7 +108,7 @@ def test_par_rate_risk_report_flat_forward():
     )
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    par_rate_bump = 1 * g_basis_point
+    par_rate_bump = 1 * G_BASIS_POINT
 
     # run the report
     base_values, risk_report = re.par_rate_risk_report(
@@ -157,27 +157,27 @@ def test_forward_rate_risk_report():
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
-    fraDCCType = DayCountTypes.ACT_360
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    fra_dcc_type = DayCountTypes.ACT_360
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settlement_date, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
         depo_dcc_type,
-        fraDCCType,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        fra_dcc_type,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
     )
     trades = _generate_trades(
         valuation_date,
         cal,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
         settlement_date,
         base_curve,
     )
@@ -187,7 +187,7 @@ def test_forward_rate_risk_report():
     grid_last_date = max(t.maturity_dt for t in trades)
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    forward_rate_bump = 1 * g_basis_point
+    forward_rate_bump = 1 * G_BASIS_POINT
 
     # run the report
     base_values, risk_report = re.forward_rate_risk_report(
@@ -236,27 +236,27 @@ def test_forward_rate_custom_grid_risk_report():
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
-    fraDCCType = DayCountTypes.ACT_360
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    fra_dcc_type = DayCountTypes.ACT_360
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settlement_date, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
         depo_dcc_type,
-        fraDCCType,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        fra_dcc_type,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
     )
     trades = _generate_trades(
         valuation_date,
         cal,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
         settlement_date,
         base_curve,
     )
@@ -270,7 +270,7 @@ def test_forward_rate_custom_grid_risk_report():
     ]
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
-    forward_rate_bump = 1 * g_basis_point
+    forward_rate_bump = 1 * G_BASIS_POINT
 
     # run the report
     base_values, risk_report, *_ = re.forward_rate_risk_report_custom_grid(
@@ -297,27 +297,27 @@ def test_carry_rolldown_report():
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
-    fraDCCType = DayCountTypes.ACT_360
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    fra_dcc_type = DayCountTypes.ACT_360
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settlement_date, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
         depo_dcc_type,
-        fraDCCType,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        fra_dcc_type,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
     )
     trades = _generate_trades(
         valuation_date,
         cal,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
         settlement_date,
         base_curve,
     )
@@ -363,34 +363,34 @@ def test_parallel_shift_ladder_report():
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
-    fraDCCType = DayCountTypes.ACT_360
-    swapType = SwapTypes.PAY
-    fixedDCCType = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freqType = FrequencyTypes.SEMI_ANNUAL
+    fra_dcc_type = DayCountTypes.ACT_360
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settlement_date, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
         depo_dcc_type,
-        fraDCCType,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        fra_dcc_type,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
     )
     trades = _generate_trades(
         valuation_date,
         cal,
-        swapType,
-        fixedDCCType,
-        fixed_freqType,
+        swap_type,
+        fixed_dcc_type,
+        fixed_freq_type,
         settlement_date,
         base_curve,
     )
 
     # the curve shift grids on which we calculate the PV ladder
     curve_shifts = np.linspace(
-        -400 * g_basis_point, 400 * g_basis_point, 17, endpoint=True
+        -400 * G_BASIS_POINT, 400 * G_BASIS_POINT, 17, endpoint=True
     )
 
     # run the report
@@ -440,19 +440,19 @@ def test_parallel_shift_ladder_report():
 def _generate_trades(
     valuation_date,
     cal,
-    swapType,
-    fixedDCCType,
-    fixed_freqType,
+    swap_type,
+    fixed_dcc_type,
+    fixed_freq_type,
     settlement_date,
     base_curve,
 ):
     trade1 = IborSwap(
         settlement_date,
         "4Y",
-        swapType,
+        swap_type,
         4.20 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
         notional=10000,
     )
@@ -461,10 +461,10 @@ def _generate_trades(
     trade2 = IborSwap(
         settlement_date.add_tenor("6M"),
         "2Y",
-        swapType,
+        swap_type,
         4.20 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
         notional=10000,
     )
@@ -479,10 +479,10 @@ def _generate_base_curve(
     cal,
     interp_type,
     depo_dcc_type,
-    fraDCCType,
-    swapType,
-    fixedDCCType,
-    fixed_freqType,
+    fra_dcc_type,
+    swap_type,
+    fixed_dcc_type,
+    fixed_freq_type,
 ):
     depos = []
     spot_days = 2
@@ -495,7 +495,7 @@ def _generate_base_curve(
         settlement_date.add_tenor("3M"),
         "3M",
         4.20 / 100.0,
-        fraDCCType,
+        fra_dcc_type,
         cal_type=cal,
     )
     fras.append(fra)
@@ -504,50 +504,50 @@ def _generate_base_curve(
     swap = IborSwap(
         settlement_date,
         "1Y",
-        swapType,
+        swap_type,
         4.20 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
     swap = IborSwap(
         settlement_date,
         "2Y",
-        swapType,
+        swap_type,
         4.30 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
     swap = IborSwap(
         settlement_date,
         "3Y",
-        swapType,
+        swap_type,
         4.70 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
     swap = IborSwap(
         settlement_date,
         "5Y",
-        swapType,
+        swap_type,
         4.70 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)
     swap = IborSwap(
         settlement_date,
         "7Y",
-        swapType,
+        swap_type,
         4.70 / 100.0,
-        fixed_freqType,
-        fixedDCCType,
+        fixed_freq_type,
+        fixed_dcc_type,
         cal_type=cal,
     )
     swaps.append(swap)

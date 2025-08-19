@@ -10,7 +10,7 @@ from numba import njit
 
 from ...utils.date import Date
 from ...utils.math import nprime
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 
@@ -270,8 +270,8 @@ class FXVanillaOption:
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
-            t_del = (self.delivery_dt - spot_dt) / g_days_in_year
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_del = (self.delivery_dt - spot_dt) / G_DAYS_IN_YEARS
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_del = value_dt
             t_exp = t_del
@@ -436,8 +436,8 @@ class FXVanillaOption:
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
-            t_del = (self.delivery_dt - spot_dt) / g_days_in_year
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_del = (self.delivery_dt - spot_dt) / G_DAYS_IN_YEARS
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_del = value_dt
             t_exp = t_del
@@ -466,7 +466,7 @@ class FXVanillaOption:
             if np.any(v < 0.0):
                 raise FinError("Volatility should not be negative.")
 
-            v = np.maximum(v, g_small)
+            v = np.maximum(v, G_SMALL)
 
             pips_spot_delta = bs_delta(
                 s0, t_exp, K, r_d, r_f, v, self.option_type.value
@@ -491,8 +491,8 @@ class FXVanillaOption:
         should be slightly faster than the full calculation of delta."""
 
         #        spot_dt = value_dt.add_weekdays(self.spot_days)
-        #        t_del = (self.delivery_dt - value_dt) / g_days_in_year
-        #        t_del = np.maximum(t_del, g_small)
+        #        t_del = (self.delivery_dt - value_dt) / G_DAYS_IN_YEARS
+        #        t_del = np.maximum(t_del, G_SMALL)
 
         #        r_d = -np.log(dom_df)/t_del
         #         r_f = -np.log(for_df)/t_del
@@ -528,7 +528,7 @@ class FXVanillaOption:
         """This function calculates the FX Option Gamma using spot delta."""
 
         if isinstance(value_dt, Date):
-            t = (self.expiry_dt - value_dt) / g_days_in_year
+            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t = value_dt
 
@@ -584,7 +584,7 @@ class FXVanillaOption:
         """This function calculates the FX Option Vega using the spot delta."""
 
         if isinstance(value_dt, Date):
-            t = (self.expiry_dt - value_dt) / g_days_in_year
+            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t = value_dt
 
@@ -639,7 +639,7 @@ class FXVanillaOption:
         """This function calculates the time decay of the FX option."""
 
         if isinstance(value_dt, Date):
-            t = (self.expiry_dt - value_dt) / g_days_in_year
+            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t = value_dt
 
@@ -746,7 +746,7 @@ class FXVanillaOption:
             raise FinError("Model Type invalid")
 
         np.random.seed(seed)
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         dom_Df = domestic_curve.df(self.expiry_dt)
         for_Df = foreign_curve.df(self.expiry_dt)

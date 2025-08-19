@@ -9,7 +9,7 @@ from numba import njit
 
 # from scipy import optimize
 from ...utils.date import Date
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
@@ -118,11 +118,11 @@ class EquityVanillaOption:
             raise FinError("Valuation date is not a Date")
 
         if isinstance(self.expiry_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         elif isinstance(self.expiry_dt, list):
             t_exp = []
             for exp_dt in self.expiry_dt:
-                t = (exp_dt - value_dt) / g_days_in_year
+                t = (exp_dt - value_dt) / G_DAYS_IN_YEARS
             t_exp.append(t)
             t_exp = np.array(t_exp)
         else:
@@ -178,11 +178,11 @@ class EquityVanillaOption:
             )
 
         if isinstance(self.expiry_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         elif isinstance(self.expiry_dt, list):
             t_exp = []
             for exp_dt in self.expiry_dt:
-                t = (exp_dt - value_dt) / g_days_in_year
+                t = (exp_dt - value_dt) / G_DAYS_IN_YEARS
             t_exp.append(t)
             t_exp = np.array(t_exp)
         else:
@@ -236,7 +236,7 @@ class EquityVanillaOption:
         """Calculate the analytical delta of a European vanilla option."""
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_exp = value_dt
 
@@ -282,7 +282,7 @@ class EquityVanillaOption:
         """Calculate the analytical gamma of a European vanilla option."""
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_exp = value_dt
 
@@ -327,7 +327,7 @@ class EquityVanillaOption:
         """Calculate the analytical vega of a European vanilla option."""
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_exp = value_dt
 
@@ -371,7 +371,7 @@ class EquityVanillaOption:
         """Calculate the analytical theta of a European vanilla option."""
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_exp = value_dt
 
@@ -413,7 +413,7 @@ class EquityVanillaOption:
         """Calculate the analytical rho of a European vanilla option."""
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_exp = value_dt
 
@@ -455,7 +455,7 @@ class EquityVanillaOption:
         """Calculate the analytical vanna of a European vanilla option."""
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_exp = value_dt
 
@@ -497,7 +497,7 @@ class EquityVanillaOption:
         """Calculate the Black-Scholes implied volatility of a European
         vanilla option."""
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         if t_exp < 1.0 / 365.0:
             print("Expiry time is too close to zero.")
@@ -530,7 +530,7 @@ class EquityVanillaOption:
         use_sobol: int = 0,
     ):
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t_exp
@@ -569,7 +569,7 @@ class EquityVanillaOption:
         use_sobol: int = 0,
     ):
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t_exp
@@ -608,7 +608,7 @@ class EquityVanillaOption:
         use_sobol: int = 0,
     ):
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t_exp
@@ -649,7 +649,7 @@ class EquityVanillaOption:
         use_sobol: int = 0,
     ):
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t_exp
@@ -688,7 +688,7 @@ class EquityVanillaOption:
         use_sobol: int = 0,
     ):
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t_exp
@@ -729,7 +729,7 @@ class EquityVanillaOption:
         """Value European style call or put option using Monte Carlo. This is
         mainly for educational purposes. Sobol numbers can be used."""
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t_exp

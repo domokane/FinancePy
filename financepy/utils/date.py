@@ -5,16 +5,15 @@
 from collections.abc import Iterable
 from functools import partial
 from enum import Enum
+import datetime
+import math
+
 
 from typing import Union
 from numba import njit
 
 import numpy as np
-import datetime
 
-import math
-
-# from financepy.utils.error import FinError
 from .error import FinError
 from .tenor import Tenor, TenorUnit
 
@@ -23,6 +22,8 @@ from .tenor import Tenor, TenorUnit
 
 
 class DateFormatTypes(Enum):
+    """Enumeration of date format types."""
+
     BLOOMBERG = 1
     US_SHORT = 2
     US_MEDIUM = 3
@@ -36,13 +37,13 @@ class DateFormatTypes(Enum):
 
 
 # Set the default
-g_date_type_format = DateFormatTypes.UK_LONG
+G_DATE_TYPE_FORMAT = DateFormatTypes.UK_LONG
 
 
 def set_date_format(format_type):
     """Function that sets the global date format type."""
-    global g_date_type_format
-    g_date_type_format = format_type
+    global G_DATE_TYPE_FORMAT
+    G_DATE_TYPE_FORMAT = format_type
 
 
 ###############################################################################
@@ -106,6 +107,9 @@ def is_leap_year(y: int):
 
 
 def parse_dt(date_str, date_format):
+    """
+    Parse a date string into day, month, and year components.
+    """
     dt_obj = datetime.datetime.strptime(date_str, date_format)
     return dt_obj.day, dt_obj.month, dt_obj.year
 
@@ -115,9 +119,9 @@ def parse_dt(date_str, date_format):
 ###############################################################################
 
 
-g_dt_counter_list = None
-g_start_year = 1900
-g_end_year = 2100
+G_DT_COUNTER_LIST = None
+G_START_YEAR = 1900
+G_END_YEAR = 2100
 
 
 def calculate_list():
@@ -131,15 +135,15 @@ def calculate_list():
     day_counter = 0
     max_days = 0
 
-    global g_dt_counter_list
-    global g_start_year
-    global g_end_year
+    global G_DT_COUNTER_LIST
+    global G_START_YEAR
+    global G_END_YEAR
 
-    g_dt_counter_list = []
+    G_DT_COUNTER_LIST = []
 
     idx = -1  # the first element will be idx=0
 
-    for yy in range(1900, g_end_year + 1):
+    for yy in range(1900, G_END_YEAR + 1):
 
         # DO NOT CHANGE THIS FOR AGREEMENT WITH EXCEL WHICH ASSUMES THAT 1900
         # WAS A LEAP YEAR AND THAT 29 FEB 1900 ACTUALLY HAPPENED. A LOTUS BUG.
@@ -158,13 +162,13 @@ def calculate_list():
             for _ in range(1, max_days + 1):
                 idx += 1
                 day_counter += 1
-                if yy >= g_start_year:
-                    g_dt_counter_list.append(day_counter)
+                if yy >= G_START_YEAR:
+                    G_DT_COUNTER_LIST.append(day_counter)
 
             for _ in range(max_days, 31):
                 idx += 1
-                if yy >= g_start_year:
-                    g_dt_counter_list.append(-999)
+                if yy >= G_START_YEAR:
+                    G_DT_COUNTER_LIST.append(-999)
 
 
 ###############################################################################
@@ -178,7 +182,7 @@ def calculate_list():
 @njit(fastmath=True, cache=True)
 def date_index(d, m, y):
     """Calculate the index of a date assuming 31 days in all months"""
-    idx = (y - g_start_year) * 12 * 31 + (m - 1) * 31 + (d - 1)
+    idx = (y - G_START_YEAR) * 12 * 31 + (m - 1) * 31 + (d - 1)
     return idx
 
 
@@ -189,9 +193,9 @@ def date_index(d, m, y):
 def date_from_index(idx):
     """Reverse mapping from index to date. Take care with numba as it can do
     weird rounding on the integer. Seems OK now."""
-    y = int(g_start_year + idx / 12 / 31)
-    m = 1 + int((idx - (y - g_start_year) * 12 * 31) / 31)
-    d = 1 + idx - (y - g_start_year) * 12 * 31 - (m - 1) * 31
+    y = int(G_START_YEAR + idx / 12 / 31)
+    m = 1 + int((idx - (y - G_START_YEAR) * 12 * 31) / 31)
+    d = 1 + idx - (y - G_START_YEAR) * 12 * 31 - (m - 1) * 31
     return (d, m, y)
 
 
@@ -209,6 +213,8 @@ def weekday(day_count):
 
 
 def vectorisation_helper(func):
+    """Decorator to allow a function to be vectorised over an iterable"""
+
     def wrapper(self_, other):
         if isinstance(other, Iterable):
             # Store the type of other, then cast the output to be the same type
@@ -247,37 +253,37 @@ class Date:
         start_dt = Date(1, 1, 2018)
         """
 
-        global g_start_year
-        global g_end_year
+        global G_START_YEAR
+        global G_END_YEAR
 
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
-        if d >= g_start_year and d < g_end_year and y > 0 and y <= 31:
+        if d >= G_START_YEAR and d < G_END_YEAR and y > 0 and y <= 31:
             raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
 
-        if g_dt_counter_list is None:
+        if G_DT_COUNTER_LIST is None:
             calculate_list()
 
         if y < 1900:
             raise FinError("Year cannot be before 1900")
 
         # Resize date list dynamically if required
-        if y < g_start_year:
-            g_start_year = y
+        if y < G_START_YEAR:
+            G_START_YEAR = y
             calculate_list()
 
-        if y > g_end_year:
-            g_end_year = y
+        if y > G_END_YEAR:
+            G_END_YEAR = y
             calculate_list()
 
-        if y < g_start_year or y > g_end_year:
+        if y < G_START_YEAR or y > G_END_YEAR:
             raise FinError(
                 "Date: year "
                 + str(y)
                 + " should be "
-                + str(g_start_year)
+                + str(G_START_YEAR)
                 + " to "
-                + str(g_end_year)
+                + str(G_END_YEAR)
             )
 
         if d < 1:
@@ -361,7 +367,7 @@ class Date:
         """Update internal representation of date as number of days since the
         1st Jan 1900. This is same as Excel convention."""
         idx = date_index(self.d, self.m, self.y)
-        days_since_first_jan_1900 = g_dt_counter_list[idx]
+        days_since_first_jan_1900 = G_DT_COUNTER_LIST[idx]
         wd = weekday(days_since_first_jan_1900)
         self.excel_dt = days_since_first_jan_1900
         self.weekday = wd
@@ -496,7 +502,7 @@ class Date:
 
         while num_days != 0:
             idx += step
-            if g_dt_counter_list[idx] > 0:
+            if G_DT_COUNTER_LIST[idx] > 0:
                 num_days -= step
 
         (d, m, y) = date_from_index(idx)
@@ -655,10 +661,10 @@ class Date:
 
             # If yyi is not a whole month I adjust for days using average
             # number of days in a month which is 365.242/12
-            daysInMonth = 365.242 / 12.0
+            days_in_month = 365.242 / 12.0
 
             mmi = int(yyi * 12.0)
-            ddi = int((yyi * 12.0 - mmi) * daysInMonth)
+            ddi = int((yyi * 12.0 - mmi) * days_in_month)
             new_dt = self.add_months(mmi)
             new_dt = new_dt.add_days(ddi)
 
@@ -856,7 +862,7 @@ class Date:
     def __repr__(self):
         """returns a formatted string of the date"""
 
-        global g_date_type_format
+        global G_DATE_TYPE_FORMAT
 
         day_name_str = short_day_names[self.weekday]
 
@@ -875,7 +881,7 @@ class Date:
         short_year_str = str(self.y)[2:]
         long_year_str = str(self.y)
 
-        if g_date_type_format == DateFormatTypes.UK_LONGEST:
+        if G_DATE_TYPE_FORMAT == DateFormatTypes.UK_LONGEST:
 
             sep = " "
             date_str = (
@@ -889,25 +895,25 @@ class Date:
             )
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.UK_LONG:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.UK_LONG:
 
             sep = "-"
             date_str = day_str + sep + long_month_str + sep + long_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.UK_MEDIUM:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.UK_MEDIUM:
 
             sep = "/"
             date_str = day_str + sep + short_month_str + sep + long_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.UK_SHORT:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.UK_SHORT:
 
             sep = "/"
             date_str = day_str + sep + short_month_str + sep + short_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.US_LONGEST:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_LONGEST:
 
             sep = " "
             date_str = (
@@ -921,31 +927,31 @@ class Date:
             )
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.US_LONG:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_LONG:
 
             sep = "-"
             date_str = long_month_str + sep + day_str + sep + long_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.US_MEDIUM:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_MEDIUM:
 
             sep = "-"
             date_str = short_month_str + sep + day_str + sep + long_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.US_SHORT:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_SHORT:
 
             sep = "-"
             date_str = short_month_str + sep + day_str + sep + short_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.BLOOMBERG:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.BLOOMBERG:
 
             sep = "/"
             date_str = short_month_str + sep + day_str + sep + short_year_str
             return date_str
 
-        elif g_date_type_format == DateFormatTypes.DATETIME:
+        elif G_DATE_TYPE_FORMAT == DateFormatTypes.DATETIME:
 
             sep = "/"
 
@@ -1062,8 +1068,8 @@ def date_range(start_dt: Date, end_dt: Date, tenor: str = "1D"):
 
 
 def test_type():
-    global g_date_type_format
-    print("TEST TYPE", g_date_type_format)
+    global G_DATE_TYPE_FORMAT
+    print("TEST TYPE", G_DATE_TYPE_FORMAT)
 
 
 ###############################################################################

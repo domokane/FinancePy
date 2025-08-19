@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.day_count import DayCount, DayCountTypes
 
 ##########################################################################
@@ -17,26 +17,28 @@ from ...utils.day_count import DayCount, DayCountTypes
 ##########################################################################
 
 
-class IborCapVolCurve():
-    """ Class to manage a term structure of cap (flat) volatilities and to
+class IborCapVolCurve:
+    """Class to manage a term structure of cap (flat) volatilities and to
     do the conversion to caplet (spot) volatilities. This does not manage a
     strike dependency, only a term structure. The cap and caplet volatilies
     are keyed off the cap and caplet maturity dates. However this volatility
     only applies to the evolution of the Ibor rate out to the caplet start
     dates. Note also that this class also handles floor vols."""
 
-    def __init__(self,
-                 curve_dt,  # Valuation date for cap volatility
-                 cap_maturity_dts,  # curve date + maturity dates for caps
-                 cap_sigmas,  # Flat cap volatility for cap maturity dates
-                 dc_type):
-        """ Create a cap/floor volatility curve given a curve date, a list of
+    def __init__(
+        self,
+        curve_dt,  # Valuation date for cap volatility
+        cap_maturity_dts,  # curve date + maturity dates for caps
+        cap_sigmas,  # Flat cap volatility for cap maturity dates
+        dc_type,
+    ):
+        """Create a cap/floor volatility curve given a curve date, a list of
         cap maturity dates and a vector of cap volatilities. To avoid confusion
         first date of the capDates must be equal to the curve date and first
         cap volatility for this date must equal zero. The internal times are
         calculated according to the provided day count convention. Note cap and
         floor volatilities are the same for the same strike and tenor, I just
-        refer to cap volatilities in the code for code simplicity. """
+        refer to cap volatilities in the code for code simplicity."""
 
         num_times = len(cap_maturity_dts)
         num_vols = len(cap_sigmas)
@@ -79,12 +81,12 @@ class IborCapVolCurve():
 
         self.generate_caplet_vols()
 
-###############################################################################
+    ###############################################################################
 
     def generate_caplet_vols(self):
-        """ Bootstrap caplet volatilities from cap volatilities using similar
+        """Bootstrap caplet volatilities from cap volatilities using similar
         notation to Hull's book (page 32.11). The first volatility in the
-        vector of caplet vols is zero. """
+        vector of caplet vols is zero."""
 
         self.times = []
         self._taus = []
@@ -94,7 +96,7 @@ class IborCapVolCurve():
         num_caps = len(self._cap_maturity_dts)
 
         for dt in self._cap_maturity_dts:
-            t = (dt - self._curve_dt) / g_days_in_year
+            t = (dt - self._curve_dt) / G_DAYS_IN_YEARS
             self.times.append(t)
             tau = day_counter.year_frac(prev_dt, dt)[0]
             self._taus.append(tau)
@@ -120,16 +122,16 @@ class IborCapVolCurve():
             self._caplet_gammas[i] = vol_ibor
             cum_ibor2_tau += vol_ibor2 * self._taus[i]
 
-###############################################################################
+    ###############################################################################
 
     def caplet_vol(self, dt):
-        """ Return the forward rate caplet/floorlet volatility for a specific
+        """Return the forward rate caplet/floorlet volatility for a specific
         forward caplet expiry date. The period of the volatility is the
         the intercaplet spacing period used when creating the class object.
-        The volatility interpolation is piecewise flat. """
+        The volatility interpolation is piecewise flat."""
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_dt) / g_days_in_year
+            t = (dt - self._curve_dt) / G_DAYS_IN_YEARS
         else:
             t = dt
 
@@ -151,15 +153,15 @@ class IborCapVolCurve():
 
         return self._caplet_gammas[-1]
 
-###############################################################################
+    ###############################################################################
 
     def cap_vol(self, dt):
-        """ Return the cap flat volatility for a specific cap maturity date for
+        """Return the cap flat volatility for a specific cap maturity date for
         the last caplet/floorlet in the cap/floor. The volatility interpolation
-        is piecewise flat. """
+        is piecewise flat."""
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_dt) / g_days_in_year
+            t = (dt - self._curve_dt) / G_DAYS_IN_YEARS
         else:
             t = dt
 
@@ -178,10 +180,10 @@ class IborCapVolCurve():
 
         return self._cap_sigmas[-1]
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
-        """ Output the contents of the FinCapVolCurve class object. """
+        """Output the contents of the FinCapVolCurve class object."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         num_times = len(self.times)
@@ -191,9 +193,12 @@ class IborCapVolCurve():
             tau = self._taus[i]
             vol_cap = self._cap_sigmas[i]
             fwd_ibor_vol = self._caplet_vols[i]
-            s += label_to_string("%7.4f  %6.4f  %9.4f  %9.4f"
-                                 % (t, tau, vol_cap*100.0, fwd_ibor_vol*100.0))
+            s += label_to_string(
+                "%7.4f  %6.4f  %9.4f  %9.4f"
+                % (t, tau, vol_cap * 100.0, fwd_ibor_vol * 100.0)
+            )
 
         return s
+
 
 ###############################################################################

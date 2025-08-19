@@ -11,7 +11,7 @@ from numba import njit
 # TODO: Add Sobol to Monte Carlo
 
 from ...utils.math import covar
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 
 from ...utils.global_types import OptionTypes
@@ -125,13 +125,9 @@ def _value_mc_numba(
 
         for obs in range(0, n):
 
-            s_1 = s_1 * np.exp(
-                (mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility
-            )
+            s_1 = s_1 * np.exp((mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility)
 
-            s_2 = s_2 * np.exp(
-                (mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility
-            )
+            s_2 = s_2 * np.exp((mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility)
 
             s_1_arithmetic += s_1
             s_2_arithmetic += s_2
@@ -500,9 +496,9 @@ class EquityAsianOption:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
+        t0 = (self.start_averaging_date - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEARS
 
         r = discount_curve.cc_rate(self.expiry_dt)
         q = dividend_curve.cc_rate(self.expiry_dt)
@@ -573,9 +569,9 @@ class EquityAsianOption:
             raise FinError("Value date after option expiry date.")
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
+        t0 = (self.start_averaging_date - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEARS
 
         multiplier = 1.0
 
@@ -649,9 +645,9 @@ class EquityAsianOption:
         if value_dt > self.expiry_dt:
             raise FinError("Value date after option expiry date.")
 
-        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
+        t0 = (self.start_averaging_date - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEARS
 
         K = self.strike_price
         multiplier = 1.0
@@ -742,9 +738,9 @@ class EquityAsianOption:
             raise FinError(errorStr)
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
+        t0 = (self.start_averaging_date - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEARS
 
         r = discount_curve.cc_rate(self.expiry_dt)
         q = dividend_curve.cc_rate(self.expiry_dt)
@@ -789,9 +785,9 @@ class EquityAsianOption:
         a lot of Numpy vectorisation. It is also helped by Numba."""
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
+        t0 = (self.start_averaging_date - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEARS
 
         K = self.strike_price
         n = self.num_observations
@@ -837,9 +833,9 @@ class EquityAsianOption:
         price. This uses Numpy and Numba. This is the standard MC pricer."""
 
         # the years to the start of the averaging period
-        t0 = (self.start_averaging_date - value_dt) / g_days_in_year
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        tau = (self.expiry_dt - self.start_averaging_date) / g_days_in_year
+        t0 = (self.start_averaging_date - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEARS
 
         K = self.strike_price
         n = self.num_observations

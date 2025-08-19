@@ -12,7 +12,7 @@ from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.helpers import check_argument_types, label_to_string
 
 from ...models.volatility_fns import VolFuncTypes
@@ -451,7 +451,7 @@ class SwaptionVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
 
         vol_type_value = self._vol_func_type.value
 
@@ -526,7 +526,7 @@ class SwaptionVolSurface:
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -629,7 +629,7 @@ class SwaptionVolSurface:
     #     interpolation is done in variance space and then converted back to a
     #     lognormal volatility."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -771,7 +771,7 @@ class SwaptionVolSurface:
         for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
-            t_exp = (expiry_dt - self.value_dt) / g_days_in_year
+            t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
             self._t_exp[i] = t_exp
 
         #######################################################################

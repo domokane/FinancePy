@@ -10,7 +10,7 @@ from scipy.interpolate import PchipInterpolator
 from scipy.interpolate import CubicSpline
 from scipy.interpolate import InterpolatedUnivariateSpline
 from ...utils.error import FinError
-from ...utils.global_vars import g_small
+from ...utils.global_vars import G_SMALL
 from ...utils.tension_spline import TensionSpline
 
 ###############################################################################
@@ -236,8 +236,8 @@ class Interpolator:
 
         elif self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
 
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -256,8 +256,8 @@ class Interpolator:
 
             """Second derivatives at left is zero and first derivative at
             right is clamped to zero."""
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -275,8 +275,8 @@ class Interpolator:
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
             """Second derivatives are clamped to zero at end points"""
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -323,8 +323,8 @@ class Interpolator:
 
         elif self._interp_type == InterpTypes.TENSION_ZERO_RATES:
             tension_sigma = self._optional_interp_params.get("sigma", 1.0)
-            g_small_vector = np.ones(len(self._times)) * g_small
-            zero_rates = -np.log(self._dfs) / (self._times + g_small_vector)
+            G_SMALL_vector = np.ones(len(self._times)) * G_SMALL
+            zero_rates = -np.log(self._dfs) / (self._times + G_SMALL_vector)
 
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
@@ -349,7 +349,7 @@ class Interpolator:
                 print(t)
                 raise FinError("Interpolate times must all be >= 0")
 
-            if np.abs(t) < g_small:
+            if np.abs(t) < G_SMALL:
                 return 1.0
 
             tvec = np.array([t])

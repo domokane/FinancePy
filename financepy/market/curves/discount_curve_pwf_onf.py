@@ -8,7 +8,7 @@ from scipy import interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import g_small, g_basis_point
+from ...utils.global_vars import G_SMALL, G_BASIS_POINT
 from ...utils.math import test_monotonicity
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
@@ -81,7 +81,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         valuation_date: Date,
         start_dt: Date,
         end_dt: Date,
-        level: float = 1.0 * g_basis_point,
+        level: float = 1.0 * G_BASIS_POINT,
     ):
         """Generate a discount curve of the shape f(t) = level*1_{startdate < t <= enddate} where f(.) is the instantaneous forward rate
             Mostly useful for applying bumps to other discount_curve's, see composite_discount_curve.py
@@ -89,7 +89,7 @@ class DiscountCurvePWFONF(DiscountCurve):
             valuation_date (Date): valuation date for the discount_curve
             start_dt (Date): start of the non-zero ON forward rate
             end_dt (Date): end of the non-zero ON forward rate
-            level (float, optional): ON forward rate between the start and end dates. Defaults to 1.0*g_basis_point.
+            level (float, optional): ON forward rate between the start and end dates. Defaults to 1.0*G_BASIS_POINT.
 
         Returns:
             DiscountCurve: discount curve of the required shape
@@ -101,7 +101,7 @@ class DiscountCurvePWFONF(DiscountCurve):
     ###############################################################################
 
     @classmethod
-    def flat_curve(cls, valuation_date: Date, level: float = 1.0 * g_basis_point):
+    def flat_curve(cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT):
         knot_dts = [valuation_date.add_tenor("1Y")]
         onfwd_rates = [level]
         return cls(valuation_date, knot_dts, onfwd_rates)
@@ -118,7 +118,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         if np.any(times < 0.0):
             raise FinError("All times must be positive")
 
-        times = np.maximum(times, g_small)
+        times = np.maximum(times, G_SMALL)
         ldfs = self._logdfs_interp(times)
         zero_rates = -ldfs / times
         return zero_rates

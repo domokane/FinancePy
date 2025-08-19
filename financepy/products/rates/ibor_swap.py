@@ -9,7 +9,7 @@ import pandas as pd
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import g_small
+from ...utils.global_vars import G_SMALL
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
@@ -279,7 +279,7 @@ class IborSwap:
 
         pv01 = self.pv01(value_dt, discount_curve)
 
-        if abs(pv01) < g_small:
+        if abs(pv01) < G_SMALL:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
         float_leg_pv = self.float_leg.value(

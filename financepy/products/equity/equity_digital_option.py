@@ -8,7 +8,7 @@ from enum import Enum
 import numpy as np
 
 
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...products.equity.equity_option import EquityOption
@@ -93,7 +93,7 @@ class EquityDigitalOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         t = max(t, 1e-6)
 
         s0 = s
@@ -109,8 +109,8 @@ class EquityDigitalOption(EquityOption):
 
         volatility = model.volatility
 
-        if abs(volatility) < g_small:
-            volatility = g_small
+        if abs(volatility) < G_SMALL:
+            volatility = G_SMALL
 
         d1 = ln_s0_k + (r - q + volatility * volatility / 2.0) * t
         d1 = d1 / volatility / sqrt_t
@@ -152,7 +152,7 @@ class EquityDigitalOption(EquityOption):
         handles both a cash-or-nothing and an asset-or-nothing option."""
 
         np.random.seed(seed)
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t
 

@@ -6,7 +6,7 @@ from typing import Union
 
 from ...utils.FinError import FinError
 from ...utils.Date import Date
-from ...utils.GlobalVariables import g_small
+from ...utils.GlobalVariables import G_SMALL
 from ...utils.DayCount import FinDayCount, DayCountTypes
 from ...utils.Frequency import FrequencyTypes, FinFrequency
 from ...utils.Calendar import CalendarTypes, DateGenRuleTypes
@@ -219,7 +219,7 @@ class FinIborIborXCcySwap:
 
         dfT = discount_curve.df(self.maturity_dt)
 
-        if abs(pv01) < g_small:
+        if abs(pv01) < G_SMALL:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
         cpn = (df0 - dfT) / pv01

@@ -9,7 +9,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.math import ONE_MILLION
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.global_types import OptionTypes
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import label_to_string, check_argument_types
@@ -63,8 +63,8 @@ class EquityVarianceSwap:
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve."""
 
-        t1 = (value_dt - self.start_dt) / g_days_in_year
-        t2 = (self.maturity_dt - self.start_dt) / g_days_in_year
+        t1 = (value_dt - self.start_dt) / G_DAYS_IN_YEARS
+        t2 = (self.maturity_dt - self.start_dt) / G_DAYS_IN_YEARS
 
         expected_variance = t1 * realised_var / t2
         expected_variance += (t2 - t1) * fair_strike_var / t2
@@ -86,7 +86,7 @@ class EquityVarianceSwap:
 
         # TODO Linear interpolation - to be revisited
         atm_vol = np.interp(f, strikes, volatilities)
-        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
         """ Calculate the slope of the volatility curve by taking the end
         points in the volatilities and strikes to calculate the gradient."""
@@ -122,7 +122,7 @@ class EquityVarianceSwap:
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df_t(t_mat)
         r = -np.log(df) / t_mat

@@ -9,7 +9,7 @@ import numpy as np
 from numba import njit, float64
 
 from .date import Date
-from .global_vars import g_days_in_year, g_small
+from .global_vars import G_DAYS_IN_YEARS, G_SMALL
 from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
@@ -31,7 +31,7 @@ def grid_index(t, grid_times):
     n = len(grid_times)
     for i in range(0, n):
         grid_time = grid_times[i]
-        if abs(grid_time - t) < g_small:
+        if abs(grid_time - t) < G_SMALL:
             print(t, grid_times, i)
             return i
 
@@ -98,7 +98,7 @@ def times_from_dates(
         num_dts = 1
         times = [None]
         if dc_counter is None:
-            times[0] = (dt - value_dt) / g_days_in_year
+            times[0] = (dt - value_dt) / G_DAYS_IN_YEARS
         else:
             times[0] = dc_counter.year_frac(value_dt, dt)[0]
 
@@ -109,7 +109,7 @@ def times_from_dates(
         times = []
         for i in range(0, num_dts):
             if dc_counter is None:
-                t = (dt[i] - value_dt) / g_days_in_year
+                t = (dt[i] - value_dt) / G_DAYS_IN_YEARS
             else:
                 t = dc_counter.year_frac(value_dt, dt[i])[0]
             times.append(t)
@@ -235,7 +235,7 @@ def input_time(dt: Date, curve):
         t = dt
         return check(t)
     elif isinstance(dt, Date):
-        t = (dt - curve.value_dt) / g_days_in_year
+        t = (dt - curve.value_dt) / G_DAYS_IN_YEARS
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt
@@ -510,7 +510,7 @@ def accrued_tree(grid_times: np.ndarray, grid_flows: np.ndarray, face: float):
         cpn_time = grid_times[i_grid]
         cpn_flow = grid_flows[i_grid]
 
-        if grid_flows[i_grid] > g_small:
+        if grid_flows[i_grid] > G_SMALL:
             cpn_times = np.append(cpn_times, cpn_time)
             cpn_flows = np.append(cpn_flows, cpn_flow)
 

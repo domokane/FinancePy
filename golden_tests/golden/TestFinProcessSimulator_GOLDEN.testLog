@@ -4,8 +4,8 @@ HEADER,PROCESS,TIME,
 RESULTS,GBM NORMAL,0.07077622,
 BANNER,######################## GBM ANTITHETIC ###########################
 RESULTS,GBM ANTITHETIC,0.09690809,
-BANNER,###################### HESTON EULER ###############################
-RESULTS,HESTON EULER,0.11363363,
+BANNER,###################### HESTON euler ###############################
+RESULTS,HESTON euler,0.11363363,
 BANNER,###################### HESTON EULERLOG ############################
 RESULTS,HESTON EULERLOG,0.12326646,
 BANNER,###################### HESTON QUADEXP #############################

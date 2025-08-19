@@ -12,7 +12,7 @@ from ...utils.date import Date
 from ...utils.date import datediff
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types, _func_name
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...market.curves.interpolator import InterpTypes, Interpolator
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.ibor_deposit import IborDeposit
@@ -415,7 +415,7 @@ class IborSingleCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
-            t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
+            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self.dfs, df_mat)
             self.fit(self.times, self._dfs)
@@ -424,8 +424,8 @@ class IborSingleCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = (fra.start_dt - self.value_dt) / g_days_in_year
-            t_mat = (fra.maturity_dt - self.value_dt) / g_days_in_year
+            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEARS
+            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -452,7 +452,7 @@ class IborSingleCurve(DiscountCurve):
             # I use the last_payment_dt in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
-            t_mat = (maturity_dt - self.value_dt) / g_days_in_year
+            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
 
             self._times = np.append(self.times, t_mat)
             self._dfs = np.append(self.dfs, df_mat)
@@ -547,20 +547,20 @@ class IborSingleCurve(DiscountCurve):
             self._interpolator = Interpolator(self._interp_type, **kwargs)
 
             for depo in self.used_deposits:
-                tmat = (depo.maturity_dt - self.value_dt) / g_days_in_year
+                tmat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
                 grid_times.append(tmat)
 
             for depo in self.used_deposits:
-                tmat = (depo.maturity_dt - self.value_dt) / g_days_in_year
+                tmat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
                 grid_times.append(tmat)
 
             for fra in self.used_fras:
-                tmat = (fra.maturity_dt - self.value_dt) / g_days_in_year
+                tmat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
                 grid_times.append(tmat)
                 grid_dfs.append(df_mat)
 
             for swap in self.used_swaps:
-                tmat = (swap.maturity_dt - self.value_dt) / g_days_in_year
+                tmat = (swap.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
                 grid_times.append(tmat)
 
             self._times = np.array(grid_times)
@@ -603,7 +603,7 @@ class IborSingleCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
-            t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
+            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
             self._times = np.append(self.times, t_mat)
             self._dfs = np.append(self.dfs, df_mat)
             self.fit(self.times, self.dfs)
@@ -612,8 +612,8 @@ class IborSingleCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = (fra.start_dt - self.value_dt) / g_days_in_year
-            t_mat = (fra.maturity_dt - self.value_dt) / g_days_in_year
+            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEARS
+            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -688,7 +688,7 @@ class IborSingleCurve(DiscountCurve):
         for swap in self.used_swaps:
             swap_rate = swap.fixed_leg.coupon
             maturity_dt = swap.adjusted_fixed_dts[-1]
-            tswap = (maturity_dt - self.value_dt) / g_days_in_year
+            tswap = (maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
             swap_times.append(tswap)
             swap_rates.append(swap_rate)
 
@@ -696,7 +696,7 @@ class IborSingleCurve(DiscountCurve):
         interpolated_swap_times = [0.0]
 
         for dt in cpn_dts[1:]:
-            swap_years = (dt - self.value_dt) / g_days_in_year
+            swap_years = (dt - self.value_dt) / G_DAYS_IN_YEARS
             swap_rate = np.interp(swap_years, swap_times, swap_rates)
             interpolated_swap_rates.append(swap_rate)
             interpolated_swap_times.append(swap_years)
@@ -720,7 +720,7 @@ class IborSingleCurve(DiscountCurve):
         for i in range(start_index, num_flows):
 
             dt = cpn_dts[i]
-            t_mat = (dt - self.value_dt) / g_days_in_year
+            t_mat = (dt - self.value_dt) / G_DAYS_IN_YEARS
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i - 1]
             pv01_end = acc * swap_rate + 1.0

@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import N
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -35,9 +35,7 @@ class EquityFixedLookbackOption(EquityOption):
     the value of the stock price used to determine the payoff is the maximum
     in the case of a call option, and a minimum in the case of a put option."""
 
-    def __init__(
-        self, expiry_dt: Date, option_type: OptionTypes, strike_price: float
-    ):
+    def __init__(self, expiry_dt: Date, option_type: OptionTypes, strike_price: float):
         """Create the FixedLookbackOption by specifying the expiry date, the
         option type and the option strike."""
 
@@ -85,7 +83,7 @@ class EquityFixedLookbackOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t
@@ -110,8 +108,8 @@ class EquityFixedLookbackOption(EquityOption):
 
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
-        if abs(r - q) < g_small:
-            q = r + g_small
+        if abs(r - q) < G_SMALL:
+            q = r + G_SMALL
 
         df = np.exp(-r * t)
         dq = np.exp(-q * t)
@@ -142,9 +140,7 @@ class EquityFixedLookbackOption(EquityOption):
 
             else:
 
-                e1 = (
-                    (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
-                )
+                e1 = (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
                 e2 = e1 - v * sqrt_t
 
                 if s0 == s_max:
@@ -203,9 +199,7 @@ class EquityFixedLookbackOption(EquityOption):
                 v = k * df * N(-d2) - s0 * dq * N(-d1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.option_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.option_type))
 
         return v
 
@@ -226,7 +220,7 @@ class EquityFixedLookbackOption(EquityOption):
         """Monte Carlo valuation of a fixed strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = discount_curve.df(self.expiry_dt)
         r = discount_curve.cc_rate(self.expiry_dt)
@@ -244,15 +238,11 @@ class EquityFixedLookbackOption(EquityOption):
         if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_max = stock_min_max
             if s_max < stock_price:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_min = stock_min_max
             if s_min > stock_price:
-                raise FinError(
-                    "Smin must be less than or equal to the stock price."
-                )
+                raise FinError("Smin must be less than or equal to the stock price.")
 
         t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed

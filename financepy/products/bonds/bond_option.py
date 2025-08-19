@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
@@ -25,22 +25,21 @@ class BondModelTypes(Enum):
     HULL_WHITE = 3
     BLACK_KARASINSKI = 4
 
+
 ###############################################################################
 
 
-class BondOption():
-    """ Class for options on fixed coupon bonds. These are options to either
+class BondOption:
+    """Class for options on fixed coupon bonds. These are options to either
     buy or sell a bond on or before a specific future expiry date at a strike
     price that is set on trade date. A European option only allows the bond to
     be exercised into on a specific expiry date. An American option allows the
     option holder to exercise early, potentially allowing earlier coupons to
-    be received. """
+    be received."""
 
-    def __init__(self,
-                 bond: Bond,
-                 expiry_dt: Date,
-                 strike_price: float,
-                 option_type: OptionTypes):
+    def __init__(
+        self, bond: Bond, expiry_dt: Date, strike_price: float, option_type: OptionTypes
+    ):
 
         check_argument_types(self.__init__, locals())
 
@@ -50,18 +49,15 @@ class BondOption():
         self.option_type = option_type
         self.par = 100.0
 
-###############################################################################
+    ###############################################################################
 
-    def value(self,
-              value_dt: Date,
-              discount_curve: DiscountCurve,
-              model):
-        """ Value a bond option (option on a bond) using a specified model
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, model):
+        """Value a bond option (option on a bond) using a specified model
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
-        model which are all implemented as short rate tree models. """
+        model which are all implemented as short rate tree models."""
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
-        t_mat = (self.bond.maturity_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t_mat = (self.bond.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
         df_times = discount_curve._times
         df_values = discount_curve._dfs
@@ -79,10 +75,10 @@ class BondOption():
         # Want the first flow to be the previous coupon date
         # This is needed to calculate accrued correctly
         for i in range(1, num_flows):
-            pcd = flow_dts[i-1]
+            pcd = flow_dts[i - 1]
             ncd = flow_dts[i]
             if pcd < value_dt and ncd > value_dt:
-                flow_time = (pcd - value_dt) / g_days_in_year
+                flow_time = (pcd - value_dt) / G_DAYS_IN_YEARS
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
                 break
@@ -96,7 +92,7 @@ class BondOption():
         for i in range(1, num_flows):
             ncd = flow_dts[i]
             if ncd > value_dt:
-                flow_time = (ncd - value_dt) / g_days_in_year
+                flow_time = (ncd - value_dt) / G_DAYS_IN_YEARS
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
 
@@ -107,27 +103,34 @@ class BondOption():
 
         exercise_type = FinExerciseTypes.AMERICAN
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL \
-                or self.option_type == OptionTypes.EUROPEAN_PUT:
+        if (
+            self.option_type == OptionTypes.EUROPEAN_CALL
+            or self.option_type == OptionTypes.EUROPEAN_PUT
+        ):
             exercise_type = FinExerciseTypes.EUROPEAN
 
         # This is wasteful if model is Jamshidian but how to do neat design
         model.build_tree(t_mat, df_times, df_values)
 
-        v = model.bond_option(t_exp, self.strike_price, self.par,
-                              cpn_times, cpn_flows, exercise_type)
+        v = model.bond_option(
+            t_exp, self.strike_price, self.par, cpn_times, cpn_flows, exercise_type
+        )
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL \
-                or self.option_type == OptionTypes.AMERICAN_CALL:
-            return v['call']
-        elif self.option_type == OptionTypes.EUROPEAN_PUT \
-                or self.option_type == OptionTypes.AMERICAN_PUT:
-            return v['put']
+        if (
+            self.option_type == OptionTypes.EUROPEAN_CALL
+            or self.option_type == OptionTypes.AMERICAN_CALL
+        ):
+            return v["call"]
+        elif (
+            self.option_type == OptionTypes.EUROPEAN_PUT
+            or self.option_type == OptionTypes.AMERICAN_PUT
+        ):
+            return v["put"]
         else:
             print(self.option_type)
             raise FinError("Unknown option type.")
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -138,10 +141,11 @@ class BondOption():
         s += str(self.bond)
         return s
 
-###############################################################################
+    ###############################################################################
 
     def _print(self):
-        """ Simple print function for backward compatibility. """
+        """Simple print function for backward compatibility."""
         print(self)
+
 
 ###############################################################################

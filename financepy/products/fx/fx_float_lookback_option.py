@@ -5,7 +5,7 @@
 import numpy as np
 
 from ...utils.math import N
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_paths_times
 from ...products.fx.fx_option import FXOption
@@ -69,11 +69,9 @@ class FXFloatLookbackOption(FXOption):
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         df = domestic_curve.df_t(t)
         r = -np.log(df) / t
@@ -89,9 +87,7 @@ class FXFloatLookbackOption(FXOption):
         if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_min = stock_min_max
             if s_min > s0:
-                raise FinError(
-                    "s_min must be less than or equal to the stock price."
-                )
+                raise FinError("s_min must be less than or equal to the stock price.")
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_max = stock_min_max
             if s_max < s0:
@@ -99,8 +95,8 @@ class FXFloatLookbackOption(FXOption):
                     "s_max must be greater than or equal to the stock price."
                 )
 
-        if abs(r - q) < g_small:
-            q = r + g_small
+        if abs(r - q) < G_SMALL:
+            q = r + G_SMALL
 
         dq = np.exp(-q * t)
         df = np.exp(-r * t)
@@ -143,9 +139,7 @@ class FXFloatLookbackOption(FXOption):
             v = s_max * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.option_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.option_type))
 
         return v
 
@@ -164,7 +158,7 @@ class FXFloatLookbackOption(FXOption):
         seed=4242,
     ):
         """Value FX floating lookback option using Monte Carlo"""
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         df = domestic_curve.df_t(t)
         r = -np.log(df) / t
 
@@ -181,9 +175,7 @@ class FXFloatLookbackOption(FXOption):
         if self.option_type == OptionTypes.EUROPEAN_CALL:
             s_min = stock_min_max
             if s_min > stock_price:
-                raise FinError(
-                    "s_min must be less than or equal to the stock price."
-                )
+                raise FinError("s_min must be less than or equal to the stock price.")
         elif self.option_type == OptionTypes.EUROPEAN_PUT:
             s_max = stock_min_max
             if s_max < stock_price:

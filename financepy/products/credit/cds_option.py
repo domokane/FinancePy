@@ -9,7 +9,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.math import ONE_MILLION, N
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
@@ -21,8 +21,8 @@ from ...utils.error import FinError
 
 
 def fvol(volatility, *args):
-    """ Root searching function in the calculation of the CDS implied
-    volatility. """
+    """Root searching function in the calculation of the CDS implied
+    volatility."""
 
     self = args[0]
     value_dt = args[1]
@@ -37,29 +37,31 @@ def fvol(volatility, *args):
 
 
 class CDSOption:
-    """ Class to manage the pricing and risk-management of an option on a
+    """Class to manage the pricing and risk-management of an option on a
     single-name CDS. This is a contract in which the option buyer pays for an
     option to either buy or sell protection on the underlying CDS at a fixed
     spread agreed today and to be exercised in the future on a specified expiry
     date. The option may or may not cancel if there is a credit event before
-    option expiry. This needs to be specified. """
+    option expiry. This needs to be specified."""
 
-    def __init__(self,
-                 expiry_dt: Date,
-                 maturity_dt: Date,
-                 strike_cpn: float,
-                 notional: float = ONE_MILLION,
-                 long_protection: bool = True,
-                 knockout_flag: bool = True,
-                 freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-                 dc_type: DayCountTypes = DayCountTypes.ACT_360,
-                 cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-                 bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
-                 dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD):
-        """ Create a FinCDSOption object with the option expiry date, the
+    def __init__(
+        self,
+        expiry_dt: Date,
+        maturity_dt: Date,
+        strike_cpn: float,
+        notional: float = ONE_MILLION,
+        long_protection: bool = True,
+        knockout_flag: bool = True,
+        freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+    ):
+        """Create a FinCDSOption object with the option expiry date, the
         maturity date of the underlying CDS, the option strike coupon,
         notional, whether the option knocks out or not in the event of a credit
-        event before expiry and the payment details of the underlying CDS. """
+        event before expiry and the payment details of the underlying CDS."""
 
         check_argument_types(self.__init__, locals())
 
@@ -82,15 +84,12 @@ class CDSOption:
         self.bd_type = bd_type
         self.dg_type = dg_type
 
-###############################################################################
+    ###############################################################################
 
-    def value(self,
-              value_dt,
-              issuer_curve,
-              volatility):
-        """ Value the CDS option using Black's model with an adjustment for any
+    def value(self, value_dt, issuer_curve, volatility):
+        """Value the CDS option using Black's model with an adjustment for any
         Front End Protection.
-        TODO - Should the CDS be created in the init method ? """
+        TODO - Should the CDS be created in the init method ?"""
 
         if value_dt > self.expiry_dt:
             raise FinError("Expiry date is now or in the past")
@@ -101,23 +100,24 @@ class CDSOption:
         # The underlying is a forward starting option that steps in on
         # the expiry date and matures on the expiry date with a coupon
         # set equal to the option spread strike
-        cds = CDS(self.expiry_dt,
-                  self.maturity_dt,
-                  self.strike_cpn,
-                  self.notional,
-                  self.long_protection,
-                  self.freq_type,
-                  self.dc_type,
-                  self.cal_type,
-                  self.bd_type,
-                  self.dg_type)
+        cds = CDS(
+            self.expiry_dt,
+            self.maturity_dt,
+            self.strike_cpn,
+            self.notional,
+            self.long_protection,
+            self.freq_type,
+            self.dc_type,
+            self.cal_type,
+            self.bd_type,
+            self.dg_type,
+        )
 
         strike = self.strike_cpn
         forward_spread = cds.par_spread(value_dt, issuer_curve)
-        forward_rpv01 = cds.risky_pv01(
-            value_dt, issuer_curve)['dirty_rpv01']
+        forward_rpv01 = cds.risky_pv01(value_dt, issuer_curve)["dirty_rpv01"]
 
-        time_to_expiry = (self.expiry_dt - value_dt) / g_days_in_year
+        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         log_moneyness = log(forward_spread / strike)
 
         half_vol_squared_t = 0.5 * volatility * volatility * time_to_expiry
@@ -146,16 +146,13 @@ class CDSOption:
         # we return the option price in dollars
         return option_value * self.notional
 
-###############################################################################
+    ###############################################################################
 
-    def implied_volatility(self,
-                           value_dt,
-                           issuer_curve,
-                           option_value):
-        """ Calculate the implied CDS option volatility from a price. """
+    def implied_volatility(self, value_dt, issuer_curve, option_value):
+        """Calculate the implied CDS option volatility from a price."""
         arg_tuple = (self, value_dt, issuer_curve, option_value)
-        sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6,
-                                maxiter=50)
+        sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50)
         return sigma
+
 
 ###############################################################################

@@ -9,7 +9,7 @@ import numpy as np
 
 from ...utils.math import n_vect  # n_prime_vect
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 
 # from ...products.equity.EquityOption import FinOption
@@ -24,6 +24,7 @@ from ...utils.global_types import OptionTypes
 
 
 class FXDigitalOption:
+    """FX Digital Option"""
 
     def __init__(
         self,
@@ -111,8 +112,8 @@ class FXDigitalOption:
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
-            t_del = (self.delivery_dt - spot_dt) / g_days_in_year
-            t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+            t_del = (self.delivery_dt - spot_dt) / G_DAYS_IN_YEARS
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         else:
             t_del = value_dt
             t_exp = t_del
@@ -132,12 +133,12 @@ class FXDigitalOption:
         r_f = -np.log(for_df) / t_del
 
         s0 = spot_fx_rate
-        K = self.strike_fx_rate
+        k = self.strike_fx_rate
 
         if isinstance(model, BlackScholes):
 
             volatility = model.volatility
-            ln_s0_k = np.log(s0 / K)
+            ln_s0_k = np.log(s0 / k)
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = r_d - r_f

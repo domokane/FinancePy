@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
-from financepy.utils.global_vars import g_basis_point
+from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.utils.date import Date
 
 # when set to True this file can be run standalone and will produce some useful output.
@@ -67,7 +67,7 @@ def test_FinDiscountCurvePCFONF_02():
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
-            abs(e - a) < g_basis_point / 100
+            abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
@@ -95,7 +95,7 @@ def test_FinDiscountCurvePCFONF_03():
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
-            abs(e - a) < g_basis_point / 100
+            abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
@@ -123,7 +123,7 @@ def test_FinDiscountCurvePCFONF_04():
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
-            abs(e - a) < g_basis_point / 100
+            abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
@@ -151,7 +151,7 @@ def test_FinDiscountCurvePCFONF_05():
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
-            abs(e - a) < g_basis_point / 100
+            abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
@@ -181,7 +181,7 @@ def test_FinDiscountCurvePCFONF_flat():
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
-            abs(e - a) < g_basis_point / 100
+            abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 

@@ -10,6 +10,8 @@ from enum import Enum
 
 
 class CurrencyTypes(Enum):
+    """Enumeration of currency types."""
+
     USD = 1
     EUR = 2
     GBP = 3
@@ -21,5 +23,6 @@ class CurrencyTypes(Enum):
     SEK = 9
     HKD = 10
     NONE = 11
+
 
 ###############################################################################

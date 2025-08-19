@@ -2,14 +2,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
+
 from ..utils.error import FinError
 
 ###############################################################################
 
-from enum import Enum
-
 
 class FrequencyTypes(Enum):
+    """Enumeration of frequency types."""
+
     ZERO = -1
     SIMPLE = 0
     ANNUAL = 1
@@ -19,11 +21,12 @@ class FrequencyTypes(Enum):
     MONTHLY = 12
     CONTINUOUS = 99
 
+
 ###############################################################################
 
 
 def annual_frequency(freq_type: FrequencyTypes):
-    """ This is a function that takes in a Frequency Type and returns a
+    """This is a function that takes in a Frequency Type and returns a
     float value for the number of times a year a payment occurs."""
     if isinstance(freq_type, FrequencyTypes) is False:
         print("FinFrequency:", freq_type)
@@ -44,5 +47,6 @@ def annual_frequency(freq_type: FrequencyTypes):
         return 4.0
     elif freq_type == FrequencyTypes.MONTHLY:
         return 12.0
+
 
 ###############################################################################

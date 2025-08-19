@@ -2,14 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
 import sys
+import time
+from os.path import join, exists, split
 
 sys.path.append("..")
 
+
 from financepy.utils.error import FinError
-from enum import Enum
-import time
-from os.path import join, exists, split
 
 
 class FinTestCaseMode(Enum):
@@ -84,7 +85,7 @@ class FinTestCases:
             return
 
         self._module_name = module_file_name[0:-3]
-        self._foldersExist = True
+        self._folders_exist = True
         self._root_folder = root_folder
         self._header_fields = None
         self._global_num_warnings = 0
@@ -93,13 +94,13 @@ class FinTestCases:
         #        print("Root folder:",self._root_folder)
         #        print("module_name:",self._module_name)
 
-        self._goldenFolder = join(root_folder, "golden")
-        self._differencesFolder = join(root_folder, "differences")
+        self._golden_folder = join(root_folder, "golden")
+        self._differences_folder = join(root_folder, "differences")
 
-        if exists(self._goldenFolder) is False:
-            print("Looking for:", self._goldenFolder)
+        if exists(self._golden_folder) is False:
+            print("Looking for:", self._golden_folder)
             print("GOLDEN Folder DOES NOT EXIST. You must create it. Exiting")
-            self._foldersExist = False
+            self._folders_exist = False
             return
 
         self._compare_folder = join(root_folder, "compare")
@@ -107,11 +108,11 @@ class FinTestCases:
         if exists(self._compare_folder) is False:
             print("Looking for:", self._compare_folder)
             print("COMPARE Folder DOES NOT EXIST. You must create it. Exiting")
-            self._foldersExist = False
+            self._folders_exist = False
             return
 
         self._golden_file_name = join(
-            self._goldenFolder, self._module_name + "_GOLDEN.testLog"
+            self._golden_folder, self._module_name + "_GOLDEN.testLog"
         )
 
         self._compare_file_name = join(
@@ -119,7 +120,7 @@ class FinTestCases:
         )
 
         self._differences_file_name = join(
-            self._differencesFolder, self._module_name + "_DIFFS.testLog"
+            self._differences_folder, self._module_name + "_DIFFS.testLog"
         )
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
@@ -173,7 +174,7 @@ class FinTestCases:
             print(args)
             return
 
-        if not self._foldersExist:
+        if not self._folders_exist:
             print("Cannot print as GOLDEN and COMPARE folders don't exist")
             return
 
@@ -217,7 +218,7 @@ class FinTestCases:
             print(txt)
             return
 
-        if not self._foldersExist:
+        if not self._folders_exist:
             print("Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
@@ -243,7 +244,7 @@ class FinTestCases:
             self.print_log(args)
             return
 
-        if not self._foldersExist:
+        if not self._folders_exist:
             self.print_log("Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
@@ -410,23 +411,23 @@ class FinTestCases:
 
         # open golden file and load it up
         with open(self._compare_file_name, "r", encoding="utf-8") as f:
-            compareContents = f.readlines()
+            compare_contents = f.readlines()
 
-        num_compare_lines = len(compareContents)
+        num_compare_lines = len(compare_contents)
 
         if num_golden_lines != num_compare_lines:
             self.print_log("File lengths not the same")
             self.print_log("Number of COMPARE lines: ", num_compare_lines)
             self.print_log("Number of GOLDEN lines: ", num_golden_lines)
 
-        minNumLines = min(num_golden_lines, num_compare_lines)
+        min_num_lines = min(num_golden_lines, num_compare_lines)
         #        maxNumLines = max(num_golden_lines, num_compare_lines)
 
         # We start at second row as first row has time stamp
-        for row_num in range(1, minNumLines):
+        for row_num in range(1, min_num_lines):
 
             golden_row = golden_contents[row_num]
-            compare_row = compareContents[row_num]
+            compare_row = compare_contents[row_num]
 
             num_warnings, num_errors = self.compare_rows(
                 golden_row, compare_row, row_num
@@ -460,18 +461,18 @@ class FinTestCases:
             totalnum_warnings += num_warnings
             totalnum_errors += num_errors
 
-        if num_golden_lines == minNumLines and num_compare_lines > minNumLines:
+        if num_golden_lines == min_num_lines and num_compare_lines > min_num_lines:
             self.print_log("ERROR:The COMPARE file is longer than the GOLDEN file")
 
-        #            for row_num in range(minNumLines,maxNumLines):
-        #                num_warnings, num_errors = compareContents[row_num]
+        #            for row_num in range(min_num_lines,maxNumLines):
+        #                num_warnings, num_errors = compare_contents[row_num]
         #                print(row_num,"COMPARE: ==>",compare_row)
 
-        if num_compare_lines == minNumLines and num_golden_lines > minNumLines:
+        if num_compare_lines == min_num_lines and num_golden_lines > min_num_lines:
             self.print_log("ERROR:The GOLDEN file is longer than the COMPARE file")
 
-        #            for row_num in range(minNumLines,maxNumLines):
-        #                num_warnings, num_errors = compareContents[row_num]
+        #            for row_num in range(min_num_lines,maxNumLines):
+        #                num_warnings, num_errors = compare_contents[row_num]
         #                print(row_num,"GOLDEN: ==>",golden_row)
 
         #        print("Analysis of", self._module_name, "completed with",
@@ -510,12 +511,14 @@ class FinTestCases:
     ###########################################################################
 
     def start_log(self):
+        """Create an empty log file for the differences."""
         f = open(self._differences_file_name, "w", encoding="utf-8")
         f.close()
 
     ###########################################################################
 
     def print_log(self, *args):
+        """Print log messages to the log file."""
         f = open(self._differences_file_name, "a", encoding="utf-8")
         for arg in args:
             f.write(str(arg) + " ")

@@ -17,7 +17,7 @@ from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.models.black import Black
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_vars import g_days_in_year
+from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.helpers import print_tree
@@ -133,13 +133,13 @@ def test_BDTExampleTwo():
         pcd = bond.cpn_dts[i - 1]
         ncd = bond.cpn_dts[i]
         if pcd < settle_dt and ncd > settle_dt:
-            flow_time = (pcd - settle_dt) / g_days_in_year
+            flow_time = (pcd - settle_dt) / G_DAYS_IN_YEARS
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
     for flow_dt in bond.cpn_dts:
         if flow_dt > settle_dt:
-            flow_time = (flow_dt - settle_dt) / g_days_in_year
+            flow_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -149,8 +149,8 @@ def test_BDTExampleTwo():
     strike_price = 105.0
     face = 100.0
 
-    t_mat = (maturity_dt - settle_dt) / g_days_in_year
-    t_exp = (expiry_dt - settle_dt) / g_days_in_year
+    t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
+    t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
     times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05 * times)
@@ -170,7 +170,7 @@ def test_BDTExampleTwo():
     exercise_type = FinExerciseTypes.AMERICAN
 
     test_cases.header("Values")
-    treeVector = []
+    tree_vector = []
     for num_time_steps in num_steps_list:
         model = BDTTree(sigma, num_time_steps)
         model.build_tree(t_mat, times, dfs)
@@ -179,10 +179,10 @@ def test_BDTExampleTwo():
         )
 
         test_cases.print(v)
-        treeVector.append(v["call"])
+        tree_vector.append(v["call"])
 
     if plot_graphs:
-        plt.plot(num_steps_list, treeVector)
+        plt.plot(num_steps_list, tree_vector)
 
     # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
 
@@ -244,8 +244,8 @@ def test_BDTExampleThree():
 
                 expiry_dt = settle_dt.add_years(expiryYears)
 
-                t_mat = (maturity_dt - settle_dt) / g_days_in_year
-                t_exp = (expiry_dt - settle_dt) / g_days_in_year
+                t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
+                t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
 
                 bond = Bond(issue_dt, maturity_dt, cpn, freq_type, dc_type)
 
@@ -254,7 +254,7 @@ def test_BDTExampleThree():
                 cpn = bond.cpn / bond.freq
                 for flow_dt in bond.cpn_dts:
                     if flow_dt > expiry_dt:
-                        flow_time = (flow_dt - settle_dt) / g_days_in_year
+                        flow_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
                         cpn_times.append(flow_time)
                         cpn_flows.append(cpn)
 

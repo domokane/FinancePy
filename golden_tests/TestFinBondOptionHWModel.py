@@ -11,7 +11,7 @@ import sys
 sys.path.append("..")
 
 from financepy.utils.global_types import FinExerciseTypes
-from financepy.utils.global_vars import g_days_in_year
+from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -285,9 +285,9 @@ def test_BondOptionAmericanConvergenceTWO():
     expiry_dt = settle_dt.add_tenor("18m")
     face = 100.0
 
-    spotValue = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
+    spot_value = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("BOND PRICE", spotValue)
+    test_cases.print("BOND PRICE", spot_value)
 
     test_cases.header("TIME", "N", "EUR_CALL", "AMER_CALL", "EUR_PUT", "AMER_PUT")
 
@@ -371,9 +371,9 @@ def test_BondOptionZEROVOLConvergence():
 
     df_expiry = discount_curve.df(expiry_dt)
     fwd_clean_value = bond.clean_price_from_discount_curve(expiry_dt, discount_curve)
-    #    fwdFullValue = bond.dirty_price_from_discount_curve(expiry_dt, discount_curve)
+    #    fwd_full_value = bond.dirty_price_from_discount_curve(expiry_dt, discount_curve)
     #    print("BOND FwdCleanBondPx", fwd_clean_value)
-    #    print("BOND FwdFullBondPx", fwdFullValue)
+    #    print("BOND FwdFullBondPx", fwd_full_value)
     #    print("BOND Accrued:", bond.accrued_int)
 
     spot_clean_value = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
@@ -493,11 +493,11 @@ def test_BondOptionDerivaGem():
         if ncd > settle_dt:
 
             if len(couponTimes) == 0:
-                flowTime = (pcd - settle_dt) / g_days_in_year
+                flowTime = (pcd - settle_dt) / G_DAYS_IN_YEARS
                 couponTimes.append(flowTime)
                 couponFlows.append(cpn)
 
-            flowTime = (ncd - settle_dt) / g_days_in_year
+            flowTime = (ncd - settle_dt) / G_DAYS_IN_YEARS
             couponTimes.append(flowTime)
             couponFlows.append(cpn)
 
@@ -513,8 +513,8 @@ def test_BondOptionDerivaGem():
     model = HWTree(sigma, a, None)
 
     #  Test convergence
-    t_exp = (expiry_dt - settle_dt) / g_days_in_year
-    t_mat = (maturity_dt - settle_dt) / g_days_in_year
+    t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
+    t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
 
     # Jamshidian approach
     vjam = model.european_bond_option_jamshidian(

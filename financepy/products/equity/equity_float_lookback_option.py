@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import N
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -85,7 +85,7 @@ class EquityFloatLookbackOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         df = discount_curve.df(self.expiry_dt)
 
         r = discount_curve.cc_rate(self.expiry_dt)
@@ -105,8 +105,8 @@ class EquityFloatLookbackOption(EquityOption):
             if smax < s0:
                 raise FinError("Smax must be greater than or equal to the stock price.")
 
-        if abs(r - q) < g_small:
-            q = r + g_small
+        if abs(r - q) < G_SMALL:
+            q = r + G_SMALL
 
         dq = np.exp(-q * t)
         df = np.exp(-r * t)
@@ -170,7 +170,7 @@ class EquityFloatLookbackOption(EquityOption):
         """Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
-        t = (self.expiry_dt - value_dt) / g_days_in_year
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         num_time_steps = int(t * num_steps_per_year)
 
         df = discount_curve.df(self.expiry_dt)

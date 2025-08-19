@@ -2,7 +2,7 @@ import copy
 from typing import Union
 import numpy as np
 
-from ...utils.global_vars import g_basis_point
+from ...utils.global_vars import G_BASIS_POINT
 from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
@@ -42,7 +42,7 @@ class IborSingleCurveParShocker:
         return len(self._benchmarks_report)
 
     def apply_bump_to_benchmark(
-        self, benchmark_idx: int, bump_size=1.0 * g_basis_point
+        self, benchmark_idx: int, bump_size=1.0 * G_BASIS_POINT
     ):
         """
         Apply a shock of a given size to a given bechmark. Indexing is per the benchmark report

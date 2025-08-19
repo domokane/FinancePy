@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.day_count import DayCount, DayCountTypes

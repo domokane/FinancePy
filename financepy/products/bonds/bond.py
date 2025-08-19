@@ -27,7 +27,7 @@ from scipy import optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import g_days_in_year, g_small
+from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
@@ -144,9 +144,7 @@ class Bond:
         self.freq = annual_frequency(freq_type)
 
         if ex_div_days > 90:
-            raise FinError(
-                "Ex dividend days cannot be more than 90" + str(ex_div_days)
-            )
+            raise FinError("Ex dividend days cannot be more than 90" + str(ex_div_days))
 
         self.ex_div_dt = None
         self.ex_div_days = ex_div_days
@@ -510,23 +508,17 @@ class Bond:
             for tenor, cpn in zip(key_rate_tenors, rates):
                 mat_dt = settle_dt.add_years(tenor)
 
-                par_bond = Bond(
-                    settle_dt, mat_dt, cpn, self.freq_type, self.dc_type
-                )
+                par_bond = Bond(settle_dt, mat_dt, cpn, self.freq_type, self.dc_type)
 
                 par_bonds.append(par_bond)
 
             clean_prices = []
 
             for par_bond, ytm in zip(par_bonds, rates):
-                clean_price = par_bond.clean_price_from_ytm(
-                    settle_dt, ytm, us_street
-                )
+                clean_price = par_bond.clean_price_from_ytm(settle_dt, ytm, us_street)
                 clean_prices.append(clean_price)
 
-            par_crv = BondZeroCurve(
-                settle_dt, par_bonds, clean_prices, lin_zero_interp
-            )
+            par_crv = BondZeroCurve(settle_dt, par_bonds, clean_prices, lin_zero_interp)
 
             # calculate the dirty price of the bond using the discount curve
             p_zero = self.dirty_price_from_discount_curve(settle_dt, par_crv)
@@ -539,18 +531,14 @@ class Bond:
             for tenor, cpn in zip(key_rate_tenors, rates):
                 mat = settle_dt.add_years(tenor)
 
-                par_bond = Bond(
-                    settle_dt, mat, cpn, self.freq_type, self.dc_type
-                )
+                par_bond = Bond(settle_dt, mat, cpn, self.freq_type, self.dc_type)
 
                 par_bonds.append(par_bond)
 
             clean_prices = []
 
             for par_bond, ytm in zip(par_bonds, rates):
-                clean_price = par_bond.clean_price_from_ytm(
-                    settle_dt, ytm, us_street
-                )
+                clean_price = par_bond.clean_price_from_ytm(settle_dt, ytm, us_street)
                 clean_prices.append(clean_price)
 
             par_crv_up = BondZeroCurve(
@@ -570,18 +558,14 @@ class Bond:
             for tenor, cpn in zip(key_rate_tenors, rates):
                 mat = settle_dt.add_years(tenor)
 
-                par_bond = Bond(
-                    settle_dt, mat, cpn, self.freq_type, self.dc_type
-                )
+                par_bond = Bond(settle_dt, mat, cpn, self.freq_type, self.dc_type)
 
                 par_bonds.append(par_bond)
 
             clean_prices = []
 
             for par_bond, ytm in zip(par_bonds, rates):
-                clean_price = par_bond.clean_price_from_ytm(
-                    settle_dt, ytm, us_street
-                )
+                clean_price = par_bond.clean_price_from_ytm(settle_dt, ytm, us_street)
                 clean_prices.append(clean_price)
 
             par_crv_down = BondZeroCurve(
@@ -589,9 +573,7 @@ class Bond:
             )
 
             # calculate the full price of the bond using
-            p_down = self.dirty_price_from_discount_curve(
-                settle_dt, par_crv_down
-            )
+            p_down = self.dirty_price_from_discount_curve(settle_dt, par_crv_down)
 
             # calculate the key rate duration
             # using the formula (P_down - P_up) / (2 * shift * P_zero)
@@ -647,9 +629,7 @@ class Bond:
 
         self.accrued_interest(settle_dt, self.par)
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
         clean_price = dirty_price - self.accrued_int
         return clean_price
@@ -725,18 +705,12 @@ class Bond:
         """Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -896,9 +870,7 @@ class Bond:
         bondPrice = clean_price + accrued_amount
 
         def _bond_price_diff_from_z_spread(z_spr_try):
-            flat_curve = DiscountCurvePWFONF.flat_curve(
-                settlement_date, z_spr_try
-            )
+            flat_curve = DiscountCurvePWFONF.flat_curve(settlement_date, z_spr_try)
             bumped_curve = CompositeDiscountCurve([discount_curve, flat_curve])
             curve_bond_price = self.dirty_price_from_discount_curve(
                 settlement_date, bumped_curve
@@ -933,9 +905,9 @@ class Bond:
 
             # coupons paid on a settlement date are paid to the seller
             if dt > settle_dt:
-                t = (dt - settle_dt) / g_days_in_year
+                t = (dt - settle_dt) / G_DAYS_IN_YEARS
 
-                t = np.maximum(t, g_small)
+                t = np.maximum(t, G_SMALL)
 
                 df = discount_curve.df(dt)
 
@@ -961,18 +933,12 @@ class Bond:
         """Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -1141,9 +1107,7 @@ class Bond:
         # The coupon or par payments on buying date belong to the buyer. The
         # coupon or par payments on selling date are given to the new buyer.
         dts_cfs = [
-            (d, c * self.par)
-            for (d, c) in dts_cfs
-            if (d >= begin_dt) and (d < end_dt)
+            (d, c * self.par) for (d, c) in dts_cfs if (d >= begin_dt) and (d < end_dt)
         ]
 
         dts_cfs.append((begin_dt, -buy_price))

@@ -2,7 +2,7 @@
 # # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 # ##############################################################################
 
-# from ...utils.FinGlobalVariables import g_days_in_year
+# from ...utils.FinGlobalVariables import G_DAYS_IN_YEARS
 # from ...models.HWTree import HWTree
 # from ...models.BKTree import BKTree
 # from ...utils.FinError import FinError
@@ -162,7 +162,7 @@
 
 #         for i_flow in range(1, len(self.swap.adjusted_fixed_dts)):
 #             flow_dt= swap.adjusted_fixed_dts[i_flow]
-#             cpn_time = (flow_dt - settle_dt) / g_days_in_year
+#             cpn_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
 #             cpn_flow = swap.fixed_flows[i_flow-1] / self.notional
 #             cpn_times.append(cpn_time)
 #             cpn_amounts.append(cpn_flow)
@@ -173,7 +173,7 @@
 #         # Generate bond call times and prices
 #         call_times = []
 #         for dt in self.call_dts:
-#             call_time = (dt - settle_dt) / g_days_in_year
+#             call_time = (dt - settle_dt) / G_DAYS_IN_YEARS
 #             call_times.append(call_time)
 #         call_times = np.array(call_times)
 #         call_prices = np.array(self.call_prices)
@@ -189,14 +189,14 @@
 #         put_times = []
 #         for put_dt in swap.adjusted_fixed_dts[1:]:
 #             if put_dt <= self.exercise_dt:
-#                 put_time = (put_dt - settle_dt) / g_days_in_year
+#                 put_time = (put_dt - settle_dt) / G_DAYS_IN_YEARS
 #                 put_times.append(put_time)
 
 #         put_times = np.array(put_times)
 #         put_prices = np.array(self.put_prices)
 
 #         maturity_dt = self.bond.maturity_dt
-#         t_mat = (maturity_dt - settle_dt) / g_days_in_year
+#         t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
 #         df_times = discount_curve._times
 #         df_values = discount_curve._values
 

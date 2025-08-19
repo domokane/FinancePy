@@ -21,7 +21,7 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...products.credit.cds import CDS
 from ...products.credit.cds_curve import CDSCurve
 
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.math import ONE_MILLION
 from ...market.curves.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
@@ -113,7 +113,7 @@ class CDSTranche:
         num_credits = len(issuer_curves)
         k1 = self.k1
         k2 = self.k2
-        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
         if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
@@ -161,7 +161,7 @@ class CDSTranche:
 
         for i in range(1, num_times):
 
-            t = (payment_dts[i - 1] - value_dt) / g_days_in_year
+            t = (payment_dts[i - 1] - value_dt) / G_DAYS_IN_YEARS
 
             for j in range(0, num_credits):
 

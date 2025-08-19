@@ -15,7 +15,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import EquityBarrierTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
@@ -97,7 +97,7 @@ class EquityBarrierOption(EquityOption):
 
         values = []
 
-        t_exp = (self.expiry_dt - value_dt) / g_days_in_year
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
         if t_exp < 0:
             raise FinError("Option expires before value date.")

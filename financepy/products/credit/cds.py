@@ -16,7 +16,7 @@ from ...utils.calendar import Calendar, CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import g_days_in_year
+from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.math import ONE_MILLION
 from ...utils.helpers import label_to_string, table_to_string
 from ...market.curves.interpolator import InterpTypes, _uinterpolate
@@ -643,8 +643,8 @@ class CDS:
         """Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above."""
 
-        teff = (self.step_in_dt - value_dt) / g_days_in_year
-        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
+        teff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEARS
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
         libor_curve = issuer_curve.libor_curve
 
@@ -672,7 +672,7 @@ class CDS:
 
         payment_times = []
         for date in self.payment_dts:
-            t = (date - value_dt) / g_days_in_year
+            t = (date - value_dt) / G_DAYS_IN_YEARS
 
             if t > 0.0:
                 payment_times.append(t)
@@ -686,7 +686,7 @@ class CDS:
         accrual_factor_pcd_to_now = day_count.year_frac(pcd, eff)[0]
 
         year_fracs = self.accrual_factors
-        teff = (eff - value_dt) / g_days_in_year
+        teff = (eff - value_dt) / G_DAYS_IN_YEARS
 
         value_rpv01 = _risky_pv01_numba(
             teff,
@@ -761,8 +761,8 @@ class CDS:
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date must be a Date and not " + str(value_dt))
 
-        t_mat = (self.maturity_dt - value_dt) / g_days_in_year
-        t_eff = (self.step_in_dt - value_dt) / g_days_in_year
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
+        t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEARS
 
         h = flat_cds_curve_spread / (1.0 - curve_recovery)
         r = flat_cont_interest_rate
