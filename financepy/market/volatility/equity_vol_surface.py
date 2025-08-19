@@ -444,7 +444,7 @@ class EquityVolSurface:
 
     #     initial_guess = self._k_atm[index0]
 
-    #     K0 = _solver_for_smile_strike(s, t_exp, self._rd[index0],
+    #     k_0 = _solver_for_smile_strike(s, t_exp, self._rd[index0],
     #                               self._rf[index0],
     #                               OptionTypes.EUROPEAN_CALL.value,
     #                               vol_type_value, call_delta,
@@ -468,7 +468,7 @@ class EquityVolSurface:
     #                                   self._gaps[index1])
     #     else:
 
-    #         k_1 = K0
+    #         k_1 = k_0
 
     #     # In the expiry time dimension, both volatilities are interpolated
     #     # at the same strikes but different deltas.
@@ -542,7 +542,7 @@ class EquityVolSurface:
 
         initial_guess = self._stock_price
 
-        K0 = _solver_for_smile_strike(
+        k_0 = _solver_for_smile_strike(
             s,
             t_exp,
             self._r[index0],
@@ -554,7 +554,7 @@ class EquityVolSurface:
             self._parameters[index0],
         )
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, K0, t0)
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k_0, t0)
 
         if index1 != index0:
 
@@ -582,7 +582,7 @@ class EquityVolSurface:
         if np.abs(t1 - t0) > 1e-6:
 
             vart = ((t_exp - t0) * vart1 + (t1 - t_exp) * vart0) / (t1 - t0)
-            kt = ((t_exp - t0) * k_1 + (t1 - t_exp) * K0) / (t1 - t0)
+            kt = ((t_exp - t0) * k_1 + (t1 - t_exp) * k_0) / (t1 - t0)
 
             if vart < 0.0:
                 raise FinError("Failed interpolation due to negative variance.")
@@ -592,7 +592,7 @@ class EquityVolSurface:
         else:
 
             volt = vol0
-            kt = K0
+            kt = k_0
 
         return volt, kt
 

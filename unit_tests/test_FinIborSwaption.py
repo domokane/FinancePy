@@ -38,19 +38,19 @@ def build_curve(value_dt):
     fras = []
 
     swaps = []
-    fixedBasis = DayCountTypes.ACT_365F
+    fixed_basis = DayCountTypes.ACT_365F
     fixed_freq = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
     swap1 = IborSwap(
-        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
+        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
     )
     swap2 = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
+        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
     )
     swap3 = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
+        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
     )
 
     swaps.append(swap1)

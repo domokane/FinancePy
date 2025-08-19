@@ -46,17 +46,17 @@ def benchmarks_report(
     return df_bmi
 
 
-def ibor_benchmarks_report(iborCurve: IborSingleCurve, include_objects=False):
+def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
     """
-    Generate a DataFrame with one row per bechmark used in constructing a given iborCurve.
+    Generate a DataFrame with one row per bechmark used in constructing a given ibor_curve.
     Various useful information is reported. This is a bit slow so do not use in performance-critical spots
     """
 
-    benchmarks = iborCurve.used_deposits + iborCurve.used_fras + iborCurve.used_swaps
+    benchmarks = ibor_curve.used_deposits + ibor_curve.used_fras + ibor_curve.used_swaps
     return benchmarks_report(
         benchmarks,
-        iborCurve.value_dt,
-        iborCurve,
+        ibor_curve.value_dt,
+        ibor_curve,
         include_objects=include_objects,
     )
 

@@ -53,17 +53,17 @@ class BondYieldCurve:
             years_to_maturity = (bond.maturity_dt - settle_dt) / g_days_in_year
             years_to_maturities.append(years_to_maturity)
 
-        self.yearsToMaturity = np.array(years_to_maturities)
+        self.years_to_maturity = np.array(years_to_maturities)
 
         if fit_type is CurveFitPolynomial:
 
             d = curve_fit.power
-            coeffs = np.polyfit(self.yearsToMaturity, self.ylds, deg=d)
+            coeffs = np.polyfit(self.years_to_maturity, self.ylds, deg=d)
             curve_fit.coeffs = coeffs
 
         elif fit_type is CurveFitNelsonSiegel:
 
-            xdata = self.yearsToMaturity
+            xdata = self.years_to_maturity
             ydata = self.ylds
 
             popt, pcov = scipy.optimize.curve_fit(
@@ -77,7 +77,7 @@ class BondYieldCurve:
 
         elif fit_type is CurveFitNelsonSiegelSvensson:
 
-            xdata = self.yearsToMaturity
+            xdata = self.years_to_maturity
             ydata = self.ylds
 
             popt, pcov = scipy.optimize.curve_fit(
@@ -93,7 +93,7 @@ class BondYieldCurve:
 
         elif fit_type is CurveFitBSpline:
 
-            xdata = self.yearsToMaturity
+            xdata = self.years_to_maturity
             ydata = self.ylds
 
             """ Cubic splines as k=3 """
@@ -149,11 +149,11 @@ class BondYieldCurve:
         plt.figure(figsize=(12, 6))
         plt.title(title)
         bond_ylds_scaled = scale(self.ylds, 100.0)
-        plt.plot(self.yearsToMaturity, bond_ylds_scaled, "o")
+        plt.plot(self.years_to_maturity, bond_ylds_scaled, "o")
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel(ylabel)
 
-        tmax = np.max(self.yearsToMaturity)
+        tmax = np.max(self.years_to_maturity)
         t = np.linspace(0.0, int(tmax + 0.5), 100)
 
         yld = self.interp_yield(t)

@@ -199,9 +199,7 @@ class BondFuture:
         """
         dc = DayCount(DayCountTypes.ACT_ACT_ISDA)
 
-        year_frac, _, _ = dc.year_frac(
-            self.first_delivery_dt, bond.maturity_dt
-        )
+        year_frac, _, _ = dc.year_frac(self.first_delivery_dt, bond.maturity_dt)
 
         years = int(year_frac)
         months = int(12 * (year_frac - years))
@@ -279,9 +277,7 @@ class BondFuture:
             raise ValueError("Prices and repo rate must be non-negative")
 
         fwd_date = self.last_delivery_dt
-        fwd_price = bond.forward_price(
-            settle_dt, fwd_date, clean_price, repo_rate
-        )
+        fwd_price = bond.forward_price(settle_dt, fwd_date, clean_price, repo_rate)
 
         cf = self.conversion_factor(bond)
         net_basis = fwd_price - cf * futures_price
@@ -328,12 +324,12 @@ class BondFuture:
             raise ValueError("Prices and futures price must be non-negative")
 
         delivery_dt = self.last_delivery_dt
-        YEAR = 360  # AGREES WITH BLOOMBERG
+        days_in_year = 360  # AGREES WITH BLOOMBERG
 
         # Accrued interest on delivery date
-        AC_settle = bond.accrued_interest(settle_dt)
-        AC_delivery = bond.accrued_interest(delivery_dt)
-        full_price = clean_price + AC_settle
+        ai_settle = bond.accrued_interest(settle_dt)
+        ai_delivery = bond.accrued_interest(delivery_dt)
+        full_price = clean_price + ai_settle
 
         fv_cpns = 0.0
         weighted_days_sum = 0.0
@@ -348,10 +344,12 @@ class BondFuture:
             avg_coupon_days = 0.0
 
         cf = self.conversion_factor(bond)
-        D1 = float(delivery_dt - settle_dt)
+        days_settle_to_delivery = float(delivery_dt - settle_dt)
 
-        num = futures_price * cf + AC_delivery - full_price + fv_cpns
-        denom = full_price * (D1 / YEAR) - fv_cpns * (avg_coupon_days / YEAR)
+        num = futures_price * cf + ai_delivery - full_price + fv_cpns
+        denom = full_price * (days_settle_to_delivery / days_in_year) - fv_cpns * (
+            avg_coupon_days / days_in_year
+        )
         irr = num / denom
         return irr
 

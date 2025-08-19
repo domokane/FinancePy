@@ -80,10 +80,10 @@ class DiscountCurve:
         # This needs to be thought about - I just assign an arbitrary value
         self.dc_type = DayCountTypes.ACT_ACT_ISDA
 
-        self._dfs = np.array(self._dfs)
+        self._dfs = np.array(self.dfs)
         self._interp_type = interp_type
         self._interpolator = Interpolator(self._interp_type)
-        self._interpolator.fit(self._times, self._dfs)
+        self.fit(self._times, self._dfs)
 
     ###############################################################################
 
@@ -133,6 +133,13 @@ class DiscountCurve:
             raise FinError("Unknown Frequency type")
 
         return df
+
+    ###########################################################################
+
+    def fit(self, times: np.ndarray, dfs: np.ndarray):
+        """Fit the interpolator to the given times and discount factors."""
+
+        self._interpolator.fit(times, dfs)
 
     ###########################################################################
 
@@ -435,7 +442,9 @@ class DiscountCurve:
         num_dates = len(start_dts)
         fwd_rates = []
         for i in range(0, num_dates):
+
             dt1 = start_dts[i]
+            dt2 = None
 
             if isinstance(date_or_tenor, str):
                 dt2 = dt1.add_tenor(date_or_tenor)

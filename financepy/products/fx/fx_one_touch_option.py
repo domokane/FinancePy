@@ -81,7 +81,7 @@ def _barrier_pay_one_at_hit_pv_up(s, H, r, dt):
 
 
 @njit(fastmath=True, cache=True)
-def _barrier_pay_asset_at_expiry_down_out(s, H):
+def _barrier_pay_asset_at_expiry_down_out(s, h):
     """Pay $1 if the stock crosses the barrier H from above. PV payment."""
     num_paths, num_time_steps = s.shape
     pv = 0.0
@@ -90,7 +90,7 @@ def _barrier_pay_asset_at_expiry_down_out(s, H):
         hit_flag = 1
 
         for it in range(0, num_time_steps):
-            if s[ip][it] <= H:
+            if s[ip][it] <= h:
                 hit_flag = 0
                 break
 
@@ -104,7 +104,7 @@ def _barrier_pay_asset_at_expiry_down_out(s, H):
 
 
 @njit(fastmath=True, cache=True)
-def _barrier_pay_asset_at_expiry_up_out(s, H):
+def _barrier_pay_asset_at_expiry_up_out(s, h):
     """Pay $1 if the stock crosses the barrier H from below. PV payment."""
 
     num_paths, num_time_steps = s.shape
@@ -114,7 +114,7 @@ def _barrier_pay_asset_at_expiry_up_out(s, H):
         hit_flag = 1
 
         for it in range(0, num_time_steps):
-            if s[ip][it] >= H:
+            if s[ip][it] >= h:
                 hit_flag = 0
                 break
 
@@ -178,7 +178,7 @@ class FXOneTouchOption(FXOption):
         if foreign_curve.value_dt != value_dt:
             raise FinError("Foreign Curve date not same as valuation date")
 
-        DEBUG_MODE = False
+        debug_mode = False
 
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
@@ -187,8 +187,8 @@ class FXOneTouchOption(FXOption):
         t = max(t, 1e-6)
 
         s0 = spot_fx_rate
-        H = self.barrier_rate
-        K = self.payment_size
+        h = self.barrier_rate
+        k = self.payment_size
 
         sqrt_t = np.sqrt(t)
 
@@ -204,7 +204,7 @@ class FXOneTouchOption(FXOption):
         mu = (b - v * v / 2.0) / v / v
         lam = np.sqrt(mu * mu + 2.0 * r_d / v / v)
 
-        if DEBUG_MODE:
+        if debug_mode:
             print("t:", t)
             print("vol", v)
             print("b", b)
@@ -214,212 +214,212 @@ class FXOneTouchOption(FXOption):
         if self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
-            if np.any(s0 <= H):
+            if np.any(s0 <= h):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = 1.0
-            z = np.log(H / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(H / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H / s0, mu - lam) * n_vect(
+            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * n_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * K
+            v = (A5_1 + A5_2) * k
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
             # HAUG 2
 
-            if np.any(s0 >= H):
+            if np.any(s0 >= h):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
-            z = np.log(H / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(H / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H / s0, mu - lam) * n_vect(
+            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * n_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * K
+            v = (A5_1 + A5_2) * k
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
             # HAUG 3
 
-            if np.any(s0 <= H):
+            if np.any(s0 <= h):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = 1.0
-            K = H
-            z = np.log(H / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(H / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H / s0, mu - lam) * n_vect(
+            k = h
+            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * n_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * K
+            v = (A5_1 + A5_2) * k
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
             # HAUG 4
 
-            if np.any(s0 >= H):
+            if np.any(s0 >= h):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
-            K = H
-            z = np.log(H / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(H / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(H / s0, mu - lam) * n_vect(
+            k = h
+            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * n_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * K
+            v = (A5_1 + A5_2) * k
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
             # HAUG 5
 
-            if np.any(s0 <= H):
+            if np.any(s0 <= h):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
-            B4 = (
-                K
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_4 = (
+                k
                 * df
-                * np.power(H / s0, 2.0 * mu)
+                * np.power(h / s0, 2.0 * mu)
                 * n_vect(eta * y2 - eta * v * sqrt_t)
             )
-            v = B2 + B4
+            v = b_2 + b_4
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
             # HAUG 6
 
-            if np.any(s0 >= H):
+            if np.any(s0 >= h):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
             phi = +1.0
 
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
-            B4 = (
-                K
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_4 = (
+                k
                 * df
-                * np.power(H / s0, 2.0 * mu)
+                * np.power(h / s0, 2.0 * mu)
                 * n_vect(eta * y2 - eta * v * sqrt_t)
             )
-            v = B2 + B4
+            v = b_2 + b_4
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 7
 
-            if np.any(s0 <= H):
+            if np.any(s0 <= h):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            v = A2 + A4
+            a_2 = s0 * dq * n_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            v = a_2 + a_4
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
-            if np.any(s0 >= H):
+            if np.any(s0 >= h):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
             phi = +1.0
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            v = A2 + A4
+            a_2 = s0 * dq * n_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            v = a_2 + a_4
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
             # HAUG 9
 
-            if np.any(s0 <= H):
+            if np.any(s0 <= h):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
-            B4 = (
-                K
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_4 = (
+                k
                 * df
-                * np.power(H / s0, 2.0 * mu)
+                * np.power(h / s0, 2.0 * mu)
                 * n_vect(eta * y2 - eta * v * sqrt_t)
             )
-            v = B2 - B4
+            v = b_2 - b_4
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
             # HAUG 10
 
-            if np.any(s0 >= H):
+            if np.any(s0 >= h):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            B2 = K * df * n_vect(phi * x2 - phi * v * sqrt_t)
-            B4 = (
-                K
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_4 = (
+                k
                 * df
-                * np.power(H / s0, 2.0 * mu)
+                * np.power(h / s0, 2.0 * mu)
                 * n_vect(eta * y2 - eta * v * sqrt_t)
             )
-            v = B2 - B4
+            v = b_2 - b_4
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
-            if np.any(s0 <= H):
+            if np.any(s0 <= h):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            v = A2 - A4
+            a_2 = s0 * dq * n_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            v = a_2 - a_4
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 12
 
-            if np.any(s0 >= H):
+            if np.any(s0 >= h):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0 / H) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
+            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            v = A2 - A4
+            a_2 = s0 * dq * n_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            v = a_2 - a_4
             return v
 
         else:
@@ -480,124 +480,124 @@ class FXOneTouchOption(FXOption):
 
         tgrid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
 
-        H = self.barrier_rate
-        X = self.payment_size
+        h = self.barrier_rate
+        x = self.payment_size
 
         v = 0.0
 
         if self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
-            if s0 <= H:
+            if s0 <= h:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, H, r_d, dt)
-            v = v * X
+            v = _barrier_pay_one_at_hit_pv_down(s, h, r_d, dt)
+            v = v * x
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
             # HAUG 2
 
-            if s0 >= H:
+            if s0 >= h:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, H, r_d, dt)
-            v = v * X
+            v = _barrier_pay_one_at_hit_pv_up(s, h, r_d, dt)
+            v = v * x
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
             # HAUG 3
 
-            if s0 <= H:
+            if s0 <= h:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, H, r_d, dt) * H
+            v = _barrier_pay_one_at_hit_pv_down(s, h, r_d, dt) * h
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
             # HAUG 4
 
-            if s0 >= H:
+            if s0 >= h:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, H, r_d, dt) * H
+            v = _barrier_pay_one_at_hit_pv_up(s, h, r_d, dt) * h
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
             # HAUG 5
 
-            if s0 <= H:
+            if s0 <= h:
                 raise FinError("Barrier has  ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt)
-            v = v * X * np.exp(-r_d * t)
+            v = _barrier_pay_one_at_hit_pv_down(s, h, 0.0, dt)
+            v = v * x * np.exp(-r_d * t)
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
             # HAUG 6
 
-            if s0 >= H:
+            if s0 >= h:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt)
-            v = v * X * np.exp(-r_d * t)
+            v = _barrier_pay_one_at_hit_pv_up(s, h, 0.0, dt)
+            v = v * x * np.exp(-r_d * t)
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 7
 
-            if s0 <= H:
+            if s0 <= h:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt) * H
+            v = _barrier_pay_one_at_hit_pv_down(s, h, 0.0, dt) * h
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
-            if s0 >= H:
+            if s0 >= h:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt) * H
+            v = _barrier_pay_one_at_hit_pv_up(s, h, 0.0, dt) * h
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
             # HAUG 9
 
-            if s0 <= H:
+            if s0 <= h:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = 1.0 - _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt)
-            v = v * X * np.exp(-r_d * t)
+            v = 1.0 - _barrier_pay_one_at_hit_pv_down(s, h, 0.0, dt)
+            v = v * x * np.exp(-r_d * t)
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
             # HAUG 10
 
-            if s0 >= H:
+            if s0 >= h:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = 1.0 - _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt)
-            v = v * X * np.exp(-r_d * t)
+            v = 1.0 - _barrier_pay_one_at_hit_pv_up(s, h, 0.0, dt)
+            v = v * x * np.exp(-r_d * t)
             return v
 
         elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
-            if s0 <= H:
+            if s0 <= h:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_asset_at_expiry_down_out(s, H)
+            v = _barrier_pay_asset_at_expiry_down_out(s, h)
             v = v * np.exp(-r_d * t)
             return v
 
         elif self.option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 12
 
-            if s0 >= H:
+            if s0 >= h:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_asset_at_expiry_up_out(s, H)
+            v = _barrier_pay_asset_at_expiry_up_out(s, h)
             v = v * np.exp(-r_d * t)
             return v
         else:

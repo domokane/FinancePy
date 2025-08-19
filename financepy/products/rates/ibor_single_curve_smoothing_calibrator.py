@@ -105,12 +105,12 @@ class IborSingleCurveSmoothingCalibrator(object):
         else:
             curve = self._curve
 
-        start_times = curve._times[:-1]
-        end_times = curve._times[1:]
+        start_times = curve.times[:-1]
+        end_times = curve.times[1:]
         tenors = end_times - start_times
 
-        start_dfs = curve._dfs[:-1]
-        end_dfs = curve._dfs[1:]
+        start_dfs = curve.dfs[:-1]
+        end_dfs = curve.dfs[1:]
         fdfs = end_dfs / start_dfs
 
         # forward cc rates -- first derivative of the yields
@@ -130,7 +130,7 @@ class IborSingleCurveSmoothingCalibrator(object):
             curve = self._curve
             curve._dfs[1:] = dfs
 
-            curve._interpolator.fit(curve._times, curve._dfs)
+            curve.fit(curve.times, curve.dfs)
 
             fit_tgts = self._repricing_objectives(curve)
             smth_tgts = self._smoothing_objectives(curve)
@@ -167,7 +167,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         )
 
         self._curve._dfs[1:] = np.array(res.x)
-        self._curve._interpolator.fit(self._curve._times, self._curve._dfs)
+        self._curve.fit(self._curve.times, self._curve.dfs)
 
         fit_report = self._generate_fit_report(smoothness)
 

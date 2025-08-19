@@ -86,7 +86,7 @@ class DiscountCurveZeros(DiscountCurve):
 
         self._interp_type = interp_type
         self._interpolator = Interpolator(self._interp_type)
-        self._interpolator.fit(self._times, self._dfs)
+        self.fit(self._times, self._dfs)
 
     # ###############################################################################
 

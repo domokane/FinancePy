@@ -44,7 +44,7 @@ class DiscountCurveFlat(DiscountCurve):
         As the curve is flat, no interpolation scheme is required.
         """
 
-        super().__init__(value_dt)
+        # super().__init__(value_dt)
 
         check_argument_types(self.__init__, locals())
 

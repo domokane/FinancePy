@@ -661,8 +661,8 @@ def test_swapValuationExample():
     iborFras = fras.copy()
     ibor_swaps = swaps.copy()
 
-    iborCurve = IborSingleCurve(value_dt, iborDepos, iborFras, ibor_swaps, interp_type)
-    v1 = offMarketSwap.value(value_dt, iborCurve, iborCurve, -0.268 / 100.0)
+    ibor_curve = IborSingleCurve(value_dt, iborDepos, iborFras, ibor_swaps, interp_type)
+    v1 = offMarketSwap.value(value_dt, ibor_curve, ibor_curve, -0.268 / 100.0)
 
     test_cases.banner("DERISCOPE EXAMPLE REPLICATION")
     test_cases.header("LABEL", "VALUE")
@@ -976,7 +976,7 @@ def test_swapValuationExample():
 
 #    test_cases.print("FP DUAL CURVE VALUE", v2)
 
-#    swap_rate = offMarketSwap.swap_rate(value_dt, oisCurveFF, iborCurve, -0.268/100.0)
+#    swap_rate = offMarketSwap.swap_rate(value_dt, oisCurveFF, ibor_curve, -0.268/100.0)
 
 #    test_cases.print("FP DUAL CURVE SWAP RATE", swap_rate)
 

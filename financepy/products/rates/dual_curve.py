@@ -36,7 +36,7 @@ def _f(df, *args):
     index_curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    index_curve._interpolator.fit(index_curve.times, index_curve.dfs)
+    index_curve.fit(index_curve.times, index_curve.dfs)
     v_swap = swap.value(value_dt, discount_curve, index_curve, None)
 
     notional = swap.fixed_leg.notional
@@ -58,7 +58,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve.times, curve.dfs)
+    curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, discount_curve, curve)
     v_fra /= fra.notional
     return v_fra
@@ -303,7 +303,7 @@ class IborDualCurve(DiscountCurve):
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
-        self._interpolator.fit(self._times, self._dfs)
+        self.fit(self._times, self._dfs)
 
         # A deposit is not margined and not indexed to Libor so should
         # probably not be used to build an indexed Libor curve from
@@ -314,7 +314,7 @@ class IborDualCurve(DiscountCurve):
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self._interpolator.fit(self._times, self._dfs)
+            self.fit(self._times, self._dfs)
 
         oldt_mat = t_mat
 

@@ -2,9 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import copy
+
 import numpy as np
 from scipy import optimize
-import copy
 
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -60,7 +61,7 @@ def _f(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve.times, curve.dfs)
+    curve.fit(curve.times, curve.dfs)
     v_swap = swap.value(value_dt, curve, None)
     notional = swap.fixed_leg.notional
     v_swap /= notional
@@ -80,7 +81,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve.times, curve.dfs)
+    curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
     return v_fra
@@ -349,7 +350,7 @@ class OISCurve(DiscountCurve):
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
-        self._interpolator.fit(self._times, self._dfs)
+        self.fit(self._times, self._dfs)
 
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
@@ -357,7 +358,7 @@ class OISCurve(DiscountCurve):
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self._interpolator.fit(self._times, self._dfs)
+            self.fit(self._times, self._dfs)
 
         old_t_mat = t_mat
 
@@ -451,11 +452,11 @@ class OISCurve(DiscountCurve):
                 df_mat = fra.maturity_df(self)
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
-                self._interpolator.fit(self._times, self._dfs)
+                self.fit(self._times, self._dfs)
             else:
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
-                self._interpolator.fit(self._times, self._dfs)
+                self.fit(self._times, self._dfs)
 
                 argtuple = (self, self.value_dt, fra)
                 df_mat = optimize.newton(
@@ -470,7 +471,7 @@ class OISCurve(DiscountCurve):
 
         if len(self.used_swaps) == 0:
             if self._check_refit_flag is True:
-                self.check_refits(1e-10, SWAP_TOL, 1e-5)
+                self.check_refits(SWAP_TOL, 1e-5)
             return
 
         #######################################################################
@@ -552,7 +553,7 @@ class OISCurve(DiscountCurve):
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
-            self._interpolator.fit(self._times, self._dfs)
+            self.fit(self._times, self._dfs)
 
             pv01 += acc * df_mat
 

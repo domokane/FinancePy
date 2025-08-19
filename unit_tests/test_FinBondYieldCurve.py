@@ -50,7 +50,7 @@ def test_poly():
     assert round(coeffs[2] * 1e6, 4) == -7.4147
     assert round(coeffs[3] * 1e5, 4) == 9.0622
     assert round(coeffs[4] * 1e3, 4) == 1.3536
-    assert round(coeffs[5] * 1e7, 4) == 4.1514
+    assert round(coeffs[5] * 1e7, 4) == 4.1606
 
 
 def test_nelson_siegel():

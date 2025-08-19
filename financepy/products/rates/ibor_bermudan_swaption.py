@@ -154,8 +154,8 @@ class IborBermudanSwaption:
         # Allow exercise on coupon dates but control this later for europeans
         self.call_times = cpn_times
 
-        df_times = discount_curve.times()
-        df_values = discount_curve.dfs()
+        df_times = discount_curve.times
+        df_values = discount_curve.dfs
 
         face_amount = 1.0
         strike_price = 1.0  # Floating leg is assumed to price at par
@@ -165,11 +165,7 @@ class IborBermudanSwaption:
         # the multi-callable nature of the Bermudan Swaption
         #######################################################################
 
-        if (
-            isinstance(model, BDTTree)
-            or isinstance(model, BKTree)
-            or isinstance(model, HWTree)
-        ):
+        if isinstance(model, (BDTTree, BKTree, HWTree)):
 
             model.build_tree(t_mat, df_times, df_values)
 

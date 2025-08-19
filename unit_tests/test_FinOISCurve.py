@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ###############################################################################
 
+
 from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.calendar import BusDayAdjustTypes

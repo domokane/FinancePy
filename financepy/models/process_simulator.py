@@ -205,10 +205,10 @@ def get_heston_paths(
         psic = 1.50
         gamma1 = 0.50
         gamma2 = 0.50
-        K0 = -rho * kappa * theta * dt / sigma
+        k_0 = -rho * kappa * theta * dt / sigma
         k_1 = gamma1 * dt * (kappa * rho / sigma - 0.5) - rho / sigma
         k_2 = gamma2 * dt * (kappa * rho / sigma - 0.5) + rho / sigma
-        K3 = gamma1 * dt * (1.0 - rho * rho)
+        k_3 = gamma1 * dt * (1.0 - rho * rho)
         K4 = gamma2 * dt * (1.0 - rho * rho)
         A = k_2 + 0.5 * K4
         mu = drift
@@ -235,7 +235,7 @@ def get_heston_paths(
                     vnp = a * ((b + zV) ** 2)
                     d = 1.0 - 2.0 * A * a
                     M = exp((A * b2 * a) / d) / sqrt(d)
-                    K0 = -log(M) - (k_1 + 0.5 * K3) * vn
+                    k_0 = -log(M) - (k_1 + 0.5 * k_3) * vn
                 else:
                     p = (psi - 1.0) / (psi + 1.0)
                     beta = (1.0 - p) / m
@@ -246,13 +246,13 @@ def get_heston_paths(
                         vnp = log((1.0 - p) / (1.0 - u)) / beta
 
                     M = p + beta * (1.0 - p) / (beta - A)
-                    K0 = -log(M) - (k_1 + 0.5 * K3) * vn
+                    k_0 = -log(M) - (k_1 + 0.5 * k_3) * vn
 
                 x += (
                     mu * dt
-                    + K0
+                    + k_0
                     + (k_1 * vn + k_2 * vnp)
-                    + sqrt(K3 * vn + K4 * vnp) * zS
+                    + sqrt(k_3 * vn + K4 * vnp) * zS
                 )
                 s_paths[i_path, i_step] = exp(x)
                 vn = vnp

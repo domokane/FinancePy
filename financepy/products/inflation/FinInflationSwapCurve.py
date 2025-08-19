@@ -256,14 +256,14 @@ class InflationSwapCurve(DiscountCurve):
         t_mat = 0.0
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, df_mat)
+        self._dfs = np.append(self.dfs, df_mat)
 
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
-            self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
+            self._times = np.append(self.times, t_mat)
+            self._dfs = np.append(self.dfs, df_mat)
 
         oldt_mat = t_mat
 
@@ -301,7 +301,7 @@ class InflationSwapCurve(DiscountCurve):
             t_mat = (maturity_dt - self.value_dt) / g_days_in_year
 
             self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
+            self._dfs = np.append(self.dfs, df_mat)
 
             argtuple = (self, self.value_dt, swap)
 
@@ -317,7 +317,7 @@ class InflationSwapCurve(DiscountCurve):
             )
 
         if self.check_refit_flag is True:
-            self.check_refits(1e-10, SWAP_TOL, 1e-5)
+            self.check_refits(SWAP_TOL, 1e-5)
 
     ###########################################################################
 
@@ -333,14 +333,14 @@ class InflationSwapCurve(DiscountCurve):
         t_mat = 0.0
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, df_mat)
+        self._dfs = np.append(self.dfs, df_mat)
 
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
+            self._dfs = np.append(self.dfs, df_mat)
 
         oldt_mat = t_mat
 
@@ -355,10 +355,10 @@ class InflationSwapCurve(DiscountCurve):
             if t_set < oldt_mat and t_mat > oldt_mat:
                 df_mat = fra.maturity_df(self)
                 self._times = np.append(self._times, t_mat)
-                self._dfs = np.append(self._dfs, df_mat)
+                self._dfs = np.append(self.dfs, df_mat)
             else:
                 self._times = np.append(self._times, t_mat)
-                self._dfs = np.append(self._dfs, df_mat)
+                self._dfs = np.append(self.dfs, df_mat)
 
                 argtuple = (self, self.value_dt, fra)
                 df_mat = optimize.newton(
@@ -373,7 +373,7 @@ class InflationSwapCurve(DiscountCurve):
 
         if len(self.used_swaps) == 0:
             if self._check_refit_flag is True:
-                self.check_refits(1e-10, SWAP_TOL, 1e-5)
+                self.check_refits(SWAP_TOL, 1e-5)
             return
 
         #        print("CURVE SO FAR")
@@ -466,16 +466,16 @@ class InflationSwapCurve(DiscountCurve):
             #  print("IN: %12s %12.10f %12.10f %12.10f %12.10f OUT: %14.12f" %
             #                  (dt, swap_rate, acc, pv01, pv01_end, df_mat))
 
-            self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
+            self._times = np.append(self.times, t_mat)
+            self._dfs = np.append(self.dfs, df_mat)
 
             pv01 += acc * df_mat
 
-        #        print(self._times)
-        #        print(self._dfs)
+        #        print(self.times)
+        #        print(self.dfs)
 
         if self._check_refit_flag is True:
-            self.check_refits(1e-10, SWAP_TOL, 1e-5)
+            self.check_refits(SWAP_TOL, 1e-5)
 
     ###########################################################################
 

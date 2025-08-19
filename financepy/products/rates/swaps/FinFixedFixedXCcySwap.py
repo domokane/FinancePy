@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ...utils.FinError import FinError
 from ...utils.Date import Date
 from ...utils.FinGlobalVariables import g_small
@@ -105,11 +107,15 @@ class FinFixedFixedXCcySwap:
         self._float_flows = []
         self._float_flow_pvs = []
         self._float_dfs = []
+        self._float_rates = []
 
         self._fixed_year_fracs = []
         self._fixed_flows = []
         self._fixed_dfs = []
         self._fixed_flow_pvs = []
+
+        self._float_total_pv = []
+        self._fixed_total_pv = []
 
         self._first_fixing_rate = None
         self.value_dt = None
@@ -226,7 +232,7 @@ class FinFixedFixedXCcySwap:
     ##########################################################################
 
     def fixed_leg_value(self, value_dt, discount_curve, principal=0.0):
-
+        """Calculate the present value of the fixed leg cash flows."""
         self.value_dt = value_dt
         self._fixed_year_fracs = []
         self._fixed_flows = []
@@ -282,6 +288,7 @@ class FinFixedFixedXCcySwap:
     ##########################################################################
 
     def _calc_fixed_leg_flows(self):
+        """Calculate the fixed leg cash flows."""
 
         self._fixed_year_fracs = []
         self._fixed_flows = []
@@ -581,8 +588,8 @@ class FinFixedFixedXCcySwap:
         s += label_to_string("TERMINATION DATE", self._termination_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("SWAP TYPE", self._swap_type)
-        s += label_to_string("FIXED cpn", self._fixed_cpn)
+        s += label_to_string("FIXED LEG TYPE", self._fixed_leg_type)
+        s += label_to_string("FIXED CPN", self._fixed_cpn)
         s += label_to_string("FLOAT SPREAD", self._float_spread)
         s += label_to_string("FIXED FREQUENCY", self._fixed_freq_type)
         s += label_to_string("FLOAT FREQUENCY", self._float_freq_type)

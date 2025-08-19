@@ -39,7 +39,7 @@ def _f(
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve.times, curve.dfs)
+    curve.fit(curve.times, curve.dfs)
     v_swap = swap.value(value_dt, curve, curve, None)
     notional = swap.fixed_leg.notional
     v_swap /= notional
@@ -58,7 +58,7 @@ def _g(df, *args):
     curve._dfs[num_points - 1] = df
 
     # For discount that need a fit function, we fit it now
-    curve._interpolator.fit(curve.times, curve.dfs)
+    curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
     return v_fra
@@ -77,7 +77,7 @@ def _cost_function(dfs, *args):
     libor_curve._dfs = dfs
 
     # For discount that need a fit function, we fit it now
-    libor_curve._interpolator.fit(libor_curve.times, libor_curve.dfs)
+    libor_curve.fit(libor_curve.times, libor_curve.dfs)
 
     cost = 0.0
     for depo in libor_curve.used_deposits:
@@ -409,16 +409,16 @@ class IborSingleCurve(DiscountCurve):
         t_mat = 0.0
         df_mat = 1.0
         self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, df_mat)
-        self._interpolator.fit(self._times, self._dfs)
+        self._dfs = np.append(self.dfs, df_mat)
+        self.fit(self.times, self._dfs)
 
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
             self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
-            self._interpolator.fit(self._times, self._dfs)
+            self._dfs = np.append(self.dfs, df_mat)
+            self.fit(self.times, self._dfs)
 
         oldt_mat = t_mat
 
@@ -433,10 +433,10 @@ class IborSingleCurve(DiscountCurve):
             if t_set < oldt_mat and t_mat > oldt_mat:
                 df_mat = fra.maturity_df(self)
                 self._times = np.append(self._times, t_mat)
-                self._dfs = np.append(self._dfs, df_mat)
+                self._dfs = np.append(self.dfs, df_mat)
             else:
                 self._times = np.append(self._times, t_mat)
-                self._dfs = np.append(self._dfs, df_mat)
+                self._dfs = np.append(self.dfs, df_mat)
                 argtuple = (self, self.value_dt, fra)
                 df_mat = optimize.newton(
                     _g,
@@ -454,8 +454,8 @@ class IborSingleCurve(DiscountCurve):
             maturity_dt = swap.fixed_leg.payment_dts[-1]
             t_mat = (maturity_dt - self.value_dt) / g_days_in_year
 
-            self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
+            self._times = np.append(self.times, t_mat)
+            self._dfs = np.append(self.dfs, df_mat)
 
             argtuple = (self, self.value_dt, swap)
 
@@ -575,7 +575,7 @@ class IborSingleCurve(DiscountCurve):
         )
 
         self._dfs[1:] = np.array(res.x)
-        self._interpolator.fit(self._times, self._dfs)
+        self.fit(self._times, self._dfs)
 
         if self._check_refit is True:
             self._check_refits(1e-5, 1e-5, 1e-5)
@@ -596,17 +596,17 @@ class IborSingleCurve(DiscountCurve):
         # time zero is now.
         t_mat = 0.0
         df_mat = 1.0
-        self._times = np.append(self._times, 0.0)
-        self._dfs = np.append(self._dfs, df_mat)
-        self._interpolator.fit(self._times, self._dfs)
+        self._times = np.append(self.times, 0.0)
+        self._dfs = np.append(self.dfs, df_mat)
+        self.fit(self.times, self._dfs)
 
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
             t_mat = (depo.maturity_dt - self.value_dt) / g_days_in_year
-            self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
-            self._interpolator.fit(self._times, self._dfs)
+            self._times = np.append(self.times, t_mat)
+            self._dfs = np.append(self.dfs, df_mat)
+            self.fit(self.times, self.dfs)
 
         oldt_mat = t_mat
 
@@ -622,15 +622,15 @@ class IborSingleCurve(DiscountCurve):
 
                 df_mat = fra.maturity_df(self)
 
-                self._times = np.append(self._times, t_mat)
-                self._dfs = np.append(self._dfs, df_mat)
-                self._interpolator.fit(self._times, self._dfs)
+                self._times = np.append(self.times, t_mat)
+                self._dfs = np.append(self.dfs, df_mat)
+                self.fit(self.times, self._dfs)
 
             else:
 
-                self._times = np.append(self._times, t_mat)
-                self._dfs = np.append(self._dfs, df_mat)
-                self._interpolator.fit(self._times, self._dfs)
+                self._times = np.append(self.times, t_mat)
+                self._dfs = np.append(self.dfs, df_mat)
+                self.fit(self.times, self.dfs)
 
                 argtuple = (self, self.value_dt, fra)
 
@@ -727,9 +727,9 @@ class IborSingleCurve(DiscountCurve):
 
             df_mat = (df_settle_dt - swap_rate * pv01) / pv01_end
 
-            self._times = np.append(self._times, t_mat)
-            self._dfs = np.append(self._dfs, df_mat)
-            self._interpolator.fit(self._times, self._dfs)
+            self._times = np.append(self.times, t_mat)
+            self._dfs = np.append(self.dfs, df_mat)
+            self._interpolator.fit(self.times, self.dfs)
 
             pv01 += acc * df_mat
 

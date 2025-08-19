@@ -14,6 +14,7 @@ issue_dt = Date(15, 2, 2004)
 
 
 def test_bond_future_1():
+
     bond = Bond(issue_dt, Date(15, 8, 2011), 0.0500, freq, basis)
 
     assert bond.maturity_dt == Date(15, 8, 2011)
@@ -23,15 +24,13 @@ def test_bond_future_1():
     last_delivery_date = Date(28, 3, 2002)
     contract_size = 100000
     contractCoupon = 0.06
-    bondFutureContract = BondFuture("TYH2",
-                                    first_delivery_date,
-                                    last_delivery_date,
-                                    contract_size,
-                                    contractCoupon)
+    bondFutureContract = BondFuture(
+        "TYH2", first_delivery_date, last_delivery_date, contract_size, contractCoupon
+    )
 
     cf = bondFutureContract.conversion_factor(bond)
 
-    assert round(cf, 4) == 92.9688
+    assert round(cf, 4) == 0.9297
 
 
 def test_bond_future_2():
@@ -50,15 +49,13 @@ def test_bond_future_2():
 
     contract_size = 100000
     contractCoupon = 0.06
-    bondFutureContract = BondFuture("TYZ7",
-                                    first_delivery_date,
-                                    last_delivery_date,
-                                    contract_size,
-                                    contractCoupon)
+    bondFutureContract = BondFuture(
+        "TYZ7", first_delivery_date, last_delivery_date, contract_size, contractCoupon
+    )
 
     cf = bondFutureContract.conversion_factor(bond)
 
-    assert round(cf, 4) == 73.1429
+    assert round(cf, 4) == 0.7314
 
     futures_price = 125.265625
 
@@ -66,12 +63,13 @@ def test_bond_future_2():
 
     assert round(pip, 4) == 9162291.0800
 
-    tia = bondFutureContract.total_invoice_amount(
-        settle_dt, bond, futures_price)
+    tia = bondFutureContract.total_invoice_amount(settle_dt, bond, futures_price)
 
     assert round(tia, 4) == 9162294.5
 
+
 ###############################################################################
+
 
 def test_future_bond_ctd():
 
@@ -81,11 +79,9 @@ def test_future_bond_ctd():
     contract_size = 100000
     contractCoupon = 0.06
 
-    bondFutureContract = BondFuture("TYZ7",
-                                    first_delivery_date,
-                                    last_delivery_date,
-                                    contract_size,
-                                    contractCoupon)
+    bondFutureContract = BondFuture(
+        "TYZ7", first_delivery_date, last_delivery_date, contract_size, contractCoupon
+    )
 
     bonds = []
     prices = []
@@ -135,8 +131,6 @@ def test_future_bond_ctd():
 
     futures_price = 125.265625
 
-    ctd = bondFutureContract.cheapest_to_deliver(bonds,
-                                                 prices,
-                                                 futures_price)
+    ctd = bondFutureContract.ctd(bonds, prices, futures_price)
 
     assert round(ctd.cpn, 4) == 0.0238

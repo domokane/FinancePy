@@ -8,12 +8,12 @@ import math
 
 
 xValues = np.array([0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0])
-a = -0.1
-b = 0.002
+A = -0.1
+B = 0.002
 
 yValues = []
 for x in xValues:
-    y = math.exp(a * x + b * x * x)
+    y = math.exp(A * x + B * x * x)
     yValues.append(y)
 
 yValues = np.array(yValues)
@@ -47,7 +47,7 @@ def test_FinInterpolate_Recovers_Inputs():
             yInterpValues.append(y_int)
 
         yInterpValues = np.array(yInterpValues)
-        assert np.linalg.norm(yValues - yInterpValues)/np.linalg.norm(yValues) <= 1e-6
+        assert np.linalg.norm(yValues - yInterpValues) / np.linalg.norm(yValues) <= 1e-6
 
 
 def test_FLAT_FWD_RATES():
@@ -311,7 +311,7 @@ def test_LINEAR_ONFWD_RATES():
     assert round(y_int, 4) == 0.5537
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # test_LINEAR_ONFWD_RATES_empty_fit()
     # test_LINEAR_ONFWD_RATES_single_value_at_origin()
     # test_LINEAR_ONFWD_RATES_single_value_not_at_origin()
