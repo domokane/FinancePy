@@ -33,8 +33,8 @@ def test_FinFXForward():
     currency_pair = for_name + dom_name  # Always ccy1ccy2
     spot_fx_rate = 1.300  # USD per EUR
     strike_fx_rate = 1.365  # USD per EUR
-    ccy1InterestRate = 0.02  # USD Rates
-    ccy2InterestRate = 0.05  # EUR rates
+    ccy1_interest_rate = 0.02  # USD Rates
+    ccy2_interest_rate = 0.05  # EUR rates
 
     ###########################################################################
 
@@ -47,7 +47,7 @@ def test_FinFXForward():
     depos = []
     fras = []
     swaps = []
-    deposit_rate = ccy1InterestRate
+    deposit_rate = ccy1_interest_rate
     depo = IborDeposit(
         settle_dt,
         maturity_dt,
@@ -62,7 +62,7 @@ def test_FinFXForward():
     depos = []
     fras = []
     swaps = []
-    deposit_rate = ccy2InterestRate
+    deposit_rate = ccy2_interest_rate
     depo = IborDeposit(
         settle_dt,
         maturity_dt,

@@ -1,7 +1,11 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from .helpers import buildIborSingleCurve
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-from helpers import *
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.utils.global_types import SwapTypes

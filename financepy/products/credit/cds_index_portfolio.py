@@ -407,7 +407,7 @@ class CDSIndexPortfolio:
             )
 
             adjusted_issuer_curve._times = issuer_curve._times.copy()
-            adjusted_issuer_curve._values = issuer_curve._values.copy()
+            adjusted_issuer_curve._qs = issuer_curve._qs.copy()
             adjusted_issuer_curves.append(adjusted_issuer_curve)
 
         # We solve for each maturity point
@@ -428,8 +428,8 @@ class CDSIndexPortfolio:
                 sum_prot = 0.0
 
                 for i_credit in range(0, num_credits):
-                    q1 = adjusted_issuer_curves[i_credit]._values[i_maturity]
-                    q2 = adjusted_issuer_curves[i_credit]._values[
+                    q1 = adjusted_issuer_curves[i_credit]._qs[i_maturity]
+                    q2 = adjusted_issuer_curves[i_credit]._qs[
                         i_maturity + 1
                     ]
                     q12 = q2 / q1
@@ -437,7 +437,7 @@ class CDSIndexPortfolio:
                     q12_new = pow(q12, ratio)
                     q2_new = q1 * q12_new
 
-                    adjusted_issuer_curves[i_credit]._values[
+                    adjusted_issuer_curves[i_credit]._qs[
                         i_maturity + 1
                     ] = q2_new
 

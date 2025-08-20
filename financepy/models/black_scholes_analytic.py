@@ -5,6 +5,7 @@
 from typing import Union
 
 import numpy as np
+
 from numba import float64, int64, vectorize, njit
 
 from ..utils.global_types import OptionTypes

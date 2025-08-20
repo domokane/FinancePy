@@ -279,7 +279,7 @@ class CDSBasket:
                 issuer_surv_probs[i_credit] = interpolate(
                     t,
                     issuer_curve._times,
-                    issuer_curve._values,
+                    issuer_curve._qs,
                     InterpTypes.FLAT_FWD_RATES.value,
                 )
 
@@ -297,7 +297,7 @@ class CDSBasket:
         libor_curve = issuer_curves[0].libor_curve
         basket_curve = CDSCurve(value_dt, [], libor_curve, curve_recovery)
         basket_curve._times = basket_times
-        basket_curve._values = basket_surv_curve
+        basket_curve._qs = basket_surv_curve
 
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, basket_curve, curve_recovery

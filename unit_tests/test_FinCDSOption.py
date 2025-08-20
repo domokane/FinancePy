@@ -2,7 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from helpers import buildFullIssuerCurve
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from .helpers import buildFullIssuerCurve
 from financepy.utils.date import Date
 from financepy.products.credit.cds_option import CDSOption
 

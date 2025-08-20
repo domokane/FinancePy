@@ -4,6 +4,8 @@
 
 from typing import Union
 
+from financepy.utils.frequency import annual_frequency
+
 from ....utils import FinError
 from ....utils import Date
 from ....utils import G_SMALL
@@ -156,7 +158,7 @@ class FixedFixedXCcySwap:
     def _generate_fixed_leg_payment_dts(self):
         """Generate the fixed leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
-        self._adjusted_fixed_dts = FinSchedule(
+        self._adjusted_fixed_dts = Schedule(
             self.effective_dt,
             self._termination_dt,
             self._fixed_freq_type,
@@ -170,7 +172,7 @@ class FixedFixedXCcySwap:
     def _generate_float_leg_payment_dts(self):
         """Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
-        self._adjusted_float_dts = FinSchedule(
+        self._adjusted_float_dts = Schedule(
             self.effective_dt,
             self._termination_dt,
             self._float_freq_type,
@@ -242,7 +244,7 @@ class FixedFixedXCcySwap:
         self._fixed_flow_pvs = []
         self._fixed_total_pv = []
 
-        day_counter = FinDayCount(self._fixed_dc_type)
+        day_counter = DayCount(self._fixed_dc_type)
 
         # The swap may have started in the past but we can only value
         # payments that have occurred after the valuation date.
@@ -295,7 +297,7 @@ class FixedFixedXCcySwap:
         self._fixed_year_fracs = []
         self._fixed_flows = []
 
-        day_counter = FinDayCount(self._fixed_dc_type)
+        day_counter = DayCount(self._fixed_dc_type)
 
         # Now PV fixed leg flows
         prev_dt = self._adjusted_fixed_dts[0]
@@ -315,7 +317,7 @@ class FixedFixedXCcySwap:
         used in the pricing of a cash-settled swaption in the IborSwaption
         class. This method does not affect the standard valuation methods."""
 
-        m = FinFrequency(freq_type)
+        m = annual_frequency(freq_type)
 
         if m == 0:
             raise FinError("Frequency cannot be zero.")
@@ -368,7 +370,7 @@ class FixedFixedXCcySwap:
         self._float_total_pv = []
         self._first_fixing_rate = first_fixing_rate
 
-        basis = FinDayCount(self._float_dc_type)
+        basis = DayCount(self._float_dc_type)
 
         # The swap may have started in the past but we can only value
         # payments that have occurred after the start date.

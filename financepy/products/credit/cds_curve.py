@@ -29,7 +29,10 @@ def f(q, *args):
     recovery_rate = args[3]
 
     num_points = len(curve._times)
-    curve._values[num_points - 1] = q
+#    curve._qs[num_points - 1] = q
+
+    curve.set_q(num_points - 1, q)
+
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
     obj_fn = cds.value(value_dt, curve, recovery_rate)["clean_pv"]
@@ -73,7 +76,7 @@ class CDSCurve:
         self.built_ok = False
 
         self._times = []
-        self._values = []
+        self._qs = []
 
         if len(self.cds_contracts) > 0:
             self._build_curve()
@@ -84,13 +87,30 @@ class CDSCurve:
 
     ###########################################################################
 
+    @property
     def times(self):
-        return self._times
+        return self._times.copy()
 
     ###########################################################################
 
-    def values(self):
-        return self._values
+    @property
+    def qs(self):
+        return self._qs.copy()
+
+    @property
+    def dfs(self):
+        return self.libor_curve.dfs
+
+    def set_q(self, index, q):
+        """Set the discount factor at a specific index."""
+
+        n_points = len(self.qs)
+
+        if index < 0 or index >= n_points:
+            raise IndexError("Index out of bounds")
+
+        self._qs[index] = q
+
 
     ###########################################################################
 
@@ -129,12 +149,12 @@ class CDSCurve:
             qs = np.zeros(n)
             for i in range(0, n):
                 qs[i] = _uinterpolate(
-                    t[i], self._times, self._values, self.interp_method.value
+                    t[i], self._times, self._qs, self.interp_method.value
                 )
             return qs
         elif isinstance(t, float):
             q = _uinterpolate(
-                t, self._times, self._values, self.interp_method.value
+                t, self._times, self._qs, self.interp_method.value
             )
             return q
         else:
@@ -167,7 +187,7 @@ class CDSCurve:
 
         # we size the vectors to include time zero
         self._times = np.array([0.0])
-        self._values = np.array([1.0])
+        self._qs = np.array([1.0])
 
         for i in range(0, num_times):
 
@@ -181,10 +201,10 @@ class CDSCurve:
             )
 
             t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
-            q = self._values[i]
+            q = self._qs[i]
 
             self._times = np.append(self._times, t_mat)
-            self._values = np.append(self._values, q)
+            self._qs = np.append(self._qs, q)
 
             optimize.newton(
                 f,
@@ -254,7 +274,11 @@ class CDSCurve:
         """Print out the details of the survival probability curve."""
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         header = "TIME,SURVIVAL_PROBABILITY"
-        value_table = [self._times, self._values]
+
+        print("XXXXX")
+        print(self._qs)
+
+        value_table = [self._times, self._qs]
         precision = "10.7f"
         s += table_to_string(header, value_table, precision)
         return s

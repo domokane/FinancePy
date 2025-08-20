@@ -3,8 +3,8 @@
 ########################################################################################
 
 import matplotlib.pyplot as plt
-import time
 
+import time
 import sys
 
 from FinTestCases import FinTestCases, globalTestCaseMode

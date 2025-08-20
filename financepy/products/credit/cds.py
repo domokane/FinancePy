@@ -660,10 +660,10 @@ class CDS:
         v = _prot_leg_pv_numba(
             teff,
             t_mat,
-            libor_curve._times,
-            libor_curve._dfs,
-            issuer_curve._times,
-            issuer_curve._values,
+            libor_curve.times,
+            libor_curve.dfs,
+            issuer_curve.times,
+            issuer_curve.qs,
             contract_recovery_rate,
             num_steps_per_year,
             prot_method,
@@ -705,7 +705,7 @@ class CDS:
             libor_curve._times,
             libor_curve._dfs,
             issuer_curve._times,
-            issuer_curve._values,
+            issuer_curve._qs,
             pv01_method,
         )
 

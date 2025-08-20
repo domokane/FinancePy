@@ -92,28 +92,19 @@ class DiscountCurve:
     @property
     def times(self) -> np.ndarray:
         """Return the internal array of times (in years) from the anchor date."""
-        return (
-            self._times.copy()
-        )  # return a copy to prevent external modification
+        return self._times.copy()  # return a copy to prevent external modification
 
     @property
     def dfs(self) -> np.ndarray:
         """Return the internal array of discount factors corresponding to times."""
-        return (
-            self._dfs.copy()
-        )  # return a copy to prevent external modification
+        return self._dfs.copy()  # return a copy to prevent external modification
 
     ###########################################################################
 
-    def set_df(self, index, df):
-        """Set the discount factor at a specific index."""
-
+    def set_last_df(self, df):
+        """Set the discount factor at the last maturity time."""
         n_points = len(self.dfs)
-
-        if index < 0 or index >= n_points:
-            raise IndexError("Index out of bounds")
-
-        self._dfs[index] = df
+        self._dfs[n_points - 1] = df
 
     ###########################################################################
 
@@ -430,9 +421,7 @@ class DiscountCurve:
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        disc_curve = DiscountCurve(
-            self.value_dt, times, values, self._interp_type
-        )
+        disc_curve = DiscountCurve(self.value_dt, times, values, self._interp_type)
 
         return disc_curve
 
@@ -492,9 +481,7 @@ class DiscountCurve:
         num_points = len(self._df_dates)
         s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += label_to_string(
-                "%12s" % self._df_dates[i], "%12.8f" % self._dfs[i]
-            )
+            s += label_to_string("%12s" % self._df_dates[i], "%12.8f" % self._dfs[i])
 
         return s
 

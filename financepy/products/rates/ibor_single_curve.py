@@ -36,9 +36,7 @@ def _f(
     curve = args[0]
     value_dt = args[1]
     swap = args[2]
-    num_points = len(curve.times)
-    # curve._dfs[num_points - 1] = df
-    curve.set_df(num_points - 1, df)
+    curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
@@ -56,9 +54,7 @@ def _g(df, *args):
     curve = args[0]
     value_dt = args[1]
     fra = args[2]
-    num_points = len(curve.times)
-    #    curve._dfs[num_points - 1] = df
-    curve.set_df(num_points - 1, df)
+    curve.set_last_df(df)
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)
@@ -185,13 +181,14 @@ class IborSingleCurve(DiscountCurve):
         if do_build:
             self._build_curve(**kwargs)
 
-    ########################################################################################
+    ####################################################################################
 
     def build_curve(self, **kwargs):
         """
         Build curve based on interpolation.
 
-        Not all interpolators are suitable for the boostrap/1d solver, only those that are local,
+        Not all interpolators are suitable for the boostrap/1d solver, only those
+        that are local,
         where the value of df[i] does not affect discount factors for t<=t[i-1]
         """
 
@@ -201,13 +198,14 @@ class IborSingleCurve(DiscountCurve):
 
         self._build_curve(**kwargs)
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve(self, **kwargs):
         """
         Build curve based on interpolation.
 
-        Not all interpolators are suitable for the boostrap/1d solver, only those that are local,
+        Not all interpolators are suitable for the boostrap/1d solver, only those
+        that are local,
         where the value of df[i] does not affect discount factors for t<=t[i-1]
         """
 
@@ -218,7 +216,7 @@ class IborSingleCurve(DiscountCurve):
 
         self._is_built = True
 
-    ########################################################################################
+    ####################################################################################
 
     def _validate_inputs(self, ibor_deposits, ibor_fras, ibor_swaps):
         """Validate the inputs for each of the Ibor products."""
@@ -246,9 +244,7 @@ class IborSingleCurve(DiscountCurve):
                 start_dt = depo.start_dt
 
                 if start_dt < self.value_dt:
-                    raise FinError(
-                        "First deposit starts before valuation date."
-                    )
+                    raise FinError("First deposit starts before valuation date.")
 
                 if start_dt < depo_start_dt:
                     depo_start_dt = start_dt
@@ -274,7 +270,7 @@ class IborSingleCurve(DiscountCurve):
         # Ensure that valuation date is on or after first deposit start date
         # if num_depos > 1:
         #    if ibor_deposits[0].effective_dt > self.value_dt:
-        #        raise FinError("Valuation date must not be before first deposit settles.")
+        #     raise FinError("Valuation date must not be before first deposit settles.")
 
         if num_fras > 0:
             for fra in ibor_fras:
@@ -339,9 +335,7 @@ class IborSingleCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dates[i_flow]:
-                        raise FinError(
-                            "Swap coupons are not on the same date grid."
-                        )
+                        raise FinError("Swap coupons are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -399,7 +393,7 @@ class IborSingleCurve(DiscountCurve):
         else:
             self.dc_type = None
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve_using_1d_solver(self, **kwargs):
         """Construct the discount curve using a bootstrap approach. This is
@@ -420,12 +414,14 @@ class IborSingleCurve(DiscountCurve):
         self.fit(self.times, self._dfs)
 
         for depo in self.used_deposits:
+
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
             t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
+
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self.dfs, df_mat)
-            self.fit(self.times, self._dfs)
+            self.fit(self.times, self.dfs)
 
         oldt_mat = t_mat
 
@@ -481,7 +477,7 @@ class IborSingleCurve(DiscountCurve):
             # self.check_refit(1e-10, swaptol, 1e-5)
             self.check_refit(1e-5, 1e-5, 1e-5)
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve_using_least_squares(self, **kwargs):
         """
@@ -522,11 +518,7 @@ class IborSingleCurve(DiscountCurve):
             for fra in libor_curve.used_fras:
                 # do not need to be too exact here
                 acc_factor = datediff(fra.start_dt, fra.maturity_dt)
-                v = (
-                    fra.value(value_dt, libor_curve)
-                    / fra.notional
-                    / acc_factor
-                )
+                v = fra.value(value_dt, libor_curve) / fra.notional / acc_factor
                 out[idx] = v
                 idx = idx + 1
 
@@ -592,7 +584,7 @@ class IborSingleCurve(DiscountCurve):
         if self.check_refit_flag is True:
             self.check_refit(1e-5, 1e-5, 1e-5)
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve_linear_swap_rate_interpolation(self):
         """Construct the discount curve using a bootstrap approach. This is
@@ -610,7 +602,7 @@ class IborSingleCurve(DiscountCurve):
         df_mat = 1.0
         self._times = np.append(self.times, 0.0)
         self._dfs = np.append(self.dfs, df_mat)
-        self.fit(self.times, self._dfs)
+        self.fit(self.times, self.dfs)
 
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
@@ -762,9 +754,7 @@ class IborSingleCurve(DiscountCurve):
         for fra in self.used_fras:
             v = fra.value(self.value_dt, self, self) / fra.notional
             if abs(v) > fra_tol:
-                raise FinError(
-                    f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}"
-                )
+                raise FinError(f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}")
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
@@ -784,7 +774,7 @@ class IborSingleCurve(DiscountCurve):
                 swap.print_float_leg_pv()
                 raise FinError("Swap not repriced.")
 
-    ########################################################################################
+    ####################################################################################
 
     def _df(self, t: Union[float, np.ndarray]):
         """
@@ -795,7 +785,7 @@ class IborSingleCurve(DiscountCurve):
         ), "The curve has not yet been built, call build_curve() first"
         return super().df_t(t)
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Print out the details of the Ibor curve."""
@@ -828,7 +818,7 @@ class IborSingleCurve(DiscountCurve):
 
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

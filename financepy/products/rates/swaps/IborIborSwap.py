@@ -164,7 +164,7 @@ class IborIborSwap:
         date."""
 
         self.value_dt = value_dt
-        self._floatYearFracs = []
+        self._float_year_fracs = []
         self._float_flows = []
         self._float_rates = []
         self._floatDfs = []
@@ -177,7 +177,7 @@ class IborIborSwap:
         """ The swap may have started in the past but we can only value
         payments that have occurred after the start date. """
         start_index = 0
-        while self._adjustedFloatDates[start_index] < value_dt:
+        while self._adjusted_float_dts[start_index] < value_dt:
             start_index += 1
 
         """ If the swap has yet to settle then we do not include the
@@ -192,8 +192,8 @@ class IborIborSwap:
 
         """ The first floating payment is usually already fixed so is
         not implied by the index curve. """
-        prev_dt = self._adjustedFloatDates[start_index - 1]
-        next_dt = self._adjustedFloatDates[start_index]
+        prev_dt = self._adjusted_float_dts[start_index - 1]
+        next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
         # Cannot be pcd as has past
         df1_index = index_curve.df(self.effective_dt)
@@ -214,7 +214,7 @@ class IborIborSwap:
 
         pv = flow * df_discount
 
-        self._floatYearFracs.append(alpha)
+        self._float_year_fracs.append(alpha)
         self._float_flows.append(flow)
         self._float_rates.append(float_rate)
         self._floatDfs.append(df_discount)
@@ -224,7 +224,7 @@ class IborIborSwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjustedFloatDates[start_index + 1 :]:
+        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -239,7 +239,7 @@ class IborIborSwap:
             prev_dt = next_dt
 
             self._float_flows.append(flow)
-            self._floatYearFracs.append(alpha)
+            self._float_year_fracs.append(alpha)
             self._float_rates.append(fwd_rate)
             self._floatDfs.append(df_discount)
             self._float_flow_pvs.append(flow * df_discount)
@@ -288,12 +288,12 @@ class IborIborSwap:
         )
 
         i_flow = 0
-        for payment_dt in self._adjustedFloatDates[start_index:]:
+        for payment_dt in self._adjusted_float_dts[start_index:]:
             print(
                 "%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f"
                 % (
                     payment_dt,
-                    self._floatYearFracs[i_flow],
+                    self._float_year_fracs[i_flow],
                     self._float_rates[i_flow] * 100.0,
                     self._float_flows[i_flow],
                     self._floatDfs[i_flow],

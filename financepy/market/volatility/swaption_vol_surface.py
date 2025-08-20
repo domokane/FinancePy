@@ -2,12 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import matplotlib.pyplot as plt
+
 from typing import Union
 
 import numpy as np
 from scipy.optimize import minimize
 
-import matplotlib.pyplot as plt
 from numba import njit, float64, int64
 
 from ...utils.error import FinError

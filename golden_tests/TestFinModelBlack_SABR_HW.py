@@ -6,11 +6,12 @@ import sys
 
 sys.path.append("..")
 
-import matplotlib.pyplot as plt
 import numpy as np
 from financepy.models.sabr import SABR
 from financepy.models.sabr_shifted import SABRShifted
 from FinTestCases import FinTestCases, globalTestCaseMode
+
+import matplotlib.pyplot as plt
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 

@@ -13,6 +13,7 @@ disable=
     R0903,  # too-few-public-methods
     W0511,  # fixme
     W0718,  # comparison-with-itself
+    R0801   # Duplicate code
 
 [FORMAT]
 # Match Black's defaults

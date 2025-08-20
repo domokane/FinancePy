@@ -16,8 +16,8 @@ from financepy.utils.tenor import Tenor, TenorUnit
                          ])
 def test_tenor_create(tenor_string, num_periods, units):
     tenor = Tenor(tenor_string)
-    assert tenor._num_periods == num_periods
-    assert tenor._units.name == units.name
+    assert tenor.num_periods == num_periods
+    assert tenor.units.name == units.name
 
 
 @pytest.mark.parametrize('tenor_string', ['5d', '-7w', '12M', '-3Y', ])

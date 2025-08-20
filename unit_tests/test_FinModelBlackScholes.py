@@ -56,10 +56,10 @@ def test_black_scholes():
     )
     assert round(v, 4) == 6.8391
 
-    modelApprox = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+    model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
 
     v = amOption.value(
-        value_dt, stock_price, discount_curve, dividend_curve, modelApprox
+        value_dt, stock_price, discount_curve, dividend_curve, model_approx
     )
 
     assert round(v, 4) == 6.8277
@@ -82,6 +82,7 @@ def test_bjerksund_stensland():
     # See Table 2 in https://www.sciencedirect.com/science/article/abs/pii/095652219390009H
 
     # value_dt and exipry_dt are set so that time to maturity becomes 0.25
+
     value_dt = Date(8, 5, 2015)
     expiry_dt = Date(7, 8, 2015, hh=6)
     interest_rate = 0.08
@@ -105,17 +106,17 @@ def test_bjerksund_stensland():
         DayCountTypes.ACT_365F,
     )
 
-    model = BlackScholes(volatility, BlackScholesTypes.Bjerksund_Stensland)
+    model = BlackScholes(volatility, BlackScholesTypes.BJERKSUND_STENSLAND)
 
     # american call case
-    amCallOption = EquityAmericanOption(
+    am_call_option = EquityAmericanOption(
         expiry_dt, strike_price, OptionTypes.AMERICAN_CALL
     )
     values = []
 
     for stock_price in stock_prices:
 
-        value = amCallOption.value(
+        value = am_call_option.value(
             value_dt, stock_price, discount_curve, borrow_curve, model
         )
 
@@ -124,7 +125,7 @@ def test_bjerksund_stensland():
     assert values == [1.29, 3.82, 8.35, 14.80, 22.71]
 
     # american put case
-    amPutOption = EquityAmericanOption(
+    am_put_option = EquityAmericanOption(
         expiry_dt, strike_price, OptionTypes.AMERICAN_PUT
     )
 
@@ -132,7 +133,7 @@ def test_bjerksund_stensland():
 
     for stock_price in stock_prices:
 
-        value = amPutOption.value(
+        value = am_put_option.value(
             value_dt, stock_price, discount_curve, borrow_curve, model
         )
 

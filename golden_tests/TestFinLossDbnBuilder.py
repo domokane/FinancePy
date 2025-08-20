@@ -17,7 +17,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-plotGraphs = False
+plot_graphs = False
 
 ##########################################################################
 
@@ -67,7 +67,7 @@ def test_FinLossDbnBuilder():
 
         #######################################################################
 
-        if plotGraphs:
+        if plot_graphs:
             plt.figure()
             plt.plot(x, dbn1, label="GCD FULL")
             plt.plot(x, dbn2, label="ADJ BIN")

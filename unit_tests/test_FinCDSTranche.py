@@ -2,7 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from helpers import (
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+from .helpers import (
     build_Ibor_Curve,
     loadHeterogeneousSpreadCurves,
     loadHomogeneousCDSCurves,
@@ -48,14 +52,14 @@ cdsIndex = CDSIndexPortfolio()
 def test_homogeneous():
 
     num_credits = 125
-    spd3Y = 0.0012
-    spd5Y = 0.0025
-    spd7Y = 0.0034
-    spd10Y = 0.0046
+    spd_3yr = 0.0012
+    spd_5yr = 0.0025
+    spd_7yr = 0.0034
+    spd_10yr = 0.0046
     num_points = 40
 
     issuer_curves = loadHomogeneousCDSCurves(
-        value_dt, libor_curve, spd3Y, spd5Y, spd7Y, spd10Y, num_credits
+        value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits
     )
 
     intrinsicSpd = (

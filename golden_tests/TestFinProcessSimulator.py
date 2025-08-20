@@ -84,7 +84,7 @@ def test_FinProcessSimulator():
     )
     end = time.time()
     elapsed = end - start
-    test_cases.print("HESTON euler", elapsed)
+    test_cases.print("HESTON EULER", elapsed)
     if printPaths:
         print(paths)
 

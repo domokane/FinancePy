@@ -72,10 +72,10 @@ def testBlackScholes():
     )
     #    print(v)
 
-    modelApprox = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+    model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
 
     v = amOption.value(
-        value_dt, stock_price, discount_curve, dividend_curve, modelApprox
+        value_dt, stock_price, discount_curve, dividend_curve, model_approx
     )
 
     #    print(v)

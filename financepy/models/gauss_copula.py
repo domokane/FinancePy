@@ -33,9 +33,9 @@ def default_times_gc(issuer_curves, corr_matrix, num_trials, seed):
             u1 = 1.0 - N(g)
             u2 = 1.0 - u1
             times = issuer_curve._times
-            values = issuer_curve._values
-            t1 = uniform_to_default_time(u1, times, values)
-            t2 = uniform_to_default_time(u2, times, values)
+            qs = issuer_curve._qs
+            t1 = uniform_to_default_time(u1, times, qs)
+            t2 = uniform_to_default_time(u2, times, qs)
             corr_times[i_credit, i_trial] = t1
             corr_times[i_credit, num_trials + i_trial] = t2
 

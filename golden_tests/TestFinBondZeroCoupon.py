@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-import sys
+import sys, os
 
 import pandas as pd
 
@@ -21,7 +21,7 @@ from financepy.utils.math import ONE_MILLION
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-plotGraphs = False
+plot_graphs = False
 
 
 ########################################################################################
@@ -55,8 +55,14 @@ def test_bond_zero():
 
 def test_bond_zero_ror():
 
-    path = ".//data//test_cases_bond_zero_ror.csv"
-    df = pd.read_csv(path, parse_dates=["buy_date", "sell_date"])
+    # Directory where *this script* is located
+    here = os.path.dirname(os.path.abspath(__file__))
+
+    # Path to your local data file inside a "data" folder
+    data_path = os.path.join(here, "data", "test_cases_bond_zero_ror.csv")
+
+#    path = ".//data//test_cases_bond_zero_ror.csv"
+    df = pd.read_csv(data_path, parse_dates=["buy_date", "sell_date"])
 
     # A 1-year bond with zero coupon per year. code: 092103011
     bond = BondZero(

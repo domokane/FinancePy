@@ -2,6 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime

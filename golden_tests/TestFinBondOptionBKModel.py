@@ -2,9 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+import matplotlib.pyplot as plt
+
 import numpy as np
 import time
-import matplotlib.pyplot as plt
 
 import sys
 
@@ -24,7 +25,7 @@ from financepy.utils.date import Date
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-plotGraphs = False
+plot_graphs = False
 
 ########################################################################################
 
@@ -187,9 +188,7 @@ def test_BondOptionAmericanConvergenceONE():
     expiry_dt = Date(1, 12, 2020)
     strike_price = 100.0
 
-    test_cases.header(
-        "TIME", "N", "PUT_AMER", "PUT_EUR", "CALL_AME", "CALL_EUR"
-    )
+    test_cases.header("TIME", "N", "PUT_AMER", "PUT_EUR", "CALL_AME", "CALL_EUR")
 
     time_steps = range(20, 100, 20)
 
@@ -234,9 +233,7 @@ def test_BondOptionAmericanConvergenceTWO():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
-    discount_curve = DiscountCurveFlat(
-        settle_dt, 0.05, FrequencyTypes.CONTINUOUS
-    )
+    discount_curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     # Bond details
     issue_dt = Date(1, 9, 2014)
@@ -247,15 +244,11 @@ def test_BondOptionAmericanConvergenceTWO():
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
     expiry_dt = settle_dt.add_tenor("18m")
 
-    spot_value = bond.dirty_price_from_discount_curve(
-        settle_dt, discount_curve
-    )
+    spot_value = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
     test_cases.header("LABEL", "VALUE")
     test_cases.print("BOND PRICE", spot_value)
 
-    test_cases.header(
-        "TIME", "N", "EUR_CALL", "AMER_CALL", "EUR_PUT", "AMER_PUT"
-    )
+    test_cases.header("TIME", "N", "EUR_CALL", "AMER_CALL", "EUR_PUT", "AMER_PUT")
 
     sigma = 0.2
     a = 0.1
@@ -270,11 +263,11 @@ def test_BondOptionAmericanConvergenceTWO():
     if 1 == 1:
         K = 100.0
         bkModel = BKTree(sigma, a, 100)
-        europeanCallBondOption = BondOption(
+        euro_call_bond_option = BondOption(
             bond, expiry_dt, K, OptionTypes.EUROPEAN_CALL
         )
 
-        v_ec = europeanCallBondOption.value(settle_dt, discount_curve, bkModel)
+        v_ec = euro_call_bond_option.value(settle_dt, discount_curve, bkModel)
         test_cases.header("LABEL", "VALUE")
         test_cases.print("OPTION", v_ec)
 
@@ -286,25 +279,21 @@ def test_BondOptionAmericanConvergenceTWO():
 
         start = time.time()
 
-        europeanCallBondOption = BondOption(
+        euro_call_bond_option = BondOption(
             bond, expiry_dt, K, OptionTypes.EUROPEAN_CALL
         )
-        v_ec = europeanCallBondOption.value(settle_dt, discount_curve, bkModel)
+        v_ec = euro_call_bond_option.value(settle_dt, discount_curve, bkModel)
 
-        americanCallBondOption = BondOption(
+        amer_call_bond_option = BondOption(
             bond, expiry_dt, K, OptionTypes.AMERICAN_CALL
         )
-        v_ac = americanCallBondOption.value(settle_dt, discount_curve, bkModel)
+        v_ac = amer_call_bond_option.value(settle_dt, discount_curve, bkModel)
 
-        europeanPutBondOption = BondOption(
-            bond, expiry_dt, K, OptionTypes.EUROPEAN_PUT
-        )
-        v_ep = europeanPutBondOption.value(settle_dt, discount_curve, bkModel)
+        euro_put_bond_option = BondOption(bond, expiry_dt, K, OptionTypes.EUROPEAN_PUT)
+        v_ep = euro_put_bond_option.value(settle_dt, discount_curve, bkModel)
 
-        americanPutBondOption = BondOption(
-            bond, expiry_dt, K, OptionTypes.AMERICAN_PUT
-        )
-        v_ap = americanPutBondOption.value(settle_dt, discount_curve, bkModel)
+        amer_put_bond_option = BondOption(bond, expiry_dt, K, OptionTypes.AMERICAN_PUT)
+        v_ap = amer_put_bond_option.value(settle_dt, discount_curve, bkModel)
 
         end = time.time()
         period = end - start
@@ -316,7 +305,7 @@ def test_BondOptionAmericanConvergenceTWO():
         vec_ep.append(v_ep)
         vec_ap.append(v_ap)
 
-    if plotGraphs:
+    if plot_graphs:
 
         plt.figure()
         plt.plot(num_stepsVector, vec_ec, label="European Call")
@@ -357,19 +346,13 @@ def test_BondOptionZEROVOLConvergence():
     expiry_dt = Date(1, 12, 2021)
 
     df_expiry = discount_curve.df(expiry_dt)
-    fwd_clean_value = bond.clean_price_from_discount_curve(
-        expiry_dt, discount_curve
-    )
-    fwd_full_value = bond.dirty_price_from_discount_curve(
-        expiry_dt, discount_curve
-    )
+    fwd_clean_value = bond.clean_price_from_discount_curve(expiry_dt, discount_curve)
+    fwd_full_value = bond.dirty_price_from_discount_curve(expiry_dt, discount_curve)
     #    print("BOND FwdCleanBondPx", fwd_clean_value)
     #    print("BOND FwdFullBondPx", fwd_full_value)
     #    print("BOND Accrued:", bond.accrued_int)
 
-    spot_clean_value = bond.clean_price_from_discount_curve(
-        settle_dt, discount_curve
-    )
+    spot_clean_value = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
 
     test_cases.header(
         "STRIKE",

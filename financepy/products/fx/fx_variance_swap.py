@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.error import FinError
@@ -23,7 +25,7 @@ class FinFXVarianceSwap:
     def __init__(
         self,
         effective_dt: Date,
-        maturity_dt_or_tenor: [Date, str],
+        maturity_dt_or_tenor: Union[Date, str],
         strike_variance: float,
         notional: float = ONE_MILLION,
         pay_strike_flag: bool = True,

@@ -2,8 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import numpy as np
 import matplotlib.pyplot as plt
+
+import numpy as np
 from scipy import optimize
 
 from ...utils.date import Date
@@ -26,9 +27,7 @@ def _f(df, *args):
     value_dt = args[1]
     bond = args[2]
     mkt_clean_price = args[3]
-    num_points = len(curve.times)
-
-    curve.set_df(num_points - 1, df)
+    curve.set_last_df(df)
 
     bond_discount_price = bond.clean_price_from_discount_curve(value_dt, curve)
     obj_fn = bond_discount_price - mkt_clean_price
@@ -110,11 +109,11 @@ class BondZeroCurve(DiscountCurve):
     def zero_rate(
         self,
         dt: Date,
-        frequencyType: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
     ):
         """Calculate the zero rate to maturity date."""
         t = input_time(dt, self)
-        f = annual_frequency(frequencyType)
+        f = annual_frequency(freq_type)
         df = self.df(t)
 
         if f == 0:  # Simple interest
@@ -152,9 +151,7 @@ class BondZeroCurve(DiscountCurve):
 
     ###########################################################################
 
-    def fwd_rate(
-        self, date1: Date, date2: Date, day_count_type: DayCountTypes
-    ):
+    def fwd_rate(self, date1: Date, date2: Date, day_count_type: DayCountTypes):
         """Calculate the forward rate according to the specified
         day count convention."""
 

@@ -130,17 +130,17 @@ def test_dirty_priceCDSIndexOption():
 
         splitRow = row.split(",")
         creditName = splitRow[0]
-        spd3Y = float(splitRow[1]) / 10000.0
-        spd5Y = float(splitRow[2]) / 10000.0
-        spd7Y = float(splitRow[3]) / 10000.0
-        spd10Y = float(splitRow[4]) / 10000.0
+        spd_3yr = float(splitRow[1]) / 10000.0
+        spd_5yr = float(splitRow[2]) / 10000.0
+        spd_7yr = float(splitRow[3]) / 10000.0
+        spd_10yr = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(step_in_dt, maturity_3yr, spd3Y)
-        cds5Y = CDS(step_in_dt, maturity_5yr, spd5Y)
-        cds7Y = CDS(step_in_dt, maturity_7yr, spd7Y)
-        cds10Y = CDS(step_in_dt, maturity_10yr, spd10Y)
-        cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
+        cds_3yr = CDS(step_in_dt, maturity_3yr, spd_3yr)
+        cds_5yr = CDS(step_in_dt, maturity_5yr, spd_5yr)
+        cds_7yr = CDS(step_in_dt, maturity_7yr, spd_7yr)
+        cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
+        cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
         issuer_curve = CDSCurve(
             value_dt, cds_contracts, libor_curve, recovery_rate

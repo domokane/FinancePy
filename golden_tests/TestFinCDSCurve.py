@@ -73,7 +73,7 @@ def test_FinCDSCurve():
     test_cases.header("T", "Q")
     n = len(issuer_curve._times)
     for i in range(0, n):
-        test_cases.print(issuer_curve._times[i], issuer_curve._values[i])
+        test_cases.print(issuer_curve._times[i], issuer_curve._qs[i])
 
     recovery_rate = 0.40
 

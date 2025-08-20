@@ -671,7 +671,7 @@ def test_key_rate_durations():
 
 def test_key_rate_durations_bloomberg_example():
 
-    dc_type, frequencyType, settle_days, exDiv, calendar = (
+    dc_type, freq_type, settle_days, exDiv, calendar = (
         get_bond_market_conventions(BondMarkets.UNITED_STATES)
     )
 

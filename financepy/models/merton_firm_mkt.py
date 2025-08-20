@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 from scipy import optimize
 
@@ -50,12 +52,12 @@ class MertonFirmMkt(MertonFirm):
     """
 
     def __init__(self,
-                 equity_value: (float, list, np.ndarray),
-                 bond_face: (float, list, np.ndarray),
-                 years_to_maturity: (float, list, np.ndarray),
-                 risk_free_rate: (float, list, np.ndarray),
-                 asset_growth_rate: (float, list, np.ndarray),
-                 equity_volatility: (float, list, np.ndarray)):
+                 equity_value: Union[float, list, np.ndarray],
+                 bond_face: Union[float, list, np.ndarray],
+                 years_to_maturity: Union[float, list, np.ndarray],
+                 risk_free_rate: Union[float, list, np.ndarray],
+                 asset_growth_rate: Union[float, list, np.ndarray],
+                 equity_volatility: Union[float, list, np.ndarray]):
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
 

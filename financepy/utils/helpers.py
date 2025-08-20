@@ -316,7 +316,7 @@ def normalise_weights(wt_vector: np.ndarray):
 
 def label_to_string(
     label: str,
-    value: (float, str),
+    value: Union[float, str],
     separator: str = "\n",
     list_format: bool = False,
 ):

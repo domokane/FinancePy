@@ -2,10 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+import matplotlib.pyplot as plt
+
 from typing import Union
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -13,10 +14,10 @@ from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.math import scale
 from ...utils.helpers import label_to_string
 
-from .yield_curve_model import CurveFitPolynomial
-from .yield_curve_model import CurveFitNelsonSiegel
-from .yield_curve_model import CurveFitNelsonSiegelSvensson
-from .yield_curve_model import CurveFitBSpline
+from .curve_fits import CurveFitPolynomial
+from .curve_fits import CurveFitNelsonSiegel
+from .curve_fits import CurveFitNelsonSiegelSvensson
+from .curve_fits import CurveFitBSpline
 
 from scipy.optimize import curve_fit
 from scipy.interpolate import splrep
@@ -114,14 +115,14 @@ class BondYieldCurve:
         else:
             raise FinError("Unrecognised curve fit type.")
 
-    ########################################################################################
+    ####################################################################################
 
     @property
     def curve_fit(self):
         """accessor function for curve_fit"""
         return self._curve_fit
 
-    ########################################################################################
+    ####################################################################################
 
     def interpolated_yield(self, maturity_dt: Date):
         """Interpolates the yield for a given maturity date."""
@@ -161,7 +162,7 @@ class BondYieldCurve:
 
         return yld
 
-    ########################################################################################
+    ####################################################################################
 
     def plot(self, title, ylabel="Yield To Maturity (%)"):
         """Display yield curve."""
@@ -183,7 +184,7 @@ class BondYieldCurve:
         plt.ylim((min(yld) - 0.3, max(yld) * 1.1))
         plt.grid(True)
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -193,7 +194,7 @@ class BondYieldCurve:
         s += label_to_string("CURVE FIT", self._curve_fit)
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

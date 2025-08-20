@@ -399,10 +399,10 @@ class Interpolator:
                 # (not sure why we have if len(times) == 1: return in the fit(...)
                 # function but reluctant to change that)
                 # so work around this. already tested that _dfs is not None
-                if len(self._dfs) == 0 or self.times[0] == 0.0:
+                if len(self._dfs) == 0 or self._times[0] == 0.0:
                     out = [1.0] * len(tvec)
                 else:
-                    onf_rate = -np.log(self._dfs[0]) / self.times[0]
+                    onf_rate = -np.log(self._dfs[0]) / self._times[0]
                     out = np.exp(-onf_rate * tvec)
             else:
                 # apparently UnivariateSpline.integral assumes the function is

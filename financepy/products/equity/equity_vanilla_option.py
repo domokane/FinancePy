@@ -489,7 +489,7 @@ class EquityVanillaOption:
     def implied_volatility(
         self,
         value_dt: Date,
-        stock_price: (float, list, np.ndarray),
+        stock_price: Union[float, list, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         price,

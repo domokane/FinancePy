@@ -54,12 +54,9 @@ def _f(df, *args):
     """Root search objective function for OIS"""
 
     curve = args[0]
-
     value_dt = args[1]
     swap = args[2]
-    num_points = len(curve.times)
-    #    curve._dfs[num_points - 1] = df
-    curve.set_df(num_points - 1, df)
+    curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
@@ -78,9 +75,7 @@ def _g(df, *args):
     value_dt = args[1]
     fra = args[2]
 
-    num_points = len(curve.times)
-    #    curve._dfs[num_points - 1] = df
-    curve.set_df(num_points - 1, df)
+    curve.set_last_df(df)
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)
@@ -104,7 +99,7 @@ class OISCurve(DiscountCurve):
     reason I call it a one-curve.
     """
 
-    ########################################################################################
+    ####################################################################################
 
     def __init__(
         self,
@@ -134,7 +129,7 @@ class OISCurve(DiscountCurve):
         self._interpolator = None
         self._build_curve()
 
-    ########################################################################################
+    ####################################################################################
 
     @property
     def times(self) -> np.ndarray:
@@ -160,14 +155,14 @@ class OISCurve(DiscountCurve):
         """
         return self._dfs.copy()
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve(self):
         """Build curve based on interpolation."""
 
         self._build_curve_using_1d_solver()
 
-    ########################################################################################
+    ####################################################################################
 
     def _validate_inputs(self, ois_deposits, ois_fras, ois_swaps):
         """Validate the inputs for each of the Libor products."""
@@ -334,7 +329,7 @@ class OISCurve(DiscountCurve):
         else:
             self.dc_type = None
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve_using_1d_solver(self):
         """Construct the discount curve using a bootstrap approach. This is
@@ -414,7 +409,7 @@ class OISCurve(DiscountCurve):
         if self.check_refit_flag is True:
             self.check_refit(SWAP_TOL, 1e-5)
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_curve_linear_swap_rate_interpolation(self):
         """Construct the discount curve using a bootstrap approach. This is
@@ -561,7 +556,7 @@ class OISCurve(DiscountCurve):
         if self.check_refit_flag is True:
             self.check_refit(SWAP_TOL, 1e-5)
 
-    ########################################################################################
+    ####################################################################################
 
     def check_refit(self, fra_tol, swap_tol):
         """Ensure that the Libor curve refits the calibration instruments.
@@ -588,7 +583,7 @@ class OISCurve(DiscountCurve):
                 swap.print_float_leg_pv()
                 raise FinError("Swap not repriced.")
 
-    ########################################################################################
+    ####################################################################################
 
     # def overnight_rate(self,
     #                   settle_dt: Date,
@@ -615,7 +610,7 @@ class OISCurve(DiscountCurve):
 
     #         schedule = FinSchedule(start_dt,
     #                                maturity_dt,
-    #                                frequencyType)
+    #                                freq_type)
 
     #         flow_dts = schedule.generate()
     #         flow_dts[0] = start_dt
@@ -646,7 +641,7 @@ class OISCurve(DiscountCurve):
     #     else:
     #         return par_rates
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Print out the details of the Libor curve."""
@@ -672,13 +667,11 @@ class OISCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string(
-                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
-            )
+            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
 
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

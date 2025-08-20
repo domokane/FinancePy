@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+from typing import Union
 
 from ...utils.error import FinError
 from ...utils.date import Date

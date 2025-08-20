@@ -2,7 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from helpers import buildIborSingleCurve
+import sys, os
+from .helpers import buildIborSingleCurve
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.global_types import SwapTypes

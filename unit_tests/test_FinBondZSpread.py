@@ -1,7 +1,8 @@
-import os
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pandas as pd
 import matplotlib.pyplot as plt
-
 
 from financepy.utils.global_vars import G_PERCENT
 from financepy.utils.calendar import CalendarTypes
@@ -61,25 +62,25 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
     bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
     bond_dataframe["maturity"] = pd.to_datetime(
-        bond_dataframe["maturity"], format="%d/%m/%Y"
+        bond_dataframe["maturity"], format="mixed"
     )
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
 
-    for bdfIndex, bondRow in bond_dataframe.iterrows():
-        matDatetime = bondRow["maturity"]
-        maturity_dt = from_datetime(matDatetime)
+    for bdf_index, bond_row in bond_dataframe.iterrows():
+        mat_date_time = bond_row["maturity"]
+        maturity_dt = from_datetime(mat_date_time)
         issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
-        coupon = bondRow["coupon"] / 100.0
-        clean_price = bondRow["mid"]
+        coupon = bond_row["coupon"] / 100.0
+        clean_price = bond_row["mid"]
         bond = Bond(issue_dt, maturity_dt, coupon, freq_type, accrual_type)
         z_spread = bond.z_spread(base_curve.value_dt, clean_price, base_curve)
         asset_swap_spread = bond.asset_swap_spread(
             base_curve.value_dt, clean_price, base_curve
         )
-        bond_dataframe.loc[bdfIndex, "z_spread"] = z_spread
-        bond_dataframe.loc[bdfIndex, "asset_swap_spread"] = asset_swap_spread
+        bond_dataframe.loc[bdf_index, "z_spread"] = z_spread
+        bond_dataframe.loc[bdf_index, "asset_swap_spread"] = asset_swap_spread
 
     if DIAGNOSTICS_MODE:
         print(bond_dataframe)

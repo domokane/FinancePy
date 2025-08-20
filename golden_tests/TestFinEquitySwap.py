@@ -196,7 +196,7 @@ def test_equity_swap_with_dividends():
     dividend_curve = DiscountCurveFlat(effective_dt, dividend_rate)
     index_curve = DiscountCurveFlat(effective_dt, indexRate)
 
-    equity_swap_leg = SwapEquityLeg(
+    equity_swap_leg = EquitySwapLeg(
         effective_dt,
         maturity_dt,
         leg_type,

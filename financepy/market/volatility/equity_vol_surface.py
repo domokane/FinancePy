@@ -3,11 +3,11 @@
 ##############################################################################
 
 from typing import Union
+import matplotlib.pyplot as plt
 
 import numpy as np
 from scipy.optimize import minimize
 
-import matplotlib.pyplot as plt
 from numba import njit, float64, int64
 
 from ...utils.error import FinError

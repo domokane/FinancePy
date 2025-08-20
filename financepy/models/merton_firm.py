@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 from ..utils.helpers import label_to_string, check_argument_types
 import numpy as np
 
@@ -21,12 +23,12 @@ class MertonFirm():
     rate, the asset growth rate and the asset value volatility. """
 
     def __init__(self,
-                 asset_value: (float, list, np.ndarray),
-                 bond_face: (float, list, np.ndarray),
-                 years_to_maturity: (float, list, np.ndarray),
-                 risk_free_rate: (float, list, np.ndarray),
-                 asset_growth_rate: (float, list, np.ndarray),
-                 asset_volatility: (float, list, np.ndarray)):
+                 asset_value: Union[float, list, np.ndarray],
+                 bond_face: Union[float, list, np.ndarray],
+                 years_to_maturity: Union[float, list, np.ndarray],
+                 risk_free_rate: Union[float, list, np.ndarray],
+                 asset_growth_rate: Union[float, list, np.ndarray],
+                 asset_volatility: Union[float, list, np.ndarray]):
         """ Create an object that holds all of the model parameters. These
         parameters may be vectorised. """
 

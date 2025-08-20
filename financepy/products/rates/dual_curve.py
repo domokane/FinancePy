@@ -32,9 +32,7 @@ def _f(df, *args):
     value_dt = args[2]
     swap = args[3]
 
-    num_points = len(index_curve.times)
-    #    index_curve._dfs[num_points - 1] = df
-    index_curve.set_df(num_points - 1, df)
+    index_curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
     index_curve.fit(index_curve.times, index_curve.dfs)
@@ -55,8 +53,7 @@ def _g(df, *args):
     curve = args[1]
     value_dt = args[2]
     fra = args[3]
-    num_points = len(curve.times)
-    curve.set_df(num_points - 1, df)
+    curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
@@ -227,9 +224,7 @@ class IborDualCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError(
-                            "Swap cpns are not on the same date grid."
-                        )
+                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -526,10 +521,7 @@ class IborDualCurve(DiscountCurve):
                 raise FinError("Deposit not repriced.")
 
         for fra in self.used_fras:
-            v = (
-                fra.value(self.value_dt, self.discount_curve, self)
-                / fra.notional
-            )
+            v = fra.value(self.value_dt, self.discount_curve, self) / fra.notional
             if abs(v) > fra_tol:
                 print("Value", v)
                 raise FinError("FRA not repriced.")
@@ -575,9 +567,7 @@ class IborDualCurve(DiscountCurve):
         s += label_to_string("GRID TIMES", "GRID DFS")
 
         for i in range(0, num_points):
-            s += label_to_string(
-                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
-            )
+            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
         return s
 
     ###########################################################################

@@ -100,12 +100,12 @@ def loadHomogeneousCDSCurves(
 
     recovery_rate = 0.40
 
-    cds3Y = CDS(value_dt, maturity_3yr, cds_spd_3yr)
-    cds5Y = CDS(value_dt, maturity_5yr, cds_spd_5yr)
-    cds7Y = CDS(value_dt, maturity_7yr, cds_spd_7yr)
-    cds10Y = CDS(value_dt, maturity_10yr, cds_spd_10yr)
+    cds_3yr = CDS(value_dt, maturity_3yr, cds_spd_3yr)
+    cds_5yr = CDS(value_dt, maturity_5yr, cds_spd_5yr)
+    cds_7yr = CDS(value_dt, maturity_7yr, cds_spd_7yr)
+    cds_10yr = CDS(value_dt, maturity_10yr, cds_spd_10yr)
 
-    contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
+    contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
     issuer_curve = CDSCurve(value_dt, contracts, libor_curve, recovery_rate)
 
@@ -136,17 +136,17 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
     for row in data[1:]:
 
         splitRow = row.split(",")
-        spd3Y = float(splitRow[1]) / 10000.0
-        spd5Y = float(splitRow[2]) / 10000.0
-        spd7Y = float(splitRow[3]) / 10000.0
-        spd10Y = float(splitRow[4]) / 10000.0
+        spd_3yr = float(splitRow[1]) / 10000.0
+        spd_5yr = float(splitRow[2]) / 10000.0
+        spd_7yr = float(splitRow[3]) / 10000.0
+        spd_10yr = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(value_dt, maturity_3yr, spd3Y)
-        cds5Y = CDS(value_dt, maturity_5yr, spd5Y)
-        cds7Y = CDS(value_dt, maturity_7yr, spd7Y)
-        cds10Y = CDS(value_dt, maturity_10yr, spd10Y)
-        cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
+        cds_3yr = CDS(value_dt, maturity_3yr, spd_3yr)
+        cds_5yr = CDS(value_dt, maturity_5yr, spd_5yr)
+        cds_7yr = CDS(value_dt, maturity_7yr, spd_7yr)
+        cds_10yr = CDS(value_dt, maturity_10yr, spd_10yr)
+        cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
         issuer_curve = CDSCurve(
             value_dt, cds_contracts, libor_curve, recovery_rate
@@ -210,13 +210,13 @@ def test_FinCDSTranche():
         "==================================================================="
     )
     num_credits = 125
-    spd3Y = 0.0012
-    spd5Y = 0.0025
-    spd7Y = 0.0034
-    spd10Y = 0.0046
+    spd_3yr = 0.0012
+    spd_5yr = 0.0025
+    spd_7yr = 0.0034
+    spd_10yr = 0.0046
 
     issuer_curves = loadHomogeneousCDSCurves(
-        value_dt, libor_curve, spd3Y, spd5Y, spd7Y, spd10Y, num_credits
+        value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits
     )
 
     intrinsicSpd = (

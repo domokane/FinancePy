@@ -6,9 +6,18 @@ import glob
 from os.path import dirname, basename, join
 import traceback
 
-import sys
+import sys, os
 
-sys.path.append("..")
+# Add the *parent of the script's parent directory* to sys.path
+sys.path.append(
+    os.path.dirname(                 # go up one directory
+        os.path.dirname(             # go up two directories
+            os.path.abspath(__file__)  # absolute path to current file
+        )
+    )
+)
+
+# sys.path.append("..")
 
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
@@ -19,7 +28,7 @@ from financepy.utils.error import FinError
 set_date_format(DateFormatTypes.UK_LONG)
 
 
-def main(start_index=90, end_index=94):
+def main(start_index=0, end_index=None):
     """Loop over test cases"""
 
     # I put this here to get the library loaded and header printed before loop
