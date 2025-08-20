@@ -30,7 +30,14 @@ def test_FinModelRatesCIR():
     seed = 1968
 
     test_cases.header(
-        "MATURITY", "TIME", "FORMULA", "euler", "LOGNORM", "MILSTEIN", "KJ", "EXACT"
+        "MATURITY",
+        "TIME",
+        "FORMULA",
+        "euler",
+        "LOGNORM",
+        "MILSTEIN",
+        "KJ",
+        "EXACT",
     )
 
     for t in np.linspace(0, 10, 21):
@@ -38,19 +45,59 @@ def test_FinModelRatesCIR():
         start = time.time()
         p = zero_price(r0, a, b, sigma, t)
         p_MC1 = zero_price_mc(
-            r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.euler.value
+            r0,
+            a,
+            b,
+            sigma,
+            t,
+            dt,
+            num_paths,
+            seed,
+            CIRNumericalScheme.EULER.value,
         )
         p_MC2 = zero_price_mc(
-            r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.LOGNORMAL.value
+            r0,
+            a,
+            b,
+            sigma,
+            t,
+            dt,
+            num_paths,
+            seed,
+            CIRNumericalScheme.LOGNORMAL.value,
         )
         p_MC3 = zero_price_mc(
-            r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.MILSTEIN.value
+            r0,
+            a,
+            b,
+            sigma,
+            t,
+            dt,
+            num_paths,
+            seed,
+            CIRNumericalScheme.MILSTEIN.value,
         )
         p_MC4 = zero_price_mc(
-            r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.KAHLJACKEL.value
+            r0,
+            a,
+            b,
+            sigma,
+            t,
+            dt,
+            num_paths,
+            seed,
+            CIRNumericalScheme.KAHLJACKEL.value,
         )
         p_MC5 = zero_price_mc(
-            r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.EXACT.value
+            r0,
+            a,
+            b,
+            sigma,
+            t,
+            dt,
+            num_paths,
+            seed,
+            CIRNumericalScheme.EXACT.value,
         )
         end = time.time()
         elapsed = end - start

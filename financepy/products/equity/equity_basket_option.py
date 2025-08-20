@@ -36,7 +36,7 @@ class EquityBasketOption:
         self,
         expiry_dt: Date,
         strike_price: float,
-        option_type: OptionTypes,
+        opt_type: OptionTypes,
         num_assets: int,
     ):
         """Define the EquityBasket option by specifying its expiry date,
@@ -47,21 +47,29 @@ class EquityBasketOption:
 
         self.expiry_dt = expiry_dt
         self.strike_price = float(strike_price)
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.num_assets = num_assets
 
     ###########################################################################
 
-    def _validate(self, stock_prices, dividend_yields, volatilities, correlations):
+    def _validate(
+        self, stock_prices, dividend_yields, volatilities, correlations
+    ):
 
         if len(stock_prices) != self.num_assets:
-            raise FinError("Stock prices must have a length " + str(self.num_assets))
+            raise FinError(
+                "Stock prices must have a length " + str(self.num_assets)
+            )
 
         if len(dividend_yields) != self.num_assets:
-            raise FinError("Dividend yields must have a length " + str(self.num_assets))
+            raise FinError(
+                "Dividend yields must have a length " + str(self.num_assets)
+            )
 
         if len(volatilities) != self.num_assets:
-            raise FinError("Volatilities must have a length " + str(self.num_assets))
+            raise FinError(
+                "Volatilities must have a length " + str(self.num_assets)
+            )
 
         if correlations.ndim != 2:
             raise FinError("Correlation must be a 2D matrix ")
@@ -162,10 +170,10 @@ class EquityBasketOption:
         d1 = (ln_s0_k + (mu + vhat2 / 2.0) * t_exp) / den
         d2 = (ln_s0_k + (mu - vhat2 / 2.0) * t_exp) / den
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             v = smean * np.exp(-qhat * t_exp) * N(d1)
             v = v - self.strike_price * np.exp(-r * t_exp) * N(d2)
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             v = self.strike_price * np.exp(-r * t_exp) * N(-d2)
             v = v - smean * np.exp(-qhat * t_exp) * N(-d1)
         else:
@@ -205,7 +213,9 @@ class EquityBasketOption:
             q = -np.log(dq) / t_exp
             dividend_yields.append(q)
 
-        self._validate(stock_prices, dividend_yields, volatilities, corr_matrix)
+        self._validate(
+            stock_prices, dividend_yields, volatilities, corr_matrix
+        )
 
         num_assets = len(stock_prices)
 
@@ -228,9 +238,9 @@ class EquityBasketOption:
             seed,
         )
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             payoff = np.maximum(np.mean(s_all, axis=0) - k, 0.0)
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             payoff = np.maximum(k - np.mean(s_all, axis=0), 0.0)
         else:
             raise FinError("Unknown option type.")
@@ -245,7 +255,7 @@ class EquityBasketOption:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("NUM ASSETS", self.num_assets, "")
         return s
 

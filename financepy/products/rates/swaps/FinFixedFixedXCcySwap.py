@@ -221,12 +221,12 @@ class FinFixedFixedXCcySwap:
         else:
             df_0 = discount_curve.df(value_dt)
 
-        df_T = discount_curve.df(self.maturity_dt)
+        df_t = discount_curve.df(self.maturity_dt)
 
         if abs(pv01) < G_SMALL:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        cpn = (df_0 - df_T) / pv01
+        cpn = (df_0 - df_t) / pv01
         return cpn
 
     ##########################################################################

@@ -343,7 +343,7 @@ def label_to_string(
 
 def table_to_string(header: str, value_table, float_precision="10.7f"):
     """Format a 2D array into a table-like string."""
-    if len(value_table) == 0 or type(value_table) is not list:
+    if len(value_table) == 0 or isinstance(value_table, list) is False:
         print(len(value_table))
         return ""
 

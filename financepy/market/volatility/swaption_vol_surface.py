@@ -57,13 +57,13 @@ from ...utils.global_types import FinSolverTypes
 #     rf = args[3]
 #     volatility = args[4]
 #     delta_method_value = args[5]
-#     option_type_value = args[6]
+#     opt_type_value = args[6]
 #     delta_target = args[7]
 
 #     delta_out = fast_delta(s, t, K, rd, rf,
 #                          volatility,
 #                          delta_method_value,
-#                          option_type_value)
+#                          opt_type_value)
 
 #     obj_fn = delta_target - delta_out
 #     return obj_fn
@@ -241,7 +241,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     t = args[2]
 #     rd = args[3]
 #     rf = args[4]
-#     option_type_value = args[5]
+#     opt_type_value = args[5]
 #     deltaTypeValue = args[6]
 #     inverse_delta_target = args[7]
 #     params = args[8]
@@ -250,7 +250,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     f = s * np.exp((rd-rf)*t)
 #     v = vol_function(vol_type_value, params, strikes, gaps, f, k, t)
-#     delta_out = fast_delta(s, t, k, rd, rf, v, deltaTypeValue, option_type_value)
+#     delta_out = fast_delta(s, t, k, rd, rf, v, deltaTypeValue, opt_type_value)
 #     inverse_delta_out = norminvcdf(np.abs(delta_out))
 #     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
@@ -265,7 +265,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #              int64, float64, float64[:], float64[:], float64[:]),
 #      fastmath=True)
 # def _solver_for_smile_strike(s, t, rd, rf,
-#                             option_type_value,
+#                             opt_type_value,
 #                             volatilityTypeValue,
 #                             delta_target,
 #                             delta_method_value,
@@ -280,7 +280,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     inverse_delta_target = norminvcdf(np.abs(delta_target))
 
 #     argtuple = (volatilityTypeValue, s, t, rd, rf,
-#                 option_type_value, delta_method_value,
+#                 opt_type_value, delta_method_value,
 #                 inverse_delta_target,
 #                 parameters, strikes, gaps)
 
@@ -298,7 +298,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #               int64, float64), fastmath=True)
 # def solve_for_strike(spot_fx_rate,
 #                    t_del, rd, rf,
-#                    option_type_value,
+#                    opt_type_value,
 #                    delta_target,
 #                    delta_method_value,
 #                    volatility):
@@ -322,7 +322,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #         dom_df = np.exp(-rd*t_del)
 #         for_df = np.exp(-rf*t_del)
 
-#         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
+#         if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
 #         else:
 #             phi = -1.0
@@ -339,7 +339,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #         dom_df = np.exp(-rd*t_del)
 #         for_df = np.exp(-rf*t_del)
 
-#         if option_type_value == OptionTypes.EUROPEAN_CALL.value:
+#         if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
 #             phi = +1.0
 #         else:
 #             phi = -1.0
@@ -354,7 +354,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     elif delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
 
 #         argtuple = (spot_fx_rate, t_del, rd, rf, volatility,
-#                     delta_method_value, option_type_value, delta_target)
+#                     delta_method_value, opt_type_value, delta_target)
 
 #         K = newton_secant(_g, x0=spot_fx_rate, args=argtuple,
 #                           tol=1e-7, maxiter=50)
@@ -364,7 +364,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
 
 #         argtuple = (spot_fx_rate, t_del, rd, rf, volatility,
-#                     delta_method_value, option_type_value, delta_target)
+#                     delta_method_value, opt_type_value, delta_target)
 
 #         K = newton_secant(_g, x0=spot_fx_rate, args=argtuple,
 #                           tol=1e-7, maxiter=50)
@@ -409,10 +409,14 @@ class SwaptionVolSurface:
             raise FinError("Volatility grid must be a 2D grid of values")
 
         if len(strike_grid) != len(vol_grid):
-            raise FinError("Strike grid and volatility grid must have same size")
+            raise FinError(
+                "Strike grid and volatility grid must have same size"
+            )
 
         if len(strike_grid[0]) != len(vol_grid[0]):
-            raise FinError("Strike grid and volatility grid must have same size")
+            raise FinError(
+                "Strike grid and volatility grid must have same size"
+            )
 
         if len(expiry_dts) != len(vol_grid[0]):
             raise FinError("Expiry dates not same size as volatility grid")
@@ -492,11 +496,15 @@ class SwaptionVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, K, t0)
+        vol0 = vol_function(
+            vol_type_value, self._parameters[index0], fwd0, K, t0
+        )
 
         if index1 != index0:
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, K, t1)
+            vol1 = vol_function(
+                vol_type_value, self._parameters[index1], fwd1, K, t1
+            )
 
         else:
 

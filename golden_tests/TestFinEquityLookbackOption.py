@@ -42,7 +42,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "SMIN",
         "VALUE",
@@ -51,10 +51,10 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFloatLookbackOption(expiry_dt, option_type)
+            option = EquityFloatLookbackOption(expiry_dt, opt_type)
             stock_min = stock_price
             value = option.value(
                 value_dt,
@@ -80,7 +80,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 stock_min,
                 value,
@@ -91,7 +91,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "SMIN",
         "VALUE",
@@ -100,10 +100,10 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFloatLookbackOption(expiry_dt, option_type)
+            option = EquityFloatLookbackOption(expiry_dt, opt_type)
             stock_min = stock_price - 10
             value = option.value(
                 value_dt,
@@ -129,7 +129,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 stock_min,
                 value,
@@ -140,7 +140,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "SMAX",
         "VALUE",
@@ -149,10 +149,10 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFloatLookbackOption(expiry_dt, option_type)
+            option = EquityFloatLookbackOption(expiry_dt, opt_type)
             stock_max = stock_price
             value = option.value(
                 value_dt,
@@ -178,7 +178,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 stock_max,
                 value,
@@ -189,7 +189,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "SMAX",
         "VALUE",
@@ -198,10 +198,10 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFloatLookbackOption(expiry_dt, option_type)
+            option = EquityFloatLookbackOption(expiry_dt, opt_type)
             stock_max = stock_price + 10
             value = option.value(
                 value_dt,
@@ -227,7 +227,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 stock_max,
                 value,
@@ -244,7 +244,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "K",
         "SMAX",
@@ -254,11 +254,11 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     k = 95.0
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFixedLookbackOption(expiry_dt, option_type, k)
+            option = EquityFixedLookbackOption(expiry_dt, opt_type, k)
             stock_max = stock_price
             value = option.value(
                 value_dt,
@@ -284,7 +284,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 k,
                 stock_max,
@@ -296,7 +296,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "K",
         "SMAX",
@@ -306,11 +306,11 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     k = 100.0
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFixedLookbackOption(expiry_dt, option_type, k)
+            option = EquityFixedLookbackOption(expiry_dt, opt_type, k)
             stock_max = stock_price
             value = option.value(
                 value_dt,
@@ -336,7 +336,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 k,
                 stock_max,
@@ -348,7 +348,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "K",
         "SMAX",
@@ -358,11 +358,11 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     k = 105.0
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFixedLookbackOption(expiry_dt, option_type, k)
+            option = EquityFixedLookbackOption(expiry_dt, opt_type, k)
             stock_max = stock_price + 10.0
             value = option.value(
                 value_dt,
@@ -388,7 +388,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 k,
                 stock_max,
@@ -400,7 +400,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "K",
         "SMIN",
@@ -410,11 +410,11 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     k = 95.0
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFixedLookbackOption(expiry_dt, option_type, k)
+            option = EquityFixedLookbackOption(expiry_dt, opt_type, k)
             stock_min = stock_price
             value = option.value(
                 value_dt,
@@ -440,7 +440,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 k,
                 stock_min,
@@ -452,7 +452,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "K",
         "SMIN",
@@ -462,11 +462,11 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     k = 100.0
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFixedLookbackOption(expiry_dt, option_type, k)
+            option = EquityFixedLookbackOption(expiry_dt, opt_type, k)
             stock_min = stock_price
             value = option.value(
                 value_dt,
@@ -492,7 +492,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 k,
                 stock_min,
@@ -504,7 +504,7 @@ def test_EquityLookBackOption():
 
     test_cases.header(
         "NUMPATHS",
-        "OPTION_TYPE",
+        "opt_type",
         "S",
         "K",
         "SMIN",
@@ -514,11 +514,11 @@ def test_EquityLookBackOption():
         "TIME",
     )
 
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     k = 105.0
     for stock_price in stock_price_range:
         for num_paths in num_paths_range:
-            option = EquityFixedLookbackOption(expiry_dt, option_type, k)
+            option = EquityFixedLookbackOption(expiry_dt, opt_type, k)
             stock_min = stock_price - 10.0
             value = option.value(
                 value_dt,
@@ -544,7 +544,7 @@ def test_EquityLookBackOption():
             diff = value_mc - value
             test_cases.print(
                 num_paths,
-                option_type,
+                opt_type,
                 stock_price,
                 k,
                 stock_min,
@@ -562,13 +562,13 @@ def test_example():
 
     expiry_dt = Date(1, 1, 2021)
     strike_price = 105.0
-    option_typeCall = OptionTypes.EUROPEAN_CALL
-    option_typePut = OptionTypes.EUROPEAN_PUT
+    opt_typeCall = OptionTypes.EUROPEAN_CALL
+    opt_typePut = OptionTypes.EUROPEAN_PUT
     lookbackCall = EquityFixedLookbackOption(
-        expiry_dt, option_typeCall, strike_price
+        expiry_dt, opt_typeCall, strike_price
     )
     lookbackPut = EquityFixedLookbackOption(
-        expiry_dt, option_typePut, strike_price
+        expiry_dt, opt_typePut, strike_price
     )
 
     value_dt = Date(1, 1, 2020)

@@ -72,7 +72,7 @@ def _value_mc_numba(
     tau,
     k,
     n,
-    option_type,
+    opt_type,
     stock_price,
     interest_rate,
     dividend_yield,
@@ -125,9 +125,13 @@ def _value_mc_numba(
 
         for obs in range(0, n):
 
-            s_1 = s_1 * np.exp((mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility)
+            s_1 = s_1 * np.exp(
+                (mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility
+            )
 
-            s_2 = s_2 * np.exp((mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility)
+            s_2 = s_2 * np.exp(
+                (mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility
+            )
 
             s_1_arithmetic += s_1
             s_2_arithmetic += s_2
@@ -135,10 +139,10 @@ def _value_mc_numba(
         s_1_arithmetic /= n
         s_2_arithmetic /= n
 
-        if option_type == OptionTypes.EUROPEAN_CALL:
+        if opt_type == OptionTypes.EUROPEAN_CALL:
             payoff_a += max(s_1_arithmetic - k, 0.0)
             payoff_a += max(s_2_arithmetic - k, 0.0)
-        elif option_type == OptionTypes.EUROPEAN_PUT:
+        elif opt_type == OptionTypes.EUROPEAN_PUT:
             payoff_a += max(k - s_1_arithmetic, 0.0)
             payoff_a += max(k - s_2_arithmetic, 0.0)
         else:
@@ -159,7 +163,7 @@ def _value_mc_fast_numba(
     tau: float,
     k: float,
     n: int,
-    option_type: int,
+    opt_type: int,
     stock_price: float,
     interest_rate: float,
     dividend_yield: float,
@@ -230,10 +234,10 @@ def _value_mc_fast_numba(
             s_1_arithmetic[ip] += s_1[ip] / n
             s_2_arithmetic[ip] += s_2[ip] / n
 
-    if option_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1_arithmetic - k, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - k, 0.0)
-    elif option_type == OptionTypes.EUROPEAN_PUT.value:
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
         payoff_a_1 = np.maximum(k - s_1_arithmetic, 0.0)
         payoff_a_2 = np.maximum(k - s_2_arithmetic, 0.0)
     else:
@@ -254,7 +258,7 @@ def _value_mc_fast_cv_numba(
     tau,
     K,
     n,
-    option_type,
+    opt_type,
     stock_price,
     interest_rate,
     dividend_yield,
@@ -332,12 +336,12 @@ def _value_mc_fast_cv_numba(
         s_2_arithmetic[ip] /= n
         s_2_geometric[ip] = np.exp(ln_s_2_geometric[ip] / n)
 
-    if option_type == OptionTypes.EUROPEAN_CALL:
+    if opt_type == OptionTypes.EUROPEAN_CALL:
         payoff_a_1 = np.maximum(s_1_arithmetic - K, 0.0)
         payoff_g_1 = np.maximum(s_1_geometric - K, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - K, 0.0)
         payoff_g_2 = np.maximum(s_2_geometric - K, 0.0)
-    elif option_type == OptionTypes.EUROPEAN_PUT:
+    elif opt_type == OptionTypes.EUROPEAN_PUT:
         payoff_a_1 = np.maximum(K - s_1_arithmetic, 0.0)
         payoff_g_1 = np.maximum(K - s_1_geometric, 0.0)
         payoff_a_2 = np.maximum(K - s_2_arithmetic, 0.0)
@@ -384,7 +388,7 @@ class EquityAsianOption:
         start_averaging_dt: Date,
         expiry_dt: Date,
         strike_price: float,
-        option_type: OptionTypes,
+        opt_type: OptionTypes,
         num_obs: int = 100,
     ):
         """Create an EquityAsian option object which takes a start date for
@@ -399,7 +403,7 @@ class EquityAsianOption:
         self.start_averaging_date = start_averaging_dt
         self.expiry_dt = expiry_dt
         self.strike_price = float(strike_price)
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.num_observations = num_obs
 
     ###############################################################################
@@ -541,13 +545,13 @@ class EquityAsianOption:
         # the Geometric price is the lower bound
         call_g = np.exp(-r * t_exp) * (EG * N(d1) - K * N(d2))
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             v = call_g
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             put_g = call_g - (EG - K) * np.exp(-r * t_exp)
             v = put_g
         else:
-            raise FinError("Unknown option type " + str(self.option_type))
+            raise FinError("Unknown option type " + str(self.opt_type))
 
         v = v * multiplier
         return v
@@ -617,9 +621,9 @@ class EquityAsianOption:
         )
         d2 = d1 - sigmaA * np.sqrt(t_exp)
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             v = np.exp(-r * t_exp) * (FA * N(d1) - K * N(d2))
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             v = np.exp(-r * t_exp) * (K * N(-d2) - FA * N(-d1))
         else:
             return None
@@ -701,10 +705,10 @@ class EquityAsianOption:
         d1 = (np.log(F0 / K) + sigma2 * t_exp / 2) / sigma / np.sqrt(t_exp)
         d2 = d1 - sigma * np.sqrt(t_exp)
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             call = np.exp(-r * t_exp) * (F0 * N(d1) - K * N(d2))
             v = call
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             put = np.exp(-r * t_exp) * (K * N(-d2) - F0 * N(-d1))
             v = put
         else:
@@ -756,7 +760,7 @@ class EquityAsianOption:
             tau,
             K,
             n,
-            self.option_type,
+            self.opt_type,
             stock_price,
             r,
             q,
@@ -803,7 +807,7 @@ class EquityAsianOption:
             tau,
             K,
             n,
-            self.option_type.value,
+            self.opt_type.value,
             stock_price,
             r,
             q,
@@ -861,7 +865,7 @@ class EquityAsianOption:
             tau,
             K,
             n,
-            self.option_type,
+            self.opt_type,
             stock_price,
             r,
             q,
@@ -881,7 +885,7 @@ class EquityAsianOption:
         s += label_to_string("START AVERAGING DATE", self.start_averaging_date)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("NUM OBSERVATIONS", self.num_observations, "")
         return s
 

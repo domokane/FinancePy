@@ -1,4 +1,4 @@
-from financepy.models.finite_difference_PSOR import black_scholes_fd_PSOR
+from financepy.models.finite_difference_PSOR import black_scholes_fd_psor
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -10,7 +10,7 @@ from financepy.models.equity_crr_tree import crr_tree_val_avg
 from pytest import approx
 
 
-def test_black_scholes_fd_PSOR():
+def test_black_scholes_fd_psor():
     """
     Compare the output of black_schole_finite_difference to kBlack::fdRunner from
     https://github.com/domokane/CompFin/blob/main/Week%204/xladdin/Utility/kBlack.cpp
@@ -30,8 +30,8 @@ def test_black_scholes_fd_PSOR():
 
     theta = 0.5
 
-    option_type = OptionTypes.EUROPEAN_CALL
-    v = black_scholes_fd_PSOR(
+    opt_type = OptionTypes.EUROPEAN_CALL
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -39,14 +39,14 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
     assert v == approx(0.07939664662902503, abs=1e-1)
 
     smooth = True
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -54,7 +54,7 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
@@ -62,7 +62,7 @@ def test_black_scholes_fd_PSOR():
     smooth = 0
 
     dig = 1
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -70,7 +70,7 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
@@ -78,7 +78,7 @@ def test_black_scholes_fd_PSOR():
 
     # smooth dig
     smooth = 1
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -86,7 +86,7 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
@@ -94,8 +94,8 @@ def test_black_scholes_fd_PSOR():
     smooth = 0
     dig = 0
 
-    option_type = OptionTypes.EUROPEAN_PUT
-    v = black_scholes_fd_PSOR(
+    opt_type = OptionTypes.EUROPEAN_PUT
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -103,14 +103,14 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
     assert v == approx(0.2139059947533305, abs=1e-1)
 
-    option_type = OptionTypes.AMERICAN_PUT
-    v = black_scholes_fd_PSOR(
+    opt_type = OptionTypes.AMERICAN_PUT
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -118,14 +118,14 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
     assert v == approx(0.2165916613669189, abs=1e-1)
 
-    option_type = OptionTypes.AMERICAN_CALL
-    v = black_scholes_fd_PSOR(
+    opt_type = OptionTypes.AMERICAN_CALL
+    v = black_scholes_fd_psor(
         spot_price=s0,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -133,12 +133,12 @@ def test_black_scholes_fd_PSOR():
         risk_free_rate=r,
         dividend_yield=dividend_yield,
         digital=dig,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=smooth,
         theta=theta,
     )
     assert v == approx(0.10259475990431438, abs=1e-1)
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
 
 
 def test_european_call():
@@ -154,10 +154,10 @@ def test_european_call():
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
     strike_price = 50.0
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     num_steps_per_year = 2000
 
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=spot_price,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -165,7 +165,7 @@ def test_european_call():
         risk_free_rate=risk_free_rate,
         dividend_yield=dividend_yield,
         digital=0,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=0,
         theta=0.5,
     )
@@ -176,7 +176,7 @@ def test_european_call():
         volatility,  # Black scholes volatility
         num_steps_per_year,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
     )
     assert v == approx(value["value"], abs=1e-3)
@@ -196,9 +196,9 @@ def test_european_put():
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
     num_steps_per_year = 2000
     strike_price = 50.0
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
 
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=spot_price,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -206,7 +206,7 @@ def test_european_put():
         risk_free_rate=risk_free_rate,
         dividend_yield=dividend_yield,
         digital=0,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=0,
         theta=0.5,
     )
@@ -217,7 +217,7 @@ def test_european_put():
         volatility,  # Black scholes volatility
         num_steps_per_year,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
     )
     assert v == approx(value["value"], abs=1e-3)
@@ -237,9 +237,9 @@ def test_american_call():
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
     num_steps_per_year = 2000
     strike_price = 50.0
-    option_type = OptionTypes.AMERICAN_CALL
+    opt_type = OptionTypes.AMERICAN_CALL
 
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=spot_price,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -247,7 +247,7 @@ def test_american_call():
         risk_free_rate=risk_free_rate,
         dividend_yield=dividend_yield,
         digital=0,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=0,
         theta=0.5,
         num_samples=5000,
@@ -259,7 +259,7 @@ def test_american_call():
         volatility,  # Black scholes volatility
         num_steps_per_year,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
     )
     assert v == approx(value["value"], abs=1e-3)
@@ -279,9 +279,9 @@ def test_american_put():
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
     num_steps_per_year = 2000
     strike_price = 50.0
-    option_type = OptionTypes.AMERICAN_PUT
+    opt_type = OptionTypes.AMERICAN_PUT
 
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=spot_price,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -289,7 +289,7 @@ def test_american_put():
         risk_free_rate=risk_free_rate,
         dividend_yield=dividend_yield,
         digital=0,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=0,
         num_samples=5000,
     )
@@ -300,7 +300,7 @@ def test_american_put():
         volatility,  # Black scholes volatility
         num_steps_per_year,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
     )
     assert v == approx(value["value"], abs=1e-3)
@@ -312,8 +312,8 @@ def test_call_option():
     """
     expiry_dt = Date(1, 7, 2015)
     strike_price = 100.0
-    option_type = OptionTypes.EUROPEAN_CALL
-    call_option = EquityVanillaOption(expiry_dt, strike_price, option_type)
+    opt_type = OptionTypes.EUROPEAN_CALL
+    call_option = EquityVanillaOption(expiry_dt, strike_price, opt_type)
 
     value_dt = Date(1, 1, 2015)
     spot_price = 100
@@ -326,9 +326,11 @@ def test_call_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
+    v0 = call_option.value(
+        value_dt, spot_price, discount_curve, dividend_curve, model
+    )
 
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=spot_price,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -336,7 +338,7 @@ def test_call_option():
         risk_free_rate=risk_free_rate,
         dividend_yield=dividend_yield,
         digital=0,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=0,
         theta=0.5,
     )
@@ -349,8 +351,8 @@ def test_put_option():
     """
     expiry_dt = Date(1, 7, 2015)
     strike_price = 100.0
-    option_type = OptionTypes.EUROPEAN_PUT
-    put_option = EquityVanillaOption(expiry_dt, strike_price, option_type)
+    opt_type = OptionTypes.EUROPEAN_PUT
+    put_option = EquityVanillaOption(expiry_dt, strike_price, opt_type)
 
     value_dt = Date(1, 1, 2015)
     spot_price = 100
@@ -363,9 +365,11 @@ def test_put_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
+    v0 = put_option.value(
+        value_dt, spot_price, discount_curve, dividend_curve, model
+    )
 
-    v = black_scholes_fd_PSOR(
+    v = black_scholes_fd_psor(
         spot_price=spot_price,
         volatility=volatility,
         time_to_expiry=time_to_expiry,
@@ -373,7 +377,7 @@ def test_put_option():
         risk_free_rate=risk_free_rate,
         dividend_yield=dividend_yield,
         digital=0,
-        option_type=option_type,
+        opt_type=opt_type,
         smooth=0,
         theta=0.5,
     )

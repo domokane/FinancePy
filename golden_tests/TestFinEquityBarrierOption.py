@@ -34,7 +34,7 @@ def test_EquitybbarrierOption():
     volatility = 0.20
     interest_rate = 0.05
     dividend_yield = 0.02
-    option_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
     notional = 1.0
 
     drift = interest_rate - dividend_yield
@@ -53,16 +53,18 @@ def test_EquitybbarrierOption():
     start = time.time()
     num_observations_per_year = 100
 
-    test_cases.header("Type", "K", "B", "S:", "Value:", "ValueMC", "Diff", "TIME")
+    test_cases.header(
+        "Type", "K", "B", "S:", "Value:", "ValueMC", "Diff", "TIME"
+    )
 
-    for option_type in EquityBarrierTypes:
+    for opt_type in EquityBarrierTypes:
         for stock_price in [80, 100, 120]:
 
             b = 110.0
             k = 100.0
 
             option = EquityBarrierOption(
-                expiry_dt, k, option_type, b, num_observations_per_year
+                expiry_dt, k, opt_type, b, num_observations_per_year
             )
 
             value = option.value(
@@ -74,7 +76,7 @@ def test_EquitybbarrierOption():
             value_mc = option.value_mc(
                 t_exp,
                 k,
-                option_type.value,
+                opt_type.value,
                 b,
                 notional,
                 stock_price,
@@ -88,7 +90,14 @@ def test_EquitybbarrierOption():
             diff = value_mc - value
 
             test_cases.print(
-                option_type, k, b, stock_price, value, value_mc, diff, time_elapsed
+                opt_type,
+                k,
+                b,
+                stock_price,
+                value,
+                value_mc,
+                diff,
+                time_elapsed,
             )
 
         for stock_price in [80, 100, 120]:
@@ -97,7 +106,7 @@ def test_EquitybbarrierOption():
             kk = 110.0
 
             option = EquityBarrierOption(
-                expiry_dt, k, option_type, b, num_observations_per_year
+                expiry_dt, k, opt_type, b, num_observations_per_year
             )
 
             value = option.value(
@@ -109,7 +118,7 @@ def test_EquitybbarrierOption():
             test_value_mc = option.value_mc(
                 t_exp,
                 kk,
-                option_type.value,
+                opt_type.value,
                 bb,
                 notional,
                 stock_price,
@@ -123,7 +132,7 @@ def test_EquitybbarrierOption():
             diff = test_value_mc - value
 
             test_cases.print(
-                option_type,
+                opt_type,
                 kk,
                 bb,
                 stock_price,
@@ -140,14 +149,16 @@ def test_EquitybbarrierOption():
     stock_prices = [80, 100, 120]
     bb = 105.0
 
-    test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
+    test_cases.header(
+        "Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta"
+    )
 
-    for option_type in EquityBarrierTypes:
+    for opt_type in EquityBarrierTypes:
 
         for stock_price in stock_prices:
 
             barrier_option = EquityBarrierOption(
-                expiry_dt, 100.0, option_type, bb, num_observations_per_year
+                expiry_dt, 100.0, opt_type, bb, num_observations_per_year
             )
 
             value = barrier_option.value(
@@ -164,7 +175,7 @@ def test_EquitybbarrierOption():
             )
 
             test_cases.print(
-                option_type, kk, bb, stock_price, value, delta, vega, theta
+                opt_type, kk, bb, stock_price, value, delta, vega, theta
             )
 
     ###############################################################################
@@ -172,10 +183,12 @@ def test_EquitybbarrierOption():
     stock_prices = [80, 100, 120]
     bb = 105.0
 
-    test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
+    test_cases.header(
+        "Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta"
+    )
 
     barrier_option = EquityBarrierOption(
-        expiry_dt, 100.0, option_type, bb, num_observations_per_year
+        expiry_dt, 100.0, opt_type, bb, num_observations_per_year
     )
 
     values = barrier_option.value(

@@ -318,6 +318,8 @@ easterMondayDay = [
 
 
 class BusDayAdjustTypes(Enum):
+    """Enum for business day adjustment types."""
+
     NONE = 1
     FOLLOWING = 2
     MODIFIED_FOLLOWING = 3
@@ -326,6 +328,8 @@ class BusDayAdjustTypes(Enum):
 
 
 class CalendarTypes(Enum):
+    """Enum for calendar types."""
+
     NONE = 1
     WEEKEND = 2
     AUSTRALIA = 3
@@ -344,6 +348,8 @@ class CalendarTypes(Enum):
 
 
 class DateGenRuleTypes(Enum):
+    """Enum for date generation rule types."""
+
     FORWARD = 1
     BACKWARD = 2
 
@@ -362,9 +368,7 @@ class Calendar:
         """Create a calendar based on a specified calendar type."""
 
         if cal_type not in CalendarTypes:
-            raise FinError(
-                "Need to pass FinCalendarType and not " + str(cal_type)
-            )
+            raise FinError("Need to pass FinCalendarType and not " + str(cal_type))
 
         self.cal_type = cal_type
         self.day_in_year = None
@@ -973,9 +977,7 @@ class Calendar:
         if m == 9 and d == 24 and weekday == Date.MON:
             return True
 
-        if (
-            m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == Date.MON
-        ):  # HS
+        if m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == Date.MON:  # HS
             return True
 
         if m == 11 and d == 3:  # Culture
@@ -1346,7 +1348,7 @@ class Calendar:
                 self.is_business_day(start_dt) is False
                 and start_dt.is_weekend() is False
             ):
-                holiday_list.append(start_dt.__str__())
+                holiday_list.append(str(start_dt))
 
             start_dt = start_dt.add_days(1)
 
@@ -1359,9 +1361,7 @@ class Calendar:
         easy to compute, so we rely on a pre-calculated array."""
 
         if year > 2100:
-            raise FinError(
-                "Unable to determine Easter monday in year " + str(year)
-            )
+            raise FinError("Unable to determine Easter monday in year " + str(year))
 
         em_days = easterMondayDay[year - 1901]
         start_dt = Date(1, 1, year)

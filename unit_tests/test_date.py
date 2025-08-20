@@ -4,7 +4,6 @@
 
 import datetime
 import numpy as np
-import time
 
 from financepy.utils.date import Date, date_range
 
@@ -348,12 +347,13 @@ def test_from_date():
 
 
 def test_list_of_date():
-    dates = [Date(1, 1, 2020),
-             Date(1, 2, 2020),
-             Date(4, 3, 2020),
-             Date(1, 1, 2021),
-             Date(1, 1, 2022),
-             ]
+    dates = [
+        Date(1, 1, 2020),
+        Date(1, 2, 2020),
+        Date(4, 3, 2020),
+        Date(1, 1, 2021),
+        Date(1, 1, 2022),
+    ]
 
     # Test logical operations
     assert all(dates < Date(1, 1, 2023))

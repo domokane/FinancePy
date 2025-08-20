@@ -38,7 +38,11 @@ class BondOption:
     be received."""
 
     def __init__(
-        self, bond: Bond, expiry_dt: Date, strike_price: float, option_type: OptionTypes
+        self,
+        bond: Bond,
+        expiry_dt: Date,
+        strike_price: float,
+        opt_type: OptionTypes,
     ):
 
         check_argument_types(self.__init__, locals())
@@ -46,7 +50,7 @@ class BondOption:
         self.expiry_dt = expiry_dt
         self.strike_price = strike_price
         self.bond = bond
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.par = 100.0
 
     ###############################################################################
@@ -104,8 +108,8 @@ class BondOption:
         exercise_type = FinExerciseTypes.AMERICAN
 
         if (
-            self.option_type == OptionTypes.EUROPEAN_CALL
-            or self.option_type == OptionTypes.EUROPEAN_PUT
+            self.opt_type == OptionTypes.EUROPEAN_CALL
+            or self.opt_type == OptionTypes.EUROPEAN_PUT
         ):
             exercise_type = FinExerciseTypes.EUROPEAN
 
@@ -113,21 +117,26 @@ class BondOption:
         model.build_tree(t_mat, df_times, df_values)
 
         v = model.bond_option(
-            t_exp, self.strike_price, self.par, cpn_times, cpn_flows, exercise_type
+            t_exp,
+            self.strike_price,
+            self.par,
+            cpn_times,
+            cpn_flows,
+            exercise_type,
         )
 
         if (
-            self.option_type == OptionTypes.EUROPEAN_CALL
-            or self.option_type == OptionTypes.AMERICAN_CALL
+            self.opt_type == OptionTypes.EUROPEAN_CALL
+            or self.opt_type == OptionTypes.AMERICAN_CALL
         ):
             return v["call"]
         elif (
-            self.option_type == OptionTypes.EUROPEAN_PUT
-            or self.option_type == OptionTypes.AMERICAN_PUT
+            self.opt_type == OptionTypes.EUROPEAN_PUT
+            or self.opt_type == OptionTypes.AMERICAN_PUT
         ):
             return v["put"]
         else:
-            print(self.option_type)
+            print(self.opt_type)
             raise FinError("Unknown option type.")
 
     ###############################################################################
@@ -136,7 +145,7 @@ class BondOption:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += "Underlying Bond\n"
         s += str(self.bond)
         return s

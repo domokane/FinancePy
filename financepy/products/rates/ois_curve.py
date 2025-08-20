@@ -79,8 +79,8 @@ def _g(df, *args):
     fra = args[2]
 
     num_points = len(curve.times)
-    curve._dfs[num_points - 1] = df
-
+    #    curve._dfs[num_points - 1] = df
+    curve.set_df(num_points - 1, df)
     # For discount that need a fit function, we fit it now
     curve.fit(curve.times, curve.dfs)
     v_fra = fra.value(value_dt, curve)

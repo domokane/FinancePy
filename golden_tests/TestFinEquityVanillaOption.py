@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 import time
@@ -33,135 +34,211 @@ def test_EquityVanillaOption():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    num_paths_list = [10000, 20000, 40000] # , 80000, 160000, 320000]
+    num_paths_list = [10000, 20000, 40000]  # , 80000, 160000, 320000]
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
     for num_paths in num_paths_list:
 
         call_option = EquityVanillaOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
+        )
 
-        value = call_option.value(value_dt, stock_price, discount_curve,
-                                  dividend_curve, model)
+        value = call_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         start = time.time()
 
-        value_mc = call_option.value_mc(value_dt, stock_price, discount_curve,
-                                        dividend_curve, model, num_paths)
+        value_mc = call_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+        )
         end = time.time()
         duration = end - start
         test_cases.print(num_paths, value, value_mc, duration)
 
-
-###############################################################################
+    ###############################################################################
 
     stock_prices = range(80, 120, 10)
     num_paths = 100000
 
-    test_cases.header("NUMPATHS", "CALL_VALUE_BS", "CALL_VALUE_MC",
-                     "CALL_VALUE_MC_SOBOL", "TIME")
+    test_cases.header(
+        "NUMPATHS",
+        "CALL_VALUE_BS",
+        "CALL_VALUE_MC",
+        "CALL_VALUE_MC_SOBOL",
+        "TIME",
+    )
     use_sobol = True
 
     for stock_price in stock_prices:
 
-        call_option = EquityVanillaOption(expiry_dt, 100.0,
-                                          OptionTypes.EUROPEAN_CALL)
+        call_option = EquityVanillaOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
+        )
 
-        value = call_option.value(value_dt, stock_price, discount_curve,
-                                  dividend_curve, model)
+        value = call_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
 
         start = time.time()
 
         use_sobol = False
-        value_mc1 = call_option.value_mc(value_dt, stock_price, discount_curve,
-                                         dividend_curve, model, num_paths, use_sobol)
+        value_mc1 = call_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            use_sobol,
+        )
 
         use_sobol = True
-        value_mc2 = call_option.value_mc(value_dt, stock_price, discount_curve,
-                                         dividend_curve, model, num_paths, use_sobol)
+        value_mc2 = call_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            use_sobol,
+        )
 
         end = time.time()
         duration = end - start
         test_cases.print(num_paths, value, value_mc1, value_mc2, duration)
 
-###############################################################################
+    ###############################################################################
 
     stock_prices = range(80, 120, 10)
     num_paths = 100000
 
-    test_cases.header("NUMPATHS", "PUT_VALUE_BS", "PUT_VALUE_MC",
-                     "PUT_VALUE_MC_SOBOL", "TIME")
+    test_cases.header(
+        "NUMPATHS",
+        "PUT_VALUE_BS",
+        "PUT_VALUE_MC",
+        "PUT_VALUE_MC_SOBOL",
+        "TIME",
+    )
 
     for stock_price in stock_prices:
 
-        put_option = EquityVanillaOption(expiry_dt, 100.0,
-                                         OptionTypes.EUROPEAN_PUT)
+        put_option = EquityVanillaOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT
+        )
 
-        value = put_option.value(value_dt, stock_price, discount_curve,
-                                 dividend_curve, model)
+        value = put_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
 
         start = time.time()
 
         use_sobol = False
-        value_mc1 = put_option.value_mc(value_dt, stock_price, discount_curve,
-                                        dividend_curve, model, num_paths, use_sobol)
+        value_mc1 = put_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            use_sobol,
+        )
 
         use_sobol = True
-        value_mc2 = put_option.value_mc(value_dt, stock_price, discount_curve,
-                                        dividend_curve, model, num_paths, use_sobol)
+        value_mc2 = put_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            use_sobol,
+        )
 
         end = time.time()
         duration = end - start
         test_cases.print(num_paths, value, value_mc1, value_mc2, duration)
 
-###############################################################################
+    ###############################################################################
 
     stock_prices = range(80, 120, 10)
 
-    test_cases.header("STOCK PRICE", "CALL_VALUE_BS", "CALL_DELTA_BS",
-                     "CALL_VEGA_BS", "CALL_THETA_BS", "CALL_RHO_BS",
-                     "CALL_VANNA_BS")
+    test_cases.header(
+        "STOCK PRICE",
+        "CALL_VALUE_BS",
+        "CALL_DELTA_BS",
+        "CALL_VEGA_BS",
+        "CALL_THETA_BS",
+        "CALL_RHO_BS",
+        "CALL_VANNA_BS",
+    )
 
     for stock_price in stock_prices:
 
-        call_option = EquityVanillaOption(expiry_dt, 100.0,
-                                          OptionTypes.EUROPEAN_CALL)
-        value = call_option.value(value_dt, stock_price, discount_curve,
-                                  dividend_curve, model)
-        delta = call_option.delta(value_dt, stock_price, discount_curve,
-                                  dividend_curve, model)
-        vega = call_option.vega(value_dt, stock_price, discount_curve,
-                                dividend_curve, model)
-        theta = call_option.theta(value_dt, stock_price, discount_curve,
-                                  dividend_curve, model)
-        rho = call_option.rho(value_dt, stock_price, discount_curve,
-                              dividend_curve, model)
-        vanna = call_option.vanna(value_dt, stock_price, discount_curve,
-                                  dividend_curve, model)
+        call_option = EquityVanillaOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
+        )
+        value = call_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        delta = call_option.delta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        vega = call_option.vega(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        theta = call_option.theta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        rho = call_option.rho(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        vanna = call_option.vanna(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         test_cases.print(stock_price, value, delta, vega, theta, rho, vanna)
 
     ###########################################################################
 
-    test_cases.header("STOCK PRICE", "PUT_VALUE_BS", "PUT_DELTA_BS",
-                     "PUT_VEGA_BS", "PUT_THETA_BS", "PUT_RHO_BS", "PUT_VANNA_BS")
+    test_cases.header(
+        "STOCK PRICE",
+        "PUT_VALUE_BS",
+        "PUT_DELTA_BS",
+        "PUT_VEGA_BS",
+        "PUT_THETA_BS",
+        "PUT_RHO_BS",
+        "PUT_VANNA_BS",
+    )
 
     for stock_price in stock_prices:
 
-        put_option = EquityVanillaOption(expiry_dt, 100.0,
-                                         OptionTypes.EUROPEAN_PUT)
+        put_option = EquityVanillaOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT
+        )
 
-        value = put_option.value(value_dt, stock_price, discount_curve,
-                                 dividend_curve, model)
-        delta = put_option.delta(value_dt, stock_price, discount_curve,
-                                 dividend_curve, model)
-        vega = put_option.vega(value_dt, stock_price, discount_curve,
-                               dividend_curve, model)
-        theta = put_option.theta(value_dt, stock_price, discount_curve,
-                                 dividend_curve, model)
-        rho = put_option.rho(value_dt, stock_price, discount_curve,
-                             dividend_curve, model)
-        vanna = put_option.vanna(value_dt, stock_price, discount_curve,
-                                 dividend_curve, model)
+        value = put_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        delta = put_option.delta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        vega = put_option.vega(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        theta = put_option.theta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        rho = put_option.rho(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        vanna = put_option.vanna(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         test_cases.print(stock_price, value, delta, vega, theta, rho, vanna)
 
 
@@ -177,10 +254,18 @@ def testImpliedVolatility_NEW():
     strikes = np.linspace(50, 150, 11)
     timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0]
     sigmas = np.arange(1, 100, 5) / 100.0
-    option_types = [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]
+    opt_types = [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]
 
-    test_cases.header("OPT_TYPE", "TEXP", "STOCK_PRICE", "STRIKE", "INTRINSIC",
-                      "VALUE", "INPUT_VOL", "IMPLIED_VOL")
+    test_cases.header(
+        "OPT_TYPE",
+        "TEXP",
+        "STOCK_PRICE",
+        "STRIKE",
+        "INTRINSIC",
+        "VALUE",
+        "INPUT_VOL",
+        "IMPLIED_VOL",
+    )
 
     tol = 1e-5
     numTests = 0
@@ -196,16 +281,21 @@ def testImpliedVolatility_NEW():
 
             for strike in strikes:
 
-                for option_type in option_types:
+                for opt_type in opt_types:
 
-                    option = EquityVanillaOption(expiry_dt, strike,
-                                                 option_type)
+                    option = EquityVanillaOption(expiry_dt, strike, opt_type)
 
-                    value = option.value(value_dt, stock_price, discount_curve,
-                                         dividend_curve, model)
+                    value = option.value(
+                        value_dt,
+                        stock_price,
+                        discount_curve,
+                        dividend_curve,
+                        model,
+                    )
 
-                    intrinsic = option.intrinsic(value_dt, stock_price,
-                                                 discount_curve, dividend_curve)
+                    intrinsic = option.intrinsic(
+                        value_dt, stock_price, discount_curve, dividend_curve
+                    )
 
                     # I remove the cases where the time value is zero
                     # This is arbitrary but 1e-10 seems good enough to me
@@ -214,11 +304,13 @@ def testImpliedVolatility_NEW():
 
                     if value - intrinsic > 1e-10:
 
-                        impliedVol = option.implied_volatility(value_dt,
-                                                               stock_price,
-                                                               discount_curve,
-                                                               dividend_curve,
-                                                               value)
+                        impliedVol = option.implied_volatility(
+                            value_dt,
+                            stock_price,
+                            discount_curve,
+                            dividend_curve,
+                            value,
+                        )
 
                     numTests += 1
 
@@ -226,22 +318,31 @@ def testImpliedVolatility_NEW():
 
                     if errVol > tol:
 
-                        test_cases.print(option_type,
-                                        time_to_expiry,
-                                        stock_price,
-                                        strike,
-                                        intrinsic,
-                                        value,
-                                        vol,
-                                        impliedVol)
+                        test_cases.print(
+                            opt_type,
+                            time_to_expiry,
+                            stock_price,
+                            strike,
+                            intrinsic,
+                            value,
+                            vol,
+                            impliedVol,
+                        )
 
                         # These fails include ones due to the zero time value
                         numFails += 1
 
-                        test_cases.print(option_type, time_to_expiry,
-                                        stock_price,
-                                        strike,
-                                        stock_price, value, vol, impliedVol)
+                        test_cases.print(
+                            opt_type,
+                            time_to_expiry,
+                            stock_price,
+                            strike,
+                            stock_price,
+                            value,
+                            vol,
+                            impliedVol,
+                        )
+
 
 #    print("Num Tests", numTests, "numFails", numFails)
 
@@ -260,10 +361,12 @@ if 1 == 0:
     dividend_curve = DiscountCurveFlat(value_dt, 0.0)
 
     call_option = EquityVanillaOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
+        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
+    )
 
-    value = call_option.value(value_dt, 105.0, discount_curve,
-                              dividend_curve, model)
+    value = call_option.value(
+        value_dt, 105.0, discount_curve, dividend_curve, model
+    )
 
 else:
     test_EquityVanillaOption()

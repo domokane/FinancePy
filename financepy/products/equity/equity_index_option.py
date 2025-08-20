@@ -25,7 +25,7 @@ class EquityIndexOption:
         self,
         expiry_dt: Union[Date, list],
         strike_price: Union[float, np.ndarray],
-        option_type: OptionTypes,
+        opt_type: OptionTypes,
         num_options: Optional[float] = 1.0,
     ):
         """Create the Equity Index option object by specifying the expiry
@@ -33,14 +33,14 @@ class EquityIndexOption:
 
         check_argument_types(self.__init__, locals())
 
-        if option_type in (
+        if opt_type in (
             OptionTypes.EUROPEAN_CALL,
             OptionTypes.EUROPEAN_PUT,
             OptionTypes.AMERICAN_CALL,
             OptionTypes.AMERICAN_PUT,
         ):
-            self.option_type = option_type
-            self.option_type_value = option_type.value
+            self.opt_type = opt_type
+            self.opt_type_value = opt_type.value
         else:
             raise FinError("Unknown Option Type")
         self.expiry_dt = expiry_dt
@@ -94,7 +94,7 @@ class EquityIndexOption:
         k = self.strike_price
 
         if isinstance(model, Black):
-            value = model.value(forward_price, k, t_exp, df, self.option_type)
+            value = model.value(forward_price, k, t_exp, df, self.opt_type)
         else:
             raise FinError("Unknown Model Type")
 
@@ -125,7 +125,9 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            delta = model.delta(forward_price, k, t_exp, df, self.option_type_value)
+            delta = model.delta(
+                forward_price, k, t_exp, df, self.opt_type_value
+            )
         else:
             raise FinError("Unknown Model Type")
         return delta
@@ -153,7 +155,9 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            gamma = model.gamma(forward_price, k, t_exp, df, self.option_type_value)
+            gamma = model.gamma(
+                forward_price, k, t_exp, df, self.opt_type_value
+            )
         else:
             raise FinError("Unknown Model Type")
         return gamma
@@ -181,7 +185,7 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            vega = model.vega(forward_price, k, t_exp, df, self.option_type_value)
+            vega = model.vega(forward_price, k, t_exp, df, self.opt_type_value)
         else:
             raise FinError("Unknown Model Type")
         return vega
@@ -209,7 +213,9 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            theta = model.theta(forward_price, k, t_exp, df, self.option_type_value)
+            theta = model.theta(
+                forward_price, k, t_exp, df, self.opt_type_value
+            )
         else:
             raise FinError("Unknown Model Type")
         return theta
@@ -239,7 +245,7 @@ class EquityIndexOption:
                 r,
                 self.strike_price,
                 price,
-                self.option_type,
+                self.opt_type,
             )
         else:
             raise FinError("Unknown Model Type")
@@ -251,7 +257,7 @@ class EquityIndexOption:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE VALUE", self.option_type)
+        s += label_to_string("OPTION TYPE VALUE", self.opt_type)
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 

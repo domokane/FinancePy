@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from financepy.utils.date import Date
@@ -13,7 +14,9 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.models.black_scholes import BlackScholesTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.products.equity.equity_american_option import EquityAmericanOption
+from financepy.products.equity.equity_american_option import (
+    EquityAmericanOption,
+)
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 
@@ -35,53 +38,59 @@ def testBlackScholes():
     interest_rate = 0.001
     dividend_yield = 0.0163
 
-    option_type = OptionTypes.AMERICAN_CALL
+    opt_type = OptionTypes.AMERICAN_CALL
     euOptionType = OptionTypes.EUROPEAN_CALL
 
-    amOption = EquityAmericanOption(expiry_dt, strike_price,
-                                    option_type)
+    amOption = EquityAmericanOption(expiry_dt, strike_price, opt_type)
 
-    ameuOption = EquityAmericanOption(expiry_dt, strike_price,
-                                      euOptionType)
+    ameuOption = EquityAmericanOption(expiry_dt, strike_price, euOptionType)
 
-    euOption = EquityVanillaOption(expiry_dt, strike_price,
-                                   euOptionType)
+    euOption = EquityVanillaOption(expiry_dt, strike_price, euOptionType)
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate,
-                                       FrequencyTypes.CONTINUOUS,
-                                       DayCountTypes.ACT_365F)
+    discount_curve = DiscountCurveFlat(
+        value_dt,
+        interest_rate,
+        FrequencyTypes.CONTINUOUS,
+        DayCountTypes.ACT_365F,
+    )
 
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield,
-                                       FrequencyTypes.CONTINUOUS,
-                                       DayCountTypes.ACT_365F)
+    dividend_curve = DiscountCurveFlat(
+        value_dt,
+        dividend_yield,
+        FrequencyTypes.CONTINUOUS,
+        DayCountTypes.ACT_365F,
+    )
 
     num_steps_per_year = 400
 
-    modelTree = BlackScholes(volatility,
-                             BlackScholesTypes.CRR_TREE,
-                             num_steps_per_year)
+    modelTree = BlackScholes(
+        volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year
+    )
 
-    v = amOption.value(value_dt, stock_price, discount_curve,
-                       dividend_curve, modelTree)
-#    print(v)
+    v = amOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, modelTree
+    )
+    #    print(v)
 
-    modelApprox = BlackScholes(volatility,
-                               BlackScholesTypes.BARONE_ADESI)
+    modelApprox = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
 
-    v = amOption.value(value_dt, stock_price, discount_curve,
-                       dividend_curve, modelApprox)
+    v = amOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, modelApprox
+    )
 
-#    print(v)
+    #    print(v)
 
-    v = ameuOption.value(value_dt, stock_price, discount_curve,
-                         dividend_curve, modelTree)
+    v = ameuOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, modelTree
+    )
 
-#    print(v)
+    #    print(v)
 
-    v = euOption.value(value_dt, stock_price, discount_curve,
-                       dividend_curve, modelTree)
+    v = euOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, modelTree
+    )
 
-#    print(v)
+    #    print(v)
 
     amTreeValue = []
     amBAWValue = []
@@ -128,6 +137,7 @@ def testBlackScholes():
     # plt.xlabel("Num Steps")
     # plt.ylabel("Value")
     # plt.legend();
+
 
 ###############################################################################
 

@@ -38,7 +38,7 @@ class EquityCliquetOption(EquityOption):
         self,
         start_dt: Date,
         final_expiry_dt: Date,
-        option_type: OptionTypes,
+        opt_type: OptionTypes,
         freq_type: FrequencyTypes,
         day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -52,17 +52,17 @@ class EquityCliquetOption(EquityOption):
         check_argument_types(self.__init__, locals())
 
         if (
-            option_type != OptionTypes.EUROPEAN_CALL
-            and option_type != OptionTypes.EUROPEAN_PUT
+            opt_type != OptionTypes.EUROPEAN_CALL
+            and opt_type != OptionTypes.EUROPEAN_PUT
         ):
-            raise FinError("Unknown Option Type" + str(option_type))
+            raise FinError("Unknown Option Type" + str(opt_type))
 
         if final_expiry_dt < start_dt:
             raise FinError("Expiry date precedes start date")
 
         self.start_dt = start_dt
         self.final_expiry_dt = final_expiry_dt
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.freq_type = freq_type
         self.dc_type = day_count_type
         self.cal_type = cal_type
@@ -146,14 +146,18 @@ class EquityCliquetOption(EquityOption):
 
                     q = -np.log(dqMat / dq) / tau
 
-                    if self.option_type == call_type:
+                    if self.opt_type == call_type:
                         v_fwd_opt = (
-                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
+                            s
+                            * dq
+                            * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
                         )
                         v_cliquet += v_fwd_opt
-                    elif self.option_type == put_type:
+                    elif self.opt_type == put_type:
                         v_fwd_opt = (
-                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
+                            s
+                            * dq
+                            * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
                         )
                         v_cliquet += v_fwd_opt
                     else:
@@ -183,7 +187,7 @@ class EquityCliquetOption(EquityOption):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START DATE", self.start_dt)
         s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
-        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
         s += label_to_string("DAY COUNT TYPE", self.dc_type)
         s += label_to_string("CALENDAR TYPE", self.cal_type)

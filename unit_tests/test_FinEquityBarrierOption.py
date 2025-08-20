@@ -19,7 +19,7 @@ interest_rate = 0.05
 dividend_yield = 0.02
 B = 110.0
 K = 100.0
-option_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+opt_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
 notional = 1.0
 
 drift = interest_rate - dividend_yield
@@ -35,12 +35,14 @@ num_observations_per_year = 100
 
 
 def test_down_and_out_call():
-    option_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 0.0000
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -48,7 +50,7 @@ def test_down_and_out_call():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -61,12 +63,14 @@ def test_down_and_out_call():
 
 
 def test_down_and_in_call():
-    option_type = EquityBarrierTypes.DOWN_AND_IN_CALL
+    opt_type = EquityBarrierTypes.DOWN_AND_IN_CALL
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 1.5307
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -74,7 +78,7 @@ def test_down_and_in_call():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -87,12 +91,14 @@ def test_down_and_in_call():
 
 
 def test_up_and_out_call():
-    option_type = EquityBarrierTypes.UP_AND_OUT_CALL
+    opt_type = EquityBarrierTypes.UP_AND_OUT_CALL
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 0.1789
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -100,7 +106,7 @@ def test_up_and_out_call():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -113,12 +119,14 @@ def test_up_and_out_call():
 
 
 def test_up_and_in_call():
-    option_type = EquityBarrierTypes.UP_AND_IN_CALL
+    opt_type = EquityBarrierTypes.UP_AND_IN_CALL
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 1.3519
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -126,7 +134,7 @@ def test_up_and_in_call():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -139,12 +147,14 @@ def test_up_and_in_call():
 
 
 def test_up_and_out_put():
-    option_type = EquityBarrierTypes.UP_AND_OUT_PUT
+    opt_type = EquityBarrierTypes.UP_AND_OUT_PUT
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 18.1445
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -152,7 +162,7 @@ def test_up_and_out_put():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -165,12 +175,14 @@ def test_up_and_out_put():
 
 
 def test_up_and_in_put():
-    option_type = EquityBarrierTypes.UP_AND_IN_PUT
+    opt_type = EquityBarrierTypes.UP_AND_IN_PUT
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 0.0933
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -178,7 +190,7 @@ def test_up_and_in_put():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -191,12 +203,14 @@ def test_up_and_in_put():
 
 
 def test_down_and_out_put():
-    option_type = EquityBarrierTypes.DOWN_AND_OUT_PUT
+    opt_type = EquityBarrierTypes.DOWN_AND_OUT_PUT
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 0.0000
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -204,7 +218,7 @@ def test_down_and_out_put():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,
@@ -217,12 +231,14 @@ def test_down_and_out_put():
 
 
 def test_down_and_in_put():
-    option_type = EquityBarrierTypes.DOWN_AND_IN_PUT
+    opt_type = EquityBarrierTypes.DOWN_AND_IN_PUT
     option = EquityBarrierOption(
-        expiry_dt, K, option_type, B, num_observations_per_year
+        expiry_dt, K, opt_type, B, num_observations_per_year
     )
 
-    value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    value = option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     assert round(value, 4) == 18.2378
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -230,7 +246,7 @@ def test_down_and_in_put():
     test_value_mc = option.value_mc(
         t_exp,
         K,
-        option_type.value,
+        opt_type.value,
         B,
         notional,
         stock_price,

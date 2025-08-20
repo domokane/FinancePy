@@ -32,7 +32,7 @@ class EquityAmericanOption(EquityOption):
         self,
         expiry_dt: Date,
         strike_price: float,
-        option_type: OptionTypes,
+        opt_type: OptionTypes,
         num_options: float = 1.0,
     ):
         """Class for American style options on simple vanilla calls and puts.
@@ -42,19 +42,19 @@ class EquityAmericanOption(EquityOption):
         check_argument_types(self.__init__, locals())
 
         if (
-            option_type != OptionTypes.EUROPEAN_CALL
-            and option_type != OptionTypes.EUROPEAN_PUT
-            and option_type != OptionTypes.AMERICAN_CALL
-            and option_type != OptionTypes.AMERICAN_PUT
+            opt_type != OptionTypes.EUROPEAN_CALL
+            and opt_type != OptionTypes.EUROPEAN_PUT
+            and opt_type != OptionTypes.AMERICAN_CALL
+            and opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError("Unknown Option Type" + str(option_type))
+            raise FinError("Unknown Option Type" + str(opt_type))
 
         self.expiry_dt = expiry_dt
         self.strike_price = strike_price
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.num_options = num_options
 
-    ###############################################################################
+    ###########################################################################
 
     def value(
         self,
@@ -99,7 +99,7 @@ class EquityAmericanOption(EquityOption):
         s = stock_price
         k = self.strike_price
 
-        v = model.value(s, t_exp, k, r, q, self.option_type)
+        v = model.value(s, t_exp, k, r, q, self.opt_type)
         v = v * self.num_options
 
         if isinstance(s, float):
@@ -107,17 +107,17 @@ class EquityAmericanOption(EquityOption):
         else:
             return v[0]
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

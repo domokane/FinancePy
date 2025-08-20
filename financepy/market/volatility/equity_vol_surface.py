@@ -199,13 +199,13 @@ def _delta_fit(k, *args):
     t = args[2]
     r = args[3]
     q = args[4]
-    option_type_value = args[5]
+    opt_type_value = args[5]
     inverse_delta_target = args[6]
     params = args[7]
 
     f = s * np.exp((r - q) * t)
     v = vol_function(vol_type_value, params, f, k, t)
-    delta_out = bs_delta(s, t, k, r, q, v, option_type_value)
+    delta_out = bs_delta(s, t, k, r, q, v, opt_type_value)
     inverse_delta_out = norminvcdf(np.abs(delta_out))
     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
@@ -224,7 +224,7 @@ def _solver_for_smile_strike(
     t,
     r,
     q,
-    option_type_value,
+    opt_type_value,
     vol_type_value,
     delta_target,
     initial_guess,
@@ -242,12 +242,14 @@ def _solver_for_smile_strike(
         t,
         r,
         q,
-        option_type_value,
+        opt_type_value,
         inverse_delta_target,
         parameters,
     )
 
-    k = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
+    k = newton_secant(
+        _delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50
+    )
     return k
 
 
@@ -362,11 +364,15 @@ class EquityVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k, t0)
+        vol0 = vol_function(
+            vol_type_value, self._parameters[index0], fwd0, k, t0
+        )
 
         if index1 != index0:
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k, t1)
+            vol1 = vol_function(
+                vol_type_value, self._parameters[index1], fwd1, k, t1
+            )
 
         else:
 
@@ -556,7 +562,9 @@ class EquityVolSurface:
             self._parameters[index0],
         )
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k_0, t0)
+        vol0 = vol_function(
+            vol_type_value, self._parameters[index0], fwd0, k_0, t0
+        )
 
         if index1 != index0:
 
@@ -572,7 +580,9 @@ class EquityVolSurface:
                 self._parameters[index1],
             )
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k_1, t1)
+            vol1 = vol_function(
+                vol_type_value, self._parameters[index1], fwd1, k_1, t1
+            )
         else:
             vol1 = vol0
 
@@ -587,7 +597,9 @@ class EquityVolSurface:
             kt = ((t_exp - t0) * k_1 + (t1 - t_exp) * k_0) / (t1 - t0)
 
             if vart < 0.0:
-                raise FinError("Failed interpolation due to negative variance.")
+                raise FinError(
+                    "Failed interpolation due to negative variance."
+                )
 
             volt = np.sqrt(vart / t_exp)
 

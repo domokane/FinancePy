@@ -34,14 +34,14 @@ class FXFloatLookbackOption(FXOption):
     but is set at expiry to equal the minimum fx rate in the case of a call
     or the maximum fx rate in the case of a put."""
 
-    def __init__(self, expiry_dt: Date, option_type: OptionTypes):
+    def __init__(self, expiry_dt: Date, opt_type: OptionTypes):
         """Create the FX Float Look Back Option by specifying the expiry
         date and the option type."""
 
         check_argument_types(self.__init__, locals())
 
         self.expiry_dt = expiry_dt
-        self.option_type = option_type
+        self.opt_type = opt_type
 
     ##########################################################################
 
@@ -69,7 +69,9 @@ class FXFloatLookbackOption(FXOption):
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as option value date")
+            raise FinError(
+                "Foreign Curve valuation date not same as option value date"
+            )
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -84,11 +86,13 @@ class FXFloatLookbackOption(FXOption):
         s_min = 0.0
         s_max = 0.0
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             s_min = stock_min_max
             if s_min > s0:
-                raise FinError("s_min must be less than or equal to the stock price.")
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+                raise FinError(
+                    "s_min must be less than or equal to the stock price."
+                )
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             s_max = stock_min_max
             if s_max < s0:
                 raise FinError(
@@ -106,7 +110,7 @@ class FXFloatLookbackOption(FXOption):
         expbt = np.exp(b * t)
 
         # Taken from Haug Page 142
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
 
             a1 = (np.log(s0 / s_min) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
             a2 = a1 - v * np.sqrt(t)
@@ -122,7 +126,7 @@ class FXFloatLookbackOption(FXOption):
 
             v = s0 * dq * N(a1) - s_min * df * N(a2) + s0 * df * u * term
 
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
             b1 = (np.log(s0 / s_max) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
             b2 = b1 - v * np.sqrt(t)
@@ -139,7 +143,9 @@ class FXFloatLookbackOption(FXOption):
             v = s_max * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
 
         else:
-            raise FinError("Unknown lookback option type:" + str(self.option_type))
+            raise FinError(
+                "Unknown lookback option type:" + str(self.opt_type)
+            )
 
         return v
 
@@ -168,15 +174,17 @@ class FXFloatLookbackOption(FXOption):
         num_time_steps = int(t * num_steps_per_year)
         mu = r - q
 
-        option_type = self.option_type
+        opt_type = self.opt_type
         s_min = 0.0
         s_max = 0.0
 
-        if self.option_type == OptionTypes.EUROPEAN_CALL:
+        if self.opt_type == OptionTypes.EUROPEAN_CALL:
             s_min = stock_min_max
             if s_min > stock_price:
-                raise FinError("s_min must be less than or equal to the stock price.")
-        elif self.option_type == OptionTypes.EUROPEAN_PUT:
+                raise FinError(
+                    "s_min must be less than or equal to the stock price."
+                )
+        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             s_max = stock_min_max
             if s_max < stock_price:
                 raise FinError(
@@ -191,18 +199,18 @@ class FXFloatLookbackOption(FXOption):
         num_paths = 2 * num_paths
         payoff = np.zeros(num_paths)
 
-        if option_type == OptionTypes.EUROPEAN_CALL:
+        if opt_type == OptionTypes.EUROPEAN_CALL:
             # minimum on time dimension axis 1
             s_min_vector = np.min(s_all, axis=1)
             s_min_vector = np.minimum(s_min_vector, s_min)
             payoff = np.maximum(s_all[:, -1] - s_min_vector, 0.0)
-        elif option_type == OptionTypes.EUROPEAN_PUT:
+        elif opt_type == OptionTypes.EUROPEAN_PUT:
             # maximum on time dimension axis 1
             s_max_vector = np.max(s_all, axis=1)
             s_max_vector = np.maximum(s_max_vector, s_max)
             payoff = np.maximum(s_max_vector - s_all[:, -1], 0.0)
         else:
-            raise FinError("Unknown lookback option type:" + str(option_type))
+            raise FinError("Unknown lookback option type:" + str(opt_type))
 
         v = payoff.mean() * np.exp(-r * t)
         return v

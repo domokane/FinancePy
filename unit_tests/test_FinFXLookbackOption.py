@@ -29,8 +29,8 @@ foreign_curve = DiscountCurveFlat(value_dt, foreignRate)
 
 
 def test_european_call():
-    option_type = OptionTypes.EUROPEAN_CALL
-    option = FXFloatLookbackOption(expiry_dt, option_type)
+    opt_type = OptionTypes.EUROPEAN_CALL
+    option = FXFloatLookbackOption(expiry_dt, opt_type)
     stock_min = stock_price - 10
     value = option.value(
         value_dt,
@@ -56,7 +56,7 @@ def test_european_call():
     assert round(value_mc, 4) == 23.2553
 
     k = 100.0
-    option = FXFixedLookbackOption(expiry_dt, option_type, k)
+    option = FXFixedLookbackOption(expiry_dt, opt_type, k)
     stock_min = stock_price
     value = option.value(
         value_dt,
@@ -83,8 +83,8 @@ def test_european_call():
 
 
 def test_european_put():
-    option_type = OptionTypes.EUROPEAN_PUT
-    option = FXFloatLookbackOption(expiry_dt, option_type)
+    opt_type = OptionTypes.EUROPEAN_PUT
+    option = FXFloatLookbackOption(expiry_dt, opt_type)
     stock_max = stock_price + 10
     value = option.value(
         value_dt,
@@ -110,7 +110,7 @@ def test_european_put():
     assert round(value_mc, 4) == 24.3641
 
     k = 105.0
-    option = FXFixedLookbackOption(expiry_dt, option_type, k)
+    option = FXFixedLookbackOption(expiry_dt, opt_type, k)
     stock_min = stock_price - 10.0
     value = option.value(
         value_dt,

@@ -22,9 +22,9 @@ def dx(x, wind=0):
         # (-1/dxl, 1/dxl, 0)
         out = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
     elif wind == 0:
-        intermediate_rows = np.array((-dxu / dxl, dxu / dxl - dxl / dxu, dxl / dxu)) / (
-            dxl + dxu
-        )
+        intermediate_rows = np.array(
+            (-dxu / dxl, dxu / dxl - dxl / dxu, dxl / dxu)
+        ) / (dxl + dxu)
         out = intermediate_rows.T
     else:
         # (0, -1/dxu, 1/dxu)
@@ -54,7 +54,9 @@ def dxx(x):
     # we can use numpy roll without worrying about the end values
     dxl = x - np.roll(x, 1)
     dxu = np.roll(x, -1) - x
-    intermediate_rows = np.array([2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (dxu + dxl)
+    intermediate_rows = np.array([2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (
+        dxu + dxl
+    )
     out = intermediate_rows.T
 
     # First row
@@ -178,10 +180,10 @@ def smooth_call(xl, xu, strike):
 ###############################################################################
 
 
-def option_payoff(s, strike, smooth, dig, option_type):
+def option_payoff(s, strike, smooth, dig, opt_type):
 
-    if isinstance(option_type, OptionTypes):
-        option_type = option_type.value
+    if isinstance(opt_type, OptionTypes):
+        opt_type = opt_type.value
 
     # Generate middle values (i.e. not first or last, which are
     # overwritten later)
@@ -209,7 +211,10 @@ def option_payoff(s, strike, smooth, dig, option_type):
     res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
 
     # Invert for put options
-    if option_type in {OptionTypes.AMERICAN_PUT.value, OptionTypes.EUROPEAN_PUT.value}:
+    if opt_type in {
+        OptionTypes.AMERICAN_PUT.value,
+        OptionTypes.EUROPEAN_PUT.value,
+    }:
         res = 1 - res if dig else res - (s - strike)
 
     return np.atleast_2d(res)
@@ -225,7 +230,7 @@ def black_scholes_fd(
     strike_price,
     risk_free_rate,
     dividend_yield,
-    option_type,
+    opt_type,
     num_time_steps=None,
     num_samples=2000,
     num_std=5,
@@ -236,8 +241,8 @@ def black_scholes_fd(
     update=False,
 ):
 
-    if isinstance(option_type, OptionTypes):
-        option_type = option_type.value
+    if isinstance(opt_type, OptionTypes):
+        opt_type = opt_type.value
 
     # Define grid
     std = volatility * (time_to_expiry**0.5)
@@ -253,7 +258,7 @@ def black_scholes_fd(
     s = spot_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
     # Generate the option payoff to be fitted
-    payoff = option_payoff(s, strike_price, smooth, digital, option_type)
+    payoff = option_payoff(s, strike_price, smooth, digital, opt_type)
 
     # time steps
     num_steps = num_time_steps or num_samples // 2
@@ -282,7 +287,7 @@ def black_scholes_fd(
 
         res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
 
-        if option_type in {
+        if opt_type in {
             OptionTypes.AMERICAN_CALL.value,
             OptionTypes.AMERICAN_PUT.value,
         }:

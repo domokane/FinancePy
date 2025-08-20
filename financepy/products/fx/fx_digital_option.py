@@ -31,7 +31,7 @@ class FXDigitalOption:
         expiry_dt: Date,
         strike_fx_rate: Union[float, np.ndarray],
         currency_pair: str,  # FORDOM
-        option_type: Union[OptionTypes, list],
+        opt_type: Union[OptionTypes, list],
         notional: float,
         prem_currency: str,
         spot_days: int = 0,
@@ -74,12 +74,12 @@ class FXDigitalOption:
         self.notional = notional
 
         if (
-            option_type != OptionTypes.DIGITAL_CALL
-            and option_type != OptionTypes.DIGITAL_PUT
+            opt_type != OptionTypes.DIGITAL_CALL
+            and opt_type != OptionTypes.DIGITAL_PUT
         ):
-            raise FinError("Unknown Digital Option Type:" + option_type)
+            raise FinError("Unknown Digital Option Type:" + opt_type)
 
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.spot_days = spot_days
 
     ###########################################################################
@@ -105,10 +105,14 @@ class FXDigitalOption:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
-            raise FinError("Domestic Curve valuation date not same as valuation date")
+            raise FinError(
+                "Domestic Curve valuation date not same as valuation date"
+            )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as valuation date")
+            raise FinError(
+                "Foreign Curve valuation date not same as valuation date"
+            )
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -145,22 +149,22 @@ class FXDigitalOption:
             d2 = (ln_s0_k + (mu - v2 / 2.0) * t_del) / den
 
             if (
-                self.option_type == OptionTypes.DIGITAL_CALL
+                self.opt_type == OptionTypes.DIGITAL_CALL
                 and self.for_name == self.prem_currency
             ):
                 v = s0 * np.exp(-r_f * t_del) * n_vect(d2)
             elif (
-                self.option_type == OptionTypes.DIGITAL_PUT
+                self.opt_type == OptionTypes.DIGITAL_PUT
                 and self.for_name == self.prem_currency
             ):
                 v = s0 * np.exp(-r_f * t_del) * n_vect(-d2)
             elif (
-                self.option_type == OptionTypes.DIGITAL_CALL
+                self.opt_type == OptionTypes.DIGITAL_CALL
                 and self.dom_name == self.prem_currency
             ):
                 v = np.exp(-r_d * t_del) * n_vect(d2)
             elif (
-                self.option_type == OptionTypes.DIGITAL_PUT
+                self.opt_type == OptionTypes.DIGITAL_PUT
                 and self.dom_name == self.prem_currency
             ):
                 v = np.exp(-r_d * t_del) * n_vect(-d2)

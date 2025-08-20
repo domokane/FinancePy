@@ -18,7 +18,7 @@ from ..models.sobol import get_gaussian_sobol
 
 
 def _value_mc_nonumba_nonumpy(
-    s, t, k, option_type, r, q, v, num_paths, seed, use_sobol
+    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
 ):
     # SLOWEST - No use of NUMPY vectorisation or NUMBA
 
@@ -36,7 +36,7 @@ def _value_mc_nonumba_nonumpy(
 
     ss = s * exp((mu - v2 / 2.0) * t)
 
-    if option_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * v_sqrt_t)
@@ -44,7 +44,7 @@ def _value_mc_nonumba_nonumpy(
             payoff += max(s_1 - k, 0.0)
             payoff += max(s_2 - k, 0.0)
 
-    elif option_type == OptionTypes.EUROPEAN_PUT.value:
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * v_sqrt_t)
@@ -62,7 +62,9 @@ def _value_mc_nonumba_nonumpy(
 ###############################################################################
 
 
-def _value_mc_numpy_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sobol):
+def _value_mc_numpy_only(
+    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
+):
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -82,10 +84,10 @@ def _value_mc_numpy_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sob
     s_2 = ss / m
 
     # Not sure if it is correct to do antithetics with sobols but why not ?
-    if option_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1 - k, 0.0)
         payoff_a_2 = np.maximum(s_2 - k, 0.0)
-    elif option_type == OptionTypes.EUROPEAN_PUT.value:
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
         payoff_a_1 = np.maximum(k - s_1, 0.0)
         payoff_a_2 = np.maximum(k - s_2, 0.0)
     else:
@@ -101,12 +103,23 @@ def _value_mc_numpy_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sob
 
 @njit(
     float64(
-        float64, float64, float64, int64, float64, float64, float64, int64, int64, int64
+        float64,
+        float64,
+        float64,
+        int64,
+        float64,
+        float64,
+        float64,
+        int64,
+        int64,
+        int64,
     ),
     cache=True,
     fastmath=True,
 )
-def _value_mc_numpy_numba(s, t, k, option_type, r, q, v, num_paths, seed, use_sobol):
+def _value_mc_numpy_numba(
+    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
+):
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -126,10 +139,10 @@ def _value_mc_numpy_numba(s, t, k, option_type, r, q, v, num_paths, seed, use_so
     s_2 = ss / m
 
     # Not sure if it is correct to do antithetics with sobols but why not ?
-    if option_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1 - k, 0.0)
         payoff_a_2 = np.maximum(s_2 - k, 0.0)
-    elif option_type == OptionTypes.EUROPEAN_PUT.value:
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
         payoff_a_1 = np.maximum(k - s_1, 0.0)
         payoff_a_2 = np.maximum(k - s_2, 0.0)
     else:
@@ -145,12 +158,23 @@ def _value_mc_numpy_numba(s, t, k, option_type, r, q, v, num_paths, seed, use_so
 
 @njit(
     float64(
-        float64, float64, float64, int64, float64, float64, float64, int64, int64, int64
+        float64,
+        float64,
+        float64,
+        int64,
+        float64,
+        float64,
+        float64,
+        int64,
+        int64,
+        int64,
     ),
     fastmath=True,
     cache=True,
 )
-def _value_mc_numba_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sobol):
+def _value_mc_numba_only(
+    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
+):
     # No use of Numpy vectorisation but NUMBA
 
     num_paths = int(num_paths)
@@ -167,7 +191,7 @@ def _value_mc_numba_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sob
 
     ss = s * np.exp((mu - v2 / 2.0) * t)
 
-    if option_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
 
         for i in range(0, num_paths):
             gg = g[i]
@@ -176,7 +200,7 @@ def _value_mc_numba_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sob
             payoff += max(s_1 - k, 0.0)
             payoff += max(s_2 - k, 0.0)
 
-    elif option_type == OptionTypes.EUROPEAN_PUT.value:
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
 
         for i in range(0, num_paths):
             gg = g[i]
@@ -197,12 +221,23 @@ def _value_mc_numba_only(s, t, k, option_type, r, q, v, num_paths, seed, use_sob
 
 @njit(
     float64(
-        float64, float64, float64, int64, float64, float64, float64, int64, int64, int64
+        float64,
+        float64,
+        float64,
+        int64,
+        float64,
+        float64,
+        float64,
+        int64,
+        int64,
+        int64,
     ),
     fastmath=True,
     cache=True,
 )
-def _value_mc_numba_parallel(s, t, k, option_type, r, q, v, num_paths, seed, use_sobol):
+def _value_mc_numba_parallel(
+    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
+):
     # No use of Numpy vectorisation but NUMBA
 
     num_paths = int(num_paths)
@@ -221,7 +256,7 @@ def _value_mc_numba_parallel(s, t, k, option_type, r, q, v, num_paths, seed, use
     payoff1 = 0.0
     payoff2 = 0.0
 
-    if option_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * v_sqrt_t)
@@ -229,7 +264,7 @@ def _value_mc_numba_parallel(s, t, k, option_type, r, q, v, num_paths, seed, use
             payoff1 += max(s_1 - k, 0.0)
             payoff2 += max(s_2 - k, 0.0)
 
-    elif option_type == OptionTypes.EUROPEAN_PUT.value:
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
 
         for i in range(0, num_paths):
             s_1 = ss * exp(+g[i] * v_sqrt_t)

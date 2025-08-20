@@ -38,10 +38,10 @@ num_time_steps = 100
 
 
 def test_european_call_bk():
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.20
     a = 0.1
@@ -54,10 +54,10 @@ def test_european_call_bk():
 
 
 def test_american_call_bk():
-    option_type = OptionTypes.AMERICAN_CALL
+    opt_type = OptionTypes.AMERICAN_CALL
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.01
     a = 0.1
@@ -69,10 +69,10 @@ def test_american_call_bk():
 
 
 def test_european_put_bk():
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.01
     a = 0.1
@@ -84,10 +84,10 @@ def test_european_put_bk():
 
 
 def test_american_put_bk():
-    option_type = OptionTypes.AMERICAN_PUT
+    opt_type = OptionTypes.AMERICAN_PUT
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.02
     a = 0.1
@@ -99,10 +99,10 @@ def test_american_put_bk():
 
 
 def test_european_call_bdt():
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.20
     model = BDTTree(sigma, num_time_steps)
@@ -113,10 +113,10 @@ def test_european_call_bdt():
 
 
 def test_american_call_bdt():
-    option_type = OptionTypes.AMERICAN_CALL
+    opt_type = OptionTypes.AMERICAN_CALL
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.20
     model = BDTTree(sigma, num_time_steps)
@@ -127,10 +127,10 @@ def test_american_call_bdt():
 
 
 def test_european_put_bdt():
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.01
     model = BDTTree(sigma, num_time_steps)
@@ -141,10 +141,10 @@ def test_european_put_bdt():
 
 
 def test_american_put_bdt():
-    option_type = OptionTypes.AMERICAN_PUT
+    opt_type = OptionTypes.AMERICAN_PUT
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.02
     model = BDTTree(sigma, num_time_steps)
@@ -157,11 +157,11 @@ def test_american_put_bdt():
 # Results different from TestFinBondOptionHWModel.py
 # because t_mat != 10.0
 def test_european_call_hw():
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100
     num_time_steps = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.01
     a = 0.1
@@ -173,10 +173,10 @@ def test_european_call_hw():
 
 
 def test_american_call_hw():
-    option_type = OptionTypes.AMERICAN_CALL
+    opt_type = OptionTypes.AMERICAN_CALL
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.01
     a = 0.1
@@ -188,10 +188,10 @@ def test_american_call_hw():
 
 
 def test_european_put_hw():
-    option_type = OptionTypes.EUROPEAN_PUT
+    opt_type = OptionTypes.EUROPEAN_PUT
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.01
     a = 0.1
@@ -203,10 +203,10 @@ def test_european_put_hw():
 
 
 def test_american_put_hw():
-    option_type = OptionTypes.AMERICAN_PUT
+    opt_type = OptionTypes.AMERICAN_PUT
     strike_price = 100
 
-    bond_option = BondOption(bond, expiry_dt, strike_price, option_type)
+    bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
     sigma = 0.02
     a = 0.1

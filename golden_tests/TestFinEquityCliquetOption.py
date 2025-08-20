@@ -3,6 +3,7 @@
 ###############################################################################
 
 import sys
+
 sys.path.append("..")
 
 from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
@@ -23,12 +24,11 @@ def test_EquityCliquetOption():
     start_dt = Date(1, 1, 2014)
     final_expiry_dt = Date(1, 1, 2017)
     freq_type = FrequencyTypes.QUARTERLY
-    option_type = OptionTypes.EUROPEAN_CALL
+    opt_type = OptionTypes.EUROPEAN_CALL
 
-    cliquetOption = EquityCliquetOption(start_dt,
-                                        final_expiry_dt,
-                                        option_type,
-                                        freq_type)
+    cliquetOption = EquityCliquetOption(
+        start_dt, final_expiry_dt, opt_type, freq_type
+    )
 
     value_dt = Date(1, 1, 2015)
     stock_price = 100.0
@@ -39,14 +39,13 @@ def test_EquityCliquetOption():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    v = cliquetOption.value(value_dt,
-                            stock_price,
-                            discount_curve,
-                            dividend_curve,
-                            model)
+    v = cliquetOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("FINANCEPY", v)
+
 
 ###############################################################################
 

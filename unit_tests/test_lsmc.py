@@ -2,7 +2,7 @@ from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.models.equity_crr_tree import crr_tree_val_avg
-from financepy.models.equity_lsmc import equity_lsmc, FIT_TYPES
+from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -22,7 +22,7 @@ def test_american_call():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2017)
     # TODO MAKE WORK WITH EUROPEAN OPTIONS
-    option_type = OptionTypes.AMERICAN_CALL
+    opt_type = OptionTypes.AMERICAN_CALL
 
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
     num_steps_per_year = 500
@@ -37,10 +37,10 @@ def test_american_call():
         num_steps_per_year,
         num_paths,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
         poly_degree,
-        FIT_TYPES.LAGUERRE.value,
+        BoundaryFitTypes.LAGUERRE.value,
         0,
         0,
     )
@@ -52,7 +52,7 @@ def test_american_call():
         volatility,  # Black scholes volatility
         50,  # num_steps_per_year,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
     )
 
@@ -72,7 +72,7 @@ def test_american_put():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2017)
     # TODO MAKE WORK WITH EUROPEAN OPTIONS
-    option_type = OptionTypes.AMERICAN_PUT
+    opt_type = OptionTypes.AMERICAN_PUT
 
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
     num_steps_per_year = 500
@@ -87,10 +87,10 @@ def test_american_put():
         num_steps_per_year,
         num_paths,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
         poly_degree,
-        FIT_TYPES.LAGUERRE.value,
+        BoundaryFitTypes.LAGUERRE.value,
         0,
         0,
     )
@@ -102,7 +102,7 @@ def test_american_put():
         volatility,  # Black scholes volatility
         50,  # num_steps_per_year,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
     )
     assert v_ls == approx(value["value"], abs=1e-1)
@@ -114,8 +114,8 @@ def test_call_option():
     """
     expiry_dt = Date(1, 7, 2015)
     strike_price = 100.0
-    option_type = OptionTypes.EUROPEAN_CALL
-    call_option = EquityVanillaOption(expiry_dt, strike_price, option_type)
+    opt_type = OptionTypes.EUROPEAN_CALL
+    call_option = EquityVanillaOption(expiry_dt, strike_price, opt_type)
 
     value_dt = Date(1, 1, 2015)
     spot_price = 100
@@ -131,7 +131,9 @@ def test_call_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
+    v0 = call_option.value(
+        value_dt, spot_price, discount_curve, dividend_curve, model
+    )
 
     v_ls = equity_lsmc(
         spot_price,
@@ -141,10 +143,10 @@ def test_call_option():
         num_steps_per_year,
         num_paths,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
         poly_degree,
-        FIT_TYPES.LAGUERRE.value,
+        BoundaryFitTypes.LAGUERRE.value,
         0,
         0,
     )
@@ -157,8 +159,8 @@ def test_put_option():
     """
     expiry_dt = Date(1, 7, 2015)
     strike_price = 100.0
-    option_type = OptionTypes.EUROPEAN_PUT
-    put_option = EquityVanillaOption(expiry_dt, strike_price, option_type)
+    opt_type = OptionTypes.EUROPEAN_PUT
+    put_option = EquityVanillaOption(expiry_dt, strike_price, opt_type)
 
     value_dt = Date(1, 1, 2015)
     spot_price = 100
@@ -174,7 +176,9 @@ def test_put_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
+    v0 = put_option.value(
+        value_dt, spot_price, discount_curve, dividend_curve, model
+    )
     v_ls = equity_lsmc(
         spot_price,
         risk_free_rate,
@@ -183,10 +187,10 @@ def test_put_option():
         num_steps_per_year,
         num_paths,
         time_to_expiry,
-        option_type.value,
+        opt_type.value,
         strike_price,
         poly_degree,
-        FIT_TYPES.LAGUERRE.value,
+        BoundaryFitTypes.LAGUERRE.value,
         0,
         0,
     )

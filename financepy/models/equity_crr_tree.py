@@ -2,29 +2,45 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ..utils.global_types import OptionTypes
 
 import numpy as np
 from numba import njit, float64, int64
 
-bump = 1e-4
+from ..utils.global_types import OptionTypes
+
+BUMP = 1e-4
 
 ###############################################################################
 ###############################################################################
 
 
-@njit(float64[:](float64, float64, float64, float64, int64, float64, int64,
-                 float64, int64), fastmath=True, cache=True)
-def crr_tree_val(stock_price,
-                 interest_rate,  # continuously compounded
-                 dividend_rate,  # continuously compounded
-                 volatility,  # Black scholes volatility
-                 num_steps_per_year,
-                 time_to_expiry,
-                 option_type,
-                 strike_price,
-                 isEven):
-    """ Value an American option using a Binomial Treee """
+@njit(
+    float64[:](
+        float64,
+        float64,
+        float64,
+        float64,
+        int64,
+        float64,
+        int64,
+        float64,
+        int64,
+    ),
+    fastmath=True,
+    cache=True,
+)
+def crr_tree_val(
+    stock_price,
+    interest_rate,  # continuously compounded
+    dividend_rate,  # continuously compounded
+    volatility,  # Black scholes volatility
+    num_steps_per_year,
+    time_to_expiry,
+    opt_type,
+    strike_price,
+    is_even,
+):
+    """Value an American option using a Binomial Treee"""
 
     num_steps = int(num_steps_per_year * time_to_expiry)
     num_steps = max(num_steps, 30)
@@ -33,12 +49,12 @@ def crr_tree_val(stock_price,
     num_steps = num_steps_per_year
 
     # if the number of steps is even but we want odd then make it odd
-    if num_steps % 2 == 0 and isEven == 0:
+    if num_steps % 2 == 0 and is_even == 0:
         num_steps += 1
-    elif num_steps % 2 == 1 and isEven == 1:
+    elif num_steps % 2 == 1 and is_even == 1:
         num_steps += 1
 
-#    print(num_steps)
+    #    print(num_steps)
     # this is the size of the step
     dt = time_to_expiry / num_steps
     r = interest_rate
@@ -78,13 +94,13 @@ def crr_tree_val(stock_price,
 
         s = stock_values[index + i_node]
 
-        if option_type == OptionTypes.EUROPEAN_CALL.value:
+        if opt_type == OptionTypes.EUROPEAN_CALL.value:
             option_values[index + i_node] = np.maximum(s - strike_price, 0.0)
-        elif option_type == OptionTypes.EUROPEAN_PUT.value:
+        elif opt_type == OptionTypes.EUROPEAN_PUT.value:
             option_values[index + i_node] = np.maximum(strike_price - s, 0.0)
-        elif option_type == OptionTypes.AMERICAN_CALL.value:
+        elif opt_type == OptionTypes.AMERICAN_CALL.value:
             option_values[index + i_node] = np.maximum(s - strike_price, 0.0)
-        elif option_type == OptionTypes.AMERICAN_PUT.value:
+        elif opt_type == OptionTypes.AMERICAN_PUT.value:
             option_values[index + i_node] = np.maximum(strike_price - s, 0.0)
 
     # begin backward steps from expiry to value date
@@ -98,13 +114,13 @@ def crr_tree_val(stock_price,
 
             exercise_value = 0.0
 
-            if option_type == OptionTypes.EUROPEAN_CALL.value:
+            if opt_type == OptionTypes.EUROPEAN_CALL.value:
                 exercise_value = 0.0
-            elif option_type == OptionTypes.EUROPEAN_PUT.value:
+            elif opt_type == OptionTypes.EUROPEAN_PUT.value:
                 exercise_value = 0.0
-            elif option_type == OptionTypes.AMERICAN_CALL.value:
+            elif opt_type == OptionTypes.AMERICAN_CALL.value:
                 exercise_value = np.maximum(s - strike_price, 0.0)
-            elif option_type == OptionTypes.AMERICAN_PUT.value:
+            elif opt_type == OptionTypes.AMERICAN_PUT.value:
                 exercise_value = np.maximum(strike_price - s, 0.0)
 
             next_index = int(0.5 * (i_time + 1) * (i_time + 2))
@@ -118,66 +134,79 @@ def crr_tree_val(stock_price,
             future_expected_value += (1.0 - probs[i_time]) * v_dn
             hold_value = period_dfs[i_time] * future_expected_value
 
-            if option_type == OptionTypes.EUROPEAN_CALL.value:
+            if opt_type == OptionTypes.EUROPEAN_CALL.value:
                 option_values[index + i_node] = hold_value
-            elif option_type == OptionTypes.EUROPEAN_PUT.value:
+            elif opt_type == OptionTypes.EUROPEAN_PUT.value:
                 option_values[index + i_node] = hold_value
-            elif option_type == OptionTypes.AMERICAN_CALL.value:
-                option_values[index +
-                              i_node] = np.maximum(exercise_value, hold_value)
-            elif option_type == OptionTypes.AMERICAN_PUT.value:
-                option_values[index +
-                              i_node] = np.maximum(exercise_value, hold_value)
+            elif opt_type == OptionTypes.AMERICAN_CALL.value:
+                option_values[index + i_node] = np.maximum(
+                    exercise_value, hold_value
+                )
+            elif opt_type == OptionTypes.AMERICAN_PUT.value:
+                option_values[index + i_node] = np.maximum(
+                    exercise_value, hold_value
+                )
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / \
-        (stock_values[2] - stock_values[1])
-    delta_up = (option_values[5] - option_values[4]) / \
-        (stock_values[5] - stock_values[4])
-    delta_dn = (option_values[4] - option_values[3]) / \
-        (stock_values[4] - stock_values[3])
+    delta = (option_values[2] - option_values[1]) / (
+        stock_values[2] - stock_values[1]
+    )
+    delta_up = (option_values[5] - option_values[4]) / (
+        stock_values[5] - stock_values[4]
+    )
+    delta_dn = (option_values[4] - option_values[3]) / (
+        stock_values[4] - stock_values[3]
+    )
     gamma = (delta_up - delta_dn) / (stock_values[2] - stock_values[1])
     theta = (option_values[4] - option_values[0]) / (2.0 * dt)
     results = np.array([price, delta, gamma, theta])
     return results
 
+
 ###############################################################################
 
 
-def crr_tree_val_avg(stock_price,
-                     interest_rate,  # continuously compounded
-                     dividend_rate,  # continuously compounded
-                     volatility,  # Black scholes volatility
-                     num_steps_per_year,
-                     time_to_expiry,
-                     option_type,
-                     strike_price):
-    """ Calculate the average values off the tree using an even and an odd
-    number of time steps. """
+def crr_tree_val_avg(
+    stock_price,
+    interest_rate,  # continuously compounded
+    dividend_rate,  # continuously compounded
+    volatility,  # Black scholes volatility
+    num_steps_per_year,
+    time_to_expiry,
+    opt_type,
+    strike_price,
+):
+    """Calculate the average values off the tree using an even and an odd
+    number of time steps."""
 
-    value1 = crr_tree_val(stock_price,
-                          interest_rate,
-                          dividend_rate,
-                          volatility,
-                          num_steps_per_year,
-                          time_to_expiry,
-                          option_type,
-                          strike_price,
-                          1)  # even
+    value1 = crr_tree_val(
+        stock_price,
+        interest_rate,
+        dividend_rate,
+        volatility,
+        num_steps_per_year,
+        time_to_expiry,
+        opt_type,
+        strike_price,
+        1,
+    )  # even
 
-    value2 = crr_tree_val(stock_price,
-                          interest_rate,
-                          dividend_rate,
-                          volatility,
-                          num_steps_per_year,
-                          time_to_expiry,
-                          option_type,
-                          strike_price,
-                          0)  # odd
+    value2 = crr_tree_val(
+        stock_price,
+        interest_rate,
+        dividend_rate,
+        volatility,
+        num_steps_per_year,
+        time_to_expiry,
+        opt_type,
+        strike_price,
+        0,
+    )  # odd
 
     v = (value1 + value2) / 2.0
-    res = {'value': v[0], 'delta': v[1], 'gamma': v[2], 'theta': v[3]}
+    res = {"value": v[0], "delta": v[1], "gamma": v[2], "theta": v[3]}
     return res
+
 
 ###############################################################################

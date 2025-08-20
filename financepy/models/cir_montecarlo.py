@@ -19,7 +19,7 @@ from ..utils.helpers import label_to_string
 
 
 class CIRNumericalScheme(Enum):
-    euler = 1
+    EULER = 1
     LOGNORMAL = 2
     MILSTEIN = 3
     KAHLJACKEL = 4
@@ -72,13 +72,18 @@ def variancer(r0, a, b, sigma, t):
 ###############################################################################
 
 
-@njit(float64(float64, float64, float64, float64, float64), fastmath=True, cache=True)
+@njit(
+    float64(float64, float64, float64, float64, float64),
+    fastmath=True,
+    cache=True,
+)
 def zero_price(r0, a, b, sigma, t):
     """Price of a zero coupon bond in CIR model."""
-    h = np.sqrt(a * a + 2.0 * sigma * sigma)
-    denom = 2.0 * h + (a + h) * (np.exp(h * t) - 1.0)
-    aa = (2.0 * h * np.exp((a + h) * t / 2.0) / denom) ** (2.0 * a * b / sigma / sigma)
-    bb = 2.0 * (np.exp(h * t) - 1.0) / denom
+    sigma2 = sigma * sigma
+    h = np.sqrt(a * a + 2.0 * sigma2)
+    denom = 2 * h + (a + h) * (np.exp(h * t) - 1.0)
+    aa = (2 * h * np.exp((a + h) * t / 2.0) / denom) ** (2.0 * a * b / sigma2)
+    bb = 2 * (np.exp(h * t) - 1.0) / denom
     zcb = aa * np.exp(-r0 * bb)
     return zcb
 
@@ -86,7 +91,11 @@ def zero_price(r0, a, b, sigma, t):
 ###############################################################################
 
 
-@njit(float64(float64, float64, float64, float64, float64), fastmath=True, cache=True)
+@njit(
+    float64(float64, float64, float64, float64, float64),
+    fastmath=True,
+    cache=True,
+)
 def draw(rt, a, b, sigma, dt):
     """Draw a next rate from the CIR model in Monte Carlo."""
     sigma2 = sigma * sigma
@@ -109,7 +118,11 @@ def draw(rt, a, b, sigma, dt):
 ###############################################################################
 
 
-@njit(float64[:](float64, float64, float64, float64, float64, float64, int64, int64))
+@njit(
+    float64[:](
+        float64, float64, float64, float64, float64, float64, int64, int64
+    )
+)
 def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     """Generate a path of CIR rates using a number of numerical schemes."""
 
@@ -119,7 +132,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     rate_path[0] = r0
     num_paths = 1
 
-    if scheme == CIRNumericalScheme.euler.value:
+    if scheme == CIRNumericalScheme.EULER.value:
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
@@ -158,7 +171,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         sigmasqrt_dt = sigma * np.sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
 
-        for i_path in range(0, num_paths):
+        for _ in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -177,7 +190,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         bhat = b - sigma * sigma / 4.0 / a
         sqrt_dt = np.sqrt(dt)
 
-        for i_path in range(0, num_paths):
+        for _ in range(0, num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -191,7 +204,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
 
     elif scheme == CIRNumericalScheme.EXACT.value:
 
-        for i_path in range(0, num_paths):
+        for _ in range(0, num_paths):
 
             r = r0
 
@@ -206,7 +219,17 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
 
 
 @njit(
-    float64(float64, float64, float64, float64, float64, float64, int64, int64, int64)
+    float64(
+        float64,
+        float64,
+        float64,
+        float64,
+        float64,
+        float64,
+        int64,
+        int64,
+        int64,
+    )
 )
 def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
     """Determine the CIR zero price using Monte Carlo."""
@@ -219,7 +242,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
     num_steps = int(t / dt)
     zcb = 0.0
 
-    if scheme == CIRNumericalScheme.euler.value:
+    if scheme == CIRNumericalScheme.EULER.value:
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
@@ -267,7 +290,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         sigmasqrt_dt = sigma * np.sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
 
-        for i_path in range(0, num_paths):
+        for _ in range(0, num_paths):
 
             r = r0
             rsum = r

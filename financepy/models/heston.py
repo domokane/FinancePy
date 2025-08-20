@@ -57,7 +57,9 @@ class HestonNumericalScheme(Enum):
     cache=True,
     fastmath=True,
 )
-def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, scheme):
+def get_paths(
+    s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, scheme
+):
 
     np.random.seed(seed)
     num_steps = int(t / dt)
@@ -138,7 +140,11 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, sc
                 u = np.random.uniform(0.0, 1.0)
 
                 if psi <= psic:
-                    b2 = 2.0 / psi - 1.0 + np.sqrt((2.0 / psi) * (2.0 / psi - 1.0))
+                    b2 = (
+                        2.0 / psi
+                        - 1.0
+                        + np.sqrt((2.0 / psi) * (2.0 / psi - 1.0))
+                    )
                     a = m / (1.0 + b2)
                     b = np.sqrt(b2)
                     zV = norminvcdf(u)
@@ -227,9 +233,9 @@ class Heston:
             schemeValue,
         )
 
-        if option.option_type == OptionTypes.EUROPEAN_CALL:
+        if option.opt_type == OptionTypes.EUROPEAN_CALL:
             path_payoff = np.maximum(s_paths[:, -1] - K, 0.0)
-        elif option.option_type == OptionTypes.EUROPEAN_PUT:
+        elif option.opt_type == OptionTypes.EUROPEAN_PUT:
             path_payoff = np.maximum(K - s_paths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")
@@ -240,7 +246,9 @@ class Heston:
 
     ###############################################################################
 
-    def value_lewis(self, value_dt, option, stock_price, interest_rate, dividend_yield):
+    def value_lewis(
+        self, value_dt, option, stock_price, interest_rate, dividend_yield
+    ):
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -277,7 +285,11 @@ class Heston:
 
         def phi_transform(x):
             def integrand(k):
-                return 2.0 * np.real(np.exp(-1j * k * x) * phi(k)) / (k**2 + 1.0 / 4.0)
+                return (
+                    2.0
+                    * np.real(np.exp(-1j * k * x) * phi(k))
+                    / (k**2 + 1.0 / 4.0)
+                )
 
             return integrate.quad(integrand, 0, np.inf)[0]
 
@@ -314,7 +326,8 @@ class Heston:
             q = V * tau / 2.0
             Q = np.exp(-e * q)
             H = np.exp(
-                (2.0 * kappa * theta / V) * (q * g - np.log((1.0 - h * Q) / (1.0 - h)))
+                (2.0 * kappa * theta / V)
+                * (q * g - np.log((1.0 - h * Q) / (1.0 - h)))
                 + v0 * g * (1.0 - Q) / (1.0 - h * Q)
             )
             integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
@@ -332,7 +345,9 @@ class Heston:
     # Taken from Nick Weber's VBA Finance book
     ###############################################################################
 
-    def value_weber(self, value_dt, option, stock_price, interest_rate, dividend_yield):
+    def value_weber(
+        self, value_dt, option, stock_price, interest_rate, dividend_yield
+    ):
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -357,7 +372,10 @@ class Heston:
                 B = (beta - d) * (1.0 - Q) / (1.0 - g * Q) / V
                 A = (
                     kappa
-                    * ((beta - d) * tau - 2.0 * np.log((1.0 - g * Q) / (1.0 - g)))
+                    * (
+                        (beta - d) * tau
+                        - 2.0 * np.log((1.0 - g * Q) / (1.0 - g))
+                    )
                     / V
                 )
                 v = np.exp(
@@ -370,9 +388,9 @@ class Heston:
             area = 0.50 + (1.0 / pi) * integrate.quad(integrand, 0, np.inf)[0]
             return area
 
-        v = s0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - exp(-r * tau) * K * f(
-            -1.0, kappa
-        )
+        v = s0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - exp(
+            -r * tau
+        ) * K * f(-1.0, kappa)
 
         return v
 
@@ -413,7 +431,8 @@ class Heston:
                 Q = np.exp(-d * tau)
                 D = rminus * (1.0 - Q) / (1.0 - R * Q)
                 C = kappa * (
-                    rminus * tau - (2.0 / V) * np.log((1.0 - R * Q) / (1.0 - R))
+                    rminus * tau
+                    - (2.0 / V) * np.log((1.0 - R * Q) / (1.0 - R))
                 )
                 phi = np.exp(C * theta + D * v0 + 1j * u * x0) / (1j * u)
                 return phi.real

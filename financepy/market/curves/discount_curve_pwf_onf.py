@@ -35,8 +35,8 @@ class DiscountCurvePWFONF(DiscountCurve):
     ):
         """
         Creates a discount curve using a vector of times and ON fwd rates
-        The fwd rate is right-continuous i.e. a given value in the
-        input is applied to the left of that date until the previous date exclusive
+        The fwd rate is right-continuous i.e. a given value in the input
+        is applied to the left of that date until the previous date exclusive
         The last fwd rate is extrapolated into the future
         """
 
@@ -77,7 +77,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-    ###############################################################################
+    ###########################################################################
 
     @classmethod
     def brick_wall_curve(
@@ -87,13 +87,17 @@ class DiscountCurvePWFONF(DiscountCurve):
         end_dt: Date,
         level: float = 1.0 * G_BASIS_POINT,
     ):
-        """Generate a discount curve of the shape f(t) = level*1_{startdate < t <= enddate} where f(.) is the instantaneous forward rate
-            Mostly useful for applying bumps to other discount_curve's, see composite_discount_curve.py
+        """Generate a discount curve of the shape
+                    f(t) = level*1_{startdate < t <= enddate}
+                    where f(.) is the instantaneous forward rate
+           Mostly useful for applying bumps to other discount_curve's,
+           see composite_discount_curve.py
         Args:
             valuation_date (Date): valuation date for the discount_curve
             start_dt (Date): start of the non-zero ON forward rate
             end_dt (Date): end of the non-zero ON forward rate
-            level (float, optional): ON forward rate between the start and end dates. Defaults to 1.0*G_BASIS_POINT.
+            level (float, optional): ON forward rate between the
+            start and end dates. Defaults to 1.0*G_BASIS_POINT.
 
         Returns:
             DiscountCurve: discount curve of the required shape
@@ -102,7 +106,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         onfwd_rates = [0.0, level, 0.0]
         return cls(valuation_date, knot_dts, onfwd_rates)
 
-    ###############################################################################
+    ###########################################################################
 
     @classmethod
     def flat_curve(
@@ -112,7 +116,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         onfwd_rates = [level]
         return cls(valuation_date, knot_dts, onfwd_rates)
 
-    ###############################################################################
+    ###########################################################################
 
     def _zero_rate(self, times: Union[float, np.ndarray, list]):
         """
@@ -129,11 +133,11 @@ class DiscountCurvePWFONF(DiscountCurve):
         zero_rates = -ldfs / times
         return zero_rates
 
-    ###############################################################################
+    ###########################################################################
 
     def df_t(self, t: Union[float, np.ndarray]):
-        """Return discount factors given a single or vector of times in years. The
-        discount factor depends on the rate and this in turn depends on its
+        """Return discount factors given a single or vector of times in years.
+        The discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
         also depends on the day count convention. This was set in the
         construction of the curve to be ACT_ACT_ISDA."""
@@ -146,7 +150,7 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         return df
 
-    ###############################################################################
+    ###########################################################################
 
     def __repr__(self):
 
@@ -157,7 +161,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         s += label_to_string("FREQUENCY", (self.freq_type))
         return s
 
-    ###############################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

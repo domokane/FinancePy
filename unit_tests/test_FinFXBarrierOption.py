@@ -35,13 +35,13 @@ K = 100.0
 
 def test_DOWN_AND_OUT_CALL():
     spot_fx_rate = 50
-    option_type = FinFXBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = FinFXBarrierTypes.DOWN_AND_OUT_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -72,13 +72,13 @@ def test_DOWN_AND_OUT_CALL():
 
 def test_DOWN_AND_IN_CALL():
     spot_fx_rate = 100
-    option_type = FinFXBarrierTypes.DOWN_AND_IN_CALL
+    opt_type = FinFXBarrierTypes.DOWN_AND_IN_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -109,13 +109,13 @@ def test_DOWN_AND_IN_CALL():
 
 def test_UP_AND_OUT_CALL():
     spot_fx_rate = 50
-    option_type = FinFXBarrierTypes.UP_AND_OUT_CALL
+    opt_type = FinFXBarrierTypes.UP_AND_OUT_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -146,13 +146,13 @@ def test_UP_AND_OUT_CALL():
 
 def test_UP_AND_IN_CALL():
     spot_fx_rate = 100
-    option_type = FinFXBarrierTypes.UP_AND_IN_CALL
+    opt_type = FinFXBarrierTypes.UP_AND_IN_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -183,13 +183,13 @@ def test_UP_AND_IN_CALL():
 
 def test_UP_AND_OUT_PUT():
     spot_fx_rate = 50
-    option_type = FinFXBarrierTypes.UP_AND_OUT_PUT
+    opt_type = FinFXBarrierTypes.UP_AND_OUT_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -220,13 +220,13 @@ def test_UP_AND_OUT_PUT():
 
 def test_UP_AND_IN_PUT():
     spot_fx_rate = 100
-    option_type = FinFXBarrierTypes.UP_AND_IN_PUT
+    opt_type = FinFXBarrierTypes.UP_AND_IN_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -257,13 +257,13 @@ def test_UP_AND_IN_PUT():
 
 def test_DOWN_AND_OUT_PUT():
     spot_fx_rate = 50
-    option_type = FinFXBarrierTypes.DOWN_AND_OUT_PUT
+    opt_type = FinFXBarrierTypes.DOWN_AND_OUT_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,
@@ -294,13 +294,13 @@ def test_DOWN_AND_OUT_PUT():
 
 def test_DOWN_AND_IN_PUT():
     spot_fx_rate = 100
-    option_type = FinFXBarrierTypes.DOWN_AND_IN_PUT
+    opt_type = FinFXBarrierTypes.DOWN_AND_IN_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
         K,
         currency_pair,
-        option_type,
+        opt_type,
         B,
         num_observations_per_year,
         notional,

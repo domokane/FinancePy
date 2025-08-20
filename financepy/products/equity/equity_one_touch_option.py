@@ -135,7 +135,7 @@ class EquityOneTouchOption(EquityOption):
     def __init__(
         self,
         expiry_dt: Date,
-        option_type: TouchOptionTypes,
+        opt_type: TouchOptionTypes,
         barrier_price: float,
         payment_size: float = 1.0,
     ):
@@ -145,7 +145,7 @@ class EquityOneTouchOption(EquityOption):
         check_argument_types(self.__init__, locals())
 
         self.expiry_dt = expiry_dt
-        self.option_type = option_type
+        self.opt_type = opt_type
         self.barrier_price = float(barrier_price)
         self.payment_size = payment_size
 
@@ -172,10 +172,14 @@ class EquityOneTouchOption(EquityOption):
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
-            raise FinError("Discount Curve date not same as option valuation date")
+            raise FinError(
+                "Discount Curve date not same as option valuation date"
+            )
 
         if dividend_curve.value_dt != value_dt:
-            raise FinError("Dividend Curve date not same as option valuation date")
+            raise FinError(
+                "Dividend Curve date not same as option valuation date"
+            )
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         t = max(t, 1e-6)
@@ -207,7 +211,7 @@ class EquityOneTouchOption(EquityOption):
 
         # Reference Option Pricing Formulas by Espen Gaarder Haug. Page 176.
 
-        if self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
+        if self.opt_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
             if np.any(s0 <= H):
@@ -222,7 +226,7 @@ class EquityOneTouchOption(EquityOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
             # HAUG 2
 
             if np.any(s0 >= H):
@@ -237,7 +241,7 @@ class EquityOneTouchOption(EquityOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
             # HAUG 3
 
             if np.any(s0 <= H):
@@ -253,7 +257,7 @@ class EquityOneTouchOption(EquityOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
             # HAUG 4
 
             if np.any(s0 >= H):
@@ -269,7 +273,7 @@ class EquityOneTouchOption(EquityOption):
             v = (A5_1 + A5_2) * K
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
             # HAUG 5
 
             if np.any(s0 <= H):
@@ -289,7 +293,7 @@ class EquityOneTouchOption(EquityOption):
             v = B2 + B4
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
             # HAUG 6
 
             if np.any(s0 >= H):
@@ -310,7 +314,7 @@ class EquityOneTouchOption(EquityOption):
             v = B2 + B4
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 7
 
             if np.any(s0 <= H):
@@ -322,11 +326,13 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            A4 = (
+                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            )
             v = A2 + A4
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
             if np.any(s0 >= H):
@@ -338,11 +344,13 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            A4 = (
+                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            )
             v = A2 + A4
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
             # HAUG 9
 
             if np.any(s0 <= H):
@@ -363,7 +371,7 @@ class EquityOneTouchOption(EquityOption):
             v = B2 - B4
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
             # HAUG 10
 
             if np.any(s0 >= H):
@@ -384,7 +392,7 @@ class EquityOneTouchOption(EquityOption):
             v = B2 - B4
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if np.any(s0 <= H):
@@ -397,11 +405,13 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            A4 = (
+                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            )
             v = A2 - A4
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 12
 
             if np.any(s0 >= H):
@@ -414,7 +424,9 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(H / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-q * t)
             A2 = s0 * dq * n_vect(phi * x2)
-            A4 = s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            A4 = (
+                s0 * dq * np.power(H / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
+            )
             v = A2 - A4
             return v
 
@@ -456,14 +468,16 @@ class EquityOneTouchOption(EquityOption):
         s0 = stock_price
         mu = r - q
 
-        time_grid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
+        time_grid, s = get_paths_times(
+            num_paths, num_time_steps, t, mu, s0, v, seed
+        )
 
         H = self.barrier_price
         X = self.payment_size
 
         v = 0.0
 
-        if self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
+        if self.opt_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT:
             # HAUG 1
 
             if s0 <= H:
@@ -473,7 +487,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
             # HAUG 2
 
             if s0 >= H:
@@ -483,7 +497,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
             # HAUG 3
 
             if s0 <= H:
@@ -492,7 +506,7 @@ class EquityOneTouchOption(EquityOption):
             v = _barrier_pay_one_at_hit_pv_down(s, H, r, dt) * H
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
             # HAUG 4
 
             if s0 >= H:
@@ -501,7 +515,7 @@ class EquityOneTouchOption(EquityOption):
             v = _barrier_pay_one_at_hit_pv_up(s, H, r, dt) * H
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
             # HAUG 5
 
             if s0 <= H:
@@ -511,7 +525,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X * np.exp(-r * t)
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
             # HAUG 6
 
             if s0 >= H:
@@ -521,7 +535,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X * np.exp(-r * t)
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 7
 
             if s0 <= H:
@@ -530,7 +544,7 @@ class EquityOneTouchOption(EquityOption):
             v = _barrier_pay_one_at_hit_pv_down(s, H, 0.0, dt) * H
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
+        elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
             if s0 >= H:
@@ -539,7 +553,7 @@ class EquityOneTouchOption(EquityOption):
             v = _barrier_pay_one_at_hit_pv_up(s, H, 0.0, dt) * H
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
             # HAUG 9
 
             if s0 <= H:
@@ -549,7 +563,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X * np.exp(-r * t)
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
             # HAUG 10
 
             if s0 >= H:
@@ -559,7 +573,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * X * np.exp(-r * t)
             return v
 
-        elif self.option_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 11
 
             if s0 <= H:
@@ -569,7 +583,7 @@ class EquityOneTouchOption(EquityOption):
             v = v * np.exp(-r * t)
             return v
 
-        elif self.option_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
+        elif self.opt_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
             # HAUG 12
 
             if s0 >= H:
@@ -588,7 +602,7 @@ class EquityOneTouchOption(EquityOption):
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
-        s += label_to_string("OPTION TYPE", self.option_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("BARRIER LEVEL", self.barrier_price)
         s += label_to_string("PAYMENT SIZE", self.payment_size, "")
         return s

@@ -40,7 +40,9 @@ def _f(s0, *args):
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits k_1")
 
-    obj_fn = self.value(value_dt, s0, discount_curve, dividend_curve, model) - value
+    obj_fn = (
+        self.value(value_dt, s0, discount_curve, dividend_curve, model) - value
+    )
 
     return obj_fn
 
@@ -50,7 +52,7 @@ def _f(s0, *args):
 
 @njit(fastmath=True, cache=True)
 def _value_once(
-    s, r, q, volatility, t1, t2, option_type1, option_type2, k1, k2, num_steps
+    s, r, q, volatility, t1, t2, opt_type1, opt_type2, k1, k2, num_steps
 ):
 
     if num_steps < 3:
@@ -117,13 +119,13 @@ def _value_once(
     for i_node in range(0, i_time + 1):
         s = stock_values[index + i_node]
         if (
-            option_type2 == OptionTypes.EUROPEAN_CALL
-            or option_type2 == OptionTypes.AMERICAN_CALL
+            opt_type2 == OptionTypes.EUROPEAN_CALL
+            or opt_type2 == OptionTypes.AMERICAN_CALL
         ):
             option_values[index + i_node] = max(s - k2, 0.0)
         elif (
-            option_type2 == OptionTypes.EUROPEAN_PUT
-            or option_type2 == OptionTypes.AMERICAN_PUT
+            opt_type2 == OptionTypes.EUROPEAN_PUT
+            or opt_type2 == OptionTypes.AMERICAN_PUT
         ):
             option_values[index + i_node] = max(k2 - s, 0.0)
 
@@ -143,9 +145,9 @@ def _value_once(
 
             exercise_value = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
-            if option_type1 == OptionTypes.AMERICAN_CALL:
+            if opt_type1 == OptionTypes.AMERICAN_CALL:
                 exercise_value = max(s - k2, 0.0)
-            elif option_type1 == OptionTypes.AMERICAN_PUT:
+            elif opt_type1 == OptionTypes.AMERICAN_PUT:
                 exercise_value = max(k2 - s, 0.0)
 
             option_values[index + i_node] = max(exercise_value, hold_value)
@@ -166,13 +168,13 @@ def _value_once(
         hold_value = period_dfs[i_time] * future_exp_val
 
         if (
-            option_type1 == OptionTypes.EUROPEAN_CALL
-            or option_type1 == OptionTypes.AMERICAN_CALL
+            opt_type1 == OptionTypes.EUROPEAN_CALL
+            or opt_type1 == OptionTypes.AMERICAN_CALL
         ):
             option_values[index + i_node] = max(hold_value - k1, 0.0)
         elif (
-            option_type1 == OptionTypes.EUROPEAN_PUT
-            or option_type1 == OptionTypes.AMERICAN_PUT
+            opt_type1 == OptionTypes.EUROPEAN_PUT
+            or opt_type1 == OptionTypes.AMERICAN_PUT
         ):
             option_values[index + i_node] = max(k1 - hold_value, 0.0)
 
@@ -195,9 +197,9 @@ def _value_once(
 
             exercise_value = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
-            if option_type1 == OptionTypes.AMERICAN_CALL:
+            if opt_type1 == OptionTypes.AMERICAN_CALL:
                 exercise_value = max(hold_value - k1, 0.0)
-            elif option_type1 == OptionTypes.AMERICAN_PUT:
+            elif opt_type1 == OptionTypes.AMERICAN_PUT:
                 exercise_value = max(k1 - hold_value, 0.0)
 
             option_values[index + i_node] = max(exercise_value, hold_value)
@@ -214,7 +216,9 @@ def _value_once(
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / (stock_values[2] - stock_values[1])
+    delta = (option_values[2] - option_values[1]) / (
+        stock_values[2] - stock_values[1]
+    )
     delta_up = (option_values[5] - option_values[4]) / (
         stock_values[5] - stock_values[4]
     )
@@ -239,10 +243,10 @@ class EquityCompoundOption(EquityOption):
     def __init__(
         self,
         c_expiry_dt: Date,  # Compound Option expiry date
-        c_option_type: OptionTypes,  # Compound option type
+        c_opt_type: OptionTypes,  # Compound option type
         c_strike_price: float,  # Compound option strike
         u_expiry_dt: Date,  # Underlying option expiry date
-        u_option_type: OptionTypes,  # Underlying option type
+        u_opt_type: OptionTypes,  # Underlying option type
         u_strike_price: float,
     ):  # Underlying option strike price
         """Create the EquityCompoundOption by passing in the first and
@@ -252,21 +256,25 @@ class EquityCompoundOption(EquityOption):
         check_argument_types(self.__init__, locals())
 
         if c_expiry_dt > u_expiry_dt:
-            raise FinError("Compound expiry date must precede underlying expiry date")
+            raise FinError(
+                "Compound expiry date must precede underlying expiry date"
+            )
 
         if (
-            c_option_type != OptionTypes.EUROPEAN_CALL
-            and c_option_type != OptionTypes.AMERICAN_CALL
-            and c_option_type != OptionTypes.EUROPEAN_PUT
-            and c_option_type != OptionTypes.AMERICAN_PUT
+            c_opt_type != OptionTypes.EUROPEAN_CALL
+            and c_opt_type != OptionTypes.AMERICAN_CALL
+            and c_opt_type != OptionTypes.EUROPEAN_PUT
+            and c_opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError("Compound option must be European or American call or put.")
+            raise FinError(
+                "Compound option must be European or American call or put."
+            )
 
         if (
-            u_option_type != OptionTypes.EUROPEAN_CALL
-            and u_option_type != OptionTypes.AMERICAN_CALL
-            and u_option_type != OptionTypes.EUROPEAN_PUT
-            and u_option_type != OptionTypes.AMERICAN_PUT
+            u_opt_type != OptionTypes.EUROPEAN_CALL
+            and u_opt_type != OptionTypes.AMERICAN_CALL
+            and u_opt_type != OptionTypes.EUROPEAN_PUT
+            and u_opt_type != OptionTypes.AMERICAN_PUT
         ):
             raise FinError(
                 "Underlying Option must be European or American call or put."
@@ -274,11 +282,11 @@ class EquityCompoundOption(EquityOption):
 
         self.c_expiry_dt = c_expiry_dt
         self.c_strike_price = float(c_strike_price)
-        self.c_option_type = c_option_type
+        self.c_opt_type = c_opt_type
 
         self.u_expiry_dt = u_expiry_dt
         self.u_strike_price = float(u_strike_price)
-        self.u_option_type = u_option_type
+        self.u_opt_type = u_opt_type
 
     ###########################################################################
 
@@ -317,10 +325,10 @@ class EquityCompoundOption(EquityOption):
 
         # If the option has any American feature then use the tree
         if (
-            self.c_option_type == OptionTypes.AMERICAN_CALL
-            or self.u_option_type == OptionTypes.AMERICAN_CALL
-            or self.c_option_type == OptionTypes.AMERICAN_PUT
-            or self.u_option_type == OptionTypes.AMERICAN_PUT
+            self.c_opt_type == OptionTypes.AMERICAN_CALL
+            or self.u_opt_type == OptionTypes.AMERICAN_CALL
+            or self.c_opt_type == OptionTypes.AMERICAN_PUT
+            or self.u_opt_type == OptionTypes.AMERICAN_PUT
         ):
 
             v = self._value_tree(
@@ -360,7 +368,7 @@ class EquityCompoundOption(EquityOption):
             self.u_expiry_dt,
             kc,
             ku,
-            self.u_option_type,
+            self.u_opt_type,
             ru,
             q,
             model,
@@ -381,25 +389,25 @@ class EquityCompoundOption(EquityOption):
         call_type = OptionTypes.EUROPEAN_CALL
         put_type = OptionTypes.EUROPEAN_PUT
 
-        if self.c_option_type == call_type and self.u_option_type == call_type:
+        if self.c_opt_type == call_type and self.u_opt_type == call_type:
             v = (
                 s0 * dqu * phi2(a1, b1, c)
                 - ku * dfu * phi2(a2, b2, c)
                 - dfc * kc * N(a2)
             )
-        elif self.c_option_type == put_type and self.u_option_type == call_type:
+        elif self.c_opt_type == put_type and self.u_opt_type == call_type:
             v = (
                 ku * dfu * phi2(-a2, b2, -c)
                 - s0 * dqu * phi2(-a1, b1, -c)
                 + dfc * kc * N(-a2)
             )
-        elif self.c_option_type == call_type and self.u_option_type == put_type:
+        elif self.c_opt_type == call_type and self.u_opt_type == put_type:
             v = (
                 ku * dfu * phi2(-a2, -b2, c)
                 - s0 * dqu * phi2(-a1, -b1, c)
                 - dfc * kc * N(-a2)
             )
-        elif self.c_option_type == put_type and self.u_option_type == put_type:
+        elif self.c_opt_type == put_type and self.u_opt_type == put_type:
             v = (
                 s0 * dqu * phi2(a1, -b1, -c)
                 - ku * dfu * phi2(a2, -b2, -c)
@@ -446,8 +454,8 @@ class EquityCompoundOption(EquityOption):
             volatility,
             tc,
             tu,
-            self.c_option_type,
-            self.u_option_type,
+            self.c_opt_type,
+            self.u_opt_type,
             self.c_strike_price,
             self.u_strike_price,
             num_steps,
@@ -464,13 +472,13 @@ class EquityCompoundOption(EquityOption):
         expiry_dt2,
         strike_price1,
         strike_price2,
-        option_type2,
+        opt_type2,
         interest_rate,
         dividend_yield,
         model,
     ):
 
-        option = EquityVanillaOption(expiry_dt2, strike_price2, option_type2)
+        option = EquityVanillaOption(expiry_dt2, strike_price2, opt_type2)
 
         discount_curve = DiscountCurveFlat(expiry_dt1, interest_rate)
         dividend_curve = DiscountCurveFlat(expiry_dt1, dividend_yield)
@@ -500,10 +508,10 @@ class EquityCompoundOption(EquityOption):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("CPD EXPIRY DATE", self.c_expiry_dt)
         s += label_to_string("CPD STRIKE PRICE", self.c_strike_price)
-        s += label_to_string("CPD OPTION TYPE", self.c_option_type)
+        s += label_to_string("CPD OPTION TYPE", self.c_opt_type)
         s += label_to_string("UND EXPIRY DATE", self.u_expiry_dt)
         s += label_to_string("UND STRIKE PRICE", self.u_strike_price)
-        s += label_to_string("UND OPTION TYPE", self.u_option_type)
+        s += label_to_string("UND OPTION TYPE", self.u_opt_type)
         return s
 
     ###########################################################################

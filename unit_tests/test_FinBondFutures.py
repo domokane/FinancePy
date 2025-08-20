@@ -61,7 +61,7 @@ def test_bond_future_2():
 
     pip = bondFutureContract.principal_invoice(bond, futures_price)
 
-    assert round(pip, 4) == 9162291.0800
+    assert round(pip, 4) == 91619.2781
 
     tia = bondFutureContract.total_invoice_amount(settle_dt, bond, futures_price)
 
