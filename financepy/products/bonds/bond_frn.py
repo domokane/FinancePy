@@ -15,9 +15,9 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.helpers import label_to_string, check_argument_types
 
 
-###############################################################################
+########################################################################################
 # TODO: Need to complete and verify the risk sensitivity calculations.
-###############################################################################
+########################################################################################
 
 
 def _f(dm, *args):
@@ -30,13 +30,15 @@ def _f(dm, *args):
     future_ibor = args[4]
     dirty_price = args[5]
 
-    px = self.dirty_price_from_dm(settle_dt, next_cpn, current_ibor, future_ibor, dm)
+    px = self.dirty_price_from_dm(
+        settle_dt, next_cpn, current_ibor, future_ibor, dm
+    )
 
     obj_fn = px - dirty_price
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 class BondFRN:
@@ -238,7 +240,9 @@ class BondFRN:
         """Calculate the Macauley duration of the FRN on a settlement date
         given its yield to maturity."""
 
-        dd = self.dollar_duration(settle_dt, next_cpn, current_ibor, future_ibor, dm)
+        dd = self.dollar_duration(
+            settle_dt, next_cpn, current_ibor, future_ibor, dm
+        )
 
         fp = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
@@ -264,7 +268,9 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin."""
 
-        dd = self.dollar_duration(settle_dt, next_cpn, current_ibor, future_ibor, dm)
+        dd = self.dollar_duration(
+            settle_dt, next_cpn, current_ibor, future_ibor, dm
+        )
 
         fp = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
@@ -453,7 +459,9 @@ class BondFRN:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("QUOTED MARGIN (bp)", self.quoted_margin * 10000.0)
+        s += label_to_string(
+            "QUOTED MARGIN (bp)", self.quoted_margin * 10000.0
+        )
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("DAY COUNT TYPE", self.dc_type)
         return s
@@ -465,4 +473,4 @@ class BondFRN:
         print(self)
 
 
-###############################################################################
+########################################################################################

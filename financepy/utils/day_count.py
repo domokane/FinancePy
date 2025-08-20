@@ -18,7 +18,7 @@ from .global_vars import G_DAYS_IN_YEARS
 # http://www.fairmat.com/documentation/usermanual/topics/download/mediawiki/index.php/Day_Count_Conventions.htm
 # http://www.eclipsesoftware.biz/DayCountConventions.html
 
-###############################################################################
+########################################################################################
 
 
 def is_last_day_of_feb(dt: Date):
@@ -34,7 +34,7 @@ def is_last_day_of_feb(dt: Date):
         return False
 
 
-###############################################################################
+########################################################################################
 #    THIRTY_360_BOND = 1  # 30E/360 ISDA 2006 4.16f, German, Eurobond(ISDA2000)
 #    THIRTY_E_360 = 2  # ISDA 2006 4.16(g) 30/360 ISMA, ICMA
 #    THIRTY_E_360_ISDA = 3  # ISDA 2006 4.16(h)
@@ -44,7 +44,7 @@ def is_last_day_of_feb(dt: Date):
 #    ACT_365F = 7  # Denominator is always Fixed at 365, even in a leap year
 #    ACT_360 = 8
 #    ACT_365L = 9  # the 29 Feb is counted if it is in the date range
-###############################################################################
+########################################################################################
 
 
 class DayCountTypes(Enum):
@@ -65,7 +65,7 @@ class DayCountTypes(Enum):
     SIMPLE = 10  # actual divided by G_DAYS_IN_YEARS
 
 
-###############################################################################
+########################################################################################
 
 
 class DayCount:
@@ -80,7 +80,7 @@ class DayCount:
 
         self._type = dcc_type
 
-    ###############################################################################
+    ########################################################################################
 
     def year_frac(
         self,
@@ -294,11 +294,11 @@ class DayCount:
 
             raise FinError(str(self._type) + " is not one of DayCountTypes")
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
         """Returns the calendar type as a string."""
         return str(self._type)
 
 
-###############################################################################
+########################################################################################

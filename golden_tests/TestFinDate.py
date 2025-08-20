@@ -1,11 +1,12 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import numpy as np
 import time
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -15,7 +16,7 @@ from financepy.utils.date import Date, date_range
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 set_date_format(DateFormatTypes.UK_LONGEST)
 
@@ -24,7 +25,7 @@ def test_dt():
 
     start_dt = Date(1, 1, 2018)
 
-    assert Date(1, 1, 2018) == Date.from_string('1-1-2018', '%d-%m-%Y')
+    assert Date(1, 1, 2018) == Date.from_string("1-1-2018", "%d-%m-%Y")
 
     test_cases.header("DATE", "MONTHS", "CDS DATE")
 
@@ -41,7 +42,8 @@ def test_dt():
         next_imm_date = start_dt.next_imm_date()
         test_cases.print(num_months, str(start_dt), str(next_imm_date))
 
-###############################################################################
+
+########################################################################################
 
 
 def test_dtTenors():
@@ -79,10 +81,11 @@ def test_dtTenors():
     tenor = "20Y"
     test_cases.print(tenor, start_dt.add_tenor(tenor))
 
-###############################################################################
+
+########################################################################################
 
 
-def test_dtRange():
+def test_dt_range():
 
     start_dt = Date(1, 1, 2010)
 
@@ -106,7 +109,8 @@ def test_dtRange():
     case = "start_dt before end_dt"
     test_cases.print(case, date_range(end_dt, start_dt))
 
-###############################################################################
+
+########################################################################################
 
 
 def test_dtAddMonths():
@@ -124,7 +128,8 @@ def test_dtAddMonths():
     for dt in dates:
         test_cases.print("DATE", dt)
 
-###############################################################################
+
+########################################################################################
 
 
 def test_dtAddYears():
@@ -149,14 +154,17 @@ def test_dtAddYears():
     for dt in dates3:
         test_cases.print("DATES3", dt)
 
-    dt = 1.0/365.0
-    years = np.array([1.5+2.0*dt, 3.5-6*dt, 5.75+3*dt, 7.25+dt, 10.0+dt])
+    dt = 1.0 / 365.0
+    years = np.array(
+        [1.5 + 2.0 * dt, 3.5 - 6 * dt, 5.75 + 3 * dt, 7.25 + dt, 10.0 + dt]
+    )
     dates4 = start_dt.add_years(years)
 
     for dt in dates4:
         test_cases.print("DATES4", dt)
 
-###############################################################################
+
+########################################################################################
 
 
 def test_dtSpeed():
@@ -177,7 +185,7 @@ def test_dtSpeed():
     test_cases.print("Mem:", mem)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_dtFormat():
@@ -189,7 +197,8 @@ def test_dtFormat():
         set_date_format(format_type)
         test_cases.print(format_type.name, dt)
 
-###############################################################################
+
+########################################################################################
 
 
 def test_IntraDay():
@@ -225,79 +234,83 @@ def test_IntraDay():
     test_cases.print(d1, d2, diff)
     test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
-###############################################################################
+
+########################################################################################
 
 
 def test_dtEOM():
 
     dt = Date(29, 2, 2000)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(28, 2, 2001)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(29, 2, 2004)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(28, 2, 2005)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(31, 3, 2003)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(30, 4, 2004)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(31, 5, 2004)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(31, 12, 2010)
-    assert(dt.is_eom() is True)
+    assert dt.is_eom() is True
 
     dt = Date(2, 2, 2000)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(24, 2, 2001)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(22, 2, 2004)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(1, 2, 2005)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(1, 3, 2003)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(3, 4, 2004)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(5, 5, 2004)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
     dt = Date(7, 12, 2010)
-    assert(dt.eom().is_eom() is True)
+    assert dt.eom().is_eom() is True
 
-###############################################################################
+
+########################################################################################
 
 import datetime
 from financepy.utils import from_datetime
 
+
 def test_add_weekdays():
 
-    today = datetime.date(2022,2,13) # Sunday 13th Feb
+    today = datetime.date(2022, 2, 13)  # Sunday 13th Feb
     next_weekday = from_datetime(today).add_weekdays(1)
     last_weekday = from_datetime(today).add_weekdays(-1)
-    assert( (last_weekday == Date(11, 2, 2022)) is True)
-    assert( (next_weekday == Date(14, 2, 2022)) is True)
+    assert (last_weekday == Date(11, 2, 2022)) is True
+    assert (next_weekday == Date(14, 2, 2022)) is True
 
-    today = datetime.date(2022,2,13) # Sunday 13th Feb
+    today = datetime.date(2022, 2, 13)  # Sunday 13th Feb
     next_weekday = from_datetime(today).add_weekdays(7)
     last_weekday = from_datetime(today).add_weekdays(-7)
-    assert( (last_weekday == Date(3, 2, 2022)) is True)
-    assert( (next_weekday == Date(22, 2, 2022)) is True)
+    assert (last_weekday == Date(3, 2, 2022)) is True
+    assert (next_weekday == Date(22, 2, 2022)) is True
 
-###############################################################################
+
+########################################################################################
 
 test_add_weekdays()
 
@@ -305,7 +318,7 @@ start = time.time()
 
 test_dt()
 test_dtTenors()
-test_dtRange()
+test_dt_range()
 test_dtAddMonths()
 test_dtAddYears()
 test_dtSpeed()

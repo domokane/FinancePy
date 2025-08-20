@@ -4,16 +4,17 @@
 
 from ...utils.helpers import label_to_string
 
-###############################################################################
+########################################################################################
 
 
 class EquityModel:
-    """ This is a parent class for equity models. """
+    """This is a parent class for equity models."""
 
     def __init__(self):
         pass
 
-###############################################################################
+
+########################################################################################
 
 
 # class EquityModelBlackScholes(EquityModel):
@@ -34,7 +35,7 @@ class EquityModel:
 #         s += label_to_string("PARAMETERS", self.parameters)
 #         return s
 
-###############################################################################
+########################################################################################
 
 
 class EquityModelHeston(EquityModel):
@@ -51,4 +52,5 @@ class EquityModelHeston(EquityModel):
         s += label_to_string("IMPLEMENTATION", self.implementation)
         return s
 
-###############################################################################
+
+########################################################################################

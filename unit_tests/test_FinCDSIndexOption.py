@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from helpers import build_Ibor_Curve, buildFlatIssuerCurve
 from financepy.utils.global_types import SwapTypes
@@ -19,20 +19,21 @@ import numpy as np
 
 def test_dirty_priceCDSIndexOption():
 
-    tradeDate = Date(1, 8, 2007)
-    step_in_dt = tradeDate.add_days(1)
+    trade_dt = Date(1, 8, 2007)
+    step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt
 
-    libor_curve = build_Ibor_Curve(tradeDate)
+    libor_curve = build_Ibor_Curve(trade_dt)
 
-    maturity3Y = tradeDate.next_cds_date(36)
-    maturity5Y = tradeDate.next_cds_date(60)
-    maturity7Y = tradeDate.next_cds_date(84)
-    maturity10Y = tradeDate.next_cds_date(120)
+    maturity_3yr = trade_dt.next_cds_date(36)
+    maturity_5yr = trade_dt.next_cds_date(60)
+    maturity_7yr = trade_dt.next_cds_date(84)
+    maturity_10yr = trade_dt.next_cds_date(120)
 
-    path = os.path.join(os.path.dirname(__file__),
-                        './/data//CDX_NA_IG_S7_SPREADS.csv')
-    f = open(path, 'r')
+    path = os.path.join(
+        os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
+    )
+    f = open(path, "r")
     data = f.readlines()
     f.close()
     issuer_curves = []
@@ -46,16 +47,15 @@ def test_dirty_priceCDSIndexOption():
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(step_in_dt, maturity3Y, spd3Y)
-        cds5Y = CDS(step_in_dt, maturity5Y, spd5Y)
-        cds7Y = CDS(step_in_dt, maturity7Y, spd7Y)
-        cds10Y = CDS(step_in_dt, maturity10Y, spd10Y)
+        cds3Y = CDS(step_in_dt, maturity_3yr, spd3Y)
+        cds5Y = CDS(step_in_dt, maturity_5yr, spd5Y)
+        cds7Y = CDS(step_in_dt, maturity_7yr, spd7Y)
+        cds10Y = CDS(step_in_dt, maturity_10yr, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
-        issuer_curve = CDSCurve(value_dt,
-                                cds_contracts,
-                                libor_curve,
-                                recovery_rate)
+        issuer_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, recovery_rate
+        )
 
         issuer_curves.append(issuer_curve)
 
@@ -63,10 +63,12 @@ def test_dirty_priceCDSIndexOption():
     ##########################################################################
 
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
-    index_maturity_dts = [Date(20, 12, 2009),
-                            Date(20, 12, 2011),
-                            Date(20, 12, 2013),
-                            Date(20, 12, 2016)]
+    index_maturity_dts = [
+        Date(20, 12, 2009),
+        Date(20, 12, 2011),
+        Date(20, 12, 2013),
+        Date(20, 12, 2016),
+    ]
     index_recovery = 0.40
 
     index_cpn = 0.004
@@ -91,8 +93,9 @@ def test_dirty_priceCDSIndexOption():
             cds = CDS(value_dt, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(value_dt, cds_contracts,
-                               libor_curve, index_recovery)
+        index_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, index_recovery
+        )
 
         indexSpreads = [index / 10000.0] * 4
 
@@ -104,24 +107,22 @@ def test_dirty_priceCDSIndexOption():
             index_upfronts,
             index_maturity_dts,
             index_recovery,
-            tolerance)
+            tolerance,
+        )
 
         #######################################################################
 
-        option = CDSIndexOption(expiry_dt,
-                                maturity_dt,
-                                index_cpn,
-                                strike / 10000.0,
-                                notional)
+        option = CDSIndexOption(
+            expiry_dt, maturity_dt, index_cpn, strike / 10000.0, notional
+        )
 
         v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
-            value_dt, adjustedIssuerCurves, index_recovery, volatility)
+            value_dt, adjustedIssuerCurves, index_recovery, volatility
+        )
 
-        v_pay_2, v_rec_2 = option.value_adjusted_black(value_dt,
-                                                       index_curve,
-                                                       index_recovery,
-                                                       libor_curve,
-                                                       volatility)
+        v_pay_2, v_rec_2 = option.value_adjusted_black(
+            value_dt, index_curve, index_recovery, libor_curve, volatility
+        )
 
         assert round(v_pay_1, 1) == results[0]
         assert round(v_rec_1, 1) == results[1]

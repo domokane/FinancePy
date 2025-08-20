@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 # THIS IS IN PROGRESS
 from scipy.optimize._differentiable_functions import ScalarFunction
@@ -23,10 +23,10 @@ import numpy as np
 #  Updated strong Wolfe conditions line search to use
 #  cubic-interpolation (Mar. 2004)
 
-###############################################################################
+########################################################################################
 
 Inf = np.inf
-_epsilon = 1e-20
+EPSILON = 1e-20
 
 
 def fmin_cg(
@@ -36,7 +36,7 @@ def fmin_cg(
     fargs=(),
     gtol=1e-5,
     norm=Inf,
-    epsilon=_epsilon,
+    epsilon=EPSILON,
     maxiter=None,
     full_output=0,
     disp=1,

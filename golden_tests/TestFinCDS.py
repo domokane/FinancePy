@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import time
 import numpy as np
@@ -57,7 +57,7 @@ def test_CDSFastApproximation():
 
     recovery_rate = 0.40
 
-    contractCoupon = 0.010
+    contract_cpn = 0.010
 
     test_cases.header("MKT_SPD", "EXACT_VALUE", "APPROX_VALUE", "DIFF(%NOT)")
 
@@ -69,10 +69,14 @@ def test_CDSFastApproximation():
 
         cds_contracts.append(cds_mkt)
 
-        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+        issuer_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, recovery_rate
+        )
 
-        cds_contract = CDS(value_dt, maturity_dt, contractCoupon)
-        v_exact = cds_contract.value(value_dt, issuer_curve, recovery_rate)["dirty_pv"]
+        cds_contract = CDS(value_dt, maturity_dt, contract_cpn)
+        v_exact = cds_contract.value(value_dt, issuer_curve, recovery_rate)[
+            "dirty_pv"
+        ]
         v_approx = cds_contract.value_fast_approx(
             value_dt, r, mktCoupon, recovery_rate
         )[0]
@@ -163,7 +167,9 @@ def test_IssuerCurveBuild():
     cds = CDS(value_dt, maturity_dt, cds_cpn)
     cds_contracts.append(cds)
 
-    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+    issuer_curve = CDSCurve(
+        value_dt, cds_contracts, libor_curve, recovery_rate
+    )
 
     return cds_contracts, issuer_curve
 
@@ -176,8 +182,8 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
 
-    tradeDate = Date(9, 8, 2019)
-    value_dt = tradeDate.add_days(1)
+    trade_dt = Date(9, 8, 2019)
+    value_dt = trade_dt.add_days(1)
 
     m = 1.0  # 0.00000000000
 
@@ -328,49 +334,51 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
-    cdsMarketContracts = []
+    cds_mkt_contracts = []
 
     cds_cpn = 0.04 + mktSpreadBump
 
     maturity_dt = value_dt.next_cds_date(6)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(12)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(24)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(36)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(48)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(60)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(84)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(120)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     maturity_dt = value_dt.next_cds_date(180)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(value_dt, cdsMarketContracts, libor_curve, recovery_rate)
+    issuer_curve = CDSCurve(
+        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
+    )
 
     return libor_curve, issuer_curve
 
@@ -391,16 +399,20 @@ def test_dirty_priceCDS1():
     cds_cpn = 0.0150
     notional = ONE_MILLION
     long_protection = True
-    tradeDate = Date(9, 8, 2019)
-    value_dt = tradeDate.add_days(1)
+    trade_dt = Date(9, 8, 2019)
+    value_dt = trade_dt.add_days(1)
     effective_dt = value_dt
 
-    cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
+    cds_contract = CDS(
+        effective_dt, maturity_dt, cds_cpn, notional, long_protection
+    )
 
     cdsRecovery = 0.40
 
     test_cases.header("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = (
+        cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    )
     test_cases.print("PAR_SPREAD", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
@@ -447,7 +459,9 @@ def test_dirty_priceCDS1():
     z = libor_curve.df(maturity_dt)
     r = -np.log(z) / t
 
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mktSpread, cdsRecovery)
+    v_approx = cds_contract.value_fast_approx(
+        value_dt, r, mktSpread, cdsRecovery
+    )
 
     test_cases.print("DIRTY APPROX VALUE", v_approx[0])
     test_cases.print("CLEAN APPROX VALUE", v_approx[1])
@@ -543,35 +557,37 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     cds_cpn = 0.01 + mktSpreadBump
 
-    cdsMarketContracts = []
+    cds_mkt_contracts = []
     effective_dt = Date(21, 8, 2020)
     cds = CDS(effective_dt, "6M", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "1Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "2Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "3Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "4Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "5Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "7Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds = CDS(effective_dt, "10Y", cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(settle_dt, cdsMarketContracts, libor_curve, recovery_rate)
+    issuer_curve = CDSCurve(
+        settle_dt, cds_mkt_contracts, libor_curve, recovery_rate
+    )
 
     test_cases.header("DATE", "DISCOUNT_FACTOR", "SURV_PROB")
     years = np.linspace(0.0, 10.0, 20)
@@ -598,16 +614,20 @@ def test_dirty_priceCDSModelCheck():
     cds_cpn = 0.050
     notional = ONE_MILLION
     long_protection = True
-    tradeDate = Date(20, 8, 2020)
+    trade_dt = Date(20, 8, 2020)
     effective_dt = Date(21, 8, 2020)
-    value_dt = tradeDate
+    value_dt = trade_dt
 
-    cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
+    cds_contract = CDS(
+        effective_dt, maturity_dt, cds_cpn, notional, long_protection
+    )
 
     cdsRecovery = 0.40
 
     test_cases.header("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = (
+        cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    )
     test_cases.print("PAR_SPREAD", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
@@ -636,7 +656,9 @@ def test_dirty_priceCDSModelCheck():
     credit_dv01 = cds_contract.credit_dv01(value_dt, issuer_curve, cdsRecovery)
     test_cases.print("CREDIT DV01", credit_dv01)
 
-    interest_dv01 = cds_contract.interest_dv01(value_dt, issuer_curve, cdsRecovery)
+    interest_dv01 = cds_contract.interest_dv01(
+        value_dt, issuer_curve, cdsRecovery
+    )
     test_cases.print("INTEREST DV01", interest_dv01)
 
     # Consider fast approximation
@@ -645,7 +667,9 @@ def test_dirty_priceCDSModelCheck():
     r = -np.log(z) / t
 
     mktSpread = 0.01
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mktSpread, cdsRecovery)
+    v_approx = cds_contract.value_fast_approx(
+        value_dt, r, mktSpread, cdsRecovery
+    )
 
     test_cases.header("FAST VALUATIONS", "VALUE")
 
@@ -667,18 +691,20 @@ def test_dirty_priceCDSConvergence():
     cds_cpn = 0.0150
     notional = ONE_MILLION
     long_protection = False
-    tradeDate = Date(9, 8, 2019)
-    value_dt = tradeDate.add_days(1)
+    trade_dt = Date(9, 8, 2019)
+    value_dt = trade_dt.add_days(1)
 
-    cds_contract = CDS(value_dt, maturity_dt, cds_cpn, notional, long_protection)
+    cds_contract = CDS(
+        value_dt, maturity_dt, cds_cpn, notional, long_protection
+    )
 
     cdsRecovery = 0.40
 
     test_cases.header("NumSteps", "Value")
     for n in [10, 50, 100, 500, 1000]:
-        v_dirty = cds_contract.value(value_dt, issuer_curve, cdsRecovery, 0, 1, n)[
-            "dirty_pv"
-        ]
+        v_dirty = cds_contract.value(
+            value_dt, issuer_curve, cdsRecovery, 0, 1, n
+        )["dirty_pv"]
         test_cases.print(n, v_dirty)
 
 
@@ -691,8 +717,8 @@ def test_CDSDateGeneration():
     maturity_dt = Date(20, 6, 2029)
     cds_cpn = 0.0100
 
-    tradeDate = Date(9, 8, 2019)
-    value_dt = tradeDate.add_days(1)
+    trade_dt = Date(9, 8, 2019)
+    value_dt = trade_dt.add_days(1)
 
     cds_contract = CDS(
         value_dt,

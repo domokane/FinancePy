@@ -16,7 +16,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.swap_float_leg import SwapFloatLeg
 from ...products.equity.equity_swap_leg import EquitySwapLeg
 
-###############################################################################
+########################################################################################
 
 
 class EquitySwap:

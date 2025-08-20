@@ -1,18 +1,18 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 # UNDER CONSTRUCTION !!!!!!!!!!!!!!!!
 
-import numpy as np
+# import numpy as np
 
-from ...utils.date import Date
-from ...utils.calendar import CalendarTypes
-from ...utils.helpers import label_to_string, check_argument_types
-from ...market.curves.discount_curve import DiscountCurve
-from .bond import YTMCalcType
+# from ...utils.date import Date
+# from ...utils.calendar import CalendarTypes
+# from ...utils.helpers import label_to_string, check_argument_types
+# from ...market.curves.discount_curve import DiscountCurve
+# from .bond import YTMCalcType
 
-###############################################################################
+########################################################################################
 
 
 # class BondPortfolio:
@@ -28,7 +28,7 @@ from .bond import YTMCalcType
 #         self.calculateFlows()
 #         self.par = 100.0
 
-# ###############################################################################
+# ########################################################################################
 
 #     def _calculate_flows(self):
 #         """ Determine the bond cashflow payment amounts without principal """
@@ -39,7 +39,7 @@ from .bond import YTMCalcType
 #             cpn = self.cpn / self.freq
 #             self.flow_amounts.append(cpn)
 
-# ###############################################################################
+# ########################################################################################
 
 #     def dollar_duration(self,
 #                         settle_dt: Date,
@@ -54,7 +54,7 @@ from .bond import YTMCalcType
 #         durn = -(p2 - p0) / dy / 2.0
 #         return durn
 
-# ###############################################################################
+# ########################################################################################
 
 #     def macauley_duration(self,
 #                           settle_dt: Date,
@@ -68,7 +68,7 @@ from .bond import YTMCalcType
 #         md = dd * (1.0 + ytm / self.freq) / fp
 #         return md
 
-# ###############################################################################
+# ########################################################################################
 
 #     def modified_duration(self,
 #                           settle_dt: Date,
@@ -82,7 +82,7 @@ from .bond import YTMCalcType
 #         md = dd / fp
 #         return md
 
-# ###############################################################################
+# ########################################################################################
 
 #     def convexity_from_ytm(self,
 #                            settle_dt: Date,
@@ -98,7 +98,7 @@ from .bond import YTMCalcType
 #         conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self.par
 #         return conv
 
-# ###############################################################################
+# ########################################################################################
 
 #     def clean_price_from_ytm(self,
 #                              settle_dt: Date,
@@ -113,7 +113,7 @@ from .bond import YTMCalcType
 #         clean_price = dirty_price - accrued_amount
 #         return clean_price
 
-# ###############################################################################
+# ########################################################################################
 
 #     def clean_price_from_discount_curve(self,
 #                                         settle_dt: Date,
@@ -134,7 +134,7 @@ from .bond import YTMCalcType
 #         """
 
 
-# ###############################################################################
+# ########################################################################################
 
 #     def current_yield(self, clean_price):
 #         """ Calculate the current yield of the bond which is the
@@ -143,7 +143,7 @@ from .bond import YTMCalcType
 #         y = self.cpn * self.par / clean_price
 #         return y
 
-# ###############################################################################
+# ########################################################################################
 
 #     def yield_to_maturity(self,
 #                           settle_dt: Date,
@@ -153,7 +153,7 @@ from .bond import YTMCalcType
 #         yield relationship using a one-dimensional root solver. """
 
 
-# ###############################################################################
+# ########################################################################################
 
 #     def accrued_interest(self,
 #                          settle_dt: Date,
@@ -162,7 +162,7 @@ from .bond import YTMCalcType
 
 #         return self.accrued_interest
 
-# ###############################################################################
+# ########################################################################################
 
 #     def print_payments(self,
 #                        settle_dt: Date,
@@ -181,7 +181,7 @@ from .bond import YTMCalcType
 
 #         print("%12s" % self.cpn_dts[-1], " %12.2f " % redemption_amount)
 
-# ###############################################################################
+# ########################################################################################
 
 #     def dirty_price_from_survival_curve(self,
 #                                         settle_dt: Date,
@@ -234,7 +234,7 @@ from .bond import YTMCalcType
 #         pv *= self.par
 #         return pv
 
-# ###############################################################################
+# ########################################################################################
 
 #     def clean_price_from_survival_curve(self,
 #                                         settle_dt: Date,
@@ -255,7 +255,7 @@ from .bond import YTMCalcType
 #         clean_price = dirty_price - self.accrued_interest
 #         return clean_price
 
-# ###############################################################################
+# ########################################################################################
 
 #     def __repr__(self):
 
@@ -267,7 +267,7 @@ from .bond import YTMCalcType
 #         s += label_to_string("DAY COUNT TYPE", self.dc_type)
 #         return s
 
-# ###############################################################################
+# ########################################################################################
 
 #     def _print(self):
 #         """ Print a list of the unadjusted coupon payment dates used in
@@ -275,4 +275,4 @@ from .bond import YTMCalcType
 #         print(self)
 
 
-# ###############################################################################
+# ########################################################################################

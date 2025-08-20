@@ -13,7 +13,7 @@ from ...utils.error import FinError
 from ...utils.global_vars import G_SMALL
 from ...utils.tension_spline import TensionSpline
 
-###############################################################################
+########################################################################################
 
 
 class InterpTypes(Enum):
@@ -33,9 +33,9 @@ class InterpTypes(Enum):
 
 # LINEAR_SWAP_RATES = 3
 
-###############################################################################
+########################################################################################
 # TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-###############################################################################
+########################################################################################
 
 
 def interpolate(
@@ -70,7 +70,7 @@ def interpolate(
     raise FinError("Unknown input type" + type(t))
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -186,7 +186,7 @@ def _uinterpolate(t, times, dfs, method):
         raise FinError("Invalid interpolation scheme.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -209,7 +209,7 @@ def _vinterpolate(x_values, x_vector, dfs, method):
     return yvalues
 
 
-###############################################################################
+########################################################################################
 
 
 class Interpolator:
@@ -394,18 +394,23 @@ class Interpolator:
 
         elif self._interp_type == InterpTypes.LINEAR_ONFWD_RATES:
             if self._interp_fn is None:
-                # not enough data was used to fit the curve -- never reached the fitting stage
-                # (not sure why we have if len(times) == 1: return in the fit(...) function but reluctant to change that)
+                # not enough data was used to fit the curve -- never reached
+                # the fitting stage
+                # (not sure why we have if len(times) == 1: return in the fit(...)
+                # function but reluctant to change that)
                 # so work around this. already tested that _dfs is not None
-                if len(self._dfs) == 0 or self._times[0] == 0.0:
+                if len(self._dfs) == 0 or self.times[0] == 0.0:
                     out = [1.0] * len(tvec)
                 else:
-                    onf_rate = -np.log(self._dfs[0]) / self._times[0]
+                    onf_rate = -np.log(self._dfs[0]) / self.times[0]
                     out = np.exp(-onf_rate * tvec)
             else:
-                # apparently UnivariateSpline.integral assumes the function is zero outside the data limits (WHY??????)
-                # so work around that. Note that we always have t=0 in the data so only need to worry about the right tail
-                # Here we assume constant extrapolation, consistent with how we set up our interpolator
+                # apparently UnivariateSpline.integral assumes the function is
+                # zero outside the data limits (WHY??????)
+                # so work around that. Note that we always have t=0 in the data
+                # so only need to worry about the right tail
+                # Here we assume constant extrapolation, consistent with how
+                # we set up our interpolator
                 def true_integral(spline, t):
                     last_t = spline.get_knots()[-1]
                     i1 = spline.integral(0.0, min(t, last_t))
@@ -444,4 +449,4 @@ class Interpolator:
         return is_suitable[interp_type]
 
 
-###############################################################################
+########################################################################################

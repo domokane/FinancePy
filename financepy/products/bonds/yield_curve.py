@@ -21,9 +21,9 @@ from .yield_curve_model import CurveFitBSpline
 from scipy.optimize import curve_fit
 from scipy.interpolate import splrep
 
-###############################################################################
+########################################################################################
 # TO DO: CONSTRAIN TAU'S IN NELSON-SIEGEL
-###############################################################################
+########################################################################################
 
 
 class BondYieldCurve:
@@ -54,7 +54,9 @@ class BondYieldCurve:
 
         years_to_maturities = []
         for bond in bonds:
-            years_to_maturity = (bond._maturity_dt - settlement_date) / G_DAYS_IN_YEARS
+            years_to_maturity = (
+                bond._maturity_dt - settlement_date
+            ) / G_DAYS_IN_YEARS
             years_to_maturities.append(years_to_maturity)
         self._years_to_maturity = np.array(years_to_maturities)
 
@@ -112,14 +114,14 @@ class BondYieldCurve:
         else:
             raise FinError("Unrecognised curve fit type.")
 
-    ###############################################################################
+    ########################################################################################
 
     @property
     def curve_fit(self):
         """accessor function for curve_fit"""
         return self._curve_fit
 
-    ###############################################################################
+    ########################################################################################
 
     def interpolated_yield(self, maturity_dt: Date):
         """Interpolates the yield for a given maturity date."""
@@ -159,7 +161,7 @@ class BondYieldCurve:
 
         return yld
 
-    ###############################################################################
+    ########################################################################################
 
     def plot(self, title, ylabel="Yield To Maturity (%)"):
         """Display yield curve."""
@@ -181,7 +183,7 @@ class BondYieldCurve:
         plt.ylim((min(yld) - 0.3, max(yld) * 1.1))
         plt.grid(True)
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -191,7 +193,7 @@ class BondYieldCurve:
         s += label_to_string("CURVE FIT", self._curve_fit)
         return s
 
-    ###############################################################################
+    ########################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

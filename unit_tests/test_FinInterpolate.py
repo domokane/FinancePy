@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.market.curves.interpolator import Interpolator, InterpTypes
 import numpy as np
@@ -47,7 +47,10 @@ def test_FinInterpolate_Recovers_Inputs():
             yInterpValues.append(y_int)
 
         yInterpValues = np.array(yInterpValues)
-        assert np.linalg.norm(yValues - yInterpValues) / np.linalg.norm(yValues) <= 1e-6
+        assert (
+            np.linalg.norm(yValues - yInterpValues) / np.linalg.norm(yValues)
+            <= 1e-6
+        )
 
 
 def test_FLAT_FWD_RATES():

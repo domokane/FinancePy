@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.calendar import Calendar, CalendarTypes
 from financepy.utils.date import set_date_format, DateFormatTypes
@@ -23,7 +23,7 @@ bus_days_in_decade = {
     "CalendarTypes.SWITZERLAND": 2530,
     "CalendarTypes.TARGET": 2562,
     "CalendarTypes.UNITED_STATES": 2507,
-    "CalendarTypes.UNITED_KINGDOM": 2527
+    "CalendarTypes.UNITED_KINGDOM": 2527,
 }
 
 
@@ -34,5 +34,6 @@ def test_add_business_day():
         start = Date(3, 1, 2020)
         end = Date(3, 1, 2030)
 
-        assert cal.add_business_days(start, num_days) == end, \
-            f"Landed on incorrect business day using {cal_type}"
+        assert (
+            cal.add_business_days(start, num_days) == end
+        ), f"Landed on incorrect business day using {cal_type}"

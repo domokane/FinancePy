@@ -22,7 +22,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 
 def test_HullWhiteExampleOne():
@@ -49,7 +49,7 @@ def test_HullWhiteExampleOne():
 #   print_tree(model._rt)
 #   print("")
 
-###############################################################################
+########################################################################################
 
 
 def test_HullWhiteExampleTwo():
@@ -119,7 +119,9 @@ def test_HullWhiteExampleTwo():
     anal_vector = []
     tree_vector = []
 
-    test_cases.banner("Comparing option on zero coupon bond analytical vs Tree")
+    test_cases.banner(
+        "Comparing option on zero coupon bond analytical vs Tree"
+    )
 
     test_cases.header(
         "NUMTIMESTEP",
@@ -138,11 +140,15 @@ def test_HullWhiteExampleTwo():
 
         model = HWTree(sigma, a, num_time_steps)
         model.build_tree(t_exp, times, dfs)
-        v_tree1 = model.option_on_zero_cpn_bond_tree(t_exp, t_mat, strike, face)
+        v_tree1 = model.option_on_zero_cpn_bond_tree(
+            t_exp, t_mat, strike, face
+        )
 
         model = HWTree(sigma, a, num_time_steps + 1)
         model.build_tree(t_exp, times, dfs)
-        v_tree2 = model.option_on_zero_cpn_bond_tree(t_exp, t_mat, strike, face)
+        v_tree2 = model.option_on_zero_cpn_bond_tree(
+            t_exp, t_mat, strike, face
+        )
 
         end = time.time()
         period = end - start
@@ -168,7 +174,7 @@ def test_HullWhiteExampleTwo():
 #   plt.plot(num_steps_list, tree_vector)
 #   plt.plot(num_steps_list, anal_vector)
 
-###############################################################################
+########################################################################################
 
 
 def test_HullWhiteBondOption():
@@ -230,12 +236,16 @@ def test_HullWhiteBondOption():
         "Pricing bond option on tree that goes to bond maturity and one using european bond option tree that goes to expiry."
     )
 
-    test_cases.header("NUMSTEPS", "TIME", "EXPIRY_ONLY", "EXPIRY_TREE", "JAMSHIDIAN")
+    test_cases.header(
+        "NUMSTEPS", "TIME", "EXPIRY_ONLY", "EXPIRY_TREE", "JAMSHIDIAN"
+    )
 
     for num_time_steps in num_steps_list:
 
         start = time.time()
-        model = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
+        model = HWTree(
+            sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY
+        )
         model.build_tree(t_exp, times, dfs)
 
         exercise_type = FinExerciseTypes.EUROPEAN
@@ -244,7 +254,9 @@ def test_HullWhiteBondOption():
             t_exp, strike_price, face, cpn_times, cpn_flows, exercise_type
         )
 
-        model = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
+        model = HWTree(
+            sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE
+        )
         model.build_tree(t_exp, times, dfs)
 
         v2 = model.bond_option(
@@ -267,7 +279,7 @@ def test_HullWhiteBondOption():
         print_tree(model._option_values, 5)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_HullWhiteCallableBond():
@@ -383,7 +395,13 @@ def test_HullWhiteCallableBond():
         model.build_tree(t_mat, times, dfs)
 
         v2 = model.callable_puttable_bond_tree(
-            cpn_times, cpn_flows, call_times, call_prices, put_times, put_prices, 100.0
+            cpn_times,
+            cpn_flows,
+            call_times,
+            call_prices,
+            put_times,
+            put_prices,
+            100.0,
         )
 
         end = time.time()
@@ -391,7 +409,7 @@ def test_HullWhiteCallableBond():
         test_cases.print(num_time_steps, period, v1, v2)
 
 
-###############################################################################
+########################################################################################
 
 
 test_HullWhiteExampleOne()

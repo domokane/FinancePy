@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import numpy as np
 from financepy.models.sabr import vol_function_sabr
@@ -8,12 +8,13 @@ from financepy.models.sabr import SABR
 from financepy.utils.global_types import OptionTypes
 from FinTestCases import FinTestCases, globalTestCaseMode
 import sys
+
 sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 alpha = 0.28
 beta = 1.0
@@ -24,7 +25,7 @@ f = 0.043
 k = 0.050
 t = 2.0
 
-###############################################################################
+########################################################################################
 
 
 def test_SABR():
@@ -38,7 +39,8 @@ def test_SABR():
                 vol = vol_function_sabr(params, f, k, t)
                 test_cases.print(alpha, beta, rho, vol)
 
-###############################################################################
+
+########################################################################################
 
 
 def test_SABR_Calibration():
@@ -70,7 +72,9 @@ def test_SABR_Calibration():
     impliedATMLognormalVol = modelSABR_01.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
 
-    assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
+    assert (
+        impliedLognormalSmile == 0.0
+    ), "In lognormal model, smile should be flat"
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
     test_cases.print("LOGNORMAL CASE", calibrationError)
 
@@ -87,10 +91,12 @@ def test_SABR_Calibration():
     # Valuation: pure SABR dynamics
     valueCall = modelSABR_02.value(f, k, t_exp, df, call_optionType)
     valuePut = modelSABR_02.value(f, k, t_exp, df, put_optionType)
-    assert round(valueCall - valuePut, 12) == round(df*(f - k), 12), \
-        "The method called 'value()' doesn't comply with Call-Put parity"
+    assert round(valueCall - valuePut, 12) == round(
+        df * (f - k), 12
+    ), "The method called 'value()' doesn't comply with Call-Put parity"
 
-###############################################################################
+
+########################################################################################
 
 
 test_SABR()

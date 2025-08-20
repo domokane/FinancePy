@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -52,12 +52,12 @@ def test_FinCDSCurve():
         curve_dt, cds_contracts, libor_curve, recovery_rate, use_cache=False
     )
 
-    assert round(issuer_curve._times[0], 4) == 0.0
-    assert round(issuer_curve._times[5], 4) == 5.0027
-    assert round(issuer_curve._times[9], 4) == 9.0055
-    assert round(issuer_curve._values[0], 4) == 1.0
-    assert round(issuer_curve._values[5], 4) == 0.9249
-    assert round(issuer_curve._values[9], 4) == 0.8071
+    assert round(issuer_curve.times[0], 4) == 0.0
+    assert round(issuer_curve.times[5], 4) == 5.0027
+    assert round(issuer_curve.times[9], 4) == 9.0055
+    assert round(issuer_curve.values[0], 4) == 1.0
+    assert round(issuer_curve.values[5], 4) == 0.9249
+    assert round(issuer_curve.values[9], 4) == 0.8071
 
     i = 1
     maturity_dt = curve_dt.add_months(12 * i)

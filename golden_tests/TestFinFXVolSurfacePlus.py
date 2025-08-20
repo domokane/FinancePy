@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import time
 import sys
@@ -21,13 +21,13 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 # TODO: ADD LOGGING TO TEST CASES
-###############################################################################
+########################################################################################
 
 
 def test_FinFXMktVolSurface1(verboseCalibration):
@@ -57,7 +57,14 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
         mkt_strangle_10d_vols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
-        rsk_reversal_10d_vols = [-1.258, -1.297, -1.332, -1.408, -1.359, -1.208]
+        rsk_reversal_10d_vols = [
+            -1.258,
+            -1.297,
+            -1.332,
+            -1.408,
+            -1.359,
+            -1.208,
+        ]
 
         notional_currency = for_name
 
@@ -101,7 +108,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                 print("SUM:", dbns[i].sum())
 
 
-###############################################################################
+########################################################################################
 
 
 def test_FinFXMktVolSurface2(verboseCalibration):
@@ -129,7 +136,14 @@ def test_FinFXMktVolSurface2(verboseCalibration):
     mkt_strangle_25d_vols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
     rsk_reversal_25d_vols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
     mkt_strangle_10d_vols = [3.704, 4.047, 4.396, 4.932, 5.726, 5.709]
-    rsk_reversal_10d_vols = [-15.855, -16.467, -17.114, -17.882, -18.855, -18.217]
+    rsk_reversal_10d_vols = [
+        -15.855,
+        -16.467,
+        -17.114,
+        -17.882,
+        -18.855,
+        -18.217,
+    ]
     alpha = 0.50  # Equally fit 10 and 25 Delta
 
     notional_currency = for_name
@@ -172,7 +186,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
             print("SUM:", dbns[i].sum())
 
 
-###############################################################################
+########################################################################################
 
 
 def test_FinFXMktVolSurface3(verboseCalibration):
@@ -310,7 +324,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
             plt.show()
 
 
-###############################################################################
+########################################################################################
 
 
 def test_FinFXMktVolSurface4(verboseCalibration):
@@ -342,7 +356,14 @@ def test_FinFXMktVolSurface4(verboseCalibration):
         mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
         mkt_strangle_10d_vols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
-        rsk_reversal_10d_vols = [-1.258, -1.297, -1.332, -1.408, -1.359, -1.208]
+        rsk_reversal_10d_vols = [
+            -1.258,
+            -1.297,
+            -1.332,
+            -1.408,
+            -1.359,
+            -1.208,
+        ]
 
         mkt_strangle_25d_vols = None
         rsk_reversal_25d_vols = None
@@ -407,7 +428,7 @@ def test_FinFXMktVolSurface4(verboseCalibration):
             plt.show()
 
 
-###############################################################################
+########################################################################################
 
 
 def test_FinFXMktVolSurface5(verboseCalibration):
@@ -439,7 +460,14 @@ def test_FinFXMktVolSurface5(verboseCalibration):
         mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
         rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
         mkt_strangle_10d_vols = [2.433, 2.83, 3.228, 3.485, 3.806, 3.208]
-        rsk_reversal_10d_vols = [-1.258, -1.297, -1.332, -1.408, -1.359, -1.208]
+        rsk_reversal_10d_vols = [
+            -1.258,
+            -1.297,
+            -1.332,
+            -1.408,
+            -1.359,
+            -1.208,
+        ]
 
         mkt_strangle_10d_vols = None
         rsk_reversal_10d_vols = None
@@ -473,7 +501,7 @@ def test_FinFXMktVolSurface5(verboseCalibration):
         fx_market_plus.check_calibration(False)
 
 
-###############################################################################
+########################################################################################
 
 
 if __name__ == "__main__":

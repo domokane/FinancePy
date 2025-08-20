@@ -23,10 +23,10 @@ from ...models.black_scholes_analytic import bs_value
 from ...models.black_scholes import BlackScholes
 from ...models.model import Model
 
-###############################################################################
+########################################################################################
 # TODO: Do we need to day count adjust option payoffs ?
 # TODO: Monte Carlo pricer
-###############################################################################
+########################################################################################
 
 
 class EquityCliquetOption(EquityOption):
@@ -202,4 +202,4 @@ class EquityCliquetOption(EquityOption):
         print(self)
 
 
-###############################################################################
+########################################################################################

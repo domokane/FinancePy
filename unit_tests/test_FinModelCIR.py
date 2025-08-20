@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.models.cir_montecarlo import CIRNumericalScheme
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
@@ -20,16 +20,40 @@ seed = 1968
 def test_model_CIR():
     p = zero_price(r0, a, b, sigma, t)
     p_MC1 = zero_price_mc(
-        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.euler.value
+        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.EULER.value
     )
     p_MC2 = zero_price_mc(
-        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.LOGNORMAL.value
+        r0,
+        a,
+        b,
+        sigma,
+        t,
+        dt,
+        num_paths,
+        seed,
+        CIRNumericalScheme.LOGNORMAL.value,
     )
     p_MC3 = zero_price_mc(
-        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.MILSTEIN.value
+        r0,
+        a,
+        b,
+        sigma,
+        t,
+        dt,
+        num_paths,
+        seed,
+        CIRNumericalScheme.MILSTEIN.value,
     )
     p_MC4 = zero_price_mc(
-        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.KAHLJACKEL.value
+        r0,
+        a,
+        b,
+        sigma,
+        t,
+        dt,
+        num_paths,
+        seed,
+        CIRNumericalScheme.KAHLJACKEL.value,
     )
     p_MC5 = zero_price_mc(
         r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.EXACT.value

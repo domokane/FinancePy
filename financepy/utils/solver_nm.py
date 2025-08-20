@@ -1,12 +1,12 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2020 Saeed Amen, Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from collections import namedtuple
 import numpy as np
 from numba import njit
 
-###############################################################################
+########################################################################################
 # from https://quanteconpy.readthedocs.io/en/latest/_modules/quantecon/optimize/root_finding.html #####################
 
 _ECONVERGED = 0
@@ -14,12 +14,12 @@ _ECONVERR = -1
 
 _ITER = 100
 _XTOL = 2e-12
-_RTOL = 4*np.finfo(float).eps
+_RTOL = 4 * np.finfo(float).eps
 
 
-results = namedtuple('results', 'root function_calls iterations converged')
+results = namedtuple("results", "root function_calls iterations converged")
 
-###############################################################################
+########################################################################################
 
 # This is from https://quanteconpy.readthedocs.io/en/latest/_modules/quantecon/optimize/nelder_mead.html#nelder_mead
 # An alternative optimizer when calibrating FX vol surface, which is faster than CG (although converges less often)
@@ -28,8 +28,19 @@ results = namedtuple('results', 'root function_calls iterations converged')
 
 
 @njit(fastmath=True)  # , cache=True)
-def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
-                tol_x=1e-10, max_iter=1000, roh=1., chi=2., v=0.5, sigma=0.5):
+def nelder_mead(
+    fun,
+    x0,
+    bounds=np.array([[], []]).T,
+    args=(),
+    tol_f=1e-10,
+    tol_x=1e-10,
+    max_iter=1000,
+    roh=1.0,
+    chi=2.0,
+    v=0.5,
+    sigma=0.5,
+):
     """
     .. highlight:: none
 
@@ -149,7 +160,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
     rohv = roh * v
     rohchi = roh * chi
-    sigma_n = sigma ** n
+    sigma_n = sigma**n
 
     f_val = np.empty(n + 1, dtype=np.float64)
     for i in range(n + 1):
@@ -228,15 +239,18 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
             else:
                 shrink = True
                 for i in sort_ind[1:]:
-                    vertices[i] = vertices[best_val_idx] + sigma * \
-                        (vertices[i] - vertices[best_val_idx])
+                    vertices[i] = vertices[best_val_idx] + sigma * (
+                        vertices[i] - vertices[best_val_idx]
+                    )
                     # f_val[i] = _bounded_fun(fun, bounds, vertices[i], args=args)
                     f_val[i] = fun(vertices[i], *args)
                 sort_ind[1:] = f_val[sort_ind[1:]].argsort() + 1
 
-                x_bar = vertices[best_val_idx] + sigma * \
-                    (x_bar - vertices[best_val_idx]) + \
-                    (vertices[worst_val_idx] - vertices[sort_ind[n]]) / n
+                x_bar = (
+                    vertices[best_val_idx]
+                    + sigma * (x_bar - vertices[best_val_idx])
+                    + (vertices[worst_val_idx] - vertices[sort_ind[n]]) / n
+                )
 
                 lv_ratio *= sigma_n
 
@@ -250,7 +264,7 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
             for i, j in enumerate(sort_ind):
                 if f_val[worst_val_idx] < f_val[j]:
-                    sort_ind[i + 1:] = sort_ind[i:-1]
+                    sort_ind[i + 1 :] = sort_ind[i:-1]
                     sort_ind[i] = worst_val_idx
                     break
 
@@ -264,7 +278,8 @@ def nelder_mead(fun, x0, bounds=np.array([[], []]).T, args=(), tol_f=1e-10,
 
     return vertices[sort_ind[0]]
 
-###############################################################################
+
+########################################################################################
 
 
 @njit(cache=True, fastmath=True)
@@ -300,14 +315,15 @@ def _initialize_simplex(x0, bounds):
 
     for i in range(n):
         # Generate candidate coordinate
-        if vertices[i + 1, i] != 0.:
-            vertices[i + 1, i] *= (1 + nonzdelt)
+        if vertices[i + 1, i] != 0.0:
+            vertices[i + 1, i] *= 1 + nonzdelt
         else:
             vertices[i + 1, i] = zdelt
 
     return vertices
 
-###############################################################################
+
+########################################################################################
 
 
 @njit(cache=True, fastmath=True)
@@ -353,7 +369,8 @@ def _check_params(rho, chi, v, sigma, bounds, n):
     if (np.atleast_2d(bounds)[:, 0] > np.atleast_2d(bounds)[:, 1]).any():
         raise ValueError("Lower bounds must be greater than upper bounds.")
 
-###############################################################################
+
+########################################################################################
 
 
 @njit(cache=True, fastmath=True)
@@ -380,7 +397,9 @@ def _check_bounds(x, bounds):
     if bounds.shape == (0, 2):
         return True
     else:
-        return ((np.atleast_2d(bounds)[:, 0] <= x).all() and
-                (x <= np.atleast_2d(bounds)[:, 1]).all())
+        return (np.atleast_2d(bounds)[:, 0] <= x).all() and (
+            x <= np.atleast_2d(bounds)[:, 1]
+        ).all()
 
-###############################################################################
+
+########################################################################################

@@ -20,9 +20,9 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 
 
-###############################################################################
+########################################################################################
 # TODO: Make it possible to specify start and end of American Callable/Puttable
-###############################################################################
+########################################################################################
 
 
 class BondModelTypes(Enum):
@@ -32,7 +32,7 @@ class BondModelTypes(Enum):
     BLACK_KARASINSKI = 4
 
 
-###############################################################################
+########################################################################################
 
 
 class BondOptionTypes(Enum):
@@ -42,7 +42,7 @@ class BondOptionTypes(Enum):
     AMERICAN_PUT = 4
 
 
-###############################################################################
+########################################################################################
 
 
 class BondEmbeddedOption:
@@ -123,7 +123,7 @@ class BondEmbeddedOption:
         self.par = 100.0
         self.bond._calculate_cpn_dts()
 
-    ###############################################################################
+    ########################################################################################
 
     def value(self, settle_dt: Date, discount_curve: DiscountCurve, model):
         """Value the bond that settles on the specified date that can have
@@ -199,7 +199,9 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
+            v_bond_with_option = (
+                v1["bondwithoption"] + v2["bondwithoption"]
+            ) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -235,7 +237,9 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
+            v_bond_with_option = (
+                v1["bondwithoption"] + v2["bondwithoption"]
+            ) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -245,7 +249,7 @@ class BondEmbeddedOption:
         else:
             raise FinError("Unknown model type")
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
 
@@ -267,10 +271,10 @@ class BondEmbeddedOption:
 
         return s
 
-    ###############################################################################
+    ########################################################################################
 
     def _print(self):
         print(self)
 
 
-###############################################################################
+########################################################################################

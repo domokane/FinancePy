@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 
 import glob
@@ -34,7 +34,7 @@ with fileinput.FileInput(new_head_file, inplace=True, backup=".bak") as file:
 VERBOSE = False
 parseDataMembers = False
 
-###############################################################################
+########################################################################################
 
 
 def parse_markdown(lines):
@@ -340,13 +340,17 @@ def parse_module(module_name):
     f = open(user_guide_file_name, "a", encoding="utf-8")
 
     for c in range(0, num_enums):
-        new_lines = parse_enum(lines, start_enum_lines[c], start_enum_lines[c + 1])
+        new_lines = parse_enum(
+            lines, start_enum_lines[c], start_enum_lines[c + 1]
+        )
 
         for newLine in new_lines:
             f.writelines(newLine)
 
     for c in range(0, num_classes):
-        new_lines = parse_class(lines, start_class_lines[c], start_class_lines[c + 1])
+        new_lines = parse_class(
+            lines, start_class_lines[c], start_class_lines[c + 1]
+        )
 
         for newLine in new_lines:
             f.writelines(newLine)
@@ -563,7 +567,9 @@ def parse_function(lines, start_line, end_line, class_name=""):
         line = lines[row_num][indent:]
         function_signature += str(line)
         if line.find("):") >= 0:
-            start_line = row_num  # update start line to after function signature
+            start_line = (
+                row_num  # update start line to after function signature
+            )
             break
 
     # Replace `__init__` with class_name and remove `self` from signatures
@@ -669,7 +675,9 @@ def parse_function(lines, start_line, end_line, class_name=""):
     func_description += "\\end{lstlisting}\n"
     func_description += "\\vspace{0.25cm}\n"
     func_description += "\\noindent \n"
-    func_description += "The function arguments are described in the following table.\n"
+    func_description += (
+        "The function arguments are described in the following table.\n"
+    )
     func_description += "\\vspace{0.25cm}\n"
     func_description += param_description
     return func_description
@@ -699,7 +707,9 @@ def parse_enum(lines, start_line, end_line):
         else:
             break
 
-    enum_description.append("\\subsubsection*{Enumerated Type: " + enum_name + "}")
+    enum_description.append(
+        "\\subsubsection*{Enumerated Type: " + enum_name + "}"
+    )
     enum_description.append("\n")
     enum_description.append("This enumerated type has the following values:\n")
     enum_description.append("\\begin{itemize}[nosep]")
@@ -725,7 +735,9 @@ def extract_params(function_signature):
     function_signature = function_signature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
-    stripedSignature = function_signature.split("(", 1)[1].replace("):", "").strip()
+    stripedSignature = (
+        function_signature.split("(", 1)[1].replace("):", "").strip()
+    )
     if stripedSignature == "":
         # The function has no parameters
         return ""
@@ -814,7 +826,7 @@ def extract_params(function_signature):
     return param_description
 
 
-###############################################################################
+########################################################################################
 
 
 def parse_type(p_type):
@@ -839,7 +851,7 @@ def parse_type(p_type):
     return s
 
 
-###############################################################################
+########################################################################################
 
 
 build_head()

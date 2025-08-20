@@ -39,7 +39,7 @@ from ...utils.global_types import FinCapFloorTypes
 
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
-###############################################################################
+########################################################################################
 
 
 class IborLMMProducts:
@@ -135,7 +135,9 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
+            fwd_rate = discount_curve.fwd_rate(
+                start_dt, end_dt, self.float_dc_type
+            )
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -202,7 +204,9 @@ class IborLMMProducts:
         for i in range(1, self.num_fwds):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
+            fwd_rate = discount_curve.fwd_rate(
+                start_dt, end_dt, self.float_dc_type
+            )
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -262,7 +266,9 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.forward_rate(start_dt, end_dt, self.float_dc_type)
+            fwd_rate = discount_curve.forward_rate(
+                start_dt, end_dt, self.float_dc_type
+            )
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -432,4 +438,4 @@ class IborLMMProducts:
         print(self)
 
 
-###############################################################################
+########################################################################################

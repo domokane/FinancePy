@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -231,7 +231,9 @@ def test_BondFRN():
     accd_amount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
     test_cases.print("Dollar Principal = ", principal)
 
@@ -313,7 +315,9 @@ def test_BondFRN():
     accd_amount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
     test_cases.print("Dollar Principal = ", principal)
 
@@ -341,7 +345,9 @@ def test_BondFRN():
 
     test_cases.print("Convexity = ", convexity)
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
     test_cases.print("Principal = ", principal)
 

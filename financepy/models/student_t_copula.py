@@ -8,17 +8,14 @@ from scipy.stats import t as student
 
 from ..utils.helpers import uniform_to_default_time
 
-###############################################################################
+########################################################################################
 
 
-class StudentTCopula():
+class StudentTCopula:
 
-    def default_times(self,
-                      issuer_curves,
-                      corr_matrix,
-                      degrees_of_freedom,
-                      num_trials,
-                      seed):
+    def default_times(
+        self, issuer_curves, corr_matrix, degrees_of_freedom, num_trials, seed
+    ):
 
         np.random.seed(seed)
         num_credits = len(issuer_curves)
@@ -45,4 +42,5 @@ class StudentTCopula():
 
         return corr_times
 
-###############################################################################
+
+########################################################################################

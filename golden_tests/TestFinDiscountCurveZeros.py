@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -19,7 +19,7 @@ from financepy.utils.day_count import DayCountTypes
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 
 def test_FinDiscountCurveZeros():
@@ -32,7 +32,12 @@ def test_FinDiscountCurveZeros():
     dc_type = DayCountTypes.ACT_ACT_ISDA
 
     curve = DiscountCurveZeros(
-        start_dt, dates, zero_rates, freq_type, dc_type, InterpTypes.FLAT_FWD_RATES
+        start_dt,
+        dates,
+        zero_rates,
+        freq_type,
+        dc_type,
+        InterpTypes.FLAT_FWD_RATES,
     )
 
     test_cases.header("T", "DF")
@@ -45,7 +50,7 @@ def test_FinDiscountCurveZeros():
 
     #    print(curve)
 
-    ###############################################################################
+    ########################################################################################
 
     num_repeats = 100
 
@@ -84,7 +89,12 @@ def test_FinDiscountCurveZeros():
         start_dt = dates[0]
 
         curve = DiscountCurveZeros(
-            start_dt, dates, zero_rates, freq_type, dc_type, InterpTypes.FLAT_FWD_RATES
+            start_dt,
+            dates,
+            zero_rates,
+            freq_type,
+            dc_type,
+            InterpTypes.FLAT_FWD_RATES,
         )
 
     end = time.time()
@@ -95,7 +105,7 @@ def test_FinDiscountCurveZeros():
 
 #    print(curve)
 
-###############################################################################
+########################################################################################
 
 
 test_FinDiscountCurveZeros()

@@ -1,8 +1,9 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -30,14 +31,11 @@ def test_FinDayCount():
 
         for _ in range(0, num_days):
             next_dt = next_dt.add_days(7)
-            dcf = day_count.year_frac(
-                start_dt, next_dt, next_dt, finFreq)
+            dcf = day_count.year_frac(start_dt, next_dt, next_dt, finFreq)
 
             test_cases.print(
-                str(day_count_method),
-                str(start_dt),
-                str(next_dt),
-                dcf[0])
+                str(day_count_method), str(start_dt), str(next_dt), dcf[0]
+            )
 
 
 test_FinDayCount()

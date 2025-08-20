@@ -51,13 +51,14 @@ class BondMarkets(Enum):
     NORWAY = 36
     SOUTH_AFRICA = 37
 
-###############################################################################
+
+########################################################################################
 
 
 def get_bond_market_conventions(country):
-    """ Returns the day count convention for accrued interest, the frequency
+    """Returns the day count convention for accrued interest, the frequency
     and the number of days from trade date to settlement date.
-    This is for Treasury markets. And for secondary bond markets. """
+    This is for Treasury markets. And for secondary bond markets."""
 
     annual = FrequencyTypes.ANNUAL
     semi_annual = FrequencyTypes.SEMI_ANNUAL

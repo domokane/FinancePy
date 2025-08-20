@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
@@ -29,9 +29,9 @@ set_date_format(DateFormatTypes.UK_LONG)
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 # TODO: Add other discount discount
-###############################################################################
+########################################################################################
 
 
 def test_FinDiscountCurves():
@@ -58,7 +58,9 @@ def test_FinDiscountCurves():
     fin_discount_curve_flat = DiscountCurveFlat(value_dt, 0.05)
     curves_list.append(fin_discount_curve_flat)
 
-    fin_discount_curve_ns = DiscountCurveNS(value_dt, 0.0305, -0.01, 0.08, 10.0)
+    fin_discount_curve_ns = DiscountCurveNS(
+        value_dt, 0.0305, -0.01, 0.08, 10.0
+    )
     curves_list.append(fin_discount_curve_ns)
 
     fin_discount_curve_nss = DiscountCurveNSS(
@@ -66,7 +68,9 @@ def test_FinDiscountCurves():
     )
     curves_list.append(fin_discount_curve_nss)
 
-    fin_discount_curve_poly = DiscountCurvePoly(value_dt, [0.05, 0.002, -0.00005])
+    fin_discount_curve_poly = DiscountCurvePoly(
+        value_dt, [0.05, 0.002, -0.00005]
+    )
     curves_list.append(fin_discount_curve_poly)
 
     fin_discount_curve_PWF = DiscountCurvePWF(value_dt, dates, rates)
@@ -174,7 +178,7 @@ def test_FinDiscountCurves():
         plt.title("Discount Factors")
 
 
-###############################################################################
+########################################################################################
 
 
 test_FinDiscountCurves()

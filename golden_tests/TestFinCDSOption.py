@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import numpy as np
 import sys
@@ -170,51 +170,51 @@ def buildFullIssuerCurve(value_dt):
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
 
-    cdsMarketContracts = []
+    cds_mkt_contracts = []
     cds_cpn = 0.005743
     maturity_dt = value_dt.next_cds_date(6)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.007497
     maturity_dt = value_dt.next_cds_date(12)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.011132
     maturity_dt = value_dt.next_cds_date(24)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.013932
     maturity_dt = value_dt.next_cds_date(36)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.015764
     maturity_dt = value_dt.next_cds_date(48)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.017366
     maturity_dt = value_dt.next_cds_date(60)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.020928
     maturity_dt = value_dt.next_cds_date(84)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     cds_cpn = 0.022835
     maturity_dt = value_dt.next_cds_date(120)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     recovery_rate = 0.40
 
     issuer_curve = CDSCurve(
-        value_dt, cdsMarketContracts, libor_curve, recovery_rate
+        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
     )
 
     return libor_curve, issuer_curve
@@ -226,9 +226,9 @@ def buildFullIssuerCurve(value_dt):
 def test_dirty_priceCDSwaption():
 
     # This reproduces example on page 38 of Open Gamma note on CDS Option
-    tradeDate = Date(5, 2, 2014)
-    _, issuer_curve = buildFullIssuerCurve(tradeDate)
-    step_in_dt = tradeDate.add_days(1)
+    trade_dt = Date(5, 2, 2014)
+    _, issuer_curve = buildFullIssuerCurve(trade_dt)
+    step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt
     expiry_dt = Date(20, 3, 2014)
     maturity_dt = Date(20, 6, 2019)

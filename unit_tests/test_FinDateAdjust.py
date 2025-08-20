@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
@@ -21,17 +21,19 @@ def test_date_adjust_no_adj():
     cal_type = CalendarTypes.NONE
     bd_type = BusDayAdjustTypes.FOLLOWING
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     assert schedule.adjusted_dts == [
-        Date(28, 2, 2008), Date(28, 8, 2008), Date(
-            28, 2, 2009), Date(28, 8, 2009),
-        Date(28, 2, 2010), Date(28, 8, 2010), Date(28, 2, 2011)]
+        Date(28, 2, 2008),
+        Date(28, 8, 2008),
+        Date(28, 2, 2009),
+        Date(28, 8, 2009),
+        Date(28, 2, 2010),
+        Date(28, 8, 2010),
+        Date(28, 2, 2011),
+    ]
 
 
 def test_date_adjust_noweekend_following():
@@ -41,17 +43,19 @@ def test_date_adjust_noweekend_following():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     assert schedule.adjusted_dts == [
-        Date(28, 2, 2008), Date(28, 8, 2008), Date(
-            2, 3, 2009), Date(28, 8, 2009),
-        Date(1, 3, 2010), Date(30, 8, 2010), Date(28, 2, 2011)]
+        Date(28, 2, 2008),
+        Date(28, 8, 2008),
+        Date(2, 3, 2009),
+        Date(28, 8, 2009),
+        Date(1, 3, 2010),
+        Date(30, 8, 2010),
+        Date(28, 2, 2011),
+    ]
 
 
 def test_date_adjust_noweekend_modfollowing():
@@ -61,17 +65,19 @@ def test_date_adjust_noweekend_modfollowing():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     assert schedule.adjusted_dts == [
-        Date(28, 2, 2008), Date(28, 8, 2008), Date(
-            27, 2, 2009), Date(28, 8, 2009),
-        Date(26, 2, 2010), Date(30, 8, 2010), Date(28, 2, 2011)]
+        Date(28, 2, 2008),
+        Date(28, 8, 2008),
+        Date(27, 2, 2009),
+        Date(28, 8, 2009),
+        Date(26, 2, 2010),
+        Date(30, 8, 2010),
+        Date(28, 2, 2011),
+    ]
 
 
 def test_date_adjust_noweekend_usholidays_modfollowing():
@@ -81,13 +87,16 @@ def test_date_adjust_noweekend_usholidays_modfollowing():
     cal_type = CalendarTypes.UNITED_STATES
     bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
 
-    schedule = Schedule(start_dt,
-                        end_dt,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(
+        start_dt, end_dt, freq_type, cal_type, bd_type, dg_type
+    )
 
     assert schedule.adjusted_dts == [
-        Date(4, 7, 2008), Date(5, 1, 2009), Date(6, 7, 2009), Date(4, 1, 2010),
-        Date(6, 7, 2010), Date(4, 1, 2011), Date(5, 7, 2011)]
+        Date(4, 7, 2008),
+        Date(5, 1, 2009),
+        Date(6, 7, 2009),
+        Date(4, 1, 2010),
+        Date(6, 7, 2010),
+        Date(4, 1, 2011),
+        Date(5, 7, 2011),
+    ]

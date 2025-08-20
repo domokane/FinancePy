@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -26,9 +26,9 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def build_Ibor_Curve(tradeDate):
+def build_Ibor_Curve(trade_dt):
 
-    value_dt = tradeDate.add_days(1)
+    value_dt = trade_dt.add_days(1)
     dc_type = DayCountTypes.ACT_360
     depos = []
 
@@ -78,21 +78,21 @@ def build_Ibor_Curve(tradeDate):
 ##########################################################################
 
 
-def buildIssuerCurve(tradeDate, libor_curve):
+def buildIssuerCurve(trade_dt, libor_curve):
 
-    value_dt = tradeDate.add_days(1)
+    value_dt = trade_dt.add_days(1)
 
-    cdsMarketContracts = []
+    cds_mkt_contracts = []
 
     cds_cpn = 0.0048375
     maturity_dt = Date(20, 6, 2010)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     recovery_rate = 0.40
 
     issuer_curve = CDSCurve(
-        value_dt, cdsMarketContracts, libor_curve, recovery_rate
+        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
     )
     return issuer_curve
 
@@ -103,10 +103,10 @@ def buildIssuerCurve(tradeDate, libor_curve):
 def test_valueCDSIndex():
 
     # We treat an index as a CDS contract with a flat CDS curve
-    tradeDate = Date(7, 2, 2006)
-    libor_curve = build_Ibor_Curve(tradeDate)
-    issuer_curve = buildIssuerCurve(tradeDate, libor_curve)
-    step_in_dt = tradeDate.add_days(1)
+    trade_dt = Date(7, 2, 2006)
+    libor_curve = build_Ibor_Curve(trade_dt)
+    issuer_curve = buildIssuerCurve(trade_dt, libor_curve)
+    step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt
     maturity_dt = Date(20, 6, 2010)
 

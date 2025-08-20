@@ -1,11 +1,13 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
+from financepy.products.equity.equity_asian_option import (
+    AsianOptionValuationMethods,
+)
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 
@@ -27,57 +29,67 @@ model = BlackScholes(volatility)
 discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-asianOption = EquityAsianOption(start_averaging_dt,
-                                expiry_dt,
-                                K,
-                                OptionTypes.EUROPEAN_CALL,
-                                num_observations)
+asianOption = EquityAsianOption(
+    start_averaging_dt,
+    expiry_dt,
+    K,
+    OptionTypes.EUROPEAN_CALL,
+    num_observations,
+)
 
 
 def test_geometric():
-    valueGeometric = asianOption.value(value_dt,
-                                       stock_price,
-                                       discount_curve,
-                                       dividend_curve,
-                                       model,
-                                       AsianOptionValuationMethods.GEOMETRIC,
-                                       accruedAverage)
+    valueGeometric = asianOption.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        AsianOptionValuationMethods.GEOMETRIC,
+        accruedAverage,
+    )
 
     assert round(valueGeometric, 4) == 12.3380
 
 
 def test_turnbull_wakeman():
-    valueTurnbullWakeman = asianOption.value(value_dt,
-                                             stock_price,
-                                             discount_curve,
-                                             dividend_curve,
-                                             model,
-                                             AsianOptionValuationMethods.TURNBULL_WAKEMAN,
-                                             accruedAverage)
+    valueTurnbullWakeman = asianOption.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        AsianOptionValuationMethods.TURNBULL_WAKEMAN,
+        accruedAverage,
+    )
 
     assert round(valueTurnbullWakeman, 4) == 12.5381
 
 
 def test_curran():
-    valueCurran = asianOption.value(value_dt,
-                                    stock_price,
-                                    discount_curve,
-                                    dividend_curve,
-                                    model,
-                                    AsianOptionValuationMethods.CURRAN,
-                                    accruedAverage)
+    valueCurran = asianOption.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        AsianOptionValuationMethods.CURRAN,
+        accruedAverage,
+    )
 
     assert round(valueCurran, 4) == 12.5368
 
 
 def test_mc():
-    value_mc = asianOption.value_mc(value_dt,
-                                    stock_price,
-                                    discount_curve,
-                                    dividend_curve,
-                                    model,
-                                    num_paths,
-                                    seed,
-                                    accruedAverage)
+    value_mc = asianOption.value_mc(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        num_paths,
+        seed,
+        accruedAverage,
+    )
 
     assert round(value_mc, 4) == 12.5269

@@ -1,4 +1,4 @@
-from financepy.models.finite_difference_PSOR import black_scholes_fd_psor
+from financepy.models.finite_difference_psor import black_scholes_fd_psor
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

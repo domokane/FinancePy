@@ -1,11 +1,11 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from numba import njit, float64, int64
 import numpy as np
 
-###############################################################################
+########################################################################################
 
 from ..utils.math import norminvcdf, N, INV_ROOT_2_PI
 from ..utils.error import FinError
@@ -13,14 +13,14 @@ from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
 from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
 from .loss_dbn_builder import portfolio_gcd
 
-###############################################################################
+########################################################################################
 
 MIN_Z = -6.0
 
-###############################################################################
+########################################################################################
 # This implements the one-factor latent variable formulation of the Gaussian
 # Copula model as well as some approximations
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -82,10 +82,14 @@ def loss_dbn_recursion_gcd(
     return uncond_loss_dbn
 
 
-###############################################################################
+########################################################################################
 
 
-@njit(float64[:](float64[:], float64[:], float64[:], int64), fastmath=True, cache=True)
+@njit(
+    float64[:](float64[:], float64[:], float64[:], int64),
+    fastmath=True,
+    cache=True,
+)
 def homog_basket_loss_dbn(
     survival_probs, recovery_rates, beta_vector, num_integration_steps
 ):
@@ -121,17 +125,23 @@ def homog_basket_loss_dbn(
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     loss_dbn = loss_dbn_recursion_gcd(
-        num_credits, default_probs, loss_units, beta_vector, num_integration_steps
+        num_credits,
+        default_probs,
+        loss_units,
+        beta_vector,
+        num_integration_steps,
     )
 
     return loss_dbn
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
+    float64(
+        float64, float64, int64, float64[:], float64[:], float64[:], int64
+    ),
     fastmath=True,
 )
 def tranche_surv_prob_recursion(
@@ -189,7 +199,11 @@ def tranche_surv_prob_recursion(
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
     loss_dbn = loss_dbn_recursion_gcd(
-        num_credits, default_probs, loss_units, beta_vector, num_integration_steps
+        num_credits,
+        default_probs,
+        loss_units,
+        beta_vector,
+        num_integration_steps,
     )
 
     tranche_el = 0.0
@@ -202,7 +216,7 @@ def tranche_surv_prob_recursion(
     return q
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(float64(float64, float64, float64, float64), fastmath=True, cache=True)
@@ -233,11 +247,13 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
     return tranche_loss
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
+    float64(
+        float64, float64, int64, float64[:], float64[:], float64[:], int64
+    ),
     fastmath=True,
     cache=True,
 )
@@ -303,7 +319,7 @@ def tranch_surv_prob_gaussian(
     return q
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -355,11 +371,13 @@ def loss_dbn_hetero_adj_binomial(
     return uncond_loss_dbn
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
+    float64(
+        float64, float64, int64, float64[:], float64[:], float64[:], int64
+    ),
     fastmath=True,
     cache=True,
 )
@@ -396,10 +414,16 @@ def tranche_surv_prob_adj_binomial(
 
     loss_ratio = np.zeros(num_credits)
     for i_credit in range(0, num_credits):
-        loss_ratio[i_credit] = (1.0 - recovery_rates[i_credit]) / num_credits / avg_loss
+        loss_ratio[i_credit] = (
+            (1.0 - recovery_rates[i_credit]) / num_credits / avg_loss
+        )
 
     loss_dbn = loss_dbn_hetero_adj_binomial(
-        num_credits, default_probs, loss_ratio, beta_vector, num_integration_steps
+        num_credits,
+        default_probs,
+        loss_ratio,
+        beta_vector,
+        num_integration_steps,
     )
     tranche_el = 0.0
     num_loss_units = num_credits + 1
@@ -412,4 +436,4 @@ def tranche_surv_prob_adj_binomial(
     return q
 
 
-###############################################################################
+########################################################################################

@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from typing import Union
 
@@ -24,7 +24,7 @@ from ...utils.helpers import (
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
 
-###############################################################################
+########################################################################################
 
 
 class SwapFloatLeg:
@@ -137,7 +137,9 @@ class SwapFloatLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
+                payment_dt = calendar.add_business_days(
+                    next_dt, self.payment_lag
+                )
 
             self.payment_dts.append(payment_dt)
 
@@ -212,7 +214,9 @@ class SwapFloatLeg:
                     fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
                 payment_amount = (
-                    (fwd_rate + self.spread) * pay_alpha * self.notional_array[i_pmnt]
+                    (fwd_rate + self.spread)
+                    * pay_alpha
+                    * self.notional_array[i_pmnt]
                 )
 
                 df_payment = discount_curve.df(payment_dt) / df_value
@@ -389,4 +393,4 @@ class SwapFloatLeg:
         print(self)
 
 
-###############################################################################
+########################################################################################

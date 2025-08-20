@@ -10,11 +10,11 @@ from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 
-###############################################################################
+########################################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
 # SO EUR USD = 1.30 MEANS 1.30 DOLLARS PER EURO SO DOLLAR IS THE DOMESTIC AND
 # EUR IS THE FOREIGN CURRENCY
-###############################################################################
+########################################################################################
 
 
 class FXForward:
@@ -55,7 +55,10 @@ class FXForward:
         self.for_name = self.currency_pair[0:3]
         self.dom_name = self.currency_pair[3:6]
 
-        if notional_currency != self.dom_name and notional_currency != self.for_name:
+        if (
+            notional_currency != self.dom_name
+            and notional_currency != self.for_name
+        ):
             raise FinError("Notional currency not in currency pair.")
 
         self.notional = notional
@@ -90,7 +93,9 @@ class FXForward:
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as option value date")
+            raise FinError(
+                "Foreign Curve valuation date not same as option value date"
+            )
 
         if isinstance(value_dt, Date):
             t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
@@ -190,4 +195,4 @@ class FXForward:
         print(self)
 
 
-###############################################################################
+########################################################################################

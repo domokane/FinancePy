@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from typing import Union
 
@@ -20,7 +20,7 @@ from ...utils.helpers import times_from_dates
 from ...utils.helpers import label_to_string
 
 
-###############################################################################
+########################################################################################
 
 
 class DiscountCurve:
@@ -52,6 +52,8 @@ class DiscountCurve:
         if df_values is None:
             df_values = [1.0]
 
+        # The internal representation of times and dfs is hidden but
+        # access is controlled using getters and setters
         self._times = [0.0]
         self._dfs = [1.0]
         self._df_dates = df_dates
@@ -85,24 +87,28 @@ class DiscountCurve:
         self._interpolator = Interpolator(self._interp_type)
         self.fit(self._times, self._dfs)
 
-    ###############################################################################
+    ########################################################################################
 
     @property
     def times(self) -> np.ndarray:
         """Return the internal array of times (in years) from the anchor date."""
-        return self._times.copy()  # return a copy to prevent external modification
+        return (
+            self._times.copy()
+        )  # return a copy to prevent external modification
 
     @property
     def dfs(self) -> np.ndarray:
         """Return the internal array of discount factors corresponding to times."""
-        return self._dfs.copy()  # return a copy to prevent external modification
+        return (
+            self._dfs.copy()
+        )  # return a copy to prevent external modification
 
     ###########################################################################
 
     def set_df(self, index, df):
         """Set the discount factor at a specific index."""
 
-        n_points = len(self._dfs)
+        n_points = len(self.dfs)
 
         if index < 0 or index >= n_points:
             raise IndexError("Index out of bounds")
@@ -338,17 +344,16 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def df_t(self, t: Union[float, np.ndarray]):
+    def df_t(self, t: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """Function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates."""
 
-        if (
-            self._interp_type is InterpTypes.FLAT_FWD_RATES
-            or self._interp_type is InterpTypes.LINEAR_ZERO_RATES
-            or self._interp_type is InterpTypes.LINEAR_FWD_RATES
+        if self._interp_type in (
+            InterpTypes.FLAT_FWD_RATES,
+            InterpTypes.LINEAR_ZERO_RATES,
+            InterpTypes.LINEAR_FWD_RATES,
         ):
-
-            df = interpolate(t, self._times, self._dfs, self._interp_type.value)
+            df = interpolate(t, self.times, self.dfs, self._interp_type.value)
 
         else:
 
@@ -358,7 +363,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def survival_prob(self, dt: Date):
+    def survival_prob(self, dt: Date) -> float:
         """This returns a survival probability to a specified date based on
         the assumption that the continuously compounded rate is a default
         hazard rate in which case the survival probability is directly
@@ -425,7 +430,9 @@ class DiscountCurve:
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        disc_curve = DiscountCurve(self.value_dt, times, values, self._interp_type)
+        disc_curve = DiscountCurve(
+            self.value_dt, times, values, self._interp_type
+        )
 
         return disc_curve
 
@@ -485,7 +492,9 @@ class DiscountCurve:
         num_points = len(self._df_dates)
         s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._df_dates[i], "%12.8f" % self._dfs[i])
+            s += label_to_string(
+                "%12s" % self._df_dates[i], "%12.8f" % self._dfs[i]
+            )
 
         return s
 
@@ -496,4 +505,4 @@ class DiscountCurve:
         print(self)
 
 
-###############################################################################
+########################################################################################

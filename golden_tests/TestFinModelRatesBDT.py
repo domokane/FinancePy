@@ -29,7 +29,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 
 
 def testBlackModelCheck():
@@ -69,7 +69,7 @@ def testBlackModelCheck():
     test_cases.print("BLACK'S MODEL PRICE:", v * 100)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_BDTExampleOne():
@@ -87,7 +87,9 @@ def test_BDTExampleOne():
     test_cases.header("RATES")
     test_cases.print(zero_rates)
 
-    curve = DiscountCurveZeros(value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL)
+    curve = DiscountCurveZeros(
+        value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL
+    )
 
     yieldVol = 0.16
 
@@ -105,7 +107,7 @@ def test_BDTExampleOne():
     model.build_tree(t_mat, years, dfs)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_BDTExampleTwo():
@@ -113,7 +115,9 @@ def test_BDTExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
 
-    test_cases.banner("===================== FIG 28.11 HULL BOOK =============")
+    test_cases.banner(
+        "===================== FIG 28.11 HULL BOOK ============="
+    )
 
     settle_dt = Date(1, 12, 2019)
     issue_dt = Date(1, 12, 2015)
@@ -193,7 +197,7 @@ def test_BDTExampleTwo():
         print_tree(model._Q, 5)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_BDTExampleThree():
@@ -221,10 +225,20 @@ def test_BDTExampleThree():
     num_time_steps = 200
 
     test_cases.header(
-        "ExerciseType", "Sigma", "NumSteps", "Texp", "Tmat", "V_Fixed", "V_pay", "V_rec"
+        "ExerciseType",
+        "Sigma",
+        "NumSteps",
+        "Texp",
+        "Tmat",
+        "V_Fixed",
+        "V_pay",
+        "V_rec",
     )
 
-    for exercise_type in [FinExerciseTypes.EUROPEAN, FinExerciseTypes.BERMUDAN]:
+    for exercise_type in [
+        FinExerciseTypes.EUROPEAN,
+        FinExerciseTypes.BERMUDAN,
+    ]:
 
         for years_to_maturity in [4.0, 5.0, 10.0, 20.0]:
 
@@ -288,7 +302,7 @@ def test_BDTExampleThree():
                 )
 
 
-###############################################################################
+########################################################################################
 # This has broken and needs to be repaired!!!!
 
 

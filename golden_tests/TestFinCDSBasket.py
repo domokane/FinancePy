@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import time
 import numpy as np
@@ -31,9 +31,9 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def build_Ibor_Curve(tradeDate):
+def build_Ibor_Curve(trade_dt):
 
-    value_dt = tradeDate.add_days(1)
+    value_dt = trade_dt.add_days(1)
     dc_type = DayCountTypes.ACT_360
 
     depos = []
@@ -85,24 +85,24 @@ def build_Ibor_Curve(tradeDate):
 def loadHomogeneousSpreadCurves(
     value_dt,
     libor_curve,
-    cdsSpread3Y,
-    cdsSpread5Y,
-    cdsSpread7Y,
-    cdsSpread10Y,
+    cds_spd_3yr,
+    cds_spd_5yr,
+    cds_spd_7yr,
+    cds_spd_10yr,
     num_credits,
 ):
 
-    maturity3Y = value_dt.next_cds_date(36)
-    maturity5Y = value_dt.next_cds_date(60)
-    maturity7Y = value_dt.next_cds_date(84)
-    maturity10Y = value_dt.next_cds_date(120)
+    maturity_3yr = value_dt.next_cds_date(36)
+    maturity_5yr = value_dt.next_cds_date(60)
+    maturity_7yr = value_dt.next_cds_date(84)
+    maturity_10yr = value_dt.next_cds_date(120)
 
     recovery_rate = 0.40
 
-    cds3Y = CDS(value_dt, maturity3Y, cdsSpread3Y)
-    cds5Y = CDS(value_dt, maturity5Y, cdsSpread5Y)
-    cds7Y = CDS(value_dt, maturity7Y, cdsSpread7Y)
-    cds10Y = CDS(value_dt, maturity10Y, cdsSpread10Y)
+    cds3Y = CDS(value_dt, maturity_3yr, cds_spd_3yr)
+    cds5Y = CDS(value_dt, maturity_5yr, cds_spd_5yr)
+    cds7Y = CDS(value_dt, maturity_7yr, cds_spd_7yr)
+    cds10Y = CDS(value_dt, maturity_10yr, cds_spd_10yr)
 
     contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
@@ -120,10 +120,10 @@ def loadHomogeneousSpreadCurves(
 
 def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
 
-    maturity3Y = value_dt.next_cds_date(36)
-    maturity5Y = value_dt.next_cds_date(60)
-    maturity7Y = value_dt.next_cds_date(84)
-    maturity10Y = value_dt.next_cds_date(120)
+    maturity_3yr = value_dt.next_cds_date(36)
+    maturity_5yr = value_dt.next_cds_date(60)
+    maturity_7yr = value_dt.next_cds_date(84)
+    maturity_10yr = value_dt.next_cds_date(120)
 
     path = dirname(__file__)
     filename = "CDX_NA_IG_S7_SPREADS.csv"
@@ -142,10 +142,10 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(value_dt, maturity3Y, spd3Y)
-        cds5Y = CDS(value_dt, maturity5Y, spd5Y)
-        cds7Y = CDS(value_dt, maturity7Y, spd7Y)
-        cds10Y = CDS(value_dt, maturity10Y, spd10Y)
+        cds3Y = CDS(value_dt, maturity_3yr, spd3Y)
+        cds5Y = CDS(value_dt, maturity_5yr, spd5Y)
+        cds7Y = CDS(value_dt, maturity_7yr, spd7Y)
+        cds10Y = CDS(value_dt, maturity_10yr, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
         issuer_curve = CDSCurve(
@@ -162,11 +162,11 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
 
 def test_FinCDSBasket():
 
-    tradeDate = Date(1, 3, 2007)
-    step_in_dt = tradeDate.add_days(1)
-    value_dt = tradeDate.add_days(1)
+    trade_dt = Date(1, 3, 2007)
+    step_in_dt = trade_dt.add_days(1)
+    value_dt = trade_dt.add_days(1)
 
-    libor_curve = build_Ibor_Curve(tradeDate)
+    libor_curve = build_Ibor_Curve(trade_dt)
 
     basketMaturity = Date(20, 12, 2011)
 
@@ -363,7 +363,7 @@ def test_FinCDSBasket():
                 test_cases.print(period, num_trials, rho, ntd, v[2] * 10000)
 
 
-###############################################################################
+########################################################################################
 
 test_FinCDSBasket()
 test_cases.compareTestCases()

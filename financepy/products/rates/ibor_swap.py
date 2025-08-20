@@ -147,7 +147,9 @@ class IborSwap:
         """
         Reset fixed rate to atm given curve(s). returns the new atm
         """
-        atm = self.swap_rate(valuation_date, discount_curve, index_curve, first_fixing)
+        atm = self.swap_rate(
+            valuation_date, discount_curve, index_curve, first_fixing
+        )
         self.set_fixed_rate(atm)
         return atm
 
@@ -218,15 +220,26 @@ class IborSwap:
         )
 
         value = fixed_leg_value + float_leg_value
-        pv01 = np.abs(fixed_leg_value / self.fixed_leg.cpn / self.fixed_leg.notional)
-        pay_receive_float = -1 if self.float_leg.leg_type == SwapTypes.PAY else 1
-        swap_rate = float_leg_value / self.float_leg.notional / pv01 / pay_receive_float
+        pv01 = np.abs(
+            fixed_leg_value / self.fixed_leg.cpn / self.fixed_leg.notional
+        )
+        pay_receive_float = (
+            -1 if self.float_leg.leg_type == SwapTypes.PAY else 1
+        )
+        swap_rate = (
+            float_leg_value
+            / self.float_leg.notional
+            / pv01
+            / pay_receive_float
+        )
 
         # VP: There is significant amount of confusion here with swap_type vs notional.
         is_payers = (
-            self.fixed_leg.leg_type == SwapTypes.PAY and self.fixed_leg.notional > 0
+            self.fixed_leg.leg_type == SwapTypes.PAY
+            and self.fixed_leg.notional > 0
         ) or (
-            self.fixed_leg.leg_type == SwapTypes.RECEIVE and self.fixed_leg.notional < 0
+            self.fixed_leg.leg_type == SwapTypes.RECEIVE
+            and self.fixed_leg.notional < 0
         )
 
         pvbp_sign = 1 if is_payers else -1
@@ -242,7 +255,9 @@ class IborSwap:
             "contract_rate": self.fixed_leg.cpn,
             "market_rate": swap_rate,
             "spot_pvbp": pv01 * pvbp_sign,
-            "fwd_pvbp": pv01 * pvbp_sign / discount_curve.df(self.effective_dt),
+            "fwd_pvbp": pv01
+            * pvbp_sign
+            / discount_curve.df(self.effective_dt),
             "unit_value": value / self.fixed_leg.notional,
             "value": value,
             # ignoring bus day adj type, calendar, etc for now
@@ -374,4 +389,4 @@ class IborSwap:
         print(self)
 
 
-###############################################################################
+########################################################################################

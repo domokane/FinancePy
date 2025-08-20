@@ -81,7 +81,7 @@ class IborCapVolCurve:
 
         self.generate_caplet_vols()
 
-    ###############################################################################
+    ########################################################################################
 
     def generate_caplet_vols(self):
         """Bootstrap caplet volatilities from cap volatilities using similar
@@ -122,7 +122,7 @@ class IborCapVolCurve:
             self._caplet_gammas[i] = vol_ibor
             cum_ibor2_tau += vol_ibor2 * self._taus[i]
 
-    ###############################################################################
+    ########################################################################################
 
     def caplet_vol(self, dt):
         """Return the forward rate caplet/floorlet volatility for a specific
@@ -153,7 +153,7 @@ class IborCapVolCurve:
 
         return self._caplet_gammas[-1]
 
-    ###############################################################################
+    ########################################################################################
 
     def cap_vol(self, dt):
         """Return the cap flat volatility for a specific cap maturity date for
@@ -180,7 +180,7 @@ class IborCapVolCurve:
 
         return self._cap_sigmas[-1]
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
         """Output the contents of the FinCapVolCurve class object."""
@@ -201,4 +201,4 @@ class IborCapVolCurve:
         return s
 
 
-###############################################################################
+########################################################################################

@@ -23,11 +23,11 @@ from scipy.stats import norm
 N = norm.cdf
 
 
-###############################################################################
+########################################################################################
 # TODO: Vectorise pricer
 # TODO: NUMBA ??
 # TODO: Monte Carlo pricer
-###############################################################################
+########################################################################################
 
 
 def _f(ss, *args):
@@ -45,14 +45,16 @@ def _f(ss, *args):
     v = args[7]
     q = args[8]
 
-    v_call = bs_value(ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+    v_call = bs_value(
+        ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
+    )
     v_put = bs_value(ss, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
     v = v_call - v_put
     return v
 
 
-###############################################################################
+########################################################################################
 
 
 class EquityChooserOption(EquityOption):
@@ -239,11 +241,19 @@ class EquityChooserOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        v_call_1 = bs_value(s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
-        v_put_1 = bs_value(s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
+        v_call_1 = bs_value(
+            s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
+        )
+        v_put_1 = bs_value(
+            s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
+        )
 
-        v_call_2 = bs_value(s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
-        v_put_2 = bs_value(s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
+        v_call_2 = bs_value(
+            s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
+        )
+        v_put_2 = bs_value(
+            s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
+        )
 
         payoff_1 = np.maximum(v_call_1, v_put_1)
         payoff_2 = np.maximum(v_call_2, v_put_2)
@@ -270,4 +280,4 @@ class EquityChooserOption(EquityOption):
         print(self)
 
 
-###############################################################################
+########################################################################################

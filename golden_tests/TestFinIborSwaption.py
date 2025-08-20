@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -30,7 +30,7 @@ from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 
 def test_ibor_depositsAndSwaps(value_dt):
@@ -58,9 +58,15 @@ def test_ibor_depositsAndSwaps(value_dt):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
-    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
-    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
+    swap1 = IborSwap(
+        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
+    )
+    swap2 = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
+    )
+    swap3 = IborSwap(
+        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
+    )
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -149,7 +155,7 @@ def testIborSwaptionModels():
         test_cases.print("REC", k, swap1, swap2, swap3, swap4, swap5, swap6)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_IborSwaptionQLExample():
@@ -175,29 +181,53 @@ def test_IborSwaptionQLExample():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
-    swap = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.00790, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, 0.00790, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "4Y", fixed_leg_type, 0.01200, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "4Y", fixed_leg_type, 0.01200, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "5Y", fixed_leg_type, 0.01570, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "5Y", fixed_leg_type, 0.01570, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "6Y", fixed_leg_type, 0.01865, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "6Y", fixed_leg_type, 0.01865, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "7Y", fixed_leg_type, 0.02160, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "7Y", fixed_leg_type, 0.02160, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "8Y", fixed_leg_type, 0.02350, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "8Y", fixed_leg_type, 0.02350, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "9Y", fixed_leg_type, 0.02540, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "9Y", fixed_leg_type, 0.02540, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "10Y", fixed_leg_type, 0.0273, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "10Y", fixed_leg_type, 0.0273, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "15Y", fixed_leg_type, 0.0297, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "15Y", fixed_leg_type, 0.0297, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "20Y", fixed_leg_type, 0.0316, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "20Y", fixed_leg_type, 0.0316, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "25Y", fixed_leg_type, 0.0335, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "25Y", fixed_leg_type, 0.0335, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "30Y", fixed_leg_type, 0.0354, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "30Y", fixed_leg_type, 0.0354, fixed_freq_type, accType
+    )
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(
@@ -250,7 +280,7 @@ def test_IborSwaptionQLExample():
     test_cases.print(model.__class__, v)
 
 
-###############################################################################
+########################################################################################
 
 
 def testFinIborCashSettledSwaption():
@@ -280,29 +310,53 @@ def testFinIborCashSettledSwaption():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
-    swap = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.00790, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, 0.00790, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "4Y", fixed_leg_type, 0.01200, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "4Y", fixed_leg_type, 0.01200, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "5Y", fixed_leg_type, 0.01570, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "5Y", fixed_leg_type, 0.01570, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "6Y", fixed_leg_type, 0.01865, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "6Y", fixed_leg_type, 0.01865, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "7Y", fixed_leg_type, 0.02160, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "7Y", fixed_leg_type, 0.02160, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "8Y", fixed_leg_type, 0.02350, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "8Y", fixed_leg_type, 0.02350, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "9Y", fixed_leg_type, 0.02540, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "9Y", fixed_leg_type, 0.02540, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "10Y", fixed_leg_type, 0.0273, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "10Y", fixed_leg_type, 0.0273, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "15Y", fixed_leg_type, 0.0297, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "15Y", fixed_leg_type, 0.0297, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "20Y", fixed_leg_type, 0.0316, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "20Y", fixed_leg_type, 0.0316, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "25Y", fixed_leg_type, 0.0335, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "25Y", fixed_leg_type, 0.0335, fixed_freq_type, accType
+    )
     swaps.append(swap)
-    swap = IborSwap(settle_dt, "30Y", fixed_leg_type, 0.0354, fixed_freq_type, accType)
+    swap = IborSwap(
+        settle_dt, "30Y", fixed_leg_type, 0.0354, fixed_freq_type, accType
+    )
     swaps.append(swap)
 
     libor_curve = IborSingleCurve(
@@ -359,12 +413,14 @@ def testFinIborCashSettledSwaption():
 
     model = Black(0.1533)
 
-    v = swaption.cash_settled_value(value_dt, libor_curve, fwd_swap_rate2, model)
+    v = swaption.cash_settled_value(
+        value_dt, libor_curve, fwd_swap_rate2, model
+    )
 
     test_cases.print("Swaption Cash Settled Value:", v)
 
 
-###############################################################################
+########################################################################################
 
 
 def testIborSwaptionMatlabExamples():
@@ -412,7 +468,7 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("MATLAB Prix:", v_matlab)
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
-    ###############################################################################
+    ########################################################################################
 
     test_cases.header("===================================")
     test_cases.header("MATLAB EXAMPLE WITH TERM STRUCTURE")
@@ -473,7 +529,7 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("MATLAB Prix:", v_matlab)
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
-    ###############################################################################
+    ########################################################################################
 
     test_cases.header("===================================")
     test_cases.header("MATLAB EXAMPLE WITH SHIFTED BLACK")
@@ -534,7 +590,7 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("MATLAB Prix:", v_matlab)
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
-    ###############################################################################
+    ########################################################################################
 
     test_cases.header("===================================")
     test_cases.header("MATLAB EXAMPLE WITH HULL WHITE")
@@ -597,7 +653,7 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("MATLAB Prix:", v_matlab)
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
-    ###############################################################################
+    ########################################################################################
 
     test_cases.header("====================================")
     test_cases.header("MATLAB EXAMPLE WITH BLACK KARASINSKI")
@@ -682,7 +738,7 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("MATLAB Prix:", v_matlab)
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
-    ###############################################################################
+    ########################################################################################
 
     test_cases.header("====================================")
     test_cases.header("MATLAB EXAMPLE WITH BLACK-DERMAN-TOY")
@@ -747,7 +803,7 @@ def testIborSwaptionMatlabExamples():
     test_cases.print("DIFF:", v_finpy - v_matlab)
 
 
-###############################################################################
+########################################################################################
 
 
 testIborSwaptionModels()

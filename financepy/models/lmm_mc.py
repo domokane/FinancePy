@@ -17,7 +17,7 @@ from ..models.sobol import get_uniform_sobol
 
 USE_PARALLEL = False
 
-###############################################################################
+########################################################################################
 
 """ This module manages the Ibor Market Model and so stores a specific MC
     forward rate simulation of a 3D matrix of num_paths x num_fwds
@@ -26,7 +26,7 @@ USE_PARALLEL = False
     where the volatility curve per factor is provided and a full N-factor corr-
     elation matrix where a Cholesky is done to decompose the N factors. """
 
-###############################################################################
+########################################################################################
 
 
 class ModelLMMModelTypes(Enum):
@@ -35,7 +35,7 @@ class ModelLMMModelTypes(Enum):
     LMM_FULL_N_FACTOR = 3
 
 
-###############################################################################
+########################################################################################
 
 
 def lmm_print_forwards(fwds):
@@ -62,7 +62,7 @@ def lmm_print_forwards(fwds):
             print("")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -138,7 +138,7 @@ def lmm_swaption_vol_approx(a, b, fwd0, taus, zetas, rho):
     return swaption_vol
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -195,10 +195,14 @@ def lmm_sim_swaption_vol(a, b, fwd0, fwds, taus):
     return fwd_swap_rate_vol
 
 
-###############################################################################
+########################################################################################
 
 
-@njit(float64[:, :](int64, int64, int64, float64[:, :, :]), cache=True, fastmath=True)
+@njit(
+    float64[:, :](int64, int64, int64, float64[:, :, :]),
+    cache=True,
+    fastmath=True,
+)
 def lmm_fwd_fwd_correlation(num_fwds, num_paths, i_time, fwds):
     """Extract forward forward correlation matrix at some future time index
     from the simulated forward rates and return the matrix."""
@@ -245,7 +249,7 @@ def lmm_fwd_fwd_correlation(num_fwds, num_paths, i_time, fwds):
     return fwd_corr
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -284,7 +288,7 @@ def lmm_price_caps_black(fwd0, vol_caplet, p, k, taus):
     return caplet
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(float64[:, :](float64[:, :], int64), cache=True, fastmath=True)
@@ -302,7 +306,7 @@ def sub_matrix(t, N):
     return result
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(float64[:, :](float64[:, :]), cache=True, fastmath=True)
@@ -312,7 +316,7 @@ def cholesky_np(rho):
     return chol
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -424,7 +428,7 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
     return fwd
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -515,7 +519,9 @@ def lmm_simulate_fwds_1f(
                     mu_a += zkj * fi * ti * zij / (1.0 + fi * ti)
 
                 # predictor corrector
-                x = np.exp(mu_a * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj)
+                x = np.exp(
+                    mu_a * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj
+                )
                 fwd_b[k] = fwd[i_path, j, k] * x
 
                 mu_b = 0.0
@@ -527,18 +533,28 @@ def lmm_simulate_fwds_1f(
 
                 mu_c = 0.5 * (mu_a + mu_b)
 
-                x = np.exp(mu_c * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj)
+                x = np.exp(
+                    mu_c * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj
+                )
                 fwd[i_path, j + 1, k] = fwd[i_path, j, k] * x
 
     return fwd
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
     float64[:, :, :](
-        int64, int64, int64, int64, float64[:], float64[:, :], float64[:], int64, int64
+        int64,
+        int64,
+        int64,
+        int64,
+        float64[:],
+        float64[:, :],
+        float64[:],
+        int64,
+        int64,
     ),
     cache=True,
     fastmath=True,
@@ -652,11 +668,13 @@ def lmm_simulate_fwds_mf(
     return fwd
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64[:](int64, int64, float64, float64[:], float64[:, :, :], float64[:], int64),
+    float64[:](
+        int64, int64, float64, float64[:], float64[:, :, :], float64[:], int64
+    ),
     cache=True,
     fastmath=True,
 )
@@ -717,7 +735,7 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
     return capFlrLetValues
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -765,8 +783,12 @@ def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
                 fixed_flows[j] = cpn * taus[j]
                 float_flows[j] = libor * taus[j]
             else:
-                fixed_flows[j] = fixed_flows[j - 1] * period_roll + cpn * taus[j]
-                float_flows[j] = float_flows[j - 1] * period_roll + libor * taus[j]
+                fixed_flows[j] = (
+                    fixed_flows[j - 1] * period_roll + cpn * taus[j]
+                )
+                float_flows[j] = (
+                    float_flows[j - 1] * period_roll + libor * taus[j]
+                )
 
             period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
@@ -788,12 +810,19 @@ def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
     return v
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
     float64(
-        float64, int64, int64, int64, float64[:], float64[:, :, :], float64[:], int64
+        float64,
+        int64,
+        int64,
+        int64,
+        float64[:],
+        float64[:, :, :],
+        float64[:],
+        int64,
     ),
     cache=True,
     fastmath=True,
@@ -855,11 +884,13 @@ def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, is_payer):
     return pay_rec_price
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64[:](float64, int64, int64, float64[:], float64[:, :, :], float64[:]),
+    float64[:](
+        float64, int64, int64, float64[:], float64[:, :, :], float64[:]
+    ),
     cache=True,
     fastmath=True,
 )
@@ -907,7 +938,9 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            rachet_caplet_values[i_fwd] += rachet_caplets[i_fwd] / numeraire[i_fwd]
+            rachet_caplet_values[i_fwd] += (
+                rachet_caplets[i_fwd] / numeraire[i_fwd]
+            )
 
     for i_fwd in range(0, num_periods):
         rachet_caplet_values[i_fwd] /= num_paths
@@ -915,15 +948,19 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
     return rachet_caplet_values
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64(int64, float64, int64, int64, float64[:], float64[:, :, :], float64[:]),
+    float64(
+        int64, float64, int64, int64, float64[:], float64[:, :, :], float64[:]
+    ),
     cache=True,
     fastmath=True,
 )
-def lmm_flexi_cap_pricer(max_caplets, K, num_periods, num_paths, fwd0, fwds, taus):
+def lmm_flexi_cap_pricer(
+    max_caplets, K, num_periods, num_paths, fwd0, fwds, taus
+):
     """Price a flexicap using the simulated Ibor rates."""
 
     max_paths = len(fwds)
@@ -971,7 +1008,9 @@ def lmm_flexi_cap_pricer(max_caplets, K, num_periods, num_paths, fwd0, fwds, tau
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            flexi_caplet_values[i_fwd] += flexi_caplets[i_fwd] / numeraire[i_fwd]
+            flexi_caplet_values[i_fwd] += (
+                flexi_caplets[i_fwd] / numeraire[i_fwd]
+            )
 
     for i_fwd in range(0, num_periods):
         flexi_caplet_values[i_fwd] /= num_paths
@@ -983,11 +1022,13 @@ def lmm_flexi_cap_pricer(max_caplets, K, num_periods, num_paths, fwd0, fwds, tau
     return flexi_cap_value
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64[:](float64, int64, int64, float64[:], float64[:, :, :], float64[:]),
+    float64[:](
+        float64, int64, int64, float64[:], float64[:, :, :], float64[:]
+    ),
     cache=True,
     fastmath=True,
 )
@@ -1036,7 +1077,9 @@ def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            stickyCapletValues[i_fwd] += stickyCaplets[i_fwd] / numeraire[i_fwd]
+            stickyCapletValues[i_fwd] += (
+                stickyCaplets[i_fwd] / numeraire[i_fwd]
+            )
 
     for i_fwd in range(0, num_periods):
         stickyCapletValues[i_fwd] /= num_paths
@@ -1044,4 +1087,4 @@ def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
     return stickyCapletValues
 
 
-###############################################################################
+########################################################################################

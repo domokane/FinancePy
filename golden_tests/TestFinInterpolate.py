@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -17,7 +17,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 
 
 def test_FinInterpolate():
@@ -58,7 +58,10 @@ def test_FinInterpolate():
             plt.figure(figsize=(12, 10))
             plt.plot(xValues, yValues, color="r", marker="o")
             plt.plot(
-                xInterpolateValues, yInterpValues, color="b", label=str(interp_type)
+                xInterpolateValues,
+                yInterpValues,
+                color="b",
+                label=str(interp_type),
             )
             plt.legend()
 
@@ -77,7 +80,7 @@ def test_FinInterpolate():
     test_cases.print("10000 Interpolations", end - start)
 
 
-###############################################################################
+########################################################################################
 
 
 test_FinInterpolate()

@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -13,7 +13,9 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_bermudan_swaption import IborBermudanSwaption
+from financepy.products.rates.ibor_bermudan_swaption import (
+    IborBermudanSwaption,
+)
 from financepy.models.black import Black
 from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
@@ -126,13 +128,25 @@ def test_IborBermudanSwaptionBKModel():
     ###########################################################################
     ###########################################################################
 
-    test_cases.banner("=======================================================")
-    test_cases.banner("=======================================================")
-    test_cases.banner("==================== BK MODEL =========================")
-    test_cases.banner("=======================================================")
-    test_cases.banner("=======================================================")
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "==================== BK MODEL ========================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
 
-    test_cases.banner("======= 0% VOLATILITY EUROPEAN SWAPTION BK MODEL ======")
+    test_cases.banner(
+        "======= 0% VOLATILITY EUROPEAN SWAPTION BK MODEL ======"
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.000000001
@@ -149,7 +163,9 @@ def test_IborBermudanSwaptionBKModel():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    test_cases.banner("======= 20% VOLATILITY EUROPEAN SWAPTION BK MODEL ========")
+    test_cases.banner(
+        "======= 20% VOLATILITY EUROPEAN SWAPTION BK MODEL ========"
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.20
@@ -314,13 +330,25 @@ def test_IborBermudanSwaptionBKModel():
     ###########################################################################
     ###########################################################################
 
-    test_cases.banner("=======================================================")
-    test_cases.banner("=======================================================")
-    test_cases.banner("======================= BDT MODEL =====================")
-    test_cases.banner("=======================================================")
-    test_cases.banner("=======================================================")
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================= BDT MODEL ====================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
 
-    test_cases.banner("====== 0% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
+    test_cases.banner(
+        "====== 0% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======"
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.00001
@@ -336,7 +364,9 @@ def test_IborBermudanSwaptionBKModel():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    test_cases.banner("===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
+    test_cases.banner(
+        "===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======"
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.20
@@ -495,11 +525,21 @@ def test_IborBermudanSwaptionBKModel():
     ###########################################################################
     ###########################################################################
 
-    test_cases.banner("=======================================================")
-    test_cases.banner("=======================================================")
-    test_cases.banner("======================= HW MODEL ======================")
-    test_cases.banner("=======================================================")
-    test_cases.banner("=======================================================")
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================= HW MODEL ======================"
+    )
+    test_cases.banner(
+        "======================================================="
+    )
+    test_cases.banner(
+        "======================================================="
+    )
 
     test_cases.banner("====== 0% VOLATILITY EUROPEAN SWAPTION HW MODEL ======")
 
@@ -517,7 +557,9 @@ def test_IborBermudanSwaptionBKModel():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    test_cases.banner("===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
+    test_cases.banner(
+        "===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======"
+    )
 
     # Used BK with constant short-rate volatility
     sigma = 0.01

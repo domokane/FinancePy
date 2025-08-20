@@ -14,7 +14,7 @@ from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
 
-###############################################################################
+########################################################################################
 
 
 def _func_name():
@@ -24,7 +24,7 @@ def _func_name():
     return ff
 
 
-###############################################################################
+########################################################################################
 
 
 def grid_index(t, grid_times):
@@ -38,7 +38,7 @@ def grid_index(t, grid_times):
     raise FinError("Grid index not found")
 
 
-###############################################################################
+########################################################################################
 
 
 def beta_vector_to_corr_matrix(betas):
@@ -56,7 +56,7 @@ def beta_vector_to_corr_matrix(betas):
     return np.array(correlation)
 
 
-###############################################################################
+########################################################################################
 
 
 def pv01_times(t: float, f: float):
@@ -75,7 +75,7 @@ def pv01_times(t: float, f: float):
     return ptimes
 
 
-###############################################################################
+########################################################################################
 
 
 def times_from_dates(
@@ -127,7 +127,7 @@ def times_from_dates(
     return None
 
 
-###############################################################################
+########################################################################################
 
 
 def check_vector_differences(x: np.ndarray, y: np.ndarray, tol: float = 1e-6):
@@ -145,7 +145,7 @@ def check_vector_differences(x: np.ndarray, y: np.ndarray, tol: float = 1e-6):
             print("Vector difference of:", diff, " at index: ", i)
 
 
-###############################################################################
+########################################################################################
 
 
 def check_dt(d: Date):
@@ -155,7 +155,7 @@ def check_dt(d: Date):
         raise FinError("Should be a date dummy!")
 
 
-###############################################################################
+########################################################################################
 
 
 def dump(obj):
@@ -190,7 +190,7 @@ def dump(obj):
         print(attr, x)
 
 
-###############################################################################
+########################################################################################
 
 
 def print_tree(array: np.ndarray, depth: int = None):
@@ -211,7 +211,7 @@ def print_tree(array: np.ndarray, depth: int = None):
         print("")
 
 
-###############################################################################
+########################################################################################
 
 
 def input_time(dt: Date, curve):
@@ -225,7 +225,10 @@ def input_time(dt: Date, curve):
     def check(t):
         if t < 0.0:
             raise FinError(
-                "Date " + str(dt) + " is before curve date " + str(curve._curve_dt)
+                "Date "
+                + str(dt)
+                + " is before curve date "
+                + str(curve._curve_dt)
             )
         elif t < small:
             t = small
@@ -247,7 +250,7 @@ def input_time(dt: Date, curve):
         raise FinError("Unknown type.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -264,7 +267,7 @@ def listdiff(a: np.ndarray, b: np.ndarray):
     return diff
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -278,7 +281,7 @@ def dotproduct(x_vector: np.ndarray, y_vector: np.ndarray):
     return dotprod
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -292,7 +295,7 @@ def frange(start: int, stop: int, step: int):
     return x
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -308,7 +311,7 @@ def normalise_weights(wt_vector: np.ndarray):
     return wt_vector
 
 
-###############################################################################
+########################################################################################
 
 
 def label_to_string(
@@ -338,7 +341,7 @@ def label_to_string(
     return f"{label}: {value}{separator}"
 
 
-###############################################################################
+########################################################################################
 
 
 def table_to_string(header: str, value_table, float_precision="10.7f"):
@@ -362,7 +365,7 @@ def table_to_string(header: str, value_table, float_precision="10.7f"):
     return s[:-1]
 
 
-###############################################################################
+########################################################################################
 
 
 # def format_table(header: (list, tuple), rows: (list, tuple)):
@@ -400,7 +403,8 @@ def format_table(header, rows):
 
     # Compute max width of each column
     col_widths = [
-        max(len(str(h)), *(len(str(r[i])) for r in rows)) for i, h in enumerate(header)
+        max(len(str(h)), *(len(str(r[i])) for r in rows))
+        for i, h in enumerate(header)
     ]
 
     def format_cell(val, width):
@@ -409,7 +413,9 @@ def format_table(header, rows):
         return f"{str(val):<{width}}"  # Left align
 
     # Build header
-    header_line = " | ".join(format_cell(h, w) for h, w in zip(header, col_widths))
+    header_line = " | ".join(
+        format_cell(h, w) for h, w in zip(header, col_widths)
+    )
     sep_line = "-+-".join("-" * w for w in col_widths)
 
     # Build rows
@@ -422,7 +428,7 @@ def format_table(header, rows):
     return "\n".join([header_line, sep_line] + row_lines)
 
 
-###############################################################################
+########################################################################################
 
 
 def to_usable_type(t):
@@ -445,7 +451,7 @@ def to_usable_type(t):
     return t
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
@@ -484,7 +490,7 @@ def uniform_to_default_time(u, t, v):
     return tau
 
 
-###############################################################################
+########################################################################################
 # THIS IS NOT USED
 
 
@@ -529,7 +535,7 @@ def accrued_tree(grid_times: np.ndarray, grid_flows: np.ndarray, face: float):
     return accrued
 
 
-###############################################################################
+########################################################################################
 
 
 def check_argument_types(func, values):
@@ -553,4 +559,4 @@ def check_argument_types(func, values):
             raise FinError("Argument Type Error")
 
 
-###############################################################################
+########################################################################################

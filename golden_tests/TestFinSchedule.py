@@ -1,8 +1,9 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
+
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, globalTestCaseMode
@@ -15,16 +16,20 @@ from financepy.utils.date import Date, set_date_format, DateFormatTypes
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
-###############################################################################
+########################################################################################
 
 set_date_format(DateFormatTypes.UK_LONGEST)
 
 
 def dumpSchedule(desc, schedule):
 
-    test_cases.banner("=======================================================")
+    test_cases.banner(
+        "======================================================="
+    )
     test_cases.banner(desc)
-    test_cases.banner("=======================================================")
+    test_cases.banner(
+        "======================================================="
+    )
     test_cases.header("OBJ")
     test_cases.print(schedule)
 
@@ -37,7 +42,7 @@ def dumpSchedule(desc, schedule):
     test_cases.print(0, "EFCT DATE", str(effDate), years, diff)
 
     prev_dt = schedule.adjusted_dts[0]
-    for i_flow in range(1, num_flows-1):
+    for i_flow in range(1, num_flows - 1):
         adjustedDate = schedule.adjusted_dts[i_flow]
         years = (adjustedDate - effDate) / 365.0
         diff = (adjustedDate - prev_dt) / 365.0
@@ -48,9 +53,10 @@ def dumpSchedule(desc, schedule):
     years = (termDate - effDate) / 365.0
     diff = (termDate - prev_dt) / 365.0
 
-    test_cases.print(num_flows-1, "TERM DATE", str(termDate), years, diff)
+    test_cases.print(num_flows - 1, "TERM DATE", str(termDate), years, diff)
 
-###############################################################################
+
+########################################################################################
 
 
 def test_FinSchedule():
@@ -67,13 +73,9 @@ def test_FinSchedule():
     dg_type = DateGenRuleTypes.BACKWARD
     termination_dtAdjust = True
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("BACKWARD SEMI-ANNUAL FREQUENCY", schedule)
 
@@ -84,13 +86,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("BACKWARD QUARTERLY FREQUENCY", schedule)
 
@@ -101,13 +99,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("BACKWARD MONTHLY FREQUENCY", schedule)
 
@@ -122,13 +116,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.FORWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("FORWARD ANNUAL", schedule)
 
@@ -139,12 +129,7 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type)
 
     dumpSchedule("FORWARD SEMI-ANNUAL", schedule)
 
@@ -155,13 +140,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("FORWARD MONTHLY", schedule)
 
@@ -176,13 +157,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
     dumpSchedule("BACKWARD GEN WITH SHORT END STUB", schedule)
 
     ###########################################################################
@@ -196,13 +173,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("BACKWARD GEN WITH VERY SHORT END STUB", schedule)
 
@@ -217,13 +190,9 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.FORWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("FORWARD GEN WITH END STUB", schedule)
 
@@ -234,12 +203,7 @@ def test_FinSchedule():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.FORWARD
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type)
+    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type)
 
     dumpSchedule("FORWARD GEN WITH VERY SHORT END STUB", schedule)
 
@@ -251,13 +215,9 @@ def test_FinSchedule():
     dg_type = DateGenRuleTypes.BACKWARD
     termination_dtAdjust = True
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust)
+    schedule = Schedule(
+        d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dtAdjust
+    )
 
     dumpSchedule("TERMINATION DATE ADJUSTED", schedule)
 
@@ -270,14 +230,16 @@ def test_FinSchedule():
     termination_dtAdjust = True
     eomFlag = True
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust,
-                        eomFlag)
+    schedule = Schedule(
+        d1,
+        d2,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        termination_dtAdjust,
+        eomFlag,
+    )
 
     dumpSchedule("END OF MONTH - NOT EOM TERM DATE - USING MOD FOLL", schedule)
 
@@ -290,29 +252,34 @@ def test_FinSchedule():
     termination_dtAdjust = True
     eomFlag = True
 
-    schedule = Schedule(d1,
-                        d2,
-                        freq_type,
-                        cal_type,
-                        bd_type,
-                        dg_type,
-                        termination_dtAdjust,
-                        eomFlag)
+    schedule = Schedule(
+        d1,
+        d2,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        termination_dtAdjust,
+        eomFlag,
+    )
 
     dumpSchedule("END OF MONTH - EOM TERM DATE - USING MOD FOLL", schedule)
 
     # PROBLEM WITH THIS ONE AS DATES COLLIDE BUT REMOVE FIRST ONE
-    schedule = Schedule(Date(28, 4, 2023),
-                        Date(30, 4, 2024),
-                        FrequencyTypes.ANNUAL,
-                        CalendarTypes.UNITED_STATES,
-                        BusDayAdjustTypes.MODIFIED_FOLLOWING,
-                        DateGenRuleTypes.BACKWARD)
+    schedule = Schedule(
+        Date(28, 4, 2023),
+        Date(30, 4, 2024),
+        FrequencyTypes.ANNUAL,
+        CalendarTypes.UNITED_STATES,
+        BusDayAdjustTypes.MODIFIED_FOLLOWING,
+        DateGenRuleTypes.BACKWARD,
+    )
+
 
 #    print(schedule)
 #    print(schedule.adjusted_dts)
 
-###############################################################################
+########################################################################################
 
 
 def test_FinScheduleAlignment(eomFlag):
@@ -328,54 +295,60 @@ def test_FinScheduleAlignment(eomFlag):
     matDate1 = effDate.add_tenor("4Y")
     matDate2 = effDate.add_tenor("50Y")
 
-#    print(matDate1)
-#    print(matDate2)
+    #    print(matDate1)
+    #    print(matDate2)
 
     myCal = Calendar(cal_type)
 
     adjustedMatDate1 = myCal.adjust(matDate1, bd_type)
     adjustedMatDate2 = myCal.adjust(matDate2, bd_type)
 
-#    print(adjustedMatDate1)
-#    print(adjustedMatDate2)
+    #    print(adjustedMatDate1)
+    #    print(adjustedMatDate2)
 
-    sched1 = Schedule(effDate,
-                      adjustedMatDate1,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched1 = Schedule(
+        effDate,
+        adjustedMatDate1,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-#    print(sched1)
+    #    print(sched1)
 
-    sched2 = Schedule(effDate,
-                      adjustedMatDate2,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched2 = Schedule(
+        effDate,
+        adjustedMatDate2,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-#    print(sched1.adjusted_dts[-1])
-#    print(sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
+    #    print(sched1.adjusted_dts[-1])
+    #    print(sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
 
-# THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
+    # THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
 
     compare = (
-        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
+        sched1.adjusted_dts[-1]
+        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+    )
 
 
 #    print(compare, eomFlag)
 #    assert(compare == eomFlag)
 
-###############################################################################
+########################################################################################
 
 
 def test_FinScheduleAlignmentLeapYearEOM():
-    """ Effective date on leap year."""
+    """Effective date on leap year."""
 
     value_dt = Date(26, 2, 2006)
     effDate = value_dt.add_tenor("2D")
@@ -389,36 +362,43 @@ def test_FinScheduleAlignmentLeapYearEOM():
     matDate2 = effDate.add_tenor("50Y")
     eomFlag = True
 
-    sched1 = Schedule(effDate,
-                      matDate1,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched1 = Schedule(
+        effDate,
+        matDate1,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-    sched2 = Schedule(effDate,
-                      matDate2,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched2 = Schedule(
+        effDate,
+        matDate2,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-#    print(sched1.adjusted_dts)
-#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
+    #    print(sched1.adjusted_dts)
+    #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
-    assert(compare == eomFlag)
+        sched1.adjusted_dts[-1]
+        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+    )
+    assert compare == eomFlag
 
-###############################################################################
+
+########################################################################################
 
 
 def test_FinScheduleAlignmentLeapYearNotEOM():
-    """ Effective date on leap year. Not EOM. """
+    """Effective date on leap year. Not EOM."""
 
     eomFlag = False
 
@@ -433,38 +413,45 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
     matDate1 = effDate.add_tenor("4Y")
     matDate2 = effDate.add_tenor("50Y")
 
-#    print(matDate1, matDate2)
+    #    print(matDate1, matDate2)
 
-    sched1 = Schedule(effDate,
-                      matDate1,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched1 = Schedule(
+        effDate,
+        matDate1,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-    sched2 = Schedule(effDate,
-                      matDate2,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched2 = Schedule(
+        effDate,
+        matDate2,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-#    print(sched1.adjusted_dts)
-#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
+    #    print(sched1.adjusted_dts)
+    #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
-    assert( compare == True )
+        sched1.adjusted_dts[-1]
+        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+    )
+    assert compare == True
 
-###############################################################################
+
+########################################################################################
 
 
 def test_FinScheduleAlignmentEff31():
-    """ EOM schedule so all unadjusted dates fall on month end."""
+    """EOM schedule so all unadjusted dates fall on month end."""
 
     eomFlag = True
     value_dt = Date(29, 7, 2006)
@@ -478,34 +465,41 @@ def test_FinScheduleAlignmentEff31():
     matDate1 = effDate.add_tenor("4Y")
     matDate2 = effDate.add_tenor("50Y")
 
-#    print(matDate1, matDate2)
+    #    print(matDate1, matDate2)
 
-    sched1 = Schedule(effDate,
-                      matDate1,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched1 = Schedule(
+        effDate,
+        matDate1,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-    sched2 = Schedule(effDate,
-                      matDate2,
-                      freq_type,
-                      cal_type,
-                      bd_type,
-                      dg_type,
-                      adjust_termination_dt,
-                      eomFlag)
+    sched2 = Schedule(
+        effDate,
+        matDate2,
+        freq_type,
+        cal_type,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eomFlag,
+    )
 
-#    print(sched1.adjusted_dts)
-#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
+    #    print(sched1.adjusted_dts)
+    #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
-    assert(compare == True)
+        sched1.adjusted_dts[-1]
+        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+    )
+    assert compare == True
 
-###############################################################################
+
+########################################################################################
 
 
 test_FinSchedule()

@@ -1,13 +1,15 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
 sys.path.append("..")
 
 from financepy.utils.date import Date
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.products.inflation.FinInflationIndexCurve import (
+    FinInflationIndexCurve,
+)
 from FinTestCases import FinTestCases, globalTestCaseMode
 
 test_cases = FinTestCases(__file__, globalTestCaseMode)
@@ -41,7 +43,7 @@ def test_FinInflationIndexCurve():
 
 #    print(curve)
 
-###############################################################################
+########################################################################################
 
 
 test_FinInflationIndexCurve()

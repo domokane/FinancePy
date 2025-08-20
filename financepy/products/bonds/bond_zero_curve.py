@@ -18,7 +18,7 @@ from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string
 
-###############################################################################
+########################################################################################
 
 
 def _f(df, *args):
@@ -26,15 +26,17 @@ def _f(df, *args):
     value_dt = args[1]
     bond = args[2]
     mkt_clean_price = args[3]
-    num_points = len(curve._times)
-    curve._values[num_points - 1] = df
+    num_points = len(curve.times)
+
+    curve.set_df(num_points - 1, df)
+
     bond_discount_price = bond.clean_price_from_discount_curve(value_dt, curve)
     obj_fn = bond_discount_price - mkt_clean_price
 
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 class BondZeroCurve(DiscountCurve):
@@ -77,7 +79,7 @@ class BondZeroCurve(DiscountCurve):
     def _bootstrap_zero_rates(self):
 
         self._times = np.array([0.0])
-        self._values = np.array([1.0])
+        self._dfs = np.array([1.0])
 
         for i in range(0, len(self.bonds)):
 
@@ -91,7 +93,7 @@ class BondZeroCurve(DiscountCurve):
 
             argtuple = (self, self.settle_dt, bond, clean_price)
             self._times = np.append(self._times, t_mat)
-            self._values = np.append(self._values, df)
+            self._dfs = np.append(self._dfs, df)
 
             optimize.newton(
                 _f,
@@ -127,14 +129,14 @@ class BondZeroCurve(DiscountCurve):
 
     def df(self, dt: Date):
         t = input_time(dt, self)
-        z = interpolate(t, self._times, self._values, self._interp_type.value)
+        z = interpolate(t, self._times, self._dfs, self._interp_type.value)
         return z
 
     ###########################################################################
 
     def survival_prob(self, dt: Date):
         t = input_time(dt, self)
-        q = interpolate(t, self._times, self._values, self._interp_type.value)
+        q = interpolate(t, self._times, self._dfs, self._interp_type.value)
         return q
 
     ###########################################################################
@@ -150,7 +152,9 @@ class BondZeroCurve(DiscountCurve):
 
     ###########################################################################
 
-    def fwd_rate(self, date1: Date, date2: Date, day_count_type: DayCountTypes):
+    def fwd_rate(
+        self, date1: Date, date2: Date, day_count_type: DayCountTypes
+    ):
         """Calculate the forward rate according to the specified
         day count convention."""
 
@@ -193,7 +197,7 @@ class BondZeroCurve(DiscountCurve):
         # TODO
         header = "TIMES,DISCOUNT FACTORS"
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        value_table = [self._times, self._values]
+        value_table = [self._times, self._dfs]
         precision = "10.7f"
         s += table_to_string(header, value_table, precision)
         return s
@@ -205,4 +209,4 @@ class BondZeroCurve(DiscountCurve):
         print(self)
 
 
-###############################################################################
+########################################################################################

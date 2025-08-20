@@ -1,8 +1,10 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.products.inflation.FinInflationIndexCurve import (
+    FinInflationIndexCurve,
+)
 from financepy.utils.date import Date
 
 

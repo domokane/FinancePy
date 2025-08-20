@@ -13,7 +13,7 @@ from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.math import heaviside
 
-###############################################################################
+########################################################################################
 
 
 class EquityTreePayoffTypes(Enum):
@@ -31,7 +31,7 @@ class EquityTreeExerciseTypes(Enum):
     AMERICAN = 2
 
 
-###############################################################################
+########################################################################################
 
 
 @njit
@@ -67,7 +67,7 @@ def _validate_payoff(payoff_type, payoff_params):
     return None
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(float64(float64, int64, float64[:]), fastmath=True, cache=True)
@@ -96,7 +96,7 @@ def _payoff_value(s, payoff_type, payoff_params):
     return payoff
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -177,11 +177,15 @@ def _value_once(
                 option_values[index + i_node] = hold_value
             elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
                 s = stock_values[index + i_node]
-                exercise_value = _payoff_value(s, payoff_typeValue, payoff_params)
+                exercise_value = _payoff_value(
+                    s, payoff_typeValue, payoff_params
+                )
                 option_values[index + i_node] = max(exercise_value, hold_value)
 
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / (stock_values[2] - stock_values[1])
+    delta = (option_values[2] - option_values[1]) / (
+        stock_values[2] - stock_values[1]
+    )
     delta_up = (option_values[5] - option_values[4]) / (
         stock_values[5] - stock_values[4]
     )
@@ -194,7 +198,7 @@ def _value_once(
     return results
 
 
-###############################################################################
+########################################################################################
 
 
 class EquityBinomialTree:
@@ -209,7 +213,7 @@ class EquityBinomialTree:
     #       self.m_num_steps = 10
     #        self.m_num_nodes = 10
 
-    ###############################################################################
+    ########################################################################################
 
     def value(
         self,
@@ -263,4 +267,4 @@ class EquityBinomialTree:
         return price
 
 
-###############################################################################
+########################################################################################

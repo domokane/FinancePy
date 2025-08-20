@@ -14,7 +14,7 @@ from ...utils.day_count import DayCountTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 
-###############################################################################
+########################################################################################
 
 
 class IborDeposit:
@@ -193,4 +193,4 @@ class IborDeposit:
         print(self)
 
 
-###############################################################################
+########################################################################################

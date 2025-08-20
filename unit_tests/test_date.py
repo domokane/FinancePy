@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import datetime
 import numpy as np
@@ -163,22 +163,22 @@ def test_DateRange():
 
     # Default
     end_dt = start_dt.add_days(3)
-    dtRange = date_range(start_dt, end_dt)
-    assert dtRange[0] == Date(1, 1, 2010)
-    assert dtRange[-1] == Date(4, 1, 2010)
+    dt_range = date_range(start_dt, end_dt)
+    assert dt_range[0] == Date(1, 1, 2010)
+    assert dt_range[-1] == Date(4, 1, 2010)
 
     # 1W Tenor
     end_dt = start_dt.add_days(20)
     tenor = "1W"
-    dtRange = date_range(start_dt, end_dt, tenor)
-    assert dtRange[0] == Date(1, 1, 2010)
-    assert dtRange[-1] == Date(21, 1, 2010)
+    dt_range = date_range(start_dt, end_dt, tenor)
+    assert dt_range[0] == Date(1, 1, 2010)
+    assert dt_range[-1] == Date(21, 1, 2010)
 
     # 7D Tenor
     tenor = "7D"
-    dtRange = date_range(start_dt, end_dt, tenor)
-    assert dtRange[1] == Date(8, 1, 2010)
-    assert dtRange[2] == Date(15, 1, 2010)
+    dt_range = date_range(start_dt, end_dt, tenor)
+    assert dt_range[1] == Date(8, 1, 2010)
+    assert dt_range[2] == Date(15, 1, 2010)
 
     # Same start_dt
     assert date_range(start_dt, start_dt)[0] == Date(1, 1, 2010)

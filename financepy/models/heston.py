@@ -30,7 +30,7 @@ from enum import Enum
 
 
 class HestonNumericalScheme(Enum):
-    euler = 1
+    EULER = 1
     EULERLOG = 2
     QUADEXP = 3
 
@@ -69,7 +69,7 @@ def get_paths(
     rhohat = np.sqrt(1.0 - rho * rho)
     sigma2 = sigma * sigma
 
-    if scheme == HestonNumericalScheme.euler.value:
+    if scheme == HestonNumericalScheme.EULER.value:
         # Basic scheme to first order with truncation on variance
         for i_path in range(0, num_paths):
             s = s0

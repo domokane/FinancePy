@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -9,7 +9,7 @@ from financepy.products.equity.equity_chooser_option import EquityChooserOption
 
 
 def test_EquityChooserOptionHaug():
-    """ Following example in Haug Page 130 """
+    """Following example in Haug Page 130"""
 
     value_dt = Date(1, 1, 2015)
     choose_dt = Date(2, 4, 2015)
@@ -26,23 +26,17 @@ def test_EquityChooserOptionHaug():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(choose_dt,
-                                        call_expiry_dt,
-                                        put_expiry_dt,
-                                        call_strike,
-                                        put_strike)
+    chooserOption = EquityChooserOption(
+        choose_dt, call_expiry_dt, put_expiry_dt, call_strike, put_strike
+    )
 
-    v = chooserOption.value(value_dt,
-                            stock_price,
-                            discount_curve,
-                            dividend_curve,
-                            model)
+    v = chooserOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
-    v_mc = chooserOption.value_mc(value_dt,
-                                  stock_price,
-                                  discount_curve,
-                                  dividend_curve,
-                                  model, 20000)
+    v_mc = chooserOption.value_mc(
+        value_dt, stock_price, discount_curve, dividend_curve, model, 20000
+    )
 
     v_haug = 6.0508
 
@@ -52,7 +46,7 @@ def test_EquityChooserOptionHaug():
 
 
 def test_EquityChooserOptionMatlab():
-    """https://fr.mathworks.com/help/fininst/chooserbybls.html """
+    """https://fr.mathworks.com/help/fininst/chooserbybls.html"""
 
     value_dt = Date(1, 6, 2007)
     chooseDate = Date(31, 8, 2007)
@@ -70,23 +64,17 @@ def test_EquityChooserOptionMatlab():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(chooseDate,
-                                        call_expiry_dt,
-                                        put_expiry_dt,
-                                        call_strike,
-                                        put_strike)
+    chooserOption = EquityChooserOption(
+        chooseDate, call_expiry_dt, put_expiry_dt, call_strike, put_strike
+    )
 
-    v = chooserOption.value(value_dt,
-                            stock_price,
-                            discount_curve,
-                            dividend_curve,
-                            model)
+    v = chooserOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
-    v_mc = chooserOption.value_mc(value_dt,
-                                  stock_price,
-                                  discount_curve,
-                                  dividend_curve,
-                                  model, 20000)
+    v_mc = chooserOption.value_mc(
+        value_dt, stock_price, discount_curve, dividend_curve, model, 20000
+    )
 
     v_matlab = 8.9308
 
@@ -96,7 +84,7 @@ def test_EquityChooserOptionMatlab():
 
 
 def test_EquityChooserOptionDerivicom():
-    """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm """
+    """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm"""
 
     value_dt = Date(1, 1, 2007)
     chooseDate = Date(1, 2, 2007)
@@ -113,23 +101,17 @@ def test_EquityChooserOptionDerivicom():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(chooseDate,
-                                        call_expiry_dt,
-                                        put_expiry_dt,
-                                        call_strike,
-                                        put_strike)
+    chooserOption = EquityChooserOption(
+        chooseDate, call_expiry_dt, put_expiry_dt, call_strike, put_strike
+    )
 
-    v = chooserOption.value(value_dt,
-                            stock_price,
-                            discount_curve,
-                            dividend_curve,
-                            model)
+    v = chooserOption.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
 
-    v_mc = chooserOption.value_mc(value_dt,
-                                  stock_price,
-                                  discount_curve,
-                                  dividend_curve,
-                                  model, 20000)
+    v_mc = chooserOption.value_mc(
+        value_dt, stock_price, discount_curve, dividend_curve, model, 20000
+    )
 
     v_derivicom = 1.0989
 

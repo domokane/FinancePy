@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from math import ceil
 
@@ -16,17 +16,17 @@ from ..utils.global_vars import G_SMALL
 
 INTERP = InterpTypes.FLAT_FWD_RATES.value
 
-###############################################################################
+########################################################################################
 # TODO : Calculate accrued in bond option according to accrual convention
 # TODO : Convergence is unstable - investigate how to improve it
 # TODO : Write a fallback for gradient based alpha using bisection
 # TODO : Fix treatment of accrued interest on the option expiry date.
-###############################################################################
+########################################################################################
 
 # (c) Dominic O'Kane - December-2019
 # Fergal O'Kane - search root function - 16-12-2019
 
-###############################################################################
+########################################################################################
 
 
 def option_exercise_types_to_int(option_exercise_type):
@@ -40,7 +40,7 @@ def option_exercise_types_to_int(option_exercise_type):
         raise FinError("Unknown option exercise type.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -59,7 +59,7 @@ def f(alpha, nm, qq, pp, dx, dt, n):
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -79,10 +79,10 @@ def fprime(alpha, nm, qq, pp, dx, dt, n):
     return deriv
 
 
-###############################################################################
+########################################################################################
 # This is the secant method which is not used as I computed the derivative of
 # objective function with respect to the drift term
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -117,10 +117,10 @@ def search_root(x0, nm, qq, pp, dx, dt, n):
     raise FinError("Search root deriv FAILED to find alpha.")
 
 
-###############################################################################
+########################################################################################
 # This is Newton Raphson which is faster than the secant measure as it has the
 # analytical derivative  that is easy to calculate.
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -152,7 +152,7 @@ def search_root_deriv(x0, nm, qq, pp, dx, dt, n):
     raise FinError("Search root deriv FAILED to find alpha.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -391,7 +391,7 @@ def bermudan_swaption_tree_fast(
     return pay_values[0, j_max], rec_values[0, j_max]
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -479,7 +479,9 @@ def american_bond_option_tree_fast(
 
     # Start with the value of the bond at maturity
     for k in range(0, num_nodes):
-        bond_values[maturity_step, k] = (1.0 + tree_flows[maturity_step]) * face_amount
+        bond_values[maturity_step, k] = (
+            1.0 + tree_flows[maturity_step]
+        ) * face_amount
 
     if debug:
         dirty_price = bond_values[maturity_step, 0]
@@ -523,7 +525,9 @@ def american_bond_option_tree_fast(
             bond_values[m, kn] += flow
 
         if debug:
-            print(m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0)
+            print(
+                m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0
+            )
 
     # Now consider exercise of the option on and before the expiry date
     for m in range(expiry_step, -1, -1):
@@ -632,7 +636,7 @@ def american_bond_option_tree_fast(
     return call_option_values[0, j_max], put_option_values[0, j_max]
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -819,7 +823,7 @@ def callable_puttable_bond_tree_fast(
     }
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -961,7 +965,7 @@ class BKTree:
         self.dfs = None
         self.dt = None
 
-    ###############################################################################
+    ########################################################################################
 
     def build_tree(self, t_mat, df_times, df_values):
 
@@ -993,10 +997,16 @@ class BKTree:
 
         return
 
-    ###############################################################################
+    ########################################################################################
 
     def bond_option(
-        self, t_exp, strike_price, face_amount, cpn_times, cpn_flows, exercise_type
+        self,
+        t_exp,
+        strike_price,
+        face_amount,
+        cpn_times,
+        cpn_flows,
+        exercise_type,
     ):
         """Value a bond option that has European or American exercise using
         the Black-Karasinski model. The model uses a trinomial tree."""
@@ -1035,7 +1045,7 @@ class BKTree:
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def bermudan_swaption(
         self,
@@ -1085,10 +1095,17 @@ class BKTree:
 
         return {"pay": pay_value, "rec": rec_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def callable_puttable_bond_tree(
-        self, cpn_times, cpn_flows, call_times, call_prices, put_times, put_prices, face
+        self,
+        cpn_times,
+        cpn_flows,
+        call_times,
+        call_prices,
+        put_times,
+        put_prices,
+        face,
     ):
         """Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
@@ -1121,9 +1138,12 @@ class BKTree:
             self.dfs,
         )
 
-        return {"bondwithoption": v["bondwithoption"], "bondpure": v["bondpure"]}
+        return {
+            "bondwithoption": v["bondwithoption"],
+            "bondpure": v["bondpure"],
+        }
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -1135,4 +1155,4 @@ class BKTree:
         return s
 
 
-###############################################################################
+########################################################################################

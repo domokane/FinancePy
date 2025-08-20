@@ -140,7 +140,9 @@ class SwapFixedLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
+                payment_dt = calendar.add_business_days(
+                    next_dt, self.payment_lag
+                )
 
             self.payment_dts.append(payment_dt)
 
@@ -158,7 +160,9 @@ class SwapFixedLeg:
 
     ###########################################################################
 
-    def value(self, value_dt: Date, discount_curve: DiscountCurve, pv_only=True):
+    def value(
+        self, value_dt: Date, discount_curve: DiscountCurve, pv_only=True
+    ):
 
         self.payment_dfs = []
         self.payment_pvs = []
@@ -345,7 +349,7 @@ class SwapFixedLeg:
         s += label_to_string("DATE GEN TYPE", self.dg_type)
         return s
 
-    ###############################################################################
+    ########################################################################################
 
     def _print(self):
         """Print a list of the unadjusted coupon payment dates used in
@@ -353,4 +357,4 @@ class SwapFixedLeg:
         print(self)
 
 
-###############################################################################
+########################################################################################

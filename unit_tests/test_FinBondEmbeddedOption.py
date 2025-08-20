@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -122,14 +122,14 @@ discount_curve_quantlib = DiscountCurveFlat(
 
 bond_quantlib = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-nextCallDate = Date(15, 9, 2016)
-call_dts = [nextCallDate]
+next_call_date = Date(15, 9, 2016)
+call_dts = [next_call_date]
 call_prices = [100.0]
 put_dts = []
 put_prices = []
 for _ in range(1, 24):
-    nextCallDate = nextCallDate.add_months(3)
-    call_dts.append(nextCallDate)
+    next_call_date = next_call_date.add_months(3)
+    call_dts.append(next_call_date)
     call_prices.append(100.0)
 
 puttable_bond_quantlib = BondEmbeddedOption(

@@ -2,6 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
+
+import numpy as np
+
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -10,13 +14,11 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes, FinExerciseTypes
 from ...products.bonds.bond import Bond
 
-from enum import Enum
-import numpy as np
 
-###############################################################################
+########################################################################################
 # TODO: Add BDT model to valuation
 # TODO: Reorganise code - too much duplication
-###############################################################################
+########################################################################################
 
 
 class BondModelTypes(Enum):
@@ -26,7 +28,7 @@ class BondModelTypes(Enum):
     BLACK_KARASINSKI = 4
 
 
-###############################################################################
+########################################################################################
 
 
 class BondOption:
@@ -53,7 +55,7 @@ class BondOption:
         self.opt_type = opt_type
         self.par = 100.0
 
-    ###############################################################################
+    ########################################################################################
 
     def value(self, value_dt: Date, discount_curve: DiscountCurve, model):
         """Value a bond option (option on a bond) using a specified model
@@ -63,8 +65,8 @@ class BondOption:
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         t_mat = (self.bond.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
-        df_times = discount_curve._times
-        df_values = discount_curve._dfs
+        df_times = discount_curve.times
+        df_values = discount_curve.dfs
 
         # We need all the flows in case the option is American
         # and some occur before expiry
@@ -139,7 +141,7 @@ class BondOption:
             print(self.opt_type)
             raise FinError("Unknown option type.")
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -150,11 +152,11 @@ class BondOption:
         s += str(self.bond)
         return s
 
-    ###############################################################################
+    ########################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""
         print(self)
 
 
-###############################################################################
+########################################################################################

@@ -14,7 +14,7 @@ from ...models.black_scholes import BlackScholes
 
 from ...utils.helpers import check_argument_types
 
-###############################################################################
+########################################################################################
 
 
 class FinFXVarianceSwap:
@@ -86,7 +86,9 @@ class FinFXVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(self, value_dt, fwd_stock_price, strikes, volatilities):
+    def fair_strike_approx(
+        self, value_dt, fwd_stock_price, strikes, volatilities
+    ):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
@@ -180,7 +182,9 @@ class FinFXVarianceSwap:
         self.call_strikes = call_k
 
         option_total = (
-            2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
+            2.0
+            * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0))
+            / t_mat
         )
 
         self.call_wts = np.zeros(num_call_options)
@@ -247,7 +251,9 @@ class FinFXVarianceSwap:
                 cum_x2 += x * x
         else:
             for i in range(1, num_observations):
-                x = (close_prices[i] - close_prices[i - 1]) / close_prices[i - 1]
+                x = (close_prices[i] - close_prices[i - 1]) / close_prices[
+                    i - 1
+                ]
                 cum_x2 += x * x
 
         var = cum_x2 * 252.0 / num_observations
@@ -272,4 +278,4 @@ class FinFXVarianceSwap:
             print("CALL %7.2f %10.3f" % (k, wt))
 
 
-###############################################################################
+########################################################################################

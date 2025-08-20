@@ -17,11 +17,11 @@ from ...products.equity.equity_option import EquityOption
 # from ...models.black_scholes_analytic import baw_value
 from ...models.model import Model
 
-###############################################################################
+########################################################################################
 # TODO: Implement some analytical approximations
 # TODO: Tree with discrete dividends
 # TODO: Other dynamics such as SABR
-###############################################################################
+########################################################################################
 
 
 class EquityAmericanOption(EquityOption):
@@ -124,4 +124,4 @@ class EquityAmericanOption(EquityOption):
         print(self)
 
 
-###############################################################################
+########################################################################################

@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -33,7 +33,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 
 
 def buildOIS(value_dt):
@@ -226,7 +226,7 @@ def buildOIS(value_dt):
     return ois_curve
 
 
-###############################################################################
+########################################################################################
 
 
 def test_bloombergPricingExample():
@@ -278,83 +278,173 @@ def test_bloombergPricingExample():
 
     swaps = []
     swap = IborSwap(
-        settle_dt, "2Y", fixed_leg_type, (2.77417 + 2.77844) / 200, freq, accrual
+        settle_dt,
+        "2Y",
+        fixed_leg_type,
+        (2.77417 + 2.77844) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, (2.86098 + 2.86582) / 200, freq, accrual
+        settle_dt,
+        "3Y",
+        fixed_leg_type,
+        (2.86098 + 2.86582) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "4Y", fixed_leg_type, (2.90240 + 2.90620) / 200, freq, accrual
+        settle_dt,
+        "4Y",
+        fixed_leg_type,
+        (2.90240 + 2.90620) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, (2.92944 + 2.92906) / 200, freq, accrual
+        settle_dt,
+        "5Y",
+        fixed_leg_type,
+        (2.92944 + 2.92906) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "6Y", fixed_leg_type, (2.94001 + 2.94499) / 200, freq, accrual
+        settle_dt,
+        "6Y",
+        fixed_leg_type,
+        (2.94001 + 2.94499) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "7Y", fixed_leg_type, (2.95352 + 2.95998) / 200, freq, accrual
+        settle_dt,
+        "7Y",
+        fixed_leg_type,
+        (2.95352 + 2.95998) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "8Y", fixed_leg_type, (2.96830 + 2.97400) / 200, freq, accrual
+        settle_dt,
+        "8Y",
+        fixed_leg_type,
+        (2.96830 + 2.97400) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "9Y", fixed_leg_type, (2.98403 + 2.98817) / 200, freq, accrual
+        settle_dt,
+        "9Y",
+        fixed_leg_type,
+        (2.98403 + 2.98817) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "10Y", fixed_leg_type, (2.99716 + 3.00394) / 200, freq, accrual
+        settle_dt,
+        "10Y",
+        fixed_leg_type,
+        (2.99716 + 3.00394) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "11Y", fixed_leg_type, (3.01344 + 3.01596) / 200, freq, accrual
+        settle_dt,
+        "11Y",
+        fixed_leg_type,
+        (3.01344 + 3.01596) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "12Y", fixed_leg_type, (3.02276 + 3.02684) / 200, freq, accrual
+        settle_dt,
+        "12Y",
+        fixed_leg_type,
+        (3.02276 + 3.02684) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "15Y", fixed_leg_type, (3.04092 + 3.04508) / 200, freq, accrual
+        settle_dt,
+        "15Y",
+        fixed_leg_type,
+        (3.04092 + 3.04508) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "20Y", fixed_leg_type, (3.04417 + 3.05183) / 200, freq, accrual
+        settle_dt,
+        "20Y",
+        fixed_leg_type,
+        (3.04417 + 3.05183) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "25Y", fixed_leg_type, (3.03219 + 3.03621) / 200, freq, accrual
+        settle_dt,
+        "25Y",
+        fixed_leg_type,
+        (3.03219 + 3.03621) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "30Y", fixed_leg_type, (3.01030 + 3.01370) / 200, freq, accrual
+        settle_dt,
+        "30Y",
+        fixed_leg_type,
+        (3.01030 + 3.01370) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "40Y", fixed_leg_type, (2.96946 + 2.97354) / 200, freq, accrual
+        settle_dt,
+        "40Y",
+        fixed_leg_type,
+        (2.96946 + 2.97354) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "50Y", fixed_leg_type, (2.91552 + 2.93748) / 200, freq, accrual
+        settle_dt,
+        "50Y",
+        fixed_leg_type,
+        (2.91552 + 2.93748) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
 
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps, interp_type, True)
+    libor_curve = IborSingleCurve(
+        value_dt, depos, fras, swaps, interp_type, True
+    )
 
     test_cases.banner("======================================================")
     test_cases.banner("SINGLE CURVE VALUATION")
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("VALUE:", swaps[0].value(value_dt, libor_curve, libor_curve, None))
+    test_cases.print(
+        "VALUE:", swaps[0].value(value_dt, libor_curve, libor_curve, None)
+    )
     test_cases.print("FIXED:", swaps[0].fixed_leg.value(value_dt, libor_curve))
     test_cases.print(
-        "FLOAT:", swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None)
+        "FLOAT:",
+        swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None),
     )
 
     test_cases.banner("======================================================")
@@ -363,9 +453,12 @@ def test_bloombergPricingExample():
     test_cases.print(
         "VALUE:", swaps[0].value(settle_dt, libor_curve, libor_curve, None)
     )
-    test_cases.print("FIXED:", swaps[0].fixed_leg.value(settle_dt, libor_curve))
     test_cases.print(
-        "FLOAT:", swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None)
+        "FIXED:", swaps[0].fixed_leg.value(settle_dt, libor_curve)
+    )
+    test_cases.print(
+        "FLOAT:",
+        swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None),
     )
     test_cases.banner("======================================================")
 
@@ -376,7 +469,13 @@ def test_bloombergPricingExample():
     #    print(ois_curve)
 
     liborDualCurve = IborDualCurve(
-        value_dt, ois_curve, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES, True
+        value_dt,
+        ois_curve,
+        depos,
+        fras,
+        swaps,
+        InterpTypes.FLAT_FWD_RATES,
+        True,
     )
     #    print(liborDualCurve)
 
@@ -388,7 +487,8 @@ def test_bloombergPricingExample():
     )
     test_cases.print("FIXED:", swaps[0].fixed_leg.value(value_dt, ois_curve))
     test_cases.print(
-        "FLOAT:", swaps[0].float_leg.value(value_dt, ois_curve, libor_curve, None)
+        "FLOAT:",
+        swaps[0].float_leg.value(value_dt, ois_curve, libor_curve, None),
     )
 
     test_cases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
@@ -430,7 +530,7 @@ def test_bloombergPricingExample():
     # swaps[0].print_float_leg_pv()
 
 
-###############################################################################
+########################################################################################
 
 
 def test_swapValuationExample():
@@ -485,29 +585,53 @@ def test_swapValuationExample():
     fras = []
     fra_dcc_type = DayCountTypes.ACT_360
 
-    fra = IborFRA(settle_dt.add_tenor("1M"), "6M", -0.2450 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("1M"), "6M", -0.2450 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("2M"), "6M", -0.2435 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("2M"), "6M", -0.2435 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("3M"), "6M", -0.2400 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("3M"), "6M", -0.2400 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("4M"), "6M", -0.2360 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("4M"), "6M", -0.2360 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("5M"), "6M", -0.2285 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("5M"), "6M", -0.2285 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("6M"), "6M", -0.2230 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("6M"), "6M", -0.2230 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("7M"), "6M", -0.2110 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("7M"), "6M", -0.2110 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("8M"), "6M", -0.1990 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("8M"), "6M", -0.1990 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("9M"), "6M", -0.1850 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("9M"), "6M", -0.1850 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("10M"), "6M", -0.1680 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("10M"), "6M", -0.1680 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("11M"), "6M", -0.1510 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("11M"), "6M", -0.1510 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("12M"), "6M", -0.1360 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("12M"), "6M", -0.1360 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
 
     swaps = []
@@ -534,27 +658,57 @@ def test_swapValuationExample():
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "4Y", fixed_leg_type, 0.1315 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "4Y",
+        fixed_leg_type,
+        0.1315 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, 0.2745 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "5Y",
+        fixed_leg_type,
+        0.2745 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "6Y", fixed_leg_type, 0.4135 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "6Y",
+        fixed_leg_type,
+        0.4135 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "7Y", fixed_leg_type, 0.5439 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "7Y",
+        fixed_leg_type,
+        0.5439 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "8Y", fixed_leg_type, 0.6652 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "8Y",
+        fixed_leg_type,
+        0.6652 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "9Y", fixed_leg_type, 0.7784 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "9Y",
+        fixed_leg_type,
+        0.7784 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = IborSwap(
@@ -661,7 +815,9 @@ def test_swapValuationExample():
     iborFras = fras.copy()
     ibor_swaps = swaps.copy()
 
-    ibor_curve = IborSingleCurve(value_dt, iborDepos, iborFras, ibor_swaps, interp_type)
+    ibor_curve = IborSingleCurve(
+        value_dt, iborDepos, iborFras, ibor_swaps, interp_type
+    )
     v1 = offMarketSwap.value(value_dt, ibor_curve, ibor_curve, -0.268 / 100.0)
 
     test_cases.banner("DERISCOPE EXAMPLE REPLICATION")
@@ -669,7 +825,7 @@ def test_swapValuationExample():
     test_cases.print("BBG VALUE", vBloomberg)
     test_cases.print("FP ONE CURVE VALUE", v1)
 
-    ###############################################################################
+    ########################################################################################
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
@@ -851,23 +1007,48 @@ def test_swapValuationExample():
     )
     swaps.append(swap)
     swap = OIS(
-        settle_dt, "5Y", fixed_leg_type, 0.1285 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "5Y",
+        fixed_leg_type,
+        0.1285 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = OIS(
-        settle_dt, "6Y", fixed_leg_type, 0.2590 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "6Y",
+        fixed_leg_type,
+        0.2590 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = OIS(
-        settle_dt, "7Y", fixed_leg_type, 0.3830 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "7Y",
+        fixed_leg_type,
+        0.3830 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = OIS(
-        settle_dt, "8Y", fixed_leg_type, 0.5020 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "8Y",
+        fixed_leg_type,
+        0.5020 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = OIS(
-        settle_dt, "9Y", fixed_leg_type, 0.6140 / 100.0, fixed_freq_type, fixed_dcc_type
+        settle_dt,
+        "9Y",
+        fixed_leg_type,
+        0.6140 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
     )
     swaps.append(swap)
     swap = OIS(
@@ -986,7 +1167,7 @@ def test_swapValuationExample():
 #    offMarketSwap.print_float_leg_pv()
 
 
-###############################################################################
+########################################################################################
 
 # test_swapValuationExample()
 

@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.products.rates.ois import OIS
 from financepy.products.rates.ois_curve import OISCurve
@@ -258,106 +258,239 @@ def test_bloombergPricingExample():
 
     swaps = []
     swap = IborSwap(
-        settle_dt, "2Y", fixed_leg_type, (2.77417 + 2.77844) / 200, freq, accrual
+        settle_dt,
+        "2Y",
+        fixed_leg_type,
+        (2.77417 + 2.77844) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, (2.86098 + 2.86582) / 200, freq, accrual
+        settle_dt,
+        "3Y",
+        fixed_leg_type,
+        (2.86098 + 2.86582) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "4Y", fixed_leg_type, (2.90240 + 2.90620) / 200, freq, accrual
+        settle_dt,
+        "4Y",
+        fixed_leg_type,
+        (2.90240 + 2.90620) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, (2.92944 + 2.92906) / 200, freq, accrual
+        settle_dt,
+        "5Y",
+        fixed_leg_type,
+        (2.92944 + 2.92906) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "6Y", fixed_leg_type, (2.94001 + 2.94499) / 200, freq, accrual
+        settle_dt,
+        "6Y",
+        fixed_leg_type,
+        (2.94001 + 2.94499) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "7Y", fixed_leg_type, (2.95352 + 2.95998) / 200, freq, accrual
+        settle_dt,
+        "7Y",
+        fixed_leg_type,
+        (2.95352 + 2.95998) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "8Y", fixed_leg_type, (2.96830 + 2.97400) / 200, freq, accrual
+        settle_dt,
+        "8Y",
+        fixed_leg_type,
+        (2.96830 + 2.97400) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "9Y", fixed_leg_type, (2.98403 + 2.98817) / 200, freq, accrual
+        settle_dt,
+        "9Y",
+        fixed_leg_type,
+        (2.98403 + 2.98817) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "10Y", fixed_leg_type, (2.99716 + 3.00394) / 200, freq, accrual
+        settle_dt,
+        "10Y",
+        fixed_leg_type,
+        (2.99716 + 3.00394) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "11Y", fixed_leg_type, (3.01344 + 3.01596) / 200, freq, accrual
+        settle_dt,
+        "11Y",
+        fixed_leg_type,
+        (3.01344 + 3.01596) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "12Y", fixed_leg_type, (3.02276 + 3.02684) / 200, freq, accrual
+        settle_dt,
+        "12Y",
+        fixed_leg_type,
+        (3.02276 + 3.02684) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "15Y", fixed_leg_type, (3.04092 + 3.04508) / 200, freq, accrual
+        settle_dt,
+        "15Y",
+        fixed_leg_type,
+        (3.04092 + 3.04508) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "20Y", fixed_leg_type, (3.04417 + 3.05183) / 200, freq, accrual
+        settle_dt,
+        "20Y",
+        fixed_leg_type,
+        (3.04417 + 3.05183) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "25Y", fixed_leg_type, (3.03219 + 3.03621) / 200, freq, accrual
+        settle_dt,
+        "25Y",
+        fixed_leg_type,
+        (3.03219 + 3.03621) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "30Y", fixed_leg_type, (3.01030 + 3.01370) / 200, freq, accrual
+        settle_dt,
+        "30Y",
+        fixed_leg_type,
+        (3.01030 + 3.01370) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "40Y", fixed_leg_type, (2.96946 + 2.97354) / 200, freq, accrual
+        settle_dt,
+        "40Y",
+        fixed_leg_type,
+        (2.96946 + 2.97354) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
     swap = IborSwap(
-        settle_dt, "50Y", fixed_leg_type, (2.91552 + 2.93748) / 200, freq, accrual
+        settle_dt,
+        "50Y",
+        fixed_leg_type,
+        (2.91552 + 2.93748) / 200,
+        freq,
+        accrual,
     )
     swaps.append(swap)
 
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps, interp_type, True)
+    libor_curve = IborSingleCurve(
+        value_dt, depos, fras, swaps, interp_type, True
+    )
 
-    assert round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4) == 0.0
-    assert round(swaps[0].fixed_leg.value(value_dt, libor_curve), 4) == -53707.6667
     assert (
-        round(swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None), 4)
+        round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4)
+        == 0.0
+    )
+    assert (
+        round(swaps[0].fixed_leg.value(value_dt, libor_curve), 4)
+        == -53707.6667
+    )
+    assert (
+        round(
+            swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None),
+            4,
+        )
         == 53707.6667
     )
 
-    assert round(swaps[0].value(settle_dt, libor_curve, libor_curve, None), 4) == 0.0
-    assert round(swaps[0].fixed_leg.value(settle_dt, libor_curve), 4) == -53714.5507
     assert (
-        round(swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None), 4)
+        round(swaps[0].value(settle_dt, libor_curve, libor_curve, None), 4)
+        == 0.0
+    )
+    assert (
+        round(swaps[0].fixed_leg.value(settle_dt, libor_curve), 4)
+        == -53714.5507
+    )
+    assert (
+        round(
+            swaps[0].float_leg.value(
+                settle_dt, libor_curve, libor_curve, None
+            ),
+            4,
+        )
         == 53714.5507
     )
 
     ois_curve = buildOIS(value_dt)
 
     liborDualCurve = IborDualCurve(
-        value_dt, ois_curve, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES, True
+        value_dt,
+        ois_curve,
+        depos,
+        fras,
+        swaps,
+        InterpTypes.FLAT_FWD_RATES,
+        True,
     )
 
-    assert round(swaps[0].value(value_dt, ois_curve, liborDualCurve, None), 4) == 0.0
-    assert round(swaps[0].fixed_leg.value(value_dt, ois_curve), 4) == -55524.5642
     assert (
-        round(swaps[0].float_leg.value(value_dt, ois_curve, liborDualCurve, None), 4)
+        round(swaps[0].value(value_dt, ois_curve, liborDualCurve, None), 4)
+        == 0.0
+    )
+    assert (
+        round(swaps[0].fixed_leg.value(value_dt, ois_curve), 4) == -55524.5642
+    )
+    assert (
+        round(
+            swaps[0].float_leg.value(
+                value_dt, ois_curve, liborDualCurve, None
+            ),
+            4,
+        )
         == 55524.5642
     )
 
-    assert round(swaps[0].value(settle_dt, ois_curve, liborDualCurve, None), 4) == 0.0
-    assert round(swaps[0].fixed_leg.value(settle_dt, ois_curve), 4) == -55524.5709
     assert (
-        round(swaps[0].float_leg.value(settle_dt, ois_curve, liborDualCurve, None), 4)
+        round(swaps[0].value(settle_dt, ois_curve, liborDualCurve, None), 4)
+        == 0.0
+    )
+    assert (
+        round(swaps[0].fixed_leg.value(settle_dt, ois_curve), 4) == -55524.5709
+    )
+    assert (
+        round(
+            swaps[0].float_leg.value(
+                settle_dt, ois_curve, liborDualCurve, None
+            ),
+            4,
+        )
         == 55524.5709
     )

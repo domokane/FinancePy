@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -33,9 +33,9 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 ##########################################################################
 
 
-def build_Ibor_Curve(tradeDate):
+def build_Ibor_Curve(trade_dt):
 
-    value_dt = tradeDate.add_days(1)
+    value_dt = trade_dt.add_days(1)
     dc_type = DayCountTypes.ACT_360
     depos = []
 
@@ -85,18 +85,18 @@ def build_Ibor_Curve(tradeDate):
 ##########################################################################
 
 
-def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
+def buildFlatIssuerCurve(trade_dt, libor_curve, spread, recovery_rate):
 
-    value_dt = tradeDate.add_days(1)
+    value_dt = trade_dt.add_days(1)
 
-    cdsMarketContracts = []
+    cds_mkt_contracts = []
 
     maturity_dt = Date(29, 6, 2010)
     cds = CDS(value_dt, maturity_dt, spread)
-    cdsMarketContracts.append(cds)
+    cds_mkt_contracts.append(cds)
 
     issuer_curve = CDSCurve(
-        value_dt, cdsMarketContracts, libor_curve, recovery_rate
+        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
     )
 
     return issuer_curve
@@ -107,16 +107,16 @@ def buildFlatIssuerCurve(tradeDate, libor_curve, spread, recovery_rate):
 
 def test_dirty_priceCDSIndexOption():
 
-    tradeDate = Date(1, 8, 2007)
-    step_in_dt = tradeDate.add_days(1)
+    trade_dt = Date(1, 8, 2007)
+    step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt
 
-    libor_curve = build_Ibor_Curve(tradeDate)
+    libor_curve = build_Ibor_Curve(trade_dt)
 
-    maturity3Y = tradeDate.next_cds_date(36)
-    maturity5Y = tradeDate.next_cds_date(60)
-    maturity7Y = tradeDate.next_cds_date(84)
-    maturity10Y = tradeDate.next_cds_date(120)
+    maturity_3yr = trade_dt.next_cds_date(36)
+    maturity_5yr = trade_dt.next_cds_date(60)
+    maturity_7yr = trade_dt.next_cds_date(84)
+    maturity_10yr = trade_dt.next_cds_date(120)
 
     path = os.path.join(
         os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
@@ -136,10 +136,10 @@ def test_dirty_priceCDSIndexOption():
         spd10Y = float(splitRow[4]) / 10000.0
         recovery_rate = float(splitRow[5])
 
-        cds3Y = CDS(step_in_dt, maturity3Y, spd3Y)
-        cds5Y = CDS(step_in_dt, maturity5Y, spd5Y)
-        cds7Y = CDS(step_in_dt, maturity7Y, spd7Y)
-        cds10Y = CDS(step_in_dt, maturity10Y, spd10Y)
+        cds3Y = CDS(step_in_dt, maturity_3yr, spd3Y)
+        cds5Y = CDS(step_in_dt, maturity_5yr, spd5Y)
+        cds7Y = CDS(step_in_dt, maturity_7yr, spd7Y)
+        cds10Y = CDS(step_in_dt, maturity_10yr, spd10Y)
         cds_contracts = [cds3Y, cds5Y, cds7Y, cds10Y]
 
         issuer_curve = CDSCurve(
@@ -224,7 +224,7 @@ def test_dirty_priceCDSIndexOption():
             indexSpread = index / 10000.0
 
             issuer_curve = buildFlatIssuerCurve(
-                tradeDate, libor_curve, indexSpread, index_recovery
+                trade_dt, libor_curve, indexSpread, index_recovery
             )
 
             adjustedIssuerCurves = []

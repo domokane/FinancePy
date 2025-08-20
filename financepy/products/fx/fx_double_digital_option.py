@@ -100,10 +100,14 @@ class FXDoubleDigitalOption:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
-            raise FinError("Domestic Curve valuation date not same as valuation date")
+            raise FinError(
+                "Domestic Curve valuation date not same as valuation date"
+            )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as valuation date")
+            raise FinError(
+                "Foreign Curve valuation date not same as valuation date"
+            )
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -155,4 +159,4 @@ class FXDoubleDigitalOption:
         return v
 
 
-###############################################################################
+########################################################################################

@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -18,7 +18,7 @@ sys.path.append("..")
 test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_BondFutures():
@@ -48,14 +48,14 @@ def test_BondFutures():
     first_delivery_dt = Date(1, 3, 2002)
     last_delivery_dt = Date(28, 3, 2002)
     contract_size = 100000
-    contractCoupon = 0.06
+    contract_cpn = 0.06
 
     bfut = BondFuture(
         "TYH2",
         first_delivery_dt,
         last_delivery_dt,
         contract_size,
-        contractCoupon,
+        contract_cpn,
     )
 
     settle_dt = Date(10, 12, 2001)
@@ -67,7 +67,7 @@ def test_BondFutures():
         test_cases.print(bond.maturity_dt, bond.cpn * 100, cf)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_BondFutures_CME_two_bond_examples():
@@ -269,14 +269,14 @@ def test_BondFutures_CME_table():
     last_delivery_dt = Date(29, 12, 2017)
 
     contract_size = 100000
-    contractCoupon = 0.06
+    contract_cpn = 0.06
 
     bfut = BondFuture(
         "TYZ7",
         first_delivery_dt,
         last_delivery_dt,
         contract_size,
-        contractCoupon,
+        contract_cpn,
     )
 
     test_cases.header("BOND MATURITY", "COUPON", "CF")
@@ -454,14 +454,14 @@ def test_BondFutures_BBG_table():
     last_delivery_dt = Date(29, 12, 2017)
 
     contract_size = 100000
-    contractCoupon = 0.06
+    contract_cpn = 0.06
 
     bfut = BondFuture(
         "TYZ7",
         first_delivery_dt,
         last_delivery_dt,
         contract_size,
-        contractCoupon,
+        contract_cpn,
     )
 
     test_cases.header("BOND MATURITY", "COUPON", "CF")

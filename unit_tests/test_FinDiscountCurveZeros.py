@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.interpolator import InterpTypes
@@ -14,16 +14,18 @@ def test_FinDiscountCurveZeros():
     start_dt = Date(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
     dates = start_dt.add_years(times)
-    zero_rates = np.linspace(5.0, 6.0, 10)/100
+    zero_rates = np.linspace(5.0, 6.0, 10) / 100
     freq_type = FrequencyTypes.ANNUAL
     day_count_type = DayCountTypes.ACT_ACT_ISDA
 
-    curve = DiscountCurveZeros(start_dt,
-                               dates,
-                               zero_rates,
-                               freq_type,
-                               day_count_type,
-                               InterpTypes.FLAT_FWD_RATES)
+    curve = DiscountCurveZeros(
+        start_dt,
+        dates,
+        zero_rates,
+        freq_type,
+        day_count_type,
+        InterpTypes.FLAT_FWD_RATES,
+    )
 
     date = start_dt.add_years(0)
     df = curve.df(date)

@@ -21,7 +21,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from .swap_fixed_leg import SwapFixedLeg
 from .swap_float_leg import SwapFloatLeg
 
-###############################################################################
+########################################################################################
 
 
 class FinCompoundingTypes(Enum):
@@ -31,7 +31,7 @@ class FinCompoundingTypes(Enum):
     AVERAGED_DAILY = 4
 
 
-###############################################################################
+########################################################################################
 
 
 class OIS:
@@ -144,7 +144,9 @@ class OIS:
 
     ##########################################################################
 
-    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None):
+    def value(
+        self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None
+    ):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
@@ -230,4 +232,4 @@ class OIS:
         print(self)
 
 
-###############################################################################
+########################################################################################

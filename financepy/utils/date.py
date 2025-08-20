@@ -18,7 +18,7 @@ from .error import FinError
 from .tenor import Tenor, TenorUnit
 
 
-###############################################################################
+########################################################################################
 
 
 class DateFormatTypes(Enum):
@@ -46,7 +46,7 @@ def set_date_format(format_type):
     G_DATE_TYPE_FORMAT = format_type
 
 
-###############################################################################
+########################################################################################
 
 
 short_day_names = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
@@ -91,7 +91,7 @@ longMonthNames = [
 month_days_not_leap_year = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 month_days_leap_year = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-###############################################################################
+########################################################################################
 
 # TODO: Fix this - it has stopped working
 # @njit(boolean(int64), fastmath=True, cache=True)
@@ -103,7 +103,7 @@ def is_leap_year(y: int):
     return leap_year
 
 
-###############################################################################
+########################################################################################
 
 
 def parse_dt(date_str, date_format):
@@ -114,9 +114,9 @@ def parse_dt(date_str, date_format):
     return dt_obj.day, dt_obj.month, dt_obj.year
 
 
-###############################################################################
+########################################################################################
 # CREATE DATE COUNTER
-###############################################################################
+########################################################################################
 
 
 G_DT_COUNTER_LIST = None
@@ -171,12 +171,12 @@ def calculate_list():
                     G_DT_COUNTER_LIST.append(-999)
 
 
-###############################################################################
+########################################################################################
 # The index in these functions is not the Excel date index used as the
 # internal representation of the date but the index of that date in the
 # padded date object used to store the dates in a way that allows for a
 # quick lookup. Do not confuse them as you will find they are out by months
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -186,7 +186,7 @@ def date_index(d, m, y):
     return idx
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -199,7 +199,7 @@ def date_from_index(idx):
     return (d, m, y)
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -209,7 +209,7 @@ def weekday(day_count):
     return week_day
 
 
-###############################################################################
+########################################################################################
 
 
 def vectorisation_helper(func):
@@ -226,7 +226,7 @@ def vectorisation_helper(func):
     return wrapper
 
 
-###############################################################################
+########################################################################################
 
 
 class Date:
@@ -259,7 +259,9 @@ class Date:
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
         if d >= G_START_YEAR and d < G_END_YEAR and y > 0 and y <= 31:
-            raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
+            raise FinError(
+                "Date arguments must now be in the order Date(dd, mm, yyyy)"
+            )
 
         if G_DT_COUNTER_LIST is None:
             calculate_list()
@@ -353,9 +355,9 @@ class Date:
             return cls(d, m, y)
 
         if isinstance(date, np.datetime64):
-            time_stamp = (date - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
-                1, "s"
-            )
+            time_stamp = (
+                date - np.datetime64("1970-01-01T00:00:00")
+            ) / np.timedelta64(1, "s")
 
             date = datetime.datetime.utcfromtimestamp(time_stamp)
             d, m, y = date.day, date.month, date.year
@@ -576,7 +578,7 @@ class Date:
 
     ###########################################################################
 
-    def add_months(self, mm: Union[list, int]):
+    def add_months(self, mm: Union[list, int]) -> Union["Date", list]:
         """Returns a new date that is mm months after the Date. If mm is an
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates."""
@@ -784,13 +786,23 @@ class Date:
         if isinstance(tenor, list) is True:
             list_flag = True
             for ten in tenor:
-                if isinstance(ten, str) is False and isinstance(ten, Tenor) is False:
-                    raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
+                if (
+                    isinstance(ten, str) is False
+                    and isinstance(ten, Tenor) is False
+                ):
+                    raise FinError(
+                        "Tenor must be a string e.g. '5Y' or a Tenor object"
+                    )
         else:
-            if isinstance(tenor, str) is True or isinstance(tenor, Tenor) is True:
+            if (
+                isinstance(tenor, str) is True
+                or isinstance(tenor, Tenor) is True
+            ):
                 tenor = [tenor]
             else:
-                raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
+                raise FinError(
+                    "Tenor must be a string e.g. '5Y' or a Tenor object"
+                )
 
         new_dts = []
 
@@ -802,13 +814,19 @@ class Date:
 
             if tenor_obj.units == TenorUnit.DAYS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_days(math.copysign(1, tenor_obj.num_periods))
+                    new_dt = new_dt.add_days(
+                        math.copysign(1, tenor_obj.num_periods)
+                    )
             elif tenor_obj.units == TenorUnit.WEEKS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_days(math.copysign(7, tenor_obj.num_periods))
+                    new_dt = new_dt.add_days(
+                        math.copysign(7, tenor_obj.num_periods)
+                    )
             elif tenor_obj.units == TenorUnit.MONTHS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_months(math.copysign(1, tenor_obj.num_periods))
+                    new_dt = new_dt.add_months(
+                        math.copysign(1, tenor_obj.num_periods)
+                    )
 
                 # in case we landed on a 28th Feb and lost the month day
                 # we add this logic
@@ -819,7 +837,9 @@ class Date:
 
             elif tenor_obj.units == TenorUnit.YEARS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_months(math.copysign(12, tenor_obj.num_periods))
+                    new_dt = new_dt.add_months(
+                        math.copysign(12, tenor_obj.num_periods)
+                    )
 
             new_dts.append(new_dt)
 
@@ -983,9 +1003,9 @@ class Date:
         print(self)
 
 
-###############################################################################
+########################################################################################
 # Date functions that are not class members but are useful
-###############################################################################
+########################################################################################
 
 
 def daily_working_day_schedule(start_dt: Date, end_dt: Date):
@@ -1003,7 +1023,7 @@ def daily_working_day_schedule(start_dt: Date, end_dt: Date):
     return date_list
 
 
-###############################################################################
+########################################################################################
 
 
 def datediff(d1: Date, d2: Date):
@@ -1012,7 +1032,7 @@ def datediff(d1: Date, d2: Date):
     return int(dd)
 
 
-###############################################################################
+########################################################################################
 
 
 def from_datetime(dt: Date):
@@ -1023,7 +1043,7 @@ def from_datetime(dt: Date):
     return fin_dt
 
 
-###############################################################################
+########################################################################################
 
 
 def days_in_month(m, y):
@@ -1038,7 +1058,7 @@ def days_in_month(m, y):
         return month_days_leap_year[m - 1]
 
 
-###############################################################################
+########################################################################################
 
 
 def date_range(start_dt: Date, end_dt: Date, tenor: str = "1D"):
@@ -1060,7 +1080,7 @@ def date_range(start_dt: Date, end_dt: Date, tenor: str = "1D"):
     return date_list
 
 
-###############################################################################
+########################################################################################
 
 
 def test_type():
@@ -1068,4 +1088,4 @@ def test_type():
     print("TEST TYPE", G_DATE_TYPE_FORMAT)
 
 
-###############################################################################
+########################################################################################

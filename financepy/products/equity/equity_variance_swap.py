@@ -16,7 +16,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 
 from .equity_vanilla_option import EquityVanillaOption
 
-###############################################################################
+########################################################################################
 
 
 class EquityVarianceSwap:
@@ -77,7 +77,9 @@ class EquityVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(self, value_dt, fwd_stock_price, strikes, volatilities):
+    def fair_strike_approx(
+        self, value_dt, fwd_stock_price, strikes, volatilities
+    ):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
@@ -171,7 +173,9 @@ class EquityVarianceSwap:
         self.call_strikes = call_k
 
         option_total = (
-            2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
+            2.0
+            * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0))
+            / t_mat
         )
 
         self.call_wts = np.zeros(num_call_options)
@@ -283,4 +287,4 @@ class EquityVarianceSwap:
         print(self)
 
 
-###############################################################################
+########################################################################################

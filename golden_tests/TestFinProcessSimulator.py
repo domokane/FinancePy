@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.models.process_simulator import FinVasicekNumericalScheme
 from financepy.models.process_simulator import CIRNumericalScheme
@@ -76,7 +76,7 @@ def test_FinProcessSimulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.euler
+    scheme = FinHestonNumericalScheme.EULER
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = modelSim.get_process(
@@ -141,7 +141,12 @@ def test_FinProcessSimulator():
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        ProcessTypes.VASICEK, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.VASICEK,
+        t,
+        model_params,
+        num_annual_steps,
+        num_paths,
+        seed,
     )
     end = time.time()
     elapsed = end - start
@@ -160,7 +165,12 @@ def test_FinProcessSimulator():
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = modelSim.get_process(
-        ProcessTypes.VASICEK, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.VASICEK,
+        t,
+        model_params,
+        num_annual_steps,
+        num_paths,
+        seed,
     )
     end = time.time()
     elapsed = end - start
@@ -188,7 +198,7 @@ def test_FinProcessSimulator():
         print(paths)
 
 
-###############################################################################
+########################################################################################
 
 
 test_FinProcessSimulator()

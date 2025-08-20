@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.global_types import OptionTypes
 from financepy.models.sabr import SABR
@@ -63,7 +63,9 @@ def test_SABR_Calibration():
     impliedATMLognormalVol = modelSABR_01.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
 
-    assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
+    assert (
+        impliedLognormalSmile == 0.0
+    ), "In lognormal model, smile should be flat"
     calibrationError = round(strikeVol - impliedLognormalVol, 6)
     assert calibrationError == 0.0
 
@@ -80,5 +82,6 @@ def test_SABR_Calibration():
     # Valuation: pure SABR dynamics
     valueCall = modelSABR_02.value(f, k, t_exp, df, call_optionType)
     valuePut = modelSABR_02.value(f, k, t_exp, df, put_optionType)
-    assert round(valueCall - valuePut, 12) == round(df*(f - k), 12), \
-        "The method called 'value()' doesn't comply with Call-Put parity"
+    assert round(valueCall - valuePut, 12) == round(
+        df * (f - k), 12
+    ), "The method called 'value()' doesn't comply with Call-Put parity"

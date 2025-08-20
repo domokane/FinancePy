@@ -17,7 +17,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 
 
-###############################################################################
+########################################################################################
 
 
 def fvol(volatility, *args):
@@ -33,7 +33,7 @@ def fvol(volatility, *args):
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 class CDSOption:
@@ -84,7 +84,7 @@ class CDSOption:
         self.bd_type = bd_type
         self.dg_type = dg_type
 
-    ###############################################################################
+    ########################################################################################
 
     def value(self, value_dt, issuer_curve, volatility):
         """Value the CDS option using Black's model with an adjustment for any
@@ -146,13 +146,15 @@ class CDSOption:
         # we return the option price in dollars
         return option_value * self.notional
 
-    ###############################################################################
+    ########################################################################################
 
     def implied_volatility(self, value_dt, issuer_curve, option_value):
         """Calculate the implied CDS option volatility from a price."""
         arg_tuple = (self, value_dt, issuer_curve, option_value)
-        sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50)
+        sigma = optimize.newton(
+            fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50
+        )
         return sigma
 
 
-###############################################################################
+########################################################################################

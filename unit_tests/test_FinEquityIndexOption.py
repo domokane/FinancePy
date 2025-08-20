@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
@@ -26,11 +26,17 @@ def test_equity_european_index_option_price():
     expected_european_put_prices = [19.6067, 10.0549, 2.9321, 0.3732, 0.0199]
 
     # costruct each opton
-    EuropeanCallOption = EquityIndexOption(expiry_dt, strike, OptionTypes.EUROPEAN_CALL)
-    EuropeanPutOption = EquityIndexOption(expiry_dt, strike, OptionTypes.EUROPEAN_PUT)
+    EuropeanCallOption = EquityIndexOption(
+        expiry_dt, strike, OptionTypes.EUROPEAN_CALL
+    )
+    EuropeanPutOption = EquityIndexOption(
+        expiry_dt, strike, OptionTypes.EUROPEAN_PUT
+    )
 
     # construct black model
-    modelBsAnalytical = Black(volatility, implementation_type=BlackTypes.ANALYTICAL)
+    modelBsAnalytical = Black(
+        volatility, implementation_type=BlackTypes.ANALYTICAL
+    )
     for i in range(len(future_prices)):
         price = EuropeanCallOption.value(
             value_dt, future_prices[i], discount_curve, modelBsAnalytical
@@ -55,11 +61,17 @@ def test_equity_american_index_option_price():
     future_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
     num_steps = 200
     # costruct each opton
-    AmericanCallOption = EquityIndexOption(expiry_dt, strike, OptionTypes.AMERICAN_CALL)
-    AmericanPutOption = EquityIndexOption(expiry_dt, strike, OptionTypes.AMERICAN_PUT)
+    AmericanCallOption = EquityIndexOption(
+        expiry_dt, strike, OptionTypes.AMERICAN_CALL
+    )
+    AmericanPutOption = EquityIndexOption(
+        expiry_dt, strike, OptionTypes.AMERICAN_PUT
+    )
     # construct black model
     modelBsCrrTree = Black(
-        volatility, implementation_type=BlackTypes.CRR_TREE, num_steps=num_steps
+        volatility,
+        implementation_type=BlackTypes.CRR_TREE,
+        num_steps=num_steps,
     )
     for i in range(len(future_prices)):
         price = AmericanCallOption.value(

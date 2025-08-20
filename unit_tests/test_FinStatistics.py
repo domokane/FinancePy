@@ -1,9 +1,10 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.stats import mean, stdev, correlation
 import numpy as np
+
 seed = 1972
 np.random.seed(seed)
 num_trials = 1000000
@@ -21,6 +22,7 @@ def test_stdev():
     np_result = x.std()
     fp_result = stdev(x)
     assert round(fp_result, 10) == round(np_result, 10)
+
 
 # TODO: tests for stderr, var, moment
 

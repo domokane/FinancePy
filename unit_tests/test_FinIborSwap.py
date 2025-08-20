@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from helpers import buildIborSingleCurve
 from financepy.market.curves.interpolator import InterpTypes
@@ -27,8 +27,8 @@ def test_LiborSwap():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    first_fixing, swap, settlement_date, libor_curve = _load_test_swap_and_curve(
-        start_dt, end_dt
+    first_fixing, swap, settlement_date, libor_curve = (
+        _load_test_swap_and_curve(start_dt, end_dt)
     )
     v = swap.value(settlement_date, libor_curve, libor_curve, first_fixing)
 
@@ -40,8 +40,8 @@ def test_LiborSwapCashflowReport():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    first_fixing, swap, settlement_date, libor_curve = _load_test_swap_and_curve(
-        start_dt, end_dt
+    first_fixing, swap, settlement_date, libor_curve = (
+        _load_test_swap_and_curve(start_dt, end_dt)
     )
     v = swap.value(
         settlement_date, libor_curve, libor_curve, first_fixing, pv_only=False
@@ -112,7 +112,9 @@ def test_dp_example():
 
     value_dt = start_dt
 
-    curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
+    curve = DiscountCurve(
+        value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES
+    )
 
     v = swap.value(value_dt, curve, curve)
 

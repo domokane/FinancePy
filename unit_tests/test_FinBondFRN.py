@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.date import Date
 from financepy.products.bonds.bond_frn import BondFRN
@@ -46,7 +46,9 @@ def test_bond_frn_1():
     accdAmount = bond.accrued_int
     assert round(accdAmount, 4) == 0.0023
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
     assert round(principal, 4) == 97.0243
 
@@ -124,7 +126,9 @@ def test_bond_frn_2():
     accdAmount = bond.accrued_int
     assert round(accdAmount, 4) == 0.0005
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
     assert round(principal, 4) == 93.131
 
@@ -152,7 +156,9 @@ def test_bond_frn_2():
 
     assert round(convexity, 4) == 0.0023
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
     assert round(principal, 4) == 93.1310
 

@@ -9,17 +9,14 @@ import numpy as np
 from ..utils.math import N
 from ..utils.helpers import uniform_to_default_time
 
-###############################################################################
+########################################################################################
 # TODO:
-###############################################################################
+########################################################################################
 
 
-def default_times_gc(issuer_curves,
-                     corr_matrix,
-                     num_trials,
-                     seed):
-    """ Generate a matrix of default times by credit and trial using a
-    Gaussian copula model using a full rank correlation matrix. """
+def default_times_gc(issuer_curves, corr_matrix, num_trials, seed):
+    """Generate a matrix of default times by credit and trial using a
+    Gaussian copula model using a full rank correlation matrix."""
 
     np.random.seed(seed)
     num_credits = len(issuer_curves)
@@ -43,5 +40,6 @@ def default_times_gc(issuer_curves,
             corr_times[i_credit, num_trials + i_trial] = t2
 
     return corr_times
+
 
 ##########################################################################

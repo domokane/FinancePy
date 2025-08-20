@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -39,7 +39,16 @@ def testAnalyticalModels():
     stock_price = 100.0
 
     test_cases.header(
-        "TIME", "RHO", "SIGMA", "K", "MC", "GATH", "LEWROU", "LEWIS", "WEBER", "MCERR"
+        "TIME",
+        "RHO",
+        "SIGMA",
+        "K",
+        "MC",
+        "GATH",
+        "LEWROU",
+        "LEWIS",
+        "WEBER",
+        "MCERR",
     )
 
     for sigma in [0.5, 0.75, 1.0]:
@@ -61,16 +70,32 @@ def testAnalyticalModels():
                 )
                 start = time.time()
                 value_gatheral = heston_model.value_gatheral(
-                    value_dt, call_option, stock_price, interest_rate, dividend_yield
+                    value_dt,
+                    call_option,
+                    stock_price,
+                    interest_rate,
+                    dividend_yield,
                 )
                 value_lewis_rouah = heston_model.value_lewis_rouah(
-                    value_dt, call_option, stock_price, interest_rate, dividend_yield
+                    value_dt,
+                    call_option,
+                    stock_price,
+                    interest_rate,
+                    dividend_yield,
                 )
                 value_lewis = heston_model.value_lewis(
-                    value_dt, call_option, stock_price, interest_rate, dividend_yield
+                    value_dt,
+                    call_option,
+                    stock_price,
+                    interest_rate,
+                    dividend_yield,
                 )
                 value_weber = heston_model.value_weber(
-                    value_dt, call_option, stock_price, interest_rate, dividend_yield
+                    value_dt,
+                    call_option,
+                    stock_price,
+                    interest_rate,
+                    dividend_yield,
                 )
                 err = value_mc_heston - value_weber
                 end = time.time()
@@ -131,7 +156,11 @@ def testMonteCarlo():
                     expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
                 )
                 value_weber = heston_model.value_weber(
-                    value_dt, call_option, stock_price, interest_rate, dividend_yield
+                    value_dt,
+                    call_option,
+                    stock_price,
+                    interest_rate,
+                    dividend_yield,
                 )
 
                 start = time.time()
@@ -145,7 +174,7 @@ def testMonteCarlo():
                     num_paths,
                     num_steps,
                     seed,
-                    HestonNumericalScheme.euler,
+                    HestonNumericalScheme.EULER,
                 )
                 value_mc_euler_log = heston_model.value_mc(
                     value_dt,

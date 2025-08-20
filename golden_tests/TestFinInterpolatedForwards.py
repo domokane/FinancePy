@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
 
@@ -17,7 +17,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 
 
 def test_FinInterpolatedForwards():
@@ -36,7 +36,9 @@ def test_FinInterpolatedForwards():
 
     for interp_type in InterpTypes:
 
-        discount_curve = DiscountCurve(curve_dt, tDates, df_values, interp_type)
+        discount_curve = DiscountCurve(
+            curve_dt, tDates, df_values, interp_type
+        )
         dfInterpValues = discount_curve.df(tInterpDates)
         fwdInterpValues = discount_curve.fwd(tInterpDates)
         zeroInterpValues = discount_curve.zero_rate(tInterpDates)
@@ -45,7 +47,10 @@ def test_FinInterpolatedForwards():
             plt.figure(figsize=(8, 6))
             plt.plot(tValues, df_values, "o", color="g", label="DFS:")
             plt.plot(
-                tInterpValues, dfInterpValues, color="r", label="DF:" + str(interp_type)
+                tInterpValues,
+                dfInterpValues,
+                color="r",
+                label="DF:" + str(interp_type),
             )
             plt.legend()
             plt.figure(figsize=(8, 6))
@@ -65,7 +70,7 @@ def test_FinInterpolatedForwards():
             plt.legend()
 
 
-###############################################################################
+########################################################################################
 
 
 test_FinInterpolatedForwards()

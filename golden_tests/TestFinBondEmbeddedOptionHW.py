@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import matplotlib.pyplot as plt
 import time
@@ -25,7 +25,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 plot_graphs = False
 
-###############################################################################
+########################################################################################
 
 
 def test_BondEmbeddedOption_MATLAB():
@@ -43,9 +43,15 @@ def test_BondEmbeddedOption_MATLAB():
     dc_type = DayCountTypes.THIRTY_E_360
     fixed_freq = FrequencyTypes.ANNUAL
     fixed_leg_type = SwapTypes.PAY
-    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type)
-    swap2 = IborSwap(settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type)
-    swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type)
+    swap1 = IborSwap(
+        settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type
+    )
+    swap2 = IborSwap(
+        settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type
+    )
+    swap3 = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type
+    )
     swaps = [swap1, swap2, swap3]
     discount_curve = IborSingleCurve(value_dt, [], [], swaps)
 
@@ -99,7 +105,9 @@ def test_BondEmbeddedOption_MATLAB():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
+        test_cases.print(
+            period, num_time_steps, v["bondwithoption"], v["bondpure"]
+        )
         values.append(v["bondwithoption"])
 
     if plot_graphs:
@@ -107,7 +115,7 @@ def test_BondEmbeddedOption_MATLAB():
         plt.plot(time_steps, values)
 
 
-###############################################################################
+########################################################################################
 
 
 def test_BondEmbeddedOption_QUANTLIB():
@@ -123,7 +131,9 @@ def test_BondEmbeddedOption_QUANTLIB():
 
     ###########################################################################
 
-    discount_curve = DiscountCurveFlat(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
+    discount_curve = DiscountCurveFlat(
+        value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL
+    )
 
     ###########################################################################
 
@@ -179,7 +189,9 @@ def test_BondEmbeddedOption_QUANTLIB():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
+        test_cases.print(
+            period, num_time_steps, v["bondwithoption"], v["bondpure"]
+        )
         values.append(v["bondwithoption"])
 
     if plot_graphs:
@@ -188,7 +200,7 @@ def test_BondEmbeddedOption_QUANTLIB():
         plt.plot(time_steps, values)
 
 
-###############################################################################
+########################################################################################
 
 
 test_BondEmbeddedOption_MATLAB()

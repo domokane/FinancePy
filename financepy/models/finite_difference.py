@@ -114,43 +114,43 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
     return A
 
 
-def fd_roll_backwards(res, theta, Ai=None, Ae=None):
+def fd_roll_backwards(res, theta, ai=None, ae=None):
     # TODO Test for more than one vector
-    Ai = np.array([]) if Ai is None else Ai
-    Ae = np.array([]) if Ae is None else Ae
+    ai = np.array([]) if ai is None else ai
+    ae = np.array([]) if ae is None else ae
     num_vectors = len(res)
     mm = 1
 
     # Explicit case
     if theta != 1:
         for k in range(num_vectors):
-            res[k] = band_matrix_multiplication(Ae, mm, mm, res[k])
+            res[k] = band_matrix_multiplication(ae, mm, mm, res[k])
 
     # Implicit case
     if theta != 0:
         for k in range(num_vectors):
-            res[k] = solve_tridiagonal_matrix(Ai, res[k])
+            res[k] = solve_tridiagonal_matrix(ai, res[k])
 
     return res
 
 
-def fd_roll_forwards(res, theta, Ai=None, Ae=None):
-    Ai = np.array([]) if Ai is None else Ai
-    Ae = np.array([]) if Ae is None else Ae
+def fd_roll_forwards(res, theta, ai=None, ae=None):
+    ai = np.array([]) if ai is None else ai
+    ae = np.array([]) if ae is None else ae
     num_vectors = len(res)
     mm = num_vectors // 2  # integer division
 
     # Implicit case
     if theta != 0:
-        Ai = transpose_tridiagonal_matrix(Ai)
+        ai = transpose_tridiagonal_matrix(ai)
         for k in range(num_vectors):
-            res[k] = solve_tridiagonal_matrix(Ai, res[k])
+            res[k] = solve_tridiagonal_matrix(ai, res[k])
 
     # Explicit case
     if theta != 1:
-        Ae = transpose_tridiagonal_matrix(Ae)
+        ae = transpose_tridiagonal_matrix(ae)
         for k in range(num_vectors):
-            res[k] = band_matrix_multiplication(Ae, mm, mm, res[k])
+            res[k] = band_matrix_multiplication(ae, mm, mm, res[k])
 
     return res
 
@@ -177,7 +177,7 @@ def smooth_call(xl, xu, strike):
         return 0.5 * (xu - strike) ** 2 / (xu - xl)
 
 
-###############################################################################
+########################################################################################
 
 
 def option_payoff(s, strike, smooth, dig, opt_type):
@@ -220,7 +220,7 @@ def option_payoff(s, strike, smooth, dig, opt_type):
     return np.atleast_2d(res)
 
 
-###############################################################################
+########################################################################################
 
 
 def black_scholes_fd(
@@ -270,8 +270,8 @@ def black_scholes_fd(
     var_ = (s * volatility) ** 2
 
     # Initialise implicit and explicit matricies
-    Ai = np.array([])
-    Ae = np.array([])
+    ai = np.array([])
+    ae = np.array([])
 
     # Store original res as res0
     res = deepcopy(payoff)
@@ -280,12 +280,12 @@ def black_scholes_fd(
         if update or h == 0:
             # Explicit case
             if theta != 1:
-                Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1 - theta, wind)
+                ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1 - theta, wind)
             # Implicit case
             if theta != 0:
-                Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
+                ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
-        res = fd_roll_backwards(res, theta, Ai=Ai, Ae=Ae)
+        res = fd_roll_backwards(res, theta, ai=ai, ae=ae)
 
         if opt_type in {
             OptionTypes.AMERICAN_CALL.value,

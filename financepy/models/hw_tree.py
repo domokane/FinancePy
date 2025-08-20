@@ -20,14 +20,14 @@ INTERP = InterpTypes.FLAT_FWD_RATES.value
 
 SMALL = 1e-10
 
-###############################################################################
+########################################################################################
 # TODO: Put Jamshidian code into Numba to get speed up
-###############################################################################
+########################################################################################
 
-###############################################################################
+########################################################################################
 # dr = (theta(t) - r) dt + sigma * dW
-###############################################################################
-###############################################################################
+########################################################################################
+########################################################################################
 
 
 class FinHWEuropeanCalcType(Enum):
@@ -36,7 +36,7 @@ class FinHWEuropeanCalcType(Enum):
     EXPIRY_TREE = 3
 
 
-###############################################################################
+########################################################################################
 
 
 def option_exercise_types_to_int(option_exercise_type):
@@ -51,7 +51,7 @@ def option_exercise_types_to_int(option_exercise_type):
         raise FinError("Unknown option exercise type.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -71,7 +71,11 @@ def p_fast(t, T, r_t, delta, pt, ptd, pT, _sigma, _a):
     term1 = np.log(pT / pt) - (BtT / BtDelta) * np.log(ptd / pt)
 
     term2 = (
-        (_sigma**2) * (1.0 - np.exp(-2.0 * _a * t)) * BtT * (BtT - BtDelta) / (4.0 * _a)
+        (_sigma**2)
+        * (1.0 - np.exp(-2.0 * _a * t))
+        * BtT
+        * (BtT - BtDelta)
+        / (4.0 * _a)
     )
 
     logAhat = term1 - term2
@@ -80,7 +84,7 @@ def p_fast(t, T, r_t, delta, pt, ptd, pT, _sigma, _a):
     return p
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -165,7 +169,7 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
     return (qq, pu, pm, pd, r_t, dt)
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -289,7 +293,9 @@ def american_bond_option_tree_fast(
             tflow = cpn_times[i]
             if tflow >= t_exp:
                 ptflow = _uinterpolate(tflow, _df_times, _df_values, INTERP)
-                zcb = p_fast(t_exp, tflow, r_t, dt, pt_exp, ptdelta, ptflow, _sigma, _a)
+                zcb = p_fast(
+                    t_exp, tflow, r_t, dt, pt_exp, ptdelta, ptflow, _sigma, _a
+                )
                 cpn = cpn_amounts[i]
                 bond_price += cpn * face_amount * zcb
 
@@ -432,7 +438,7 @@ def american_bond_option_tree_fast(
     return call_option_values[0, j_max], put_option_values[0, j_max]
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -617,7 +623,9 @@ def bermudan_swaption_tree_fast(
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif exercise_type_int == 2 and flow > G_SMALL and m >= expiry_step:
+            elif (
+                exercise_type_int == 2 and flow > G_SMALL and m >= expiry_step
+            ):
 
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
@@ -634,9 +642,9 @@ def bermudan_swaption_tree_fast(
     return pay_values[0, j_max], rec_values[0, j_max]
 
 
-###############################################################################
+########################################################################################
 # TODO: CHECK ACCRUED AND COUPONS TO SEE IF IT WORKS FOR LOW TREE STEPS
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -836,7 +844,7 @@ def callable_puttable_bond_tree_fast(
     }
 
 
-###############################################################################
+########################################################################################
 
 
 def fwd_dirty_bond_price(r_t, *args):
@@ -873,7 +881,15 @@ def fwd_dirty_bond_price(r_t, *args):
         if t_cpn > t_exp:
             pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP)
             zcb = p_fast(
-                t_exp, t_cpn, r_t, dt, pt_exp, ptdelta, pt_cpn, self.sigma, self.a
+                t_exp,
+                t_cpn,
+                r_t,
+                dt,
+                pt_exp,
+                ptdelta,
+                pt_cpn,
+                self.sigma,
+                self.a,
             )
             pv = pv + zcb * cpn
     #            print("TCPN", t_cpn, "ZCB", zcb, "CPN", cpn, "PV", pv)
@@ -896,7 +912,7 @@ def fwd_dirty_bond_price(r_t, *args):
     return obj
 
 
-###############################################################################
+########################################################################################
 
 
 class HWTree:
@@ -938,9 +954,11 @@ class HWTree:
         self.r_t = None
         self.dt = None
 
-    ###############################################################################
+    ########################################################################################
 
-    def option_on_zcb(self, t_exp, t_mat, strike, face_amount, df_times, df_values):
+    def option_on_zcb(
+        self, t_exp, t_mat, strike, face_amount, df_times, df_values
+    ):
         """Price an option on a zero cpn bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date."""
@@ -966,16 +984,30 @@ class HWTree:
         if abs(sigmap) < SMALL:
             sigmap = SMALL
 
-        h = np.log((face_amount * pt_mat) / (strike * pt_exp)) / sigmap + sigmap / 2.0
-        call_value = face_amount * pt_mat * N(h) - strike * pt_exp * N(h - sigmap)
-        put_value = strike * pt_exp * N(-h + sigmap) - face_amount * pt_mat * N(-h)
+        h = (
+            np.log((face_amount * pt_mat) / (strike * pt_exp)) / sigmap
+            + sigmap / 2.0
+        )
+        call_value = face_amount * pt_mat * N(h) - strike * pt_exp * N(
+            h - sigmap
+        )
+        put_value = strike * pt_exp * N(
+            -h + sigmap
+        ) - face_amount * pt_mat * N(-h)
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def european_bond_option_jamshidian(
-        self, t_exp, strike_price, face, cpn_times, cpn_amounts, df_times, df_values
+        self,
+        t_exp,
+        strike_price,
+        face,
+        cpn_times,
+        cpn_amounts,
+        df_times,
+        df_values,
     ):
         """Valuation of a European bond option using the Jamshidian
         deconstruction of the bond into a strip of zero cpn bonds with the
@@ -1030,10 +1062,20 @@ class HWTree:
                 pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP)
 
                 strike = p_fast(
-                    t_exp, t_cpn, rstar, dt, pt_exp, ptdelta, pt_cpn, self.sigma, self.a
+                    t_exp,
+                    t_cpn,
+                    rstar,
+                    dt,
+                    pt_exp,
+                    ptdelta,
+                    pt_cpn,
+                    self.sigma,
+                    self.a,
                 )
 
-                v = self.option_on_zcb(t_exp, t_cpn, strike, 1.0, df_times, df_values)
+                v = self.option_on_zcb(
+                    t_exp, t_cpn, strike, 1.0, df_times, df_values
+                )
 
                 call = v["call"]
                 put = v["put"]
@@ -1046,7 +1088,7 @@ class HWTree:
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def european_bond_option_expiry_only(
         self, t_exp, strike_price, face_amount, cpn_times, cpn_amounts
@@ -1086,7 +1128,9 @@ class HWTree:
 
                 if t_cpn >= t_exp:
 
-                    pt_cpn = _uinterpolate(t_cpn, self.df_times, self.dfs, INTERP)
+                    pt_cpn = _uinterpolate(
+                        t_cpn, self.df_times, self.dfs, INTERP
+                    )
 
                     zcb = p_fast(
                         t_exp,
@@ -1123,9 +1167,11 @@ class HWTree:
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ########################################################################################
 
-    def option_on_zero_cpn_bond_tree(self, t_exp, t_mat, strike_price, face_amount):
+    def option_on_zero_cpn_bond_tree(
+        self, t_exp, t_mat, strike_price, face_amount
+    ):
         """Price an option on a zero cpn bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build."""
 
@@ -1160,7 +1206,15 @@ class HWTree:
             r_t = self.r_t[expiry_step, k]
 
             zcb = p_fast(
-                t_exp, t_mat, r_t, dt, pt_exp, ptdelta, pt_mat, self.sigma, self.a
+                t_exp,
+                t_mat,
+                r_t,
+                dt,
+                pt_exp,
+                ptdelta,
+                pt_mat,
+                self.sigma,
+                self.a,
             )
 
             put_payoff = max(strike_price - zcb * face_amount, 0.0)
@@ -1170,7 +1224,7 @@ class HWTree:
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def bermudan_swaption(
         self, t_exp, t_mat, strike, face, cpn_times, cpn_flows, exercise_type
@@ -1213,10 +1267,16 @@ class HWTree:
 
         return {"pay": pay_value, "rec": rec_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def bond_option(
-        self, t_exp, strike_price, face_amount, cpn_times, cpn_flows, exercise_type
+        self,
+        t_exp,
+        strike_price,
+        face_amount,
+        cpn_times,
+        cpn_flows,
+        exercise_type,
     ):
         """Value a bond option that can have European or American exercise.
         This is done using a trinomial tree that we extend out to bond
@@ -1300,7 +1360,7 @@ class HWTree:
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ########################################################################################
 
     def callable_puttable_bond_tree(
         self,
@@ -1347,9 +1407,12 @@ class HWTree:
             self.dfs,
         )
 
-        return {"bondwithoption": v["bondwithoption"], "bondpure": v["bondpure"]}
+        return {
+            "bondwithoption": v["bondwithoption"],
+            "bondpure": v["bondpure"],
+        }
 
-    ###############################################################################
+    ########################################################################################
 
     def df_tree(self, t_mat):
         """Discount factor as seen from now to time t_mat as long as the time
@@ -1373,7 +1436,7 @@ class HWTree:
         zero_rate = -np.log(p) / t_mat
         return p, zero_rate
 
-    ###############################################################################
+    ########################################################################################
 
     def build_tree(self, tree_mat, df_times, df_values):
         """Build the trinomial tree."""
@@ -1387,7 +1450,9 @@ class HWTree:
         # I wish to add on an additional time to the tree so that the second
         # last time corresponds to a maturity tree_mat. For this reason I scale
         # up the maturity date of the tree as follows
-        tree_maturity = tree_mat * (self.num_time_steps + 1) / self.num_time_steps
+        tree_maturity = (
+            tree_mat * (self.num_time_steps + 1) / self.num_time_steps
+        )
 
         # The vector of times goes out to this maturity
         tree_times = np.linspace(0.0, tree_maturity, self.num_time_steps + 2)
@@ -1403,13 +1468,15 @@ class HWTree:
         self.df_times = df_times
         self.dfs = df_values
 
-        self.qq, self.pu, self.pm, self.pd, self.r_t, self.dt = build_tree_fast(
-            self.a, self.sigma, tree_times, self.num_time_steps, df_tree
+        self.qq, self.pu, self.pm, self.pd, self.r_t, self.dt = (
+            build_tree_fast(
+                self.a, self.sigma, tree_times, self.num_time_steps, df_tree
+            )
         )
 
         return
 
-    ###############################################################################
+    ########################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -1422,4 +1489,4 @@ class HWTree:
         return s
 
 
-###############################################################################
+########################################################################################

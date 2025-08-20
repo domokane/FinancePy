@@ -18,7 +18,7 @@ from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 
 
-###############################################################################
+########################################################################################
 
 
 class DiscountCurvePWFONF(DiscountCurve):
@@ -168,4 +168,4 @@ class DiscountCurvePWFONF(DiscountCurve):
         print(self)
 
 
-###############################################################################
+########################################################################################

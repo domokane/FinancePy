@@ -12,6 +12,7 @@ disable=
     C0116,  # missing-function-docstring
     R0903,  # too-few-public-methods
     W0511,  # fixme
+    W0718,  # comparison-with-itself
 
 [FORMAT]
 # Match Black's defaults

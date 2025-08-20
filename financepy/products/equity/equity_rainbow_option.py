@@ -28,7 +28,7 @@ class EquityRainbowOptionTypes(Enum):
     PUT_ON_NTH = 6  # MAX(K-NTH(S1,S2,...,SN),0)
 
 
-###############################################################################
+########################################################################################
 
 
 def payoff_value(s, payoff_typeValue, payoff_params):
@@ -69,7 +69,7 @@ def payoff_value(s, payoff_typeValue, payoff_params):
     return payoff
 
 
-###############################################################################
+########################################################################################
 
 
 def value_mc_fast(
@@ -118,7 +118,7 @@ def value_mc_fast(
     return v
 
 
-###############################################################################
+########################################################################################
 
 
 class EquityRainbowOption(EquityOption):
@@ -146,21 +146,26 @@ class EquityRainbowOption(EquityOption):
 
         if len(stock_prices) != self.num_assets:
             raise FinError(
-                "Stock prices must be a vector of length " + str(self.num_assets)
+                "Stock prices must be a vector of length "
+                + str(self.num_assets)
             )
 
         if len(dividend_curves) != self.num_assets:
             raise FinError(
-                "Dividend discount must be a vector of length " + str(self.num_assets)
+                "Dividend discount must be a vector of length "
+                + str(self.num_assets)
             )
 
         if len(volatilities) != self.num_assets:
             raise FinError(
-                "Volatilities must be a vector of length " + str(self.num_assets)
+                "Volatilities must be a vector of length "
+                + str(self.num_assets)
             )
 
         if len(betas) != self.num_assets:
-            raise FinError("Betas must be a vector of length " + str(self.num_assets))
+            raise FinError(
+                "Betas must be a vector of length " + str(self.num_assets)
+            )
 
     ###########################################################################
 
@@ -246,7 +251,9 @@ class EquityRainbowOption(EquityOption):
 
         dividend_yields = [q1, q2]
 
-        self._validate(stock_prices, dividend_yields, volatilities, corr_matrix)
+        self._validate(
+            stock_prices, dividend_yields, volatilities, corr_matrix
+        )
 
         #        q1 = dividend_yields[0]
         #        q2 = dividend_yields[1]
@@ -274,7 +281,9 @@ class EquityRainbowOption(EquityOption):
             v = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2)
-                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                - k
+                * df
+                * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
             )
         elif self.payoff_type == EquityRainbowOptionTypes.CALL_ON_MINIMUM:
             v = (
@@ -287,7 +296,9 @@ class EquityRainbowOption(EquityOption):
             cmax2 = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2)
-                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                - k
+                * df
+                * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
             )
             v = k * df - cmax1 + cmax2
         elif self.payoff_type == EquityRainbowOptionTypes.PUT_ON_MINIMUM:
@@ -317,7 +328,9 @@ class EquityRainbowOption(EquityOption):
         seed=4242,
     ):
 
-        self._validate(stock_prices, dividend_curves, volatilities, corr_matrix)
+        self._validate(
+            stock_prices, dividend_curves, volatilities, corr_matrix
+        )
 
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
@@ -358,4 +371,4 @@ class EquityRainbowOption(EquityOption):
         print(self)
 
 
-###############################################################################
+########################################################################################

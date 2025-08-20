@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import pandas as pd
 import numpy as np
@@ -19,7 +19,7 @@ import sys
 
 sys.path.append("..")
 
-###############################################################################
+########################################################################################
 
 
 def test_bondtutor_example():
@@ -37,7 +37,12 @@ def test_bondtutor_example():
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     bond = Bond(
-        issue_dt, maturity_dt, coupon, freq_type, accrualConvention, ex_div_days
+        issue_dt,
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrualConvention,
+        ex_div_days,
     )
 
     dirty_price = bond.dirty_price_from_ytm(settle_dt, y)
@@ -98,7 +103,9 @@ def test_bloomberg_us_treasury_example():
     ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
     assert round(ytm, 4) == 0.0240
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
+    ytm = bond.yield_to_maturity(
+        settle_dt, clean_price, YTMCalcType.US_TREASURY
+    )
     assert round(ytm, 4) == 0.0240
 
     dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
@@ -149,7 +156,9 @@ def test_bloomberg_apple_corp_example():
     ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
     assert round(ytm, 4) == 0.0235
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
+    ytm = bond.yield_to_maturity(
+        settle_dt, clean_price, YTMCalcType.US_TREASURY
+    )
     assert round(ytm, 4) == 0.0235
 
     dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
@@ -177,7 +186,7 @@ def test_bloomberg_apple_corp_example():
     assert round(conv, 4) == 0.2302
 
 
-###############################################################################
+########################################################################################
 
 
 def test_zero_bond():
@@ -185,12 +194,16 @@ def test_zero_bond():
     # A 3 months treasure with 0 coupon per year.
 
     bill = BondZero(
-        issue_dt=Date(25, 7, 2022), maturity_dt=Date(24, 10, 2022), issue_price=99.6410
+        issue_dt=Date(25, 7, 2022),
+        maturity_dt=Date(24, 10, 2022),
+        issue_price=99.6410,
     )
     settle_dt = Date(8, 8, 2022)
 
     clean_price = 99.6504
-    calc_ytm = bill.yield_to_maturity(settle_dt, clean_price, YTMCalcType.ZERO) * 100
+    calc_ytm = (
+        bill.yield_to_maturity(settle_dt, clean_price, YTMCalcType.ZERO) * 100
+    )
 
     accrued_interest = bill.accrued_interest(settle_dt, ONE_MILLION)
 
@@ -198,7 +211,7 @@ def test_zero_bond():
     assert abs(accrued_interest - ONE_MILLION * 0.05523077 / 100) < 0.01
 
 
-###############################################################################
+########################################################################################
 
 
 def test_bond_ror():
@@ -217,14 +230,20 @@ def test_bond_ror():
         dc_type=DayCountTypes.ACT_ACT_ICMA,
     )
     for row in df.itertuples(index=False):
-        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
-        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
-        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
+        buy_date = Date(
+            row.buy_date.day, row.buy_date.month, row.buy_date.year
+        )
+        sell_date = Date(
+            row.sell_date.day, row.sell_date.month, row.sell_date.year
+        )
+        simple, irr, pnl = bond.calc_ror(
+            buy_date, sell_date, row.buy_ytm, row.sell_ytm
+        )
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
 
-###############################################################################
+########################################################################################
 
 
 def test_bond_zero_ror():
@@ -236,17 +255,25 @@ def test_bond_zero_ror():
 
     # A 1-year bond with zero coupon per year. code: 092103011
     bond = BondZero(
-        issue_dt=Date(23, 7, 2021), maturity_dt=Date(24, 8, 2022), issue_price=97.67
+        issue_dt=Date(23, 7, 2021),
+        maturity_dt=Date(24, 8, 2022),
+        issue_price=97.67,
     )
     for row in df.itertuples(index=False):
-        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
-        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
-        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
+        buy_date = Date(
+            row.buy_date.day, row.buy_date.month, row.buy_date.year
+        )
+        sell_date = Date(
+            row.sell_date.day, row.sell_date.month, row.sell_date.year
+        )
+        simple, irr, pnl = bond.calc_ror(
+            buy_date, sell_date, row.buy_ytm, row.sell_ytm
+        )
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
 
-###############################################################################
+########################################################################################
 
 
 def test_bond_cfets():
@@ -258,11 +285,15 @@ def test_bond_cfets():
     test_case_file = "./data/test_cases_bond_cfets.csv"
     path = os.path.join(os.path.dirname(__file__), test_case_file)
 
-    df = pd.read_csv(path, parse_dates=["settlement_date", "issue_date", "maturity_dt"])
+    df = pd.read_csv(
+        path, parse_dates=["settlement_date", "issue_date", "maturity_dt"]
+    )
 
     for row in df.itertuples(index=False):
 
-        issue_dt = Date(row.issue_date.day, row.issue_date.month, row.issue_date.year)
+        issue_dt = Date(
+            row.issue_date.day, row.issue_date.month, row.issue_date.year
+        )
 
         maturity_dt = Date(
             row.maturity_dt.day, row.maturity_dt.month, row.maturity_dt.year
@@ -282,13 +313,16 @@ def test_bond_cfets():
         )
 
         settle_dt = Date(
-            row.settlement_date.day, row.settlement_date.month, row.settlement_date.year
+            row.settlement_date.day,
+            row.settlement_date.month,
+            row.settlement_date.year,
         )
 
         accrued_interest = bond.accrued_interest(settle_dt, face)
         clean_price = row.dirty_price - accrued_interest
         calc_ytm = (
-            bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.CFETS) * 100
+            bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.CFETS)
+            * 100
         )
         try:
             assert abs(calc_ytm - row.ytm) < 0.0001
@@ -301,13 +335,13 @@ def test_bond_cfets():
             continue
 
 
-###############################################################################
+########################################################################################
 
 
 def test_key_rate_durations_bloomberg_example():
 
-    dc_type, freq_type, settle_days, exDiv, calendar = get_bond_market_conventions(
-        BondMarkets.UNITED_STATES
+    dc_type, freq_type, settle_days, exDiv, calendar = (
+        get_bond_market_conventions(BondMarkets.UNITED_STATES)
     )
 
     # interest accrues on this date. Issue date is 01/08/2022
@@ -316,8 +350,8 @@ def test_key_rate_durations_bloomberg_example():
     coupon = 2.75 / 100.0
     ex_div_days = 0
 
-    dc_type, freq_type, settle_days, exDiv, calendar = get_bond_market_conventions(
-        BondMarkets.UNITED_STATES
+    dc_type, freq_type, settle_days, exDiv, calendar = (
+        get_bond_market_conventions(BondMarkets.UNITED_STATES)
     )
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
@@ -331,7 +365,8 @@ def test_key_rate_durations_bloomberg_example():
     # Details of yields of market bonds at KRD maturity points
     my_tenors = np.array([0.5, 1, 2, 3, 5, 7, 10])
     my_rates = (
-        np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272, 3.5825, 3.5347]) / 100.0
+        np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272, 3.5825, 3.5347])
+        / 100.0
     )
 
     krt, krd = bond.key_rate_durations(
@@ -354,4 +389,4 @@ def test_key_rate_durations_bloomberg_example():
         assert round(krd[i], 3) == bbg_key_rate_durations[i]
 
 
-###############################################################################
+########################################################################################

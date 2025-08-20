@@ -27,12 +27,12 @@ USE_FLAT_HAZARD_RATE_INTEGRAL = True
 STANDARD_RECOVERY_RATE = 0.40
 GLOB_NUM_STEPS_PER_YEAR = 25
 
-###############################################################################
+########################################################################################
 # TODO: Perform protection leg pv analytically using fact that hazard rate and
 #       interest rates are flat between their combined node points. Right now I
 #       do not find the protection leg PV calculations to be a bottleneck,
 #       especially given the speedup benefits of using NUMBA.
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -98,7 +98,8 @@ def _risky_pv01_numba(
     # cpn accrued from previous cpn to today paid in full at default
     # before cpn payment
     full_rpv01 = (
-        full_rpv01 + z1 * (qeff - q1) * accrual_factor_pcd_to_now * cpnAccruedIndicator
+        full_rpv01
+        + z1 * (qeff - q1) * accrual_factor_pcd_to_now * cpnAccruedIndicator
     )
 
     # future accrued from now to cpn payment date assuming default roughly
@@ -134,8 +135,12 @@ def _risky_pv01_numba(
                 h12 = -log(q2 / q1) / tau
                 r12 = -log(z2 / z1) / tau
                 alpha = h12 + r12
-                exp_term = 1.0 - exp(-alpha * tau) - alpha * tau * exp(-alpha * tau)
-                d_full_rpv01 = q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
+                exp_term = (
+                    1.0 - exp(-alpha * tau) - alpha * tau * exp(-alpha * tau)
+                )
+                d_full_rpv01 = (
+                    q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
+                )
             else:
                 d_full_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
 
@@ -148,7 +153,7 @@ def _risky_pv01_numba(
     return np.array([full_rpv01, clean_rpv01])
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -202,7 +207,9 @@ def _prot_leg_pv_numba(
             h12 = -log(q2 / q1) / dt
             r12 = -log(z2 / z1) / dt
             exp_term = exp(-(r12 + h12) * dt)
-            dprot_pv = h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
+            dprot_pv = (
+                h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
+            )
             prot_pv += dprot_pv
             q1 = q2
             z1 = z2
@@ -223,9 +230,9 @@ def _prot_leg_pv_numba(
     return prot_pv
 
 
-###############################################################################
-###############################################################################
-###############################################################################
+########################################################################################
+########################################################################################
+########################################################################################
 
 
 class CDS:
@@ -597,7 +604,9 @@ class CDS:
 
         fwd_df = 1.0
 
-        clean_pv = fwd_df * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
+        clean_pv = fwd_df * (
+            prot_pv - self.running_cpn * clean_rpv01 * self.notional
+        )
 
         clean_price = (self.notional - clean_pv) / self.notional * 100.0
 
@@ -710,7 +719,9 @@ class CDS:
     def premium_leg_pv(self, value_dt, issuer_curve, pv01_method=0):
         """Value of the premium leg of a CDS."""
 
-        full_rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)["dirty_rpv01"]
+        full_rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)[
+            "dirty_rpv01"
+        ]
 
         v = full_rpv01 * self.notional * self.running_cpn
         return v
@@ -759,7 +770,9 @@ class CDS:
         accurate approximation that avoids curve building."""
 
         if isinstance(value_dt, Date) is False:
-            raise FinError("Valuation date must be a Date and not " + str(value_dt))
+            raise FinError(
+                "Valuation date must be a Date and not " + str(value_dt)
+            )
 
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
         t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEARS
@@ -796,7 +809,9 @@ class CDS:
         # bump CDS spread and calculate
         #######################################################################
 
-        h = (flat_cds_curve_spread + bump_size) / (1.0 - contract_recovery_rate)
+        h = (flat_cds_curve_spread + bump_size) / (
+            1.0 - contract_recovery_rate
+        )
         r = flat_cont_interest_rate
         w = r + h
         z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
@@ -807,7 +822,9 @@ class CDS:
             * long_protect
             * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
         )
-        full_pv_credit_bumped = clean_pv_credit_bumped + fwd_df * long_protect * accrued
+        full_pv_credit_bumped = (
+            clean_pv_credit_bumped + fwd_df * long_protect * accrued
+        )
         credit01 = full_pv_credit_bumped - full_pv
 
         #######################################################################
@@ -830,7 +847,9 @@ class CDS:
             * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
         )
 
-        full_pv_ir_bumped = clean_pv_ir_bumped + fwd_df * long_protect * accrued
+        full_pv_ir_bumped = (
+            clean_pv_ir_bumped + fwd_df * long_protect * accrued
+        )
 
         ir01 = full_pv_ir_bumped - full_pv
 
@@ -897,4 +916,4 @@ class CDS:
         print(self)
 
 
-###############################################################################
+########################################################################################

@@ -36,26 +36,26 @@ from numba import njit
 
 from ..utils.math import norminvcdf
 
-###############################################################################
+########################################################################################
 # This code loads sobol coefficients from binary numpy file and allocates
 # contents to static global variables.
-###############################################################################
+########################################################################################
 
 dirname = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(dirname, "sobolcoeff.npz")
 
-with np.load(path, mmap_mode='r') as f:
-    s_arr = np.array(f['sa'][0])
-    a_arr = np.array(f['sa'][1])
-    m_i = f['c']
+with np.load(path, mmap_mode="r") as f:
+    s_arr = np.array(f["sa"][0])
+    a_arr = np.array(f["sa"][1])
+    m_i = f["c"]
 
-###############################################################################
+########################################################################################
 
 
 @njit(cache=True)
 def get_gaussian_sobol(num_points, dimension):
-    """ Sobol Gaussian quasi random points generator based on graycode order.
-    The generated points follow a normal distribution. """
+    """Sobol Gaussian quasi random points generator based on graycode order.
+    The generated points follow a normal distribution."""
     points = get_uniform_sobol(num_points, dimension)
 
     for i in range(num_points):
@@ -63,12 +63,13 @@ def get_gaussian_sobol(num_points, dimension):
             points[i, j] = norminvcdf(points[i, j])
     return points
 
-###############################################################################
+
+########################################################################################
 
 
 @njit(cache=True)
 def get_uniform_sobol(num_points, dimension):
-    """ Sobol uniform quasi random points generator based on graycode order.
+    """Sobol uniform quasi random points generator based on graycode order.
     This function returns a 2D Numpy array of values where the number of rows
     is the number of draws and the number of columns is the number of
     dimensions of the random values. Each dimension has the same number of
@@ -80,7 +81,7 @@ def get_uniform_sobol(num_points, dimension):
     global m_i
 
     # ll = number of bits needed
-    ll = int(np.ceil(np.log(num_points+1)/np.log(2.0)))
+    ll = int(np.ceil(np.log(num_points + 1) / np.log(2.0)))
 
     # c[i] = index from the right of the first zero bit of i
     c = np.zeros(num_points, dtype=np.int64)
@@ -97,47 +98,49 @@ def get_uniform_sobol(num_points, dimension):
 
     # ----- Compute the first dimension -----
     # Compute direction numbers v[1] to v[L], scaled by 2**32
-    v = np.zeros(ll+1)
-    for i in range(1, ll+1):
-        v[i] = 1 << (32-i)
+    v = np.zeros(ll + 1)
+    for i in range(1, ll + 1):
+        v[i] = 1 << (32 - i)
         v[i] = int(v[i])
 
     #  Evalulate x[0] to x[N-1], scaled by 2**32
-    x = np.zeros(num_points+1)
-    for i in range(1, num_points+1):
-        x[i] = int(x[i-1]) ^ int(v[c[i-1]])
-        points[i-1, 0] = x[i]/(2**32)
+    x = np.zeros(num_points + 1)
+    for i in range(1, num_points + 1):
+        x[i] = int(x[i - 1]) ^ int(v[c[i - 1]])
+        points[i - 1, 0] = x[i] / (2**32)
 
     # ----- Compute the remaining dimensions -----
     for j in range(1, dimension):
         # read parameters from file
-        s = s_arr[j-1]
-        a = a_arr[j-1]
-        mm = m_i[j-1]
+        s = s_arr[j - 1]
+        a = a_arr[j - 1]
+        mm = m_i[j - 1]
         m = np.concatenate((np.zeros(1), mm))
 
         # Compute direction numbers V[1] to V[L], scaled by 2**32
-        v = np.zeros(ll+1)
+        v = np.zeros(ll + 1)
         if ll <= s:
-            for i in range(1, ll+1):
-                v[i] = int(m[i]) << (32-i)
+            for i in range(1, ll + 1):
+                v[i] = int(m[i]) << (32 - i)
 
         else:
-            for i in range(1, s+1):
-                v[i] = int(m[i]) << (32-i)
+            for i in range(1, s + 1):
+                v[i] = int(m[i]) << (32 - i)
 
-            for i in range(s+1, ll+1):
-                v[i] = int(v[i-s]) ^ (int(v[i-s]) >> s)
+            for i in range(s + 1, ll + 1):
+                v[i] = int(v[i - s]) ^ (int(v[i - s]) >> s)
                 for k in range(1, s):
-                    v[i] = int(v[i]) ^ (((int(a) >> int(s-1-k)) & 1)
-                                        * int(v[i-k]))
+                    v[i] = int(v[i]) ^ (
+                        ((int(a) >> int(s - 1 - k)) & 1) * int(v[i - k])
+                    )
 
         # Evalulate X[0] to X[N-1], scaled by pow(2,32)
-        x = np.zeros(num_points+1)
-        for i in range(1, num_points+1):
-            x[i] = int(x[i-1]) ^ int(v[c[i-1]])
-            points[i-1, j] = x[i]/(2**32)
+        x = np.zeros(num_points + 1)
+        for i in range(1, num_points + 1):
+            x[i] = int(x[i - 1]) ^ int(v[c[i - 1]])
+            points[i - 1, j] = x[i] / (2**32)
 
     return points
 
-###############################################################################
+
+########################################################################################

@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from FinTestCases import FinTestCases, globalTestCaseMode
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
@@ -25,7 +25,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 # This is in progress and needs to be completed
 
-###############################################################################
+########################################################################################
 
 
 # def test_Swaptions():
@@ -137,7 +137,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #                  swaption_vol, swaption_price1F, swaption_priceNF,
 #                  blackSwaptionPrice))
 
-###############################################################################
+########################################################################################
 
 
 # def test_CapsFloors():
@@ -233,7 +233,7 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 #         err = v_lmm - v_BLK
 #         test_cases.print(num_paths, v_lmm, v_BLK, err)
 
-###############################################################################
+########################################################################################
 
 
 # test_CapsFloors()

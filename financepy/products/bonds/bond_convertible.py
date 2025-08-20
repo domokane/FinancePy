@@ -26,7 +26,7 @@ from ...utils.calendar import DateGenRuleTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes, _uinterpolate
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -212,7 +212,9 @@ def _value_convertible(
     bullet_pv = (1.0 + flow) * face_amount
     for i_node in range(0, num_levels):
         convValue = tree_convert_value[num_times - 1, i_node]
-        tree_convert_bond_value[num_times - 1, i_node] = max(bullet_pv, convValue)
+        tree_convert_bond_value[num_times - 1, i_node] = max(
+            bullet_pv, convValue
+        )
 
     #  begin backward steps from expiry
     for i_time in range(num_times - 2, -1, -1):
@@ -228,9 +230,13 @@ def _value_convertible(
         for i_node in range(0, i_time + 1):
             fut_value_up = tree_convert_bond_value[i_time + 1, i_node + 1]
             fut_value_dn = tree_convert_bond_value[i_time + 1, i_node]
-            hold = p_up * fut_value_up + p_dn * fut_value_dn  # p_up already embeds Q
+            hold = (
+                p_up * fut_value_up + p_dn * fut_value_dn
+            )  # p_up already embeds Q
             hold_pv = (
-                df * hold + pDef * df * recovery_rate * face_amount + flow * face_amount
+                df * hold
+                + pDef * df * recovery_rate * face_amount
+                + flow * face_amount
             )
             conv = tree_convert_value[i_time, i_node]
             value = min(max(hold_pv, conv, put), call)
@@ -244,19 +250,23 @@ def _value_convertible(
     delta = (tree_convert_bond_value[1, 1] - tree_convert_bond_value[1, 0]) / (
         tree_stock_value[1, 1] - tree_stock_value[1, 0]
     )
-    delta_up = (tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]) / (
-        tree_stock_value[2, 3] - tree_stock_value[2, 2]
+    delta_up = (
+        tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]
+    ) / (tree_stock_value[2, 3] - tree_stock_value[2, 2])
+    delta_dn = (
+        tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]
+    ) / (tree_stock_value[2, 2] - tree_stock_value[2, 1])
+    gamma = (delta_up - delta_dn) / (
+        tree_stock_value[1, 1] - tree_stock_value[1, 0]
     )
-    delta_dn = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]) / (
-        tree_stock_value[2, 2] - tree_stock_value[2, 1]
+    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (
+        2.0 * dt
     )
-    gamma = (delta_up - delta_dn) / (tree_stock_value[1, 1] - tree_stock_value[1, 0])
-    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (2.0 * dt)
     results = np.array([price, bullet_pv, delta, gamma, theta])
     return results
 
 
-###############################################################################
+########################################################################################
 
 
 class BondConvertible:
@@ -588,7 +598,9 @@ class BondConvertible:
 
         dc = DayCount(self.dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(self.pcd, settle_dt, self.ncd, self.freq)
+        (acc_factor, num, _) = dc.year_frac(
+            self.pcd, settle_dt, self.ncd, self.freq
+        )
 
         self.alpha = 1.0 - acc_factor * self.freq
 
@@ -636,8 +648,8 @@ class BondConvertible:
         print(self)
 
 
-###############################################################################
-###############################################################################
+########################################################################################
+########################################################################################
 # TEST PV OF CASHFLOW MAPPING
 #    if 1==0:
 #        pv = 0.0
@@ -659,9 +671,9 @@ class BondConvertible:
 #        pv += df
 #
 #        print("ACTUAL PV",pv)
-###############################################################################
-###############################################################################
-###############################################################################
+########################################################################################
+########################################################################################
+########################################################################################
 
 
 def print_tree(array):
@@ -676,4 +688,4 @@ def print_tree(array):
         print("")
 
 
-###############################################################################
+########################################################################################

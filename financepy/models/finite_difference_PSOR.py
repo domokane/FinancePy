@@ -34,7 +34,7 @@ def black_scholes_fd_psor(
         acc: Keep iterating until this accuracy is achieved
         d_omega: Larger numbers lead to bigger changes in omega with each
         iteration
-        max_iter: Maximum number of iterations in PSOR step. Set to 0 to
+        max_iter: Maximum number of iterations in psor step. Set to 0 to
         allow any number of iterations.
     """
     if isinstance(opt_type, OptionTypes):
@@ -69,9 +69,9 @@ def black_scholes_fd_psor(
     res = deepcopy(payoff)[0]
 
     # Explicit
-    Ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1.0 - theta, wind)
+    ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1.0 - theta, wind)
     # Implicit
-    Ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
+    ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
     # Loop backwards through time_steps, starting with a higher number for
     # faster convergence and lower as estimation improves
@@ -81,8 +81,8 @@ def black_scholes_fd_psor(
 
     for _ in range(num_steps - 1, -1, -1):
 
-        res, nloops = PSOR_roll_backwards(
-            res_k=res, acc=acc, Ai=Ai, Ae=Ae, omega=omega, max_iter=max_iter
+        res, nloops = psor_roll_backwards(
+            res_k=res, acc=acc, ai=ai, ae=ae, omega=omega, max_iter=max_iter
         )
 
         # Increase omega if nloops is larger this iteration.
@@ -104,29 +104,29 @@ def black_scholes_fd_psor(
     return res[num_samples // 2]
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
-def PSOR_roll_backwards(Ae, Ai, res_k, omega, acc=1e-13, max_iter=0):
+def psor_roll_backwards(ae, ai, res_k, omega, acc=1e-13, max_iter=0):
     # Explicit step
-    z_ip1 = band_matrix_multiplication(Ae, 1, 1, res_k)
+    z_ip1 = band_matrix_multiplication(ae, 1, 1, res_k)
 
-    # PSOR - Iterate until the total change in res is less than acc
-    res_k, nloops = PSOR(Ai, omega, res_k, z_ip1, acc=acc, max_iter=max_iter)
+    # psor - Iterate until the total change in res is less than acc
+    res_k, nloops = psor(ai, omega, res_k, z_ip1, acc=acc, max_iter=max_iter)
     return res_k, nloops
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
-def PSOR(Ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
+def psor(ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
     """
     Projected Successive Over Relaxation -
 
     Parameters:
-        Ai (np.array): Implicit finite difference matrix
+        ai (np.array): Implicit finite difference matrix
         omega (float): Number between 1 and 2 weighted average of previous and
         current iteration
         initial_value (np.array): Vector produced by previous iteration
@@ -144,7 +144,7 @@ def PSOR(Ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
     res_k = initial_value
     res_kp1 = initial_value.copy()
     delta = 1
-    a, b, c = Ai.T
+    a, b, c = ai.T
 
     # Iterate for until solution is stable
     while delta >= acc:
@@ -169,4 +169,4 @@ def PSOR(Ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
     return res_k, nloops
 
 
-###############################################################################
+########################################################################################

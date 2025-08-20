@@ -1,12 +1,16 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import sys
+
 sys.path.append("..")
 
 from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_digital_option import EquityDigitalOption, FinDigitalOptionTypes
+from financepy.products.equity.equity_digital_option import (
+    EquityDigitalOption,
+    FinDigitalOptionTypes,
+)
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
@@ -36,31 +40,25 @@ def test_EquityDigitalOption():
 
     call_option_values = []
     call_option_valuesMC = []
-    num_paths_list = [
-        10000,
-        20000,
-        40000,
-        80000]
+    num_paths_list = [10000, 20000, 40000, 80000]
 
-    '''        160000,
+    """        160000,
         320000,
         640000,
         1280000,
         2560000]
-    '''
+    """
 
     test_cases.header("NumLoops", "ValueBS", "ValueMC", "TIME")
 
     for num_paths in num_paths_list:
 
         call_option = EquityDigitalOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type
+        )
         value = call_option.value(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         start = time.time()
         value_mc = call_option.value_mc(
             value_dt,
@@ -68,7 +66,8 @@ def test_EquityDigitalOption():
             discount_curve,
             dividend_curve,
             model,
-            num_paths)
+            num_paths,
+        )
         end = time.time()
         duration = end - start
         test_cases.print(num_paths, value, value_mc, duration)
@@ -76,13 +75,13 @@ def test_EquityDigitalOption():
         call_option_values.append(value)
         call_option_valuesMC.append(value_mc)
 
-#    plt.figure(figsize=(10,8))
-#    plt.plot(num_paths_list, call_option_values, color = 'b', label="Call Option")
-#    plt.plot(num_paths_list, call_option_valuesMC, color = 'r', label = "Call Option MC")
-#    plt.xlabel("Num Loops")
-#    plt.legend(loc='best')
+    #    plt.figure(figsize=(10,8))
+    #    plt.plot(num_paths_list, call_option_values, color = 'b', label="Call Option")
+    #    plt.plot(num_paths_list, call_option_valuesMC, color = 'r', label = "Call Option MC")
+    #    plt.xlabel("Num Loops")
+    #    plt.legend(loc='best')
 
-##########################################################################
+    ##########################################################################
 
     stock_prices = range(50, 150, 50)
     call_option_values = []
@@ -92,31 +91,20 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         call_option = EquityDigitalOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type
+        )
         value = call_option.value(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         delta = call_option.delta(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         vega = call_option.vega(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         theta = call_option.theta(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         call_option_values.append(value)
         call_optionDeltas.append(delta)
         call_optionVegas.append(vega)
@@ -129,35 +117,25 @@ def test_EquityDigitalOption():
 
     for stock_price in stock_prices:
         put_option = EquityDigitalOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type)
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type
+        )
         value = put_option.value(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         delta = put_option.delta(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         vega = put_option.vega(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         theta = put_option.theta(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model)
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
         put_option_values.append(value)
         put_optionDeltas.append(delta)
         put_optionVegas.append(vega)
         put_optionThetas.append(theta)
+
 
 ##########################################################################
 

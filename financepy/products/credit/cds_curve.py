@@ -16,7 +16,7 @@ from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
 
 
-###############################################################################
+########################################################################################
 
 
 def f(q, *args):
@@ -36,7 +36,7 @@ def f(q, *args):
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 class CDSCurve:
@@ -61,7 +61,9 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if value_dt != libor_curve.value_dt:
-            raise FinError("Curve does not have same valuation date as Issuer curve.")
+            raise FinError(
+                "Curve does not have same valuation date as Issuer curve."
+            )
 
         self.value_dt = value_dt
         self.cds_contracts = cds_contracts
@@ -131,7 +133,9 @@ class CDSCurve:
                 )
             return qs
         elif isinstance(t, float):
-            q = _uinterpolate(t, self._times, self._values, self.interp_method.value)
+            q = _uinterpolate(
+                t, self._times, self._values, self.interp_method.value
+            )
             return q
         else:
             raise FinError("Unknown time type")
@@ -262,4 +266,4 @@ class CDSCurve:
         print(self)
 
 
-###############################################################################
+########################################################################################

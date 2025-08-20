@@ -1,6 +1,6 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -23,12 +23,16 @@ def test_bond_future_1():
     first_delivery_date = Date(1, 3, 2002)
     last_delivery_date = Date(28, 3, 2002)
     contract_size = 100000
-    contractCoupon = 0.06
-    bondFutureContract = BondFuture(
-        "TYH2", first_delivery_date, last_delivery_date, contract_size, contractCoupon
+    contract_cpn = 0.06
+    bond_fut_contract = BondFuture(
+        "TYH2",
+        first_delivery_date,
+        last_delivery_date,
+        contract_size,
+        contract_cpn,
     )
 
-    cf = bondFutureContract.conversion_factor(bond)
+    cf = bond_fut_contract.conversion_factor(bond)
 
     assert round(cf, 4) == 0.9297
 
@@ -48,27 +52,33 @@ def test_bond_future_2():
     last_delivery_date = Date(28, 12, 2017)
 
     contract_size = 100000
-    contractCoupon = 0.06
-    bondFutureContract = BondFuture(
-        "TYZ7", first_delivery_date, last_delivery_date, contract_size, contractCoupon
+    contract_cpn = 0.06
+    bond_fut_contract = BondFuture(
+        "TYZ7",
+        first_delivery_date,
+        last_delivery_date,
+        contract_size,
+        contract_cpn,
     )
 
-    cf = bondFutureContract.conversion_factor(bond)
+    cf = bond_fut_contract.conversion_factor(bond)
 
     assert round(cf, 4) == 0.7314
 
     futures_price = 125.265625
 
-    pip = bondFutureContract.principal_invoice(bond, futures_price)
+    pip = bond_fut_contract.principal_invoice(bond, futures_price)
 
     assert round(pip, 4) == 91619.2781
 
-    tia = bondFutureContract.total_invoice_amount(settle_dt, bond, futures_price)
+    tia = bond_fut_contract.total_invoice_amount(
+        settle_dt, bond, futures_price
+    )
 
     assert round(tia, 4) == 9162294.5
 
 
-###############################################################################
+########################################################################################
 
 
 def test_future_bond_ctd():
@@ -77,10 +87,14 @@ def test_future_bond_ctd():
     last_delivery_date = Date(28, 12, 2017)
 
     contract_size = 100000
-    contractCoupon = 0.06
+    contract_cpn = 0.06
 
-    bondFutureContract = BondFuture(
-        "TYZ7", first_delivery_date, last_delivery_date, contract_size, contractCoupon
+    bond_fut_contract = BondFuture(
+        "TYZ7",
+        first_delivery_date,
+        last_delivery_date,
+        contract_size,
+        contract_cpn,
     )
 
     bonds = []
@@ -131,6 +145,6 @@ def test_future_bond_ctd():
 
     futures_price = 125.265625
 
-    ctd = bondFutureContract.ctd(bonds, prices, futures_price)
+    ctd = bond_fut_contract.ctd(bonds, prices, futures_price)
 
     assert round(ctd.cpn, 4) == 0.0225

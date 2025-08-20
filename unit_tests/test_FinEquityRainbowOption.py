@@ -1,11 +1,13 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.helpers import beta_vector_to_corr_matrix
-from financepy.products.equity.equity_rainbow_option import EquityRainbowOptionTypes
+from financepy.products.equity.equity_rainbow_option import (
+    EquityRainbowOptionTypes,
+)
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
 import numpy as np
 from math import sqrt

@@ -1,9 +1,10 @@
-###############################################################################
+########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-###############################################################################
+########################################################################################
 
 import time
 import sys
+
 sys.path.append("..")
 
 import numpy as np
@@ -51,22 +52,23 @@ def test_FinFXDigitalOption():
 
     model = BlackScholes(volatility)
 
-    digital_option = FXDigitalOption(expiry_dt,
-                                     strike_fx_rate,
-                                     currency_pair,
-                                     OptionTypes.DIGITAL_CALL,
-                                     notional,
-                                     "USD")
+    digital_option = FXDigitalOption(
+        expiry_dt,
+        strike_fx_rate,
+        currency_pair,
+        OptionTypes.DIGITAL_CALL,
+        notional,
+        "USD",
+    )
 
     spot_fx_rate = np.linspace(0.01, 2.0, 10)
 
-    value = digital_option.value(value_dt,
-                                 spot_fx_rate,
-                                 domestic_curve,
-                                 foreign_curve,
-                                 model)
+    value = digital_option.value(
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+    )
 
-###############################################################################
+
+########################################################################################
 
 
 test_FinFXDigitalOption()

@@ -16,9 +16,9 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.frequency import FrequencyTypes
 from ...products.bonds.bond import YTMCalcType
 
-###############################################################################
+########################################################################################
 # TO DO - THIS CLASS NEEDS TO INHERIT FROM BOND CLASS
-###############################################################################
+########################################################################################
 
 
 def _f(ytm, *args):
@@ -32,7 +32,7 @@ def _f(ytm, *args):
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 def _g(oas, *args):
@@ -46,7 +46,7 @@ def _g(oas, *args):
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 class BondZero:
@@ -247,7 +247,9 @@ class BondZero:
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
 
-        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
+        dirty_price = self.dirty_price_from_discount_curve(
+            settle_dt, discount_curve
+        )
 
         accrued = self.accrued_interest(settle_dt, self.par)
         clean_price = dirty_price - accrued
@@ -320,12 +322,18 @@ class BondZero:
         """Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver."""
 
-        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
+        if isinstance(clean_price, float) or isinstance(
+            clean_price, np.float64
+        ):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
+        elif isinstance(clean_price, list) or isinstance(
+            clean_price, np.ndarray
+        ):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
+            raise FinError(
+                "Unknown type for clean_price " + str(type(clean_price))
+            )
 
         accrued_amount = self.accrued_interest(settle_dt, self.par)
         dirty_prices = clean_prices + accrued_amount
@@ -505,12 +513,18 @@ class BondZero:
         """Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed."""
 
-        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
+        if isinstance(clean_price, float) or isinstance(
+            clean_price, np.float64
+        ):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
+        elif isinstance(clean_price, list) or isinstance(
+            clean_price, np.ndarray
+        ):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
+            raise FinError(
+                "Unknown type for clean_price " + str(type(clean_price))
+            )
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -594,7 +608,9 @@ class BondZero:
 
                 dq = q - prev_q
 
-                defaulting_principal_pv_pay_start += -dq * recovery_rate * prev_df
+                defaulting_principal_pv_pay_start += (
+                    -dq * recovery_rate * prev_df
+                )
                 defaulting_principal_pv_pay_start += -dq * recovery_rate * df
 
                 # Add on PV of principal if default occurs in cpn period
@@ -714,4 +730,4 @@ class BondZero:
         print(self)
 
 
-###############################################################################
+########################################################################################

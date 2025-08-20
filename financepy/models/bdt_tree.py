@@ -14,10 +14,10 @@ from ..utils.global_vars import G_SMALL
 
 INTERP_TYPE = InterpTypes.FLAT_FWD_RATES.value
 
-###############################################################################
+########################################################################################
 # ISSUE: PUT CALL PARITY IS NOT EXACTLY OBSERVED FOR BERMUDAN SWAPTIONS WHEN
 #       VOL IS TURNED UP. SMALL EFFECT. $3 OUT OF $1m.
-###############################################################################
+########################################################################################
 
 
 def option_exercise_types_to_int(option_exercise_type):
@@ -32,11 +32,13 @@ def option_exercise_types_to_int(option_exercise_type):
         raise FinError("Unknown option exercise type.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64(float64, int64, float64[:, :], float64[:, :], float64, float64, float64),
+    float64(
+        float64, int64, float64[:, :], float64[:, :], float64, float64, float64
+    ),
     fastmath=True,
     cache=True,
 )
@@ -62,11 +64,13 @@ def f(x0, m, q_matrix, rt, df_end, dt, sigma):
     return obj_fn
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
-    float64(float64, int64, float64[:, :], float64[:, :], float64, float64, float64),
+    float64(
+        float64, int64, float64[:, :], float64[:, :], float64, float64, float64
+    ),
     fastmath=True,
     cache=True,
 )
@@ -97,7 +101,7 @@ def search_root(x0, m, q_matrix, rt, df_end, dt, sigma):
     raise FinError("Search root derivative FAILED to find alpha.")
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -255,7 +259,7 @@ def bermudan_swaption_tree_fast(
     return pay_values[0, 0], rec_values[0, 0]
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -359,7 +363,9 @@ def american_bond_option_tree_fast(
 
     # Start with the value of the bond at maturity
     for k in range(0, num_nodes):
-        bond_values[maturity_step, k] = (1.0 + tree_flows[maturity_step]) * face_amount
+        bond_values[maturity_step, k] = (
+            1.0 + tree_flows[maturity_step]
+        ) * face_amount
 
     if debug:
         dirty_price = bond_values[maturity_step, 0]
@@ -387,7 +393,9 @@ def american_bond_option_tree_fast(
             clean_price = dirty_price - accrued[m]
 
         if debug:
-            print(m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0)
+            print(
+                m, _tree_times[m], accrued[m], dirty_price, clean_price, 0, 0
+            )
 
     # Now step back to today from the expiry date considering early exercise
     for m in range(expiry_step, -1, -1):
@@ -453,7 +461,7 @@ def american_bond_option_tree_fast(
     return call_option_values[0, 0], put_option_values[0, 0]
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -612,11 +620,14 @@ def callable_puttable_bond_tree_fast(
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
             call_put_bond_values[m, k] = value
 
-    return {"bondwithoption": call_put_bond_values[0, 0], "bondpure": bond_values[0, 0]}
+    return {
+        "bondwithoption": call_put_bond_values[0, 0],
+        "bondpure": bond_values[0, 0],
+    }
 
 
-###############################################################################
-###############################################################################
+########################################################################################
+########################################################################################
 
 
 @njit(cache=True, fastmath=True)
@@ -687,7 +698,7 @@ def build_tree_fast(sigma, tree_times, num_time_steps, discount_factors):
     return (qq, rt, dt)
 
 
-###############################################################################
+########################################################################################
 
 
 class BDTTree:
@@ -717,7 +728,7 @@ class BDTTree:
         self.discount_curve = None
         self.dt = None
 
-    ###############################################################################
+    ########################################################################################
 
     def build_tree(self, tree_mat, df_times, df_values):
 
@@ -729,7 +740,9 @@ class BDTTree:
 
         interp = InterpTypes.FLAT_FWD_RATES.value
 
-        tree_maturity = tree_mat * (self.num_time_steps + 1) / self.num_time_steps
+        tree_maturity = (
+            tree_mat * (self.num_time_steps + 1) / self.num_time_steps
+        )
         tree_times = np.linspace(0.0, tree_maturity, self.num_time_steps + 2)
         self.tree_times = tree_times
 
@@ -749,10 +762,16 @@ class BDTTree:
 
         return
 
-    ###############################################################################
+    ####################################################################################
 
     def bond_option(
-        self, t_exp, strike_price, face_amount, cpn_times, cpn_flows, exercise_type
+        self,
+        t_exp,
+        strike_price,
+        face_amount,
+        cpn_times,
+        cpn_flows,
+        exercise_type,
     ):
         """Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree."""
@@ -787,10 +806,17 @@ class BDTTree:
 
         return {"call": call_value, "put": put_value}
 
-    ###############################################################################
+    ####################################################################################
 
     def bermudan_swaption(
-        self, t_exp, t_mat, strike, face_amount, cpn_times, cpn_flows, exercise_type
+        self,
+        t_exp,
+        t_mat,
+        strike,
+        face_amount,
+        cpn_times,
+        cpn_flows,
+        exercise_type,
     ):
         """Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
@@ -826,7 +852,7 @@ class BDTTree:
 
         return {"pay": pay_value, "rec": rec_value}
 
-    ###############################################################################
+    ####################################################################################
 
     def callable_puttable_bond_tree(
         self,
@@ -865,9 +891,12 @@ class BDTTree:
             self.dfs,
         )
 
-        return {"bondwithoption": v["bondwithoption"], "bondpure": v["bondpure"]}
+        return {
+            "bondwithoption": v["bondwithoption"],
+            "bondpure": v["bondpure"],
+        }
 
-    ###############################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -878,4 +907,4 @@ class BDTTree:
         return s
 
 
-###############################################################################
+########################################################################################

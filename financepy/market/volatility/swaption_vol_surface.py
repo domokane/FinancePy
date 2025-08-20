@@ -28,7 +28,7 @@ from ...models.sabr import vol_function_sabr_beta_one
 from ...utils.solver_nm import nelder_mead
 from ...utils.global_types import FinSolverTypes
 
-###############################################################################
+########################################################################################
 # ISSUES
 # sabr does not fit inverted skew discount like eurjpy
 # problem with initial values ? optimiser can drive vol negative
@@ -39,12 +39,12 @@ from ...utils.global_types import FinSolverTypes
 # examine other functions for vol
 #
 # find python version of cg minimiser to apply numba to
-###############################################################################
+########################################################################################
 
-###############################################################################
+########################################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
 #       delta fit.
-###############################################################################
+########################################################################################
 
 # @njit(fastmath=True, cache=True)
 # def _g(K, *args):
@@ -68,7 +68,7 @@ from ...utils.global_types import FinSolverTypes
 #     obj_fn = delta_target - delta_out
 #     return obj_fn
 
-###############################################################################
+########################################################################################
 
 # @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
 # def _interpolate_gap(k, strikes, gaps):
@@ -95,7 +95,7 @@ from ...utils.global_types import FinSolverTypes
 #     v = ((k-k0) * v1 + (k1-k) * v0) / (k1-k0)
 #     return v
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -127,9 +127,9 @@ def _obj(params, *args):
     return tot
 
 
-###############################################################################
+########################################################################################
 # Do not cache this function as it leads to complaints
-###############################################################################
+########################################################################################
 
 
 def _solve_to_horizon(
@@ -185,7 +185,7 @@ def _solve_to_horizon(
     return params
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -225,7 +225,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
         raise FinError("Unknown Model Type")
 
 
-###############################################################################
+########################################################################################
 
 
 # @njit(cache=True, fastmath=True)
@@ -256,9 +256,9 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     return inv_obj_fn
 
-###############################################################################
+########################################################################################
 # Unable to cache this function due to dynamic globals warning. Revisit.
-###############################################################################
+########################################################################################
 
 
 # @njit(float64(float64, float64, float64, float64, int64, int64, float64,
@@ -289,9 +289,9 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     return K
 
-###############################################################################
+########################################################################################
 # Unable to cache function and if I remove njit it complains about pickle
-###############################################################################
+########################################################################################
 
 
 # @njit(float64(float64, float64, float64, float64, int64, float64,
@@ -375,7 +375,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #         raise FinError("Unknown FinFXDeltaMethod")
 
-###############################################################################
+########################################################################################
 
 
 class SwaptionVolSurface:
@@ -742,7 +742,7 @@ class SwaptionVolSurface:
 
     #     return volt, kt
 
-    ###############################################################################
+    ########################################################################################
 
     def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
         """Main function to construct the vol surface."""
@@ -985,4 +985,4 @@ class SwaptionVolSurface:
         print(self)
 
 
-###############################################################################
+########################################################################################
