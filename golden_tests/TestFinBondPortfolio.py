@@ -4,6 +4,7 @@
 
 import os
 import datetime as dt
+import pandas as pd
 
 import sys
 
@@ -22,8 +23,6 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 def test_BondPortfolio():
 
-    import pandas as pd
-
     path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
     bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
@@ -36,6 +35,7 @@ def test_BondPortfolio():
     test_cases.header("DCTYPE", "MATDATE", "CPN", "PRICE", "ACCD", "YTM")
 
     for dc_type in DayCountTypes:
+
         if dc_type == DayCountTypes.ZERO:
             continue
         for _, bond in bond_dataframe.iterrows():

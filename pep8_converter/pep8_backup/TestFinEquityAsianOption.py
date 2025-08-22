@@ -1,0 +1,420 @@
+########################################################################################
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+########################################################################################
+
+import sys
+
+sys.path.append("..")
+
+import time
+
+from financepy.utils.date import Date
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.products.equity.equity_asian_option import (
+    AsianOptionValuationMethods,
+)
+from financepy.products.equity.equity_asian_option import EquityAsianOption
+from financepy.utils.global_types import OptionTypes
+from FinTestCases import FinTestCases, global_test_case_mode
+
+
+test_cases = FinTestCases(__file__, global_test_case_mode)
+
+########################################################################################
+
+test_convergence = False
+test_time_evolution = False
+test_mc_timings = True
+
+########################################################################################
+
+
+def test_convergence():
+
+    value_dt = Date(1, 1, 2014)
+    start_averaging_date = Date(1, 6, 2014)
+    expiry_dt = Date(1, 1, 2015)
+    stock_price = 100.0
+    volatility = 0.20
+    interest_rate = 0.30
+    dividend_yield = 0.10
+    num_observations = 120  # daily as we have a half year
+    accrued_avg = None
+    K = 100
+    seed = 1976
+
+    model = BlackScholes(volatility)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+
+    asian_option = EquityAsianOption(
+        start_averaging_date,
+        expiry_dt,
+        K,
+        OptionTypes.EUROPEAN_CALL,
+        num_observations,
+    )
+
+    test_cases.header(
+        "K", "Geometric", "Turnbull_Wakeman", "Curran", "FastMC", "FastMC_CV"
+    )
+
+    values_turnbull = []
+    values_curran = []
+    values_geometric = []
+    values_mc_fast = []
+    values_mc_cv = []
+
+    num_paths_list = [5000]
+
+    for num_paths in num_paths_list:
+
+        accrued_avg = stock_price * 1.1
+
+        value_mc_fast = asian_option._value_mc_fast(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        value_mc_cv = asian_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        value_geometric = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            AsianOptionValuationMethods.GEOMETRIC,
+            accrued_avg,
+        )
+
+        valueTurnbullWakeman = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            AsianOptionValuationMethods.TURNBULL_WAKEMAN,
+            accrued_avg,
+        )
+
+        valueCurran = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            AsianOptionValuationMethods.CURRAN,
+            accrued_avg,
+        )
+
+        values_geometric.append(value_geometric)
+        values_turnbull.append(valueTurnbullWakeman)
+        values_curran.append(valueCurran)
+        values_mc_fast.append(value_mc_fast)
+        values_mc_cv.append(value_mc_cv)
+
+        test_cases.print(
+            num_paths,
+            value_geometric,
+            valueTurnbullWakeman,
+            valueCurran,
+            value_mc_fast,
+            value_mc_cv,
+        )
+
+
+#    import matplotlib.pyplot as plt
+#    x = num_paths_list
+#    plt.figure(figsize=(8,6))
+#    plt.plot(x,values_geometric,label="Geometric")
+#    plt.plot(x,values_turnbull,label="Turbull_Wakeman")
+#    plt.plot(x,values_curran,label="Curran")
+#    plt.plot(x,values_mc_fast,label="MC_Fast")
+#    plt.plot(x,values_mc_cv,label="MC_CV")
+#    plt.legend()
+#    plt.xlabel("Number of Paths")
+#    plt.show()
+
+########################################################################################
+
+
+def test_time_evolution():
+
+    start_averaging_date = Date(1, 1, 2015)
+    expiry_dt = Date(1, 1, 2016)
+    stock_price = 100.0
+    volatility = 0.20
+    interest_rate = 0.30
+    dividend_yield = 0.10
+    num_observations = 100  # weekly as we have a year
+    accrued_avg = None
+    K = 100
+    seed = 1976
+
+    model = BlackScholes(volatility)
+
+    asian_option = EquityAsianOption(
+        start_averaging_date,
+        expiry_dt,
+        K,
+        OptionTypes.EUROPEAN_CALL,
+        num_observations,
+    )
+
+    test_cases.header(
+        "Date",
+        "Geometric",
+        "Turnbull_Wakeman",
+        "Curran",
+        "FastMC",
+        "FastMC_CV",
+    )
+
+    values_turnbull = []
+    values_curran = []
+    values_geometric = []
+    values_mc_fast = []
+    values_mc_cv = []
+
+    value_dts = []
+    value_dts.append(Date(1, 4, 2014))
+    value_dts.append(Date(1, 6, 2014))
+    value_dts.append(Date(1, 8, 2014))
+    value_dts.append(Date(1, 2, 2015))
+    value_dts.append(Date(1, 4, 2015))
+    value_dts.append(Date(1, 6, 2015))
+    value_dts.append(Date(1, 8, 2015))
+
+    num_paths = 10000
+
+    for value_dt in value_dts:
+
+        accrued_avg = stock_price * 0.9
+
+        discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+        dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+
+        value_mc_fast = asian_option._value_mc_fast(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        value_mc_cv = asian_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        value_geometric = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            AsianOptionValuationMethods.GEOMETRIC,
+            accrued_avg,
+        )
+
+        valueTurnbullWakeman = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            AsianOptionValuationMethods.TURNBULL_WAKEMAN,
+            accrued_avg,
+        )
+
+        valueCurran = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            AsianOptionValuationMethods.CURRAN,
+            accrued_avg,
+        )
+
+        values_geometric.append(value_geometric)
+        values_turnbull.append(valueTurnbullWakeman)
+        values_curran.append(valueCurran)
+        values_mc_fast.append(value_mc_fast)
+        values_mc_cv.append(value_mc_cv)
+
+        test_cases.print(
+            str(value_dt),
+            value_geometric,
+            valueTurnbullWakeman,
+            valueCurran,
+            value_mc_fast,
+            value_mc_cv,
+        )
+
+
+#    import matplotlib.pyplot as plt
+#    x = [ dt.date() for dt in value_dts]
+#
+#    plt.figure(figsize=(8,6))
+#    plt.plot(x,values_geometric,label="Geometric")
+#    plt.plot(x,values_turnbull,label="Turbull_Wakeman")
+#    plt.plot(x,values_curran,label="Curran")
+#    plt.plot(x,values_mc_fast,label="MC_Fast")
+#    plt.plot(x,values_mc_cv,label="MC_CV")
+#    plt.legend()
+#    plt.xlabel("Valuation Date")
+#    plt.show()
+
+##########################################################################
+
+
+def test_mc_timings():
+
+    value_dt = Date(1, 1, 2014)
+    start_averaging_date = Date(1, 6, 2014)
+    expiry_dt = Date(1, 1, 2015)
+    stock_price = 100.0
+    volatility = 0.20
+    interest_rate = 0.30
+    dividend_yield = 0.10
+    num_observations = 120  # daily as we have a half year
+    accrued_avg = None
+    K = 100
+    seed = 1976
+
+    model = BlackScholes(volatility)
+    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+
+    asian_option = EquityAsianOption(
+        start_averaging_date,
+        expiry_dt,
+        K,
+        OptionTypes.EUROPEAN_CALL,
+        num_observations,
+    )
+
+    test_cases.header(
+        "NUMPATHS", "VALUE", "TIME", "VALUE_MC", "TIME", "value_mc_cv", "TIME"
+    )
+
+    valuesMC = []
+    values_mc_fast = []
+    values_mc_fast_CV = []
+
+    tvaluesMC = []
+    tvalues_mc_fast = []
+    tvalues_mc_fast_CV = []
+
+    num_paths_list = [5000]
+
+    for num_paths in num_paths_list:
+
+        accrued_avg = stock_price * 1.1
+
+        start = time.time()
+        value_mc = asian_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        end = time.time()
+        t_MC = end - start
+
+        start = time.time()
+        value_mc_fast = asian_option._value_mc_fast(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        end = time.time()
+        t_MC_fast = end - start
+
+        start = time.time()
+        value_mc_fast_CV = asian_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+            seed,
+            accrued_avg,
+        )
+
+        end = time.time()
+        t_MC_fast_CV = end - start
+
+        valuesMC.append(value_mc)
+        values_mc_fast.append(value_mc_fast)
+        values_mc_fast_CV.append(value_mc_fast_CV)
+
+        tvaluesMC.append(t_MC)
+        tvalues_mc_fast.append(t_MC_fast)
+        tvalues_mc_fast_CV.append(t_MC_fast_CV)
+
+        test_cases.print(
+            num_paths,
+            value_mc,
+            t_MC,
+            value_mc_fast,
+            t_MC_fast,
+            value_mc_fast_CV,
+            t_MC_fast_CV,
+        )
+
+
+#    import matplotlib.pyplot as plt
+#    x = num_paths_list
+#    plt.figure(figsize=(8,6))
+#    plt.plot(x,valuesMC,label="Basic MC")
+#    plt.plot(x,values_mc_fast,label="MC_Fast")
+#    plt.plot(x,values_mc_fast_CV,label="MC_Fast CV")
+#    plt.legend()
+#    plt.xlabel("Number of Paths")
+#    plt.show()
+
+
+test_convergence()
+test_mc_timings()
+test_time_evolution()
+test_cases.compare_test_cases()

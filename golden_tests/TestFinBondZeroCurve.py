@@ -5,6 +5,7 @@
 import os
 import sys
 import datetime as dt
+import pandas as pd
 
 sys.path.append("..")
 
@@ -17,14 +18,12 @@ from financepy.utils.frequency import FrequencyTypes
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
 
 def test_BondZeroCurve():
-
-    import pandas as pd
 
     path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
@@ -62,7 +61,7 @@ def test_BondZeroCurve():
         zero_rate = bondCurve.zero_rate(maturity_dt)
         test_cases.print(maturity_dt, zero_rate)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         bondCurve.plot("BOND CURVE")
 
 

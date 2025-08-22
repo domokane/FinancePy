@@ -3,39 +3,47 @@ import os
 import re
 import ast
 import difflib
+from typing import Dict, Set
+
+# Configuration constants
+HASH_LINE_LENGTH = 80  # Standard line width for PEP 8
+OUTPUT_DIR = "./pep8_output"
+SHOW_DIFF = False  # Toggle to show diff output
 
 
 def to_snake_case(name: str) -> str:
+    """Convert a string to snake_case."""
     s1 = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", name)
     s2 = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", s1)
     return s2.lower()
 
 
 def rename_functions_and_calls(source: str) -> str:
-    """
-    Rename functions (definitions and calls) to snake_case.
-    Class names and calls to classes are NOT renamed.
-    Preserves original line breaks and parentheses.
-    """
-    tree = ast.parse(source)
+    """Rename function definitions and calls to snake_case, excluding classes."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as e:
+        print(f"Syntax error in source code: {e}")
+        return source
 
-    function_names = set()
-    class_names = set()
+    function_names: Set[str] = set()
+    class_names: Set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             if not (node.name.startswith("__") and node.name.endswith("__")):
                 function_names.add(node.name)
         elif isinstance(node, ast.ClassDef):
             class_names.add(node.name)
+    function_names -= class_names
 
-    function_names -= class_names  # exclude class names
-
-    rename_map = {}
-    for name in function_names:
-        if name.startswith("_"):
-            rename_map[name] = "_" + to_snake_case(name[1:])
-        else:
-            rename_map[name] = to_snake_case(name)
+    rename_map: Dict[str, str] = {
+        name: (
+            "_" + to_snake_case(name[1:])
+            if name.startswith("_")
+            else to_snake_case(name)
+        )
+        for name in function_names
+    }
 
     # Replace function definitions
     source = re.sub(
@@ -44,45 +52,89 @@ def rename_functions_and_calls(source: str) -> str:
         source,
     )
 
-    # Replace function calls (bare names, not attributes)
+    # Replace function calls
+    def replace_call(match):
+        name = match.group(1)
+        if name in rename_map and name not in class_names:
+            return f"{rename_map[name]}("
+        return match.group(0)
+
     source = re.sub(
-        r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(",
-        lambda m: f"{rename_map.get(m.group(1), m.group(1))}(",
+        r"(?<!\.)(\b[A-Za-z_][A-Za-z0-9_]*)\s*\(",
+        replace_call,
         source,
     )
+    return source
 
+
+def rename_variables(source: str) -> str:
+    """Rename variable names in assignments to snake_case, excluding classes and functions."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as e:
+        print(f"Syntax error in source code: {e}")
+        return source
+
+    function_names: Set[str] = set()
+    class_names: Set[str] = set()
+    variable_names: Set[str] = set()
+
+    # Collect function, class, and variable names
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            if not (node.name.startswith("__") and node.name.endswith("__")):
+                function_names.add(node.name)
+        elif isinstance(node, ast.ClassDef):
+            class_names.add(node.name)
+        elif isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
+            if not (node.id.startswith("__") and node.id.endswith("__")):
+                variable_names.add(node.id)
+
+    variable_names -= class_names | function_names  # Exclude class and function names
+
+    rename_map: Dict[str, str] = {
+        name: (
+            "_" + to_snake_case(name[1:])
+            if name.startswith("_")
+            else to_snake_case(name)
+        )
+        for name in variable_names
+    }
+
+    # Replace variable names (standalone identifiers, not in attribute chains or function calls)
+    def replace_variable(match):
+        name = match.group(1)
+        if name in rename_map and name not in class_names | function_names:
+            return rename_map[name]
+        return match.group(0)
+
+    source = re.sub(
+        r"(?<!\.)(\b[A-Za-z_][A-Za-z0-9_]*)\b(?!\s*\()",
+        replace_variable,
+        source,
+    )
     return source
 
 
 def ensure_blank_line_after_defs_and_classes(source: str) -> str:
-    """
-    Ensure there is a blank line after each 'def' or 'class' line.
-    If there is already a blank line, leave it as-is.
-    """
+    """Ensure a blank line after each def or class line."""
     lines = source.splitlines()
     new_lines = []
     n = len(lines)
-
     i = 0
     while i < n:
         line = lines[i]
         new_lines.append(line)
-
         stripped = line.lstrip()
         if stripped.startswith(("def ", "class ")):
-            # Check if next line exists and is not blank
             if i + 1 < n and lines[i + 1].strip() != "":
-                new_lines.append("")  # insert blank line
+                new_lines.append("")
         i += 1
-
     return "\n".join(new_lines) + "\n"
 
 
 def strip_hash_lines(source: str) -> str:
-    """
-    Remove all full-line hashes (lines consisting only of # characters),
-    but leave normal comments intact.
-    """
+    """Remove lines consisting only of # characters."""
     lines = source.splitlines()
     cleaned_lines = [
         line for line in lines if not (line.strip() and set(line.strip()) == {"#"})
@@ -91,15 +143,12 @@ def strip_hash_lines(source: str) -> str:
 
 
 def remove_blank_lines_before_defs(source: str) -> str:
-    """
-    Remove blank lines immediately before a function or class definition.
-    """
+    """Remove blank lines before function or class definitions."""
     lines = source.splitlines()
     new_lines = []
     for i, line in enumerate(lines):
         stripped = line.strip()
         if stripped.startswith(("def ", "class ")):
-            # Remove preceding blank lines
             while new_lines and new_lines[-1].strip() == "":
                 new_lines.pop()
         new_lines.append(line)
@@ -107,106 +156,83 @@ def remove_blank_lines_before_defs(source: str) -> str:
 
 
 def normalize_hashes_and_functions(source: str) -> str:
-    """
-    Normalize Python code:
-    - Remove existing hash lines
-    - Remove blank lines before function/class definitions
-    - Add a single blank line + 88 '#' + 2 blank lines before each function/class
-    - Ensure file ends with a single newline
-    """
+    """Normalize code with hash lines before functions/classes."""
     lines = source.splitlines()
     new_lines = []
     i = 0
     n = len(lines)
-
     while i < n:
         line = lines[i]
         stripped = line.lstrip()
-
-        # Skip existing full-line hashes
         if stripped.startswith("#") and set(stripped.strip()) == {"#"}:
             i += 1
             continue
-
         is_def_or_class = stripped.startswith(("def ", "class "))
-
         if is_def_or_class:
-            # Remove preceding blank lines
             while new_lines and new_lines[-1].strip() == "":
                 new_lines.pop()
-
-            # Add one blank line, 88 '#'s, 2 blank lines
-            new_lines.append("")
-            new_lines.append("#" * 88)
-            new_lines.append("")
-            new_lines.append("")
-
-            # Add the def/class line
+            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
             new_lines.append(line)
             i += 1
             continue
-
-        # Normal line
         new_lines.append(line)
         i += 1
-
-    # Ensure file ends with single newline
     if not new_lines or new_lines[-1].strip() != "":
         new_lines.append("")
-
     return "\n".join(new_lines)
 
 
 def add_hash_before_if_main(source: str) -> str:
-    """
-    Insert a full line of 88 '#' two spaces before 'if __name__ == "__main__":'.
-    """
+    """Insert a hash line before 'if __name__ == "__main__":'."""
     lines = source.splitlines()
     new_lines = []
-
     for line in lines:
         stripped = line.lstrip()
         if stripped.startswith("if __name__") and "__main__" in stripped:
-            indent = max(0, len(line) - len(stripped) - 2)
-            new_lines.append(" " * indent + "#" * 88)
-            new_lines.append("")
+            indent = len(line) - len(stripped)
+            new_lines.extend([" " * indent + "#" * HASH_LINE_LENGTH, ""])
         new_lines.append(line)
-
-    new_lines.append("")  # Ensure file ends with a newline
-    return "\n".join(new_lines) + "\n"
+    new_lines.append("")
+    return "\n".join(new_lines)
 
 
 def add_hash_on_dedent_to_0(source: str) -> str:
-    """
-    Insert a line of 88 '#' whenever indentation drops from >=4 spaces to 0.
-    """
+    """Insert a hash line when indentation drops from >=4 to 0, only if no def/class follows."""
     lines = source.splitlines()
     new_lines = []
-
     prev_indent = 0
-    for line in lines:
+    n = len(lines)
+    for i, line in enumerate(lines):  # Fixed: Use enumerate correctly
         stripped = line.lstrip()
-        curr_indent = len(line) - len(stripped)
-
-        # Skip empty lines
         if stripped == "":
             new_lines.append(line)
             continue
-
-        # Insert hash line only if dedent is from >=4 to 0
-        if prev_indent >= 4 and curr_indent == 0:
-            new_lines.append("#" * 88)
-            new_lines.append("")
-
+        curr_indent = len(line) - len(stripped)
+        # Check if there are any def or class statements in the remaining lines
+        has_future_defs = False
+        for j in range(i + 1, n):
+            future_stripped = lines[j].lstrip()
+            if future_stripped.startswith(("def ", "class ")):
+                has_future_defs = True
+                break
+        # Insert hash line only if indentation drops to 0, no def/class follows, and not a def/class line
+        if (
+            prev_indent >= 4
+            and curr_indent == 0
+            and not has_future_defs
+            and not stripped.startswith(("def ", "class "))
+        ):
+            new_lines.extend(["#" * HASH_LINE_LENGTH, ""])
         new_lines.append(line)
         prev_indent = curr_indent
-
     return "\n".join(new_lines) + "\n"
 
 
 def transform(source: str) -> str:
+    """Apply all transformations to the source code."""
     source_new = strip_hash_lines(source)
     source_new = rename_functions_and_calls(source_new)
+    source_new = rename_variables(source_new)
     source_new = ensure_blank_line_after_defs_and_classes(source_new)
     source_new = remove_blank_lines_before_defs(source_new)
     source_new = normalize_hashes_and_functions(source_new)
@@ -221,10 +247,10 @@ def convert_file(filepath: str) -> None:
         with open(filepath, "r", encoding="utf-8") as f:
             source = f.read()
         print(f"Converting file: {filepath}")
-
         new_source = transform(source)
 
-        if source != new_source and False:
+        # Show diff if enabled
+        if SHOW_DIFF and source != new_source:
             diff = difflib.unified_diff(
                 source.splitlines(),
                 new_source.splitlines(),
@@ -234,33 +260,29 @@ def convert_file(filepath: str) -> None:
             )
             print(f"Changes in {filepath}:\n{'\n'.join(diff)}\n")
 
-        folder = os.path.dirname(filepath)
-        filename = os.path.basename(filepath)
-        base, ext = os.path.splitext(filename)
-        target_folder = os.path.join(folder, "../pep8_output")
-        os.makedirs(target_folder, exist_ok=True)
-        new_filepath = os.path.join(target_folder, base + "_2.py")
-
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+        base, ext = os.path.splitext(os.path.basename(filepath))
+        new_filepath = os.path.join(
+            OUTPUT_DIR, f"{base}.py"
+        )  # Overwrite any existing _2.py
         with open(new_filepath, "w", encoding="utf-8") as f:
             f.write(new_source)
-
-        print(f"Written to {new_filepath} (overwritten if existed)")
-
+        print(f"Written to {new_filepath}")
     except (IOError, OSError) as e:
         print(f"Error processing {filepath}: {e}")
 
 
 def convert_folder(folder_path: str) -> None:
-    """Process all .py files in a folder, skipping already converted _2.py files."""
+    """Process all .py files in a folder, skipping _2.py files."""
     try:
         for filename in os.listdir(folder_path):
-            if filename.endswith(".py") and not filename.endswith("_2.py"):
+            if filename.startswith("Test") and filename.endswith(".py"):
                 convert_file(os.path.join(folder_path, filename))
     except (IOError, OSError) as e:
         print(f"Error accessing folder {folder_path}: {e}")
 
 
 if __name__ == "__main__":
-    FOLDER_PATH = "../pep8_tests"
-    convert_folder(FOLDER_PATH)
+    TARGET_FOLDER_RELATIVE_PATH = "../golden_tests"
+    convert_folder(TARGET_FOLDER_RELATIVE_PATH)
     print("PEP8 conversion complete.")
