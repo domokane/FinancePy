@@ -3,6 +3,7 @@
 ########################################################################################
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pandas as pd
@@ -24,7 +25,7 @@ bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
 freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
-settlement = Date(19, 9, 2012)
+settle_dt = Date(19, 9, 2012)
 
 bonds = []
 ylds = []
@@ -38,14 +39,14 @@ for _, bond in bond_dataframe.iterrows():
     coupon = bond["coupon"] / 100.0
     clean_price = bond["mid"]
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
-    yld = bond.yield_to_maturity(settlement, clean_price)
+    yld = bond.yield_to_maturity(settle_dt, clean_price)
     bonds.append(bond)
     ylds.append(yld)
 
 
 def test_poly():
     curve_fit_method = CurveFitPolynomial(5)
-    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curve_fit_method)
+    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     coeffs = fitted_curve.curve_fit.coeffs
     assert round(coeffs[0] * 1e9, 4) == -1.4477
@@ -58,7 +59,7 @@ def test_poly():
 
 def test_nelson_siegel():
     curve_fit_method = CurveFitNelsonSiegel()
-    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curve_fit_method)
+    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     assert round(fitted_curve.curve_fit.beta_1, 3) == -0.094
     assert round(fitted_curve.curve_fit.beta_2, 3) == 0.092
@@ -68,7 +69,7 @@ def test_nelson_siegel():
 
 def test_nelson_siegel_svensson():
     curve_fit_method = CurveFitNelsonSiegelSvensson()
-    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curve_fit_method)
+    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     assert round(fitted_curve.curve_fit.beta_1, 4) == 0.0460
     assert round(fitted_curve.curve_fit.beta_2, 4) == -0.0433
@@ -80,7 +81,7 @@ def test_nelson_siegel_svensson():
 
 def test_interp_yield():
     curve_fit_method = CurveFitBSpline()
-    fitted_curve = BondYieldCurve(settlement, bonds, ylds, curve_fit_method)
+    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     maturity_dt = Date(19, 9, 2030)
     interp_yield = fitted_curve.interp_yield(maturity_dt)

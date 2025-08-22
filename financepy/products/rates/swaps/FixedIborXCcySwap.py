@@ -132,9 +132,7 @@ class FixedIborXCcySwap:
         """Value the interest rate swap on a value date given a single Libor
         discount curve."""
 
-        fixed_leg_value = self.fixed_leg_value(
-            value_dt, discount_curve, principal
-        )
+        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
         float_leg_value = self.float_leg_value(
             value_dt, discount_curve, index_curve, first_fixing_rate, principal
@@ -241,20 +239,20 @@ class FixedIborXCcySwap:
 
         day_counter = DayCount(self._fixed_dc_type)
 
-        """ The swap may have started in the past but we can only value
-        payments that have occurred after the valuation date. """
+        # The swap may have started in the past but we can only value
+        # payments that have occurred after the valuation date.
         start_index = 0
         while self._adjusted_fixed_dts[start_index] < value_dt:
             start_index += 1
 
-        """ If the swap has yet to settle then we do not include the
-        start date of the swap as a cpn payment date. """
+        # If the swap has yet to settle then we do not include the
+        # start date of the swap as a cpn payment date.
         if value_dt <= self.effective_dt:
             start_index = 1
 
         self._fixed_start_index = start_index
 
-        """ Now PV fixed leg flows. """
+        # Now PV fixed leg flows.
         self._df_value_dt = discount_curve.df(value_dt)
 
         pv = 0.0
@@ -474,8 +472,7 @@ class FixedIborXCcySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
         print(
-            "%15s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", 1.0, "-", "-")
+            "%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-")
         )
 
         i_flow = 0

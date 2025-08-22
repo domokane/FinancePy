@@ -23,9 +23,9 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -303,9 +303,9 @@ def test_BondOptionAmericanConvergenceTWO():
     vec_ep = []
     vec_ap = []
 
-    num_stepsVector = range(100, 400, 100)
+    num_steps_vector = range(100, 400, 100)
 
-    for num_steps in num_stepsVector:
+    for num_steps in num_steps_vector:
         hwModel = HWTree(sigma, a, num_steps)
 
         start = time.time()
@@ -342,11 +342,11 @@ def test_BondOptionAmericanConvergenceTWO():
 
     if plot_graphs:
         plt.figure()
-        plt.plot(num_stepsVector, vec_ac, label="American Call")
+        plt.plot(num_steps_vector, vec_ac, label="American Call")
         plt.legend()
 
         plt.figure()
-        plt.plot(num_stepsVector, vec_ap, label="American Put")
+        plt.plot(num_steps_vector, vec_ap, label="American Put")
         plt.legend()
 
 
@@ -544,4 +544,4 @@ test_BondOption()
 test_BondOptionEuropeanConvergence()
 test_BondOptionAmericanConvergenceONE()
 test_BondOptionAmericanConvergenceTWO()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

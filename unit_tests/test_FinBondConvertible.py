@@ -26,9 +26,9 @@ call_prices = np.array([call_price, call_price, call_price])
 
 put_dts = [Date(20, 3, 2007), Date(15, 3, 2012), Date(15, 3, 2017)]
 
-putPrice = 90.0
-put_prices = np.array([putPrice, putPrice, putPrice])
-accrualBasis = DayCountTypes.ACT_365F
+put_price = 90.0
+put_prices = np.array([put_price, put_price, put_price])
+accrual_basis = DayCountTypes.ACT_365F
 
 bond = BondConvertible(
     maturity_dt,
@@ -40,7 +40,7 @@ bond = BondConvertible(
     call_prices,
     put_dts,
     put_prices,
-    accrualBasis,
+    accrual_basis,
 )
 
 settle_dt = Date(31, 12, 2003)

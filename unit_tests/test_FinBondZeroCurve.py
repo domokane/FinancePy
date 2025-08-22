@@ -3,6 +3,7 @@
 ########################################################################################
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
@@ -22,7 +23,7 @@ bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
 freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
-settlement = Date(19, 9, 2012)
+settle_dt = Date(19, 9, 2012)
 
 bonds = []
 clean_prices = []
@@ -38,7 +39,7 @@ for _, bondRow in bond_dataframe.iterrows():
     bonds.append(bond)
     clean_prices.append(clean_price)
 
-bondCurve = BondZeroCurve(settlement, bonds, clean_prices)
+bondCurve = BondZeroCurve(settle_dt, bonds, clean_prices)
 
 
 def test_zero_curve():

@@ -12,10 +12,10 @@ from financepy.models.heston import Heston, HestonNumericalScheme
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -225,4 +225,4 @@ def testMonteCarlo():
 
 testAnalyticalModels()
 testMonteCarlo()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

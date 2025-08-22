@@ -17,10 +17,10 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.products.equity.equity_american_option import (
     EquityAmericanOption,
 )
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##############################################################################
 
@@ -63,13 +63,9 @@ def testBlackScholes():
 
     num_steps_per_year = 400
 
-    modelTree = BlackScholes(
-        volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year
-    )
+    modelTree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
 
-    v = amOption.value(
-        value_dt, stock_price, discount_curve, dividend_curve, modelTree
-    )
+    v = amOption.value(value_dt, stock_price, discount_curve, dividend_curve, modelTree)
     #    print(v)
 
     model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
@@ -86,9 +82,7 @@ def testBlackScholes():
 
     #    print(v)
 
-    v = euOption.value(
-        value_dt, stock_price, discount_curve, dividend_curve, modelTree
-    )
+    v = euOption.value(value_dt, stock_price, discount_curve, dividend_curve, modelTree)
 
     #    print(v)
 
@@ -143,4 +137,4 @@ def testBlackScholes():
 
 
 testBlackScholes()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

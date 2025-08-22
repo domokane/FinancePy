@@ -13,9 +13,9 @@ from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 from financepy.models.gauss_copula_onefactor import (
     loss_dbn_hetero_adj_binomial,
 )
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -32,9 +32,7 @@ def test_FinLossDbnBuilder():
     loss_units = np.ones(num_credits)
     loss_ratio = np.ones(num_credits)
 
-    test_cases.header(
-        "BETA", "BUILDER", "LOSS0", "LOSS1", "LOSS2", "LOSS3", "TIME"
-    )
+    test_cases.header("BETA", "BUILDER", "LOSS0", "LOSS1", "LOSS2", "LOSS3", "TIME")
 
     for beta in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
 
@@ -97,9 +95,7 @@ def test_FinLossDbnBuilder():
     )
     end = time.time()
 
-    test_cases.print(
-        beta, "ADJ_BIN", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start
-    )
+    test_cases.print(beta, "ADJ_BIN", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start)
 
     start = time.time()
     dbn2 = loss_dbn_hetero_adj_binomial(
@@ -107,13 +103,11 @@ def test_FinLossDbnBuilder():
     )
     end = time.time()
 
-    test_cases.print(
-        beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start
-    )
+    test_cases.print(beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start)
 
 
 ##########################################################################
 
 
 test_FinLossDbnBuilder()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

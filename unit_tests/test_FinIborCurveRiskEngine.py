@@ -1,7 +1,8 @@
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from .helpers import buildIborSingleCurve
+from .helpers import build_ibor_single_curve
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -87,7 +88,7 @@ def test_par_rate_risk_report_cubic_zero():
 
 def test_par_rate_risk_report_flat_forward():
     valuation_date = Date(6, 10, 2022)
-    base_curve = buildIborSingleCurve(valuation_date, "10Y")
+    base_curve = build_ibor_single_curve(valuation_date, "10Y")
     settlement_date = base_curve.used_swaps[0].effective_dt
     cal = base_curve.used_swaps[0].fixed_leg.cal_type
     fixed_day_count = base_curve.used_swaps[0].fixed_leg.dc_type

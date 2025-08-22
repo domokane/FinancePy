@@ -25,10 +25,11 @@ def benchmarks_report(
     include_objects=False,
 ):
     """
-    Generate a DataFrame with one row per bechmark. A benchmark is any object that has a function
-    valuation_details(...) that returns a dictionary of the right shape. Allowed benchmarks at the moment
-    are depos, fras and swaps. Various useful information is reported. This is a bit slow
-    so do not use in performance-critical spots
+    Generate a DataFrame with one row per bechmark. A benchmark is any object that
+    has a function valuation_details(...) that returns a dictionary of the right shape.
+    Allowed benchmarks at the moment are depos, fras and swaps. Various useful
+    information is reported. This is a bit slow so do not use in performance-critical
+    spots
     """
 
     # benchmarks = depos + fras + swaps
@@ -48,11 +49,13 @@ def benchmarks_report(
 
 def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
     """
-    Generate a DataFrame with one row per bechmark used in constructing a given ibor_curve.
-    Various useful information is reported. This is a bit slow so do not use in performance-critical spots
+    Generate a DataFrame with one row per bechmark used in constructing a given
+    ibor_curve. Various useful information is reported. This is a bit slow so do
+    not use in performance-critical spots
     """
 
     benchmarks = ibor_curve.used_deposits + ibor_curve.used_fras + ibor_curve.used_swaps
+
     return benchmarks_report(
         benchmarks,
         ibor_curve.value_dt,
@@ -70,7 +73,8 @@ def _date_or_tenor_to_date(date_or_tenor: Union[Date, str, datetime], asof_date:
         return from_datetime(date_or_tenor)
 
     raise FinError(
-        f"{date_or_tenor} is of type {type(date_or_tenor)}, expecting a Date or a tenor string or a datetime"
+        f"{date_or_tenor} is of type {type(date_or_tenor)}, "
+        f"expecting one of: Date, tenor string, datetime"
     )
 
 
@@ -83,7 +87,8 @@ def _date_or_tenor_to_date_or_tenor(date_or_tenor: Union[Date, str, datetime]):
         return from_datetime(date_or_tenor)
 
     raise FinError(
-        f"{date_or_tenor} is of type {type(date_or_tenor)}, expecting a Date or a tenor string or a datetime"
+        f"{date_or_tenor} is of type {type(date_or_tenor)}, "
+        f"expecting a Date, a tenor string, or a datetime"
     )
 
 
@@ -136,7 +141,7 @@ def dataframe_to_benchmarks(
 ):
     """Crete IborBenchmarks from a dataframe. The dataframe should have at least these columns
     with these sample inputs:
-                type   start_dt maturity_dt     day_count_type notional contract_rate fixed_leg_type fixed_freq_type
+                type   start_dt maturity_dt     dc_type notional contract_rate fixed_leg_type fixed_freq_type
         0   IborDeposit  06-OCT-2001   09-OCT-2001            ACT_360    100.0         0.042            NaN             NaN
         1       IborFRA  09-JAN-2002   09-APR-2002            ACT_360    100.0         0.042            PAY             NaN
         2      IborSwap  09-OCT-2001   09-OCT-2002  THIRTY_E_360_ISDA  1000000         0.042            PAY     SEMI_ANNUAL

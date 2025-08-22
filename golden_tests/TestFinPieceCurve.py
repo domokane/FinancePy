@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 import sys
 
 sys.path.append("..")
@@ -10,7 +10,7 @@ sys.path.append("..")
 # import numpy as np
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 #
@@ -34,4 +34,4 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 
 # test_FinPieceCurve()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

@@ -10,9 +10,9 @@ from financepy.products.equity.equity_chooser_option import EquityChooserOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##############################################################################
 
@@ -135,4 +135,4 @@ def test_EquityChooserOptionDerivicom():
 test_EquityChooserOptionHaug()
 test_EquityChooserOptionMatlab()
 test_EquityChooserOptionDerivicom()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

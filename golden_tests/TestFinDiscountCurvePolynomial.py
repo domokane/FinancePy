@@ -2,17 +2,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
-from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 import numpy as np
 
 import sys
+import matplotlib.pyplot as plt
 
 sys.path.append("..")
 
+from FinTestCases import FinTestCases, global_test_case_mode
+from financepy.utils.date import Date
+from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##############################################################################
 # TODO
@@ -35,7 +37,6 @@ def test_FinDiscountCurvePolynomial():
     fwds = curve1.fwd(dates)
 
     if plot_graphs:
-        import matplotlib.pyplot as plt
 
         plt.figure(figsize=(6, 4))
         plt.plot(times, zeros, label="Zeros")
@@ -46,4 +47,4 @@ def test_FinDiscountCurvePolynomial():
 
 
 test_FinDiscountCurvePolynomial()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

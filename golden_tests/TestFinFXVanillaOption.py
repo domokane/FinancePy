@@ -19,10 +19,10 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -499,9 +499,7 @@ def test_FinFXVanillaOptionSABRExample():
     model = SABR(alpha, beta, rho, nu)
     black_vol = volatility
     t_exp = 0.8444  # 10M
-    model.set_alpha_from_black_vol(
-        black_vol, spot_fx_rate, strike_price, t_exp
-    )
+    model.set_alpha_from_black_vol(black_vol, spot_fx_rate, strike_price, t_exp)
 
     spot_fx_rate = np.linspace(80, 300, 1000)
 
@@ -527,4 +525,4 @@ test_FinFXVanillaOptionWystupExample2()
 test_FinFXVanillaOptionBloombergExample()
 test_FinFXVanillaOptionHullExample()
 test_FinFXVanillaOptionSABRExample()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

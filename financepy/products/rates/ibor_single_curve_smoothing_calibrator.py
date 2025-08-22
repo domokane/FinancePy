@@ -140,14 +140,15 @@ class IborSingleCurveSmoothingCalibrator(object):
                 n_fit = len(fit_tgts)
                 n_smth = len(smth_tgts)
                 print(
-                    f"fit rmse in bps={10000*np.linalg.norm(fit_tgts)/n_fit}, smooth = {10000*np.linalg.norm(smth_tgts)/n_smth}"
+                    f"fit rmse in bps = {10000*np.linalg.norm(fit_tgts)/n_fit:.4f}, "
+                    f"smooth = {10000*np.linalg.norm(smth_tgts)/n_smth:.4f}"
                 )
 
             return np.concatenate((fit_tgts, smth_tgts))
 
         # If the curve passed during construction is already built, use that
         # for the initial guess of our optimization. If not, use the bootstrap
-        if self._curve._is_built:
+        if self._curve.is_built:
             init_curve = self._curve
         else:
             init_curve = copy.deepcopy(self._curve)
@@ -158,9 +159,9 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         dfs0 = init_curve.df(self._knot_dts)
 
-        self._curve._times = self._knot_times
-        self._curve._dfs = np.ones_like(self._knot_times, dtype=float)
-        self._curve._is_built = True
+        self._curve.set_times(self._knot_times)
+        self._curve.set_dfs(np.ones_like(self._knot_times, dtype=float))
+        self._curve.is_built = True
 
         res = optimize.least_squares(
             _obj_f, dfs0[1:], bounds=(0, np.inf), ftol=1e-4, xtol=1e-6

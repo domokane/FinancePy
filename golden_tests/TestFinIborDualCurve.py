@@ -2,11 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-import sys
+import sys, os
 
 sys.path.append("..")
-
-import sys, os
 
 # Add the *parent of the script's parent directory* to sys.path
 sys.path.append(
@@ -18,7 +16,7 @@ sys.path.append(
 )
 
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
@@ -41,7 +39,7 @@ from financepy.products.rates.ois import OIS
 import numpy as np
 import matplotlib.pyplot as plt
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -474,7 +472,7 @@ def test_bloombergPricingExample():
     ois_curve = buildOIS(value_dt)
     #    print(ois_curve)
 
-    liborDualCurve = IborDualCurve(
+    libor_dual_curve = IborDualCurve(
         value_dt,
         ois_curve,
         depos,
@@ -483,13 +481,13 @@ def test_bloombergPricingExample():
         InterpTypes.FLAT_FWD_RATES,
         True,
     )
-    #    print(liborDualCurve)
+    #    print(libor_dual_curve)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
 
     test_cases.header("VALUATION TO TODAY DATE", " PV")
     test_cases.print(
-        "VALUE:", swaps[0].value(value_dt, ois_curve, liborDualCurve, None)
+        "VALUE:", swaps[0].value(value_dt, ois_curve, libor_dual_curve, None)
     )
     test_cases.print("FIXED:", swaps[0].fixed_leg.value(value_dt, ois_curve))
     test_cases.print(
@@ -499,7 +497,7 @@ def test_bloombergPricingExample():
 
     test_cases.header("VALUATION TO SWAP SETTLEMENT DATE", " PV")
     test_cases.print(
-        "VALUE:", swaps[0].value(settle_dt, ois_curve, liborDualCurve, None)
+        "VALUE:", swaps[0].value(settle_dt, ois_curve, libor_dual_curve, None)
     )
     test_cases.print("FIXED:", swaps[0].fixed_leg.value(settle_dt, ois_curve))
     test_cases.print(
@@ -507,7 +505,7 @@ def test_bloombergPricingExample():
         swaps[0].float_leg.value(
             settle_dt,
             ois_curve,
-            liborDualCurve,
+            libor_dual_curve,
             None,
         ),
     )
@@ -515,20 +513,20 @@ def test_bloombergPricingExample():
     #    swaps[0].print_fixed_leg_pv()
     #    swaps[0].print_float_leg_pv()
 
-    PLOT = False
-    if PLOT is True:
+    plot = False
+    if plot is True:
 
         years = np.linspace(0, 5, 21)
         dates = settle_dt.add_years(years)
 
-        singleCurveFwds = libor_curve.fwd(dates)
-        plt.plot(years, singleCurveFwds, label="Single Libor Curve")
+        single_curve_fwds = libor_curve.fwd(dates)
+        plt.plot(years, single_curve_fwds, label="Single Libor Curve")
 
-        oisCurveFwds = ois_curve.fwd(dates)
-        plt.plot(years, oisCurveFwds, label="OIS Curve")
+        ois_curve_fwds = ois_curve.fwd(dates)
+        plt.plot(years, ois_curve_fwds, label="OIS Curve")
 
-        index_curveFwds = liborDualCurve.fwd(dates)
-        plt.plot(years, index_curveFwds, label="Libor Index Curve")
+        index_curve_fwds = libor_dual_curve.fwd(dates)
+        plt.plot(years, index_curve_fwds, label="Libor Index Curve")
 
         plt.legend()
 
@@ -544,7 +542,7 @@ def test_swapValuationExample():
     # Example from
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
 
-    vBloomberg = 388147
+    v_bbg = 388147
 
     value_dt = Date(30, 11, 2018)
 
@@ -553,7 +551,7 @@ def test_swapValuationExample():
     notional = 10 * ONE_MILLION
     fixed_leg_type = SwapTypes.RECEIVE
 
-    fixedRate = 0.0150
+    fixed_rate = 0.0150
     fixed_dcc_type = DayCountTypes.THIRTY_360_BOND
     fixed_freq_type = FrequencyTypes.ANNUAL
 
@@ -561,11 +559,11 @@ def test_swapValuationExample():
     float_dcc_type = DayCountTypes.ACT_360
     float_freq_type = FrequencyTypes.SEMI_ANNUAL
 
-    offMarketSwap = IborSwap(
+    off_mkt_swap = IborSwap(
         start_dt,
         maturity_dt,
         fixed_leg_type,
-        fixedRate,
+        fixed_rate,
         fixed_freq_type,
         fixed_dcc_type,
         notional,
@@ -793,16 +791,18 @@ def test_swapValuationExample():
     )
     swaps.append(swap)
 
-    iborDepos = depos.copy()
-    iborFras = fras.copy()
+    ibor_depos = depos.copy()
+    ibor_fras = fras.copy()
     ibor_swaps = swaps.copy()
 
-    ibor_curve = IborSingleCurve(value_dt, iborDepos, iborFras, ibor_swaps, interp_type)
-    v1 = offMarketSwap.value(value_dt, ibor_curve, ibor_curve, -0.268 / 100.0)
+    ibor_curve = IborSingleCurve(
+        value_dt, ibor_depos, ibor_fras, ibor_swaps, interp_type
+    )
+    v1 = off_mkt_swap.value(value_dt, ibor_curve, ibor_curve, -0.268 / 100.0)
 
     test_cases.banner("DERISCOPE EXAMPLE REPLICATION")
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("BBG VALUE", vBloomberg)
+    test_cases.print("BBG VALUE", v_bbg)
     test_cases.print("FP ONE CURVE VALUE", v1)
 
     ########################################################################################
@@ -1126,25 +1126,25 @@ def test_swapValuationExample():
     ois_fras = fras.copy()
     ois_swaps = swaps.copy()
 
-    oisCurveFF = OISCurve(value_dt, ois_depos, ois_fras, ois_swaps, interp_type)
+    ois_curve_ff = OISCurve(value_dt, ois_depos, ois_fras, ois_swaps, interp_type)
 
-    iborDualCurve = IborDualCurve(
-        value_dt, oisCurveFF, iborDepos, iborFras, ibor_swaps, interp_type
+    ibor_dual_curve = IborDualCurve(
+        value_dt, ois_curve_ff, ibor_depos, ibor_fras, ibor_swaps, interp_type
     )
 
 
-#    v2 = offMarketSwap.value(value_dt, oisCurveFF, iborDualCurve, -0.268/100.0)
+#    v2 = off_mkt_swap.value(value_dt, ois_curve_ff, ibor_dual_curve, -0.268/100.0)
 
 #    test_cases.print("FP DUAL CURVE VALUE", v2)
 
-#    swap_rate = offMarketSwap.swap_rate(value_dt, oisCurveFF, ibor_curve, -0.268/100.0)
+#    swap_rate = off_mkt_swap.swap_rate(value_dt, ois_curve_ff, ibor_curve, -0.268/100.0)
 
 #    test_cases.print("FP DUAL CURVE SWAP RATE", swap_rate)
 
-#    offMarketSwap.printFixedLegFlows()
-#    offMarketSwap.printFloatLegFlows()
-#    offMarketSwap.print_fixed_leg_pv()
-#    offMarketSwap.print_float_leg_pv()
+#    off_mkt_swap.printFixedLegFlows()
+#    off_mkt_swap.printFloatLegFlows()
+#    off_mkt_swap.print_fixed_leg_pv()
+#    off_mkt_swap.print_float_leg_pv()
 
 
 ########################################################################################
@@ -1153,4 +1153,4 @@ def test_swapValuationExample():
 
 test_bloombergPricingExample()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

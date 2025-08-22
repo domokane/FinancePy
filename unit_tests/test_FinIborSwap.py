@@ -3,7 +3,7 @@
 ########################################################################################
 
 import sys, os
-from .helpers import buildIborSingleCurve
+from .helpers import build_ibor_single_curve
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -31,8 +31,8 @@ def test_LiborSwap():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    first_fixing, swap, settlement_date, libor_curve = (
-        _load_test_swap_and_curve(start_dt, end_dt)
+    first_fixing, swap, settlement_date, libor_curve = _load_test_swap_and_curve(
+        start_dt, end_dt
     )
     v = swap.value(settlement_date, libor_curve, libor_curve, first_fixing)
 
@@ -44,8 +44,8 @@ def test_LiborSwapCashflowReport():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    first_fixing, swap, settlement_date, libor_curve = (
-        _load_test_swap_and_curve(start_dt, end_dt)
+    first_fixing, swap, settlement_date, libor_curve = _load_test_swap_and_curve(
+        start_dt, end_dt
     )
     v = swap.value(
         settlement_date, libor_curve, libor_curve, first_fixing, pv_only=False
@@ -116,9 +116,7 @@ def test_dp_example():
 
     value_dt = start_dt
 
-    curve = DiscountCurve(
-        value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES
-    )
+    curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
 
     v = swap.value(value_dt, curve, curve)
 
@@ -129,11 +127,11 @@ def test_dp_example():
 def _load_test_swap_and_curve(start_dt, end_dt):
     fixed_coupon = 0.015
     fixedFreqType = FrequencyTypes.ANNUAL
-    fixed_day_count_type = DayCountTypes.THIRTY_E_360
+    fixed_dc_type = DayCountTypes.THIRTY_E_360
 
     float_spread = 0.0
     floatFreqType = FrequencyTypes.SEMI_ANNUAL
-    float_day_count_type = DayCountTypes.ACT_360
+    float_dc_type = DayCountTypes.ACT_360
     first_fixing = -0.00268
 
     swapCalendarType = CalendarTypes.WEEKEND
@@ -149,11 +147,11 @@ def _load_test_swap_and_curve(start_dt, end_dt):
         fixed_leg_type,
         fixed_coupon,
         fixedFreqType,
-        fixed_day_count_type,
+        fixed_dc_type,
         notional,
         float_spread,
         floatFreqType,
-        float_day_count_type,
+        float_dc_type,
         swapCalendarType,
         bus_day_adjust_type,
         date_gen_rule_type,
@@ -165,7 +163,7 @@ def _load_test_swap_and_curve(start_dt, end_dt):
 
     valuation_date = Date(30, 11, 2018)
     settlement_date = valuation_date.add_days(2)
-    libor_curve = buildIborSingleCurve(valuation_date)
+    libor_curve = build_ibor_single_curve(valuation_date)
     return first_fixing, swap, settlement_date, libor_curve
 
 

@@ -11,7 +11,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import OptionTypes
 from financepy.products.bonds.bond_option import BondOption
@@ -24,7 +24,7 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -253,7 +253,7 @@ def test_BondOptionAmericanConvergenceTWO():
 
     if 1 == 1:
         K = 100.0
-        bkModel = BDTTree(sigma, 100)
+        bk_model = BDTTree(sigma, 100)
         euro_call_bond_option = BondOption(
             bond, expiry_dt, K, OptionTypes.EUROPEAN_CALL
         )
@@ -262,29 +262,29 @@ def test_BondOptionAmericanConvergenceTWO():
         test_cases.header("LABEL", "VALUE")
         test_cases.print("OPTION", v_ec)
 
-    num_stepsVector = range(100, 100, 1)  # should be 100-400
+    num_steps_vector = range(100, 100, 1)  # should be 100-400
 
-    for num_steps in num_stepsVector:
+    for num_steps in num_steps_vector:
 
-        bkModel = BDTTree(sigma, num_steps)
+        bk_model = BDTTree(sigma, num_steps)
 
         start = time.time()
 
         euro_call_bond_option = BondOption(
             bond, expiry_dt, K, OptionTypes.EUROPEAN_CALL
         )
-        v_ec = euro_call_bond_option.value(settle_dt, discount_curve, bkModel)
+        v_ec = euro_call_bond_option.value(settle_dt, discount_curve, bk_model)
 
         amer_call_bond_option = BondOption(
             bond, expiry_dt, K, OptionTypes.AMERICAN_CALL
         )
-        v_ac = amer_call_bond_option.value(settle_dt, discount_curve, bkModel)
+        v_ac = amer_call_bond_option.value(settle_dt, discount_curve, bk_model)
 
         euro_put_bond_option = BondOption(bond, expiry_dt, K, OptionTypes.EUROPEAN_PUT)
-        v_ep = euro_put_bond_option.value(settle_dt, discount_curve, bkModel)
+        v_ep = euro_put_bond_option.value(settle_dt, discount_curve, bk_model)
 
         amer_put_bond_option = BondOption(bond, expiry_dt, K, OptionTypes.AMERICAN_PUT)
-        v_ap = amer_put_bond_option.value(settle_dt, discount_curve, bkModel)
+        v_ap = amer_put_bond_option.value(settle_dt, discount_curve, bk_model)
 
         end = time.time()
         period = end - start
@@ -299,19 +299,19 @@ def test_BondOptionAmericanConvergenceTWO():
     if plot_graphs:
 
         plt.figure()
-        plt.plot(num_stepsVector, vec_ec, label="European Call")
+        plt.plot(num_steps_vector, vec_ec, label="European Call")
         plt.legend()
 
         plt.figure()
-        plt.plot(num_stepsVector, vec_ac, label="American Call")
+        plt.plot(num_steps_vector, vec_ac, label="American Call")
         plt.legend()
 
         plt.figure()
-        plt.plot(num_stepsVector, vec_ep, label="European Put")
+        plt.plot(num_steps_vector, vec_ep, label="European Put")
         plt.legend()
 
         plt.figure()
-        plt.plot(num_stepsVector, vec_ap, label="American Put")
+        plt.plot(num_steps_vector, vec_ap, label="American Put")
         plt.legend()
 
 
@@ -413,4 +413,4 @@ test_BondOptionZEROVOLConvergence()
 test_BondOption()
 # test_BondOptionAmericanConvergenceONE()
 test_BondOptionAmericanConvergenceTWO()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

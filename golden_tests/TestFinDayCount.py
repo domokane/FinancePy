@@ -6,12 +6,12 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCount, DayCountTypes
 from financepy.utils.date import Date
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##############################################################################
 
@@ -33,10 +33,8 @@ def test_FinDayCount():
             next_dt = next_dt.add_days(7)
             dcf = day_count.year_frac(start_dt, next_dt, next_dt, finFreq)
 
-            test_cases.print(
-                str(day_count_method), str(start_dt), str(next_dt), dcf[0]
-            )
+            test_cases.print(str(day_count_method), str(start_dt), str(next_dt), dcf[0])
 
 
 test_FinDayCount()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

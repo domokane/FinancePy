@@ -217,7 +217,7 @@ class OISCurve(DiscountCurve):
         # Ensure that valuation date is on or after first deposit start date
         # if num_depos > 1:
         #    if ois_deposits[0].start_dt > self.value_dt:
-        #        raise FinError("Valuation date must not be before first deposit settles.")
+        #     raise FinError("Valuation date must not be before first deposit settles.")
 
         # Validation of the inputs.
         if num_fras > 0:
@@ -667,7 +667,7 @@ class OISCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
+            s += label_to_string(f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}")
 
         return s
 

@@ -8,7 +8,7 @@ import pandas as pd
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond import Bond, YTMCalcType
 
@@ -19,7 +19,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.math import ONE_MILLION
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -34,9 +34,7 @@ def test_bond_zero():
     face_amount = 100.0
     issue_price = 99.6410
 
-    bond = BondZero(
-        issue_dt=issue_dt, maturity_dt=maturity_dt, issue_price=issue_price
-    )
+    bond = BondZero(issue_dt=issue_dt, maturity_dt=maturity_dt, issue_price=issue_price)
 
     settle_dt = Date(8, 8, 2022)
 
@@ -61,7 +59,7 @@ def test_bond_zero_ror():
     # Path to your local data file inside a "data" folder
     data_path = os.path.join(here, "data", "test_cases_bond_zero_ror.csv")
 
-#    path = ".//data//test_cases_bond_zero_ror.csv"
+    #    path = ".//data//test_cases_bond_zero_ror.csv"
     df = pd.read_csv(data_path, parse_dates=["buy_date", "sell_date"])
 
     # A 1-year bond with zero coupon per year. code: 092103011
@@ -86,20 +84,12 @@ def test_bond_zero_ror():
     for row in df.itertuples(index=False):
 
         buy_dt = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
-        sell_dt = Date(
-            row.sell_date.day, row.sell_date.month, row.sell_date.year
-        )
+        sell_dt = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
 
-        buy_price = bond.dirty_price_from_ytm(
-            buy_dt, row.buy_ytm, YTMCalcType.ZERO
-        )
-        sell_price = bond.dirty_price_from_ytm(
-            sell_dt, row.sell_ytm, YTMCalcType.ZERO
-        )
+        buy_price = bond.dirty_price_from_ytm(buy_dt, row.buy_ytm, YTMCalcType.ZERO)
+        sell_price = bond.dirty_price_from_ytm(sell_dt, row.sell_ytm, YTMCalcType.ZERO)
 
-        simple, irr, pnl = bond.calc_ror(
-            buy_dt, sell_dt, row.buy_ytm, row.sell_ytm
-        )
+        simple, irr, pnl = bond.calc_ror(buy_dt, sell_dt, row.buy_ytm, row.sell_ytm)
 
         test_cases.print(
             row.bond_code,
@@ -119,6 +109,6 @@ def test_bond_zero_ror():
 try:
     test_bond_zero()
     test_bond_zero_ror()
-    test_cases.compareTestCases()
+    test_cases.compare_test_cases()
 except Exception as e:
     print(f"Unexpected error:{e}", sys.exc_info()[0])

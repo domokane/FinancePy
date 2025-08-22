@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 from financepy.utils.error import FinError
 
@@ -71,6 +72,24 @@ class Tenor:
         """Returns the number of periods in the tenor."""
         return self._num_periods
 
+    def set_units(self, units: TenorUnit):
+        """Set the units for the tenor."""
+        if not isinstance(units, TenorUnit):
+            raise FinError("units must be a TenorUnit")
+        self._units = units
+
+    def set_num_periods(self, num):
+        """Set the number of periods for the tenor."""
+        if not isinstance(num, Union[float, int]):
+            print(num)
+            raise FinError("num_periods must be an integer")
+        self._num_periods = num
+
+    def set(self, num, units: TenorUnit):
+        """Convenience method to set both number and units at once."""
+        self.set_num_periods(num)
+        self.set_units(units)
+
     @classmethod
     def as_tenor(cls, str_or_tenor):
         """Convert a string or Tenor object to a Tenor object."""
@@ -138,12 +157,12 @@ class Tenor:
 
         if self._units.value < new_units.value:
             raise FinError(
-                f"Cannot convert units from {self._units.name}" + "to {new_units.name}"
+                f"Cannot convert units from {self._units.name} to {new_units.name}"
             )
 
         res = Tenor()
-        res._units = new_units
-        res._num_periods = self._num_periods * self._units.value / new_units.value
+        res.set_units(new_units)
+        res.set_num_periods(self._num_periods * self._units.value / new_units.value)
         return res
 
     @classmethod

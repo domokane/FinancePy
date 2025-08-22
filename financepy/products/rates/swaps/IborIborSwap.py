@@ -89,8 +89,8 @@ class IborIborSwap:
         self._pay_float_flow_pvs = []
         self._recfloat_flow_pvs = []
 
-        self._payfirst_fixing_rate = None
-        self._recfirst_fixing_rate = None
+        self._pay_first_fixing_rate = None
+        self._rec_first_fixing_rate = None
 
         self.value_dt = None
 
@@ -117,33 +117,33 @@ class IborIborSwap:
         self,
         value_dt,
         discount_curve,
-        payIndexCurve,
-        recIndexCurve,
-        payfirst_fixing_rate=None,
-        recfirst_fixing_rate=None,
+        pay_index_curve,
+        rec_index_curve,
+        pay_first_fixing_rate=None,
+        rec_first_fixing_rate=None,
         principal=0.0,
     ):
         """Value the LIBOR basis swap on a value date given a single Ibor
         discount curve and each of the index discount for the two floating legs
         of the swap."""
 
-        payFloatLegValue = self.float_leg_value(
+        pay_float_leg_value = self.float_leg_value(
             value_dt,
             discount_curve,
-            payIndexCurve,
-            payfirst_fixing_rate,
+            pay_index_curve,
+            pay_first_fixing_rate,
             principal,
         )
 
-        recFloatLegValue = self.float_leg_value(
+        rec_float_leg_value = self.float_leg_value(
             value_dt,
             discount_curve,
-            recIndexCurve,
-            recfirst_fixing_rate,
+            rec_index_curve,
+            rec_first_fixing_rate,
             principal,
         )
 
-        value = recFloatLegValue - payFloatLegValue
+        value = rec_float_leg_value - pay_float_leg_value
         return value
 
     ##########################################################################

@@ -410,14 +410,10 @@ class SwaptionVolSurface:
             raise FinError("Volatility grid must be a 2D grid of values")
 
         if len(strike_grid) != len(vol_grid):
-            raise FinError(
-                "Strike grid and volatility grid must have same size"
-            )
+            raise FinError("Strike grid and volatility grid must have same size")
 
         if len(strike_grid[0]) != len(vol_grid[0]):
-            raise FinError(
-                "Strike grid and volatility grid must have same size"
-            )
+            raise FinError("Strike grid and volatility grid must have same size")
 
         if len(expiry_dts) != len(vol_grid[0]):
             raise FinError("Expiry dates not same size as volatility grid")
@@ -497,15 +493,11 @@ class SwaptionVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(
-            vol_type_value, self._parameters[index0], fwd0, K, t0
-        )
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, K, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(
-                vol_type_value, self._parameters[index1], fwd1, K, t1
-            )
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, K, t1)
 
         else:
 
@@ -919,7 +911,7 @@ class SwaptionVolSurface:
 
             num_intervals = 30
             K = low_k
-            dK = (high_k - low_k) / num_intervals
+            dk = (high_k - low_k) / num_intervals
 
             fitted_vols = []
 
@@ -928,7 +920,7 @@ class SwaptionVolSurface:
                 ks.append(K)
                 fitted_vol = self.vol_from_strike_dt(K, expiry_dt) * 100.0
                 fitted_vols.append(fitted_vol)
-                K = K + dK
+                k = K + dk
 
             label_str = "FITTED AT " + str(self._expiry_dts[tenor_index])
             plt.plot(ks, fitted_vols, label=label_str)

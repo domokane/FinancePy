@@ -16,9 +16,7 @@ class TensionSpline(object):
         self.calculate_coefs()
 
     def validate_inputs(self):
-        assert len(self._x) == len(
-            self._y
-        ), "x and y should be the same length"
+        assert len(self._x) == len(self._y), "x and y should be the same length"
         assert len(self._x) > 0, "Empty arrays are not allowed"
         assert len(self._x) == 1 or np.min(
             np.diff(self._x) > 1e-8
@@ -28,7 +26,7 @@ class TensionSpline(object):
 
         self.validate_inputs()
 
-        N = len(self._x)
+        n = len(self._x)
         sig = self._sigma
 
         # prelim calcs
@@ -44,15 +42,15 @@ class TensionSpline(object):
         shl = self._sh[:-1]
         shr = self._sh[1:]
         chl = self._ch[:-1]
-        chr = self._ch[1:]
+        chrx = self._ch[1:]  # edited to avoid confusion with chr
 
         # set up a tri-diagona matrix in the form needed for solve_baded
-        ab = np.zeros((3, N))
+        ab = np.zeros((3, n))
 
         # main diagonal
         ab[1, 0] = 1
         ab[1, -1] = 1
-        ab[1, 1:-1] = sig * (chl / shl + chr / shr) - 1 / hl - 1 / hr
+        ab[1, 1:-1] = sig * (chl / shl + chrx / shr) - 1 / hl - 1 / hr
 
         # lower diagonal
         ab[2, :-2] = 1 / hl - sig / shl
@@ -61,7 +59,7 @@ class TensionSpline(object):
         ab[0, 2:] = 1 / hr - sig / shr
 
         # rhs
-        b = np.zeros(N)
+        b = np.zeros(n)
         b[1:-1] = (dy[1:] / hr - dy[:-1] / hl) * sig * sig
 
         self._ypp = solve_banded((1, 1), ab, b)

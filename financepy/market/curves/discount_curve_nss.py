@@ -37,7 +37,7 @@ class DiscountCurveNSS(DiscountCurve):
         tau_1: float,
         tau_2: float,
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
     ):
         """Create a FinDiscountCurveNSS object by passing in curve valuation
         date plus the 4 different beta values and the 2 tau values. The zero
@@ -60,7 +60,7 @@ class DiscountCurveNSS(DiscountCurve):
         self._tau_1 = tau_1
         self._tau_2 = tau_2
         self.freq_type = freq_type
-        self.dc_type = day_count_type
+        self.dc_type = dc_type
 
     ###########################################################################
 

@@ -14,10 +14,10 @@ from financepy.products.equity.equity_digital_option import (
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -85,9 +85,9 @@ def test_EquityDigitalOption():
 
     stock_prices = range(50, 150, 50)
     call_option_values = []
-    call_optionDeltas = []
-    call_optionVegas = []
-    call_optionThetas = []
+    call_option_deltas = []
+    call_option_vegas = []
+    call_option_thetas = []
 
     for stock_price in stock_prices:
         call_option = EquityDigitalOption(
@@ -106,14 +106,14 @@ def test_EquityDigitalOption():
             value_dt, stock_price, discount_curve, dividend_curve, model
         )
         call_option_values.append(value)
-        call_optionDeltas.append(delta)
-        call_optionVegas.append(vega)
-        call_optionThetas.append(theta)
+        call_option_deltas.append(delta)
+        call_option_vegas.append(vega)
+        call_option_thetas.append(theta)
 
     put_option_values = []
-    put_optionDeltas = []
-    put_optionVegas = []
-    put_optionThetas = []
+    put_option_deltas = []
+    put_option_vegas = []
+    put_option_thetas = []
 
     for stock_price in stock_prices:
         put_option = EquityDigitalOption(
@@ -132,13 +132,13 @@ def test_EquityDigitalOption():
             value_dt, stock_price, discount_curve, dividend_curve, model
         )
         put_option_values.append(value)
-        put_optionDeltas.append(delta)
-        put_optionVegas.append(vega)
-        put_optionThetas.append(theta)
+        put_option_deltas.append(delta)
+        put_option_vegas.append(vega)
+        put_option_thetas.append(theta)
 
 
 ##########################################################################
 
 
 test_EquityDigitalOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

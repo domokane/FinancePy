@@ -368,9 +368,7 @@ class Calendar:
         """Create a calendar based on a specified calendar type."""
 
         if cal_type not in CalendarTypes:
-            raise FinError(
-                "Need to pass FinCalendarType and not " + str(cal_type)
-            )
+            raise FinError("Need to pass FinCalendarType and not " + str(cal_type))
 
         self.cal_type = cal_type
         self.day_in_year = None
@@ -451,7 +449,7 @@ class Calendar:
 
         raise FinError("Unknown adjustment convention" + str(bd_type))
 
-    ########################################################################################
+    ####################################################################################
 
     def add_business_days(self, start_dt: Date, num_days: int):
         """Returns a new date that is num_days business days after Date.
@@ -485,7 +483,7 @@ class Calendar:
 
         return new_dt
 
-    ########################################################################################
+    ####################################################################################
 
     def is_business_day(self, dt: Date):
         """Determines if a date is a business day according to the specified
@@ -501,7 +499,7 @@ class Calendar:
 
         return True
 
-    ########################################################################################
+    ####################################################################################
 
     def is_holiday(self, dt: Date):
         """Determines if a date is a Holiday according to the specified
@@ -560,7 +558,7 @@ class Calendar:
         print(self.cal_type)
         raise FinError("Unknown calendar")
 
-    ########################################################################################
+    ####################################################################################
 
     def holiday_weekend(self, dt: Date):
         """Weekends by themselves are a holiday."""
@@ -570,7 +568,7 @@ class Calendar:
 
         return False
 
-    ########################################################################################
+    ####################################################################################
 
     def holiday_australia(self, dt: Date):
         """Only bank holidays. Weekends by themselves are not a holiday."""
@@ -979,9 +977,7 @@ class Calendar:
         if m == 9 and d == 24 and weekday == Date.MON:
             return True
 
-        if (
-            m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == Date.MON
-        ):  # HS
+        if m == 10 and d > 7 and d <= 14 and y != 2021 and weekday == Date.MON:  # HS
             return True
 
         if m == 11 and d == 3:  # Culture
@@ -1365,9 +1361,7 @@ class Calendar:
         easy to compute, so we rely on a pre-calculated array."""
 
         if year > 2100:
-            raise FinError(
-                "Unable to determine Easter monday in year " + str(year)
-            )
+            raise FinError("Unable to determine Easter monday in year " + str(year))
 
         em_days = easterMondayDay[year - 1901]
         start_dt = Date(1, 1, year)

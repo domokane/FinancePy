@@ -30,7 +30,7 @@ def test_equity_variance_swap():
 
     atm_vol = 0.20
     atmK = 100.0
-    skew = -0.02 / 5.0  # defined as dsigma/dK
+    skew = -0.02 / 5.0  # defined as dsigma/dk
     strikes = np.linspace(50.0, 135.0, 18)
     vols = vol_skew(strikes, atm_vol, atmK, skew)
     vol_curve = EquityVolCurve(value_dt, maturity_dt, strikes, vols)

@@ -40,7 +40,7 @@ class EquityCliquetOption(EquityOption):
         final_expiry_dt: Date,
         opt_type: OptionTypes,
         freq_type: FrequencyTypes,
-        day_count_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
@@ -64,7 +64,7 @@ class EquityCliquetOption(EquityOption):
         self.final_expiry_dt = final_expiry_dt
         self.opt_type = opt_type
         self.freq_type = freq_type
-        self.dc_type = day_count_type
+        self.dc_type = dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -148,16 +148,12 @@ class EquityCliquetOption(EquityOption):
 
                     if self.opt_type == call_type:
                         v_fwd_opt = (
-                            s
-                            * dq
-                            * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
+                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
                         )
                         v_cliquet += v_fwd_opt
                     elif self.opt_type == put_type:
                         v_fwd_opt = (
-                            s
-                            * dq
-                            * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
+                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
                         )
                         v_cliquet += v_fwd_opt
                     else:

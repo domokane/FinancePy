@@ -10,9 +10,9 @@ sys.path.append("..")
 import numpy as np
 from financepy.models.black import Black
 from financepy.utils.global_types import OptionTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 def test_Black():
@@ -37,12 +37,8 @@ def test_Black():
 
         #######################################################################
 
-        valueCall = model.value(
-            forward, strike, time_to_expiry, df, call_optionType
-        )
-        valuePut = model.value(
-            forward, strike, time_to_expiry, df, put_optionType
-        )
+        valueCall = model.value(forward, strike, time_to_expiry, df, call_optionType)
+        valuePut = model.value(forward, strike, time_to_expiry, df, put_optionType)
 
         assert round((valueCall - valuePut), dp) == round(
             df * (forward - strike), dp
@@ -52,12 +48,8 @@ def test_Black():
 
         #######################################################################
 
-        deltaCall = model.delta(
-            forward, strike, time_to_expiry, df, call_optionType
-        )
-        deltaPut = model.delta(
-            forward, strike, time_to_expiry, df, put_optionType
-        )
+        deltaCall = model.delta(forward, strike, time_to_expiry, df, call_optionType)
+        deltaPut = model.delta(forward, strike, time_to_expiry, df, put_optionType)
 
         assert (
             round((1 / df) * (deltaCall - deltaPut), dp) == 1.0
@@ -67,12 +59,8 @@ def test_Black():
 
         #######################################################################
 
-        gammaCall = model.gamma(
-            forward, strike, time_to_expiry, df, call_optionType
-        )
-        gammaPut = model.gamma(
-            forward, strike, time_to_expiry, df, put_optionType
-        )
+        gammaCall = model.gamma(forward, strike, time_to_expiry, df, call_optionType)
+        gammaPut = model.gamma(forward, strike, time_to_expiry, df, put_optionType)
 
         assert (
             round(gammaCall - gammaPut, dp) == 0.0
@@ -82,12 +70,8 @@ def test_Black():
 
         #######################################################################
 
-        thetaCall = model.theta(
-            forward, strike, time_to_expiry, df, call_optionType
-        )
-        thetaPut = model.theta(
-            forward, strike, time_to_expiry, df, put_optionType
-        )
+        thetaCall = model.theta(forward, strike, time_to_expiry, df, call_optionType)
+        thetaPut = model.theta(forward, strike, time_to_expiry, df, put_optionType)
 
         assert round((thetaCall - thetaPut), dp) == round(
             (riskFreeIR * time_to_expiry) * (forward - strike) * df, dp
@@ -97,12 +81,8 @@ def test_Black():
 
         #######################################################################
 
-        vegaCall = model.vega(
-            forward, strike, time_to_expiry, df, call_optionType
-        )
-        vegaPut = model.vega(
-            forward, strike, time_to_expiry, df, put_optionType
-        )
+        vegaCall = model.vega(forward, strike, time_to_expiry, df, call_optionType)
+        vegaPut = model.vega(forward, strike, time_to_expiry, df, put_optionType)
 
         assert (
             round(vegaCall - vegaPut, dp) == 0.0
@@ -120,4 +100,4 @@ def test_Black():
 
 
 test_Black()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

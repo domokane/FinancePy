@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("..")
 
-from helpers import buildIborSingleCurve
+from helpers import build_ibor_single_curve
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.utils.global_types import SwapTypes
@@ -19,9 +19,9 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 import financepy.products.rates.ibor_curve_risk_engine as re
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
@@ -91,7 +91,7 @@ def test_par_rate_risk_report_cubic_zero():
 
 def test_par_rate_risk_report_flat_forward():
     valuation_date = Date(6, 10, 2022)
-    base_curve = buildIborSingleCurve(valuation_date, "10Y")
+    base_curve = build_ibor_single_curve(valuation_date, "10Y")
     settlement_date = base_curve.used_swaps[0].effective_dt
     cal = base_curve.used_swaps[0].fixed_leg.cal_type
     fixed_day_count = base_curve.used_swaps[0].fixed_leg.dc_type

@@ -8,13 +8,13 @@ from financepy.models.process_simulator import FinHestonNumericalScheme
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
 from financepy.models.process_simulator import FinProcessSimulator
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 import sys
 
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -202,4 +202,4 @@ def test_FinProcessSimulator():
 
 
 test_FinProcessSimulator()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

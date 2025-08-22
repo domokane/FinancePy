@@ -16,14 +16,14 @@ def test_FinDiscountCurveZeros():
     dates = start_dt.add_years(times)
     zero_rates = np.linspace(5.0, 6.0, 10) / 100
     freq_type = FrequencyTypes.ANNUAL
-    day_count_type = DayCountTypes.ACT_ACT_ISDA
+    dc_type = DayCountTypes.ACT_ACT_ISDA
 
     curve = DiscountCurveZeros(
         start_dt,
         dates,
         zero_rates,
         freq_type,
-        day_count_type,
+        dc_type,
         InterpTypes.FLAT_FWD_RATES,
     )
 

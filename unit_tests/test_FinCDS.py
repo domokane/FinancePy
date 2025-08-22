@@ -3,6 +3,7 @@
 ########################################################################################
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -27,7 +28,7 @@ from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
 
 
-def buildFullIssuerCurve1(mktSpreadBump, irBump):
+def buildFullIssuerCurve1(mkt_spdBump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
@@ -77,7 +78,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.015910 + irBump,
+        m * 0.015910 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -88,7 +89,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.014990 + irBump,
+        m * 0.014990 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -99,7 +100,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.014725 + irBump,
+        m * 0.014725 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -110,7 +111,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.014640 + irBump,
+        m * 0.014640 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -121,7 +122,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.014800 + irBump,
+        m * 0.014800 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -132,7 +133,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.014995 + irBump,
+        m * 0.014995 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -143,7 +144,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.015180 + irBump,
+        m * 0.015180 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -154,7 +155,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.015610 + irBump,
+        m * 0.015610 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -165,7 +166,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.015880 + irBump,
+        m * 0.015880 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -176,7 +177,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.016430 + irBump,
+        m * 0.016430 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -186,7 +187,7 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 
     cds_mkt_contracts = []
 
-    cds_cpn = 0.04 + mktSpreadBump
+    cds_cpn = 0.04 + mkt_spdBump
 
     maturity_dt = value_dt.next_cds_date(6)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
@@ -226,14 +227,12 @@ def buildFullIssuerCurve1(mktSpreadBump, irBump):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(
-        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return libor_curve, issuer_curve
 
 
-def buildFullIssuerCurve2(mktSpreadBump, irBump):
+def buildFullIssuerCurve2(mkt_spdBump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 20 August 2020 SNAP AT 1600
@@ -275,7 +274,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.002155 + irBump,
+        m * 0.002155 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -286,7 +285,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.002305 + irBump,
+        m * 0.002305 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -297,7 +296,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.002665 + irBump,
+        m * 0.002665 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -308,7 +307,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.003290 + irBump,
+        m * 0.003290 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -316,7 +315,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     libor_curve = IborSingleCurve(value_dt, depos, [], swaps)
 
-    cds_cpn = 0.01 + mktSpreadBump
+    cds_cpn = 0.01 + mkt_spdBump
 
     cds_mkt_contracts = []
     effective_dt = Date(21, 8, 2020)
@@ -346,9 +345,7 @@ def buildFullIssuerCurve2(mktSpreadBump, irBump):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(
-        settle_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(settle_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     years = np.linspace(0.0, 10.0, 20)
     dates = settle_dt.add_years(years)
@@ -372,14 +369,12 @@ trade_dt = Date(9, 8, 2019)
 value_dt1 = trade_dt.add_days(1)
 effective_dt = value_dt1
 
-cds_contract1 = CDS(
-    effective_dt, maturity_dt, cds_cpn, notional, long_protection
-)
+cds_contract1 = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
 t = (maturity_dt - value_dt1) / G_DAYS_IN_YEARS
 z = libor_curve.df(maturity_dt)
 r1 = -np.log(z) / t
 print(t, z, r1, maturity_dt)
-mktSpread1 = 0.040
+mkt_spd1 = 0.040
 
 libor_curve, issuer_curve2 = buildFullIssuerCurve2(0.0, 0.0)
 
@@ -392,26 +387,18 @@ trade_dt = Date(20, 8, 2020)
 effective_dt = Date(21, 8, 2020)
 value_dt2 = trade_dt
 
-cds_contract2 = CDS(
-    effective_dt, maturity_dt, cds_cpn, notional, long_protection
-)
+cds_contract2 = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
 t = (maturity_dt - value_dt2) / G_DAYS_IN_YEARS
 z = libor_curve.df(maturity_dt)
 r2 = -np.log(z) / t
-mktSpread2 = 0.01
+mkt_spd2 = 0.01
 
 
 def test_par_spread():
-    spd = (
-        cds_contract1.par_spread(value_dt1, issuer_curve1, cdsRecovery)
-        * 10000.0
-    )
+    spd = cds_contract1.par_spread(value_dt1, issuer_curve1, cdsRecovery) * 10000.0
     assert round(spd, 4) == 399.9996
 
-    spd = (
-        cds_contract2.par_spread(value_dt2, issuer_curve2, cdsRecovery)
-        * 10000.0
-    )
+    spd = cds_contract2.par_spread(value_dt2, issuer_curve2, cdsRecovery) * 10000.0
     assert round(spd, 4) == 99.5858
 
 
@@ -458,31 +445,23 @@ def test_prot_leg_pv():
 
 
 def test_premium_leg_pv():
-    premPV = cds_contract1.premium_leg_pv(
-        value_dt1, issuer_curve1, cdsRecovery
-    )
+    premPV = cds_contract1.premium_leg_pv(value_dt1, issuer_curve1, cdsRecovery)
     assert round(premPV, 4) == 104508.9265
 
-    premPV = cds_contract2.premium_leg_pv(
-        value_dt2, issuer_curve2, cdsRecovery
-    )
+    premPV = cds_contract2.premium_leg_pv(value_dt2, issuer_curve2, cdsRecovery)
     assert round(premPV, 4) == 247472.5265
 
 
 def test_value_approx():
 
-    v_approx = cds_contract1.value_fast_approx(
-        value_dt1, r1, mktSpread1, cdsRecovery
-    )
-    print(value_dt1, r1, mktSpread1, cdsRecovery)
+    v_approx = cds_contract1.value_fast_approx(value_dt1, r1, mkt_spd1, cdsRecovery)
+    print(value_dt1, r1, mkt_spd1, cdsRecovery)
     assert round(v_approx[0], 4) == 165262.8062
     assert round(v_approx[1], 4) == 167387.8062
     assert round(v_approx[2], 4) == 555.5746
     assert round(v_approx[3], 4) == -71.4881
 
-    v_approx = cds_contract2.value_fast_approx(
-        value_dt2, r2, mktSpread2, cdsRecovery
-    )
+    v_approx = cds_contract2.value_fast_approx(value_dt2, r2, mkt_spd2, cdsRecovery)
     assert round(v_approx[0], 4) == -195853.3675
     assert round(v_approx[1], 4) == -187520.0342
     assert round(v_approx[2], 4) == 534.9973

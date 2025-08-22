@@ -7,7 +7,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -20,7 +20,7 @@ from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_option import CDSOption
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 # TO DO
@@ -32,7 +32,7 @@ def buildFullIssuerCurve(value_dt):
 
     dc_type = DayCountTypes.ACT_360
     depos = []
-    irBump = 0.0
+    ir_bump = 0.0
 
     m = 1.0  # 0.00000000000
 
@@ -74,7 +74,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0044 + irBump,
+        m * 0.0044 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -85,7 +85,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0078 + irBump,
+        m * 0.0078 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -96,7 +96,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0119 + irBump,
+        m * 0.0119 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -107,7 +107,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0158 + irBump,
+        m * 0.0158 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -118,7 +118,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0192 + irBump,
+        m * 0.0192 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -129,7 +129,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0219 + irBump,
+        m * 0.0219 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -140,7 +140,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0242 + irBump,
+        m * 0.0242 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -151,7 +151,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0261 + irBump,
+        m * 0.0261 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -162,7 +162,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0276 + irBump,
+        m * 0.0276 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -213,9 +213,7 @@ def buildFullIssuerCurve(value_dt):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(
-        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return libor_curve, issuer_curve
 
@@ -238,9 +236,7 @@ def test_dirty_priceCDSwaption():
     long_protection = False
     cds_cpn = 0.0  # NOT KNOWN
 
-    cds_contract = CDS(
-        step_in_dt, maturity_dt, cds_cpn, notional, long_protection
-    )
+    cds_contract = CDS(step_in_dt, maturity_dt, cds_cpn, notional, long_protection)
 
     test_cases.banner(
         "=============================== CDS ==============================="
@@ -248,9 +244,7 @@ def test_dirty_priceCDSwaption():
     #    cds_contract.print(value_dt)
 
     test_cases.header("LABEL", "VALUE")
-    spd = (
-        cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
-    )
+    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
     test_cases.print("PAR SPREAD:", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
@@ -282,15 +276,11 @@ def test_dirty_priceCDSwaption():
         "=========================== FORWARD CDS ==========================="
     )
 
-    cds_contract = CDS(
-        expiry_dt, maturity_dt, cds_cpn, notional, long_protection
-    )
+    cds_contract = CDS(expiry_dt, maturity_dt, cds_cpn, notional, long_protection)
 
     #    cds_contract.print(value_dt)
 
-    spd = (
-        cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
-    )
+    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
     test_cases.print("PAR SPREAD", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
@@ -319,9 +309,7 @@ def test_dirty_priceCDSwaption():
     test_cases.print("Maturity Date:", str(maturity_dt))
     test_cases.print("CDS Coupon:", cds_cpn)
 
-    test_cases.header(
-        "STRIKE", "LONG PROTECTION", "DIRTY VALUE", "IMPLIED VOL"
-    )
+    test_cases.header("STRIKE", "LONG PROTECTION", "DIRTY VALUE", "IMPLIED VOL")
 
     for strike in np.linspace(100, 300, 41):
 
@@ -356,4 +344,4 @@ def test_dirty_priceCDSwaption():
 
 
 test_dirty_priceCDSwaption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

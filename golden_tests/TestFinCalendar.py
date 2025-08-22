@@ -6,13 +6,13 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.calendar import Calendar, CalendarTypes
 from financepy.utils.date import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -40,8 +40,8 @@ def test_Calendar():
                 test_cases.banner("================================")
             #                print("=========================")
 
-            is_holidayDay = cal.is_holiday(next_dt)
-            if is_holidayDay is True:
+            is_holiday_day = cal.is_holiday(next_dt)
+            if is_holiday_day is True:
                 test_cases.print(cal, next_dt)
     #                print(cal, next_dt)
 
@@ -52,4 +52,4 @@ def test_Calendar():
 
 
 test_Calendar()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

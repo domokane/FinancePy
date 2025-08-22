@@ -9,11 +9,11 @@ sys.path.append("..")
 import numpy as np
 from financepy.models.sabr import SABR
 from financepy.models.sabr_shifted import SABRShifted
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 import matplotlib.pyplot as plt
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -114,4 +114,4 @@ test_FinSABR()
 test_FinShiftedSABRSimple()
 test_FinShiftedSABR()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

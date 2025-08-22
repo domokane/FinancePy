@@ -12,9 +12,9 @@ from financepy.utils.math import normcdf_integrate
 from financepy.utils.math import N
 from financepy.utils.math import normcdf_slow
 from financepy.utils.math import norminvcdf
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -98,4 +98,4 @@ def test_FinMath():
 
 
 test_FinMath()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

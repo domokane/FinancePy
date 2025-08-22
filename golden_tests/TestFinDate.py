@@ -9,12 +9,12 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.date import set_date_format
 from financepy.utils.date import DateFormatTypes
 from financepy.utils.date import Date, date_range
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -330,6 +330,6 @@ end = time.time()
 elapsed = end - start
 # print("Elapsed time:", elapsed)
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()
 
 set_date_format(DateFormatTypes.UK_LONG)

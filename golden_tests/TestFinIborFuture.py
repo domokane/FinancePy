@@ -8,9 +8,9 @@ sys.path.append("..")
 
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.utils.date import Date, set_date_format, DateFormatTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 set_date_format(DateFormatTypes.UK_LONG)
 
@@ -35,4 +35,4 @@ def test_FinIborFuture():
 
 
 test_FinIborFuture()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

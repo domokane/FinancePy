@@ -18,9 +18,9 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -72,4 +72,4 @@ def test_FinFXDigitalOption():
 
 
 test_FinFXDigitalOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

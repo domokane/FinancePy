@@ -36,28 +36,26 @@ def option_implied_dbn(s, t, r, q, strikes, sigmas):
     strike = strikes[1]
 
     inflator = np.exp((r - 0) * t)
-    dK = strikes[1] - strikes[0]
+    dk = strikes[1] - strikes[0]
     values = np.zeros(num_steps)
 
     for ik in range(0, num_steps):
         strike = strikes[ik]
         sigma = sigmas[ik]
-        v = bs_value(
-            s, t, strike, r, q, sigma, OptionTypes.EUROPEAN_CALL.value
-        )
+        v = bs_value(s, t, strike, r, q, sigma, OptionTypes.EUROPEAN_CALL.value)
 
         values[ik] = v
 
-    # Calculate the density rho(K) dK
+    # Calculate the density rho(K) dk
     densitydk = np.zeros(num_steps)
 
     for ik in range(1, num_steps - 1):
-        d2VdK2 = (values[ik + 1] - 2.0 * values[ik] + values[ik - 1]) / dK
+        d2Vdk2 = (values[ik + 1] - 2.0 * values[ik] + values[ik - 1]) / dk
 
         #       print("%d %12.8f %12.8f %12.8f" %
-        #             (ik, strikes[ik], values[ik], d2VdK2))
+        #             (ik, strikes[ik], values[ik], d2Vdk2))
 
-        densitydk[ik] = d2VdK2 * inflator
+        densitydk[ik] = d2Vdk2 * inflator
 
     return densitydk
 

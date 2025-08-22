@@ -88,9 +88,7 @@ class FinFXVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(
-        self, value_dt, fwd_stock_price, strikes, volatilities
-    ):
+    def fair_strike_approx(self, value_dt, fwd_stock_price, strikes, volatilities):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
@@ -105,8 +103,8 @@ class FinFXVarianceSwap:
         points in the volatilities and strikes to calculate the gradient."""
 
         dvol = volatilities[-1] - volatilities[0]
-        dK = strikes[-1] - strikes[0]
-        b = f * dvol / dK
+        dk = strikes[-1] - strikes[0]
+        b = f * dvol / dk
         var = (atm_vol**2) * np.sqrt(1.0 + 3.0 * t_mat * (b**2))
         return var
 
@@ -184,9 +182,7 @@ class FinFXVarianceSwap:
         self.call_strikes = call_k
 
         option_total = (
-            2.0
-            * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0))
-            / t_mat
+            2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
         )
 
         self.call_wts = np.zeros(num_call_options)
@@ -253,9 +249,7 @@ class FinFXVarianceSwap:
                 cum_x2 += x * x
         else:
             for i in range(1, num_observations):
-                x = (close_prices[i] - close_prices[i - 1]) / close_prices[
-                    i - 1
-                ]
+                x = (close_prices[i] - close_prices[i - 1]) / close_prices[i - 1]
                 cum_x2 += x * x
 
         var = cum_x2 * 252.0 / num_observations

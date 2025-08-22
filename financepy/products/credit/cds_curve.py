@@ -28,10 +28,7 @@ def f(q, *args):
     cds = args[2]
     recovery_rate = args[3]
 
-    num_points = len(curve._times)
-#    curve._qs[num_points - 1] = q
-
-    curve.set_q(num_points - 1, q)
+    curve.set_last_q(q)
 
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
@@ -64,9 +61,7 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if value_dt != libor_curve.value_dt:
-            raise FinError(
-                "Curve does not have same valuation date as Issuer curve."
-            )
+            raise FinError("Curve does not have same valuation date as Issuer curve.")
 
         self.value_dt = value_dt
         self.cds_contracts = cds_contracts
@@ -111,6 +106,11 @@ class CDSCurve:
 
         self._qs[index] = q
 
+    def set_last_q(self, q):
+        """Set the discount factor at last index."""
+
+        n_points = len(self.qs)
+        self._qs[n_points - 1] = q
 
     ###########################################################################
 
@@ -153,9 +153,7 @@ class CDSCurve:
                 )
             return qs
         elif isinstance(t, float):
-            q = _uinterpolate(
-                t, self._times, self._qs, self.interp_method.value
-            )
+            q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
             return q
         else:
             raise FinError("Unknown time type")
@@ -231,7 +229,7 @@ class CDSCurve:
 
     ###########################################################################
 
-    def fwd_rate(self, date1, date2, day_count_type):
+    def fwd_rate(self, date1, date2, dc_type):
         """Calculate the forward rate according between dates date1 and date2
         according to the specified day count convention."""
 
@@ -241,7 +239,7 @@ class CDSCurve:
         if date2 < date1:
             raise FinError("Date2 must not be before Date1")
 
-        day_count = DayCount(day_count_type)
+        day_count = DayCount(dc_type)
         year_frac = day_count.year_frac(date1, date2)[0]
         df1 = self.df(date1)
         df2 = self.df(date2)

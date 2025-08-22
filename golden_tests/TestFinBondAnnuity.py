@@ -5,7 +5,7 @@
 # TODO Set up test cases correctly
 import sys
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond_annuity import BondAnnuity
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -16,7 +16,7 @@ from financepy.utils.calendar import DateGenRuleTypes
 
 sys.path.append("..")
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -182,4 +182,4 @@ def test_BondAnnuity():
 
 
 test_BondAnnuity()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

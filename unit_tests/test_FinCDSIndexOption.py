@@ -3,9 +3,10 @@
 ########################################################################################
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from .helpers import build_Ibor_Curve, buildFlatIssuerCurve
+from .helpers import build_ibor_curve, build_flat_issuer_curve
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -27,16 +28,14 @@ def test_dirty_priceCDSIndexOption():
     step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt
 
-    libor_curve = build_Ibor_Curve(trade_dt)
+    libor_curve = build_ibor_curve(trade_dt)
 
     maturity_3yr = trade_dt.next_cds_date(36)
     maturity_5yr = trade_dt.next_cds_date(60)
     maturity_7yr = trade_dt.next_cds_date(84)
     maturity_10yr = trade_dt.next_cds_date(120)
 
-    path = os.path.join(
-        os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
-    )
+    path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
     f = open(path, "r")
     data = f.readlines()
     f.close()
@@ -44,12 +43,12 @@ def test_dirty_priceCDSIndexOption():
 
     for row in data[1:]:
 
-        splitRow = row.split(",")
-        spd_3yr = float(splitRow[1]) / 10000.0
-        spd_5yr = float(splitRow[2]) / 10000.0
-        spd_7yr = float(splitRow[3]) / 10000.0
-        spd_10yr = float(splitRow[4]) / 10000.0
-        recovery_rate = float(splitRow[5])
+        split_row = row.split(",")
+        spd_3yr = float(split_row[1]) / 10000.0
+        spd_5yr = float(split_row[2]) / 10000.0
+        spd_7yr = float(split_row[3]) / 10000.0
+        spd_10yr = float(split_row[4]) / 10000.0
+        recovery_rate = float(split_row[5])
 
         cds_3yr = CDS(step_in_dt, maturity_3yr, spd_3yr)
         cds_5yr = CDS(step_in_dt, maturity_5yr, spd_5yr)
@@ -57,9 +56,7 @@ def test_dirty_priceCDSIndexOption():
         cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
         cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
-        issuer_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, recovery_rate
-        )
+        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
@@ -97,14 +94,12 @@ def test_dirty_priceCDSIndexOption():
             cds = CDS(value_dt, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, index_recovery
-        )
+        index_curve = CDSCurve(value_dt, cds_contracts, libor_curve, index_recovery)
 
         indexSpreads = [index / 10000.0] * 4
 
-        indexPortfolio = CDSIndexPortfolio()
-        adjustedIssuerCurves = indexPortfolio.hazard_rate_adjust_intrinsic(
+        index_portfolio = CDSIndexPortfolio()
+        adjusted_issuer_curves = index_portfolio.hazard_rate_adjust_intrinsic(
             value_dt,
             issuer_curves,
             indexSpreads,
@@ -121,7 +116,7 @@ def test_dirty_priceCDSIndexOption():
         )
 
         v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
-            value_dt, adjustedIssuerCurves, index_recovery, volatility
+            value_dt, adjusted_issuer_curves, index_recovery, volatility
         )
 
         v_pay_2, v_rec_2 = option.value_adjusted_black(

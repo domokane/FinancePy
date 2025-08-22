@@ -46,7 +46,7 @@ class FinInflationSwap:
         # End of the Ibor rate period
         maturity_dt_or_tenor: Union[Date, str],
         fra_rate: float,  # The fixed contractual FRA rate
-        day_count_type: DayCountTypes,  # For interest period
+        dc_type: DayCountTypes,  # For interest period
         notional: float = 100.0,
         pay_fixed_rate: bool = True,  # True if the FRA rate is being paid
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -76,7 +76,7 @@ class FinInflationSwap:
         self.maturity_dt = maturity_dt
         self.fra_rate = fra_rate
         self.pay_fixed_rate = pay_fixed_rate
-        self.dc_type = day_count_type
+        self.dc_type = dc_type
         self.notional = notional
 
     ###########################################################################

@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.schedule import Schedule
@@ -14,7 +14,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes, Calendar
 from financepy.utils.date import Date, set_date_format, DateFormatTypes
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -23,13 +23,9 @@ set_date_format(DateFormatTypes.UK_LONGEST)
 
 def dumpSchedule(desc, schedule):
 
-    test_cases.banner(
-        "======================================================="
-    )
+    test_cases.banner("=======================================================")
     test_cases.banner(desc)
-    test_cases.banner(
-        "======================================================="
-    )
+    test_cases.banner("=======================================================")
     test_cases.header("OBJ")
     test_cases.print(schedule)
 
@@ -336,8 +332,7 @@ def test_FinScheduleAlignment(eomFlag):
     # THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
 
     compare = (
-        sched1.adjusted_dts[-1]
-        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
     )
 
 
@@ -388,8 +383,7 @@ def test_FinScheduleAlignmentLeapYearEOM():
     #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1.adjusted_dts[-1]
-        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
     )
     assert compare == eomFlag
 
@@ -441,8 +435,7 @@ def test_FinScheduleAlignmentLeapYearNotEOM():
     #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1.adjusted_dts[-1]
-        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
     )
     assert compare == True
 
@@ -493,8 +486,7 @@ def test_FinScheduleAlignmentEff31():
     #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
 
     compare = (
-        sched1.adjusted_dts[-1]
-        == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+        sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
     )
     assert compare == True
 
@@ -511,6 +503,6 @@ test_FinScheduleAlignmentLeapYearNotEOM()
 
 test_FinScheduleAlignmentEff31()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()
 
 set_date_format(DateFormatTypes.UK_LONGEST)

@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -20,7 +20,7 @@ from financepy.products.inflation.FinInflationIndexCurve import (
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -71,9 +71,7 @@ def test_FinInflationBondBBG():
 
     test_cases.print("US STREET REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(
-        settle_dt, clean_price, YTMCalcType.US_TREASURY
-    )
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
 
     test_cases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -100,9 +98,7 @@ def test_FinInflationBondBBG():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflation_accd = bond.inflation_accrued_interest(
-        settle_dt, face, refCPIValue
-    )
+    inflation_accd = bond.inflation_accrued_interest(settle_dt, face, refCPIValue)
 
     test_cases.print("Inflation Accrued = ", inflation_accd)
 
@@ -302,9 +298,7 @@ def test_FinInflationBondStack():
 
     test_cases.print("US STREET REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(
-        settle_dt, clean_price, YTMCalcType.US_TREASURY
-    )
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
 
     test_cases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -329,9 +323,7 @@ def test_FinInflationBondStack():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflationAccd = bond.calc_inflation_accrued_interest(
-        settle_dt, refCPIValue
-    )
+    inflationAccd = bond.calc_inflation_accrued_interest(settle_dt, refCPIValue)
 
     test_cases.print("Inflation Accrued = ", inflationAccd)
 
@@ -369,4 +361,4 @@ def test_FinInflationBondStack():
 
 test_FinInflationBondBBG()
 test_FinInflationBondStack()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

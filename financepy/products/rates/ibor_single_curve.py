@@ -138,7 +138,7 @@ class IborSingleCurve(DiscountCurve):
     to provide a smoother or other functional curve shape which may have a more
     economically justifiable shape. However the root search makes it slower."""
 
-    ########################################################################################
+    ####################################################################################
 
     def __init__(
         self,
@@ -169,7 +169,7 @@ class IborSingleCurve(DiscountCurve):
         self._interp_type = interp_type
         self.check_refit_flag = check_refit_flag
         self._interpolator = Interpolator(self._interp_type, **kwargs)
-        self._is_built = False
+        self.is_built = False
         self._optional_interp_params = kwargs
 
         self._validate_inputs(
@@ -192,7 +192,7 @@ class IborSingleCurve(DiscountCurve):
         where the value of df[i] does not affect discount factors for t<=t[i-1]
         """
 
-        if self._is_built:
+        if self.is_built:
             # already built
             return
 
@@ -214,7 +214,7 @@ class IborSingleCurve(DiscountCurve):
         else:
             self._build_curve_using_least_squares(**kwargs)
 
-        self._is_built = True
+        self.is_built = True
 
     ####################################################################################
 
@@ -404,7 +404,7 @@ class IborSingleCurve(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type, **kwargs)
         self._times = np.array([])
         self._dfs = np.array([])
-        self._is_built = True
+        self.is_built = True
 
         # time zero is now.
         t_mat = 0.0
@@ -534,7 +534,7 @@ class IborSingleCurve(DiscountCurve):
             return out
 
         bootstrap_first = True
-        self._is_built = True
+        self.is_built = True
 
         if bootstrap_first:
             orig_check_refit_flag = self.check_refit_flag
@@ -592,7 +592,7 @@ class IborSingleCurve(DiscountCurve):
         require the use of a solver. It is also market standard."""
 
         self._interpolator = Interpolator(self._interp_type)
-        self._is_built = True
+        self.is_built = True
 
         self._times = np.array([])
         self._dfs = np.array([])
@@ -740,7 +740,7 @@ class IborSingleCurve(DiscountCurve):
         if self.check_refit_flag is True:
             self.check_refit(1e-10, SWAP_TOL, 1e-5)
 
-    ########################################################################################
+    ####################################################################################
 
     def check_refit(self, depo_tol, fra_tol, swap_tol):
         """Ensure that the Ibor curve refits the calibration instruments."""
@@ -778,10 +778,11 @@ class IborSingleCurve(DiscountCurve):
 
     def _df(self, t: Union[float, np.ndarray]):
         """
-        Override from DiscountCurve so we can check if the curve has actually been built.
+        Override from DiscountCurve so we can check if the curve
+        has actually been built.
         """
         assert (
-            self._is_built
+            self.is_built
         ), "The curve has not yet been built, call build_curve() first"
         return super().df_t(t)
 
@@ -806,9 +807,9 @@ class IborSingleCurve(DiscountCurve):
             s += swap.__repr__()
 
         s += label_to_string("INTERP TYPE", self._interp_type)
-        s += label_to_string("IS BUILT", self._is_built)
+        s += label_to_string("IS BUILT", self.is_built)
 
-        if self._is_built:
+        if self.is_built:
             num_points = len(self._times)
             s += label_to_string("GRID TIMES", "GRID DFS")
             for i in range(0, num_points):

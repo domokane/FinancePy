@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
@@ -31,7 +31,7 @@ import sys
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -308,9 +308,7 @@ def test_HullBookExamples():
     #    LMMPrintForwards(fwds1F)
 
     vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwds1F, taus
-        )
+        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds1F, taus)
         * 100.0
     )
 
@@ -337,10 +335,7 @@ def test_HullBookExamples():
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
     vStickyCaplets = (
-        lmm_sticky_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwds1F, taus
-        )
-        * 100.0
+        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds1F, taus) * 100.0
     )
 
     hullStickyCaplets1F = [
@@ -396,9 +391,7 @@ def test_HullBookExamples():
     )
 
     vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwdsMF, taus
-        )
+        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwdsMF, taus)
         * 100.0
     )
 
@@ -424,10 +417,7 @@ def test_HullBookExamples():
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
 
     vStickyCaplets = (
-        lmm_sticky_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwdsMF, taus
-        )
-        * 100.0
+        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwdsMF, taus) * 100.0
     )
 
     hullStickyCaplets1F = [
@@ -496,9 +486,7 @@ def test_HullBookExamples():
     )
 
     vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwds2F, taus
-        )
+        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds2F, taus)
         * 100.0
     )
     hullRatchetCaplets2F = [
@@ -523,10 +511,7 @@ def test_HullBookExamples():
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
 
     vStickyCaplets = (
-        lmm_sticky_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwds2F, taus
-        )
-        * 100.0
+        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds2F, taus) * 100.0
     )
 
     hullStickyCaplets2F = [
@@ -622,9 +607,7 @@ def test_HullBookExamples():
     ]
 
     vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwds3F, taus
-        )
+        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds3F, taus)
         * 100.0
     )
 
@@ -636,10 +619,7 @@ def test_HullBookExamples():
     check_vector_differences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
 
     vStickyCaplets = (
-        lmm_sticky_caplet_pricer(
-            spread, numFwds, num_paths, fwd0, fwds3F, taus
-        )
-        * 100.0
+        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds3F, taus) * 100.0
     )
 
     hullStickyCaplets3F = [
@@ -714,4 +694,4 @@ def fwdfwdCorrelation(fwds):
 test_HullBookExamples()
 # test_CapsFloors()
 # test_Swaptions()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

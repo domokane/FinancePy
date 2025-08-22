@@ -20,7 +20,7 @@ volatility = 0.20
 interest_rate = 0.30
 dividend_yield = 0.10
 num_observations = 120  # daily as we have a half year
-accruedAverage = None
+accrued_avg = None
 K = 100
 seed = 1976
 num_paths = 5000
@@ -29,7 +29,7 @@ model = BlackScholes(volatility)
 discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-asianOption = EquityAsianOption(
+asian_option = EquityAsianOption(
     start_averaging_dt,
     expiry_dt,
     K,
@@ -39,49 +39,49 @@ asianOption = EquityAsianOption(
 
 
 def test_geometric():
-    valueGeometric = asianOption.value(
+    value_geometric = asian_option.value(
         value_dt,
         stock_price,
         discount_curve,
         dividend_curve,
         model,
         AsianOptionValuationMethods.GEOMETRIC,
-        accruedAverage,
+        accrued_avg,
     )
 
-    assert round(valueGeometric, 4) == 12.3380
+    assert round(value_geometric, 4) == 12.3380
 
 
 def test_turnbull_wakeman():
-    valueTurnbullWakeman = asianOption.value(
+    valueTurnbullWakeman = asian_option.value(
         value_dt,
         stock_price,
         discount_curve,
         dividend_curve,
         model,
         AsianOptionValuationMethods.TURNBULL_WAKEMAN,
-        accruedAverage,
+        accrued_avg,
     )
 
     assert round(valueTurnbullWakeman, 4) == 12.5381
 
 
 def test_curran():
-    valueCurran = asianOption.value(
+    valueCurran = asian_option.value(
         value_dt,
         stock_price,
         discount_curve,
         dividend_curve,
         model,
         AsianOptionValuationMethods.CURRAN,
-        accruedAverage,
+        accrued_avg,
     )
 
     assert round(valueCurran, 4) == 12.5368
 
 
 def test_mc():
-    value_mc = asianOption.value_mc(
+    value_mc = asian_option.value_mc(
         value_dt,
         stock_price,
         discount_curve,
@@ -89,7 +89,7 @@ def test_mc():
         model,
         num_paths,
         seed,
-        accruedAverage,
+        accrued_avg,
     )
 
     assert round(value_mc, 4) == 12.5269

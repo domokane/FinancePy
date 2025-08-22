@@ -8,7 +8,7 @@ sys.path.append("..")
 
 import numpy as np
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
@@ -17,7 +17,7 @@ from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -112,4 +112,4 @@ def test_FinOptionImpliedDbn():
 
 
 test_FinOptionImpliedDbn()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

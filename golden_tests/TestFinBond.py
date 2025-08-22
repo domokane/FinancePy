@@ -11,7 +11,7 @@ import numpy as np
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -27,7 +27,7 @@ from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 ##########################################################################
@@ -216,13 +216,9 @@ def test_bond():
 
     import pandas as pd
 
-    path = os.path.join(
-        os.path.dirname(__file__), ".//data//gilt_bond_prices.txt"
-    )
+    path = os.path.join(os.path.dirname(__file__), ".//data//gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
-    bond_dataframe["mid"] = 0.5 * (
-        bond_dataframe["bid"] + bond_dataframe["ask"]
-    )
+    bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     settle_dt = Date(19, 9, 2012)
@@ -244,9 +240,7 @@ def test_bond():
 
             coupon = bond["coupon"] / 100.0
             clean_price = bond["mid"]
-            bond = Bond(
-                issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days
-            )
+            bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
             ytm = bond.yield_to_maturity(settle_dt, clean_price)
             accrued_int = bond.accrued_int
@@ -394,20 +388,14 @@ def test_bond():
     ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
     test_cases.print("US STREET Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(
-        settle_dt, clean_price, YTMCalcType.US_TREASURY
-    )
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
     test_cases.print("US TREASURY Yield To Maturity = ", ytm)
 
-    dirty_price = bond.dirty_price_from_ytm(
-        settle_dt, ytm, YTMCalcType.US_TREASURY
-    )
+    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm, YTMCalcType.US_TREASURY)
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    clean_price = bond.clean_price_from_ytm(
-        settle_dt, ytm, YTMCalcType.US_TREASURY
-    )
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm, YTMCalcType.US_TREASURY)
 
     test_cases.print("Clean Price = ", clean_price)
 
@@ -457,9 +445,7 @@ def test_bond():
     ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
     test_cases.print("US STREET Yield To Maturity", ytm)
 
-    ytm = bond.yield_to_maturity(
-        settle_dt, clean_price, YTMCalcType.US_TREASURY
-    )
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
     test_cases.print("US TREASURY Yield To Maturity", ytm)
 
     dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
@@ -509,9 +495,7 @@ def test_bond_ex_dividend():
     test_cases.print("Accrued:", accrued)
 
     ###########################################################################
-    test_cases.banner(
-        "======================================================="
-    )
+    test_cases.banner("=======================================================")
     test_cases.header("SETTLEMENT", "DIRTY PRICE", "ACCRUED", "CLEAN PRICE")
 
     issue_dt = Date(7, 9, 2000)
@@ -541,9 +525,6 @@ def test_bond_ex_dividend():
 
 def test_bond_payment_dates():
 
-    from financepy.products.bonds.bond import Bond
-    from financepy.utils import Date, DayCountTypes, FrequencyTypes
-
     bond = Bond(
         issue_dt=Date(7, 6, 2021),
         maturity_dt=Date(7, 6, 2031),
@@ -564,9 +545,7 @@ def test_bond_payment_dates():
 
 def test_bond_ror():
 
-    path = os.path.join(
-        os.path.dirname(__file__), ".//data//test_cases_bond_ror.csv"
-    )
+    path = os.path.join(os.path.dirname(__file__), ".//data//test_cases_bond_ror.csv")
     df = pd.read_csv(path, parse_dates=["buy_date", "sell_date"])
     # A 10-year bond with 1 coupon per year. code: 210215
 
@@ -592,21 +571,15 @@ def test_bond_ror():
 
     for row in df.itertuples(index=False):
 
-        buy_date = Date(
-            row.buy_date.day, row.buy_date.month, row.buy_date.year
-        )
-        sell_date = Date(
-            row.sell_date.day, row.sell_date.month, row.sell_date.year
-        )
+        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
+        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
         buy_price = bond.dirty_price_from_ytm(
             buy_date, row.buy_ytm, YTMCalcType.US_STREET
         )
         sell_price = bond.dirty_price_from_ytm(
             sell_date, row.sell_ytm, YTMCalcType.US_STREET
         )
-        simple, irr, pnl = bond.calc_ror(
-            buy_date, sell_date, row.buy_ytm, row.sell_ytm
-        )
+        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
 
         test_cases.print(
             row.bond_code,
@@ -650,8 +623,8 @@ def test_key_rate_durations():
     coupon = 0.0275
     ex_div_days = 0
 
-    dc_type, freq_type, settle_days, exDiv, calendar = (
-        get_bond_market_conventions(BondMarkets.UNITED_STATES)
+    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(
+        BondMarkets.UNITED_STATES
     )
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
@@ -671,8 +644,8 @@ def test_key_rate_durations():
 
 def test_key_rate_durations_bloomberg_example():
 
-    dc_type, freq_type, settle_days, exDiv, calendar = (
-        get_bond_market_conventions(BondMarkets.UNITED_STATES)
+    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(
+        BondMarkets.UNITED_STATES
     )
 
     # interest accrues on this date. Issue date is 01/08/2022
@@ -681,8 +654,8 @@ def test_key_rate_durations_bloomberg_example():
     coupon = 2.75 / 100.0
     ex_div_days = 0
 
-    dc_type, freq_type, settle_days, exDiv, calendar = (
-        get_bond_market_conventions(BondMarkets.UNITED_STATES)
+    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(
+        BondMarkets.UNITED_STATES
     )
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
@@ -696,10 +669,7 @@ def test_key_rate_durations_bloomberg_example():
     # Details of yields of market bonds at KRD maturity points
     my_tenors = np.array([0.5, 1, 2, 3, 5, 7, 10])
 
-    my_rates = (
-        np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272, 3.5825, 3.5347])
-        / 100
-    )
+    my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272, 3.5825, 3.5347]) / 100
 
     krt, krd = bond.key_rate_durations(
         settle_dt, ytm, key_rate_tenors=my_tenors, rates=my_rates
@@ -725,20 +695,17 @@ def test_oas():
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-    liborFlatRate = 0.0275
+    libor_flat_rate = 0.0275
     settle_dt = Date(21, 7, 2017)
 
-    liborFlatCurve = DiscountCurveFlat(
-        settle_dt, liborFlatRate, FrequencyTypes.SEMI_ANNUAL
+    libor_flat_curve = DiscountCurveFlat(
+        settle_dt, libor_flat_rate, FrequencyTypes.SEMI_ANNUAL
     )
 
     # I specified face to be 100 - if face is 1 then this must be 0.99780842
     clean_price = 99.780842
 
-    oas = (
-        bond.option_adjusted_spread(settle_dt, clean_price, liborFlatCurve)
-        * 10000
-    )
+    oas = bond.option_adjusted_spread(settle_dt, clean_price, libor_flat_curve) * 10000
 
     if (oas - (-34.95)) > 0.01:
         print("OAS incorrect")
@@ -757,9 +724,7 @@ def test_div_dts():
     face = 125000
     ex_div_days = 10
 
-    bond = Bond(
-        issue_dt, maturity_dt, coupon, freq_type, accrual_type, ex_div_days
-    )
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, accrual_type, ex_div_days)
 
     print(bond)
 
@@ -786,4 +751,4 @@ test_bond_eom()
 test_key_rate_durations()
 test_key_rate_durations_bloomberg_example()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

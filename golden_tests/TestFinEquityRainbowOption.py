@@ -16,10 +16,10 @@ from financepy.products.equity.equity_rainbow_option import (
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -453,9 +453,7 @@ def test_EquityRainbowOption():
 
     #    plt.figure(figsize=(10,8))
 
-    test_cases.header(
-        "NUMPATHS", "CORRELATION", "NTD", "VALUE", "VALUE_MC", "TIME"
-    )
+    test_cases.header("NUMPATHS", "CORRELATION", "NTD", "VALUE", "VALUE_MC", "TIME")
 
     for n in [1, 2, 3, 4, 5]:
 
@@ -513,9 +511,7 @@ def test_EquityRainbowOption():
 
     #    plt.figure(figsize=(10,8))
 
-    test_cases.header(
-        "NUMPATHS", "CORRELATION", "NTD", "VALUE", "VALUE_MC", "TIME"
-    )
+    test_cases.header("NUMPATHS", "CORRELATION", "NTD", "VALUE", "VALUE_MC", "TIME")
 
     for n in [1, 2, 3, 4, 5]:
 
@@ -561,4 +557,4 @@ def test_EquityRainbowOption():
 
 
 test_EquityRainbowOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

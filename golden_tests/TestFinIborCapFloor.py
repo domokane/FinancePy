@@ -33,10 +33,10 @@ from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##############################################################################
 
@@ -66,15 +66,9 @@ def test_ibor_depositsAndSwaps(value_dt):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(
-        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
-    )
-    swap2 = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
-    )
-    swap3 = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis
-    )
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
+    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
+    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -132,9 +126,7 @@ def test_IborCapFloor():
         cvalue4 = capfloor.value(value_dt, libor_curve, model4)
         cvalue5 = capfloor.value(value_dt, libor_curve, model5)
         cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6
-        )
+        test_cases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6)
 
     test_cases.header(
         "LABEL",
@@ -156,9 +148,7 @@ def test_IborCapFloor():
         fvalue4 = capfloor.value(value_dt, libor_curve, model4)
         fvalue5 = capfloor.value(value_dt, libor_curve, model5)
         fvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6
-        )
+        test_cases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
 
     ########################################################################################
     # PUT CALL CHECK
@@ -233,9 +223,7 @@ def test_IborCapFloorVolCurve():
         value_dt, maturity_dt, capFloorType, k, None, frequency, dc_type
     )
 
-    capVolDates = Schedule(
-        value_dt, value_dt.add_tenor("10Y"), frequency
-    ).generate()
+    capVolDates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
 
     flat_rate = 0.04
     libor_curve = DiscountCurveFlat(value_dt, flat_rate, frequency, dc_type)
@@ -262,9 +250,7 @@ def test_IborCapFloorVolCurve():
     capVolatilities = np.array(capVolatilities) / 100.0
     capVolatilities[0] = 0.0
 
-    vol_curve = IborCapVolCurve(
-        value_dt, capVolDates, capVolatilities, dc_type
-    )
+    vol_curve = IborCapVolCurve(value_dt, capVolDates, capVolatilities, dc_type)
 
     #    print(vol_curve._capletGammas)
 
@@ -435,4 +421,4 @@ test_IborCapletHull()
 test_IborCapFloorVolCurve()
 test_IborCapFloor()
 test_IborCapFloorQLExample()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

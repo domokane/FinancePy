@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
@@ -23,7 +23,7 @@ import sys
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 set_date_format(DateFormatTypes.UK_LONG)
 
@@ -58,9 +58,7 @@ def test_FinDiscountCurves():
     fin_discount_curve_flat = DiscountCurveFlat(value_dt, 0.05)
     curves_list.append(fin_discount_curve_flat)
 
-    fin_discount_curve_ns = DiscountCurveNS(
-        value_dt, 0.0305, -0.01, 0.08, 10.0
-    )
+    fin_discount_curve_ns = DiscountCurveNS(value_dt, 0.0305, -0.01, 0.08, 10.0)
     curves_list.append(fin_discount_curve_ns)
 
     fin_discount_curve_nss = DiscountCurveNSS(
@@ -68,9 +66,7 @@ def test_FinDiscountCurves():
     )
     curves_list.append(fin_discount_curve_nss)
 
-    fin_discount_curve_poly = DiscountCurvePoly(
-        value_dt, [0.05, 0.002, -0.00005]
-    )
+    fin_discount_curve_poly = DiscountCurvePoly(value_dt, [0.05, 0.002, -0.00005])
     curves_list.append(fin_discount_curve_poly)
 
     fin_discount_curve_PWF = DiscountCurvePWF(value_dt, dates, rates)
@@ -182,4 +178,4 @@ def test_FinDiscountCurves():
 
 
 test_FinDiscountCurves()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

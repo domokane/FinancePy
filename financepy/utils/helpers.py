@@ -79,7 +79,7 @@ def pv01_times(t: float, f: float):
 
 
 def times_from_dates(
-    dt: Union[Date, list], value_dt: Date, day_count_type: DayCountTypes = None
+    dt: Union[Date, list], value_dt: Date, dc_type: DayCountTypes = None
 ):
     """If a single date is passed in then return the year from valuation date
     but if a whole vector of dates is passed in then convert to a vector of
@@ -89,10 +89,10 @@ def times_from_dates(
     if isinstance(value_dt, Date) is False:
         raise FinError("Valuation date is not a Date")
 
-    if day_count_type is None:
+    if dc_type is None:
         dc_counter = None
     else:
-        dc_counter = DayCount(day_count_type)
+        dc_counter = DayCount(dc_type)
 
     if isinstance(dt, Date):
         num_dts = 1
@@ -225,10 +225,7 @@ def input_time(dt: Date, curve):
     def check(t):
         if t < 0.0:
             raise FinError(
-                "Date "
-                + str(dt)
-                + " is before curve date "
-                + str(curve._curve_dt)
+                "Date " + str(dt) + " is before curve date " + str(curve._curve_dt)
             )
         elif t < small:
             t = small
@@ -403,8 +400,7 @@ def format_table(header, rows):
 
     # Compute max width of each column
     col_widths = [
-        max(len(str(h)), *(len(str(r[i])) for r in rows))
-        for i, h in enumerate(header)
+        max(len(str(h)), *(len(str(r[i])) for r in rows)) for i, h in enumerate(header)
     ]
 
     def format_cell(val, width):
@@ -413,9 +409,7 @@ def format_table(header, rows):
         return f"{str(val):<{width}}"  # Left align
 
     # Build header
-    header_line = " | ".join(
-        format_cell(h, w) for h, w in zip(header, col_widths)
-    )
+    header_line = " | ".join(format_cell(h, w) for h, w in zip(header, col_widths))
     sep_line = "-+-".join("-" * w for w in col_widths)
 
     # Build rows

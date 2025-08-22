@@ -8,14 +8,14 @@ import datetime as dt
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -26,17 +26,13 @@ def test_BondZeroCurve():
 
     import pandas as pd
 
-    path = os.path.join(
-        os.path.dirname(__file__), "./data/gilt_bond_prices.txt"
-    )
+    path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
-    bond_dataframe["mid"] = 0.5 * (
-        bond_dataframe["bid"] + bond_dataframe["ask"]
-    )
+    bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    settlement = Date(19, 9, 2012)
+    settle_dt = Date(19, 9, 2012)
 
     bonds = []
     clean_prices = []
@@ -73,4 +69,4 @@ def test_BondZeroCurve():
 ########################################################################################
 
 test_BondZeroCurve()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

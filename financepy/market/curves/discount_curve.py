@@ -101,6 +101,18 @@ class DiscountCurve:
 
     ###########################################################################
 
+    def set_times(self, times: np.ndarray):
+        """Set the discount factor at the last maturity time."""
+        self._times = times
+
+    ###########################################################################
+
+    def set_dfs(self, dfs: np.ndarray):
+        """Set the discount factor at the last maturity time."""
+        self._dfs = dfs
+
+    ###########################################################################
+
     def set_last_df(self, df):
         """Set the discount factor at the last maturity time."""
         n_points = len(self.dfs)
@@ -398,7 +410,7 @@ class DiscountCurve:
         and measuring the change in the log of the discount factor divided by
         the time increment dt."""
 
-        dt = 1e-6
+        dt = 1e-8
         times = np.maximum(times, dt)
 
         df1 = self.df_t(times - dt)
@@ -481,7 +493,7 @@ class DiscountCurve:
         num_points = len(self._df_dates)
         s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += label_to_string("%12s" % self._df_dates[i], "%12.8f" % self._dfs[i])
+            s += label_to_string(f"{self._df_dates[i]:>12}", f"{self._dfs[i]:12.8f}")
 
         return s
 

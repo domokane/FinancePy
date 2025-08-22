@@ -150,7 +150,7 @@ class IborDeposit:
             "type": type(self).__name__,
             "start_dt": self.start_dt,
             "maturity_dt": self.maturity_dt,
-            "day_count_type": self.dc_type.name,
+            "dc_type": self.dc_type.name,
             "notional": self.notional,
             "contract_rate": self.deposit_rate,
             "market_rate": (df_settle / df_maturity - 1) / acc_factor,

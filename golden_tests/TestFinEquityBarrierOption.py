@@ -8,7 +8,7 @@ sys.path.append("..")
 
 from financepy.utils import G_DAYS_IN_YEARS
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 from financepy.utils.date import Date
 
@@ -20,7 +20,7 @@ from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -53,9 +53,7 @@ def test_EquitybbarrierOption():
     start = time.time()
     num_observations_per_year = 100
 
-    test_cases.header(
-        "Type", "K", "B", "S:", "Value:", "ValueMC", "Diff", "TIME"
-    )
+    test_cases.header("Type", "K", "B", "S:", "Value:", "ValueMC", "Diff", "TIME")
 
     for opt_type in EquityBarrierTypes:
         for stock_price in [80, 100, 120]:
@@ -149,9 +147,7 @@ def test_EquitybbarrierOption():
     stock_prices = [80, 100, 120]
     bb = 105.0
 
-    test_cases.header(
-        "Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta"
-    )
+    test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
     for opt_type in EquityBarrierTypes:
 
@@ -174,18 +170,14 @@ def test_EquitybbarrierOption():
                 value_dt, stock_price, discount_curve, dividend_curve, model
             )
 
-            test_cases.print(
-                opt_type, kk, bb, stock_price, value, delta, vega, theta
-            )
+            test_cases.print(opt_type, kk, bb, stock_price, value, delta, vega, theta)
 
     ########################################################################################
 
     stock_prices = [80, 100, 120]
     bb = 105.0
 
-    test_cases.header(
-        "Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta"
-    )
+    test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
     barrier_option = EquityBarrierOption(
         expiry_dt, 100.0, opt_type, bb, num_observations_per_year
@@ -200,4 +192,4 @@ def test_EquitybbarrierOption():
 
 
 test_EquitybbarrierOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

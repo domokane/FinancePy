@@ -1,7 +1,8 @@
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from .helpers import buildIborSingleCurve
+from .helpers import build_ibor_single_curve
 
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
@@ -71,7 +72,7 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
 def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
     """Test that adding a zero bump to an IborSingleCurve does not affect valuation"""
     valuation_date = Date(6, 10, 2022)
-    base_curve = buildIborSingleCurve(valuation_date, last_tenor="10Y")
+    base_curve = build_ibor_single_curve(valuation_date, last_tenor="10Y")
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)

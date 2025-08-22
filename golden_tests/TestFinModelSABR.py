@@ -6,13 +6,13 @@ import numpy as np
 from financepy.models.sabr import vol_function_sabr
 from financepy.models.sabr import SABR
 from financepy.utils.global_types import OptionTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 import sys
 
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -72,9 +72,7 @@ def test_SABR_Calibration():
     impliedATMLognormalVol = modelSABR_01.black_vol(k, k, t_exp)
     impliedLognormalSmile = impliedLognormalVol - impliedATMLognormalVol
 
-    assert (
-        impliedLognormalSmile == 0.0
-    ), "In lognormal model, smile should be flat"
+    assert impliedLognormalSmile == 0.0, "In lognormal model, smile should be flat"
     calibrationError = round(strikeVol - impliedLognormalVol, 12)
     test_cases.print("LOGNORMAL CASE", calibrationError)
 
@@ -102,4 +100,4 @@ def test_SABR_Calibration():
 test_SABR()
 test_SABR_Calibration()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

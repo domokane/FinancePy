@@ -17,9 +17,9 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.calendar import CalendarTypes
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 def test_ibor_curve_par_rate_shocker():

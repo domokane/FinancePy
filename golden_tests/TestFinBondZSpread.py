@@ -23,14 +23,14 @@ from financepy.products.rates.ibor_benchmarks_report import (
 # Set to True to run this file spandalone and see some useful info
 DIAGNOSTICS_MODE = False
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 def test_z_spread_flat_curve():
 
-    settlement = Date(19, 9, 2012)
+    settle_dt = Date(19, 9, 2012)
     base_curve = DiscountCurveFlat(settlement, flat_rate=1 * G_PERCENT)
     return _test_z_spread_for_curve(base_curve)
 

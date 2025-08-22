@@ -2,11 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+import time
 import sys
 
 sys.path.append("..")
 
-import time
 from financepy.products.equity.equity_american_option import (
     EquityAmericanOption,
 )
@@ -14,10 +14,10 @@ from financepy.utils.global_types import OptionTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -35,13 +35,9 @@ def testEquityAmericanOption():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    test_cases.banner(
-        "================== EUROPEAN PUT ======================="
-    )
+    test_cases.banner("================== EUROPEAN PUT =======================")
 
-    put_option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT
-    )
+    put_option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
     num_steps = 4
 
@@ -63,13 +59,9 @@ def testEquityAmericanOption():
     test_cases.header("opt_type", "VALUE", "DELTA", "GAMMA", "THETA")
     test_cases.print("EUROPEAN_PUT_BS", value, delta, gamma, theta)
 
-    option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT
-    )
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
 
-    test_cases.header(
-        "opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME"
-    )
+    test_cases.header("opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
     num_steps_list = [100, 200, 1000]
 
@@ -85,17 +77,11 @@ def testEquityAmericanOption():
         duration = end - start
         test_cases.print("EUROPEAN_PUT_TREE", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN PUT ======================="
-    )
+    test_cases.banner("================== AMERICAN PUT =======================")
 
-    option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.AMERICAN_PUT
-    )
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_PUT)
 
-    test_cases.header(
-        "opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME"
-    )
+    test_cases.header("opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
     for num_steps in num_steps_list:
 
@@ -109,9 +95,7 @@ def testEquityAmericanOption():
         duration = end - start
         test_cases.print("AMERICAN_PUT", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== EUROPEAN CALL ======================="
-    )
+    test_cases.banner("================== EUROPEAN CALL =======================")
 
     call_option = EquityAmericanOption(
         expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
@@ -133,13 +117,9 @@ def testEquityAmericanOption():
     test_cases.header("opt_type", "VALUE", "DELTA", "GAMMA", "THETA")
     test_cases.print("EUROPEAN_CALL_BS", value, delta, gamma, theta)
 
-    option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
-    )
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL)
 
-    test_cases.header(
-        "opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME"
-    )
+    test_cases.header("opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
     for num_steps in num_steps_list:
 
@@ -152,16 +132,10 @@ def testEquityAmericanOption():
         duration = end - start
         test_cases.print("EUROPEAN_CALL_TREE", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN CALL ======================="
-    )
-    test_cases.header(
-        "opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME"
-    )
+    test_cases.banner("================== AMERICAN CALL =======================")
+    test_cases.header("opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
-    option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.AMERICAN_CALL
-    )
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_CALL)
 
     for num_steps in num_steps_list:
 
@@ -177,16 +151,10 @@ def testEquityAmericanOption():
         duration = end - start
         test_cases.print("AMERICAN_TREE_CALL", num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN PUT ======================="
-    )
-    test_cases.header(
-        "opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME"
-    )
+    test_cases.banner("================== AMERICAN PUT =======================")
+    test_cases.header("opt_type", "NUMSTEPS", "VALUE DELTA GAMMA THETA", "TIME")
 
-    option = EquityAmericanOption(
-        expiry_dt, strike_price, OptionTypes.AMERICAN_PUT
-    )
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_PUT)
 
     for num_steps in num_steps_list:
 
@@ -209,4 +177,4 @@ def testEquityAmericanOption():
 
 
 testEquityAmericanOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

@@ -21,9 +21,9 @@ from financepy.products.rates.ibor_benchmarks_report import (
     dataframe_to_benchmarks,
 )
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 def test_ibor_benchmarks_report():

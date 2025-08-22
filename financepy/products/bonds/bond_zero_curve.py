@@ -151,7 +151,7 @@ class BondZeroCurve(DiscountCurve):
 
     ###########################################################################
 
-    def fwd_rate(self, date1: Date, date2: Date, day_count_type: DayCountTypes):
+    def fwd_rate(self, date1: Date, date2: Date, dc_type: DayCountTypes):
         """Calculate the forward rate according to the specified
         day count convention."""
 
@@ -161,7 +161,7 @@ class BondZeroCurve(DiscountCurve):
         if date2 < date1:
             raise FinError("Date2 must not be before Date1")
 
-        day_count = DayCount(day_count_type)
+        day_count = DayCount(dc_type)
         year_frac = day_count.year_frac(date1, date2)[0]
         df1 = self.df(date1)
         df2 = self.df(date2)

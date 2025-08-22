@@ -10,13 +10,13 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 import sys
 
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -38,9 +38,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    call_option = EquityVanillaOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
-    )
+    call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(
         value_dt, stock_price, discount_curve, dividend_yield, model
@@ -75,9 +73,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NONUMBA_NONUMPY_v.append(value_mc)
         NONUMBA_NONUMPY_t.append(duration + 1e-10)
@@ -102,9 +98,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMPY_ONLY_v.append(value_mc)
         NUMPY_ONLY_t.append(duration + 1e-10)
@@ -163,9 +157,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMPY_ONLY_v.append(value_mc)
         NUMPY_ONLY_t.append(duration)
@@ -190,9 +182,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMBA_NUMPY_v.append(value_mc)
         NUMBA_NUMPY_t.append(duration)
@@ -217,9 +207,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMBA_ONLY_v.append(value_mc)
         NUMBA_ONLY_t.append(duration)
@@ -244,9 +232,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMBA_PARALLEL_v.append(value_mc)
         NUMBA_PARALLEL_t.append(duration)
@@ -376,9 +362,7 @@ def test_FinNumbaNumbaParallel(use_sobol):
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
-    call_option = EquityVanillaOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
-    )
+    call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
     value = call_option.value(
         value_dt, stock_price, discount_curve, dividend_yield, model
@@ -409,9 +393,7 @@ def test_FinNumbaNumbaParallel(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMBA_ONLY_v.append(value_mc)
         NUMBA_ONLY_t.append(duration)
@@ -436,9 +418,7 @@ def test_FinNumbaNumbaParallel(use_sobol):
         end = time.time()
         duration = end - start
 
-        print(
-            "%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration)
-        )
+        print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
         NUMBA_PARALLEL_v.append(value_mc)
         NUMBA_PARALLEL_t.append(duration)
@@ -481,4 +461,4 @@ if 1 == 0:
     test_FinNumbaNumbaParallel(False)
     test_FinNumbaNumbaParallel(True)
 
-#  test_cases.compareTestCases()
+#  test_cases.compare_test_cases()

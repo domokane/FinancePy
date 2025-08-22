@@ -3,19 +3,20 @@
 ########################################################################################
 
 import sys
+
 sys.path.append("..")
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.math import scale
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 # TODO: Add other discount discount
@@ -87,4 +88,4 @@ def test_FinDiscountCurve():
 
 
 test_FinDiscountCurve()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

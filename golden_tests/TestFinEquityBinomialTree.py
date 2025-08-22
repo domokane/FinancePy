@@ -20,10 +20,10 @@ from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -46,13 +46,9 @@ def test_FinBinomialTree():
 
     strike_price = 50.0
 
-    test_cases.banner(
-        "================== EUROPEAN PUT ======================="
-    )
+    test_cases.banner("================== EUROPEAN PUT =======================")
 
-    put_option = EquityVanillaOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT
-    )
+    put_option = EquityVanillaOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_PUT)
     value = put_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
@@ -94,9 +90,7 @@ def test_FinBinomialTree():
         duration = end - start
         test_cases.print(num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN PUT ======================="
-    )
+    test_cases.banner("================== AMERICAN PUT =======================")
 
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.AMERICAN
@@ -124,9 +118,7 @@ def test_FinBinomialTree():
         duration = end - start
         test_cases.print(num_steps, results, duration)
 
-    test_cases.banner(
-        "================== EUROPEAN CALL ======================="
-    )
+    test_cases.banner("================== EUROPEAN CALL =======================")
 
     call_option = EquityVanillaOption(
         expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
@@ -173,9 +165,7 @@ def test_FinBinomialTree():
         duration = end - start
         test_cases.print(num_steps, results, duration)
 
-    test_cases.banner(
-        "================== AMERICAN CALL ======================="
-    )
+    test_cases.banner("================== AMERICAN CALL =======================")
 
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.AMERICAN
@@ -209,4 +199,4 @@ def test_FinBinomialTree():
 
 
 test_FinBinomialTree()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

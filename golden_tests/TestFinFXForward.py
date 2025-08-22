@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.date import Date
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
@@ -14,7 +14,7 @@ import sys
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
@@ -83,13 +83,9 @@ def test_FinFXForward():
 
     test_cases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwd_value = fx_fwd.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve
-    )
+    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
-    fwd_fx_rate = fx_fwd.forward(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve
-    )
+    fwd_fx_rate = fx_fwd.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
     test_cases.print(spot_fx_rate, fwd_fx_rate, fwd_value)
 
@@ -98,4 +94,4 @@ def test_FinFXForward():
 
 
 test_FinFXForward()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

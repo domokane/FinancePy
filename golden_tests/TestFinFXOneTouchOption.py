@@ -11,9 +11,9 @@ from financepy.products.fx import FXOneTouchOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -52,9 +52,7 @@ def test_FinFXOneTouchOption():
 
     for downType in downTypes:
 
-        option = FXOneTouchOption(
-            expiry_dt, downType, barrier_level, payment_size
-        )
+        option = FXOneTouchOption(expiry_dt, downType, barrier_level, payment_size)
 
         v = option.value(value_dt, spot_fx_rate, dom_curve, for_curve, model)
 
@@ -85,9 +83,7 @@ def test_FinFXOneTouchOption():
 
     for upType in upTypes:
 
-        option = FXOneTouchOption(
-            expiry_dt, upType, barrier_level, payment_size
-        )
+        option = FXOneTouchOption(expiry_dt, upType, barrier_level, payment_size)
 
         v = option.value(value_dt, spot_fx_rate, dom_curve, for_curve, model)
 
@@ -136,9 +132,7 @@ def test_BBGOneTouchOption():
 
     optionType = TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY
 
-    option = FXOneTouchOption(
-        expiry_dt, optionType, barrier_level, payment_size
-    )
+    option = FXOneTouchOption(expiry_dt, optionType, barrier_level, payment_size)
 
     v = option.value(value_dt, spot_fx_rate, dom_curve, for_curve, model)
 
@@ -177,4 +171,4 @@ def test_BBGOneTouchOption():
 
 test_FinFXOneTouchOption()
 test_BBGOneTouchOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

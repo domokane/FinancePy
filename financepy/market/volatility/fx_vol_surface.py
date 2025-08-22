@@ -610,7 +610,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def volatility(self, K, expiry_dt):
+    def volatility(self, k, expiry_dt):
         """Interpolate the Black-Scholes volatility from the volatility
         surface given the option strike and expiry date. Linear interpolation
         is done in variance x time."""
@@ -629,7 +629,7 @@ class FXVolSurface:
             # The volatility term structure is flat if there is only one expiry
             fwd = self.fwd[0]
             t_exp = self.t_exp[0]
-            vol = vol_function(vol_type_value, self.parameters[0], fwd, K, t_exp)
+            vol = vol_function(vol_type_value, self.parameters[0], fwd, k, t_exp)
             return vol
 
         # If the time is below first time then assume a flat vol
@@ -637,7 +637,7 @@ class FXVolSurface:
 
             fwd = self.fwd[0]
             t_exp = self.t_exp[0]
-            vol = vol_function(vol_type_value, self.parameters[0], fwd, K, t_exp)
+            vol = vol_function(vol_type_value, self.parameters[0], fwd, k, t_exp)
             return vol
 
         # If the time is beyond the last time then extrapolate with a flat vol
@@ -645,7 +645,7 @@ class FXVolSurface:
 
             fwd = self.fwd[-1]
             t_exp = self.t_exp[-1]
-            vol = vol_function(vol_type_value, self.parameters[-1], fwd, K, t_exp)
+            vol = vol_function(vol_type_value, self.parameters[-1], fwd, k, t_exp)
             return vol
 
         for i in range(1, num_curves):
@@ -657,11 +657,11 @@ class FXVolSurface:
 
         fwd0 = self.fwd[index0]
         t0 = self.t_exp[index0]
-        vol0 = vol_function(vol_type_value, self.parameters[index0], fwd0, K, t0)
+        vol0 = vol_function(vol_type_value, self.parameters[index0], fwd0, k, t0)
 
         fwd1 = self.fwd[index1]
         t1 = self.t_exp[index1]
-        vol1 = vol_function(vol_type_value, self.parameters[index1], fwd1, K, t1)
+        vol1 = vol_function(vol_type_value, self.parameters[index1], fwd1, k, t1)
 
         vart0 = vol0 * vol0 * t0
         vart1 = vol1 * vol1 * t1
@@ -852,7 +852,7 @@ class FXVolSurface:
     ###########################################################################
 
     def solver_for_smile_strike(
-        self, opt_type_value, delta_target, tenor_index, initialValue
+        self, opt_type_value, delta_target, tenor_index, initial_value
     ):
         """Solve for the strike that sets the delta of the option equal to the
         target value of delta allowing the volatility to be a function of the
@@ -890,11 +890,11 @@ class FXVolSurface:
             self.parameters[tenor_index],
         )
 
-        K = newton_secant(
-            delta_fit, x0=initialValue, args=argtuple, tol=1e-5, maxiter=50
+        k = newton_secant(
+            delta_fit, x0=initial_value, args=argtuple, tol=1e-5, maxiter=50
         )
 
-        return K
+        return k
 
     ###########################################################################
 

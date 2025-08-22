@@ -12,9 +12,9 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -26,9 +26,7 @@ def test_EquityCliquetOption():
     freq_type = FrequencyTypes.QUARTERLY
     opt_type = OptionTypes.EUROPEAN_CALL
 
-    cliquetOption = EquityCliquetOption(
-        start_dt, final_expiry_dt, opt_type, freq_type
-    )
+    cliquetOption = EquityCliquetOption(start_dt, final_expiry_dt, opt_type, freq_type)
 
     value_dt = Date(1, 1, 2015)
     stock_price = 100.0
@@ -51,4 +49,4 @@ def test_EquityCliquetOption():
 
 
 test_EquityCliquetOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

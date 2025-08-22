@@ -22,10 +22,10 @@ from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import FinExerciseTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -87,9 +87,7 @@ def test_BDTExampleOne():
     test_cases.header("RATES")
     test_cases.print(zero_rates)
 
-    curve = DiscountCurveZeros(
-        value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL
-    )
+    curve = DiscountCurveZeros(value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL)
 
     yieldVol = 0.16
 
@@ -115,9 +113,7 @@ def test_BDTExampleTwo():
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
 
-    test_cases.banner(
-        "===================== FIG 28.11 HULL BOOK ============="
-    )
+    test_cases.banner("===================== FIG 28.11 HULL BOOK =============")
 
     settle_dt = Date(1, 12, 2019)
     issue_dt = Date(1, 12, 2015)
@@ -310,4 +306,4 @@ test_BDTExampleOne()
 test_BDTExampleTwo()
 test_BDTExampleThree()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

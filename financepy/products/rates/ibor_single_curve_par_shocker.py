@@ -45,17 +45,20 @@ class IborSingleCurveParShocker:
         self, benchmark_idx: int, bump_size=1.0 * G_BASIS_POINT
     ):
         """
-        Apply a shock of a given size to a given bechmark. Indexing is per the benchmark report
+        Apply a shock of a given size to a given bechmark.
+        Indexing is per the benchmark report
         """
         composite_shock = np.zeros(self.n_benchmarks())
         composite_shock[benchmark_idx] = bump_size
         return self.apply_composite_bump(composite_shock)
 
     def apply_composite_bump(self, bump_sizes: Union[np.array, list]):
-        """Apply a composite bump to base_curve. A composite bump is a list/array of bumps, one per bechmark
+        """Apply a composite bump to base_curve.
+        A composite bump is a list/array of bumps, one per bechmark
 
         Args:
-            bump_sizes (Union[np.array, list]): a list/array of bump sizes, one per benchmark
+            bump_sizes (Union[np.array, list]): a list/array of bump sizes,
+            one per benchmark
 
         Returns:
             IborSingleCurve: A bumped curve
@@ -81,10 +84,11 @@ class IborSingleCurveParShocker:
                 bumped_swaps.append(bumped_benchmark)
 
         # This assumes that the base curve was built using the default method as defined
-        # in IborSingleCurve._build_curve() based on interp_type. This at the moment excludes
-        # the non-parametric smoothing calibration (for which, incidentally, par bumps are not a giid
-        # idea anyway). But in the future we should keep track of what exactly we used to build
-        # the base curve and use the same method here
+        # in IborSingleCurve._build_curve() based on interp_type. This at the moment
+        # excludes the non-parametric smoothing calibration (for which, incidentally,
+        # par bumps are not a good idea anyway). But in the future we should keep
+        # track of what exactly we used to build the base curve and use the same
+        # method here
         bumped_curve = IborSingleCurve(
             self._base_curve.value_dt,
             bumped_depos,

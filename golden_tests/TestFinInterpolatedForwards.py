@@ -10,10 +10,10 @@ import numpy as np
 from financepy.utils.date import Date
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 plot_graphs = False
 
@@ -36,9 +36,7 @@ def test_FinInterpolatedForwards():
 
     for interp_type in InterpTypes:
 
-        discount_curve = DiscountCurve(
-            curve_dt, tDates, df_values, interp_type
-        )
+        discount_curve = DiscountCurve(curve_dt, tDates, df_values, interp_type)
         dfInterpValues = discount_curve.df(tInterpDates)
         fwdInterpValues = discount_curve.fwd(tInterpDates)
         zeroInterpValues = discount_curve.zero_rate(tInterpDates)
@@ -74,4 +72,4 @@ def test_FinInterpolatedForwards():
 
 
 test_FinInterpolatedForwards()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

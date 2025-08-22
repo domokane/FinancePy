@@ -10,7 +10,7 @@ sys.path.append("..")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
@@ -19,7 +19,7 @@ from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -520,4 +520,4 @@ if __name__ == "__main__":
 
     elapsed = end - start
     #    print("Elapsed Time:", elapsed)
-    test_cases.compareTestCases()
+    test_cases.compare_test_cases()

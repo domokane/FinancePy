@@ -10,7 +10,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -24,14 +24,14 @@ from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.utils.math import corr_matrix_generator
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 # TO DO
 ##########################################################################
 
 
-def build_Ibor_Curve(trade_dt):
+def build_ibor_curve(trade_dt):
 
     value_dt = trade_dt.add_days(1)
     dc_type = DayCountTypes.ACT_360
@@ -45,33 +45,23 @@ def build_Ibor_Curve(trade_dt):
     settle_dt = value_dt
 
     maturity_dt = settle_dt.add_months(12)
-    swap1 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap1 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(24)
-    swap2 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap2 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(36)
-    swap3 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap3 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(48)
-    swap4 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap4 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(60)
-    swap5 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap5 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap5)
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
@@ -82,7 +72,7 @@ def build_Ibor_Curve(trade_dt):
 ##########################################################################
 
 
-def loadHomogeneousSpreadCurves(
+def load_homogeneous_spread_curves(
     value_dt,
     libor_curve,
     cds_spd_3yr,
@@ -118,7 +108,7 @@ def loadHomogeneousSpreadCurves(
 ##########################################################################
 
 
-def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
+def load_hetero_spread_curves(value_dt, libor_curve):
 
     maturity_3yr = value_dt.next_cds_date(36)
     maturity_5yr = value_dt.next_cds_date(60)
@@ -135,12 +125,12 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
 
     for row in data[1:]:
 
-        splitRow = row.split(",")
-        spd_3yr = float(splitRow[1]) / 10000.0
-        spd_5yr = float(splitRow[2]) / 10000.0
-        spd_7yr = float(splitRow[3]) / 10000.0
-        spd_10yr = float(splitRow[4]) / 10000.0
-        recovery_rate = float(splitRow[5])
+        split_row = row.split(",")
+        spd_3yr = float(split_row[1]) / 10000.0
+        spd_5yr = float(split_row[2]) / 10000.0
+        spd_7yr = float(split_row[3]) / 10000.0
+        spd_10yr = float(split_row[4]) / 10000.0
+        recovery_rate = float(split_row[5])
 
         cds_3yr = CDS(value_dt, maturity_3yr, spd_3yr)
         cds_5yr = CDS(value_dt, maturity_5yr, spd_5yr)
@@ -148,9 +138,7 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
         cds_10yr = CDS(value_dt, maturity_10yr, spd_10yr)
         cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
-        issuer_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, recovery_rate
-        )
+        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
@@ -166,11 +154,11 @@ def test_FinCDSBasket():
     step_in_dt = trade_dt.add_days(1)
     value_dt = trade_dt.add_days(1)
 
-    libor_curve = build_Ibor_Curve(trade_dt)
+    libor_curve = build_ibor_curve(trade_dt)
 
     basketMaturity = Date(20, 12, 2011)
 
-    cdsIndex = CDSIndexPortfolio()
+    cds_index = CDSIndexPortfolio()
 
     ##########################################################################
 
@@ -193,44 +181,36 @@ def test_FinCDSBasket():
     test_cases.header("LABELS", "VALUE")
 
     if 1 == 1:
-        issuer_curves = loadHomogeneousSpreadCurves(
+        issuer_curves = load_homogeneous_spread_curves(
             value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits
         )
     else:
-        issuer_curves = loadHeterogeneousSpreadCurves(value_dt, libor_curve)
+        issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
         issuer_curves = issuer_curves[0:num_credits]
 
-    intrinsicSpd = (
-        cdsIndex.intrinsic_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+    intrinsic_spd = (
+        cds_index.intrinsic_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
 
-    test_cases.print("INTRINSIC SPD BASKET MATURITY", intrinsicSpd)
+    test_cases.print("INTRINSIC SPD BASKET MATURITY", intrinsic_spd)
 
     totalSpd = (
-        cdsIndex.total_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+        cds_index.total_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
 
     test_cases.print("SUMMED UP SPD BASKET MATURITY", totalSpd)
 
     minSpd = (
-        cdsIndex.min_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+        cds_index.min_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
 
     test_cases.print("MINIMUM SPD BASKET MATURITY", minSpd)
 
     maxSpd = (
-        cdsIndex.max_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+        cds_index.max_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
 
@@ -311,9 +291,7 @@ def test_FinCDSBasket():
 
                 end = time.time()
                 period = end - start
-                test_cases.print(
-                    period, num_trials, rho, doF, ntd, v[2] * 10000
-                )
+                test_cases.print(period, num_trials, rho, doF, ntd, v[2] * 10000)
 
             start = time.time()
             v = basket.value_gaussian_mc(
@@ -366,4 +344,4 @@ def test_FinCDSBasket():
 ########################################################################################
 
 test_FinCDSBasket()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

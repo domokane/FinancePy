@@ -16,7 +16,7 @@ from financepy.products.credit.cds import CDS
 from os.path import dirname, join
 
 
-def build_Ibor_Curve(trade_dt):
+def build_ibor_curve(trade_dt):
 
     value_dt = trade_dt.add_days(1)
     dc_type = DayCountTypes.ACT_360
@@ -30,33 +30,23 @@ def build_Ibor_Curve(trade_dt):
     settle_dt = value_dt
 
     maturity_dt = settle_dt.add_months(12)
-    swap1 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap1 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(24)
-    swap2 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap2 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(36)
-    swap3 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap3 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(48)
-    swap4 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap4 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(60)
-    swap5 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap5 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap5)
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
@@ -64,7 +54,7 @@ def build_Ibor_Curve(trade_dt):
     return libor_curve
 
 
-def buildIssuerCurve(trade_dt, libor_curve):
+def build_issuer_curve(trade_dt, libor_curve):
 
     value_dt = trade_dt.add_days(1)
 
@@ -77,14 +67,12 @@ def buildIssuerCurve(trade_dt, libor_curve):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(
-        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return issuer_curve
 
 
-def buildFlatIssuerCurve(trade_dt, libor_curve, spread, recovery_rate):
+def build_flat_issuer_curve(trade_dt, libor_curve, spread, recovery_rate):
 
     value_dt = trade_dt.add_days(1)
 
@@ -94,9 +82,7 @@ def buildFlatIssuerCurve(trade_dt, libor_curve, spread, recovery_rate):
     cds = CDS(value_dt, maturity_dt, spread)
     cds_mkt_contracts.append(cds)
 
-    issuer_curve = CDSCurve(
-        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return issuer_curve
 
@@ -105,7 +91,7 @@ def buildFullIssuerCurve(value_dt):
 
     dc_type = DayCountTypes.ACT_360
     depos = []
-    irBump = 0.0
+    ir_bump = 0.0
 
     m = 1.0  # 0.00000000000
 
@@ -147,7 +133,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0044 + irBump,
+        m * 0.0044 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -158,7 +144,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0078 + irBump,
+        m * 0.0078 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -169,7 +155,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0119 + irBump,
+        m * 0.0119 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -180,7 +166,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0158 + irBump,
+        m * 0.0158 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -191,7 +177,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0192 + irBump,
+        m * 0.0192 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -202,7 +188,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0219 + irBump,
+        m * 0.0219 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -213,7 +199,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0242 + irBump,
+        m * 0.0242 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -224,7 +210,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0261 + irBump,
+        m * 0.0261 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -235,7 +221,7 @@ def buildFullIssuerCurve(value_dt):
         settle_dt,
         maturity_dt,
         SwapTypes.PAY,
-        m * 0.0276 + irBump,
+        m * 0.0276 + ir_bump,
         fixed_freq,
         dc_type,
     )
@@ -286,14 +272,12 @@ def buildFullIssuerCurve(value_dt):
 
     recovery_rate = 0.40
 
-    issuer_curve = CDSCurve(
-        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return libor_curve, issuer_curve
 
 
-def loadHomogeneousSpreadCurves(
+def load_homogeneous_spread_curves(
     value_dt,
     libor_curve,
     cds_spd_3yr,
@@ -326,7 +310,7 @@ def loadHomogeneousSpreadCurves(
     return issuer_curves
 
 
-def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
+def load_hetero_spread_curves(value_dt, libor_curve):
 
     maturity_3yr = value_dt.next_cds_date(36)
     maturity_5yr = value_dt.next_cds_date(60)
@@ -343,12 +327,12 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
 
     for row in data[1:]:
 
-        splitRow = row.split(",")
-        spd_3yr = float(splitRow[1]) / 10000.0
-        spd_5yr = float(splitRow[2]) / 10000.0
-        spd_7yr = float(splitRow[3]) / 10000.0
-        spd_10yr = float(splitRow[4]) / 10000.0
-        recovery_rate = float(splitRow[5])
+        split_row = row.split(",")
+        spd_3yr = float(split_row[1]) / 10000.0
+        spd_5yr = float(split_row[2]) / 10000.0
+        spd_7yr = float(split_row[3]) / 10000.0
+        spd_10yr = float(split_row[4]) / 10000.0
+        recovery_rate = float(split_row[5])
 
         cds_3yr = CDS(value_dt, maturity_3yr, spd_3yr)
         cds_5yr = CDS(value_dt, maturity_5yr, spd_5yr)
@@ -356,16 +340,14 @@ def loadHeterogeneousSpreadCurves(value_dt, libor_curve):
         cds_10yr = CDS(value_dt, maturity_10yr, spd_10yr)
         cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
-        issuer_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, recovery_rate
-        )
+        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
     return issuer_curves
 
 
-def loadHomogeneousCDSCurves(
+def load_homogeneous_cds_curves(
     value_dt,
     libor_curve,
     cds_spd_3yr,
@@ -398,7 +380,7 @@ def loadHomogeneousCDSCurves(
     return issuer_curves
 
 
-def buildIborSingleCurve(value_dt, last_tenor="51Y"):
+def build_ibor_single_curve(value_dt, last_tenor="51Y"):
 
     settle_dt = value_dt.add_days(2)
     dc_type = DayCountTypes.ACT_360
@@ -636,9 +618,7 @@ def buildIborSingleCurve(value_dt, last_tenor="51Y"):
     ########################################
 
     last_maturity_dt = settle_dt.add_tenor(last_tenor)
-    swaps_to_use = [
-        s for s in swaps if s.fixed_leg.maturity_dt <= last_maturity_dt
-    ]
+    swaps_to_use = [s for s in swaps if s.fixed_leg.maturity_dt <= last_maturity_dt]
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps_to_use)
 

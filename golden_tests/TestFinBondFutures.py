@@ -4,7 +4,7 @@
 
 import sys
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.append("..")
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 ########################################################################################
@@ -123,12 +123,12 @@ def test_BondFutures_CME_two_bond_examples():
     delgainloss2 = bfut.delivery_gain_loss(bond2, price2, fut_price)
     print("Delivery Gain/Loss  %12.2f %12.2f" % (delgainloss1, delgainloss2))
 
-    basis1 = bfut.basis(bond1, fut_price, price1)
-    basis2 = bfut.basis(bond2, fut_price, price2)
+    basis1 = bfut.net_basis(bond1, fut_price, price1)
+    basis2 = bfut.net_basis(bond2, fut_price, price2)
     print("Basis (32nds)       %12.2f %12.2f" % (basis1 * 32, basis2 * 32))
 
-    basis1 = bfut.basis_net_of_carry(bond1, settle_dt, fut_price, price1)
-    basis2 = bfut.basis_net_of_carry(bond2, settle_dt, fut_price, price2)
+    basis1 = bfut.net_basis(bond1, settle_dt, fut_price, price1)
+    basis2 = bfut.net_basis(bond2, settle_dt, fut_price, price2)
     print("Basis (32nds)       %12.2f %12.2f" % (basis1, basis2))
 
     ###########################################################################
@@ -299,9 +299,7 @@ def test_BondFutures_CME_table():
 
     test_cases.header("BOND MATURITY", "IMPLIED REPO RATE")
     for bond, clean_price in zip(bonds, clean_prices):
-        repo_rate = bfut.implied_repo_rate(
-            bond, settle_dt, clean_price, futures_price
-        )
+        repo_rate = bfut.implied_repo_rate(bond, settle_dt, clean_price, futures_price)
         test_cases.print(str(bond.maturity_dt), repo_rate)
 
     ctd = bfut.ctd(bonds, prices, futures_price)
@@ -317,9 +315,7 @@ def test_BondFutures_CME_table():
 
             cf = bfut.conversion_factor(bond)
 
-            yld = bond.yield_to_maturity(
-                settle_dt, clean_price, yield_convention
-            )
+            yld = bond.yield_to_maturity(settle_dt, clean_price, yield_convention)
 
             del_years = bfut.delivery_years(bond)
 
@@ -333,9 +329,7 @@ def test_BondFutures_CME_table():
                 bond, settle_dt, clean_price, futures_price, repo_rate
             )
 
-            irr = bfut.implied_repo_rate(
-                bond, settle_dt, clean_price, futures_price
-            )
+            irr = bfut.implied_repo_rate(bond, settle_dt, clean_price, futures_price)
 
             fut_dv01 = 0.0
 
@@ -359,9 +353,7 @@ def test_BondFutures_CME_table():
 
         # Create DataFrame
         df = pd.DataFrame(results)
-        df = df.sort_values(by="IRR (%)", ascending=False).reset_index(
-            drop=True
-        )
+        df = df.sort_values(by="IRR (%)", ascending=False).reset_index(drop=True)
 
         formatted_df = df.copy()
         formatted_df["Coupon"] = formatted_df["Coupon"].map("{:.3f}".format)
@@ -369,19 +361,11 @@ def test_BondFutures_CME_table():
         formatted_df["TCF"] = formatted_df["TCF"].map("{:.4f}".format)
         formatted_df["PIP"] = formatted_df["PIP"].map("{:.2f}".format)
         formatted_df["TIA"] = formatted_df["TIA"].map("{:.2f}".format)
-        formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map(
-            "{:.3f}".format
-        )
-        formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map(
-            "{:.3f}".format
-        )
-        formatted_df["FUT_DV01"] = formatted_df["FUT_DV01"].map(
-            "{:.3f}".format
-        )
+        formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map("{:.3f}".format)
+        formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map("{:.3f}".format)
+        formatted_df["FUT_DV01"] = formatted_df["FUT_DV01"].map("{:.3f}".format)
         formatted_df["IRR (%)"] = formatted_df["IRR (%)"].map("{:.3f}".format)
-        formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map(
-            "{:.3f}".format
-        )
+        formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map("{:.3f}".format)
 
         print(formatted_df.to_string(index=False))
 
@@ -497,9 +481,7 @@ def test_BondFutures_BBG_table():
 
             cf = bfut.conversion_factor(bond)
 
-            yld = bond.yield_to_maturity(
-                settle_dt, mid_price, yield_convention
-            )
+            yld = bond.yield_to_maturity(settle_dt, mid_price, yield_convention)
 
             del_years = bfut.delivery_years(bond)
 
@@ -509,9 +491,7 @@ def test_BondFutures_BBG_table():
 
             gross_basis = bfut.gross_basis(bond, mid_price, futures_price)
 
-            irr = bfut.implied_repo_rate(
-                bond, settle_dt, mid_price, futures_price
-            )
+            irr = bfut.implied_repo_rate(bond, settle_dt, mid_price, futures_price)
 
             net_basis = bfut.net_basis(
                 bond, settle_dt, clean_price, futures_price, repo_rate
@@ -544,16 +524,10 @@ def test_BondFutures_BBG_table():
         formatted_df["TCF"] = formatted_df["TCF"].map("{:.4f}".format)
         formatted_df["PIP"] = formatted_df["PIP"].map("{:.2f}".format)
         formatted_df["TIA"] = formatted_df["TIA"].map("{:.2f}".format)
-        formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map(
-            "{:.3f}".format
-        )
-        formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map(
-            "{:.3f}".format
-        )
+        formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map("{:.3f}".format)
+        formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map("{:.3f}".format)
         formatted_df["IRR (%)"] = formatted_df["IRR (%)"].map("{:.3f}".format)
-        formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map(
-            "{:.6f}".format
-        )
+        formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map("{:.6f}".format)
 
         print(formatted_df.to_string(index=False))
 
@@ -564,4 +538,4 @@ def test_BondFutures_BBG_table():
 # test_BondFutures_CME_two_bond_examples()
 test_BondFutures_CME_table()
 test_BondFutures_BBG_table()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

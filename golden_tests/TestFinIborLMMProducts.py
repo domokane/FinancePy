@@ -2,7 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_lmm_products import IborLMMProducts
 from financepy.utils.global_types import FinCapFloorTypes
@@ -21,7 +21,7 @@ import sys
 sys.path.append("..")
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 # This is in progress and needs to be completed
 
@@ -238,4 +238,4 @@ test_cases = FinTestCases(__file__, globalTestCaseMode)
 
 # test_CapsFloors()
 # test_Swaptions()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

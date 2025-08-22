@@ -29,9 +29,9 @@ VERBOSE = False
 # TESTING
 
 
-# globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
-globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
-# globalTestCaseMode = FinTestCaseMode.DEBUG_TEST_CASES
+# global_test_case_mode = FinTestCaseMode.SAVE_TEST_CASES
+global_test_case_mode = FinTestCaseMode.ANALYSE_TEST_CASES
+# global_test_case_mode = FinTestCaseMode.DEBUG_TEST_CASES
 
 TOLERANCE = 1e-8
 
@@ -44,12 +44,12 @@ class FinTestCases:
     """Test case framework for FinancePy.
     - The basic step is that we generate a GOLDEN folder that creates an output
     file for each testcase which is assumed to be correct. This can be done by
-    running the test cases Python file with the globalTestCaseMode flag set to
+    running the test cases Python file with the global_test_case_mode flag set to
     FinTestCaseMode.SAVE_TEST_CASES.
-    - The second step is that we change the value of globalTestCaseMode to
+    - The second step is that we change the value of global_test_case_mode to
     FinTestCaseMode.ANALYSE_TEST_CASES and then run the test scripts. This time
     they save a copy of the output to the COMPARE folder.
-    Finally, a function called compareTestCases() is used to compare the new
+    Finally, a function called compare_test_cases() is used to compare the new
     output with the GOLDEN output and states whether anything has changed.
 
     - The output of a test case has three forms each with its own method:
@@ -129,9 +129,7 @@ class FinTestCases:
 
             if exists(self._golden_file_name) and self._careful_mode:
                 overwrite = input(
-                    "File "
-                    + self._golden_file_name
-                    + " exists. Overwrite (Y/N) ?"
+                    "File " + self._golden_file_name + " exists. Overwrite (Y/N) ?"
                 )
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
@@ -152,9 +150,7 @@ class FinTestCases:
 
             if exists(self._compare_file_name) and self._careful_mode:
                 overwrite = input(
-                    "File "
-                    + self._compare_file_name
-                    + " exists. Overwrite (Y/N) ?"
+                    "File " + self._compare_file_name + " exists. Overwrite (Y/N) ?"
                 )
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
@@ -249,17 +245,13 @@ class FinTestCases:
             return
 
         if not self._folders_exist:
-            self.print_log(
-                "Cannot print as GOLDEN and COMPARE folders do not exist"
-            )
+            self.print_log("Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
         self._header_fields = args
 
         if len(self._header_fields) == 0:
-            self.print_log(
-                "ERROR: Number of header fields must be greater than 0"
-            )
+            self.print_log("ERROR: Number of header fields must be greater than 0")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             file_name = self._golden_file_name
@@ -372,8 +364,7 @@ class FinTestCases:
                         self.print_log(
                             "Row# ",
                             row_num,
-                            " WARNING: Calculation time has changed by %5.2f"
-                            % change,
+                            " WARNING: Calculation time has changed by %5.2f" % change,
                             " percent.",
                         )
 
@@ -383,7 +374,7 @@ class FinTestCases:
 
     ###########################################################################
 
-    def compareTestCases(self):
+    def compare_test_cases(self):
         """Compare output of COMPARE mode to GOLDEN output"""
 
         self.start_log()
@@ -401,8 +392,8 @@ class FinTestCases:
             + self._module_name
         )
 
-        totalnum_warnings = 0
-        totalnum_errors = 0
+        total_num_warnings = 0
+        total_num_errors = 0
 
         # check golden file exists
         if exists(self._golden_file_name) is False:
@@ -463,56 +454,42 @@ class FinTestCases:
                         self._header_fields[0:-1],
                     )
 
-                self.print_log(
-                    "Row# ", row_num, " GOLDEN : ==>", golden_row[:-2]
-                )
-                self.print_log(
-                    "Row# ", row_num, " COMPARE: ==>", compare_row[:-2]
-                )
+                self.print_log("Row# ", row_num, " GOLDEN : ==>", golden_row[:-2])
+                self.print_log("Row# ", row_num, " COMPARE: ==>", compare_row[:-2])
                 self.print_log("")
 
-            totalnum_warnings += num_warnings
-            totalnum_errors += num_errors
+            total_num_warnings += num_warnings
+            total_num_errors += num_errors
 
-        if (
-            num_golden_lines == min_num_lines
-            and num_compare_lines > min_num_lines
-        ):
-            self.print_log(
-                "ERROR:The COMPARE file is longer than the GOLDEN file"
-            )
+        if num_golden_lines == min_num_lines and num_compare_lines > min_num_lines:
+            self.print_log("ERROR:The COMPARE file is longer than the GOLDEN file")
 
         #            for row_num in range(min_num_lines,maxNumLines):
         #                num_warnings, num_errors = compare_contents[row_num]
         #                print(row_num,"COMPARE: ==>",compare_row)
 
-        if (
-            num_compare_lines == min_num_lines
-            and num_golden_lines > min_num_lines
-        ):
-            self.print_log(
-                "ERROR:The GOLDEN file is longer than the COMPARE file"
-            )
+        if num_compare_lines == min_num_lines and num_golden_lines > min_num_lines:
+            self.print_log("ERROR:The GOLDEN file is longer than the COMPARE file")
 
         #            for row_num in range(min_num_lines,maxNumLines):
         #                num_warnings, num_errors = compare_contents[row_num]
         #                print(row_num,"GOLDEN: ==>",golden_row)
 
         #        print("Analysis of", self._module_name, "completed with",
-        #              totalnum_errors, "errors and", totalnum_warnings, "warnings.")
+        #              total_num_errors, "errors and", total_num_warnings, "warnings.")
 
         #        print("NUM LINES:", num_compare_lines,
         #              "====>",
-        #              "ERRORS:", totalnum_errors,
-        #              "WARNINGS:", totalnum_warnings)
+        #              "ERRORS:", total_num_errors,
+        #              "WARNINGS:", total_num_warnings)
 
         self.print_log(
             "Analysis of ",
             self._module_name,
             " completed with ",
-            totalnum_errors,
+            total_num_errors,
             " errors and ",
-            totalnum_warnings,
+            total_num_warnings,
             " warnings.",
         )
 
@@ -521,13 +498,13 @@ class FinTestCases:
             num_compare_lines,
             "====>",
             "ERRORS:",
-            totalnum_errors,
+            total_num_errors,
             " WARNINGS:",
-            totalnum_warnings,
+            total_num_warnings,
         )
 
-        self._global_num_errors = totalnum_errors
-        self._global_num_warnings = totalnum_warnings
+        self._global_num_errors = total_num_errors
+        self._global_num_warnings = total_num_warnings
 
         return
 

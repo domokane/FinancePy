@@ -17,10 +17,10 @@ from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.utils.helpers import print_tree
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import FinExerciseTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -153,4 +153,4 @@ def test_BKExampleTwo():
 
 test_BKExampleOne()
 test_BKExampleTwo()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

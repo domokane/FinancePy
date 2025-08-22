@@ -10,9 +10,9 @@ import time
 import numpy as np
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
 from financepy.models.cir_montecarlo import CIRNumericalScheme
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -108,4 +108,4 @@ def test_FinModelRatesCIR():
 
 
 test_FinModelRatesCIR()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

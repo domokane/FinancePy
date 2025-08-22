@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 from financepy.utils.date import Date
 from financepy.utils.calendar import CalendarTypes
@@ -22,7 +22,7 @@ from financepy.products.equity.equity_swap_leg import EquitySwapLeg
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
 def test_equity_swap_at_inception():
@@ -70,9 +70,7 @@ def test_equity_swap_at_inception():
         dg_type,
     )
 
-    value = equity_swap.value(
-        effective_dt, discount_curve, index_curve, dividend_curve
-    )
+    value = equity_swap.value(effective_dt, discount_curve, index_curve, dividend_curve)
 
     assert round(value, 5) == 0.00000
 
@@ -114,11 +112,7 @@ def test_equity_swap_not_in_inception():
         effective_dt, maturity_dt
     )[0]
     firstFixing = (
-        (
-            index_curve_first.df(effective_dt)
-            / index_curve_first.df(maturity_dt)
-        )
-        - 1.0
+        (index_curve_first.df(effective_dt) / index_curve_first.df(maturity_dt)) - 1.0
     ) / index_alpha_first
 
     ## Rate between valuation date to maturity
@@ -127,8 +121,7 @@ def test_equity_swap_not_in_inception():
         value_dt, maturity_dt
     )[0]
     periodFixing = (
-        (index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt))
-        - 1.0
+        (index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt)) - 1.0
     ) / index_alpha_period
 
     ## This is the price at which abs_value(equity leg) == abs_value(float leg)

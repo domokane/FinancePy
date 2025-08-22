@@ -181,10 +181,10 @@
 #         # Generate bond put times and prices
 #         if self.swaptionType == IborSwaptionType.PAY:
 #             call_price = 100.0
-#             putPrice = 1e10
+#             put_price = 1e10
 #         else:
 #             call_price = 1e10
-#             putPrice = 100.0
+#             put_price = 100.0
 
 #         put_times = []
 #         for put_dt in swap.adjusted_fixed_dts[1:]:

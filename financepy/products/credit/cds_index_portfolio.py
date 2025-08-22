@@ -29,17 +29,17 @@ class CDSIndexPortfolio:
     def __init__(
         self,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        day_count_type: DayCountTypes = DayCountTypes.ACT_360,
+        dc_type: DayCountTypes = DayCountTypes.ACT_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):
-        """Create Fincds_indexPortfolio object. Note that all of the inputs
+        """Create Fincds_index_portfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard."""
 
         check_argument_types(self.__init__, locals())
 
-        self.dc_type = day_count_type
+        self.dc_type = dc_type
         self.dg_type = dg_type
         self.cal_type = cal_type
         self.freq_type = freq_type
@@ -47,9 +47,7 @@ class CDSIndexPortfolio:
 
     ###########################################################################
 
-    def intrinsic_rpv01(
-        self, value_dt, step_in_dt, maturity_dt, issuer_curves
-    ):
+    def intrinsic_rpv01(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of the risky PV01 of the CDS portfolio by taking the
         average of the risky PV01s of each contract."""
 
@@ -71,9 +69,7 @@ class CDSIndexPortfolio:
 
     ###########################################################################
 
-    def intrinsic_prot_leg_pv(
-        self, value_dt, step_in_dt, maturity_dt, issuer_curves
-    ):
+    def intrinsic_prot_leg_pv(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of intrinsic protection leg value of the CDS portfolio
         by taking the average sum the protection legs of each contract."""
 
@@ -94,9 +90,7 @@ class CDSIndexPortfolio:
 
     ###########################################################################
 
-    def intrinsic_spread(
-        self, value_dt, step_in_dt, maturity_dt, issuer_curves
-    ):
+    def intrinsic_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of the intrinsic spread of the CDS portfolio as the one
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spread."""
@@ -159,8 +153,7 @@ class CDSIndexPortfolio:
 
         if num_credits < 1:
             raise FinError(
-                "Number of credits in index must be > 1 and not"
-                + str(num_credits)
+                "Number of credits in index must be > 1 and not" + str(num_credits)
             )
 
         cds_contract = CDS(step_in_dt, maturity_dt, 0.0)
@@ -184,8 +177,7 @@ class CDSIndexPortfolio:
 
         if num_credits < 1:
             raise FinError(
-                "Number of credits in index must be > 1 and not "
-                + str(num_credits)
+                "Number of credits in index must be > 1 and not " + str(num_credits)
             )
 
         cds_contract = CDS(step_in_dt, maturity_dt, 0.0)
@@ -220,8 +212,7 @@ class CDSIndexPortfolio:
 
         if num_credits < 1:
             raise FinError(
-                "Number of credits in index must be > 1 and not "
-                + str(num_credits)
+                "Number of credits in index must be > 1 and not " + str(num_credits)
             )
 
         libor_curve = issuer_curves[0].libor_curve
@@ -237,9 +228,7 @@ class CDSIndexPortfolio:
         for issuer_curve in issuer_curves:
             n = len(issuer_curve.cds_contracts)
             if n != len(cds_maturity_dts):
-                raise FinError(
-                    "All issuer discount must be from same cds maturities"
-                )
+                raise FinError("All issuer discount must be from same cds maturities")
 
         cds_spread_multipliers = [1.0] * num_cds_mat_points
 
@@ -291,12 +280,8 @@ class CDSIndexPortfolio:
 
                     for j in range(0, num_cds_mat_points):
                         cds_spread = cds_contracts[j].running_cpn
-                        adjusted_cds_spreads[j] = (
-                            cds_spread * cds_spread_multipliers[j]
-                        )
-                        curve_cds_contracts[j].running_cpn = (
-                            adjusted_cds_spreads[j]
-                        )
+                        adjusted_cds_spreads[j] = cds_spread * cds_spread_multipliers[j]
+                        curve_cds_contracts[j].running_cpn = adjusted_cds_spreads[j]
 
                     adjusted_issuer_curve = CDSCurve(
                         value_dt,
@@ -309,9 +294,9 @@ class CDSIndexPortfolio:
                         value_dt, adjusted_issuer_curve, index_recovery_rate
                     )
 
-                    clean_rpv01 = cds_index.risky_pv01(
-                        value_dt, adjusted_issuer_curve
-                    )["clean_rpv01"]
+                    clean_rpv01 = cds_index.risky_pv01(value_dt, adjusted_issuer_curve)[
+                        "clean_rpv01"
+                    ]
 
                     sum_rpv01 += clean_rpv01
                     sum_prot += index_prot_pv
@@ -339,9 +324,7 @@ class CDSIndexPortfolio:
 
             for j in range(0, num_cds_mat_points):
 
-                unadjusted_spread = (
-                    issuer_curves[i_credit].cds_contracts[j].running_cpn
-                )
+                unadjusted_spread = issuer_curves[i_credit].cds_contracts[j].running_cpn
 
                 adjusted_spread = unadjusted_spread * cds_spread_multipliers[j]
 
@@ -429,17 +412,13 @@ class CDSIndexPortfolio:
 
                 for i_credit in range(0, num_credits):
                     q1 = adjusted_issuer_curves[i_credit]._qs[i_maturity]
-                    q2 = adjusted_issuer_curves[i_credit]._qs[
-                        i_maturity + 1
-                    ]
+                    q2 = adjusted_issuer_curves[i_credit]._qs[i_maturity + 1]
                     q12 = q2 / q1
 
                     q12_new = pow(q12, ratio)
                     q2_new = q1 * q12_new
 
-                    adjusted_issuer_curves[i_credit]._qs[
-                        i_maturity + 1
-                    ] = q2_new
+                    adjusted_issuer_curves[i_credit]._qs[i_maturity + 1] = q2_new
 
                     #        if i_maturity == 0 and index_cpns[0] == 0.006:
                     #              print(i_credit, q1, q2_new)

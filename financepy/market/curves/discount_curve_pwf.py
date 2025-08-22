@@ -32,7 +32,7 @@ class DiscountCurvePWF(DiscountCurve):
         zero_dts: list,
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        day_count_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
     ):
         """Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat."""
@@ -50,7 +50,7 @@ class DiscountCurvePWF(DiscountCurve):
         self._zero_dts = zero_dts
         self._zero_rates = np.array(zero_rates)
         self.freq_type = freq_type
-        self.dc_type = day_count_type
+        self.dc_type = dc_type
 
         dc_times = times_from_dates(zero_dts, self.value_dt, self.dc_type)
 

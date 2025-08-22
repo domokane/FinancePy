@@ -77,9 +77,7 @@ class EquityVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(
-        self, value_dt, fwd_stock_price, strikes, volatilities
-    ):
+    def fair_strike_approx(self, value_dt, fwd_stock_price, strikes, volatilities):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
@@ -94,8 +92,8 @@ class EquityVarianceSwap:
         points in the volatilities and strikes to calculate the gradient."""
 
         dvol = volatilities[-1] - volatilities[0]
-        dK = strikes[-1] - strikes[0]
-        b = f * dvol / dK
+        dk = strikes[-1] - strikes[0]
+        b = f * dvol / dk
         var = (atm_vol**2) * np.sqrt(1.0 + 3.0 * t_mat * (b**2))
         return var
 
@@ -173,9 +171,7 @@ class EquityVarianceSwap:
         self.call_strikes = call_k
 
         option_total = (
-            2.0
-            * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0))
-            / t_mat
+            2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
         )
 
         self.call_wts = np.zeros(num_call_options)

@@ -3,10 +3,11 @@
 ########################################################################################
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-from .helpers import build_Ibor_Curve, loadHeterogeneousSpreadCurves
+from .helpers import build_ibor_curve, load_hetero_spread_curves
 from financepy.utils.date import Date
 from financepy.utils.math import corr_matrix_generator
 from financepy.products.credit.cds_basket import CDSBasket
@@ -19,14 +20,14 @@ trade_dt = Date(1, 3, 2007)
 step_in_dt = trade_dt.add_days(1)
 value_dt = trade_dt.add_days(1)
 
-libor_curve = build_Ibor_Curve(trade_dt)
+libor_curve = build_ibor_curve(trade_dt)
 
 basketMaturity = Date(20, 12, 2011)
 
-cdsIndex = CDSIndexPortfolio()
+cds_index = CDSIndexPortfolio()
 
 num_credits = 5
-issuer_curves = loadHeterogeneousSpreadCurves(value_dt, libor_curve)
+issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
 issuer_curves = issuer_curves[0:num_credits]
 
 seed = 1967
@@ -34,34 +35,26 @@ basket = CDSBasket(value_dt, basketMaturity)
 
 
 def test_inhomogeneous_curve():
-    intrinsicSpd = (
-        cdsIndex.intrinsic_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+    intrinsic_spd = (
+        cds_index.intrinsic_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
-    assert round(intrinsicSpd, 4) == 32.0971
+    assert round(intrinsic_spd, 4) == 32.0971
 
     totalSpd = (
-        cdsIndex.total_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+        cds_index.total_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
     assert round(totalSpd, 4) == 161.3169
 
     minSpd = (
-        cdsIndex.min_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+        cds_index.min_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
     assert round(minSpd, 4) == 10.6722
 
     maxSpd = (
-        cdsIndex.max_spread(
-            value_dt, step_in_dt, basketMaturity, issuer_curves
-        )
+        cds_index.max_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
         * 10000.0
     )
     assert round(maxSpd, 4) == 81.1466

@@ -5,3 +5,4 @@ scipy==1.13.1
 llvmlite==0.43.0
 ipython==8.25.0
 pandas==2.3.1
+matplotlib==3.10.5

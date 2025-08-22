@@ -178,31 +178,23 @@ class IborFRA:
         df_to_valuation_date = discount_curve.df(valuation_date)
         v = v * self.notional / df_to_valuation_date
 
-        if (
-            self.pay_fixed_rate is True
-        ):  # VP: ??? pay fixed should be positive notional
+        if self.pay_fixed_rate is True:  # VP: ??? pay fixed should be positive notional
             v *= -1.0
 
         out = {
             "type": type(self).__name__,
             "start_dt": self.start_dt,
             "maturity_dt": self.maturity_dt,
-            "day_count_type": self.dc_type.name,
+            "dc_type": self.dc_type.name,
             "fixed_leg_type": (
-                SwapTypes.PAY.name
-                if self.pay_fixed_rate
-                else SwapTypes.RECEIVE.name
+                SwapTypes.PAY.name if self.pay_fixed_rate else SwapTypes.RECEIVE.name
             ),
             "notional": self.notional,
             "contract_rate": self.fra_rate,
             "market_rate": libor_fwd,
             "spot_pvbp": acc_factor * df_discount_2,
-            "fwd_pvbp": acc_factor
-            * df_discount_2
-            / discount_curve.df(self.start_dt),
-            "unit_value": acc_factor
-            * df_discount_2
-            * (libor_fwd - self.fra_rate),
+            "fwd_pvbp": acc_factor * df_discount_2 / discount_curve.df(self.start_dt),
+            "unit_value": acc_factor * df_discount_2 * (libor_fwd - self.fra_rate),
             "value": v,
             # ignoring pay_fixed flag (which is wrong anyway I think),
             # bus day adj type, calendar for now

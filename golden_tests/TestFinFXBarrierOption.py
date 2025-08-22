@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
@@ -16,7 +16,7 @@ from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -50,9 +50,7 @@ def test_FinFXBarrierOption():
 
     for opt_type in FinFXBarrierTypes:
 
-        test_cases.header(
-            "Type", "K", "B", "S", "Value", "ValueMC", "TIME", "Diff"
-        )
+        test_cases.header("Type", "K", "B", "S", "Value", "ValueMC", "TIME", "Diff")
 
         for spot_fx_rate in range(60, 140, 20):
             B = 110.0
@@ -149,9 +147,7 @@ def test_FinFXBarrierOption():
     spot_fx_rates = range(50, 150, 50)
     B = 105.0
 
-    test_cases.header(
-        "Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta"
-    )
+    test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
     for opt_type in FinFXBarrierTypes:
         for spot_fx_rate in spot_fx_rates:
@@ -182,13 +178,11 @@ def test_FinFXBarrierOption():
                 value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
             )
 
-            test_cases.print(
-                opt_type, K, B, spot_fx_rate, value, delta, vega, theta
-            )
+            test_cases.print(opt_type, K, B, spot_fx_rate, value, delta, vega, theta)
 
 
 ########################################################################################
 
 
 test_FinFXBarrierOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

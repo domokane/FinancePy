@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("..")
 
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
@@ -17,12 +17,12 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.date import Date
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
 
-def build_Ibor_Curve(value_dt):
+def build_ibor_curve(value_dt):
 
     depo_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
@@ -231,9 +231,7 @@ def test_BondFRN():
     accd_amount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Dollar Principal = ", principal)
 
@@ -315,9 +313,7 @@ def test_BondFRN():
     accd_amount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Dollar Principal = ", principal)
 
@@ -345,9 +341,7 @@ def test_BondFRN():
 
     test_cases.print("Convexity = ", convexity)
 
-    principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Principal = ", principal)
 
@@ -368,4 +362,4 @@ def test_BondFRN():
 
 
 test_BondFRN()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

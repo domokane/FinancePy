@@ -21,15 +21,15 @@ from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.bdt_tree import BDTTree
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ##########################################################################
 
 
-def test_IborBermudanSwaptionBKModel():
+def test_IborBermudanSwaptionbk_model():
     """Replicate examples in paper by Leif Andersen which can be found at
     file:///C:/Users/Dominic/Downloads/SSRN-id155208.pdf"""
 
@@ -40,7 +40,7 @@ def test_IborBermudanSwaptionBKModel():
 
     swap_fixed_cpn = 0.060
     swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-    swap_fixed_day_count_type = DayCountTypes.ACT_365F
+    swap_fixed_dc_type = DayCountTypes.ACT_365F
 
     libor_curve = DiscountCurveFlat(
         value_dt, 0.0625, FrequencyTypes.SEMI_ANNUAL, DayCountTypes.ACT_365F
@@ -52,7 +52,7 @@ def test_IborBermudanSwaptionBKModel():
         SwapTypes.PAY,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fwd_swap_value = fwd_pay_swap.value(settle_dt, libor_curve, libor_curve)
@@ -71,7 +71,7 @@ def test_IborBermudanSwaptionBKModel():
         fixed_leg_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -82,7 +82,7 @@ def test_IborBermudanSwaptionBKModel():
         fixed_leg_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     ###########################################################################
@@ -128,25 +128,13 @@ def test_IborBermudanSwaptionBKModel():
     ###########################################################################
     ###########################################################################
 
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "==================== BK MODEL ========================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
+    test_cases.banner("=======================================================")
+    test_cases.banner("=======================================================")
+    test_cases.banner("==================== BK MODEL =========================")
+    test_cases.banner("=======================================================")
+    test_cases.banner("=======================================================")
 
-    test_cases.banner(
-        "======= 0% VOLATILITY EUROPEAN SWAPTION BK MODEL ======"
-    )
+    test_cases.banner("======= 0% VOLATILITY EUROPEAN SWAPTION BK MODEL ======")
 
     # Used BK with constant short-rate volatility
     sigma = 0.000000001
@@ -163,9 +151,7 @@ def test_IborBermudanSwaptionBKModel():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    test_cases.banner(
-        "======= 20% VOLATILITY EUROPEAN SWAPTION BK MODEL ========"
-    )
+    test_cases.banner("======= 20% VOLATILITY EUROPEAN SWAPTION BK MODEL ========")
 
     # Used BK with constant short-rate volatility
     sigma = 0.20
@@ -197,7 +183,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -211,7 +197,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     test_cases.banner(
@@ -267,7 +253,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -281,7 +267,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     test_cases.banner(
@@ -330,25 +316,13 @@ def test_IborBermudanSwaptionBKModel():
     ###########################################################################
     ###########################################################################
 
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================= BDT MODEL ====================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
+    test_cases.banner("=======================================================")
+    test_cases.banner("=======================================================")
+    test_cases.banner("======================= BDT MODEL =====================")
+    test_cases.banner("=======================================================")
+    test_cases.banner("=======================================================")
 
-    test_cases.banner(
-        "====== 0% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======"
-    )
+    test_cases.banner("====== 0% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
 
     # Used BK with constant short-rate volatility
     sigma = 0.00001
@@ -364,9 +338,7 @@ def test_IborBermudanSwaptionBKModel():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    test_cases.banner(
-        "===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======"
-    )
+    test_cases.banner("===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
 
     # Used BK with constant short-rate volatility
     sigma = 0.20
@@ -398,7 +370,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -410,7 +382,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     test_cases.banner(
@@ -464,7 +436,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -476,7 +448,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     test_cases.banner(
@@ -525,21 +497,11 @@ def test_IborBermudanSwaptionBKModel():
     ###########################################################################
     ###########################################################################
 
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================= HW MODEL ======================"
-    )
-    test_cases.banner(
-        "======================================================="
-    )
-    test_cases.banner(
-        "======================================================="
-    )
+    test_cases.banner("=======================================================")
+    test_cases.banner("=======================================================")
+    test_cases.banner("======================= HW MODEL ======================")
+    test_cases.banner("=======================================================")
+    test_cases.banner("=======================================================")
 
     test_cases.banner("====== 0% VOLATILITY EUROPEAN SWAPTION HW MODEL ======")
 
@@ -557,9 +519,7 @@ def test_IborBermudanSwaptionBKModel():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    test_cases.banner(
-        "===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======"
-    )
+    test_cases.banner("===== 20% VOLATILITY EUROPEAN SWAPTION BDT MODEL ======")
 
     # Used BK with constant short-rate volatility
     sigma = 0.01
@@ -591,7 +551,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -603,7 +563,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     test_cases.banner(
@@ -656,7 +616,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -668,7 +628,7 @@ def test_IborBermudanSwaptionBKModel():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swap_fixed_day_count_type,
+        swap_fixed_dc_type,
     )
 
     test_cases.banner(
@@ -713,6 +673,6 @@ def test_IborBermudanSwaptionBKModel():
 ##########################################################################
 
 
-test_IborBermudanSwaptionBKModel()
+test_IborBermudanSwaptionbk_model()
 
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

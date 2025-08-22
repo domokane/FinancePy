@@ -16,10 +16,10 @@ from financepy.products.equity.equity_fixed_lookback_option import (
 from financepy.utils.global_types import OptionTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -564,12 +564,8 @@ def test_example():
     strike_price = 105.0
     opt_typeCall = OptionTypes.EUROPEAN_CALL
     opt_typePut = OptionTypes.EUROPEAN_PUT
-    lookbackCall = EquityFixedLookbackOption(
-        expiry_dt, opt_typeCall, strike_price
-    )
-    lookbackPut = EquityFixedLookbackOption(
-        expiry_dt, opt_typePut, strike_price
-    )
+    lookbackCall = EquityFixedLookbackOption(expiry_dt, opt_typeCall, strike_price)
+    lookbackPut = EquityFixedLookbackOption(expiry_dt, opt_typePut, strike_price)
 
     value_dt = Date(1, 1, 2020)
     interest_rate = 0.10
@@ -600,4 +596,4 @@ def test_example():
 
 test_example()
 # test_EquityLookBackOption()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

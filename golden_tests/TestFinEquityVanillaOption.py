@@ -14,10 +14,10 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.error import FinError
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
@@ -40,9 +40,7 @@ def test_EquityVanillaOption():
 
     for num_paths in num_paths_list:
 
-        call_option = EquityVanillaOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
-        )
+        call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
         value = call_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model
@@ -77,9 +75,7 @@ def test_EquityVanillaOption():
 
     for stock_price in stock_prices:
 
-        call_option = EquityVanillaOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
-        )
+        call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
         value = call_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model
@@ -128,9 +124,7 @@ def test_EquityVanillaOption():
 
     for stock_price in stock_prices:
 
-        put_option = EquityVanillaOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT
-        )
+        put_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT)
 
         value = put_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model
@@ -180,9 +174,7 @@ def test_EquityVanillaOption():
 
     for stock_price in stock_prices:
 
-        call_option = EquityVanillaOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
-        )
+        call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
         value = call_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model
         )
@@ -217,9 +209,7 @@ def test_EquityVanillaOption():
 
     for stock_price in stock_prices:
 
-        put_option = EquityVanillaOption(
-            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT
-        )
+        put_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT)
 
         value = put_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model
@@ -360,13 +350,9 @@ if 1 == 0:
     discount_curve = DiscountCurveFlat(value_dt, 0.05)
     dividend_curve = DiscountCurveFlat(value_dt, 0.0)
 
-    call_option = EquityVanillaOption(
-        expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL
-    )
+    call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(
-        value_dt, 105.0, discount_curve, dividend_curve, model
-    )
+    value = call_option.value(value_dt, 105.0, discount_curve, dividend_curve, model)
 
 else:
     test_EquityVanillaOption()
@@ -378,4 +364,4 @@ else:
 
     # print("Elapsed:", elapsed)
 
-    test_cases.compareTestCases()
+    test_cases.compare_test_cases()

@@ -10,6 +10,5 @@ from .math import *
 from .stats import *
 from .schedule import *
 from .error import *
-from .currency import *
 from .amount import *
 from .distribution import *

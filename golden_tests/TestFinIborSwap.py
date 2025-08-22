@@ -21,15 +21,15 @@ from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
-from FinTestCases import FinTestCases, globalTestCaseMode
+from FinTestCases import FinTestCases, global_test_case_mode
 
 
-test_cases = FinTestCases(__file__, globalTestCaseMode)
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
 
-def buildIborSingleCurve(value_dt):
+def build_ibor_single_curve(value_dt):
 
     settle_dt = value_dt.add_days(2)
     dc_type = DayCountTypes.ACT_360
@@ -334,7 +334,7 @@ def test_LiborSwap():
 
     value_dt = Date(30, 11, 2018)
     settle_dt = value_dt.add_days(2)
-    libor_curve = buildIborSingleCurve(value_dt)
+    libor_curve = build_ibor_single_curve(value_dt)
     v = swap.value(settle_dt, libor_curve, libor_curve, firstFixing)
 
     v_bbg = 388147.0
@@ -409,9 +409,7 @@ def test_dp_example():
 
     value_dt = start_dt
 
-    curve = DiscountCurve(
-        value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES
-    )
+    curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
 
     v = swap.value(value_dt, curve, curve)
 
@@ -428,4 +426,4 @@ def test_dp_example():
 
 test_LiborSwap()
 test_dp_example()
-test_cases.compareTestCases()
+test_cases.compare_test_cases()

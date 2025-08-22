@@ -38,10 +38,8 @@ def test_FinCapVolCurve():
     ]
     capVolatilities = np.array(capVolatilities) / 100.0
 
-    day_count_type = DayCountTypes.ACT_ACT_ISDA
-    vol_curve = IborCapVolCurve(
-        value_dt, capVolDates, capVolatilities, day_count_type
-    )
+    dc_type = DayCountTypes.ACT_ACT_ISDA
+    vol_curve = IborCapVolCurve(value_dt, capVolDates, capVolatilities, dc_type)
 
     dt = Date(1, 1, 2020)
     capFloorVol = vol_curve.cap_vol(dt)
