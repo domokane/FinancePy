@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.date import Date
@@ -16,10 +14,10 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def test_FinFXForward():
+def test_fin_fx_forward():
 
     #  https://stackoverflow.com/questions/48778712
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
@@ -35,8 +33,6 @@ def test_FinFXForward():
     strike_fx_rate = 1.365  # USD per EUR
     ccy1_interest_rate = 0.02  # USD Rates
     ccy2_interest_rate = 0.05  # EUR rates
-
-    ###########################################################################
 
     spot_days = 0
     settle_dt = value_dt.add_weekdays(spot_days)
@@ -92,6 +88,5 @@ def test_FinFXForward():
 
 ########################################################################################
 
-
-test_FinFXForward()
+test_fin_fx_forward()
 test_cases.compare_test_cases()

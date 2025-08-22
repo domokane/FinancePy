@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 
@@ -29,7 +27,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def testEquityAmericanOption():
+def test_equity_american_option():
 
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2017)
@@ -213,7 +211,7 @@ def testEquityAmericanOption():
 ########################################################################################
 
 
-def replicateLSPaper():
+def replicate_ls_paper():
 
     amer_option_call_value = OptionTypes.AMERICAN_CALL.value
     amer_option_put_value = OptionTypes.AMERICAN_PUT.value
@@ -283,9 +281,10 @@ def replicateLSPaper():
                     )
 
 
+
+
 ########################################################################################
 
-
-# replicateLSPaper()
-testEquityAmericanOption()
+# replicate_ls_paper()
+test_equity_american_option()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import matplotlib.pyplot as plt
@@ -19,16 +17,12 @@ sys.path.append("..")
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-########################################################################################
-
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_FinFXMktVolSurface1(verboseCalibration):
-
-    ###########################################################################
+def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
     if 1 == 1:
 
@@ -75,7 +69,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
             vol_function_type,
         )
 
-        fx_market.check_calibration(verboseCalibration)
+        fx_market.check_calibration(verbose_calibration)
 
         # EXPLORE AND TEST DIFFERENT CATEGORICAL PARAMETERS
         # for atm_method in FinFXATMMethod:
@@ -96,9 +90,9 @@ def test_FinFXMktVolSurface1(verboseCalibration):
         #                                        delta_method,
         #                                        vol_function_type)
 
-        #             fx_market.check_calibration(verboseCalibration)
+        #             fx_market.check_calibration(verbose_calibration)
 
-        if PLOT_GRAPHS:
+        if plot_graphs:
 
             fx_market.plot_vol_curves()
 
@@ -109,10 +103,11 @@ def test_FinFXMktVolSurface1(verboseCalibration):
                 plt.title(vol_function_type)
                 print("SUM:", dbns[i].sum())
 
-    ###########################################################################
+
+########################################################################################
 
 
-def test_FinFXMktVolSurface2(verboseCalibration):
+def test_fin_fx_mkt_vol_surface2(verbose_calibration):
 
     # print("==============================================================")
 
@@ -157,9 +152,9 @@ def test_FinFXMktVolSurface2(verboseCalibration):
         delta_method,
     )
 
-    fx_market.check_calibration(verboseCalibration)
+    fx_market.check_calibration(verbose_calibration)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market.plot_vol_curves()
 
 
@@ -167,8 +162,10 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
 #   ###########################################################################
 
+########################################################################################
 
-def test_FinFXMktVolSurface3(verboseCalibration):
+
+def test_fin_fx_mkt_vol_surface3(verbose_calibration):
 
     # EURUSD Example from Paper by Uwe Wystup using Tables 4
     #        print("EURUSD EXAMPLE WYSTUP")
@@ -211,15 +208,16 @@ def test_FinFXMktVolSurface3(verboseCalibration):
         delta_method,
     )
 
-    fx_market.check_calibration(verboseCalibration)
+    fx_market.check_calibration(verbose_calibration)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market.plot_vol_curves()
 
-    ###########################################################################
+
+########################################################################################
 
 
-def test_FinFXMktVolSurface4(verboseCalibration):
+def test_fin_fx_mkt_vol_surface4(verbose_calibration):
 
     # USDJPY Example from Paper by Uwe Wystup using Tables 4
     #        print("USDJPY EXAMPLE WYSTUP")
@@ -262,9 +260,9 @@ def test_FinFXMktVolSurface4(verboseCalibration):
         delta_method,
     )
 
-    fx_market.check_calibration(verboseCalibration)
+    fx_market.check_calibration(verbose_calibration)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market.plot_vol_curves()
 
     #    test_cases.header("value", "delta")
@@ -273,17 +271,18 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
 ########################################################################################
 
+########################################################################################
 
 if __name__ == "__main__":
 
     start = time.time()
 
-    verboseCalibration = False
+    verbose_calibration = False
 
-    test_FinFXMktVolSurface1(verboseCalibration)
-    test_FinFXMktVolSurface2(verboseCalibration)
-    test_FinFXMktVolSurface3(verboseCalibration)
-    test_FinFXMktVolSurface4(verboseCalibration)
+    test_fin_fx_mkt_vol_surface1(verbose_calibration)
+    test_fin_fx_mkt_vol_surface2(verbose_calibration)
+    test_fin_fx_mkt_vol_surface3(verbose_calibration)
+    test_fin_fx_mkt_vol_surface4(verbose_calibration)
 
     end = time.time()
 

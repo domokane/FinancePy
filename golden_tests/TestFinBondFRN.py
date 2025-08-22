@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -19,7 +17,7 @@ from financepy.utils.date import Date
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
 def build_ibor_curve(value_dt):
@@ -179,19 +177,17 @@ def build_ibor_curve(value_dt):
     return libor_curve
 
 
-##########################################################################
+########################################################################################
 
 
-def test_BondFRN():
+def test_bond_frn():
 
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     # I have a day out problem on the accrued interest - should be 71 and
     # not 72 days
     # Other than that agreement on the DM is very good.
 
-    ##########################################################################
     # CITIGROUP FRN SCREENSHOT
-    ##########################################################################
 
     test_cases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE")
     issue_dt = Date(10, 11, 2010)
@@ -271,10 +267,8 @@ def test_BondFRN():
 
     test_cases.print("Modified Credit Duration = ", modified_duration)
 
-    ##########################################################################
     # EXAMPLE
     # https://ebrary.net/14293/economics/actual_floater
-    ##########################################################################
 
     test_cases.banner("BLOOMBERG CITIGROUP FRN EXAMPLE II")
     issue_dt = Date(28, 3, 2000)
@@ -358,8 +352,7 @@ def test_BondFRN():
     test_cases.print("Modified Credit Duration = ", modified_duration)
 
 
-##########################################################################
+########################################################################################
 
-
-test_BondFRN()
+test_bond_frn()
 test_cases.compare_test_cases()

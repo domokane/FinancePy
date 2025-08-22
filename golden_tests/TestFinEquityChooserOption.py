@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -14,10 +12,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##############################################################################
+########################################################################################
 
 
-def test_EquityChooserOptionHaug():
+def test_equity_chooser_option_haug():
     """Following example in Haug Page 130"""
 
     value_dt = Date(1, 1, 2015)
@@ -35,15 +33,15 @@ def test_EquityChooserOptionHaug():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(
+    chooser_option = EquityChooserOption(
         choose_dt, call_expiry_dt, put_expiry_dt, call_strike, put_strike
     )
 
-    v = chooserOption.value(
+    v = chooser_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    v_mc = chooserOption.value_mc(
+    v_mc = chooser_option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model, 20000
     )
 
@@ -52,14 +50,14 @@ def test_EquityChooserOptionHaug():
     test_cases.print("FINANCEPY", v, "HAUG", v_haug, "MC", v_mc)
 
 
-##########################################################################
+########################################################################################
 
 
-def test_EquityChooserOptionMatlab():
+def test_equity_chooser_option_matlab():
     """https://fr.mathworks.com/help/fininst/chooserbybls.html"""
 
     value_dt = Date(1, 6, 2007)
-    chooseDate = Date(31, 8, 2007)
+    choose_date = Date(31, 8, 2007)
     call_expiry_dt = Date(2, 12, 2007)
     put_expiry_dt = Date(2, 12, 2007)
     call_strike = 60.0
@@ -74,15 +72,15 @@ def test_EquityChooserOptionMatlab():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(
-        chooseDate, call_expiry_dt, put_expiry_dt, call_strike, put_strike
+    chooser_option = EquityChooserOption(
+        choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike
     )
 
-    v = chooserOption.value(
+    v = chooser_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    v_mc = chooserOption.value_mc(
+    v_mc = chooser_option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model, 20000
     )
 
@@ -91,14 +89,14 @@ def test_EquityChooserOptionMatlab():
     test_cases.print("FINANCEPY", v, "MATLAB", v_matlab, "MC", v_mc)
 
 
-##########################################################################
+########################################################################################
 
 
-def test_EquityChooserOptionDerivicom():
+def test_equity_chooser_option_derivicom():
     """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm"""
 
     value_dt = Date(1, 1, 2007)
-    chooseDate = Date(1, 2, 2007)
+    choose_date = Date(1, 2, 2007)
     call_expiry_dt = Date(1, 4, 2007)
     put_expiry_dt = Date(1, 5, 2007)
     call_strike = 40.0
@@ -112,15 +110,15 @@ def test_EquityChooserOptionDerivicom():
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-    chooserOption = EquityChooserOption(
-        chooseDate, call_expiry_dt, put_expiry_dt, call_strike, put_strike
+    chooser_option = EquityChooserOption(
+        choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike
     )
 
-    v = chooserOption.value(
+    v = chooser_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    v_mc = chooserOption.value_mc(
+    v_mc = chooser_option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model, 20000
     )
 
@@ -129,10 +127,9 @@ def test_EquityChooserOptionDerivicom():
     test_cases.print("FINANCEPY", v, "DERIVICOM", v_derivicom, "MC", v_mc)
 
 
-##########################################################################
+########################################################################################
 
-
-test_EquityChooserOptionHaug()
-test_EquityChooserOptionMatlab()
-test_EquityChooserOptionDerivicom()
+test_equity_chooser_option_haug()
+test_equity_chooser_option_matlab()
+test_equity_chooser_option_derivicom()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,7 +19,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinNumbaNumpySpeed(use_sobol):
+def test_fin_numba_numpy_speed(use_sobol):
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 7, 2015)
@@ -34,7 +32,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 
-    use_sobolInt = int(use_sobol)
+    use_sobol_int = int(use_sobol)
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
@@ -47,14 +45,12 @@ def test_FinNumbaNumpySpeed(use_sobol):
     num_points = 20
     v_exact = [value] * num_points
 
-    ###########################################################################
     # DO UP TO 100K AS IT IS SLOW
-    ###########################################################################
 
     num_paths_list = np.arange(1, num_points + 1, 1) * 100000
 
-    NONUMBA_NONUMPY_v = []
-    NONUMBA_NONUMPY_t = []
+    nonumba_nonumpy_v = []
+    nonumba_nonumpy_t = []
 
     print("PURE PYTHON")
     for num_paths in num_paths_list:
@@ -68,18 +64,18 @@ def test_FinNumbaNumpySpeed(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NONUMBA_NONUMPY_v.append(value_mc)
-        NONUMBA_NONUMPY_t.append(duration + 1e-10)
+        nonumba_nonumpy_v.append(value_mc)
+        nonumba_nonumpy_t.append(duration + 1e-10)
 
-    NUMPY_ONLY_v = []
-    NUMPY_ONLY_t = []
+    numpy_only_v = []
+    numpy_only_t = []
 
     print("NUMPY ONLY")
     for num_paths in num_paths_list:
@@ -93,19 +89,19 @@ def test_FinNumbaNumpySpeed(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMPY_ONLY_v.append(value_mc)
-        NUMPY_ONLY_t.append(duration + 1e-10)
+        numpy_only_v.append(value_mc)
+        numpy_only_t.append(duration + 1e-10)
 
-    #    speedUp = np.array(NONUMBA_NONUMPY_t)/np.array(NUMPY_ONLY_t)
-    #    print(NUMPY_ONLY_t)
-    #    print(NONUMBA_NONUMPY_t)
+    #    speedUp = np.array(nonumba_nonumpy_t)/np.array(numpy_only_t)
+    #    print(numpy_only_t)
+    #    print(nonumba_nonumpy_t)
     #    print(speedUp)
 
     if use_sobol:
@@ -114,8 +110,8 @@ def test_FinNumbaNumpySpeed(use_sobol):
         title = "PSEUDORANDOM: PURE PYTHON VS NUMPY"
 
     plt.figure(figsize=(8, 6))
-    plt.plot(num_paths_list, NONUMBA_NONUMPY_t, "o-", label="PURE PYTHON")
-    plt.plot(num_paths_list, NUMPY_ONLY_t, "o-", label="NUMPY ONLY")
+    plt.plot(num_paths_list, nonumba_nonumpy_t, "o-", label="PURE PYTHON")
+    plt.plot(num_paths_list, numpy_only_t, "o-", label="NUMPY ONLY")
     plt.xlabel("Number of Paths")
     plt.ylabel("Wall Time (s)")
     plt.legend()
@@ -123,22 +119,20 @@ def test_FinNumbaNumpySpeed(use_sobol):
 
     plt.figure(figsize=(8, 6))
     plt.plot(num_paths_list, v_exact, label="EXACT")
-    plt.plot(num_paths_list, NONUMBA_NONUMPY_v, "o-", label="PURE PYTHON")
-    plt.plot(num_paths_list, NUMPY_ONLY_v, "o-", label="NUMPY ONLY")
+    plt.plot(num_paths_list, nonumba_nonumpy_v, "o-", label="PURE PYTHON")
+    plt.plot(num_paths_list, numpy_only_v, "o-", label="NUMPY ONLY")
 
     plt.xlabel("Number of Paths")
     plt.ylabel("Option Value")
     plt.legend()
     plt.title(title)
 
-    ###########################################################################
     # DO UP TO 10 MILLION NOW THAT WE HAVE NUMPY
-    ###########################################################################
 
     num_paths_list = np.arange(1, num_points + 1, 1) * 1000000
 
-    NUMPY_ONLY_v = []
-    NUMPY_ONLY_t = []
+    numpy_only_v = []
+    numpy_only_t = []
 
     print("NUMPY ONLY")
     for num_paths in num_paths_list:
@@ -152,18 +146,18 @@ def test_FinNumbaNumpySpeed(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMPY_ONLY_v.append(value_mc)
-        NUMPY_ONLY_t.append(duration)
+        numpy_only_v.append(value_mc)
+        numpy_only_t.append(duration)
 
-    NUMBA_NUMPY_v = []
-    NUMBA_NUMPY_t = []
+    numba_numpy_v = []
+    numba_numpy_t = []
 
     print("NUMBA+NUMPY")
     for num_paths in num_paths_list:
@@ -177,18 +171,18 @@ def test_FinNumbaNumpySpeed(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_NUMPY_v.append(value_mc)
-        NUMBA_NUMPY_t.append(duration)
+        numba_numpy_v.append(value_mc)
+        numba_numpy_t.append(duration)
 
-    NUMBA_ONLY_v = []
-    NUMBA_ONLY_t = []
+    numba_only_v = []
+    numba_only_t = []
 
     print("NUMBA ONLY")
     for num_paths in num_paths_list:
@@ -202,18 +196,18 @@ def test_FinNumbaNumpySpeed(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_ONLY_v.append(value_mc)
-        NUMBA_ONLY_t.append(duration)
+        numba_only_v.append(value_mc)
+        numba_only_t.append(duration)
 
-    NUMBA_PARALLEL_v = []
-    NUMBA_PARALLEL_t = []
+    numba_parallel_v = []
+    numba_parallel_t = []
 
     print("NUMBA PARALLEL")
     for num_paths in num_paths_list:
@@ -227,24 +221,22 @@ def test_FinNumbaNumpySpeed(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_PARALLEL_v.append(value_mc)
-        NUMBA_PARALLEL_t.append(duration)
+        numba_parallel_v.append(value_mc)
+        numba_parallel_t.append(duration)
 
-    #    speedUp = np.array(NUMBA_ONLY_t)/np.array(NUMBA_PARALLEL_t)
+    #    speedUp = np.array(numba_only_t)/np.array(numba_parallel_t)
     #    print("PARALLEL:", speedUp)
 
-    ###########################################################################
     # COMPUTED USING NUMSTEPS FROM 1M to 10M
-    ###########################################################################
 
-    CPP_t = np.array(
+    cpp_t = np.array(
         [
             0.075,
             0.155,
@@ -269,7 +261,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
         ]
     )
 
-    CPP_v = np.array(
+    cpp_v = np.array(
         [
             9.30872,
             9.29576,
@@ -300,15 +292,13 @@ def test_FinNumbaNumpySpeed(use_sobol):
         title = "PSEUDORANDOM: COMPARING OPTIMISATIONS"
 
     plt.figure(figsize=(8, 6))
-    plt.plot(num_paths_list, NUMPY_ONLY_t, "o-", label="NUMPY ONLY")
-    plt.plot(num_paths_list, NUMBA_NUMPY_t, "o-", label="NUMBA + NUMPY")
+    plt.plot(num_paths_list, numpy_only_t, "o-", label="NUMPY ONLY")
+    plt.plot(num_paths_list, numba_numpy_t, "o-", label="NUMBA + NUMPY")
 
     plt.xlabel("Number of Paths")
     plt.ylabel("Wall Time (s)")
     plt.legend()
     plt.title(title)
-
-    ###########################################################################
 
     if use_sobol:
         title = "SOBOL: COMPARING OPTIMISATIONS"
@@ -316,25 +306,23 @@ def test_FinNumbaNumpySpeed(use_sobol):
         title = "PSEUDORANDOM: COMPARING OPTIMISATIONS"
 
     plt.figure(figsize=(8, 6))
-    plt.plot(num_paths_list, NUMPY_ONLY_t, "o-", label="NUMPY ONLY")
-    plt.plot(num_paths_list, NUMBA_NUMPY_t, "o-", label="NUMBA + NUMPY")
-    plt.plot(num_paths_list, NUMBA_ONLY_t, "o-", label="NUMBA ONLY")
-    plt.plot(num_paths_list, NUMBA_PARALLEL_t, "o-", label="NUMBA PARALLEL")
+    plt.plot(num_paths_list, numpy_only_t, "o-", label="NUMPY ONLY")
+    plt.plot(num_paths_list, numba_numpy_t, "o-", label="NUMBA + NUMPY")
+    plt.plot(num_paths_list, numba_only_t, "o-", label="NUMBA ONLY")
+    plt.plot(num_paths_list, numba_parallel_t, "o-", label="NUMBA PARALLEL")
 
     if use_sobol is False:
-        plt.plot(num_paths_list, CPP_t, "o-", label="C++")
+        plt.plot(num_paths_list, cpp_t, "o-", label="C++")
 
     plt.xlabel("Number of Paths")
     plt.ylabel("Wall Time (s)")
     plt.legend()
     plt.title(title)
 
-    ###########################################################################
-
     plt.figure(figsize=(8, 6))
     plt.plot(num_paths_list, v_exact, label="EXACT")
-    plt.plot(num_paths_list, NUMBA_ONLY_v, "o-", label="NUMBA ONLY")
-    plt.plot(num_paths_list, CPP_v, "o-", label="C++")
+    plt.plot(num_paths_list, numba_only_v, "o-", label="NUMBA ONLY")
+    plt.plot(num_paths_list, cpp_v, "o-", label="C++")
 
     plt.xlabel("Number of Paths")
     plt.ylabel("Option Value")
@@ -345,7 +333,7 @@ def test_FinNumbaNumpySpeed(use_sobol):
 ########################################################################################
 
 
-def test_FinNumbaNumbaParallel(use_sobol):
+def test_fin_numba_numba_parallel(use_sobol):
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 7, 2015)
@@ -358,7 +346,7 @@ def test_FinNumbaNumbaParallel(use_sobol):
     model = BlackScholes(volatility)
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 
-    use_sobolInt = int(use_sobol)
+    use_sobol_int = int(use_sobol)
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC", "TIME")
 
@@ -373,8 +361,8 @@ def test_FinNumbaNumbaParallel(use_sobol):
 
     num_paths_list = np.arange(1, num_points + 1, 1) * 1000000
 
-    NUMBA_ONLY_v = []
-    NUMBA_ONLY_t = []
+    numba_only_v = []
+    numba_only_t = []
 
     print("NUMBA ONLY")
     for num_paths in num_paths_list:
@@ -388,18 +376,18 @@ def test_FinNumbaNumbaParallel(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_ONLY_v.append(value_mc)
-        NUMBA_ONLY_t.append(duration)
+        numba_only_v.append(value_mc)
+        numba_only_t.append(duration)
 
-    NUMBA_PARALLEL_v = []
-    NUMBA_PARALLEL_t = []
+    numba_parallel_v = []
+    numba_parallel_t = []
 
     print("NUMBA PARALLEL")
     for num_paths in num_paths_list:
@@ -413,17 +401,15 @@ def test_FinNumbaNumbaParallel(use_sobol):
             model,
             num_paths,
             seed,
-            use_sobolInt,
+            use_sobol_int,
         )
         end = time.time()
         duration = end - start
 
         print("%10d %9.5f %9.5f %9.6f" % (num_paths, value, value_mc, duration))
 
-        NUMBA_PARALLEL_v.append(value_mc)
-        NUMBA_PARALLEL_t.append(duration)
-
-    ###########################################################################
+        numba_parallel_v.append(value_mc)
+        numba_parallel_t.append(duration)
 
     import matplotlib.pyplot as plt
 
@@ -433,8 +419,8 @@ def test_FinNumbaNumbaParallel(use_sobol):
         title = "PSEUDORANDOM: NUMBA VS NUMBA + PARALLEL"
 
     plt.figure(figsize=(8, 6))
-    plt.plot(num_paths_list, NUMBA_ONLY_t, "o-", label="NUMBA ONLY")
-    plt.plot(num_paths_list, NUMBA_PARALLEL_t, "o-", label="NUMBA PARALLEL")
+    plt.plot(num_paths_list, numba_only_t, "o-", label="NUMBA ONLY")
+    plt.plot(num_paths_list, numba_parallel_t, "o-", label="NUMBA PARALLEL")
     plt.xlabel("Number of Paths")
     plt.ylabel("Wall Time (s)")
     plt.legend()
@@ -442,8 +428,8 @@ def test_FinNumbaNumbaParallel(use_sobol):
 
     plt.figure(figsize=(8, 6))
     plt.plot(num_paths_list, v_exact, label="EXACT")
-    plt.plot(num_paths_list, NUMBA_ONLY_v, "o-", label="NUMBA ONLY")
-    plt.plot(num_paths_list, NUMBA_PARALLEL_v, "o-", label="NUMBA PARALLEL")
+    plt.plot(num_paths_list, numba_only_v, "o-", label="NUMBA ONLY")
+    plt.plot(num_paths_list, numba_parallel_v, "o-", label="NUMBA PARALLEL")
     plt.xlabel("Number of Paths")
     plt.ylabel("Option Value")
     plt.legend()
@@ -452,13 +438,16 @@ def test_FinNumbaNumbaParallel(use_sobol):
 
 ########################################################################################
 
+if 1 == 0:
+    test_fin_numba_numpy_speed(False)
+    test_fin_numba_numpy_speed(True)
+
+########################################################################################
 
 if 1 == 0:
-    test_FinNumbaNumpySpeed(False)
-    test_FinNumbaNumpySpeed(True)
+    test_fin_numba_numba_parallel(False)
+    test_fin_numba_numba_parallel(True)
 
-if 1 == 0:
-    test_FinNumbaNumbaParallel(False)
-    test_FinNumbaNumbaParallel(True)
+########################################################################################
 
 #  test_cases.compare_test_cases()

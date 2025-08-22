@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -23,7 +21,8 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_EquityLookBackOption():
+def test_equity_look_back_option():
+
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
@@ -32,13 +31,11 @@ def test_EquityLookBackOption():
     stock_price_range = range(90, 110, 5)
     num_steps_per_year = 252
 
-    domesticRate = 0.05
-    domestic_curve = DiscountCurveFlat(value_dt, domesticRate)
+    domestic_rate = 0.05
+    domestic_curve = DiscountCurveFlat(value_dt, domestic_rate)
 
-    foreignRate = 0.02
-    foreign_curve = DiscountCurveFlat(value_dt, foreignRate)
-
-    ########################################################################################
+    foreign_rate = 0.02
+    foreign_curve = DiscountCurveFlat(value_dt, foreign_rate)
 
     test_cases.header(
         "NUMPATHS",
@@ -235,9 +232,6 @@ def test_EquityLookBackOption():
                 diff,
                 time_elapsed,
             )
-
-    ########################################################################################
-    ########################################################################################
 
     stock_price_range = range(90, 110, 5)
     num_steps_per_year = 252
@@ -557,6 +551,5 @@ def test_EquityLookBackOption():
 
 ########################################################################################
 
-
-test_EquityLookBackOption()
+test_equity_look_back_option()
 test_cases.compare_test_cases()

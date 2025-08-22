@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,12 +15,12 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
-##########################################################################
+########################################################################################
 
 
-def test_FinNelsonSiegelCurve():
+def test_fin_nelson_siegel_curve():
 
     tau = 2.0
     times = np.linspace(0.0, 10.0, 5)
@@ -41,7 +39,7 @@ def test_FinNelsonSiegelCurve():
     test_cases.print(factor2loading)
     test_cases.print(factor3loading)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(factor1loading, 1), label="beta_1")
         plt.plot(times, scale(factor2loading, 1), label="beta_2")
@@ -52,8 +50,6 @@ def test_FinNelsonSiegelCurve():
         plt.xlabel("Time (years)")
         plt.ylabel("Loading")
         plt.legend(loc="best")
-
-    ###########################################################################
 
     test_cases.header("beta_1", "beta_2", "beta_3", "ZEROS")
 
@@ -92,7 +88,7 @@ def test_FinNelsonSiegelCurve():
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_1=3%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_1=4%")
@@ -105,8 +101,6 @@ def test_FinNelsonSiegelCurve():
         plt.xlabel("Time (years)")
         plt.ylabel("Zero Rate (%)")
         plt.legend(loc="lower right", frameon=False)
-
-    ###########################################################################
 
     beta_1 = 0.06
     beta_2 = -0.04
@@ -143,7 +137,7 @@ def test_FinNelsonSiegelCurve():
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_2=-4%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_2=-2%")
@@ -197,7 +191,7 @@ def test_FinNelsonSiegelCurve():
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_3=-2%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_3=0%")
@@ -214,6 +208,5 @@ def test_FinNelsonSiegelCurve():
 
 ########################################################################################
 
-
-test_FinNelsonSiegelCurve()
+test_fin_nelson_siegel_curve()
 test_cases.compare_test_cases()

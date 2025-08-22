@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -24,7 +22,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinFixedIborSwapLeg():
+def test_fin_fixed_ibor_swap_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -33,17 +31,17 @@ def test_FinFixedIborSwapLeg():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
-    legPayRecType = SwapTypes.PAY
+    leg_pay_rec_type = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     principal = 0.0
 
-    swapFixedLeg = SwapFixedLeg(
+    swap_fixed_leg = SwapFixedLeg(
         effective_dt,
         maturity_dt,
-        legPayRecType,
+        leg_pay_rec_type,
         coupon,
         freq_type,
         dc_type,
@@ -59,7 +57,7 @@ def test_FinFixedIborSwapLeg():
 ########################################################################################
 
 
-def test_FinFixedOISSwapLeg():
+def test_fin_fixed_ois_swap_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -68,17 +66,17 @@ def test_FinFixedOISSwapLeg():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
-    legPayRecType = SwapTypes.PAY
+    leg_pay_rec_type = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
     principal = 0.0
 
-    swapFixedLeg = SwapFixedLeg(
+    swap_fixed_leg = SwapFixedLeg(
         effective_dt,
         maturity_dt,
-        legPayRecType,
+        leg_pay_rec_type,
         coupon,
         freq_type,
         dc_type,
@@ -94,7 +92,7 @@ def test_FinFixedOISSwapLeg():
 ########################################################################################
 
 
-def test_FinFloatIborLeg():
+def test_fin_float_ibor_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -103,17 +101,17 @@ def test_FinFloatIborLeg():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.THIRTY_360_BOND
     notional = 10.0 * ONE_MILLION
-    legPayRecType = SwapTypes.PAY
+    leg_pay_rec_type = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
     principal = 0.0
 
-    swapFloatLeg = SwapFloatLeg(
+    swap_float_leg = SwapFloatLeg(
         effective_dt,
         maturity_dt,
-        legPayRecType,
+        leg_pay_rec_type,
         spread,
         freq_type,
         dc_type,
@@ -127,15 +125,15 @@ def test_FinFloatIborLeg():
 
     libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
-    firstFixing = 0.03
+    first_fixing = 0.03
 
-    v = swapFloatLeg.value(effective_dt, libor_curve, libor_curve, firstFixing)
+    v = swap_float_leg.value(effective_dt, libor_curve, libor_curve, first_fixing)
 
 
 ########################################################################################
 
 
-def test_FinFloatOISLeg():
+def test_fin_float_ois_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -144,17 +142,17 @@ def test_FinFloatOISLeg():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_360
     notional = 10.0 * ONE_MILLION
-    legPayRecType = SwapTypes.PAY
+    leg_pay_rec_type = SwapTypes.PAY
     cal_type = CalendarTypes.TARGET
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 1
     principal = 0.0
 
-    swapFloatLeg = SwapFloatLeg(
+    swap_float_leg = SwapFloatLeg(
         effective_dt,
         maturity_dt,
-        legPayRecType,
+        leg_pay_rec_type,
         spread,
         freq_type,
         dc_type,
@@ -168,15 +166,15 @@ def test_FinFloatOISLeg():
 
     libor_curve = DiscountCurveFlat(effective_dt, 0.05)
 
-    firstFixing = 0.03
+    first_fixing = 0.03
 
-    v = swapFloatLeg.value(effective_dt, libor_curve, libor_curve, firstFixing)
+    v = swap_float_leg.value(effective_dt, libor_curve, libor_curve, first_fixing)
 
 
 ########################################################################################
 
 
-def swapFixedLegMonthEnds():
+def swap_fixed_leg_month_ends():
 
     # Written in response to github issue that has been solved
 
@@ -214,7 +212,7 @@ def swapFixedLegMonthEnds():
 ########################################################################################
 
 
-def test_swapFloatLeg():
+def test_swap_float_leg():
 
     effective_dt = Date(1, 9, 2021)
 
@@ -257,16 +255,15 @@ def test_swapFloatLeg():
 
 ########################################################################################
 
-
-test_swapFloatLeg()
-# swapFixedLegMonthEnds()
+test_swap_float_leg()
+# swap_fixed_leg_month_ends()
 
 # Ibor Swap
-test_FinFixedIborSwapLeg()
-test_FinFloatIborLeg()
+test_fin_fixed_ibor_swap_leg()
+test_fin_float_ibor_leg()
 
 # OIS Swap
-test_FinFixedOISSwapLeg()
-test_FinFloatOISLeg()
+test_fin_fixed_ois_swap_leg()
+test_fin_float_ois_leg()
 
 test_cases.compare_test_cases()

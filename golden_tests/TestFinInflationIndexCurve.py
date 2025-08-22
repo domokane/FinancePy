@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -14,10 +12,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##############################################################################
+########################################################################################
 
 
-def test_FinInflationIndexCurve():
+def test_fin_inflation_index_curve():
 
     # Create a curve from times and discount factors
     index_dates = [Date(15, 1, 2008), Date(1, 4, 2008), Date(1, 5, 2008)]
@@ -41,10 +39,10 @@ def test_FinInflationIndexCurve():
     test_cases.print(ref_date, index_ratio)
 
 
-#    print(curve)
-
 ########################################################################################
 
+#    print(curve)
 
-test_FinInflationIndexCurve()
+
+test_fin_inflation_index_curve()
 test_cases.compare_test_cases()

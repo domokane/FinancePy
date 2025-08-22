@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,11 +15,10 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-
 ########################################################################################
 
 
-def test_BondFutures():
+def test_bond_futures():
 
     # Example taken from Martellini and Priaulet page 360
     freq = FrequencyTypes.SEMI_ANNUAL
@@ -70,7 +67,7 @@ def test_BondFutures():
 ########################################################################################
 
 
-def test_BondFutures_CME_two_bond_examples():
+def test_bond_futures_cme_two_bond_examples():
 
     # Example from
     # https://www.cmegroup.com/education/files/understanding-treasury-futures.pdf
@@ -119,22 +116,23 @@ def test_BondFutures_CME_two_bond_examples():
     tia2 = bfut.total_invoice_amount(settle_dt, bond2, fut_price)
     print("Total Invoice price %12.2f %12.2f" % (tia1, tia2))
 
-    delgainloss1 = bfut.delivery_gain_loss(bond1, price1, fut_price)
-    delgainloss2 = bfut.delivery_gain_loss(bond2, price2, fut_price)
-    print("Delivery Gain/Loss  %12.2f %12.2f" % (delgainloss1, delgainloss2))
+    # delgainloss1 = bfut.delivery_gain_loss(bond1, price1, fut_price)
+    # delgainloss2 = bfut.delivery_gain_loss(bond2, price2, fut_price)
+    # print("Delivery Gain/Loss  %12.2f %12.2f" % (delgainloss1, delgainloss2))
 
-    basis1 = bfut.net_basis(bond1, fut_price, price1)
-    basis2 = bfut.net_basis(bond2, fut_price, price2)
-    print("Basis (32nds)       %12.2f %12.2f" % (basis1 * 32, basis2 * 32))
+    # basis1 = bfut.net_basis(bond1, fut_price, price1)
+    # basis2 = bfut.net_basis(bond2, fut_price, price2)
+    # print("Basis (32nds)       %12.2f %12.2f" % (basis1 * 32, basis2 * 32))
 
-    basis1 = bfut.net_basis(bond1, settle_dt, fut_price, price1)
-    basis2 = bfut.net_basis(bond2, settle_dt, fut_price, price2)
-    print("Basis (32nds)       %12.2f %12.2f" % (basis1, basis2))
-
-    ###########################################################################
+    # basis1 = bfut.net_basis(bond1, settle_dt, fut_price, price1)
+    # basis2 = bfut.net_basis(bond2, settle_dt, fut_price, price2)
+    # print("Basis (32nds)       %12.2f %12.2f" % (basis1, basis2))
 
 
-def test_BondFutures_CME_table():
+########################################################################################
+
+
+def test_bond_futures_cme_table():
 
     freq = FrequencyTypes.SEMI_ANNUAL
     basis = DayCountTypes.ACT_ACT_ICMA
@@ -369,10 +367,11 @@ def test_BondFutures_CME_table():
 
         print(formatted_df.to_string(index=False))
 
-    ##########################################################################
+
+########################################################################################
 
 
-def test_BondFutures_BBG_table():
+def test_bond_futures_bbg_table():
 
     # https://i.sstatic.net/gg6eg.png
 
@@ -531,11 +530,11 @@ def test_BondFutures_BBG_table():
 
         print(formatted_df.to_string(index=False))
 
-    ##########################################################################
 
+########################################################################################
 
-# test_BondFutures()
-# test_BondFutures_CME_two_bond_examples()
-test_BondFutures_CME_table()
-test_BondFutures_BBG_table()
+# test_bond_futures()
+# test_bond_futures_cme_two_bond_examples()
+test_bond_futures_cme_table()
+test_bond_futures_bbg_table()
 test_cases.compare_test_cases()

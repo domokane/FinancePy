@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.math import scale
@@ -16,12 +14,12 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
-##########################################################################
+########################################################################################
 
 
-def test_FinNelsonSiegelSvenssonCurve():
+def test_fin_nelson_siegel_svensson_curve():
 
     tau_1 = 2.0
     tau_2 = 0.5
@@ -49,13 +47,10 @@ def test_FinNelsonSiegelSvenssonCurve():
     #    plt.plot(times,scaleVector(factor2loading,1),label='beta_2');
     #    plt.plot(times,scaleVector(factor3loading,1),label='beta_3');
     #    plt.ylim((0,1.05))
-    #
     #    plt.title('Factor Loadings in Nelson-Siegel Model');
     #    plt.xlabel('Time (years)');
     #    plt.ylabel('Loading');
     #    plt.legend(loc='best')
-
-    ##########################################################################
 
     test_cases.header("beta_1", "beta_2", "beta_3", "beta_4", "ZEROS")
 
@@ -99,7 +94,7 @@ def test_FinNelsonSiegelSvenssonCurve():
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, beta_4, zero_rates5)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_1=3%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_1=4%")
@@ -114,8 +109,7 @@ def test_FinNelsonSiegelSvenssonCurve():
         plt.legend(loc="lower right", frameon=False)
 
 
-##########################################################################
+########################################################################################
 
-
-test_FinNelsonSiegelSvenssonCurve()
+test_fin_nelson_siegel_svensson_curve()
 test_cases.compare_test_cases()

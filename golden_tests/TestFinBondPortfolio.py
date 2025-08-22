@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import os
 import datetime as dt
@@ -21,7 +19,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_BondPortfolio():
+def test_bond_portfolio():
 
     path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
@@ -62,8 +60,7 @@ def test_BondPortfolio():
             )
 
 
-##########################################################################
+########################################################################################
 
-
-test_BondPortfolio()
+test_bond_portfolio()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import matplotlib.pyplot as plt
 
@@ -27,12 +25,12 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_BondOption():
+def test_bond_option():
 
     settle_dt = Date(1, 12, 2019)
     issue_dt = Date(1, 12, 2018)
@@ -49,9 +47,6 @@ def test_BondOption():
 
     expiry_dt = settle_dt.add_tenor("18m")
     strike_price = 105.0
-    face = 100.0
-
-    ###########################################################################
 
     strikes = [80, 90, 100, 110, 120]
 
@@ -78,8 +73,6 @@ def test_BondOption():
         v = bond_option.value(settle_dt, discount_curve, model)
         test_cases.print(strike_price, v)
 
-    ###########################################################################
-
     opt_type = OptionTypes.AMERICAN_CALL
 
     price = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
@@ -100,8 +93,6 @@ def test_BondOption():
         v = bond_option.value(settle_dt, discount_curve, model)
         test_cases.print(strike_price, v)
 
-    ###########################################################################
-
     opt_type = OptionTypes.EUROPEAN_PUT
     test_cases.banner("HW EUROPEAN PUT")
     test_cases.header("STRIKE", "VALUE")
@@ -118,8 +109,6 @@ def test_BondOption():
         model = HWTree(sigma, a)
         v = bond_option.value(settle_dt, discount_curve, model)
         test_cases.print(strike_price, v)
-
-    ###########################################################################
 
     opt_type = OptionTypes.AMERICAN_PUT
     test_cases.banner("HW AMERICAN PUT")
@@ -142,7 +131,7 @@ def test_BondOption():
 ########################################################################################
 
 
-def test_BondOptionEuropeanConvergence():
+def test_bond_option_european_convergence():
 
     # CONVERGENCE TESTS
     # COMPARE AMERICAN TREE VERSUS JAMSHIDIAN IN EUROPEAN LIMIT TO CHECK THAT
@@ -207,7 +196,7 @@ def test_BondOptionEuropeanConvergence():
 ########################################################################################
 
 
-def test_BondOptionAmericanConvergenceONE():
+def test_bond_option_american_convergence_one():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
@@ -271,7 +260,7 @@ def test_BondOptionAmericanConvergenceONE():
 ########################################################################################
 
 
-def test_BondOptionAmericanConvergenceTWO():
+def test_bond_option_american_convergence_two():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
@@ -295,8 +284,8 @@ def test_BondOptionAmericanConvergenceTWO():
 
     sigma = 0.01
     a = 0.1
-    hwModel = HWTree(sigma, a)
-    K = 102.0
+    hw_model = HWTree(sigma, a)
+    k = 102.0
 
     vec_ec = []
     vec_ac = []
@@ -306,29 +295,29 @@ def test_BondOptionAmericanConvergenceTWO():
     num_steps_vector = range(100, 400, 100)
 
     for num_steps in num_steps_vector:
-        hwModel = HWTree(sigma, a, num_steps)
+        hw_model = HWTree(sigma, a, num_steps)
 
         start = time.time()
 
         euro_call_bond_option = BondOption(
-            bond, expiry_dt, K, OptionTypes.EUROPEAN_CALL
+            bond, expiry_dt, k, OptionTypes.EUROPEAN_CALL
         )
 
-        v_ec = euro_call_bond_option.value(settle_dt, discount_curve, hwModel)
+        v_ec = euro_call_bond_option.value(settle_dt, discount_curve, hw_model)
 
         amer_call_bond_option = BondOption(
-            bond, expiry_dt, K, OptionTypes.AMERICAN_CALL
+            bond, expiry_dt, k, OptionTypes.AMERICAN_CALL
         )
 
-        v_ac = amer_call_bond_option.value(settle_dt, discount_curve, hwModel)
+        v_ac = amer_call_bond_option.value(settle_dt, discount_curve, hw_model)
 
-        euro_put_bond_option = BondOption(bond, expiry_dt, K, OptionTypes.EUROPEAN_PUT)
+        euro_put_bond_option = BondOption(bond, expiry_dt, k, OptionTypes.EUROPEAN_PUT)
 
-        v_ep = euro_put_bond_option.value(settle_dt, discount_curve, hwModel)
+        v_ep = euro_put_bond_option.value(settle_dt, discount_curve, hw_model)
 
-        amer_put_bond_option = BondOption(bond, expiry_dt, K, OptionTypes.AMERICAN_PUT)
+        amer_put_bond_option = BondOption(bond, expiry_dt, k, OptionTypes.AMERICAN_PUT)
 
-        v_ap = amer_put_bond_option.value(settle_dt, discount_curve, hwModel)
+        v_ap = amer_put_bond_option.value(settle_dt, discount_curve, hw_model)
 
         end = time.time()
         period = end - start
@@ -340,7 +329,7 @@ def test_BondOptionAmericanConvergenceTWO():
         vec_ep.append(v_ep)
         vec_ap.append(v_ap)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(num_steps_vector, vec_ac, label="American Call")
         plt.legend()
@@ -353,7 +342,7 @@ def test_BondOptionAmericanConvergenceTWO():
 ########################################################################################
 
 
-def test_BondOptionZEROVOLConvergence():
+def test_bond_option_zerovol_convergence():
 
     # Build discount curve
     settle_dt = Date(1, 9, 2019)
@@ -442,7 +431,7 @@ def test_BondOptionZEROVOLConvergence():
 ########################################################################################
 
 
-def test_BondOptionDerivaGem():
+def test_bond_option_deriva_gem():
 
     # See https://github.com/domokane/FinancePy/issues/98
 
@@ -479,8 +468,6 @@ def test_BondOptionDerivaGem():
     model_hw = HWTree(sigma, a, num_steps)
 
     # ec = euro_call_bond_option.value(settle_dt, discount_curve, model_hw)
-
-    ###########################################################################
 
     coupon_times = []
     coupon_flows = []
@@ -519,29 +506,29 @@ def test_BondOptionDerivaGem():
     t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
 
     # Jamshidian approach
-    vjam = model.european_bond_option_jamshidian(
+    v_jam = model.european_bond_option_jamshidian(
         t_exp, strike_price, face, coupon_times, coupon_flows, times, dfs
     )
-    # print("Jamshidian:", vjam)
+    # print("Jamshidian:", v_jam)
 
     model.num_time_steps = 100
     model.build_tree(t_mat, times, dfs)
     exercise_type = FinExerciseTypes.EUROPEAN
 
-    vHW = model.bond_option(
+    v_hw = model.bond_option(
         t_exp, strike_price, face, coupon_times, coupon_flows, exercise_type
     )
 
-    # print("Full Tree:", vHW)
+    # print("Full Tree:", v_hw)
 
 
 ########################################################################################
 
-test_BondOptionDerivaGem()
+test_bond_option_deriva_gem()
 
-test_BondOptionZEROVOLConvergence()
-test_BondOption()
-test_BondOptionEuropeanConvergence()
-test_BondOptionAmericanConvergenceONE()
-test_BondOptionAmericanConvergenceTWO()
+test_bond_option_zerovol_convergence()
+test_bond_option()
+test_bond_option_european_convergence()
+test_bond_option_american_convergence_one()
+test_bond_option_american_convergence_two()
 test_cases.compare_test_cases()

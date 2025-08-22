@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import os
 
@@ -21,11 +19,9 @@ from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
 # TO DO
-##########################################################################
 
-##########################################################################
+########################################################################################
 
 
 def build_ibor_curve(trade_dt):
@@ -65,8 +61,7 @@ def build_ibor_curve(trade_dt):
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
     return libor_curve
 
-
-##############################################################################
+########################################################################################
 
 
 def build_issuer_curve(trade_dt, libor_curve):
@@ -86,11 +81,10 @@ def build_issuer_curve(trade_dt, libor_curve):
 
     return issuer_curve
 
+########################################################################################
 
-##########################################################################
 
-
-def test_CDSIndexPortfolio():
+def test_cds_index_portfolio():
 
     trade_dt = Date(1, 8, 2007)
     step_in_dt = trade_dt.add_days(1)
@@ -128,9 +122,7 @@ def test_CDSIndexPortfolio():
 
         issuer_curves.append(issuer_curve)
 
-    ##########################################################################
     # Now determine the average spread of the index
-    ##########################################################################
 
     cds_index = CDSIndexPortfolio()
 
@@ -160,10 +152,8 @@ def test_CDSIndexPortfolio():
     test_cases.print("AVERAGE SPD 7Y", avg_spd_7yr)
     test_cases.print("AVERAGE SPD 10Y", avg_spd_10yr)
 
-    ##########################################################################
     # Now determine the intrinsic spread of the index to the same maturity
     # dates. As the single name CDS contracts
-    ##########################################################################
 
     cds_index = CDSIndexPortfolio()
 
@@ -187,8 +177,6 @@ def test_CDSIndexPortfolio():
         * 10000.0
     )
 
-    ##########################################################################
-    ##########################################################################
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)
@@ -197,5 +185,7 @@ def test_CDSIndexPortfolio():
     test_cases.print("INTRINSIC SPD 10Y", intrinsic_spd_10yr)
 
 
-test_CDSIndexPortfolio()
+########################################################################################
+
+test_cds_index_portfolio()
 test_cases.compare_test_cases()

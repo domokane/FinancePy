@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -20,9 +18,9 @@ from os.path import dirname, join
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
 # TO DO
-##########################################################################
+
+########################################################################################
 
 
 def build_ibor_curve(trade_dt):
@@ -63,7 +61,7 @@ def build_ibor_curve(trade_dt):
     return libor_curve
 
 
-##########################################################################
+########################################################################################
 
 
 def build_issuer_curve(trade_dt, libor_curve):
@@ -84,10 +82,10 @@ def build_issuer_curve(trade_dt, libor_curve):
     return issuer_curve
 
 
-##########################################################################
+########################################################################################
 
 
-def test_performCDSIndexHazardRateAdjustment():
+def test_perform_cds_index_hazard_rate_adjustment():
 
     trade_dt = Date(1, 8, 2007)
     step_in_dt = trade_dt.add_days(1)
@@ -127,9 +125,7 @@ def test_performCDSIndexHazardRateAdjustment():
 
         issuer_curves.append(issuer_curve)
 
-    ##########################################################################
     # Now determine the average spread of the index
-    ##########################################################################
 
     cds_index = CDSIndexPortfolio()
 
@@ -162,10 +158,8 @@ def test_performCDSIndexHazardRateAdjustment():
         "==================================================================="
     )
 
-    ##########################################################################
     # Now determine the intrinsic spread of the index to same maturity dates
     # As the single name CDS contracts
-    ##########################################################################
 
     cds_index = CDSIndexPortfolio()
 
@@ -189,9 +183,6 @@ def test_performCDSIndexHazardRateAdjustment():
         * 10000.0
     )
 
-    ##########################################################################
-    ##########################################################################
-
     test_cases.header("LABEL", "VALUE")
     test_cases.print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)
     test_cases.print("INTRINSIC SPD 5Y", intrinsic_spd_5yr)
@@ -200,9 +191,6 @@ def test_performCDSIndexHazardRateAdjustment():
     test_cases.banner(
         "==================================================================="
     )
-
-    ##########################################################################
-    ##########################################################################
 
     index_cpns = [0.002, 0.0037, 0.0050, 0.0063]
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
@@ -214,7 +202,7 @@ def test_performCDSIndexHazardRateAdjustment():
         Date(20, 12, 2016),
     ]
 
-    index_recoveryRate = 0.40
+    index_recovery_rate = 0.40
 
     tolerance = 1e-4  # should be smaller
 
@@ -229,7 +217,7 @@ def test_performCDSIndexHazardRateAdjustment():
         index_cpns,
         index_upfronts,
         index_maturity_dts,
-        index_recoveryRate,
+        index_recovery_rate,
         tolerance,
     )
 
@@ -285,6 +273,5 @@ def test_performCDSIndexHazardRateAdjustment():
 
 ########################################################################################
 
-
-test_performCDSIndexHazardRateAdjustment()
+test_perform_cds_index_hazard_rate_adjustment()
 test_cases.compare_test_cases()

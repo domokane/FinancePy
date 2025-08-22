@@ -25,8 +25,11 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
+########################################################################################
+
 
 def test_ibor_benchmarks_report():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -179,8 +182,11 @@ def test_ibor_benchmarks_report():
         .values.any()
     ) == False
 
+########################################################################################
+
 
 def test_dataframe_to_benchmarks():
+
     path = dirname(__file__)
     filename = "ibor_benchmarks_example.csv"
     full_filename_path = join(path, "data", filename)
@@ -203,8 +209,12 @@ def test_dataframe_to_benchmarks():
     assert len(benchmarks["IborSwap"]) == 10
 
 
+########################################################################################
+
 try:
     test_ibor_benchmarks_report()
     test_dataframe_to_benchmarks()
+########################################################################################
+
 except Exception as e:
     print(f"Unexpected error:{e}", sys.exc_info()[0])

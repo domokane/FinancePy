@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import os
 import sys
@@ -29,8 +27,7 @@ from financepy.utils.global_types import SwapTypes
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-
-##########################################################################
+########################################################################################
 
 
 def build_ibor_curve(value_dt):
@@ -208,8 +205,7 @@ def build_ibor_curve(value_dt):
 
     return libor_curve
 
-
-##########################################################################
+########################################################################################
 
 
 def test_bond():
@@ -253,10 +249,9 @@ def test_bond():
                 "%8.4f" % ytm,
             )
 
-    ###########################################################################
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
 
-    accrualConvention = DayCountTypes.ACT_ACT_ICMA
+    accrual_convention = DayCountTypes.ACT_ACT_ICMA
     y = 0.062267
     settle_dt = Date(19, 4, 1994)
     issue_dt = Date(15, 7, 1990)
@@ -272,7 +267,7 @@ def test_bond():
         maturity_dt,
         coupon,
         freq_type,
-        accrualConvention,
+        accrual_convention,
         ex_div_days,
     )
 
@@ -290,18 +285,18 @@ def test_bond():
     test_cases.print("Yield to Maturity = ", ytm)
 
     bump = 1e-4
-    priceBumpedUp = bond.dirty_price_from_ytm(settle_dt, y + bump)
-    test_cases.print("Price Bumped Up:", priceBumpedUp)
+    price_bumped_up = bond.dirty_price_from_ytm(settle_dt, y + bump)
+    test_cases.print("Price Bumped Up:", price_bumped_up)
 
-    priceBumpedDn = bond.dirty_price_from_ytm(settle_dt, y - bump)
-    test_cases.print("Price Bumped Dn:", priceBumpedDn)
+    price_bumped_dn = bond.dirty_price_from_ytm(settle_dt, y - bump)
+    test_cases.print("Price Bumped Dn:", price_bumped_dn)
 
-    durationByBump = -(priceBumpedUp - dirty_price) / bump
-    test_cases.print("Duration by Bump = ", durationByBump)
+    duration_by_bump = -(price_bumped_up - dirty_price) / bump
+    test_cases.print("Duration by Bump = ", duration_by_bump)
 
     duration = bond.dollar_duration(settle_dt, y)
     test_cases.print("Dollar Duration = ", duration)
-    test_cases.print("Duration Difference:", duration - durationByBump)
+    test_cases.print("Duration Difference:", duration - duration_by_bump)
 
     modified_duration = bond.modified_duration(settle_dt, y)
     test_cases.print("Modified Duration = ", modified_duration)
@@ -349,10 +344,8 @@ def test_bond():
     test_cases.print("Above par bond at 120 ASW:", asw * 10000)
     test_cases.print("Above par bond at 120 OAS:", oas * 10000)
 
-    ##########################################################################
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     # Page 10 TREASURY NOTE SCREENSHOT
-    ##########################################################################
 
     test_cases.banner("BLOOMBERG US TREASURY EXAMPLE")
     settle_dt = Date(21, 7, 2017)
@@ -415,9 +408,7 @@ def test_bond():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     test_cases.print("Convexity = ", conv)
 
-    ##########################################################################
     # Page 11 APPLE NOTE SCREENSHOT
-    ##########################################################################
 
     test_cases.banner("BLOOMBERG APPLE CORP BOND EXAMPLE")
     settle_dt = Date(21, 7, 2017)
@@ -470,7 +461,6 @@ def test_bond():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     test_cases.print("Convexity", conv)
 
-
 ########################################################################################
 
 
@@ -492,7 +482,6 @@ def test_bond_ex_dividend():
     test_cases.print("settle_dt:", settle_dt)
     test_cases.print("Accrued:", accrued)
 
-    ###########################################################################
     test_cases.banner("=======================================================")
     test_cases.header("SETTLEMENT", "DIRTY PRICE", "ACCRUED", "CLEAN PRICE")
 
@@ -517,7 +506,6 @@ def test_bond_ex_dividend():
         clean_price = dirty_price - accrued
         test_cases.print(settle_dt, dirty_price, accrued, clean_price)
 
-
 ########################################################################################
 
 
@@ -536,7 +524,6 @@ def test_bond_payment_dates():
         print(bond.flow_amounts)
         print(bond.cpn_dts)
         print(bond._payment_dts)
-
 
 ########################################################################################
 
@@ -591,7 +578,6 @@ def test_bond_ror():
             irr,
         )
 
-
 ########################################################################################
 
 
@@ -609,7 +595,6 @@ def test_bond_eom():
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
     ai = bond.accrued_interest(settle_dt)  # should be 8406.593406
-
 
 ########################################################################################
 
@@ -708,7 +693,6 @@ def test_oas():
     if (oas - (-34.95)) > 0.01:
         print("OAS incorrect")
 
-
 ########################################################################################
 
 
@@ -736,6 +720,7 @@ def test_div_dts():
 
     ytm = bond.yield_to_maturity(settle_dt, clean_price) * 100.0
     print("Yield to Mat: %10.5f %%" % (ytm))
+
 
 
 ########################################################################################

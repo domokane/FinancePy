@@ -14,7 +14,9 @@ disable=
     W0511,  # fixme
     W0718,  # comparison-with-itself
     R0801,   # Duplicate code
-    C0209
+    C0209,
+    C0200,
+    C0413
 
 [FORMAT]
 # Match Black's defaults

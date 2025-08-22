@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -18,7 +16,8 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinFXOneTouchOption():
+def test_fin_fx_one_touch_option():
+
     # Examples Haug Page 180 Table 4-22
     # Agreement not exact at t is not exactly 0.50
 
@@ -28,21 +27,21 @@ def test_FinFXOneTouchOption():
     barrier_level = 1.0  # H
     model = BlackScholes(volatility)
 
-    domesticRate = 0.10
-    foreignRate = 0.03
+    domestic_rate = 0.10
+    foreign_rate = 0.03
 
     num_paths = 50000
     num_steps_per_year = 252 * 2
 
-    dom_curve = DiscountCurveFlat(value_dt, domesticRate)
-    for_curve = DiscountCurveFlat(value_dt, foreignRate)
+    dom_curve = DiscountCurveFlat(value_dt, domestic_rate)
+    for_curve = DiscountCurveFlat(value_dt, foreign_rate)
 
     spot_fx_rate = 1.050
     payment_size = 1.5
 
     test_cases.header("================================= CASH ONLY")
 
-    downTypes = [
+    down_types = [
         TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT,
         TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY,
         TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING,
@@ -50,9 +49,9 @@ def test_FinFXOneTouchOption():
 
     test_cases.header("TYPE", "VALUE", "VALUE_MC")
 
-    for downType in downTypes:
+    for down_type in down_types:
 
-        option = FXOneTouchOption(expiry_dt, downType, barrier_level, payment_size)
+        option = FXOneTouchOption(expiry_dt, down_type, barrier_level, payment_size)
 
         v = option.value(value_dt, spot_fx_rate, dom_curve, for_curve, model)
 
@@ -66,14 +65,14 @@ def test_FinFXOneTouchOption():
             num_paths,
         )
 
-        test_cases.print("%60s " % downType, "%9.5f" % v, "%9.5f" % v_mc)
+        test_cases.print("%60s " % down_type, "%9.5f" % v, "%9.5f" % v_mc)
 
-    #        print(downType, v, v_mc)
+    #        print(down_type, v, v_mc)
 
     spot_fx_rate = 0.950
     payment_size = 1.5
 
-    upTypes = [
+    up_types = [
         TouchOptionTypes.UP_AND_IN_CASH_AT_HIT,
         TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY,
         TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING,
@@ -81,9 +80,9 @@ def test_FinFXOneTouchOption():
 
     test_cases.header("TYPE", "VALUE", "VALUE_MC")
 
-    for upType in upTypes:
+    for up_type in up_types:
 
-        option = FXOneTouchOption(expiry_dt, upType, barrier_level, payment_size)
+        option = FXOneTouchOption(expiry_dt, up_type, barrier_level, payment_size)
 
         v = option.value(value_dt, spot_fx_rate, dom_curve, for_curve, model)
 
@@ -97,16 +96,15 @@ def test_FinFXOneTouchOption():
             num_paths,
         )
 
-        test_cases.print("%60s " % upType, "%9.5f" % v, "%9.5f" % v_mc)
+        test_cases.print("%60s " % up_type, "%9.5f" % v, "%9.5f" % v_mc)
 
 
-#        print(upType, v, v_mc)
-
+#        print(up_type, v, v_mc)
 
 ########################################################################################
 
 
-def test_BBGOneTouchOption():
+def test_bbg_one_touch_option():
 
     # 1YR ONETOUCH ON EURUSD
 
@@ -119,20 +117,20 @@ def test_BBGOneTouchOption():
 
     model = BlackScholes(volatility)
 
-    forRate = 0.00593  # EUR
-    domRate = -0.00414  # USD
+    for_rate = 0.00593  # EUR
+    dom_rate = -0.00414  # USD
 
     num_paths = 50000
     num_steps_per_year = 252
 
-    dom_curve = DiscountCurveFlat(value_dt, domRate)
-    for_curve = DiscountCurveFlat(value_dt, forRate)
+    dom_curve = DiscountCurveFlat(value_dt, dom_rate)
+    for_curve = DiscountCurveFlat(value_dt, for_rate)
 
     payment_size = 1000000  # EUR
 
-    optionType = TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY
+    option_type = TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY
 
-    option = FXOneTouchOption(expiry_dt, optionType, barrier_level, payment_size)
+    option = FXOneTouchOption(expiry_dt, option_type, barrier_level, payment_size)
 
     v = option.value(value_dt, spot_fx_rate, dom_curve, for_curve, model)
 
@@ -158,7 +156,7 @@ def test_BBGOneTouchOption():
     # DELTA IS -9560266
 
     if 1 == 0:
-        print(optionType)
+        print(option_type)
         print("Value:", v)
         print("Value MC:", v_mc)
         print("Delta: ", d)
@@ -168,7 +166,6 @@ def test_BBGOneTouchOption():
 
 ########################################################################################
 
-
-test_FinFXOneTouchOption()
-test_BBGOneTouchOption()
+test_fin_fx_one_touch_option()
+test_bbg_one_touch_option()
 test_cases.compare_test_cases()

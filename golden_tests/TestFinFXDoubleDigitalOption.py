@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import sys
@@ -20,10 +18,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def test_FinFXDoubleDigitalOption():
+def test_fin_fx_double_digital_option():
 
     value_dt = Date(10, 4, 2020)
     expiry_dt = Date(18, 9, 2020)
@@ -66,6 +64,5 @@ def test_FinFXDoubleDigitalOption():
 
 ########################################################################################
 
-
-test_FinFXDoubleDigitalOption()
+test_fin_fx_double_digital_option()
 test_cases.compare_test_cases()

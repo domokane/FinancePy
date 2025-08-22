@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,7 +15,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_Calendar():
+def test_calendar():
 
     set_date_format(DateFormatTypes.US_LONGEST)
     end_dt = Date(31, 12, 2030)
@@ -50,6 +48,5 @@ def test_Calendar():
 
 ########################################################################################
 
-
-test_Calendar()
+test_calendar()
 test_cases.compare_test_cases()

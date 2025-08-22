@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -41,12 +39,13 @@ import matplotlib.pyplot as plt
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def buildOIS(value_dt):
+def build_ois(value_dt):
+
     """Build the OIS funding curve from futures (FRAs) and OIS"""
 
     spot_days = 0
@@ -235,11 +234,11 @@ def buildOIS(value_dt):
 
     return ois_curve
 
-
 ########################################################################################
 
 
-def test_bloombergPricingExample():
+def test_bloomberg_pricing_example():
+
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
@@ -469,7 +468,7 @@ def test_bloombergPricingExample():
     #    swaps[0].print_fixed_leg_pv()
     #    swaps[0].print_float_leg_pv()
 
-    ois_curve = buildOIS(value_dt)
+    ois_curve = build_ois(value_dt)
     #    print(ois_curve)
 
     libor_dual_curve = IborDualCurve(
@@ -533,11 +532,10 @@ def test_bloombergPricingExample():
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()
 
-
 ########################################################################################
 
 
-def test_swapValuationExample():
+def test_swap_valuation_example():
 
     # Example from
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
@@ -577,9 +575,7 @@ def test_swapValuationExample():
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
 
-    ###########################################################################
     # MARKET
-    ###########################################################################
 
     spot_days = 0
     settle_dt = value_dt.add_weekdays(spot_days)
@@ -805,7 +801,6 @@ def test_swapValuationExample():
     test_cases.print("BBG VALUE", v_bbg)
     test_cases.print("FP ONE CURVE VALUE", v1)
 
-    ########################################################################################
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
@@ -1133,6 +1128,8 @@ def test_swapValuationExample():
     )
 
 
+########################################################################################
+
 #    v2 = off_mkt_swap.value(value_dt, ois_curve_ff, ibor_dual_curve, -0.268/100.0)
 
 #    test_cases.print("FP DUAL CURVE VALUE", v2)
@@ -1147,10 +1144,9 @@ def test_swapValuationExample():
 #    off_mkt_swap.print_float_leg_pv()
 
 
-########################################################################################
 
-# test_swapValuationExample()
+# test_swap_valuation_example()
 
-test_bloombergPricingExample()
+test_bloomberg_pricing_example()
 
 test_cases.compare_test_cases()

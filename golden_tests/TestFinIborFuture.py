@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,14 +15,14 @@ set_date_format(DateFormatTypes.UK_LONG)
 ########################################################################################
 
 
-def test_FinIborFuture():
+def test_fin_ibor_future():
 
-    todayDate = Date(5, 5, 2020)
+    today_date = Date(5, 5, 2020)
 
     test_cases.header("VALUES")
 
     for i in range(1, 12):
-        fut = IborFuture(todayDate, i, "3M")
+        fut = IborFuture(today_date, i, "3M")
         test_cases.print(fut)
 
         fra = fut.to_fra(0.020, 0.0)
@@ -33,6 +31,5 @@ def test_FinIborFuture():
 
 ########################################################################################
 
-
-test_FinIborFuture()
+test_fin_ibor_future()
 test_cases.compare_test_cases()

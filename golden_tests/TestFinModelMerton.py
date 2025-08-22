@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -16,7 +14,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinModelMertonCredit():
+def test_fin_model_merton_credit():
 
     # Input Equity values and equity vols
     equity_value = [2.6406, 2.6817, 3.977, 2.947, 2.528]
@@ -106,6 +104,5 @@ def test_FinModelMertonCredit():
 
 ########################################################################################
 
-
-test_FinModelMertonCredit()
+test_fin_model_merton_credit()
 test_cases.compare_test_cases()

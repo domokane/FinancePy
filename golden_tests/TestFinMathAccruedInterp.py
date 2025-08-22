@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import sys
 
@@ -14,12 +12,12 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-pltGraph = False
+plt_graph = False
 
-##########################################################################
+########################################################################################
 
 
-def test_FinMathAccdInterpolator():
+def test_fin_math_accd_interpolator():
 
     cpn_times = [0.0, 4.000087613144162, 4.495649459810208, 5.002162949496498]
     cpn_flows = [0.0, 0.0, 0.03461111111111111, 0.035194444444444445]
@@ -81,12 +79,11 @@ def test_FinMathAccdInterpolator():
     test_cases.header("VALUE")
     test_cases.print(values)
 
-    if pltGraph:
+    if plt_graph:
         plt.plot(tree_times, values)
 
 
-##########################################################################
+########################################################################################
 
-
-test_FinMathAccdInterpolator()
+test_fin_math_accd_interpolator()
 test_cases.compare_test_cases()

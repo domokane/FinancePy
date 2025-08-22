@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import sys
@@ -21,18 +19,15 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-########################################################################################
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
-########################################################################################
 # TODO: ADD LOGGING TO TEST CASES
+
 ########################################################################################
 
 
-def test_FinFXMktVolSurface1(verboseCalibration):
-
-    ###########################################################################
+def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
     if 1 == 1:
 
@@ -94,7 +89,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 
         fx_market_plus.check_calibration(False)
 
-        if 1 == 0:  # PLOT_GRAPHS:
+        if 1 == 0:  # plot_graphs:
 
             fx_market_plus.plot_vol_curves()
 
@@ -111,7 +106,7 @@ def test_FinFXMktVolSurface1(verboseCalibration):
 ########################################################################################
 
 
-def test_FinFXMktVolSurface2(verboseCalibration):
+def test_fin_fx_mkt_vol_surface2(verbose_calibration):
 
     # print("==============================================================")
 
@@ -173,7 +168,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 
     #        fx_market_plus.check_calibration(True)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         fx_market_plus.plot_vol_curves()
 
         plt.figure()
@@ -189,9 +184,7 @@ def test_FinFXMktVolSurface2(verboseCalibration):
 ########################################################################################
 
 
-def test_FinFXMktVolSurface3(verboseCalibration):
-
-    ###########################################################################
+def test_fin_fx_mkt_vol_surface3(verbose_calibration):
 
     if 1 == 1:
 
@@ -249,7 +242,7 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
         fx_market_plus.check_calibration(False)
 
-        if 1 == 0:  # PLOT_GRAPHS:
+        if 1 == 0:  # plot_graphs:
 
             fx_market_plus.plot_vol_curves()
 
@@ -282,19 +275,17 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
             fig = plt.figure()
             ax = fig.add_subplot(111, projection="3d")
-            X, Y = np.meshgrid(years, strikes)
+            x, y = np.meshgrid(years, strikes)
             zs = np.array(vol_surface)
-            Z = zs.reshape(X.shape)
+            z = zs.reshape(x.shape)
 
-            ax.plot_surface(X, Y, Z)
+            ax.plot_surface(x, y, z)
 
             ax.set_xlabel("Years")
             ax.set_ylabel("Strikes")
             ax.set_zlabel("Volatility")
 
             plt.show()
-
-        #######################################################################
 
         deltas = np.linspace(0.10, 0.90, 17)
 
@@ -311,11 +302,11 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 
             fig = plt.figure()
             ax = fig.add_subplot(111, projection="3d")
-            X, Y = np.meshgrid(years, deltas)
+            x, y = np.meshgrid(years, deltas)
             zs = np.array(vol_surface)
-            Z = zs.reshape(X.shape)
+            z = zs.reshape(x.shape)
 
-            ax.plot_surface(X, Y, Z)
+            ax.plot_surface(x, y, z)
 
             ax.set_xlabel("Years")
             ax.set_ylabel("Delta")
@@ -327,11 +318,9 @@ def test_FinFXMktVolSurface3(verboseCalibration):
 ########################################################################################
 
 
-def test_FinFXMktVolSurface4(verboseCalibration):
+def test_fin_fx_mkt_vol_surface4(verbose_calibration):
 
-    ###########################################################################
     # Here I remove the 25D Vols
-    ###########################################################################
 
     if 1 == 1:
 
@@ -415,11 +404,11 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 
             fig = plt.figure()
             ax = fig.add_subplot(111, projection="3d")
-            X, Y = np.meshgrid(years, deltas)
+            x, y = np.meshgrid(years, deltas)
             zs = np.array(vol_surface)
-            Z = zs.reshape(X.shape)
+            z = zs.reshape(x.shape)
 
-            ax.plot_surface(X, Y, Z)
+            ax.plot_surface(x, y, z)
 
             ax.set_xlabel("Years")
             ax.set_ylabel("Delta")
@@ -431,11 +420,9 @@ def test_FinFXMktVolSurface4(verboseCalibration):
 ########################################################################################
 
 
-def test_FinFXMktVolSurface5(verboseCalibration):
+def test_fin_fx_mkt_vol_surface5(verbose_calibration):
 
-    ###########################################################################
     # Here I remove the 10D Vols
-    ###########################################################################
 
     if 1 == 1:
 
@@ -503,18 +490,19 @@ def test_FinFXMktVolSurface5(verboseCalibration):
 
 ########################################################################################
 
+########################################################################################
 
 if __name__ == "__main__":
 
     start = time.time()
 
-    verboseCalibration = False
+    verbose_calibration = False
 
-    test_FinFXMktVolSurface1(verboseCalibration)
-    test_FinFXMktVolSurface2(verboseCalibration)
-    test_FinFXMktVolSurface3(verboseCalibration)
-    test_FinFXMktVolSurface4(verboseCalibration)
-    test_FinFXMktVolSurface5(verboseCalibration)
+    test_fin_fx_mkt_vol_surface1(verbose_calibration)
+    test_fin_fx_mkt_vol_surface2(verbose_calibration)
+    test_fin_fx_mkt_vol_surface3(verbose_calibration)
+    test_fin_fx_mkt_vol_surface4(verbose_calibration)
+    test_fin_fx_mkt_vol_surface5(verbose_calibration)
 
     end = time.time()
 

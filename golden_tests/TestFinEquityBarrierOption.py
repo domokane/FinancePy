@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'kkane
-########################################################################################
 
 import sys
 
@@ -25,7 +23,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_EquitybbarrierOption():
+def test_equitybbarrier_option():
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
@@ -45,8 +43,6 @@ def test_EquitybbarrierOption():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     model = BlackScholes(volatility)
-
-    #######################################################################
 
     import time
 
@@ -142,8 +138,6 @@ def test_EquitybbarrierOption():
 
         end = time.time()
 
-    ##########################################################################
-
     stock_prices = [80, 100, 120]
     bb = 105.0
 
@@ -172,8 +166,6 @@ def test_EquitybbarrierOption():
 
             test_cases.print(opt_type, kk, bb, stock_price, value, delta, vega, theta)
 
-    ########################################################################################
-
     stock_prices = [80, 100, 120]
     bb = 105.0
 
@@ -190,6 +182,5 @@ def test_EquitybbarrierOption():
 
 ########################################################################################
 
-
-test_EquitybbarrierOption()
+test_equitybbarrier_option()
 test_cases.compare_test_cases()

@@ -25,10 +25,13 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
-DIAGNOSTICS_MODE = False
+diagnostics_mode = False
+
+########################################################################################
 
 
 def test_par_rate_risk_report_cubic_zero():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
@@ -79,7 +82,7 @@ def test_par_rate_risk_report_cubic_zero():
     ]
     actual_totals = risk_report["total"].values
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         trade_labels = list(base_values.keys())
         np.set_printoptions(suppress=True)
         print(base_values)
@@ -88,8 +91,11 @@ def test_par_rate_risk_report_cubic_zero():
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+########################################################################################
+
 
 def test_par_rate_risk_report_flat_forward():
+
     valuation_date = Date(6, 10, 2022)
     base_curve = build_ibor_single_curve(valuation_date, "10Y")
     settlement_date = base_curve.used_swaps[0].effective_dt
@@ -141,7 +147,7 @@ def test_par_rate_risk_report_flat_forward():
     ]
     actual_totals = risk_report["total"].values
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         trade_labels = list(base_values.keys())
         np.set_printoptions(suppress=True)
         print(base_values)
@@ -150,8 +156,11 @@ def test_par_rate_risk_report_flat_forward():
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+########################################################################################
+
 
 def test_forward_rate_risk_report():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -219,7 +228,7 @@ def test_forward_rate_risk_report():
     ]
     actual_totals = risk_report[re.DV01_PREFIX + "total"].values
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         dv01_trade_labels = [re.DV01_PREFIX + l for l in base_values.keys()]
         np.set_printoptions(suppress=True)
         print(base_values)
@@ -229,8 +238,11 @@ def test_forward_rate_risk_report():
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+########################################################################################
+
 
 def test_forward_rate_custom_grid_risk_report():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -280,7 +292,7 @@ def test_forward_rate_custom_grid_risk_report():
     expected_totals = [0.24374713, 1.70089994, 3.65138343]
     actual_totals = risk_report[re.DV01_PREFIX + "total"].values
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         dv01_trade_labels = [re.DV01_PREFIX + l for l in base_values.keys()]
         np.set_printoptions(suppress=True)
         print(base_values)
@@ -290,8 +302,11 @@ def test_forward_rate_custom_grid_risk_report():
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+########################################################################################
+
 
 def test_carry_rolldown_report():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -334,7 +349,7 @@ def test_carry_rolldown_report():
         trades,
     )
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         roll_trade_labels = [re.ROLL_PREFIX + l for l in base_values.keys()]
         np.set_printoptions(suppress=True)
         print(base_values)
@@ -356,8 +371,11 @@ def test_carry_rolldown_report():
     actual_totals = risk_report[re.ROLL_PREFIX + "total"].values
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+########################################################################################
+
 
 def test_parallel_shift_ladder_report():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -400,7 +418,7 @@ def test_parallel_shift_ladder_report():
         trades,
     )
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         pv_trade_labels = [re.PV_PREFIX + l for l in base_values.keys()]
         np.set_printoptions(suppress=True)
         print(base_values)
@@ -436,8 +454,11 @@ def test_parallel_shift_ladder_report():
     actual_totals = risk_report[re.PV_PREFIX + "total"].values
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+########################################################################################
+
 
 def _generate_trades(
+
     valuation_date,
     cal,
     swap_type,
@@ -473,8 +494,11 @@ def _generate_trades(
     trades = [trade1, trade2]
     return trades
 
+########################################################################################
+
 
 def _generate_base_curve(
+
     valuation_date,
     cal,
     interp_type,
@@ -483,6 +507,8 @@ def _generate_base_curve(
     swap_type,
     fixed_dcc_type,
     fixed_freq_type,
+########################################################################################
+
 ):
     depos = []
     spot_days = 2
@@ -562,6 +588,8 @@ def _generate_base_curve(
 
     return settlement_date, base_curve
 
+
+########################################################################################
 
 if 1 == 1:
     test_par_rate_risk_report_cubic_zero()

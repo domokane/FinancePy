@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 
@@ -16,17 +14,17 @@ from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##############################################################################
 # TODO
 # Inherit from DiscountCurve and add df method
 # Put in a convention for the rate
 # Use Frequency object
-##############################################################################
 
-PLOT_GRAPHS = False
+plot_graphs = False
+
+########################################################################################
 
 
-def test_FinDiscountCurvePolynomial():
+def test_fin_discount_curve_polynomial():
 
     times = np.linspace(0.00, 10.0, 21)
     curve_dt = Date(2, 2, 2019)
@@ -36,7 +34,7 @@ def test_FinDiscountCurvePolynomial():
     zeros = curve1.zero_rate(dates)
     fwds = curve1.fwd(dates)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
 
         plt.figure(figsize=(6, 4))
         plt.plot(times, zeros, label="Zeros")
@@ -46,5 +44,7 @@ def test_FinDiscountCurvePolynomial():
         plt.legend(loc="best")
 
 
-test_FinDiscountCurvePolynomial()
+########################################################################################
+
+test_fin_discount_curve_polynomial()
 test_cases.compare_test_cases()

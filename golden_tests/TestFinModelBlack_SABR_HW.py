@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -15,12 +13,12 @@ import matplotlib.pyplot as plt
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_FinSABR():
+def test_fin_sabr():
 
     strikes = np.linspace(0.01, 0.06, 10)
 
@@ -37,12 +35,12 @@ def test_FinSABR():
     model2 = SABR(alpha, beta, rho, nu)
 
     f = 0.0350
-    T = 1.0
+    t = 1.0
 
-    vols1 = model1.black_vol(f, strikes, T)
-    vols2 = model2.black_vol(f, strikes, T)
+    vols1 = model1.black_vol(f, strikes, t)
+    vols2 = model2.black_vol(f, strikes, t)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(strikes, vols1)
         plt.plot(strikes, vols2)
@@ -52,7 +50,7 @@ def test_FinSABR():
 ########################################################################################
 
 
-def test_FinShiftedSABRSimple():
+def test_fin_shifted_sabr_simple():
 
     strikes = np.linspace(0.01, 0.06, 10)
 
@@ -69,12 +67,12 @@ def test_FinShiftedSABRSimple():
     model2 = SABRShifted(alpha, beta, rho, nu, 0.0)
 
     f = 0.0350
-    T = 1.0
+    t = 1.0
 
-    vols1 = model1.black_vol(f, strikes, T)
-    vols2 = model2.black_vol(f, strikes, T)
+    vols1 = model1.black_vol(f, strikes, t)
+    vols2 = model2.black_vol(f, strikes, t)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(strikes, vols1)
         plt.plot(strikes, vols2)
@@ -84,7 +82,7 @@ def test_FinShiftedSABRSimple():
 ########################################################################################
 
 
-def test_FinShiftedSABR():
+def test_fin_shifted_sabr():
 
     strikes = np.linspace(-0.006, 0.016, 10)
 
@@ -97,11 +95,11 @@ def test_FinShiftedSABR():
     model = SABRShifted(alpha, beta, rho, nu, shift)
 
     f = 0.0006384
-    T = 1.0
+    t = 1.0
 
-    vols = model.black_vol(f, strikes, T)
+    vols = model.black_vol(f, strikes, t)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(strikes, vols)
         plt.title("SHIFTED SABR")
@@ -109,9 +107,8 @@ def test_FinShiftedSABR():
 
 ########################################################################################
 
-
-test_FinSABR()
-test_FinShiftedSABRSimple()
-test_FinShiftedSABR()
+test_fin_sabr()
+test_fin_shifted_sabr_simple()
+test_fin_shifted_sabr()
 
 test_cases.compare_test_cases()

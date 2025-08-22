@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 import sys
@@ -22,13 +20,12 @@ from financepy.products.credit.cds_option import CDSOption
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
 # TO DO
-##########################################################################
-##########################################################################
+
+########################################################################################
 
 
-def buildFullIssuerCurve(value_dt):
+def build_full_issuer_curve(value_dt):
 
     dc_type = DayCountTypes.ACT_360
     depos = []
@@ -217,21 +214,20 @@ def buildFullIssuerCurve(value_dt):
 
     return libor_curve, issuer_curve
 
+########################################################################################
 
-##########################################################################
 
-
-def test_dirty_priceCDSwaption():
+def test_dirty_price_cd_swaption():
 
     # This reproduces example on page 38 of Open Gamma note on CDS Option
     trade_dt = Date(5, 2, 2014)
-    _, issuer_curve = buildFullIssuerCurve(trade_dt)
+    _, issuer_curve = build_full_issuer_curve(trade_dt)
     step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt
     expiry_dt = Date(20, 3, 2014)
     maturity_dt = Date(20, 6, 2019)
 
-    cdsRecovery = 0.40
+    cds_recovery = 0.40
     notional = 100.0
     long_protection = False
     cds_cpn = 0.0  # NOT KNOWN
@@ -244,14 +240,14 @@ def test_dirty_priceCDSwaption():
     #    cds_contract.print(value_dt)
 
     test_cases.header("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
     test_cases.print("PAR SPREAD:", spd)
 
-    v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
+    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
     test_cases.print("DIRTY VALUE", v["dirty_pv"])
     test_cases.print("CLEAN VALUE", v["clean_pv"])
 
-    p = cds_contract.clean_price(value_dt, issuer_curve, cdsRecovery)
+    p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN PRICE", p)
 
     accrued_days = cds_contract.accrued_days()
@@ -260,14 +256,14 @@ def test_dirty_priceCDSwaption():
     accrued_interest = cds_contract.accrued_interest()
     test_cases.print("ACCRUED COUPON", accrued_interest)
 
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PREMIUM LEG PV", premPV)
+    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    test_cases.print("PREMIUM LEG PV", prem_pv)
 
-    fullRPV01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
-    test_cases.print("FULL  RPV01", fullRPV01)
+    full_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
+    test_cases.print("FULL  RPV01", full_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
 
     #    cds_contract.print_payments(issuer_curve)
@@ -280,18 +276,18 @@ def test_dirty_priceCDSwaption():
 
     #    cds_contract.print(value_dt)
 
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
     test_cases.print("PAR SPREAD", spd)
 
-    v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
+    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
     test_cases.print("DIRTY VALUE", v["dirty_pv"])
     test_cases.print("CLEAN VALUE", v["clean_pv"])
 
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PREMIUM LEG PV", premPV)
+    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    test_cases.print("PREMIUM LEG PV", prem_pv)
 
     dirty_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
     test_cases.print("DIRTY RPV01", dirty_rpv01)
@@ -315,13 +311,13 @@ def test_dirty_priceCDSwaption():
 
         long_protection = True  # long protection
 
-        cdsOption = CDSOption(
+        cds_option = CDSOption(
             expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection
         )
 
-        v = cdsOption.value(value_dt, issuer_curve, volatility)
+        v = cds_option.value(value_dt, issuer_curve, volatility)
 
-        vol = cdsOption.implied_volatility(value_dt, issuer_curve, v)
+        vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
 
         test_cases.print(strike, long_protection, v, vol)
 
@@ -329,19 +325,20 @@ def test_dirty_priceCDSwaption():
 
         long_protection = False  # long protection
 
-        cdsOption = CDSOption(
+        cds_option = CDSOption(
             expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection
         )
 
-        v = cdsOption.value(value_dt, issuer_curve, volatility)
+        v = cds_option.value(value_dt, issuer_curve, volatility)
 
-        vol = cdsOption.implied_volatility(value_dt, issuer_curve, v)
+        vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
 
         test_cases.print(strike, long_protection, v, vol)
 
 
-##########################################################################
 
 
-test_dirty_priceCDSwaption()
+########################################################################################
+
+test_dirty_price_cd_swaption()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import sys
 
@@ -25,7 +23,8 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_HullWhiteExampleOne():
+def test_hull_white_example_one():
+
     # HULL BOOK INITIAL EXAMPLE SECTION 28.7 HW EDITION 6
 
     times = [0.0, 0.5000, 1.00000, 1.50000, 2.00000, 2.500000, 3.00000]
@@ -52,11 +51,12 @@ def test_HullWhiteExampleOne():
 ########################################################################################
 
 
-def test_HullWhiteExampleTwo():
+def test_hull_white_example_two():
+
     # HULL BOOK ZERO COUPON BOND EXAMPLE 28.1 SEE TABLE 28.3
     # Replication may not be exact as I am using dates rather than times
 
-    zeroDays = [
+    zero_days = [
         0,
         3,
         31,
@@ -94,7 +94,7 @@ def test_HullWhiteExampleTwo():
         7.49015,
     ]
 
-    times = np.array(zeroDays) / 365.0
+    times = np.array(zero_days) / 365.0
     zeros = np.array(zero_rates) / 100.0
     dfs = np.exp(-zeros * times)
 
@@ -171,7 +171,8 @@ def test_HullWhiteExampleTwo():
 ########################################################################################
 
 
-def test_HullWhiteBondOption():
+def test_hull_white_bond_option():
+
     # Valuation of a European option on a cpn bearing bond
 
     settle_dt = Date(1, 12, 2019)
@@ -270,7 +271,8 @@ def test_HullWhiteBondOption():
 ########################################################################################
 
 
-def test_HullWhiteCallableBond():
+def test_hull_white_callable_bond():
+
     # Valuation of a European option on a cpn bearing bond
 
     settle_dt = Date(1, 12, 2019)
@@ -295,9 +297,7 @@ def test_HullWhiteCallableBond():
     cpn_times = np.array(cpn_times)
     cpn_flows = np.array(cpn_flows)
 
-    ###########################################################################
     # Set up the call and put times and prices
-    ###########################################################################
 
     call_dts = []
     call_prices = []
@@ -345,8 +345,6 @@ def test_HullWhiteCallableBond():
         t = (dt - settle_dt) / G_DAYS_IN_YEARS
         put_times.append(t)
 
-    ###########################################################################
-
     t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
     curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
@@ -362,8 +360,6 @@ def test_HullWhiteCallableBond():
 
     dfs = np.array(dfs)
     times = np.array(times)
-
-    ###########################################################################
 
     v1 = bond.clean_price_from_discount_curve(settle_dt, curve)
 
@@ -399,9 +395,8 @@ def test_HullWhiteCallableBond():
 
 ########################################################################################
 
-
-test_HullWhiteExampleOne()
-test_HullWhiteExampleTwo()
-test_HullWhiteBondOption()
-test_HullWhiteCallableBond()
+test_hull_white_example_one()
+test_hull_white_example_two()
+test_hull_white_bond_option()
+test_hull_white_callable_bond()
 test_cases.compare_test_cases()

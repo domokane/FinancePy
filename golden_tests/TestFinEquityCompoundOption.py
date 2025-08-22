@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,10 +15,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def test_EquityCompoundOption():
+def test_equity_compound_option():
 
     value_dt = Date(1, 1, 2015)
     expiry_dt1 = Date(1, 1, 2017)
@@ -37,8 +35,6 @@ def test_EquityCompoundOption():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     num_steps_list = [100, 200, 500, 1000]
-
-    ###########################################################################
 
     stock_price = 85.0
 
@@ -83,8 +79,6 @@ def test_EquityCompoundOption():
                     values[0],
                 )
 
-    ###########################################################################
-
     stock_price = 85.0
 
     test_cases.header(
@@ -128,8 +122,6 @@ def test_EquityCompoundOption():
                     value,
                     values[0],
                 )
-
-    ###########################################################################
 
     test_cases.header(
         "TYPE1",
@@ -210,8 +202,7 @@ def test_EquityCompoundOption():
                 )
 
 
-##########################################################################
+########################################################################################
 
-
-test_EquityCompoundOption()
+test_equity_compound_option()
 test_cases.compare_test_cases()

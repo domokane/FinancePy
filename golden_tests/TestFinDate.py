@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 import time
@@ -16,9 +14,10 @@ from financepy.utils.date import Date, date_range
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-########################################################################################
 
 set_date_format(DateFormatTypes.UK_LONGEST)
+
+########################################################################################
 
 
 def test_dt():
@@ -46,7 +45,7 @@ def test_dt():
 ########################################################################################
 
 
-def test_dtTenors():
+def test_dt_tenors():
 
     start_dt = Date(23, 2, 2018)
 
@@ -113,7 +112,7 @@ def test_dt_range():
 ########################################################################################
 
 
-def test_dtAddMonths():
+def test_dt_add_months():
 
     start_dt = Date(1, 1, 2010)
 
@@ -132,7 +131,7 @@ def test_dtAddMonths():
 ########################################################################################
 
 
-def test_dtAddYears():
+def test_dt_add_years():
 
     start_dt = Date(1, 1, 2010)
 
@@ -167,7 +166,7 @@ def test_dtAddYears():
 ########################################################################################
 
 
-def test_dtSpeed():
+def test_dt_speed():
 
     num_steps = 100
     start = time.time()
@@ -188,7 +187,7 @@ def test_dtSpeed():
 ########################################################################################
 
 
-def test_dtFormat():
+def test_dt_format():
 
     dt = Date(20, 10, 2019)
     test_cases.header("FORMAT", "DATE")
@@ -201,7 +200,7 @@ def test_dtFormat():
 ########################################################################################
 
 
-def test_IntraDay():
+def test_intra_day():
 
     test_cases.header("Date1", "Date2", "Diff")
     d1 = Date(20, 10, 2019, 0, 0, 0)
@@ -210,23 +209,17 @@ def test_IntraDay():
     test_cases.print(d1, d2, diff)
     test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
-    ###########################################################################
-
     d1 = Date(20, 10, 2019, 10, 0, 0)
     d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
     test_cases.print(d1, d2, diff)
     test_cases.print(d1.excel_dt, d2.excel_dt, diff)
 
-    ###########################################################################
-
     d1 = Date(20, 10, 2019, 10, 0, 0)
     d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
     test_cases.print(d1, d2, diff)
     test_cases.print(d1.excel_dt, d2.excel_dt, diff)
-
-    ###########################################################################
 
     d1 = Date(19, 10, 2019, 10, 0, 0)
     d2 = Date(20, 10, 2019, 10, 25, 40)
@@ -238,7 +231,7 @@ def test_IntraDay():
 ########################################################################################
 
 
-def test_dtEOM():
+def test_dt_eom():
 
     dt = Date(29, 2, 2000)
     assert dt.is_eom() is True
@@ -289,10 +282,10 @@ def test_dtEOM():
     assert dt.eom().is_eom() is True
 
 
-########################################################################################
-
 import datetime
 from financepy.utils import from_datetime
+
+########################################################################################
 
 
 def test_add_weekdays():
@@ -317,14 +310,14 @@ test_add_weekdays()
 start = time.time()
 
 test_dt()
-test_dtTenors()
+test_dt_tenors()
 test_dt_range()
-test_dtAddMonths()
-test_dtAddYears()
-test_dtSpeed()
-test_dtFormat()
-test_IntraDay()
-test_dtEOM()
+test_dt_add_months()
+test_dt_add_years()
+test_dt_speed()
+test_dt_format()
+test_intra_day()
+test_dt_eom()
 
 end = time.time()
 elapsed = end - start

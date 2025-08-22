@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -22,7 +20,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_BondConvertible():
+def test_bond_convertible():
 
     settle_dt = Date(31, 12, 2003)
     start_convert_date = Date(31, 12, 2003)
@@ -133,6 +131,5 @@ def test_BondConvertible():
 
 ########################################################################################
 
-
-test_BondConvertible()
+test_bond_convertible()
 test_cases.compare_test_cases()

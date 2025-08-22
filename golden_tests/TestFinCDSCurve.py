@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -28,7 +26,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinCDSCurve():
+def test_fin_cds_curve():
 
     curve_dt = Date(20, 12, 2018)
 
@@ -36,7 +34,7 @@ def test_FinCDSCurve():
     depos = []
     fras = []
 
-    fixedDCC = DayCountTypes.ACT_365F
+    fixed_dcc = DayCountTypes.ACT_365F
     fixed_freq = FrequencyTypes.SEMI_ANNUAL
     fixed_cpn = 0.05
 
@@ -49,7 +47,7 @@ def test_FinCDSCurve():
             SwapTypes.PAY,
             fixed_cpn,
             fixed_freq,
-            fixedDCC,
+            fixed_dcc,
         )
         swaps.append(swap)
 
@@ -107,7 +105,7 @@ def test_FinCDSCurve():
 ########################################################################################
 
 
-def test_CDS_recovery_rate():
+def test_cds_recovery_rate():
 
     value_dt = Date(15, 8, 2022)
     settle_dt = value_dt
@@ -164,12 +162,12 @@ def test_CDS_recovery_rate():
     issuer_curve = CDSCurve(value_dt, cdss, libor_curve, recovery_rate)
 
 
+########################################################################################
+
 #    print(issuer_curve)
 
 
-########################################################################################
-
-test_FinCDSCurve()
-test_CDS_recovery_rate()
+test_fin_cds_curve()
+test_cds_recovery_rate()
 
 test_cases.compare_test_cases()

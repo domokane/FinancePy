@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -22,7 +20,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinDiscountCurveZeros():
+def test_fin_discount_curve_zeros():
 
     start_dt = Date(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)
@@ -49,8 +47,6 @@ def test_FinDiscountCurveZeros():
         test_cases.print(dt, df)
 
     #    print(curve)
-
-    ########################################################################################
 
     num_repeats = 100
 
@@ -101,12 +97,12 @@ def test_FinDiscountCurveZeros():
     period = end - start
 
 
+########################################################################################
+
 #    print("Time taken:", period)
 
 #    print(curve)
 
-########################################################################################
 
-
-test_FinDiscountCurveZeros()
+test_fin_discount_curve_zeros()
 test_cases.compare_test_cases()

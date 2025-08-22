@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -28,7 +26,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinBinomialTree():
+def test_fin_binomial_tree():
 
     stock_price = 50.0
     risk_free_rate = 0.06
@@ -197,6 +195,5 @@ def test_FinBinomialTree():
 
 ########################################################################################
 
-
-test_FinBinomialTree()
+test_fin_binomial_tree()
 test_cases.compare_test_cases()

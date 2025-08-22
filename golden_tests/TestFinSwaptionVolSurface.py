@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -18,18 +16,14 @@ from FinTestCases import FinTestCases, global_test_case_mode
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-########################################################################################
+plot_graphs = False
 
-PLOT_GRAPHS = False
-
-########################################################################################
 # TODO: ADD LOGGING TO TEST CASES
+
 ########################################################################################
 
 
-def test_FinSwaptionVolSurface1():
-
-    ###########################################################################
+def test_fin_swaption_vol_surface1():
 
     # https://fr.mathworks.com/help/fininst/pricing-a-swaption-using-the-sabr-model.html
 
@@ -76,15 +70,15 @@ def test_FinSwaptionVolSurface1():
     fwd_swap_rates = market_strikes[3]
     atm_vols = market_volatilities[3]
 
-    rfrRate = 0.020  # USD
-    discount_curve = DiscountCurveFlat(value_dt, rfrRate)
+    rfr_rate = 0.020  # USD
+    discount_curve = DiscountCurveFlat(value_dt, rfr_rate)
 
-    divRate = 0.010  # USD
-    dividend_curve = DiscountCurveFlat(value_dt, divRate)
+    div_rate = 0.010  # USD
+    dividend_curve = DiscountCurveFlat(value_dt, div_rate)
 
     vol_function_type = VolFuncTypes.SABR_BETA_HALF
 
-    swaptionSurface = SwaptionVolSurface(
+    swaption_surface = SwaptionVolSurface(
         value_dt,
         exercise_dts,
         fwd_swap_rates,
@@ -93,19 +87,19 @@ def test_FinSwaptionVolSurface1():
         vol_function_type,
     )
 
-    if 1 == 0:  # PLOT_GRAPHS:
+    if 1 == 0:  # plot_graphs:
 
         tol = 1e-4
-        swaptionSurface.check_calibration(False, tol)
+        swaption_surface.check_calibration(False, tol)
 
-        swaptionSurface.plot_vol_curves()
+        swaption_surface.plot_vol_curves()
 
         # plt.figure()
 
         # mins = 0.5
         # maxs = 5.0
 
-        # dbns = swaptionSurface.implied_dbns(mins, maxs, 1000)
+        # dbns = swaption_surface.implied_dbns(mins, maxs, 1000)
 
         # for i in range(0, len(dbns)):
         #     expiry_dt_str = str(equitySurface._expiry_dts[i])
@@ -117,4 +111,4 @@ def test_FinSwaptionVolSurface1():
 
 ########################################################################################
 
-test_FinSwaptionVolSurface1()
+test_fin_swaption_vol_surface1()

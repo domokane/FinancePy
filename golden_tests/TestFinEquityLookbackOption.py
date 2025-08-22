@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -24,7 +22,8 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_EquityLookBackOption():
+def test_equity_look_back_option():
+
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
@@ -37,8 +36,6 @@ def test_EquityLookBackOption():
 
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
-
-    ########################################################################################
 
     test_cases.header(
         "NUMPATHS",
@@ -235,9 +232,6 @@ def test_EquityLookBackOption():
                 diff,
                 time_elapsed,
             )
-
-    ########################################################################################
-    ########################################################################################
 
     stock_price_range = range(90, 110, 10)
     num_steps_per_year = 252
@@ -562,10 +556,10 @@ def test_example():
 
     expiry_dt = Date(1, 1, 2021)
     strike_price = 105.0
-    opt_typeCall = OptionTypes.EUROPEAN_CALL
-    opt_typePut = OptionTypes.EUROPEAN_PUT
-    lookbackCall = EquityFixedLookbackOption(expiry_dt, opt_typeCall, strike_price)
-    lookbackPut = EquityFixedLookbackOption(expiry_dt, opt_typePut, strike_price)
+    opt_type_call = OptionTypes.EUROPEAN_CALL
+    opt_type_put = OptionTypes.EUROPEAN_PUT
+    lookback_call = EquityFixedLookbackOption(expiry_dt, opt_type_call, strike_price)
+    lookback_put = EquityFixedLookbackOption(expiry_dt, opt_type_put, strike_price)
 
     value_dt = Date(1, 1, 2020)
     interest_rate = 0.10
@@ -580,7 +574,7 @@ def test_example():
 
     test_cases.header("VALUE")
     for vol in volatilities:
-        v = lookbackCall.value(
+        v = lookback_call.value(
             value_dt,
             stock_price,
             discount_curve,
@@ -593,7 +587,6 @@ def test_example():
 
 ########################################################################################
 
-
 test_example()
-# test_EquityLookBackOption()
+# test_equity_look_back_option()
 test_cases.compare_test_cases()

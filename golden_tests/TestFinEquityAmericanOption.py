@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import sys
@@ -22,7 +20,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def testEquityAmericanOption():
+def test_equity_american_option():
 
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2017)
@@ -171,10 +169,11 @@ def testEquityAmericanOption():
         test_cases.print("AMERICAN_TREE_PUT", num_steps, results, duration)
 
 
-#    FinTest.TestReport(filename)
-
 ########################################################################################
 
+#    FinTest.TestReport(filename)
 
-testEquityAmericanOption()
+
+
+test_equity_american_option()
 test_cases.compare_test_cases()

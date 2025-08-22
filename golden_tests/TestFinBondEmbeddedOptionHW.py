@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import matplotlib.pyplot as plt
 
@@ -23,12 +21,12 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_BondEmbeddedOption_MATLAB():
+def test_bond_embedded_option_matlab():
 
     # https://fr.mathworks.com/help/fininst/optembndbyhw.html
     # I FIND THAT THE PRICE CONVERGES TO 102.88 WHICH IS CLOSE TO 102.9127
@@ -38,8 +36,6 @@ def test_BondEmbeddedOption_MATLAB():
     settle_dt = Date(1, 1, 2007)
     value_dt = settle_dt
 
-    ###########################################################################
-
     dc_type = DayCountTypes.THIRTY_E_360
     fixed_freq = FrequencyTypes.ANNUAL
     fixed_leg_type = SwapTypes.PAY
@@ -48,8 +44,6 @@ def test_BondEmbeddedOption_MATLAB():
     swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type)
     swaps = [swap1, swap2, swap3]
     discount_curve = IborSingleCurve(value_dt, [], [], swaps)
-
-    ###########################################################################
 
     issue_dt = Date(1, 1, 2004)
     maturity_dt = Date(1, 1, 2010)
@@ -102,7 +96,7 @@ def test_BondEmbeddedOption_MATLAB():
         test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
         values.append(v["bondwithoption"])
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.plot(time_steps, values)
 
@@ -110,7 +104,7 @@ def test_BondEmbeddedOption_MATLAB():
 ########################################################################################
 
 
-def test_BondEmbeddedOption_QUANTLIB():
+def test_bond_embedded_option_quantlib():
 
     # Based on example at the nice blog on Quantlib at
     # http://gouthamanbalaraman.com/blog/callable-bond-quantlib-python.html
@@ -121,11 +115,7 @@ def test_BondEmbeddedOption_QUANTLIB():
     value_dt = Date(16, 8, 2016)
     settle_dt = value_dt.add_weekdays(3)
 
-    ###########################################################################
-
     discount_curve = DiscountCurveFlat(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
-
-    ###########################################################################
 
     issue_dt = Date(15, 9, 2010)
     maturity_dt = Date(15, 9, 2022)
@@ -134,9 +124,7 @@ def test_BondEmbeddedOption_QUANTLIB():
     dc_type = DayCountTypes.ACT_ACT_ICMA
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-    ###########################################################################
     # Set up the call and put times and prices
-    ###########################################################################
 
     next_call_dt = Date(15, 9, 2016)
     call_dts = [next_call_dt]
@@ -182,7 +170,7 @@ def test_BondEmbeddedOption_QUANTLIB():
         test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
         values.append(v["bondwithoption"])
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure()
         plt.title("Puttable Bond Price Convergence")
         plt.plot(time_steps, values)
@@ -190,7 +178,6 @@ def test_BondEmbeddedOption_QUANTLIB():
 
 ########################################################################################
 
-
-test_BondEmbeddedOption_MATLAB()
-test_BondEmbeddedOption_QUANTLIB()
+test_bond_embedded_option_matlab()
+test_bond_embedded_option_quantlib()
 test_cases.compare_test_cases()

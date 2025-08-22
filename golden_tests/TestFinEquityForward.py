@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -14,7 +12,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
 def test_equity_forward():
@@ -27,7 +25,6 @@ def test_equity_forward():
     discount_rate = 0.05
     dividend_rate = 0.02
 
-    ###########################################################################
 
     expiry_dt = value_dt.add_months(12)
     notional = 100.0
@@ -53,8 +50,9 @@ def test_equity_forward():
     test_cases.print(stock_price, fwd_price, fwd_value)
 
 
-########################################################################################
 
+
+########################################################################################
 
 test_equity_forward()
 test_cases.compare_test_cases()

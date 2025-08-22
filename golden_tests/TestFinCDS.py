@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import numpy as np
@@ -29,9 +27,9 @@ from financepy.products.credit.cds import CDS
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
 # TO DO
-##########################################################################
+
+########################################################################################
 
 
 def test_cds_fast_approximation():
@@ -47,8 +45,6 @@ def test_cds_fast_approximation():
     libor_curve = DiscountCurve(
         value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES
     )
-
-    ##########################################################################
 
     maturity_dt = value_dt.next_cds_date(120)
     t = (maturity_dt - value_dt) / 365.242
@@ -80,7 +76,7 @@ def test_cds_fast_approximation():
         test_cases.print(mkt_cpn * 10000, v_exact, v_approx, pct_diff)
 
 
-##########################################################################
+########################################################################################
 
 
 def test_cds_curve_repricing():
@@ -88,14 +84,14 @@ def test_cds_curve_repricing():
     value_dt = Date(20, 6, 2018)
     recovery_rate = 0.40
 
-    cds_contracts, issuer_curve = test_IssuerCurveBuild()
+    cds_contracts, issuer_curve = test_issuer_curve_build()
     test_cases.header("CDS_MATURITY_dt", "PAR_SPREAD")
     for cds in cds_contracts:
         spd = cds.par_spread(value_dt, issuer_curve, recovery_rate)
         test_cases.print(str(cds.maturity_dt), spd * 10000.0)
 
 
-##########################################################################
+########################################################################################
 
 
 def test_cds_curve_build_timing():
@@ -104,7 +100,7 @@ def test_cds_curve_build_timing():
 
     start = time.time()
     for _ in range(0, num_curves):
-        test_IssuerCurveBuild()
+        test_issuer_curve_build()
 
     end = time.time()
 
@@ -113,10 +109,10 @@ def test_cds_curve_build_timing():
     test_cases.print(str(num_curves) + " Libor curves", duration)
 
 
-##########################################################################
+########################################################################################
 
 
-def test_IssuerCurveBuild():
+def test_issuer_curve_build():
     """Test issuer curve build with simple libor curve to isolate cds
     curve building time cost."""
 
@@ -168,10 +164,10 @@ def test_IssuerCurveBuild():
     return cds_contracts, issuer_curve
 
 
-##########################################################################
+########################################################################################
 
 
-def buildFullIssuerCurve1(mkt_spdBump, ir_bump):
+def build_full_issuer_curve1(mkt_spdBump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
@@ -375,7 +371,7 @@ def buildFullIssuerCurve1(mkt_spdBump, ir_bump):
     return libor_curve, issuer_curve
 
 
-##########################################################################
+########################################################################################
 
 
 def test_dirty_price_cds():
@@ -384,7 +380,7 @@ def test_dirty_price_cds():
 
     test_cases.header("Example", "Markit 9 Aug 2019")
 
-    libor_curve, issuer_curve = buildFullIssuerCurve1(0.0, 0.0)
+    libor_curve, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
 
     # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2029)
@@ -397,17 +393,17 @@ def test_dirty_price_cds():
 
     cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
 
-    cdsRecovery = 0.40
+    cds_recovery = 0.40
 
     test_cases.header("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
     test_cases.print("PAR_SPREAD", spd)
 
-    v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
+    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
     test_cases.print("DIRTY_VALUE", v["dirty_pv"])
     test_cases.print("CLEAN_VALUE", v["clean_pv"])
 
-    p = cds_contract.clean_price(value_dt, issuer_curve, cdsRecovery)
+    p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN_PRICE", p)
 
     # MARKIT PRICE IS 168517
@@ -418,11 +414,11 @@ def test_dirty_price_cds():
     accrued_interest = cds_contract.accrued_interest()
     test_cases.print("ACCRUED_COUPON", accrued_interest)
 
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("prot_PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PREMIUM_PV", premPV)
+    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    test_cases.print("PREMIUM_PV", prem_pv)
 
     dirty_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
     test_cases.print("DIRTY_RPV01", dirty_rpv01)
@@ -432,14 +428,14 @@ def test_dirty_price_cds():
 
     bump = 1.0 / 10000.0  # 1 bp
 
-    libor_curve, issuer_curve = buildFullIssuerCurve1(bump, 0)
-    v_bump = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
+    libor_curve, issuer_curve = build_full_issuer_curve1(bump, 0)
+    v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
     dv = v_bump["dirty_pv"] - v["dirty_pv"]
     test_cases.print("CREDIT_DV01", dv)
 
     # Interest Rate Bump
-    libor_curve, issuer_curve = buildFullIssuerCurve1(0, bump)
-    v_bump = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
+    libor_curve, issuer_curve = build_full_issuer_curve1(0, bump)
+    v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
     dv = v_bump["dirty_pv"] - v["dirty_pv"]
     test_cases.print("INTEREST_DV01", dv)
 
@@ -447,7 +443,7 @@ def test_dirty_price_cds():
     z = libor_curve.df(maturity_dt)
     r = -np.log(z) / t
 
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cdsRecovery)
+    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
 
     test_cases.print("DIRTY APPROX VALUE", v_approx[0])
     test_cases.print("CLEAN APPROX VALUE", v_approx[1])
@@ -455,10 +451,10 @@ def test_dirty_price_cds():
     test_cases.print("APPROX INTEREST DV01", v_approx[3])
 
 
-##########################################################################
+########################################################################################
 
 
-def buildFullIssuerCurve2(mkt_spdBump, ir_bump):
+def build_full_issuer_curve2(mkt_spdBump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 20 August 2020 SNAP AT 1600
@@ -584,14 +580,14 @@ def buildFullIssuerCurve2(mkt_spdBump, ir_bump):
     return libor_curve, issuer_curve
 
 
-##########################################################################
+########################################################################################
 
 
 def test_dirty_price_cds_model_check():
 
     test_cases.print("Example", "MARKIT CHECK 19 Aug 2020")
 
-    libor_curve, issuer_curve = buildFullIssuerCurve2(0.0, 0.0)
+    libor_curve, issuer_curve = build_full_issuer_curve2(0.0, 0.0)
 
     # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2025)
@@ -604,17 +600,17 @@ def test_dirty_price_cds_model_check():
 
     cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
 
-    cdsRecovery = 0.40
+    cds_recovery = 0.40
 
     test_cases.header("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
     test_cases.print("PAR_SPREAD", spd)
 
-    v = cds_contract.value(value_dt, issuer_curve, cdsRecovery)
+    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
     test_cases.print("FULL_VALUE", v["dirty_pv"])
     test_cases.print("CLEAN_VALUE", v["clean_pv"])
 
-    p = cds_contract.clean_price(value_dt, issuer_curve, cdsRecovery)
+    p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN_PRICE", p)
 
     accrued_days = cds_contract.accrued_days()
@@ -623,20 +619,20 @@ def test_dirty_price_cds_model_check():
     accrued_interest = cds_contract.accrued_interest()
     test_cases.print("ACCRUED_COUPON", accrued_interest)
 
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("prot_PV", prot_pv)
 
-    premPV = cds_contract.premium_leg_pv(value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PREMIUM_PV", premPV)
+    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    test_cases.print("PREMIUM_PV", prem_pv)
 
     rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
     test_cases.print("FULL_RPV01", rpv01["dirty_rpv01"])
     test_cases.print("CLEAN_RPV01", rpv01["clean_rpv01"])
 
-    credit_dv01 = cds_contract.credit_dv01(value_dt, issuer_curve, cdsRecovery)
+    credit_dv01 = cds_contract.credit_dv01(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CREDIT DV01", credit_dv01)
 
-    interest_dv01 = cds_contract.interest_dv01(value_dt, issuer_curve, cdsRecovery)
+    interest_dv01 = cds_contract.interest_dv01(value_dt, issuer_curve, cds_recovery)
     test_cases.print("INTEREST DV01", interest_dv01)
 
     # Consider fast approximation
@@ -645,7 +641,7 @@ def test_dirty_price_cds_model_check():
     r = -np.log(z) / t
 
     mkt_spd = 0.01
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cdsRecovery)
+    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
 
     test_cases.header("FAST VALUATIONS", "VALUE")
 
@@ -655,12 +651,12 @@ def test_dirty_price_cds_model_check():
     test_cases.print("APPROX INTEREST DV01", v_approx[3])
 
 
-##########################################################################
+########################################################################################
 
 
 def test_dirty_price_cds_convergence():
 
-    _, issuer_curve = buildFullIssuerCurve1(0.0, 0.0)
+    _, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
 
     # This is the 10 year contract at an off market cpn
     maturity_dt = Date(20, 6, 2029)
@@ -672,17 +668,17 @@ def test_dirty_price_cds_convergence():
 
     cds_contract = CDS(value_dt, maturity_dt, cds_cpn, notional, long_protection)
 
-    cdsRecovery = 0.40
+    cds_recovery = 0.40
 
     test_cases.header("NumSteps", "Value")
     for n in [10, 50, 100, 500, 1000]:
-        v_dirty = cds_contract.value(value_dt, issuer_curve, cdsRecovery, 0, 1, n)[
+        v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[
             "dirty_pv"
         ]
         test_cases.print(n, v_dirty)
 
 
-##########################################################################
+########################################################################################
 
 
 def test_cds_date_generation():
@@ -717,8 +713,7 @@ def test_cds_date_generation():
         )
 
 
-##########################################################################
-
+########################################################################################
 
 test_cds_curve_build_timing()
 test_dirty_price_cds_model_check()

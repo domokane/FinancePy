@@ -87,7 +87,7 @@ def build_flat_issuer_curve(trade_dt, libor_curve, spread, recovery_rate):
     return issuer_curve
 
 
-def buildFullIssuerCurve(value_dt):
+def build_full_issuer_curve(value_dt):
 
     dc_type = DayCountTypes.ACT_360
     depos = []

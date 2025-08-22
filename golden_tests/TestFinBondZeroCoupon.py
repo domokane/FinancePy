@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -21,8 +19,7 @@ from financepy.utils.math import ONE_MILLION
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
-
+plot_graphs = False
 
 ########################################################################################
 
@@ -46,7 +43,6 @@ def test_bond_zero():
 
     test_cases.header("YTM", "accrued")
     test_cases.print(ytm, accrued_interest)
-
 
 ########################################################################################
 
@@ -104,11 +100,14 @@ def test_bond_zero_ror():
         )
 
 
+
 ########################################################################################
 
 try:
     test_bond_zero()
     test_bond_zero_ror()
     test_cases.compare_test_cases()
+########################################################################################
+
 except Exception as e:
     print(f"Unexpected error:{e}", sys.exc_info()[0])

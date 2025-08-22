@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 import time
@@ -38,21 +36,21 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##############################################################################
+########################################################################################
 
 
-def test_ibor_depositsAndSwaps(value_dt):
+def test_ibor_deposits_and_swaps(value_dt):
 
-    depoBasis = DayCountTypes.THIRTY_E_360_ISDA
+    depo_basis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
     settle_dt = value_dt.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settle_dt, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settle_dt, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settle_dt, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_dt, "1M", deposit_rate, depo_basis)
+    depo2 = IborDeposit(settle_dt, "3M", deposit_rate, depo_basis)
+    depo3 = IborDeposit(settle_dt, "6M", deposit_rate, depo_basis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -61,14 +59,20 @@ def test_ibor_depositsAndSwaps(value_dt):
     fras = []
 
     swaps = []
-    fixedBasis = DayCountTypes.ACT_365F
+    fixed_basis = DayCountTypes.ACT_365F
     fixed_freq = FrequencyTypes.SEMI_ANNUAL
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
-    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
-    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixedBasis)
+    swap1 = IborSwap(
+        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
+    )
+    swap2 = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
+    )
+    swap3 = IborSwap(
+        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
+    )
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -79,23 +83,21 @@ def test_ibor_depositsAndSwaps(value_dt):
     return libor_curve
 
 
-##########################################################################
+########################################################################################
 
 
-def test_IborCapFloor():
+def test_ibor_cap_floor():
 
-    todayDate = Date(20, 6, 2019)
-    value_dt = todayDate
-    start_dt = todayDate.add_weekdays(2)
+    today_date = Date(20, 6, 2019)
+    value_dt = today_date
+    start_dt = today_date.add_weekdays(2)
     maturity_dt = start_dt.add_tenor("1Y")
-    libor_curve = test_ibor_depositsAndSwaps(todayDate)
+    libor_curve = test_ibor_deposits_and_swaps(today_date)
 
     # The capfloor has begun
     # last_fixing = 0.028
 
-    ##########################################################################
     # COMPARISON OF MODELS
-    ##########################################################################
 
     strikes = np.linspace(0.02, 0.08, 5)
 
@@ -118,8 +120,8 @@ def test_IborCapFloor():
     model6 = Bachelier(0.01)
 
     for k in strikes:
-        capFloorType = FinCapFloorTypes.CAP
-        capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+        cap_floor_type = FinCapFloorTypes.CAP
+        capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         cvalue1 = capfloor.value(value_dt, libor_curve, model1)
         cvalue2 = capfloor.value(value_dt, libor_curve, model2)
         cvalue3 = capfloor.value(value_dt, libor_curve, model3)
@@ -140,8 +142,8 @@ def test_IborCapFloor():
     )
 
     for k in strikes:
-        capFloorType = FinCapFloorTypes.FLOOR
-        capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+        cap_floor_type = FinCapFloorTypes.FLOOR
+        capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         fvalue1 = capfloor.value(value_dt, libor_curve, model1)
         fvalue2 = capfloor.value(value_dt, libor_curve, model2)
         fvalue3 = capfloor.value(value_dt, libor_curve, model3)
@@ -150,9 +152,7 @@ def test_IborCapFloor():
         fvalue6 = capfloor.value(value_dt, libor_curve, model6)
         test_cases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
 
-    ########################################################################################
     # PUT CALL CHECK
-    ########################################################################################
 
     test_cases.header(
         "LABEL",
@@ -166,8 +166,8 @@ def test_IborCapFloor():
     )
 
     for k in strikes:
-        capFloorType = FinCapFloorTypes.CAP
-        capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+        cap_floor_type = FinCapFloorTypes.CAP
+        capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         cvalue1 = capfloor.value(value_dt, libor_curve, model1)
         cvalue2 = capfloor.value(value_dt, libor_curve, model2)
         cvalue3 = capfloor.value(value_dt, libor_curve, model3)
@@ -175,8 +175,8 @@ def test_IborCapFloor():
         cvalue5 = capfloor.value(value_dt, libor_curve, model5)
         cvalue6 = capfloor.value(value_dt, libor_curve, model6)
 
-        capFloorType = FinCapFloorTypes.FLOOR
-        capfloor = IborCapFloor(start_dt, maturity_dt, capFloorType, k)
+        cap_floor_type = FinCapFloorTypes.FLOOR
+        capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         fvalue1 = capfloor.value(value_dt, libor_curve, model1)
         fvalue2 = capfloor.value(value_dt, libor_curve, model2)
         fvalue3 = capfloor.value(value_dt, libor_curve, model3)
@@ -206,34 +206,34 @@ def test_IborCapFloor():
 ########################################################################################
 
 
-def test_IborCapFloorVolCurve():
+def test_ibor_cap_floor_vol_curve():
     """aim here is to price cap and caplets using cap and caplet vols and to
     demonstrate they are the same - NOT SURE THAT HULLS BOOKS FORMULA WORKS FOR
     OPTIONS."""
 
-    todayDate = Date(20, 6, 2019)
-    value_dt = todayDate
+    today_date = Date(20, 6, 2019)
+    value_dt = today_date
     maturity_dt = value_dt.add_tenor("3Y")
     dc_type = DayCountTypes.THIRTY_E_360
     frequency = FrequencyTypes.ANNUAL
 
     k = 0.04
-    capFloorType = FinCapFloorTypes.CAP
-    capFloor = IborCapFloor(
-        value_dt, maturity_dt, capFloorType, k, None, frequency, dc_type
+    cap_floor_type = FinCapFloorTypes.CAP
+    cap_floor = IborCapFloor(
+        value_dt, maturity_dt, cap_floor_type, k, None, frequency, dc_type
     )
 
-    capVolDates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
+    cap_vol_dates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
 
     flat_rate = 0.04
     libor_curve = DiscountCurveFlat(value_dt, flat_rate, frequency, dc_type)
 
     flat = False
     if flat is True:
-        capVolatilities = [20.0] * 11
-        capVolatilities[0] = 0.0
+        cap_volatilities = [20.0] * 11
+        cap_volatilities[0] = 0.0
     else:
-        capVolatilities = [
+        cap_volatilities = [
             0.00,
             15.50,
             18.25,
@@ -247,10 +247,10 @@ def test_IborCapFloorVolCurve():
             15.54,
         ]
 
-    capVolatilities = np.array(capVolatilities) / 100.0
-    capVolatilities[0] = 0.0
+    cap_volatilities = np.array(cap_volatilities) / 100.0
+    cap_volatilities[0] = 0.0
 
-    vol_curve = IborCapVolCurve(value_dt, capVolDates, capVolatilities, dc_type)
+    vol_curve = IborCapVolCurve(value_dt, cap_vol_dates, cap_volatilities, dc_type)
 
     #    print(vol_curve._capletGammas)
 
@@ -258,54 +258,54 @@ def test_IborCapFloorVolCurve():
     tcap = (maturity_dt - value_dt) / G_DAYS_IN_YEARS
     vol = vol_curve.cap_vol(maturity_dt)
     model = Black(vol)
-    valueCap = capFloor.value(value_dt, libor_curve, model)
-    #    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", valueCap)
+    value_cap = cap_floor.value(value_dt, libor_curve, model)
+    #    print("CAP T", tcap, "VOL:", vol, "VALUE OF CAP:", value_cap)
 
     # Value cap by breaking it down into caplets using caplet vols
-    vCaplets = 0.0
-    capletstart_dt = capFloor.caplet_floorlet_dates[1]
+    v_caplets = 0.0
+    capletstart_dt = cap_floor.caplet_floorlet_dates[1]
     test_cases.header("START", "END", "VOL", "VALUE")
 
-    for caplet_end_dt in capFloor.caplet_floorlet_dates[2:]:
+    for caplet_end_dt in cap_floor.caplet_floorlet_dates[2:]:
         vol = vol_curve.caplet_vol(caplet_end_dt)
-        modelCaplet = Black(vol)
-        vCaplet = capFloor.value_caplet_floor_let(
-            value_dt, capletstart_dt, caplet_end_dt, libor_curve, modelCaplet
+        model_caplet = Black(vol)
+        v_caplet = cap_floor.value_caplet_floor_let(
+            value_dt, capletstart_dt, caplet_end_dt, libor_curve, model_caplet
         )
 
-        vCaplets += vCaplet
+        v_caplets += v_caplet
         test_cases.print(
             "%12s" % capletstart_dt,
             "%s" % caplet_end_dt,
             "%9.5f" % (vol * 100.0),
-            "%9.5f" % vCaplet,
+            "%9.5f" % v_caplet,
         )
 
         capletstart_dt = caplet_end_dt
 
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("CAPLETS->CAP: ", vCaplets)
+    test_cases.print("CAPLETS->CAP: ", v_caplets)
 
 
 ########################################################################################
 
 
-def test_IborCapletHull():
+def test_ibor_caplet_hull():
 
     #  Hull Page 703, example 29.3
-    todayDate = Date(20, 6, 2019)
-    value_dt = todayDate
+    today_date = Date(20, 6, 2019)
+    value_dt = today_date
     maturity_dt = value_dt.add_tenor("2Y")
     libor_curve = DiscountCurveFlat(
         value_dt, 0.070, FrequencyTypes.QUARTERLY, DayCountTypes.THIRTY_E_360
     )
 
     k = 0.08
-    capFloorType = FinCapFloorTypes.CAP
-    capFloor = IborCapFloor(
+    cap_floor_type = FinCapFloorTypes.CAP
+    cap_floor = IborCapFloor(
         value_dt,
         maturity_dt,
-        capFloorType,
+        cap_floor_type,
         k,
         None,
         FrequencyTypes.QUARTERLY,
@@ -314,25 +314,25 @@ def test_IborCapletHull():
 
     # Value cap using a single flat cap volatility
     model = Black(0.20)
-    capFloor.value(value_dt, libor_curve, model)
+    cap_floor.value(value_dt, libor_curve, model)
 
     # Value cap by breaking it down into caplets using caplet vols
     capletstart_dt = value_dt.add_tenor("1Y")
     caplet_end_dt = capletstart_dt.add_tenor("3M")
 
-    vCaplet = capFloor.value_caplet_floor_let(
+    v_caplet = cap_floor.value_caplet_floor_let(
         value_dt, capletstart_dt, caplet_end_dt, libor_curve, model
     )
 
     # Cannot match Hull due to dates being adjusted
     test_cases.header("CORRECT PRICE", "MODEL_PRICE")
-    test_cases.print(517.29, vCaplet)
+    test_cases.print(517.29, v_caplet)
 
 
 ########################################################################################
 
 
-def test_IborCapFloorQLExample():
+def test_ibor_cap_floor_ql_example():
 
     value_dt = Date(14, 6, 2016)
 
@@ -404,21 +404,21 @@ def test_IborCapFloorQLExample():
     model = Black(black_vol)
 
     start = time.time()
-    numRepeats = 10
-    for i in range(0, numRepeats):
+    num_repeats = 10
+    for i in range(0, num_repeats):
         v = cap.value(value_dt, discount_curve, model)
 
     end = time.time()
     period = end - start
 
 
-#    print(v, period/numRepeats)
-
 ########################################################################################
 
+#    print(v, period/num_repeats)
 
-test_IborCapletHull()
-test_IborCapFloorVolCurve()
-test_IborCapFloor()
-test_IborCapFloorQLExample()
+
+test_ibor_caplet_hull()
+test_ibor_cap_floor_vol_curve()
+test_ibor_cap_floor()
+test_ibor_cap_floor_ql_example()
 test_cases.compare_test_cases()

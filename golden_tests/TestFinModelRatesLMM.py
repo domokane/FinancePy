@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
@@ -36,21 +34,19 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def getCorrelationMatrix(numFwds, beta, dt):
-    correl = np.zeros((numFwds, numFwds))  # indexes from 1 to p-1
-    for i in range(0, numFwds):
+def get_correlation_matrix(num_fwds, beta, dt):
+
+    correl = np.zeros((num_fwds, num_fwds))  # indexes from 1 to p-1
+    for i in range(0, num_fwds):
         correl[i][i] = 1.0
-        for j in range(i + 1, numFwds):
+        for j in range(i + 1, num_fwds):
             correl[i][j] = np.exp(-beta * (j - i) * dt)
             correl[j][i] = correl[i][j]
 
     return correl
 
 
-########################################################################################
-
-
-""" def getVolCurve(numFwds, dt, flatVol=None):
+""" def getVolCurve(num_fwds, dt, flatVol=None):
 
     value_dt = Date(1, 1, 2020)
 
@@ -79,9 +75,9 @@ def getCorrelationMatrix(numFwds, beta, dt):
                                    capVolatilities,
                                    dc_type)
 
-    zetas = np.zeros(numFwds)
+    zetas = np.zeros(num_fwds)
     t = 0.0
-    for ix in range(0, numFwds):
+    for ix in range(0, num_fwds):
         t = t + dt
         zetas[ix] = vol_curve.capFloorletVol(t)
 
@@ -91,17 +87,14 @@ def getCorrelationMatrix(numFwds, beta, dt):
 ########################################################################################
 
 
-def getForwardCurve(numFwds, r):
+def get_forward_curve(num_fwds, r):
 
-    fwd0 = np.zeros(numFwds)
-    for i in range(0, numFwds):
+    fwd0 = np.zeros(num_fwds)
+    for i in range(0, num_fwds):
         fwd0[i] = r
 
     fwd0 = np.array(fwd0)
     return fwd0
-
-
-########################################################################################
 
 
 # def test_Swaptions():
@@ -111,26 +104,26 @@ def getForwardCurve(numFwds, r):
 #     t_mat = 10.0
 #     a = int(2*t_exp)
 #     b = int(2*t_mat)
-#     numFwds = 20
-#     taus = np.array([dt] * numFwds)
+#     num_fwds = 20
+#     taus = np.array([dt] * num_fwds)
 
 #     r = 0.05
-#     fwd0 = getForwardCurve(numFwds, r)
-#     correl = getCorrelationMatrix(numFwds, 0.00000000000001, dt)
+#     fwd0 = get_forward_curve(num_fwds, r)
+#     correl = get_correlation_matrix(num_fwds, 0.00000000000001, dt)
 
 #     fwd_rateVol = 0.20
-#     zetas = getVolCurve(numFwds, dt, fwd_rateVol)
+#     zetas = getVolCurve(num_fwds, dt, fwd_rateVol)
 
 #     seed = 1489
 #     num_paths = 2000  # 100000
-#     fwdsNF = LMMSimulateFwdsNF(numFwds, num_paths, fwd0,
+#     fwdsNF = LMMSimulateFwdsNF(num_fwds, num_paths, fwd0,
 #                                zetas, correl, taus, seed)
 #     strike = r
 #     PAYSwaption = 1
 #     use_sobol = 0
 #     numeraire_index = 0
 
-#     fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraire_index, fwd0,
+#     fwds1_f = LMMSimulateFwds1F(num_fwds, num_paths, numeraire_index, fwd0,
 #                                zetas, taus, use_sobol, seed)
 
 #     for iExp in range(1, 10):
@@ -140,14 +133,14 @@ def getForwardCurve(numFwds, r):
 #         print(a, b)
 
 #         swaption_price1F = LMMSwaptionPricer(strike, a, b, num_paths,
-#                                             fwd0, fwds1F, taus, PAYSwaption)
+#                                             fwd0, fwds1_f, taus, PAYSwaption)
 
 #         swaption_priceNF = LMMSwaptionPricer(strike, a, b, num_paths,
 #                                             fwd0, fwdsNF, taus, PAYSwaption)
 
 #         swaption_vol = LMMSwaptionVolApprox(a, b, fwd0, taus, zetas, correl)
 
-#         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1F, taus)
+#         swapVolSim1F = LMMSimSwaptionVol(a, b, fwd0, fwds1_f, taus)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
 #         value_dt = Date(1, 1, 2010)
@@ -187,28 +180,26 @@ def getForwardCurve(numFwds, r):
 
 # #        print(swaption)
 
-########################################################################################
-
 
 # def test_CapsFloors():
 
-#     numFwds = 40
+#     num_fwds = 40
 #     num_paths = 100000
 #     dt = 0.25
-#     taus = np.array([dt] * numFwds)
+#     taus = np.array([dt] * num_fwds)
 #     seeds = [42] #, 143, 101, 993, 9988]
 
 #     r = 0.04
-#     fwd0 = getForwardCurve(numFwds, r)
+#     fwd0 = get_forward_curve(num_fwds, r)
 
 #     fwd_rateVol = 0.20
-#     zetas = getVolCurve(numFwds, dt, fwd_rateVol)
+#     zetas = getVolCurve(num_fwds, dt, fwd_rateVol)
 
-#     correl = getCorrelationMatrix(numFwds, 100.0, dt)
+#     correl = get_correlation_matrix(num_fwds, 100.0, dt)
 
 #     # At the money
 #     K = r
-#     capletPricesBlack = LMMPriceCapsBlack(fwd0, zetas, numFwds, K, taus)
+#     capletPricesBlack = LMMPriceCapsBlack(fwd0, zetas, num_fwds, K, taus)
 
 #     num_factors = 1
 #     numeraire_index = 1
@@ -220,20 +211,20 @@ def getForwardCurve(numFwds, r):
 #         print("=============================================================")
 #         print("Seed:", seed)
 
-#         fwds1F = LMMSimulateFwds1F(numFwds, num_paths, numeraire_index, fwd0,
+#         fwds1_f = LMMSimulateFwds1F(num_fwds, num_paths, numeraire_index, fwd0,
 #                                    zetas, taus, use_sobol, seed)
 
-#         sumCap1F = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwds1F, taus, 1)
-#         sumFlr1F = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwds1F, taus, 0)
+#         sumCap1F = LMMCapFlrPricer(num_fwds, num_paths, K, fwd0, fwds1_f, taus, 1)
+#         sumFlr1F = LMMCapFlrPricer(num_fwds, num_paths, K, fwd0, fwds1_f, taus, 0)
 
-#         fwdsNF = LMMSimulateFwdsNF(numFwds, num_paths, fwd0,
+#         fwdsNF = LMMSimulateFwdsNF(num_fwds, num_paths, fwd0,
 #                                    zetas, correl, taus, seed)
 
-#         sumCapNF = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwdsNF, taus, 1)
-#         sumFlrNF = LMMCapFlrPricer(numFwds, num_paths, K, fwd0, fwdsNF, taus, 0)
+#         sumCapNF = LMMCapFlrPricer(num_fwds, num_paths, K, fwd0, fwdsNF, taus, 1)
+#         sumFlrNF = LMMCapFlrPricer(num_fwds, num_paths, K, fwd0, fwdsNF, taus, 0)
 
 #         print("i     CAPLET1F    FLRLET1F   CAPLETNF    FLRLET_NF   BS CAP")
-#         for i in range(0, numFwds):
+#         for i in range(0, num_fwds):
 #             bsCapFlrLet = capletPricesBlack[i]
 #             print("%d %9.6f %9.6f  %9.6f %9.6f %9.6f"% (i, sumCap1F[i] * 100.0,
 #                                                          sumFlr1F[i] * 100.0,
@@ -244,7 +235,7 @@ def getForwardCurve(numFwds, r):
 ########################################################################################
 
 
-def test_HullBookExamples():
+def test_hull_book_examples():
     """Examining examples on page 770 of Hull OFODS
     Last cap product has caplet starting in 10 years so we have to model
     the forward curve from time 0 out to 11 forwards, not 10 forwards.
@@ -253,14 +244,14 @@ def test_HullBookExamples():
     verbose = True
 
     # We go out 11 periods because last caplet resets in 10 years
-    numFwds = 11
+    num_fwds = 11
     dt = 1.00
-    taus = np.array([dt] * numFwds)
+    taus = np.array([dt] * num_fwds)
     seed = 438
 
     r = 0.05127
-    fwd0 = np.zeros(numFwds)
-    for i in range(0, numFwds):
+    fwd0 = np.zeros(num_fwds)
+    for i in range(0, num_fwds):
         fwd0[i] = r
 
     num_paths = 500000
@@ -268,9 +259,7 @@ def test_HullBookExamples():
 
     test_cases.header("COMMENTS", "VALUES")
 
-    ###########################################################################
     # HULL TABLE 32.1
-    ###########################################################################
 
     use_sobol = 1
     numeraire_index = 0
@@ -278,7 +267,7 @@ def test_HullBookExamples():
     # We need the volatility for the forward rates out to the one starting in
     # 10 years. So we have 11 elements. The one starting today has zero vol.
     num_factors = 1
-    gammas1FList = [
+    gammas1_f_list = [
         0.00,
         0.1550,
         0.2063674,
@@ -291,28 +280,28 @@ def test_HullBookExamples():
         0.135955,
         0.1339842,
     ]
-    gammas1F = np.array(gammas1FList)
+    gammas1_f = np.array(gammas1_f_list)
 
     # One factor model
-    fwds1F = lmm_simulate_fwds_1f(
-        numFwds,
+    fwds1_f = lmm_simulate_fwds_1f(
+        num_fwds,
         num_paths,
         numeraire_index,
         fwd0,
-        gammas1F,
+        gammas1_f,
         taus,
         use_sobol,
         seed,
     )
 
-    #    LMMPrintForwards(fwds1F)
+    #    LMMPrintForwards(fwds1_f)
 
-    vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds1F, taus)
+    v_ratchet_caplets = (
+        lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds1_f, taus)
         * 100.0
     )
 
-    hullRatchetCaplets1F = [
+    hull_ratchet_caplets1_f = [
         0.00,
         0.196,
         0.207,
@@ -325,20 +314,21 @@ def test_HullBookExamples():
         0.160,
         0.153,
     ]
-    hullRatchetCaplets1F = np.array(hullRatchetCaplets1F)
+    hull_ratchet_caplets1_f = np.array(hull_ratchet_caplets1_f)
 
     if verbose:
         test_cases.banner("Ratchet ONE FACTOR IMPLEMENTATION")
-        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
-        test_cases.print("HULL GETS:", hullRatchetCaplets1F)
+        test_cases.print("FINANCEPY GETS:", v_ratchet_caplets)
+        test_cases.print("HULL GETS:", hull_ratchet_caplets1_f)
 
-    check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
+    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets1_f, 1e-2)
 
-    vStickyCaplets = (
-        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds1F, taus) * 100.0
+    v_sticky_caplets = (
+        lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds1_f, taus)
+        * 100.0
     )
 
-    hullStickyCaplets1F = [
+    hull_sticky_caplets1_f = [
         0.0,
         0.196,
         0.336,
@@ -354,13 +344,13 @@ def test_HullBookExamples():
 
     if verbose:
         test_cases.banner("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
-        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
-        test_cases.print("HULL GETS:", hullStickyCaplets1F)
+        test_cases.print("FINANCEPY GETS:", v_sticky_caplets)
+        test_cases.print("HULL GETS:", hull_sticky_caplets1_f)
 
-    check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
+    check_vector_differences(v_sticky_caplets, hull_sticky_caplets1_f, 1e-2)
 
     num_factors = 1
-    lambdas1FList = [
+    lambdas1_f_list = [
         [
             0.0,
             0.1550,
@@ -375,27 +365,27 @@ def test_HullBookExamples():
             0.1340,
         ]
     ]
-    lambdas1F = np.array(lambdas1FList)
+    lambdas1_f = np.array(lambdas1_f_list)
 
     # One factor model
-    fwdsMF = lmm_simulate_fwds_mf(
-        numFwds,
+    fwds_mf = lmm_simulate_fwds_mf(
+        num_fwds,
         num_factors,
         num_paths,
         numeraire_index,
         fwd0,
-        lambdas1F,
+        lambdas1_f,
         taus,
         use_sobol,
         seed,
     )
 
-    vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwdsMF, taus)
+    v_ratchet_caplets = (
+        lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds_mf, taus)
         * 100.0
     )
 
-    hullRatchetCaplets1F = [
+    hull_ratchet_caplets1_f = [
         0.0,
         0.196,
         0.207,
@@ -411,16 +401,17 @@ def test_HullBookExamples():
 
     if verbose:
         test_cases.banner("RATCHET - NUM FACTORS 1F")
-        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
-        test_cases.print("HULL GETS:", hullRatchetCaplets1F)
+        test_cases.print("FINANCEPY GETS:", v_ratchet_caplets)
+        test_cases.print("HULL GETS:", hull_ratchet_caplets1_f)
 
-    check_vector_differences(vRatchetCaplets, hullRatchetCaplets1F, 1e-2)
+    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets1_f, 1e-2)
 
-    vStickyCaplets = (
-        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwdsMF, taus) * 100.0
+    v_sticky_caplets = (
+        lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds_mf, taus)
+        * 100.0
     )
 
-    hullStickyCaplets1F = [
+    hull_sticky_caplets1_f = [
         0.00,
         0.196,
         0.336,
@@ -434,15 +425,15 @@ def test_HullBookExamples():
         0.488,
     ]
 
-    check_vector_differences(vStickyCaplets, hullStickyCaplets1F, 1e-2)
+    check_vector_differences(v_sticky_caplets, hull_sticky_caplets1_f, 1e-2)
 
     if verbose:
         test_cases.banner("STICKY RATCHET - NUM FACTORS 1")
-        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
-        test_cases.print("HULL GETS:", hullStickyCaplets1F)
+        test_cases.print("FINANCEPY GETS:", v_sticky_caplets)
+        test_cases.print("HULL GETS:", hull_sticky_caplets1_f)
 
     num_factors = 2
-    lambdas2FList = [
+    lambdas2_f_list = [
         [
             0.00,
             0.1410,
@@ -470,26 +461,26 @@ def test_HullBookExamples():
             0.0665,
         ],
     ]
-    lambdas2F = np.array(lambdas2FList)
+    lambdas2_f = np.array(lambdas2_f_list)
 
     # Two factor model
-    fwds2F = lmm_simulate_fwds_mf(
-        numFwds,
+    fwds2_f = lmm_simulate_fwds_mf(
+        num_fwds,
         num_factors,
         num_paths,
         numeraire_index,
         fwd0,
-        lambdas2F,
+        lambdas2_f,
         taus,
         use_sobol,
         seed,
     )
 
-    vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds2F, taus)
+    v_ratchet_caplets = (
+        lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds2_f, taus)
         * 100.0
     )
-    hullRatchetCaplets2F = [
+    hull_ratchet_caplets2_f = [
         0.00,
         0.194,
         0.207,
@@ -505,16 +496,17 @@ def test_HullBookExamples():
 
     if verbose:
         test_cases.banner("RATCHET - NUM FACTORS:2")
-        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
-        test_cases.print("HULL GETS:", hullRatchetCaplets2F)
+        test_cases.print("FINANCEPY GETS:", v_ratchet_caplets)
+        test_cases.print("HULL GETS:", hull_ratchet_caplets2_f)
 
-    check_vector_differences(vRatchetCaplets, hullRatchetCaplets2F, 1e-2)
+    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets2_f, 1e-2)
 
-    vStickyCaplets = (
-        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds2F, taus) * 100.0
+    v_sticky_caplets = (
+        lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds2_f, taus)
+        * 100.0
     )
 
-    hullStickyCaplets2F = [
+    hull_sticky_caplets2_f = [
         0.00,
         0.196,
         0.334,
@@ -530,13 +522,13 @@ def test_HullBookExamples():
 
     if verbose:
         test_cases.banner("STICKY RATCHET - NUM FACTORS:2")
-        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
-        test_cases.print("HULL GETS:", hullStickyCaplets2F)
+        test_cases.print("FINANCEPY GETS:", v_sticky_caplets)
+        test_cases.print("HULL GETS:", hull_sticky_caplets2_f)
 
-    check_vector_differences(vStickyCaplets, hullStickyCaplets2F, 1e-2)
+    check_vector_differences(v_sticky_caplets, hull_sticky_caplets2_f, 1e-2)
 
     num_factors = 3
-    lambdas3FList = [
+    lambdas3_f_list = [
         [
             0.00,
             0.1365,
@@ -577,22 +569,22 @@ def test_HullBookExamples():
             0.0384,
         ],
     ]
-    lambdas3F = np.array(lambdas3FList)
+    lambdas3_f = np.array(lambdas3_f_list)
 
     # Three factor model
-    fwds3F = lmm_simulate_fwds_mf(
-        numFwds,
+    fwds3_f = lmm_simulate_fwds_mf(
+        num_fwds,
         num_factors,
         num_paths,
         numeraire_index,
         fwd0,
-        lambdas3F,
+        lambdas3_f,
         taus,
         use_sobol,
         seed,
     )
 
-    hullRatchetCaplets3F = [
+    hull_ratchet_caplets3_f = [
         0.00,
         0.194,
         0.207,
@@ -606,23 +598,24 @@ def test_HullBookExamples():
         0.162,
     ]
 
-    vRatchetCaplets = (
-        lmm_ratchet_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds3F, taus)
+    v_ratchet_caplets = (
+        lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds3_f, taus)
         * 100.0
     )
 
     if verbose:
         test_cases.banner("RATCHET - NUM FACTORS:3")
-        test_cases.print("FINANCEPY GETS:", vRatchetCaplets)
-        test_cases.print("HULL GETS:", hullRatchetCaplets3F)
+        test_cases.print("FINANCEPY GETS:", v_ratchet_caplets)
+        test_cases.print("HULL GETS:", hull_ratchet_caplets3_f)
 
-    check_vector_differences(vRatchetCaplets, hullRatchetCaplets3F, 1e-2)
+    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets3_f, 1e-2)
 
-    vStickyCaplets = (
-        lmm_sticky_caplet_pricer(spread, numFwds, num_paths, fwd0, fwds3F, taus) * 100.0
+    v_sticky_caplets = (
+        lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds3_f, taus)
+        * 100.0
     )
 
-    hullStickyCaplets3F = [
+    hull_sticky_caplets3_f = [
         0.00,
         0.195,
         0.336,
@@ -638,31 +631,28 @@ def test_HullBookExamples():
 
     if verbose:
         test_cases.banner("STICKY RATCHET - NUM FACTORS:3")
-        test_cases.print("FINANCEPY GETS:", vStickyCaplets)
-        test_cases.print("HULL GETS:", hullStickyCaplets3F)
+        test_cases.print("FINANCEPY GETS:", v_sticky_caplets)
+        test_cases.print("HULL GETS:", hull_sticky_caplets3_f)
 
-    check_vector_differences(vStickyCaplets, hullStickyCaplets3F, 1e-2)
-
-
-########################################################################################
+    check_vector_differences(v_sticky_caplets, hull_sticky_caplets3_f, 1e-2)
 
 
 """ def test_Swap():
 
-    numFwds = 40
+    num_fwds = 40
     num_paths = 10000
     dt = 0.25
-    taus = np.array([dt] * numFwds)
+    taus = np.array([dt] * num_fwds)
     seed = 143
 
     r = 0.04
-    fwd0 = getForwardCurve(numFwds, r)
+    fwd0 = get_forward_curve(num_fwds, r)
 
     fwd_rateVol = 0.40
-    zetas = getVolCurve(numFwds, dt, fwd_rateVol)
-    correl = getCorrelationMatrix(numFwds, 100.0)
+    zetas = getVolCurve(num_fwds, dt, fwd_rateVol)
+    correl = get_correlation_matrix(num_fwds, 100.0)
 
-    fwds = LMMSimulateFwdsNF(numFwds, num_paths, fwd0, zetas, correl, taus, seed)
+    fwds = LMMSimulateFwdsNF(num_fwds, num_paths, fwd0, zetas, correl, taus, seed)
 
     start = time.time()
     cpn = 0.05
@@ -676,22 +666,22 @@ def test_HullBookExamples():
 ########################################################################################
 
 
-def fwdfwdCorrelation(fwds):
+def fwdfwd_correlation(fwds):
 
     num_paths = len(fwds)
-    numFwds = len(fwds[0])
+    num_fwds = len(fwds[0])
     start = time.time()
-    fwdCorr = lmm_fwd_fwd_correlation(numFwds, num_paths, 1, fwds)
+    fwd_corr = lmm_fwd_fwd_correlation(num_fwds, num_paths, 1, fwds)
     end = time.time()
 
 
-#    print("CORR Period:", end - start)
-#    print(fwdCorr)
-
 ########################################################################################
 
+#    print("CORR Period:", end - start)
+#    print(fwd_corr)
 
-test_HullBookExamples()
+
+test_hull_book_examples()
 # test_CapsFloors()
 # test_Swaptions()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import numpy as np
@@ -17,8 +15,10 @@ from financepy.utils.math import corr_matrix_generator
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
+########################################################################################
 
-def testFinGBMProcess():
+
+def test_fin_gbm_process():
 
     num_assets = 3
     num_paths = 6
@@ -44,8 +44,9 @@ def testFinGBMProcess():
     )
 
 
+
+
 ########################################################################################
 
-
-testFinGBMProcess()
+test_fin_gbm_process()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,10 +15,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def testAnalyticalModels():
+def test_analytical_models():
 
     # Reference see table 4.1 of Rouah book
     value_dt = Date(1, 1, 2015)
@@ -113,11 +111,10 @@ def testAnalyticalModels():
                     "%12.9f" % err,
                 )
 
+########################################################################################
 
-##########################################################################
 
-
-def testMonteCarlo():
+def test_monte_carlo():
 
     import time
 
@@ -220,9 +217,10 @@ def testMonteCarlo():
                 )
 
 
-##########################################################################
 
 
-testAnalyticalModels()
-testMonteCarlo()
+########################################################################################
+
+test_analytical_models()
+test_monte_carlo()
 test_cases.compare_test_cases()

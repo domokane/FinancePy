@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -21,7 +19,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinFXBarrierOption():
+def test_fin_fx_barrier_option():
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
@@ -41,8 +39,6 @@ def test_FinFXBarrierOption():
     foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
     model = BlackScholes(volatility)
 
-    ###########################################################################
-
     import time
 
     start = time.time()
@@ -53,15 +49,15 @@ def test_FinFXBarrierOption():
         test_cases.header("Type", "K", "B", "S", "Value", "ValueMC", "TIME", "Diff")
 
         for spot_fx_rate in range(60, 140, 20):
-            B = 110.0
-            K = 100.0
+            b = 110.0
+            k = 100.0
 
             option = FXBarrierOption(
                 expiry_dt,
-                K,
+                k,
                 currency_pair,
                 opt_type,
-                B,
+                b,
                 num_observations_per_year,
                 notional,
                 notional_currency,
@@ -87,8 +83,8 @@ def test_FinFXBarrierOption():
 
             test_cases.print(
                 opt_type,
-                K,
-                B,
+                k,
+                b,
                 spot_fx_rate,
                 value,
                 value_mc,
@@ -97,15 +93,15 @@ def test_FinFXBarrierOption():
             )
 
         for spot_fx_rate in range(60, 140, 20):
-            B = 100.0
-            K = 110.0
+            b = 100.0
+            k = 110.0
 
             option = FXBarrierOption(
                 expiry_dt,
-                K,
+                k,
                 currency_pair,
                 opt_type,
-                B,
+                b,
                 num_observations_per_year,
                 notional,
                 notional_currency,
@@ -131,8 +127,8 @@ def test_FinFXBarrierOption():
 
             test_cases.print(
                 opt_type,
-                K,
-                B,
+                k,
+                b,
                 spot_fx_rate,
                 value,
                 value_mc,
@@ -142,10 +138,8 @@ def test_FinFXBarrierOption():
 
     end = time.time()
 
-    ##########################################################################
-
     spot_fx_rates = range(50, 150, 50)
-    B = 105.0
+    b = 105.0
 
     test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
@@ -156,7 +150,7 @@ def test_FinFXBarrierOption():
                 100.0,
                 currency_pair,
                 opt_type,
-                B,
+                b,
                 num_observations_per_year,
                 notional,
                 notional_currency,
@@ -178,11 +172,10 @@ def test_FinFXBarrierOption():
                 value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
             )
 
-            test_cases.print(opt_type, K, B, spot_fx_rate, value, delta, vega, theta)
+            test_cases.print(opt_type, k, b, spot_fx_rate, value, delta, vega, theta)
 
 
 ########################################################################################
 
-
-test_FinFXBarrierOption()
+test_fin_fx_barrier_option()
 test_cases.compare_test_cases()

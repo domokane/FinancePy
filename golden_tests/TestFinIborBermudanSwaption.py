@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -26,10 +24,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def test_IborBermudanSwaptionbk_model():
+def test_ibor_bermudan_swaptionbk_model():
     """Replicate examples in paper by Leif Andersen which can be found at
     file:///C:/Users/Dominic/Downloads/SSRN-id155208.pdf"""
 
@@ -85,13 +83,7 @@ def test_IborBermudanSwaptionbk_model():
         swap_fixed_dc_type,
     )
 
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
     # BLACK'S MODEL
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
 
     test_cases.banner("======= ZERO VOLATILITY ========")
     model = Black(0.0000001)
@@ -120,13 +112,7 @@ def test_IborBermudanSwaptionbk_model():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
     # BK MODEL
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
 
     test_cases.banner("=======================================================")
     test_cases.banner("=======================================================")
@@ -168,8 +154,6 @@ def test_IborBermudanSwaptionbk_model():
 
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
-
-    ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
     fixed_leg_type = SwapTypes.PAY
@@ -238,9 +222,7 @@ def test_IborBermudanSwaptionbk_model():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    ###########################################################################
     # Now we create the Bermudan swaptions but allow Bermudan exercise
-    ###########################################################################
 
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
@@ -308,13 +290,7 @@ def test_IborBermudanSwaptionbk_model():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
     # BDT MODEL
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
 
     test_cases.banner("=======================================================")
     test_cases.banner("=======================================================")
@@ -355,8 +331,6 @@ def test_IborBermudanSwaptionbk_model():
 
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
-
-    ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
     fixed_leg_type = SwapTypes.PAY
@@ -421,9 +395,7 @@ def test_IborBermudanSwaptionbk_model():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    ###########################################################################
     # Now we create the Bermudan swaptions but allow Bermudan exercise
-    ###########################################################################
 
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
@@ -489,13 +461,7 @@ def test_IborBermudanSwaptionbk_model():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
     # BDT MODEL
-    ###########################################################################
-    ###########################################################################
-    ###########################################################################
 
     test_cases.banner("=======================================================")
     test_cases.banner("=======================================================")
@@ -536,8 +502,6 @@ def test_IborBermudanSwaptionbk_model():
 
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
-
-    ###########################################################################
 
     # Now we create the Bermudan swaptions but only allow European exercise
     fixed_leg_type = SwapTypes.PAY
@@ -601,9 +565,7 @@ def test_IborBermudanSwaptionbk_model():
     pay_rec = value_pay - value_rec
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
-    ###########################################################################
     # Now we create the Bermudan swaptions but allow Bermudan exercise
-    ###########################################################################
 
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
@@ -670,9 +632,8 @@ def test_IborBermudanSwaptionbk_model():
     test_cases.print("PAY MINUS RECEIVER :", pay_rec)
 
 
-##########################################################################
+########################################################################################
 
-
-test_IborBermudanSwaptionbk_model()
+test_ibor_bermudan_swaptionbk_model()
 
 test_cases.compare_test_cases()

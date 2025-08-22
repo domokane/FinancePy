@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -19,10 +17,10 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def test_EquityDigitalOption():
+def test_equity_digital_option():
 
     underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
 
@@ -39,7 +37,7 @@ def test_EquityDigitalOption():
     import time
 
     call_option_values = []
-    call_option_valuesMC = []
+    call_option_values_mc = []
     num_paths_list = [10000, 20000, 40000, 80000]
 
     """        160000,
@@ -73,15 +71,13 @@ def test_EquityDigitalOption():
         test_cases.print(num_paths, value, value_mc, duration)
 
         call_option_values.append(value)
-        call_option_valuesMC.append(value_mc)
+        call_option_values_mc.append(value_mc)
 
     #    plt.figure(figsize=(10,8))
     #    plt.plot(num_paths_list, call_option_values, color = 'b', label="Call Option")
-    #    plt.plot(num_paths_list, call_option_valuesMC, color = 'r', label = "Call Option MC")
+    #    plt.plot(num_paths_list, call_option_values_mc, color = 'r', label = "Call Option MC")
     #    plt.xlabel("Num Loops")
     #    plt.legend(loc='best')
-
-    ##########################################################################
 
     stock_prices = range(50, 150, 50)
     call_option_values = []
@@ -137,8 +133,7 @@ def test_EquityDigitalOption():
         put_option_thetas.append(theta)
 
 
-##########################################################################
+########################################################################################
 
-
-test_EquityDigitalOption()
+test_equity_digital_option()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -19,11 +17,9 @@ from financepy.products.credit.cds import CDS
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
 # TO DO
-##########################################################################
 
-##########################################################################
+########################################################################################
 
 
 def build_ibor_curve(trade_dt):
@@ -64,8 +60,7 @@ def build_ibor_curve(trade_dt):
 
     return libor_curve
 
-
-##########################################################################
+########################################################################################
 
 
 def build_issuer_curve(trade_dt, libor_curve):
@@ -84,11 +79,10 @@ def build_issuer_curve(trade_dt, libor_curve):
     issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
     return issuer_curve
 
+########################################################################################
 
-##########################################################################
 
-
-def test_valueCDSIndex():
+def test_value_cds_index():
 
     # We treat an index as a CDS contract with a flat CDS curve
     trade_dt = Date(7, 2, 2006)
@@ -98,48 +92,50 @@ def test_valueCDSIndex():
     value_dt = step_in_dt
     maturity_dt = Date(20, 6, 2010)
 
-    cdsRecovery = 0.40
+    cds_recovery = 0.40
     notional = 10.0 * ONE_MILLION
     long_protection = True
     index_cpn = 0.004
 
-    cds_indexContract = CDS(
+    cds_index_contract = CDS(
         step_in_dt, maturity_dt, index_cpn, notional, long_protection
     )
 
-    #    cds_indexContract.print(value_dt)
+    #    cds_index_contract.print(value_dt)
 
     test_cases.header("LABEL", "VALUE")
 
-    spd = cds_indexContract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+    spd = cds_index_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
     test_cases.print("PAR SPREAD", spd)
 
-    v = cds_indexContract.value(value_dt, issuer_curve, cdsRecovery)
+    v = cds_index_contract.value(value_dt, issuer_curve, cds_recovery)
     test_cases.print("DIRTY VALUE", v["dirty_pv"])
     test_cases.print("CLEAN VALUE", v["clean_pv"])
 
-    p = cds_indexContract.clean_price(value_dt, issuer_curve, cdsRecovery)
+    p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN PRICE", p)
 
-    accrued_days = cds_indexContract.accrued_days()
+    accrued_days = cds_index_contract.accrued_days()
     test_cases.print("ACCRUED DAYS", accrued_days)
 
-    accrued_interest = cds_indexContract.accrued_interest()
+    accrued_interest = cds_index_contract.accrued_interest()
     test_cases.print("ACCRUED COUPON", accrued_interest)
 
-    prot_pv = cds_indexContract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
 
-    premPV = cds_indexContract.premium_leg_pv(value_dt, issuer_curve, cdsRecovery)
-    test_cases.print("PREMIUM LEG PV", premPV)
+    prem_pv = cds_index_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    test_cases.print("PREMIUM LEG PV", prem_pv)
 
-    dirty_rpv01, clean_rpv01 = cds_indexContract.risky_pv01(value_dt, issuer_curve)
+    dirty_rpv01, clean_rpv01 = cds_index_contract.risky_pv01(value_dt, issuer_curve)
     test_cases.print("DIRTY RPV01", dirty_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
 
 
-#    cds_indexContract.print_payments(issuer_curve)
+########################################################################################
+
+#    cds_index_contract.print_payments(issuer_curve)
 
 
-test_valueCDSIndex()
+test_value_cds_index()
 test_cases.compare_test_cases()

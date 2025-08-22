@@ -12,7 +12,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinSobol():
+def test_fin_sobol():
 
     num_points = 1000
     dimensions = 3
@@ -30,39 +30,40 @@ def test_FinSobol():
         av /= num_points
         var /= num_points
 
-        avError = abs(av - (1 / 2))
-        varError = abs(var - (1 / 3))
-        assert avError < 0.002
-        assert varError < 0.002
+        av_error = abs(av - (1 / 2))
+        var_error = abs(var - (1 / 3))
+        assert av_error < 0.002
+        assert var_error < 0.002
 
-    numRepeats = 100
-    numDimensions = 10
+    num_repeats = 100
+    num_dimensions = 10
 
     test_cases.header("LABEL", "TIME")
     start = time.time()
-    for _ in range(numRepeats):
-        get_uniform_sobol(1000, numDimensions)
+    for _ in range(num_repeats):
+        get_uniform_sobol(1000, num_dimensions)
     end = time.time()
-    test_cases.print("Average time taken", (end - start) / numRepeats)
+    test_cases.print("Average time taken", (end - start) / num_repeats)
 
     start = time.time()
-    for _ in range(numRepeats):
-        get_gaussian_sobol(1000, numDimensions)
+    for _ in range(num_repeats):
+        get_gaussian_sobol(1000, num_dimensions)
     end = time.time()
-    test_cases.print("Average time taken", (end - start) / numRepeats)
+    test_cases.print("Average time taken", (end - start) / num_repeats)
 
+
+@jit(cache=True, nopython=True)
 
 ########################################################################################
 
 
-@jit(cache=True, nopython=True)
-def test_FinSobolCache():
+def test_fin_sobol_cache():
+
     return get_uniform_sobol(2, 2)
 
 
 ########################################################################################
 
-
-test_FinSobol()
-test_FinSobolCache()
+test_fin_sobol()
+test_fin_sobol_cache()
 test_cases.compare_test_cases()

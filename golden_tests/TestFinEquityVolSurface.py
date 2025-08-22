@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -19,16 +17,15 @@ import numpy as np
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-########################################################################################
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
-########################################################################################
 # TODO: ADD LOGGING TO TEST CASES
+
 ########################################################################################
 
 
-def test_equity_vol_surface(verboseCalibration):
+def test_equity_vol_surface(verbose_calibration):
 
     value_dt = Date(11, 1, 2021)
 
@@ -67,7 +64,7 @@ def test_equity_vol_surface(verboseCalibration):
 
     vol_function_type = VolFuncTypes.SVI
 
-    equitySurface = EquityVolSurface(
+    equity_surface = EquityVolSurface(
         value_dt,
         stock_price,
         discount_curve,
@@ -79,21 +76,21 @@ def test_equity_vol_surface(verboseCalibration):
     )
 
     #    tol = 1e-4
-    #    equitySurface.check_calibration(False, tol)
+    #    equity_surface.check_calibration(False, tol)
 
-    if 1 == 0:  # PLOT_GRAPHS:
+    if 1 == 0:  # plot_graphs:
 
-        equitySurface.plot_vol_curves()
+        equity_surface.plot_vol_curves()
 
         plt.figure()
 
         mins = strikes[0] * 0.5
         maxs = strikes[-1] * 1.5
 
-        dbns = equitySurface.implied_dbns(mins, maxs, 1000)
+        dbns = equity_surface.implied_dbns(mins, maxs, 1000)
 
         for i in range(0, len(dbns)):
-            expiry_dt_str = str(equitySurface._expiry_dts[i])
+            expiry_dt_str = str(equity_surface._expiry_dts[i])
             plt.plot(dbns[i]._x, dbns[i]._densitydx, label=expiry_dt_str)
             plt.title(vol_function_type)
             plt.legend()
@@ -104,20 +101,23 @@ def test_equity_vol_surface(verboseCalibration):
     test_cases.header("EXPIRY", "DELTA", "VOL", "STRIKE")
     for expiry_dt in expiry_dts:
         for delta in deltas:
-            vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
+            vol = equity_surface.vol_from_delta_date(delta, expiry_dt)
             test_cases.print(expiry_dt, delta, vol[0], vol[1])
+
+
 
 
 ########################################################################################
 
+########################################################################################
 
 if __name__ == "__main__":
 
     start = time.time()
 
-    verboseCalibration = False
+    verbose_calibration = False
 
-    test_equity_vol_surface(verboseCalibration)
+    test_equity_vol_surface(verbose_calibration)
 
     end = time.time()
 

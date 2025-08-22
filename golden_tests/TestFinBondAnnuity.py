@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 # TODO Set up test cases correctly
 import sys
@@ -21,7 +19,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_BondAnnuity():
+def test_bond_annuity():
     """Test"""
 
     settle_dt = Date(20, 6, 2018)
@@ -178,8 +176,7 @@ def test_BondAnnuity():
         test_cases.print(dt, flow)
 
 
-##########################################################################
+########################################################################################
 
-
-test_BondAnnuity()
+test_bond_annuity()
 test_cases.compare_test_cases()

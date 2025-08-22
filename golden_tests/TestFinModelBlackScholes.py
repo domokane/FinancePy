@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -22,12 +20,13 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##############################################################################
 
 # TODO Complete output of results to log files
 
+########################################################################################
 
-def testBlackScholes():
+
+def test_black_scholes():
 
     value_dt = Date(8, 5, 2015)
     expiry_dt = Date(15, 1, 2016)
@@ -39,13 +38,13 @@ def testBlackScholes():
     dividend_yield = 0.0163
 
     opt_type = OptionTypes.AMERICAN_CALL
-    euOptionType = OptionTypes.EUROPEAN_CALL
+    eu_option_type = OptionTypes.EUROPEAN_CALL
 
-    amOption = EquityAmericanOption(expiry_dt, strike_price, opt_type)
+    am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
 
-    ameuOption = EquityAmericanOption(expiry_dt, strike_price, euOptionType)
+    ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
 
-    euOption = EquityVanillaOption(expiry_dt, strike_price, euOptionType)
+    eu_option = EquityVanillaOption(expiry_dt, strike_price, eu_option_type)
 
     discount_curve = DiscountCurveFlat(
         value_dt,
@@ -63,40 +62,40 @@ def testBlackScholes():
 
     num_steps_per_year = 400
 
-    modelTree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
+    model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
 
-    v = amOption.value(value_dt, stock_price, discount_curve, dividend_curve, modelTree)
+    v = am_option.value(value_dt, stock_price, discount_curve, dividend_curve, model_tree)
     #    print(v)
 
     model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
 
-    v = amOption.value(
+    v = am_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model_approx
     )
 
     #    print(v)
 
-    v = ameuOption.value(
-        value_dt, stock_price, discount_curve, dividend_curve, modelTree
+    v = ameu_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_tree
     )
 
     #    print(v)
 
-    v = euOption.value(value_dt, stock_price, discount_curve, dividend_curve, modelTree)
+    v = eu_option.value(value_dt, stock_price, discount_curve, dividend_curve, model_tree)
 
     #    print(v)
 
-    amTreeValue = []
-    amBAWValue = []
-    euTreeValue = []
-    euAnalValue = []
+    am_tree_value = []
+    am_baw_value = []
+    eu_tree_value = []
+    eu_anal_value = []
     volatility = 0.20
 
     # num_steps_per_year = range(5, 200, 1)
 
     # for num_steps in num_steps_per_year:
 
-    #     modelTree = BlackScholes(volatility,
+    #     model_tree = BlackScholes(volatility,
     #                                      BlackScholesTypes.CRR_TREE,
     #                                      {'num_steps_per_year':num_steps})
 
@@ -106,35 +105,36 @@ def testBlackScholes():
     #     modelBAW = BlackScholes(volatility,
     #                                     BlackScholesTypes.BARONE_ADESI)
 
-    #     v_am = amOption.value(value_dt, stock_price, discount_curve,
-    #                           dividend_yield, modelTree)
+    #     v_am = am_option.value(value_dt, stock_price, discount_curve,
+    #                           dividend_yield, model_tree)
 
-    #     v_eu = ameuOption.value(value_dt, stock_price, discount_curve,
-    #                             dividend_yield, modelTree)
+    #     v_eu = ameu_option.value(value_dt, stock_price, discount_curve,
+    #                             dividend_yield, model_tree)
 
-    #     v_bs = euOption.value(value_dt, stock_price, discount_curve,
+    #     v_bs = eu_option.value(value_dt, stock_price, discount_curve,
     #                           dividend_yield, modelAnal)
 
-    #     v_am_baw = amOption.value(value_dt, stock_price, discount_curve,
+    #     v_am_baw = am_option.value(value_dt, stock_price, discount_curve,
     #                               dividend_yield, modelBAW)
 
-    #     amTreeValue.append(v_am)
-    #     euTreeValue.append(v_eu)
-    #     euAnalValue.append(v_bs)
-    #     amBAWValue.append(v_am_baw)
+    #     am_tree_value.append(v_am)
+    #     eu_tree_value.append(v_eu)
+    #     eu_anal_value.append(v_bs)
+    #     am_baw_value.append(v_am_baw)
 
     # plt.title("American PUT Option Price Convergence Analysis")
-    # plt.plot(num_steps_per_year, amTreeValue, label="American Tree")
-    # plt.plot(num_steps_per_year, amBAWValue, label="American BAW")
-    # plt.plot(num_steps_per_year, euTreeValue, label="European Tree")
-    # plt.plot(num_steps_per_year, euAnalValue, label="European Anal", lw =2)
+    # plt.plot(num_steps_per_year, am_tree_value, label="American Tree")
+    # plt.plot(num_steps_per_year, am_baw_value, label="American BAW")
+    # plt.plot(num_steps_per_year, eu_tree_value, label="European Tree")
+    # plt.plot(num_steps_per_year, eu_anal_value, label="European Anal", lw =2)
     # plt.xlabel("Num Steps")
     # plt.ylabel("Value")
     # plt.legend();
 
 
+
+
 ########################################################################################
 
-
-testBlackScholes()
+test_black_scholes()
 test_cases.compare_test_cases()

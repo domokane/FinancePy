@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import numpy as np
@@ -16,7 +14,8 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinStatistics():
+def test_fin_statistics():
+
     seed = 1972
     np.random.seed(seed)
 
@@ -24,9 +23,7 @@ def test_FinStatistics():
     x = np.random.normal(0.0, 1.0, size=(num_trials))
     y = np.random.normal(0.0, 1.0, size=(num_trials))
 
-    ##########################################################################
     # DO NUMPY TIMINGS
-    ##########################################################################
 
     start = time.time()
 
@@ -54,7 +51,6 @@ def test_FinStatistics():
     test_cases.header("TIME")
     test_cases.print(elapsed)
 
-    ##########################################################################
     # DO STATS TIMINGS
 
     test_cases.header("l", "Mean", "SD")
@@ -88,6 +84,5 @@ def test_FinStatistics():
 
 ########################################################################################
 
-
-test_FinStatistics()
+test_fin_statistics()
 test_cases.compare_test_cases()

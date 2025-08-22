@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time as time
 import numpy as np
@@ -26,12 +24,12 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_OISFRAsOnly():
+def test_oisfr_as_only():
 
     # TO DO FIX THIS
     value_dt = Date(23, 2, 2018)
@@ -92,11 +90,11 @@ def test_OISFRAsOnly():
 ########################################################################################
 
 
-def test_OISDepositsFRAsSwaps():
+def test_ois_deposits_fr_as_swaps():
 
     value_dt = Date(18, 9, 2019)
 
-    dccType = DayCountTypes.THIRTY_E_360_ISDA
+    dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
@@ -120,21 +118,21 @@ def test_OISDepositsFRAsSwaps():
     fra_rate = 0.04
     fra_settle_dt = settle_dt.add_months(9)
     fra_maturity_dt = settle_dt.add_months(13)
-    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dccType)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dcc_type)
     fras.append(fra)
 
     # 4 x 7 FRA
     fra_rate = 0.03
     fra_settle_dt = settle_dt.add_months(13)
     fra_maturity_dt = settle_dt.add_months(17)
-    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dccType)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dcc_type)
     fras.append(fra)
 
     # 4 x 7 FRA
     fra_rate = 0.07
     fra_settle_dt = settle_dt.add_months(17)
     fra_maturity_dt = settle_dt.add_months(21)
-    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dccType)
+    fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, dcc_type)
     fras.append(fra)
 
     swaps = []
@@ -319,15 +317,14 @@ def test_OISDepositsFRAsSwaps():
         test_cases.print(str(swap.maturity_dt), df)
 
 
-########################################################################################
-########################################################################################
 # https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
-########################################################################################
-########################################################################################
 # AGREEMENT IS VERY CLOSE - NOT SURE ABOUT SIZE OF LAST PAYMENT ON FIXED LEG!
 
+########################################################################################
 
-def futureTofra_rate(price, convexity):
+
+def future_tofra_rate(price, convexity):
+
     futures_rate = (100 - price) / 100
     if convexity < 0:
         fra_rate = futures_rate + convexity / 100.0
@@ -340,7 +337,7 @@ def futureTofra_rate(price, convexity):
 ########################################################################################
 
 
-def test_OISDepositsFuturesSwaps():
+def test_ois_deposits_futures_swaps():
 
     spot_dt = Date(6, 6, 2018)
     spot_days = 0
@@ -352,43 +349,41 @@ def test_OISDepositsFuturesSwaps():
 
     fras = []
 
-    fra_rate = futureTofra_rate(97.6675, -0.00005)
+    fra_rate = future_tofra_rate(97.6675, -0.00005)
     fra_settle_dt = spot_dt.next_imm_date()
     fra_maturity_dt = fra_settle_dt.next_imm_date()
     fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depo_dcc_type)
     fras.append(fra)
 
-    fra_rate = futureTofra_rate(97.5200, -0.00060)
+    fra_rate = future_tofra_rate(97.5200, -0.00060)
     fra_settle_dt = fra_maturity_dt
     fra_maturity_dt = fra_settle_dt.next_imm_date()
     fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depo_dcc_type)
     fras.append(fra)
 
-    fra_rate = futureTofra_rate(97.3550, -0.00146)
+    fra_rate = future_tofra_rate(97.3550, -0.00146)
     fra_settle_dt = fra_maturity_dt
     fra_maturity_dt = fra_settle_dt.next_imm_date()
     fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depo_dcc_type)
     fras.append(fra)
 
-    fra_rate = futureTofra_rate(97.2450, -0.00263)
+    fra_rate = future_tofra_rate(97.2450, -0.00263)
     fra_settle_dt = fra_maturity_dt
     fra_maturity_dt = fra_settle_dt.next_imm_date()
     fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depo_dcc_type)
     fras.append(fra)
 
-    fra_rate = futureTofra_rate(97.1450, -0.00411)
+    fra_rate = future_tofra_rate(97.1450, -0.00411)
     fra_settle_dt = fra_maturity_dt
     fra_maturity_dt = fra_settle_dt.next_imm_date()
     fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depo_dcc_type)
     fras.append(fra)
 
-    fra_rate = futureTofra_rate(97.0750, -0.00589)
+    fra_rate = future_tofra_rate(97.0750, -0.00589)
     fra_settle_dt = fra_settle_dt.next_imm_date()
     fra_maturity_dt = fra_settle_dt.next_imm_date()
     fra = IborFRA(fra_settle_dt, fra_maturity_dt, fra_rate, depo_dcc_type)
     fras.append(fra)
-
-    ###########################################################################
 
     spot_days = 2
     start_dt = spot_dt.add_weekdays(spot_days)
@@ -432,7 +427,7 @@ def test_OISDepositsFuturesSwaps():
     zero_rates = libor_curve.zero_rate(dates)
     fwd_rates = libor_curve.fwd(dates)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         plt.figure(figsize=(8, 6))
         plt.plot(times, zero_rates * 100, label="zero rates")
         plt.plot(times, fwd_rates * 100, label="fwd rates")
@@ -476,7 +471,7 @@ def test_OISDepositsFuturesSwaps():
 ########################################################################################
 
 
-def test_derivativePricingExample():
+def test_derivative_pricing_example():
 
     value_dt = Date(10, 11, 2011)
 
@@ -524,10 +519,10 @@ def test_derivativePricingExample():
     swap = OIS(settle_dt, "30Y", fixed_leg_type, swap_rate, freq_type, dc_type)
     swaps.append(swap)
 
-    numRepeats = 10
+    num_repeats = 10
     start = time.time()
 
-    for _ in range(0, numRepeats):
+    for _ in range(0, num_repeats):
         _ = OISCurve(value_dt, fras, swaps, InterpTypes.FLAT_FWD_RATES)
 
     end = time.time()
@@ -535,21 +530,21 @@ def test_derivativePricingExample():
 
     start = time.time()
 
-    for _ in range(0, numRepeats):
+    for _ in range(0, num_repeats):
         _ = OISCurve(value_dt, fras, swaps, InterpTypes.LINEAR_SWAP_RATES)
 
     end = time.time()
     elapsed2 = end - start
 
     test_cases.header("METHOD", "TIME")
-    test_cases.print("NON-LINEAR SOLVER BOOTSTRAP", elapsed1 / numRepeats)
-    test_cases.print("LINEAR SWAP BOOTSTRAP", elapsed2 / numRepeats)
+    test_cases.print("NON-LINEAR SOLVER BOOTSTRAP", elapsed1 / num_repeats)
+    test_cases.print("LINEAR SWAP BOOTSTRAP", elapsed2 / num_repeats)
 
 
 ########################################################################################
 
 
-def test_bloombergPricingExample():
+def test_bloomberg_pricing_example():
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """
@@ -652,11 +647,10 @@ def test_bloombergPricingExample():
 
 ########################################################################################
 
-
-test_bloombergPricingExample()
-# test_derivativePricingExample()
-# test_OISFRAsOnly()
-# test_OISDepositsFRAsSwaps()
-# test_OISDepositsFuturesSwaps()
+test_bloomberg_pricing_example()
+# test_derivative_pricing_example()
+# test_oisfr_as_only()
+# test_ois_deposits_fr_as_swaps()
+# test_ois_deposits_futures_swaps()
 
 test_cases.compare_test_cases()

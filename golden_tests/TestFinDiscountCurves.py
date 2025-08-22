@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
@@ -27,14 +25,14 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 set_date_format(DateFormatTypes.UK_LONG)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
-########################################################################################
 # TODO: Add other discount discount
+
 ########################################################################################
 
 
-def test_FinDiscountCurves():
+def test_fin_discount_curves():
 
     # Create a curve from times and discount factors
     value_dt = Date(1, 1, 2018)
@@ -69,17 +67,17 @@ def test_FinDiscountCurves():
     fin_discount_curve_poly = DiscountCurvePoly(value_dt, [0.05, 0.002, -0.00005])
     curves_list.append(fin_discount_curve_poly)
 
-    fin_discount_curve_PWF = DiscountCurvePWF(value_dt, dates, rates)
-    curves_list.append(fin_discount_curve_PWF)
+    fin_discount_curve_pwf = DiscountCurvePWF(value_dt, dates, rates)
+    curves_list.append(fin_discount_curve_pwf)
 
-    fin_discount_curve_PWL = DiscountCurvePWL(value_dt, dates, rates)
-    curves_list.append(fin_discount_curve_PWL)
+    fin_discount_curve_pwl = DiscountCurvePWL(value_dt, dates, rates)
+    curves_list.append(fin_discount_curve_pwl)
 
     fin_discount_curve_zeros = DiscountCurveZeros(value_dt, dates, rates)
     curves_list.append(fin_discount_curve_zeros)
 
-    fin_discount_curve_PWFONF = DiscountCurvePWFONF(value_dt, dates, rates)
-    curves_list.append(fin_discount_curve_PWFONF)
+    fin_discount_curve_pwfonf = DiscountCurvePWFONF(value_dt, dates, rates)
+    curves_list.append(fin_discount_curve_pwfonf)
 
     curve_names = []
     for curve in curves_list:
@@ -138,7 +136,7 @@ def test_FinDiscountCurves():
                 "%7.6f" % (swap_rate[i]),
             )
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0
@@ -176,6 +174,5 @@ def test_FinDiscountCurves():
 
 ########################################################################################
 
-
-test_FinDiscountCurves()
+test_fin_discount_curves()
 test_cases.compare_test_cases()

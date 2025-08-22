@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -22,7 +20,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinOptionImpliedDbn():
+def test_fin_option_implied_dbn():
 
     if 1 == 1:
 
@@ -68,20 +66,20 @@ def test_FinOptionImpliedDbn():
 
         #        fx_market.check_calibration(True)
 
-        PLOT_GRAPHS = False
-        if PLOT_GRAPHS:
+        plot_graphs = False
+        if plot_graphs:
             fx_market.plot_vol_curves()
 
         for i_tenor in range(0, len(fx_market.tenors)):
 
-            F = fx_market.fwd[i_tenor]
+            f = fx_market.fwd[i_tenor]
             t_exp = fx_market.t_exp[i_tenor]
 
-            start_fx = F * 0.05
-            end_fx = F * 5.0
+            start_fx = f * 0.05
+            end_fx = f * 5.0
 
             num_steps = 10000
-            dFX = (end_fx - start_fx) / num_steps
+            d_fx = (end_fx - start_fx) / num_steps
 
             #            dom_df = domestic_curve.df_t(t_exp)
             #            for_df = foreign_curve.df_t(t_exp)
@@ -94,8 +92,8 @@ def test_FinOptionImpliedDbn():
             vols = []
 
             for i_k in range(0, num_steps):
-                strike = start_fx + i_k * dFX
-                vol = vol_function_clark(params, F, strike, t_exp)
+                strike = start_fx + i_k * d_fx
+                vol = vol_function_clark(params, f, strike, t_exp)
                 strikes.append(strike)
                 vols.append(vol)
 
@@ -103,13 +101,13 @@ def test_FinOptionImpliedDbn():
             vols = np.array(vols)
 
 
+########################################################################################
+
 #            dbn = optionImpliedDbn(spot_fx_rate, t_exp, rd, rf, strikes, vols)
 #            print("SUM:", dbn.sum())
 #            plt.figure()
 #            plt.plot(dbn._x, dbn._densitydx)
 
-########################################################################################
 
-
-test_FinOptionImpliedDbn()
+test_fin_option_implied_dbn()
 test_cases.compare_test_cases()

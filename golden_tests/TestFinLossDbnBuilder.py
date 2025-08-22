@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,17 +15,17 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
-##########################################################################
+########################################################################################
 
 
-def test_FinLossDbnBuilder():
+def test_fin_loss_dbn_builder():
 
     num_credits = 125
 
     x = np.linspace(0, num_credits, num_credits + 1)
-    defaultProb = 0.30
+    default_prob = 0.30
     num_steps = 25
     loss_units = np.ones(num_credits)
     loss_ratio = np.ones(num_credits)
@@ -36,7 +34,7 @@ def test_FinLossDbnBuilder():
 
     for beta in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
 
-        default_probs = np.ones(num_credits) * defaultProb
+        default_probs = np.ones(num_credits) * default_prob
         beta_vector = np.ones(num_credits) * beta
 
         start = time.time()
@@ -51,8 +49,6 @@ def test_FinLossDbnBuilder():
             beta, "FULL_GCD", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start
         )
 
-        #######################################################################
-
         start = time.time()
         dbn2 = loss_dbn_hetero_adj_binomial(
             num_credits, default_probs, loss_ratio, beta_vector, num_steps
@@ -63,9 +59,7 @@ def test_FinLossDbnBuilder():
             beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start
         )
 
-        #######################################################################
-
-        if PLOT_GRAPHS:
+        if plot_graphs:
             plt.figure()
             plt.plot(x, dbn1, label="GCD FULL")
             plt.plot(x, dbn2, label="ADJ BIN")
@@ -77,13 +71,11 @@ def test_FinLossDbnBuilder():
             plt.legend()
             plt.show()
 
-    #######################################################################
     # INHOMOGENEOUS CASE
-    #######################################################################
 
     num_credits = 100
     beta = 0.0
-    defaultProb = 0.10
+    default_prob = 0.10
 
     default_probs = np.random.randint(3, 4, size=(num_credits)) / 10.0
     beta_vector = np.random.randint(5, 6, size=(num_credits)) / 10.0
@@ -106,8 +98,7 @@ def test_FinLossDbnBuilder():
     test_cases.print(beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start)
 
 
-##########################################################################
+########################################################################################
 
-
-test_FinLossDbnBuilder()
+test_fin_loss_dbn_builder()
 test_cases.compare_test_cases()

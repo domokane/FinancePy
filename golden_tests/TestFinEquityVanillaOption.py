@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -22,7 +20,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_EquityVanillaOption():
+def test_equity_vanilla_option():
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 7, 2015)
@@ -58,8 +56,6 @@ def test_EquityVanillaOption():
         end = time.time()
         duration = end - start
         test_cases.print(num_paths, value, value_mc, duration)
-
-    ########################################################################################
 
     stock_prices = range(80, 120, 10)
     num_paths = 100000
@@ -109,8 +105,6 @@ def test_EquityVanillaOption():
         duration = end - start
         test_cases.print(num_paths, value, value_mc1, value_mc2, duration)
 
-    ########################################################################################
-
     stock_prices = range(80, 120, 10)
     num_paths = 100000
 
@@ -158,8 +152,6 @@ def test_EquityVanillaOption():
         duration = end - start
         test_cases.print(num_paths, value, value_mc1, value_mc2, duration)
 
-    ########################################################################################
-
     stock_prices = range(80, 120, 10)
 
     test_cases.header(
@@ -194,8 +186,6 @@ def test_EquityVanillaOption():
             value_dt, stock_price, discount_curve, dividend_curve, model
         )
         test_cases.print(stock_price, value, delta, vega, theta, rho, vanna)
-
-    ###########################################################################
 
     test_cases.header(
         "STOCK PRICE",
@@ -232,7 +222,10 @@ def test_EquityVanillaOption():
         test_cases.print(stock_price, value, delta, vega, theta, rho, vanna)
 
 
-def testImpliedVolatility_NEW():
+########################################################################################
+
+
+def test_implied_volatility_new():
 
     value_dt = Date(1, 1, 2015)
     stock_price = 100.0
@@ -242,7 +235,7 @@ def testImpliedVolatility_NEW():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     strikes = np.linspace(50, 150, 11)
-    timesToExpiry = [0.003, 0.01, 0.1, 0.5, 1.0]
+    times_to_expiry = [0.003, 0.01, 0.1, 0.5, 1.0]
     sigmas = np.arange(1, 100, 5) / 100.0
     opt_types = [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]
 
@@ -258,14 +251,14 @@ def testImpliedVolatility_NEW():
     )
 
     tol = 1e-5
-    numTests = 0
-    numFails = 0
+    num_tests = 0
+    num_fails = 0
 
     for vol in sigmas:
 
         model = BlackScholes(vol)
 
-        for time_to_expiry in timesToExpiry:
+        for time_to_expiry in times_to_expiry:
 
             expiry_dt = value_dt.add_years(time_to_expiry)
 
@@ -290,11 +283,11 @@ def testImpliedVolatility_NEW():
                     # I remove the cases where the time value is zero
                     # This is arbitrary but 1e-10 seems good enough to me
 
-                    impliedVol = -999
+                    implied_vol = -999
 
                     if value - intrinsic > 1e-10:
 
-                        impliedVol = option.implied_volatility(
+                        implied_vol = option.implied_volatility(
                             value_dt,
                             stock_price,
                             discount_curve,
@@ -302,11 +295,11 @@ def testImpliedVolatility_NEW():
                             value,
                         )
 
-                    numTests += 1
+                    num_tests += 1
 
-                    errVol = np.abs(impliedVol - vol)
+                    err_vol = np.abs(implied_vol - vol)
 
-                    if errVol > tol:
+                    if err_vol > tol:
 
                         test_cases.print(
                             opt_type,
@@ -316,11 +309,11 @@ def testImpliedVolatility_NEW():
                             intrinsic,
                             value,
                             vol,
-                            impliedVol,
+                            implied_vol,
                         )
 
                         # These fails include ones due to the zero time value
-                        numFails += 1
+                        num_fails += 1
 
                         test_cases.print(
                             opt_type,
@@ -330,13 +323,13 @@ def testImpliedVolatility_NEW():
                             stock_price,
                             value,
                             vol,
-                            impliedVol,
+                            implied_vol,
                         )
 
 
-#    print("Num Tests", numTests, "numFails", numFails)
-
 ########################################################################################
+
+#    print("Num Tests", num_tests, "num_fails", num_fails)
 
 
 if 1 == 0:
@@ -354,11 +347,13 @@ if 1 == 0:
 
     value = call_option.value(value_dt, 105.0, discount_curve, dividend_curve, model)
 
+########################################################################################
+
 else:
-    test_EquityVanillaOption()
+    test_equity_vanilla_option()
 
     start = time.time()
-    testImpliedVolatility_NEW()
+    test_implied_volatility_new()
     end = time.time()
     elapsed = end - start
 

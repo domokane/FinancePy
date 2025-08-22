@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -16,10 +14,10 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
+########################################################################################
 
 
-def test_FinFXAmericanOption():
+def test_fin_fx_american_option():
 
     # There is no FXAmericanOption class. It is embedded in the FXVanillaOption
     # class. This test just compares it to the European
@@ -32,16 +30,16 @@ def test_FinFXAmericanOption():
     # DOM = USD , FOR = EUR
     ccy1 = "EUR"
     ccy2 = "USD"
-    ccy1CCRate = 0.030  # EUR
-    ccy2CCRate = 0.025  # USD
+    ccy1_cc_rate = 0.030  # EUR
+    ccy2_cc_rate = 0.025  # USD
 
     currency_pair = ccy1 + ccy2  # Always ccy1ccy2
     spot_fx_rate = 1.20
     strike_fx_rate = 1.250
     volatility = 0.10
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 
@@ -117,6 +115,5 @@ def test_FinFXAmericanOption():
 
 ########################################################################################
 
-
-test_FinFXAmericanOption()
+test_fin_fx_american_option()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -17,7 +15,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_FinModelRatesCIR():
+def test_fin_model_rates_cir():
 
     r0 = 0.05
     a = 0.20
@@ -44,7 +42,7 @@ def test_FinModelRatesCIR():
 
         start = time.time()
         p = zero_price(r0, a, b, sigma, t)
-        p_MC1 = zero_price_mc(
+        p_mc1 = zero_price_mc(
             r0,
             a,
             b,
@@ -55,7 +53,7 @@ def test_FinModelRatesCIR():
             seed,
             CIRNumericalScheme.EULER.value,
         )
-        p_MC2 = zero_price_mc(
+        p_mc2 = zero_price_mc(
             r0,
             a,
             b,
@@ -66,7 +64,7 @@ def test_FinModelRatesCIR():
             seed,
             CIRNumericalScheme.LOGNORMAL.value,
         )
-        p_MC3 = zero_price_mc(
+        p_mc3 = zero_price_mc(
             r0,
             a,
             b,
@@ -77,7 +75,7 @@ def test_FinModelRatesCIR():
             seed,
             CIRNumericalScheme.MILSTEIN.value,
         )
-        p_MC4 = zero_price_mc(
+        p_mc4 = zero_price_mc(
             r0,
             a,
             b,
@@ -88,7 +86,7 @@ def test_FinModelRatesCIR():
             seed,
             CIRNumericalScheme.KAHLJACKEL.value,
         )
-        p_MC5 = zero_price_mc(
+        p_mc5 = zero_price_mc(
             r0,
             a,
             b,
@@ -101,11 +99,10 @@ def test_FinModelRatesCIR():
         )
         end = time.time()
         elapsed = end - start
-        test_cases.print(t, elapsed, p, p_MC1, p_MC2, p_MC3, p_MC4, p_MC5)
+        test_cases.print(t, elapsed, p, p_mc1, p_mc2, p_mc3, p_mc4, p_mc5)
 
 
 ########################################################################################
 
-
-test_FinModelRatesCIR()
+test_fin_model_rates_cir()
 test_cases.compare_test_cases()

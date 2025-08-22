@@ -28,7 +28,7 @@ from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
 
 
-def buildFullIssuerCurve1(mkt_spdBump, ir_bump):
+def build_full_issuer_curve1(mkt_spdBump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
@@ -232,7 +232,7 @@ def buildFullIssuerCurve1(mkt_spdBump, ir_bump):
     return libor_curve, issuer_curve
 
 
-def buildFullIssuerCurve2(mkt_spdBump, ir_bump):
+def build_full_issuer_curve2(mkt_spdBump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 20 August 2020 SNAP AT 1600
@@ -358,7 +358,7 @@ def buildFullIssuerCurve2(mkt_spdBump, ir_bump):
 
 cdsRecovery = 0.40
 
-libor_curve, issuer_curve1 = buildFullIssuerCurve1(0.0, 0.0)
+libor_curve, issuer_curve1 = build_full_issuer_curve1(0.0, 0.0)
 
 # This is the 10 year contract at an off market cpn
 maturity_dt = Date(20, 6, 2029)
@@ -376,7 +376,7 @@ r1 = -np.log(z) / t
 print(t, z, r1, maturity_dt)
 mkt_spd1 = 0.040
 
-libor_curve, issuer_curve2 = buildFullIssuerCurve2(0.0, 0.0)
+libor_curve, issuer_curve2 = build_full_issuer_curve2(0.0, 0.0)
 
 # This is the 10 year contract at an off market cpn
 maturity_dt = Date(20, 6, 2025)

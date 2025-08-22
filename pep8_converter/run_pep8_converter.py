@@ -6,7 +6,7 @@ import difflib
 from typing import Dict, Set
 
 # Configuration constants
-HASH_LINE_LENGTH = 80  # Standard line width for PEP 8
+HASH_LINE_LENGTH = 88  # Standard line width for PEP 8
 OUTPUT_DIR = "./pep8_output"
 SHOW_DIFF = False  # Toggle to show diff output
 
@@ -263,7 +263,7 @@ def convert_file(filepath: str) -> None:
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         base, ext = os.path.splitext(os.path.basename(filepath))
         new_filepath = os.path.join(
-            OUTPUT_DIR, f"{base}.py"
+            OUTPUT_DIR, "..\\..\\pep8_test/", f"{base}.py"
         )  # Overwrite any existing _2.py
         with open(new_filepath, "w", encoding="utf-8") as f:
             f.write(new_source)
@@ -276,7 +276,7 @@ def convert_folder(folder_path: str) -> None:
     """Process all .py files in a folder, skipping _2.py files."""
     try:
         for filename in os.listdir(folder_path):
-            if filename.startswith("Test") and filename.endswith(".py"):
+            if filename.startswith("test") and filename.endswith(".py"):
                 convert_file(os.path.join(folder_path, filename))
     except (IOError, OSError) as e:
         print(f"Error accessing folder {folder_path}: {e}")
@@ -284,5 +284,6 @@ def convert_folder(folder_path: str) -> None:
 
 if __name__ == "__main__":
     TARGET_FOLDER_RELATIVE_PATH = "../golden_tests"
+    TARGET_FOLDER_RELATIVE_PATH = "../unit_tests"
     convert_folder(TARGET_FOLDER_RELATIVE_PATH)
     print("PEP8 conversion complete.")

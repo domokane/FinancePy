@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -15,51 +13,51 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_FinInterpolate():
+def test_fin_interpolate():
 
     import time
 
-    xValues = np.array([0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0])
+    x_values = np.array([0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0])
     a = -0.1
     b = 0.002
 
-    yValues = []
-    for x in xValues:
+    y_values = []
+    for x in x_values:
         y = math.exp(a * x + b * x * x)
-        yValues.append(y)
+        y_values.append(y)
 
-    yValues = np.array(yValues)
+    y_values = np.array(y_values)
 
-    xInterpolateValues = np.linspace(0.0, 10.0, 20)
+    x_interpolate_values = np.linspace(0.0, 10.0, 20)
 
     test_cases.header("METHOD", "X", "Y_INTERPOLATED")
 
     for interp_type in InterpTypes:
 
-        yInterpValues = []
+        y_interp_values = []
         start = time.time()
 
         interpolator = Interpolator(interp_type)
-        interpolator.fit(xValues, yValues)
+        interpolator.fit(x_values, y_values)
 
-        for x in xInterpolateValues:
+        for x in x_interpolate_values:
             y_int = interpolator.interpolate(x)
             test_cases.print(interp_type, x, y_int)
-            yInterpValues.append(y_int)
+            y_interp_values.append(y_int)
 
         end = time.time()
 
-        if PLOT_GRAPHS:
+        if plot_graphs:
             plt.figure(figsize=(12, 10))
-            plt.plot(xValues, yValues, color="r", marker="o")
+            plt.plot(x_values, y_values, color="r", marker="o")
             plt.plot(
-                xInterpolateValues,
-                yInterpValues,
+                x_interpolate_values,
+                y_interp_values,
                 color="b",
                 label=str(interp_type),
             )
@@ -82,6 +80,5 @@ def test_FinInterpolate():
 
 ########################################################################################
 
-
-test_FinInterpolate()
+test_fin_interpolate()
 test_cases.compare_test_cases()

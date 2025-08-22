@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import time
 import numpy as np
@@ -26,9 +24,9 @@ from financepy.utils.math import corr_matrix_generator
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-##########################################################################
 # TO DO
-##########################################################################
+
+########################################################################################
 
 
 def build_ibor_curve(trade_dt):
@@ -69,7 +67,7 @@ def build_ibor_curve(trade_dt):
     return libor_curve
 
 
-##########################################################################
+########################################################################################
 
 
 def load_homogeneous_spread_curves(
@@ -105,7 +103,7 @@ def load_homogeneous_spread_curves(
     return issuer_curves
 
 
-##########################################################################
+########################################################################################
 
 
 def load_hetero_spread_curves(value_dt, libor_curve):
@@ -145,10 +143,10 @@ def load_hetero_spread_curves(value_dt, libor_curve):
     return issuer_curves
 
 
-##########################################################################
+########################################################################################
 
 
-def test_FinCDSBasket():
+def test_fin_cds_basket():
 
     trade_dt = Date(1, 3, 2007)
     step_in_dt = trade_dt.add_days(1)
@@ -156,11 +154,9 @@ def test_FinCDSBasket():
 
     libor_curve = build_ibor_curve(trade_dt)
 
-    basketMaturity = Date(20, 12, 2011)
+    basket_maturity = Date(20, 12, 2011)
 
     cds_index = CDSIndexPortfolio()
-
-    ##########################################################################
 
     test_cases.banner(
         "==================================================================="
@@ -189,35 +185,35 @@ def test_FinCDSBasket():
         issuer_curves = issuer_curves[0:num_credits]
 
     intrinsic_spd = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+        cds_index.intrinsic_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
 
     test_cases.print("INTRINSIC SPD BASKET MATURITY", intrinsic_spd)
 
-    totalSpd = (
-        cds_index.total_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+    total_spd = (
+        cds_index.total_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
 
-    test_cases.print("SUMMED UP SPD BASKET MATURITY", totalSpd)
+    test_cases.print("SUMMED UP SPD BASKET MATURITY", total_spd)
 
-    minSpd = (
-        cds_index.min_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+    min_spd = (
+        cds_index.min_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
 
-    test_cases.print("MINIMUM SPD BASKET MATURITY", minSpd)
+    test_cases.print("MINIMUM SPD BASKET MATURITY", min_spd)
 
-    maxSpd = (
-        cds_index.max_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+    max_spd = (
+        cds_index.max_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
 
-    test_cases.print("MAXIMUM SPD BASKET MATURITY", maxSpd)
+    test_cases.print("MAXIMUM SPD BASKET MATURITY", max_spd)
 
     seed = 1967
-    basket = CDSBasket(value_dt, basketMaturity)
+    basket = CDSBasket(value_dt, basket_maturity)
 
     test_cases.banner(
         "==================================================================="
@@ -275,7 +271,7 @@ def test_FinCDSBasket():
         rho = beta**2
         corr_matrix = corr_matrix_generator(rho, num_credits)
         for ntd in range(1, num_credits + 1):
-            for doF in [3, 4]:
+            for do_f in [3, 4]:
                 start = time.time()
 
                 v = basket.value_student_t_mc(
@@ -283,7 +279,7 @@ def test_FinCDSBasket():
                     ntd,
                     issuer_curves,
                     corr_matrix,
-                    doF,
+                    do_f,
                     libor_curve,
                     num_trials,
                     seed,
@@ -291,7 +287,7 @@ def test_FinCDSBasket():
 
                 end = time.time()
                 period = end - start
-                test_cases.print(period, num_trials, rho, doF, ntd, v[2] * 10000)
+                test_cases.print(period, num_trials, rho, do_f, ntd, v[2] * 10000)
 
             start = time.time()
             v = basket.value_gaussian_mc(
@@ -317,7 +313,7 @@ def test_FinCDSBasket():
     test_cases.banner(
         "==================================================================="
     )
-    doF = 5
+    do_f = 5
     test_cases.header("TIME", "NUMTRIALS", "RHO", "NTD", "SPD")
     for beta in [0.0, 0.5]:
         rho = beta**2
@@ -331,7 +327,7 @@ def test_FinCDSBasket():
                     ntd,
                     issuer_curves,
                     corr_matrix,
-                    doF,
+                    do_f,
                     libor_curve,
                     num_trials,
                     seed,
@@ -343,5 +339,5 @@ def test_FinCDSBasket():
 
 ########################################################################################
 
-test_FinCDSBasket()
+test_fin_cds_basket()
 test_cases.compare_test_cases()

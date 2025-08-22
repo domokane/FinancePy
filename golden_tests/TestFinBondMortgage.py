@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -14,11 +12,10 @@ from financepy.utils.date import Date
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-
 ########################################################################################
 
 
-def test_BondMortgage():
+def test_bond_mortgage():
 
     principal = 130000
     start_dt = Date(23, 2, 2018)
@@ -57,6 +54,5 @@ def test_BondMortgage():
 
 ########################################################################################
 
-
-test_BondMortgage()
+test_bond_mortgage()
 test_cases.compare_test_cases()

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
@@ -13,12 +11,12 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_GRAPHS = False
+plot_graphs = False
 
 ########################################################################################
 
 
-def test_FinVolatilityCurve():
+def test_fin_volatility_curve():
 
     value_dt = Date(20, 6, 2012)
     expiry_dt = Date(20, 12, 2012)
@@ -30,7 +28,7 @@ def test_FinVolatilityCurve():
     interp_strikes = np.linspace(50, 150, 10)
     interp_vols = vol_curve.volatility(interp_strikes)
 
-    if PLOT_GRAPHS:
+    if plot_graphs:
         import matplotlib.pyplot as plt
 
         plt.plot(strikes, vols, "o", interp_strikes, interp_vols)
@@ -39,6 +37,5 @@ def test_FinVolatilityCurve():
 
 ########################################################################################
 
-
-test_FinVolatilityCurve()
+test_fin_volatility_curve()
 test_cases.compare_test_cases()

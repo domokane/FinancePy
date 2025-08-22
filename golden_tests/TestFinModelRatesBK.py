@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import sys
 
@@ -25,7 +23,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def test_BKExampleOne():
+def test_bk_example_one():
 
     test_cases.banner("=== HULL INITIAL EXAMPLE SECTION 28.7 ED 6 PG 668 ====")
 
@@ -54,11 +52,11 @@ def test_BKExampleOne():
         test_cases.print("PDM AT LAST TIME", model.pm)
         test_cases.print("PD AT LAST TIME", model.pd)
 
-
 ########################################################################################
 
 
-def test_BKExampleTwo():
+def test_bk_example_two():
+
     # Valuation of a European option on a coupon bearing bond
     # This follows example in Fig 28.11 of John Hull's book but does not
     # have the exact same dt so there are some differences
@@ -148,9 +146,10 @@ def test_BKExampleTwo():
         print_tree(model.qq, 5)
 
 
+
+
 ########################################################################################
 
-
-test_BKExampleOne()
-test_BKExampleTwo()
+test_bk_example_one()
+test_bk_example_two()
 test_cases.compare_test_cases()

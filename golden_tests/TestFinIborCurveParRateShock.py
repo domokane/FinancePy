@@ -21,8 +21,11 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
+########################################################################################
+
 
 def test_ibor_curve_par_rate_shocker():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
 
@@ -133,5 +136,7 @@ def test_ibor_curve_par_rate_shocker():
             expected_fwd_rate_changes[benchmark_idx][1], 3
         )
 
+
+########################################################################################
 
 test_ibor_curve_par_rate_shocker()
