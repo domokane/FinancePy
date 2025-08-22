@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,6 +13,8 @@ from financepy.products.bonds.bond_future import BondFuture
 freq = FrequencyTypes.SEMI_ANNUAL
 basis = DayCountTypes.ACT_ACT_ICMA
 issue_dt = Date(15, 2, 2004)
+
+########################################################################################
 
 
 def test_bond_future_1():
@@ -40,8 +40,11 @@ def test_bond_future_1():
 
     assert round(cf, 4) == 0.9297
 
+########################################################################################
+
 
 def test_bond_future_2():
+
     bond = Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis)
     assert bond.maturity_dt == Date(15, 8, 2027)
 

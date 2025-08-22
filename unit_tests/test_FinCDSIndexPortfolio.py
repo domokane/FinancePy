@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -14,8 +12,11 @@ from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 import os
 
+########################################################################################
 
-def test_CDSIndexPortfolio():
+
+def test_cds_index_portfolio():
+
     trade_dt = Date(1, 8, 2007)
     step_in_dt = trade_dt.add_days(1)
     value_dt = step_in_dt

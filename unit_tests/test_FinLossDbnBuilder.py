@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.models.gauss_copula_onefactor import (
     loss_dbn_hetero_adj_binomial,
@@ -8,12 +6,15 @@ from financepy.models.gauss_copula_onefactor import (
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 import numpy as np
 
+########################################################################################
 
-def test_FinLossDbnBuilder():
+
+def test__fin_loss_dbn_builder():
+
     num_steps = 25
 
     num_credits = 125
-    defaultProb = 0.30
+    default_prob = 0.30
     loss_ratio = np.ones(num_credits)
     loss_units = np.ones(num_credits)
 
@@ -31,7 +32,7 @@ def test_FinLossDbnBuilder():
 
     for beta, results in beta_results:
 
-        default_probs = np.ones(num_credits) * defaultProb
+        default_probs = np.ones(num_credits) * default_prob
         beta_vector = np.ones(num_credits) * beta
 
         dbn1 = loss_dbn_recursion_gcd(

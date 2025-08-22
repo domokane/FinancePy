@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
@@ -13,8 +11,11 @@ from financepy.utils.date import Date
 freq_type = FrequencyTypes.SEMI_ANNUAL
 dg_type = DateGenRuleTypes.BACKWARD
 
+########################################################################################
+
 
 def test_date_adjust_no_adj():
+
     start_dt = Date(28, 2, 2008)
     end_dt = Date(28, 2, 2011)
 
@@ -35,8 +36,11 @@ def test_date_adjust_no_adj():
         Date(28, 2, 2011),
     ]
 
+########################################################################################
+
 
 def test_date_adjust_noweekend_following():
+
     start_dt = Date(28, 2, 2008)
     end_dt = Date(28, 2, 2011)
 
@@ -57,8 +61,11 @@ def test_date_adjust_noweekend_following():
         Date(28, 2, 2011),
     ]
 
+########################################################################################
+
 
 def test_date_adjust_noweekend_modfollowing():
+
     start_dt = Date(28, 2, 2008)
     end_dt = Date(28, 2, 2011)
 
@@ -79,8 +86,11 @@ def test_date_adjust_noweekend_modfollowing():
         Date(28, 2, 2011),
     ]
 
+########################################################################################
+
 
 def test_date_adjust_noweekend_usholidays_modfollowing():
+
     start_dt = Date(4, 7, 2008)
     end_dt = Date(4, 7, 2011)
 

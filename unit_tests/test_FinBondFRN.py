@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,8 +9,11 @@ from financepy.products.bonds.bond_frn import BondFRN
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 
+########################################################################################
+
 
 def test_bond_frn_1():
+
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     issue_dt = Date(10, 11, 2010)
     maturity_dt = Date(10, 11, 2021)
@@ -47,8 +48,8 @@ def test_bond_frn_1():
     accddays = bond.accrued_days
     assert accddays == 71
 
-    accdAmount = bond.accrued_int
-    assert round(accdAmount, 4) == 0.0023
+    accd_amount = bond.accrued_int
+    assert round(accd_amount, 4) == 0.0023
 
     principal = bond.principal(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -92,8 +93,11 @@ def test_bond_frn_1():
 
     assert round(modified_duration, 4) == 4.1335
 
+########################################################################################
+
 
 def test_bond_frn_2():
+
     # https://ebrary.net/14293/economics/actual_floater
     issue_dt = Date(28, 3, 2000)
     settle_dt = Date(28, 3, 2014)
@@ -127,8 +131,8 @@ def test_bond_frn_2():
     accddays = bond.accrued_days
     assert accddays == 55
 
-    accdAmount = bond.accrued_int
-    assert round(accdAmount, 4) == 0.0005
+    accd_amount = bond.accrued_int
+    assert round(accd_amount, 4) == 0.0005
 
     principal = bond.principal(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -178,5 +182,7 @@ def test_bond_frn_2():
 
     assert round(modified_duration, 4) == 6.0480
 
+
+########################################################################################
 
 test_bond_frn_1()

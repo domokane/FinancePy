@@ -18,8 +18,11 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.calendar import Calendar, CalendarTypes
 
+########################################################################################
+
 
 def test_ibor_curve_par_rate_shocker():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -131,5 +134,7 @@ def test_ibor_curve_par_rate_shocker():
             expected_fwd_rate_changes[benchmark_idx][1], 3
         )
 
+
+########################################################################################
 
 test_ibor_curve_par_rate_shocker()

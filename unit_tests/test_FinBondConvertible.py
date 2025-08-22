@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -70,6 +68,8 @@ discount_curve = DiscountCurveFlat(settle_dt, rate, FrequencyTypes.CONTINUOUS)
 credit_spread = 0.00
 recovery_rate = 0.40
 
+########################################################################################
+
 
 def test_calls_or_puts():
 
@@ -114,8 +114,11 @@ def test_calls_or_puts():
     assert round(res["gamma"], 4) == 0.0832
     assert round(res["theta"], 4) == 53.9851
 
+########################################################################################
+
 
 def test_dividends():
+
     dividend_yields = [0.02] * 16
 
     num_steps_per_year = 5

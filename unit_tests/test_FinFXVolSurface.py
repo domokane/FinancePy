@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
@@ -10,10 +8,13 @@ from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 
-verboseCalibration = False
+verbose_calibration = False
+
+########################################################################################
 
 
-def test_FinFXMktVolSurface1(capsys):
+def test__fin_fx_mkt_vol_surface1(capsys):
+
     # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
 
@@ -57,12 +58,15 @@ def test_FinFXMktVolSurface1(capsys):
         vol_function_type,
     )
 
-    fx_market.check_calibration(verboseCalibration, tol=1e-5)
+    fx_market.check_calibration(verbose_calibration, tol=1e-5)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface2(capsys):
+
+def test__fin_fx_mkt_vol_surface2(capsys):
+
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURJPY EXAMPLE CLARK")
 
@@ -104,12 +108,15 @@ def test_FinFXMktVolSurface2(capsys):
         delta_method,
     )
 
-    fx_market.check_calibration(verboseCalibration, tol=0.0005)
+    fx_market.check_calibration(verbose_calibration, tol=0.0005)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface3(capsys):
+
+def test__fin_fx_mkt_vol_surface3(capsys):
+
     # EURUSD Example from Paper by Uwe Wystup using Tables 4
     #        print("EURUSD EXAMPLE WYSTUP")
 
@@ -151,12 +158,15 @@ def test_FinFXMktVolSurface3(capsys):
         delta_method,
     )
 
-    fx_market.check_calibration(verboseCalibration)
+    fx_market.check_calibration(verbose_calibration)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface4(capsys):
+
+def test__fin_fx_mkt_vol_surface4(capsys):
+
     # USDJPY Example from Paper by Uwe Wystup using Tables 4
 
     value_dt = Date(20, 1, 2009)
@@ -197,6 +207,6 @@ def test_FinFXMktVolSurface4(capsys):
         delta_method,
     )
 
-    fx_market.check_calibration(verboseCalibration)
+    fx_market.check_calibration(verbose_calibration)
     captured = capsys.readouterr()
     assert captured.out == ""

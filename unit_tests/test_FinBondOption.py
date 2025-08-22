@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -40,8 +38,11 @@ face = 100.0
 
 num_time_steps = 100
 
+########################################################################################
+
 
 def test_european_call_bk():
+
     opt_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100
 
@@ -56,8 +57,11 @@ def test_european_call_bk():
 
     assert round(v, 4) == 1.7055
 
+########################################################################################
+
 
 def test_american_call_bk():
+
     opt_type = OptionTypes.AMERICAN_CALL
     strike_price = 100
 
@@ -71,8 +75,11 @@ def test_american_call_bk():
 
     assert round(v, 4) == 0.0069
 
+########################################################################################
+
 
 def test_european_put_bk():
+
     opt_type = OptionTypes.EUROPEAN_PUT
     strike_price = 100
 
@@ -86,8 +93,11 @@ def test_european_put_bk():
 
     assert round(v, 4) == 0.4060
 
+########################################################################################
+
 
 def test_american_put_bk():
+
     opt_type = OptionTypes.AMERICAN_PUT
     strike_price = 100
 
@@ -101,8 +111,11 @@ def test_american_put_bk():
 
     assert round(v, 4) == 0.5331
 
+########################################################################################
+
 
 def test_european_call_bdt():
+
     opt_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100
 
@@ -115,8 +128,11 @@ def test_european_call_bdt():
 
     assert round(v, 4) == 2.9156
 
+########################################################################################
+
 
 def test_american_call_bdt():
+
     opt_type = OptionTypes.AMERICAN_CALL
     strike_price = 100
 
@@ -129,8 +145,11 @@ def test_american_call_bdt():
 
     assert round(v, 4) == 3.0939
 
+########################################################################################
+
 
 def test_european_put_bdt():
+
     opt_type = OptionTypes.EUROPEAN_PUT
     strike_price = 100
 
@@ -143,8 +162,11 @@ def test_european_put_bdt():
 
     assert round(v, 4) == 0.4326
 
+########################################################################################
+
 
 def test_american_put_bdt():
+
     opt_type = OptionTypes.AMERICAN_PUT
     strike_price = 100
 
@@ -160,7 +182,12 @@ def test_american_put_bdt():
 
 # Results different from TestFinBondOptionHWModel.py
 # because t_mat != 10.0
+
+########################################################################################
+
+
 def test_european_call_hw():
+
     opt_type = OptionTypes.EUROPEAN_CALL
     strike_price = 100
     num_time_steps = 100
@@ -175,8 +202,11 @@ def test_european_call_hw():
 
     assert round(v, 4) == 1.8809
 
+########################################################################################
+
 
 def test_american_call_hw():
+
     opt_type = OptionTypes.AMERICAN_CALL
     strike_price = 100
 
@@ -190,8 +220,11 @@ def test_american_call_hw():
 
     assert round(v, 4) == 2.0443
 
+########################################################################################
+
 
 def test_european_put_hw():
+
     opt_type = OptionTypes.EUROPEAN_PUT
     strike_price = 100
 
@@ -205,8 +238,11 @@ def test_european_put_hw():
 
     assert round(v, 4) == 2.2767
 
+########################################################################################
+
 
 def test_american_put_hw():
+
     opt_type = OptionTypes.AMERICAN_PUT
     strike_price = 100
 

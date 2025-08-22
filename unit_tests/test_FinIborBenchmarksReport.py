@@ -18,8 +18,11 @@ from financepy.products.rates.ibor_benchmarks_report import (
     dataframe_to_benchmarks,
 )
 
+########################################################################################
+
 
 def test_ibor_benchmarks_report():
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
     interp_type = InterpTypes.FLAT_FWD_RATES
@@ -172,8 +175,11 @@ def test_ibor_benchmarks_report():
         .values.any()
     ) == False
 
+########################################################################################
+
 
 def test_dataframe_to_benchmarks():
+
     path = dirname(__file__)
     filename = "ibor_benchmarks_example.csv"
     full_filename_path = join(path, "data", filename)
@@ -197,6 +203,10 @@ def test_dataframe_to_benchmarks():
     assert len(benchmarks["IborFRA"]) == 1
     assert len(benchmarks["IborSwap"]) == 10
 
+
+########################################################################################
+
+########################################################################################
 
 if __name__ == "__main__":
     test_ibor_benchmarks_report()

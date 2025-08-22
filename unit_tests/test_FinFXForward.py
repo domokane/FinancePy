@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -9,8 +7,11 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.products.fx.fx_forward import FXForward
 
+########################################################################################
 
-def test_FinFXForward():
+
+def test__fin_fx_forward():
+
     #  https://stackoverflow.com/questions/48778712
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 

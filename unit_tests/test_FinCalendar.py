@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,8 +27,11 @@ bus_days_in_decade = {
     "CalendarTypes.UNITED_KINGDOM": 2527,
 }
 
+########################################################################################
+
 
 def test_add_business_day():
+
     for cal_type in CalendarTypes:
         num_days = bus_days_in_decade[str(cal_type)]
         cal = Calendar(cal_type)

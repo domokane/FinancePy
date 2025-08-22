@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date
 from financepy.utils.calendar import CalendarTypes
@@ -15,6 +13,8 @@ from financepy.products.equity.equity_swap import EquitySwap
 from financepy.products.equity.equity_swap_leg import EquitySwapLeg
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+
+########################################################################################
 
 
 def test_equity_swap_at_inception():
@@ -68,6 +68,8 @@ def test_equity_swap_at_inception():
 
     assert round(value, 5) == 0.00000
 
+########################################################################################
+
 
 def test_equity_swap_not_in_inception():
 
@@ -105,7 +107,7 @@ def test_equity_swap_not_in_inception():
     index_alpha_first = DayCount(index_curve_first.dc_type).year_frac(
         effective_dt, maturity_dt
     )[0]
-    firstFixing = (
+    first_fixing = (
         (
             index_curve_first.df(effective_dt)
             / index_curve_first.df(maturity_dt)
@@ -118,7 +120,7 @@ def test_equity_swap_not_in_inception():
     index_alpha_period = DayCount(index_curve_period.dc_type).year_frac(
         value_dt, maturity_dt
     )[0]
-    periodFixing = (
+    period_fixing = (
         (index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt))
         - 1.0
     ) / index_alpha_period
@@ -126,8 +128,8 @@ def test_equity_swap_not_in_inception():
     # This is the price at which abs_value(equity leg) == abs_value(float leg)
     stock_price = (
         stock_strike
-        * (1 + firstFixing * index_alpha_first)
-        / (1 + periodFixing * index_alpha_period)
+        * (1 + first_fixing * index_alpha_first)
+        / (1 + period_fixing * index_alpha_period)
     )
 
     equity_swap = EquitySwap(
@@ -155,10 +157,12 @@ def test_equity_swap_not_in_inception():
         index_curve,
         dividend_curve,
         stock_price,
-        firstFixing,
+        first_fixing,
     )
 
     assert round(value, 5) == 0.00000
+
+########################################################################################
 
 
 def test_equity_swap_with_dividends():
@@ -181,11 +185,11 @@ def test_equity_swap_with_dividends():
     stock_qty = notional / stock_price
     discount_rate = 0.05
     dividend_rate = 0.02
-    indexRate = 0.03
+    index_rate = 0.03
 
     discount_curve = DiscountCurveFlat(effective_dt, discount_rate)
     dividend_curve = DiscountCurveFlat(effective_dt, dividend_rate)
-    index_curve = DiscountCurveFlat(effective_dt, indexRate)
+    index_curve = DiscountCurveFlat(effective_dt, index_rate)
 
     equity_swap_leg = EquitySwapLeg(
         effective_dt,

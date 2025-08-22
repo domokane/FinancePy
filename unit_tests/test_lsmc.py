@@ -9,8 +9,11 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 from pytest import approx
 
+########################################################################################
+
 
 def test_american_call():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -59,8 +62,11 @@ def test_american_call():
     # FIGURE OUT WHY THIS FAILS
     # assert v_ls == approx(value['value'], abs=1e-1)
 
+########################################################################################
+
 
 def test_american_put():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -107,8 +113,11 @@ def test_american_put():
     )
     assert v_ls == approx(value["value"], abs=1e-1)
 
+########################################################################################
+
 
 def test_call_option():
+
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -152,8 +161,11 @@ def test_call_option():
     )
     assert v_ls == approx(v0, 1e-1)
 
+########################################################################################
+
 
 def test_put_option():
+
     """
     Check finite difference method gives similar result to BlackScholes model
     """

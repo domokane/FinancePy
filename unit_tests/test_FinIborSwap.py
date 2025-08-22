@@ -1,11 +1,10 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
-from .helpers import build_ibor_single_curve
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from .helpers import build_ibor_single_curve
 
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
@@ -23,8 +22,11 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.math import ONE_MILLION
 import numpy as np
 
+########################################################################################
 
-def test_LiborSwap():
+
+def test__libor_swap():
+
     # I have tried to reproduce the example from the blog by Ioannis Rigopoulos
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
 
@@ -39,7 +41,11 @@ def test_LiborSwap():
     assert round(v, 4) == 318901.6015
 
 
-def test_LiborSwapCashflowReport():
+########################################################################################
+
+
+def test__libor_swap_cashflow_report():
+
     # as test_LiborSwap but with extra output
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
@@ -57,7 +63,11 @@ def test_LiborSwapCashflowReport():
     assert round(sum_of_cashflows - v[0], 4) == 0
 
 
+########################################################################################
+
+
 def test_dp_example():
+
     #  http://www.derivativepricing.com/blogpage.asp?id=8
 
     start_dt = Date(14, 11, 2011)
@@ -124,17 +134,21 @@ def test_dp_example():
     assert round(v * 1000, 4) == 785300.0566
 
 
+########################################################################################
+
+
 def _load_test_swap_and_curve(start_dt, end_dt):
+
     fixed_coupon = 0.015
-    fixedFreqType = FrequencyTypes.ANNUAL
+    fixed_freq_type = FrequencyTypes.ANNUAL
     fixed_dc_type = DayCountTypes.THIRTY_E_360
 
     float_spread = 0.0
-    floatFreqType = FrequencyTypes.SEMI_ANNUAL
+    float_freq_type = FrequencyTypes.SEMI_ANNUAL
     float_dc_type = DayCountTypes.ACT_360
     first_fixing = -0.00268
 
-    swapCalendarType = CalendarTypes.WEEKEND
+    swap_calendar_type = CalendarTypes.WEEKEND
     bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
     date_gen_rule_type = DateGenRuleTypes.BACKWARD
     fixed_leg_type = SwapTypes.RECEIVE
@@ -146,13 +160,13 @@ def _load_test_swap_and_curve(start_dt, end_dt):
         end_dt,
         fixed_leg_type,
         fixed_coupon,
-        fixedFreqType,
+        fixed_freq_type,
         fixed_dc_type,
         notional,
         float_spread,
-        floatFreqType,
+        float_freq_type,
         float_dc_type,
-        swapCalendarType,
+        swap_calendar_type,
         bus_day_adjust_type,
         date_gen_rule_type,
     )
@@ -167,5 +181,7 @@ def _load_test_swap_and_curve(start_dt, end_dt):
     return first_fixing, swap, settlement_date, libor_curve
 
 
+########################################################################################
+
 # if __name__ == '__main__':
-#     test_LiborSwapCashflowReport()
+#     test__libor_swap_cashflow_report()

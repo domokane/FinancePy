@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,8 +9,11 @@ from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.day_count import DayCountTypes
 
+########################################################################################
+
 
 def test_equity_vol_surface():
+
     value_dt = Date(11, 1, 2021)
 
     stock_price = 3800.0  # Check
@@ -52,7 +53,7 @@ def test_equity_vol_surface():
 
     vol_function_type = VolFuncTypes.SVI
 
-    equitySurface = EquityVolSurface(
+    equity_surface = EquityVolSurface(
         value_dt,
         stock_price,
         discount_curve,
@@ -65,19 +66,19 @@ def test_equity_vol_surface():
 
     expiry_dt = expiry_dts[0]
     delta = 0.10
-    vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
+    vol = equity_surface.vol_from_delta_date(delta, expiry_dt)
     assert round(vol[0], 4) == 0.1544
     assert round(vol[1], 4) == 4032.9156
 
     expiry_dt = expiry_dts[1]
     delta = 0.20
-    vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
+    vol = equity_surface.vol_from_delta_date(delta, expiry_dt)
     assert round(vol[0], 4) == 0.1555
     assert round(vol[1], 4) == 4019.3793
 
     expiry_dt = expiry_dts[6]
     delta = 0.90
-    vol = equitySurface.vol_from_delta_date(delta, expiry_dt)
+    vol = equity_surface.vol_from_delta_date(delta, expiry_dt)
     assert (
         round(vol[0], 4) == 0.3498
     )  # 0.353 # 0.3498 VP TODO: had to rebase, not sure why. Investigate more. Interestingly the original numbers pass on github so restored them

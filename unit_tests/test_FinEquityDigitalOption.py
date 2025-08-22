@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_digital_option import (
@@ -30,6 +28,8 @@ model = BlackScholes(volatility)
 
 num_paths = 40000
 
+########################################################################################
+
 
 def test_value():
 
@@ -46,8 +46,11 @@ def test_value():
     assert round(value, 4) == 0.4693
     assert round(value_mc, 4) == 0.4694
 
+########################################################################################
+
 
 def test_greeks():
+
     call_option = EquityDigitalOption(
         expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type
     )

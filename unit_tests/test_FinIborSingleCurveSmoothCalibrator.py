@@ -19,7 +19,12 @@ from financepy.utils.calendar import Calendar, CalendarTypes
 
 
 @pytest.mark.parametrize("interp_type", InterpTypes)
-def test_SmoothFitSimple(interp_type, report_progress=False):
+
+########################################################################################
+
+
+def test__smooth_fit_simple(interp_type, report_progress=False):
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
 
@@ -100,7 +105,12 @@ def test_SmoothFitSimple(interp_type, report_progress=False):
 
 
 @pytest.mark.parametrize("interp_type", [InterpTypes.FLAT_FWD_RATES])
-def test_SmoothFit(interp_type, report_progress=False):
+
+########################################################################################
+
+
+def test__smooth_fit(interp_type, report_progress=False):
+
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
 
@@ -267,8 +277,12 @@ def test_SmoothFit(interp_type, report_progress=False):
     # If no exception, we are good
 
 
+########################################################################################
+
+########################################################################################
+
 if __name__ == "__main__":
     report_progress = True
-    test_SmoothFitSimple(InterpTypes.LINEAR_ZERO_RATES, report_progress)
-    test_SmoothFit(InterpTypes.FLAT_FWD_RATES, report_progress)
-    # test_SmoothFit(InterpTypes.FINCUBIC_ZERO_RATES, report_progress)
+    test__smooth_fit_simple(InterpTypes.LINEAR_ZERO_RATES, report_progress)
+    test__smooth_fit(InterpTypes.FLAT_FWD_RATES, report_progress)
+    # test__smooth_fit(InterpTypes.FINCUBIC_ZERO_RATES, report_progress)

@@ -20,7 +20,9 @@ from financepy.products.rates.ibor_benchmarks_report import (
 )
 
 # Set to True to run this file spandalone and see some useful info
-DIAGNOSTICS_MODE = False
+diagnostics_mode = False
+
+########################################################################################
 
 
 def test_z_spread_flat_curve():
@@ -28,6 +30,8 @@ def test_z_spread_flat_curve():
     settle_dt = Date(19, 9, 2012)
     base_curve = DiscountCurveFlat(settle_dt, flat_rate=1 * G_PERCENT)
     return _test_z_spread_for_curve(base_curve)
+
+########################################################################################
 
 
 def test_z_spread_actual_curve():
@@ -55,8 +59,11 @@ def test_z_spread_actual_curve():
 
     return _test_z_spread_for_curve(libor_curve)
 
+########################################################################################
+
 
 def _test_z_spread_for_curve(base_curve: DiscountCurve):
+
     path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
 
@@ -83,7 +90,7 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
         bond_dataframe.loc[bdf_index, "z_spread"] = z_spread
         bond_dataframe.loc[bdf_index, "asset_swap_spread"] = asset_swap_spread
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         print(bond_dataframe)
         plt.plot(
             bond_dataframe["maturity"],
@@ -108,6 +115,10 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
 
     assert bond_dataframe["z_spread"].isnull().values.any() == False
 
+
+########################################################################################
+
+########################################################################################
 
 if __name__ == "__main__":
     test_z_spread_flat_curve()

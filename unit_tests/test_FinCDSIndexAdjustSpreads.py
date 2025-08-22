@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -13,8 +11,10 @@ from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from os.path import dirname, join
 
+########################################################################################
 
-def test_CDSIndexAdjustSpreads():
+
+def test_cds_index_adjust_spreads():
 
     trade_dt = Date(1, 8, 2007)
     step_in_dt = trade_dt.add_days(1)

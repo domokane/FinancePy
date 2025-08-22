@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
@@ -27,8 +25,11 @@ model = BlackScholes(volatility)
 discount_curve = DiscountCurveFlat(value_date, interest_rate)
 dividend_curve = DiscountCurveFlat(value_date, dividend_yield)
 
+########################################################################################
+
 
 def test_call_option():
+
     v = call_option.value(
         value_date, stock_price, discount_curve, dividend_curve, model
     )
@@ -36,6 +37,8 @@ def test_call_option():
         value_date, stock_price, discount_curve, dividend_curve, model
     ) == [v] * 3
     assert v.round(4) == 9.3021
+
+########################################################################################
 
 
 def test_greeks():
@@ -63,8 +66,11 @@ def test_greeks():
         23.9608,
     ]
 
+########################################################################################
+
 
 def test_put_option():
+
     v = put_option.value(
         value_date, stock_price, discount_curve, dividend_curve, model
     )

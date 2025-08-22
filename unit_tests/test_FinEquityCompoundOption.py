@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.products.equity.equity_compound_option import (
     EquityCompoundOption,
@@ -30,8 +28,11 @@ dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
 num_steps = 200
 
+########################################################################################
+
 
 def test_european():
+
     stock_price = 85.0
 
     opt_type1 = OptionTypes.EUROPEAN_CALL
@@ -98,8 +99,11 @@ def test_european():
     assert round(value, 4) == 1.0873
     assert round(values[0], 4) == 1.0789
 
+########################################################################################
+
 
 def test_american():
+
     stock_price = 85.0
 
     opt_type1 = OptionTypes.AMERICAN_CALL
@@ -166,8 +170,11 @@ def test_american():
     assert round(value, 4) == 4.3034
     assert round(values[0], 4) == 4.3034
 
+########################################################################################
+
 
 def test_greeks():
+
     stock_price = 70
     opt_type1 = OptionTypes.EUROPEAN_CALL
     opt_type2 = OptionTypes.EUROPEAN_PUT

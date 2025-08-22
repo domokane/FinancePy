@@ -1,12 +1,13 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.models.merton_firm_mkt import MertonFirmMkt
 from financepy.models.merton_firm import MertonFirm
 
+########################################################################################
+
 
 def test_merton():
+
     # Input Equity values and equity vols
     equity_value = [2.6406, 2.6817, 3.977, 2.947, 2.528]
     equity_vol = [0.7103, 0.3929, 0.3121, 0.4595, 0.6181]

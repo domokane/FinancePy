@@ -17,8 +17,11 @@ from financepy.market.curves.composite_discount_curve import (
 )
 from financepy.products.rates.ibor_swap import IborSwap
 
+########################################################################################
+
 
 def test_composite_discount_curve_can_value_trades():
+
     """Test that we can use a composite discount curve to value trades"""
     valuation_date = Date(6, 10, 2022)
     base_curve = DiscountCurveFlat(valuation_date, 0.02)
@@ -42,8 +45,11 @@ def test_composite_discount_curve_can_value_trades():
     assert abs(atm - expected_atm) < 1e-5
     assert abs(value - expected_value) < 1e-5
 
+########################################################################################
+
 
 def test_zero_bump_has_no_effect_on_base_discount_curve():
+
     """Test that adding a zero bump to a DiscountCurve does not affect valuation"""
     valuation_date = Date(6, 10, 2022)
     base_curve = DiscountCurveFlat(valuation_date, 0.02)
@@ -68,8 +74,11 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
 
     assert abs(value_base - value_comp) < 1e-8
 
+########################################################################################
+
 
 def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
+
     """Test that adding a zero bump to an IborSingleCurve does not affect valuation"""
     valuation_date = Date(6, 10, 2022)
     base_curve = build_ibor_single_curve(valuation_date, last_tenor="10Y")
@@ -94,8 +103,11 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
 
     assert abs(value_base - value_comp) < 1e-8
 
+########################################################################################
+
 
 def _create_test_swap(valuation_date):
+
     spot_days = 2
     cal = CalendarTypes.UNITED_KINGDOM
     settlement_date = valuation_date.add_weekdays(spot_days)
@@ -116,6 +128,10 @@ def _create_test_swap(valuation_date):
 
     return trade
 
+
+########################################################################################
+
+########################################################################################
 
 if __name__ == "__main__":
     test_zero_bump_has_no_effect_on_base_ibor_single_curve()

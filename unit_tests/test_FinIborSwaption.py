@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.models.bk_tree import BKTree
@@ -18,18 +16,21 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 import numpy as np
 
+########################################################################################
+
 
 def build_curve(value_dt):
-    depoBasis = DayCountTypes.THIRTY_E_360_ISDA
+
+    depo_basis = DayCountTypes.THIRTY_E_360_ISDA
     depos = []
 
     spot_days = 0
     settle_dt = value_dt.add_weekdays(spot_days)
     deposit_rate = 0.05
 
-    depo1 = IborDeposit(settle_dt, "1M", deposit_rate, depoBasis)
-    depo2 = IborDeposit(settle_dt, "3M", deposit_rate, depoBasis)
-    depo3 = IborDeposit(settle_dt, "6M", deposit_rate, depoBasis)
+    depo1 = IborDeposit(settle_dt, "1M", deposit_rate, depo_basis)
+    depo2 = IborDeposit(settle_dt, "3M", deposit_rate, depo_basis)
+    depo3 = IborDeposit(settle_dt, "6M", deposit_rate, depo_basis)
 
     depos.append(depo1)
     depos.append(depo2)
@@ -69,7 +70,7 @@ exercise_dt = Date(1, 1, 2012)
 swap_maturity_dt = Date(1, 1, 2017)
 
 swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-swapFixedDayCountType = DayCountTypes.ACT_365F
+swap_fixed_day_count_type = DayCountTypes.ACT_365F
 
 model1 = Black(0.00001)
 model2 = BlackShifted(0.00001, 0.0)
@@ -82,20 +83,23 @@ settle_dt = value_dt.add_weekdays(2)
 
 libor_curve = build_curve(value_dt)
 
+########################################################################################
+
 
 def test_pay():
+
     libor_curve = build_curve(value_dt)
-    swaptionType = SwapTypes.PAY
+    swaption_type = SwapTypes.PAY
 
     k = 0.02
     swaption = IborSwaption(
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
-        swaptionType,
+        swaption_type,
         k,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     swap1 = swaption.value(value_dt, libor_curve, model1)
@@ -116,10 +120,10 @@ def test_pay():
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
-        swaptionType,
+        swaption_type,
         k,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     swap1 = swaption.value(value_dt, libor_curve, model1)
@@ -140,10 +144,10 @@ def test_pay():
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
-        swaptionType,
+        swaption_type,
         k,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     swap1 = swaption.value(value_dt, libor_curve, model1)
@@ -159,19 +163,22 @@ def test_pay():
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
 
+########################################################################################
+
 
 def test_receive():
-    swaptionType = SwapTypes.RECEIVE
+
+    swaption_type = SwapTypes.RECEIVE
 
     k = 0.02
     swaption = IborSwaption(
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
-        swaptionType,
+        swaption_type,
         k,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     swap1 = swaption.value(value_dt, libor_curve, model1)
@@ -192,10 +199,10 @@ def test_receive():
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
-        swaptionType,
+        swaption_type,
         k,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     swap1 = swaption.value(value_dt, libor_curve, model1)
@@ -216,10 +223,10 @@ def test_receive():
         settle_dt,
         exercise_dt,
         swap_maturity_dt,
-        swaptionType,
+        swaption_type,
         k,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     swap1 = swaption.value(value_dt, libor_curve, model1)

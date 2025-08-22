@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date, set_date_format, DateFormatTypes
 from financepy.utils.calendar import CalendarTypes, Calendar
@@ -12,8 +10,11 @@ from financepy.utils.calendar import BusDayAdjustTypes
 
 termination_date_adjust = True
 
+########################################################################################
+
 
 def check_frequency(schedule, start=0):
+
     dates = schedule.adjusted_dts
     diff_d1d2 = (schedule.termination_dt - schedule.effective_dt) / 365.0
 
@@ -23,8 +24,11 @@ def check_frequency(schedule, start=0):
         print(err)
         assert round(err, 1) == 0.0
 
+########################################################################################
+
 
 def test_backward_frequencies():
+
     # BACKWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
     d1 = Date(20, 6, 2018)
     d2 = Date(20, 6, 2020)
@@ -56,8 +60,11 @@ def test_backward_frequencies():
     assert len(adjusted_dts) == 25
     check_frequency(schedule)
 
+########################################################################################
+
 
 def test_forward_frequencies():
+
     # FORWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
@@ -88,8 +95,11 @@ def test_forward_frequencies():
     assert len(adjusted_dts) == 25
     check_frequency(schedule)
 
+########################################################################################
+
 
 def test_backward_front_stub():
+
     # BACKWARD SHORT STUB AT FRONT
     d1 = Date(20, 8, 2018)
     d2 = Date(20, 6, 2020)
@@ -122,8 +132,11 @@ def test_backward_front_stub():
     assert len(adjusted_dts) == 9
     check_frequency(schedule, start=1)
 
+########################################################################################
+
 
 def test_forward_end_stub():
+
     # FORWARD SHORT STUB AT END
     termination_date_adjust = True
 

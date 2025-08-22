@@ -1,14 +1,15 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.products.inflation.FinInflationIndexCurve import (
     FinInflationIndexCurve,
 )
 from financepy.utils.date import Date
 
+########################################################################################
 
-def test_FinInflationIndexCurve():
+
+def test__fin_inflation_index_curve():
+
     # Create a curve from times and discount factors
     index_dates = [Date(15, 1, 2008), Date(1, 4, 2008), Date(1, 5, 2008)]
     index_values = [209.49645, 214.823, 216.632]

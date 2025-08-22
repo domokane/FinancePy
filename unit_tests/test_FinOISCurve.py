@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 
 from financepy.utils.global_types import SwapTypes
@@ -18,8 +16,11 @@ from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
+########################################################################################
 
-def test_bloombergPricingExample():
+
+def test_bloomberg_pricing_example():
+
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """

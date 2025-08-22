@@ -14,14 +14,24 @@ from financepy.utils.tenor import Tenor, TenorUnit
                              ('12M', 12, TenorUnit.MONTHS),
                              ('-3Y', -3, TenorUnit.YEARS),
                          ])
+
+########################################################################################
+
+
 def test_tenor_create(tenor_string, num_periods, units):
+
     tenor = Tenor(tenor_string)
     assert tenor.num_periods == num_periods
     assert tenor.units.name == units.name
 
 
 @pytest.mark.parametrize('tenor_string', ['5d', '-7w', '12M', '-3Y', ])
+
+########################################################################################
+
+
 def test_tenor_to_string(tenor_string):
+
     tenor = Tenor(tenor_string)
     assert f'{tenor}' == tenor_string.upper()
 
@@ -33,7 +43,12 @@ def test_tenor_to_string(tenor_string):
                              ('12M', 2, '24M'),
                              ('-3Y', -2, '6Y'),
                          ])
+
+########################################################################################
+
+
 def test_tenor_multiply(tenor, mult, result):
+
     t1 = Tenor(tenor)
     t2 = t1 * mult
     t3 = mult*t1
@@ -51,12 +66,19 @@ def test_tenor_multiply(tenor, mult, result):
                              ('12M', '1Y', '24M'),
                              ('-3Y', '-2Y', '-5Y'),
                          ])
+
+########################################################################################
+
+
 def test_tenor_add(tenor1, tenor2, result):
+
     t1 = Tenor(tenor1)
     t2 = Tenor(tenor2)
     res = Tenor(result)
     assert t1 + t2 == res
 
+
+########################################################################################
 
 # if __name__ == '__main__':
 #     # test_tenor_create(None, 0, TenorUnit.NONE)

@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.models.bk_tree import BKTree
@@ -12,8 +10,11 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 import numpy as np
 
+########################################################################################
 
-def test_BKExampleOne():
+
+def test_bk_example_one():
+
     times = [0.0, 0.5000, 1.00000, 1.50000, 2.00000, 2.500000, 3.00000]
     zeros = [0.03, 0.0343, 0.03824, 0.04183, 0.04512, 0.048512, 0.05086]
     times = np.array(times)
@@ -69,8 +70,11 @@ def test_BKExampleOne():
         0.0808,
     ]
 
+########################################################################################
 
-def test_BKExampleTwo():
+
+def test_bk_example_two():
+
     # Valuation of a European option on a coupon bearing bond
     # This follows example in Fig 28.11 of John Hull's book but does not
     # have the exact same dt so there are some differences
@@ -148,4 +152,6 @@ def test_BKExampleTwo():
     assert round(v["put"], 4) == 7.9605
 
 
-test_BKExampleOne()
+########################################################################################
+
+test_bk_example_one()

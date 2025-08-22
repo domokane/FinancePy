@@ -7,10 +7,12 @@ from financepy.utils.date import Date
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
-DIAGNOSTICS_MODE = False
+diagnostics_mode = False
+
+########################################################################################
 
 
-def test_FinDiscountCurvePCFONF_01():
+def test__fin_discount_curve_pcfonf_01():
 
     start_dt = Date(1, 1, 2015)
     knot_dts = [
@@ -44,8 +46,10 @@ def test_FinDiscountCurvePCFONF_01():
             abs(e - a) < one_bp / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
+########################################################################################
 
-def test_FinDiscountCurvePCFONF_02():
+
+def test__fin_discount_curve_pcfonf_02():
 
     start_dt = Date(1, 1, 2015)
     knot_dts = [Date(1, 6, 2017), Date(1, 6, 2018), Date(2, 6, 2018)]
@@ -70,8 +74,10 @@ def test_FinDiscountCurvePCFONF_02():
             abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
+########################################################################################
 
-def test_FinDiscountCurvePCFONF_03():
+
+def test__fin_discount_curve_pcfonf_03():
 
     valuation_date = Date(1, 1, 2015)
     start_dt = Date(1, 6, 2017)
@@ -98,8 +104,10 @@ def test_FinDiscountCurvePCFONF_03():
             abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
+########################################################################################
 
-def test_FinDiscountCurvePCFONF_04():
+
+def test__fin_discount_curve_pcfonf_04():
 
     valuation_date = Date(1, 1, 2015)
     start_dt = valuation_date
@@ -126,8 +134,10 @@ def test_FinDiscountCurvePCFONF_04():
             abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
+########################################################################################
 
-def test_FinDiscountCurvePCFONF_05():
+
+def test__fin_discount_curve_pcfonf_05():
 
     valuation_date = Date(1, 1, 2015)
     start_dt = valuation_date.add_months(-6)
@@ -154,8 +164,10 @@ def test_FinDiscountCurvePCFONF_05():
             abs(e - a) < G_BASIS_POINT / 100
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
+########################################################################################
 
-def test_FinDiscountCurvePCFONF_flat():
+
+def test__fin_discount_curve_pcfonf_flat():
 
     valuation_date = Date(1, 1, 2015)
     level = 0.01
@@ -172,7 +184,7 @@ def test_FinDiscountCurvePCFONF_flat():
     expected_onfwd = [0.01, 0.01, 0.01]
     actual_onfwd = curve.fwd(test_dates)
 
-    if DIAGNOSTICS_MODE:
+    if diagnostics_mode:
         years = np.linspace(0, 10, 100)
         dates = valuation_date.add_years(years)
         onrates = curve.fwd(dates)
@@ -185,5 +197,7 @@ def test_FinDiscountCurvePCFONF_flat():
         ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
-if DIAGNOSTICS_MODE and __name__ == "__main__":
-    test_FinDiscountCurvePCFONF_flat()
+########################################################################################
+
+if diagnostics_mode and __name__ == "__main__":
+    test__fin_discount_curve_pcfonf_flat()

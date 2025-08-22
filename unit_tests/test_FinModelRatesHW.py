@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
@@ -12,12 +10,15 @@ from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from financepy.utils.date import Date
 import numpy as np
 
+########################################################################################
 
-def test_HullWhiteExampleTwo():
+
+def test__hull_white_example_two():
+
     # HULL BOOK ZERO COUPON BOND EXAMPLE 28.1 SEE TABLE 28.3
     # Replication may not be exact as I am using dates rather than times
 
-    zeroDays = [
+    zero_days = [
         0,
         3,
         31,
@@ -55,7 +56,7 @@ def test_HullWhiteExampleTwo():
         7.49015,
     ]
 
-    times = np.array(zeroDays) / 365.0
+    times = np.array(zero_days) / 365.0
     zeros = np.array(zero_rates) / 100.0
     dfs = np.exp(-zeros * times)
 

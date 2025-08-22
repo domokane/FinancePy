@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date
 from financepy.utils.helpers import beta_vector_to_corr_matrix
@@ -21,8 +19,11 @@ betas = np.ones(num_assets) * beta
 corr_matrix = beta_vector_to_corr_matrix(betas)
 num_paths = 10000
 
+########################################################################################
+
 
 def test_homogeneous_call():
+
     volatilities = np.ones(num_assets) * volatility
     dividend_yields = np.ones(num_assets) * 0.01
     stock_prices = np.ones(num_assets) * 100
@@ -58,8 +59,11 @@ def test_homogeneous_call():
 
     assert round(value_mc, 4) == 13.4914
 
+########################################################################################
+
 
 def test_homogeneous_put():
+
     volatilities = np.ones(num_assets) * volatility
     dividend_yields = np.ones(num_assets) * 0.01
     stock_prices = np.ones(num_assets) * 100
@@ -95,8 +99,11 @@ def test_homogeneous_put():
 
     assert round(value_mc, 2) == 9.69
 
+########################################################################################
+
 
 def test_inhomogeneous_call():
+
     volatilities = np.array([0.3, 0.2, 0.25, 0.22, 0.4])
     dividend_yields = np.array([0.01, 0.02, 0.04, 0.01, 0.02])
     stock_prices = np.array([100, 105, 120, 100, 90])
@@ -132,8 +139,11 @@ def test_inhomogeneous_call():
 
     assert round(value_mc, 4) == 13.5088
 
+########################################################################################
+
 
 def test_inhomogeneous_put():
+
     volatilities = np.array([0.3, 0.2, 0.25, 0.22, 0.4])
     dividend_yields = np.array([0.01, 0.02, 0.04, 0.01, 0.02])
     stock_prices = np.array([100, 105, 120, 100, 90])

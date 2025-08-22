@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import pandas as pd
 import numpy as np
@@ -26,7 +24,7 @@ def test_bondtutor_example():
 
     #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
 
-    accrualConvention = DayCountTypes.ACT_ACT_ICMA
+    accrual_convention = DayCountTypes.ACT_ACT_ICMA
     y = 0.062267
     settle_dt = Date(19, 4, 1994)
     issue_dt = Date(15, 7, 1990)
@@ -41,7 +39,7 @@ def test_bondtutor_example():
         maturity_dt,
         coupon,
         freq_type,
-        accrualConvention,
+        accrual_convention,
         ex_div_days,
     )
 
@@ -55,18 +53,18 @@ def test_bondtutor_example():
     assert round(ytm, 4) == 0.0622
 
     bump = 1e-4
-    priceBumpedUp = bond.dirty_price_from_ytm(settle_dt, y + bump)
-    assert round(priceBumpedUp, 4) == 108.7395
+    price_bumped_up = bond.dirty_price_from_ytm(settle_dt, y + bump)
+    assert round(price_bumped_up, 4) == 108.7395
 
-    priceBumpedDn = bond.dirty_price_from_ytm(settle_dt, y - bump)
-    assert round(priceBumpedDn, 4) == 108.7998
+    price_bumped_dn = bond.dirty_price_from_ytm(settle_dt, y - bump)
+    assert round(price_bumped_dn, 4) == 108.7998
 
-    durationByBump = -(priceBumpedUp - dirty_price) / bump
-    assert round(durationByBump, 4) == 301.1932
+    duration_by_bump = -(price_bumped_up - dirty_price) / bump
+    assert round(duration_by_bump, 4) == 301.1932
 
     duration = bond.dollar_duration(settle_dt, y)
     assert round(duration, 4) == 301.2458
-    assert round(duration - durationByBump, 4) == 0.0526
+    assert round(duration - duration_by_bump, 4) == 0.0526
 
     modified_duration = bond.modified_duration(settle_dt, y)
     assert round(modified_duration, 4) == 2.7696
@@ -77,8 +75,11 @@ def test_bondtutor_example():
     conv = bond.convexity_from_ytm(settle_dt, y)
     assert round(conv, 4) == 0.0967
 
+########################################################################################
+
 
 def test_bloomberg_us_treasury_example():
+
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
 
     settle_dt = Date(21, 7, 2017)
@@ -130,8 +131,11 @@ def test_bloomberg_us_treasury_example():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.8517
 
+########################################################################################
+
 
 def test_bloomberg_apple_corp_example():
+
     settle_dt = Date(21, 7, 2017)
     issue_dt = Date(13, 5, 2012)
     maturity_dt = Date(13, 5, 2022)
@@ -181,7 +185,6 @@ def test_bloomberg_apple_corp_example():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.2302
 
-
 ########################################################################################
 
 
@@ -203,7 +206,6 @@ def test_zero_bond():
 
     assert abs(calc_ytm - 1.3997) < 0.0002
     assert abs(accrued_interest - ONE_MILLION * 0.05523077 / 100) < 0.01
-
 
 ########################################################################################
 
@@ -230,7 +232,6 @@ def test_bond_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
-
 ########################################################################################
 
 
@@ -254,11 +255,11 @@ def test_bond_zero_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
-
 ########################################################################################
 
 
 def test_bond_cfets():
+
     """
     Test ytms of bonds in CFETS convention, especially for those in last
     coupon period and have 2 or more coupon payments per year.
@@ -310,7 +311,6 @@ def test_bond_cfets():
             print(bond.bond_payments(settle_dt, 100.0))
             print(f"calc_ytm:{calc_ytm}, correct_ytm:{row.ytm}")
             continue
-
 
 ########################################################################################
 
@@ -364,5 +364,3 @@ def test_key_rate_durations_bloomberg_example():
     for i in range(len(krd)):
         assert round(krd[i], 3) == bbg_key_rate_durations[i]
 
-
-########################################################################################

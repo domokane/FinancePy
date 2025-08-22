@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
@@ -120,8 +118,11 @@ results = [
     ],
 ]
 
+########################################################################################
 
-def test_FinFlatCurve():
+
+def test__fin_flat_curve():
+
     curve_dt = Date(1, 1, 2019)
     months = range(1, 60, 3)
     dates = curve_dt.add_months(months)

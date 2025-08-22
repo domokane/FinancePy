@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys
 
@@ -14,8 +12,10 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.products.bonds.bond_annuity import BondAnnuity
 
+########################################################################################
 
-def test_SemiAnnual_BondAnnuity():
+
+def test__semi_annual__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -46,8 +46,10 @@ def test_SemiAnnual_BondAnnuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+########################################################################################
 
-def test_Quarterly_BondAnnuity():
+
+def test__quarterly__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -78,8 +80,10 @@ def test_Quarterly_BondAnnuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+########################################################################################
 
-def test_Monthly_BondAnnuity():
+
+def test__monthly__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -110,8 +114,10 @@ def test_Monthly_BondAnnuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+########################################################################################
 
-def test_ForwardGen_BondAnnuity():
+
+def test__forward_gen__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -141,8 +147,10 @@ def test_ForwardGen_BondAnnuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+########################################################################################
 
-def test_ForwardGenWithLongEndStub_BondAnnuity():
+
+def test__forward_gen_with_long_end_stub__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -173,4 +181,6 @@ def test_ForwardGenWithLongEndStub_BondAnnuity():
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
 
-test_SemiAnnual_BondAnnuity()
+########################################################################################
+
+test__semi_annual__bond_annuity()

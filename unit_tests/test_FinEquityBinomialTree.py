@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
@@ -34,8 +32,11 @@ strike_price = 50.0
 
 tree = EquityBinomialTree()
 
+########################################################################################
+
 
 def test_european_put():
+
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.EUROPEAN
     params = np.array([-1, strike_price])
@@ -56,8 +57,11 @@ def test_european_put():
 
     assert [round(x, 4) for x in value] == [7.1050, -0.3865, 0.0187, -2.9453]
 
+########################################################################################
+
 
 def test_american_put():
+
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.AMERICAN
     params = np.array([-1, strike_price])
@@ -78,8 +82,11 @@ def test_american_put():
 
     assert [round(x, 4) for x in value] == [7.2753, -0.4008, 0.0200, -3.1803]
 
+########################################################################################
+
 
 def test_european_call():
+
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.EUROPEAN
     params = np.array([1.0, strike_price])
@@ -100,8 +107,11 @@ def test_european_call():
 
     assert [round(x, 4) for x in value] == [8.0175, 0.5747, 0.0187, -3.8111]
 
+########################################################################################
+
 
 def test_american_call():
+
     payoff = EquityTreePayoffTypes.VANILLA_OPTION
     exercise = EquityTreeExerciseTypes.AMERICAN
     params = np.array([1.0, strike_price])

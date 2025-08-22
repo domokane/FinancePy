@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
@@ -8,13 +6,19 @@ from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.utils.date import Date
 import numpy as np
 
+########################################################################################
 
-def vol_skew(K, atm_vol, atmK, skew):
-    v = atm_vol + skew * (K - atmK)
+
+def vol_skew(K, atm_vol, atm_k, skew):
+
+    v = atm_vol + skew * (K - atm_k)
     return v
+
+########################################################################################
 
 
 def test_equity_variance_swap():
+
     start_dt = Date(20, 3, 2018)
     tenor = "3M"
     strike = 0.3 * 0.3
@@ -29,10 +33,10 @@ def test_equity_variance_swap():
     maturity_dt = start_dt.add_months(3)
 
     atm_vol = 0.20
-    atmK = 100.0
+    atm_k = 100.0
     skew = -0.02 / 5.0  # defined as dsigma/dk
     strikes = np.linspace(50.0, 135.0, 18)
-    vols = vol_skew(strikes, atm_vol, atmK, skew)
+    vols = vol_skew(strikes, atm_vol, atm_k, skew)
     vol_curve = EquityVolCurve(value_dt, maturity_dt, strikes, vols)
 
     strike_spacing = 5.0

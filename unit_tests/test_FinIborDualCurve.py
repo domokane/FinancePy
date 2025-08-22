@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.products.rates.ois import OIS
 from financepy.products.rates.ois_curve import OISCurve
@@ -19,8 +17,11 @@ from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
+########################################################################################
 
-def buildOIS(value_dt):
+
+def build_ois(value_dt):
+
     """Build the OIS funding curve from futures (FRAs) and OIS"""
 
     spot_days = 0
@@ -209,8 +210,11 @@ def buildOIS(value_dt):
 
     return ois_curve
 
+########################################################################################
 
-def test_bloombergPricingExample():
+
+def test_bloomberg_pricing_example():
+
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """
@@ -433,7 +437,7 @@ def test_bloombergPricingExample():
         == 53714.5507
     )
 
-    ois_curve = buildOIS(value_dt)
+    ois_curve = build_ois(value_dt)
 
     libor_dual_curve = IborDualCurve(
         value_dt,

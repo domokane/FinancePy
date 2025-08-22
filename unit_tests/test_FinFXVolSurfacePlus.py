@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 import matplotlib.pyplot as plt
 
 from financepy.models.volatility_fns import VolFuncTypes
@@ -13,10 +11,13 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 import numpy as np
 
 
-verboseCalibration = False
+verbose_calibration = False
+
+########################################################################################
 
 
-def test_FinFXMktVolSurface1(capsys):
+def test__fin_fx_mkt_vol_surface1(capsys):
+
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
 
@@ -66,12 +67,15 @@ def test_FinFXMktVolSurface1(capsys):
         vol_function_type,
     )
 
-    fx_market_plus.check_calibration(verboseCalibration)
+    fx_market_plus.check_calibration(verbose_calibration)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface2(capsys):
+
+def test__fin_fx_mkt_vol_surface2(capsys):
+
     # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
     # print("EURJPY EXAMPLE CLARK")
 
@@ -129,12 +133,15 @@ def test_FinFXMktVolSurface2(capsys):
     )
 
     # Fails with default stricter tolerance
-    fx_market_plus.check_calibration(verboseCalibration, tol=0.2)
+    fx_market_plus.check_calibration(verbose_calibration, tol=0.2)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface3(capsys):
+
+def test__fin_fx_mkt_vol_surface3(capsys):
+
     # Example from Book extract by Iain Clark using Tables 4.4 and 4.5
     # where we examine the calibration to a full surface in Chapter 4
 
@@ -187,15 +194,16 @@ def test_FinFXMktVolSurface3(capsys):
         vol_function_type,
     )
 
-    fx_market_plus.check_calibration(verboseCalibration)
+    fx_market_plus.check_calibration(verbose_calibration)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface4(capsys):
-    ###########################################################################
+
+def test__fin_fx_mkt_vol_surface4(capsys):
+
     # Here I remove the 25D Vols
-    ###########################################################################
 
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
@@ -249,15 +257,16 @@ def test_FinFXMktVolSurface4(capsys):
         vol_function_type,
     )
 
-    fx_market_plus.check_calibration(verboseCalibration)
+    fx_market_plus.check_calibration(verbose_calibration)
     captured = capsys.readouterr()
     assert captured.out == ""
 
+########################################################################################
 
-def test_FinFXMktVolSurface5(capsys):
-    ###########################################################################
+
+def test__fin_fx_mkt_vol_surface5(capsys):
+
     # Here I remove the 10D Vols
-    ###########################################################################
 
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
@@ -311,6 +320,6 @@ def test_FinFXMktVolSurface5(capsys):
         vol_function_type,
     )
 
-    fx_market_plus.check_calibration(verboseCalibration)
+    fx_market_plus.check_calibration(verbose_calibration)
     captured = capsys.readouterr()
     assert captured.out == ""

@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -14,8 +12,10 @@ from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 
+########################################################################################
 
-def test_FinCDSCurve():
+
+def test__fin_cds_curve():
 
     curve_dt = Date(20, 12, 2018)
 
@@ -23,7 +23,7 @@ def test_FinCDSCurve():
     depos = []
     fras = []
 
-    fixedDCC = DayCountTypes.ACT_365F
+    fixed_dcc = DayCountTypes.ACT_365F
     fixed_freq = FrequencyTypes.SEMI_ANNUAL
     fixed_cpn = 0.05
 
@@ -36,7 +36,7 @@ def test_FinCDSCurve():
             SwapTypes.PAY,
             fixed_cpn,
             fixed_freq,
-            fixedDCC,
+            fixed_dcc,
         )
         swaps.append(swap)
 

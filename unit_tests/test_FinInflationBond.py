@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
@@ -11,8 +9,11 @@ from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
+########################################################################################
 
-def test_FinInflationBondBBG():
+
+def test__fin_inflation_bond_bbg():
+
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     # Look for CPI Bond example
 
@@ -22,7 +23,7 @@ def test_FinInflationBondBBG():
     coupon = 0.0125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    baseCPIValue = 218.08532
+    base_cpi_value = 218.08532
     ex_dividend_days = 0
 
     bond = FinInflationBond(issue_dt,
@@ -31,7 +32,7 @@ def test_FinInflationBondBBG():
                             freq_type,
                             dc_type,
                             ex_dividend_days,
-                            baseCPIValue)
+                            base_cpi_value)
 
     clean_price = 104.03502
 
@@ -70,22 +71,22 @@ def test_FinInflationBondBBG():
     assert round(accrued_interest, 4) == 0.0204
 
     # Inflation functions that calculate nominal yield with CPI adjustment
-    refCPIValue = 244.65884
+    ref_cpi_value = 244.65884
 
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     assert round(clean_price, 4) == 104.0350
 
     face = 100.0
-    inflationAccd = bond.inflation_accrued_interest(settle_dt,
+    inflation_accd = bond.inflation_accrued_interest(settle_dt,
                                                     face,
-                                                    refCPIValue)
+                                                    ref_cpi_value)
 
-    assert round(inflationAccd * 100, 4) == 2.2864
+    assert round(inflation_accd * 100, 4) == 2.2864
 
-    lastCpnCPIValue = 244.61839
+    last_cpn_cpi_value = 244.61839
 
     clean_price = bond.flat_price_from_yield_to_maturity(settle_dt, ytm,
-                                                         lastCpnCPIValue,
+                                                         last_cpn_cpi_value,
                                                          YTMCalcType.US_TREASURY)
 
     assert round(clean_price, 4) == 116.6923
@@ -93,7 +94,7 @@ def test_FinInflationBondBBG():
     principal = bond.inflation_principal(settle_dt,
                                          face,
                                          ytm,
-                                         refCPIValue,
+                                         ref_cpi_value,
                                          YTMCalcType.US_TREASURY)
 
     assert round(principal, 4) == 116.7342
@@ -110,8 +111,11 @@ def test_FinInflationBondBBG():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.1020
 
+########################################################################################
 
-def test_FinInflationBondStack():
+
+def test__fin_inflation_bond_stack():
+
     # https://stackoverflow.com/questions/57676724/failing-to-obtain-correct-accrued-interest-with-quantlib-inflation-bond-pricer-i
 
     issue_dt = Date(25, 9, 2013)
@@ -119,7 +123,7 @@ def test_FinInflationBondStack():
     coupon = 0.00125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    baseCPIValue = 249.70
+    base_cpi_value = 249.70
     ex_dividend_days = 0
 
     bond = FinInflationBond(issue_dt,
@@ -128,7 +132,7 @@ def test_FinInflationBondStack():
                             freq_type,
                             dc_type,
                             ex_dividend_days,
-                            baseCPIValue)
+                            base_cpi_value)
 
     clean_price = 104.03502
 

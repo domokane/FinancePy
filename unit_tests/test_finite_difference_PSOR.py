@@ -9,8 +9,11 @@ from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 from pytest import approx
 
+########################################################################################
+
 
 def test_black_scholes_fd_psor():
+
     """
     Compare the output of black_schole_finite_difference to kBlack::fdRunner from
     https://github.com/domokane/CompFin/blob/main/Week%204/xladdin/Utility/kBlack.cpp
@@ -140,8 +143,11 @@ def test_black_scholes_fd_psor():
     assert v == approx(0.10259475990431438, abs=1e-1)
     opt_type = OptionTypes.EUROPEAN_CALL
 
+########################################################################################
+
 
 def test_european_call():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -181,8 +187,11 @@ def test_european_call():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_european_put():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -222,8 +231,11 @@ def test_european_put():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_american_call():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -264,8 +276,11 @@ def test_american_call():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_american_put():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -305,8 +320,11 @@ def test_american_put():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_call_option():
+
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -344,8 +362,11 @@ def test_call_option():
     )
     assert v == approx(v0, 1e-5)
 
+########################################################################################
+
 
 def test_put_option():
+
     """
     Check finite difference method gives similar result to BlackScholes model
     """

@@ -16,8 +16,11 @@ from financepy.models.equity_crr_tree import crr_tree_val_avg
 import numpy as np
 from pytest import approx
 
+########################################################################################
+
 
 def test_black_scholes_fd():
+
     """
     Compare the output of black_schole_finite_difference to kBlack::fdRunner from
     https://github.com/domokane/CompFin/blob/main/Week%204/xladdin/Utility/kBlack.cpp
@@ -248,8 +251,11 @@ def test_black_scholes_fd():
     assert v == approx(0.08042112779963827, abs=1e-3)
     wind = 0
 
+########################################################################################
+
 
 def test_european_call():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -294,8 +300,11 @@ def test_european_call():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_european_put():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -340,8 +349,11 @@ def test_european_put():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_american_call():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -387,8 +399,11 @@ def test_american_call():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_american_put():
+
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -433,8 +448,11 @@ def test_american_put():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+########################################################################################
+
 
 def test_call_option():
+
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -477,8 +495,11 @@ def test_call_option():
     )
     assert v == approx(v0, 1e-5)
 
+########################################################################################
+
 
 def test_put_option():
+
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -522,8 +543,11 @@ def test_put_option():
 
     assert v == approx(v0, 1e-5)
 
+########################################################################################
+
 
 def test_dx():
+
     np.testing.assert_array_equal(
         dx([0, 1, 2, 3, 4, 5], wind=0),
         np.array(
@@ -552,8 +576,11 @@ def test_dx():
         decimal=3,
     )
 
+########################################################################################
+
 
 def test_dxx():
+
     np.testing.assert_array_equal(
         dxx([1, 1.5, 2, 2.5, 3]),
         np.array(
@@ -567,19 +594,25 @@ def test_dxx():
         ),
     )
 
+########################################################################################
+
 
 def test_solve_tridiagonal_matrix():
-    M = np.array([[0, 1, 1, 1], [-2, -2, -2, -2], [1, 1, 1, 0]]).T
+
+    m = np.array([[0, 1, 1, 1], [-2, -2, -2, -2], [1, 1, 1, 0]]).T
 
     r = np.array([1, 1, 1, 1]) * 0.04
-    u = solve_tridiagonal_matrix(M, r)
+    u = solve_tridiagonal_matrix(m, r)
 
     np.testing.assert_array_equal(u, np.array([-0.08, -0.12, -0.12, -0.08]))
 
+########################################################################################
+
 
 def test_band_matrix_multiplication():
-    M = np.array([[0, 1, 1, 1], [-2, -2, -2, -2], [1, 1, 1, 0]]).T
+
+    m = np.array([[0, 1, 1, 1], [-2, -2, -2, -2], [1, 1, 1, 0]]).T
     u = np.array([-0.08, -0.12, -0.12, -0.08])
     np.testing.assert_array_almost_equal(
-        band_matrix_multiplication(M, 1, 1, u), np.array([0.04] * 4)
+        band_matrix_multiplication(m, 1, 1, u), np.array([0.04] * 4)
     )

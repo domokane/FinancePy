@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 import pytest
 
 from financepy.utils.global_types import SwapTypes
@@ -16,8 +14,11 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.calendar import Calendar, CalendarTypes
 
+########################################################################################
 
-def test_bloombergPricingExample():
+
+def test_bloomberg_pricing_example():
+
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
@@ -263,7 +264,12 @@ def test_bloombergPricingExample():
 
 
 @pytest.mark.parametrize("interp_type", InterpTypes)
-def test_RepriceInputsForAllInterpChoices(interp_type):
+
+########################################################################################
+
+
+def test__reprice_inputs_for_all_interp_choices(interp_type):
+
     valuation_date = Date(6, 10, 2001)
 
     cal = CalendarTypes.UNITED_KINGDOM

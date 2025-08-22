@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -30,23 +28,26 @@ for q in dividend_yields:
 
 stock_prices = np.ones(num_assets) * 100
 num_paths = 10000
-corrList = np.linspace(0.0, 0.999999, 6)
+corr_list = np.linspace(0.0, 0.999999, 6)
 strike = 100.0
 
 correlation = 0.39999960
 
+########################################################################################
+
 
 def test_call_on_max():
+
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MAXIMUM
     payoff_params = [strike]
-    rainbowOption = EquityRainbowOption(
+    rainbow_option = EquityRainbowOption(
         expiry_dt, payoff_type, payoff_params, num_assets
     )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
-    v = rainbowOption.value(
+    v = rainbow_option.value(
         value_dt,
         stock_prices,
         discount_curve,
@@ -55,7 +56,7 @@ def test_call_on_max():
         corr_matrix,
     )
 
-    v_MC = rainbowOption.value_mc(
+    v_mc = rainbow_option.value_mc(
         value_dt,
         stock_prices,
         discount_curve,
@@ -66,20 +67,23 @@ def test_call_on_max():
     )
 
     assert round(v, 4) == 21.4034
-    assert round(v_MC, 4) == 21.3580
+    assert round(v_mc, 4) == 21.3580
+
+########################################################################################
 
 
 def test_call_on_min():
+
     payoff_type = EquityRainbowOptionTypes.CALL_ON_MINIMUM
     payoff_params = [strike]
-    rainbowOption = EquityRainbowOption(
+    rainbow_option = EquityRainbowOption(
         expiry_dt, payoff_type, payoff_params, num_assets
     )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
-    v = rainbowOption.value(
+    v = rainbow_option.value(
         value_dt,
         stock_prices,
         discount_curve,
@@ -88,7 +92,7 @@ def test_call_on_min():
         corr_matrix,
     )
 
-    v_MC = rainbowOption.value_mc(
+    v_mc = rainbow_option.value_mc(
         value_dt,
         stock_prices,
         discount_curve,
@@ -99,20 +103,23 @@ def test_call_on_min():
     )
 
     assert round(v, 4) == 5.7817
-    assert round(v_MC, 4) == 5.8022
+    assert round(v_mc, 4) == 5.8022
+
+########################################################################################
 
 
 def test_put_on_max():
+
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MAXIMUM
     payoff_params = [strike]
-    rainbowOption = EquityRainbowOption(
+    rainbow_option = EquityRainbowOption(
         expiry_dt, payoff_type, payoff_params, num_assets
     )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
-    v = rainbowOption.value(
+    v = rainbow_option.value(
         value_dt,
         stock_prices,
         discount_curve,
@@ -121,7 +128,7 @@ def test_put_on_max():
         corr_matrix,
     )
 
-    v_MC = rainbowOption.value_mc(
+    v_mc = rainbow_option.value_mc(
         value_dt,
         stock_prices,
         discount_curve,
@@ -132,20 +139,23 @@ def test_put_on_max():
     )
 
     assert round(v, 4) == 4.6493
-    assert round(v_MC, 4) == 4.6484
+    assert round(v_mc, 4) == 4.6484
+
+########################################################################################
 
 
 def test_put_on_min():
+
     payoff_type = EquityRainbowOptionTypes.PUT_ON_MINIMUM
     payoff_params = [strike]
-    rainbowOption = EquityRainbowOption(
+    rainbow_option = EquityRainbowOption(
         expiry_dt, payoff_type, payoff_params, num_assets
     )
 
     betas = np.ones(num_assets) * sqrt(correlation)
     corr_matrix = beta_vector_to_corr_matrix(betas)
 
-    v = rainbowOption.value(
+    v = rainbow_option.value(
         value_dt,
         stock_prices,
         discount_curve,
@@ -154,7 +164,7 @@ def test_put_on_min():
         corr_matrix,
     )
 
-    v_MC = rainbowOption.value_mc(
+    v_mc = rainbow_option.value_mc(
         value_dt,
         stock_prices,
         discount_curve,
@@ -165,10 +175,13 @@ def test_put_on_min():
     )
 
     assert round(v, 4) == 14.8750
-    assert round(v_MC, 4) == 14.7673
+    assert round(v_mc, 4) == 14.7673
+
+########################################################################################
 
 
 def test_call_on_nth():
+
     num_paths = 10000
     num_assets = 5
     volatilities = np.ones(num_assets) * 0.3
@@ -187,14 +200,14 @@ def test_call_on_nth():
     for n in [1, 2, 3, 4, 5]:
         print(n)
         payoff_params = [n, strike]
-        rainbowOption = EquityRainbowOption(
+        rainbow_option = EquityRainbowOption(
             expiry_dt, payoff_type, payoff_params, num_assets
         )
 
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vector_to_corr_matrix(betas)
 
-        v_MC = rainbowOption.value_mc(
+        v_mc = rainbow_option.value_mc(
             value_dt,
             stock_prices,
             discount_curve,
@@ -204,12 +217,15 @@ def test_call_on_nth():
             num_paths,
         )
 
-        assert round(v_MC, 4) == expected_results[n - 1]
+        assert round(v_mc, 4) == expected_results[n - 1]
+
+########################################################################################
 
 
 def test_put_on_nth():
-    rainboxOptionValues = []
-    rainbowOptionValuesMC = []
+
+    rainbox_option_values = []
+    rainbow_option_values_mc = []
     num_paths = 10000
     num_assets = 5
     volatilities = np.ones(num_assets) * 0.3
@@ -228,14 +244,14 @@ def test_put_on_nth():
     for n in [1, 2, 3, 4, 5]:
         print(n)
         payoff_params = [n, strike]
-        rainbowOption = EquityRainbowOption(
+        rainbow_option = EquityRainbowOption(
             expiry_dt, payoff_type, payoff_params, num_assets
         )
 
         betas = np.ones(num_assets) * sqrt(correlation)
         corr_matrix = beta_vector_to_corr_matrix(betas)
 
-        v_MC = rainbowOption.value_mc(
+        v_mc = rainbow_option.value_mc(
             value_dt,
             stock_prices,
             discount_curve,
@@ -245,4 +261,4 @@ def test_put_on_nth():
             num_paths,
         )
 
-        assert round(v_MC, 4) == expected_results[n - 1]
+        assert round(v_mc, 4) == expected_results[n - 1]

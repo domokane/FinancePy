@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -43,8 +41,11 @@ for _, bond in bond_dataframe.iterrows():
     bonds.append(bond)
     ylds.append(yld)
 
+########################################################################################
+
 
 def test_poly():
+
     curve_fit_method = CurveFitPolynomial(5)
     fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
@@ -56,8 +57,11 @@ def test_poly():
     assert round(coeffs[4] * 1e3, 4) == 1.3536
     assert round(coeffs[5] * 1e7, 4) == 4.1606
 
+########################################################################################
+
 
 def test_nelson_siegel():
+
     curve_fit_method = CurveFitNelsonSiegel()
     fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
@@ -66,8 +70,11 @@ def test_nelson_siegel():
     assert round(fitted_curve.curve_fit.beta_3, 3) == 0.259
     assert round(fitted_curve.curve_fit.tau, 1) == 35.8
 
+########################################################################################
+
 
 def test_nelson_siegel_svensson():
+
     curve_fit_method = CurveFitNelsonSiegelSvensson()
     fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
@@ -78,8 +85,11 @@ def test_nelson_siegel_svensson():
     assert round(fitted_curve.curve_fit.tau_1, 3) == 3.177
     assert round(fitted_curve.curve_fit.tau_2, 4) == 100.0000
 
+########################################################################################
+
 
 def test_interp_yield():
+
     curve_fit_method = CurveFitBSpline()
     fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 

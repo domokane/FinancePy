@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.math import scale
 from financepy.market.curves.discount_curve_ns import DiscountCurveNS
@@ -13,8 +11,11 @@ times = np.linspace(0.0, 10.0, 5)
 curve_dt = Date(6, 6, 2019)
 dates = curve_dt.add_years(times)
 
+########################################################################################
+
 
 def test_factor_loading_zero_rates():
+
     curve = DiscountCurveNS(curve_dt, 1, 0, 0, tau)
     factor1loading = curve.zero_rate(dates)
     curve = DiscountCurveNS(curve_dt, 0, 1, 0, tau)
@@ -44,8 +45,11 @@ def test_factor_loading_zero_rates():
         0.1891,
     ]
 
+########################################################################################
+
 
 def test_beta_1():
+
     beta_2 = -0.02
     beta_3 = 0.02
 
@@ -104,8 +108,11 @@ def test_beta_1():
         0.0689,
     ]
 
+########################################################################################
+
 
 def test_beta_2():
+
     beta_1 = 0.06
     beta_3 = 0.02
 
@@ -164,8 +171,11 @@ def test_beta_2():
         0.0707,
     ]
 
+########################################################################################
+
 
 def test_beta_3():
+
     beta_1 = 0.06
     beta_2 = -0.02
 

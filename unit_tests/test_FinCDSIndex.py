@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -26,33 +24,36 @@ step_in_dt = trade_dt.add_days(1)
 value_dt = step_in_dt
 maturity_dt = Date(20, 6, 2010)
 
-cdsRecovery = 0.40
+cds_recovery = 0.40
 notional = 10.0 * ONE_MILLION
 long_protection = True
 index_cpn = 0.004
 
-cds_indexContract = CDS(step_in_dt, maturity_dt, index_cpn, notional, long_protection)
+cds_index_contract = CDS(step_in_dt, maturity_dt, index_cpn, notional, long_protection)
+
+########################################################################################
 
 
 def test_cds_index():
-    spd = cds_indexContract.par_spread(value_dt, issuer_curve, cdsRecovery) * 10000.0
+
+    spd = cds_index_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
     assert round(spd, 4) == 48.3748
 
-    v = cds_indexContract.value(value_dt, issuer_curve, cdsRecovery)
+    v = cds_index_contract.value(value_dt, issuer_curve, cds_recovery)
     assert round(v["dirty_pv"], 4) == 27064.9906
     assert round(v["clean_pv"], 4) == 32620.5461
 
-    p = cds_indexContract.clean_price(value_dt, issuer_curve, cdsRecovery)
+    p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     assert round(p, 4) == 99.6738
 
-    accrued_days = cds_indexContract.accrued_days()
+    accrued_days = cds_index_contract.accrued_days()
     assert accrued_days == 50.0
 
-    accrued_interest = cds_indexContract.accrued_interest()
+    accrued_interest = cds_index_contract.accrued_interest()
     assert round(accrued_interest, 4) == -5555.5556
 
-    prot_pv = cds_indexContract.prot_leg_pv(value_dt, issuer_curve, cdsRecovery)
+    prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     assert round(prot_pv, 4) == 188423.9948
 
-    premPV = cds_indexContract.premium_leg_pv(value_dt, issuer_curve, cdsRecovery)
-    assert round(premPV, 4) == 161359.0042
+    prem_pv = cds_index_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    assert round(prem_pv, 4) == 161359.0042

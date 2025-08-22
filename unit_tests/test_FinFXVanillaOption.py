@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import numpy as np
 from financepy.utils.global_types import OptionTypes
@@ -16,8 +14,11 @@ import sys
 
 sys.path.append("./..")
 
+########################################################################################
 
-def test_FinFXVanillaOptionWystupExample1():
+
+def test__fin_fx_vanilla_option_wystup_example1():
+
     # Example from Book extract by Uwe Wystup with results in Table 1.2
     # https://mathfinance.com/wp-content/uploads/2017/06/FXOptionsStructuredProducts2e-Extract.pdf
 
@@ -31,8 +32,8 @@ def test_FinFXVanillaOptionWystupExample1():
     # DOM = USD , FOR = EUR
     ccy1 = "EUR"
     ccy2 = "USD"
-    ccy1CCRate = 0.030  # EUR
-    ccy2CCRate = 0.025  # USD
+    ccy1_cc_rate = 0.030  # EUR
+    ccy2_cc_rate = 0.025  # USD
 
     currency_pair = ccy1 + ccy2  # Always ccy1ccy2
     spot_fx_rate = 1.20
@@ -41,8 +42,8 @@ def test_FinFXVanillaOptionWystupExample1():
 
     notional = 1000000.0
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 
@@ -99,11 +100,11 @@ def test_FinFXVanillaOptionWystupExample1():
     assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3105
     assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3200
 
-
 ########################################################################################
 
 
-def test_FinFXVanillaOptionWystupExample2():
+def test__fin_fx_vanilla_option_wystup_example2():
+
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
@@ -115,8 +116,8 @@ def test_FinFXVanillaOptionWystupExample2():
     # DOM = USD , FOR = EUR
     ccy1 = "EUR"
     ccy2 = "USD"
-    ccy1CCRate = 0.0396  # EUR
-    ccy2CCRate = 0.0357  # USD
+    ccy1_cc_rate = 0.0396  # EUR
+    ccy2_cc_rate = 0.0357  # USD
 
     currency_pair = ccy1 + ccy2  # Always ccy1ccy2
     spot_fx_rate = 0.9090
@@ -125,8 +126,8 @@ def test_FinFXVanillaOptionWystupExample2():
 
     notional = 1000000.0
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2CCRate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1CCRate)
+    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
+    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 
@@ -168,11 +169,11 @@ def test_FinFXVanillaOptionWystupExample2():
     assert round(delta["pct_spot_delta_prem_adj"], 4) == -0.5180
     assert round(delta["pct_fwd_delta_prem_adj"], 4) == -0.5389
 
-
 ########################################################################################
 
 
-def test_FinFXVanillaOptionBloombergExample():
+def test__fin_fx_vanilla_option_bloomberg_example():
+
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
 
@@ -184,8 +185,8 @@ def test_FinFXVanillaOptionBloombergExample():
     # DOM = USD , FOR = EUR
     for_name = "EUR"
     dom_name = "USD"
-    forDepoRate = 0.05  # EUR
-    domDepoRate = 0.02  # USD
+    for_depo_rate = 0.05  # EUR
+    dom_depo_rate = 0.02  # USD
 
     currency_pair = for_name + dom_name  # Always FORDOM
     spot_fx_rate = 1.30
@@ -205,7 +206,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = IborDeposit(
         settle_dt,
         maturity_dt,
-        domDepoRate,
+        dom_depo_rate,
         DayCountTypes.ACT_360,
         notional,
         cal_type,
@@ -219,7 +220,7 @@ def test_FinFXVanillaOptionBloombergExample():
     depo = IborDeposit(
         settle_dt,
         maturity_dt,
-        forDepoRate,
+        for_depo_rate,
         DayCountTypes.ACT_360,
         notional,
         cal_type,
@@ -264,18 +265,21 @@ def test_FinFXVanillaOptionBloombergExample():
     assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3208
     assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3373
 
+########################################################################################
+
 
 def test_value_mc():
+
     #   Example from Hull 4th edition page 284
     value_dt = Date(1, 1, 2015)
     expiry_dt = value_dt.add_months(4)
     spot_fx_rate = 1.60
     volatility = 0.1411
     dom_interest_rate = 0.08
-    forInterestRate = 0.11
+    for_interest_rate = 0.11
     model = BlackScholes(volatility)
     domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
+    foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
     num_paths = 100000
 
     strike_fx_rate = 1.6
@@ -310,18 +314,21 @@ def test_value_mc():
 
     assert round(value_mc, 4) == 0.0582
 
+########################################################################################
+
 
 def test_vega_theta():
+
     #   Example from Hull 4th edition page 284
     value_dt = Date(1, 1, 2015)
     expiry_dt = value_dt.add_months(4)
     spot_fx_rate = 1.60
     volatility = 0.1411
     dom_interest_rate = 0.08
-    forInterestRate = 0.11
+    for_interest_rate = 0.11
     model = BlackScholes(volatility)
     domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, forInterestRate)
+    foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
 
     strike_fx_rate = 1.6
 

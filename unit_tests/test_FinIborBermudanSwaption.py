@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.bdt_tree import BDTTree
@@ -26,7 +24,7 @@ swap_maturity_dt = settle_dt.add_years(4)
 
 swap_fixed_cpn = 0.060
 swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-swapFixedDayCountType = DayCountTypes.ACT_365F
+swap_fixed_day_count_type = DayCountTypes.ACT_365F
 
 libor_curve = DiscountCurveFlat(
     value_dt, 0.0625, FrequencyTypes.SEMI_ANNUAL, DayCountTypes.ACT_365F
@@ -34,8 +32,11 @@ libor_curve = DiscountCurveFlat(
 
 num_time_steps = 200
 
+########################################################################################
+
 
 def test_bk_european_exercise():
+
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
@@ -47,7 +48,7 @@ def test_bk_european_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -61,7 +62,7 @@ def test_bk_european_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     # Used BK with constant short-rate volatility
@@ -86,8 +87,11 @@ def test_bk_european_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 9392.9531
 
+########################################################################################
+
 
 def test_bk_bermudan_exercise():
+
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
@@ -99,7 +103,7 @@ def test_bk_bermudan_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -113,7 +117,7 @@ def test_bk_bermudan_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     # Used BK with constant short-rate volatility
@@ -138,8 +142,11 @@ def test_bk_bermudan_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 12956.6057
 
+########################################################################################
+
 
 def test_bdt_european_exercise():
+
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
@@ -151,7 +158,7 @@ def test_bdt_european_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -165,7 +172,7 @@ def test_bdt_european_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     sigma = 0.00001
@@ -186,8 +193,11 @@ def test_bdt_european_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 9652.6912
 
+########################################################################################
+
 
 def test_bdt_bermudan_exercise():
+
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
@@ -199,7 +209,7 @@ def test_bdt_bermudan_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -213,7 +223,7 @@ def test_bdt_bermudan_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     sigma = 0.00001
@@ -234,8 +244,11 @@ def test_bdt_bermudan_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 13256.8421
 
+########################################################################################
+
 
 def test_hw_european_exercise():
+
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.EUROPEAN
 
@@ -247,7 +260,7 @@ def test_hw_european_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -261,7 +274,7 @@ def test_hw_european_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     sigma = 0.000001
@@ -284,8 +297,11 @@ def test_hw_european_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 7344.6339
 
+########################################################################################
+
 
 def test_hw_bermudan_exercise():
+
     fixed_leg_type = SwapTypes.PAY
     exercise_type = FinExerciseTypes.BERMUDAN
 
@@ -297,7 +313,7 @@ def test_hw_bermudan_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
@@ -311,7 +327,7 @@ def test_hw_bermudan_exercise():
         exercise_type,
         swap_fixed_cpn,
         swap_fixed_freq_type,
-        swapFixedDayCountType,
+        swap_fixed_day_count_type,
     )
 
     sigma = 0.000001

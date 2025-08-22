@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -21,8 +19,10 @@ from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 import os
 import numpy as np
 
+########################################################################################
 
-def test_dirty_priceCDSIndexOption():
+
+def test_dirty_price_cds_index_option():
 
     trade_dt = Date(1, 8, 2007)
     step_in_dt = trade_dt.add_days(1)
@@ -60,8 +60,6 @@ def test_dirty_priceCDSIndexOption():
 
         issuer_curves.append(issuer_curve)
 
-    ##########################################################################
-    ##########################################################################
 
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
     index_maturity_dts = [
@@ -87,7 +85,6 @@ def test_dirty_priceCDSIndexOption():
 
     for index, strike, results in index_strike_results:
 
-        #######################################################################
 
         cds_contracts = []
         for dt in index_maturity_dts:
@@ -96,26 +93,25 @@ def test_dirty_priceCDSIndexOption():
 
         index_curve = CDSCurve(value_dt, cds_contracts, libor_curve, index_recovery)
 
-        indexSpreads = [index / 10000.0] * 4
+        index_spreads = [index / 10000.0] * 4
 
         index_portfolio = CDSIndexPortfolio()
         adjusted_issuer_curves = index_portfolio.hazard_rate_adjust_intrinsic(
             value_dt,
             issuer_curves,
-            indexSpreads,
+            index_spreads,
             index_upfronts,
             index_maturity_dts,
             index_recovery,
             tolerance,
         )
 
-        #######################################################################
 
         option = CDSIndexOption(
             expiry_dt, maturity_dt, index_cpn, strike / 10000.0, notional
         )
 
-        v_pay_1, v_rec_1, strike_value, mu, expH = option.value_anderson(
+        v_pay_1, v_rec_1, strike_value, mu, exp_h = option.value_anderson(
             value_dt, adjusted_issuer_curves, index_recovery, volatility
         )
 
@@ -127,6 +123,6 @@ def test_dirty_priceCDSIndexOption():
         assert round(v_rec_1, 1) == results[1]
         assert round(strike_value, 1) == results[2]
         assert round(mu, 1) == results[3]
-        assert round(expH, 1) == results[4]
+        assert round(exp_h, 1) == results[4]
         assert round(v_pay_2, 1) == results[5]
         assert round(v_rec_2, 1) == results[6]

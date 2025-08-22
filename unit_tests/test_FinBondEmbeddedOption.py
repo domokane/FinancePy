@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -72,16 +70,22 @@ puttable_bond_matlab = BondEmbeddedOption(
     put_prices,
 )
 
+########################################################################################
+
 
 def test_matlab_clean_price_from_discount_curve():
+
     v = bond_matlab.clean_price_from_discount_curve(
         settle_dt_matlab, discount_curve_matlab
     )
 
     assert round(v, 4) == 102.0746
 
+########################################################################################
+
 
 def test_matlab_bk():
+
     sigma = 0.01  # This volatility is very small for a BK process
     a = 0.1
     model = BKTree(sigma, a, num_time_steps)
@@ -93,8 +97,11 @@ def test_matlab_bk():
     assert round(v["bondwithoption"], 4) == 102.3508
     assert round(v["bondpure"], 4) == 102.0603
 
+########################################################################################
+
 
 def test_matlab_hw():
+
     sigma = 0.01  # basis point volatility
     a = 0.1
 
@@ -147,16 +154,22 @@ puttable_bond_quantlib = BondEmbeddedOption(
     put_prices,
 )
 
+########################################################################################
+
 
 def test_quantlib_clean_price_from_discount_curve():
+
     v = bond_quantlib.clean_price_from_discount_curve(
         settle_dt_quantlib, discount_curve_quantlib
     )
 
     assert round(v, 4) == 94.6318
 
+########################################################################################
+
 
 def test_quantlib_bk():
+
     sigma = 0.12 / 0.035  # basis point volatility
     a = 0.03
     model = BKTree(sigma, a, num_time_steps)
@@ -168,8 +181,11 @@ def test_quantlib_bk():
     assert round(v["bondwithoption"], 4) == 89.7614
     assert round(v["bondpure"], 4) == 95.0619
 
+########################################################################################
+
 
 def test_quantlib_hw():
+
     # the value used in blog of 12% bp vol is unrealistic
     sigma = 0.12  # basis point volatility
     a = 0.03

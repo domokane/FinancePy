@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.helpers import print_tree
@@ -18,8 +16,11 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 import numpy as np
 
+########################################################################################
 
-def test_BDTExampleTwo():
+
+def test_bdt_example_two():
+
     # Valuation of a European option on a coupon bearing bond
     # This follows example in Fig 28.11 of John Hull's book (6th Edition)
     # but does not have the exact same dt so there are some differences
@@ -84,8 +85,11 @@ def test_BDTExampleTwo():
     assert round(v["call"], 4) == 0.5043
     assert round(v["put"], 4) == 8.2242
 
+########################################################################################
 
-def test_BDTExampleThree():
+
+def test_bdt_example_three():
+
     # Valuation of a swaption as in Leif Andersen's paper - see Table 1 on
     # SSRN-id155208.pdf
 
@@ -106,14 +110,14 @@ def test_BDTExampleThree():
 
     exercise_type = FinExerciseTypes.EUROPEAN
     years_to_maturity = 4.0
-    expiryYears = 2.0
+    expiry_years = 2.0
 
     maturity_dt = settle_dt.add_years(years_to_maturity)
     issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
 
     sigma = 0.2012
 
-    expiry_dt = settle_dt.add_years(expiryYears)
+    expiry_dt = settle_dt.add_years(expiry_years)
 
     t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
     t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
@@ -149,14 +153,14 @@ def test_BDTExampleThree():
 
     exercise_type = FinExerciseTypes.BERMUDAN
     years_to_maturity = 10.0
-    expiryYears = 5.0
+    expiry_years = 5.0
 
     maturity_dt = settle_dt.add_years(years_to_maturity)
     issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
 
     sigma = 0.1522
 
-    expiry_dt = settle_dt.add_years(expiryYears)
+    expiry_dt = settle_dt.add_years(expiry_years)
 
     t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
     t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS

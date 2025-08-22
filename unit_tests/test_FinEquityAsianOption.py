@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
@@ -21,7 +19,7 @@ interest_rate = 0.30
 dividend_yield = 0.10
 num_observations = 120  # daily as we have a half year
 accrued_avg = None
-K = 100
+k = 100
 seed = 1976
 num_paths = 5000
 
@@ -32,13 +30,16 @@ dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 asian_option = EquityAsianOption(
     start_averaging_dt,
     expiry_dt,
-    K,
+    k,
     OptionTypes.EUROPEAN_CALL,
     num_observations,
 )
 
+########################################################################################
+
 
 def test_geometric():
+
     value_geometric = asian_option.value(
         value_dt,
         stock_price,
@@ -51,9 +52,12 @@ def test_geometric():
 
     assert round(value_geometric, 4) == 12.3380
 
+########################################################################################
+
 
 def test_turnbull_wakeman():
-    valueTurnbullWakeman = asian_option.value(
+
+    value_turnbull_wakeman = asian_option.value(
         value_dt,
         stock_price,
         discount_curve,
@@ -63,11 +67,14 @@ def test_turnbull_wakeman():
         accrued_avg,
     )
 
-    assert round(valueTurnbullWakeman, 4) == 12.5381
+    assert round(value_turnbull_wakeman, 4) == 12.5381
+
+########################################################################################
 
 
 def test_curran():
-    valueCurran = asian_option.value(
+
+    value_curran = asian_option.value(
         value_dt,
         stock_price,
         discount_curve,
@@ -77,10 +84,13 @@ def test_curran():
         accrued_avg,
     )
 
-    assert round(valueCurran, 4) == 12.5368
+    assert round(value_curran, 4) == 12.5368
+
+########################################################################################
 
 
 def test_mc():
+
     value_mc = asian_option.value_mc(
         value_dt,
         stock_price,

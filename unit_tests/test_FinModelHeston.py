@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.utils.date import Date
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
@@ -25,8 +23,11 @@ num_steps = 100
 num_paths = 20000
 stock_price = 100.0
 
+########################################################################################
+
 
 def test_heston():
+
     rho = -0.90000
     sigma = 0.75000
     strike_price = 105.00

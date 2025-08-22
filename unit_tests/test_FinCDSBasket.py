@@ -1,20 +1,18 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
+import numpy as np
+from os.path import dirname, join
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-from .helpers import build_ibor_curve, load_hetero_spread_curves
 from financepy.utils.date import Date
 from financepy.utils.math import corr_matrix_generator
 from financepy.products.credit.cds_basket import CDSBasket
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-import numpy as np
-from os.path import dirname, join
 
+from .helpers import build_ibor_curve
+from .helpers import load_hetero_spread_curves
 
 trade_dt = Date(1, 3, 2007)
 step_in_dt = trade_dt.add_days(1)
@@ -22,7 +20,7 @@ value_dt = trade_dt.add_days(1)
 
 libor_curve = build_ibor_curve(trade_dt)
 
-basketMaturity = Date(20, 12, 2011)
+basket_maturity = Date(20, 12, 2011)
 
 cds_index = CDSIndexPortfolio()
 
@@ -31,36 +29,43 @@ issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
 issuer_curves = issuer_curves[0:num_credits]
 
 seed = 1967
-basket = CDSBasket(value_dt, basketMaturity)
+basket = CDSBasket(value_dt, basket_maturity)
+
+########################################################################################
 
 
 def test_inhomogeneous_curve():
+
     intrinsic_spd = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+        cds_index.intrinsic_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
     assert round(intrinsic_spd, 4) == 32.0971
 
-    totalSpd = (
-        cds_index.total_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+    total_spd = (
+        cds_index.total_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
-    assert round(totalSpd, 4) == 161.3169
+    assert round(total_spd, 4) == 161.3169
 
-    minSpd = (
-        cds_index.min_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+    min_spd = (
+        cds_index.min_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
-    assert round(minSpd, 4) == 10.6722
+    assert round(min_spd, 4) == 10.6722
 
-    maxSpd = (
-        cds_index.max_spread(value_dt, step_in_dt, basketMaturity, issuer_curves)
+    max_spd = (
+        cds_index.max_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
-    assert round(maxSpd, 4) == 81.1466
+    assert round(max_spd, 4) == 81.1466
+
+
+########################################################################################
 
 
 def test_gaussian_copula():
+
     num_trials = 1000
 
     ntd = 1
@@ -110,9 +115,13 @@ def test_gaussian_copula():
     assert round(v2[3] * 10000, 4) == 16.6395
 
 
+########################################################################################
+
+
 def test_student_t():
+
     num_trials = 1000
-    doF = 5
+    do_f = 5
 
     ntd = 1
     beta = 0.0
@@ -124,7 +133,7 @@ def test_student_t():
         ntd,
         issuer_curves,
         corr_matrix,
-        doF,
+        do_f,
         libor_curve,
         num_trials,
         seed,
@@ -142,7 +151,7 @@ def test_student_t():
         ntd,
         issuer_curves,
         corr_matrix,
-        doF,
+        do_f,
         libor_curve,
         num_trials,
         seed,

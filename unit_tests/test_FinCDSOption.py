@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 
@@ -20,18 +18,21 @@ expiry_dt = Date(20, 3, 2014)
 maturity_dt = Date(20, 6, 2019)
 notional = 100.0
 
+########################################################################################
+
 
 def test_cds_option():
+
     volatility = 0.3
 
     strike_result = [(100, 4.0007), (150, 1.5874), (200, 0.0955), (300, 0.0)]
 
     for strike, result in strike_result:
-        cdsOption = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional)
+        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional)
 
-        v = cdsOption.value(value_dt, issuer_curve, volatility)
+        v = cds_option.value(value_dt, issuer_curve, volatility)
 
-        vol = cdsOption.implied_volatility(value_dt, issuer_curve, v)
+        vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
 
         assert round(v, 4) == result
         assert vol == 0.3

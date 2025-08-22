@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,8 +16,11 @@ mortgage = BondMortgage(start_dt, end_dt, principal)
 
 rate = 0.035
 
+########################################################################################
+
 
 def test_bond_mortgage_repayment():
+
     mortgage.generate_flows(rate, BondMortgageTypes.REPAYMENT)
     i = 10
     assert mortgage.schedule.adjusted_dts[i] == Date(24, 12, 2018)
@@ -28,8 +29,11 @@ def test_bond_mortgage_repayment():
     assert round(mortgage.principal_remaining[i], 4) == 120816.6155
     assert round(mortgage.total_flows[i], 4) == 1285.5163
 
+########################################################################################
+
 
 def test_bond_mortgage_interest():
+
     mortgage.generate_flows(rate, BondMortgageTypes.INTEREST_ONLY)
     i = 10
     assert mortgage.schedule.adjusted_dts[i] == Date(24, 12, 2018)

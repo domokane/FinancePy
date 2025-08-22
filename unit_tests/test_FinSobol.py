@@ -1,11 +1,11 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from financepy.models.sobol import get_uniform_sobol
 
+########################################################################################
 
-def test_FinSobol():
+
+def test__fin_sobol():
 
     num_points = 1000
     dimensions = 3
@@ -23,7 +23,7 @@ def test_FinSobol():
         av /= num_points
         var /= num_points
 
-        avError = abs(av - (1 / 2))
-        varError = abs(var - (1 / 3))
-        assert avError < 0.002
-        assert varError < 0.002
+        av_error = abs(av - (1 / 2))
+        var_error = abs(var - (1 / 3))
+        assert av_error < 0.002
+        assert var_error < 0.002
