@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.utils.math import normcdf_slow, N, normcdf_integrate
+from financepy.utils.math import normcdf_slow, normcdf, normcdf_integrate
 from financepy.utils.math import accrued_interpolator
 import numpy as np
 
