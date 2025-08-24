@@ -262,21 +262,26 @@ def convert_file(filepath: str) -> None:
 
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         base, ext = os.path.splitext(os.path.basename(filepath))
-        new_filepath = os.path.join(
-            OUTPUT_DIR, "..\\..\\pep8_test/", f"{base}.py"
-        )  # Overwrite any existing _2.py
+
+        bkp_filepath = os.path.join(OUTPUT_DIR, "../backup/", f"{base}.py")
+        with open(bkp_filepath, "w", encoding="utf-8") as f:
+            f.write(source)
+        print(f"Backup Written to {bkp_filepath}")
+
+        new_filepath = os.path.join(OUTPUT_DIR, "../converted/", f"{base}.py")
         with open(new_filepath, "w", encoding="utf-8") as f:
             f.write(new_source)
         print(f"Written to {new_filepath}")
+
     except (IOError, OSError) as e:
         print(f"Error processing {filepath}: {e}")
 
 
 def convert_folder(folder_path: str) -> None:
-    """Process all .py files in a folder, skipping _2.py files."""
+    """Process all .py files in a folder."""
     try:
         for filename in os.listdir(folder_path):
-            if filename.startswith("test") and filename.endswith(".py"):
+            if filename.endswith(".py"):
                 convert_file(os.path.join(folder_path, filename))
     except (IOError, OSError) as e:
         print(f"Error accessing folder {folder_path}: {e}")
@@ -285,5 +290,7 @@ def convert_folder(folder_path: str) -> None:
 if __name__ == "__main__":
     TARGET_FOLDER_RELATIVE_PATH = "../golden_tests"
     TARGET_FOLDER_RELATIVE_PATH = "../unit_tests"
+    TARGET_FOLDER_RELATIVE_PATH = "../financepy/market/curves"
+    TARGET_FOLDER_RELATIVE_PATH = "../financepy/market/volatility"
     convert_folder(TARGET_FOLDER_RELATIVE_PATH)
     print("PEP8 conversion complete.")

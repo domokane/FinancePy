@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from typing import Union
 from enum import Enum
@@ -33,8 +31,8 @@ class InterpTypes(Enum):
 
 # LINEAR_SWAP_RATES = 3
 
-########################################################################################
 # TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ########################################################################################
 
 
@@ -70,15 +68,16 @@ def interpolate(
     raise FinError("Unknown input type" + type(t))
 
 
-########################################################################################
-
-
 @njit(
     float64(float64, float64[:], float64[:], int64),
     fastmath=True,
     cache=True,
     nogil=True,
 )
+
+########################################################################################
+
+
 def _uinterpolate(t, times, dfs, method):
     """Return the interpolated value of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
@@ -100,9 +99,7 @@ def _uinterpolate(t, times, dfs, method):
 
     yvalue = 0.0
 
-    ###########################################################################
     # linear interpolation of y(x)
-    ###########################################################################
 
     if method == InterpTypes.LINEAR_ZERO_RATES.value:
 
@@ -127,11 +124,9 @@ def _uinterpolate(t, times, dfs, method):
 
         return yvalue
 
-    ###########################################################################
     # linear interpolation of log(y(x)) which means the linear interpolation of
     # continuously compounded zero rates in the case of discount discount
     # This is also FLAT FORWARDS
-    ###########################################################################
 
     elif method == InterpTypes.FLAT_FWD_RATES.value:
 
@@ -180,15 +175,16 @@ def _uinterpolate(t, times, dfs, method):
         raise FinError("Invalid interpolation scheme.")
 
 
-########################################################################################
-
-
 @njit(
     float64[:](float64[:], float64[:], float64[:], int64),
     fastmath=True,
     cache=True,
     nogil=True,
 )
+
+########################################################################################
+
+
 def _vinterpolate(x_values, x_vector, dfs, method):
     """Return the interpolated values of y given x and a vector of x and y.
     The values of x must be monotonic and increasing. The different schemes for
@@ -209,6 +205,8 @@ def _vinterpolate(x_values, x_vector, dfs, method):
 class Interpolator:
     """Interpolator class for curve fitting and value interpolation."""
 
+    ########################################################################################
+
     def __init__(self, interpolator_type: InterpTypes, **kwargs: dict):
 
         self._interp_type = interpolator_type
@@ -218,7 +216,7 @@ class Interpolator:
         self._refit_curve = False
         self._optional_interp_params = kwargs
 
-    ###########################################################################
+    ########################################################################################
 
     def fit(self, times: np.ndarray, dfs: np.ndarray):
         """
@@ -285,7 +283,6 @@ class Interpolator:
             self._interp_fn = CubicSpline(self._times, zero_rates, bc_type="natural")
 
         #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
-        #
         #            log_dfs = np.log(self.dfs)
         #            self._interp_fn = interp1d(self.times, log_dfs,
         #                                      fill_value="extrapolate")
@@ -334,7 +331,7 @@ class Interpolator:
                 self._times, zero_rates, sigma=tension_sigma
             )
 
-    ###########################################################################
+    ########################################################################################
 
     def interpolate(self, t: float):
         """Interpolation of discount factors at time x given discount factors
@@ -401,7 +398,11 @@ class Interpolator:
                 # so only need to worry about the right tail
                 # Here we assume constant extrapolation, consistent with how
                 # we set up our interpolator
+
+                ########################################################################################
+
                 def true_integral(spline, t):
+
                     last_t = spline.get_knots()[-1]
                     i1 = spline.integral(0.0, min(t, last_t))
                     i2 = (t - min(t, last_t)) * spline(last_t)
@@ -419,6 +420,9 @@ class Interpolator:
         return out
 
     @classmethod
+
+    ########################################################################################
+
     def suitable_for_bootstrap(cls, interp_type):
         """Check if the interpolation type is suitable for bootstrapping."""
         is_suitable = {
@@ -435,6 +439,3 @@ class Interpolator:
         }
 
         return is_suitable[interp_type]
-
-
-########################################################################################

@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from typing import Union
 
@@ -17,16 +15,20 @@ from ...utils.day_count import DayCountTypes
 from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 
-
 ########################################################################################
 
 
 class DiscountCurvePWF(DiscountCurve):
+
     """Curve is made up of a series of zero rates sections with each having
     a piecewise flat zero rate. The default compounding assumption is
     continuous. The class inherits methods from DiscountCurve."""
 
+########################################################################################
+
+
     def __init__(
+
         self,
         value_dt: Date,
         zero_dts: list,
@@ -59,9 +61,11 @@ class DiscountCurvePWF(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-    ###########################################################################
+########################################################################################
+
 
     def _zero_rate(self, times: Union[float, np.ndarray, list]):
+
         """The piecewise flat zero rate is selected and returned."""
 
         if isinstance(times, float):
@@ -96,9 +100,11 @@ class DiscountCurvePWF(DiscountCurve):
 
         return np.array(zero_rates)
 
-    ###########################################################################
+########################################################################################
+
 
     def _fwd(self, times: Union[np.ndarray, list]):
+
         """Calculate the continuously compounded forward rate at the forward
         time provided. This is done by perturbing the time by a small amount
         and measuring the change in the log of the discount factor divided by
@@ -118,9 +124,11 @@ class DiscountCurvePWF(DiscountCurve):
 
         return fwd
 
-    ###########################################################################
+########################################################################################
+
 
     def df(self, dates: Union[Date, list]):
+
         """Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
@@ -138,7 +146,8 @@ class DiscountCurvePWF(DiscountCurve):
 
         return df
 
-    ###########################################################################
+########################################################################################
+
 
     def __repr__(self):
 
@@ -149,11 +158,11 @@ class DiscountCurvePWF(DiscountCurve):
         s += label_to_string("FREQUENCY", (self.freq_type))
         return s
 
-    ###########################################################################
+########################################################################################
+
 
     def _print(self):
+
         """Simple print function for backward compatibility."""
         print(self)
 
-
-########################################################################################

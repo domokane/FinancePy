@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from typing import Union
 
@@ -18,12 +16,13 @@ from ...utils.helpers import check_argument_types
 from .interpolator import InterpTypes, Interpolator
 
 
-########################################################################################
 # TODO: Fix up __repr__ function
+
 ########################################################################################
 
 
 class DiscountCurveZeros(DiscountCurve):
+
     """This is a curve calculated from a set of dates and zero rates. As we
     have rates as inputs, we need to specify the corresponding compounding
     frequency. Also to go from rates and dates to discount factors we need to
@@ -32,9 +31,11 @@ class DiscountCurveZeros(DiscountCurve):
     between the zero rates given and for this we must specify an interpolation
     convention. The class inherits methods from DiscountCurve."""
 
-    ###########################################################################
+########################################################################################
+
 
     def __init__(
+
         self,
         value_dt: Date,
         zero_dts: list,
@@ -113,7 +114,8 @@ class DiscountCurveZeros(DiscountCurve):
 
     #         return disc_curve
 
-    ###########################################################################
+########################################################################################
+
 
     def __repr__(self):
 
@@ -132,11 +134,11 @@ class DiscountCurveZeros(DiscountCurve):
 
         return s
 
-    ###########################################################################
+########################################################################################
+
 
     def _print(self):
+
         """Simple print function for backward compatibility."""
         print(self)
 
-
-########################################################################################

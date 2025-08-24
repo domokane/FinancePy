@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from typing import Union
 
@@ -16,18 +14,22 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import times_from_dates
 
-
 ########################################################################################
 
 
 class DiscountCurvePoly(DiscountCurve):
+
     """Zero Rate Curve of a specified frequency parametrised using a cubic
     polynomial. The zero rate is assumed to be continuously compounded but
     this can be amended by providing a frequency when extracting zero rates.
     We also need to specify a Day count convention for time calculations.
     The class inherits all of the methods from DiscountCurve."""
 
+########################################################################################
+
+
     def __init__(
+
         self,
         value_dt: Date,
         coefficients: Union[list, np.ndarray],
@@ -46,9 +48,11 @@ class DiscountCurvePoly(DiscountCurve):
         self.freq_type = freq_type
         self.dc_type = dc_type
 
-    ###########################################################################
+########################################################################################
+
 
     def zero_rate(
+
         self,
         dts: Union[list, Date],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
@@ -83,9 +87,11 @@ class DiscountCurvePoly(DiscountCurve):
         zero_rates = self._df_to_zero(dfs, dts, freq_type, dc_type)
         return zero_rates
 
-    ###########################################################################
+########################################################################################
+
 
     def _zero_rate(self, times: Union[float, np.ndarray]):
+
         """Calculate the zero rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
         use. The compounding frequency defaults to that specified in the
@@ -99,9 +105,11 @@ class DiscountCurvePoly(DiscountCurve):
 
         return zero_rate
 
-    ###########################################################################
+########################################################################################
+
 
     def df(self, dates: Union[list, Date]):
+
         """Calculate the fwd rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
         use. The compounding frequency defaults to that specified in the
@@ -120,9 +128,11 @@ class DiscountCurvePoly(DiscountCurve):
 
         return dfs
 
-    ###########################################################################
+########################################################################################
+
 
     def __repr__(self):
+
         """Display internal parameters of curve."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -133,11 +143,11 @@ class DiscountCurvePoly(DiscountCurve):
 
         return s
 
-    ###########################################################################
+########################################################################################
+
 
     def _print(self):
+
         """Simple print function for backward compatibility."""
         print(self)
 
-
-########################################################################################

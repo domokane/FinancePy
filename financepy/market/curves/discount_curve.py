@@ -1,6 +1,4 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from typing import Union
 
@@ -19,18 +17,20 @@ from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates
 from ...utils.helpers import label_to_string
 
-
 ########################################################################################
 
 
 class DiscountCurve:
+
     """This is a base discount curve which has an internal representation of
     a vector of times and discount factors and an interpolation scheme for
     interpolating between these fixed points."""
 
-    ###########################################################################
+########################################################################################
+
 
     def __init__(
+
         self,
         value_dt: Date,
         df_dates: list = None,
@@ -87,40 +87,57 @@ class DiscountCurve:
         self._interpolator = Interpolator(self._interp_type)
         self.fit(self._times, self._dfs)
 
-    ########################################################################################
 
     @property
+
+########################################################################################
+
+
     def times(self) -> np.ndarray:
-        """Return the internal array of times (in years) from the anchor date."""
+
+        """Return the internal array of times(in years) from the anchor date."""
         return self._times.copy()  # return a copy to prevent external modification
 
     @property
+
+########################################################################################
+
+
     def dfs(self) -> np.ndarray:
+
         """Return the internal array of discount factors corresponding to times."""
         return self._dfs.copy()  # return a copy to prevent external modification
 
-    ###########################################################################
+########################################################################################
+
 
     def set_times(self, times: np.ndarray):
+
         """Set the discount factor at the last maturity time."""
         self._times = times
 
-    ###########################################################################
+########################################################################################
+
 
     def set_dfs(self, dfs: np.ndarray):
+
         """Set the discount factor at the last maturity time."""
         self._dfs = dfs
 
-    ###########################################################################
+########################################################################################
+
 
     def set_last_df(self, df):
+
         """Set the discount factor at the last maturity time."""
         n_points = len(self.dfs)
         self._dfs[n_points - 1] = df
 
-    ###########################################################################
+########################################################################################
+
 
     def _zero_to_df(
+
         self,
         value_dt: Date,  # TODO: why is value_dt not used ?
         rates: Union[float, np.ndarray],
@@ -155,16 +172,20 @@ class DiscountCurve:
 
         return df
 
-    ###########################################################################
+########################################################################################
+
 
     def fit(self, times: np.ndarray, dfs: np.ndarray):
+
         """Fit the interpolator to the given times and discount factors."""
 
         self._interpolator.fit(times, dfs)
 
-    ###########################################################################
+########################################################################################
+
 
     def _df_to_zero(
+
         self,
         dfs: Union[float, np.ndarray],
         maturity_dts: Union[Date, list],
@@ -214,9 +235,11 @@ class DiscountCurve:
 
         return np.array(zero_rates)
 
-    ###########################################################################
+########################################################################################
+
 
     def zero_rate(
+
         self,
         dts: Union[list, Date],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
@@ -241,9 +264,11 @@ class DiscountCurve:
 
         return np.array(zero_rates)
 
-    ###########################################################################
+########################################################################################
+
 
     def cc_rate(
+
         self,
         dts: Union[list, Date],
         dc_type: DayCountTypes = DayCountTypes.SIMPLE,
@@ -255,9 +280,11 @@ class DiscountCurve:
         cc_rates = self.zero_rate(dts, FrequencyTypes.CONTINUOUS, dc_type)
         return cc_rates
 
-    ###########################################################################
+########################################################################################
+
 
     def swap_rate(
+
         self,
         effective_dt: Date,
         maturity_dt: Union[list, Date],
@@ -330,9 +357,11 @@ class DiscountCurve:
 
         return par_rates
 
-    ###########################################################################
+########################################################################################
+
 
     def df(self, dt: Union[list, Date], day_count=DayCountTypes.ACT_ACT_ISDA):
+
         """Function to calculate a discount factor from a date or a
         vector of dates. The day count determines how dates get converted to
         years. I allow this to default to ACT_ACT_ISDA unless specified."""
@@ -345,9 +374,11 @@ class DiscountCurve:
 
         return np.array(dfs)
 
-    ###########################################################################
+########################################################################################
+
 
     def df_t(self, t: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+
         """Function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates."""
 
@@ -364,9 +395,11 @@ class DiscountCurve:
 
         return df
 
-    ###########################################################################
+########################################################################################
+
 
     def survival_prob(self, dt: Date) -> float:
+
         """This returns a survival probability to a specified date based on
         the assumption that the continuously compounded rate is a default
         hazard rate in which case the survival probability is directly
@@ -375,9 +408,11 @@ class DiscountCurve:
         q = self.df(dt)
         return q
 
-    ###########################################################################
+########################################################################################
+
 
     def fwd(self, dts: Date):
+
         """Calculate the continuously compounded forward rate at the forward
         Date provided. This is done by perturbing the time by one day only
         and measuring the change in the log of the discount factor divided by
@@ -402,9 +437,11 @@ class DiscountCurve:
 
         return np.array(fwd)
 
-    ###########################################################################
+########################################################################################
+
 
     def _fwd(self, times: Union[np.ndarray, float]):
+
         """Calculate the continuously compounded forward rate at the forward
         time provided. This is done by perturbing the time by a small amount
         and measuring the change in the log of the discount factor divided by
@@ -418,9 +455,11 @@ class DiscountCurve:
         fwd = np.log(df1 / df2) / (2.0 * dt)
         return fwd
 
-    ###########################################################################
+########################################################################################
+
 
     def bump(self, bump_size: float):
+
         """Adjust the continuously compounded forward rates by a perturbation
         upward equal to the bump size and return a curve objet with this bumped
         curve. This is used for interest rate risk."""
@@ -437,9 +476,11 @@ class DiscountCurve:
 
         return disc_curve
 
-    ###########################################################################
+########################################################################################
+
 
     def fwd_rate(
+
         self,
         start_dt: Union[list, Date],
         date_or_tenor: Union[Date, str],
@@ -485,7 +526,8 @@ class DiscountCurve:
 
         return np.array(fwd_rates)
 
-    ###########################################################################
+########################################################################################
+
 
     def __repr__(self):
 
@@ -497,11 +539,11 @@ class DiscountCurve:
 
         return s
 
-    ###########################################################################
+########################################################################################
+
 
     def _print(self):
+
         """Simple print function for backward compatibility."""
         print(self)
 
-
-########################################################################################

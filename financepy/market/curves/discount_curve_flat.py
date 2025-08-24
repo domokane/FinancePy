@@ -1,11 +1,8 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from typing import Union
 import numpy as np
 
-########################################################################################
 
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
@@ -16,21 +13,24 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import times_from_dates
 from ...market.curves.interpolator import InterpTypes
 
-########################################################################################
 # TODO: Do I need to add a day count to ensure rate and times are linked in
 #       the correct way URGENT
+
 ########################################################################################
 
 
 class DiscountCurveFlat(DiscountCurve):
+
     """A very simple discount curve based on a single zero rate with its
     own specified compounding method. Hence, the curve is assumed to be flat.
     It is used for quick and dirty analysis and when limited information is
     available. It inherits several methods from DiscountCurve."""
 
-    ###########################################################################
+########################################################################################
+
 
     def __init__(
+
         self,
         value_dt: Date,
         flat_rate: Union[float, np.ndarray],
@@ -65,21 +65,32 @@ class DiscountCurveFlat(DiscountCurve):
         self._times = times_from_dates(dts, self.value_dt, dc_type)
         self._dfs = self.df(dts)
 
-    ###########################################################################
 
     @property
+
+########################################################################################
+
+
     def times(self) -> np.ndarray:
+
         """Return the cached grid of times."""
         return self._times
 
     @property
+
+########################################################################################
+
+
     def dfs(self) -> np.ndarray:
+
         """Return the cached grid of discount factors."""
         return self._dfs
 
-    ###########################################################################
+########################################################################################
+
 
     def df(self, dts: Union[Date, list]):
+
         """Return discount factors given a single or vector of dts. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency, and it defaults to continuous compounding. It
@@ -102,9 +113,11 @@ class DiscountCurveFlat(DiscountCurve):
 
         return np.array(dfs)
 
-    ###########################################################################
+########################################################################################
+
 
     def bump(self, bump_size: float):
+
         """Create a new FinDiscountCurveFlat object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
@@ -117,9 +130,11 @@ class DiscountCurveFlat(DiscountCurve):
         )
         return disc_curve
 
-    ###########################################################################
+########################################################################################
+
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", (self.value_dt))
         s += label_to_string("FLAT RATE", (self.flat_rate))
@@ -127,11 +142,11 @@ class DiscountCurveFlat(DiscountCurve):
         s += label_to_string("DAY COUNT", (self.dc_type))
         return s
 
-    ###########################################################################
+########################################################################################
+
 
     def _print(self):
+
         """Simple print function for backward compatibility."""
         print(self)
 
-
-########################################################################################
