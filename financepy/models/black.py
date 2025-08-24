@@ -9,7 +9,7 @@ from enum import Enum
 import numpy as np
 from numba import njit, float64
 
-from ..utils.math import n_vect, n_prime_vect
+from ..utils.math import normcdf_vect, normcdf_prime_vect
 from ..utils.global_vars import G_SMALL
 from ..utils.helpers import label_to_string
 from ..utils.global_types import OptionTypes
@@ -82,9 +82,7 @@ class Black:
             )
             value = results["value"]
         else:
-            raise FinError(
-                "Option type must be a European/American Call or Put"
-            )
+            raise FinError("Option type must be a European/American Call or Put")
         return value
 
     ###########################################################################
@@ -129,9 +127,7 @@ class Black:
             raise FinError("Implementation not available for this product")
 
         else:
-            raise FinError(
-                "Option type must be a European/American Call or Put"
-            )
+            raise FinError("Option type must be a European/American Call or Put")
 
     ###########################################################################
 
@@ -172,9 +168,7 @@ class Black:
             else:
                 raise FinError("Implementation not available for this product")
         else:
-            raise FinError(
-                "Option type must be a European/American Call or Put"
-            )
+            raise FinError("Option type must be a European/American Call or Put")
 
     ###########################################################################
 
@@ -215,9 +209,7 @@ class Black:
             else:
                 raise FinError("Implementation not available for this product")
         else:
-            raise FinError(
-                "Option type must be a European/American Call or Put"
-            )
+            raise FinError("Option type must be a European/American Call or Put")
         return theta
 
     ###########################################################################
@@ -266,16 +258,12 @@ class Black:
                     opt_type.value,
                     k,
                 )
-                vega = (
-                    results_volshift["value"] - results["value"]
-                ) / bump_size
+                vega = (results_volshift["value"] - results["value"]) / bump_size
                 return vega
             else:
                 raise FinError("Implementation not available for this product")
         else:
-            raise FinError(
-                "Option type must be a European/American Call or Put"
-            )
+            raise FinError("Option type must be a European/American Call or Put")
         return vega
 
     ###########################################################################
@@ -295,9 +283,9 @@ def black_value(fwd, t, k, r, v, opt_type):
     """Price a derivative using Black model."""
     d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
-        return np.exp(-r * t) * (fwd * n_vect(d1) - k * n_vect(d2))
+        return np.exp(-r * t) * (fwd * normcdf_vect(d1) - k * normcdf_vect(d2))
     elif opt_type == OptionTypes.EUROPEAN_PUT:
-        return np.exp(-r * t) * (k * n_vect(-d2) - fwd * n_vect(-d1))
+        return np.exp(-r * t) * (k * normcdf_vect(-d2) - fwd * normcdf_vect(-d1))
     else:
         raise FinError("Option type must be a European Call or Put")
 
@@ -306,9 +294,9 @@ def black_delta(fwd, t, k, r, v, opt_type):
     """Return delta of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
-        return np.exp(-r * t) * n_vect(d1)
+        return np.exp(-r * t) * normcdf_vect(d1)
     elif opt_type == OptionTypes.EUROPEAN_PUT:
-        return -np.exp(-r * t) * n_vect(-d1)
+        return -np.exp(-r * t) * normcdf_vect(-d1)
     else:
         raise FinError("Option type must be a European Call or Put")
 
@@ -317,7 +305,7 @@ def black_gamma(fwd, t, k, r, v, opt_type):
     """Return gamma of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
-        return np.exp(-r * t) * n_prime_vect(d1) / (fwd * v * np.sqrt(t))
+        return np.exp(-r * t) * normcdf_prime_vect(d1) / (fwd * v * np.sqrt(t))
     else:
         raise FinError("Option type must be a European Call or Put")
 
@@ -326,7 +314,7 @@ def black_vega(fwd, t, k, r, v, opt_type):
     """Return vega of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
-        return np.exp(-r * t) * fwd * np.sqrt(t) * n_prime_vect(d1)
+        return np.exp(-r * t) * fwd * np.sqrt(t) * normcdf_prime_vect(d1)
     else:
         raise FinError("Option type must be a European Call or Put")
 
@@ -336,23 +324,21 @@ def black_theta(fwd, t, k, r, v, opt_type):
     d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
         return np.exp(-r * t) * (
-            -(fwd * v * n_prime_vect(d1)) / (2 * np.sqrt(t))
-            + r * fwd * n_vect(d1)
-            - r * k * n_vect(d2)
+            -(fwd * v * normcdf_prime_vect(d1)) / (2 * np.sqrt(t))
+            + r * fwd * normcdf_vect(d1)
+            - r * k * normcdf_vect(d2)
         )
     elif opt_type == OptionTypes.EUROPEAN_PUT:
         return np.exp(-r * t) * (
-            -(fwd * v * n_prime_vect(d1)) / (2 * np.sqrt(t))
-            - r * fwd * n_vect(-d1)
-            + r * k * n_vect(-d2)
+            -(fwd * v * normcdf_prime_vect(d1)) / (2 * np.sqrt(t))
+            - r * fwd * normcdf_vect(-d1)
+            + r * k * normcdf_vect(-d2)
         )
     else:
         raise FinError("Option type must be a European Call or Put")
 
 
-@njit(
-    float64[:](float64, float64, float64, float64), fastmath=True, cache=True
-)
+@njit(float64[:](float64, float64, float64, float64), fastmath=True, cache=True)
 def calculate_d1_d2(f, t, k, v):
     """Calculate d1 and d2 for Black-Scholes model."""
 
@@ -459,17 +445,13 @@ def implied_volatility(fwd, t, r, k, price, opt_type, debug_print=True):
         # Instead of european price, american price is
         # passed to an approximation formula for european option.
         # But it's just an initial point, so has no affect on the calibration.
-        sigma0 = _estimate_vol_from_price(
-            fwd, t, k, OptionTypes.EUROPEAN_CALL, price
-        )
+        sigma0 = _estimate_vol_from_price(fwd, t, k, OptionTypes.EUROPEAN_CALL, price)
     elif opt_type == OptionTypes.AMERICAN_PUT:
         _f = _f_american
         _f_vega = _f_american_vega
         # NOTE:
         # Same argument as american call's case
-        sigma0 = _estimate_vol_from_price(
-            fwd, t, k, OptionTypes.EUROPEAN_PUT, price
-        )
+        sigma0 = _estimate_vol_from_price(fwd, t, k, OptionTypes.EUROPEAN_PUT, price)
     else:
         raise FinError("Option type must be a European Call or Put")
 

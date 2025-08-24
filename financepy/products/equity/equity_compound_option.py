@@ -10,7 +10,7 @@ from scipy import optimize
 from numba import njit
 
 
-from ...utils.math import N, phi2
+from ...utils.math import normcdf, phi2
 from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
@@ -40,9 +40,7 @@ def _f(s0, *args):
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits k_1")
 
-    obj_fn = (
-        self.value(value_dt, s0, discount_curve, dividend_curve, model) - value
-    )
+    obj_fn = self.value(value_dt, s0, discount_curve, dividend_curve, model) - value
 
     return obj_fn
 
@@ -51,9 +49,7 @@ def _f(s0, *args):
 
 
 @njit(fastmath=True, cache=True)
-def _value_once(
-    s, r, q, volatility, t1, t2, opt_type1, opt_type2, k1, k2, num_steps
-):
+def _value_once(s, r, q, volatility, t1, t2, opt_type1, opt_type2, k1, k2, num_steps):
 
     if num_steps < 3:
         num_steps = 3
@@ -216,9 +212,7 @@ def _value_once(
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / (
-        stock_values[2] - stock_values[1]
-    )
+    delta = (option_values[2] - option_values[1]) / (stock_values[2] - stock_values[1])
     delta_up = (option_values[5] - option_values[4]) / (
         stock_values[5] - stock_values[4]
     )
@@ -256,9 +250,7 @@ class EquityCompoundOption(EquityOption):
         check_argument_types(self.__init__, locals())
 
         if c_expiry_dt > u_expiry_dt:
-            raise FinError(
-                "Compound expiry date must precede underlying expiry date"
-            )
+            raise FinError("Compound expiry date must precede underlying expiry date")
 
         if (
             c_opt_type != OptionTypes.EUROPEAN_CALL
@@ -266,9 +258,7 @@ class EquityCompoundOption(EquityOption):
             and c_opt_type != OptionTypes.EUROPEAN_PUT
             and c_opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError(
-                "Compound option must be European or American call or put."
-            )
+            raise FinError("Compound option must be European or American call or put.")
 
         if (
             u_opt_type != OptionTypes.EUROPEAN_CALL
@@ -393,25 +383,25 @@ class EquityCompoundOption(EquityOption):
             v = (
                 s0 * dqu * phi2(a1, b1, c)
                 - ku * dfu * phi2(a2, b2, c)
-                - dfc * kc * N(a2)
+                - dfc * kc * normcdf(a2)
             )
         elif self.c_opt_type == put_type and self.u_opt_type == call_type:
             v = (
                 ku * dfu * phi2(-a2, b2, -c)
                 - s0 * dqu * phi2(-a1, b1, -c)
-                + dfc * kc * N(-a2)
+                + dfc * kc * normcdf(-a2)
             )
         elif self.c_opt_type == call_type and self.u_opt_type == put_type:
             v = (
                 ku * dfu * phi2(-a2, -b2, c)
                 - s0 * dqu * phi2(-a1, -b1, c)
-                - dfc * kc * N(-a2)
+                - dfc * kc * normcdf(-a2)
             )
         elif self.c_opt_type == put_type and self.u_opt_type == put_type:
             v = (
                 s0 * dqu * phi2(a1, -b1, -c)
                 - ku * dfu * phi2(a2, -b2, -c)
-                + dfc * kc * N(a2)
+                + dfc * kc * normcdf(a2)
             )
         else:
             raise FinError("Unknown option type")

@@ -19,7 +19,7 @@ from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
-from ...utils.math import N
+from ...utils.math import normcdf, normcdf_prime_vect
 
 
 ########################################################################################
@@ -125,13 +125,9 @@ def _value_mc_numba(
 
         for obs in range(0, n):
 
-            s_1 = s_1 * np.exp(
-                (mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility
-            )
+            s_1 = s_1 * np.exp((mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility)
 
-            s_2 = s_2 * np.exp(
-                (mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility
-            )
+            s_2 = s_2 * np.exp((mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility)
 
             s_1_arithmetic += s_1
             s_2_arithmetic += s_2
@@ -543,7 +539,7 @@ class EquityAsianOption:
         d2 = d1 - np.sqrt(varGeo)
 
         # the Geometric price is the lower bound
-        call_g = np.exp(-r * t_exp) * (EG * N(d1) - K * N(d2))
+        call_g = np.exp(-r * t_exp) * (EG * normcdf(d1) - K * normcdf(d2))
 
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             v = call_g
@@ -622,9 +618,9 @@ class EquityAsianOption:
         d2 = d1 - sigmaA * np.sqrt(t_exp)
 
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
-            v = np.exp(-r * t_exp) * (FA * N(d1) - K * N(d2))
+            v = np.exp(-r * t_exp) * (FA * normcdf(d1) - K * normcdf(d2))
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
-            v = np.exp(-r * t_exp) * (K * N(-d2) - FA * N(-d1))
+            v = np.exp(-r * t_exp) * (K * normcdf(-d2) - FA * normcdf(-d1))
         else:
             return None
 
@@ -706,10 +702,10 @@ class EquityAsianOption:
         d2 = d1 - sigma * np.sqrt(t_exp)
 
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
-            call = np.exp(-r * t_exp) * (F0 * N(d1) - K * N(d2))
+            call = np.exp(-r * t_exp) * (F0 * normcdf(d1) - K * normcdf(d2))
             v = call
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
-            put = np.exp(-r * t_exp) * (K * N(-d2) - F0 * N(-d1))
+            put = np.exp(-r * t_exp) * (K * normcdf(-d2) - F0 * normcdf(-d1))
             v = put
         else:
             return None

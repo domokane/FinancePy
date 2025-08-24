@@ -7,7 +7,7 @@ from math import exp, log, sqrt
 import numpy as np
 
 from ...utils.error import FinError
-from ...utils.math import N
+from ...utils.math import normcdf
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...products.fx.fx_option import FXOption
 from ...models.process_simulator import FinProcessSimulator
@@ -61,9 +61,7 @@ class FXBarrierOption(FXOption):
 
     ##########################################################################
 
-    def value(
-        self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    ):
+    def value(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
         """Value FX Barrier Option using Black-Scholes model with closed-form
         analytical models."""
 
@@ -83,9 +81,7 @@ class FXBarrierOption(FXOption):
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
         k = self.strike_fx_rate
         s0 = spot_fx_rate
@@ -107,8 +103,8 @@ class FXBarrierOption(FXOption):
         d1 = (ln_s0_k + (mu + v2 / 2.0) * t) / sigma_root_t
         d2 = (ln_s0_k + (mu - v2 / 2.0) * t) / sigma_root_t
 
-        c = s0 * dq * N(d1) - k * df * N(d2)
-        p = k * df * N(-d2) - s0 * dq * N(-d1)
+        c = s0 * dq * normcdf(d1) - k * df * normcdf(d2)
+        p = k * df * normcdf(-d2) - s0 * dq * normcdf(-d1)
         #        print("CALL:",c,"PUT:",p)
 
         if self.opt_type == FinFXBarrierTypes.DOWN_AND_OUT_CALL and s0 <= h:
@@ -166,47 +162,47 @@ class FXBarrierOption(FXOption):
         if self.opt_type == FinFXBarrierTypes.DOWN_AND_OUT_CALL:
             if h >= k:
                 c_do = (
-                    s0 * dq * N(x1)
-                    - k * df * N(x1 - sigma_root_t)
-                    - s0 * dq * pow(h_over_s, 2.0 * ll) * N(y1)
+                    s0 * dq * normcdf(x1)
+                    - k * df * normcdf(x1 - sigma_root_t)
+                    - s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(y1)
                     + k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * N(y1 - sigma_root_t)
+                    * normcdf(y1 - sigma_root_t)
                 )
                 price = c_do
             else:
-                c_di = s0 * dq * pow(h_over_s, 2.0 * ll) * N(y) - k * df * pow(
+                c_di = s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(y) - k * df * pow(
                     h_over_s, 2.0 * ll - 2.0
-                ) * N(y - sigma_root_t)
+                ) * normcdf(y - sigma_root_t)
                 price = c - c_di
         elif self.opt_type == FinFXBarrierTypes.DOWN_AND_IN_CALL:
             if h <= k:
-                c_di = s0 * dq * pow(h_over_s, 2.0 * ll) * N(y) - k * df * pow(
+                c_di = s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(y) - k * df * pow(
                     h_over_s, 2.0 * ll - 2.0
-                ) * N(y - sigma_root_t)
+                ) * normcdf(y - sigma_root_t)
                 price = c_di
             else:
                 c_do = (
-                    s0 * dq * N(x1)
-                    - k * df * N(x1 - sigma_root_t)
-                    - s0 * dq * pow(h_over_s, 2.0 * ll) * N(y1)
+                    s0 * dq * normcdf(x1)
+                    - k * df * normcdf(x1 - sigma_root_t)
+                    - s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(y1)
                     + k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * N(y1 - sigma_root_t)
+                    * normcdf(y1 - sigma_root_t)
                 )
                 price = c - c_do
         elif self.opt_type == FinFXBarrierTypes.UP_AND_IN_CALL:
             if h >= k:
                 c_ui = (
-                    s0 * dq * N(x1)
-                    - k * df * N(x1 - sigma_root_t)
-                    - s0 * dq * pow(h_over_s, 2.0 * ll) * (N(-y) - N(-y1))
+                    s0 * dq * normcdf(x1)
+                    - k * df * normcdf(x1 - sigma_root_t)
+                    - s0 * dq * pow(h_over_s, 2.0 * ll) * (normcdf(-y) - normcdf(-y1))
                     + k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * (N(-y + sigma_root_t) - N(-y1 + sigma_root_t))
+                    * (normcdf(-y + sigma_root_t) - normcdf(-y1 + sigma_root_t))
                 )
                 price = c_ui
             else:
@@ -214,53 +210,49 @@ class FXBarrierOption(FXOption):
         elif self.opt_type == FinFXBarrierTypes.UP_AND_OUT_CALL:
             if h > k:
                 c_ui = (
-                    s0 * dq * N(x1)
-                    - k * df * N(x1 - sigma_root_t)
-                    - s0 * dq * pow(h_over_s, 2.0 * ll) * (N(-y) - N(-y1))
+                    s0 * dq * normcdf(x1)
+                    - k * df * normcdf(x1 - sigma_root_t)
+                    - s0 * dq * pow(h_over_s, 2.0 * ll) * (normcdf(-y) - normcdf(-y1))
                     + k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * (N(-y + sigma_root_t) - N(-y1 + sigma_root_t))
+                    * (normcdf(-y + sigma_root_t) - normcdf(-y1 + sigma_root_t))
                 )
                 price = c - c_ui
             else:
                 price = 0.0
         elif self.opt_type == FinFXBarrierTypes.UP_AND_IN_PUT:
             if h > k:
-                p_ui = -s0 * dq * pow(h_over_s, 2.0 * ll) * N(
-                    -y
-                ) + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(
-                    -y + sigma_root_t
-                )
+                p_ui = -s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
+                    h_over_s, 2.0 * ll - 2.0
+                ) * normcdf(-y + sigma_root_t)
                 price = p_ui
             else:
                 p_uo = (
-                    -s0 * dq * N(-x1)
-                    + k * df * N(-x1 + sigma_root_t)
-                    + s0 * dq * pow(h_over_s, 2.0 * ll) * N(-y1)
+                    -s0 * dq * normcdf(-x1)
+                    + k * df * normcdf(-x1 + sigma_root_t)
+                    + s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y1)
                     - k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * N(-y1 + sigma_root_t)
+                    * normcdf(-y1 + sigma_root_t)
                 )
                 price = p - p_uo
         elif self.opt_type == FinFXBarrierTypes.UP_AND_OUT_PUT:
             if h >= k:
-                p_ui = -s0 * dq * pow(h_over_s, 2.0 * ll) * N(
-                    -y
-                ) + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(
-                    -y + sigma_root_t
-                )
+                p_ui = -s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
+                    h_over_s, 2.0 * ll - 2.0
+                ) * normcdf(-y + sigma_root_t)
                 price = p - p_ui
             else:
                 p_uo = (
-                    -s0 * dq * N(-x1)
-                    + k * df * N(-x1 + sigma_root_t)
-                    + s0 * dq * pow(h_over_s, 2.0 * ll) * N(-y1)
+                    -s0 * dq * normcdf(-x1)
+                    + k * df * normcdf(-x1 + sigma_root_t)
+                    + s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y1)
                     - k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * N(-y1 + sigma_root_t)
+                    * normcdf(-y1 + sigma_root_t)
                 )
                 price = p_uo
         elif self.opt_type == FinFXBarrierTypes.DOWN_AND_OUT_PUT:
@@ -268,13 +260,13 @@ class FXBarrierOption(FXOption):
                 price = 0.0
             else:
                 p_di = (
-                    -s0 * dq * N(-x1)
-                    + k * df * N(-x1 + sigma_root_t)
-                    + s0 * dq * pow(h_over_s, 2.0 * ll) * (N(y) - N(y1))
+                    -s0 * dq * normcdf(-x1)
+                    + k * df * normcdf(-x1 + sigma_root_t)
+                    + s0 * dq * pow(h_over_s, 2.0 * ll) * (normcdf(y) - normcdf(y1))
                     - k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * (N(y - sigma_root_t) - N(y1 - sigma_root_t))
+                    * (normcdf(y - sigma_root_t) - normcdf(y1 - sigma_root_t))
                 )
                 price = p - p_di
         elif self.opt_type == FinFXBarrierTypes.DOWN_AND_IN_PUT:
@@ -282,13 +274,13 @@ class FXBarrierOption(FXOption):
                 price = p
             else:
                 p_di = (
-                    -s0 * dq * N(-x1)
-                    + k * df * N(-x1 + sigma_root_t)
-                    + s0 * dq * pow(h_over_s, 2.0 * ll) * (N(y) - N(y1))
+                    -s0 * dq * normcdf(-x1)
+                    + k * df * normcdf(-x1 + sigma_root_t)
+                    + s0 * dq * pow(h_over_s, 2.0 * ll) * (normcdf(y) - normcdf(y1))
                     - k
                     * df
                     * pow(h_over_s, 2.0 * ll - 2.0)
-                    * (N(y - sigma_root_t) - N(y1 - sigma_root_t))
+                    * (normcdf(y - sigma_root_t) - normcdf(y1 - sigma_root_t))
                 )
                 price = p_di
         else:
@@ -402,21 +394,15 @@ class FXBarrierOption(FXOption):
                 ones - barrier_crossed_from_above
             )
         elif opt_type == FinFXBarrierTypes.DOWN_AND_IN_CALL:
-            payoff = (
-                np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_above
-            )
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_above
         elif opt_type == FinFXBarrierTypes.UP_AND_IN_CALL:
-            payoff = (
-                np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_below
-            )
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_below
         elif opt_type == FinFXBarrierTypes.UP_AND_OUT_CALL:
             payoff = np.maximum(s_all[:, -1] - k, 0.0) * (
                 ones - barrier_crossed_from_below
             )
         elif opt_type == FinFXBarrierTypes.UP_AND_IN_PUT:
-            payoff = (
-                np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_below
-            )
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_below
         elif opt_type == FinFXBarrierTypes.UP_AND_OUT_PUT:
             payoff = np.maximum(k - s_all[:, -1], 0.0) * (
                 ones - barrier_crossed_from_below
@@ -426,9 +412,7 @@ class FXBarrierOption(FXOption):
                 ones - barrier_crossed_from_above
             )
         elif opt_type == FinFXBarrierTypes.DOWN_AND_IN_PUT:
-            payoff = (
-                np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_above
-            )
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_above
         else:
             raise FinError("Unknown barrier option type." + str(self.opt_type))
 

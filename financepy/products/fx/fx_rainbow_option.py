@@ -8,7 +8,7 @@ import numpy as np
 from typing import List
 
 from ...utils.date import Date
-from ...utils.math import N, M
+from ...utils.math import normcdf, M
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_assets_paths_times
@@ -32,26 +32,26 @@ class FXRainbowOptionTypes(Enum):
 ########################################################################################
 
 
-def payoff_value(s, payoff_typeValue, payoff_params):
-    if payoff_typeValue == FXRainbowOptionTypes.CALL_ON_MINIMUM.value:
+def payoff_value(s, payoff_type_value, payoff_params):
+    if payoff_type_value == FXRainbowOptionTypes.CALL_ON_MINIMUM.value:
         k = payoff_params[0]
         payoff = np.maximum(np.min(s, axis=1) - k, 0.0)
-    elif payoff_typeValue == FXRainbowOptionTypes.CALL_ON_MAXIMUM.value:
+    elif payoff_type_value == FXRainbowOptionTypes.CALL_ON_MAXIMUM.value:
         k = payoff_params[0]
         payoff = np.maximum(np.max(s, axis=1) - k, 0.0)
-    elif payoff_typeValue == FXRainbowOptionTypes.PUT_ON_MINIMUM.value:
+    elif payoff_type_value == FXRainbowOptionTypes.PUT_ON_MINIMUM.value:
         k = payoff_params[0]
         payoff = np.maximum(k - np.min(s, axis=1), 0.0)
-    elif payoff_typeValue == FXRainbowOptionTypes.PUT_ON_MAXIMUM.value:
+    elif payoff_type_value == FXRainbowOptionTypes.PUT_ON_MAXIMUM.value:
         k = payoff_params[0]
         payoff = np.maximum(k - np.max(s, axis=1), 0.0)
-    elif payoff_typeValue == FXRainbowOptionTypes.CALL_ON_NTH.value:
+    elif payoff_type_value == FXRainbowOptionTypes.CALL_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
         ssorted = np.sort(s)
         assetn = ssorted[:, -n]
         payoff = np.maximum(assetn - k, 0.0)
-    elif payoff_typeValue == FXRainbowOptionTypes.PUT_ON_NTH.value:
+    elif payoff_type_value == FXRainbowOptionTypes.PUT_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
         ssorted = np.sort(s)
@@ -132,26 +132,21 @@ class FXRainbowOption(FXOption):
 
         if len(stock_prices) != self.num_assets:
             raise FinError(
-                "Stock prices must be a vector of length "
-                + str(self.num_assets)
+                "Stock prices must be a vector of length " + str(self.num_assets)
             )
 
         if len(dividend_yields) != self.num_assets:
             raise FinError(
-                "Dividend yields must be a vector of length "
-                + str(self.num_assets)
+                "Dividend yields must be a vector of length " + str(self.num_assets)
             )
 
         if len(volatilities) != self.num_assets:
             raise FinError(
-                "Volatilities must be a vector of length "
-                + str(self.num_assets)
+                "Volatilities must be a vector of length " + str(self.num_assets)
             )
 
         if len(betas) != self.num_assets:
-            raise FinError(
-                "Betas must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Betas must be a vector of length " + str(self.num_assets))
 
     ###########################################################################
 
@@ -214,9 +209,7 @@ class FXRainbowOption(FXOption):
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
         if self.num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -258,9 +251,7 @@ class FXRainbowOption(FXOption):
             v = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrtt, rho2)
-                - k
-                * df
-                * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
+                - k * df * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
             )
         elif self.payoff_type == FXRainbowOptionTypes.CALL_ON_MINIMUM:
             v = (
@@ -269,7 +260,7 @@ class FXRainbowOption(FXOption):
                 - k * df * M(y1 - v1 * np.sqrt(t), y2 - v2 * np.sqrt(t), rho)
             )
         elif self.payoff_type == FXRainbowOptionTypes.PUT_ON_MAXIMUM:
-            cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrtt)
+            cmax1 = s2 * dq2 + s1 * dq1 * normcdf(d) - s2 * dq2 * normcdf(d - v * sqrtt)
             cmax2 = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrtt, rho2)
@@ -277,7 +268,7 @@ class FXRainbowOption(FXOption):
             )
             v = k * df - cmax1 + cmax2
         elif self.payoff_type == FXRainbowOptionTypes.PUT_ON_MINIMUM:
-            cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrtt)
+            cmin1 = s1 * dq1 - s1 * dq1 * normcdf(d) + s2 * dq2 * normcdf(d - v * sqrtt)
             cmin2 = (
                 s1 * dq1 * M(y1, -d, -rho1)
                 + s2 * dq2 * M(y2, d - v * sqrtt, -rho2)

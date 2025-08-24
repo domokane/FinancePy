@@ -7,7 +7,7 @@ import numpy as np
 from ..utils.helpers import label_to_string
 from ..utils.global_types import OptionTypes
 
-from ..utils.math import N
+from ..utils.math import normcdf
 
 ########################################################################################
 # NOTE: Keeping this separate from SABR for the moment.
@@ -56,9 +56,9 @@ class BlackShifted:
         d2 = d1 - vol * sqrt_t
 
         if call_or_put == OptionTypes.EUROPEAN_CALL:
-            return df * ((f + s) * N(d1) - (k + s) * N(d2))
+            return df * ((f + s) * normcdf(d1) - (k + s) * normcdf(d2))
         elif call_or_put == OptionTypes.EUROPEAN_PUT:
-            return df * ((k + s) * N(-d2) - (f + s) * N(-d1))
+            return df * ((k + s) * normcdf(-d2) - (f + s) * normcdf(-d1))
         else:
             raise ValueError("Option type must be European Call(C) or Put(P)")
 

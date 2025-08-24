@@ -57,7 +57,6 @@ from ...utils.global_types import FinSolverTypes
 
 
 def _g(kk, *args):
-
     """This is the objective function used in the determination of the FX
     option implied strike which is computed in the class below."""
 
@@ -76,8 +75,6 @@ def _g(kk, *args):
 
     obj_fn = delta_target - delta_out
     return obj_fn
-
-
 
 
 @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
@@ -119,7 +116,6 @@ def _interpolate_gap(k, strikes, gaps):
 
 
 def _obj(params, *args):
-
     """Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
     params and specified by the vol_type_value
@@ -356,7 +352,6 @@ def _obj(params, *args):
 
 
 def _obj_gap(gaps, *args):
-
     """Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
     params and specified by the vol_type_value
@@ -568,11 +563,11 @@ def _obj_gap(gaps, *args):
     tot = tot + (term10d_1 + term10d_2)
     return tot
 
+
 ########################################################################################
 
 
 def _solve_to_horizon(
-
     s,
     t,
     rd,
@@ -662,7 +657,6 @@ def _solve_to_horizon(
         v_25d_c_ms = 0.0
         v_25d_p_ms = 0.0
         v_25d_ms = 0.0
-
 
     if use10d is True:
 
@@ -824,7 +818,6 @@ def _solve_to_horizon(
     #    diff = atm_vol - interpATMVol
     #    gaps[2] = diff
 
-
     if use25d is False:
         k_25d_c_ms = k_atm
         k_25d_p_ms = k_atm
@@ -908,8 +901,6 @@ def _solve_to_horizon(
     )
 
 
-
-
 @njit(
     float64(int64, float64[:], float64[:], float64[:], float64, float64, float64),
     cache=True,
@@ -920,7 +911,6 @@ def _solve_to_horizon(
 
 
 def vol_function(vol_function_type_value, params, strikes, gaps, f, k, t):
-
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -958,15 +948,12 @@ def vol_function(vol_function_type_value, params, strikes, gaps, f, k, t):
     raise FinError("Unknown Model Type")
 
 
-
-
 @njit(cache=True, fastmath=True)
 
 ########################################################################################
 
 
 def _delta_fit(k, *args):
-
     """This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol
@@ -1024,7 +1011,6 @@ def _delta_fit(k, *args):
 
 
 def _solver_for_smile_strike(
-
     s,
     t,
     rd,
@@ -1077,7 +1063,6 @@ def _solver_for_smile_strike(
 
 
 def solve_for_strike(
-
     spot_fx_rate,
     t_del,
     rd,
@@ -1097,7 +1082,7 @@ def solve_for_strike(
     # =========================================================================
     # For some delta quotation conventions I can solve for kk explicitly.
     # Note that as I am using the function norminvdelta to calculate the
-    # inverse value of delta, this may not, on a round trip using N(x), give
+    # inverse value of delta, this may not, on a round trip using normcdf(x), give
     # back the value x as it is calculated to a different number of decimal
     # places. It should however agree to 6-7 decimal places. Which is Okk.
     # =========================================================================
@@ -1112,7 +1097,7 @@ def solve_for_strike(
         else:
             phi = -1.0
 
-        fwd_fx_rate = spot_fx_rate * for_df / dom_df
+        fwd_fx_rate = spot_fx_rate * for_df / dom_df normcdf(
         vsqrtt = volatility * np.sqrt(t_del)
         arg = delta_target * phi / for_df  # CHECkk THIS !!!
         norminvdelta = norminvcdf(arg)
@@ -1172,11 +1157,11 @@ def solve_for_strike(
 
     raise FinError("Unknown FinFXDeltaMethod")
 
+
 ########################################################################################
 
 
 class FXVolSurfacePlus:
-
     """Class to perform a calibration of a chosen parametrised surface to the
     prices of FX options at different strikes and expiry tenors. The
     calibration inputs are the ATM and 25 and 10 Delta volatilities in terms of
@@ -1188,11 +1173,9 @@ class FXVolSurfacePlus:
     it might also overfit. Visualising the volatility curve is useful. Also,
     there is no guarantee that the implied pdf will be positive."""
 
-########################################################################################
-
+    ########################################################################################
 
     def __init__(
-
         self,
         value_dt: Date,
         spot_fx_rate: float,
@@ -1335,11 +1318,9 @@ class FXVolSurfacePlus:
 
         self._build_vol_surface(fin_solver_type=fin_solver_type, tol=tol)
 
-########################################################################################
-
+    ########################################################################################
 
     def vol_from_strike_date(self, kk, expiry_dt):
-
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -1435,11 +1416,9 @@ class FXVolSurfacePlus:
 
         return volt
 
-########################################################################################
-
+    ########################################################################################
 
     def delta_to_strike(self, call_delta, expiry_dt, delta_method):
-
         """Interpolates the strike at a delta and expiry date. Linear
         time to expiry interpolation is used in strike."""
 
@@ -1485,7 +1464,6 @@ class FXVolSurfacePlus:
                     index0 = i - 1
                     index1 = i
                     break
-
 
         t0 = self.t_exp[index0]
         t1 = self.t_exp[index1]
@@ -1540,11 +1518,9 @@ class FXVolSurfacePlus:
 
         return kk
 
-########################################################################################
-
+    ########################################################################################
 
     def vol_from_delta_date(self, call_delta, expiry_dt, delta_method=None):
-
         """Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -1682,11 +1658,9 @@ class FXVolSurfacePlus:
 
         return volt, kt
 
-########################################################################################
-
+    ########################################################################################
 
     def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD, tol=1e-8):
-
         """Main function to construct the vol surface."""
 
         s = self.spot_fx_rate
@@ -1949,11 +1923,9 @@ class FXVolSurfacePlus:
                 self.k_10d_p[i],
             ) = res
 
-########################################################################################
-
+    ########################################################################################
 
     def check_calibration(self, verbose: bool, tol: float = 1e-6):
-
         """Compare calibrated vol surface with market and output a report
         which sets out the quality of fit to the ATM and 10 and 25 delta market
         strangles and risk reversals."""
@@ -2563,11 +2535,9 @@ class FXVolSurfacePlus:
                         f"DIFF: {diff * 100.0:9.6f}"
                     )
 
-########################################################################################
-
+    ########################################################################################
 
     def implied_dbns(self, low_fx, high_fx, num_intervals):
-
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""
 
@@ -2616,11 +2586,9 @@ class FXVolSurfacePlus:
 
         return dbns
 
-########################################################################################
-
+    ########################################################################################
 
     def plot_vol_curves(self):
-
         """Generates a plot of each of the vol discount implied by the market
         and fitted."""
 
@@ -2722,8 +2690,7 @@ class FXVolSurfacePlus:
         plt.title(title)
         plt.legend(loc="lower left", bbox_to_anchor=(1, 0))
 
-########################################################################################
-
+    ########################################################################################
 
     def __repr__(self):
 
@@ -2769,12 +2736,9 @@ class FXVolSurfacePlus:
 
         return s
 
-########################################################################################
-
+    ########################################################################################
 
     def _print(self):
-
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
         print(self)
-

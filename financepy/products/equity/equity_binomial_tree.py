@@ -116,7 +116,7 @@ def _value_once(
 
     #        validate_payoff(payoff_type.value,payoff_params)
 
-    payoff_typeValue = payoff_type.value
+    payoff_type_value = payoff_type.value
 
     # this is the size of the step
     dt = time_to_expiry / num_steps
@@ -154,7 +154,7 @@ def _value_once(
     for i_node in range(0, i_time + 1):
         s = stock_values[index + i_node]
         option_values[index + i_node] = _payoff_value(
-            s, payoff_typeValue, payoff_params
+            s, payoff_type_value, payoff_params
         )
 
     # begin backward steps from expiry
@@ -177,15 +177,11 @@ def _value_once(
                 option_values[index + i_node] = hold_value
             elif exercise_type == EquityTreeExerciseTypes.AMERICAN:
                 s = stock_values[index + i_node]
-                exercise_value = _payoff_value(
-                    s, payoff_typeValue, payoff_params
-                )
+                exercise_value = _payoff_value(s, payoff_type_value, payoff_params)
                 option_values[index + i_node] = max(exercise_value, hold_value)
 
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / (
-        stock_values[2] - stock_values[1]
-    )
+    delta = (option_values[2] - option_values[1]) / (stock_values[2] - stock_values[1])
     delta_up = (option_values[5] - option_values[4]) / (
         stock_values[5] - stock_values[4]
     )

@@ -7,7 +7,7 @@ from typing import Union
 import numpy as np
 
 
-from ...utils.math import n_vect  # n_prime_vect
+from ...utils.math import normcdf_vect  # normcdf_prime_vect
 
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
@@ -100,14 +100,10 @@ class FXDoubleDigitalOption:
             raise FinError("Valuation date after expiry date.")
 
         if domestic_curve.value_dt != value_dt:
-            raise FinError(
-                "Domestic Curve valuation date not same as valuation date"
-            )
+            raise FinError("Domestic Curve valuation date not same as valuation date")
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as valuation date"
-            )
+            raise FinError("Foreign Curve valuation date not same as valuation date")
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -148,11 +144,11 @@ class FXDoubleDigitalOption:
             upper_d2 = (ln_s0_k2 + (mu - v2 / 2.0) * t_del) / den
 
             if self.prem_currency == self.for_name:
-                lower_digital = s0 * np.exp(-r_f * t_del) * n_vect(-lower_d2)
-                upper_digital = s0 * np.exp(-r_f * t_del) * n_vect(-upper_d2)
+                lower_digital = s0 * np.exp(-r_f * t_del) * normcdf_vect(-lower_d2)
+                upper_digital = s0 * np.exp(-r_f * t_del) * normcdf_vect(-upper_d2)
             elif self.prem_currency == self.dom_name:
-                lower_digital = np.exp(-r_f * t_del) * n_vect(-lower_d2)
-                upper_digital = np.exp(-r_f * t_del) * n_vect(-upper_d2)
+                lower_digital = np.exp(-r_f * t_del) * normcdf_vect(-lower_d2)
+                upper_digital = np.exp(-r_f * t_del) * normcdf_vect(-upper_d2)
 
             v = (upper_digital - lower_digital) * self.notional
 

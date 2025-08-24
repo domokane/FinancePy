@@ -10,7 +10,7 @@ from scipy import optimize
 from numba import njit
 
 from ..utils.error import FinError
-from ..utils.math import N, accrued_interpolator
+from ..utils.math import normcdf, accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
 from ..utils.global_types import FinExerciseTypes
@@ -31,8 +31,8 @@ SMALL = 1e-10
 
 
 class FinHWEuropeanCalcType(Enum):
-    JAMSHIDIAN = (1,)
-    EXPIRY_ONLY = (2,)
+    JAMSHIDIAN = 1
+    EXPIRY_ONLY = 2
     EXPIRY_TREE = 3
 
 
@@ -70,13 +70,7 @@ def p_fast(t, T, r_t, delta, pt, ptd, pT, _sigma, _a):
 
     term1 = np.log(pT / pt) - (BtT / BtDelta) * np.log(ptd / pt)
 
-    term2 = (
-        (_sigma**2)
-        * (1.0 - np.exp(-2.0 * _a * t))
-        * BtT
-        * (BtT - BtDelta)
-        / (4.0 * _a)
-    )
+    term2 = (_sigma**2) * (1 - np.exp(-2 * _a * t)) * BtT * (BtT - BtDelta) / (4 * _a)
 
     logAhat = term1 - term2
     BhattT = (BtT / BtDelta) * delta
@@ -293,9 +287,7 @@ def american_bond_option_tree_fast(
             tflow = cpn_times[i]
             if tflow >= t_exp:
                 ptflow = _uinterpolate(tflow, _df_times, _df_values, INTERP)
-                zcb = p_fast(
-                    t_exp, tflow, r_t, dt, pt_exp, ptdelta, ptflow, _sigma, _a
-                )
+                zcb = p_fast(t_exp, tflow, r_t, dt, pt_exp, ptdelta, ptflow, _sigma, _a)
                 cpn = cpn_amounts[i]
                 bond_price += cpn * face_amount * zcb
 
@@ -623,9 +615,7 @@ def bermudan_swaption_tree_fast(
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
 
-            elif (
-                exercise_type_int == 2 and flow > G_SMALL and m >= expiry_step
-            ):
+            elif exercise_type_int == 2 and flow > G_SMALL and m >= expiry_step:
 
                 pay_values[m, kN] = max(pay_exercise, hold_pay)
                 rec_values[m, kN] = max(rec_exercise, hold_rec)
@@ -956,9 +946,7 @@ class HWTree:
 
     ########################################################################################
 
-    def option_on_zcb(
-        self, t_exp, t_mat, strike, face_amount, df_times, df_values
-    ):
+    def option_on_zcb(self, t_exp, t_mat, strike, face_amount, df_times, df_values):
         """Price an option on a zero cpn bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date."""
@@ -984,30 +972,20 @@ class HWTree:
         if abs(sigmap) < SMALL:
             sigmap = SMALL
 
-        h = (
-            np.log((face_amount * pt_mat) / (strike * pt_exp)) / sigmap
-            + sigmap / 2.0
-        )
-        call_value = face_amount * pt_mat * N(h) - strike * pt_exp * N(
+        h = np.log((face_amount * pt_mat) / (strike * pt_exp)) / sigmap + sigmap / 2.0
+        call_value = face_amount * pt_mat * normcdf(h) - strike * pt_exp * normcdf(
             h - sigmap
         )
-        put_value = strike * pt_exp * N(
+        put_value = strike * pt_exp * normcdf(
             -h + sigmap
-        ) - face_amount * pt_mat * N(-h)
+        ) - face_amount * pt_mat * normcdf(-h)
 
         return {"call": call_value, "put": put_value}
 
-    ########################################################################################
+    ####################################################################################
 
     def european_bond_option_jamshidian(
-        self,
-        t_exp,
-        strike_price,
-        face,
-        cpn_times,
-        cpn_amounts,
-        df_times,
-        df_values,
+        self, t_exp, strike_price, face, cpn_times, cpn_amounts, df_times, df_values
     ):
         """Valuation of a European bond option using the Jamshidian
         deconstruction of the bond into a strip of zero cpn bonds with the
@@ -1073,9 +1051,7 @@ class HWTree:
                     self.a,
                 )
 
-                v = self.option_on_zcb(
-                    t_exp, t_cpn, strike, 1.0, df_times, df_values
-                )
+                v = self.option_on_zcb(t_exp, t_cpn, strike, 1.0, df_times, df_values)
 
                 call = v["call"]
                 put = v["put"]
@@ -1128,9 +1104,7 @@ class HWTree:
 
                 if t_cpn >= t_exp:
 
-                    pt_cpn = _uinterpolate(
-                        t_cpn, self.df_times, self.dfs, INTERP
-                    )
+                    pt_cpn = _uinterpolate(t_cpn, self.df_times, self.dfs, INTERP)
 
                     zcb = p_fast(
                         t_exp,
@@ -1169,9 +1143,7 @@ class HWTree:
 
     ########################################################################################
 
-    def option_on_zero_cpn_bond_tree(
-        self, t_exp, t_mat, strike_price, face_amount
-    ):
+    def option_on_zero_cpn_bond_tree(self, t_exp, t_mat, strike_price, face_amount):
         """Price an option on a zero cpn bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build."""
 
@@ -1450,9 +1422,7 @@ class HWTree:
         # I wish to add on an additional time to the tree so that the second
         # last time corresponds to a maturity tree_mat. For this reason I scale
         # up the maturity date of the tree as follows
-        tree_maturity = (
-            tree_mat * (self.num_time_steps + 1) / self.num_time_steps
-        )
+        tree_maturity = tree_mat * (self.num_time_steps + 1) / self.num_time_steps
 
         # The vector of times goes out to this maturity
         tree_times = np.linspace(0.0, tree_maturity, self.num_time_steps + 2)
@@ -1468,10 +1438,8 @@ class HWTree:
         self.df_times = df_times
         self.dfs = df_values
 
-        self.qq, self.pu, self.pm, self.pd, self.r_t, self.dt = (
-            build_tree_fast(
-                self.a, self.sigma, tree_times, self.num_time_steps, df_tree
-            )
+        self.qq, self.pu, self.pm, self.pd, self.r_t, self.dt = build_tree_fast(
+            self.a, self.sigma, tree_times, self.num_time_steps, df_tree
         )
 
         return

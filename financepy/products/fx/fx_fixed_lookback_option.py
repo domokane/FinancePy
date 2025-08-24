@@ -6,7 +6,7 @@ from math import exp, log, sqrt
 import numpy as np
 
 
-from ...utils.math import N
+from ...utils.math import normcdf
 from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_paths_times
@@ -31,9 +31,7 @@ from ...market.curves.discount_curve import DiscountCurve
 class FXFixedLookbackOption:
     """The Class for FX Fixed Strike Lookback options."""
 
-    def __init__(
-        self, expiry_dt: Date, opt_type: OptionTypes, option_strike: float
-    ):
+    def __init__(self, expiry_dt: Date, opt_type: OptionTypes, option_strike: float):
         """Create option with expiry date, option type and the option strike"""
 
         check_argument_types(self.__init__, locals())
@@ -68,9 +66,7 @@ class FXFixedLookbackOption:
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -115,33 +111,33 @@ class FXFixedLookbackOption:
                 d2 = d1 - v * sqrt(t)
 
                 if s0 == k:
-                    term = -N(d1 - 2.0 * b * sqrt(t) / v) + expbt * N(d1)
+                    term = -normcdf(d1 - 2.0 * b * sqrt(t) / v) + expbt * normcdf(d1)
                 elif s0 < k and w > 100:
-                    term = expbt * N(d1)
+                    term = expbt * normcdf(d1)
                 else:
-                    term = (-((s0 / k) ** (-w))) * N(
+                    term = (-((s0 / k) ** (-w))) * normcdf(
                         d1 - 2.0 * b * sqrt(t) / v
-                    ) + expbt * N(d1)
+                    ) + expbt * normcdf(d1)
 
-                v = s0 * dq * N(d1) - k * df * N(d2) + s0 * df * u * term
+                v = s0 * dq * normcdf(d1) - k * df * normcdf(d2) + s0 * df * u * term
 
             else:
                 e1 = (log(s0 / s_max) + (b + v * v / 2.0) * t) / v / sqrt(t)
                 e2 = e1 - v * sqrt(t)
 
                 if s0 == s_max:
-                    term = -N(e1 - 2.0 * b * sqrt(t) / v) + expbt * N(e1)
+                    term = -normcdf(e1 - 2.0 * b * sqrt(t) / v) + expbt * normcdf(e1)
                 elif s0 < s_max and w > 100:
-                    term = expbt * N(e1)
+                    term = expbt * normcdf(e1)
                 else:
-                    term = (-((s0 / s_max) ** (-w))) * N(
+                    term = (-((s0 / s_max) ** (-w))) * normcdf(
                         e1 - 2.0 * b * sqrt(t) / v
-                    ) + expbt * N(e1)
+                    ) + expbt * normcdf(e1)
 
                 v = (
                     df * (s_max - k)
-                    + s0 * dq * N(e1)
-                    - s_max * df * N(e2)
+                    + s0 * dq * normcdf(e1)
+                    - s_max * df * normcdf(e2)
                     + s0 * df * u * term
                 )
 
@@ -152,18 +148,18 @@ class FXFixedLookbackOption:
                 f2 = f1 - v * sqrt(t)
 
                 if s0 == s_min:
-                    term = N(-f1 + 2.0 * b * sqrt(t) / v) - expbt * N(-f1)
+                    term = normcdf(-f1 + 2.0 * b * sqrt(t) / v) - expbt * normcdf(-f1)
                 elif s0 > s_min and w < -100:
-                    term = -expbt * N(-f1)
+                    term = -expbt * normcdf(-f1)
                 else:
-                    term = ((s0 / s_min) ** (-w)) * N(
+                    term = ((s0 / s_min) ** (-w)) * normcdf(
                         -f1 + 2.0 * b * sqrt(t) / v
-                    ) - expbt * N(-f1)
+                    ) - expbt * normcdf(-f1)
 
                 v = (
                     df * (k - s_min)
-                    - s0 * dq * N(-f1)
-                    + s_min * df * N(-f2)
+                    - s0 * dq * normcdf(-f1)
+                    + s_min * df * normcdf(-f2)
                     + s0 * df * u * term
                 )
 
@@ -171,20 +167,18 @@ class FXFixedLookbackOption:
                 d1 = (log(s0 / k) + (b + v * v / 2) * t) / v / sqrt(t)
                 d2 = d1 - v * sqrt(t)
                 if s0 == k:
-                    term = N(-d1 + 2.0 * b * sqrt(t) / v) - expbt * N(-d1)
+                    term = normcdf(-d1 + 2.0 * b * sqrt(t) / v) - expbt * normcdf(-d1)
                 elif s0 > k and w < -100:
-                    term = -expbt * N(-d1)
+                    term = -expbt * normcdf(-d1)
                 else:
-                    term = ((s0 / k) ** (-w)) * N(
+                    term = ((s0 / k) ** (-w)) * normcdf(
                         -d1 + 2.0 * b * sqrt(t) / v
-                    ) - expbt * N(-d1)
+                    ) - expbt * normcdf(-d1)
 
-                v = k * df * N(-d2) - s0 * dq * N(-d1) + s0 * df * u * term
+                v = k * df * normcdf(-d2) - s0 * dq * normcdf(-d1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.opt_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.opt_type))
 
         return v
 
@@ -226,15 +220,11 @@ class FXFixedLookbackOption:
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             s_max = spot_fx_rate_min_max
             if s_max < s_0:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             s_min = spot_fx_rate_min_max
             if s_min > s_0:
-                raise FinError(
-                    "s_min must be less than or equal to the stock price."
-                )
+                raise FinError("s_min must be less than or equal to the stock price.")
 
         t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, s_0, volatility, seed
@@ -248,9 +238,9 @@ class FXFixedLookbackOption:
             payoff = np.maximum(s_max_vector - k, 0.0)
             payoff = np.maximum(payoff, s_maxs - k)
         elif opt_type == OptionTypes.EUROPEAN_PUT:
-            s_min_vector = np.min(s_all, axis=1)
+            s_minormcdf_vector = np.min(s_all, axis=1)
             s_mins = np.ones(num_paths) * s_min
-            payoff = np.maximum(k - s_min_vector, 0.0)
+            payoff = np.maximum(k - s_minormcdf_vector, 0.0)
             payoff = np.maximum(payoff, k - s_mins)
         else:
             raise FinError("Unknown lookback option type:" + str(opt_type))

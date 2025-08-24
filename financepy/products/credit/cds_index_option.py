@@ -11,7 +11,7 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEARS
-from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, N
+from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, normcdf
 from ...utils.error import FinError
 from ...products.credit.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
@@ -104,9 +104,7 @@ class CDSIndexOption:
         strike_rpv01 = self.cds_contract.risky_pv01(value_dt, strike_curve)[
             "clean_rpv01"
         ]
-        index_rpv01 = self.cds_contract.risky_pv01(value_dt, index_curve)[
-            "clean_rpv01"
-        ]
+        index_rpv01 = self.cds_contract.risky_pv01(value_dt, index_curve)["clean_rpv01"]
 
         s = self.cds_contract.par_spread(value_dt, index_curve)
 
@@ -120,8 +118,8 @@ class CDSIndexOption:
         d1 /= denom
         d2 /= denom
 
-        v_pay = (adj_fwd * N(d1) - adj_strike * N(d2)) * index_rpv01
-        v_rec = (adj_strike * N(-d2) - adj_fwd * N(-d1)) * index_rpv01
+        v_pay = (adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)) * index_rpv01
+        v_rec = (adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)) * index_rpv01
 
         v_pay *= self.notional
         v_rec *= self.notional
@@ -146,13 +144,9 @@ class CDSIndexOption:
         k = self.strike_cpn
         c = self.index_cpn
 
-        strike_cds = CDS(
-            self.expiry_dt, self.maturity_dt, self.strike_cpn, 1.0
-        )
+        strike_cds = CDS(self.expiry_dt, self.maturity_dt, self.strike_cpn, 1.0)
 
-        strike_curve = CDSCurve(
-            value_dt, [strike_cds], libor_curve, index_recovery
-        )
+        strike_curve = CDSCurve(value_dt, [strike_cds], libor_curve, index_recovery)
         strike_rpv01s = strike_cds.risky_pv01(value_dt, strike_curve)
         q_to_expiry = strike_curve.survival_prob(time_to_expiry)
         strike_value = (k - c) * strike_rpv01s["clean_rpv01"]
@@ -177,9 +171,7 @@ class CDSIndexOption:
 
         exp_h = (h1 + h2) / num_credits
 
-        x = self._solve_for_x(
-            value_dt, sigma, c, index_recovery, libor_curve, exp_h
-        )
+        x = self._solve_for_x(value_dt, sigma, c, index_recovery, libor_curve, exp_h)
 
         v = self._calc_index_payer_option_price(
             value_dt, x, sigma, c, strike_value, libor_curve, index_recovery

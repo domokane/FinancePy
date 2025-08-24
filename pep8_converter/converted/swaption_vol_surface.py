@@ -87,14 +87,12 @@ from ...utils.global_types import FinSolverTypes
 #     return v
 
 
-
 @njit(fastmath=True, cache=True)
 
 ########################################################################################
 
 
 def _obj(params, *args):
-
     """Return a value that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
     params and specified by the vol_type_value at a single time slice only.
@@ -128,7 +126,6 @@ def _obj(params, *args):
 
 
 def _solve_to_horizon(
-
     t,
     f,
     strikes_grid,
@@ -179,8 +176,6 @@ def _solve_to_horizon(
     return params
 
 
-
-
 @njit(
     float64(int64, float64[:], float64, float64, float64),
     cache=True,
@@ -191,7 +186,6 @@ def _solve_to_horizon(
 
 
 def vol_function(vol_function_type_value, params, f, k, t):
-
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -221,8 +215,6 @@ def vol_function(vol_function_type_value, params, f, k, t):
         return vol
     else:
         raise FinError("Unknown Model Type")
-
-
 
 
 # @njit(cache=True, fastmath=True)
@@ -305,7 +297,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     # ======================================================================
 #     # For some delta quotation conventions I can solve for k explicitly.
 #     # Note that as I am using the function norm_inv_delta to calculate the
-#     # inverse value of delta, this may not, on a round trip using N(x), give
+#     # inverse value of delta, this may not, on a round trip using normcdf(x), give
 #     # back the value x as it is calculated to a different number of decimal
 #     # places. It should however agree to 6-7 decimal places. Which is OK.
 #     # ======================================================================
@@ -372,18 +364,15 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 
 class SwaptionVolSurface:
-
     """Class to perform a calibration of a chosen parametrised surface to the
     prices of swaptions at different expiry dates and swap tenors. There is a
     choice of volatility function from cubic in delta to full SABR and SSVI.
     Check out VolFuncTypes. Visualising the volatility curve is useful.
     Also, there is no guarantee that the implied pdf will be positive."""
 
-########################################################################################
-
+    ########################################################################################
 
     def __init__(
-
         self,
         value_dt: Date,
         expiry_dts: list,
@@ -436,11 +425,9 @@ class SwaptionVolSurface:
     #        self._strikes = []
     #        self._vol_grid = []
 
-########################################################################################
-
+    ########################################################################################
 
     def vol_from_strike_dt(self, k, expiry_dt):
-
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -519,7 +506,6 @@ class SwaptionVolSurface:
             volt = vol1
 
         return volt
-
 
     # def delta_to_strike(self, call_delta, expiry_dt, delta_method):
     #     """ Interpolates the strike at a delta and expiry date. Linear
@@ -613,7 +599,6 @@ class SwaptionVolSurface:
     #         k = k_1
 
     #     return k
-
 
     # def vol_from_delta_date(self, call_delta, expiry_dt,
     #                                delta_method = None):
@@ -732,11 +717,9 @@ class SwaptionVolSurface:
 
     #     return volt, kt
 
-########################################################################################
-
+    ########################################################################################
 
     def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
-
         """Main function to construct the vol surface."""
 
         if self._vol_func_type == VolFuncTypes.CLARK:
@@ -801,11 +784,9 @@ class SwaptionVolSurface:
             x_init = res
             x_inits.append(x_init)
 
-########################################################################################
-
+    ########################################################################################
 
     def check_calibration(self, verbose: bool, tol: float = 1e-6):
-
         """Compare calibrated vol surface with market and output a report
         which sets out the quality of fit to the ATM and 10 and 25 delta market
         strangles and risk reversals."""
@@ -844,7 +825,6 @@ class SwaptionVolSurface:
                 )
 
         print("==========================================================")
-
 
     # def implied_dbns(self, low_s, high_s, num_intervals):
     #     """ Calculate the pdf for each tenor horizon. Returns a list of
@@ -889,11 +869,9 @@ class SwaptionVolSurface:
 
     #     return dbns
 
-########################################################################################
-
+    ########################################################################################
 
     def plot_vol_curves(self):
-
         """Generates a plot of each of the vol discount implied by the market
         and fitted."""
 
@@ -939,8 +917,7 @@ class SwaptionVolSurface:
             plt.title(title)
             plt.legend()
 
-########################################################################################
-
+    ########################################################################################
 
     def __repr__(self):
 
@@ -969,12 +946,9 @@ class SwaptionVolSurface:
 
         return s
 
-########################################################################################
-
+    ########################################################################################
 
     def _print(self):
-
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
         print(self)
-

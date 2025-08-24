@@ -12,8 +12,9 @@ x = -3.0
 
 def test_normcdf1():
 
-    result = N(x)
+    result = normcdf(x)
     assert round(result, 5) == 0.00135
+
 
 ########################################################################################
 
@@ -23,6 +24,7 @@ def test_normcdf2():
     result = normcdf_slow(x)
     assert round(result, 5) == 0.00135
 
+
 ########################################################################################
 
 
@@ -30,6 +32,7 @@ def test_normcdf_integrate():
 
     result = normcdf_integrate(x)
     assert round(result, 5) == 0.00135
+
 
 ########################################################################################
 

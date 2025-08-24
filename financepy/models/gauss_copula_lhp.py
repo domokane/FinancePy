@@ -7,7 +7,7 @@ import numpy as np
 
 ########################################################################################
 
-from ..utils.math import N
+from ..utils.math import normcdf
 from ..utils.math import normpdf, norminvcdf, M
 from ..utils.error import FinError
 
@@ -15,9 +15,7 @@ from ..utils.error import FinError
 
 
 @njit(fastmath=True, cache=True)
-def tr_surv_prob_lhp(
-    k1, k2, num_credits, survival_probs, recovery_rates, beta
-):
+def tr_surv_prob_lhp(k1, k2, num_credits, survival_probs, recovery_rates, beta):
     """Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the large portfolio limit which
     assumes a homogenous portfolio with an infinite number of credits. This
@@ -82,7 +80,7 @@ def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta):
     c = norminvcdf(p)
     arga = k / (1.0 - recovery)
     a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
-    return N(-a)
+    return normcdf(-a)
 
 
 ########################################################################################
@@ -110,7 +108,7 @@ def exp_min_lk(k, p, r, n, beta):
     arga = k / (1.0 - r) / n
 
     a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
-    el1 = (1.0 - r) * M(c, -a, -beta) + k * N(a)
+    el1 = (1.0 - r) * M(c, -a, -beta) + k * normcdf(a)
     return el1
 
 
@@ -138,12 +136,12 @@ def lhp_density(k, p, r, beta):
     dk = 0.0000001
 
     a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
-    term1 = N(a)
+    term1 = normcdf(a)
 
     arga = (k + dk) / (1.0 - r)
     a = 1.0 / beta * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
 
-    term2 = N(a)
+    term2 = normcdf(a)
     rho = -(term2 - term1) / dk
 
     return rho
@@ -243,7 +241,7 @@ def exp_min_lk(k, p, r, n, beta):
     arga = k / (1.0 - r) / n
 
     a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
-    el = (1.0 - r) * M(c, -a, -beta) + k * N(a)
+    el = (1.0 - r) * M(c, -a, -beta) + k * normcdf(a)
 
     return el
 """
@@ -255,7 +253,7 @@ def prob_l_greater_than_k(k, p, r, beta):
     c = normpdf(p)
     arga = k / (1.0 - r)
     a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
-    prob = 1.0 - N(a)
+    prob = 1.0 - normcdf(a)
     return prob
 
 

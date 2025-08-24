@@ -20,7 +20,7 @@ from ...utils.helpers import _func_name
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
-from ...utils.math import N
+from ...utils.math import normcdf
 
 
 ########################################################################################
@@ -52,24 +52,16 @@ class EquityBasketOption:
 
     ###########################################################################
 
-    def _validate(
-        self, stock_prices, dividend_yields, volatilities, correlations
-    ):
+    def _validate(self, stock_prices, dividend_yields, volatilities, correlations):
 
         if len(stock_prices) != self.num_assets:
-            raise FinError(
-                "Stock prices must have a length " + str(self.num_assets)
-            )
+            raise FinError("Stock prices must have a length " + str(self.num_assets))
 
         if len(dividend_yields) != self.num_assets:
-            raise FinError(
-                "Dividend yields must have a length " + str(self.num_assets)
-            )
+            raise FinError("Dividend yields must have a length " + str(self.num_assets))
 
         if len(volatilities) != self.num_assets:
-            raise FinError(
-                "Volatilities must have a length " + str(self.num_assets)
-            )
+            raise FinError("Volatilities must have a length " + str(self.num_assets))
 
         if correlations.ndim != 2:
             raise FinError("Correlation must be a 2D matrix ")
@@ -171,11 +163,11 @@ class EquityBasketOption:
         d2 = (ln_s0_k + (mu - vhat2 / 2.0) * t_exp) / den
 
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
-            v = smean * np.exp(-qhat * t_exp) * N(d1)
-            v = v - self.strike_price * np.exp(-r * t_exp) * N(d2)
+            v = smean * np.exp(-qhat * t_exp) * normcdf(d1)
+            v = v - self.strike_price * np.exp(-r * t_exp) * normcdf(d2)
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
-            v = self.strike_price * np.exp(-r * t_exp) * N(-d2)
-            v = v - smean * np.exp(-qhat * t_exp) * N(-d1)
+            v = self.strike_price * np.exp(-r * t_exp) * normcdf(-d2)
+            v = v - smean * np.exp(-qhat * t_exp) * normcdf(-d1)
         else:
             raise FinError("Unknown option type")
 
@@ -213,9 +205,7 @@ class EquityBasketOption:
             q = -np.log(dq) / t_exp
             dividend_yields.append(q)
 
-        self._validate(
-            stock_prices, dividend_yields, volatilities, corr_matrix
-        )
+        self._validate(stock_prices, dividend_yields, volatilities, corr_matrix)
 
         num_assets = len(stock_prices)
 

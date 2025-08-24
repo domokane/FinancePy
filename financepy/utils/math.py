@@ -145,7 +145,7 @@ def minaxis(s: np.ndarray):
     2D Numpy Array"""
     shp = s.shape
 
-    min_vector = np.empty(shp[0])
+    minormcdf_vector = np.empty(shp[0])
 
     for i in range(0, shp[0]):
         xmin = s[i, 0]
@@ -153,9 +153,9 @@ def minaxis(s: np.ndarray):
             x = s[i, j]
             xmin = min(xmin, x)
 
-        min_vector[i] = xmin
+        minormcdf_vector[i] = xmin
 
-    return min_vector
+    return minormcdf_vector
 
 
 ########################################################################################
@@ -226,17 +226,6 @@ def pair_gcd(v1: float, v2: float):
 
 
 @njit(fastmath=True, cache=True)
-def nprime(x: float):
-    """Calculate the first derivative of the Cumulative Normal CDF which is
-    simply the PDF of the Normal Distribution"""
-
-    return np.exp(-x * x / 2.0) * INV_ROOT_2_PI
-
-
-########################################################################################
-
-
-@njit(fastmath=True, cache=True)
 def heaviside(x: float):
     """Calculate the Heaviside function for x"""
     if x >= 0.0:
@@ -263,6 +252,17 @@ def frange(start: int, stop: int, step: int):
 
 
 @njit(fastmath=True, cache=True)
+def normcdf_prime(x: float):
+    """Calculate the first derivative of the Cumulative Normal CDF which is
+    simply the PDF of the Normal Distribution"""
+
+    return np.exp(-x * x / 2.0) * INV_ROOT_2_PI
+
+
+########################################################################################
+
+
+@njit(fastmath=True, cache=True)
 def normpdf(x: float):
     """Calculate the probability density function for a Gaussian (Normal)
     function at value x"""
@@ -273,7 +273,7 @@ def normpdf(x: float):
 
 
 @njit(float64(float64), fastmath=True, cache=True)
-def N(x):
+def normcdf(x):
     """Fast Normal CDF function based on Hull OFAODS  4th Edition Page 252.
     This function is accurate to 6 decimal places."""
 
@@ -294,7 +294,7 @@ def N(x):
         c = a1 * k + a2 * k2 + a3 * k3 + a4 * k4 + a5 * k5
         phi = 1.0 - c * np.exp(-x * x / 2.0) * INV_ROOT_2_PI
     else:
-        phi = 1.0 - N(-x)
+        phi = 1.0 - normcdf(-x)
 
     return phi
 
@@ -303,16 +303,16 @@ def N(x):
 
 
 @vectorize([float64(float64)], fastmath=True, cache=True)
-def n_vect(x):
-    return N(x)
+def normcdf_vect(x):
+    return normcdf(x)
 
 
 ########################################################################################
 
 
 @vectorize([float64(float64)], fastmath=True, cache=True)
-def n_prime_vect(x):
-    return nprime(x)
+def normcdf_prime_vect(x):
+    return normcdf_prime(x)
 
 
 ########################################################################################
@@ -432,7 +432,7 @@ def normcdf_slow(z: float):
 
 
 # @vectorize([float64(float64)], fastmath=True, cache=True)
-# def N(x: float):
+# def normcdf(x: float):
 #     """ This is the shortcut to the default Normal CDF function and currently
 #     is hardcoded to the fastest of the implemented routines. This is the most
 #     widely used way to access the Normal CDF. """
@@ -462,7 +462,7 @@ def phi3(b1: float, b2: float, b3: float, r12: float, r13: float, r23: float):
     v = 0.0
 
     for _ in range(1, num_points + 1):
-        dp = N(x + dx) - N(x)
+        dp = normcdf(x + dx) - normcdf(x)
         h = (b2 - r12 * x) / r12p
         k = (b3 - r13 * x) / r13p
         bivariate = M(h, k, r123)
@@ -526,9 +526,9 @@ def norminvcdf(p):
     if p < p_low:
         # Rational approximation for lower region
         q = np.sqrt(-2.0 * np.log(p))
-        inverse_cdf = (
-            ((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6
-        ) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+        inverse_cdf = (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) / (
+            (((d1 * q + d2) * q + d3) * q + d4) * q + 1.0
+        )
     elif p <= p_high:
         # Rational approximation for lower region
         q = p - 0.5
@@ -541,15 +541,15 @@ def norminvcdf(p):
     elif p < 1.0:
         # Rational approximation for upper region
         q = np.sqrt(-2.0 * np.log(1 - p))
-        inverse_cdf = -(
-            ((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6
-        ) / ((((d1 * q + d2) * q + d3) * q + d4) * q + 1.0)
+        inverse_cdf = -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) / (
+            (((d1 * q + d2) * q + d3) * q + d4) * q + 1.0
+        )
 
     return inverse_cdf
 
 
 ########################################################################################
-# This is used for consistency with Haug and its conciseness. Consider renaming
+# This is named for consistency with Haug and its conciseness. Consider renaming
 # phi2 to M
 
 
@@ -596,7 +596,7 @@ def phi2(h1, hk, r):
             rr2 = 1.0 - r1 * r1
             bv = bv + w[i] * np.exp((r1 * h3 - h12) / rr2) / np.sqrt(rr2)
 
-        bv = N(h1) * N(h2) + r * bv
+        bv = normcdf(h1) * normcdf(h2) + r * bv
     else:
         r2 = 1.0 - r * r
         r3 = np.sqrt(r2)
@@ -614,7 +614,7 @@ def phi2(h1, hk, r):
             aa = 0.5 - h3 * 0.125
             ab = 3.0 - 2.0 * aa * h5
             bv = (
-                0.13298076 * h6 * ab * N(-h6)
+                0.13298076 * h6 * ab * normcdf(-h6)
                 - np.exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
             )
 
@@ -627,12 +627,12 @@ def phi2(h1, hk, r):
                 )
 
         if r > 0.0:
-            bv = bv * r3 * h7 + N(min(h1, h2))
+            bv = bv * r3 * h7 + normcdf(min(h1, h2))
         else:
             if h1 < h2:
                 bv = -bv * r3 * h7
             else:
-                bv = -bv * r3 * h7 + N(h1) + N(hk) - 1.0
+                bv = -bv * r3 * h7 + normcdf(h1) + normcdf(hk) - 1.0
 
     return bv
 

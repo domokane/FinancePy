@@ -7,7 +7,7 @@ from numba import float64, int64, vectorize
 
 from ..utils.error import FinError
 from ..utils.global_types import EquityBarrierTypes
-from ..utils.math import N
+from ..utils.math import normcdf
 
 
 # Calculates the Barrier option price using an Analytical Approach
@@ -47,8 +47,8 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
     df = np.exp(-r * t)
     dq = np.exp(-q * t)
 
-    c = s * dq * N(+d1) - k * df * N(+d2)
-    p = k * df * N(-d2) - s * dq * N(-d1)
+    c = s * dq * normcdf(+d1) - k * df * normcdf(+d2)
+    p = k * df * normcdf(-d2) - s * dq * normcdf(-d1)
 
     if s >= h:
 
@@ -130,41 +130,41 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
     if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
         if h >= k:
             c_do = (
-                s * dq * N(x1)
-                - k * df * N(x1 - sigma_rt_t)
-                - s * dq * pow(h_over_s, 2.0 * ll) * N(y1)
-                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(y1 - sigma_rt_t)
+                s * dq * normcdf(x1)
+                - k * df * normcdf(x1 - sigma_rt_t)
+                - s * dq * pow(h_over_s, 2.0 * ll) * normcdf(y1)
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(y1 - sigma_rt_t)
             )
             price = c_do
         else:
-            c_di = s * dq * pow(h_over_s, 2.0 * ll) * N(y) - k * df * pow(
+            c_di = s * dq * pow(h_over_s, 2.0 * ll) * normcdf(y) - k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
-            ) * N(y - sigma_rt_t)
+            ) * normcdf(y - sigma_rt_t)
             price = c - c_di
     elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
         if h <= k:
-            c_di = s * dq * pow(h_over_s, 2.0 * ll) * N(y) - k * df * pow(
+            c_di = s * dq * pow(h_over_s, 2.0 * ll) * normcdf(y) - k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
-            ) * N(y - sigma_rt_t)
+            ) * normcdf(y - sigma_rt_t)
             price = c_di
         else:
             c_do = (
-                s * dq * N(x1)
-                - k * df * N(x1 - sigma_rt_t)
-                - s * dq * pow(h_over_s, 2.0 * ll) * N(y1)
-                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(y1 - sigma_rt_t)
+                s * dq * normcdf(x1)
+                - k * df * normcdf(x1 - sigma_rt_t)
+                - s * dq * pow(h_over_s, 2.0 * ll) * normcdf(y1)
+                + k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(y1 - sigma_rt_t)
             )
             price = c - c_do
     elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
         if h >= k:
             c_ui = (
-                s * dq * N(x1)
-                - k * df * N(x1 - sigma_rt_t)
-                - s * dq * pow(h_over_s, 2.0 * ll) * (N(-y) - N(-y1))
+                s * dq * normcdf(x1)
+                - k * df * normcdf(x1 - sigma_rt_t)
+                - s * dq * pow(h_over_s, 2.0 * ll) * (normcdf(-y) - normcdf(-y1))
                 + k
                 * df
                 * pow(h_over_s, 2.0 * ll - 2.0)
-                * (N(-y + sigma_rt_t) - N(-y1 + sigma_rt_t))
+                * (normcdf(-y + sigma_rt_t) - normcdf(-y1 + sigma_rt_t))
             )
             price = c_ui
         else:
@@ -172,43 +172,43 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
     elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
         if h > k:
             c_ui = (
-                s * dq * N(x1)
-                - k * df * N(x1 - sigma_rt_t)
-                - s * dq * pow(h_over_s, 2.0 * ll) * (N(-y) - N(-y1))
+                s * dq * normcdf(x1)
+                - k * df * normcdf(x1 - sigma_rt_t)
+                - s * dq * pow(h_over_s, 2.0 * ll) * (normcdf(-y) - normcdf(-y1))
                 + k
                 * df
                 * pow(h_over_s, 2.0 * ll - 2.0)
-                * (N(-y + sigma_rt_t) - N(-y1 + sigma_rt_t))
+                * (normcdf(-y + sigma_rt_t) - normcdf(-y1 + sigma_rt_t))
             )
             price = c - c_ui
         else:
             price = 0.0
     elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
         if h > k:
-            p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * N(-y) + k * df * pow(
+            p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
-            ) * N(-y + sigma_rt_t)
+            ) * normcdf(-y + sigma_rt_t)
             price = p_ui
         else:
             p_uo = (
-                -s * dq * N(-x1)
-                + k * df * N(-x1 + sigma_rt_t)
-                + s * dq * pow(h_over_s, 2.0 * ll) * N(-y1)
-                - k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(-y1 + sigma_rt_t)
+                -s * dq * normcdf(-x1)
+                + k * df * normcdf(-x1 + sigma_rt_t)
+                + s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y1)
+                - k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(-y1 + sigma_rt_t)
             )
             price = p - p_uo
     elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
         if h >= k:
-            p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * N(-y) + k * df * pow(
+            p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
-            ) * N(-y + sigma_rt_t)
+            ) * normcdf(-y + sigma_rt_t)
             price = p - p_ui
         else:
             p_uo = (
-                -s * dq * N(-x1)
-                + k * df * N(-x1 + sigma_rt_t)
-                + s * dq * pow(h_over_s, 2.0 * ll) * N(-y1)
-                - k * df * pow(h_over_s, 2.0 * ll - 2.0) * N(-y1 + sigma_rt_t)
+                -s * dq * normcdf(-x1)
+                + k * df * normcdf(-x1 + sigma_rt_t)
+                + s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y1)
+                - k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(-y1 + sigma_rt_t)
             )
             price = p_uo
     elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
@@ -216,13 +216,13 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
             price = 0.0
         else:
             p_di = (
-                -s * dq * N(-x1)
-                + k * df * N(-x1 + sigma_rt_t)
-                + s * dq * pow(h_over_s, 2.0 * ll) * (N(y) - N(y1))
+                -s * dq * normcdf(-x1)
+                + k * df * normcdf(-x1 + sigma_rt_t)
+                + s * dq * pow(h_over_s, 2.0 * ll) * (normcdf(y) - normcdf(y1))
                 - k
                 * df
                 * pow(h_over_s, 2.0 * ll - 2.0)
-                * (N(y - sigma_rt_t) - N(y1 - sigma_rt_t))
+                * (normcdf(y - sigma_rt_t) - normcdf(y1 - sigma_rt_t))
             )
             price = p - p_di
     elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
@@ -230,13 +230,13 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
             price = p
         else:
             p_di = (
-                -s * dq * N(-x1)
-                + k * df * N(-x1 + sigma_rt_t)
-                + s * dq * pow(h_over_s, 2.0 * ll) * (N(y) - N(y1))
+                -s * dq * normcdf(-x1)
+                + k * df * normcdf(-x1 + sigma_rt_t)
+                + s * dq * pow(h_over_s, 2.0 * ll) * (normcdf(y) - normcdf(y1))
                 - k
                 * df
                 * pow(h_over_s, 2.0 * ll - 2.0)
-                * (N(y - sigma_rt_t) - N(y1 - sigma_rt_t))
+                * (normcdf(y - sigma_rt_t) - normcdf(y1 - sigma_rt_t))
             )
             price = p_di
     else:

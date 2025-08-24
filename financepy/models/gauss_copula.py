@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from ..utils.math import N
+from ..utils.math import normcdf
 from ..utils.helpers import uniform_to_default_time
 
 ########################################################################################
@@ -30,7 +30,7 @@ def default_times_gc(issuer_curves, corr_matrix, num_trials, seed):
         issuer_curve = issuer_curves[i_credit]
         for i_trial in range(0, num_trials):
             g = y[i_credit, i_trial]
-            u1 = 1.0 - N(g)
+            u1 = 1.0 - normcdf(g)
             u2 = 1.0 - u1
             times = issuer_curve._times
             qs = issuer_curve._qs

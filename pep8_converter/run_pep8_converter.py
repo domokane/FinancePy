@@ -1,4 +1,5 @@
 from hmac import new
+from operator import is_
 import os
 import re
 import ast
@@ -167,14 +168,62 @@ def normalize_hashes_and_functions(source: str) -> str:
         if stripped.startswith("#") and set(stripped.strip()) == {"#"}:
             i += 1
             continue
-        is_def_or_class = stripped.startswith(("def ", "class "))
-        if is_def_or_class:
+
+        is_vectorize = stripped.startswith("@vectorize")
+
+        if is_vectorize:
+            while new_lines and new_lines[-1].strip() == "":
+                new_lines.pop()
+
+            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
+
+            while lines[i].find("def ") == -1 and i < n:
+                print("VECTORIZE LINE:", lines[i])
+                new_lines.append(lines[i])
+                i += 1
+
+                continue
+
+            while lines[i].strip() != "" and i < n:
+                new_lines.append(lines[i])
+                i += 1
+                continue
+
+            line = lines[i]
+            stripped = line.lstrip()
+
+        is_njit = stripped.startswith("@njit")
+
+        if is_njit:
+            while new_lines and new_lines[-1].strip() == "":
+                new_lines.pop()
+            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
+            new_lines.append(lines[i])
+            i += 1
+            new_lines.append(lines[i])
+            i += 1
+            continue
+
+        is_def = stripped.startswith("def ")
+
+        if is_def:
             while new_lines and new_lines[-1].strip() == "":
                 new_lines.pop()
             new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
             new_lines.append(line)
             i += 1
             continue
+
+        is_class = stripped.startswith("class ")
+
+        if is_class:
+            while new_lines and new_lines[-1].strip() == "":
+                new_lines.pop()
+            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
+            new_lines.append(line)
+            i += 1
+            continue
+
         new_lines.append(line)
         i += 1
     if not new_lines or new_lines[-1].strip() != "":
@@ -292,5 +341,6 @@ if __name__ == "__main__":
     TARGET_FOLDER_RELATIVE_PATH = "../unit_tests"
     TARGET_FOLDER_RELATIVE_PATH = "../financepy/market/curves"
     TARGET_FOLDER_RELATIVE_PATH = "../financepy/market/volatility"
+    TARGET_FOLDER_RELATIVE_PATH = "../financepy/models"
     convert_folder(TARGET_FOLDER_RELATIVE_PATH)
     print("PEP8 conversion complete.")

@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
-from ..utils.math import N
+from ..utils.math import normcdf
 from ..utils.helpers import label_to_string
 
 ########################################################################################
@@ -65,12 +65,7 @@ def vol_function_shifted_sabr(params, f, k, t):
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = (
-            alpha
-            * z
-            * (1.0 + (a + b + c) * t)
-            / (d * (1.0 + v + w) * _x(rho, z))
-        )
+        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
         return vz
 
     v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
@@ -103,9 +98,7 @@ class SABRShifted:
     def black_vol(self, f, k, t):
         """Black volatility from SABR model using Hagan et al. approx."""
 
-        params = np.array(
-            [self._alpha, self._beta, self._rho, self._nu, self._shift]
-        )
+        params = np.array([self._alpha, self._beta, self._rho, self._nu, self._shift])
 
         # I wish to enable vectorisations
         if isinstance(f, np.ndarray):
@@ -161,18 +154,16 @@ class SABRShifted:
         d2 = d1 - vol * sqrt_t
 
         if call_or_put == OptionTypes.EUROPEAN_CALL:
-            return df * (f * N(d1) - k * N(d2))
+            return df * (f * normcdf(d1) - k * normcdf(d2))
         elif call_or_put == OptionTypes.EUROPEAN_PUT:
-            return df * (k * N(-d2) - f * N(-d1))
+            return df * (k * normcdf(-d2) - f * normcdf(-d1))
 
         raise Exception("Option type must be a European Call(C) or Put(P)")
 
     ########################################################################################
 
-    def set_alpha_from_black_vol(
-        self, black_vol, forward, strike, time_to_expiry
-    ):
-        """Estimate the value of the alpha coefficient of the SABR model
+    def set_alpha_from_black_vol(self, black_vol, forward, strike, time_to_expiry):
+        """Estimate the valu normcdf(f the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
         to the input black vol. This uses a numerical 1D solver."""
 
@@ -189,15 +180,12 @@ class SABRShifted:
             # Objective function
             def fn(x):
                 return np.sqrt(
-                    (black_vol - self.black_vol_with_alpha(x, f, K, t_exp))
-                    ** 2
+                    (black_vol - self.black_vol_with_alpha(x, f, K, t_exp)) ** 2
                 )
 
             bnds = ((0.0, None),)
             x0 = init_alpha
-            results = minimize(
-                fn, x0, method="L-BFGS-B", bounds=bnds, tol=1e-8
-            )
+            results = minimize(fn, x0, method="L-BFGS-B", bounds=bnds, tol=1e-8)
             alpha = results.x[0]
         else:
             alpha = init_alpha
@@ -206,9 +194,7 @@ class SABRShifted:
 
     ########################################################################################
 
-    def set_alpha_from_atm_black_vol(
-        self, black_vol, atm_strike, time_to_expiry
-    ):
+    def set_alpha_from_atm_black_vol(self, black_vol, atm_strike, time_to_expiry):
         """We solve cubic equation for the unknown variable alpha for the
         special ATM case of the strike equalling the forward following Hagan
         and al. equation (3.3). We take the smallest real root as the preferred
@@ -227,9 +213,7 @@ class SABRShifted:
         coeff0 = -black_vol * (K ** (1.0 - self._beta))
         coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
         coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K ** (1.0 - beta)))
-        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (
-            24.0 * (K ** (2.0 - 2.0 * beta))
-        )
+        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (24.0 * (K ** (2.0 - 2.0 * beta)))
         coeffs = [coeff3, coeff2, coeff1, coeff0]
         roots = np.roots(coeffs)
 

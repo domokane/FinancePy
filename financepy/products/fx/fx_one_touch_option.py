@@ -18,7 +18,7 @@ from ...products.fx.fx_option import FXOption
 
 from numba import njit
 
-from ...utils.math import n_vect
+from ...utils.math import normcdf_vect
 
 ########################################################################################
 # TODO: Implement Sobol random numbers
@@ -219,8 +219,8 @@ class FXOneTouchOption(FXOption):
 
             eta = 1.0
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * n_vect(
+            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
             v = (A5_1 + A5_2) * k
@@ -234,8 +234,8 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * n_vect(
+            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
             v = (A5_1 + A5_2) * k
@@ -250,8 +250,8 @@ class FXOneTouchOption(FXOption):
             eta = 1.0
             k = h
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * n_vect(
+            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
             v = (A5_1 + A5_2) * k
@@ -266,8 +266,8 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             k = h
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * n_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * n_vect(
+            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
             v = (A5_1 + A5_2) * k
@@ -283,12 +283,12 @@ class FXOneTouchOption(FXOption):
             phi = -1.0
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * n_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
             )
             v = b_2 + b_4
             return v
@@ -304,12 +304,12 @@ class FXOneTouchOption(FXOption):
 
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * n_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
             )
             v = b_2 + b_4
             return v
@@ -325,10 +325,8 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            a_2 = s0 * dq * n_vect(phi * x2)
-            a_4 = (
-                s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            a_2 = s0 * dq * normcdf_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a_2 + a_4
             return v
 
@@ -343,10 +341,8 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            a_2 = s0 * dq * n_vect(phi * x2)
-            a_4 = (
-                s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            a_2 = s0 * dq * normcdf_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a_2 + a_4
             return v
 
@@ -361,12 +357,12 @@ class FXOneTouchOption(FXOption):
 
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * n_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
             )
             v = b_2 - b_4
             return v
@@ -382,12 +378,12 @@ class FXOneTouchOption(FXOption):
 
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * n_vect(phi * x2 - phi * v * sqrt_t)
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * n_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
             )
             v = b_2 - b_4
             return v
@@ -404,10 +400,8 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            a_2 = s0 * dq * n_vect(phi * x2)
-            a_4 = (
-                s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            a_2 = s0 * dq * normcdf_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a_2 - a_4
             return v
 
@@ -423,10 +417,8 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
             dq = np.exp(-r_f * t)
-            a_2 = s0 * dq * n_vect(phi * x2)
-            a_4 = (
-                s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * n_vect(eta * y2)
-            )
+            a_2 = s0 * dq * normcdf_vect(phi * x2)
+            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a_2 - a_4
             return v
 
@@ -486,9 +478,7 @@ class FXOneTouchOption(FXOption):
         s0 = stock_price
         mu = r_d - r_f
 
-        tgrid, s = get_paths_times(
-            num_paths, num_time_steps, t, mu, s0, v, seed
-        )
+        tgrid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
 
         h = self.barrier_rate
         x = self.payment_size

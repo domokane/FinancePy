@@ -7,7 +7,7 @@ import numpy as np
 
 ########################################################################################
 
-from ..utils.math import norminvcdf, N, INV_ROOT_2_PI
+from ..utils.math import norminvcdf, normcdf, INV_ROOT_2_PI
 from ..utils.error import FinError
 from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
 from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
@@ -63,7 +63,7 @@ def loss_dbn_recursion_gcd(
             beta = beta_vector[i_credit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[i_credit] - beta * z) / denom
-            cond_default_probs[i_credit] = N(argz)
+            cond_default_probs[i_credit] = normcdf(argz)
 
         indep_dbn = indep_loss_dbn_recursion_gcd(
             num_credits, cond_default_probs, loss_units
@@ -139,9 +139,7 @@ def homog_basket_loss_dbn(
 
 
 @njit(
-    float64(
-        float64, float64, int64, float64[:], float64[:], float64[:], int64
-    ),
+    float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
     fastmath=True,
 )
 def tranche_surv_prob_recursion(
@@ -238,8 +236,8 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
         expd2 = np.exp(-0.5 * d2 * d2)
 
         tranche_loss = (
-            (mu - k1) * N(d1)
-            - (mu - k2) * N(d2)
+            (mu - k1) * normcdf(d1)
+            - (mu - k2) * normcdf(d2)
             + sigma * expd1 * INV_ROOT_2_PI
             - sigma * expd2 * INV_ROOT_2_PI
         )
@@ -251,9 +249,7 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
 
 
 @njit(
-    float64(
-        float64, float64, int64, float64[:], float64[:], float64[:], int64
-    ),
+    float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
     fastmath=True,
     cache=True,
 )
@@ -303,7 +299,7 @@ def tranch_surv_prob_gaussian(
             beta = beta_vector[i_credit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[i_credit] - beta * z) / denom
-            condprob = N(argz)
+            condprob = normcdf(argz)
             mu += condprob * losses[i_credit]
             var += (losses[i_credit] ** 2) * condprob * (1.0 - condprob)
 
@@ -352,7 +348,7 @@ def loss_dbn_hetero_adj_binomial(
             beta = beta_vector[i_credit]
             denom = np.sqrt(1.0 - beta * beta)
             argz = (thresholds[i_credit] - beta * z) / denom
-            cond_default_probs[i_credit] = N(argz)
+            cond_default_probs[i_credit] = normcdf(argz)
 
         indep_dbn = indep_loss_dbn_hetero_adj_binomial(
             num_credits, cond_default_probs, loss_ratio
@@ -375,9 +371,7 @@ def loss_dbn_hetero_adj_binomial(
 
 
 @njit(
-    float64(
-        float64, float64, int64, float64[:], float64[:], float64[:], int64
-    ),
+    float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
     fastmath=True,
     cache=True,
 )
@@ -414,9 +408,7 @@ def tranche_surv_prob_adj_binomial(
 
     loss_ratio = np.zeros(num_credits)
     for i_credit in range(0, num_credits):
-        loss_ratio[i_credit] = (
-            (1.0 - recovery_rates[i_credit]) / num_credits / avg_loss
-        )
+        loss_ratio[i_credit] = (1.0 - recovery_rates[i_credit]) / num_credits / avg_loss
 
     loss_dbn = loss_dbn_hetero_adj_binomial(
         num_credits,

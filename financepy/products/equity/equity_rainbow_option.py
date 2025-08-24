@@ -7,7 +7,8 @@ from math import exp, log, sqrt
 import numpy as np
 from typing import List
 
-from ...utils.math import N, M
+from ...utils.math import normcdf
+from ...utils.math import M
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_assets_paths
@@ -31,32 +32,32 @@ class EquityRainbowOptionTypes(Enum):
 ########################################################################################
 
 
-def payoff_value(s, payoff_typeValue, payoff_params):
+def payoff_value(s, payoff_type_value, payoff_params):
 
-    if payoff_typeValue == EquityRainbowOptionTypes.CALL_ON_MINIMUM.value:
+    if payoff_type_value == EquityRainbowOptionTypes.CALL_ON_MINIMUM.value:
         k = payoff_params[0]
         # average on asset
         payoff = np.maximum(np.min(s, axis=0) - k, 0.0)
-    elif payoff_typeValue == EquityRainbowOptionTypes.CALL_ON_MAXIMUM.value:
+    elif payoff_type_value == EquityRainbowOptionTypes.CALL_ON_MAXIMUM.value:
         k = payoff_params[0]
         # average on asset
         payoff = np.maximum(np.max(s, axis=0) - k, 0.0)
-    elif payoff_typeValue == EquityRainbowOptionTypes.PUT_ON_MINIMUM.value:
+    elif payoff_type_value == EquityRainbowOptionTypes.PUT_ON_MINIMUM.value:
         k = payoff_params[0]
         # average on asset
         payoff = np.maximum(k - np.min(s, axis=0), 0.0)
-    elif payoff_typeValue == EquityRainbowOptionTypes.PUT_ON_MAXIMUM.value:
+    elif payoff_type_value == EquityRainbowOptionTypes.PUT_ON_MAXIMUM.value:
         k = payoff_params[0]
         # average on asset
         payoff = np.maximum(k - np.max(s, axis=0), 0.0)
-    elif payoff_typeValue == EquityRainbowOptionTypes.CALL_ON_NTH.value:
+    elif payoff_type_value == EquityRainbowOptionTypes.CALL_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
         # sort on asset
         ssorted = np.sort(s, axis=0)
         assetn = ssorted[-n, :]
         payoff = np.maximum(assetn - k, 0.0)
-    elif payoff_typeValue == EquityRainbowOptionTypes.PUT_ON_NTH.value:
+    elif payoff_type_value == EquityRainbowOptionTypes.PUT_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
         # sort on asset
@@ -146,26 +147,21 @@ class EquityRainbowOption(EquityOption):
 
         if len(stock_prices) != self.num_assets:
             raise FinError(
-                "Stock prices must be a vector of length "
-                + str(self.num_assets)
+                "Stock prices must be a vector of length " + str(self.num_assets)
             )
 
         if len(dividend_curves) != self.num_assets:
             raise FinError(
-                "Dividend discount must be a vector of length "
-                + str(self.num_assets)
+                "Dividend discount must be a vector of length " + str(self.num_assets)
             )
 
         if len(volatilities) != self.num_assets:
             raise FinError(
-                "Volatilities must be a vector of length "
-                + str(self.num_assets)
+                "Volatilities must be a vector of length " + str(self.num_assets)
             )
 
         if len(betas) != self.num_assets:
-            raise FinError(
-                "Betas must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Betas must be a vector of length " + str(self.num_assets))
 
     ###########################################################################
 
@@ -251,9 +247,7 @@ class EquityRainbowOption(EquityOption):
 
         dividend_yields = [q1, q2]
 
-        self._validate(
-            stock_prices, dividend_yields, volatilities, corr_matrix
-        )
+        self._validate(stock_prices, dividend_yields, volatilities, corr_matrix)
 
         #        q1 = dividend_yields[0]
         #        q2 = dividend_yields[1]
@@ -281,9 +275,7 @@ class EquityRainbowOption(EquityOption):
             v = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2)
-                - k
-                * df
-                * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
             )
         elif self.payoff_type == EquityRainbowOptionTypes.CALL_ON_MINIMUM:
             v = (
@@ -292,17 +284,19 @@ class EquityRainbowOption(EquityOption):
                 - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
             )
         elif self.payoff_type == EquityRainbowOptionTypes.PUT_ON_MAXIMUM:
-            cmax1 = s2 * dq2 + s1 * dq1 * N(d) - s2 * dq2 * N(d - v * sqrt(t))
+            cmax1 = (
+                s2 * dq2 + s1 * dq1 * normcdf(d) - s2 * dq2 * normcdf(d - v * sqrt(t))
+            )
             cmax2 = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2)
-                - k
-                * df
-                * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
+                - k * df * (1.0 - M(-y1 + v1 * sqrt(t), -y2 + v2 * sqrt(t), rho))
             )
             v = k * df - cmax1 + cmax2
         elif self.payoff_type == EquityRainbowOptionTypes.PUT_ON_MINIMUM:
-            cmin1 = s1 * dq1 - s1 * dq1 * N(d) + s2 * dq2 * N(d - v * sqrt(t))
+            cmin1 = (
+                s1 * dq1 - s1 * dq1 * normcdf(d) + s2 * dq2 * normcdf(d - v * sqrt(t))
+            )
             cmin2 = (
                 s1 * dq1 * M(y1, -d, -rho1)
                 + s2 * dq2 * M(y2, d - v * sqrt(t), -rho2)
@@ -328,9 +322,7 @@ class EquityRainbowOption(EquityOption):
         seed=4242,
     ):
 
-        self._validate(
-            stock_prices, dividend_curves, volatilities, corr_matrix
-        )
+        self._validate(stock_prices, dividend_curves, volatilities, corr_matrix)
 
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")

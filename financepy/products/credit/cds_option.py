@@ -10,7 +10,7 @@ from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEARS
-from ...utils.math import ONE_MILLION, N
+from ...utils.math import ONE_MILLION, normcdf
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
@@ -127,9 +127,9 @@ class CDSOption:
         d2 = (log_moneyness - half_vol_squared_t) / vol_sqrt_t
 
         if self.long_protection:
-            option_value = forward_spread * N(d1) - strike * N(d2)
+            option_value = forward_spread * normcdf(d1) - strike * normcdf(d2)
         else:
-            option_value = strike * N(-d2) - forward_spread * N(-d1)
+            option_value = strike * normcdf(-d2) - forward_spread * normcdf(-d1)
 
         option_value = option_value * forward_rpv01
 
@@ -151,9 +151,7 @@ class CDSOption:
     def implied_volatility(self, value_dt, issuer_curve, option_value):
         """Calculate the implied CDS option volatility from a price."""
         arg_tuple = (self, value_dt, issuer_curve, option_value)
-        sigma = optimize.newton(
-            fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50
-        )
+        sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50)
         return sigma
 
 

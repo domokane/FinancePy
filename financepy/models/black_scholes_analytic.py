@@ -10,7 +10,7 @@ from numba import float64, int64, vectorize, njit
 
 from ..utils.global_types import OptionTypes
 from ..utils.global_vars import G_SMALL
-from ..utils.math import N, n_vect, n_prime_vect
+from ..utils.math import normcdf, normcdf_vect, normcdf_prime_vect
 from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton, newton_secant
 
@@ -57,7 +57,7 @@ def bs_value(s, t, k, r, q, v, opt_type_value):
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
     d2 = d1 - v_sqrt_t
 
-    value = phi * ss * N(phi * d1) - phi * kk * N(phi * d2)
+    value = phi * ss * normcdf(phi * d1) - phi * kk * normcdf(phi * d2)
     return value
 
 
@@ -86,7 +86,7 @@ def bs_delta(s, t, k, r, q, v, opt_type_value):
     ss = s * np.exp(-q * t)
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
-    delta = phi * np.exp(-q * t) * n_vect(phi * d1)
+    delta = phi * np.exp(-q * t) * normcdf_vect(phi * d1)
     return delta
 
 
@@ -109,7 +109,7 @@ def bs_gamma(s, t, k, r, q, v, opt_type_value=None):
     ss = s * np.exp(-q * t)
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
-    gamma = np.exp(-q * t) * n_prime_vect(d1) / s / v_sqrt_t
+    gamma = np.exp(-q * t) * normcdf_prime_vect(d1) / s / v_sqrt_t
     return gamma
 
 
@@ -132,7 +132,7 @@ def bs_vega(s, t, k, r, q, v, opt_type_value):
     ss = s * np.exp(-q * t)
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
-    vega = ss * sqrt_t * n_prime_vect(d1)
+    vega = ss * sqrt_t * normcdf_prime_vect(d1)
     return vega
 
 
@@ -164,9 +164,9 @@ def bs_theta(s, t, k, r, q, v, opt_type_value):
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
     d2 = d1 - v_sqrt_t
-    theta = -ss * n_prime_vect(d1) * v / 2.0 / sqrt_t
-    theta = theta - phi * r * k * np.exp(-r * t) * n_vect(phi * d2)
-    theta = theta + phi * q * ss * n_vect(phi * d1)
+    theta = -ss * normcdf_prime_vect(d1) * v / 2.0 / sqrt_t
+    theta = theta - phi * r * k * np.exp(-r * t) * normcdf_vect(phi * d2)
+    theta = theta + phi * q * ss * normcdf_vect(phi * d1)
     return theta
 
 
@@ -198,7 +198,7 @@ def bs_rho(s, t, k, r, q, v, opt_type_value):
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
     d2 = d1 - v_sqrt_t
-    rho = phi * k * t * np.exp(-r * t) * n_vect(phi * d2)
+    rho = phi * k * t * np.exp(-r * t) * normcdf_vect(phi * d2)
     return rho
 
 
@@ -223,7 +223,7 @@ def bs_vanna(s, t, k, r, q, v, opt_type_value):
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
     d2 = d1 - v_sqrt_t
-    vanna = np.exp(-q * t) * sqrt_t * n_prime_vect(d1) * (d2 / v)
+    vanna = np.exp(-q * t) * sqrt_t * normcdf_prime_vect(d1) * (d2 / v)
     return vanna
 
 
@@ -449,7 +449,7 @@ def _fcall(si, *args):
 
     obj_fn = si - k
     obj_fn = obj_fn - bs_value(si, t, k, r, q, v, +1)
-    obj_fn = obj_fn - (1.0 - np.exp(-q * t) * n_vect(d1)) * si / q2
+    obj_fn = obj_fn - (1.0 - np.exp(-q * t) * normcdf_vect(d1)) * si / q2
     return obj_fn
 
 
@@ -476,7 +476,7 @@ def _fput(si, *args):
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
     obj_fn = si - k
     obj_fn = obj_fn - bs_value(si, t, k, r, q, v, -1)
-    obj_fn = obj_fn - (1.0 - np.exp(-q * t) * n_vect(-d1)) * si / q1
+    obj_fn = obj_fn - (1.0 - np.exp(-q * t) * normcdf_vect(-d1)) * si / q1
     return obj_fn
 
 
@@ -499,23 +499,19 @@ def baw_value(s, t, k, r, q, v, phi):
 
         argtuple = (t, k, r, q, v)
 
-        sstar = newton_secant(
-            _fcall, x0=s, args=argtuple, tol=1e-7, maxiter=50
-        )
+        sstar = newton_secant(_fcall, x0=s, args=argtuple, tol=1e-7, maxiter=50)
 
         mm = 2.0 * r / (v * v)
         ww = 2.0 * b / (v * v)
         kk = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar / k) + (b + v * v / 2.0) * t) / (v * np.sqrt(t))
-        q2 = (
-            -1.0 * (ww - 1.0) + np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)
-        ) / 2.0
-        a2 = (sstar / q2) * (1.0 - np.exp(-q * t) * n_vect(d1))
+        q2 = (-1.0 * (ww - 1.0) + np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
+        a2 = (sstar / q2) * (1.0 - np.exp(-q * t) * normcdf_vect(d1))
 
         if s < sstar:
-            return bs_value(
-                s, t, k, r, q, v, OptionTypes.EUROPEAN_CALL.value
-            ) + a2 * ((s / sstar) ** q2)
+            return bs_value(s, t, k, r, q, v, OptionTypes.EUROPEAN_CALL.value) + a2 * (
+                (s / sstar) ** q2
+            )
 
         return s - k
 
@@ -531,10 +527,8 @@ def baw_value(s, t, k, r, q, v, phi):
         ww = 2.0 * b / v2
         kk = 1.0 - np.exp(-r * t)
         d1 = (np.log(sstar / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
-        q1 = (
-            -1.0 * (ww - 1.0) - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)
-        ) / 2.0
-        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * n_vect(-d1))
+        q1 = (-1.0 * (ww - 1.0) - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
+        a1 = -(sstar / q1) * (1 - np.exp(-q * t) * normcdf_vect(-d1))
 
         if s > sstar:
             bsv = bs_value(s, t, k, r, q, v, OptionTypes.EUROPEAN_PUT.value)
@@ -566,24 +560,20 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
         """Eq.(13) in Bjerksund-sstensland approximation (1993)."""
         nonlocal r, q
         lambda0 = (-r + gamma * q + 0.5 * gamma * (gamma - 1.0) * v**2) * tt
-        d = -(np.log(ss / hh) + (q + (gamma - 0.5) * v**2) * tt) / (
-            v * np.sqrt(t)
-        )
+        d = -(np.log(ss / hh) + (q + (gamma - 0.5) * v**2) * tt) / (v * np.sqrt(t))
         kappa = (2.0 * gamma - 1.0) + (2.0 * q) / v**2
         return (
             np.exp(lambda0)
             * (ss**gamma)
             * (
-                N(d)
-                - N(d - (2.0 * np.log(xx / ss) / v / np.sqrt(tt)))
+                normcdf(d)
+                - normcdf(d - (2.0 * np.log(xx / ss) / v / np.sqrt(tt)))
                 * ((xx / ss) ** kappa)
             )
         )
 
     # calc trigger price x_t
-    beta = (0.5 - q / (v**2)) + np.sqrt(
-        (0.5 - q / (v**2)) ** 2 + 2.0 * r / (v**2)
-    )
+    beta = (0.5 - q / (v**2)) + np.sqrt((0.5 - q / (v**2)) ** 2 + 2.0 * r / (v**2))
     # avoid division by zero
     if abs(r - q) < 1.0e-10:
         beta = 1.0

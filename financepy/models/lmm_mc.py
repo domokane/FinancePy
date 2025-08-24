@@ -7,7 +7,7 @@ import numpy as np
 from numba import njit, float64, int64  # , prange DOES NOT WORK ON GITHUB
 
 from ..utils.error import FinError
-from ..utils.math import N
+from ..utils.math import normcdf
 from ..utils.math import norminvcdf
 from ..models.sobol import get_uniform_sobol
 
@@ -283,7 +283,7 @@ def lmm_price_caps_black(fwd0, vol_caplet, p, k, taus):
         f = fwd0[i]
         d1 = (np.log(f / k) + vol * vol * t_exp / 2.0) / vol / np.sqrt(t_exp)
         d2 = d1 - vol * np.sqrt(t_exp)
-        caplet[i] = (f * N(d1) - k * N(d2)) * taus[i] * disc_fwd[i]
+        caplet[i] = (f * normcdf(d1) - k * normcdf(d2)) * taus[i] * disc_fwd[i]
 
     return caplet
 
@@ -519,9 +519,7 @@ def lmm_simulate_fwds_1f(
                     mu_a += zkj * fi * ti * zij / (1.0 + fi * ti)
 
                 # predictor corrector
-                x = np.exp(
-                    mu_a * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj
-                )
+                x = np.exp(mu_a * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj)
                 fwd_b[k] = fwd[i_path, j, k] * x
 
                 mu_b = 0.0
@@ -533,9 +531,7 @@ def lmm_simulate_fwds_1f(
 
                 mu_c = 0.5 * (mu_a + mu_b)
 
-                x = np.exp(
-                    mu_c * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj
-                )
+                x = np.exp(mu_c * dtj - 0.5 * (zkj**2) * dtj + zkj * w * sqrt_dtj)
                 fwd[i_path, j + 1, k] = fwd[i_path, j, k] * x
 
     return fwd
@@ -672,9 +668,7 @@ def lmm_simulate_fwds_mf(
 
 
 @njit(
-    float64[:](
-        int64, int64, float64, float64[:], float64[:, :, :], float64[:], int64
-    ),
+    float64[:](int64, int64, float64, float64[:], float64[:, :, :], float64[:], int64),
     cache=True,
     fastmath=True,
 )
@@ -783,12 +777,8 @@ def lmm_swap_pricer(cpn, num_periods, num_paths, fwd0, fwds, taus):
                 fixed_flows[j] = cpn * taus[j]
                 float_flows[j] = libor * taus[j]
             else:
-                fixed_flows[j] = (
-                    fixed_flows[j - 1] * period_roll + cpn * taus[j]
-                )
-                float_flows[j] = (
-                    float_flows[j - 1] * period_roll + libor * taus[j]
-                )
+                fixed_flows[j] = fixed_flows[j - 1] * period_roll + cpn * taus[j]
+                float_flows[j] = float_flows[j - 1] * period_roll + libor * taus[j]
 
             period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
@@ -888,9 +878,7 @@ def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, is_payer):
 
 
 @njit(
-    float64[:](
-        float64, int64, int64, float64[:], float64[:, :, :], float64[:]
-    ),
+    float64[:](float64, int64, int64, float64[:], float64[:, :, :], float64[:]),
     cache=True,
     fastmath=True,
 )
@@ -938,9 +926,7 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            rachet_caplet_values[i_fwd] += (
-                rachet_caplets[i_fwd] / numeraire[i_fwd]
-            )
+            rachet_caplet_values[i_fwd] += rachet_caplets[i_fwd] / numeraire[i_fwd]
 
     for i_fwd in range(0, num_periods):
         rachet_caplet_values[i_fwd] /= num_paths
@@ -952,15 +938,11 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
 
 
 @njit(
-    float64(
-        int64, float64, int64, int64, float64[:], float64[:, :, :], float64[:]
-    ),
+    float64(int64, float64, int64, int64, float64[:], float64[:, :, :], float64[:]),
     cache=True,
     fastmath=True,
 )
-def lmm_flexi_cap_pricer(
-    max_caplets, K, num_periods, num_paths, fwd0, fwds, taus
-):
+def lmm_flexi_cap_pricer(max_caplets, K, num_periods, num_paths, fwd0, fwds, taus):
     """Price a flexicap using the simulated Ibor rates."""
 
     max_paths = len(fwds)
@@ -1008,9 +990,7 @@ def lmm_flexi_cap_pricer(
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            flexi_caplet_values[i_fwd] += (
-                flexi_caplets[i_fwd] / numeraire[i_fwd]
-            )
+            flexi_caplet_values[i_fwd] += flexi_caplets[i_fwd] / numeraire[i_fwd]
 
     for i_fwd in range(0, num_periods):
         flexi_caplet_values[i_fwd] /= num_paths
@@ -1026,9 +1006,7 @@ def lmm_flexi_cap_pricer(
 
 
 @njit(
-    float64[:](
-        float64, int64, int64, float64[:], float64[:, :, :], float64[:]
-    ),
+    float64[:](float64, int64, int64, float64[:], float64[:, :, :], float64[:]),
     cache=True,
     fastmath=True,
 )
@@ -1077,9 +1055,7 @@ def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            stickyCapletValues[i_fwd] += (
-                stickyCaplets[i_fwd] / numeraire[i_fwd]
-            )
+            stickyCapletValues[i_fwd] += stickyCaplets[i_fwd] / numeraire[i_fwd]
 
     for i_fwd in range(0, num_periods):
         stickyCapletValues[i_fwd] /= num_paths

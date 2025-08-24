@@ -7,7 +7,7 @@ from enum import Enum
 import numpy as np
 from numba import njit, float64
 
-from ..utils.math import N
+from ..utils.math import normcdf
 from ..utils.error import FinError
 
 ########################################################################################
@@ -29,9 +29,7 @@ class VolFuncTypes(Enum):
 ########################################################################################
 
 
-@njit(
-    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
-)
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def vol_function_clark(params, f, k, t):
     """Volatility Function in book by Iain Clark generalised to allow for
     higher than quadratic power. Care needs to be taken to avoid overfitting.
@@ -48,7 +46,7 @@ def vol_function_clark(params, f, k, t):
     x = np.log(f / k)
     sigma0 = np.exp(params[0])
     arg = x / (sigma0 * np.sqrt(t))
-    deltax = N(arg) - 0.50  # The -0.50 seems to be missing in book
+    deltax = normcdf(arg) - 0.50  # The -0.50 seems to be missing in book
 
     f = 0.0
     for i in range(0, len(params)):
@@ -60,9 +58,7 @@ def vol_function_clark(params, f, k, t):
 ########################################################################################
 
 
-@njit(
-    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
-)
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def vol_function_bloomberg(params, f, k, t):
     """Volatility Function similar to the one used by Bloomberg. It is
     a quadratic function in the spot delta of the option. It can therefore
@@ -82,7 +78,7 @@ def vol_function_bloomberg(params, f, k, t):
     vsqrtt = sigma * np.sqrt(t)
 
     d1 = np.log(f / k) / vsqrtt + vsqrtt / 2.0
-    delta = N(d1)
+    delta = normcdf(d1)
 
     v = 0.0
     for i in range(0, len(params)):
@@ -98,9 +94,7 @@ def vol_function_bloomberg(params, f, k, t):
 ########################################################################################
 
 
-@njit(
-    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
-)
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def vol_function_svi(params, f, k, t):
     """Volatility Function proposed by Gatheral in 2004. Increasing a results
     in a vertical translation of the smile in the positive direction.
@@ -140,9 +134,7 @@ def phi_ssvi(theta, gamma):
     if abs(theta) < 1e-8:
         theta = 1e-8
 
-    phi = (1.0 / gamma / theta) * (
-        1.0 - (1.0 - np.exp(-gamma * theta)) / gamma / theta
-    )
+    phi = (1.0 / gamma / theta) * (1.0 - (1.0 - np.exp(-gamma * theta)) / gamma / theta)
     return phi
 
 
@@ -172,12 +164,7 @@ def ssvi1(x, gamma, sigma, rho, t):
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
     px = p * x
-    v = (
-        0.5
-        * theta
-        * p
-        * (px + rho * np.sqrt(px**2 + 2.0 * px * rho + 1.0) + rho)
-    )
+    v = 0.5 * theta * p * (px + rho * np.sqrt(px**2 + 2.0 * px * rho + 1.0) + rho)
     v = v / np.sqrt(px**2 + 2.0 * px * rho + 1.0)
     return v
 
@@ -193,9 +180,7 @@ def ssvi2(x, gamma, sigma, rho, t):
     p = phi_ssvi(theta, gamma)
     px = p * x
     v = 0.5 * theta * p * p * (1.0 - rho * rho)
-    v = v / (
-        (px**2 + 2.0 * px * rho + 1.0) * np.sqrt(px**2 + 2.0 * px * rho + 1.0)
-    )
+    v = v / ((px**2 + 2.0 * px * rho + 1.0) * np.sqrt(px**2 + 2.0 * px * rho + 1.0))
     return v
 
 
@@ -267,9 +252,7 @@ def ssvi_local_varg(x, gamma, sigma, rho, t):
     return var
 
 
-@njit(
-    float64(float64[:], float64, float64, float64), fastmath=True, cache=True
-)
+@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
 def vol_function_ssvi(params, f, k, t):
     """Volatility Function proposed by Gatheral in 2004."""
 

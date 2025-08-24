@@ -7,7 +7,7 @@ from typing import Union
 import numpy as np
 from scipy import optimize
 
-from ..utils.math import N
+from ..utils.math import normcdf
 from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
 from .merton_firm import MertonFirm
@@ -16,7 +16,7 @@ from .merton_firm import MertonFirm
 
 
 def _fobj(x, *args):
-    """ Find value of asset value and vol that fit equity value and vol """
+    """Find value of asset value and vol that fit equity value and vol"""
 
     A, vA = x
 
@@ -28,15 +28,16 @@ def _fobj(x, *args):
 
     lvg = A / L
     sigmaRootT = vA * np.sqrt(t)
-    d1 = np.log(lvg) + (r + 0.5 * vA ** 2) * t
+    d1 = np.log(lvg) + (r + 0.5 * vA**2) * t
     d1 = d1 / sigmaRootT
     d2 = d1 - sigmaRootT
 
-    vE_LHS = (A / E) * N(d1) * vA
-    E_LHS = A * N(d1) - L * np.exp(-r * t) * N(d2)
-    obj = (E - E_LHS)**2 + (vE - vE_LHS)**2
+    vE_LHS = (A / E) * normcdf(d1) * vA
+    E_LHS = A * normcdf(d1) - L * np.exp(-r * t) * normcdf(d2)
+    obj = (E - E_LHS) ** 2 + (vE - vE_LHS) ** 2
 
     return obj
+
 
 ###############################################################################
 
@@ -51,15 +52,17 @@ class MertonFirmMkt(MertonFirm):
     simultaneous equations.
     """
 
-    def __init__(self,
-                 equity_value: Union[float, list, np.ndarray],
-                 bond_face: Union[float, list, np.ndarray],
-                 years_to_maturity: Union[float, list, np.ndarray],
-                 risk_free_rate: Union[float, list, np.ndarray],
-                 asset_growth_rate: Union[float, list, np.ndarray],
-                 equity_volatility: Union[float, list, np.ndarray]):
-        """ Create an object that holds all of the model parameters. These
-        parameters may be vectorised. """
+    def __init__(
+        self,
+        equity_value: Union[float, list, np.ndarray],
+        bond_face: Union[float, list, np.ndarray],
+        years_to_maturity: Union[float, list, np.ndarray],
+        risk_free_rate: Union[float, list, np.ndarray],
+        asset_growth_rate: Union[float, list, np.ndarray],
+        equity_volatility: Union[float, list, np.ndarray],
+    ):
+        """Create an object that holds all of the model parameters. These
+        parameters may be vectorised."""
 
         check_argument_types(self.__init__, locals())
 
@@ -88,12 +91,14 @@ class MertonFirmMkt(MertonFirm):
         self._mu = np.array(asset_growth_rate)
         self._vE = np.array(equity_volatility)
 
-        nmax = max(len(self._E),
-                   len(self._L),
-                   len(self._t),
-                   len(self._r),
-                   len(self._mu),
-                   len(self._vE))
+        nmax = max(
+            len(self._E),
+            len(self._L),
+            len(self._t),
+            len(self._r),
+            len(self._mu),
+            len(self._vE),
+        )
 
         if len(self._E) != nmax and len(self._E) > 1:
             raise FinError("Len E must be 1 or maximum length of arrays")
@@ -117,7 +122,7 @@ class MertonFirmMkt(MertonFirm):
         self._solve_for_asset_value_and_vol()
         self._D = self.debt_value()
 
-###############################################################################
+    ###############################################################################
 
     def _solve_for_asset_value_and_vol(self):
 
@@ -164,7 +169,7 @@ class MertonFirmMkt(MertonFirm):
         self._A = np.array(self._A)
         self._vA = np.array(self._vA)
 
-###############################################################################
+    ###############################################################################
 
     def __repr__(self):
 
@@ -175,5 +180,6 @@ class MertonFirmMkt(MertonFirm):
         s += label_to_string("ASSET GROWTH", self._mu)
         s += label_to_string("EQUITY VOLATILITY", self._vE)
         return s
+
 
 ###############################################################################

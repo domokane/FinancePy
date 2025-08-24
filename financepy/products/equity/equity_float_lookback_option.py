@@ -5,7 +5,7 @@
 import numpy as np
 
 
-from ...utils.math import N
+from ...utils.math import normcdf
 from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -99,15 +99,11 @@ class EquityFloatLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > s0:
-                raise FinError(
-                    "Smin must be less than or equal to the stock price."
-                )
+                raise FinError("Smin must be less than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < s0:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
 
         if abs(r - q) < G_SMALL:
             q = r + G_SMALL
@@ -126,15 +122,15 @@ class EquityFloatLookbackOption(EquityOption):
             a2 = a1 - v * np.sqrt(t)
 
             if smin == s0:
-                term = N(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * N(-a1)
+                term = normcdf(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * normcdf(-a1)
             elif s0 < smin and w < -100:
-                term = -expbt * N(-a1)
+                term = -expbt * normcdf(-a1)
             else:
-                term = ((s0 / smin) ** (-w)) * N(
+                term = ((s0 / smin) ** (-w)) * normcdf(
                     -a1 + 2.0 * b * np.sqrt(t) / v
-                ) - expbt * N(-a1)
+                ) - expbt * normcdf(-a1)
 
-            v = s0 * dq * N(a1) - smin * df * N(a2) + s0 * df * u * term
+            v = s0 * dq * normcdf(a1) - smin * df * normcdf(a2) + s0 * df * u * term
 
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
@@ -142,20 +138,18 @@ class EquityFloatLookbackOption(EquityOption):
             b2 = b1 - v * np.sqrt(t)
 
             if smax == s0:
-                term = -N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
+                term = -normcdf(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * normcdf(b1)
             elif s0 < smax and w > 100:
-                term = expbt * N(b1)
+                term = expbt * normcdf(b1)
             else:
-                term = (-((s0 / smax) ** (-w))) * N(
+                term = (-((s0 / smax) ** (-w))) * normcdf(
                     b1 - 2.0 * b * np.sqrt(t) / v
-                ) + expbt * N(b1)
+                ) + expbt * normcdf(b1)
 
-            v = smax * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
+            v = smax * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.opt_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.opt_type))
 
         return v
 
@@ -191,15 +185,11 @@ class EquityFloatLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > stock_price:
-                raise FinError(
-                    "Smin must be less than or equal to the stock price."
-                )
+                raise FinError("Smin must be less than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < stock_price:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
 
         t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed

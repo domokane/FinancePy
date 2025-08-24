@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from ...utils.math import N
+from ...utils.math import normcdf
 from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_paths_times
@@ -69,9 +69,7 @@ class FXFloatLookbackOption(FXOption):
             )
 
         if foreign_curve.value_dt != value_dt:
-            raise FinError(
-                "Foreign Curve valuation date not same as option value date"
-            )
+            raise FinError("Foreign Curve valuation date not same as option value date")
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -89,9 +87,7 @@ class FXFloatLookbackOption(FXOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             s_min = stock_min_max
             if s_min > s0:
-                raise FinError(
-                    "s_min must be less than or equal to the stock price."
-                )
+                raise FinError("s_min must be less than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             s_max = stock_min_max
             if s_max < s0:
@@ -116,15 +112,15 @@ class FXFloatLookbackOption(FXOption):
             a2 = a1 - v * np.sqrt(t)
 
             if s_min == s0:
-                term = N(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * N(-a1)
+                term = normcdf(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * normcdf(-a1)
             elif s0 < s_min and w < -100:
-                term = -expbt * N(-a1)
+                term = -expbt * normcdf(-a1)
             else:
-                term = ((s0 / s_min) ** (-w)) * N(
+                term = ((s0 / s_min) ** (-w)) * normcdf(
                     -a1 + 2.0 * b * np.sqrt(t) / v
-                ) - expbt * N(-a1)
+                ) - expbt * normcdf(-a1)
 
-            v = s0 * dq * N(a1) - s_min * df * N(a2) + s0 * df * u * term
+            v = s0 * dq * normcdf(a1) - s_min * df * normcdf(a2) + s0 * df * u * term
 
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
@@ -132,20 +128,18 @@ class FXFloatLookbackOption(FXOption):
             b2 = b1 - v * np.sqrt(t)
 
             if s_max == s0:
-                term = -N(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * N(b1)
+                term = -normcdf(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * normcdf(b1)
             elif s0 < s_max and w > 100:
-                term = expbt * N(b1)
+                term = expbt * normcdf(b1)
             else:
-                term = (-((s0 / s_max) ** (-w))) * N(
+                term = (-((s0 / s_max) ** (-w))) * normcdf(
                     b1 - 2.0 * b * np.sqrt(t) / v
-                ) + expbt * N(b1)
+                ) + expbt * normcdf(b1)
 
-            v = s_max * df * N(-b2) - s0 * dq * N(-b1) + s0 * df * u * term
+            v = s_max * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.opt_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.opt_type))
 
         return v
 
@@ -181,9 +175,7 @@ class FXFloatLookbackOption(FXOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             s_min = stock_min_max
             if s_min > stock_price:
-                raise FinError(
-                    "s_min must be less than or equal to the stock price."
-                )
+                raise FinError("s_min must be less than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             s_max = stock_min_max
             if s_max < stock_price:
@@ -201,9 +193,9 @@ class FXFloatLookbackOption(FXOption):
 
         if opt_type == OptionTypes.EUROPEAN_CALL:
             # minimum on time dimension axis 1
-            s_min_vector = np.min(s_all, axis=1)
-            s_min_vector = np.minimum(s_min_vector, s_min)
-            payoff = np.maximum(s_all[:, -1] - s_min_vector, 0.0)
+            s_minormcdf_vector = np.min(s_all, axis=1)
+            s_minormcdf_vector = np.minimum(s_minormcdf_vector, s_min)
+            payoff = np.maximum(s_all[:, -1] - s_minormcdf_vector, 0.0)
         elif opt_type == OptionTypes.EUROPEAN_PUT:
             # maximum on time dimension axis 1
             s_max_vector = np.max(s_all, axis=1)

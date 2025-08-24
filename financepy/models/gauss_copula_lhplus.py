@@ -4,7 +4,7 @@
 
 import numpy as np
 
-from ..utils.math import N, M, phi3
+from ..utils.math import normcdf, M, phi3
 from ..utils.math import norminvcdf as NormSInv
 from ..utils.error import FinError
 
@@ -59,7 +59,7 @@ class LHPlusModel:
 
         b = (1.0 / self._beta) * ((c - root_one_minus_beta2 * invb))
 
-        prob_loss_gt_k = N(a) + M(c0, b, self._beta_0) - M(c0, a, self._beta_0)
+        prob_loss_gt_k = normcdf(a) + M(c0, b, self._beta_0) - M(c0, a, self._beta_0)
 
         return prob_loss_gt_k
 
@@ -114,7 +114,7 @@ class LHPlusModel:
         r23 = self._beta * self._beta_0
         el1 = self._p * self._h * (1.0 - self._r)
         el2 = self._p0 * self._h0 * (1.0 - self._r0)
-        el3 = -k * (M(c0, a, self._beta_0) - N(a))
+        el3 = -k * (M(c0, a, self._beta_0) - normcdf(a))
         el4 = -((1.0 - self._r0) * self._h0 - k) * M(c0, b, self._beta_0)
         term1 = (
             M(c, a, self._beta)
@@ -155,7 +155,7 @@ class LHPlusModel:
         el1 = self._p * self._h * (1.0 - self._r) + self._p0 * self._h0 * (
             1.0 - self._r0
         )
-        el1 = el1 - k * (M(c0, a, self._beta_0) - N(a))
+        el1 = el1 - k * (M(c0, a, self._beta_0) - normcdf(a))
         el1 = el1 - ((1.0 - self._r0) * self._h0 - k) * M(c0, b, self._beta_0)
 
         term = (

@@ -313,7 +313,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     # ======================================================================
 #     # For some delta quotation conventions I can solve for K explicitly.
 #     # Note that as I am using the function norm_inv_delta to calculate the
-#     # inverse value of delta, this may not, on a round trip using N(x), give
+#     # inverse value of delta, this may not, on a round trip using normcdf(x), give
 #     # back the value x as it is calculated to a different number of decimal
 #     # places. It should however agree to 6-7 decimal places. Which is OK.
 #     # ======================================================================

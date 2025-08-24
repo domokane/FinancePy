@@ -1105,7 +1105,7 @@ def solve_for_strike(
     # =========================================================================
     # For some delta quotation conventions I can solve for kk explicitly.
     # Note that as I am using the function norminvdelta to calculate the
-    # inverse value of delta, this may not, on a round trip using N(x), give
+    # inverse value of delta, this may not, on a round trip using normcdf(x), give
     # back the value x as it is calculated to a different number of decimal
     # places. It should however agree to 6-7 decimal places. Which is Okk.
     # =========================================================================

@@ -62,9 +62,13 @@ def test_black_scholes():
 
     num_steps_per_year = 400
 
-    model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
+    model_tree = BlackScholes(
+        volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year
+    )
 
-    v = am_option.value(value_dt, stock_price, discount_curve, dividend_curve, model_tree)
+    v = am_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_tree
+    )
     #    print(v)
 
     model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
@@ -81,7 +85,9 @@ def test_black_scholes():
 
     #    print(v)
 
-    v = eu_option.value(value_dt, stock_price, discount_curve, dividend_curve, model_tree)
+    v = eu_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_tree
+    )
 
     #    print(v)
 
@@ -130,8 +136,6 @@ def test_black_scholes():
     # plt.xlabel("Num Steps")
     # plt.ylabel("Value")
     # plt.legend();
-
-
 
 
 ########################################################################################

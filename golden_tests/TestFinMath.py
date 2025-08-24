@@ -7,7 +7,7 @@ sys.path.append("..")
 import time
 import numpy as np
 from financepy.utils.math import normcdf_integrate
-from financepy.utils.math import N
+from financepy.utils.math import normcdf
 from financepy.utils.math import normcdf_slow
 from financepy.utils.math import norminvcdf
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -25,13 +25,13 @@ def test_fin_math():
 
     test_cases.header("FUNCTION", "X", "Y")
     for x in x_values:
-        y = N(x)
+        y = normcdf(x)
         test_cases.print("NORMCDF1", x, y)
 
     end = time.time()
     duration = end - start
     test_cases.header("LABEL", "TIME")
-    test_cases.print("Fast N(x) takes ", duration)
+    test_cases.print("Fast normcdf(x) takes ", duration)
 
     test_cases.header("FUNCTION", "X", "Y")
 
@@ -43,7 +43,7 @@ def test_fin_math():
     end = time.time()
     duration = end - start
     test_cases.header("LABEL", "TIME")
-    test_cases.print("Slow N(x) takes ", duration)
+    test_cases.print("Slow normcdf(x) takes ", duration)
 
     test_cases.header("FUNCTION", "X", "Y")
 
@@ -56,14 +56,14 @@ def test_fin_math():
     duration = end - start
 
     test_cases.header("LABEL", "TIME")
-    test_cases.print("Trapezium N(x) takes ", duration)
+    test_cases.print("Trapezium normcdf(x) takes ", duration)
 
     x_values = np.linspace(-6.0, 6.0, 20)
 
     test_cases.header("X", "Y1", "Y2", "Y3", "DIFF1", "DIFF2")
 
     for x in x_values:
-        y1 = N(x)
+        y1 = normcdf(x)
         y2 = normcdf_slow(x)
         y3 = normcdf_integrate(x)
         diff1 = y3 - y1
@@ -75,7 +75,7 @@ def test_fin_math():
     test_cases.header("X", "Y1", "Y2", "INV_Y1", "INV_Y2", "DIFF1", "DIFF2")
 
     for x_in in x_values:
-        y1 = N(x_in)
+        y1 = normcdf(x_in)
         y2 = normcdf_slow(x_in)
         x_out1 = norminvcdf(y1)
         x_out2 = norminvcdf(y2)
