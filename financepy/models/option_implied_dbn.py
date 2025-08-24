@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 # TODO Fix this
 
@@ -13,13 +11,15 @@ from ..utils.error import FinError
 
 from .black_scholes_analytic import bs_value
 
-########################################################################################
 # Analytical Black Scholes model implementation and approximations
-########################################################################################
 
 
 # @njit(float64[:](float64, float64, float64, float64, float64[:],
 #                 float64[:]), cache=True, fastmath=True)
+
+########################################################################################
+
+
 def option_implied_dbn(s, t, r, q, strikes, sigmas):
     """This function calculates the option smile/skew-implied probability
     density function times the interval width."""
@@ -50,14 +50,11 @@ def option_implied_dbn(s, t, r, q, strikes, sigmas):
     densitydk = np.zeros(num_steps)
 
     for ik in range(1, num_steps - 1):
-        d2Vdk2 = (values[ik + 1] - 2.0 * values[ik] + values[ik - 1]) / dk
+        d2_vdk2 = (values[ik + 1] - 2.0 * values[ik] + values[ik - 1]) / dk
 
         #       print("%d %12.8f %12.8f %12.8f" %
-        #             (ik, strikes[ik], values[ik], d2Vdk2))
+        #             (ik, strikes[ik], values[ik], d2_vdk2))
 
-        densitydk[ik] = d2Vdk2 * inflator
+        densitydk[ik] = d2_vdk2 * inflator
 
     return densitydk
-
-
-########################################################################################

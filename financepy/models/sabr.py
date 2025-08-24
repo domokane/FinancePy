@@ -1,7 +1,5 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 # Volatility calibration functionality - Guillaume Lefieux 2021
-########################################################################################
 
 import numpy as np
 from numba import njit, float64
@@ -23,7 +21,7 @@ def _x(rho, z):
     return np.log(a / b)
 
 
-##############################################################################
+########################################################################################
 
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
@@ -163,6 +161,8 @@ class SABR:
     is normal and beta = 1 is lognormal, rho is the correlation between the
     underlying and the volatility process."""
 
+    ####################################################################################
+
     def __init__(self, alpha, beta, rho, nu):
         """Create SABR with all of the model parameters. We will
         also provide functions below to assist with the calibration of the
@@ -173,7 +173,7 @@ class SABR:
         self.rho = rho
         self.nu = nu
 
-    ########################################################################################
+    ####################################################################################
 
     def black_vol(self, f, k, t):
         """Black volatility from SABR model using Hagan et al. approx."""
@@ -205,7 +205,7 @@ class SABR:
         v = vol_function_sabr(params, f, k, t)
         return v
 
-    ########################################################################################
+    ####################################################################################
 
     def black_vol_with_alpha(self, alpha, f, k, t):
 
@@ -213,7 +213,7 @@ class SABR:
         black_vol = self.black_vol(f, k, t)
         return black_vol
 
-    ########################################################################################
+    ####################################################################################
 
     def value(
         self,
@@ -243,7 +243,7 @@ class SABR:
         else:
             raise Exception("Option type must be a European Call(C) or Put(P)")
 
-    ########################################################################################
+    ####################################################################################
 
     def set_alpha_from_black_vol(self, black_vol, forward, strike, time_to_expiry):
         """Estimate the value of the alpha coefficient of the SABR model
@@ -260,7 +260,11 @@ class SABR:
 
         if init_alpha != black_vol:
             # Objective function
+
+            ############################################################################
+
             def fn(x):
+
                 return np.sqrt(
                     (black_vol - self.black_vol_with_alpha(x, f, k, t_exp)) ** 2
                 )
@@ -274,7 +278,7 @@ class SABR:
 
         self.alpha = alpha
 
-    ########################################################################################
+    ####################################################################################
 
     def set_alpha_from_atm_black_vol(self, black_vol, atm_strike, time_to_expiry):
         """We solve cubic equation for the unknown variable alpha for the
@@ -286,12 +290,12 @@ class SABR:
         rho = self.rho
         nu = self.nu
         t_exp = time_to_expiry
-        K = atm_strike
+        k = atm_strike
 
-        coeff0 = -black_vol * (K ** (1.0 - self.beta))
+        coeff0 = -black_vol * (k ** (1.0 - self.beta))
         coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
-        coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K ** (1.0 - beta)))
-        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (24.0 * (K ** (2.0 - 2.0 * beta)))
+        coeff2 = (rho * beta * nu * t_exp) / (4.0 * (k ** (1.0 - beta)))
+        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (24.0 * (k ** (2.0 - 2.0 * beta)))
         coeffs = [coeff3, coeff2, coeff1, coeff0]
         roots = np.roots(coeffs)
 
@@ -299,7 +303,7 @@ class SABR:
         alpha = np.min([coeff.real for coeff in roots if coeff.real > 0])
         self.alpha = alpha
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -309,6 +313,3 @@ class SABR:
         s += label_to_string("Nu", self.nu)
         s += label_to_string("Rho", self.rho)
         return s
-
-
-########################################################################################

@@ -8,7 +8,6 @@ from typing import Dict, Set
 
 # Configuration constants
 HASH_LINE_LENGTH = 88  # Standard line width for PEP 8
-OUTPUT_DIR = "./pep8_output"
 SHOW_DIFF = False  # Toggle to show diff output
 
 
@@ -78,6 +77,7 @@ def rename_variables(source: str) -> str:
 
     function_names: Set[str] = set()
     class_names: Set[str] = set()
+    enum_names: Set[str] = set()
     variable_names: Set[str] = set()
 
     # Collect function, class, and variable names
@@ -86,12 +86,19 @@ def rename_variables(source: str) -> str:
             if not (node.name.startswith("__") and node.name.endswith("__")):
                 function_names.add(node.name)
         elif isinstance(node, ast.ClassDef):
-            class_names.add(node.name)
+            if node.name.find("Type") == -1:
+                class_names.add(node.name)
+                print(f"Class detected: {node.name}")
+            else:
+                enum_names.add(node.name)
+                print(f"Enum detected: {node.name}")
         elif isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store):
             if not (node.id.startswith("__") and node.id.endswith("__")):
                 variable_names.add(node.id)
 
     variable_names -= class_names | function_names  # Exclude class and function names
+
+    print(f"Variable names to rename: {variable_names}")
 
     rename_map: Dict[str, str] = {
         name: (
@@ -100,6 +107,11 @@ def rename_variables(source: str) -> str:
             else to_snake_case(name)
         )
         for name in variable_names
+        if not (
+            name.isupper()
+            and len(name) > 6
+            and all(c.isalpha() or c == "_" for c in name)
+        )
     }
 
     # Replace variable names (standalone identifiers, not in attribute chains or function calls)
@@ -156,78 +168,66 @@ def remove_blank_lines_before_defs(source: str) -> str:
     return "\n".join(new_lines) + "\n"
 
 
+HASH_LINE_LENGTH = 88  # total line length including indentation
+
+
 def normalize_hashes_and_functions(source: str) -> str:
-    """Normalize code with hash lines before functions/classes."""
+    """Normalize code with hash lines before functions/classes.
+    Hash lines are adjusted so that they **end at column 88**,
+    keeping indentation aligned with the function/method.
+    Blank line before and after each hash line.
+    """
     lines = source.splitlines()
     new_lines = []
     i = 0
     n = len(lines)
+
     while i < n:
         line = lines[i]
         stripped = line.lstrip()
+        indent = line[: len(line) - len(stripped)]  # current line indentation
+        indent_len = len(indent)
+        hash_len = max(HASH_LINE_LENGTH - indent_len, 0)  # adjust to fit column 88
+
+        # Skip lines that are only hashes
         if stripped.startswith("#") and set(stripped.strip()) == {"#"}:
             i += 1
             continue
 
         is_vectorize = stripped.startswith("@vectorize")
-
-        if is_vectorize:
-            while new_lines and new_lines[-1].strip() == "":
-                new_lines.pop()
-
-            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
-
-            while lines[i].find("def ") == -1 and i < n:
-                print("VECTORIZE LINE:", lines[i])
-                new_lines.append(lines[i])
-                i += 1
-
-                continue
-
-            while lines[i].strip() != "" and i < n:
-                new_lines.append(lines[i])
-                i += 1
-                continue
-
-            line = lines[i]
-            stripped = line.lstrip()
-
         is_njit = stripped.startswith("@njit")
-
-        if is_njit:
-            while new_lines and new_lines[-1].strip() == "":
-                new_lines.pop()
-            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
-            new_lines.append(lines[i])
-            i += 1
-            new_lines.append(lines[i])
-            i += 1
-            continue
-
         is_def = stripped.startswith("def ")
-
-        if is_def:
-            while new_lines and new_lines[-1].strip() == "":
-                new_lines.pop()
-            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
-            new_lines.append(line)
-            i += 1
-            continue
-
         is_class = stripped.startswith("class ")
 
-        if is_class:
+        # Helper to insert hash section with blank lines
+        def add_hash_section():
             while new_lines and new_lines[-1].strip() == "":
                 new_lines.pop()
-            new_lines.extend(["", "#" * HASH_LINE_LENGTH, "", ""])
+            new_lines.append("")  # blank line before
+            new_lines.append(indent + "#" * hash_len)
+            new_lines.append("")  # blank line after
+
+        if is_vectorize or is_njit or is_def or is_class:
+            add_hash_section()
             new_lines.append(line)
             i += 1
+            # If decorators, also include the next line (the actual def)
+            if is_vectorize or is_njit:
+                while i < n and not lines[i].lstrip().startswith("def "):
+                    new_lines.append(lines[i])
+                    i += 1
+                if i < n:
+                    new_lines.append(lines[i])
+                    i += 1
             continue
 
         new_lines.append(line)
         i += 1
+
+    # Ensure final newline
     if not new_lines or new_lines[-1].strip() != "":
         new_lines.append("")
+
     return "\n".join(new_lines)
 
 
@@ -309,15 +309,14 @@ def convert_file(filepath: str) -> None:
             )
             print(f"Changes in {filepath}:\n{'\n'.join(diff)}\n")
 
-        os.makedirs(OUTPUT_DIR, exist_ok=True)
         base, ext = os.path.splitext(os.path.basename(filepath))
 
-        bkp_filepath = os.path.join(OUTPUT_DIR, "../backup/", f"{base}.py")
+        bkp_filepath = os.path.join(base, "../backup/", f"{base}.py")
         with open(bkp_filepath, "w", encoding="utf-8") as f:
             f.write(source)
         print(f"Backup Written to {bkp_filepath}")
 
-        new_filepath = os.path.join(OUTPUT_DIR, "../converted/", f"{base}.py")
+        new_filepath = os.path.join(base, "../converted/", f"{base}.py")
         with open(new_filepath, "w", encoding="utf-8") as f:
             f.write(new_source)
         print(f"Written to {new_filepath}")

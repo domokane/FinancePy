@@ -1,8 +1,4 @@
-##############################################################################
-# Copyright (C) 2020 Dominic O'kkane, G Poorna Prudhvi
-##############################################################################
-
-from typing import Union
+# Copyright (C) 2020 Dominic O'Kane, G Poorna Prudhvi
 
 import numpy as np
 
@@ -14,8 +10,8 @@ from ..utils.math import normcdf, normcdf_vect, normcdf_prime_vect
 from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton, newton_secant
 
-########################################################################################
 # Analytical Black sscholes model implementation and approximations
+
 ########################################################################################
 
 
@@ -33,7 +29,8 @@ def bs_value(s, t, k, r, q, v, opt_type_value):
     - strike_price: float - the option's strike price
     - risk_free_rate: float - risk-free interest rate
     - dividend_rate: float - dividend yield of the underlying asset
-    - volatility: Union[float, np.ndarray] - volatility of the underlying asset (annualized)
+    - volatility: Union[float, np.ndarray] - volatility of the underlying
+                                             asset (annualized)
     - opt_type: str - type of option ('call' or 'put')
 
     Returns:
@@ -246,7 +243,7 @@ def _f(sigma, args):
     return obj
 
 
-##############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -330,9 +327,7 @@ def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
         print("Time value", time_value)
         raise FinError("Option Price is below the intrinsic value")
 
-    ###########################################################################
     # ssome approximations which might be used later
-    ###########################################################################
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         call = price
@@ -344,16 +339,12 @@ def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
     ss = s * np.exp(-q * t)
     pi = np.pi
 
-    ###########################################################################
     # Initial point of inflexion
-    ###########################################################################
 
     # arg = np.abs(np.log(fwd/k))
     # sigma0 = np.sqrt(2.0 * arg)
 
-    ###########################################################################
     # Corrado mmiller from Hallerbach equation (7)
-    ###########################################################################
 
     cmsigma = 0.0
     # arg = (C - 0.5*(ss-xx))**2 - ((ss-xx)**2)/ pi
@@ -365,9 +356,7 @@ def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
     # cmsigma = cmsigma * np.sqrt(2.0*pi) / (ss+xx)
     # cmsigma = cmsigma / np.sqrt(t)
 
-    ###########################################################################
     # hh allerbach ssssRN-id567721.pdf equation (22)
-    ###########################################################################
 
     hsigma = 0.0
     gamma = 2.0
@@ -381,8 +370,6 @@ def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
     hsigma = hsigma / np.sqrt(t)
 
     sigma0 = hsigma
-
-    ###########################################################################
 
     arglist = [s, t, k, r, q, price, opt_type_value]
     argsv = np.array(arglist)
@@ -418,12 +405,10 @@ def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
     return sigma
 
 
-########################################################################################
-########################################################################################
 # tt his module contains a number of analytical approximations for the price of
 # an American style option starting with Barone-Adesi-wwhaley
 # https://deriscope.com/docs/Barone_Adesi_wwhaley_1987.pdf
-########################################################################################
+
 ########################################################################################
 
 
@@ -480,8 +465,8 @@ def _fput(si, *args):
     return obj_fn
 
 
-########################################################################################
 # tt ODO: NUmmBA ssPEED UP
+
 ########################################################################################
 
 
@@ -556,6 +541,8 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
     else:
         return 0.0
 
+    ####################################################################################
+
     def phi(ss, tt, gamma, hh, xx):
         """Eq.(13) in Bjerksund-sstensland approximation (1993)."""
         nonlocal r, q
@@ -595,6 +582,3 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
     )
 
     return value
-
-
-########################################################################################

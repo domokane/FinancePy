@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from math import sqrt, exp
 from numba import njit, float64, int64
@@ -8,9 +6,7 @@ import numpy as np
 
 from ..utils.helpers import label_to_string
 
-##########################################################################
 # dr = a(b-r) + sigma dW
-##########################################################################
 
 # TO DO - DECIDE WHETHER TO OO MODEL
 
@@ -19,12 +15,18 @@ from ..utils.helpers import label_to_string
 
 class ModelRatesVasicek:
 
+    ####################################################################################
+
     def __init__(self, a, b, sigma):
+
         self._a = a
         self._b = b
         self._sigma = sigma
 
+    ####################################################################################
+
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("a", self._a)
         s += label_to_string("b", self._b)
@@ -60,8 +62,7 @@ def zero_price(r0, a, b, sigma, t):
     """Generate zero price analytically using Vasicek model"""
     bb = (1.0 - exp(-a * t)) / a
     aa = exp(
-        (b - sigma * sigma / 2.0 / a / a) * (bb - t)
-        - bb * bb * sigma * sigma / 4.0 / a
+        (b - sigma * sigma / 2.0 / a / a) * (bb - t) - bb * bb * sigma * sigma / 4.0 / a
     )
     zcb = aa * exp(-r0 * bb)
     return zcb
@@ -98,9 +99,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
 
 @njit(
-    float64(
-        float64, float64, float64, float64, float64, float64, int64, int64
-    ),
+    float64(float64, float64, float64, float64, float64, float64, int64, int64),
     fastmath=True,
     cache=True,
 )
@@ -120,6 +119,3 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
         zcb += exp(-rsum)
     zcb /= num_paths
     return zcb
-
-
-########################################################################################

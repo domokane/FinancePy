@@ -205,7 +205,7 @@ def _vinterpolate(x_values, x_vector, dfs, method):
 class Interpolator:
     """Interpolator class for curve fitting and value interpolation."""
 
-    ########################################################################################
+    ####################################################################################
 
     def __init__(self, interpolator_type: InterpTypes, **kwargs: dict):
 
@@ -216,7 +216,7 @@ class Interpolator:
         self._refit_curve = False
         self._optional_interp_params = kwargs
 
-    ########################################################################################
+    ####################################################################################
 
     def fit(self, times: np.ndarray, dfs: np.ndarray):
         """
@@ -331,7 +331,7 @@ class Interpolator:
                 self._times, zero_rates, sigma=tension_sigma
             )
 
-    ########################################################################################
+    ####################################################################################
 
     def interpolate(self, t: float):
         """Interpolation of discount factors at time x given discount factors
@@ -399,7 +399,7 @@ class Interpolator:
                 # Here we assume constant extrapolation, consistent with how
                 # we set up our interpolator
 
-                ########################################################################################
+                ########################################################################
 
                 def true_integral(spline, t):
 
@@ -421,7 +421,7 @@ class Interpolator:
 
     @classmethod
 
-    ########################################################################################
+    ####################################################################################
 
     def suitable_for_bootstrap(cls, interp_type):
         """Check if the interpolation type is suitable for bootstrapping."""

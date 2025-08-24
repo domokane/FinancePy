@@ -1,43 +1,47 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from enum import Enum
 from numba import njit, float64, int64
 import numpy as np
 from ..utils.helpers import label_to_string
 
-###############################################################################
 # CIR Process
 # dr = a(b-r) + sigma sqrt(r) dW
 # Note that r can hit zero if 2.0 * a * b < sigma*sigma:
-###############################################################################
 
 # TO DO - DECIDE WHETHER TO OO MODEL
 # CAN DO Z SCALING INSIDE NUMPY ?
 # ANTITHETICS
 
+########################################################################################
+
 
 class CIRNumericalScheme(Enum):
+
     EULER = 1
     LOGNORMAL = 2
     MILSTEIN = 3
     KAHLJACKEL = 4
-    EXACT = 5  # SAMPLES EXACT DISTRIBUTION
+    EXACT = 5  # SAMPLES exact DISTRIBUTION
 
-
-###############################################################################
 
 # THIS CLASS IS NOT USED BUT MAY BE USED IF WE CREATE AN OO FRAMEWORK
+
+########################################################################################
 
 
 class CIRMonteCarlo:
     """This is a Monte Carlo implementation of the Cox-Ingersoll-Ross Model"""
 
+    ####################################################################################
+
     def __init__(self, a, b, sigma):
+
         self._a = a
         self._b = b
         self._sigma = sigma
+
+    ####################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -48,7 +52,7 @@ class CIRMonteCarlo:
         return s
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -58,7 +62,7 @@ def meanr(r0, a, b, t):
     return mr
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(fastmath=True, cache=True)
@@ -69,7 +73,7 @@ def variancer(r0, a, b, sigma, t):
     return vr
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -88,7 +92,7 @@ def zero_price(r0, a, b, sigma, t):
     return zcb
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -115,14 +119,10 @@ def draw(rt, a, b, sigma, dt):
     return r
 
 
-###############################################################################
+########################################################################################
 
 
-@njit(
-    float64[:](
-        float64, float64, float64, float64, float64, float64, int64, int64
-    )
-)
+@njit(float64[:](float64, float64, float64, float64, float64, float64, int64, int64))
 def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     """Generate a path of CIR rates using a number of numerical schemes."""
 
@@ -215,7 +215,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     return rate_path
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -345,6 +345,3 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
     zcb /= num_paths
     return zcb
-
-
-###############################################################################

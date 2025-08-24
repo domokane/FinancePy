@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from enum import Enum
 
@@ -10,12 +8,13 @@ from numba import njit, float64
 from ..utils.math import normcdf
 from ..utils.error import FinError
 
-########################################################################################
 # Parametric functions for option volatility to use in a Black-Scholes model
+
 ########################################################################################
 
 
 class VolFuncTypes(Enum):
+
     CLARK = 0
     SABR = 1
     SABR_BETA_ONE = 2
@@ -88,9 +87,9 @@ def vol_function_bloomberg(params, f, k, t):
     return v
 
 
-########################################################################################
 # I do not jit this so it can be called from a notebook with a vector of strike
 # Also, if I vectorise it it fails as it cannot handle a numpy array as input
+
 ########################################################################################
 
 
@@ -117,11 +116,9 @@ def vol_function_svi(params, f, k, t):
     return v
 
 
-########################################################################################
-########################################################################################
-# Gatheral SSVI surface SVI and equivalent local volatility
-# Code from https://wwwf.imperial.ac.uk/~ajacquie/IC_AMDP/IC_AMDP_Docs/Code/SSVI.pdf
-########################################################################################
+# Gatheral ssvi surface svi and equivalent local volatility
+# Code from https://wwwf.imperial.ac.uk/~ajacquie/IC_AMDP/IC_AMDP_Docs/Code/ssvi.pdf
+
 ########################################################################################
 
 
@@ -138,6 +135,9 @@ def phi_ssvi(theta, gamma):
     return phi
 
 
+########################################################################################
+
+
 @njit(
     float64(float64, float64, float64, float64, float64),
     fastmath=True,
@@ -149,9 +149,12 @@ def ssvi(x, gamma, sigma, rho, t):
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
     px = p * x
-    g = px + rho
-    v = 0.5 * theta * (1.0 + rho * px + np.sqrt(g**2 + 1.0 - rho * rho))
+    gg = px + rho
+    v = 0.5 * theta * (1.0 + rho * px + np.sqrt(gg**2 + 1.0 - rho * rho))
     return v
+
+
+########################################################################################
 
 
 @njit(
@@ -160,6 +163,7 @@ def ssvi(x, gamma, sigma, rho, t):
     cache=True,
 )
 def ssvi1(x, gamma, sigma, rho, t):
+
     # First derivative with respect to x
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
@@ -169,12 +173,16 @@ def ssvi1(x, gamma, sigma, rho, t):
     return v
 
 
+########################################################################################
+
+
 @njit(
     float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
 def ssvi2(x, gamma, sigma, rho, t):
+
     # Second derivative with respect to x
     theta = sigma * sigma * t
     p = phi_ssvi(theta, gamma)
@@ -184,12 +192,16 @@ def ssvi2(x, gamma, sigma, rho, t):
     return v
 
 
+########################################################################################
+
+
 @njit(
     float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
 def ssvit(x, gamma, sigma, rho, t):
+
     # First derivative with respect to t, by central difference
     eps = 0.0001
     ssvitplus = ssvi(x, gamma, sigma, rho, t + eps)
@@ -198,12 +210,16 @@ def ssvit(x, gamma, sigma, rho, t):
     return deriv
 
 
+########################################################################################
+
+
 @njit(
     float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
 def g(x, gamma, sigma, rho, t):
+
     w = ssvi(x, gamma, sigma, rho, t)
 
     if abs(w) < 1e-10:
@@ -216,15 +232,22 @@ def g(x, gamma, sigma, rho, t):
     return v
 
 
+########################################################################################
+
+
 @njit(
     float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
 def dminus(x, gamma, sigma, rho, t):
+
     vsqrt = np.sqrt(ssvi(x, gamma, sigma, rho, t))
     v = -x / vsqrt - 0.5 * vsqrt
     return v
+
+
+########################################################################################
 
 
 @njit(
@@ -233,10 +256,14 @@ def dminus(x, gamma, sigma, rho, t):
     cache=True,
 )
 def density_ssvi(x, gamma, sigma, rho, t):
+
     dm = dminus(x, gamma, sigma, rho, t)
     v = g(x, gamma, sigma, rho, t) * np.exp(-0.5 * dm * dm)
     v = v / np.sqrt(2.0 * np.pi * ssvi(x, gamma, sigma, rho, t))
     return v
+
+
+########################################################################################
 
 
 @njit(
@@ -245,11 +272,15 @@ def density_ssvi(x, gamma, sigma, rho, t):
     cache=True,
 )
 def ssvi_local_varg(x, gamma, sigma, rho, t):
-    # Compute the equivalent SSVI local variance
+
+    # Compute the equivalent ssvi local variance
     num = ssvit(x, gamma, sigma, rho, t)
     den = g(x, gamma, sigma, rho, t)
     var = num / den
     return var
+
+
+########################################################################################
 
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
@@ -267,9 +298,4 @@ def vol_function_ssvi(params, f, k, t):
 
     sigma = np.sqrt(vart)
 
-    print(gamma, sigma, rho, f, x, sigma)
-
     return sigma
-
-
-########################################################################################

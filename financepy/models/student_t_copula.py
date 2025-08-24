@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from math import sqrt
 import numpy as np
@@ -12,6 +10,8 @@ from ..utils.helpers import uniform_to_default_time
 
 
 class StudentTCopula:
+
+    ####################################################################################
 
     def default_times(
         self, issuer_curves, corr_matrix, degrees_of_freedom, num_trials, seed
@@ -41,6 +41,3 @@ class StudentTCopula:
                 corr_times[i_credit, i_trial + num_trials] = t2
 
         return corr_times
-
-
-########################################################################################

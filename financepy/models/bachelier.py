@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import numpy as np
 from scipy.stats import norm
@@ -10,24 +8,28 @@ from ..utils.global_types import OptionTypes
 from ..utils.helpers import label_to_string
 
 
-########################################################################################
 # NOTE: Need to convert option types to use enums.
 # NOTE: Perhaps just turn this into a function rather than a class.
+
 ########################################################################################
 
-
 class Bachelier:
+
     """Bachelier's Model which prices call and put options in the forward
     measure assuming the underlying rate follows a normal process.
     """
 
+    ####################################################################################
+
     def __init__(self, volatility):
+
         """Create FinModel black using parameters."""
         self.volatility = volatility
 
     ####################################################################################
 
     def value(
+
         self,
         forward_rate,  # Forward rate F
         strike_rate,  # Strike Rate K
@@ -53,9 +55,8 @@ class Bachelier:
     ####################################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         return s
 
-
-########################################################################################

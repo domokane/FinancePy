@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import numpy as np
 from numba import njit
@@ -12,8 +10,8 @@ from ..utils.helpers import label_to_string
 
 interp = InterpTypes.FLAT_FWD_RATES.value
 
-########################################################################################
 # dr = theta(t) dt + sigma * dW
+
 ########################################################################################
 
 
@@ -25,14 +23,14 @@ def p_fast(t, T, Rt, delta, pt, ptd, pT, _sigma):
     period discount factor to time t+dt and pT is the discount factor from
     now until the payment of the 1 dollar of the discount factor."""
 
-    BtT = T - t
-    BtDelta = delta
-    term1 = np.log(pT / pt) - (BtT / BtDelta) * np.log(ptd / pt)
-    term2 = (_sigma**2) * t * BtT * (BtT - BtDelta) / (2.0)
+    bt_t = T - t
+    bt_delta = delta
+    term1 = np.log(pT / pt) - (bt_t / bt_delta) * np.log(ptd / pt)
+    term2 = (_sigma**2) * t * bt_t * (bt_t - bt_delta) / (2.0)
 
-    logAhat = term1 - term2
-    BhattT = (BtT / BtDelta) * delta
-    p = np.exp(logAhat - BhattT * Rt)
+    log_ahat = term1 - term2
+    bhatt_t = (bt_t / bt_delta) * delta
+    p = np.exp(log_ahat - bhatt_t * Rt)
     return p
 
 
@@ -40,6 +38,8 @@ def p_fast(t, T, Rt, delta, pt, ptd, pT, _sigma):
 
 
 class ModelRatesHoLee:
+
+    ####################################################################################
 
     def __init__(self, sigma):
         """Construct Ho-Lee model using single parameter of volatility. The
@@ -51,7 +51,7 @@ class ModelRatesHoLee:
 
         self._sigma = sigma
 
-    ########################################################################################
+    ####################################################################################
 
     def zcb(self, rt1, t1, t2, discount_curve):
 
@@ -63,7 +63,7 @@ class ModelRatesHoLee:
         z = p_fast(t1, t2, rt1, delta, pt1, pt1p, pt2, self._sigma)
         return z
 
-    ########################################################################################
+    ####################################################################################
 
     def option_on_zcb(
         self, t_exp, t_mat, strike_price, face_amount, df_times, df_values
@@ -99,7 +99,7 @@ class ModelRatesHoLee:
 
         return {"call": call_value, "put": put_value}
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -107,6 +107,3 @@ class ModelRatesHoLee:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("Sigma", self._sigma)
         return s
-
-
-########################################################################################

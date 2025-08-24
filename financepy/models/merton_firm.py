@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from typing import Union
 import numpy as np
@@ -10,7 +8,7 @@ from ..utils.math import normcdf, normcdf_vect
 
 # TODO: Redesign this class
 
-###############################################################################
+########################################################################################
 
 
 class MertonFirm:
@@ -18,6 +16,8 @@ class MertonFirm:
     formulation by Merton with the inputs being the asset value of the firm,
     the liabilities (bond face), the time to maturity in years, the risk-free
     rate, the asset growth rate and the asset value volatility."""
+
+    ####################################################################################
 
     def __init__(
         self,
@@ -43,7 +43,7 @@ class MertonFirm:
         self._E = self.equity_value()
         self._vE = self.equity_vol()
 
-    ###############################################################################
+    ####################################################################################
 
     def leverage(self):
         """Calculate the leverage."""
@@ -51,36 +51,36 @@ class MertonFirm:
         lvg = self._A / self._L
         return lvg
 
-    ###############################################################################
+    ####################################################################################
 
     def asset_value(self):
         """Calculate the asset value."""
 
         return self._A
 
-    ###############################################################################
+    ####################################################################################
 
     def debt_face_value(self):
         """Calculate the asset value."""
 
         return self._L
 
-    ###############################################################################
+    ####################################################################################
 
     def equity_vol(self):
         """Calculate the equity volatility."""
 
-        E = self.equity_value()
+        e = self.equity_value()
 
         lvg = self._A / self._L
         sigma_root_t = self._vA * np.sqrt(self._t)
 
         d1 = np.log(lvg) + (self._r + 0.5 * self._vA**2) * self._t
         d1 = d1 / sigma_root_t
-        evol = (self._A / E) * normcdf_vect(d1) * self._vA
+        evol = (self._A / e) * normcdf_vect(d1) * self._vA
         return evol
 
-    ###############################################################################
+    ####################################################################################
 
     def equity_value(self):
         """Calculate the equity value."""
@@ -95,7 +95,7 @@ class MertonFirm:
         ) * normcdf_vect(d2)
         return evalue
 
-    ###############################################################################
+    ####################################################################################
 
     def debt_value(self):
         """Calculate the debt value"""
@@ -110,7 +110,7 @@ class MertonFirm:
         ) * normcdf_vect(d2)
         return dvalue
 
-    ###############################################################################
+    ####################################################################################
 
     def credit_spread(self):
         """Calculate the credit spread from the debt value."""
@@ -119,7 +119,7 @@ class MertonFirm:
         spd = -(1.0 / self._t) * np.log(dvalue / self._L) - self._r
         return spd
 
-    ###############################################################################
+    ####################################################################################
 
     def prob_default(self):
         """Calculate the default probability. This is not risk-neutral so it
@@ -131,7 +131,7 @@ class MertonFirm:
         pd = 1.0 - normcdf_vect(dd)
         return pd
 
-    ###############################################################################
+    ####################################################################################
 
     def dist_default(self):
         """Calculate the distance to default. This is not risk-neutral so it
@@ -142,9 +142,10 @@ class MertonFirm:
         dd = dd / self._vA / np.sqrt(self._t)
         return dd
 
-    ###############################################################################
+    ####################################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ASSET VALUE", self._A)
         s += label_to_string("BOND FACE", self._L)
@@ -152,6 +153,3 @@ class MertonFirm:
         s += label_to_string("ASSET GROWTH", self._mu)
         s += label_to_string("ASSET VOLATILITY", self._vA)
         return s
-
-
-###############################################################################

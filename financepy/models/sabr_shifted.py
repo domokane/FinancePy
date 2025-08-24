@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import numpy as np
 from numba import njit
@@ -11,9 +9,7 @@ from ..utils.error import FinError
 from ..utils.math import normcdf
 from ..utils.helpers import label_to_string
 
-########################################################################################
 # TODO: Should I merge this with SABR ?
-########################################################################################
 
 ########################################################################################
 
@@ -82,6 +78,8 @@ class SABRShifted:
     is normal and beta = 1 is lognormal, rho is the correlation between the
     underlying and the volatility process. The shift allows negative rates."""
 
+    ####################################################################################
+
     def __init__(self, alpha, beta, rho, nu, shift):
         """Create SABRShifted with all of the model parameters. We
         also provide functions below to assist with the calibration of the
@@ -93,7 +91,7 @@ class SABRShifted:
         self._nu = nu
         self._shift = shift
 
-    ########################################################################################
+    ####################################################################################
 
     def black_vol(self, f, k, t):
         """Black volatility from SABR model using Hagan et al. approx."""
@@ -123,7 +121,7 @@ class SABRShifted:
         v = vol_function_shifted_sabr(params, f, k, t)
         return v
 
-    ########################################################################################
+    ####################################################################################
 
     def black_vol_with_alpha(self, alpha, f, k, t):
 
@@ -131,12 +129,12 @@ class SABRShifted:
         black_vol = self.black_vol(f, k, t)
         return black_vol
 
-    ########################################################################################
+    ####################################################################################
 
     def value(
         self,
         forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate K
+        strike_rate,  # Strike Rate k
         time_to_expiry,  # Time to Expiry (years)
         df,  # Discount Factor to expiry date
         call_or_put,
@@ -160,7 +158,7 @@ class SABRShifted:
 
         raise Exception("Option type must be a European Call(C) or Put(P)")
 
-    ########################################################################################
+    ####################################################################################
 
     def set_alpha_from_black_vol(self, black_vol, forward, strike, time_to_expiry):
         """Estimate the valu normcdf(f the alpha coefficient of the SABR model
@@ -169,7 +167,7 @@ class SABRShifted:
 
         t_exp = time_to_expiry
         f = forward
-        K = strike
+        k = strike
 
         # The starting point is based on assuming that the strike is ATM
         self.set_alpha_from_atm_black_vol(black_vol, strike, time_to_expiry)
@@ -178,9 +176,13 @@ class SABRShifted:
 
         if init_alpha != black_vol:
             # Objective function
+
+            ############################################################################
+
             def fn(x):
+
                 return np.sqrt(
-                    (black_vol - self.black_vol_with_alpha(x, f, K, t_exp)) ** 2
+                    (black_vol - self.black_vol_with_alpha(x, f, k, t_exp)) ** 2
                 )
 
             bnds = ((0.0, None),)
@@ -192,7 +194,7 @@ class SABRShifted:
 
         self._alpha = alpha
 
-    ########################################################################################
+    ####################################################################################
 
     def set_alpha_from_atm_black_vol(self, black_vol, atm_strike, time_to_expiry):
         """We solve cubic equation for the unknown variable alpha for the
@@ -208,12 +210,12 @@ class SABRShifted:
         rho = self._rho
         nu = self._nu
         t_exp = time_to_expiry
-        K = atm_strike
+        k = atm_strike
 
-        coeff0 = -black_vol * (K ** (1.0 - self._beta))
+        coeff0 = -black_vol * (k ** (1.0 - self._beta))
         coeff1 = 1.0 + ((2.0 - 3.0 * rho**2) / 24.0) * (nu**2) * t_exp
-        coeff2 = (rho * beta * nu * t_exp) / (4.0 * (K ** (1.0 - beta)))
-        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (24.0 * (K ** (2.0 - 2.0 * beta)))
+        coeff2 = (rho * beta * nu * t_exp) / (4.0 * (k ** (1.0 - beta)))
+        coeff3 = (((1.0 - beta) ** 2) * t_exp) / (24.0 * (k ** (2.0 - 2.0 * beta)))
         coeffs = [coeff3, coeff2, coeff1, coeff0]
         roots = np.roots(coeffs)
 
@@ -221,7 +223,7 @@ class SABRShifted:
         alpha = np.min([coeff.real for coeff in roots if coeff.real > 0])
         self._alpha = alpha
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Return string with class details."""
@@ -233,6 +235,3 @@ class SABRShifted:
         s += label_to_string("Rho", self._rho)
         s += label_to_string("Shift", self._shift)
         return s
-
-
-########################################################################################

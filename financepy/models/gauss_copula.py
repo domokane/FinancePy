@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 # TODO: Use Numba to speed this up more.
 
@@ -9,8 +7,8 @@ import numpy as np
 from ..utils.math import normcdf
 from ..utils.helpers import uniform_to_default_time
 
-########################################################################################
 # TODO:
+
 ########################################################################################
 
 
@@ -40,6 +38,3 @@ def default_times_gc(issuer_curves, corr_matrix, num_trials, seed):
             corr_times[i_credit, num_trials + i_trial] = t2
 
     return corr_times
-
-
-##########################################################################

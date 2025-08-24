@@ -1,25 +1,21 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import numpy as np
 from numba import njit  # , float64, int64
 from ..utils.math import cholesky
 from ..utils.error import FinError
 
-########################################################################################
 # WE SIMULATE GEOMETRIC BROWNIAN MOTION WITH DIFFERENT CUTS ACROSS 3D SPACE
 # OF ASSETS, PATHS AND TIME STEPS.
-########################################################################################
 
 # Seed the random generator globally for reproducibility
 np.random.seed(42)
 
+########################################################################################
+
 
 @njit
-def get_paths_times(
-    num_paths, num_time_steps, t, mu, stock_price, volatility, seed
-):
+def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, seed):
     """Get the simulated GBM process for a single asset with even num paths and
     time steps. Inputs include the number of time steps, paths, the drift mu,
     stock price, volatility and a seed.
@@ -104,10 +100,7 @@ def get_assets_paths_times(
     if mus.shape[0] != num_assets:
         raise FinError("Drift mu vector incorrect size.")
 
-    if (
-        corr_matrix.shape[0] != num_assets
-        and corr_matrix.shape[1] != num_assets
-    ):
+    if corr_matrix.shape[0] != num_assets and corr_matrix.shape[1] != num_assets:
         raise FinError("Correlation matrix incorrect size.")
 
     np.random.seed(seed)
@@ -118,9 +111,7 @@ def get_assets_paths_times(
     s_all = np.empty((num_assets, num_paths, num_time_steps + 1))
     t_all = np.linspace(0, t, num_time_steps + 1)
 
-    g = np.random.standard_normal(
-        (num_paths_even, num_time_steps + 1, num_assets)
-    )
+    g = np.random.standard_normal((num_paths_even, num_time_steps + 1, num_assets))
     c = cholesky(corr_matrix)
     g_corr = np.empty((num_paths_even, num_time_steps + 1, num_assets))
 
@@ -145,9 +136,7 @@ def get_assets_paths_times(
                 w = np.exp(z * vsqrt_dts[ia])
                 v = m[ia]
                 s_all[ia, ip_start, it] = s_all[ia, ip_start, it - 1] * v * w
-                s_all[ia, ip_start + 1, it] = (
-                    s_all[ia, ip_start + 1, it - 1] * v / w
-                )
+                s_all[ia, ip_start + 1, it] = s_all[ia, ip_start + 1, it - 1] * v / w
 
     return t_all, s_all
 
@@ -165,6 +154,7 @@ def get_assets_paths(
     volatilities,
     corr_matrix,
     seed,
+    ########################################################################################
 ):
     """Get the simulated GBM process for a number of assets and paths for one
     time step. Inputs include the number of assets, paths, the vector of mus,
@@ -195,10 +185,7 @@ def get_assets_paths(
     if mus.shape[0] != num_assets:
         raise FinError("Drift mu vector incorrect size.")
 
-    if (
-        corr_matrix.shape[0] != num_assets
-        or corr_matrix.shape[1] != num_assets
-    ):
+    if corr_matrix.shape[0] != num_assets or corr_matrix.shape[1] != num_assets:
         raise FinError("Correlation matrix incorrect size.")
 
     np.random.seed(seed)
@@ -229,6 +216,3 @@ def get_assets_paths(
             s_all[ia, ip_start + 1] = stock_prices[ia] * m[ia] / w
 
     return t_all, s_all
-
-
-########################################################################################

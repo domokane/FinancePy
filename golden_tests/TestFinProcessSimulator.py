@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import sys
 from financepy.models.process_simulator import FinVasicekNumericalScheme
 from financepy.models.process_simulator import CIRNumericalScheme
 from financepy.models.process_simulator import FinHestonNumericalScheme
@@ -7,7 +8,6 @@ from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
 from financepy.models.process_simulator import FinProcessSimulator
 from FinTestCases import FinTestCases, global_test_case_mode
-import sys
 
 sys.path.append("..")
 
@@ -34,11 +34,11 @@ def test_fin_process_simulator():
     sigma = 0.10
     stock_price = 100.0
     drift = 0.04
-    scheme = FinGBMNumericalScheme.NORMAL
+    scheme = FinGBMNumericalScheme.NORMAL_SCHEME
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.GBM, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.GBM_PROCESS, t, model_params, num_annual_steps, num_paths, seed
     )
     end = time.time()
     elapsed = end - start
@@ -53,11 +53,11 @@ def test_fin_process_simulator():
     sigma = 0.10
     stock_price = 100.0
     drift = 0.04
-    scheme = FinGBMNumericalScheme.ANTITHETIC
+    scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.GBM, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.GBM_PROCESS, t, model_params, num_annual_steps, num_paths, seed
     )
     end = time.time()
     elapsed = end - start
@@ -74,11 +74,11 @@ def test_fin_process_simulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.EULER
+    scheme = FinHestonNumericalScheme.EULER_SCHEME
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.HESTON, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.HESTON_PROCESS, t, model_params, num_annual_steps, num_paths, seed
     )
     end = time.time()
     elapsed = end - start
@@ -95,11 +95,11 @@ def test_fin_process_simulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.EULERLOG
+    scheme = FinHestonNumericalScheme.EULERLOG_SCHEME
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.HESTON, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.HESTON_PROCESS, t, model_params, num_annual_steps, num_paths, seed
     )
     end = time.time()
     elapsed = end - start
@@ -116,11 +116,11 @@ def test_fin_process_simulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.QUADEXP
+    scheme = FinHestonNumericalScheme.QUADEXP_SCHEME
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.HESTON, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.HESTON_PROCESS, t, model_params, num_annual_steps, num_paths, seed
     )
     end = time.time()
     elapsed = end - start
@@ -139,7 +139,7 @@ def test_fin_process_simulator():
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.VASICEK,
+        ProcessTypes.VASICEK_PROCESS,
         t,
         model_params,
         num_annual_steps,
@@ -163,7 +163,7 @@ def test_fin_process_simulator():
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.VASICEK,
+        ProcessTypes.VASICEK_PROCESS,
         t,
         model_params,
         num_annual_steps,
@@ -183,11 +183,11 @@ def test_fin_process_simulator():
     kappa = 0.50
     theta = 0.05
     sigma = 0.90
-    scheme = CIRNumericalScheme.MILSTEIN
+    scheme = CIRNumericalScheme.MILSTEIN_SCHEME
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
-        ProcessTypes.CIR, t, model_params, num_annual_steps, num_paths, seed
+        ProcessTypes.CIR_PROCESS, t, model_params, num_annual_steps, num_paths, seed
     )
     end = time.time()
     elapsed = end - start

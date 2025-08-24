@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 # TODO Fix this
 
@@ -13,11 +11,10 @@ from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 from ..models.sobol import get_gaussian_sobol
 
-
 ########################################################################################
 
-
 def _value_mc_nonumba_nonumpy(
+
     s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
 ):
     # SLOWEST - No use of NUMPY vectorisation or NUMBA
@@ -58,11 +55,10 @@ def _value_mc_nonumba_nonumpy(
     v = payoff * np.exp(-r * t) / num_paths / 2.0
     return v
 
-
 ########################################################################################
 
-
 def _value_mc_numpy_only(
+
     s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
 ):
     # Use of NUMPY ONLY
@@ -97,9 +93,7 @@ def _value_mc_numpy_only(
     v = payoff * np.exp(-r * t) / 2.0
     return v
 
-
 ########################################################################################
-
 
 @njit(
     float64(
@@ -118,6 +112,7 @@ def _value_mc_numpy_only(
     fastmath=True,
 )
 def _value_mc_numpy_numba(
+
     s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
 ):
     # Use of NUMPY ONLY
@@ -152,9 +147,7 @@ def _value_mc_numpy_numba(
     v = payoff * np.exp(-r * t) / 2.0
     return v
 
-
 ########################################################################################
-
 
 @njit(
     float64(
@@ -173,6 +166,7 @@ def _value_mc_numpy_numba(
     cache=True,
 )
 def _value_mc_numba_only(
+
     s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
 ):
     # No use of Numpy vectorisation but NUMBA
@@ -215,9 +209,7 @@ def _value_mc_numba_only(
     v = payoff * np.exp(-r * t) / num_paths / 2.0
     return v
 
-
 ########################################################################################
-
 
 @njit(
     float64(
@@ -236,7 +228,10 @@ def _value_mc_numba_only(
     cache=True,
 )
 def _value_mc_numba_parallel(
+
     s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
+########################################################################################
+
 ):
     # No use of Numpy vectorisation but NUMBA
 
@@ -279,5 +274,3 @@ def _value_mc_numba_parallel(
     v = average_payoff * np.exp(-r * t)
     return v
 
-
-########################################################################################

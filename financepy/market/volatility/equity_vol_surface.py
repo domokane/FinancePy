@@ -247,9 +247,7 @@ def _solver_for_smile_strike(
         parameters,
     )
 
-    k = newton_secant(
-        _delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50
-    )
+    k = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
     return k
 
 
@@ -358,21 +356,17 @@ class EquityVolSurface:
                     index1 = i
                     break
 
-        fwd0 = self._fwd_0_T[index0]
-        fwd1 = self._fwd_0_T[index1]
+        fwd0 = self._fwd_0_t[index0]
+        fwd1 = self._fwd_0_t[index1]
 
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(
-            vol_type_value, self._parameters[index0], fwd0, k, t0
-        )
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(
-                vol_type_value, self._parameters[index1], fwd1, k, t1
-            )
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k, t1)
 
         else:
 
@@ -542,8 +536,8 @@ class EquityVolSurface:
                     index1 = i
                     break
 
-        fwd0 = self._fwd_0_T[index0]
-        fwd1 = self._fwd_0_T[index1]
+        fwd0 = self._fwd_0_t[index0]
+        fwd1 = self._fwd_0_t[index1]
 
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
@@ -562,9 +556,7 @@ class EquityVolSurface:
             self._parameters[index0],
         )
 
-        vol0 = vol_function(
-            vol_type_value, self._parameters[index0], fwd0, k_0, t0
-        )
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k_0, t0)
 
         if index1 != index0:
 
@@ -580,9 +572,7 @@ class EquityVolSurface:
                 self._parameters[index1],
             )
 
-            vol1 = vol_function(
-                vol_type_value, self._parameters[index1], fwd1, k_1, t1
-            )
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k_1, t1)
         else:
             vol1 = vol0
 
@@ -597,9 +587,7 @@ class EquityVolSurface:
             kt = ((t_exp - t0) * k_1 + (t1 - t_exp) * k_0) / (t1 - t0)
 
             if vart < 0.0:
-                raise FinError(
-                    "Failed interpolation due to negative variance."
-                )
+                raise FinError("Failed interpolation due to negative variance.")
 
             volt = np.sqrt(vart / t_exp)
 
@@ -654,7 +642,7 @@ class EquityVolSurface:
 
         self._t_exp = np.zeros(num_expiry_dts)
 
-        self._fwd_0_T = np.zeros(num_expiry_dts)
+        self._fwd_0_t = np.zeros(num_expiry_dts)
         self._r = np.zeros(num_expiry_dts)
         self._q = np.zeros(num_expiry_dts)
 
@@ -676,7 +664,7 @@ class EquityVolSurface:
             self._t_exp[i] = t_exp
             self._r[i] = -np.log(dis_df) / t_exp
             self._q[i] = -np.log(div_df) / t_exp
-            self._fwd_0_T[i] = f
+            self._fwd_0_t[i] = f
 
         #######################################################################
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
@@ -764,7 +752,7 @@ class EquityVolSurface:
 
         for i_tenor in range(0, self._num_expiry_dts):
 
-            f = self._fwd_0_T[i_tenor]
+            f = self._fwd_0_t[i_tenor]
             t = self._t_exp[i_tenor]
 
             ds = (high_s - low_s) / num_intervals

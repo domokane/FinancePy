@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import sys
+import time
 
 sys.path.append("..")
 
@@ -33,13 +34,11 @@ def test_fin_fx_barrier_option():
     notional_currency = "USD"
 
     drift = dom_interest_rate - for_interest_rate
-    scheme = FinGBMNumericalScheme.ANTITHETIC
-    process_type = ProcessTypes.GBM
+    scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
+    process_type = ProcessTypes.GBM_PROCESS
     domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
     foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
     model = BlackScholes(volatility)
-
-    import time
 
     start = time.time()
     num_observations_per_year = 100

@@ -2,9 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from enum import Enum
+from math import exp, log, pi
+
 from numba import njit, float64, int64
 from scipy import integrate
-from math import exp, log, pi
 import numpy as np
 
 from ..utils.global_vars import G_DAYS_IN_YEARS
@@ -21,12 +23,10 @@ from ..utils.error import FinError
 # dS = rS dt + sqrt(V) * S * (rhohat dz1 + rho dz2)
 # dV = kappa(theta-V) dt + sigma sqrt(V) dz2
 # where rhohat = sqrt(1-rho*rho)
-###############################################################################
+########################################################################################
 # TODO - DECIDE WHETHER TO OO MODEL
 # TODO - NEEDS CHECKING FOR MC CONVERGENCE
-###############################################################################
-
-from enum import Enum
+########################################################################################
 
 
 class HestonNumericalScheme(Enum):
@@ -35,7 +35,7 @@ class HestonNumericalScheme(Enum):
     QUADEXP = 3
 
 
-###############################################################################
+########################################################################################
 
 
 @njit(
@@ -57,9 +57,7 @@ class HestonNumericalScheme(Enum):
     cache=True,
     fastmath=True,
 )
-def get_paths(
-    s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, scheme
-):
+def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, scheme):
 
     np.random.seed(seed)
     num_steps = int(t / dt)
@@ -77,19 +75,19 @@ def get_paths(
             for i_step in range(1, num_steps):
                 z1 = np.random.normal(0.0, 1.0) * sdt
                 z2 = np.random.normal(0.0, 1.0) * sdt
-                zV = z1
-                zS = rho * z1 + rhohat * z2
+                z_v = z1
+                z_s = rho * z1 + rhohat * z2
                 vplus = max(v, 0.0)
                 rtvplus = np.sqrt(vplus)
                 v += (
                     kappa * (theta - vplus) * dt
-                    + sigma * rtvplus * zV
-                    + 0.25 * sigma2 * (zV * zV - dt)
+                    + sigma * rtvplus * z_v
+                    + 0.25 * sigma2 * (z_v * z_v - dt)
                 )
                 s += (
                     (r - q) * s * dt
-                    + rtvplus * s * zS
-                    + 0.5 * s * vplus * (zV * zV - dt)
+                    + rtvplus * s * z_s
+                    + 0.5 * s * vplus * (z_v * z_v - dt)
                 )
                 s_paths[i_path, i_step] = s
 
@@ -99,59 +97,55 @@ def get_paths(
             x = log(s0)
             v = v0
             for i_step in range(1, num_steps):
-                zV = np.random.normal(0.0, 1.0) * sdt
-                zS = rho * zV + rhohat * np.random.normal(0.0, 1.0) * sdt
+                z_v = np.random.normal(0.0, 1.0) * sdt
+                z_s = rho * z_v + rhohat * np.random.normal(0.0, 1.0) * sdt
                 vplus = max(v, 0.0)
                 rtvplus = np.sqrt(vplus)
-                x += (r - q - 0.5 * vplus) * dt + rtvplus * zS
+                x += (r - q - 0.5 * vplus) * dt + rtvplus * z_s
                 v += (
                     kappa * (theta - vplus) * dt
-                    + sigma * rtvplus * zV
-                    + sigma2 * (zV * zV - dt) / 4.0
+                    + sigma * rtvplus * z_v
+                    + sigma2 * (z_v * z_v - dt) / 4.0
                 )
                 s_paths[i_path, i_step] = exp(x)
 
     elif scheme == HestonNumericalScheme.QUADEXP.value:
         # Due to Leif Andersen(2006)
-        Q = exp(-kappa * dt)
+        qq = exp(-kappa * dt)
         psic = 1.50
         gamma1 = 0.50
         gamma2 = 0.50
-        K0 = -rho * kappa * theta * dt / sigma
+        k_0 = -rho * kappa * theta * dt / sigma
         k_1 = gamma1 * dt * (kappa * rho / sigma - 0.5) - rho / sigma
         k_2 = gamma2 * dt * (kappa * rho / sigma - 0.5) + rho / sigma
-        K3 = gamma1 * dt * (1.0 - rho * rho)
-        K4 = gamma2 * dt * (1.0 - rho * rho)
-        A = k_2 + 0.5 * K4
+        k_3 = gamma1 * dt * (1.0 - rho * rho)
+        k_4 = gamma2 * dt * (1.0 - rho * rho)
+        aa = k_2 + 0.5 * k_4
         mu = r - q
-        c1 = sigma2 * Q * (1.0 - Q) / kappa
-        c2 = theta * sigma2 * ((1.0 - Q) ** 2) / 2.0 / kappa
+        c1 = sigma2 * qq * (1.0 - qq) / kappa
+        c2 = theta * sigma2 * ((1.0 - qq) ** 2) / 2.0 / kappa
 
         for i_path in range(0, num_paths):
             x = log(s0)
             vn = v0
             for i_step in range(1, num_steps):
-                zV = np.random.normal(0, 1)
-                zS = rho * zV + rhohat * np.random.normal(0, 1)
-                m = theta + (vn - theta) * Q
+                z_v = np.random.normal(0, 1)
+                z_s = rho * z_v + rhohat * np.random.normal(0, 1)
+                m = theta + (vn - theta) * qq
                 m2 = m * m
                 s2 = c1 * vn + c2
                 psi = s2 / m2
                 u = np.random.uniform(0.0, 1.0)
 
                 if psi <= psic:
-                    b2 = (
-                        2.0 / psi
-                        - 1.0
-                        + np.sqrt((2.0 / psi) * (2.0 / psi - 1.0))
-                    )
+                    b2 = 2.0 / psi - 1.0 + np.sqrt((2.0 / psi) * (2.0 / psi - 1.0))
                     a = m / (1.0 + b2)
                     b = np.sqrt(b2)
-                    zV = norminvcdf(u)
-                    vnp = a * ((b + zV) ** 2)
-                    d = 1.0 - 2.0 * A * a
-                    M = exp((A * b2 * a) / d) / np.sqrt(d)
-                    K0 = -log(M) - (k_1 + 0.5 * K3) * vn
+                    z_v = norminvcdf(u)
+                    vnp = a * ((b + z_v) ** 2)
+                    d = 1.0 - 2.0 * aa * a
+                    m = exp((aa * b2 * a) / d) / np.sqrt(d)
+                    k_0 = -log(m) - (k_1 + 0.5 * k_3) * vn
                 else:
                     p = (psi - 1.0) / (psi + 1.0)
                     beta = (1.0 - p) / m
@@ -161,14 +155,14 @@ def get_paths(
                     else:
                         vnp = log((1.0 - p) / (1.0 - u)) / beta
 
-                    M = p + beta * (1.0 - p) / (beta - A)
-                    K0 = -log(M) - (k_1 + 0.5 * K3) * vn
+                    m = p + beta * (1.0 - p) / (beta - aa)
+                    k_0 = -log(m) - (k_1 + 0.5 * k_3) * vn
 
                 x += (
                     mu * dt
-                    + K0
+                    + k_0
                     + (k_1 * vn + k_2 * vnp)
-                    + np.sqrt(K3 * vn + K4 * vnp) * zS
+                    + np.sqrt(k_3 * vn + k_4 * vnp) * z_s
                 )
                 s_paths[i_path, i_step] = exp(x)
                 vn = vnp
@@ -178,7 +172,7 @@ def get_paths(
     return s_paths
 
 
-###############################################################################
+########################################################################################
 
 
 class Heston:
@@ -196,7 +190,7 @@ class Heston:
         self._sigma = sigma
         self._rho = rho
 
-    ###############################################################################
+    ####################################################################################
 
     def value_mc(
         self,
@@ -215,7 +209,7 @@ class Heston:
 
         K = option.strike_price
         dt = 1.0 / num_steps_per_year
-        schemeValue = float(scheme.value)
+        scheme_value = float(scheme.value)
 
         s_paths = get_paths(
             stock_price,
@@ -230,7 +224,7 @@ class Heston:
             dt,
             num_paths,
             seed,
-            schemeValue,
+            scheme_value,
         )
 
         if option.opt_type == OptionTypes.EUROPEAN_CALL:
@@ -244,11 +238,9 @@ class Heston:
         v = payoff * exp(-interest_rate * tau)
         return v
 
-    ###############################################################################
+    ####################################################################################
 
-    def value_lewis(
-        self, value_dt, option, stock_price, interest_rate, dividend_yield
-    ):
+    def value_lewis(self, value_dt, option, stock_price, interest_rate, dividend_yield):
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -272,34 +264,30 @@ class Heston:
             b = kappa + 1j * rho * sigma * k
             d = np.sqrt(b**2 + V * k * (k - 1j))
             g = (b - d) / (b + d)
-            T_m = (b - d) / V
-            Q = np.exp(-d * tau)
-            T = T_m * (1.0 - Q) / (1.0 - g * Q)
+            t_m = (b - d) / V
+            qq = np.exp(-d * tau)
+            t = t_m * (1.0 - qq) / (1.0 - g * qq)
             W = (
                 kappa
                 * theta
-                * (tau * T_m - 2.0 * np.log((1.0 - g * Q) / (1.0 - g)) / V)
+                * (tau * t_m - 2.0 * np.log((1.0 - g * qq) / (1.0 - g)) / V)
             )
-            phi = np.exp(W + v0 * T)
+            phi = np.exp(W + v0 * t)
             return phi
 
         def phi_transform(x):
             def integrand(k):
-                return (
-                    2.0
-                    * np.real(np.exp(-1j * k * x) * phi(k))
-                    / (k**2 + 1.0 / 4.0)
-                )
+                return 2.0 * np.real(np.exp(-1j * k * x) * phi(k)) / (k**2 + 1.0 / 4.0)
 
             return integrate.quad(integrand, 0, np.inf)[0]
 
         x = log(F / K)
-        I1 = phi_transform(x) / (2.0 * pi)
-        v1 = F * exp(-r * tau) - np.sqrt(K * F) * exp(-r * tau) * I1
+        i_1 = phi_transform(x) / (2.0 * pi)
+        v1 = F * exp(-r * tau) - np.sqrt(K * F) * exp(-r * tau) * i_1
         #        v2 = s0 * exp(-q*tau) - K * exp(-r*tau) * I1
         return v1
 
-    ###############################################################################
+    ####################################################################################
 
     def value_lewis_rouah(
         self, value_dt, option, stock_price, interest_rate, dividend_yield
@@ -315,39 +303,38 @@ class Heston:
 
         q = dividend_yield
         r = interest_rate
-        V = sigma * sigma
-
-        def f(k_in):
-            k = k_in + 0.5 * 1j
-            b = (2.0 / V) * (1j * k * rho * sigma + kappa)
-            e = np.sqrt(b**2 + 4.0 * k * (k - 1j) / V)
-            g = (b - e) / 2.0
-            h = (b - e) / (b + e)
-            q = V * tau / 2.0
-            Q = np.exp(-e * q)
-            H = np.exp(
-                (2.0 * kappa * theta / V)
-                * (q * g - np.log((1.0 - h * Q) / (1.0 - h)))
-                + v0 * g * (1.0 - Q) / (1.0 - h * Q)
-            )
-            integrand = H * np.exp(-1j * k * X) / (k * k - 1j * k)
-            return integrand.real
+        vv = sigma * sigma
 
         s0 = stock_price
-        F = s0 * exp((r - q) * tau)
-        K = option.strike_price
-        X = log(F / K)
-        integral = integrate.quad(f, 0.0, np.inf)[0] * (1.0 / pi)
-        v = s0 * exp(-q * tau) - K * exp(-r * tau) * integral
+        f = s0 * exp((r - q) * tau)
+        k = option.strike_price
+        x = log(f / k)
+
+        def fn(k_in):
+            k = k_in + 0.5 * 1j
+            b = (2.0 / vv) * (1j * k * rho * sigma + kappa)
+            e = np.sqrt(b**2 + 4.0 * k * (k - 1j) / vv)
+            g = (b - e) / 2.0
+            h = (b - e) / (b + e)
+            q = vv * tau / 2.0
+            qq = np.exp(-e * q)
+            hh = np.exp(
+                (2.0 * kappa * theta / vv)
+                * (q * g - np.log((1.0 - h * qq) / (1.0 - h)))
+                + v0 * g * (1.0 - qq) / (1.0 - h * qq)
+            )
+            integrand = hh * np.exp(-1j * k * x) / (k * k - 1j * k)
+            return integrand.real
+
+        integral = integrate.quad(fn, 0.0, np.inf)[0] * (1.0 / pi)
+        v = s0 * exp(-q * tau) - k * exp(-r * tau) * integral
         return v
 
-    ###############################################################################
+    ####################################################################################
     # Taken from Nick Weber's VBA Finance book
-    ###############################################################################
+    ####################################################################################
 
-    def value_weber(
-        self, value_dt, option, stock_price, interest_rate, dividend_yield
-    ):
+    def value_weber(self, value_dt, option, stock_price, interest_rate, dividend_yield):
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -360,44 +347,40 @@ class Heston:
         q = dividend_yield
         r = interest_rate
         s0 = stock_price
-        K = option.strike_price
-        V = sigma**2
+        k = option.strike_price
+        vv = sigma**2
 
-        def f(s, b):
+        def fn(s, b):
             def integrand(u):
                 beta = b - 1j * rho * sigma * u
-                d = np.sqrt((beta**2) - V * u * (s * 1j - u))
+                d = np.sqrt((beta**2) - vv * u * (s * 1j - u))
                 g = (beta - d) / (beta + d)
-                Q = np.exp(-d * tau)
-                B = (beta - d) * (1.0 - Q) / (1.0 - g * Q) / V
-                A = (
+                qq = np.exp(-d * tau)
+                bb = (beta - d) * (1.0 - qq) / (1.0 - g * qq) / vv
+                aa = (
                     kappa
-                    * (
-                        (beta - d) * tau
-                        - 2.0 * np.log((1.0 - g * Q) / (1.0 - g))
-                    )
-                    / V
+                    * ((beta - d) * tau - 2.0 * np.log((1.0 - g * qq) / (1.0 - g)))
+                    / vv
                 )
                 v = np.exp(
-                    A * theta
-                    + B * v0
-                    + 1j * u * np.log(s0 / (K * np.exp(-(r - q) * tau)))
+                    aa * theta
+                    + bb * v0
+                    + 1j * u * np.log(s0 / (k * np.exp(-(r - q) * tau)))
                 ) / (u * 1j)
                 return v.real
 
             area = 0.50 + (1.0 / pi) * integrate.quad(integrand, 0, np.inf)[0]
             return area
 
-        v = s0 * exp(-q * tau) * f(1.0, kappa - rho * sigma) - exp(
-            -r * tau
-        ) * K * f(-1.0, kappa)
+        v = s0 * exp(-q * tau) * fn(1.0, kappa - rho * sigma)
+        v = v - exp(-r * tau) * k * fn(-1.0, kappa)
 
         return v
 
-    ###############################################################################
+    ####################################@#@#############################################
     # Gatheral book page 19 with definition of x given on page 16 and noting
     # that the value C is a forward value and so needs to be discounted
-    ###############################################################################
+    ####################################################################################
 
     def value_gatheral(
         self, value_dt, option, stock_price, interest_rate, dividend_yield
@@ -414,34 +397,33 @@ class Heston:
         q = dividend_yield
         r = interest_rate
         s0 = stock_price
-        K = option.strike_price
-        F = s0 * exp((r - q) * tau)
-        x0 = log(F / K)
+        k = option.strike_price
+        f = s0 * exp((r - q) * tau)
+        x0 = log(f / k)
 
         def ff(j):
             def integrand(u):
-                V = sigma * sigma
-                A = -u * u / 2.0 - 1j * u / 2.0 + 1j * j * u
-                B = kappa - rho * sigma * j - rho * sigma * 1j * u
-                G = V / 2.0
-                d = np.sqrt(B**2 - 4.0 * A * G)
-                rplus = (B + d) / 2.0 / G
-                rminus = (B - d) / 2.0 / G
-                R = rminus / rplus
-                Q = np.exp(-d * tau)
-                D = rminus * (1.0 - Q) / (1.0 - R * Q)
-                C = kappa * (
-                    rminus * tau
-                    - (2.0 / V) * np.log((1.0 - R * Q) / (1.0 - R))
+                vv = sigma * sigma
+                aa = -u * u / 2.0 - 1j * u / 2.0 + 1j * j * u
+                bb = kappa - rho * sigma * j - rho * sigma * 1j * u
+                gg = vv / 2.0
+                d = np.sqrt(bb**2 - 4.0 * aa * gg)
+                rplus = (bb + d) / 2.0 / gg
+                rminus = (bb - d) / 2.0 / gg
+                rr = rminus / rplus
+                qq = np.exp(-d * tau)
+                dd = rminus * (1.0 - qq) / (1.0 - rr * qq)
+                cc = kappa * (
+                    rminus * tau - (2.0 / vv) * np.log((1.0 - rr * qq) / (1.0 - rr))
                 )
-                phi = np.exp(C * theta + D * v0 + 1j * u * x0) / (1j * u)
+                phi = np.exp(cc * theta + dd * v0 + 1j * u * x0) / (1j * u)
                 return phi.real
 
             area = 0.50 + 1.0 / pi * integrate.quad(integrand, 0.0, np.inf)[0]
             return area
 
-        v = s0 * exp(-q * tau) * ff(1) - K * exp(-r * tau) * ff(0)
+        v = s0 * exp(-q * tau) * ff(1) - k * exp(-r * tau) * ff(0)
         return v
 
 
-###############################################################################
+########################################################################################

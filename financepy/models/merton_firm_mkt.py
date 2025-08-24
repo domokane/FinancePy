@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from typing import Union
 
@@ -12,34 +10,34 @@ from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
 from .merton_firm import MertonFirm
 
-###############################################################################
+########################################################################################
 
 
 def _fobj(x, *args):
     """Find value of asset value and vol that fit equity value and vol"""
 
-    A, vA = x
+    a, v_a = x
 
-    E = args[0]
-    vE = args[1]
-    L = args[2]
+    e = args[0]
+    v_e = args[1]
+    l = args[2]
     t = args[3]
     r = args[4]
 
-    lvg = A / L
-    sigmaRootT = vA * np.sqrt(t)
-    d1 = np.log(lvg) + (r + 0.5 * vA**2) * t
-    d1 = d1 / sigmaRootT
-    d2 = d1 - sigmaRootT
+    lvg = a / l
+    sigma_root_t = v_a * np.sqrt(t)
+    d1 = np.log(lvg) + (r + 0.5 * v_a**2) * t
+    d1 = d1 / sigma_root_t
+    d2 = d1 - sigma_root_t
 
-    vE_LHS = (A / E) * normcdf(d1) * vA
-    E_LHS = A * normcdf(d1) - L * np.exp(-r * t) * normcdf(d2)
-    obj = (E - E_LHS) ** 2 + (vE - vE_LHS) ** 2
+    v_e_lhs = (a / e) * normcdf(d1) * v_a
+    e_lhs = a * normcdf(d1) - l * np.exp(-r * t) * normcdf(d2)
+    obj = (e - e_lhs) ** 2 + (v_e - v_e_lhs) ** 2
 
     return obj
 
 
-###############################################################################
+########################################################################################
 
 
 class MertonFirmMkt(MertonFirm):
@@ -51,6 +49,8 @@ class MertonFirmMkt(MertonFirm):
     asset volatility are computed internally by solving two non-linear
     simultaneous equations.
     """
+
+    ####################################################################################
 
     def __init__(
         self,
@@ -101,10 +101,10 @@ class MertonFirmMkt(MertonFirm):
         )
 
         if len(self._E) != nmax and len(self._E) > 1:
-            raise FinError("Len E must be 1 or maximum length of arrays")
+            raise FinError("Len e must be 1 or maximum length of arrays")
 
         if len(self._L) != nmax and len(self._L) > 1:
-            raise FinError("Len L must be 1 or maximum length of arrays")
+            raise FinError("Len l must be 1 or maximum length of arrays")
 
         if len(self._t) != nmax and len(self._t) > 1:
             raise FinError("Len T must be 1 or maximum length of arrays")
@@ -122,7 +122,7 @@ class MertonFirmMkt(MertonFirm):
         self._solve_for_asset_value_and_vol()
         self._D = self.debt_value()
 
-    ###############################################################################
+    ####################################################################################
 
     def _solve_for_asset_value_and_vol(self):
 
@@ -169,7 +169,7 @@ class MertonFirmMkt(MertonFirm):
         self._A = np.array(self._A)
         self._vA = np.array(self._vA)
 
-    ###############################################################################
+    ####################################################################################
 
     def __repr__(self):
 
@@ -180,6 +180,3 @@ class MertonFirmMkt(MertonFirm):
         s += label_to_string("ASSET GROWTH", self._mu)
         s += label_to_string("EQUITY VOLATILITY", self._vE)
         return s
-
-
-###############################################################################

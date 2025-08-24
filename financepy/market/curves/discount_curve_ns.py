@@ -18,18 +18,15 @@ from ...utils.helpers import times_from_dates
 
 
 class DiscountCurveNS(DiscountCurve):
-
     """Implementation of Nelson-Siegel parametrisation of a discount curve.
     The internal rate is a continuously compounded rate but you can calculate
     alternative frequencies by providing a corresponding compounding frequency.
     A day count convention is needed to ensure that dates are converted to the
     correct time in years. The class inherits methods from DiscountCurve."""
 
-########################################################################################
-
+    ####################################################################################
 
     def __init__(
-
         self,
         value_dt: Date,
         beta_0: float,
@@ -57,11 +54,9 @@ class DiscountCurveNS(DiscountCurve):
         self.freq_type = freq_type
         self.dc_type = dc_type
 
-########################################################################################
-
+    ####################################################################################
 
     def zero_rate(
-
         self,
         dts: Union[list, Date],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
@@ -97,11 +92,9 @@ class DiscountCurveNS(DiscountCurve):
 
         return zero_rates
 
-########################################################################################
-
+    ####################################################################################
 
     def _zero_rate(self, times: Union[float, np.ndarray]):
-
         """Zero rate for Nelson-Siegel curve parametrisation. This means that
         the t vector must use the curve day count."""
 
@@ -114,11 +107,9 @@ class DiscountCurveNS(DiscountCurve):
         zero_rate += self._beta_2 * ((1.0 - e) / theta - e)
         return zero_rate
 
-########################################################################################
-
+    ####################################################################################
 
     def df(self, dates: Union[Date, list]):
-
         """Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
@@ -139,8 +130,7 @@ class DiscountCurveNS(DiscountCurve):
 
         return df
 
-########################################################################################
-
+    ####################################################################################
 
     def __repr__(self):
 
@@ -154,11 +144,8 @@ class DiscountCurveNS(DiscountCurve):
         s += label_to_string("DAY_COUNT", (self.dc_type))
         return s
 
-########################################################################################
-
+    ####################################################################################
 
     def _print(self):
-
         """Simple print function for backward compatibility."""
         print(self)
-

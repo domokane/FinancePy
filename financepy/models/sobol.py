@@ -36,10 +36,8 @@ from numba import njit
 
 from ..utils.math import norminvcdf
 
-########################################################################################
 # This code loads sobol coefficients from binary numpy file and allocates
 # contents to static global variables.
-########################################################################################
 
 dirname = os.path.abspath(os.path.dirname(__file__))
 path = os.path.join(dirname, "sobolcoeff.npz")
@@ -141,6 +139,3 @@ def get_uniform_sobol(num_points, dimension):
             points[i - 1, j] = x[i] / (2**32)
 
     return points
-
-
-########################################################################################

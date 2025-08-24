@@ -1,4 +1,4 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'kkane
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import sys
 
@@ -36,8 +36,8 @@ def test_equitybbarrier_option():
     notional = 1.0
 
     drift = interest_rate - dividend_yield
-    scheme = FinGBMNumericalScheme.NORMAL
-    process_type = ProcessTypes.GBM
+    scheme = FinGBMNumericalScheme.NORMAL_SCHEME
+    process_type = ProcessTypes.GBM_PROCESS
 
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)

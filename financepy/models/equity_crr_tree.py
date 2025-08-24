@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 
 import numpy as np
@@ -8,11 +6,9 @@ from numba import njit, float64, int64
 
 from ..utils.global_types import OptionTypes
 
-BUMP = 1e-4
+bump = 1e-4
 
 ########################################################################################
-########################################################################################
-
 
 @njit(
     float64[:](
@@ -30,6 +26,7 @@ BUMP = 1e-4
     cache=True,
 )
 def crr_tree_val(
+
     stock_price,
     interest_rate,  # continuously compounded
     dividend_rate,  # continuously compounded
@@ -163,11 +160,10 @@ def crr_tree_val(
     results = np.array([price, delta, gamma, theta])
     return results
 
-
 ########################################################################################
 
-
 def crr_tree_val_avg(
+
     stock_price,
     interest_rate,  # continuously compounded
     dividend_rate,  # continuously compounded
@@ -176,6 +172,8 @@ def crr_tree_val_avg(
     time_to_expiry,
     opt_type,
     strike_price,
+########################################################################################
+
 ):
     """Calculate the average values off the tree using an even and an odd
     number of time steps."""
@@ -208,5 +206,3 @@ def crr_tree_val_avg(
     res = {"value": v[0], "delta": v[1], "gamma": v[2], "theta": v[3]}
     return res
 
-
-########################################################################################

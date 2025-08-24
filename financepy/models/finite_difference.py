@@ -10,8 +10,11 @@ from ..utils.global_types import OptionTypes
 
 # @njit
 
+########################################################################################
 
-def dx(x, wind=0):
+
+def fn_dx(x, wind=0):
+
     # Intermediate rows
     # Note: As first and last rows are handled separately
     # (at the end of this method)
@@ -22,9 +25,9 @@ def dx(x, wind=0):
         # (-1/dxl, 1/dxl, 0)
         out = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
     elif wind == 0:
-        intermediate_rows = np.array(
-            (-dxu / dxl, dxu / dxl - dxl / dxu, dxl / dxu)
-        ) / (dxl + dxu)
+        intermediate_rows = np.array((-dxu / dxl, dxu / dxl - dxl / dxu, dxl / dxu)) / (
+            dxl + dxu
+        )
         out = intermediate_rows.T
     else:
         # (0, -1/dxu, 1/dxu)
@@ -47,16 +50,18 @@ def dx(x, wind=0):
     return out
 
 
-def dxx(x):
+########################################################################################
+
+
+def fn_dxx(x):
+
     # Intermediate rows
     # Note: As first and last rows are handled separately
     # (they overwritten at end of this method),
     # we can use numpy roll without worrying about the end values
     dxl = x - np.roll(x, 1)
     dxu = np.roll(x, -1) - x
-    intermediate_rows = np.array([2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (
-        dxu + dxl
-    )
+    intermediate_rows = np.array([2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (dxu + dxl)
     out = intermediate_rows.T
 
     # First row
@@ -67,17 +72,20 @@ def dxx(x):
     return out
 
 
+########################################################################################
+
+
 def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
     """
     1d finite difference solution for pdes of the form
 
-    0 = dV/dt + A V
+    0 = dV/dt + a V
 
-    A = -risk_free_rate + mu d/dx + 1/2 var d2/dx2
+    a = -risk_free_rate + mu d/dx + 1/2 var d2/dx2
 
     using the theta scheme
 
-    [1-theta dt A] V(t) = [1 + (1-theta) dt A] V(t+dt)
+    [1-theta dt a] V(t) = [1 + (1-theta) dt a] V(t+dt)
     """
     if dt == 0:
         raise ValueError("Timestep length dt must be non-zero")
@@ -85,36 +93,40 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
         raise ValueError("Theta must be non-zero")
 
     # Calculate the finite differences for the first and second derivatives
-    Dxx = dxx(x)
+    dxx = fn_dxx(x)
 
     if wind == 0:
-        Dx = dx(x, 0)
+        dx = fn_dx(x, 0)
     elif wind < 0:
-        Dxd = dx(x, -1)
-        Dx = Dxd
+        dxd = fn_dx(x, -1)
+        dx = dxd
     elif wind == 1:
-        Dxu = dx(x, 1)
-        Dx = Dxu
+        dxu = fn_dx(x, 1)
+        dx = dxu
     elif wind > 1:
-        # use Dxd when mu < 0 and Dxu otherwise
-        Dxd = dx(x, -1)
-        Dxu = dx(x, 1)
-        Dx = np.zeros((len(x), 1)) + Dxu
-        Dx[mu[0] < 0] = Dxd
+        # use dxd when mu < 0 and dxu otherwise
+        dxd = fn_dx(x, -1)
+        dxu = fn_dx(x, 1)
+        dx = np.zeros((len(x), 1)) + dxu
+        dx[mu[0] < 0] = dxd
 
     # Ensure mu and var have correct dimensions
     mu = np.atleast_2d(mu)
     var = np.atleast_2d(var)
 
     # Calculate matrix
-    mm = Dx.shape[1] // 2  # integer division
-    A = dt * theta * (mu.T * Dx + 0.5 * var.T * Dxx)
-    A[:, mm] += 1 - dt * theta * r
+    mm = dx.shape[1] // 2  # integer division
+    a = dt * theta * (mu.T * dx + 0.5 * var.T * dxx)
+    a[:, mm] += 1 - dt * theta * r
 
-    return A
+    return a
+
+
+########################################################################################
 
 
 def fd_roll_backwards(res, theta, ai=None, ae=None):
+
     # TODO Test for more than one vector
     ai = np.array([]) if ai is None else ai
     ae = np.array([]) if ae is None else ae
@@ -134,7 +146,11 @@ def fd_roll_backwards(res, theta, ai=None, ae=None):
     return res
 
 
+########################################################################################
+
+
 def fd_roll_forwards(res, theta, ai=None, ae=None):
+
     ai = np.array([]) if ai is None else ai
     ae = np.array([]) if ae is None else ae
     num_vectors = len(res)
@@ -155,7 +171,11 @@ def fd_roll_forwards(res, theta, ai=None, ae=None):
     return res
 
 
+########################################################################################
+
+
 def smooth_digital(xl, xu, strike):
+
     if xu <= strike:
         return 0
     elif strike <= xl:
@@ -164,11 +184,19 @@ def smooth_digital(xl, xu, strike):
         return (xu - strike) / (xu - xl)
 
 
+########################################################################################
+
+
 def digital(x, strike):
+
     return 0.5 * (np.sign(x - strike) + 1)
 
 
+########################################################################################
+
+
 def smooth_call(xl, xu, strike):
+
     if xu <= strike:
         return 0
     elif strike <= xl:

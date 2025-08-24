@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import numpy as np
 
@@ -9,18 +7,21 @@ from ..utils.global_types import OptionTypes
 
 from ..utils.math import normcdf
 
-########################################################################################
 # NOTE: Keeping this separate from SABR for the moment.
-########################################################################################
 
+########################################################################################
 
 class BlackShifted:
+
     """Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. This model also allows
     the distribution to be shifted to the negative in order to allow for
     negative interest rates."""
 
+    ####################################################################################
+
     def __init__(self, volatility, shift, implementation=0):
+
         """Create FinModel black using parameters."""
         self.volatility = volatility
         self.shift = shift
@@ -33,6 +34,7 @@ class BlackShifted:
     ####################################################################################
 
     def value(
+
         self,
         forward_rate,  # Forward rate
         strike_rate,  # Strike Rate
@@ -65,6 +67,7 @@ class BlackShifted:
     ####################################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         s += label_to_string("SHIFT", self.shift)
@@ -72,5 +75,3 @@ class BlackShifted:
         s += label_to_string("NUMSTEPS", self.num_steps)
         return s
 
-
-########################################################################################

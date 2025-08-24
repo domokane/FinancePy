@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 # TODO Fix this
 from typing import Union
@@ -27,8 +25,11 @@ from .black_scholes_analytic import (
 from .finite_difference import black_scholes_fd
 from .finite_difference_psor import black_scholes_fd_psor
 
+########################################################################################
+
 
 class BlackScholesTypes(Enum):
+
     DEFAULT = 0
     ANALYTICAL = 1
     CRR_TREE = 2
@@ -46,6 +47,8 @@ class BlackScholes(Model):
     """
     Black-Scholes model class supporting various pricing methods.
     """
+
+    ####################################################################################
 
     def __init__(
         self,
@@ -70,7 +73,7 @@ class BlackScholes(Model):
         self.poly_degree = self.params.get("poly_degree", 3)
         self.fit_type = self.params.get("fit_type", BoundaryFitTypes.HERMITE_E)
 
-    ###########################################################################
+    ####################################################################################
 
     def value(
         self,
@@ -153,7 +156,7 @@ class BlackScholes(Model):
 
             if self.bs_type == BlackScholesTypes.LSMC:
 
-                print("LSMC Model", self)
+                print("lsmc Model", self)
                 poly_degree = self.poly_degree
                 fit_type = self.fit_type
 
@@ -282,6 +285,3 @@ class BlackScholes(Model):
         else:
 
             raise FinError("Should not be here")
-
-
-########################################################################################

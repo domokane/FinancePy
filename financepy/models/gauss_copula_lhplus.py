@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 import numpy as np
 
@@ -15,7 +13,10 @@ class LHPlusModel:
     """Large Homogenous Portfolio model with extra asset. Used for
     approximating full Gaussian copula."""
 
+    ####################################################################################
+
     def __init__(self, p, r, h, beta, p0, r0, h0, beta_0):
+
         self._p = p
         self._r = r
         self._h = h
@@ -179,6 +180,3 @@ class LHPlusModel:
         el_k1 = self.exp_min_lk_integral(k1, dk)
         q = 1.0 - (el_k2 - el_k1) / (k2 - k1)
         return q
-
-
-########################################################################################

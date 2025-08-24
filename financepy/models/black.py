@@ -1,7 +1,5 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 # Greeks added thanks to Guillaume Lefieux
-##############################################################################
 
 # TODO Fix this
 from enum import Enum
@@ -17,21 +15,26 @@ from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton
 from ..models.equity_crr_tree import crr_tree_val_avg
 
-########################################################################################
 # TODO: Use Numba ?
-########################################################################################
 
+########################################################################################
 
 class BlackTypes(Enum):
+
     ANALYTICAL = 1
     CRR_TREE = 2
 
+########################################################################################
 
 class Black:
+
     """Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation."""
 
+    ####################################################################################
+
     def __init__(
+
         self,
         volatility,
         implementation_type=BlackTypes.ANALYTICAL,
@@ -45,9 +48,10 @@ class Black:
         self.param1 = 0
         self.param2 = 0
 
-    ###########################################################################
+    ####################################################################################
 
     def value(
+
         self,
         forward_rate,  # Forward rate F
         strike_rate,  # Strike Rate K
@@ -85,9 +89,10 @@ class Black:
             raise FinError("Option type must be a European/American Call or Put")
         return value
 
-    ###########################################################################
+    ####################################################################################
 
     def delta(
+
         self,
         forward_rate,  # Forward rate
         strike_rate,  # Strike Rate
@@ -129,9 +134,10 @@ class Black:
         else:
             raise FinError("Option type must be a European/American Call or Put")
 
-    ###########################################################################
+    ####################################################################################
 
     def gamma(
+
         self,
         forward_rate,  # Forward rate F
         strike_rate,  # Strike Rate K
@@ -170,9 +176,10 @@ class Black:
         else:
             raise FinError("Option type must be a European/American Call or Put")
 
-    ###########################################################################
+    ####################################################################################
 
     def theta(
+
         self,
         forward_rate,  # Forward rate F
         strike_rate,  # Strike Rate K
@@ -212,9 +219,10 @@ class Black:
             raise FinError("Option type must be a European/American Call or Put")
         return theta
 
-    ###########################################################################
+    ####################################################################################
 
     def vega(
+
         self,
         forward_rate,  # Forward rate F
         strike_rate,  # Strike Rate K
@@ -266,20 +274,20 @@ class Black:
             raise FinError("Option type must be a European/American Call or Put")
         return vega
 
-    ###########################################################################
+    ####################################################################################
 
     def __repr__(self):
+
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         s += label_to_string("IMPLEMENTATION", self.implementation_type)
         s += label_to_string("NUMSTEPS", self.num_steps)
         return s
 
-
 ########################################################################################
 
-
 def black_value(fwd, t, k, r, v, opt_type):
+
     """Price a derivative using Black model."""
     d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
@@ -289,8 +297,10 @@ def black_value(fwd, t, k, r, v, opt_type):
     else:
         raise FinError("Option type must be a European Call or Put")
 
+########################################################################################
 
 def black_delta(fwd, t, k, r, v, opt_type):
+
     """Return delta of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
@@ -300,8 +310,10 @@ def black_delta(fwd, t, k, r, v, opt_type):
     else:
         raise FinError("Option type must be a European Call or Put")
 
+########################################################################################
 
 def black_gamma(fwd, t, k, r, v, opt_type):
+
     """Return gamma of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
@@ -309,8 +321,10 @@ def black_gamma(fwd, t, k, r, v, opt_type):
     else:
         raise FinError("Option type must be a European Call or Put")
 
+########################################################################################
 
 def black_vega(fwd, t, k, r, v, opt_type):
+
     """Return vega of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
@@ -318,8 +332,10 @@ def black_vega(fwd, t, k, r, v, opt_type):
     else:
         raise FinError("Option type must be a European Call or Put")
 
+########################################################################################
 
 def black_theta(fwd, t, k, r, v, opt_type):
+
     """Return theta of a derivative using Black model."""
     d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
@@ -337,9 +353,11 @@ def black_theta(fwd, t, k, r, v, opt_type):
     else:
         raise FinError("Option type must be a European Call or Put")
 
+########################################################################################
 
 @njit(float64[:](float64, float64, float64, float64), fastmath=True, cache=True)
 def calculate_d1_d2(f, t, k, v):
+
     """Calculate d1 and d2 for Black-Scholes model."""
 
     t = np.maximum(t, G_SMALL)
@@ -358,16 +376,18 @@ def calculate_d1_d2(f, t, k, v):
 
     return np.array([d1, d2])
 
-
 ########################################################################################
 
-
 def implied_volatility(fwd, t, r, k, price, opt_type, debug_print=True):
+
     """Calculate the Black implied volatility of a European/American
     options on futures contracts using Newton with
     a fallback to bisection."""
 
+    ####################################################################################
+
     def _f_european(sigma, args):
+
         """Function to determine ststar for pricing
         European options on future contracts."""
         fwd, t, k, r, opt_type, price = args
@@ -375,14 +395,20 @@ def implied_volatility(fwd, t, r, k, price, opt_type, debug_print=True):
         obj = value - price
         return obj
 
+    ####################################################################################
+
     def _f_european_vega(sigma, args):
+
         """Function to calculate the Vega of European
         options on future contracts."""
         fwd, t, k, r, opt_type, _ = args
         vega = black_vega(fwd, t, k, r, sigma, opt_type)
         return vega
 
+    ####################################################################################
+
     def _f_american(sigma, args):
+
         """Function to determine ststar for pricing
         American options on future contracts."""
         fwd, t, k, _, opt_type, price = args
@@ -393,7 +419,10 @@ def implied_volatility(fwd, t, r, k, price, opt_type, debug_print=True):
         obj = results["value"] - price
         return obj
 
+    ####################################################################################
+
     def _f_american_vega(sigma, args):
+
         """Function to calculate the Vega of American
         options on future contracts."""
         fwd, t, k, _, opt_type, _ = args
@@ -415,7 +444,10 @@ def implied_volatility(fwd, t, r, k, price, opt_type, debug_print=True):
         vega = (results_volshift["value"] - results["value"]) / bump_size
         return vega
 
+    ####################################################################################
+
     def _estimate_vol_from_price(fwd, t, k, european_opt_type, european_price):
+
         # Brenner and Subrahmanyan (1988) and Feinstein
         # (1988) approximation for at-the-money forward call option. See Eq.(3) in
         # https://www.tandfonline.com/doi/abs/10.2469/faj.v44.n5.80?journalCode=ufaj20

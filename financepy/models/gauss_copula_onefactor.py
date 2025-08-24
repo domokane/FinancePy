@@ -1,11 +1,8 @@
-########################################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-########################################################################################
 
 from numba import njit, float64, int64
 import numpy as np
 
-########################################################################################
 
 from ..utils.math import norminvcdf, normcdf, INV_ROOT_2_PI
 from ..utils.error import FinError
@@ -13,13 +10,12 @@ from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
 from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
 from .loss_dbn_builder import portfolio_gcd
 
-########################################################################################
 
-MIN_Z = -6.0
+min_z = -6.0
 
-########################################################################################
 # This implements the one-factor latent variable formulation of the Gaussian
 # Copula model as well as some approximations
+
 ########################################################################################
 
 
@@ -49,7 +45,7 @@ def loss_dbn_recursion_gcd(
 
     uncond_loss_dbn = np.zeros(num_loss_units)
 
-    z = MIN_Z
+    z = min_z
     dz = 2.0 * abs(z) / num_integration_steps
 
     cond_default_probs = np.zeros(num_credits)
@@ -277,8 +273,8 @@ def tranch_surv_prob_gaussian(
     for i_credit in range(0, num_credits):
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
-    dz = 2.0 * abs(MIN_Z) / num_integration_steps
-    z = MIN_Z
+    dz = 2.0 * abs(min_z) / num_integration_steps
+    z = min_z
 
     thresholds = np.zeros(num_credits)
     losses = np.zeros(num_credits)
@@ -339,8 +335,8 @@ def loss_dbn_hetero_adj_binomial(
     for i_credit in range(0, num_credits):
         thresholds[i_credit] = norminvcdf(default_probs[i_credit])
 
-    dz = 2.0 * abs(MIN_Z) / num_integration_steps
-    z = MIN_Z
+    dz = 2.0 * abs(min_z) / num_integration_steps
+    z = min_z
 
     for _ in range(0, num_integration_steps):
 
@@ -383,6 +379,7 @@ def tranche_surv_prob_adj_binomial(
     recovery_rates,
     beta_vector,
     num_integration_steps,
+    ########################################################################################
 ):
     """Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the adjusted binomial fit of the
@@ -426,6 +423,3 @@ def tranche_surv_prob_adj_binomial(
 
     q = 1.0 - tranche_el / (k2 - k1)
     return q
-
-
-########################################################################################

@@ -322,7 +322,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 
 @njit(cache=True, fastmath=True)
-def delta_fit(K, *args):
+def delta_fit(k, *args):
     """This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol
@@ -340,8 +340,8 @@ def delta_fit(K, *args):
     params = args[8]
 
     f = s * np.exp((r_d - r_f) * t)
-    v = vol_function(vol_type_value, params, f, K, t)
-    delta_out = fast_delta(s, t, K, r_d, r_f, v, delta_type_value, opt_type_value)
+    v = vol_function(vol_type_value, params, f, k, t)
+    delta_out = fast_delta(s, t, k, r_d, r_f, v, delta_type_value, opt_type_value)
     inverse_delta_out = norminvcdf(np.abs(delta_out))
     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
@@ -398,9 +398,8 @@ def solver_for_smile_strike_fast(
         parameters,
     )
 
-    K = newton_secant(delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
-
-    return K
+    k = newton_secant(delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
+    return k
 
 
 ########################################################################################
@@ -450,8 +449,8 @@ def solve_for_strike(
         vsqrtt = volatility * np.sqrt(t_del)
         arg = delta_target * phi / for_df  # CHECK THIS !!!
         norm_inv_delta = norminvcdf(arg)
-        K = fwd_fx_rate * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt / 2.0))
-        return K
+        k = fwd_fx_rate * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt / 2.0))
+        return k
 
     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
 
@@ -467,8 +466,8 @@ def solve_for_strike(
         vsqrtt = volatility * np.sqrt(t_del)
         arg = delta_target * phi  # CHECK THIS!!!!!!!!
         norm_inv_delta = norminvcdf(arg)
-        K = fwd_fx_rate * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt / 2.0))
-        return K
+        k = fwd_fx_rate * np.exp(-vsqrtt * (phi * norm_inv_delta - vsqrtt / 2.0))
+        return k
 
     elif delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
 
@@ -483,9 +482,8 @@ def solve_for_strike(
             delta_target,
         )
 
-        K = newton_secant(g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
-
-        return K
+        k = newton_secant(g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
+        return k
 
     elif delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
 
@@ -500,9 +498,8 @@ def solve_for_strike(
             delta_target,
         )
 
-        K = newton_secant(g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
-
-        return K
+        k = newton_secant(g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
+        return k
 
     else:
 
@@ -909,7 +906,7 @@ class FXVolSurface:
             print("DELTA METHOD:", self.delta_method)
             print("==========================================================")
 
-        K_dummy = 999
+        k_dummy = 999
 
         for i in range(0, self.num_vol_curves):
 
@@ -930,7 +927,7 @@ class FXVolSurface:
 
             call = FXVanillaOption(
                 expiry_dt,
-                K_dummy,
+                k_dummy,
                 self.currency_pair,
                 OptionTypes.EUROPEAN_CALL,
                 1.0,
@@ -939,7 +936,7 @@ class FXVolSurface:
 
             put = FXVanillaOption(
                 expiry_dt,
-                K_dummy,
+                k_dummy,
                 self.currency_pair,
                 OptionTypes.EUROPEAN_PUT,
                 1.0,

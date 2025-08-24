@@ -1,6 +1,4 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from enum import Enum
 import numpy as np
@@ -17,7 +15,6 @@ from ..models.sobol import get_uniform_sobol
 
 USE_PARALLEL = False
 
-########################################################################################
 
 """ This module manages the Ibor Market Model and so stores a specific MC
     forward rate simulation of a 3D matrix of num_paths x num_fwds
@@ -30,6 +27,7 @@ USE_PARALLEL = False
 
 
 class ModelLMMModelTypes(Enum):
+
     LMM_ONE_FACTOR = 1
     LMM_HW_M_FACTOR = 2
     LMM_FULL_N_FACTOR = 3
@@ -360,10 +358,8 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
         chol = cholesky_np(matrix)
         factors.append(chol)
 
-    ###########################################################################
     # I HAVE PROBLEMS AS THE PARALLELISATION CHANGES THE OUTPUT IF RANDS ARE
     # CALCULATED INSIDE THE MAIN LOOP SO I CALCULATE THEM NOW
-    ###########################################################################
 
     if 1 == 1:
         g_matrix = np.empty((num_paths, num_fwds, num_fwds))
@@ -632,9 +628,9 @@ def lmm_simulate_fwds_mf(
                         zz += zij * zkj
                     mu_a += fi * ti * zz / (1.0 + fi * ti)
 
-                itoTerm = 0.0
+                ito_term = 0.0
                 for q in range(0, num_factors):
-                    itoTerm += lambdas[q][k - j] * lambdas[q][k - j]
+                    ito_term += lambdas[q][k - j] * lambdas[q][k - j]
 
                 random_term = 0.0
                 for q in range(0, num_factors):
@@ -642,7 +638,7 @@ def lmm_simulate_fwds_mf(
                     random_term += lambdas[q][k - j] * wq
                 random_term *= sqrt_dtj
 
-                x = np.exp(mu_a * dtj - 0.5 * itoTerm * dtj + random_term)
+                x = np.exp(mu_a * dtj - 0.5 * ito_term * dtj + random_term)
                 fwd_b[k] = fwd[i_path, j, k] * x
 
                 mu_b = 0.0
@@ -658,7 +654,7 @@ def lmm_simulate_fwds_mf(
 
                 mu_c = 0.5 * (mu_a + mu_b)
 
-                x = np.exp(mu_c * dtj - 0.5 * itoTerm * dtj + random_term)
+                x = np.exp(mu_c * dtj - 0.5 * ito_term * dtj + random_term)
                 fwd[i_path, j + 1, k] = fwd[i_path, j, k] * x
 
     return fwd
@@ -672,7 +668,7 @@ def lmm_simulate_fwds_mf(
     cache=True,
     fastmath=True,
 )
-def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
+def lmm_cap_flr_pricer(num_fwds, num_paths, k, fwd0, fwds, taus, is_cap):
     """Function to price a strip of cap or floorlets in accordance with the
     simulated forward curve dynamics."""
 
@@ -686,15 +682,15 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
         raise FinError("NumPaths > MaxPaths")
 
     df = np.zeros(num_fwds)
-    capFlrLets = np.zeros(num_fwds - 1)
-    capFlrLetValues = np.zeros(num_fwds - 1)
+    cap_flr_lets = np.zeros(num_fwds - 1)
+    cap_flr_let_values = np.zeros(num_fwds - 1)
     numeraire = np.zeros(num_fwds)
 
     for i_path in range(0, num_paths):
 
         period_roll = 1.0
         libor = fwds[i_path, 0, 0]
-        capFlrLets[0] = max(K - libor, 0.0) * taus[0]
+        cap_flr_lets[0] = max(k - libor, 0.0) * taus[0]
 
         # Now loop over the caplets starting with one that fixes immediately
         # but which may have intrinsic value that cannot be ignored.
@@ -703,16 +699,16 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
             libor = fwds[i_path, j, j]
             if j == 1:
                 if is_cap == 0:
-                    capFlrLets[j] = max(K - libor, 0.0) * taus[j]
+                    cap_flr_lets[j] = max(k - libor, 0.0) * taus[j]
                 else:
-                    capFlrLets[j] = max(libor - K, 0.0) * taus[j]
+                    cap_flr_lets[j] = max(libor - k, 0.0) * taus[j]
 
                 numeraire[0] = 1.0 / df[0]
             else:
                 if is_cap == 1:
-                    capFlrLets[j] = max(libor - K, 0.0) * taus[j]
+                    cap_flr_lets[j] = max(libor - k, 0.0) * taus[j]
                 elif is_cap == 0:
-                    capFlrLets[j] = max(K - libor, 0.0) * taus[j]
+                    cap_flr_lets[j] = max(k - libor, 0.0) * taus[j]
                 else:
                     raise FinError("is_cap should be 0 or 1")
 
@@ -721,12 +717,12 @@ def lmm_cap_flr_pricer(num_fwds, num_paths, K, fwd0, fwds, taus, is_cap):
 
         for i_fwd in range(0, num_fwds):
             denom = abs(numeraire[i_fwd]) + 1e-12
-            capFlrLetValues[i_fwd] += capFlrLets[i_fwd] / denom
+            cap_flr_let_values[i_fwd] += cap_flr_lets[i_fwd] / denom
 
     for i_fwd in range(0, num_fwds):
-        capFlrLetValues[i_fwd] /= num_paths
+        cap_flr_let_values[i_fwd] /= num_paths
 
-    return capFlrLetValues
+    return cap_flr_let_values
 
 
 ########################################################################################
@@ -841,7 +837,7 @@ def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, is_payer):
     for ix in range(1, b):
         df[ix] = df[ix - 1] / (1.0 + fwd0[ix] * taus[ix])
 
-    sumPayRecSwaption = 0.0
+    sum_pay_rec_swaption = 0.0
 
     for i_path in range(0, num_paths):
 
@@ -868,9 +864,9 @@ def lmm_swaption_pricer(strike, a, b, num_paths, fwd0, fwds, taus, is_payer):
         else:
             raise FinError("Unknown pay_rec_swaption value - must be 0 or 1")
 
-        sumPayRecSwaption += pay_rec_swaption / (abs(numeraire) + 1e-10)
+        sum_pay_rec_swaption += pay_rec_swaption / (abs(numeraire) + 1e-10)
 
-    pay_rec_price = sumPayRecSwaption / num_paths
+    pay_rec_price = sum_pay_rec_swaption / num_paths
     return pay_rec_price
 
 
@@ -912,15 +908,15 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
 
         for j in range(1, num_periods):  # TIME LOOP
 
-            prevIbor = libor
-            K = prevIbor + spd
+            prev_ibor = libor
+            k = prev_ibor + spd
             libor = fwds[i_path, j, j]
 
             if j == 1:
-                rachet_caplets[j] = max(libor - K, 0.0) * taus[j]
+                rachet_caplets[j] = max(libor - k, 0.0) * taus[j]
                 numeraire[0] = 1.0 / df[0]
             else:
-                rachet_caplets[j] = max(libor - K, 0.0) * taus[j]
+                rachet_caplets[j] = max(libor - k, 0.0) * taus[j]
 
             period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
@@ -942,7 +938,7 @@ def lmm_ratchet_caplet_pricer(spd, num_periods, num_paths, fwd0, fwds, taus):
     cache=True,
     fastmath=True,
 )
-def lmm_flexi_cap_pricer(max_caplets, K, num_periods, num_paths, fwd0, fwds, taus):
+def lmm_flexi_cap_pricer(max_caplets, k, num_periods, num_paths, fwd0, fwds, taus):
     """Price a flexicap using the simulated Ibor rates."""
 
     max_paths = len(fwds)
@@ -977,13 +973,13 @@ def lmm_flexi_cap_pricer(max_caplets, K, num_periods, num_paths, fwd0, fwds, tau
             libor = fwds[i_path, j, j]
 
             if j == 1:
-                if libor > K and num_caplets_left > 0:
-                    flexi_caplets[j] = max(libor - K, 0.0) * taus[j]
+                if libor > k and num_caplets_left > 0:
+                    flexi_caplets[j] = max(libor - k, 0.0) * taus[j]
                     num_caplets_left -= 1
                 numeraire[0] = 1.0 / df[0]
             else:
-                if libor > K and num_caplets_left > 0:
-                    flexi_caplets[j] = max(libor - K, 0.0) * taus[j]
+                if libor > k and num_caplets_left > 0:
+                    flexi_caplets[j] = max(libor - k, 0.0) * taus[j]
                     num_caplets_left -= 1
 
             period_roll = 1.0 + libor * taus[j]
@@ -1024,8 +1020,8 @@ def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
 
     df = np.zeros(max_fwds)
     numeraire = np.zeros(max_fwds)
-    stickyCaplets = np.zeros(max_fwds)
-    stickyCapletValues = np.zeros(max_fwds)
+    sticky_caplets = np.zeros(max_fwds)
+    sticky_caplet_values = np.zeros(max_fwds)
 
     # Set up initial term structure
     df[0] = 1.0 / (1.0 + fwd0[0] * taus[0])
@@ -1036,31 +1032,28 @@ def lmm_sticky_caplet_pricer(spread, num_periods, num_paths, fwd0, fwds, taus):
 
         period_roll = 1.0
         libor = fwds[i_path, 0, 0]
-        stickyCaplets[0] = 0.0
-        K = libor
+        sticky_caplets[0] = 0.0
+        k = libor
 
         for j in range(1, num_periods):  # TIME LOOP
 
-            prevIbor = libor
-            K = min(prevIbor, K) + spread
+            prev_ibor = libor
+            k = min(prev_ibor, k) + spread
             libor = fwds[i_path, j, j]
 
             if j == 1:
-                stickyCaplets[j] = max(libor - K, 0.0) * taus[j]
+                sticky_caplets[j] = max(libor - k, 0.0) * taus[j]
                 numeraire[0] = 1.0 / df[0]
             else:
-                stickyCaplets[j] = max(libor - K, 0.0) * taus[j]
+                sticky_caplets[j] = max(libor - k, 0.0) * taus[j]
 
             period_roll = 1.0 + libor * taus[j]
             numeraire[j] = numeraire[j - 1] * period_roll
 
         for i_fwd in range(0, num_periods):
-            stickyCapletValues[i_fwd] += stickyCaplets[i_fwd] / numeraire[i_fwd]
+            sticky_caplet_values[i_fwd] += sticky_caplets[i_fwd] / numeraire[i_fwd]
 
     for i_fwd in range(0, num_periods):
-        stickyCapletValues[i_fwd] /= num_paths
+        sticky_caplet_values[i_fwd] /= num_paths
 
-    return stickyCapletValues
-
-
-########################################################################################
+    return sticky_caplet_values

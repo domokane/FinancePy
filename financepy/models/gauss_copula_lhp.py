@@ -1,11 +1,8 @@
-##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
 
 from numba import njit
 import numpy as np
 
-########################################################################################
 
 from ..utils.math import normcdf
 from ..utils.math import normpdf, norminvcdf, M
@@ -215,10 +212,10 @@ def lhp_analytical_density(k, p, r, beta):
     return rho
 
 
+"""
+
 ########################################################################################
 
-
-"""
 @njit(fastmath=True, cache=True)
 def exp_min_lk(k, p, r, n, beta):
 
@@ -245,16 +242,15 @@ def exp_min_lk(k, p, r, n, beta):
 
     return el
 """
+
 ########################################################################################
 
 
 @njit(fastmath=True, cache=True)
 def prob_l_greater_than_k(k, p, r, beta):
+
     c = normpdf(p)
     arga = k / (1.0 - r)
     a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
     prob = 1.0 - normcdf(a)
     return prob
-
-
-########################################################################################

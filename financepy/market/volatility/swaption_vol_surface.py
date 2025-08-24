@@ -431,7 +431,7 @@ class SwaptionVolSurface:
 
         self._build_vol_surface(fin_solver_type=fin_solver_type)
 
-    #        self._fwd_0_T = []
+    #        self._fwd_0_t = []
     #        self._stock_price = None
     #        self._atm_method = None
     #        self._atm_vols = []
@@ -673,8 +673,8 @@ class SwaptionVolSurface:
     #                 index1 = i
     #                 break
 
-    #     fwd0 = self._fwd_0_T[index0]
-    #     fwd1 = self._fwd_0_T[index1]
+    #     fwd0 = self._fwd_0_t[index0]
+    #     fwd1 = self._fwd_0_t[index1]
 
     #     t0 = self._t_exp[index0]
     #     t1 = self._t_exp[index1]
@@ -958,7 +958,7 @@ class SwaptionVolSurface:
 
             s += label_to_string("EXPIRY DATE", self._expiry_dts[i])
             s += label_to_string("TIME (YRS)", self._t_exp[i])
-            s += label_to_string("FWD FX", self._fwd_0_T[i])
+            s += label_to_string("FWD FX", self._fwd_0_t[i])
             s += label_to_string("ATM VOLS", self._atm_vols[i] * 100.0)
 
             for j in range(0, self._num_strikes):
