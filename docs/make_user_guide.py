@@ -4,6 +4,7 @@
 
 
 import glob
+from math import e
 import os
 import sys
 import subprocess
@@ -340,28 +341,24 @@ def parse_module(module_name):
     f = open(user_guide_file_name, "a", encoding="utf-8")
 
     for c in range(0, num_enums):
-        new_lines = parse_enum(
-            lines, start_enum_lines[c], start_enum_lines[c + 1]
-        )
+        new_lines = parse_enum(lines, start_enum_lines[c], start_enum_lines[c + 1])
 
-        for newLine in new_lines:
-            f.writelines(newLine)
+        for new_line in new_lines:
+            f.writelines(new_line)
 
     for c in range(0, num_classes):
-        new_lines = parse_class(
-            lines, start_class_lines[c], start_class_lines[c + 1]
-        )
+        new_lines = parse_class(lines, start_class_lines[c], start_class_lines[c + 1])
 
-        for newLine in new_lines:
-            f.writelines(newLine)
+        for new_line in new_lines:
+            f.writelines(new_line)
 
     for c in range(0, num_functions):
         new_lines = parse_function(
             lines, start_function_lines[c], start_function_lines[c + 1]
         )
 
-        for newLine in new_lines:
-            f.writelines(newLine)
+        for new_line in new_lines:
+            f.writelines(new_line)
 
         f.write("\n")
 
@@ -567,9 +564,7 @@ def parse_function(lines, start_line, end_line, class_name=""):
         line = lines[row_num][indent:]
         function_signature += str(line)
         if line.find("):") >= 0:
-            start_line = (
-                row_num  # update start line to after function signature
-            )
+            start_line = row_num  # update start line to after function signature
             break
 
     # Replace `__init__` with class_name and remove `self` from signatures
@@ -675,9 +670,7 @@ def parse_function(lines, start_line, end_line, class_name=""):
     func_description += "\\end{lstlisting}\n"
     func_description += "\\vspace{0.25cm}\n"
     func_description += "\\noindent \n"
-    func_description += (
-        "The function arguments are described in the following table.\n"
-    )
+    func_description += "The function arguments are described in the following table.\n"
     func_description += "\\vspace{0.25cm}\n"
     func_description += param_description
     return func_description
@@ -690,26 +683,36 @@ def parse_enum(lines, start_line, end_line):
     """Parse a Class that implements an Enumerated type."""
     enum_description = []
 
-    enumLine = lines[start_line]
-    n1 = enumLine.find("class")
-    n2 = enumLine.find("(")
+    enum_line = lines[start_line]
+    n1 = enum_line.find("class")
+    n2 = enum_line.find("(")
     # len("class ") == 6
-    enum_name = enumLine[n1 + 6 : n2]
+    enum_name = enum_line[n1 + 6 : n2]
+    print("  Enumerated Type:", enum_name)
+    print(start_line, end_line)
 
     enum_types = []
     for row_num in range(start_line + 1, end_line):
         line = lines[row_num]
         line = line.replace(" ", "")
         n = line.find("=")
-        if n != -1:
+        if n != -1:  # There is an assignment of an enum type
             enum_type = line[0:n]
             enum_types.append(enum_type)
-        else:
-            break
+            print("ENUM TYPES:", enum_type)
+        elif line.find("#") != -1:  # There is a comment so ignore the line
+            print("HASH COMMENT:", line)
+            pass
+        elif line.find("'''") != -1 or line.find('"""') != -1:  #
+            print("LONG COMMENT:", line)
+            pass
+        elif len(line) == 0:  # Blank line so ignore it
+            print("BLANK LINE")
+            pass
+    #        else:
+    #            break
 
-    enum_description.append(
-        "\\subsubsection*{Enumerated Type: " + enum_name + "}"
-    )
+    enum_description.append("\\subsubsection*{Enumerated Type: " + enum_name + "}")
     enum_description.append("\n")
     enum_description.append("This enumerated type has the following values:\n")
     enum_description.append("\\begin{itemize}[nosep]")
@@ -735,9 +738,7 @@ def extract_params(function_signature):
     function_signature = function_signature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
-    stripedSignature = (
-        function_signature.split("(", 1)[1].replace("):", "").strip()
-    )
+    stripedSignature = function_signature.split("(", 1)[1].replace("):", "").strip()
     if stripedSignature == "":
         # The function has no parameters
         return ""
