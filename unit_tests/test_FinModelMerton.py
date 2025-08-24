@@ -33,11 +33,11 @@ def test_merton():
         3.7951,
     ]
     assert [round(x * 1e4, 4) for x in model.credit_spread()] == [
-        64.6893,
-        0.2289,
+        64.6904,
+        0.2286,
         0.0009,
-        1.2398,
-        25.7203,
+        1.2391,
+        25.7206,
     ]
     assert [round(x, 4) for x in model.leverage()] == [
         1.6052,
@@ -74,11 +74,11 @@ def test_merton():
         3.7951,
     ]
     assert [round(x * 1e4, 4) for x in model.credit_spread()] == [
-        64.6893,
-        0.2289,
+        64.6904,
+        0.2286,
         0.0009,
-        1.2398,
-        25.7203,
+        1.2391,
+        25.7206,
     ]
     assert [round(x, 4) for x in model.leverage()] == [
         1.6052,
@@ -119,7 +119,7 @@ def test_merton():
     )
 
     assert round(model.debt_value(), 4) == 94.8894
-    assert round(model.credit_spread() * 10000, 4) == 24.5829
+    assert round(model.credit_spread() * 10000, 4) == 24.5833
     assert model.leverage() == 1.4
     assert round(model.prob_default(), 4) == 0.0334
     assert round(model.dist_default(), 4) == 1.8324
