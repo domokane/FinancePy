@@ -6,6 +6,7 @@ from typing import Union
 
 import numpy as np
 
+from numba import njit
 
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.error import FinError
@@ -15,9 +16,6 @@ from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.gbm_process_simulator import get_paths_times
 from ...products.fx.fx_option import FXOption
-
-from numba import njit
-
 from ...utils.math import normcdf_vect
 
 ########################################################################################
@@ -30,7 +28,7 @@ from ...utils.math import normcdf_vect
 
 
 @njit(fastmath=True, cache=True)
-def _barrier_pay_one_at_hit_pv_down(s, H, r, dt):
+def _barrier_pay_one_at_hit_pv_down(s, h, r, dt):
     """Pay $1 if the stock crosses the barrier H from above. PV payment."""
     num_paths, num_time_steps = s.shape
     pv = 0.0
@@ -39,7 +37,7 @@ def _barrier_pay_one_at_hit_pv_down(s, H, r, dt):
         hit_flag = 0
 
         for it in range(0, num_time_steps):
-            if s[ip][it] <= H:
+            if s[ip][it] <= h:
                 hit_time = dt * it
                 v = np.exp(-r * hit_time)
                 hit_flag = 1
@@ -55,7 +53,7 @@ def _barrier_pay_one_at_hit_pv_down(s, H, r, dt):
 
 
 @njit(fastmath=True, cache=True)
-def _barrier_pay_one_at_hit_pv_up(s, H, r, dt):
+def _barrier_pay_one_at_hit_pv_up(s, h, r, dt):
     """Pay $1 if the stock crosses the barrier H from below. PV payment."""
 
     num_paths, num_time_steps = s.shape
@@ -65,7 +63,7 @@ def _barrier_pay_one_at_hit_pv_up(s, H, r, dt):
         hit_flag = 0
 
         for it in range(0, num_time_steps):
-            if s[ip][it] >= H:
+            if s[ip][it] >= h:
                 hit_time = dt * it
                 v = np.exp(-r * hit_time)
                 hit_flag = 1
@@ -219,11 +217,11 @@ class FXOneTouchOption(FXOption):
 
             eta = 1.0
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
+            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * k
+            v = (a5_1 + a5_2) * k
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
@@ -234,11 +232,11 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
+            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * k
+            v = (a5_1 + a5_2) * k
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
@@ -250,11 +248,11 @@ class FXOneTouchOption(FXOption):
             eta = 1.0
             k = h
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
+            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * k
+            v = (a5_1 + a5_2) * k
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
@@ -266,11 +264,11 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             k = h
             z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
-            A5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            A5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
+            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
+            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
                 eta * z - 2.0 * eta * lam * v * sqrt_t
             )
-            v = (A5_1 + A5_2) * k
+            v = (a5_1 + a5_2) * k
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
@@ -478,7 +476,7 @@ class FXOneTouchOption(FXOption):
         s0 = stock_price
         mu = r_d - r_f
 
-        tgrid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
+        _, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
 
         h = self.barrier_rate
         x = self.payment_size

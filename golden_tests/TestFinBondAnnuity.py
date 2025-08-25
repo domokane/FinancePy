@@ -1,9 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 # TODO Set up test cases correctly
-import sys
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond_annuity import BondAnnuity
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -12,7 +9,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 
-sys.path.append("..")
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

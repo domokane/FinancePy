@@ -84,7 +84,7 @@ class CDSOption:
         self.bd_type = bd_type
         self.dg_type = dg_type
 
-    ########################################################################################
+    ####################################################################################
 
     def value(self, value_dt, issuer_curve, volatility):
         """Value the CDS option using Black's model with an adjustment for any
@@ -146,7 +146,7 @@ class CDSOption:
         # we return the option price in dollars
         return option_value * self.notional
 
-    ########################################################################################
+    ####################################################################################
 
     def implied_volatility(self, value_dt, issuer_curve, option_value):
         """Calculate the implied CDS option volatility from a price."""

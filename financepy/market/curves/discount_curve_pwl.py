@@ -18,17 +18,14 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class DiscountCurvePWL(DiscountCurve):
-
     """Curve is made up of a series of sections assumed to each have a
     piece-wise linear zero rate. The zero rate has a specified frequency
     which defaults to continuous. This curve inherits all of the extra methods
     from DiscountCurve."""
 
-########################################################################################
-
+    ####################################################################################
 
     def __init__(
-
         self,
         value_dt: Date,
         zero_dts: Union[Date, list],
@@ -60,11 +57,9 @@ class DiscountCurvePWL(DiscountCurve):
         if test_monotonicity(self.times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-########################################################################################
-
+    ####################################################################################
 
     def _zero_rate(self, times: Union[list, np.ndarray]):
-
         """Calculate the piecewise linear zero rate. This is taken from the
         initial inputs. A simple linear interpolation scheme is used. If the
         user supplies a frequency type then a conversion is done."""
@@ -104,11 +99,9 @@ class DiscountCurvePWL(DiscountCurve):
 
         return np.array(zero_rates)
 
-########################################################################################
-
+    ####################################################################################
 
     def df(self, dates: Union[Date, list]):
-
         """Return discount factors given a single or vector of dates. The
         discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
@@ -126,7 +119,6 @@ class DiscountCurvePWL(DiscountCurve):
 
         return df
 
-
     # def _df(self,
     #         t: Union[float, np.ndarray]):
     #     """ Returns the discount factor at time t taking into account the
@@ -136,8 +128,7 @@ class DiscountCurvePWL(DiscountCurve):
     #     df = zero_to_df(r, t, self.freq_type)
     #     return df
 
-########################################################################################
-
+    ####################################################################################
 
     def __repr__(self):
 
@@ -148,11 +139,8 @@ class DiscountCurvePWL(DiscountCurve):
         s += label_to_string("FREQUENCY", self.freq_type)
         return s
 
-########################################################################################
-
+    ####################################################################################
 
     def _print(self):
-
         """Simple print function for backward compatibility."""
         print(self)
-

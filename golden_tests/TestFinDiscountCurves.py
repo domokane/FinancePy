@@ -12,7 +12,8 @@ from financepy.market.curves.discount_curve_ns import DiscountCurveNS
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.date import Date, set_date_format, DateFormatTypes
+from financepy.utils.date_format import set_date_format, DateFormatTypes
+from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -25,7 +26,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 set_date_format(DateFormatTypes.UK_LONG)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 # TODO: Add other discount discount
 
@@ -136,7 +137,7 @@ def test_fin_discount_curves():
                 "%7.6f" % (swap_rate[i]),
             )
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
 
         years = np.linspace(0, 10, 121)
         years2 = years + 1.0

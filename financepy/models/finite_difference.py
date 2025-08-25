@@ -180,8 +180,8 @@ def smooth_digital(xl, xu, strike):
         return 0
     elif strike <= xl:
         return 1
-    else:
-        return (xu - strike) / (xu - xl)
+
+    return (xu - strike) / (xu - xl)
 
 
 ########################################################################################
@@ -201,8 +201,8 @@ def smooth_call(xl, xu, strike):
         return 0
     elif strike <= xl:
         return 0.5 * (xl + xu) - strike
-    else:
-        return 0.5 * (xu - strike) ** 2 / (xu - xl)
+
+    return 0.5 * (xu - strike) ** 2 / (xu - xl)
 
 
 ########################################################################################

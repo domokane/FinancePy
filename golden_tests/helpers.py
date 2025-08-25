@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+from os.path import dirname, join
+
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -12,8 +14,6 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.credit.cds import CDS
-
-from os.path import dirname, join
 
 
 def build_ibor_curve(trade_dt):

@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -40,7 +40,7 @@ def test_fin_sabr():
     vols1 = model1.black_vol(f, strikes, t)
     vols2 = model2.black_vol(f, strikes, t)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure()
         plt.plot(strikes, vols1)
         plt.plot(strikes, vols2)
@@ -72,7 +72,7 @@ def test_fin_shifted_sabr_simple():
     vols1 = model1.black_vol(f, strikes, t)
     vols2 = model2.black_vol(f, strikes, t)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure()
         plt.plot(strikes, vols1)
         plt.plot(strikes, vols2)
@@ -99,7 +99,7 @@ def test_fin_shifted_sabr():
 
     vols = model.black_vol(f, strikes, t)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure()
         plt.plot(strikes, vols)
         plt.title("SHIFTED SABR")

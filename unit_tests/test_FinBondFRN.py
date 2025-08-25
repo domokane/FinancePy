@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -42,7 +43,7 @@ def test_bond_frn_1():
 
     assert round(dirty_price, 4) == 97.0266
 
-    last_coupon_dt = bond.pcd
+    last_coupon_dt = bond._pcd
     assert last_coupon_dt == Date(10, 5, 2017)
 
     accddays = bond.accrued_days
@@ -51,9 +52,7 @@ def test_bond_frn_1():
     accd_amount = bond.accrued_int
     assert round(accd_amount, 4) == 0.0023
 
-    principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     assert round(principal, 4) == 97.0243
 
@@ -93,6 +92,7 @@ def test_bond_frn_1():
 
     assert round(modified_duration, 4) == 4.1335
 
+
 ########################################################################################
 
 
@@ -125,7 +125,7 @@ def test_bond_frn_2():
 
     assert round(dirty_price, 4) == 93.1315
 
-    last_coupon_dt = bond.pcd
+    last_coupon_dt = bond._pcd
     assert last_coupon_dt == Date(3, 2, 2014)
 
     accddays = bond.accrued_days
@@ -134,9 +134,7 @@ def test_bond_frn_2():
     accd_amount = bond.accrued_int
     assert round(accd_amount, 4) == 0.0005
 
-    principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     assert round(principal, 4) == 93.131
 
@@ -164,9 +162,7 @@ def test_bond_frn_2():
 
     assert round(convexity, 4) == 0.0023
 
-    principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm
-    )
+    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     assert round(principal, 4) == 93.1310
 

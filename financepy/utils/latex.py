@@ -3,7 +3,9 @@
 ########################################################################################
 
 
-def convertToLatexTable(txt, sep=" ", header_list=[]):
+def convert_to_latex_table(txt, sep=" ", header_list=None):
+    if header_list is None:
+        header_list = []
 
     num_header_cols = len(header_list)
 

@@ -155,6 +155,9 @@ def _solve_to_horizon(
     # Nelder-Mead (both SciPy amd Numba) is quicker, but occasionally fails
     # to converge, so for those cases try again with CG
     # Numba version is quicker, but can be slightly away from CG output
+
+    xopt = None
+
     try:
         if fin_solver_type == FinSolverTypes.NELDER_MEAD_NUMBA:
             xopt = nelder_mead(
@@ -243,7 +246,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 #     rd = args[3]
 #     rf = args[4]
 #     opt_type_value = args[5]
-#     deltaTypeValue = args[6]
+#     delta_type_value = args[6]
 #     inverse_delta_target = args[7]
 #     params = args[8]
 #     strikes = args[9]
@@ -251,7 +254,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 #     f = s * np.exp((rd-rf)*t)
 #     v = vol_function(vol_type_value, params, strikes, gaps, f, k, t)
-#     delta_out = fast_delta(s, t, k, rd, rf, v, deltaTypeValue, opt_type_value)
+#     delta_out = fast_delta(s, t, k, rd, rf, v, delta_type_value, opt_type_value)
 #     inverse_delta_out = norminvcdf(np.abs(delta_out))
 #     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
@@ -441,7 +444,7 @@ class SwaptionVolSurface:
 
     ###########################################################################
 
-    def vol_from_strike_dt(self, K, expiry_dt):
+    def vol_from_strike_dt(self, k, expiry_dt):
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -493,11 +496,11 @@ class SwaptionVolSurface:
         t0 = self._t_exp[index0]
         t1 = self._t_exp[index1]
 
-        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, K, t0)
+        vol0 = vol_function(vol_type_value, self._parameters[index0], fwd0, k, t0)
 
         if index1 != index0:
 
-            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, K, t1)
+            vol1 = vol_function(vol_type_value, self._parameters[index1], fwd1, k, t1)
 
         else:
 
@@ -735,7 +738,7 @@ class SwaptionVolSurface:
 
     #     return volt, kt
 
-    ########################################################################################
+    ####################################################################################
 
     def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
         """Main function to construct the vol surface."""
@@ -910,17 +913,17 @@ class SwaptionVolSurface:
             ks = []
 
             num_intervals = 30
-            K = low_k
+            k = low_k
             dk = (high_k - low_k) / num_intervals
 
             fitted_vols = []
 
-            for i in range(0, num_intervals):
+            for _ in range(0, num_intervals):
 
-                ks.append(K)
-                fitted_vol = self.vol_from_strike_dt(K, expiry_dt) * 100.0
+                ks.append(k)
+                fitted_vol = self.vol_from_strike_dt(k, expiry_dt) * 100.0
                 fitted_vols.append(fitted_vol)
-                k = K + dk
+                k = k + dk
 
             label_str = "FITTED AT " + str(self._expiry_dts[tenor_index])
             plt.plot(ks, fitted_vols, label=label_str)

@@ -16,7 +16,7 @@ from financepy.utils.frequency import FrequencyTypes
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -57,7 +57,7 @@ def test_bond_zero_curve():
         zero_rate = bond_curve.zero_rate(maturity_dt)
         test_cases.print(maturity_dt, zero_rate)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         bond_curve.plot("BOND CURVE")
 
 

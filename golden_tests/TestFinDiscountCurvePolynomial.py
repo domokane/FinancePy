@@ -19,7 +19,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 # Put in a convention for the rate
 # Use Frequency object
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -34,7 +34,7 @@ def test_fin_discount_curve_polynomial():
     zeros = curve1.zero_rate(dates)
     fwds = curve1.fwd(dates)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
 
         plt.figure(figsize=(6, 4))
         plt.plot(times, zeros, label="Zeros")

@@ -1,9 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.utils.global_types import OptionTypes
 from financepy.models.sabr import SABR
 from financepy.models.sabr import vol_function_sabr
-import numpy as np
 
 ########################################################################################
 
@@ -36,6 +37,7 @@ def test_sabr():
     vol = vol_function_sabr(params, f, k, t)
     assert round(vol, 4) == 0.0148
 
+
 ########################################################################################
 
 
@@ -67,9 +69,7 @@ def test_sabr__calibration():
     implied_atm_lognormal_vol = model_sabr_01.black_vol(k, k, t_exp)
     implied_lognormal_smile = implied_lognormal_vol - implied_atm_lognormal_vol
 
-    assert (
-        implied_lognormal_smile == 0.0
-    ), "In lognormal model, smile should be flat"
+    assert implied_lognormal_smile == 0.0, "In lognormal model, smile should be flat"
     calibration_error = round(strike_vol - implied_lognormal_vol, 6)
     assert calibration_error == 0.0
 

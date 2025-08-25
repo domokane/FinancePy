@@ -1,11 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import matplotlib.pyplot as plt
-
-import numpy as np
 import time
-
 import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 sys.path.append("..")
 
@@ -24,7 +23,7 @@ from financepy.utils.date import Date
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -286,7 +285,7 @@ def test_bond_option_american_convergence_two():
         vec_ep.append(v_ep)
         vec_ap.append(v_ap)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
 
         plt.figure()
         plt.plot(num_steps_vector, vec_ec, label="European Call")

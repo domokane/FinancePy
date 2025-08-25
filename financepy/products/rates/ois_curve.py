@@ -127,7 +127,8 @@ class OISCurve(DiscountCurve):
         self._interp_type = interp_type
         self.check_refit_flag = check_refit_flag
         self._interpolator = None
-        self._build_curve()
+
+        self.build_curve()
 
     ####################################################################################
 
@@ -157,7 +158,7 @@ class OISCurve(DiscountCurve):
 
     ####################################################################################
 
-    def _build_curve(self):
+    def build_curve(self):
         """Build curve based on interpolation."""
 
         self._build_curve_using_1d_solver()
@@ -269,7 +270,7 @@ class OISCurve(DiscountCurve):
         #                num_flows = len(swap_cpn_dts)
         #                for i_flow in range(0, num_flows):
         #                    if swap_cpn_dts[i_flow] != longest_swap_cpn_dates[i_flow]:
-        #                        raise FinError("Swap cpns are not on the same date grid.")
+        #                     raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -285,6 +286,8 @@ class OISCurve(DiscountCurve):
         if num_fras > 0:
             first_fra_maturity_dt = ois_fras[0].maturity_dt
             last_fra_maturity_dt = ois_fras[-1].maturity_dt
+
+        first_swap_maturity_dt = None
 
         if num_swaps > 0:
             first_swap_maturity_dt = ois_swaps[0].maturity_dt

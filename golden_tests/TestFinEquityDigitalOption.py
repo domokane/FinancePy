@@ -40,12 +40,7 @@ def test_equity_digital_option():
     call_option_values_mc = []
     num_paths_list = [10000, 20000, 40000, 80000]
 
-    """        160000,
-        320000,
-        640000,
-        1280000,
-        2560000]
-    """
+    #  [160000, 320000, 640000, 1280000, 2560000]
 
     test_cases.header("NumLoops", "ValueBS", "ValueMC", "TIME")
 

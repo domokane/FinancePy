@@ -46,7 +46,7 @@ class FinFXVarianceSwap:
         self.maturity_dt = maturity_dt
         self.strike_variance = strike_variance
         self.notional = notional
-        self.payStrike = pay_strike_flag
+        self.pay_strike_flag = pay_strike_flag
 
         # Replication portfolio is stored
         self.num_put_options = 0
@@ -99,8 +99,8 @@ class FinFXVarianceSwap:
         atm_vol = np.interp(f, strikes, volatilities)
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
-        """ Calculate the slope of the volatility curve by taking the end
-        points in the volatilities and strikes to calculate the gradient."""
+        # Calculate the slope of the volatility curve by taking the end
+        # points in the volatilities and strikes to calculate the gradient
 
         dvol = volatilities[-1] - volatilities[0]
         dk = strikes[-1] - strikes[0]
@@ -151,9 +151,9 @@ class FinFXVarianceSwap:
         else:
             sstar = stock_price
 
-        """ Replication argument from Demeterfi, Derman, Kamal and Zhou from
-        Goldman Sachs Research notes March 1999. See Appendix A. This aim is
-        to use calls and puts to approximate the payoff of a log contract """
+        # Replication argument from Demeterfi, Derman, Kamal and Zhou from
+        # Goldman Sachs Research notes March 1999. See Appendix A. This aim is
+        # to use calls and puts to approximate the payoff of a log contract """
 
         min_strike = sstar - (num_put_options + 1) * strike_spacing
 

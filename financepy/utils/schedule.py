@@ -96,10 +96,7 @@ class Schedule:
         if next_to_last_dt is None:
             self.next_to_last_dt = termination_dt
         else:
-            if (
-                next_to_last_dt > effective_dt
-                and next_to_last_dt < termination_dt
-            ):
+            if next_to_last_dt > effective_dt and next_to_last_dt < termination_dt:
                 self.next_to_last_dt = next_to_last_dt
                 print("NEXT TO LAST DATE NOT IMPLEMENTED")  # TODO
             else:
@@ -215,9 +212,7 @@ class Schedule:
         # We change it if the adjust_termination_dt flag is True.
         if self.adjust_termination_dt is True:
 
-            self.termination_dt = calendar.adjust(
-                self.termination_dt, self.bd_type
-            )
+            self.termination_dt = calendar.adjust(self.termination_dt, self.bd_type)
 
             self.adjusted_dts[-1] = self.termination_dt
 
@@ -262,16 +257,15 @@ class Schedule:
         s += label_to_string("ADJUST TERM DATE", self.adjust_termination_dt)
         s += label_to_string("END OF MONTH", self.end_of_month, "")
 
-        if 1 == 0:
+        verbose = False
+        if verbose is True:
             if len(self.adjusted_dts) > 0:
                 s += "\n\n"
                 s += label_to_string("EFF", self.adjusted_dts[0], "")
 
             if len(self.adjusted_dts) > 1:
                 s += "\n"
-                s += label_to_string(
-                    "FLW", self.adjusted_dts[1:], "", list_format=True
-                )
+                s += label_to_string("FLW", self.adjusted_dts[1:], "", list_format=True)
 
         return s
 

@@ -16,7 +16,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 # TODO: ADD LOGGING TO TEST CASES
 
@@ -66,16 +66,7 @@ def test_fin_swaption_vol_surface1():
     ]
 
     market_strikes = np.array(market_strikes) / 100.0
-
     fwd_swap_rates = market_strikes[3]
-    atm_vols = market_volatilities[3]
-
-    rfr_rate = 0.020  # USD
-    discount_curve = DiscountCurveFlat(value_dt, rfr_rate)
-
-    div_rate = 0.010  # USD
-    dividend_curve = DiscountCurveFlat(value_dt, div_rate)
-
     vol_function_type = VolFuncTypes.SABR_BETA_HALF
 
     swaption_surface = SwaptionVolSurface(
@@ -87,7 +78,7 @@ def test_fin_swaption_vol_surface1():
         vol_function_type,
     )
 
-    if 1 == 0:  # plot_graphs:
+    if PLOT_GRAPHS:
 
         tol = 1e-4
         swaption_surface.check_calibration(False, tol)

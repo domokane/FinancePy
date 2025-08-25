@@ -2,10 +2,6 @@
 
 import sys
 
-sys.path.append("..")
-
-# TODO
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -14,6 +10,7 @@ from financepy.products.bonds.bond_convertible import BondConvertible
 import time
 import numpy as np
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

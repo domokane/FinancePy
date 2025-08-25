@@ -108,12 +108,12 @@ def bermudan_swaption_tree_fast(
     cpn_times,
     cpn_flows,
     exercise_type_int,
-    _df_times,
-    _df_values,
-    _tree_times,
-    _qq,
-    _rt,
-    _dt,
+    df_times,
+    df_values,
+    tree_times,
+    qq,
+    rt,
+    dt,
 ):
     """Option to enter into a swap that can be exercised on coupon payment
     dates after the start of the exercise period. Due to non-analytical bond
@@ -122,9 +122,9 @@ def bermudan_swaption_tree_fast(
     pu = 0.50
     pd = 0.50
 
-    num_time_steps, num_nodes = _qq.shape
-    expiry_step = int(t_exp / _dt + 0.50)
-    maturity_step = int(t_mat / _dt + 0.50)
+    num_time_steps, num_nodes = qq.shape
+    expiry_step = int(t_exp / dt + 0.50)
+    maturity_step = int(t_mat / dt + 0.50)
 
     fixed_leg_flows = np.zeros(num_time_steps)
     float_leg_values = np.zeros(num_time_steps)
@@ -133,10 +133,10 @@ def bermudan_swaption_tree_fast(
     # Tree flows go all the way out to the swap maturity date
     for i in range(0, num_cpns):
         t_cpn = cpn_times[i]
-        n = int(t_cpn / _dt + 0.50)
-        ttree = _tree_times[n]
-        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP_TYPE)
-        df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP_TYPE)
+        n = int(t_cpn / dt + 0.50)
+        ttree = tree_times[n]
+        df_flow = _uinterpolate(t_cpn, df_times, df_values, INTERP_TYPE)
+        df_tree = _uinterpolate(ttree, df_times, df_values, INTERP_TYPE)
         fixed_leg_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
         float_leg_values[n] = strike_price  # * df_flow / df_tree
 
@@ -147,20 +147,20 @@ def bermudan_swaption_tree_fast(
     mapped_times = np.array([0.0])
     mapped_amounts = np.array([0.0])
 
-    for n in range(1, len(_tree_times)):
+    for n in range(1, len(tree_times)):
 
         accd_at_expiry = 0.0
-        if _tree_times[n - 1] < t_exp and _tree_times[n] >= t_exp:
+        if tree_times[n - 1] < t_exp and tree_times[n] >= t_exp:
             mapped_times = np.append(mapped_times, t_exp)
             mapped_amounts = np.append(mapped_amounts, accd_at_expiry)
 
         if fixed_leg_flows[n] > 0.0:
-            mapped_times = np.append(mapped_times, _tree_times[n])
+            mapped_times = np.append(mapped_times, tree_times[n])
             mapped_amounts = np.append(mapped_amounts, fixed_leg_flows[n])
 
     accrued = np.zeros(num_time_steps)
     for m in range(0, maturity_step + 1):
-        ttree = _tree_times[m]
+        ttree = tree_times[m]
         accrued[m] = accrued_interpolator(ttree, mapped_times, mapped_amounts)
         accrued[m] *= face_amount
 
@@ -189,8 +189,8 @@ def bermudan_swaption_tree_fast(
         flow = fixed_leg_flows[m] * face_amount
 
         for k in range(0, nm + 1):
-            rt = _rt[m, k]
-            df = np.exp(-rt * _dt)
+            short_rate = rt[m, k]
+            df = np.exp(-short_rate * dt)
 
             vu = fixed_leg_values[m + 1, k + 1]
             vd = fixed_leg_values[m + 1, k]

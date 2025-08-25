@@ -132,6 +132,10 @@ class FXDoubleDigitalOption:
         k_1 = self.lower_strike
         k_2 = self.upper_strike
 
+        lower_digital = None
+        upper_digital = None
+        v = None
+
         if isinstance(model, BlackScholes):
 
             volatility = model.volatility

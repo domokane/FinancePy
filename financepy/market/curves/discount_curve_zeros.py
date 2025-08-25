@@ -22,7 +22,6 @@ from .interpolator import InterpTypes, Interpolator
 
 
 class DiscountCurveZeros(DiscountCurve):
-
     """This is a curve calculated from a set of dates and zero rates. As we
     have rates as inputs, we need to specify the corresponding compounding
     frequency. Also to go from rates and dates to discount factors we need to
@@ -31,11 +30,9 @@ class DiscountCurveZeros(DiscountCurve):
     between the zero rates given and for this we must specify an interpolation
     convention. The class inherits methods from DiscountCurve."""
 
-########################################################################################
-
+    ####################################################################################
 
     def __init__(
-
         self,
         value_dt: Date,
         zero_dts: list,
@@ -65,9 +62,7 @@ class DiscountCurveZeros(DiscountCurve):
             raise FinError("Unknown Frequency type " + str(freq_type))
 
         if dc_type not in DayCountTypes:
-            raise FinError(
-                "Unknown Cap Floor DayCountRule type " + str(dc_type)
-            )
+            raise FinError("Unknown Cap Floor DayCountRule type " + str(dc_type))
 
         self.value_dt = value_dt
         self.freq_type = freq_type
@@ -114,8 +109,7 @@ class DiscountCurveZeros(DiscountCurve):
 
     #         return disc_curve
 
-########################################################################################
-
+    ####################################################################################
 
     def __repr__(self):
 
@@ -128,17 +122,12 @@ class DiscountCurveZeros(DiscountCurve):
         s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._times)
         for i in range(0, num_points):
-            s += label_to_string(
-                "%12s" % self._zero_dts[i], "%10.7f" % self._zero_rates[i]
-            )
+            s += f"{self._zero_dts[i]:>12} {self._zero_rates[i]:10.7f}\n"
 
         return s
 
-########################################################################################
-
+    ####################################################################################
 
     def _print(self):
-
         """Simple print function for backward compatibility."""
         print(self)
-

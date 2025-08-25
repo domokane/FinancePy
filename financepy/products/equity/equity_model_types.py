@@ -40,7 +40,7 @@ class EquityModel:
 
 class EquityModelHeston(EquityModel):
     def __init__(self, volatility, mean_reversion):
-        self.parentType = EquityModel
+        self.parent_type = EquityModel
         self.volatility = volatility
         self.mean_reversion = mean_reversion
         self.implementation = 0

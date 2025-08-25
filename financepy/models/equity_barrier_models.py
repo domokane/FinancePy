@@ -13,6 +13,7 @@ from ..utils.math import normcdf
 
 ########################################################################################
 
+
 @vectorize(
     [
         float64(
@@ -31,7 +32,6 @@ from ..utils.math import normcdf
     cache=True,
 )
 def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
-
     """This values a single barrier option. Because of its structure it cannot
     easily be vectorised which is why it has been wrapped.
     # number of observations per year
@@ -72,23 +72,23 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
         elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
             return p
 
-    if 1 == 0:
-        if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and s <= h:
-            return 0.0
-        elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and s >= h:
-            return 0.0
-        elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and s >= h:
-            return 0.0
-        elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and s <= h:
-            return 0.0
-        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and s <= h:
-            return c
-        elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value and s >= h:
-            return c
-        elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value and s >= h:
-            return p
-        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= h:
-            return p
+    # if 1 == 0:
+    #     if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and s <= h:
+    #         return 0.0
+    #     elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and s >= h:
+    #         return 0.0
+    #     elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and s >= h:
+    #         return 0.0
+    #     elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and s <= h:
+    #         return 0.0
+    #     elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and s <= h:
+    #         return c
+    #     elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value and s >= h:
+    #         return c
+    #     elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value and s >= h:
+    #         return p
+    #     elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= h:
+    #         return p
 
     num_observations = 1 + t * nobs
 
@@ -243,4 +243,3 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
         raise FinError("Unknown barrier option type." + str(opt_type))
 
     return price
-

@@ -25,7 +25,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -329,7 +329,7 @@ def test_bond_option_american_convergence_two():
         vec_ep.append(v_ep)
         vec_ap.append(v_ap)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure()
         plt.plot(num_steps_vector, vec_ac, label="American Call")
         plt.legend()

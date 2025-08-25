@@ -55,8 +55,8 @@ class BondAnnuity:
         self.accrued_days = 0.0
         self.alpha = 0.0
 
-        self.pcd = None
-        self.ncd = None
+        self._pcd = None
+        self._ncd = None
         self.flow_amounts = None
 
     ###########################################################################
@@ -67,9 +67,7 @@ class BondAnnuity:
         """Calculate the bond price using some discount curve to present-value
         the bond's cash flows."""
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
         accrued = self.accrued_int * self.par
         clean_price = dirty_price - accrued
         return clean_price
@@ -119,14 +117,14 @@ class BondAnnuity:
             dg_type,
         ).generate()
 
-        self.pcd = self.cpn_dts[0]
-        self.ncd = self.cpn_dts[1]
+        self._pcd = self.cpn_dts[0]
+        self._ncd = self.cpn_dts[1]
         self.accrued_interest(settle_dt, 1.0)
 
         self.flow_amounts = [0.0]
         basis = DayCount(self.dc_type)
 
-        prev_dt = self.pcd
+        prev_dt = self._pcd
 
         for next_dt in self.cpn_dts[1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
@@ -148,9 +146,7 @@ class BondAnnuity:
 
         dc = DayCount(self.dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(
-            self.pcd, settle_dt, self.ncd, self.freq
-        )
+        (acc_factor, num, _) = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq)
 
         self.alpha = 1.0 - acc_factor * self.freq
 

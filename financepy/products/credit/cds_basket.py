@@ -130,9 +130,7 @@ class CDSBasket:
 
                 num_payment_amounts_index = int(min_tau / avg_acc_factor)
                 rpv01_trial = rpv01_to_times[num_payment_amounts_index]
-                rpv01_trial += (
-                    min_tau - num_payment_amounts_index * avg_acc_factor
-                )
+                rpv01_trial += min_tau - num_payment_amounts_index * avg_acc_factor
 
                 # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
                 asset_index = 0
@@ -177,9 +175,7 @@ class CDSBasket:
         if n_to_default > num_credits or n_to_default < 1:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        default_times = default_times_gc(
-            issuer_curves, corr_matrix, num_trials, seed
-        )
+        default_times = default_times_gc(issuer_curves, corr_matrix, num_trials, seed)
 
         rpv01, prot_pv = self.value_legs_mc(
             value_dt, n_to_default, default_times, issuer_curves, libor_curve
@@ -278,8 +274,8 @@ class CDSBasket:
                 recovery_rates[i_credit] = issuer_curve.recovery_rate
                 issuer_surv_probs[i_credit] = interpolate(
                     t,
-                    issuer_curve._times,
-                    issuer_curve._qs,
+                    issuer_curve.times,
+                    issuer_curve.qs,
                     InterpTypes.FLAT_FWD_RATES.value,
                 )
 
@@ -302,9 +298,7 @@ class CDSBasket:
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, basket_curve, curve_recovery
         )
-        risky_pv01 = self.cds_contract.risky_pv01(value_dt, basket_curve)[
-            "clean_rpv01"
-        ]
+        risky_pv01 = self.cds_contract.risky_pv01(value_dt, basket_curve)["clean_rpv01"]
 
         # Long protection
         mtm = self.notional * (prot_leg_pv - risky_pv01 * self.running_cpn)
@@ -329,9 +323,7 @@ class CDSBasket:
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string(
-            "RUNNING COUPON", self.running_cpn * 10000, "bp\n"
-        )
+        s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
         s += label_to_string("DAYCOUNT", self.dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)

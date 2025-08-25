@@ -207,7 +207,7 @@ class Heston:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
-        K = option.strike_price
+        k = option.strike_price
         dt = 1.0 / num_steps_per_year
         scheme_value = float(scheme.value)
 
@@ -228,9 +228,9 @@ class Heston:
         )
 
         if option.opt_type == OptionTypes.EUROPEAN_CALL:
-            path_payoff = np.maximum(s_paths[:, -1] - K, 0.0)
+            path_payoff = np.maximum(s_paths[:, -1] - k, 0.0)
         elif option.opt_type == OptionTypes.EUROPEAN_PUT:
-            path_payoff = np.maximum(K - s_paths[:, -1], 0.0)
+            path_payoff = np.maximum(k - s_paths[:, -1], 0.0)
         else:
             raise FinError("Unknown option type.")
 
@@ -253,26 +253,26 @@ class Heston:
         r = interest_rate
         q = dividend_yield
         s0 = stock_price
-        K = option.strike_price
-        F = s0 * exp((r - q) * tau)
-        V = sigma * sigma
+        kk = option.strike_price
+        ff = s0 * exp((r - q) * tau)
+        vv = sigma * sigma
 
         def phi(
             k_in,
         ):
             k = k_in + 0.5 * 1j
             b = kappa + 1j * rho * sigma * k
-            d = np.sqrt(b**2 + V * k * (k - 1j))
+            d = np.sqrt(b**2 + vv * k * (k - 1j))
             g = (b - d) / (b + d)
-            t_m = (b - d) / V
+            t_m = (b - d) / vv
             qq = np.exp(-d * tau)
             t = t_m * (1.0 - qq) / (1.0 - g * qq)
-            W = (
+            ww = (
                 kappa
                 * theta
-                * (tau * t_m - 2.0 * np.log((1.0 - g * qq) / (1.0 - g)) / V)
+                * (tau * t_m - 2.0 * np.log((1.0 - g * qq) / (1.0 - g)) / vv)
             )
-            phi = np.exp(W + v0 * t)
+            phi = np.exp(ww + v0 * t)
             return phi
 
         def phi_transform(x):
@@ -281,9 +281,9 @@ class Heston:
 
             return integrate.quad(integrand, 0, np.inf)[0]
 
-        x = log(F / K)
+        x = log(ff / kk)
         i_1 = phi_transform(x) / (2.0 * pi)
-        v1 = F * exp(-r * tau) - np.sqrt(K * F) * exp(-r * tau) * i_1
+        v1 = ff * exp(-r * tau) - np.sqrt(kk * ff) * exp(-r * tau) * i_1
         #        v2 = s0 * exp(-q*tau) - K * exp(-r*tau) * I1
         return v1
 

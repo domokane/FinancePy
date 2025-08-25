@@ -10,11 +10,10 @@ import matplotlib.pyplot as plt
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.equity.equity_asian_option import (
-    AsianOptionValuationMethods,
-)
+from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
+
 from FinTestCases import FinTestCases, global_test_case_mode
 
 
@@ -29,7 +28,7 @@ test_mc_timings = True
 ########################################################################################
 
 
-def test_convergence():
+def test_convergence_fn():
 
     value_dt = Date(1, 1, 2014)
     start_averaging_date = Date(1, 6, 2014)
@@ -156,7 +155,7 @@ if PLOT_FLAG:
 ########################################################################################
 
 
-def test_time_evolution():
+def test_time_evolution_fn():
 
     start_averaging_date = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
@@ -281,7 +280,6 @@ def test_time_evolution():
 
 
 if PLOT_FLAG:
-    import matplotlib.pyplot as plt
 
     x = [dt.date() for dt in value_dts]
     plt.figure(figsize=(8, 6))
@@ -297,7 +295,7 @@ if PLOT_FLAG:
 ########################################################################################
 
 
-def test_mc_timings():
+def test_mc_timings_fn():
 
     value_dt = Date(1, 1, 2014)
     start_averaging_date = Date(1, 6, 2014)
@@ -419,7 +417,8 @@ if PLOT_FLAG:
     plt.show()
 
 
-test_convergence()
-test_mc_timings()
-test_time_evolution()
+test_convergence_fn()
+test_mc_timings_fn()
+test_time_evolution_fn()
+
 test_cases.compare_test_cases()

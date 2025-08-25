@@ -20,12 +20,12 @@ notional = 100.0
 notional_currency = "USD"
 
 drift = dom_interest_rate - for_interest_rate
-scheme = FinGBMNumericalScheme.ANTITHETIC
-process_type = ProcessTypes.GBM
+scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
+process_type = ProcessTypes.GBM_PROCESS
 domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
 foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
 model = BlackScholes(volatility)
-num_observations_per_year = 100
+num_obs_per_year = 100
 
 b = 105.0
 k = 100.0
@@ -44,7 +44,7 @@ def test_down_and_out_call():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -70,6 +70,7 @@ def test_down_and_out_call():
     assert round(vega, 4) == 0.0000
     assert round(theta, 4) == 0.0000
 
+
 ########################################################################################
 
 
@@ -84,7 +85,7 @@ def test_down_and_in_call():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -110,6 +111,7 @@ def test_down_and_in_call():
     assert round(vega, 4) == 0.3791
     assert round(theta, 4) == -5.0924
 
+
 ########################################################################################
 
 
@@ -124,7 +126,7 @@ def test_up_and_out_call():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -150,6 +152,7 @@ def test_up_and_out_call():
     assert round(vega, 4) == 0.0002
     assert round(theta, 4) == -0.0015
 
+
 ########################################################################################
 
 
@@ -164,7 +167,7 @@ def test_up_and_in_call():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -190,6 +193,7 @@ def test_up_and_in_call():
     assert round(vega, 4) == 0.3811
     assert round(theta, 4) == -5.1229
 
+
 ########################################################################################
 
 
@@ -204,7 +208,7 @@ def test_up_and_out_put():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -230,6 +234,7 @@ def test_up_and_out_put():
     assert round(vega, 4) == 0.0013
     assert round(theta, 4) == 3.7654
 
+
 ########################################################################################
 
 
@@ -244,7 +249,7 @@ def test_up_and_in_put():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -270,6 +275,7 @@ def test_up_and_in_put():
     assert round(vega, 4) == 0.2680
     assert round(theta, 4) == -2.3502
 
+
 ########################################################################################
 
 
@@ -284,7 +290,7 @@ def test_down_and_out_put():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )
@@ -310,6 +316,7 @@ def test_down_and_out_put():
     assert round(vega, 4) == 0.0000
     assert round(theta, 4) == 0.0000
 
+
 ########################################################################################
 
 
@@ -324,7 +331,7 @@ def test_down_and_in_put():
         currency_pair,
         opt_type,
         b,
-        num_observations_per_year,
+        num_obs_per_year,
         notional,
         notional_currency,
     )

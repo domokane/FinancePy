@@ -1,8 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.models.gauss_copula_onefactor import (
-    loss_dbn_hetero_adj_binomial,
-)
+from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 import numpy as np
 

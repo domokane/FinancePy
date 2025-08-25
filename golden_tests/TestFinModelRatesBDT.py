@@ -25,7 +25,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -66,6 +66,7 @@ def test_black_model_check():
     test_cases.header("LABEL", "VALUE")
     test_cases.print("BLACK'S MODEL PRICE:", v * 100)
 
+
 ########################################################################################
 
 
@@ -101,6 +102,7 @@ def test_bdt_example_one():
 
     model = BDTTree(yield_vol, num_time_steps)
     model.build_tree(t_mat, years, dfs)
+
 
 ########################################################################################
 
@@ -179,7 +181,7 @@ def test_bdt_example_two():
         test_cases.print(v)
         tree_vector.append(v["call"])
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.plot(num_steps_list, tree_vector)
 
     # The value in Hull converges to 0.699 with 100 time steps while I get 0.70
@@ -189,6 +191,7 @@ def test_bdt_example_two():
         print_tree(model._rt, 5)
         print("Q")
         print_tree(model._Q, 5)
+
 
 ########################################################################################
 

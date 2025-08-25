@@ -2,8 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.error import FinError
 from enum import Enum
+
+from ...utils.error import FinError
 
 # Non exhaustive list of country codes and currency names
 
@@ -101,7 +102,7 @@ prem_currency = {
     "USDMXN": "USD",
 }
 
-deltaConvention = {
+delta_convention = {
     "EURUSD": FinFXDeltaMethod.SPOT_DELTA,
     "USDJPY": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
     "EURJPY": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
@@ -134,7 +135,7 @@ class FinFXRate:
             raise FinError("Unknown currency code:" + ccy2)
 
         self.ccy2 = ccy2
-        self.rate = None
+        self.rate = rate
 
 
 ########################################################################################

@@ -6,7 +6,7 @@ sys.path.append("..")
 
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.calendar import Calendar, CalendarTypes
-from financepy.utils.date import set_date_format, DateFormatTypes
+from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
 
 

@@ -13,7 +13,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -52,7 +52,7 @@ def test_fin_interpolate():
 
         end = time.time()
 
-        if plot_graphs:
+        if PLOT_GRAPHS:
             plt.figure(figsize=(12, 10))
             plt.plot(x_values, y_values, color="r", marker="o")
             plt.plot(

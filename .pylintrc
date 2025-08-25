@@ -1,45 +1,72 @@
 [MASTER]
-# Files and folders to ignore
-ignore=__pycache__,.venv,build,dist,migrations
+ignore=build,dist,.eggs,.venv,venv,.mypy_cache,.ruff_cache,.pytest_cache
+ignore-patterns=^_version\.py$,^version\.py$,^conftest\.py$
+extension-pkg-whitelist=numpy,scipy,pandas,numba
+jobs=0
 persistent=yes
-jobs=1
+load-plugins=
 
 [MESSAGES CONTROL]
-# Disable some overly noisy or redundant warnings
+# Start strict and tune over time; add/remove codes as you ratchet quality.
 disable=
     C0114,  # missing-module-docstring
     C0115,  # missing-class-docstring
     C0116,  # missing-function-docstring
-    R0903,  # too-few-public-methods
-    W0511,  # fixme
-    W0718,  # comparison-with-itself
-    R0801,   # Duplicate code
-    C0209,
-    C0200,
-    C0413
+    R0902,  # too-many-instance-attributes (common in product models)
+    R0913,  # too-many-arguments (pricers/calibrators often need them)
+    R0914,  # too-many-locals (numerical routines)
+    R0903,  # too-few-public-methods (data containers)
+    R0801,  # duplicate-code (can be noisy across product variants)
+    W0511,  # fixme (we allow TODO notes, use pre-commit to gate later)
+    W1203,  # logging-fstring-interpolation (we prefer f-strings)
+    E1136,  # unsubscriptable-object (often false-positive with numpy)
+    E1101,  # no-member (NumPy/Numba dynamic attrs)
+
+enable=
+    unused-import,
+    redefined-outer-name,
+    reimported,
+    consider-using-with,
+    consider-using-f-string
+
+[REPORTS]
+score=yes
+evaluation=10.0 - ((5.0 * error) + (2.0 * warning) + (0.5 * refactor) + (0.0 * convention)) / statement
+output-format=colorized
 
 [FORMAT]
-# Match Black's defaults
-max-line-length=88
+max-line-length=110
+max-module-lines=4000
 indent-string='    '
 
 [BASIC]
-# Variable naming style
-good-names=i,j,k,_,id,db
+good-names=i,j,k,m,n,t,x,y,z,dt,df,pv,dv01,ir,fx,np,va,vc,mu,sigma,qr
+bad-names=foo,bar,baz
+variable-rgx=^[a-z_][a-z0-9_]*$
+argument-rgx=^[a-z_][a-z0-9_]*$
+attr-rgx=^[a-z_][a-z0-9_]*$
+method-rgx=^(test_.+|[a-z_][a-z0-9_]*)$
+function-rgx=^(test_.+|[a-z_][a-z0-9_]*)$
+class-rgx=^[A-Z][a-zA-Z0-9]+$
+const-rgx=^(_?[A-Z][A-Z0-9_]*|k[A-Z][A-Za-z0-9]+)$
 
 [TYPECHECK]
-# Sometimes pylint flags external imports incorrectly
-ignored-modules=numpy,pandas,matplotlib,pytest
-
-[REPORTS]
-output-format=colorized
-reports=no
-score=no
+generated-members=numpy.*,np.*,pandas.*,pd.*
+ignored-modules=numpy,scipy,pandas,numba
+# Useful when stubs are imperfect
 
 [DESIGN]
-max-args=10
-max-attributes=15
-max-branches=12
+max-args=12
+max-attributes=20
+max-branches=20
 max-locals=25
-max-returns=6
-max-statements=50
+min-public-methods=0
+
+[SIMILARITIES]
+min-similarity-lines=8
+ignore-comments=yes
+ignore-docstrings=yes
+ignore-imports=yes
+
+[EXCEPTIONS]
+overgeneral-exceptions=builtins.Exception,builtins.OverflowError

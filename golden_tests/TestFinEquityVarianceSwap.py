@@ -18,9 +18,9 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 ########################################################################################
 
 
-def vol_skew(K, atm_vol, atm_k, skew):
+def vol_skew(k, atm_vol, atm_k, skew):
 
-    v = atm_vol + skew * (K - atm_k)
+    v = atm_vol + skew * (k - atm_k)
     return v
 
 

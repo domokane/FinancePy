@@ -19,15 +19,14 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-
-plot_graphs = False
+PLOT_GRAPHS = False
 
 # TODO: ADD LOGGING TO TEST CASES
 
 ########################################################################################
 
 
-def test_fin_fx_mkt_vol_surface1(verbose_calibration):
+def test_fin_fx_mkt_vol_surface1(verbose):
 
     if 1 == 1:
 
@@ -89,7 +88,7 @@ def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
         fx_market_plus.check_calibration(False)
 
-        if 1 == 0:  # plot_graphs:
+        if 1 == 0:  # PLOT_GRAPHS:
 
             fx_market_plus.plot_vol_curves()
 
@@ -106,7 +105,7 @@ def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 ########################################################################################
 
 
-def test_fin_fx_mkt_vol_surface2(verbose_calibration):
+def test_fin_fx_mkt_vol_surface2(verbose):
 
     # print("==============================================================")
 
@@ -168,7 +167,7 @@ def test_fin_fx_mkt_vol_surface2(verbose_calibration):
 
     #        fx_market_plus.check_calibration(True)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         fx_market_plus.plot_vol_curves()
 
         plt.figure()
@@ -184,7 +183,7 @@ def test_fin_fx_mkt_vol_surface2(verbose_calibration):
 ########################################################################################
 
 
-def test_fin_fx_mkt_vol_surface3(verbose_calibration):
+def test_fin_fx_mkt_vol_surface3(verbose):
 
     if 1 == 1:
 
@@ -242,7 +241,7 @@ def test_fin_fx_mkt_vol_surface3(verbose_calibration):
 
         fx_market_plus.check_calibration(False)
 
-        if 1 == 0:  # plot_graphs:
+        if 1 == 0:  # PLOT_GRAPHS:
 
             fx_market_plus.plot_vol_curves()
 
@@ -318,11 +317,11 @@ def test_fin_fx_mkt_vol_surface3(verbose_calibration):
 ########################################################################################
 
 
-def test_fin_fx_mkt_vol_surface4(verbose_calibration):
+def test_fin_fx_mkt_vol_surface4(verbose):
 
     # Here I remove the 25D Vols
 
-    if 1 == 1:
+    if True:
 
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
@@ -420,7 +419,7 @@ def test_fin_fx_mkt_vol_surface4(verbose_calibration):
 ########################################################################################
 
 
-def test_fin_fx_mkt_vol_surface5(verbose_calibration):
+def test_fin_fx_mkt_vol_surface5(verbose):
 
     # Here I remove the 10D Vols
 
@@ -496,13 +495,13 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    verbose_calibration = False
+    verbose = False
 
-    test_fin_fx_mkt_vol_surface1(verbose_calibration)
-    test_fin_fx_mkt_vol_surface2(verbose_calibration)
-    test_fin_fx_mkt_vol_surface3(verbose_calibration)
-    test_fin_fx_mkt_vol_surface4(verbose_calibration)
-    test_fin_fx_mkt_vol_surface5(verbose_calibration)
+    test_fin_fx_mkt_vol_surface1(verbose)
+    test_fin_fx_mkt_vol_surface2(verbose)
+    test_fin_fx_mkt_vol_surface3(verbose)
+    test_fin_fx_mkt_vol_surface4(verbose)
+    test_fin_fx_mkt_vol_surface5(verbose)
 
     end = time.time()
 

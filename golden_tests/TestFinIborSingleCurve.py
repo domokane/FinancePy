@@ -26,7 +26,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -516,7 +516,7 @@ def test_ibor_deposits_futures_swaps():
     zero_rates = libor_curve.zero_rate(dates)
     fwd_rates = libor_curve.fwd(dates)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(8, 6))
         plt.plot(times, zero_rates * 100, label="zero rates")
         plt.plot(times, fwd_rates * 100, label="fwd rates")

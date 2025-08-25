@@ -84,26 +84,26 @@ class MertonFirmMkt(MertonFirm):
         if isinstance(equity_volatility, float):
             equity_volatility = [equity_volatility]
 
-        self._E = np.array(equity_value)
-        self._L = np.array(bond_face)
+        self._e = np.array(equity_value)
+        self._l = np.array(bond_face)
         self._t = np.array(years_to_maturity)
         self._r = np.array(risk_free_rate)
         self._mu = np.array(asset_growth_rate)
-        self._vE = np.array(equity_volatility)
+        self._ve = np.array(equity_volatility)
 
         nmax = max(
-            len(self._E),
-            len(self._L),
+            len(self._e),
+            len(self._l),
             len(self._t),
             len(self._r),
             len(self._mu),
-            len(self._vE),
+            len(self._ve),
         )
 
-        if len(self._E) != nmax and len(self._E) > 1:
+        if len(self._e) != nmax and len(self._e) > 1:
             raise FinError("Len e must be 1 or maximum length of arrays")
 
-        if len(self._L) != nmax and len(self._L) > 1:
+        if len(self._l) != nmax and len(self._l) > 1:
             raise FinError("Len l must be 1 or maximum length of arrays")
 
         if len(self._t) != nmax and len(self._t) > 1:
@@ -115,38 +115,38 @@ class MertonFirmMkt(MertonFirm):
         if len(self._mu) != nmax and len(self._mu) > 1:
             raise FinError("Len mu must be 1 or maximum length of arrays")
 
-        if len(self._vE) != nmax and len(self._vE) > 1:
+        if len(self._ve) != nmax and len(self._ve) > 1:
             raise FinError("Len mu must be 1 or maximum length of arrays")
 
         self._nmax = nmax
         self._solve_for_asset_value_and_vol()
-        self._D = self.debt_value()
+        self._d = self.debt_value()
 
     ####################################################################################
 
     def _solve_for_asset_value_and_vol(self):
 
-        self._A = []
-        self._vA = []
+        self._a = []
+        self._va = []
 
         for i in range(0, self._nmax):
 
             argtuple = ()
 
-            if len(self._E) == self._nmax:
-                argtuple += (self._E[i],)
+            if len(self._e) == self._nmax:
+                argtuple += (self._e[i],)
             else:
-                argtuple += (self._E[0],)
+                argtuple += (self._e[0],)
 
-            if len(self._vE) == self._nmax:
-                argtuple += (self._vE[i],)
+            if len(self._ve) == self._nmax:
+                argtuple += (self._ve[i],)
             else:
-                argtuple += (self._vE[0],)
+                argtuple += (self._ve[0],)
 
-            if len(self._L) == self._nmax:
-                argtuple += (self._L[i],)
+            if len(self._l) == self._nmax:
+                argtuple += (self._l[i],)
             else:
-                argtuple += (self._L[0],)
+                argtuple += (self._l[0],)
 
             if len(self._t) == self._nmax:
                 argtuple += (self._t[i],)
@@ -163,20 +163,20 @@ class MertonFirmMkt(MertonFirm):
 
             result = optimize.minimize(_fobj, x0, args=argtuple, tol=1e-9)
 
-            self._A.append(result.x[0])
-            self._vA.append(result.x[1])
+            self._a.append(result.x[0])
+            self._va.append(result.x[1])
 
-        self._A = np.array(self._A)
-        self._vA = np.array(self._vA)
+        self._a = np.array(self._a)
+        self._va = np.array(self._va)
 
     ####################################################################################
 
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("EQUITY VALUE", self._E)
-        s += label_to_string("BOND FACE", self._L)
+        s += label_to_string("EQUITY VALUE", self._e)
+        s += label_to_string("BOND FACE", self._l)
         s += label_to_string("YEARS TO MATURITY", self._t)
         s += label_to_string("ASSET GROWTH", self._mu)
-        s += label_to_string("EQUITY VOLATILITY", self._vE)
+        s += label_to_string("EQUITY VOLATILITY", self._ve)
         return s

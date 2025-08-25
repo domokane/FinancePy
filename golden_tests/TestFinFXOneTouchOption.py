@@ -13,6 +13,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
+DEBUG_FLAG = False
 ########################################################################################
 
 
@@ -155,7 +156,7 @@ def test_bbg_one_touch_option():
     # GAMMA IS 916,285
     # DELTA IS -9560266
 
-    if 1 == 0:
+    if DEBUG_FLAG:
         print(option_type)
         print("Value:", v)
         print("Value MC:", v_mc)

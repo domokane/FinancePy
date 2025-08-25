@@ -5,8 +5,10 @@
 
 import numpy as np
 from scipy import optimize
+from scipy.stats import norm
 
 from ...utils.math import M
+from ...utils.math import normcdf as N
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
@@ -18,10 +20,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...models.black_scholes_analytic import bs_value
 
-from scipy.stats import norm
-
-N = norm.cdf
-
+DEBUG_MODE = False
 
 ########################################################################################
 # TODO: Vectorise pricer
@@ -45,9 +44,7 @@ def _f(ss, *args):
     v = args[7]
     q = args[8]
 
-    v_call = bs_value(
-        ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
-    )
+    v_call = bs_value(ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
     v_put = bs_value(ss, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
     v = v_call - v_put
@@ -84,7 +81,7 @@ class EquityChooserOption(EquityOption):
         if choose_dt > put_expiry_dt:
             raise FinError("Expiry date must precede put option expiry date")
 
-        self.chooseDate = choose_dt
+        self.choose_dt = choose_dt
         self.call_expiry_dt = call_expiry_dt
         self.put_expiry_dt = put_expiry_dt
         self.call_strike = float(call_strike_price)
@@ -103,7 +100,7 @@ class EquityChooserOption(EquityOption):
         """Value the complex chooser option using an approach by Rubinstein
         (1991). See also Haug page 129 for complex chooser options."""
 
-        if value_dt > self.chooseDate:
+        if value_dt > self.choose_dt:
             raise FinError("Value date after choose date.")
 
         if isinstance(value_dt, Date) is False:
@@ -125,17 +122,15 @@ class EquityChooserOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        DEBUG_MODE = False
-
-        t = (self.chooseDate - value_dt) / G_DAYS_IN_YEARS
+        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEARS
         tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEARS
         tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
-        rt = discount_curve.cc_rate(self.chooseDate)
+        rt = discount_curve.cc_rate(self.choose_dt)
         rtc = discount_curve.cc_rate(self.call_expiry_dt)
         rtp = discount_curve.cc_rate(self.put_expiry_dt)
 
-        q = dividend_curve.cc_rate(self.chooseDate)
+        q = dividend_curve.cc_rate(self.choose_dt)
 
         t = max(t, G_SMALL)
         tc = max(tc, G_SMALL)
@@ -203,11 +198,11 @@ class EquityChooserOption(EquityOption):
     ):
         """Value the complex chooser option Monte Carlo."""
 
-        dft = discount_curve.df(self.chooseDate)
+        dft = discount_curve.df(self.choose_dt)
         dftc = discount_curve.df(self.call_expiry_dt)
         dftp = discount_curve.df(self.put_expiry_dt)
 
-        t = (self.chooseDate - value_dt) / G_DAYS_IN_YEARS
+        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEARS
         tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEARS
         tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -223,7 +218,7 @@ class EquityChooserOption(EquityOption):
         v = max(v, 1e-6)
 
         # SHOULD THIS CARE ABOUT TERM STRUCTURE OF Q
-        dq = dividend_curve.df(self.chooseDate)
+        dq = dividend_curve.df(self.choose_dt)
         q = -np.log(dq) / t
 
         #        q = dividend_yield
@@ -241,19 +236,11 @@ class EquityChooserOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        v_call_1 = bs_value(
-            s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
-        )
-        v_put_1 = bs_value(
-            s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
-        )
+        v_call_1 = bs_value(s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+        v_put_1 = bs_value(s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
-        v_call_2 = bs_value(
-            s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
-        )
-        v_put_2 = bs_value(
-            s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
-        )
+        v_call_2 = bs_value(s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+        v_put_2 = bs_value(s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
         payoff_1 = np.maximum(v_call_1, v_put_1)
         payoff_2 = np.maximum(v_call_2, v_put_2)
@@ -266,7 +253,7 @@ class EquityChooserOption(EquityOption):
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("CHOOSER DATE", self.chooseDate)
+        s += label_to_string("CHOOSER DATE", self.choose_dt)
         s += label_to_string("CALL EXPIRY DATE", self.call_expiry_dt)
         s += label_to_string("CALL STRIKE PRICE", self.call_strike)
         s += label_to_string("PUT EXPIRY DATE", self.put_expiry_dt)

@@ -55,7 +55,7 @@ class BondOption:
         self.opt_type = opt_type
         self.par = 100.0
 
-    ########################################################################################
+    ####################################################################################
 
     def value(self, value_dt: Date, discount_curve: DiscountCurve, model):
         """Value a bond option (option on a bond) using a specified model
@@ -127,21 +127,14 @@ class BondOption:
             exercise_type,
         )
 
-        if (
-            self.opt_type == OptionTypes.EUROPEAN_CALL
-            or self.opt_type == OptionTypes.AMERICAN_CALL
-        ):
+        if self.opt_type in [OptionTypes.EUROPEAN_CALL, OptionTypes.AMERICAN_CALL]:
             return v["call"]
-        elif (
-            self.opt_type == OptionTypes.EUROPEAN_PUT
-            or self.opt_type == OptionTypes.AMERICAN_PUT
-        ):
+        elif self.opt_type in [OptionTypes.AMERICAN_PUT, OptionTypes.EUROPEAN_PUT]:
             return v["put"]
-        else:
-            print(self.opt_type)
-            raise FinError("Unknown option type.")
 
-    ########################################################################################
+        raise FinError("Unknown option type.")
+
+    ####################################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -152,7 +145,7 @@ class BondOption:
         s += str(self.bond)
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

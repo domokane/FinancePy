@@ -11,7 +11,7 @@ from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
 from .loss_dbn_builder import portfolio_gcd
 
 
-min_z = -6.0
+MIN_Z = -6.0
 
 # This implements the one-factor latent variable formulation of the Gaussian
 # Copula model as well as some approximations
@@ -45,7 +45,7 @@ def loss_dbn_recursion_gcd(
 
     uncond_loss_dbn = np.zeros(num_loss_units)
 
-    z = min_z
+    z = MIN_Z
     dz = 2.0 * abs(z) / num_integration_steps
 
     cond_default_probs = np.zeros(num_credits)
@@ -273,8 +273,8 @@ def tranch_surv_prob_gaussian(
     for i_credit in range(0, num_credits):
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
-    dz = 2.0 * abs(min_z) / num_integration_steps
-    z = min_z
+    dz = 2.0 * abs(MIN_Z) / num_integration_steps
+    z = MIN_Z
 
     thresholds = np.zeros(num_credits)
     losses = np.zeros(num_credits)
@@ -335,8 +335,8 @@ def loss_dbn_hetero_adj_binomial(
     for i_credit in range(0, num_credits):
         thresholds[i_credit] = norminvcdf(default_probs[i_credit])
 
-    dz = 2.0 * abs(min_z) / num_integration_steps
-    z = min_z
+    dz = 2.0 * abs(MIN_Z) / num_integration_steps
+    z = MIN_Z
 
     for _ in range(0, num_integration_steps):
 

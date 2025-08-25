@@ -84,7 +84,7 @@ class IborSingleCurveParShocker:
                 bumped_swaps.append(bumped_benchmark)
 
         # This assumes that the base curve was built using the default method as defined
-        # in IborSingleCurve._build_curve() based on interp_type. This at the moment
+        # in IborSingleCurve.build_curve() based on interp_type. This at the moment
         # excludes the non-parametric smoothing calibration (for which, incidentally,
         # par bumps are not a good idea anyway). But in the future we should keep
         # track of what exactly we used to build the base curve and use the same

@@ -4,7 +4,6 @@
 
 from collections.abc import Iterable
 from functools import partial
-from enum import Enum
 import datetime
 import math
 
@@ -16,40 +15,14 @@ import numpy as np
 
 from .error import FinError
 from .tenor import Tenor, TenorUnit
-
-
-########################################################################################
-
-
-class DateFormatTypes(Enum):
-    """Enumeration of date format types."""
-
-    BLOOMBERG = 1
-    US_SHORT = 2
-    US_MEDIUM = 3
-    US_LONG = 4
-    US_LONGEST = 5
-    UK_SHORT = 6
-    UK_MEDIUM = 7
-    UK_LONG = 8
-    UK_LONGEST = 9
-    DATETIME = 10
-
-
-# Set the default
-G_DATE_TYPE_FORMAT = DateFormatTypes.UK_LONG
-
-
-def set_date_format(format_type):
-    """Function that sets the global date format type."""
-    global G_DATE_TYPE_FORMAT
-    G_DATE_TYPE_FORMAT = format_type
+from .date_format import DateFormatTypes, get_date_format
 
 
 ########################################################################################
 
 
 short_day_names = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+
 long_day_names = [
     "MONDAY",
     "TUESDAY",
@@ -180,7 +153,7 @@ def calculate_list():
 
 
 @njit(fastmath=True, cache=True)
-def date_index(d, m, y):
+def date_index(d, m, y) -> int:
     """Calculate the index of a date assuming 31 days in all months"""
     idx = (y - G_START_YEAR) * 12 * 31 + (m - 1) * 31 + (d - 1)
     return idx
@@ -203,7 +176,7 @@ def date_from_index(idx):
 
 
 @njit(fastmath=True, cache=True)
-def weekday(day_count):
+def weekday(day_count) -> int:
     """Converts day count to a weekday based on Excel date"""
     week_day = (day_count + 5) % 7
     return week_day
@@ -233,13 +206,7 @@ class Date:
     """A date class to manage dates that is simple to use and includes a
     number of useful date functions used frequently in Finance."""
 
-    MON = 0
-    TUE = 1
-    WED = 2
-    THU = 3
-    FRI = 4
-    SAT = 5
-    SUN = 6
+    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
 
     ###########################################################################
 
@@ -259,9 +226,7 @@ class Date:
         # If the date has been entered as y, m, d we flip it to d, m, y
         # This message should be removed after a few releases
         if d >= G_START_YEAR and d < G_END_YEAR and y > 0 and y <= 31:
-            raise FinError(
-                "Date arguments must now be in the order Date(dd, mm, yyyy)"
-            )
+            raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
 
         if G_DT_COUNTER_LIST is None:
             calculate_list()
@@ -355,9 +320,9 @@ class Date:
             return cls(d, m, y)
 
         if isinstance(date, np.datetime64):
-            time_stamp = (
-                date - np.datetime64("1970-01-01T00:00:00")
-            ) / np.timedelta64(1, "s")
+            time_stamp = (date - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
+                1, "s"
+            )
 
             date = datetime.datetime.utcfromtimestamp(time_stamp)
             d, m, y = date.day, date.month, date.year
@@ -583,27 +548,21 @@ class Date:
         integer or float you get back a single date. If mm is a vector you get
         back a vector of dates."""
 
-        num_months = 1
         scalar_flag = False
 
-        if isinstance(mm, int) or isinstance(mm, float):
+        if isinstance(mm, (int, float)):
             mm_vector = [mm]
             scalar_flag = True
         else:
             mm_vector = mm
 
-        num_months = len(mm_vector)
-
         date_list = []
 
-        for i in range(0, num_months):
-
-            mmi = mm_vector[i]
+        for mmi in mm_vector:
 
             # If I get a float I check it has no decimal places
             if int(mmi) != mmi:
                 raise FinError("Must only pass integers or float integers.")
-
             mmi = int(mmi)
 
             d = self.d
@@ -786,23 +745,13 @@ class Date:
         if isinstance(tenor, list) is True:
             list_flag = True
             for ten in tenor:
-                if (
-                    isinstance(ten, str) is False
-                    and isinstance(ten, Tenor) is False
-                ):
-                    raise FinError(
-                        "Tenor must be a string e.g. '5Y' or a Tenor object"
-                    )
+                if isinstance(ten, str) is False and isinstance(ten, Tenor) is False:
+                    raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
         else:
-            if (
-                isinstance(tenor, str) is True
-                or isinstance(tenor, Tenor) is True
-            ):
+            if isinstance(tenor, str) is True or isinstance(tenor, Tenor) is True:
                 tenor = [tenor]
             else:
-                raise FinError(
-                    "Tenor must be a string e.g. '5Y' or a Tenor object"
-                )
+                raise FinError("Tenor must be a string e.g. '5Y' or a Tenor object")
 
         new_dts = []
 
@@ -814,19 +763,13 @@ class Date:
 
             if tenor_obj.units == TenorUnit.DAYS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_days(
-                        math.copysign(1, tenor_obj.num_periods)
-                    )
+                    new_dt = new_dt.add_days(math.copysign(1, tenor_obj.num_periods))
             elif tenor_obj.units == TenorUnit.WEEKS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_days(
-                        math.copysign(7, tenor_obj.num_periods)
-                    )
+                    new_dt = new_dt.add_days(math.copysign(7, tenor_obj.num_periods))
             elif tenor_obj.units == TenorUnit.MONTHS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_months(
-                        math.copysign(1, tenor_obj.num_periods)
-                    )
+                    new_dt = new_dt.add_months(math.copysign(1, tenor_obj.num_periods))
 
                 # in case we landed on a 28th Feb and lost the month day
                 # we add this logic
@@ -837,9 +780,7 @@ class Date:
 
             elif tenor_obj.units == TenorUnit.YEARS:
                 for _ in range(0, abs(tenor_obj.num_periods)):
-                    new_dt = new_dt.add_months(
-                        math.copysign(12, tenor_obj.num_periods)
-                    )
+                    new_dt = new_dt.add_months(math.copysign(12, tenor_obj.num_periods))
 
             new_dts.append(new_dt)
 
@@ -897,7 +838,7 @@ class Date:
         short_year_str = str(self.y)[2:]
         long_year_str = str(self.y)
 
-        if G_DATE_TYPE_FORMAT == DateFormatTypes.UK_LONGEST:
+        if get_date_format() == DateFormatTypes.UK_LONGEST:
 
             sep = " "
             date_str = (
@@ -911,25 +852,25 @@ class Date:
             )
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.UK_LONG:
+        elif get_date_format() == DateFormatTypes.UK_LONG:
 
             sep = "-"
             date_str = day_str + sep + long_month_str + sep + long_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.UK_MEDIUM:
+        elif get_date_format() == DateFormatTypes.UK_MEDIUM:
 
             sep = "/"
             date_str = day_str + sep + short_month_str + sep + long_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.UK_SHORT:
+        elif get_date_format() == DateFormatTypes.UK_SHORT:
 
             sep = "/"
             date_str = day_str + sep + short_month_str + sep + short_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_LONGEST:
+        elif get_date_format() == DateFormatTypes.US_LONGEST:
 
             sep = " "
             date_str = (
@@ -943,31 +884,31 @@ class Date:
             )
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_LONG:
+        elif get_date_format() == DateFormatTypes.US_LONG:
 
             sep = "-"
             date_str = long_month_str + sep + day_str + sep + long_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_MEDIUM:
+        elif get_date_format() == DateFormatTypes.US_MEDIUM:
 
             sep = "-"
             date_str = short_month_str + sep + day_str + sep + long_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.US_SHORT:
+        elif get_date_format() == DateFormatTypes.US_SHORT:
 
             sep = "-"
             date_str = short_month_str + sep + day_str + sep + short_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.BLOOMBERG:
+        elif get_date_format() == DateFormatTypes.BLOOMBERG:
 
             sep = "/"
             date_str = short_month_str + sep + day_str + sep + short_year_str
             return date_str
 
-        elif G_DATE_TYPE_FORMAT == DateFormatTypes.DATETIME:
+        elif get_date_format() == DateFormatTypes.DATETIME:
 
             sep = "/"
 

@@ -34,19 +34,19 @@ def test_fin_model_merton_credit():
     )
 
     test_cases.header("MERTON MARKET MODEL", "VALUE")
-    test_cases.print("ASSET VALUE", model._A)
-    test_cases.print("EQUITY VALUE", model._E)
+    test_cases.print("ASSET VALUE", model.asset_value())
+    test_cases.print("EQUITY VALUE", model.equity_value())
     test_cases.print("DEBT VALUE", model.debt_value())
 
-    test_cases.print("ASSET VOLATILITY", model._vA)
-    test_cases.print("EQUITY VOL", model._vE)
+    test_cases.print("ASSET VOLATILITY", model.asset_vol())
+    test_cases.print("EQUITY VOL", model.equity_vol())
 
     test_cases.print("CREDIT SPREAD", model.credit_spread())
     test_cases.print("LEVERAGE", model.leverage())
     test_cases.print("PROD DEFAULT", model.prob_default())
 
-    asset_value = model._A
-    asset_vol = model._vA
+    asset_value = model.asset_value()
+    asset_vol = model.asset_vol()
 
     model = MertonFirm(
         asset_value,
@@ -59,12 +59,12 @@ def test_fin_model_merton_credit():
 
     test_cases.header("BASIC MERTON MODEL", "VALUE")
 
-    test_cases.print("ASSET VALUE", model._A)
-    test_cases.print("EQUITY VALUE", model._E)
+    test_cases.print("ASSET VALUE", model.asset_value())
+    test_cases.print("EQUITY VALUE", model.equity_value())
     test_cases.print("DEBT VALUE", model.debt_value())
 
-    test_cases.print("ASSET VOLATILITY", model._vA)
-    test_cases.print("EQUITY VOL", model._vE)
+    test_cases.print("ASSET VOLATILITY", model.asset_vol())
+    test_cases.print("EQUITY VOL", model.equity_vol())
 
     test_cases.print("CREDIT SPREAD", model.credit_spread())
     test_cases.print("LEVERAGE", model.leverage())
@@ -89,12 +89,12 @@ def test_fin_model_merton_credit():
 
     test_cases.header("BASIC MERTON MODEL", "VALUE")
 
-    test_cases.print("ASSET VALUE", model._A)
-    test_cases.print("EQUITY VALUE", model._E)
+    test_cases.print("ASSET VALUE", model.asset_value())
+    test_cases.print("EQUITY VALUE", model.equity_value())
     test_cases.print("DEBT VALUE", model.debt_value())
 
-    test_cases.print("ASSET VOLATILITY", model._vA)
-    test_cases.print("EQUITY VOL", model._vE)
+    test_cases.print("ASSET VOLATILITY", model.asset_vol())
+    test_cases.print("EQUITY VOL", model.equity_vol())
 
     test_cases.print("CREDIT SPREAD", model.credit_spread() * 10000)
     test_cases.print("LEVERAGE", model.leverage())

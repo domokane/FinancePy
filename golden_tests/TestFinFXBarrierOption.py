@@ -41,7 +41,7 @@ def test_fin_fx_barrier_option():
     model = BlackScholes(volatility)
 
     start = time.time()
-    num_observations_per_year = 100
+    num_obs_per_year = 100
 
     for opt_type in FinFXBarrierTypes:
 
@@ -57,7 +57,7 @@ def test_fin_fx_barrier_option():
                 currency_pair,
                 opt_type,
                 b,
-                num_observations_per_year,
+                num_obs_per_year,
                 notional,
                 notional_currency,
             )
@@ -101,7 +101,7 @@ def test_fin_fx_barrier_option():
                 currency_pair,
                 opt_type,
                 b,
-                num_observations_per_year,
+                num_obs_per_year,
                 notional,
                 notional_currency,
             )
@@ -150,7 +150,7 @@ def test_fin_fx_barrier_option():
                 currency_pair,
                 opt_type,
                 b,
-                num_observations_per_year,
+                num_obs_per_year,
                 notional,
                 notional_currency,
             )

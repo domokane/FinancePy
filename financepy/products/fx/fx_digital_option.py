@@ -66,14 +66,14 @@ class FXDigitalOption:
         self.for_name = self.currency_pair[0:3]
         self.dom_name = self.currency_pair[3:6]
 
-        if prem_currency != self.dom_name and prem_currency != self.for_name:
+        if prem_currency not in [self.dom_name, self.for_name]:
             raise FinError("Notional currency not in currency pair.")
 
         self.prem_currency = prem_currency
 
         self.notional = notional
 
-        if opt_type != OptionTypes.DIGITAL_CALL and opt_type != OptionTypes.DIGITAL_PUT:
+        if opt_type not in [OptionTypes.DIGITAL_CALL, OptionTypes.DIGITAL_PUT]:
             raise FinError("Unknown Digital Option Type:" + opt_type)
 
         self.opt_type = opt_type

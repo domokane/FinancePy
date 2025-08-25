@@ -6,20 +6,19 @@ import glob
 from os.path import dirname, basename, join
 import traceback
 
-import sys, os
+import sys
+import os
 
 # Add the *parent of the script's parent directory* to sys.path
 sys.path.append(
-    os.path.dirname(                 # go up one directory
-        os.path.dirname(             # go up two directories
+    os.path.dirname(  # go up one directory
+        os.path.dirname(  # go up two directories
             os.path.abspath(__file__)  # absolute path to current file
         )
     )
 )
 
-# sys.path.append("..")
-
-from financepy.utils.date import set_date_format, DateFormatTypes
+from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 
 
@@ -54,13 +53,9 @@ def main(start_index=0, end_index=None):
             module = __import__(module_name)
 
             num_errors = getattr(module.test_cases, "_global_num_errors", 0)
-            num_warnings = getattr(
-                module.test_cases, "_global_num_warnings", 0
-            )
+            num_warnings = getattr(module.test_cases, "_global_num_warnings", 0)
 
-            print(
-                f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end=""
-            )
+            print(f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end="")
 
             if num_errors > 0:
                 print("*" * num_errors, end="")

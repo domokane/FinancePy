@@ -14,9 +14,8 @@ from ..utils.helpers import label_to_string
 from ..utils.global_types import FinExerciseTypes
 from ..utils.global_vars import G_SMALL
 
-interp = InterpTypes.FLAT_FWD_RATES.value
-
-small = 1e-10
+INTERP_TYPE_VALUE = InterpTypes.FLAT_FWD_RATES.value
+SMALL = 1e-10
 
 # TODO: Put Jamshidian code into Numba to get speed up
 
@@ -51,20 +50,20 @@ def option_exercise_types_to_int(option_exercise_type):
 
 
 @njit(fastmath=True, cache=True)
-def p_fast(t, T, r_t, delta, pt, ptd, pT, _sigma, _a):
+def p_fast(t, t_mat, r_t, delta, pt, ptd, p_mat, _sigma, _a):
     """Forward discount factor as seen at some time t which may be in the
     future for payment at time T where r_t is the delta-period short rate
     seen at time t and pt is the discount factor to time t, ptd is the one
     period discount factor to time t+dt and pT is the discount factor from
     now until the payment of the 1 dollar of the discount factor."""
 
-    if abs(_a) < small:
-        _a = small
+    if abs(_a) < SMALL:
+        _a = SMALL
 
-    bt_t = (1.0 - np.exp(-_a * (T - t))) / _a
+    bt_t = (1.0 - np.exp(-_a * (t_mat - t))) / _a
     bt_delta = (1.0 - np.exp(-_a * delta)) / _a
 
-    term1 = np.log(pT / pt) - (bt_t / bt_delta) * np.log(ptd / pt)
+    term1 = np.log(p_mat / pt) - (bt_t / bt_delta) * np.log(ptd / pt)
 
     term2 = (
         (_sigma**2) * (1 - np.exp(-2 * _a * t)) * bt_t * (bt_t - bt_delta) / (4 * _a)
@@ -211,8 +210,8 @@ def american_bond_option_tree_fast(
         if t_cpn <= t_exp:
             n = int(t_cpn / dt + 0.50)
             ttree = _tree_times[n]
-            df_flow = _uinterpolate(t_cpn, _df_times, _df_values, interp)
-            df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
+            df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP_TYPE_VALUE)
+            df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP_TYPE_VALUE)
             tree_flows[n] += cpn_amounts[i] * 1.0 * df_flow / df_tree
 
     # Mapped times stores the mapped times and flows and is used to calculate
@@ -257,8 +256,8 @@ def american_bond_option_tree_fast(
     put_option_values = np.zeros(shape=(num_time_steps, num_nodes))
     bond_values = np.zeros(shape=(num_time_steps, num_nodes))
 
-    pt_exp = _uinterpolate(t_exp, _df_times, _df_values, interp)
-    ptdelta = _uinterpolate(t_exp + dt, _df_times, _df_values, interp)
+    pt_exp = _uinterpolate(t_exp, _df_times, _df_values, INTERP_TYPE_VALUE)
+    ptdelta = _uinterpolate(t_exp + dt, _df_times, _df_values, INTERP_TYPE_VALUE)
 
     cpn = 0.0
     zcb = 0.0
@@ -274,7 +273,7 @@ def american_bond_option_tree_fast(
         for i in range(0, num_cpns):
             tflow = cpn_times[i]
             if tflow >= t_exp:
-                ptflow = _uinterpolate(tflow, _df_times, _df_values, interp)
+                ptflow = _uinterpolate(tflow, _df_times, _df_values, INTERP_TYPE_VALUE)
                 zcb = p_fast(t_exp, tflow, r_t, dt, pt_exp, ptdelta, ptflow, _sigma, _a)
                 cpn = cpn_amounts[i]
                 bond_price += cpn * face_amount * zcb
@@ -460,8 +459,8 @@ def bermudan_swaption_tree_fast(
         t_cpn = cpn_times[i]
         n = int(round(t_cpn / _dt, 0))
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, interp)
-        df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP_TYPE_VALUE)
+        df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP_TYPE_VALUE)
         fixed_leg_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
         float_leg_values[n] = strike_price * df_flow / df_tree
 
@@ -666,8 +665,8 @@ def callable_puttable_bond_tree_fast(
         t_cpn = cpn_times[i]
         n = int(round(t_cpn / dt, 0))
         ttree = _tree_times[n]
-        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, interp)
-        df_tree = _uinterpolate(ttree, _df_times, _df_values, interp)
+        df_flow = _uinterpolate(t_cpn, _df_times, _df_values, INTERP_TYPE_VALUE)
+        df_tree = _uinterpolate(ttree, _df_times, _df_values, INTERP_TYPE_VALUE)
         tree_flows[n] += cpn_flows[i] * 1.0 * df_flow / df_tree
 
     #    print("Tree flows:", tree_flows)
@@ -724,7 +723,7 @@ def callable_puttable_bond_tree_fast(
         for i in range(0, maturity_step + 1):
             flow = tree_flows[i]
             t = _tree_times[i]
-            df = _uinterpolate(t, _df_times, _df_values, interp)
+            df = _uinterpolate(t, _df_times, _df_values, INTERP_TYPE_VALUE)
 
             if flow > G_SMALL:
                 pv = flow * df
@@ -825,8 +824,8 @@ def fwd_dirty_bond_price(r_t, *args):
 
     dt = 0.001
     tdelta = t_exp + dt
-    pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
-    ptdelta = _uinterpolate(tdelta, df_times, df_values, interp)
+    pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP_TYPE_VALUE)
+    ptdelta = _uinterpolate(tdelta, df_times, df_values, INTERP_TYPE_VALUE)
 
     #    print("TEXP", t_exp, pt_exp)
 
@@ -839,7 +838,7 @@ def fwd_dirty_bond_price(r_t, *args):
         cpn = cpn_amounts[i]
 
         if t_cpn > t_exp:
-            pt_cpn = _uinterpolate(t_cpn, df_times, df_values, interp)
+            pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP_TYPE_VALUE)
             zcb = p_fast(
                 t_exp,
                 t_cpn,
@@ -929,20 +928,20 @@ class HWTree:
         if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
-        pt_mat = _uinterpolate(t_mat, df_times, df_values, interp)
+        pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP_TYPE_VALUE)
+        pt_mat = _uinterpolate(t_mat, df_times, df_values, INTERP_TYPE_VALUE)
 
         sigma = self.sigma
         a = self.a
 
-        if abs(a) < small:
-            a = small
+        if abs(a) < SMALL:
+            a = SMALL
 
         sigmap = (sigma / a) * (1.0 - np.exp(-a * (t_mat - t_exp)))
         sigmap = sigmap * np.sqrt((1.0 - np.exp(-2.0 * a * t_exp)) / 2.0 / a)
 
-        if abs(sigmap) < small:
-            sigmap = small
+        if abs(sigmap) < SMALL:
+            sigmap = SMALL
 
         h = np.log((face_amount * pt_mat) / (strike * pt_exp)) / sigmap + sigmap / 2.0
         call_value = face_amount * pt_mat * normcdf(h) - strike * pt_exp * normcdf(
@@ -995,8 +994,8 @@ class HWTree:
         # Now we price a series of zero cpn bonds using this short rate
         dt = 1e-6
 
-        pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
-        ptdelta = _uinterpolate(t_exp + dt, df_times, df_values, interp)
+        pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP_TYPE_VALUE)
+        ptdelta = _uinterpolate(t_exp + dt, df_times, df_values, INTERP_TYPE_VALUE)
 
         call_value = 0.0
         put_value = 0.0
@@ -1009,7 +1008,7 @@ class HWTree:
 
             if t_cpn >= t_exp:  # cpns on the expiry date are included
 
-                pt_cpn = _uinterpolate(t_cpn, df_times, df_values, interp)
+                pt_cpn = _uinterpolate(t_cpn, df_times, df_values, INTERP_TYPE_VALUE)
 
                 strike = p_fast(
                     t_exp,
@@ -1050,8 +1049,8 @@ class HWTree:
         dt = self.dt
         tdelta = t_exp + dt
 
-        pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, interp)
-        ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, interp)
+        pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, INTERP_TYPE_VALUE)
+        ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, INTERP_TYPE_VALUE)
 
         _, num_nodes = self.qq.shape
         expiry_step = int(t_exp / dt + 0.50)
@@ -1074,7 +1073,9 @@ class HWTree:
 
                 if t_cpn >= t_exp:
 
-                    pt_cpn = _uinterpolate(t_cpn, self.df_times, self.dfs, interp)
+                    pt_cpn = _uinterpolate(
+                        t_cpn, self.df_times, self.dfs, INTERP_TYPE_VALUE
+                    )
 
                     zcb = p_fast(
                         t_exp,
@@ -1130,9 +1131,9 @@ class HWTree:
         dt = self.dt
         tdelta = t_exp + dt
 
-        pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, interp)
-        ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, interp)
-        pt_mat = _uinterpolate(t_mat, self.df_times, self.dfs, interp)
+        pt_exp = _uinterpolate(t_exp, self.df_times, self.dfs, INTERP_TYPE_VALUE)
+        ptdelta = _uinterpolate(tdelta, self.df_times, self.dfs, INTERP_TYPE_VALUE)
+        pt_mat = _uinterpolate(t_mat, self.df_times, self.dfs, INTERP_TYPE_VALUE)
 
         _, num_nodes = self.qq.shape
         expiry_step = int(t_exp / dt + 0.50)
@@ -1399,7 +1400,7 @@ class HWTree:
 
         for i in range(1, self.num_time_steps + 2):
             t = tree_times[i]
-            df_tree[i] = _uinterpolate(t, df_times, df_values, interp)
+            df_tree[i] = _uinterpolate(t, df_times, df_values, INTERP_TYPE_VALUE)
 
         self.df_times = df_times
         self.dfs = df_values

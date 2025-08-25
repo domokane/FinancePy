@@ -4,8 +4,9 @@
 
 from enum import Enum
 
-import numpy as np
 from typing import List
+
+import numpy as np
 
 from ...utils.date import Date
 from ...utils.math import normcdf, M

@@ -5,7 +5,8 @@ import sys
 sys.path.append("..")
 
 from financepy.products.rates.ibor_future import IborFuture
-from financepy.utils.date import Date, set_date_format, DateFormatTypes
+from financepy.utils.date_format import set_date_format, DateFormatTypes
+from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

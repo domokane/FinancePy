@@ -39,13 +39,12 @@ import matplotlib.pyplot as plt
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
 
 def build_ois(value_dt):
-
     """Build the OIS funding curve from futures (FRAs) and OIS"""
 
     spot_days = 0
@@ -234,11 +233,11 @@ def build_ois(value_dt):
 
     return ois_curve
 
+
 ########################################################################################
 
 
 def test_bloomberg_pricing_example():
-
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
@@ -532,6 +531,7 @@ def test_bloomberg_pricing_example():
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()
 
+
 ########################################################################################
 
 
@@ -800,7 +800,6 @@ def test_swap_valuation_example():
     test_cases.header("LABEL", "VALUE")
     test_cases.print("BBG VALUE", v_bbg)
     test_cases.print("FP ONE CURVE VALUE", v1)
-
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
@@ -1142,7 +1141,6 @@ def test_swap_valuation_example():
 #    off_mkt_swap.printFloatLegFlows()
 #    off_mkt_swap.print_fixed_leg_pv()
 #    off_mkt_swap.print_float_leg_pv()
-
 
 
 # test_swap_valuation_example()

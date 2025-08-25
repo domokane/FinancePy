@@ -6,9 +6,8 @@ from numba import njit, float64, int64
 
 from ..utils.global_types import OptionTypes
 
-bump = 1e-4
-
 ########################################################################################
+
 
 @njit(
     float64[:](
@@ -26,7 +25,6 @@ bump = 1e-4
     cache=True,
 )
 def crr_tree_val(
-
     stock_price,
     interest_rate,  # continuously compounded
     dividend_rate,  # continuously compounded
@@ -136,19 +134,13 @@ def crr_tree_val(
             elif opt_type == OptionTypes.EUROPEAN_PUT.value:
                 option_values[index + i_node] = hold_value
             elif opt_type == OptionTypes.AMERICAN_CALL.value:
-                option_values[index + i_node] = np.maximum(
-                    exercise_value, hold_value
-                )
+                option_values[index + i_node] = np.maximum(exercise_value, hold_value)
             elif opt_type == OptionTypes.AMERICAN_PUT.value:
-                option_values[index + i_node] = np.maximum(
-                    exercise_value, hold_value
-                )
+                option_values[index + i_node] = np.maximum(exercise_value, hold_value)
 
     # We calculate all of the important Greeks in one go
     price = option_values[0]
-    delta = (option_values[2] - option_values[1]) / (
-        stock_values[2] - stock_values[1]
-    )
+    delta = (option_values[2] - option_values[1]) / (stock_values[2] - stock_values[1])
     delta_up = (option_values[5] - option_values[4]) / (
         stock_values[5] - stock_values[4]
     )
@@ -160,10 +152,11 @@ def crr_tree_val(
     results = np.array([price, delta, gamma, theta])
     return results
 
+
 ########################################################################################
 
-def crr_tree_val_avg(
 
+def crr_tree_val_avg(
     stock_price,
     interest_rate,  # continuously compounded
     dividend_rate,  # continuously compounded
@@ -172,8 +165,6 @@ def crr_tree_val_avg(
     time_to_expiry,
     opt_type,
     strike_price,
-########################################################################################
-
 ):
     """Calculate the average values off the tree using an even and an odd
     number of time steps."""
@@ -205,4 +196,3 @@ def crr_tree_val_avg(
     v = (value1 + value2) / 2.0
     res = {"value": v[0], "delta": v[1], "gamma": v[2], "theta": v[3]}
     return res
-

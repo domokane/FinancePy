@@ -5,6 +5,7 @@
 # TODO: Add __repr__ method
 
 from math import sqrt
+from enum import Enum
 
 import numpy as np
 
@@ -30,8 +31,6 @@ from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
 ########################################################################################
-
-from enum import Enum
 
 
 class FinLossDistributionBuilder(Enum):
@@ -166,8 +165,8 @@ class CDSTranche:
             for j in range(0, num_credits):
 
                 issuer_curve = issuer_curves[j]
-                v_times = issuer_curve._times
-                q_row = issuer_curve._qs
+                v_times = issuer_curve.times
+                q_row = issuer_curve.qs
                 recovery_rates[j] = issuer_curve.recovery_rate
                 q_vector[j] = interpolate(
                     t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value
@@ -250,19 +249,13 @@ class CDSTranche:
                 )
 
             else:
-                raise FinError(
-                    "Unknown model type only full and AdjBinomial allowed"
-                )
+                raise FinError("Unknown model type only full and AdjBinomial allowed")
 
             if qt1[i] > qt1[i - 1]:
-                raise FinError(
-                    "Tranche k_1 survival probabilities not decreasing."
-                )
+                raise FinError("Tranche k_1 survival probabilities not decreasing.")
 
             if qt2[i] > qt2[i - 1]:
-                raise FinError(
-                    "Tranche k_2 survival probabilities not decreasing."
-                )
+                raise FinError("Tranche k_2 survival probabilities not decreasing.")
 
             tranche_surv_curve[i] = kappa * qt2[i] + (1.0 - kappa) * qt1[i]
             tranche_times[i] = t
@@ -280,9 +273,7 @@ class CDSTranche:
             "clean_rpv01"
         ]
 
-        mtm = self.notional * (
-            prot_leg_pv - upfront - risky_pv01 * running_cpn
-        )
+        mtm = self.notional * (prot_leg_pv - upfront - risky_pv01 * running_cpn)
 
         if not self.long_protect:
             mtm *= -1.0

@@ -17,8 +17,7 @@ import numpy as np
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-
-plot_graphs = False
+PLOT_GRAPHS = False
 
 # TODO: ADD LOGGING TO TEST CASES
 
@@ -78,7 +77,7 @@ def test_equity_vol_surface(verbose_calibration):
     #    tol = 1e-4
     #    equity_surface.check_calibration(False, tol)
 
-    if 1 == 0:  # plot_graphs:
+    if PLOT_GRAPHS:
 
         equity_surface.plot_vol_curves()
 
@@ -103,8 +102,6 @@ def test_equity_vol_surface(verbose_calibration):
         for delta in deltas:
             vol = equity_surface.vol_from_delta_date(delta, expiry_dt)
             test_cases.print(expiry_dt, delta, vol[0], vol[1])
-
-
 
 
 ########################################################################################

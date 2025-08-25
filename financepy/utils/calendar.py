@@ -14,7 +14,7 @@ from .error import FinError
 
 # from numba import njit, jit, int64, boolean
 
-easterMondayDay = [
+easter_monday_day = [
     98,
     90,
     103,
@@ -591,7 +591,7 @@ class Calendar:
         if m == 1 and d == 28 and weekday == Date.MON:  # Australia day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em - 3:  # good friday
             return True
@@ -653,7 +653,7 @@ class Calendar:
         if m == 1 and d == 3 and weekday == Date.MON:  # new years day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if self.day_in_year == em:  # Easter Monday
             return True
@@ -709,7 +709,7 @@ class Calendar:
         if m == 1 and d == 1:  # new years day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em:  # Easter Monday
             return True
@@ -766,7 +766,7 @@ class Calendar:
         if m == 1 and d == 6:  # epiphany day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em - 3:  # good friday
             return True
@@ -813,7 +813,7 @@ class Calendar:
         if m == 1 and d == 1:  # new years day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em:  # Easter Monday
             return True
@@ -860,7 +860,7 @@ class Calendar:
         if m == 1 and d == 2:  # berchtoldstag
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em:  # Easter Monday
             return True
@@ -1017,7 +1017,7 @@ class Calendar:
         if m == 2 and d == 6:  # Waitanga day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em - 3:  # good friday
             return True
@@ -1067,7 +1067,7 @@ class Calendar:
         if m == 1 and d == 1:  # new years day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em - 4:  # holy thursday
             return True
@@ -1192,7 +1192,7 @@ class Calendar:
         if m == 2 and d >= 15 and d < 22 and weekday == Date.MON:  # FAMILY
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em - 3:  # good friday
             return True
@@ -1263,7 +1263,7 @@ class Calendar:
         if m == 1 and d == 6:  # epiphany
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em:  # Easter Monday
             return True
@@ -1313,7 +1313,7 @@ class Calendar:
         if m == 5 and d == 1:  # May day
             return True
 
-        em = easterMondayDay[y - 1901]
+        em = easter_monday_day[y - 1901]
 
         if day_in_year == em - 3:  # Easter Friday holiday
             return True
@@ -1363,7 +1363,7 @@ class Calendar:
         if year > 2100:
             raise FinError("Unable to determine Easter monday in year " + str(year))
 
-        em_days = easterMondayDay[year - 1901]
+        em_days = easter_monday_day[year - 1901]
         start_dt = Date(1, 1, year)
         em = start_dt.add_days(em_days - 1)
         return em

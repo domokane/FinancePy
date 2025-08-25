@@ -1,10 +1,6 @@
-from financepy.models.finite_difference import (
-    black_scholes_fd,
-    dx,
-    dxx,
-    solve_tridiagonal_matrix,
-    band_matrix_multiplication,
-)
+import numpy as np
+from pytest import approx
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -13,14 +9,14 @@ from financepy.utils.date import Date
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 
-import numpy as np
-from pytest import approx
+from financepy.models.finite_difference import black_scholes_fd, fn_dx, fn_dxx
+from financepy.models.finite_difference import solve_tridiagonal_matrix
+from financepy.models.finite_difference import band_matrix_multiplication
 
 ########################################################################################
 
 
 def test_black_scholes_fd():
-
     """
     Compare the output of black_schole_finite_difference to kBlack::fdRunner from
     https://github.com/domokane/CompFin/blob/main/Week%204/xladdin/Utility/kBlack.cpp
@@ -251,11 +247,11 @@ def test_black_scholes_fd():
     assert v == approx(0.08042112779963827, abs=1e-3)
     wind = 0
 
+
 ########################################################################################
 
 
 def test_european_call():
-
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -300,11 +296,11 @@ def test_european_call():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+
 ########################################################################################
 
 
 def test_european_put():
-
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -349,11 +345,11 @@ def test_european_put():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+
 ########################################################################################
 
 
 def test_american_call():
-
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -399,11 +395,11 @@ def test_american_call():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+
 ########################################################################################
 
 
 def test_american_put():
-
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -448,11 +444,11 @@ def test_american_put():
     )
     assert v == approx(value["value"], abs=1e-3)
 
+
 ########################################################################################
 
 
 def test_call_option():
-
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -472,9 +468,7 @@ def test_call_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = call_option.value(
-        value_dt, spot_price, discount_curve, dividend_curve, model
-    )
+    v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
 
     v = black_scholes_fd(
         spot_price=spot_price,
@@ -495,11 +489,11 @@ def test_call_option():
     )
     assert v == approx(v0, 1e-5)
 
+
 ########################################################################################
 
 
 def test_put_option():
-
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -519,9 +513,7 @@ def test_put_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = put_option.value(
-        value_dt, spot_price, discount_curve, dividend_curve, model
-    )
+    v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
 
     v = black_scholes_fd(
         spot_price=spot_price,
@@ -543,13 +535,14 @@ def test_put_option():
 
     assert v == approx(v0, 1e-5)
 
+
 ########################################################################################
 
 
 def test_dx():
 
     np.testing.assert_array_equal(
-        dx([0, 1, 2, 3, 4, 5], wind=0),
+        fn_dx([0, 1, 2, 3, 4, 5], wind=0),
         np.array(
             [
                 [0.0, -1.0, 1.0],
@@ -562,7 +555,7 @@ def test_dx():
         ),
     )
     np.testing.assert_array_almost_equal(
-        dx([0, 1, 1.5, 3, 5, 10], wind=0),
+        fn_dx([0, 1, 1.5, 3, 5, 10], wind=0),
         np.array(
             [
                 [0.0, -1, 1.0],
@@ -576,13 +569,14 @@ def test_dx():
         decimal=3,
     )
 
+
 ########################################################################################
 
 
 def test_dxx():
 
     np.testing.assert_array_equal(
-        dxx([1, 1.5, 2, 2.5, 3]),
+        fn_dxx([1, 1.5, 2, 2.5, 3]),
         np.array(
             [
                 [0.0, 0.0, 0.0],
@@ -593,6 +587,7 @@ def test_dxx():
             ]
         ),
     )
+
 
 ########################################################################################
 
@@ -605,6 +600,7 @@ def test_solve_tridiagonal_matrix():
     u = solve_tridiagonal_matrix(m, r)
 
     np.testing.assert_array_equal(u, np.array([-0.08, -0.12, -0.12, -0.08]))
+
 
 ########################################################################################
 

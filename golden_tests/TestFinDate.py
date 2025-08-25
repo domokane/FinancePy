@@ -8,8 +8,8 @@ import sys
 sys.path.append("..")
 
 from FinTestCases import FinTestCases, global_test_case_mode
-from financepy.utils.date import set_date_format
-from financepy.utils.date import DateFormatTypes
+from financepy.utils.date_format import set_date_format
+from financepy.utils.date_format import DateFormatTypes
 from financepy.utils.date import Date, date_range
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

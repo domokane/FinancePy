@@ -78,7 +78,7 @@ class IborDeposit:
         self.dc_type = dc_type
         self.notional = notional
 
-    ###########################################################################
+    #####################################################$###############################
 
     def maturity_df(self):
         """Returns the maturity date discount factor that would allow the
@@ -90,7 +90,7 @@ class IborDeposit:
         df = 1.0 / (1.0 + acc_factor * self.deposit_rate)
         return df
 
-    ###########################################################################
+    ####################################################################################
 
     def value(self, value_dt: Date, libor_curve):
         """Determine the value of an existing Libor Deposit contract given a
@@ -112,7 +112,7 @@ class IborDeposit:
 
         return value
 
-    ###########################################################################
+    ####################################################################################
 
     def valuation_details(
         self,
@@ -154,7 +154,8 @@ class IborDeposit:
             "notional": self.notional,
             "contract_rate": self.deposit_rate,
             "market_rate": (df_settle / df_maturity - 1) / acc_factor,
-            # for depo pvbp is actually negative: rates up, value down. but probably makes sense to report as positive, asif for a spot-starting fra
+            # for depo pvbp is actually negative: rates up, value down but
+            # probably makes sense to report as positive, asif for a spot-starting fra
             "spot_pvbp": acc_factor * df_maturity,
             "fwd_pvbp": acc_factor * df_maturity / df_settle,
             "unit_value": value / self.notional,
@@ -163,7 +164,7 @@ class IborDeposit:
         }
         return out
 
-    ###########################################################################
+    ####################################################################################
 
     def print_flows(self, value_dt: Date):
         """Print the date and size of the future repayment."""
@@ -173,7 +174,7 @@ class IborDeposit:
         flow = (1.0 + acc_factor * self.deposit_rate) * self.notional
         print(self.maturity_dt, flow)
 
-    ###########################################################################
+    #####################################################$##############################
 
     def __repr__(self):
         """Print the contractual details of the Libor deposit."""
@@ -187,7 +188,7 @@ class IborDeposit:
         s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
         return s
 
-    ###########################################################################
+    #####################################################$###############################
 
     def _print(self):
         print(self)

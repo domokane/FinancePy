@@ -142,9 +142,9 @@ class EquityCliquetOption(EquityOption):
                     dq = dividend_curve.df_t(t_prev)
 
                     # The option dividend is over the option life
-                    dqMat = dividend_curve.df_t(t_exp)
+                    dq_mat = dividend_curve.df_t(t_exp)
 
-                    q = -np.log(dqMat / dq) / tau
+                    q = -np.log(dq_mat / dq) / tau
 
                     if self.opt_type == call_type:
                         v_fwd_opt = (

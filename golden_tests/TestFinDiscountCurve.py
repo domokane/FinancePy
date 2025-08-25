@@ -18,7 +18,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 # TODO: Add other discount discount
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -46,7 +46,7 @@ def test_fin_discount_curve():
     zero_rates_m = curve.zero_rate(plot_dts, FrequencyTypes.MONTHLY)
     zero_rates_c = curve.zero_rate(plot_dts, FrequencyTypes.CONTINUOUS)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
         plt.plot(plot_years, scale(zero_rates_a, 100), label="A")
         plt.plot(plot_years, scale(zero_rates_s, 100), label="S")
@@ -69,7 +69,7 @@ def test_fin_discount_curve():
         zero_rates = curve.zero_rate(plot_dts, FrequencyTypes.ANNUAL)
         par_rates = curve.swap_rate(start_dt, plot_dts, FrequencyTypes.ANNUAL)
 
-        if plot_graphs:
+        if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))
             plt.plot(plot_years, scale(fwd_rates, 100), label="FWD RATES")
             plt.plot(plot_years, scale(zero_rates, 100), label="ZERO RATES")

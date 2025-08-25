@@ -84,8 +84,8 @@ class FinInflationBond(Bond):
         self.accrued_days = 0.0
         self.alpha = 0.0
 
-        self._calculate_cpn_dts()
-        self._calculate_flows()
+        self._calculate_unadjusted_cpn_dts()
+        self._calculate_flow_amounts()
 
     ###########################################################################
 
@@ -127,9 +127,7 @@ class FinInflationBond(Bond):
 
     ###########################################################################
 
-    def inflation_accrued_interest(
-        self, settle_dt: Date, face: float, reference_cpi
-    ):
+    def inflation_accrued_interest(self, settle_dt: Date, face: float, reference_cpi):
         """Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. This is adjusted by the
         index ratio in line with the CPI growth since the bond base CPI date.

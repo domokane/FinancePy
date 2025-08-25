@@ -136,9 +136,7 @@ class FixedFixedXCcySwap:
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
-        fixed_leg_value = self.fixed_leg_value(
-            value_dt, discount_curve, principal
-        )
+        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
         float_leg_value = self.float_leg_value(
             value_dt, discount_curve, index_curve, first_fixing_rate, principal
@@ -477,14 +475,10 @@ class FixedFixedXCcySwap:
         start_index = self._fixed_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
-        print(
-            f"{self.value_dt:15} {'-':10} {'-':12} {1.0:12.8f} {'-':12} {'-':12}"
-        )
+        print(f"{self.value_dt:15} {'-':10} {'-':12} {1.0:12.8f} {'-':12} {'-':12}")
 
         i_flow = 0
-        for i_flow, payment_dt in enumerate(
-            self._adjusted_fixed_dts[start_index:]
-        ):
+        for i_flow, payment_dt in enumerate(self._adjusted_fixed_dts[start_index:]):
             print(
                 f"{payment_dt:15} {self._fixed_year_fracs[i_flow]:10.7f} "
                 f"{self._fixed_flows[i_flow]:12.2f} {self._fixed_dfs[i_flow]:12.8f} "
@@ -525,7 +519,7 @@ class FixedFixedXCcySwap:
 
             i_flow += 1
 
-    ##########################################################################
+    ####################################################################################
 
     def print_float_leg_pv(self):
         """Prints the floating leg dates, accrual factors, discount factors,
@@ -576,7 +570,7 @@ class FixedFixedXCcySwap:
 
             i_flow += 1
 
-    ##########################################################################
+    ####################################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -596,7 +590,7 @@ class FixedFixedXCcySwap:
         s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         """Print a list of the unadjusted cpn payment dates used in

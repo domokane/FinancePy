@@ -386,7 +386,8 @@ def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
     else:
         method = "Newton"
 
-    if 1 == 0:
+    debug = False
+    if debug:
         print(
             "ss: %7.2f kk: %7.3f tt :%5.3f V:%10.7f ssig0: %7.5f Cmm: %7.5f hh L: %7.5f Nww: %7.5f %10s"
             % (
@@ -521,9 +522,7 @@ def baw_value(s, t, k, r, q, v, phi):
         else:
             return k - s
 
-    else:
-
-        raise FinError("Phi must equal 1 or -1.")
+    raise FinError("Phi must equal 1 or -1.")
 
 
 ########################################################################################

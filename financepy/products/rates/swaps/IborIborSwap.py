@@ -32,11 +32,11 @@ class IborIborSwap:
         self,
         effective_dt: Date,  # Date interest starts to accrue
         term_dt_or_tenor: Union[Date, str],  # Date contract ends
-        payFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        payDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        recFreqType: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        recDayCountType: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        basisSwapSpread: float = 0.0,
+        pay_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        pay_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        rec_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        rec_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        basis_swap_spread: float = 0.0,
         notional: float = ONE_MILLION,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
@@ -66,28 +66,28 @@ class IborIborSwap:
 
         self.effective_dt = effective_dt
         self.notional = notional
-        self._basis_swap_spread = basisSwapSpread
-        self._payFreqType = payFreqType
-        self._recFreqType = recFreqType
-        self._payDayCountType = payDayCountType
-        self._recDayCountType = recDayCountType
+        self._basis_swap_spread = basis_swap_spread
+        self._pay_freq_type = pay_freq_type
+        self._rec_freq_type = rec_freq_type
+        self._pay_dc_type = pay_dc_type
+        self._rec_dc_type = rec_dc_type
         self._cal_type = cal_type
         self._bd_type = bd_type
         self._dg_type = dg_type
 
-        self._payFloatDates = self._generateFloatLegDates(self._payFreqType)
-        self._recFloatDates = self._generateFloatLegDates(self._recFreqType)
+        self._payFloatDates = self._generateFloatLegDates(self._pay_freq_type)
+        self._recFloatDates = self._generateFloatLegDates(self._rec_freq_type)
 
         self._adjusted_maturity_dt = self._adjusted_fixed_dts[-1]
 
-        self._payFloatYearFracs = []
-        self._recFloatYearFracs = []
+        self._pay_float_year_fracs = []
+        self._rec_float_year_fracs = []
 
         self._payfloat_flows = []
         self._recfloat_flows = []
 
         self._pay_float_flow_pvs = []
-        self._recfloat_flow_pvs = []
+        self._rec_float_flow_pvs = []
 
         self._pay_first_fixing_rate = None
         self._rec_first_fixing_rate = None
@@ -100,7 +100,7 @@ class IborIborSwap:
         """Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
 
-        floatDates = Schedule(
+        float_dts = Schedule(
             self.effective_dt,
             self.termination_dt,
             freq_type,
@@ -109,7 +109,7 @@ class IborIborSwap:
             self._dg_type,
         ).generate()
 
-        return floatDates
+        return float_dts
 
     ##########################################################################
 
@@ -167,9 +167,9 @@ class IborIborSwap:
         self._float_year_fracs = []
         self._float_flows = []
         self._float_rates = []
-        self._floatDfs = []
+        self._float_dfs = []
         self._float_flow_pvs = []
-        self._floatTotalPV = []
+        self._float_total_pv = []
         self._first_fixing_rate = first_fixing_rate
 
         basis = DayCount(self.float_dc_type)
@@ -217,9 +217,9 @@ class IborIborSwap:
         self._float_year_fracs.append(alpha)
         self._float_flows.append(flow)
         self._float_rates.append(float_rate)
-        self._floatDfs.append(df_discount)
+        self._float_dfs.append(df_discount)
         self._float_flow_pvs.append(flow * df_discount)
-        self._floatTotalPV.append(pv)
+        self._float_total_pv.append(pv)
 
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
@@ -241,15 +241,15 @@ class IborIborSwap:
             self._float_flows.append(flow)
             self._float_year_fracs.append(alpha)
             self._float_rates.append(fwd_rate)
-            self._floatDfs.append(df_discount)
+            self._float_dfs.append(df_discount)
             self._float_flow_pvs.append(flow * df_discount)
-            self._floatTotalPV.append(pv)
+            self._float_total_pv.append(pv)
 
         flow = principal * self.notional
         pv = pv + flow * df_discount
         self._float_flows[-1] += flow
         self._float_flow_pvs[-1] += flow * df_discount
-        self._floatTotalPV[-1] = pv
+        self._float_total_pv[-1] = pv
 
         return pv
 
@@ -296,9 +296,9 @@ class IborIborSwap:
                     self._float_year_fracs[i_flow],
                     self._float_rates[i_flow] * 100.0,
                     self._float_flows[i_flow],
-                    self._floatDfs[i_flow],
+                    self._float_dfs[i_flow],
                     self._float_flow_pvs[i_flow],
-                    self._floatTotalPV[i_flow],
+                    self._float_total_pv[i_flow],
                 )
             )
 

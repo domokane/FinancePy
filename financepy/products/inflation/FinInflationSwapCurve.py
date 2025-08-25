@@ -115,7 +115,7 @@ class InflationSwapCurve(DiscountCurve):
 
     ###########################################################################
 
-    def _build_curve(self):
+    def build_curve(self):
         """Build curve based on interpolation."""
         self.build_curve_using_solver()
 
@@ -206,9 +206,7 @@ class InflationSwapCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError(
-                            "Swap cpns are not on the same date grid."
-                        )
+                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -538,9 +536,7 @@ class InflationSwapCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string(
-                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
-            )
+            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
 
         return s
 

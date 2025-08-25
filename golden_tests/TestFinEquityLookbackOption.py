@@ -557,9 +557,7 @@ def test_example():
     expiry_dt = Date(1, 1, 2021)
     strike_price = 105.0
     opt_type_call = OptionTypes.EUROPEAN_CALL
-    opt_type_put = OptionTypes.EUROPEAN_PUT
     lookback_call = EquityFixedLookbackOption(expiry_dt, opt_type_call, strike_price)
-    lookback_put = EquityFixedLookbackOption(expiry_dt, opt_type_put, strike_price)
 
     value_dt = Date(1, 1, 2020)
     interest_rate = 0.10

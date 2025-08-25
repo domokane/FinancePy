@@ -218,7 +218,7 @@ def test_bond_frn():
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    last_coupon_dt = bond.pcd
+    last_coupon_dt = bond._pcd
     test_cases.print("Last Coupon Date = ", str(last_coupon_dt))
 
     accddays = bond.accrued_days
@@ -298,7 +298,7 @@ def test_bond_frn():
 
     test_cases.print("Dirty Price = ", dirty_price)
 
-    last_coupon_dt = bond.pcd
+    last_coupon_dt = bond._pcd
     test_cases.print("Last Coupon Date = ", str(last_coupon_dt))
 
     accddays = bond.accrued_days

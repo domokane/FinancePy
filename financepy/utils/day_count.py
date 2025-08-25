@@ -21,17 +21,12 @@ from .global_vars import G_DAYS_IN_YEARS
 ########################################################################################
 
 
-def is_last_day_of_feb(dt: Date):
-    """Returns True if we are on the last day of February"""
-
-    if dt.m == 2:
-        is_leap = is_leap_year(dt.y)
-        if is_leap is True and dt.d == 29:
-            return True
-        if is_leap is False and dt.d == 28:
-            return True
-    else:
+def is_last_day_of_feb(dt: Date) -> bool:
+    """Return True if the date is the last day of February."""
+    if dt.m != 2:
         return False
+
+    return dt.d == 29 if is_leap_year(dt.y) else dt.d == 28
 
 
 ########################################################################################
@@ -80,7 +75,7 @@ class DayCount:
 
         self._type = dcc_type
 
-    ########################################################################################
+    ####################################################################################
 
     def year_frac(
         self,
@@ -294,7 +289,7 @@ class DayCount:
 
             raise FinError(str(self._type) + " is not one of DayCountTypes")
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
         """Returns the calendar type as a string."""

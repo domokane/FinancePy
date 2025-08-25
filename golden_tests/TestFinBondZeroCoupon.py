@@ -19,7 +19,7 @@ from financepy.utils.math import ONE_MILLION
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -43,6 +43,7 @@ def test_bond_zero():
 
     test_cases.header("YTM", "accrued")
     test_cases.print(ytm, accrued_interest)
+
 
 ########################################################################################
 
@@ -85,7 +86,7 @@ def test_bond_zero_ror():
         buy_price = bond.dirty_price_from_ytm(buy_dt, row.buy_ytm, YTMCalcType.ZERO)
         sell_price = bond.dirty_price_from_ytm(sell_dt, row.sell_ytm, YTMCalcType.ZERO)
 
-        simple, irr, pnl = bond.calc_ror(buy_dt, sell_dt, row.buy_ytm, row.sell_ytm)
+        simple, irr, _ = bond.calc_ror(buy_dt, sell_dt, row.buy_ytm, row.sell_ytm)
 
         test_cases.print(
             row.bond_code,
@@ -98,7 +99,6 @@ def test_bond_zero_ror():
             simple,
             irr,
         )
-
 
 
 ########################################################################################

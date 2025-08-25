@@ -15,7 +15,7 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -39,7 +39,7 @@ def test_fin_nelson_siegel_curve():
     test_cases.print(factor2loading)
     test_cases.print(factor3loading)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(factor1loading, 1), label="beta_1")
         plt.plot(times, scale(factor2loading, 1), label="beta_2")
@@ -88,7 +88,7 @@ def test_fin_nelson_siegel_curve():
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_1=3%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_1=4%")
@@ -137,7 +137,7 @@ def test_fin_nelson_siegel_curve():
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_2=-4%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_2=-2%")
@@ -191,7 +191,7 @@ def test_fin_nelson_siegel_curve():
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(6, 4))
         plt.plot(times, scale(zero_rates1, 100), label="beta_3=-2%")
         plt.plot(times, scale(zero_rates2, 100), label="beta_3=0%")

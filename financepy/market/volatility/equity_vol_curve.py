@@ -17,11 +17,9 @@ class EquityVolCurve:
     extract the implied pdf of the underyling at maturity. THIS NEEDS TO BE
     SUBSTITUTED WITH FINEQUITYVOLSURFACE."""
 
-    ###########################################################################
+    ####################################################################################
 
-    def __init__(
-        self, curve_dt, expiry_dt, strikes, volatilities, polynomial=3
-    ):
+    def __init__(self, curve_dt, expiry_dt, strikes, volatilities, polynomial=3):
 
         if expiry_dt <= curve_dt:
             raise FinError("Expiry date before curve date.")
@@ -49,7 +47,7 @@ class EquityVolCurve:
         self._z = np.polyfit(self._strikes, self._volatilities, polynomial)
         self._f = np.poly1d(self._z)
 
-    ###########################################################################
+    ####################################################################################
 
     def volatility(self, strike):
         """Return the volatility for a strike using a given polynomial
@@ -62,7 +60,7 @@ class EquityVolCurve:
 
         return vol
 
-    ###########################################################################
+    ####################################################################################
 
     def calculate_pdf(self):
         """calculate the probability density function of the underlying using

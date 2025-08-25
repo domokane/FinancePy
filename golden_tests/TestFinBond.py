@@ -205,6 +205,7 @@ def build_ibor_curve(value_dt):
 
     return libor_curve
 
+
 ########################################################################################
 
 
@@ -461,6 +462,7 @@ def test_bond():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     test_cases.print("Convexity", conv)
 
+
 ########################################################################################
 
 
@@ -506,6 +508,7 @@ def test_bond_ex_dividend():
         clean_price = dirty_price - accrued
         test_cases.print(settle_dt, dirty_price, accrued, clean_price)
 
+
 ########################################################################################
 
 
@@ -524,6 +527,7 @@ def test_bond_payment_dates():
         print(bond.flow_amounts)
         print(bond.cpn_dts)
         print(bond._payment_dts)
+
 
 ########################################################################################
 
@@ -578,6 +582,7 @@ def test_bond_ror():
             irr,
         )
 
+
 ########################################################################################
 
 
@@ -595,6 +600,7 @@ def test_bond_eom():
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
     ai = bond.accrued_interest(settle_dt)  # should be 8406.593406
+
 
 ########################################################################################
 
@@ -693,6 +699,7 @@ def test_oas():
     if (oas - (-34.95)) > 0.01:
         print("OAS incorrect")
 
+
 ########################################################################################
 
 
@@ -720,7 +727,6 @@ def test_div_dts():
 
     ytm = bond.yield_to_maturity(settle_dt, clean_price) * 100.0
     print("Yield to Mat: %10.5f %%" % (ytm))
-
 
 
 ########################################################################################

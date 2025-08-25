@@ -22,7 +22,7 @@ sys.path.append("..")
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -97,7 +97,7 @@ def test_bond_embedded_option_matlab():
 
         values.append(v["bondwithoption"])
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure()
         plt.plot(time_steps, values)
 
@@ -171,7 +171,7 @@ def test_bond_embedded_option_quantlib():
         test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
         values.append(v["bondwithoption"])
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure()
         plt.title("Puttable Bond Price Convergence")
         plt.plot(time_steps, values)

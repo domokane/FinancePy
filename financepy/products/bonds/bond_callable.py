@@ -121,9 +121,9 @@ class BondEmbeddedOption:
         self.put_dts = put_dts
         self.put_prices = put_prices
         self.par = 100.0
-        self.bond._calculate_cpn_dts()
+        self.bond._calculate_unadjusted_cpn_dts()
 
-    ########################################################################################
+    ####################################################################################
 
     def value(self, settle_dt: Date, discount_curve: DiscountCurve, model):
         """Value the bond that settles on the specified date that can have
@@ -172,9 +172,9 @@ class BondEmbeddedOption:
 
         if isinstance(model, HWTree):
 
-            """We need to build the tree out to the bond maturity date. To be
-            more precise we only need to go out the the last option date but
-            we can do that refinement at a later date."""
+            # We need to build the tree out to the bond maturity date. To be
+            # more precise we only need to go out the the last option date but
+            # we can do that refinement at a later date.
 
             model.build_tree(t_mat, df_times, df_values)
             v1 = model.callable_puttable_bond_tree(
@@ -199,9 +199,7 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (
-                v1["bondwithoption"] + v2["bondwithoption"]
-            ) / 2
+            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -237,9 +235,7 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (
-                v1["bondwithoption"] + v2["bondwithoption"]
-            ) / 2
+            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -249,7 +245,7 @@ class BondEmbeddedOption:
         else:
             raise FinError("Unknown model type")
 
-    ########################################################################################
+    ####################################################################################
 
     def __repr__(self):
 
@@ -271,7 +267,7 @@ class BondEmbeddedOption:
 
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         print(self)

@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import sys, os
+import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -16,8 +17,6 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_option import CDSIndexOption
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-import os
-import numpy as np
 
 ########################################################################################
 
@@ -60,7 +59,6 @@ def test_dirty_price_cds_index_option():
 
         issuer_curves.append(issuer_curve)
 
-
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
     index_maturity_dts = [
         Date(20, 12, 2009),
@@ -85,7 +83,6 @@ def test_dirty_price_cds_index_option():
 
     for index, strike, results in index_strike_results:
 
-
         cds_contracts = []
         for dt in index_maturity_dts:
             cds = CDS(value_dt, dt, index / 10000.0)
@@ -105,7 +102,6 @@ def test_dirty_price_cds_index_option():
             index_recovery,
             tolerance,
         )
-
 
         option = CDSIndexOption(
             expiry_dt, maturity_dt, index_cpn, strike / 10000.0, notional

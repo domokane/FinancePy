@@ -25,28 +25,31 @@ class FrequencyTypes(Enum):
 ########################################################################################
 
 
-def annual_frequency(freq_type: FrequencyTypes):
-    """This is a function that takes in a Frequency Type and returns a
-    float value for the number of times a year a payment occurs."""
-    if isinstance(freq_type, FrequencyTypes) is False:
+def annual_frequency(freq_type: FrequencyTypes) -> float:
+    """
+    Return the number of payment periods per year for a given FrequencyType.
+    CONTINUOUS returns -1. ZERO returns 1 (to avoid division by zero).
+    """
+    if not isinstance(freq_type, FrequencyTypes):
         print("FinFrequency:", freq_type)
         raise FinError("Unknown frequency type")
 
     if freq_type == FrequencyTypes.CONTINUOUS:
-        return -1
-    elif freq_type == FrequencyTypes.ZERO:
-        # This means that there is no coupon and I use 1 to avoid div by zero
+        return -1.0
+    if freq_type == FrequencyTypes.ZERO:
         return 1.0
-    elif freq_type == FrequencyTypes.ANNUAL:
+    if freq_type == FrequencyTypes.ANNUAL:
         return 1.0
-    elif freq_type == FrequencyTypes.SEMI_ANNUAL:
+    if freq_type == FrequencyTypes.SEMI_ANNUAL:
         return 2.0
-    elif freq_type == FrequencyTypes.TRI_ANNUAL:
+    if freq_type == FrequencyTypes.TRI_ANNUAL:
         return 3.0
-    elif freq_type == FrequencyTypes.QUARTERLY:
+    if freq_type == FrequencyTypes.QUARTERLY:
         return 4.0
-    elif freq_type == FrequencyTypes.MONTHLY:
+    if freq_type == FrequencyTypes.MONTHLY:
         return 12.0
+
+    raise FinError("Invalid frequency type")
 
 
 ########################################################################################

@@ -14,7 +14,7 @@ from ..models.sobol import get_uniform_sobol
 # TO DO:: CALIBRATION
 
 USE_PARALLEL = False
-
+DEBUG = False
 
 """ This module manages the Ibor Market Model and so stores a specific MC
     forward rate simulation of a 3D matrix of num_paths x num_fwds
@@ -49,13 +49,13 @@ def lmm_print_forwards(fwds):
     for ip in range(0, num_paths):
         for it in range(0, num_times):
 
-            print("Path: %3d Time: %3d" % (ip, it), end=""),
+            print("Path: %3d Time: %3d" % (ip, it), end="")
 
             for ifwd in range(0, it):
-                print("%8s" % ("-"), end=""),
+                print("%8s" % ("-"), end="")
 
             for ifwd in range(it, num_fwds):
-                print("%8.4f" % (fwds[ip][it][ifwd] * 100.0), end=""),
+                print("%8.4f" % (fwds[ip][it][ifwd] * 100.0), end="")
 
             print("")
 
@@ -290,16 +290,16 @@ def lmm_price_caps_black(fwd0, vol_caplet, p, k, taus):
 
 
 @njit(float64[:, :](float64[:, :], int64), cache=True, fastmath=True)
-def sub_matrix(t, N):
+def sub_matrix(t, n):
     """Returns a submatrix of correlation matrix at later time step in the LMM
     simulation which is then used to generate correlated Gaussian RVs."""
 
     lent = len(t)
-    result = np.zeros((lent - N - 1, lent - N - 1))
+    result = np.zeros((lent - n - 1, lent - n - 1))
 
-    for i in range(N + 1, lent):
-        for j in range(N + 1, lent):
-            result[i - N - 1][j - N - 1] = t[i][j]
+    for i in range(n + 1, lent):
+        for j in range(n + 1, lent):
+            result[i - n - 1][j - n - 1] = t[i][j]
 
     return result
 
@@ -361,7 +361,7 @@ def lmm_simulate_fwds_nf(num_fwds, num_paths, fwd0, zetas, correl, taus, seed):
     # I HAVE PROBLEMS AS THE PARALLELISATION CHANGES THE OUTPUT IF RANDS ARE
     # CALCULATED INSIDE THE MAIN LOOP SO I CALCULATE THEM NOW
 
-    if 1 == 1:
+    if True:
         g_matrix = np.empty((num_paths, num_fwds, num_fwds))
         for i_path in range(0, half_num_paths):
             for j in range(1, num_fwds):

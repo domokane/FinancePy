@@ -99,11 +99,11 @@ class IborDualCurve(DiscountCurve):
         self._validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
         self._interp_type = interp_type
         self.check_refit_flag = check_refit_flag
-        self._build_curve()
+        self.build_curve()
 
     ###########################################################################
 
-    def _build_curve(self):
+    def build_curve(self):
         """Build curve based on interpolation."""
 
         self._build_curve_using_1d_solver()
@@ -566,8 +566,8 @@ class IborDualCurve(DiscountCurve):
         s += label_to_string("INTERP TYPE", self._interp_type)
         s += label_to_string("GRID TIMES", "GRID DFS")
 
-        for i in range(0, num_points):
-            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
+        for i in range(num_points):
+            s += f"{self._times[i]:10.6f} {self._dfs[i]:12.10f}\n"
         return s
 
     ###########################################################################

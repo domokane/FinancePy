@@ -19,17 +19,14 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class DiscountCurvePWFONF(DiscountCurve):
-
     """Curve with piece-wise flat instantaneous (ON) fwd rates.
     Curve is made up of a series of sections with each having
     a flat instantaneous forward rate. The default compounding assumption is
     continuous. The class inherits methods from DiscountCurve."""
 
-########################################################################################
-
+    ####################################################################################
 
     def __init__(
-
         self,
         value_dt: Date,
         knot_dts: list,
@@ -58,16 +55,12 @@ class DiscountCurvePWFONF(DiscountCurve):
         self.freq_type = FrequencyTypes.CONTINUOUS
         self.dc_type = DayCountTypes.SIMPLE
 
-        dc_times = times_from_dates(
-            self._knot_dts, self.value_dt, self.dc_type
-        )
+        dc_times = times_from_dates(self._knot_dts, self.value_dt, self.dc_type)
 
         self._times = np.atleast_1d(dc_times)
 
         # it is easier to deal in log(dfs), log(df[Ti]) = -\int_0^T_i f(u) du
-        self._logdfs = -np.cumsum(
-            np.diff(self._times, prepend=0.0) * self._onfwd_rates
-        )
+        self._logdfs = -np.cumsum(np.diff(self._times, prepend=0.0) * self._onfwd_rates)
         self._logdfs_interp = interpolate.interp1d(
             np.concatenate(([0.0], self._times)),
             np.concatenate(([0.0], self._logdfs)),
@@ -79,14 +72,11 @@ class DiscountCurvePWFONF(DiscountCurve):
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
-
     @classmethod
 
-########################################################################################
-
+    ####################################################################################
 
     def brick_wall_curve(
-
         cls,
         valuation_date: Date,
         start_dt: Date,
@@ -112,25 +102,18 @@ class DiscountCurvePWFONF(DiscountCurve):
         onfwd_rates = [0.0, level, 0.0]
         return cls(valuation_date, knot_dts, onfwd_rates)
 
-
     @classmethod
 
-########################################################################################
+    ####################################################################################
 
-
-    def flat_curve(
-
-        cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT
-    ):
+    def flat_curve(cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT):
         knot_dts = [valuation_date.add_tenor("1Y")]
         onfwd_rates = [level]
         return cls(valuation_date, knot_dts, onfwd_rates)
 
-########################################################################################
-
+    ####################################################################################
 
     def _zero_rate(self, times: Union[float, np.ndarray, list]):
-
         """
         Piecewise flat instantaneous (ON) fwd rate is the same as linear logDfs
         """
@@ -145,11 +128,9 @@ class DiscountCurvePWFONF(DiscountCurve):
         zero_rates = -ldfs / times
         return zero_rates
 
-########################################################################################
-
+    ####################################################################################
 
     def df_t(self, t: Union[float, np.ndarray]):
-
         """Return discount factors given a single or vector of times in years.
         The discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
@@ -164,8 +145,7 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         return df
 
-########################################################################################
-
+    ####################################################################################
 
     def __repr__(self):
 
@@ -176,11 +156,8 @@ class DiscountCurvePWFONF(DiscountCurve):
         s += label_to_string("FREQUENCY", (self.freq_type))
         return s
 
-########################################################################################
-
+    ####################################################################################
 
     def _print(self):
-
         """Simple print function for backward compatibility."""
         print(self)
-

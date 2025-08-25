@@ -88,8 +88,8 @@ class EquityVarianceSwap:
         atm_vol = np.interp(f, strikes, volatilities)
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
 
-        """ Calculate the slope of the volatility curve by taking the end
-        points in the volatilities and strikes to calculate the gradient."""
+        # Calculate the slope of the volatility curve by taking the end
+        # points in the volatilities and strikes to calculate the gradient
 
         dvol = volatilities[-1] - volatilities[0]
         dk = strikes[-1] - strikes[0]
@@ -140,9 +140,9 @@ class EquityVarianceSwap:
         else:
             sstar = stock_price
 
-        """ Replication argument from Demeterfi, Derman, Kamal and Zhou from
-        Goldman Sachs Research notes March 1999. See Appendix A. This aim is
-        to use calls and puts to approximate the payoff of a log contract """
+        # Replication argument from Demeterfi, Derman, Kamal and Zhou from
+        # Goldman Sachs Research notes March 1999. See Appendix A. This aim is
+        # to use calls and puts to approximate the payoff of a log contract
 
         min_strike = sstar - (num_put_options + 1) * strike_spacing
 
@@ -220,25 +220,25 @@ class EquityVarianceSwap:
 
     ###########################################################################
 
-    def realised_variance(self, closePrices, use_logs=True):
+    def realised_variance(self, close_prices, use_logs=True):
         """Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns."""
 
-        num_observations = len(closePrices)
+        num_observations = len(close_prices)
 
         for i in range(0, num_observations):
-            if closePrices[i] <= 0.0:
+            if close_prices[i] <= 0.0:
                 raise FinError("Stock prices must be greater than zero")
 
         cum_x2 = 0.0
 
         if use_logs is True:
             for i in range(1, num_observations):
-                x = np.log(closePrices[i] / closePrices[i - 1])
+                x = np.log(close_prices[i] / close_prices[i - 1])
                 cum_x2 += x * x
         else:
             for i in range(1, num_observations):
-                x = (closePrices[i] - closePrices[i - 1]) / closePrices[i - 1]
+                x = (close_prices[i] - close_prices[i - 1]) / close_prices[i - 1]
                 cum_x2 += x * x
 
         var = cum_x2 * 252.0 / num_observations

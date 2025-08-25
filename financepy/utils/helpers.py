@@ -204,10 +204,7 @@ def print_tree(array: np.ndarray, depth: int = None):
     for j in range(0, n2):
         for i in range(0, n1):
             x = array[i, n2 - j - 1]
-            if x != 0.0:
-                print("%10.5f" % x, end="")
-            else:
-                print("%10s" % "-", end="")
+            print(f"{x:10.5f}" if x != 0.0 else f"{'-':>10}", end="")
         print("")
 
 
@@ -536,6 +533,10 @@ def check_argument_types(func, values):
     """Check that all values passed into a function are of the same type
     as the function annotations. If a value has not been annotated, it
     will not be checked."""
+
+    value = None
+    usable_type = None
+
     for value_name, annotation_type in func.__annotations__.items():
 
         if value_name in values:

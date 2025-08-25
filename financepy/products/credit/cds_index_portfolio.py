@@ -3,8 +3,6 @@
 ##############################################################################
 
 
-from math import pow
-
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
@@ -389,8 +387,8 @@ class CDSIndexPortfolio:
                 value_dt, [], libor_curve, index_recovery_rate
             )
 
-            adjusted_issuer_curve._times = issuer_curve._times.copy()
-            adjusted_issuer_curve._qs = issuer_curve._qs.copy()
+            adjusted_issuer_curve._times = issuer_curve.times
+            adjusted_issuer_curve._qs = issuer_curve.qs
             adjusted_issuer_curves.append(adjusted_issuer_curve)
 
         # We solve for each maturity point
@@ -411,14 +409,14 @@ class CDSIndexPortfolio:
                 sum_prot = 0.0
 
                 for i_credit in range(0, num_credits):
-                    q1 = adjusted_issuer_curves[i_credit]._qs[i_maturity]
-                    q2 = adjusted_issuer_curves[i_credit]._qs[i_maturity + 1]
+                    q1 = adjusted_issuer_curves[i_credit].qs[i_maturity]
+                    q2 = adjusted_issuer_curves[i_credit].qs[i_maturity + 1]
                     q12 = q2 / q1
 
                     q12_new = pow(q12, ratio)
                     q2_new = q1 * q12_new
 
-                    adjusted_issuer_curves[i_credit]._qs[i_maturity + 1] = q2_new
+                    adjusted_issuer_curves[i_credit].set_q(i_maturity + 1, q2_new)
 
                     #        if i_maturity == 0 and index_cpns[0] == 0.006:
                     #              print(i_credit, q1, q2_new)
@@ -447,7 +445,7 @@ class CDSIndexPortfolio:
                 sum_rpv01 /= num_credits
                 sum_prot /= num_credits
 
-                spd = sum_prot / sum_rpv01
+                # spd = sum_prot / sum_rpv01
 
                 sum_prem = sum_rpv01 * index_cpns[i_maturity]
 
@@ -470,8 +468,8 @@ class CDSIndexPortfolio:
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("DAYCOUNT", self.dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS_DAY_RULE", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
         return s
 
     ###########################################################################

@@ -3,7 +3,7 @@
 ##############################################################################
 
 import numpy as np
-import scipy.optimize as optimize
+from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
@@ -74,7 +74,7 @@ class CDSCurve:
         self._qs = []
 
         if len(self.cds_contracts) > 0:
-            self._build_curve()
+            self.build_curve()
         else:
             pass  # In some cases we allow None to be passed
 
@@ -177,7 +177,7 @@ class CDSCurve:
 
     ###########################################################################
 
-    def _build_curve(self):
+    def build_curve(self):
         """Construct the CDS survival curve from a set of CDS contracts"""
 
         self._validate(self.cds_contracts)

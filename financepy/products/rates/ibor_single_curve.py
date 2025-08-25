@@ -179,7 +179,7 @@ class IborSingleCurve(DiscountCurve):
         )
 
         if do_build:
-            self._build_curve(**kwargs)
+            self.build_curve(**kwargs)
 
     ####################################################################################
 
@@ -196,11 +196,11 @@ class IborSingleCurve(DiscountCurve):
             # already built
             return
 
-        self._build_curve(**kwargs)
+        self.build_curve(**kwargs)
 
     ####################################################################################
 
-    def _build_curve(self, **kwargs):
+    def build_curve(self, **kwargs):
         """
         Build curve based on interpolation.
 
@@ -351,6 +351,8 @@ class IborSingleCurve(DiscountCurve):
         if num_fras > 0:
             first_fra_maturity_dt = ibor_fras[0].maturity_dt
             last_fra_maturity_dt = ibor_fras[-1].maturity_dt
+
+        first_swap_maturity_dt = None
 
         if num_swaps > 0:
             first_swap_maturity_dt = ibor_swaps[0].maturity_dt
@@ -812,9 +814,9 @@ class IborSingleCurve(DiscountCurve):
         if self.is_built:
             num_points = len(self._times)
             s += label_to_string("GRID TIMES", "GRID DFS")
-            for i in range(0, num_points):
+            for i in range(num_points):
                 s += label_to_string(
-                    "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
+                    f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}"
                 )
 
         return s

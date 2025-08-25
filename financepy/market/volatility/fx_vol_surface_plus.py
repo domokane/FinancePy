@@ -4,7 +4,7 @@
 
 from typing import Union
 
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 import numpy as np
 from scipy.optimize import minimize
@@ -942,8 +942,6 @@ def vol_function(vol_function_type_value, params, strikes, gaps, f, k, t):
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
-    #    print("vol_function", vol_function_type_value)
-
     if len(strikes) == 1:
         gap_k = 0.0
     else:
@@ -1069,11 +1067,9 @@ def _solver_for_smile_strike(
         gaps,
     )
 
-    kk = newton_secant(
-        _delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50
-    )
+    k = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
 
-    return kk
+    return k
 
 
 ########################################################################################
@@ -2299,29 +2295,35 @@ class FXVolSurfacePlus:
 
                 if verbose:
                     print(
-                        f"k_25d_c: {self.k_25d_c[i]:9.7f}  VOL: {100*sigma_k_25d_c:9.6f}  DELTA: {delta_call:9.6f}"
+                        f"k_25d_c: {self.k_25d_c[i]:9.7f}  "
+                        f"VOL: {100 * sigma_k_25d_c:9.6f}  "
+                        f"DELTA: {delta_call:9.6f}"
                     )
-
                     print(
-                        f"k_25d_p: {self.k_25d_p[i]:9.7f}  VOL: {100*sigma_k_25d_p:9.6f}  DELTA: {delta_put:9.6f}"
+                        f"k_25d_p: {self.k_25d_p[i]:9.7f}  "
+                        f"VOL: {100 * sigma_k_25d_p:9.6f}  "
+                        f"DELTA: {delta_put:9.6f}"
                     )
 
                 sigma_rr = sigma_k_25d_c - sigma_k_25d_p
 
                 if verbose:
-                    print("==========================================================")
+                    print("=" * 58)
                     print(
-                        f"RR = VOL_k_25_c - VOL_k_25_p => RR_IN: {100*self.rr_25_delta_vols[i]:9.6f} % "
-                        f"RR_OUT: {100*sigma_rr:9.6f} %"
+                        f"RR = VOL_k_25_c - VOL_k_25_p => "
+                        f"RR_IN: {100 * self.rr_25_delta_vols[i]:9.6f} % "
+                        f"RR_OUT: {100 * sigma_rr:9.6f} %"
                     )
-                    print("==========================================================")
+                    print("=" * 58)
 
                 diff = sigma_rr - self.rr_25_delta_vols[i]
 
                 if np.abs(diff) > tol:
                     print(
-                        f"FAILED FIT TO 25d RRV IN: {self.rr_25_delta_vols[i]*100:9.6f}  "
-                        f"OUT: {sigma_rr*100:9.6f}  DIFF: {diff*100:9.6f}"
+                        f"FAILED FIT TO 25d RRV "
+                        f"IN: {self.rr_25_delta_vols[i] * 100:9.6f}  "
+                        f"OUT: {sigma_rr * 100:9.6f}  "
+                        f"DIFF: {diff * 100:9.6f}"
                     )
 
             ###################################################################

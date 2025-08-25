@@ -1,17 +1,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import sys
 import numpy as np
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
-import sys
 
 sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -28,7 +28,7 @@ def test_fin_volatility_curve():
     interp_strikes = np.linspace(50, 150, 10)
     interp_vols = vol_curve.volatility(interp_strikes)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         import matplotlib.pyplot as plt
 
         plt.plot(strikes, vols, "o", interp_strikes, interp_vols)

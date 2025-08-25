@@ -485,7 +485,7 @@ class EquityVolSurface:
 
     #     return K
 
-    ###########################################################################
+    ####################################################################################
 
     def vol_from_delta_date(self, call_delta, expiry_dt, delta_method=None):
         """Interpolates the Black-Scholes volatility from the volatility
@@ -598,7 +598,7 @@ class EquityVolSurface:
 
         return volt, kt
 
-    ###########################################################################
+    ####################################################################################
 
     def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
         """Main function to construct the vol surface."""
@@ -700,7 +700,7 @@ class EquityVolSurface:
             x_init = res
             x_inits.append(x_init)
 
-    ###########################################################################
+    ####################################################################################
 
     def check_calibration(self, verbose: bool):
         """Compare calibrated vol surface with market and output a report
@@ -742,7 +742,7 @@ class EquityVolSurface:
 
         print("==========================================================")
 
-    ###########################################################################
+    ####################################################################################
 
     def implied_dbns(self, low_s, high_s, num_intervals):
         """Calculate the pdf for each tenor horizon. Returns a list of
@@ -791,7 +791,7 @@ class EquityVolSurface:
 
         return dbns
 
-    ###########################################################################
+    ####################################################################################
 
     def plot_vol_curves(self):
         """Generates a plot of each of the vol discount implied by the market
@@ -833,7 +833,7 @@ class EquityVolSurface:
             plt.title(title)
             plt.legend()
 
-    ###########################################################################
+    ####################################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -851,7 +851,7 @@ class EquityVolSurface:
 
         return s
 
-    ###########################################################################
+    ####################################################################################
 
     def _print(self):
         """Print a list of the unadjusted coupon payment dates used in

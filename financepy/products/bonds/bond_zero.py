@@ -90,8 +90,8 @@ class BondZero:
         self.accrued_int = None
         self.accrued_days = None
         self.alpha = None
-        self.pcd = None
-        self.ncd = None
+        self._pcd = None
+        self._ncd = None
 
     ###########################################################################
 
@@ -247,9 +247,7 @@ class BondZero:
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
         accrued = self.accrued_interest(settle_dt, self.par)
         clean_price = dirty_price - accrued
@@ -322,18 +320,12 @@ class BondZero:
         """Calculate the bond's yield to maturity by solving the price
         yield relationship using a one-dimensional root solver."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         accrued_amount = self.accrued_interest(settle_dt, self.par)
         dirty_prices = clean_prices + accrued_amount
@@ -358,8 +350,8 @@ class BondZero:
 
         if len(ytms) == 1:
             return ytms[0]
-        else:
-            return np.array(ytms)
+
+        return np.array(ytms)
 
     ###########################################################################
 
@@ -385,17 +377,17 @@ class BondZero:
 
             # cpns paid on the settlement date are paid to the seller
             if self.cpn_dts[i_flow] > settle_dt:
-                self.pcd = self.cpn_dts[i_flow - 1]
-                self.ncd = self.cpn_dts[i_flow]
+                self._pcd = self.cpn_dts[i_flow - 1]
+                self._ncd = self.cpn_dts[i_flow]
                 break
 
         dc = DayCount(self.dc_type)
         cal = Calendar(self.cal_type)
 
-        ex_dividend_dt = cal.add_business_days(self.ncd, -self.ex_div_days)
+        ex_dividend_dt = cal.add_business_days(self._ncd, -self.ex_div_days)
 
         (acc_factor, num, _) = dc.year_frac(
-            self.pcd, settle_dt, self.ncd, FrequencyTypes.ZERO
+            self._pcd, settle_dt, self._ncd, FrequencyTypes.ZERO
         )
 
         if settle_dt > ex_dividend_dt:
@@ -421,11 +413,11 @@ class BondZero:
         settle_dt: Date,
         clean_price: float,
         discount_curve: DiscountCurve,
-        swapFloatDayCountConventionType=DayCountTypes.ACT_360,
+        swap_float_dc_type=DayCountTypes.ACT_360,
         swap_float_freq_type=FrequencyTypes.SEMI_ANNUAL,
         swap_float_cal_type=CalendarTypes.WEEKEND,
         swap_float_bus_day_adjust_rule_type=BusDayAdjustTypes.FOLLOWING,
-        swapFloatDateGenRuleType=DateGenRuleTypes.BACKWARD,
+        swap_float_dategen_type=DateGenRuleTypes.BACKWARD,
     ):
         """Calculate the par asset swap spread of the bond. The discount curve
         is a Ibor curve that is passed in. This function is vectorised with
@@ -437,7 +429,9 @@ class BondZero:
         bond_price = clean_price + accrued_amount
         # Calculate the price of the bond discounted on the Ibor curve
         pv_ibor = 0.0
-        prev_dt = self.pcd
+        prev_dt = self._pcd
+
+        df = 0.0
 
         for dt in self.cpn_dts[1:]:
 
@@ -450,19 +444,19 @@ class BondZero:
 
         # Calculate the PV01 of the floating leg of the asset swap
         # I assume here that the cpn starts accruing on the settlement date
-        prev_dt = self.pcd
+        prev_dt = self._pcd
         schedule = Schedule(
             settle_dt,
             self.maturity_dt,
             swap_float_freq_type,
             swap_float_cal_type,
             swap_float_bus_day_adjust_rule_type,
-            swapFloatDateGenRuleType,
+            swap_float_dategen_type,
         )
 
-        day_count = DayCount(swapFloatDayCountConventionType)
+        day_count = DayCount(swap_float_dc_type)
 
-        prev_dt = self.pcd
+        prev_dt = self._pcd
         pv01 = 0.0
         for dt in schedule.adjusted_dts[1:]:
             df = discount_curve.df(dt)
@@ -482,6 +476,8 @@ class BondZero:
         settlement date, a discount curve and the oas as a number."""
 
         self.accrued_interest(settle_dt, 1.0)
+
+        df_adjusted = 0.0
 
         pv = 0.0
         for dt in self.cpn_dts[1:]:
@@ -513,18 +509,12 @@ class BondZero:
         """Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -550,8 +540,8 @@ class BondZero:
 
         if len(oass) == 1:
             return oass[0]
-        else:
-            return np.array(oass)
+
+        return np.array(oass)
 
     ###########################################################################
 
@@ -608,9 +598,7 @@ class BondZero:
 
                 dq = q - prev_q
 
-                defaulting_principal_pv_pay_start += (
-                    -dq * recovery_rate * prev_df
-                )
+                defaulting_principal_pv_pay_start += -dq * recovery_rate * prev_df
                 defaulting_principal_pv_pay_start += -dq * recovery_rate * df
 
                 # Add on PV of principal if default occurs in cpn period

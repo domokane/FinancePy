@@ -17,14 +17,14 @@ sys.path.append("..")
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
 
 def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
-    if 1 == 1:
+    if True:
 
         # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
@@ -92,7 +92,7 @@ def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
         #             fx_market.check_calibration(verbose_calibration)
 
-        if plot_graphs:
+        if PLOT_GRAPHS:
 
             fx_market.plot_vol_curves()
 
@@ -154,7 +154,7 @@ def test_fin_fx_mkt_vol_surface2(verbose_calibration):
 
     fx_market.check_calibration(verbose_calibration)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         fx_market.plot_vol_curves()
 
 
@@ -210,7 +210,7 @@ def test_fin_fx_mkt_vol_surface3(verbose_calibration):
 
     fx_market.check_calibration(verbose_calibration)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         fx_market.plot_vol_curves()
 
 
@@ -262,7 +262,7 @@ def test_fin_fx_mkt_vol_surface4(verbose_calibration):
 
     fx_market.check_calibration(verbose_calibration)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         fx_market.plot_vol_curves()
 
     #    test_cases.header("value", "delta")

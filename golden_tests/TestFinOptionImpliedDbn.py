@@ -66,8 +66,8 @@ def test_fin_option_implied_dbn():
 
         #        fx_market.check_calibration(True)
 
-        plot_graphs = False
-        if plot_graphs:
+        PLOT_GRAPHS = False
+        if PLOT_GRAPHS:
             fx_market.plot_vol_curves()
 
         for i_tenor in range(0, len(fx_market.tenors)):

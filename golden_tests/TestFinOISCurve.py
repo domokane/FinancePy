@@ -24,7 +24,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -427,7 +427,7 @@ def test_ois_deposits_futures_swaps():
     zero_rates = libor_curve.zero_rate(dates)
     fwd_rates = libor_curve.fwd(dates)
 
-    if plot_graphs:
+    if PLOT_GRAPHS:
         plt.figure(figsize=(8, 6))
         plt.plot(times, zero_rates * 100, label="zero rates")
         plt.plot(times, fwd_rates * 100, label="fwd rates")
@@ -531,7 +531,7 @@ def test_derivative_pricing_example():
     start = time.time()
 
     for _ in range(0, num_repeats):
-        _ = OISCurve(value_dt, fras, swaps, InterpTypes.LINEAR_SWAP_RATES)
+        _ = OISCurve(value_dt, fras, swaps, InterpTypes.LINEAR_ZERO_RATES)
 
     end = time.time()
     elapsed2 = end - start
@@ -586,7 +586,6 @@ def test_bloomberg_pricing_example():
     spot_days = 2
     settle_dt = value_dt.add_weekdays(spot_days)
     pay_rec = SwapTypes.PAY
-    lag = 1  # Not used
 
     swaps = []
     swap = OIS(settle_dt, "2Y", pay_rec, (2.77417 + 2.77844) / 200, freq, accrual)

@@ -9,11 +9,15 @@ class TensionSpline(object):
     [AP] Andersen, Piterbarg. Interest Rate Modeling, 2010
     """
 
+    ####################################################################################
+
     def __init__(self, x, y, sigma):
         self._x = np.atleast_1d(x).astype(float)
         self._y = np.atleast_1d(y).astype(float)
         self._sigma = max(sigma, 1e-2)
         self.calculate_coefs()
+
+    ####################################################################################
 
     def validate_inputs(self):
         assert len(self._x) == len(self._y), "x and y should be the same length"
@@ -21,6 +25,8 @@ class TensionSpline(object):
         assert len(self._x) == 1 or np.min(
             np.diff(self._x) > 1e-8
         ), "x should be strictly increasing"
+
+    ####################################################################################
 
     def calculate_coefs(self):
 
@@ -64,6 +70,8 @@ class TensionSpline(object):
 
         self._ypp = solve_banded((1, 1), ab, b)
 
+    ####################################################################################
+
     def __call__(self, xs):
         xs = np.atleast_1d(xs).astype(float)
 
@@ -75,6 +83,7 @@ class TensionSpline(object):
 
         ids = np.searchsorted(self._x, xs, side="left")
         out = np.zeros_like(xs)
+
         for i, x in enumerate(xs):
             idx = ids[i]
 
@@ -104,3 +113,6 @@ class TensionSpline(object):
             out[i] = v1 + v2 + v3 + v4
 
         return out
+
+
+########################################################################################

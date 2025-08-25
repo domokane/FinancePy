@@ -8,7 +8,7 @@ from ..utils.math import normcdf
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
 
-interp = InterpTypes.FLAT_FWD_RATES.value
+INTERP = InterpTypes.FLAT_FWD_RATES.value
 
 # dr = theta(t) dt + sigma * dW
 
@@ -16,21 +16,21 @@ interp = InterpTypes.FLAT_FWD_RATES.value
 
 
 @njit(fastmath=True, cache=True)
-def p_fast(t, T, Rt, delta, pt, ptd, pT, _sigma):
+def p_fast(t, t_mat, rt, delta, pt, ptd, p_mat, sigma):
     """Forward discount factor as seen at some time t which may be in the
     future for payment at time T where Rt is the delta-period short rate
     seen at time t and pt is the discount factor to time t, ptd is the one
     period discount factor to time t+dt and pT is the discount factor from
     now until the payment of the 1 dollar of the discount factor."""
 
-    bt_t = T - t
+    bt_t = t_mat - t
     bt_delta = delta
-    term1 = np.log(pT / pt) - (bt_t / bt_delta) * np.log(ptd / pt)
-    term2 = (_sigma**2) * t * bt_t * (bt_t - bt_delta) / (2.0)
+    term1 = np.log(p_mat / pt) - (bt_t / bt_delta) * np.log(ptd / pt)
+    term2 = (sigma**2) * t * bt_t * (bt_t - bt_delta) / (2.0)
 
     log_ahat = term1 - term2
     bhatt_t = (bt_t / bt_delta) * delta
-    p = np.exp(log_ahat - bhatt_t * Rt)
+    p = np.exp(log_ahat - bhatt_t * rt)
     return p
 
 
@@ -78,8 +78,8 @@ class ModelRatesHoLee:
         if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
-        pt_exp = _uinterpolate(t_exp, df_times, df_values, interp)
-        pt_mat = _uinterpolate(t_mat, df_times, df_values, interp)
+        pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP)
+        pt_mat = _uinterpolate(t_mat, df_times, df_values, INTERP)
 
         sigma = self._sigma
 

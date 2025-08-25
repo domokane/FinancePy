@@ -100,7 +100,10 @@ def get_assets_paths_times(
     if mus.shape[0] != num_assets:
         raise FinError("Drift mu vector incorrect size.")
 
-    if corr_matrix.shape[0] != num_assets and corr_matrix.shape[1] != num_assets:
+    if corr_matrix.shape[0] != num_assets:
+        raise FinError("Correlation matrix incorrect size.")
+
+    if corr_matrix.shape[1] != num_assets:
         raise FinError("Correlation matrix incorrect size.")
 
     np.random.seed(seed)

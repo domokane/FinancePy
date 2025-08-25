@@ -8,7 +8,7 @@ from ....utils import FinError
 from ....utils import Date
 from ....utils import G_SMALL
 from ....utils import DayCount, DayCountTypes
-from ....utils import FrequencyTypes, Frequency
+from ....utils import FrequencyTypes, annual_frequency
 from ....utils import CalendarTypes, DateGenRuleTypes
 from ....utils import Calendar, BusDayAdjustTypes
 from ....utils import Schedule
@@ -132,9 +132,7 @@ class IborIborXCcySwap:
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
-        fixed_leg_value = self.fixed_leg_value(
-            value_dt, discount_curve, principal
-        )
+        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
         float_leg_value = self.float_leg_value(
             value_dt, discount_curve, index_curve, first_fixing_rate, principal
@@ -219,12 +217,12 @@ class IborIborXCcySwap:
         else:
             df0 = discount_curve.df(value_dt)
 
-        dfT = discount_curve.df(self.maturity_dt)
+        df_mat = discount_curve.df(self.maturity_dt)
 
         if abs(pv01) < G_SMALL:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        cpn = (df0 - dfT) / pv01
+        cpn = (df0 - df_mat) / pv01
         return cpn
 
     ##########################################################################
@@ -305,13 +303,13 @@ class IborIborXCcySwap:
 
     ##########################################################################
 
-    def cash_settled_pv01(self, value_dt, flatSwapRate, freq_type):
+    def cash_settled_pv01(self, value_dt, flat_swap_rate, freq_type):
         """Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
         used in the pricing of a cash-settled swaption in the IborSwaption
         class. This method does not affect the standard valuation methods."""
 
-        m = Frequency(freq_type)
+        m = annual_frequency(freq_type)
 
         if m == 0:
             raise FinError("Frequency cannot be zero.")
@@ -333,7 +331,7 @@ class IborIborXCcySwap:
         alpha = 1.0 / m
 
         for _ in self._adjusted_fixed_dts[start_index:]:
-            df = df / (1.0 + alpha * flatSwapRate)
+            df = df / (1.0 + alpha * flat_swap_rate)
             flat_pv01 += df * alpha
 
         return flat_pv01
@@ -366,14 +364,14 @@ class IborIborXCcySwap:
 
         basis = DayCount(self.float_dc_type)
 
-        """ The swap may have started in the past but we can only value
-        payments that have occurred after the start date. """
+        # The swap may have started in the past but we can only value
+        # payments that have occurred after the start date.
         start_index = 0
         while self._adjusted_float_dts[start_index] < value_dt:
             start_index += 1
 
-        """ If the swap has yet to settle then we do not include the
-        start date of the swap as a cpn payment date. """
+        # If the swap has yet to settle then we do not include the
+        # start date of the swap as a cpn payment date.
         if value_dt <= self.effective_dt:
             start_index = 1
 
@@ -382,8 +380,8 @@ class IborIborXCcySwap:
         # Forward price to settlement date (if valuation is settlement date)
         self._df_value_dt = discount_curve.df(value_dt)
 
-        """ The first floating payment is usually already fixed so is
-        not implied by the index curve. """
+        # The first floating payment is usually already fixed so is
+        # not implied by the index curve.
         prev_dt = self._adjusted_float_dts[start_index - 1]
         next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
@@ -474,8 +472,7 @@ class IborIborXCcySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
         print(
-            "%15s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", 1.0, "-", "-")
+            "%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-")
         )
 
         i_flow = 0
@@ -599,7 +596,7 @@ class IborIborXCcySwap:
         s += label_to_string("DATE GEN TYPE", self.dg_type)
         return s
 
-    ########################################################################################
+    ####################################################################################
 
     def _print(self):
         """Print a list of the unadjusted cpn payment dates used in

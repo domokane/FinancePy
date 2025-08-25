@@ -15,7 +15,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -59,7 +59,7 @@ def test_fin_loss_dbn_builder():
             beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start
         )
 
-        if plot_graphs:
+        if PLOT_GRAPHS:
             plt.figure()
             plt.plot(x, dbn1, label="GCD FULL")
             plt.plot(x, dbn2, label="ADJ BIN")

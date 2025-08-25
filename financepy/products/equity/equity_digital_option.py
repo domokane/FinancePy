@@ -68,7 +68,7 @@ class EquityDigitalOption(EquityOption):
     def value(
         self,
         value_dt: Date,
-        s: Union[float, np.ndarray],
+        stock_price: Union[float, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model,
@@ -96,9 +96,9 @@ class EquityDigitalOption(EquityOption):
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
         t = max(t, 1e-6)
 
-        s0 = s
-        X = self.barrier
-        ln_s0_k = np.log(s0 / X)
+        s0 = stock_price
+        x = self.barrier
+        ln_s0_k = np.log(s0 / x)
         sqrt_t = np.sqrt(t)
 
         df = discount_curve.df(self.expiry_dt)
@@ -115,6 +115,7 @@ class EquityDigitalOption(EquityOption):
         d1 = ln_s0_k + (r - q + volatility * volatility / 2.0) * t
         d1 = d1 / volatility / sqrt_t
         d2 = d1 - volatility * sqrt_t
+        v = None
 
         if self.digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
 
@@ -160,7 +161,7 @@ class EquityDigitalOption(EquityOption):
         q = -np.log(dq) / t
 
         volatility = model.volatility
-        K = self.barrier
+        k = self.barrier
         sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
@@ -171,20 +172,23 @@ class EquityDigitalOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
+        payoff_a_1 = None
+        payoff_a_2 = None
+
         if self.digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
             if self.call_put_type == OptionTypes.EUROPEAN_CALL:
-                payoff_a_1 = np.heaviside(s_1 - K, 0.0)
-                payoff_a_2 = np.heaviside(s_2 - K, 0.0)
+                payoff_a_1 = np.heaviside(s_1 - k, 0.0)
+                payoff_a_2 = np.heaviside(s_2 - k, 0.0)
             elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
-                payoff_a_1 = np.heaviside(K - s_1, 0.0)
-                payoff_a_2 = np.heaviside(K - s_2, 0.0)
+                payoff_a_1 = np.heaviside(k - s_1, 0.0)
+                payoff_a_2 = np.heaviside(k - s_2, 0.0)
         elif self.digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
             if self.call_put_type == OptionTypes.EUROPEAN_CALL:
-                payoff_a_1 = s_1 * np.heaviside(s_1 - K, 0.0)
-                payoff_a_2 = s_2 * np.heaviside(s_2 - K, 0.0)
+                payoff_a_1 = s_1 * np.heaviside(s_1 - k, 0.0)
+                payoff_a_2 = s_2 * np.heaviside(s_2 - k, 0.0)
             elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
-                payoff_a_1 = s_1 * np.heaviside(K - s_1, 0.0)
-                payoff_a_2 = s_2 * np.heaviside(K - s_2, 0.0)
+                payoff_a_1 = s_1 * np.heaviside(k - s_1, 0.0)
+                payoff_a_2 = s_2 * np.heaviside(k - s_2, 0.0)
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
         v = payoff * df / 2.0

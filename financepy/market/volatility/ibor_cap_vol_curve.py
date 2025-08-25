@@ -136,7 +136,8 @@ class IborCapVolCurve:
         if t <= self.times[1]:
             return self._caplet_gammas[1]
 
-        if 1 == 0:
+        debug = False
+        if debug:
             print(self.times)
             print(self._caplet_gammas)
             print(t)
@@ -166,7 +167,8 @@ class IborCapVolCurve:
         num_vols = len(self.times)
         vol = self._cap_sigmas[0]
 
-        if 1 == 0:
+        debug = False
+        if debug:
             print(self.times)
             print(self._caplet_gammas)
             print(t)

@@ -156,7 +156,7 @@ class SABRShifted:
         elif call_or_put == OptionTypes.EUROPEAN_PUT:
             return df * (k * normcdf(-d2) - f * normcdf(-d1))
 
-        raise Exception("Option type must be a European Call(C) or Put(P)")
+        raise FinError("Option type must be a European Call(C) or Put(P)")
 
     ####################################################################################
 

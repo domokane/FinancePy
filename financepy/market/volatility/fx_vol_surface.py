@@ -2,11 +2,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane, Saeed Amen
 ##############################################################################
 
-import matplotlib.pyplot as plt
 
 from typing import Union
 
 import numpy as np
+
+import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 from numba import njit, float64, int64
@@ -501,9 +502,7 @@ def solve_for_strike(
         k = newton_secant(g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
         return k
 
-    else:
-
-        raise FinError("Unknown FinFXDeltaMethod")
+    raise FinError("Unknown FinFXDeltaMethod")
 
 
 ########################################################################################
@@ -647,7 +646,7 @@ class FXVolSurface:
 
         for i in range(1, num_curves):
 
-            if t <= self.t_exp[i] and t > self.t_exp[i - 1]:
+            if self.t_exp[i - 1] < t <= self.t_exp[i]:
                 index0 = i - 1
                 index1 = i
                 break
@@ -913,16 +912,16 @@ class FXVolSurface:
             expiry_dt = self.expiry_dts[i]
 
             if verbose:
-                print("TENOR:", self.tenors[i])
-                print("EXPIRY DATE:", expiry_dt)
-                print("IN ATM VOL: %9.6f %%" % (100.0 * self.atm_vols[i]))
+                print(f"TENOR: {self.tenors[i]}")
+                print(f"EXPIRY DATE: {expiry_dt}")
+                print(f"IN ATM VOL: " f"{100.0 * self.atm_vols[i]:9.6f} %")
                 print(
-                    "IN MKT STRANGLE 25d VOL: %9.6f %%"
-                    % (100.0 * self.ms_25_delta_vols[i])
+                    f"IN MKT STRANGLE 25d VOL: "
+                    f"{100.0 * self.ms_25_delta_vols[i]:9.6f} %"
                 )
                 print(
-                    "IN RSK REVERSAL 25d VOL: %9.6f %%"
-                    % (100.0 * self.rr_25_delta_vols[i])
+                    f"IN RSK REVERSAL 25d VOL: "
+                    f"{100.0 * self.rr_25_delta_vols[i]:9.6f} %"
                 )
 
             call = FXVanillaOption(

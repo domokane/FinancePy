@@ -87,10 +87,7 @@ class BlackScholes(Model):
         """
         Compute the option value based on the specified Black-Scholes type.
         """
-        if (
-            opt_type == OptionTypes.EUROPEAN_CALL
-            or opt_type == OptionTypes.EUROPEAN_PUT
-        ):
+        if opt_type in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
 
             if self.bs_type is BlackScholesTypes.DEFAULT:
                 self.bs_type = BlackScholesTypes.ANALYTICAL
@@ -180,10 +177,7 @@ class BlackScholes(Model):
 
             raise FinError("Implementation not available for this product")
 
-        if (
-            opt_type == OptionTypes.AMERICAN_CALL
-            or opt_type == OptionTypes.AMERICAN_PUT
-        ):
+        if opt_type in [OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT]:
 
             if self.bs_type is BlackScholesTypes.DEFAULT:
                 self.bs_type = BlackScholesTypes.CRR_TREE
@@ -282,6 +276,4 @@ class BlackScholes(Model):
 
             raise FinError("Implementation not available for this product")
 
-        else:
-
-            raise FinError("Should not be here")
+        raise FinError("Should not be here")

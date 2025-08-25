@@ -2,11 +2,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import matplotlib.pyplot as plt
-
 from typing import Union
 
 import numpy as np
+import matplotlib.pyplot as plt
+
+from scipy.optimize import curve_fit
+from scipy.interpolate import splrep
 
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -18,9 +20,6 @@ from .curve_fits import CurveFitPolynomial
 from .curve_fits import CurveFitNelsonSiegel
 from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
-
-from scipy.optimize import curve_fit
-from scipy.interpolate import splrep
 
 ########################################################################################
 # TO DO: CONSTRAIN TAU'S IN NELSON-SIEGEL
@@ -55,9 +54,7 @@ class BondYieldCurve:
 
         years_to_maturities = []
         for bond in bonds:
-            years_to_maturity = (
-                bond._maturity_dt - settlement_date
-            ) / G_DAYS_IN_YEARS
+            years_to_maturity = (bond._maturity_dt - settlement_date) / G_DAYS_IN_YEARS
             years_to_maturities.append(years_to_maturity)
         self._years_to_maturity = np.array(years_to_maturities)
 
@@ -138,6 +135,7 @@ class BondYieldCurve:
             raise FinError("Unknown date type.")
 
         fit = self._curve_fit
+        yld = None
 
         if isinstance(fit, CurveFitPolynomial):
             yld = fit._interpolated_yield(t)

@@ -41,10 +41,7 @@ class EquityFixedLookbackOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if (
-            opt_type != OptionTypes.EUROPEAN_CALL
-            and opt_type != OptionTypes.EUROPEAN_PUT
-        ):
+        if opt_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt
@@ -244,7 +241,7 @@ class EquityFixedLookbackOption(EquityOption):
             if s_min > stock_price:
                 raise FinError("Smin must be less than or equal to the stock price.")
 
-        t_all, s_all = get_paths_times(
+        _, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed
         )
 

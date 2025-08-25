@@ -172,6 +172,8 @@ class EquityBarrierOption(EquityOption):
         elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= b:
             simple_put = True
 
+        s_all = None
+
         if simple_put or simple_call:
             s_all = process.get_process(
                 process_type, t, model_params, 1, num_paths, seed
@@ -225,21 +227,15 @@ class EquityBarrierOption(EquityOption):
                 ones - barrier_crossed_from_above
             )
         elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
-            payoff = (
-                np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_above
-            )
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_above
         elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
-            payoff = (
-                np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_below
-            )
+            payoff = np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_below
         elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
             payoff = np.maximum(s_all[:, -1] - k, 0.0) * (
                 ones - barrier_crossed_from_below
             )
         elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
-            payoff = (
-                np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_below
-            )
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_below
         elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
             payoff = np.maximum(k - s_all[:, -1], 0.0) * (
                 ones - barrier_crossed_from_below
@@ -249,9 +245,7 @@ class EquityBarrierOption(EquityOption):
                 ones - barrier_crossed_from_above
             )
         elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
-            payoff = (
-                np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_above
-            )
+            payoff = np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_above
         else:
             raise FinError("Unknown barrier option type." + str(opt_type))
 

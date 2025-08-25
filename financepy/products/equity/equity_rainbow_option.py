@@ -2,10 +2,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import List
+from enum import Enum
 
 from math import exp, log, sqrt
 import numpy as np
-from typing import List
 
 from ...utils.math import normcdf
 from ...utils.math import M
@@ -16,8 +17,6 @@ from ...products.equity.equity_option import EquityOption
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-
-from enum import Enum
 
 
 class EquityRainbowOptionTypes(Enum):
@@ -102,7 +101,7 @@ def value_mc_fast(
 
     mus = r - qs
 
-    t_all, s_all = get_assets_paths(
+    _, s_all = get_assets_paths(
         num_assets,
         num_paths,
         t,

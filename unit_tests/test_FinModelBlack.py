@@ -10,8 +10,7 @@ from financepy.models.black import (
     black_value,
     implied_volatility,
 )
-from financepy.utils.date import Date
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 forward = 0.034
@@ -34,12 +33,8 @@ dp = 12  # Precision
 
 def test_value():
 
-    value_call = model.value(
-        forward, strike, time_to_expiry, df, call_option_type
-    )
-    value_put = model.value(
-        forward, strike, time_to_expiry, df, put_option_type
-    )
+    value_call = model.value(forward, strike, time_to_expiry, df, call_option_type)
+    value_put = model.value(forward, strike, time_to_expiry, df, put_option_type)
 
     assert round((value_call - value_put), dp) == round(
         df * (forward - strike), dp
@@ -48,17 +43,14 @@ def test_value():
     assert round(value_call * 1000, 4) == 0.4599
     assert round(value_put * 10, 4) == 0.1646
 
+
 ########################################################################################
 
 
 def test_delta():
 
-    delta_call = model.delta(
-        forward, strike, time_to_expiry, df, call_option_type
-    )
-    delta_put = model.delta(
-        forward, strike, time_to_expiry, df, put_option_type
-    )
+    delta_call = model.delta(forward, strike, time_to_expiry, df, call_option_type)
+    delta_put = model.delta(forward, strike, time_to_expiry, df, put_option_type)
 
     assert (
         round((1 / df) * (delta_call - delta_put), dp) == 1.0
@@ -67,17 +59,14 @@ def test_delta():
     assert round(delta_call, 4) == 0.1108
     assert round(delta_put, 4) == -0.8892
 
+
 ########################################################################################
 
 
 def test_gamma():
 
-    gamma_call = model.gamma(
-        forward, strike, time_to_expiry, df, call_option_type
-    )
-    gamma_put = model.gamma(
-        forward, strike, time_to_expiry, df, put_option_type
-    )
+    gamma_call = model.gamma(forward, strike, time_to_expiry, df, call_option_type)
+    gamma_put = model.gamma(forward, strike, time_to_expiry, df, put_option_type)
 
     assert (
         round(gamma_call - gamma_put, dp) == 0.0
@@ -86,17 +75,14 @@ def test_gamma():
     assert round(gamma_call, 4) == 19.6594
     assert round(gamma_put, 4) == 19.6594
 
+
 ########################################################################################
 
 
 def test_theta():
 
-    theta_call = model.theta(
-        forward, strike, time_to_expiry, df, call_option_type
-    )
-    theta_put = model.theta(
-        forward, strike, time_to_expiry, df, put_option_type
-    )
+    theta_call = model.theta(forward, strike, time_to_expiry, df, call_option_type)
+    theta_put = model.theta(forward, strike, time_to_expiry, df, put_option_type)
 
     assert round((theta_call - theta_put), dp) == round(
         (risk_free_rate * time_to_expiry) * (forward - strike) * df, dp
@@ -105,14 +91,13 @@ def test_theta():
     assert round(theta_call * 1000, 4) == -0.4545
     assert round(theta_put * 1000, 4) == -0.4545
 
+
 ########################################################################################
 
 
 def test_vega():
 
-    vega_call = model.vega(
-        forward, strike, time_to_expiry, df, call_option_type
-    )
+    vega_call = model.vega(forward, strike, time_to_expiry, df, call_option_type)
     vega_put = model.vega(forward, strike, time_to_expiry, df, put_option_type)
 
     assert (
@@ -121,6 +106,7 @@ def test_vega():
 
     assert round(vega_call * 10, 4) == 0.0909
     assert round(vega_put * 10, 4) == 0.0909
+
 
 ########################################################################################
 
@@ -166,6 +152,7 @@ def test_american_value_greeks():
     )
     assert round(vega_american_put, 5) == round(expected["vega"], 5)
 
+
 ########################################################################################
 
 
@@ -181,22 +168,14 @@ def test_implied_volatility():
 
     # European Call
     opt_type = OptionTypes.EUROPEAN_CALL
-    price = black_value(
-        forward, time_to_expiry, strike, r, volatility, opt_type
-    )
-    sigma = implied_volatility(
-        forward, time_to_expiry, r, strike, price, opt_type
-    )
+    price = black_value(forward, time_to_expiry, strike, r, volatility, opt_type)
+    sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)
     assert round(sigma, 5) == volatility
 
     # European Put
     opt_type = OptionTypes.EUROPEAN_PUT
-    price = black_value(
-        forward, time_to_expiry, strike, r, volatility, opt_type
-    )
-    sigma = implied_volatility(
-        forward, time_to_expiry, r, strike, price, opt_type
-    )
+    price = black_value(forward, time_to_expiry, strike, r, volatility, opt_type)
+    sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)
     assert round(sigma, 5) == volatility
 
     # American Call
@@ -212,9 +191,7 @@ def test_implied_volatility():
         strike,
     )
     price = results["value"]
-    sigma = implied_volatility(
-        forward, time_to_expiry, r, strike, price, opt_type
-    )
+    sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)
     assert round(sigma, 5) == volatility
 
     # American Put
@@ -230,7 +207,5 @@ def test_implied_volatility():
         strike,
     )
     price = results["value"]
-    sigma = implied_volatility(
-        forward, time_to_expiry, r, strike, price, opt_type
-    )
+    sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)
     assert round(sigma, 5) == volatility

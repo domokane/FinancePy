@@ -1,11 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import numpy as np
 import time
 
-import sys
+import numpy as np
 
-sys.path.append("..")
+from FinTestCases import FinTestCases, global_test_case_mode
 
 from financepy.utils.schedule import Schedule
 from financepy.utils.global_types import FinCapFloorTypes
@@ -31,8 +30,6 @@ from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-from FinTestCases import FinTestCases, global_test_case_mode
-
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

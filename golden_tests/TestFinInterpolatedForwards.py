@@ -13,7 +13,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-plot_graphs = False
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -39,7 +39,7 @@ def test_fin_interpolated_forwards():
         fwd_interp_values = discount_curve.fwd(t_interp_dates)
         zero_interp_values = discount_curve.zero_rate(t_interp_dates)
 
-        if plot_graphs:
+        if PLOT_GRAPHS:
             plt.figure(figsize=(8, 6))
             plt.plot(t_values, df_values, "o", color="g", label="DFS:")
             plt.plot(

@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
-from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.day_count import DayCount, DayCountTypes
@@ -96,9 +95,9 @@ class BondFuture:
 
         dy = self.delivery_years(bond)
 
-        roundedt_matInMonths = int(dy * 4) * 3  # DO NOT CHANGE
+        round_t_in_months = int(dy * 4) * 3  # DO NOT CHANGE
 
-        new_mat = self.first_delivery_dt.add_months(roundedt_matInMonths)
+        new_mat = self.first_delivery_dt.add_months(round_t_in_months)
         ex_div_days = 0
 
         # Hypothetical issue date for bond is fixed in year 2000 to align
@@ -199,9 +198,7 @@ class BondFuture:
         """
         dc = DayCount(DayCountTypes.ACT_ACT_ISDA)
 
-        year_frac, _, _ = dc.year_frac(
-            self.first_delivery_dt, bond.maturity_dt
-        )
+        year_frac, _, _ = dc.year_frac(self.first_delivery_dt, bond.maturity_dt)
 
         years = int(year_frac)
         months = int(12 * (year_frac - years))
@@ -279,9 +276,7 @@ class BondFuture:
             raise ValueError("Prices and repo rate must be non-negative")
 
         fwd_date = self.last_delivery_dt
-        fwd_price = bond.forward_price(
-            settle_dt, fwd_date, clean_price, repo_rate
-        )
+        fwd_price = bond.forward_price(settle_dt, fwd_date, clean_price, repo_rate)
 
         cf = self.conversion_factor(bond)
         net_basis = fwd_price - cf * futures_price
@@ -351,9 +346,9 @@ class BondFuture:
         days_settle_to_delivery = float(delivery_dt - settle_dt)
 
         num = futures_price * cf + ai_delivery - full_price + fv_cpns
-        denom = full_price * (
-            days_settle_to_delivery / days_in_year
-        ) - fv_cpns * (avg_coupon_days / days_in_year)
+        denom = full_price * (days_settle_to_delivery / days_in_year) - fv_cpns * (
+            avg_coupon_days / days_in_year
+        )
         irr = num / denom
         return irr
 

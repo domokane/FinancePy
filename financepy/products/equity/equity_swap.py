@@ -55,13 +55,15 @@ class EquitySwap:
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         end_of_month: bool = False,
     ):
-        """Create an equity swap contract given the contract effective date, its maturity,
-        underlying price and quantity, day count convention and return type and other details.
-        The equity leg parameters have default values that can be overwritten if needed.
-        The start date is contractual and is the same as the settlement date for a new swap.
-        It is the date on which interest starts to accrue. The end of the contract is the
-        termination date. This is not adjusted for business days. The adjusted termination
-        date is called the maturity date. This is calculated."""
+        """Create an equity swap contract given the contract effective date,
+        its maturity, underlying price and quantity, day count convention and
+        return type and other details. The equity leg parameters have default
+        values that can be overwritten if needed.
+        The start date is contractual and is the same as the settlement date
+        for a new swap. It is the date on which interest starts to accrue. The end
+        of the contract is the termination date. This is not adjusted for business
+        days. The adjusted termination date is called the maturity date.
+        This is calculated."""
 
         check_argument_types(self.__init__, locals())
 

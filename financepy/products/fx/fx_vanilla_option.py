@@ -81,23 +81,23 @@ def fvega(volatility, *args):
 
 
 @njit(fastmath=True, cache=True)
-def fast_delta(s, t, k, rd, rf, vol, deltaTypeValue, opt_type_value):
+def fast_delta(s, t, k, rd, rf, vol, delta_type_value, opt_type_value):
     """Calculation of the FX Option delta. Used in the determination of
     the volatility surface. Avoids discount curve interpolation so it
     should be slightly faster than the full calculation of delta."""
 
     pips_spot_delta = bs_delta(s, t, k, rd, rf, vol, opt_type_value)
 
-    if deltaTypeValue == FinFXDeltaMethod.SPOT_DELTA.value:
+    if delta_type_value == FinFXDeltaMethod.SPOT_DELTA.value:
         return pips_spot_delta
-    elif deltaTypeValue == FinFXDeltaMethod.FORWARD_DELTA.value:
+    elif delta_type_value == FinFXDeltaMethod.FORWARD_DELTA.value:
         pips_fwd_delta = pips_spot_delta * np.exp(rf * t)
         return pips_fwd_delta
-    elif deltaTypeValue == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+    elif delta_type_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
         vpctf = bs_value(s, t, k, rd, rf, vol, opt_type_value) / s
         pct_spot_delta_prem_adj = pips_spot_delta - vpctf
         return pct_spot_delta_prem_adj
-    elif deltaTypeValue == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+    elif delta_type_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
         vpctf = bs_value(s, t, k, rd, rf, vol, opt_type_value) / s
         pct_fwd_delta_prem_adj = np.exp(rf * t) * (pips_spot_delta - vpctf)
         return pct_fwd_delta_prem_adj
@@ -295,6 +295,8 @@ class FXVanillaOption:
         k = self.strike_fx_rate
         f0t = s0 * np.exp((r_d - r_f) * t_del)
 
+        vdf = None
+
         if isinstance(model, BlackScholes) or isinstance(model, SABR):
 
             if isinstance(model, BlackScholes):
@@ -367,7 +369,6 @@ class FXVanillaOption:
         else:
             raise FinError("Invalid notional currency.")
 
-        vdf = vdf
         pips_dom = vdf
         pips_for = vdf / (spot_fx_rate * self.strike_fx_rate)
 
@@ -397,8 +398,8 @@ class FXVanillaOption:
         self,
         value_dt,
         spot_fx_rate,
-        ccy1DiscountCurve,
-        ccy2DiscountCurve,
+        ccy1_discount_curve,
+        ccy2_discount_curve,
         model,
     ):
         """Calculation of the FX option delta by bumping the spot FX rate by
@@ -408,14 +409,14 @@ class FXVanillaOption:
         bump = 0.0001 * spot_fx_rate
 
         v = self.value(
-            value_dt, spot_fx_rate, ccy1DiscountCurve, ccy2DiscountCurve, model
+            value_dt, spot_fx_rate, ccy1_discount_curve, ccy2_discount_curve, model
         )
 
         v_bumped = self.value(
             value_dt,
             spot_fx_rate + bump,
-            ccy1DiscountCurve,
-            ccy2DiscountCurve,
+            ccy1_discount_curve,
+            ccy2_discount_curve,
             model,
         )
 
@@ -457,7 +458,12 @@ class FXVanillaOption:
         r_f = -np.log(for_df) / t_del
 
         s0 = spot_fx_rate
-        K = self.strike_fx_rate
+        k = self.strike_fx_rate
+
+        pips_spot_delta = None
+        pips_fwd_delta = None
+        pct_spot_delta_prem_adj = None
+        pct_fwd_delta_prem_adj = None
 
         if isinstance(model, BlackScholes):
 
@@ -468,11 +474,14 @@ class FXVanillaOption:
 
             v = np.maximum(v, G_SMALL)
 
-            pips_spot_delta = bs_delta(s0, t_exp, K, r_d, r_f, v, self.opt_type.value)
+            pips_spot_delta = bs_delta(s0, t_exp, k, r_d, r_f, v, self.opt_type.value)
             pips_fwd_delta = pips_spot_delta * np.exp(r_f * t_del)
-            vpctf = bs_value(s0, t_exp, K, r_d, r_f, v, self.opt_type.value) / s0
+            vpctf = bs_value(s0, t_exp, k, r_d, r_f, v, self.opt_type.value) / s0
             pct_spot_delta_prem_adj = pips_spot_delta - vpctf
             pct_fwd_delta_prem_adj = np.exp(r_f * t_del) * (pips_spot_delta - vpctf)
+
+        else:
+            raise FinError("Unknown Model Type")
 
         return {
             "pips_spot_delta": pips_spot_delta,
@@ -544,7 +553,7 @@ class FXVanillaOption:
         for_df = foreign_curve.df_t(t)
         r_f = -np.log(for_df) / t
 
-        K = self.strike_fx_rate
+        k = self.strike_fx_rate
         s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
@@ -556,7 +565,7 @@ class FXVanillaOption:
 
             volatility = np.maximum(volatility, 1e-10)
 
-            ln_s0_k = np.log(s0 / K)
+            ln_s0_k = np.log(s0 / k)
             sqrt_t = np.sqrt(t)
             den = volatility * sqrt_t
             mu = r_d - r_f
@@ -600,7 +609,7 @@ class FXVanillaOption:
         for_df = foreign_curve.df_t(t)
         r_f = -np.log(for_df) / t
 
-        K = self.strike_fx_rate
+        k = self.strike_fx_rate
         s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
@@ -612,7 +621,7 @@ class FXVanillaOption:
 
             volatility = np.maximum(volatility, 1e-10)
 
-            ln_s0_k = np.log(s0 / K)
+            ln_s0_k = np.log(s0 / k)
             sqrt_t = np.sqrt(t)
             den = volatility * sqrt_t
             mu = r_d - r_f
@@ -655,7 +664,7 @@ class FXVanillaOption:
         for_df = foreign_curve.df_t(t)
         r_f = -np.log(for_df) / t
 
-        K = self.strike_fx_rate
+        k = self.strike_fx_rate
         s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
@@ -667,7 +676,7 @@ class FXVanillaOption:
 
             vol = np.maximum(vol, 1e-10)
 
-            ln_s0_k = np.log(s0 / K)
+            ln_s0_k = np.log(s0 / k)
             sqrt_t = np.sqrt(t)
             den = vol * sqrt_t
             mu = r_d - r_f
@@ -678,10 +687,10 @@ class FXVanillaOption:
             if self.opt_type == OptionTypes.EUROPEAN_CALL:
                 v = -s0 * np.exp(-r_f * t) * normcdf_prime(d1) * vol / 2.0 / sqrt_t
                 v = v + r_f * s0 * np.exp(-r_f * t) * normcdf(d1)
-                v = v - r_d * K * np.exp(-r_d * t) * normcdf(d2)
+                v = v - r_d * k * np.exp(-r_d * t) * normcdf(d2)
             elif self.opt_type == OptionTypes.EUROPEAN_PUT:
                 v = -s0 * np.exp(-r_f * t) * normcdf_prime(d1) * vol / 2.0 / sqrt_t
-                v = v + r_d * K * np.exp(-r_d * t) * normcdf(-d2)
+                v = v + r_d * k * np.exp(-r_d * t) * normcdf(-d2)
                 v = v - r_f * s0 * np.exp(-r_f * t) * normcdf(-d1)
             else:
                 raise FinError("Unknown option type")
@@ -746,15 +755,15 @@ class FXVanillaOption:
         np.random.seed(seed)
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
-        dom_Df = domestic_curve.df(self.expiry_dt)
-        for_Df = foreign_curve.df(self.expiry_dt)
+        dom_df = domestic_curve.df(self.expiry_dt)
+        for_df = foreign_curve.df(self.expiry_dt)
 
-        r_d = -np.log(dom_Df) / t
-        r_f = -np.log(for_Df) / t
+        r_d = -np.log(dom_df) / t
+        r_f = -np.log(for_df) / t
 
         mu = r_d - r_f
         v2 = volatility**2
-        K = self.strike_fx_rate
+        k = self.strike_fx_rate
         sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
@@ -765,11 +774,11 @@ class FXVanillaOption:
         s_2 = s / m
 
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
-            payoff_a_1 = np.maximum(s_1 - K, 0.0)
-            payoff_a_2 = np.maximum(s_2 - K, 0.0)
+            payoff_a_1 = np.maximum(s_1 - k, 0.0)
+            payoff_a_2 = np.maximum(s_2 - k, 0.0)
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
-            payoff_a_1 = np.maximum(K - s_1, 0.0)
-            payoff_a_2 = np.maximum(K - s_2, 0.0)
+            payoff_a_1 = np.maximum(k - s_1, 0.0)
+            payoff_a_2 = np.maximum(k - s_2, 0.0)
         else:
             raise FinError("Unknown option type.")
 

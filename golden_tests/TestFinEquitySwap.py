@@ -74,6 +74,7 @@ def test_equity_swap_at_inception():
 
     assert round(value, 5) == 0.00000
 
+
 ########################################################################################
 
 
@@ -110,7 +111,7 @@ def test_equity_swap_not_in_inception():
 
     ## Rate determined at last reset date, from that date to maturity
     index_curve_first = DiscountCurveFlat(effective_dt, discount_rate)
-    index_alpha_first = DayCount(index_curve_first._dc_type).year_frac(
+    index_alpha_first = DayCount(index_curve_first.dc_type).year_frac(
         effective_dt, maturity_dt
     )[0]
     first_fixing = (
@@ -160,6 +161,7 @@ def test_equity_swap_not_in_inception():
         stock_price,
         first_fixing,
     )
+
 
 ########################################################################################
 

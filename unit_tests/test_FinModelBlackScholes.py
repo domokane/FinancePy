@@ -2,9 +2,7 @@
 
 from pytest import approx
 
-from financepy.products.equity.equity_american_option import (
-    EquityAmericanOption,
-)
+from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholesTypes
 from financepy.models.black_scholes import BlackScholes
@@ -43,9 +41,7 @@ dividend_curve = DiscountCurveFlat(
 
 num_steps_per_year = 400
 
-model_tree = BlackScholes(
-    volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year
-)
+model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
 
 ########################################################################################
 
@@ -76,6 +72,7 @@ def test_black_scholes():
     )
 
     assert round(v, 4) == 6.7493
+
 
 ########################################################################################
 
@@ -145,11 +142,11 @@ def test_bjerksund_stensland():
 
     assert values == [20.53, 12.91, 7.42, 3.93, 1.93]
 
+
 ########################################################################################
 
 
 def test_black_scholes_fd():
-
     """
     Assert finite difference model matches tree model to at least 1 dp
     """
@@ -158,20 +155,14 @@ def test_black_scholes_fd():
         volatility, bs_type=BlackScholesTypes.FINITE_DIFFERENCE, params=params
     )
 
-    v = am_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    v = am_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
     assert v == approx(6.8391, 1e-1)
 
-    v = ameu_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    v = ameu_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
     assert v == approx(6.7510, 1e-1)
 
-    v = eu_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    v = eu_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
     assert v == approx(6.7493, 1e-1)

@@ -104,6 +104,8 @@ class FixedFixedXCcySwap:
         if self._adjusted_float_dts[-1] > self._last_payment_dt:
             self._last_payment_dt = self._adjusted_float_dts[-1]
 
+        self.value_dt = None
+
         # NOT TO BE PRINTED
         self._float_year_fracs = []
         self._float_flows = []
@@ -120,7 +122,6 @@ class FixedFixedXCcySwap:
         self._fixed_total_pv = []
 
         self._first_fixing_rate = None
-        self.value_dt = None
         self._fixed_start_index = None
 
         self._calc_fixed_leg_flows()
@@ -138,9 +139,7 @@ class FixedFixedXCcySwap:
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
-        fixed_leg_value = self.fixed_leg_value(
-            value_dt, discount_curve, principal
-        )
+        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
         float_leg_value = self.float_leg_value(
             value_dt, discount_curve, index_curve, first_fixing_rate, principal
@@ -480,8 +479,7 @@ class FixedFixedXCcySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
         print(
-            "%15s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", 1.0, "-", "-")
+            "%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-")
         )
 
         i_flow = 0

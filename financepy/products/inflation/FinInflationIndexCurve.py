@@ -27,7 +27,7 @@ class FinInflationIndexCurve:
 
     """
 
-    ########################################################################################
+    ####################################################################################
 
     def __init__(
         self,
@@ -57,7 +57,7 @@ class FinInflationIndexCurve:
         if test_monotonicity(self.index_times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-    ###########################################################################
+    ####################################################################################
 
     def index_value(self, dt: Date):
         """Calculate index value by interpolating the CPI curve"""
@@ -70,9 +70,7 @@ class FinInflationIndexCurve:
         cpi_first_time = (cpi_first_dt - self.base_dt) / G_DAYS_IN_YEARS
         cpi_second_time = (cpi_second_dt - self.base_dt) / G_DAYS_IN_YEARS
 
-        cpi_first_value = np.interp(
-            cpi_first_time, self.index_times, self.index_values
-        )
+        cpi_first_value = np.interp(cpi_first_time, self.index_times, self.index_values)
 
         cpi_second_value = np.interp(
             cpi_second_time, self.index_times, self.index_values
@@ -82,13 +80,10 @@ class FinInflationIndexCurve:
         m = dt.m
         y = dt.y
         num_days = days_in_month(m, y)
-        v = (
-            cpi_first_value
-            + (d - 1) * (cpi_second_value - cpi_first_value) / num_days
-        )
+        v = cpi_first_value + (d - 1) * (cpi_second_value - cpi_first_value) / num_days
         return v
 
-    ###########################################################################
+    ####################################################################################
 
     def index_ratio(self, dt: Date):
         """Calculate index value by interpolating the CPI curve"""
@@ -98,7 +93,7 @@ class FinInflationIndexCurve:
         index_ratio = vt / v0
         return index_ratio
 
-    ###########################################################################
+    ####################################################################################
 
     def __repr__(self):
 
@@ -115,7 +110,7 @@ class FinInflationIndexCurve:
 
         return s
 
-    ###########################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

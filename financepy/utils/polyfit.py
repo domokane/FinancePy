@@ -1,6 +1,6 @@
-# Fast numba compatible implementation of polyfit
-# See https://gist.github.com/kadereub/9eae9cff356bb62cdbd672931e8e5ec4#file-numba_polyfit-py
-
+"""Fast numba compatible implementation of polyfit
+https://gist.github.com/kadereub/9eae9cff356bb62cdbd672931e8e5ec4#file-numba_polyfit-py
+"""
 
 import numpy as np
 import numba
