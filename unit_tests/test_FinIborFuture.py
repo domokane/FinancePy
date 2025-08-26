@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.utils.date import Date, set_date_format, DateFormatTypes
+from financepy.utils.date_format import set_date_format, DateFormatTypes
+from financepy.utils.date import Date
 from financepy.products.rates.ibor_future import IborFuture
 
 set_date_format(DateFormatTypes.UK_LONG)

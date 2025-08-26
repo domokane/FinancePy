@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import datetime
@@ -10,7 +11,7 @@ from financepy.utils.date import Date, date_range
 
 # Not under test
 
-from financepy.utils.date import DateFormatTypes, set_date_format
+from financepy.utils.date_format import DateFormatTypes, set_date_format
 
 set_date_format(DateFormatTypes.UK_LONGEST)
 
@@ -23,6 +24,7 @@ def test_add_days():
 
     assert Date(1, 1, 2018).add_days(-1).add_days(1) == Date(1, 1, 2018)
 
+
 ########################################################################################
 
 
@@ -30,12 +32,14 @@ def test_from_string():
 
     assert Date.from_string("1-1-2018", "%d-%m-%Y") == Date(1, 1, 2018)
 
+
 ########################################################################################
 
 
 def test_weekday():
 
     assert Date(3, 3, 2021).weekday == Date.WED
+
 
 ########################################################################################
 
@@ -75,6 +79,7 @@ def test__date():
     # Checking for num_days = 365
     next_imm_date = start_dt.add_days(365).next_imm_date()
     assert next_imm_date == Date(20, 3, 2019)
+
 
 ########################################################################################
 
@@ -173,6 +178,7 @@ def test__date_tenors():
     tenor = "-20Y"
     assert start_dt.add_tenor(tenor) == Date(23, 2, 1998)
 
+
 ########################################################################################
 
 
@@ -205,6 +211,7 @@ def test__date_range():
     # start_dt before end_dt"
     assert len(date_range(end_dt, start_dt)) == 0
 
+
 ########################################################################################
 
 
@@ -219,6 +226,7 @@ def test__date_add_months():
     assert dates[0] == Date(1, 2, 2010)
     assert dates[-1] == Date(1, 1, 2015)
     assert len(dates) == len(months)
+
 
 ########################################################################################
 
@@ -258,6 +266,7 @@ def test__date_add_years():
     assert dates_fractional_np[0] == Date(3, 7, 2011)
     assert dates_fractional_np[-1] == Date(2, 1, 2020)
 
+
 ########################################################################################
 
 
@@ -277,6 +286,7 @@ def test__date_format():
     set_date_format(DateFormatTypes.UK_LONGEST)
     assert str(dt) == "SUN 20 OCT 2019"
 
+
 ########################################################################################
 
 
@@ -287,23 +297,21 @@ def test__intra_day():
     diff = d2 - d1
     assert round(diff, 4) == 5
 
-
     d1 = Date(20, 10, 2019, 10, 0, 0)
     d2 = Date(25, 10, 2019, 10, 25, 0)
     diff = d2 - d1
     assert round(diff, 4) == 5.0174
-
 
     d1 = Date(20, 10, 2019, 10, 0, 0)
     d2 = Date(20, 10, 2019, 10, 25, 30)
     diff = d2 - d1
     assert round(diff, 4) == 0.0177
 
-
     d1 = Date(19, 10, 2019, 10, 0, 0)
     d2 = Date(20, 10, 2019, 10, 25, 40)
     diff = d2 - d1
     assert round(diff, 4) == 1.0178
+
 
 ########################################################################################
 
@@ -358,6 +366,7 @@ def test__date_eom():
     dt = Date(7, 12, 2010)
     assert dt.eom().is_eom() is True
 
+
 ########################################################################################
 
 
@@ -365,6 +374,7 @@ def test_datetime():
 
     dt = Date(30, 12, 2021)
     assert dt.datetime()
+
 
 ########################################################################################
 
@@ -375,6 +385,7 @@ def test_from_date():
     dt1 = Date(d, m, y)
     dt2 = Date.from_date(datetime.date(y, m, d))
     assert dt1 == dt2
+
 
 ########################################################################################
 

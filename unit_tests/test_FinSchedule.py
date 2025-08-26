@@ -1,6 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.utils.date import Date, set_date_format, DateFormatTypes
+from financepy.utils.date import Date
+from financepy.utils.date_format import set_date_format, DateFormatTypes
+
 from financepy.utils.calendar import CalendarTypes, Calendar
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.schedule import Schedule
@@ -23,6 +25,7 @@ def check_frequency(schedule, start=0):
         err = diff - (diff_d1d2 / (len(dates) - 1))
         print(err)
         assert round(err, 1) == 0.0
+
 
 ########################################################################################
 
@@ -60,6 +63,7 @@ def test_backward_frequencies():
     assert len(adjusted_dts) == 25
     check_frequency(schedule)
 
+
 ########################################################################################
 
 
@@ -94,6 +98,7 @@ def test_forward_frequencies():
     adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 25
     check_frequency(schedule)
+
 
 ########################################################################################
 
@@ -131,6 +136,7 @@ def test_backward_front_stub():
     adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 9
     check_frequency(schedule, start=1)
+
 
 ########################################################################################
 
