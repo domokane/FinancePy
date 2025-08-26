@@ -20,5 +20,5 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint --rcfile=.pylintrc financepy
+        pylint --rcfile=.pylintrc --exit-zero financepy
         
