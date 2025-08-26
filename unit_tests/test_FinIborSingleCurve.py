@@ -18,7 +18,6 @@ from financepy.utils.calendar import Calendar, CalendarTypes
 
 
 def test_bloomberg_pricing_example():
-
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
 
@@ -227,14 +226,8 @@ def test_bloomberg_pricing_example():
     principal = 0.0
 
     # Pay fixed so make fixed leg value negative
-    assert (
-        round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4)
-        == 0.0
-    )
-    assert (
-        round(-swaps[0].fixed_leg.value(value_dt, libor_curve), 4)
-        == 53707.6667
-    )
+    assert round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4) == 0.0
+    assert round(-swaps[0].fixed_leg.value(value_dt, libor_curve), 4) == 53707.6667
     assert (
         round(
             swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None),
@@ -244,19 +237,11 @@ def test_bloomberg_pricing_example():
     )
 
     # Pay fixed so make fixed leg value negative
-    assert (
-        round(swaps[0].value(settle_dt, libor_curve, libor_curve, None), 4)
-        == 0.0
-    )
-    assert (
-        round(-swaps[0].fixed_leg.value(settle_dt, libor_curve), 4)
-        == 53714.5507
-    )
+    assert round(swaps[0].value(settle_dt, libor_curve, libor_curve, None), 4) == 0.0
+    assert round(-swaps[0].fixed_leg.value(settle_dt, libor_curve), 4) == 53714.5507
     assert (
         round(
-            swaps[0].float_leg.value(
-                settle_dt, libor_curve, libor_curve, None
-            ),
+            swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None),
             4,
         )
         == 53714.5507
@@ -268,7 +253,7 @@ def test_bloomberg_pricing_example():
 ########################################################################################
 
 
-def test__reprice_inputs_for_all_interp_choices(interp_type):
+def test_reprice_inputs_for_all_interp_choices(interp_type):
 
     valuation_date = Date(6, 10, 2001)
 
@@ -278,9 +263,7 @@ def test__reprice_inputs_for_all_interp_choices(interp_type):
     depos = []
     spot_days = 2
     settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360

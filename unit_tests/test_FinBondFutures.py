@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -39,6 +35,7 @@ def test_bond_future_1():
     cf = bond_fut_contract.conversion_factor(bond)
 
     assert round(cf, 4) == 0.9297
+
 
 ########################################################################################
 
@@ -78,11 +75,10 @@ def test_bond_future_2():
 
     assert round(pip, 4) == 91619.2781
 
-    tia = bond_fut_contract.total_invoice_amount(
-        settle_dt, bond, futures_price
-    )
+    tia = bond_fut_contract.total_invoice_amount(settle_dt, bond, futures_price)
 
     assert round(tia, 4) == 91961.6694
+
 
 ########################################################################################
 

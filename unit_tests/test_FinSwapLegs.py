@@ -15,7 +15,7 @@ from financepy.utils.math import ONE_MILLION
 ########################################################################################
 
 
-def test__fin_fixed_ibor_swap_leg():
+def test_fin_fixed_ibor_swap_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -51,10 +51,11 @@ def test__fin_fixed_ibor_swap_leg():
     v = swap_fixed_leg.value(effective_dt, libor_curve)
     assert round(v, 4) == 194018.0116
 
+
 ########################################################################################
 
 
-def test__fin_fixed_ois_swap_leg():
+def test_fin_fixed_ois_swap_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -90,10 +91,11 @@ def test__fin_fixed_ois_swap_leg():
     v = swap_fixed_leg.value(effective_dt, libor_curve)
     assert round(v, 4) == 225367.1730
 
+
 ########################################################################################
 
 
-def test__fin_float_ibor_leg():
+def test_fin_float_ibor_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)
@@ -131,10 +133,11 @@ def test__fin_float_ibor_leg():
     v = swap_float_leg.value(effective_dt, libor_curve, libor_curve, first_fixing)
     assert round(v, 4) == -2009695.8385
 
+
 ########################################################################################
 
 
-def test__fin_float_ois_leg():
+def test_fin_float_ois_leg():
 
     effective_dt = Date(28, 10, 2020)
     maturity_dt = Date(28, 10, 2025)

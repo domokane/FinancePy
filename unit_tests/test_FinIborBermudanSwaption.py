@@ -4,12 +4,9 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.bdt_tree import BDTTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.bk_tree import BKTree
-from financepy.models.black import Black
 from financepy.products.rates.ibor_bermudan_swaption import (
     IborBermudanSwaption,
 )
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -87,6 +84,7 @@ def test_bk_european_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 9392.9531
 
+
 ########################################################################################
 
 
@@ -142,6 +140,7 @@ def test_bk_bermudan_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 12956.6057
 
+
 ########################################################################################
 
 
@@ -193,6 +192,7 @@ def test_bdt_european_exercise():
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 9652.6912
 
+
 ########################################################################################
 
 
@@ -243,6 +243,7 @@ def test_bdt_bermudan_exercise():
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 13256.8421
+
 
 ########################################################################################
 
@@ -296,6 +297,7 @@ def test_hw_european_exercise():
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert round(value_rec, 4) == 7344.6339
+
 
 ########################################################################################
 

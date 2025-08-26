@@ -1,9 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.utils.math import scale
+import numpy as np
+
 from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
 from financepy.utils.date import Date
-import numpy as np
 
 
 tau_1 = 2.0
@@ -55,6 +55,7 @@ def test_factor_loading_zero_rates():
         0.0493,
     ]
 
+
 ########################################################################################
 
 
@@ -65,9 +66,7 @@ def test_beta_1():
     beta_4 = 0.08
 
     beta_1 = 0.03
-    curve1 = DiscountCurveNSS(
-        start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2
-    )
+    curve1 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates = curve1.zero_rate(dates)
     assert [round(x, 4) for x in zero_rates] == [
         0.01,
@@ -78,9 +77,7 @@ def test_beta_1():
     ]
 
     beta_1 = 0.04
-    curve2 = DiscountCurveNSS(
-        start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2
-    )
+    curve2 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates = curve2.zero_rate(dates)
     assert [round(x, 4) for x in zero_rates] == [
         0.02,
@@ -91,9 +88,7 @@ def test_beta_1():
     ]
 
     beta_1 = 0.05
-    curve3 = DiscountCurveNSS(
-        start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2
-    )
+    curve3 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates = curve3.zero_rate(dates)
     assert [round(x, 4) for x in zero_rates] == [
         0.03,
@@ -104,9 +99,7 @@ def test_beta_1():
     ]
 
     beta_1 = 0.06
-    curve4 = DiscountCurveNSS(
-        start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2
-    )
+    curve4 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates = curve4.zero_rate(dates)
     assert [round(x, 4) for x in zero_rates] == [
         0.04,
@@ -117,9 +110,7 @@ def test_beta_1():
     ]
 
     beta_1 = 0.07
-    curve5 = DiscountCurveNSS(
-        start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2
-    )
+    curve5 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates = curve5.zero_rate(dates)
     assert [round(x, 4) for x in zero_rates] == [
         0.05,

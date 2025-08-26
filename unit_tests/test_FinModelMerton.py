@@ -54,8 +54,8 @@ def test_merton():
         3.4408,
     ]
 
-    asset_value = model._a
-    asset_vol = model._va
+    asset_value = model.asset_value()
+    asset_vol = model.asset_vol()
 
     model = MertonFirm(
         asset_value,

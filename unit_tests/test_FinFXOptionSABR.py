@@ -1,11 +1,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
-import numpy as np
 
 
 # UNFINISHED
@@ -74,6 +75,7 @@ def test_european_call():
 
     assert round(value_european, 4) == 0.5277
 
+
 ########################################################################################
 
 
@@ -111,6 +113,7 @@ def test_american_call():
 
     assert round(value_american, 4) == 0.5500
 
+
 ########################################################################################
 
 
@@ -147,6 +150,7 @@ def test_european_put():
     )["v"]
 
     assert round(value_european, 4) == 0.0000
+
 
 ########################################################################################
 

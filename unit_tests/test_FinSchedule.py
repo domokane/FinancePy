@@ -1,9 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from financepy.utils.date import Date
-from financepy.utils.date_format import set_date_format, DateFormatTypes
-
-from financepy.utils.calendar import CalendarTypes, Calendar
+from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.schedule import Schedule
 from financepy.utils.calendar import DateGenRuleTypes

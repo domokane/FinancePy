@@ -1,16 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import datetime
 import numpy as np
 
 from financepy.utils.date import Date, date_range
-
-# Not under test
-
 from financepy.utils.date_format import DateFormatTypes, set_date_format
 
 set_date_format(DateFormatTypes.UK_LONGEST)
@@ -58,7 +51,7 @@ def test_excel_representation():
 ########################################################################################
 
 
-def test__date():
+def test_date():
 
     start_dt = Date(1, 1, 2018)
 
@@ -84,7 +77,7 @@ def test__date():
 ########################################################################################
 
 
-def test__date_tenors():
+def test_date_tenors():
 
     start_dt = Date(23, 2, 2018)
 
@@ -182,7 +175,7 @@ def test__date_tenors():
 ########################################################################################
 
 
-def test__date_range():
+def test_date_range():
 
     start_dt = Date(1, 1, 2010)
 
@@ -215,7 +208,7 @@ def test__date_range():
 ########################################################################################
 
 
-def test__date_add_months():
+def test_date_add_months():
 
     start_dt = Date(1, 1, 2010)
 
@@ -231,7 +224,7 @@ def test__date_add_months():
 ########################################################################################
 
 
-def test__date_add_years():
+def test_date_add_years():
 
     start_dt = Date(1, 1, 2010)
 
@@ -270,7 +263,7 @@ def test__date_add_years():
 ########################################################################################
 
 
-def test__date_format():
+def test_date_format():
 
     dt = Date(20, 10, 2019)
 
@@ -290,7 +283,7 @@ def test__date_format():
 ########################################################################################
 
 
-def test__intra_day():
+def test_intra_day():
 
     d1 = Date(20, 10, 2019, 0, 0, 0)
     d2 = Date(25, 10, 2019, 0, 0, 0)
@@ -316,7 +309,7 @@ def test__intra_day():
 ########################################################################################
 
 
-def test__date_eom():
+def test_date_eom():
 
     dt = Date(29, 2, 2000)
     assert dt.is_eom() is True

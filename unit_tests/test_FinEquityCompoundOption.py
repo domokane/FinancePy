@@ -1,15 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.products.equity.equity_compound_option import (
-    EquityCompoundOption,
-)
+from financepy.products.equity.equity_compound_option import EquityCompoundOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-import sys
-
-sys.path.append("./..")
 
 
 value_dt = Date(1, 1, 2015)
@@ -99,6 +94,7 @@ def test_european():
     assert round(value, 4) == 1.0873
     assert round(values[0], 4) == 1.0789
 
+
 ########################################################################################
 
 
@@ -169,6 +165,7 @@ def test_american():
 
     assert round(value, 4) == 4.3034
     assert round(values[0], 4) == 4.3034
+
 
 ########################################################################################
 

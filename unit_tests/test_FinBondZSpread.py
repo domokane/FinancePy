@@ -1,7 +1,4 @@
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -31,6 +28,7 @@ def test_z_spread_flat_curve():
     base_curve = DiscountCurveFlat(settle_dt, flat_rate=1 * G_PERCENT)
     return _test_z_spread_for_curve(base_curve)
 
+
 ########################################################################################
 
 
@@ -58,6 +56,7 @@ def test_z_spread_actual_curve():
     )
 
     return _test_z_spread_for_curve(libor_curve)
+
 
 ########################################################################################
 

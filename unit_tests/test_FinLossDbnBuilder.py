@@ -1,13 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
-import numpy as np
 
 ########################################################################################
 
 
-def test__fin_loss_dbn_builder():
+def test_fin_loss_dbn_builder():
 
     num_steps = 25
 

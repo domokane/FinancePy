@@ -5,23 +5,18 @@ from financepy.products.rates.ois_curve import OISCurve
 from financepy.products.rates.dual_curve import IborDualCurve
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.global_types import SwapTypes
-from financepy.utils.math import ONE_MILLION
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_future import IborFuture
-from financepy.products.rates.ibor_fra import IborFRA
-from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
-import matplotlib.pyplot as plt
-import numpy as np
 
 ########################################################################################
 
 
 def build_ois(value_dt):
-
     """Build the OIS funding curve from futures (FRAs) and OIS"""
 
     spot_days = 0
@@ -210,11 +205,11 @@ def build_ois(value_dt):
 
     return ois_curve
 
+
 ########################################################################################
 
 
 def test_bloomberg_pricing_example():
-
     """This is an example of a replication of a BBG example from
     https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
     """

@@ -12,7 +12,7 @@ from financepy.utils.frequency import FrequencyTypes
 ########################################################################################
 
 
-def test__fin_inflation_bond_bbg():
+def test_fin_inflation_bond_bbg():
 
     # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
     # Look for CPI Bond example
@@ -26,13 +26,15 @@ def test__fin_inflation_bond_bbg():
     base_cpi_value = 218.08532
     ex_dividend_days = 0
 
-    bond = FinInflationBond(issue_dt,
-                            maturity_dt,
-                            coupon,
-                            freq_type,
-                            dc_type,
-                            ex_dividend_days,
-                            base_cpi_value)
+    bond = FinInflationBond(
+        issue_dt,
+        maturity_dt,
+        coupon,
+        freq_type,
+        dc_type,
+        ex_dividend_days,
+        base_cpi_value,
+    )
 
     clean_price = 104.03502
 
@@ -40,21 +42,15 @@ def test__fin_inflation_bond_bbg():
     assert round(yld * 100, 4) == 1.2015
 
     # Inherited functions that just calculate real yield without CPI adjustments
-    ytm = bond.yield_to_maturity(settle_dt,
-                                 clean_price,
-                                 YTMCalcType.UK_DMO)
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.UK_DMO)
 
     assert round(ytm, 4) == -0.0010
 
-    ytm = bond.yield_to_maturity(settle_dt,
-                                 clean_price,
-                                 YTMCalcType.US_STREET)
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
 
     assert round(ytm, 4) == -0.0010
 
-    ytm = bond.yield_to_maturity(settle_dt,
-                                 clean_price,
-                                 YTMCalcType.US_TREASURY)
+    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
 
     assert round(ytm, 4) == -0.0010
 
@@ -77,25 +73,21 @@ def test__fin_inflation_bond_bbg():
     assert round(clean_price, 4) == 104.0350
 
     face = 100.0
-    inflation_accd = bond.inflation_accrued_interest(settle_dt,
-                                                    face,
-                                                    ref_cpi_value)
+    inflation_accd = bond.inflation_accrued_interest(settle_dt, face, ref_cpi_value)
 
     assert round(inflation_accd * 100, 4) == 2.2864
 
     last_cpn_cpi_value = 244.61839
 
-    clean_price = bond.flat_price_from_yield_to_maturity(settle_dt, ytm,
-                                                         last_cpn_cpi_value,
-                                                         YTMCalcType.US_TREASURY)
+    clean_price = bond.flat_price_from_yield_to_maturity(
+        settle_dt, ytm, last_cpn_cpi_value, YTMCalcType.US_TREASURY
+    )
 
     assert round(clean_price, 4) == 116.6923
 
-    principal = bond.inflation_principal(settle_dt,
-                                         face,
-                                         ytm,
-                                         ref_cpi_value,
-                                         YTMCalcType.US_TREASURY)
+    principal = bond.inflation_principal(
+        settle_dt, face, ytm, ref_cpi_value, YTMCalcType.US_TREASURY
+    )
 
     assert round(principal, 4) == 116.7342
 
@@ -111,10 +103,11 @@ def test__fin_inflation_bond_bbg():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.1020
 
+
 ########################################################################################
 
 
-def test__fin_inflation_bond_stack():
+def test_fin_inflation_bond_stack():
 
     # https://stackoverflow.com/questions/57676724/failing-to-obtain-correct-accrued-interest-with-quantlib-inflation-bond-pricer-i
 
@@ -126,13 +119,15 @@ def test__fin_inflation_bond_stack():
     base_cpi_value = 249.70
     ex_dividend_days = 0
 
-    bond = FinInflationBond(issue_dt,
-                            maturity_dt,
-                            coupon,
-                            freq_type,
-                            dc_type,
-                            ex_dividend_days,
-                            base_cpi_value)
+    bond = FinInflationBond(
+        issue_dt,
+        maturity_dt,
+        coupon,
+        freq_type,
+        dc_type,
+        ex_dividend_days,
+        base_cpi_value,
+    )
 
     clean_price = 104.03502
 

@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import sys, os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from financepy.utils.global_types import SwapTypes
@@ -15,7 +16,7 @@ from financepy.products.credit.cds import CDS
 ########################################################################################
 
 
-def test__fin_cds_curve():
+def test_fin_cds_curve():
 
     curve_dt = Date(20, 12, 2018)
 

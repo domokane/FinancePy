@@ -11,7 +11,7 @@ from financepy.utils.global_vars import G_SMALL
 ########################################################################################
 
 
-def test__tensor_spline__recovers__inputs(n_knots):
+def test_tensor_spline__recovers__inputs(n_knots):
 
     x = np.arange(n_knots)
     y = x * 0.1 + np.arange(n_knots) % 2
@@ -21,10 +21,11 @@ def test__tensor_spline__recovers__inputs(n_knots):
     relerr = np.linalg.norm(y - y_out) / (np.linalg.norm(y) + G_SMALL)
     assert relerr <= G_SMALL
 
+
 ########################################################################################
 
 
-def test__tensor_spline__values():
+def test_tensor_spline__values():
 
     n_knots = 4
     x = np.arange(n_knots)
@@ -53,5 +54,5 @@ def test__tensor_spline__values():
 ########################################################################################
 
 # if __name__ == '__main__':
-# test__tensor_spline__recovers__inputs(2)
-# test__tensor_spline__values()
+# test_tensor_spline__recovers__inputs(2)
+# test_tensor_spline__values()

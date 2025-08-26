@@ -19,7 +19,7 @@ t_interp_dates = curve_dt.add_years(t_interp_values)
 ########################################################################################
 
 
-def test__fin_interpolated_forwards():
+def test_fin_interpolated_forwards():
 
     interp_type = InterpTypes.FLAT_FWD_RATES
     discount_curve = DiscountCurve(curve_dt, t_dates, df_values, interp_type)

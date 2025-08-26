@@ -1,6 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import numpy as np
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.models.black_scholes import BlackScholes
@@ -10,14 +9,11 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
-import sys
-
-sys.path.append("./..")
 
 ########################################################################################
 
 
-def test__fin_fx_vanilla_option_wystup_example1():
+def test_fin_fx_vanilla_option_wystup_example1():
 
     # Example from Book extract by Uwe Wystup with results in Table 1.2
     # https://mathfinance.com/wp-content/uploads/2017/06/FXOptionsStructuredProducts2e-Extract.pdf
@@ -100,10 +96,11 @@ def test__fin_fx_vanilla_option_wystup_example1():
     assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3105
     assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3200
 
+
 ########################################################################################
 
 
-def test__fin_fx_vanilla_option_wystup_example2():
+def test_fin_fx_vanilla_option_wystup_example2():
 
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
@@ -169,10 +166,11 @@ def test__fin_fx_vanilla_option_wystup_example2():
     assert round(delta["pct_spot_delta_prem_adj"], 4) == -0.5180
     assert round(delta["pct_fwd_delta_prem_adj"], 4) == -0.5389
 
+
 ########################################################################################
 
 
-def test__fin_fx_vanilla_option_bloomberg_example():
+def test_fin_fx_vanilla_option_bloomberg_example():
 
     # Example Bloomberg Pricing at
     # https://stackoverflow.com/questions/48778712/fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
@@ -265,6 +263,7 @@ def test__fin_fx_vanilla_option_bloomberg_example():
     assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3208
     assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3373
 
+
 ########################################################################################
 
 
@@ -313,6 +312,7 @@ def test_value_mc():
     )
 
     assert round(value_mc, 4) == 0.0582
+
 
 ########################################################################################
 

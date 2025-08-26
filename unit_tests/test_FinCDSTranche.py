@@ -1,20 +1,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+from financepy.utils.date import Date
+from financepy.products.credit.cds_tranche import CDSTranche
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
 
 from .helpers import (
     build_ibor_curve,
     load_hetero_spread_curves,
     load_homogeneous_cds_curves,
 )
-from financepy.utils.date import Date
-from financepy.products.credit.cds_tranche import CDSTranche
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
-
 
 trade_dt = Date(1, 3, 2007)
 step_in_dt = trade_dt.add_days(1)
@@ -95,6 +90,7 @@ def test_homogeneous():
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
     assert round(v[3] * 10000, 4) == 39.9617
+
 
 ########################################################################################
 

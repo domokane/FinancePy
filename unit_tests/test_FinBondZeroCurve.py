@@ -1,19 +1,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
+import datetime as dt
+import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import pandas as pd
 
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-import datetime as dt
-import os
 
-
-import pandas as pd
 
 path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
 bond_dataframe = pd.read_csv(path, sep="\t")

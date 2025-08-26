@@ -1,11 +1,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
-import numpy as np
 
 
 # There is no FXAmericanOption class. It is embedded in the FXVanillaOption
@@ -131,6 +132,7 @@ def test_call():
     diff = value_american - value_european
     assert round(value_american, 4) == 0.6500
     assert round(value_european, 4) == 0.6247
+
 
 ########################################################################################
 

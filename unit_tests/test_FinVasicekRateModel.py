@@ -5,7 +5,7 @@ from financepy.models.vasicek_mc import zero_price, zero_price_mc
 ########################################################################################
 
 
-def test__fin_model_rates_vasicek():
+def test_fin_model_rates_vasicek():
 
     r0 = 0.05
     a = 0.10

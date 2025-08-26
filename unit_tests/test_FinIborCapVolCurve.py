@@ -1,14 +1,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
-import numpy as np
 
 ########################################################################################
 
 
-def test__fin_cap_vol_curve():
+def test_fin_cap_vol_curve():
 
     # Reproduces example in Table 32.1 of Hull Book
     value_dt = Date(1, 1, 2020)
@@ -20,7 +21,7 @@ def test__fin_cap_vol_curve():
 
     cap_vol_dates.append(value_dt)
 
-    for i in range(0, num_periods):
+    for _ in range(0, num_periods):
         caplet_dt = caplet_dt.add_tenor(caplet_vol_tenor)
         cap_vol_dates.append(caplet_dt)
 

@@ -10,7 +10,7 @@ from financepy.products.fx.fx_forward import FXForward
 ########################################################################################
 
 
-def test__fin_fx_forward():
+def test_fin_fx_forward():
 
     #  https://stackoverflow.com/questions/48778712
     #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
@@ -70,13 +70,9 @@ def test__fin_fx_forward():
         expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency
     )
 
-    fwd_value = fx_fwd.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve
-    )
+    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
-    fwd_fx_rate = fx_fwd.forward(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve
-    )
+    fwd_fx_rate = fx_fwd.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
     assert round(fwd_fx_rate, 4) == 1.3388
 

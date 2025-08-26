@@ -9,7 +9,7 @@ set_date_format(DateFormatTypes.UK_LONG)
 ########################################################################################
 
 
-def test__fin_ibor_future():
+def test_fin_ibor_future():
 
     today_date = Date(5, 5, 2020)
 

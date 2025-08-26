@@ -8,7 +8,7 @@ from financepy.utils.date import Date
 ########################################################################################
 
 
-def test__fin_inflation_index_curve():
+def test_fin_inflation_index_curve():
 
     # Create a curve from times and discount factors
     index_dates = [Date(15, 1, 2008), Date(1, 4, 2008), Date(1, 5, 2008)]

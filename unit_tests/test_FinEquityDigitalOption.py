@@ -1,16 +1,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_digital_option import (
-    EquityDigitalOption,
-    FinDigitalOptionTypes,
-)
+from financepy.products.equity.equity_digital_option import FinDigitalOptionTypes
+from financepy.products.equity.equity_digital_option import EquityDigitalOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-import sys
-
-sys.path.append("./..")
 
 
 underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
@@ -45,6 +40,7 @@ def test_value():
 
     assert round(value, 4) == 0.4693
     assert round(value_mc, 4) == 0.4694
+
 
 ########################################################################################
 

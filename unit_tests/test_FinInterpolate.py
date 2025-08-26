@@ -1,8 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.market.curves.interpolator import Interpolator, InterpTypes
-import numpy as np
 import math
+import numpy as np
+from financepy.market.curves.interpolator import Interpolator, InterpTypes
 
 
 x_values = np.array([0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0])
@@ -21,7 +21,7 @@ x_interpolate_values = np.linspace(0.0, 10.0, 20)
 ########################################################################################
 
 
-def test__fin_interpolate__runs():
+def test_fin_interpolate__runs():
 
     for interp_type in InterpTypes:
 
@@ -34,10 +34,11 @@ def test__fin_interpolate__runs():
             y_int = interpolator.interpolate(x)
             y_interp_values.append(y_int)
 
+
 ########################################################################################
 
 
-def test__fin_interpolate__recovers__inputs():
+def test_fin_interpolate__recovers__inputs():
 
     for interp_type in InterpTypes:
 
@@ -55,6 +56,7 @@ def test__fin_interpolate__recovers__inputs():
             np.linalg.norm(y_values - y_interp_values) / np.linalg.norm(y_values)
             <= 1e-6
         )
+
 
 ########################################################################################
 
@@ -84,6 +86,7 @@ def test_flat_fwd_rates():
     assert round(x, 4) == 5.2632
     assert round(y_int, 4) == 0.6260
 
+
 ########################################################################################
 
 
@@ -111,6 +114,7 @@ def test_linear_fwd_rates():
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 10.0
     assert round(y_int, 4) == 0.4493
+
 
 ########################################################################################
 
@@ -140,6 +144,7 @@ def test_linear_zero_rates():
     assert round(x, 4) == 9.4737
     assert round(y_int, 4) == 0.4640
 
+
 ########################################################################################
 
 
@@ -167,6 +172,7 @@ def test_fincubic_zero_rates():
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 5.7895
     assert round(y_int, 4) == 0.6007
+
 
 ########################################################################################
 
@@ -196,6 +202,7 @@ def test_natcubic_log_discount():
     assert round(x, 4) == 7.3684
     assert round(y_int, 4) == 0.5355
 
+
 ########################################################################################
 
 
@@ -223,6 +230,7 @@ def test_natcubic_zero_rates():
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 6.3158
     assert round(y_int, 4) == 0.5759
+
 
 ########################################################################################
 
@@ -252,6 +260,7 @@ def test_pchip_zero_rates():
     assert round(x, 4) == 5.2632
     assert round(y_int, 4) == 0.6244
 
+
 ########################################################################################
 
 
@@ -280,6 +289,7 @@ def test_pchip_log_discount():
     assert round(x, 4) == 6.8421
     assert round(y_int, 4) == 0.5551
 
+
 ########################################################################################
 
 
@@ -291,6 +301,7 @@ def test_linear_onfwd_rates_empty_fit():
     interpolator.fit([], [])
     assert round(interpolator.interpolate(1.0), 4) == 1.0
 
+
 ########################################################################################
 
 
@@ -301,6 +312,7 @@ def test_linear_onfwd_rates_single_value_at_origin():
     interpolator = Interpolator(interp_type)
     interpolator.fit([0.0], [1.0])
     assert round(interpolator.interpolate(1.0), 4) == 1.0
+
 
 ########################################################################################
 
@@ -316,6 +328,7 @@ def test_linear_onfwd_rates_single_value_not_at_origin():
     assert round(interpolator.interpolate(0.1), 4) == 0.9
     assert round(interpolator.interpolate(1.0), 4) == 0.3487
 
+
 ########################################################################################
 
 
@@ -329,6 +342,7 @@ def test_linear_onfwd_rates_two_values_including_origin():
     assert round(interpolator.interpolate(0.05), 4) == 0.9487
     assert round(interpolator.interpolate(0.1), 4) == 0.9
     assert round(interpolator.interpolate(1.0), 4) == 0.3487
+
 
 ########################################################################################
 

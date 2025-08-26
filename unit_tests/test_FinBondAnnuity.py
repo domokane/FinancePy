@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.day_count import DayCountTypes
@@ -15,7 +11,7 @@ from financepy.products.bonds.bond_annuity import BondAnnuity
 ########################################################################################
 
 
-def test__semi_annual__bond_annuity():
+def test_semi_annual__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -46,10 +42,11 @@ def test__semi_annual__bond_annuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+
 ########################################################################################
 
 
-def test__quarterly__bond_annuity():
+def test_quarterly__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -80,10 +77,11 @@ def test__quarterly__bond_annuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+
 ########################################################################################
 
 
-def test__monthly__bond_annuity():
+def test_monthly__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -114,10 +112,11 @@ def test__monthly__bond_annuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+
 ########################################################################################
 
 
-def test__forward_gen__bond_annuity():
+def test_forward_gen__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -147,10 +146,11 @@ def test__forward_gen__bond_annuity():
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
 
+
 ########################################################################################
 
 
-def test__forward_gen_with_long_end_stub__bond_annuity():
+def test_forward_gen_with_long_end_stub__bond_annuity():
 
     settle_dt = Date(20, 6, 2018)
     face = 1000000
@@ -183,4 +183,4 @@ def test__forward_gen_with_long_end_stub__bond_annuity():
 
 ########################################################################################
 
-test__semi_annual__bond_annuity()
+test_semi_annual__bond_annuity()

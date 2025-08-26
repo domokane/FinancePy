@@ -1,16 +1,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-import numpy as np
 
 ########################################################################################
 
 
-def test__fin_discount_curve_zeros():
+def test_fin_discount_curve_zeros():
 
     start_dt = Date(1, 1, 2018)
     times = np.linspace(1.0, 10.0, 10)

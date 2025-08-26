@@ -1,15 +1,9 @@
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from .helpers import build_ibor_single_curve
-
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.global_vars import G_BASIS_POINT, G_PERCENT
+from financepy.utils.global_vars import G_PERCENT
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from financepy.market.curves.composite_discount_curve import (
@@ -17,11 +11,12 @@ from financepy.market.curves.composite_discount_curve import (
 )
 from financepy.products.rates.ibor_swap import IborSwap
 
+from .helpers import build_ibor_single_curve
+
 ########################################################################################
 
 
 def test_composite_discount_curve_can_value_trades():
-
     """Test that we can use a composite discount curve to value trades"""
     valuation_date = Date(6, 10, 2022)
     base_curve = DiscountCurveFlat(valuation_date, 0.02)
@@ -45,11 +40,11 @@ def test_composite_discount_curve_can_value_trades():
     assert abs(atm - expected_atm) < 1e-5
     assert abs(value - expected_value) < 1e-5
 
+
 ########################################################################################
 
 
 def test_zero_bump_has_no_effect_on_base_discount_curve():
-
     """Test that adding a zero bump to a DiscountCurve does not affect valuation"""
     valuation_date = Date(6, 10, 2022)
     base_curve = DiscountCurveFlat(valuation_date, 0.02)
@@ -74,11 +69,11 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
 
     assert abs(value_base - value_comp) < 1e-8
 
+
 ########################################################################################
 
 
 def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
-
     """Test that adding a zero bump to an IborSingleCurve does not affect valuation"""
     valuation_date = Date(6, 10, 2022)
     base_curve = build_ibor_single_curve(valuation_date, last_tenor="10Y")
@@ -102,6 +97,7 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
     value_comp = trade.value(valuation_date, composite_curve)
 
     assert abs(value_base - value_comp) < 1e-8
+
 
 ########################################################################################
 
@@ -128,8 +124,6 @@ def _create_test_swap(valuation_date):
 
     return trade
 
-
-########################################################################################
 
 ########################################################################################
 

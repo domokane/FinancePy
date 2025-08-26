@@ -1,10 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from .helpers import build_ibor_single_curve
+import numpy as np
 
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
@@ -15,17 +11,15 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.utils.math import ONE_MILLION
-import numpy as np
+
+from .helpers import build_ibor_single_curve
 
 ########################################################################################
 
 
-def test__libor_swap():
+def test_libor_swap():
 
     # I have tried to reproduce the example from the blog by Ioannis Rigopoulos
     # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
@@ -44,7 +38,7 @@ def test__libor_swap():
 ########################################################################################
 
 
-def test__libor_swap_cashflow_report():
+def test_libor_swap_cashflow_report():
 
     # as test_LiborSwap but with extra output
     start_dt = Date(27, 12, 2017)
@@ -184,4 +178,4 @@ def _load_test_swap_and_curve(start_dt, end_dt):
 ########################################################################################
 
 # if __name__ == '__main__':
-#     test__libor_swap_cashflow_report()
+#     test_libor_swap_cashflow_report()

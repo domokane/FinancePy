@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import os
 import pandas as pd
 import numpy as np
 
@@ -11,11 +12,6 @@ from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond_market import get_bond_market_conventions
-
-import os
-import sys
-
-sys.path.append("..")
 
 ########################################################################################
 
@@ -75,6 +71,7 @@ def test_bondtutor_example():
     conv = bond.convexity_from_ytm(settle_dt, y)
     assert round(conv, 4) == 0.0967
 
+
 ########################################################################################
 
 
@@ -131,6 +128,7 @@ def test_bloomberg_us_treasury_example():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.8517
 
+
 ########################################################################################
 
 
@@ -185,6 +183,7 @@ def test_bloomberg_apple_corp_example():
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.2302
 
+
 ########################################################################################
 
 
@@ -206,6 +205,7 @@ def test_zero_bond():
 
     assert abs(calc_ytm - 1.3997) < 0.0002
     assert abs(accrued_interest - ONE_MILLION * 0.05523077 / 100) < 0.01
+
 
 ########################################################################################
 
@@ -232,6 +232,7 @@ def test_bond_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
+
 ########################################################################################
 
 
@@ -255,11 +256,11 @@ def test_bond_zero_ror():
         assert abs(simple - row.simple_return) < 0.00001
         assert abs(irr - row.irr) < 0.00001
 
+
 ########################################################################################
 
 
 def test_bond_cfets():
-
     """
     Test ytms of bonds in CFETS convention, especially for those in last
     coupon period and have 2 or more coupon payments per year.
@@ -308,9 +309,10 @@ def test_bond_cfets():
             print(bond)
             print(clean_price)
             print(settle_dt)
-            print(bond.bond_payments(settle_dt, 100.0))
+            bond.print_bond_payments(settle_dt, 100.0)
             print(f"calc_ytm:{calc_ytm}, correct_ytm:{row.ytm}")
             continue
+
 
 ########################################################################################
 
@@ -363,4 +365,3 @@ def test_key_rate_durations_bloomberg_example():
 
     for i in range(len(krd)):
         assert round(krd[i], 3) == bbg_key_rate_durations[i]
-

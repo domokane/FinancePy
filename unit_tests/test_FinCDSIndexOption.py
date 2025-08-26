@@ -1,22 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-import numpy as np
+import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from .helpers import build_ibor_curve, build_flat_issuer_curve
-
-from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
 from financepy.products.credit.cds_curve import CDSCurve
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_option import CDSIndexOption
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+
+from .helpers import build_ibor_curve
 
 ########################################################################################
 

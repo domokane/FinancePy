@@ -11,7 +11,7 @@ from financepy.utils.math import ONE_MILLION
 ########################################################################################
 
 
-def test__fin_fixed_ois():
+def test_fin_fixed_ois():
 
     # Here I follow the example in
     # https://blog.deriscope.com/index.php/en/excel-quantlib-overnight-index-swap

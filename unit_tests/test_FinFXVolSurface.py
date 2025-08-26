@@ -13,7 +13,7 @@ verbose_calibration = False
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface1(capsys):
+def test_fin_fx_mkt_vol_surface1(capsys):
 
     # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
@@ -62,10 +62,11 @@ def test__fin_fx_mkt_vol_surface1(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface2(capsys):
+def test_fin_fx_mkt_vol_surface2(capsys):
 
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURJPY EXAMPLE CLARK")
@@ -112,10 +113,11 @@ def test__fin_fx_mkt_vol_surface2(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface3(capsys):
+def test_fin_fx_mkt_vol_surface3(capsys):
 
     # EURUSD Example from Paper by Uwe Wystup using Tables 4
     #        print("EURUSD EXAMPLE WYSTUP")
@@ -162,10 +164,11 @@ def test__fin_fx_mkt_vol_surface3(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface4(capsys):
+def test_fin_fx_mkt_vol_surface4(capsys):
 
     # USDJPY Example from Paper by Uwe Wystup using Tables 4
 

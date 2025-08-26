@@ -1,15 +1,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
+from os.path import dirname, join
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from .helpers import build_ibor_curve
 from financepy.utils.date import Date
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from os.path import dirname, join
+
+from .helpers import build_ibor_curve
 
 ########################################################################################
 

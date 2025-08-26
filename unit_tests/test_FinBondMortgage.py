@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
 from financepy.products.bonds.bond_mortgage import BondMortgageTypes
 from financepy.products.bonds.bond_mortgage import BondMortgage
 from financepy.utils.date import Date
@@ -28,6 +24,7 @@ def test_bond_mortgage_repayment():
     assert round(mortgage.principal_flows[i], 4) == 930.4208
     assert round(mortgage.principal_remaining[i], 4) == 120816.6155
     assert round(mortgage.total_flows[i], 4) == 1285.5163
+
 
 ########################################################################################
 

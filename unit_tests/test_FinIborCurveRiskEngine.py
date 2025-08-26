@@ -1,9 +1,3 @@
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from .helpers import build_ibor_single_curve
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,6 +13,8 @@ from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 import financepy.products.rates.ibor_curve_risk_engine as re
+
+from .helpers import build_ibor_single_curve
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
@@ -88,6 +84,7 @@ def test_par_rate_risk_report_cubic_zero():
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+
 ########################################################################################
 
 
@@ -152,6 +149,7 @@ def test_par_rate_risk_report_flat_forward():
         print(risk_report[trade_labels + ["total"]].sum(axis=0))
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+
 
 ########################################################################################
 
@@ -235,6 +233,7 @@ def test_forward_rate_risk_report():
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+
 ########################################################################################
 
 
@@ -298,6 +297,7 @@ def test_forward_rate_custom_grid_risk_report():
         print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+
 
 ########################################################################################
 
@@ -367,6 +367,7 @@ def test_carry_rolldown_report():
     ]
     actual_totals = risk_report[re.ROLL_PREFIX + "total"].values
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+
 
 ########################################################################################
 
@@ -451,11 +452,11 @@ def test_parallel_shift_ladder_report():
     actual_totals = risk_report[re.PV_PREFIX + "total"].values
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
+
 ########################################################################################
 
 
 def _generate_trades(
-
     valuation_date,
     cal,
     swap_type,
@@ -491,11 +492,11 @@ def _generate_trades(
     trades = [trade1, trade2]
     return trades
 
+
 ########################################################################################
 
 
 def _generate_base_curve(
-
     valuation_date,
     cal,
     interp_type,
@@ -504,8 +505,7 @@ def _generate_base_curve(
     swap_type,
     fixed_dcc_type,
     fixed_freq_type,
-########################################################################################
-
+    ########################################################################################
 ):
     depos = []
     spot_days = 2

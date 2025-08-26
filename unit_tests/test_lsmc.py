@@ -1,3 +1,5 @@
+from pytest import approx
+
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
@@ -7,13 +9,11 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
-from pytest import approx
 
 ########################################################################################
 
 
 def test_american_call():
-
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -62,11 +62,11 @@ def test_american_call():
     # FIGURE OUT WHY THIS FAILS
     # assert v_ls == approx(value['value'], abs=1e-1)
 
+
 ########################################################################################
 
 
 def test_american_put():
-
     """
     Check finite difference method gives similar result to binomial tree
     """
@@ -113,11 +113,11 @@ def test_american_put():
     )
     assert v_ls == approx(value["value"], abs=1e-1)
 
+
 ########################################################################################
 
 
 def test_call_option():
-
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -140,9 +140,7 @@ def test_call_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = call_option.value(
-        value_dt, spot_price, discount_curve, dividend_curve, model
-    )
+    v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
 
     v_ls = equity_lsmc(
         spot_price,
@@ -161,11 +159,11 @@ def test_call_option():
     )
     assert v_ls == approx(v0, 1e-1)
 
+
 ########################################################################################
 
 
 def test_put_option():
-
     """
     Check finite difference method gives similar result to BlackScholes model
     """
@@ -188,9 +186,7 @@ def test_put_option():
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
     # Call option
-    v0 = put_option.value(
-        value_dt, spot_price, discount_curve, dividend_curve, model
-    )
+    v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
     v_ls = equity_lsmc(
         spot_price,
         risk_free_rate,

@@ -1,9 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.utils.math import scale
+import numpy as np
+
 from financepy.market.curves.discount_curve_ns import DiscountCurveNS
 from financepy.utils.date import Date
-import numpy as np
 
 
 tau = 2.0
@@ -44,6 +44,7 @@ def test_factor_loading_zero_rates():
         0.2334,
         0.1891,
     ]
+
 
 ########################################################################################
 
@@ -108,6 +109,7 @@ def test_beta_1():
         0.0689,
     ]
 
+
 ########################################################################################
 
 
@@ -170,6 +172,7 @@ def test_beta_2():
         0.0741,
         0.0707,
     ]
+
 
 ########################################################################################
 

@@ -1,11 +1,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.utils.date import Date
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_basket_option import EquityBasketOption
-import numpy as np
 
 
 value_dt = Date(1, 1, 2015)
@@ -59,6 +60,7 @@ def test_homogeneous_call():
 
     assert round(value_mc, 4) == 13.4914
 
+
 ########################################################################################
 
 
@@ -99,6 +101,7 @@ def test_homogeneous_put():
 
     assert round(value_mc, 2) == 9.69
 
+
 ########################################################################################
 
 
@@ -138,6 +141,7 @@ def test_inhomogeneous_call():
     )
 
     assert round(value_mc, 4) == 13.5088
+
 
 ########################################################################################
 

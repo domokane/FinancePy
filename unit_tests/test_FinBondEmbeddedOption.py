@@ -1,8 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -34,15 +31,9 @@ settle_dt_matlab = value_dt
 fixed_leg_type = SwapTypes.PAY
 dc_type = DayCountTypes.THIRTY_E_360
 fixed_freq = FrequencyTypes.ANNUAL
-swap1 = IborSwap(
-    settle_dt_matlab, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type
-)
-swap2 = IborSwap(
-    settle_dt_matlab, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type
-)
-swap3 = IborSwap(
-    settle_dt_matlab, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type
-)
+swap1 = IborSwap(settle_dt_matlab, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type)
+swap2 = IborSwap(settle_dt_matlab, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type)
+swap3 = IborSwap(settle_dt_matlab, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type)
 swaps = [swap1, swap2, swap3]
 discount_curve_matlab = IborSingleCurve(value_dt, [], [], swaps)
 
@@ -81,6 +72,7 @@ def test_matlab_clean_price_from_discount_curve():
 
     assert round(v, 4) == 102.0746
 
+
 ########################################################################################
 
 
@@ -90,12 +82,11 @@ def test_matlab_bk():
     a = 0.1
     model = BKTree(sigma, a, num_time_steps)
 
-    v = puttable_bond_matlab.value(
-        settle_dt_matlab, discount_curve_matlab, model
-    )
+    v = puttable_bond_matlab.value(settle_dt_matlab, discount_curve_matlab, model)
 
     assert round(v["bondwithoption"], 4) == 102.3508
     assert round(v["bondpure"], 4) == 102.0603
+
 
 ########################################################################################
 
@@ -107,9 +98,7 @@ def test_matlab_hw():
 
     model = HWTree(sigma, a, num_time_steps)
 
-    v = puttable_bond_matlab.value(
-        settle_dt_matlab, discount_curve_matlab, model
-    )
+    v = puttable_bond_matlab.value(settle_dt_matlab, discount_curve_matlab, model)
 
     assert round(v["bondwithoption"], 4) == 102.8733
     assert round(v["bondpure"], 4) == 102.0603
@@ -126,9 +115,7 @@ dc_type = DayCountTypes.ACT_ACT_ICMA
 value_dt = Date(16, 8, 2016)
 settle_dt_quantlib = value_dt.add_weekdays(3)
 
-discount_curve_quantlib = DiscountCurveFlat(
-    value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL
-)
+discount_curve_quantlib = DiscountCurveFlat(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
 
 bond_quantlib = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
@@ -165,6 +152,7 @@ def test_quantlib_clean_price_from_discount_curve():
 
     assert round(v, 4) == 94.6318
 
+
 ########################################################################################
 
 
@@ -174,12 +162,11 @@ def test_quantlib_bk():
     a = 0.03
     model = BKTree(sigma, a, num_time_steps)
 
-    v = puttable_bond_quantlib.value(
-        settle_dt_quantlib, discount_curve_quantlib, model
-    )
+    v = puttable_bond_quantlib.value(settle_dt_quantlib, discount_curve_quantlib, model)
 
     assert round(v["bondwithoption"], 4) == 89.7614
     assert round(v["bondpure"], 4) == 95.0619
+
 
 ########################################################################################
 
@@ -191,9 +178,7 @@ def test_quantlib_hw():
     a = 0.03
     model = HWTree(sigma, a, num_time_steps)
 
-    v = puttable_bond_quantlib.value(
-        settle_dt_quantlib, discount_curve_quantlib, model
-    )
+    v = puttable_bond_quantlib.value(settle_dt_quantlib, discount_curve_quantlib, model)
 
     assert round(v["bondwithoption"], 4) == 68.8665
     assert round(v["bondpure"], 4) == 95.0619

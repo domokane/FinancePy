@@ -1,21 +1,21 @@
-import pytest
 import pandas as pd
+import pytest
 
 from financepy.utils.global_types import SwapTypes
-from financepy.utils.math import ONE_MILLION
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_single_curve_smoothing_calibrator import (
     IborSingleCurveSmoothingCalibrator,
 )
 from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-from financepy.utils.calendar import Calendar, CalendarTypes
+
+REPORT_PROGRESS = True
 
 
 @pytest.mark.parametrize("interp_type", InterpTypes)
@@ -23,7 +23,7 @@ from financepy.utils.calendar import Calendar, CalendarTypes
 ########################################################################################
 
 
-def test__smooth_fit_simple(interp_type, report_progress=False):
+def test_smooth_fit_simple(interp_type):
 
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
@@ -88,10 +88,10 @@ def test__smooth_fit_simple(interp_type, report_progress=False):
 
     smooth_param = 1.0
     curve, report = calibrator.fit(
-        smoothness=smooth_param, report_progress=report_progress
+        smoothness=smooth_param, report_progress=REPORT_PROGRESS
     )
 
-    if report_progress:
+    if REPORT_PROGRESS:
         with pd.option_context(
             "display.max_rows",
             None,
@@ -109,7 +109,7 @@ def test__smooth_fit_simple(interp_type, report_progress=False):
 ########################################################################################
 
 
-def test__smooth_fit(interp_type, report_progress=False):
+def test_smooth_fit(interp_type):
 
     valuation_date = Date(6, 10, 2001)
     cal = CalendarTypes.UNITED_KINGDOM
@@ -260,9 +260,9 @@ def test__smooth_fit(interp_type, report_progress=False):
     # here we go
     smooth_param = 1e-2
     curve, report = calibrator.fit(
-        smoothness=smooth_param, report_progress=report_progress
+        smoothness=smooth_param, report_progress=REPORT_PROGRESS
     )
-    if report_progress:
+    if REPORT_PROGRESS:
         with pd.option_context(
             "display.max_rows",
             None,
@@ -279,10 +279,7 @@ def test__smooth_fit(interp_type, report_progress=False):
 
 ########################################################################################
 
-########################################################################################
-
 if __name__ == "__main__":
-    report_progress = True
-    test__smooth_fit_simple(InterpTypes.LINEAR_ZERO_RATES, report_progress)
-    test__smooth_fit(InterpTypes.FLAT_FWD_RATES, report_progress)
-    # test__smooth_fit(InterpTypes.FINCUBIC_ZERO_RATES, report_progress)
+    test_smooth_fit_simple(InterpTypes.LINEAR_ZERO_RATES)
+    test_smooth_fit(InterpTypes.FLAT_FWD_RATES)
+    # test_smooth_fit(InterpTypes.FINCUBIC_ZERO_RATES)

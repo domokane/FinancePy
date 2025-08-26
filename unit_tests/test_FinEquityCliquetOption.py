@@ -10,16 +10,14 @@ from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 ########################################################################################
 
 
-def test__equity_cliquet_option():
+def test_equity_cliquet_option():
 
     start_dt = Date(1, 1, 2014)
     final_expiry_dt = Date(1, 1, 2017)
     freq_type = FrequencyTypes.QUARTERLY
     opt_type = OptionTypes.EUROPEAN_CALL
 
-    cliquet_option = EquityCliquetOption(
-        start_dt, final_expiry_dt, opt_type, freq_type
-    )
+    cliquet_option = EquityCliquetOption(start_dt, final_expiry_dt, opt_type, freq_type)
 
     value_dt = Date(1, 1, 2015)
     stock_price = 100.0

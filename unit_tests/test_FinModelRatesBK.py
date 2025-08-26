@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
@@ -8,7 +10,6 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
-import numpy as np
 
 ########################################################################################
 

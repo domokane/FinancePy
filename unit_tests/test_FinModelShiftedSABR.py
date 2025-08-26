@@ -8,7 +8,7 @@ from financepy.models.sabr_shifted import SABRShifted
 ########################################################################################
 
 
-def test__shifted_sabr():
+def test_shifted_sabr():
 
     alpha = 0.0
     beta = 0.5

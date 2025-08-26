@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import numpy as np
 
 from financepy.products.bonds.bond_convertible import BondConvertible
@@ -113,6 +109,7 @@ def test_calls_or_puts():
     assert round(res["delta"], 4) == 3.3634
     assert round(res["gamma"], 4) == 0.0832
     assert round(res["theta"], 4) == 53.9851
+
 
 ########################################################################################
 

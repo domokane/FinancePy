@@ -1,11 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import os
+import datetime as dt
 
 import pandas as pd
-import datetime as dt
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -57,6 +55,7 @@ def test_poly():
     assert round(coeffs[4] * 1e3, 4) == 1.3536
     assert round(coeffs[5] * 1e7, 4) == 4.1606
 
+
 ########################################################################################
 
 
@@ -69,6 +68,7 @@ def test_nelson_siegel():
     assert round(fitted_curve.curve_fit.beta_2, 3) == 0.092
     assert round(fitted_curve.curve_fit.beta_3, 3) == 0.259
     assert round(fitted_curve.curve_fit.tau, 1) == 35.8
+
 
 ########################################################################################
 
@@ -84,6 +84,7 @@ def test_nelson_siegel_svensson():
     assert round(fitted_curve.curve_fit.beta_4, 4) == -0.0376
     assert round(fitted_curve.curve_fit.tau_1, 3) == 3.177
     assert round(fitted_curve.curve_fit.tau_2, 4) == 100.0000
+
 
 ########################################################################################
 

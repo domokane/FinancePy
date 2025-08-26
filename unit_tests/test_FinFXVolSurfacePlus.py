@@ -1,14 +1,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-import matplotlib.pyplot as plt
+
 
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
-from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-import numpy as np
 
 
 verbose_calibration = False
@@ -16,7 +14,7 @@ verbose_calibration = False
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface1(capsys):
+def test_fin_fx_mkt_vol_surface1(capsys):
 
     # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
     # print("EURUSD EXAMPLE CLARK")
@@ -71,10 +69,11 @@ def test__fin_fx_mkt_vol_surface1(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface2(capsys):
+def test_fin_fx_mkt_vol_surface2(capsys):
 
     # Example from Book extract by Iain Clarke using Tables 3.3 and 3.4
     # print("EURJPY EXAMPLE CLARK")
@@ -137,10 +136,11 @@ def test__fin_fx_mkt_vol_surface2(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface3(capsys):
+def test_fin_fx_mkt_vol_surface3(capsys):
 
     # Example from Book extract by Iain Clark using Tables 4.4 and 4.5
     # where we examine the calibration to a full surface in Chapter 4
@@ -198,10 +198,11 @@ def test__fin_fx_mkt_vol_surface3(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface4(capsys):
+def test_fin_fx_mkt_vol_surface4(capsys):
 
     # Here I remove the 25D Vols
 
@@ -261,10 +262,11 @@ def test__fin_fx_mkt_vol_surface4(capsys):
     captured = capsys.readouterr()
     assert captured.out == ""
 
+
 ########################################################################################
 
 
-def test__fin_fx_mkt_vol_surface5(capsys):
+def test_fin_fx_mkt_vol_surface5(capsys):
 
     # Here I remove the 10D Vols
 

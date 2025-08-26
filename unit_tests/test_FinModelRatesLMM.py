@@ -1,16 +1,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_simulate_fwds_mf
 from financepy.models.lmm_mc import lmm_simulate_fwds_1f
 from financepy.utils.helpers import check_vector_differences
-import numpy as np
 
 ########################################################################################
 
 
-def test__hull_book_examples(capsys):
+def test_hull_book_examples(capsys):
     """Examining examples on page 770 of Hull OFODS
     Last cap product has caplet starting in 10 years so we have to model
     the forward curve from time 0 out to 11 forwards, not 10 forwards.

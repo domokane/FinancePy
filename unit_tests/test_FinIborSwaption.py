@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
@@ -14,7 +16,6 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
-import numpy as np
 
 ########################################################################################
 
@@ -162,6 +163,7 @@ def test_pay():
     assert round(swap4, 1) == 60.3
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
+
 
 ########################################################################################
 

@@ -8,8 +8,7 @@ from financepy.products.equity.equity_chooser_option import EquityChooserOption
 ########################################################################################
 
 
-def test__equity_chooser_option_haug():
-
+def test_equity_chooser_option_haug():
     """Following example in Haug Page 130"""
 
     value_dt = Date(1, 1, 2015)
@@ -45,11 +44,11 @@ def test__equity_chooser_option_haug():
     assert round(v_haug, 4) == 6.0508
     assert round(v_mc, 4) == 6.0587
 
+
 ########################################################################################
 
 
-def test__equity_chooser_option_matlab():
-
+def test_equity_chooser_option_matlab():
     """https://fr.mathworks.com/help/fininst/chooserbybls.html"""
 
     value_dt = Date(1, 6, 2007)
@@ -86,11 +85,11 @@ def test__equity_chooser_option_matlab():
     assert round(v_matlab, 4) == 8.9308
     assert round(v_mc, 4) == 8.9356
 
+
 ########################################################################################
 
 
-def test__equity_chooser_option_derivicom():
-
+def test_equity_chooser_option_derivicom():
     """http://derivicom.com/support/finoptionsxl/index.html?complex_chooser.htm"""
 
     value_dt = Date(1, 1, 2007)

@@ -121,7 +121,7 @@ results = [
 ########################################################################################
 
 
-def test__fin_flat_curve():
+def test_fin_flat_curve():
 
     curve_dt = Date(1, 1, 2019)
     months = range(1, 60, 3)

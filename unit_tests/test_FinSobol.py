@@ -5,7 +5,7 @@ from financepy.models.sobol import get_uniform_sobol
 ########################################################################################
 
 
-def test__fin_sobol():
+def test_fin_sobol():
 
     num_points = 1000
     dimensions = 3
