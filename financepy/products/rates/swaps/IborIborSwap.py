@@ -75,34 +75,35 @@ class IborIborSwap:
         self._bd_type = bd_type
         self._dg_type = dg_type
 
-        self._payFloatDates = self._generateFloatLegDates(self._pay_freq_type)
-        self._recFloatDates = self._generateFloatLegDates(self._rec_freq_type)
+        self._pay_float_dts = self._generate_float_leg_dts(self._pay_freq_type)
+        self._rec_float_dts = self._generate_float_leg_dts(self._rec_freq_type)
 
-        self._adjusted_maturity_dt = self._adjusted_fixed_dts[-1]
+        self._float_year_fracs = []
+        self._float_flows = []
+        self._float_rates = []
+        self._float_dfs = []
+        self._float_flow_pvs = []
+        self._float_total_pv = []
 
         self._pay_float_year_fracs = []
         self._rec_float_year_fracs = []
 
-        self._payfloat_flows = []
-        self._recfloat_flows = []
-
         self._pay_float_flow_pvs = []
         self._rec_float_flow_pvs = []
 
-        self._pay_first_fixing_rate = None
-        self._rec_first_fixing_rate = None
+        self._first_fixing_rate = None
 
         self.value_dt = None
 
     ##########################################################################
 
-    def _generate_pay_float_leg_payment_dts(self, freq_type):
+    def _generate_float_leg_dts(self, freq_type):
         """Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
 
         float_dts = Schedule(
             self.effective_dt,
-            self.termination_dt,
+            self._termination_dt,
             freq_type,
             self._cal_type,
             self._bd_type,
@@ -174,14 +175,14 @@ class IborIborSwap:
 
         basis = DayCount(self.float_dc_type)
 
-        """ The swap may have started in the past but we can only value
-        payments that have occurred after the start date. """
+        # The swap may have started in the past but we can only value
+        # payments that have occurred after the start date.
         start_index = 0
         while self._adjusted_float_dts[start_index] < value_dt:
             start_index += 1
 
-        """ If the swap has yet to settle then we do not include the
-        start date of the swap as a cpn payment date. """
+        # If the swap has yet to settle then we do not include the
+        # start date of the swap as a cpn payment date. """
         if value_dt <= self.effective_dt:
             start_index = 1
 
@@ -190,8 +191,8 @@ class IborIborSwap:
         # Forward price to settlement date (if valuation is settlement date)
         self._df_value_dt = discount_curve.df(value_dt)
 
-        """ The first floating payment is usually already fixed so is
-        not implied by the index curve. """
+        # The first floating payment is usually already fixed so is
+        # not implied by the index curve. """
         prev_dt = self._adjusted_float_dts[start_index - 1]
         next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]

@@ -4,9 +4,6 @@ import numpy as np
 from financepy.models.sabr_shifted import SABRShifted
 from financepy.utils.global_types import OptionTypes
 from FinTestCases import FinTestCases, global_test_case_mode
-import sys
-
-sys.path.append("..")
 
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

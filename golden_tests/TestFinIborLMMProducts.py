@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from FinTestCases import FinTestCases, global_test_case_mode
+import numpy as np
+
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_lmm_products import IborLMMProducts
 from financepy.utils.global_types import FinCapFloorTypes
@@ -12,17 +13,12 @@ from financepy.models.black import Black
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-import numpy as np
 
-import sys
-
-sys.path.append("..")
-
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 # This is in progress and needs to be completed
-
 
 
 # def test_Swaptions():
@@ -135,7 +131,6 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 #                  blackSwaptionPrice))
 
 
-
 # def test_CapsFloors():
 
 #     # Define the CAP
@@ -228,7 +223,6 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 #         err = v_lmm - v_BLK
 #         test_cases.print(num_paths, v_lmm, v_BLK, err)
-
 
 
 # test_CapsFloors()

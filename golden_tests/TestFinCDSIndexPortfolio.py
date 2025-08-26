@@ -2,11 +2,6 @@
 
 import os
 
-import sys
-
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -16,6 +11,8 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -61,6 +58,7 @@ def build_ibor_curve(trade_dt):
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
     return libor_curve
 
+
 ########################################################################################
 
 
@@ -80,6 +78,7 @@ def build_issuer_curve(trade_dt, libor_curve):
     issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return issuer_curve
+
 
 ########################################################################################
 
@@ -176,7 +175,6 @@ def test_cds_index_portfolio():
         cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves)
         * 10000.0
     )
-
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)

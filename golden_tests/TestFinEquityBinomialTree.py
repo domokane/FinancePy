@@ -1,11 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import numpy as np
+
 from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
 from financepy.products.equity.equity_binomial_tree import (
     EquityTreeExerciseTypes,
@@ -18,8 +15,9 @@ from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from FinTestCases import FinTestCases, global_test_case_mode
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

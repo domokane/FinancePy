@@ -1,9 +1,6 @@
-import sys
-
-sys.path.append("..")
+from os.path import dirname, join
 
 import pandas as pd
-from os.path import dirname, join
 
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
@@ -181,6 +178,7 @@ def test_ibor_benchmarks_report():
         .isnull()
         .values.any()
     ) == False
+
 
 ########################################################################################
 

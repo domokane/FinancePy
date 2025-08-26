@@ -1,9 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from FinTestCases import FinTestCases, global_test_case_mode
-import sys
-
-sys.path.append("..")
 
 # import numpy as np
 
@@ -22,7 +19,6 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 #    test_cases.print(dfs)
 #    dfs = flat_curve.df(times, -1)
 #    test_cases.print(dfs)
-
 
 
 # test_FinPieceCurve()

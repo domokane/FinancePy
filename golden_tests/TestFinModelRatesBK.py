@@ -1,11 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import numpy as np
+
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.products.bonds.bond import Bond
@@ -15,8 +12,9 @@ from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.utils.helpers import print_tree
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import FinExerciseTypes
-from FinTestCases import FinTestCases, global_test_case_mode
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -51,6 +49,7 @@ def test_bk_example_one():
         test_cases.print("PU AT LAST TIME", model.pu)
         test_cases.print("PDM AT LAST TIME", model.pm)
         test_cases.print("PD AT LAST TIME", model.pd)
+
 
 ########################################################################################
 
@@ -139,13 +138,11 @@ def test_bk_example_two():
 
     # Value in Hill converges to 0.699 with 100 time steps while I get 0.700
 
-    if 1 == 0:
+    if False:
         print("RT")
         print_tree(model.rt, 5)
         print("Q")
         print_tree(model.qq, 5)
-
-
 
 
 ########################################################################################

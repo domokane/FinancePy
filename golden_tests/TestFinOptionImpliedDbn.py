@@ -1,12 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import numpy as np
 
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
@@ -14,15 +9,18 @@ from financepy.models.volatility_fns import vol_function_clark
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
 
+PLOT_GRAPHS = False
+
 
 def test_fin_option_implied_dbn():
 
-    if 1 == 1:
+    if True:
 
         # Example from Book extract by Iain Clark using Tables 3.3 and 3.4
         # print("EURUSD EXAMPLE CLARK")
@@ -66,7 +64,6 @@ def test_fin_option_implied_dbn():
 
         #        fx_market.check_calibration(True)
 
-        PLOT_GRAPHS = False
         if PLOT_GRAPHS:
             fx_market.plot_vol_curves()
 

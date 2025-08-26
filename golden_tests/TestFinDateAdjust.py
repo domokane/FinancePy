@@ -1,10 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import CalendarTypes
@@ -12,6 +7,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.schedule import Schedule
 from financepy.utils.date import Date
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -73,8 +69,6 @@ def test_dt_adjust():
 
     for dt in schedule.adjusted_dts:
         test_cases.print("Date:", dt)
-
-
 
 
 ########################################################################################

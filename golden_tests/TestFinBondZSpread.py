@@ -1,10 +1,6 @@
-import os
-import sys
 import pandas as pd
 
 import matplotlib.pyplot as plt
-
-sys.path.append("..")
 
 from financepy.utils.global_vars import G_PERCENT
 from financepy.utils.calendar import CalendarTypes

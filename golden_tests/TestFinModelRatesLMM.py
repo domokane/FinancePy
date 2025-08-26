@@ -1,6 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from FinTestCases import FinTestCases, global_test_case_mode
+import time as time
+import numpy as np
+
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
@@ -22,12 +24,8 @@ from financepy.models.black import Black
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
-import numpy as np
-import time as time
-import sys
 
-sys.path.append("..")
-
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

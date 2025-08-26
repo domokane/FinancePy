@@ -1,11 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import time
+
 import matplotlib.pyplot as plt
 
-import time
-import sys
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
 from financepy.products.bonds.bond import Bond
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -17,7 +15,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 
-sys.path.append("..")
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

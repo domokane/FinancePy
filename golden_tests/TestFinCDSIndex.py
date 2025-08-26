@@ -1,10 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -14,6 +9,8 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -60,6 +57,7 @@ def build_ibor_curve(trade_dt):
 
     return libor_curve
 
+
 ########################################################################################
 
 
@@ -78,6 +76,7 @@ def build_issuer_curve(trade_dt, libor_curve):
 
     issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
     return issuer_curve
+
 
 ########################################################################################
 

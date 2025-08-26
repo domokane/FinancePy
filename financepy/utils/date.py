@@ -16,53 +16,7 @@ import numpy as np
 from .error import FinError
 from .tenor import Tenor, TenorUnit
 from .date_format import DateFormatTypes, get_date_format
-
-
-########################################################################################
-
-
-short_day_names = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-
-long_day_names = [
-    "MONDAY",
-    "TUESDAY",
-    "WEDNESDAY",
-    "THURSDAY",
-    "FRIDAY",
-    "SATURDAY",
-    "SUNDAY",
-]
-short_month_names = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-]
-longMonthNames = [
-    "JANUARY",
-    "FEBRUARY",
-    "MARCH",
-    "APRIL",
-    "MAY",
-    "JUNE",
-    "JULY",
-    "AUGUST",
-    "SEPTEMBER",
-    "OCTOBER",
-    "NOVEMBER",
-    "DECEMBER",
-]
-
-month_days_not_leap_year = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-month_days_leap_year = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+from .date_arrays import *
 
 ########################################################################################
 
@@ -932,9 +886,7 @@ class Date:
             date_str = date_str + " " + time_str
             return date_str
 
-        else:
-
-            raise FinError("Unknown date format")
+        raise FinError("Unknown date format")
 
     ###########################################################################
     # REMOVE THIS

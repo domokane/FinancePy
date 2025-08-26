@@ -1,14 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import time
-import sys
-
-sys.path.append("..")
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
@@ -16,6 +11,7 @@ from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -88,7 +84,7 @@ def test_fin_fx_mkt_vol_surface1(verbose):
 
         fx_market_plus.check_calibration(False)
 
-        if 1 == 0:  # PLOT_GRAPHS:
+        if PLOT_GRAPHS:
 
             fx_market_plus.plot_vol_curves()
 

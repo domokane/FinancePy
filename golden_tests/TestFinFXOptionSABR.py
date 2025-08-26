@@ -1,16 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from FinTestCases import FinTestCases, global_test_case_mode
+import numpy as np
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
-import numpy as np
-import sys
 
-sys.path.append("..")
-
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

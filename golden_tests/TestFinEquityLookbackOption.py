@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 from financepy.products.equity.equity_float_lookback_option import (
     EquityFloatLookbackOption,

@@ -1,10 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
+from os.path import dirname, join
 
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -14,7 +11,8 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from os.path import dirname, join
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -59,6 +57,7 @@ def build_ibor_curve(value_dt):
 
     return libor_curve
 
+
 ########################################################################################
 
 
@@ -76,6 +75,7 @@ def build_issuer_curve(value_dt, libor_curve):
     issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return issuer_curve
+
 
 ########################################################################################
 
@@ -175,13 +175,11 @@ def test_cds_index_adjust_spreads():
         * 10000.0
     )
 
-
     test_cases.header("LABEL", "VALUE")
     test_cases.print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)
     test_cases.print("INTRINSIC SPD 5Y", intrinsic_spd_5yr)
     test_cases.print("INTRINSIC SPD 7Y", intrinsic_spd_7yr)
     test_cases.print("INTRINSIC SPD 10Y", intrinsic_spd_10yr)
-
 
     index_cpns = [0.002, 0.0037, 0.0050, 0.0063]
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
@@ -250,8 +248,6 @@ def test_cds_index_adjust_spreads():
     test_cases.print("ADJUSTED INTRINSIC SPD 5Y:", intrinsic_spd_5yr)
     test_cases.print("ADJUSTED INTRINSIC SPD 7Y", intrinsic_spd_7yr)
     test_cases.print("ADJUSTED INTRINSIC SPD 10Y", intrinsic_spd_10yr)
-
-
 
 
 ########################################################################################

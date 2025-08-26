@@ -216,7 +216,7 @@ def _value_mc_fast_numba(
 
     for _ in range(0, n):
 
-        g = np.random.normal(0.0, 1.0, size=(num_paths))
+        g = np.random.normal(0.0, 1.0, size=num_paths)
 
         for ip in range(0, num_paths):
             s_1[ip] = s_1[ip] * np.exp(
@@ -288,7 +288,7 @@ def _value_mc_fast_cv_numba(
         n = int(n * t / tau + 0.5) + 1
 
     # evolve stock price to start of averaging period
-    g = np.random.normal(0.0, 1.0, size=(num_paths))
+    g = np.random.normal(0.0, 1.0, size=num_paths)
 
     s_1 = np.empty(num_paths)
     s_2 = np.empty(num_paths)
@@ -308,7 +308,7 @@ def _value_mc_fast_cv_numba(
 
     for _ in range(0, n):
 
-        g = np.random.normal(0.0, 1.0, size=(num_paths))
+        g = np.random.normal(0.0, 1.0, size=num_paths)
         for ip in range(0, num_paths):
             s_1[ip] = s_1[ip] * np.exp(
                 (mu - v2 / 2.0) * dt + g[ip] * np.sqrt(dt) * volatility

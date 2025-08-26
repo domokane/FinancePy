@@ -2,11 +2,7 @@
 
 import time
 import numpy as np
-import sys
 
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -24,6 +20,8 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -167,7 +165,7 @@ def test_issuer_curve_build():
 ########################################################################################
 
 
-def build_full_issuer_curve1(mkt_spdBump, ir_bump):
+def build_full_issuer_curve1(mkt_spd_bump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
@@ -326,7 +324,7 @@ def build_full_issuer_curve1(mkt_spdBump, ir_bump):
 
     cds_mkt_contracts = []
 
-    cds_cpn = 0.04 + mkt_spdBump
+    cds_cpn = 0.04 + mkt_spd_bump
 
     maturity_dt = value_dt.next_cds_date(6)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
@@ -454,7 +452,7 @@ def test_dirty_price_cds():
 ########################################################################################
 
 
-def build_full_issuer_curve2(mkt_spdBump, ir_bump):
+def build_full_issuer_curve2(mkt_spd_bump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 20 August 2020 SNAP AT 1600
@@ -537,7 +535,7 @@ def build_full_issuer_curve2(mkt_spdBump, ir_bump):
 
     libor_curve = IborSingleCurve(value_dt, depos, [], swaps)
 
-    cds_cpn = 0.01 + mkt_spdBump
+    cds_cpn = 0.01 + mkt_spd_bump
 
     cds_mkt_contracts = []
     effective_dt = Date(21, 8, 2020)

@@ -56,3 +56,11 @@ def get_date_format() -> DateFormatTypes:
         The currently set global date format.
     """
     return _date_format
+
+
+########################################################################################
+
+
+def print_date_format():
+    global G_DATE_TYPE_FORMAT
+    print("TEST TYPE", G_DATE_TYPE_FORMAT)

@@ -1,11 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import numpy as np
+
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
 from financepy.models.cir_montecarlo import CIRNumericalScheme
 from FinTestCases import FinTestCases, global_test_case_mode

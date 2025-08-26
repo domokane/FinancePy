@@ -1,20 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-
-sys.path.append("..")
-
-# Add the *parent of the script's parent directory* to sys.path
-sys.path.append(
-    os.path.dirname(  # go up one directory
-        os.path.dirname(  # go up two directories
-            os.path.abspath(__file__)  # absolute path to current file
-        )
-    )
-)
-
-
-from FinTestCases import FinTestCases, global_test_case_mode
+import numpy as np
+import matplotlib.pyplot as plt
 
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
@@ -34,8 +21,8 @@ from financepy.products.rates.dual_curve import IborDualCurve
 from financepy.products.rates.ois_curve import OISCurve
 from financepy.products.rates.ois import OIS
 
-import numpy as np
-import matplotlib.pyplot as plt
+from FinTestCases import FinTestCases, global_test_case_mode
+
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

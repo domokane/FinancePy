@@ -2,11 +2,6 @@
 
 import time
 
-import sys
-
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 
 from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
 from financepy.models.equity_crr_tree import crr_tree_val
@@ -21,6 +16,8 @@ from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

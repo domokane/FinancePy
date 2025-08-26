@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import os
 import time
 import numpy as np
@@ -66,6 +62,7 @@ def build_ibor_curve(trade_dt):
 
     return libor_curve
 
+
 ########################################################################################
 
 
@@ -82,6 +79,7 @@ def build_flat_issuer_curve(trade_dt, libor_curve, spread, recovery_rate):
     issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return issuer_curve
+
 
 ########################################################################################
 
@@ -125,7 +123,6 @@ def test_dirty_price_cds_index_option():
 
         issuer_curves.append(issuer_curve)
 
-
     index_upfronts = [0.0, 0.0, 0.0, 0.0]
     index_maturity_dts = [
         Date(20, 12, 2009),
@@ -163,7 +160,6 @@ def test_dirty_price_cds_index_option():
     # I have investigated but have not found cause yet
     for index in [20, 40, 50]:  # was [20, 40, 60]
 
-
         #        print("Index", index)
 
         cds_contracts = []
@@ -175,7 +171,7 @@ def test_dirty_price_cds_index_option():
 
         index_curve = CDSCurve(value_dt, cds_contracts, libor_curve, index_recovery)
 
-        if 1 == 1:
+        if True:
 
             index_spreads = [index / 10000.0] * 4
 
@@ -239,8 +235,6 @@ def test_dirty_price_cds_index_option():
                 v_pay_2,
                 v_rec_2,
             )
-
-
 
 
 ########################################################################################

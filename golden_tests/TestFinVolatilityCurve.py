@@ -1,13 +1,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
 import numpy as np
+
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.utils.date import Date
+
 from FinTestCases import FinTestCases, global_test_case_mode
-
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

@@ -1,12 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import time
-import sys
 
 import matplotlib.pyplot as plt
 
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import SwapTypes
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
@@ -18,7 +15,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 
-sys.path.append("..")
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

@@ -11,8 +11,8 @@ from ..utils.math import normcdf
 
 ########################################################################################
 
-class BlackShifted:
 
+class BlackShifted:
     """Black's Model which prices call and put options in the forward
     measure according to the Black-Scholes equation. This model also allows
     the distribution to be shifted to the negative in order to allow for
@@ -21,7 +21,6 @@ class BlackShifted:
     ####################################################################################
 
     def __init__(self, volatility, shift, implementation=0):
-
         """Create FinModel black using parameters."""
         self.volatility = volatility
         self.shift = shift
@@ -34,7 +33,6 @@ class BlackShifted:
     ####################################################################################
 
     def value(
-
         self,
         forward_rate,  # Forward rate
         strike_rate,  # Strike Rate
@@ -61,8 +59,8 @@ class BlackShifted:
             return df * ((f + s) * normcdf(d1) - (k + s) * normcdf(d2))
         elif call_or_put == OptionTypes.EUROPEAN_PUT:
             return df * ((k + s) * normcdf(-d2) - (f + s) * normcdf(-d1))
-        else:
-            raise ValueError("Option type must be European Call(C) or Put(P)")
+
+        raise ValueError("Option type must be European Call(C) or Put(P)")
 
     ####################################################################################
 
@@ -74,4 +72,3 @@ class BlackShifted:
         s += label_to_string("IMPLEMENTATION", self.implementation)
         s += label_to_string("NUMSTEPS", self.num_steps)
         return s
-

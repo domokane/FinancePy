@@ -1,16 +1,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-
-from FinTestCases import FinTestCases, global_test_case_mode
-from financepy.utils.math import scale
-from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
-from financepy.utils.date import Date
 import matplotlib.pyplot as plt
 import numpy as np
 
-import sys
+from financepy.utils.math import scale
+from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
+from financepy.utils.date import Date
 
-sys.path.append("..")
-
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

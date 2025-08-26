@@ -1,11 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import numpy as np
+
 from financepy.utils.math import normcdf_integrate
 from financepy.utils.math import normcdf
 from financepy.utils.math import normcdf_slow

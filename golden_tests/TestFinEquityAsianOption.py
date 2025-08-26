@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import matplotlib.pyplot as plt
 
@@ -15,7 +11,6 @@ from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
-
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

@@ -1,12 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys, os
-
+import os
 import pandas as pd
 
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond import Bond, YTMCalcType
 
@@ -16,6 +12,8 @@ from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.math import ONE_MILLION
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -103,11 +101,6 @@ def test_bond_zero_ror():
 
 ########################################################################################
 
-try:
-    test_bond_zero()
-    test_bond_zero_ror()
-    test_cases.compare_test_cases()
-########################################################################################
-
-except Exception as e:
-    print(f"Unexpected error:{e}", sys.exc_info()[0])
+test_bond_zero()
+test_bond_zero_ror()
+test_cases.compare_test_cases()

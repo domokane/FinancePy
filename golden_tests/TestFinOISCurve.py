@@ -1,12 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import time as time
+import time
 import numpy as np
 import matplotlib.pyplot as plt
-
-import sys
-
-sys.path.append("..")
 
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -20,6 +16,7 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.global_types import SwapTypes
+
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

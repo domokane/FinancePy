@@ -1,18 +1,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
+import numpy as np
 import matplotlib.pyplot as plt
-from FinTestCases import FinTestCases, global_test_case_mode
+
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-import numpy as np
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

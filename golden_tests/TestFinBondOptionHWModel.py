@@ -1,14 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import time
+
 import matplotlib.pyplot as plt
 
-
-import sys
-import time
 import numpy as np
-
-
-sys.path.append("..")
 
 from financepy.utils.global_types import FinExerciseTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEARS

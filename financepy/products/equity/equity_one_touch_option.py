@@ -458,7 +458,7 @@ class EquityOneTouchOption(EquityOption):
         time_grid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
 
         hh = self.barrier_price
-        X = self.payment_size
+        xx = self.payment_size
 
         v = 0.0
 
@@ -469,7 +469,7 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Barrier has ALREADY been crossed.")
 
             v = _barrier_pay_one_at_hit_pv_down(s, hh, r, dt)
-            v = v * X
+            v = v * xx
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_HIT:
@@ -479,7 +479,7 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Barrier has ALREADY been crossed.")
 
             v = _barrier_pay_one_at_hit_pv_up(s, hh, r, dt)
-            v = v * X
+            v = v * xx
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT:
@@ -507,7 +507,7 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Barrier has  ALREADY been crossed.")
 
             v = _barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt)
-            v = v * X * np.exp(-r * t)
+            v = v * xx * np.exp(-r * t)
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
@@ -517,7 +517,7 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Barrier has ALREADY been crossed.")
 
             v = _barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt)
-            v = v * X * np.exp(-r * t)
+            v = v * xx * np.exp(-r * t)
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
@@ -545,7 +545,7 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Barrier has ALREADY been crossed.")
 
             v = 1.0 - _barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt)
-            v = v * X * np.exp(-r * t)
+            v = v * xx * np.exp(-r * t)
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
@@ -555,7 +555,7 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Barrier has ALREADY been crossed.")
 
             v = 1.0 - _barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt)
-            v = v * X * np.exp(-r * t)
+            v = v * xx * np.exp(-r * t)
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:

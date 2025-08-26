@@ -155,8 +155,8 @@ class CDSCurve:
         elif isinstance(t, float):
             q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
             return q
-        else:
-            raise FinError("Unknown time type")
+
+        raise FinError("Unknown time type")
 
     ###########################################################################
 

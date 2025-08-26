@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 from financepy.products.equity.equity_forward import EquityForward
 from financepy.utils.date import Date
 from financepy.utils.global_types import FinLongShort
@@ -24,7 +20,6 @@ def test_equity_forward():
     forward_price = 125.0  # Locked
     discount_rate = 0.05
     dividend_rate = 0.02
-
 
     expiry_dt = value_dt.add_months(12)
     notional = 100.0
@@ -48,8 +43,6 @@ def test_equity_forward():
 
     #    print(stock_price, fwd_price, fwd_value)
     test_cases.print(stock_price, fwd_price, fwd_value)
-
-
 
 
 ########################################################################################

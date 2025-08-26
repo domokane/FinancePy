@@ -424,7 +424,7 @@ def test_fin_schedule_alignment_leap_year_not_eom():
     compare = (
         sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
     )
-    assert compare == True
+    assert compare is True
 
 
 ########################################################################################
@@ -475,7 +475,7 @@ def test_fin_schedule_alignment_eff31():
     compare = (
         sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
     )
-    assert compare == True
+    assert compare is True
 
 
 ########################################################################################

@@ -1,10 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import time
-import sys
-
-sys.path.append("..")
-
 import numpy as np
 
 from financepy.products.fx.fx_double_digital_option import (

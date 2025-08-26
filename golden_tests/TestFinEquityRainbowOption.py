@@ -1,10 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
 import numpy as np
-
-sys.path.append("..")
-
 import time
 from math import sqrt
 

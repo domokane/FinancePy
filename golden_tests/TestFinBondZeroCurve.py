@@ -1,18 +1,16 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import os
-import sys
 import datetime as dt
 import pandas as pd
 
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

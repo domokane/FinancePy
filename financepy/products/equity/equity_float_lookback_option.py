@@ -46,10 +46,7 @@ class EquityFloatLookbackOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if (
-            opt_type != OptionTypes.EUROPEAN_CALL
-            and opt_type != OptionTypes.EUROPEAN_PUT
-        ):
+        if opt_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt

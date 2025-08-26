@@ -109,19 +109,19 @@ class FXBarrierOption(FXOption):
 
         if self.opt_type == FinFXBarrierTypes.DOWN_AND_OUT_CALL and s0 <= h:
             return 0.0
-        elif self.opt_type == FinFXBarrierTypes.UP_AND_OUT_CALL and s0 >= h:
+        if self.opt_type == FinFXBarrierTypes.UP_AND_OUT_CALL and s0 >= h:
             return 0.0
-        elif self.opt_type == FinFXBarrierTypes.UP_AND_OUT_PUT and s0 >= h:
+        if self.opt_type == FinFXBarrierTypes.UP_AND_OUT_PUT and s0 >= h:
             return 0.0
-        elif self.opt_type == FinFXBarrierTypes.DOWN_AND_OUT_PUT and s0 <= h:
+        if self.opt_type == FinFXBarrierTypes.DOWN_AND_OUT_PUT and s0 <= h:
             return 0.0
-        elif self.opt_type == FinFXBarrierTypes.DOWN_AND_IN_CALL and s0 <= h:
+        if self.opt_type == FinFXBarrierTypes.DOWN_AND_IN_CALL and s0 <= h:
             return c
-        elif self.opt_type == FinFXBarrierTypes.UP_AND_IN_CALL and s0 >= h:
+        if self.opt_type == FinFXBarrierTypes.UP_AND_IN_CALL and s0 >= h:
             return c
-        elif self.opt_type == FinFXBarrierTypes.UP_AND_IN_PUT and s0 >= h:
+        if self.opt_type == FinFXBarrierTypes.UP_AND_IN_PUT and s0 >= h:
             return p
-        elif self.opt_type == FinFXBarrierTypes.DOWN_AND_IN_PUT and s0 <= h:
+        if self.opt_type == FinFXBarrierTypes.DOWN_AND_IN_PUT and s0 <= h:
             return p
 
         num_observations = t * self.num_obs_per_year

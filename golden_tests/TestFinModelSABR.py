@@ -5,10 +5,6 @@ from financepy.models.sabr import vol_function_sabr
 from financepy.models.sabr import SABR
 from financepy.utils.global_types import OptionTypes
 from FinTestCases import FinTestCases, global_test_case_mode
-import sys
-
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -35,6 +31,7 @@ def test_sabr():
                 params = np.array([alpha, beta, rho, nu])
                 vol = vol_function_sabr(params, f, k, t)
                 test_cases.print(alpha, beta, rho, vol)
+
 
 ########################################################################################
 
@@ -88,8 +85,6 @@ def test_sabr__calibration():
     assert round(value_call - value_put, 12) == round(
         df * (f - k), 12
     ), "The method called 'value()' doesn't comply with Call-Put parity"
-
-
 
 
 ########################################################################################

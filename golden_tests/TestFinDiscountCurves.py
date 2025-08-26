@@ -1,6 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from FinTestCases import FinTestCases, global_test_case_mode
+import matplotlib.pyplot as plt
+import numpy as np
+
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
@@ -14,13 +16,8 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
-import matplotlib.pyplot as plt
-import numpy as np
 
-import sys
-
-sys.path.append("..")
-
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

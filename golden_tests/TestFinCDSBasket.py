@@ -2,13 +2,7 @@
 
 import time
 import numpy as np
-from os.path import dirname, join
 
-import sys
-
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -21,6 +15,8 @@ from financepy.products.credit.cds_basket import CDSBasket
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.utils.math import corr_matrix_generator
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

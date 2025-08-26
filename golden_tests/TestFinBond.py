@@ -1,15 +1,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import os
-import sys
 
 import datetime as dt
 import pandas as pd
 import numpy as np
 
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -24,6 +20,7 @@ from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.utils.global_types import SwapTypes
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -523,7 +520,9 @@ def test_bond_payment_dates():
     )
     bond._calculate_payment_dts()
 
-    if 1 == 0:
+    DEBUG = False
+
+    if DEBUG:
         print(bond.flow_amounts)
         print(bond.cpn_dts)
         print(bond._payment_dts)
@@ -599,7 +598,7 @@ def test_bond_eom():
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
-    ai = bond.accrued_interest(settle_dt)  # should be 8406.593406
+    accrued_interest = bond.accrued_interest(settle_dt)  # should be 8406.593406
 
 
 ########################################################################################
@@ -622,7 +621,7 @@ def test_key_rate_durations():
 
     ytm = 3.725060 / 100.0
 
-    krt, krd = bond.key_rate_durations(settle_dt, ytm)
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settle_dt, ytm)
 
 
 #    print(key_rate_tenors)
@@ -660,7 +659,7 @@ def test_key_rate_durations_bloomberg_example():
 
     my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272, 3.5825, 3.5347]) / 100
 
-    krt, krd = bond.key_rate_durations(
+    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
         settle_dt, ytm, key_rate_tenors=my_tenors, rates=my_rates
     )
 

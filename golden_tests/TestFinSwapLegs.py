@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import BusDayAdjustTypes
@@ -15,6 +11,7 @@ from financepy.utils.date import Date
 from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
 from financepy.products.rates.swap_float_leg import SwapFloatLeg
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

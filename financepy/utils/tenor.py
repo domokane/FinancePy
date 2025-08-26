@@ -226,8 +226,8 @@ class Tenor:
     def __repr__(self):
         if self.is_valid():
             return f"{self._num_periods}{self._units.name[0]}"
-        else:
-            return "*Invalid*"
+
+        return "*Invalid*"
 
 
 ########################################################################################

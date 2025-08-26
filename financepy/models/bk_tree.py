@@ -205,7 +205,7 @@ def bermudan_swaption_tree_fast(
 
     ############################## REMOVE START ###############################
 
-    if 1 == 0:
+    if False:
         fixed_pv = 0.0
         for n in range(0, num_time_steps - 1):
             ttree = _tree_times[n]
@@ -910,8 +910,7 @@ class BKTree:
         if a < 0.0:
             raise FinError("Mean reversion speed parameter should be >= 0.")
 
-        if a < 1e-10:
-            a = 1e-10
+        a = max(a, 1e-10)
 
         self.a = a
         self.sigma = sigma

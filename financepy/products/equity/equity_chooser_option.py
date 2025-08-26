@@ -5,10 +5,8 @@
 
 import numpy as np
 from scipy import optimize
-from scipy.stats import norm
 
 from ...utils.math import M
-from ...utils.math import normcdf as N
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError

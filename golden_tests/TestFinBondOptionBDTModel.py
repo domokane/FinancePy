@@ -1,14 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import time
-import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import OptionTypes
 from financepy.products.bonds.bond_option import BondOption
@@ -20,6 +16,8 @@ from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -240,7 +238,7 @@ def test_bond_option_american_convergence_two():
     vec_ep = []
     vec_ap = []
 
-    if 1 == 1:
+    if True:
         k = 100.0
         bk_model = BDTTree(sigma, 100)
         euro_call_bond_option = BondOption(

@@ -1,9 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_float_lookback_option import (

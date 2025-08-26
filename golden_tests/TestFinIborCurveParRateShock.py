@@ -1,7 +1,3 @@
-import sys
-
-sys.path.append("..")
-
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.market.curves.interpolator import InterpTypes

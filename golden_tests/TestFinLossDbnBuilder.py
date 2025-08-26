@@ -1,12 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 from financepy.models.gauss_copula_onefactor import (
     loss_dbn_hetero_adj_binomial,
@@ -77,9 +74,9 @@ def test_fin_loss_dbn_builder():
     beta = 0.0
     default_prob = 0.10
 
-    default_probs = np.random.randint(3, 4, size=(num_credits)) / 10.0
-    beta_vector = np.random.randint(5, 6, size=(num_credits)) / 10.0
-    loss_units = np.random.randint(1, 3, size=(num_credits)) / 1.0
+    default_probs = np.random.randint(3, 4, size=num_credits) / 10.0
+    beta_vector = np.random.randint(5, 6, size=num_credits) / 10.0
+    loss_units = np.random.randint(1, 3, size=num_credits) / 1.0
 
     start = time.time()
     dbn1 = loss_dbn_recursion_gcd(

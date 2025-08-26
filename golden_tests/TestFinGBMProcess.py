@@ -1,15 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import time
 import numpy as np
-from os.path import dirname, join
-
-import sys
-
-sys.path.append("..")
 
 from FinTestCases import FinTestCases, global_test_case_mode
-from financepy.utils.global_types import SwapTypes
 from financepy.models.gbm_process_simulator import get_assets_paths_times
 from financepy.utils.math import corr_matrix_generator
 
@@ -42,8 +35,6 @@ def test_fin_gbm_process():
         corr_matrix,
         seed,
     )
-
-
 
 
 ########################################################################################

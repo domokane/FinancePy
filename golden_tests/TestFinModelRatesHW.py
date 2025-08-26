@@ -1,11 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
 import time
 import numpy as np
+
 from financepy.utils.date import Date
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -15,8 +12,9 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import FinExerciseTypes
-from FinTestCases import FinTestCases, global_test_case_mode
 
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -228,7 +226,7 @@ def test_hull_white_bond_option():
     )
 
     test_cases.banner(
-        "Pricing bond option on tree that goes to bond maturity and one using european bond option tree that goes to expiry."
+        "Pricing bond option on tree to maturity using european bond option tree that goes to expiry."
     )
 
     test_cases.header("NUMSTEPS", "TIME", "EXPIRY_ONLY", "EXPIRY_TREE", "JAMSHIDIAN")

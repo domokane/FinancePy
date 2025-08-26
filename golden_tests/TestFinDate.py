@@ -1,16 +1,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import numpy as np
-import time
-
 import sys
+import time
+import datetime
 
-sys.path.append("..")
+import numpy as np
 
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.date_format import set_date_format
 from financepy.utils.date_format import DateFormatTypes
 from financepy.utils.date import Date, date_range
+from financepy.utils import from_datetime
+
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -281,9 +282,6 @@ def test_dt_eom():
     dt = Date(7, 12, 2010)
     assert dt.eom().is_eom() is True
 
-
-import datetime
-from financepy.utils import from_datetime
 
 ########################################################################################
 

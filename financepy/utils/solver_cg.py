@@ -299,5 +299,5 @@ def fmin_cg(
     else:
         if retall:
             return res["x"], res["allvecs"]
-        else:
-            return res["x"]
+
+        return res["x"]

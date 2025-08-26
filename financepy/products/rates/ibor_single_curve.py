@@ -192,23 +192,6 @@ class IborSingleCurve(DiscountCurve):
         where the value of df[i] does not affect discount factors for t<=t[i-1]
         """
 
-        if self.is_built:
-            # already built
-            return
-
-        self.build_curve(**kwargs)
-
-    ####################################################################################
-
-    def build_curve(self, **kwargs):
-        """
-        Build curve based on interpolation.
-
-        Not all interpolators are suitable for the boostrap/1d solver, only those
-        that are local,
-        where the value of df[i] does not affect discount factors for t<=t[i-1]
-        """
-
         if Interpolator.suitable_for_bootstrap(self._interp_type):
             self._build_curve_using_1d_solver(**kwargs)
         else:

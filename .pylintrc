@@ -20,7 +20,9 @@ disable=
     W0511,  # fixme (we allow TODO notes, use pre-commit to gate later)
     W1203,  # logging-fstring-interpolation (we prefer f-strings)
     E1136,  # unsubscriptable-object (often false-positive with numpy)
-    E1101,  # no-member (NumPy/Numba dynamic attrs)
+#    E1101,  # no-member (NumPy/Numba dynamic attrs)
+    E0401,  # unable to import
+    E0411,  # unable to import in some order
 
 enable=
     unused-import,

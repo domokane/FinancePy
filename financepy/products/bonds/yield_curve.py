@@ -7,7 +7,6 @@ from typing import Union
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.optimize import curve_fit
 from scipy.interpolate import splrep
 
 from ...utils.error import FinError

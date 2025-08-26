@@ -1,13 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import os
 import time
+import os
 
-import sys
-
-sys.path.append("..")
-
-from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -20,6 +15,7 @@ from financepy.products.credit.cds_tranche import CDSTranche
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -64,11 +60,11 @@ def build_ibor_curve(trade_dt):
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
     return libor_curve
 
+
 ########################################################################################
 
 
 def load_homogeneous_cds_curves(
-
     value_dt,
     libor_curve,
     cds_spd_3yr,
@@ -99,6 +95,7 @@ def load_homogeneous_cds_curves(
         issuer_curves.append(issuer_curve)
 
     return issuer_curves
+
 
 ########################################################################################
 
@@ -135,6 +132,7 @@ def load_hetero_spread_curves(value_dt, libor_curve):
         issuer_curves.append(issuer_curve)
 
     return issuer_curves
+
 
 ########################################################################################
 
@@ -176,7 +174,6 @@ def test_cds_tranche():
     spd = 0.0
 
     cds_index = CDSIndexPortfolio()
-
 
     test_cases.banner(
         "==================================================================="
@@ -236,7 +233,6 @@ def test_cds_tranche():
                     v[3] * 10000,
                 )
 
-
     test_cases.banner(
         "==================================================================="
     )
@@ -291,8 +287,6 @@ def test_cds_tranche():
     test_cases.banner(
         "==================================================================="
     )
-
-
 
 
 ########################################################################################

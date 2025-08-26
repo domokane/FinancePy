@@ -1,6 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-# TODO Set up test cases correctly
 from financepy.products.bonds.bond_annuity import BondAnnuity
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes

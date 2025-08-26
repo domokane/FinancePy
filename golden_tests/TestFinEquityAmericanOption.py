@@ -1,9 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import time
-import sys
-
-sys.path.append("..")
 
 from financepy.products.equity.equity_american_option import (
     EquityAmericanOption,
@@ -172,7 +169,6 @@ def test_equity_american_option():
 ########################################################################################
 
 #    FinTest.TestReport(filename)
-
 
 
 test_equity_american_option()

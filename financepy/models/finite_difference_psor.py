@@ -9,8 +9,8 @@ from .finite_difference import option_payoff, calculate_fd_matrix
 
 ########################################################################################
 
-def black_scholes_fd_psor(
 
+def black_scholes_fd_psor(
     spot_price,
     volatility,
     time_to_expiry,
@@ -105,7 +105,9 @@ def black_scholes_fd_psor(
 
     return res[num_samples // 2]
 
+
 ########################################################################################
+
 
 @njit(fastmath=True, cache=True)
 def psor_roll_backwards(ae, ai, res_k, omega, acc=1e-13, max_iter=0):
@@ -117,11 +119,12 @@ def psor_roll_backwards(ae, ai, res_k, omega, acc=1e-13, max_iter=0):
     res_k, nloops = psor(ai, omega, res_k, z_ip1, acc=acc, max_iter=max_iter)
     return res_k, nloops
 
+
 ########################################################################################
+
 
 @njit(fastmath=True, cache=True)
 def psor(ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
-
     """
     Projected Successive Over Relaxation -
 
@@ -167,4 +170,3 @@ def psor(ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
         nloops += 1
 
     return res_k, nloops
-

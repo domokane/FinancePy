@@ -1,17 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
-import numpy as np
 import time
+import numpy as np
+
 from financepy.models.heston import Heston, HestonNumericalScheme
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.utils.date import Date
-from FinTestCases import FinTestCases, global_test_case_mode
 
+from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -99,24 +96,23 @@ def test_analytical_models():
                 end = time.time()
                 elapsed = end - start
                 test_cases.print(
-                    "%6.3f" % elapsed,
-                    "% 7.5f" % rho,
-                    "%7.5f" % sigma,
-                    "%7.2f" % strike_price,
-                    "%12.9f" % value_mc_heston,
-                    "%12.9f" % value_gatheral,  # problem
-                    "%12.9f" % value_lewis_rouah,
-                    "%12.9f" % value_lewis,
-                    "%12.9f" % value_weber,
-                    "%12.9f" % err,
+                    f"{elapsed:6.3f}",
+                    f"{rho: 7.5f}",
+                    f"{sigma:7.5f}",
+                    f"{strike_price:7.2f}",
+                    f"{value_mc_heston:12.9f}",
+                    f"{value_gatheral:12.9f}",
+                    f"{value_lewis_rouah:12.9f}",
+                    f"{value_lewis:12.9f}",
+                    f"{value_weber:12.9f}",
+                    f"{err:12.9f}",
                 )
+
 
 ########################################################################################
 
 
 def test_monte_carlo():
-
-    import time
 
     # Reference see table 4.1 of Rouah book
     value_dt = Date(1, 1, 2015)
@@ -215,8 +211,6 @@ def test_monte_carlo():
                     err_euler_log,
                     err_quadexp,
                 )
-
-
 
 
 ########################################################################################

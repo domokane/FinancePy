@@ -1,12 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
-
-sys.path.append("..")
-
-import matplotlib.pyplot as plt
 import math
+import time
 import numpy as np
+import matplotlib.pyplot as plt
+
 from financepy.market.curves.interpolator import Interpolator, InterpTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -19,8 +17,6 @@ PLOT_GRAPHS = False
 
 
 def test_fin_interpolate():
-
-    import time
 
     x_values = np.array([0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 5.0, 10.0])
     a = -0.1
@@ -72,7 +68,7 @@ def test_fin_interpolate():
     interpolator.fit(xp, yp)
 
     start = time.time()
-    for i in range(0, n):
+    for _ in range(0, n):
         interpolator.interpolate(0.8)
     end = time.time()
     test_cases.print("10000 Interpolations", end - start)

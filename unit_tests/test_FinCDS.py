@@ -28,7 +28,7 @@ from financepy.products.credit.cds import CDS
 ########################################################################################
 
 
-def build_full_issuer_curve1(mkt_spdBump, ir_bump):
+def build_full_issuer_curve1(mkt_spd_bump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 8-AUG-2019 SNAP AT 1600
@@ -187,7 +187,7 @@ def build_full_issuer_curve1(mkt_spdBump, ir_bump):
 
     cds_mkt_contracts = []
 
-    cds_cpn = 0.04 + mkt_spdBump
+    cds_cpn = 0.04 + mkt_spd_bump
 
     maturity_dt = value_dt.next_cds_date(6)
     cds = CDS(value_dt, maturity_dt, cds_cpn)
@@ -231,10 +231,11 @@ def build_full_issuer_curve1(mkt_spdBump, ir_bump):
 
     return libor_curve, issuer_curve
 
+
 ########################################################################################
 
 
-def build_full_issuer_curve2(mkt_spdBump, ir_bump):
+def build_full_issuer_curve2(mkt_spd_bump, ir_bump):
 
     # https://www.markit.com/markit.jsp?jsppage=pv.jsp
     # YIELD CURVE 20 August 2020 SNAP AT 1600
@@ -317,7 +318,7 @@ def build_full_issuer_curve2(mkt_spdBump, ir_bump):
 
     libor_curve = IborSingleCurve(value_dt, depos, [], swaps)
 
-    cds_cpn = 0.01 + mkt_spdBump
+    cds_cpn = 0.01 + mkt_spd_bump
 
     cds_mkt_contracts = []
     effective_dt = Date(21, 8, 2020)
@@ -406,6 +407,7 @@ def test_par_spread():
     spd = cds_contract2.par_spread(value_dt2, issuer_curve2, cds_recovery) * 10000.0
     assert round(spd, 4) == 99.5858
 
+
 ########################################################################################
 
 
@@ -419,6 +421,7 @@ def test_value():
     assert round(v["dirty_pv"], 4) == -199842.7922
     assert round(v["clean_pv"], 4) == -191509.4589
 
+
 ########################################################################################
 
 
@@ -429,6 +432,7 @@ def test_clean_price():
 
     p = cds_contract2.clean_price(value_dt2, issuer_curve2, cds_recovery)
     assert round(p, 4) == 119.1509
+
 
 ########################################################################################
 
@@ -441,6 +445,7 @@ def testaccrued_days():
     accrued_days = cds_contract2.accrued_days()
     assert accrued_days == 60.0
 
+
 ########################################################################################
 
 
@@ -451,6 +456,7 @@ def test_accrued_interest():
 
     accrued_interest = cds_contract2.accrued_interest()
     assert round(accrued_interest, 4) == -8333.3333
+
 
 ########################################################################################
 
@@ -463,6 +469,7 @@ def test_prot_leg_pv():
     prot_pv = cds_contract2.prot_leg_pv(value_dt2, issuer_curve2, cds_recovery)
     assert round(prot_pv, 4) == 47629.7343
 
+
 ########################################################################################
 
 
@@ -473,6 +480,7 @@ def test_premium_leg_pv():
 
     prem_pv = cds_contract2.premium_leg_pv(value_dt2, issuer_curve2, cds_recovery)
     assert round(prem_pv, 4) == 247472.5265
+
 
 ########################################################################################
 

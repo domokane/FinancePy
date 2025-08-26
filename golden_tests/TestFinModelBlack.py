@@ -1,14 +1,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 # Guillaume Lefieux
 
-import sys
-
-sys.path.append("..")
-
 import numpy as np
+
+from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.black import Black
 from financepy.utils.global_types import OptionTypes
-from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
