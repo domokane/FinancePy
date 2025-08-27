@@ -14,7 +14,7 @@ np.random.seed(42)
 ########################################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, seed):
     """Get the simulated GBM process for a single asset with even num paths and
     time steps. Inputs include the number of time steps, paths, the drift mu,
@@ -58,7 +58,7 @@ def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, s
 ########################################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def get_assets_paths_times(
     num_assets,
     num_paths,
@@ -147,7 +147,7 @@ def get_assets_paths_times(
 ########################################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def get_assets_paths(
     num_assets,
     num_paths,

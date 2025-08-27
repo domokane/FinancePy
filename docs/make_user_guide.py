@@ -33,7 +33,7 @@ with fileinput.FileInput(new_head_file, inplace=True, backup=".bak") as file:
         print(line.replace("VERSION_NUMBER_TO_BE_REPLACED", VERSION), end="")
 
 VERBOSE = False
-parseDataMembers = False
+parse_data_members = False
 
 ########################################################################################
 
@@ -133,20 +133,20 @@ def parse_markdown(lines):
     return parsed_lines
 
 
-##########################################################################
+########################################################################################
 
 
-def add_to_list(listName, item):
+def add_to_list(list_name, item):
 
-    for x in listName:
+    for x in list_name:
         if item == x:
-            return listName
+            return list_name
 
-    listName.append(item)
-    return listName
+    list_name.append(item)
+    return list_name
 
 
-##########################################################################
+########################################################################################
 
 
 def open_file(filename):
@@ -157,7 +157,7 @@ def open_file(filename):
         subprocess.call([opener, filename])
 
 
-##########################################################################
+########################################################################################
 
 
 def build_head():
@@ -173,7 +173,7 @@ def build_head():
     f.close()
 
 
-##########################################################################
+########################################################################################
 
 
 def build_tail():
@@ -187,7 +187,7 @@ def build_tail():
     f.close()
 
 
-##########################################################################
+########################################################################################
 
 
 def build_intro(intro_file):
@@ -207,7 +207,7 @@ def build_intro(intro_file):
     f.close()
 
 
-##########################################################################
+########################################################################################
 
 
 def build_chapter(folder_name):
@@ -291,7 +291,7 @@ def build_chapter(folder_name):
         parse_module(module)
 
 
-##########################################################################
+########################################################################################
 
 
 def parse_module(module_name):
@@ -365,7 +365,7 @@ def parse_module(module_name):
     f.close()
 
 
-##########################################################################
+########################################################################################
 
 
 def parse_class(lines, start_line, end_line):
@@ -445,7 +445,7 @@ def parse_class(lines, start_line, end_line):
     ##################################################
     # Now get the data members
 
-    if parseDataMembers:
+    if parsedata_members:
         new_lines.append("\\subsubsection*{Data Members}\n")
 
         data_members = []
@@ -462,17 +462,17 @@ def parse_class(lines, start_line, end_line):
             n3 = row.find("[")
 
             if n1 != -1 and n2 > n1 and n3 == -1:
-                dataMember = row[n1:n2]
-                dataMember = dataMember.strip(" ")
-                dataMember = dataMember.strip(")")
-                dataMember = dataMember.replace("self.", "")
-                data_members = add_to_list(data_members, dataMember)
+                data_member = row[n1:n2]
+                data_member = data_member.strip(" ")
+                data_member = data_member.strip(")")
+                data_member = data_member.replace("self.", "")
+                data_members = add_to_list(data_members, data_member)
 
         if len(data_members) > 0:
             new_lines.append("\\begin{itemize}\n")
 
-            for dataMember in data_members:
-                new_lines.append("\\item{" + dataMember + "}\n")
+            for data_member in data_members:
+                new_lines.append("\\item{" + data_member + "}\n")
             new_lines.append("\\end{itemize}")
             new_lines.append("\n")
             new_lines.append("\n")
@@ -516,7 +516,7 @@ def parse_class(lines, start_line, end_line):
     return new_lines
 
 
-##########################################################################
+########################################################################################
 
 
 def parse_function(lines, start_line, end_line, class_name=""):
@@ -525,24 +525,24 @@ def parse_function(lines, start_line, end_line, class_name=""):
     TODO: Add parsing of function arguments and any comments."""
 
     function_line = lines[start_line]
-    leftCol = function_line.find("def ")
-    indent = leftCol + 4
+    left_col = function_line.find("def ")
+    indent = left_col + 4
 
     # Do not include a commented out function
-    hashCol = function_line.find("#")
-    if hashCol < leftCol and hashCol != -1:
+    hash_col = function_line.find("#")
+    if hash_col < left_col and hash_col != -1:
         return ""
 
     n2 = function_line.find("(")
-    function_name = function_line[leftCol + 4 : n2]
+    function_name = function_line[left_col + 4 : n2]
 
     # If the function name starts with a _ and is not init then ignore it
     if function_name[0] == "_" and function_name != "__init__":
         return ""
 
     # Functions beginning with underscores ('_') are not to be parsed
-    isPrivate = function_line.find("def _") != -1
-    if isPrivate and function_name != r"\_\_init\_\_":
+    is_private = function_line.find("def _") != -1
+    if is_private and function_name != r"\_\_init\_\_":
         return ""
 
     # Ensure function stops before any class
@@ -578,14 +578,14 @@ def parse_function(lines, start_line, end_line, class_name=""):
 
             function_signature = function_signature.replace("def ", "")
 
-            missingSpaces = len(class_name) - len("__init__")
-            if missingSpaces >= 0:
+            missing_spaces = len(class_name) - len("__init__")
+            if missing_spaces >= 0:
                 function_signature = function_signature.replace(
-                    "\n ", "\n " + " " * (missingSpaces)
+                    "\n ", "\n " + " " * (missing_spaces)
                 )
             else:
                 function_signature = function_signature.replace(
-                    "\n" + " " * (-missingSpaces), "\n"
+                    "\n" + " " * (-missing_spaces), "\n"
                 )
 
         # Remove 'self' and any whitespace following it
@@ -676,7 +676,7 @@ def parse_function(lines, start_line, end_line, class_name=""):
     return func_description
 
 
-##########################################################################
+########################################################################################
 
 
 def parse_enum(lines, start_line, end_line):
@@ -727,7 +727,7 @@ def parse_enum(lines, start_line, end_line):
     return enum_description
 
 
-##########################################################################
+########################################################################################
 
 
 def extract_params(function_signature):
@@ -738,8 +738,8 @@ def extract_params(function_signature):
     function_signature = function_signature.replace("%", "\%")
 
     # Remove information that isn't to do with the parameters
-    stripedSignature = function_signature.split("(", 1)[1].replace("):", "").strip()
-    if stripedSignature == "":
+    striped_signature = function_signature.split("(", 1)[1].replace("):", "").strip()
+    if striped_signature == "":
         # The function has no parameters
         return ""
 
@@ -749,15 +749,15 @@ def extract_params(function_signature):
     param_description += "{ \\bf Argument Name} & { \\bf Type} & {\\bf Description} & {\\bf Default Value} \\\\\n"
     param_description += "\\hline\n"
 
-    lines = stripedSignature.split("\n")
+    lines = striped_signature.split("\n")
     for line in lines:
         # Find comment
         # If multiple arguments are on the same line as a comment,
         # the comment will be used for each argument on that line.
         comment_location = line.find("#")
-        pComment = "-"
+        p_comment = "-"
         if comment_location != -1:
-            pComment = line[comment_location + 1 :].strip()
+            p_comment = line[comment_location + 1 :].strip()
             line = line[:comment_location]
 
         line = line.strip()
@@ -807,17 +807,17 @@ def extract_params(function_signature):
 
             # Find type
             p_type = "-"
-            typeLocation = param.find(":")
-            if typeLocation != -1:
-                p_type = param[typeLocation + 1 :].strip()
+            type_location = param.find(":")
+            if type_location != -1:
+                p_type = param[type_location + 1 :].strip()
                 p_type = parse_type(p_type)
-                param = param[:typeLocation].strip()
+                param = param[:type_location].strip()
 
             # Everything remaining must be the name
             p_name = param
 
             param_description += (
-                f"{p_name} & {p_type} & {pComment} & {p_default} \\\\\n"
+                f"{p_name} & {p_type} & {p_comment} & {p_default} \\\\\n"
             )
             param_description += "\\hline\n"
 

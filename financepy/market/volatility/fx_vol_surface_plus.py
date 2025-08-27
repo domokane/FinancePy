@@ -1337,7 +1337,7 @@ class FXVolSurfacePlus:
 
     ###########################################################################
 
-    def vol_from_strike_date(self, kk, expiry_dt):
+    def vol_from_strike_dt(self, kk, expiry_dt):
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are

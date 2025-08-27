@@ -122,7 +122,9 @@ class DiscountCurveZeros(DiscountCurve):
         s += label_to_string("DATES", "ZERO RATES")
         num_points = len(self._times)
         for i in range(0, num_points):
-            s += f"{self._zero_dts[i]:>12} {self._zero_rates[i]:10.7f}\n"
+            s += label_to_string(
+                "%12s" % self._zero_dts[i], "%10.7f" % self._zero_rates[i]
+            )
 
         return s
 

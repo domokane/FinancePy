@@ -267,6 +267,7 @@ def black_scholes_fd(
     digital=False,
     smooth=False,
     update=False,
+    return_grid=False,
 ):
 
     if isinstance(opt_type, OptionTypes):
@@ -306,15 +307,14 @@ def black_scholes_fd(
 
     for h in range(num_steps):
         if update or h == 0:
-            # Explicit case
             if theta != 1:
                 ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1 - theta, wind)
-            # Implicit case
             if theta != 0:
                 ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
         res = fd_roll_backwards(res, theta, ai=ai, ae=ae)
 
+        # Early exercise (American)
         if opt_type in {
             OptionTypes.AMERICAN_CALL.value,
             OptionTypes.AMERICAN_PUT.value,
@@ -322,4 +322,9 @@ def black_scholes_fd(
             idx = res[0] < payoff[0]
             res[0][idx] = payoff[0][idx]
 
-    return res[0][num_samples // 2]
+    # By default, keep old behaviour (scalar @ center node)
+    center_val = res[0][num_samples // 2]
+    if return_grid:
+        # Return the full grid for plotting and analysis
+        return s, res[0], center_val
+    return center_val

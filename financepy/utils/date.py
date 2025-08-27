@@ -976,9 +976,4 @@ def date_range(start_dt: Date, end_dt: Date, tenor: str = "1D"):
 ########################################################################################
 
 
-def test_type():
-    global G_DATE_TYPE_FORMAT
-    print("TEST TYPE", G_DATE_TYPE_FORMAT)
-
-
 ########################################################################################

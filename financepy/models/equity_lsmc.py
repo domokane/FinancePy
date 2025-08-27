@@ -5,6 +5,7 @@
 from enum import Enum, auto
 
 import numpy as np
+
 from ..utils.global_types import OptionTypes
 from ..utils.polyfit import fit_poly, eval_polynomial
 from ..models.finite_difference import option_payoff
@@ -15,8 +16,8 @@ from ..models.finite_difference import option_payoff
 
 ########################################################################################
 
-class BoundaryFitTypes(Enum):
 
+class BoundaryFitTypes(Enum):
     """Enum for polynomial fit types."""
 
     HERMITE_E = auto()
@@ -34,8 +35,8 @@ class BoundaryFitTypes(Enum):
 
 ########################################################################################
 
-def equity_lsmc(
 
+def equity_lsmc(
     spot_price,
     risk_free_rate,
     dividend_yield,
@@ -49,8 +50,7 @@ def equity_lsmc(
     fit_type_value,
     use_sobol,
     seed,
-########################################################################################
-
+    ########################################################################################
 ):
 
     np.random.seed(seed)
@@ -80,9 +80,7 @@ def equity_lsmc(
     # ensure forward price is recovered exactly
     for it in range(0, num_times):
         fmean = np.mean(st[it])
-        fexact = spot_price * np.exp(
-            (risk_free_rate - dividend_yield) * times[it]
-        )
+        fexact = spot_price * np.exp((risk_free_rate - dividend_yield) * times[it])
         st[it] = st[it] * fexact / fmean
 
     exercise_matrix = np.zeros_like(st)
@@ -130,9 +128,7 @@ def equity_lsmc(
             )
             cont_value = np.polynomial.chebyshev.chebval(st[it], regression2)
         elif fit_type_value == BoundaryFitTypes.POLYNOMIAL.value:
-            regression2 = fit_poly(
-                st[it], value_matrix[it + 1] * df, poly_degree
-            )
+            regression2 = fit_poly(st[it], value_matrix[it + 1] * df, poly_degree)
             cont_value = eval_polynomial(regression2, st[it])
         else:
             raise ValueError(f"Unknown _fit_type: {fit_type_value}")
@@ -164,4 +160,3 @@ def equity_lsmc(
     value = np.mean(values)
 
     return value
-

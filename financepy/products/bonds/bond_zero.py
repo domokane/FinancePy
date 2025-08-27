@@ -555,7 +555,7 @@ class BondZero:
 
     ###########################################################################
 
-    def print_bond_payments(self, settle_dt: Date, face: float = 100.0):
+    def print_payments(self, settle_dt: Date, face: float = 100.0):
         """Print a list of the unadjusted cpn payment dates used in
         analytic calculations for the bond."""
 

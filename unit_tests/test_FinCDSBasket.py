@@ -84,7 +84,7 @@ def test_gaussian_copula():
         value_dt, ntd, issuer_curves, beta_vector, libor_curve
     )
 
-    assert round(v1[2] * 10000, 4) == 151.7163
+    assert round(v1[2] * 10000, 4) == 152.3986
     assert round(v2[3] * 10000, 4) == 160.0121
 
     ntd = 2
@@ -107,7 +107,7 @@ def test_gaussian_copula():
         value_dt, ntd, issuer_curves, beta_vector, libor_curve
     )
 
-    assert round(v1[2] * 10000, 4) == 15.6402
+    assert round(v1[2] * 10000, 4) == 15.6482
     assert round(v2[3] * 10000, 4) == 16.6395
 
 
@@ -135,7 +135,7 @@ def test_student_t():
         seed,
     )
 
-    assert round(v[2] * 10000, 4) == 133.6284
+    assert round(v[2] * 10000, 4) == 134.1422
 
     ntd = 2
     beta = 0.5
@@ -153,4 +153,4 @@ def test_student_t():
         seed,
     )
 
-    assert round(v[2] * 10000, 4) == 26.5991
+    assert round(v[2] * 10000, 4) == 26.6215

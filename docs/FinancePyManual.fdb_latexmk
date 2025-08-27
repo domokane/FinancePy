@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1756116811.93737 "c:/Users/Dominic/Dropbox/Desktop/RESEARCH_DB/FinancePy/Code/financepy-git/docs/FinancePyManual.tex" "FinancePyManual.pdf" "FinancePyManual" 1756116812.72998 2
+["pdflatex"] 1756298008.28141 "c:/Users/Dominic/Dropbox/Desktop/RESEARCH_DB/FinancePy/Code/financepy-git/docs/FinancePyManual.tex" "FinancePyManual.pdf" "FinancePyManual" 1756298016.17775 2
   "C:/Users/Dominic/AppData/Local/Programs/MiKTeX/tex/context/base/mkii/supp-pdf.mkii" 1580390158 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "C:/Users/Dominic/AppData/Local/Programs/MiKTeX/tex/generic/bigintcalc/bigintcalc.sty" 1576433602 40635 c40361e206be584d448876bba8a64a3b ""
   "C:/Users/Dominic/AppData/Local/Programs/MiKTeX/tex/generic/bitset/bitset.sty" 1575926576 33961 6b5c75130e435b2bfdb9f480a09a39f9 ""
@@ -114,15 +114,13 @@
   "C:/Users/Dominic/AppData/Local/Programs/MiKTeX/tex/latex/wordlike/wordlike.sty" 1144958158 3247 c9def12555e1422aa0aeacb5ebef7080 ""
   "C:/Users/Dominic/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1656236890 56148 51a9a8571c07b9921892ae11063ae853 ""
   "C:/Users/Dominic/AppData/Local/Programs/MiKTeX/tex/latex/xkeyval/xkeyval.sty" 1656236919 4937 4ce600ce9bd4ec84d0250eb6892fcf4f ""
-  "FinancePyManual.aux" 1756033631 13387 5f659d4422a5941e62900a08d4a902cd "pdflatex"
-  "FinancePyManual.out" 1756033631 14003 40e12a50f050d17904bfb198b0f546a9 "pdflatex"
-  "FinancePyManual.tex" 1756033581 1696792 55514629a193ce4c44545b1da92083ce ""
-  "FinancePyManual.toc" 1756033585 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "c:/Users/Dominic/Dropbox/Desktop/RESEARCH_DB/FinancePy/Code/financepy-git/docs/FinancePyManual.tex" 1756033581 1696792 55514629a193ce4c44545b1da92083ce ""
+  "FinancePyManual.aux" 1756298015 12288 bfbaa5f2ad3d0d6bb6245feb08303e81 "pdflatex"
+  "FinancePyManual.tex" 1756295466 1649771 69ed26024bd02441169e5bb1207f2b8a ""
+  "FinancePyManual.toc" 1756298009 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "c:/Users/Dominic/Dropbox/Desktop/RESEARCH_DB/FinancePy/Code/financepy-git/docs/FinancePyManual.tex" 1756295466 1649771 69ed26024bd02441169e5bb1207f2b8a ""
   (generated)
   "FinancePyManual.aux"
   "FinancePyManual.log"
-  "FinancePyManual.out"
   "FinancePyManual.pdf"
   "FinancePyManual.toc"
   (rewritten before read)

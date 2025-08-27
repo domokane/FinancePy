@@ -9,12 +9,11 @@ import numpy as np
 
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
-
 from ..utils.helpers import check_argument_types
-
 from .model import Model
 from .equity_crr_tree import crr_tree_val_avg
 from .equity_lsmc import equity_lsmc, BoundaryFitTypes
+
 
 from .black_scholes_analytic import (
     bs_value,
@@ -22,8 +21,10 @@ from .black_scholes_analytic import (
     bjerksund_stensland_value,
 )
 
+
 from .finite_difference import black_scholes_fd
 from .finite_difference_psor import black_scholes_fd_psor
+
 
 ########################################################################################
 

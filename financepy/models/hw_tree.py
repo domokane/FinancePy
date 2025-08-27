@@ -42,8 +42,8 @@ def option_exercise_types_to_int(option_exercise_type):
         return 2
     if option_exercise_type == FinExerciseTypes.AMERICAN:
         return 3
-    else:
-        raise FinError("Unknown option exercise type.")
+
+    raise FinError("Unknown option exercise type.")
 
 
 ########################################################################################

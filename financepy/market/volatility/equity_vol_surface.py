@@ -310,7 +310,7 @@ class EquityVolSurface:
 
     ###########################################################################
 
-    def vol_from_strike_date(self, k, expiry_dt):
+    def vol_from_strike_dt(self, k, expiry_dt):
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -723,7 +723,7 @@ class EquityVolSurface:
 
                 strike = self._strikes[j]
 
-                fitted_vol = self.vol_from_strike_date(strike, expiry_dt)
+                fitted_vol = self.vol_from_strike_dt(strike, expiry_dt)
 
                 mkt_vol = self._volatility_grid[i][j]
 
@@ -815,7 +815,7 @@ class EquityVolSurface:
             for _ in range(0, num_intervals):
 
                 ks.append(k)
-                fitted_vol = self.vol_from_strike_date(k, expiry_dt) * 100.0
+                fitted_vol = self.vol_from_strike_dt(k, expiry_dt) * 100.0
                 fitted_vols.append(fitted_vol)
                 k = k + dk
 

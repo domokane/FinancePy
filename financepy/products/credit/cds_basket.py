@@ -77,14 +77,13 @@ class CDSBasket:
 
     ###########################################################################
 
-    def value_legs_mc(
+    def value_legs_mc_old(
         self, value_dt, n_to_default, default_times, issuer_curves, libor_curve
     ):
         """Value the legs of the default basket using Monte Carlo. The default
         times are an input so this valuation is not model dependent."""
 
-        num_credits = default_times.shape[0]
-        num_trials = default_times.shape[1]
+        num_credits, num_trials = default_times.shape
 
         payment_dts = self.cds_contract.payment_dts
         num_payments = len(payment_dts)
@@ -128,6 +127,11 @@ class CDSBasket:
 
             if min_tau < t_mat:
 
+                index_float = min_tau / avg_acc_factor
+                index_int = int(index_float)
+
+                print(index_float, index_int)
+
                 num_payment_amounts_index = int(min_tau / avg_acc_factor)
                 rpv01_trial = rpv01_to_times[num_payment_amounts_index]
                 rpv01_trial += min_tau - num_payment_amounts_index * avg_acc_factor
@@ -155,7 +159,110 @@ class CDSBasket:
         prot = prot / num_trials
         return (rpv01, prot)
 
-    ###########################################################################
+    ####################################################################################
+
+    def value_legs_mc(
+        self, value_dt, n_to_default, default_times, issuer_curves, libor_curve
+    ):
+        """
+        Value the premium PV01 and protection legs of an n-to-default basket via Monte Carlo.
+        `default_times` is (num_credits x num_trials) of default times in YEARS from value_dt.
+        The valuation is pathwise (no model dependence beyond the given default times).
+        """
+
+        # TODO: You can do it much faster by vectorizing on trials
+
+        def to_years(dt, value_dt, days_in_year=365.0):
+            """Convert date difference into year fraction."""
+            delta = dt - value_dt
+            if hasattr(delta, "days"):  # datetime.timedelta
+                return delta.days / days_in_year
+            else:  # numeric (serial day count)
+                return delta / days_in_year
+
+        num_credits, num_trials = default_times.shape
+
+        if n_to_default < 1 or n_to_default > num_credits:
+            raise FinError("n_to_default must be in [1, num_credits]")
+
+        # Contract schedule
+        payment_dts = self.cds_contract.payment_dts
+        num_payments = len(payment_dts)
+        day_count = DayCount(self.dc_type)
+
+        # First accrual start date (stub handling)
+        accrual_start_dt = getattr(
+            self.cds_contract, "accrual_start_dt", payment_dts[0]
+        )
+
+        # Times in years from value_dt
+        pay_times = np.array(
+            [to_years(dt, value_dt, G_DAYS_IN_YEARS) for dt in payment_dts], dtype=float
+        )
+        accrual_start_time = to_years(accrual_start_dt, value_dt, G_DAYS_IN_YEARS)
+
+        # Period year-fractions and discount factors
+        accrual_factors = np.zeros(num_payments, dtype=float)
+        accrual_factors[0] = day_count.year_frac(accrual_start_dt, payment_dts[0])[0]
+        for i in range(1, num_payments):
+            accrual_factors[i] = day_count.year_frac(
+                payment_dts[i - 1], payment_dts[i]
+            )[0]
+
+        df_pay = np.array([libor_curve.df_t(t) for t in pay_times], dtype=float)
+
+        # Cumulative PV01 to each payment date
+        rpv01_to_times = np.cumsum(accrual_factors * df_pay)
+
+        # Maturity time and full PV01
+        t_mat = to_years(self.maturity_dt, value_dt, G_DAYS_IN_YEARS)
+        full_rpv01 = rpv01_to_times[-1]
+
+        rpv01_sum = 0.0
+        prot_sum = 0.0
+
+        asset_tau = np.empty(num_credits)
+
+        for j in range(num_trials):
+
+            # sort the trial’s default times to get nth-to-default time
+            asset_tau[:] = default_times[:, j]
+            order = np.argsort(asset_tau)
+            tau_sorted = asset_tau[order]
+            min_tau = tau_sorted[n_to_default - 1]
+
+            if min_tau < t_mat:
+                # find number of payment dates before default
+                pos = int(np.searchsorted(pay_times, min_tau, side="left"))
+
+                if pos == 0:
+                    rpv01_trial = 0.0
+                    last_start_time = accrual_start_time
+                else:
+                    rpv01_trial = rpv01_to_times[pos - 1]
+                    last_start_time = pay_times[pos - 1]
+
+                # partial accrual from last coupon date to default
+                partial_accrual = max(0.0, min_tau - last_start_time)
+                rpv01_trial += partial_accrual * libor_curve.df_t(min_tau)
+
+                # nth defaulter identity
+                nth_defaulter_index = order[n_to_default - 1]
+                lgd = 1.0 - issuer_curves[nth_defaulter_index].recovery_rate
+                prot_trial = lgd * libor_curve.df_t(min_tau)
+
+            else:
+                rpv01_trial = full_rpv01
+                prot_trial = 0.0
+
+            rpv01_sum += rpv01_trial
+            prot_sum += prot_trial
+
+        rpv01 = rpv01_sum / num_trials
+        prot = prot_sum / num_trials
+        return (rpv01, prot)
+
+    ####################################################################################
 
     def value_gaussian_mc(
         self,

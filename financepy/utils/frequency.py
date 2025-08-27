@@ -36,6 +36,8 @@ def annual_frequency(freq_type: FrequencyTypes) -> float:
 
     if freq_type == FrequencyTypes.CONTINUOUS:
         return -1.0
+    if freq_type == FrequencyTypes.SIMPLE:  # THE RETURN VALUE IS NEVER USED
+        return -99
     if freq_type == FrequencyTypes.ZERO:
         return 1.0
     if freq_type == FrequencyTypes.ANNUAL:

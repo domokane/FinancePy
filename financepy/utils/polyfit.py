@@ -1,86 +1,132 @@
-"""Fast numba compatible implementation of polyfit
-https://gist.github.com/kadereub/9eae9cff356bb62cdbd672931e8e5ec4#file-numba_polyfit-py
+"""
+Fast polynomial fit with optional Numba acceleration.
+Set FINANCEPY_USE_NUMBA=1 to enable Numba (import & JIT deferred until first use).
 """
 
+from __future__ import annotations
+import os
 import numpy as np
-import numba
+from typing import Callable, Optional
 
-# Goal is to implement a numba compatible polyfit (note does not include
-# error handling)
+# --------------------------------------------------------------------
+# Config: default OFF for fastest package import
+# Turn on by: export FINANCEPY_USE_NUMBA=1
+# --------------------------------------------------------------------
+_USE_NUMBA_DEFAULT = os.getenv("FINANCEPY_USE_NUMBA", "0") == "1"
 
-# Define Functions Using Numba
-# Idea here is to solve ax = b, using least squares, where a represents
-# our coefficients e.g. x**2, x, constants
+# Internal handle for (maybe) jitted callables
+_fit_poly_impl: Optional[Callable[[np.ndarray, np.ndarray, int], np.ndarray]] = None
+_eval_poly_impl: Optional[Callable[[np.ndarray, np.ndarray], np.ndarray]] = None
 
-########################################################################################
-
-
-@numba.njit("f8[:,:](f8[:], i8)")
-def _coeff_mat(x, deg):
-    """Construct the coefficient matrix for polynomial fitting."""
-    mat = np.zeros(shape=(x.shape[0], deg + 1))
-    c = np.ones_like(x)
-    mat[:, 0] = c
-    mat[:, 1] = x
-    if deg > 1:
-        for n in range(2, deg + 1):
-            mat[:, n] = x**n
-    return mat
+# ----------------------- Pure NumPy implementations ------------------
 
 
-########################################################################################
+def _coeff_mat_numpy(x: np.ndarray, deg: int) -> np.ndarray:
+    # fast and stable: column order matches coefficients of increasing power
+    # (we’ll reverse later to match your API)
+    # vander with increasing=True gives [1, x, x^2, ...]
+    return np.vander(x, N=deg + 1, increasing=True)
 
 
-@numba.njit("f8[:](f8[:,:], f8[:])")
-def _fit_x(a, b):
-    """Fit the polynomial coefficients to the data points."""
-    # linalg solves ax = b
-    det = np.linalg.lstsq(a, b)[0]
-    return det
+def _fit_poly_numpy(x: np.ndarray, y: np.ndarray, deg: int) -> np.ndarray:
+    a = _coeff_mat_numpy(x, deg)
+    # numpy lstsq: returns coeffs for increasing powers; reverse to highest-first
+    p_inc, *_ = np.linalg.lstsq(a, y, rcond=None)
+    return p_inc[::-1]
 
 
-########################################################################################
-
-
-@numba.njit("f8[:](f8[:], f8[:], i8)")
-def fit_poly(x, y, deg):
-    """Fit a polynomial of degree `deg` to points (x, y)"""
-    a = _coeff_mat(x, deg)
-    p = _fit_x(a, y)
-    # Reverse order so p[0] is coefficient of highest order
-    ret = p[::-1]
-    return ret
-
-
-########################################################################################
-
-
-@numba.njit(fastmath=True, cache=True)
-def eval_polynomial(p, x):
-    """
-    Compute polynomial p(x) where p is a vector of coefficients, highest
-    order coefficient at p[0].  Uses Horner's Method.
-    """
-
-    result = np.zeros_like(x)
+def _eval_polynomial_numpy(p: np.ndarray, x: np.ndarray) -> np.ndarray:
+    # Horner with highest-order first (your API)
+    result = np.zeros_like(x, dtype=np.result_type(p.dtype, x.dtype))
     for coeff in p:
         result = x * result + coeff
     return result
 
 
-########################################################################################
+# ----------------------- Lazy Numba wiring ---------------------------
 
 
-# if __name__ == "__main__":
+def _enable_numba() -> None:
+    """Import numba and build jitted implementations on demand."""
+    global _fit_poly_impl, _eval_poly_impl
 
-#     # Create Dummy Data and use existing numpy polyfit as test
-#     x = np.linspace(0, 2, 20)
-#     y = np.cos(x) + 0.3*np.random.rand(20)
-#     p = np.poly1d(np.polyfit(x, y, 3))
+    import numba as nb  # heavy import; done only once, on first enable
 
-#     t = np.linspace(0, 2, 200)
-#     plt.plot(x, y, 'o', t, p(t), '-')
+    # Numba-compatible pieces
+    @nb.njit("f8[:,:](f8[:], i8)", cache=True)
+    def _coeff_mat_numba(x, deg):
+        mat = np.zeros((x.shape[0], deg + 1))
+        c = np.ones_like(x)
+        mat[:, 0] = c
+        if deg >= 1:
+            mat[:, 1] = x
+        if deg > 1:
+            for n in range(2, deg + 1):
+                mat[:, n] = x**n
+        return mat
 
-#     # Now plot using the Numba (amazing) functions
-#     p_coeffs = fit_poly(x, y, deg=3)
-#     plt.plot(x, y, 'o', t, eval_polynomial(p_coeffs, t), '-')
+    # NOTE: np.linalg.lstsq support in Numba varies by version.
+    # If your Numba doesn’t support it natively, consider QR or normal equations.
+    @nb.njit("f8[:](f8[:,:], f8[:])", cache=True)
+    def _fit_x_numba(a, b):
+        # Least squares: fall back to normal equations if needed:
+        # x = solve(a.T @ a, a.T @ b)
+        # Replace with lstsq if your Numba version supports it well.
+        ata = a.T @ a
+        atb = a.T @ b
+        x = np.linalg.solve(ata, atb)
+        return x
+
+    @nb.njit("f8[:](f8[:], f8[:], i8)", cache=True)
+    def _fit_poly_numba(x, y, deg):
+        a = _coeff_mat_numba(x, deg)
+        p_inc = _fit_x_numba(a, y)  # increasing order
+        return p_inc[::-1]  # highest-first
+
+    @nb.njit(fastmath=True, cache=True)
+    def _eval_polynomial_numba(p, x):
+        result = np.zeros_like(x)
+        for coeff in p:
+            result = x * result + coeff
+        return result
+
+    _fit_poly_impl = _fit_poly_numba
+    _eval_poly_impl = _eval_polynomial_numba
+
+
+def _ensure_impls():
+    """Choose NumPy or Numba impls; import Numba lazily if requested."""
+    global _fit_poly_impl, _eval_poly_impl
+    if _fit_poly_impl is not None and _eval_poly_impl is not None:
+        return
+    if _USE_NUMBA_DEFAULT:
+        try:
+            _enable_numba()
+            return
+        except Exception:
+            # Fall back silently to NumPy if Numba unavailable or unsupported op
+            pass
+    _fit_poly_impl = _fit_poly_numpy
+    _eval_poly_impl = _eval_poly_numpy
+
+
+# ----------------------- Public API ---------------------------------
+
+
+def fit_poly(x: np.ndarray, y: np.ndarray, deg: int) -> np.ndarray:
+    """
+    Fit polynomial of degree `deg` to points (x, y).
+    Returns coefficients with highest order first (same as original API).
+    """
+    _ensure_impls()
+    return _fit_poly_impl(x.astype(np.float64), y.astype(np.float64), int(deg))
+
+
+def eval_polynomial(p: np.ndarray, x: np.ndarray) -> np.ndarray:
+    """
+    Evaluate polynomial with coefficients `p` (highest-first) at points `x`.
+    """
+    _ensure_impls()
+    p = np.asarray(p, dtype=np.float64)
+    x = np.asarray(x, dtype=np.float64)
+    return _eval_poly_impl(p, x)

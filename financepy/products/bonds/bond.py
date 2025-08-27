@@ -1114,12 +1114,11 @@ class Bond:
 
     ###########################################################################
 
-    def print_bond_payments(self, settle_dt: Date, face: float):
+    def print_payments(self, settle_dt: Date, face: float = 100):
         """Print a list of the unadjusted coupon payment dts used in
         analytic calculations for the bond."""
 
         flow = face * self.cpn / self.freq
-
         flow_str = ""
 
         for dt in self.cpn_dts[1:-1]:

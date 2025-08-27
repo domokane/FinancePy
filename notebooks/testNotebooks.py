@@ -7,13 +7,13 @@ Created on Sun Jan 17 12:36:01 2021
 
 import os
 
+import glob
+from os.path import dirname, join
+
 import nbformat
 
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.preprocessors import CellExecutionError
-
-import glob
-from os.path import dirname, join
 
 print("Looking in folder:", dirname(__file__))
 

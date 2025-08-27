@@ -156,7 +156,7 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def print_payments(self, settle_dt: Date, face: float):
+    def print_payments(self, settle_dt: Date, face: float = 100):
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
 

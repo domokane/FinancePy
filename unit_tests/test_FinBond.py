@@ -309,7 +309,7 @@ def test_bond_cfets():
             print(bond)
             print(clean_price)
             print(settle_dt)
-            bond.print_bond_payments(settle_dt, 100.0)
+            bond.print_payments(settle_dt, 100.0)
             print(f"calc_ytm:{calc_ytm}, correct_ytm:{row.ytm}")
             continue
 

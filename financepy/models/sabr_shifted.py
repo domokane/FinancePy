@@ -14,7 +14,7 @@ from ..utils.helpers import label_to_string
 ########################################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def _x(rho, z):
     """Return function x used in Hagan's 2002 SABR lognormal vol expansion."""
     a = (1.0 - 2.0 * rho * z + z**2) ** 0.5 + z - rho
@@ -25,7 +25,7 @@ def _x(rho, z):
 ########################################################################################
 
 
-@njit
+@njit(fastmath=True, cache=True)
 def vol_function_shifted_sabr(params, f, k, t):
     """Black volatility implied by SABR model."""
 

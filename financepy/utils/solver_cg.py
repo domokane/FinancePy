@@ -281,15 +281,17 @@ def fmin_cg(
     callback=None,
 ):
     """Minimize a function using nonlinear conjugate gradient (Polak-Ribiere)."""
-    opts = {
-        "gtol": gtol,
-        "norm": norm,
-        "eps": epsilon,
-        "disp": disp,
-        "maxiter": maxiter,
-        "return_all": retall,
-    }
-    res = _minimize_cg(f, x0, args=fargs, jac=fprime, callback=callback, **opts)
+
+    # opts = {
+    #     "gtol": gtol,
+    #     "norm": norm,
+    #     "eps": epsilon,
+    #     "disp": disp,
+    #     "maxiter": maxiter,
+    #     "return_all": retall,
+    # }
+
+    res = _minimize_cg(f, x0, args=fargs, jac=fprime, callback=callback)
 
     if full_output:
         retlist = res["x"], res["fun"], res["nfev"], res["njev"], res["status"]

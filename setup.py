@@ -17,7 +17,7 @@ print(">>>" + version_number_str + "<<<")
 ########################################################################################
 cr = "\n"
 
-if 1 == 1:
+if True:
     with open("financepy//__init__.template", "r") as file:
         filedata = file.read()
 
@@ -33,6 +33,11 @@ if 1 == 1:
     # Write the file out again
     with open("./financepy//__init__.py", "w") as file:
         file.write(filedata)
+
+else:
+    # Just make it an empty file
+    with open("./financepy//__init__.py", "w") as file:
+        file.write("")
 
 ########################################################################################
 

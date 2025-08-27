@@ -15,8 +15,6 @@ from ...utils.tension_spline import TensionSpline
 
 
 class InterpTypes(Enum):
-    """Interpolation method types."""
-
     FLAT_FWD_RATES = 1
     LINEAR_FWD_RATES = 2
     LINEAR_ZERO_RATES = 4
@@ -28,8 +26,6 @@ class InterpTypes(Enum):
     LINEAR_ONFWD_RATES = 21
     TENSION_ZERO_RATES = 22
 
-
-# LINEAR_SWAP_RATES = 3
 
 # TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

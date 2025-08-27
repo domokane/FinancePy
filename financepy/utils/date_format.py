@@ -39,7 +39,7 @@ def set_date_format(format_type: DateFormatTypes):
     format_type : DateFormatTypes
         The new date format to set globally.
     """
-    global _date_format  # pylint: disable=W0603
+    global _date_format
     _date_format = format_type
 
 
