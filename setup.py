@@ -17,7 +17,7 @@ print(">>>" + version_number_str + "<<<")
 ########################################################################################
 cr = "\n"
 
-if True:
+if False:
     with open("financepy//__init__.template", "r") as file:
         filedata = file.read()
 
