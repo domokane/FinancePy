@@ -28,8 +28,13 @@ eggs/
 *.egg
 financepy.egg-info
 financepy-0.*
-.ipynb_checkpoints
 *.out
+
+# -------------------------------------------------------------------
+# Jupyter / notebooks
+# -------------------------------------------------------------------
+.ipynb_checkpoints
+*.ipynb~
 ERROR_*.ipynb
 
 # SPYDER
@@ -68,10 +73,14 @@ coverage.xml
 *,cover
 .hypothesis/
 
-# virtualenv
+# -------------------------------------------------------------------
+# Python virtual environments
+# -------------------------------------------------------------------
 venv/
+.venv/
+env/
 ENV/
-.env
+*.env
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
