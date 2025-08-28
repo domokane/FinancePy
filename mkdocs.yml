@@ -1,11 +1,63 @@
-site_name: financepy
+site_name: FinancePy
+site_description: "A Finance Securities Valuation Library"
+site_author: "Dominic O'Kane"
+repo_url: https://github.com/domokane/FinancePy
+repo_name: FinancePy
+edit_uri: ""
 
 theme:
-  name: readthedocs
+  name: material
+  logo: images/logo.png   # optional if you have a logo
+  favicon: images/favicon.png
+  palette:
+    - scheme: default
+      primary: blue
+      accent: cyan
+    - scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - Tutorials:
+      - Bonds: tutorials/bonds.md
+      - Options: tutorials/options.md
+      - Credit: tutorials/credit.md
+  - API Reference:
+      - Products: api/products.md
+      - Models: api/models.md
+      - Markets: api/markets.md
+      - Utils: api/utils.md
+  - Examples: examples.md
+  - About: about.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
 
 plugins:
-- search  
-- mkdocstrings
-- gen-files:
-    scripts:
-    - docs/generate.py  
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            heading_level: 2
+            docstring_style: google
+  - mkdocs-jupyter:
+      execute: false   # set true if you want notebooks auto-executed
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/domokane/FinancePy
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/financepy/
