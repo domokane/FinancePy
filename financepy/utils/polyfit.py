@@ -5,8 +5,8 @@ Set FINANCEPY_USE_NUMBA=1 to enable Numba (import & JIT deferred until first use
 
 from __future__ import annotations
 import os
-import numpy as np
 from typing import Callable, Optional
+import numpy as np
 
 # --------------------------------------------------------------------
 # Config: default OFF for fastest package import
