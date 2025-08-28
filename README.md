@@ -1,7 +1,7 @@
 # FinancePy
 A one-stop library for pricing and risk-managing options, futures and other financial instruments. See below for a comprehensive overview.
 
-## Getting Started
+## First Installation
 FinancePy can be installed from pip using the following command:
 
 `pip install financepy`
@@ -10,31 +10,97 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
-To analyse a Bond
+Then start a Python terminal and type
 
-'issue_dt = Date(13, 5, 2010)
-maturity_dt = Date(13, 5, 2022)
-coupon = 0.027
-freq_type = FrequencyTypes.SEMI_ANNUAL
-dc_type = DayCountTypes.THIRTY_E_360
-face = ONE_MILLION
+`import financepy`
 
-bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+Here is a quick check to make sure it all loaded. Type
 
-clean_price = 101.581564  # if face is 1 then this must be 0.99780842
+```>>> Date(19,2,2026).add_days(2)```
 
-print(bond)
+You should see
 
-bond.print_payments(settle_dt)
+```21-FEB-2026```
 
-bond.current_yield(clean_price)*100.0
+Warning: You may notice that the library can take several seconds to import after the first install if you do a wildcard import of classes which rely on certain models. This is because financepy relies upon Numba to compile a lot of the models - resulting in calculation speeds similar to C/C++. This compile only takes place on the first import of the model and the compiled code is then cached on your machine. No further compilation will be required. As a consequence subsequent imports will be almost instant.
 
-bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)*100
+## Quickstart Guide
 
-bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)*100'
+👉 See [Quick Start Guide](./docs/QUICKSTART.md) to get going in 2 minutes!
+
+
+## Structure of Financepy
+
+The structure of financepy is as follows
+```
+├── market/
+├── models/
+├── products/
+├── utils/
+```
+
+The market folder contains objects linked to structured market data such as interest rate term structures, i.e `curves' and volatility term structures and surfaces.
+
+```
+├── market/
+│   ├── curves
+│       ├── composite_discount_curve.py
+│       ├── discount_curve_flat.py
+│       ├── ...
+│       ├── discount_curve.py
+│   ├── prices
+│   ├── volatility
+│       ├── equity_vol_curve.py
+│       ├── ...
+│       ├── fx_vol_surface.py
+│       ├── swaption_vol_surface.py
+```
+The models folder contains mathematical pricing models.
+```
+├── models/
+│   ├── bachelier.py
+│   ├── bdt_tree.py
+│   ├── black_scholes.py
+│   ├── ...
+│   ├── vasicek_mc.py
+```
+These model pricing functions are not usually called directly but are called from the products objects in the products folder. There is a module for each of the covered product types which are grouped into bonds, credit, equiy, fx and rates as follows:
+```
+├── products/
+│   ├── Bonds
+│       ├── bond_convertible.py
+│       ├── bond_future.py
+│       ├── ...
+│       ├── bond.py
+│   ├── Credit
+│       ├── cds_basket.py
+│       ├── ...
+│       ├── cds.py
+│   ├── Equity
+│       ├── equity_american_option.py
+│       ├── ...
+│       ├── equity_variance_swap.py
+│   ├── FX
+│       ├── fx_barrier_option.py
+│       ├── ...
+│       ├── fx_variance_swap.py
+│   ├── Rates
+│       ├── callable_swap.py
+│       ├── ...
+│       ├── ibor_swaption.py
+```
+Finally, we have the utils folder that contains useful classes such as dates, day counts and schedule generation
+```
+├── utils/
+│   ├── calendar.py
+│   ├── day_count.py
+│   ├── date
+│   ├── schedule
+```
+and many more.
 
 ## Notebooks
-The notebooks folder contains over 90 example notebooks on how to use the library. 
+The notebooks folder contains over 90 example notebooks on how to use the library.
 
 ## Disclaimer
 This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or concerns here as an issue.

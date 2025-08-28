@@ -5,7 +5,7 @@
 .vs
 .vscode
 *.code-workspace
-pep8_output/
+pep8_converter/
 
 # PYTHON AND JUPYTER FILES
 build/
