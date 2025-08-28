@@ -10,9 +10,31 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
-The notebooks folder contains over 60 example notebooks on how to use the library. 
+To analyse a Bond
 
-There is also a pdf manual at the top of the project listing all of the functionality.
+'issue_dt = Date(13, 5, 2010)
+maturity_dt = Date(13, 5, 2022)
+coupon = 0.027
+freq_type = FrequencyTypes.SEMI_ANNUAL
+dc_type = DayCountTypes.THIRTY_E_360
+face = ONE_MILLION
+
+bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+
+clean_price = 101.581564  # if face is 1 then this must be 0.99780842
+
+print(bond)
+
+bond.print_payments(settle_dt)
+
+bond.current_yield(clean_price)*100.0
+
+bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)*100
+
+bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)*100'
+
+## Notebooks
+The notebooks folder contains over 90 example notebooks on how to use the library. 
 
 ## Disclaimer
 This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or concerns here as an issue.
@@ -95,3 +117,4 @@ See the changelog for a detailed history of changes.
 ## License
 
  GPL-3.0 License - See the license file in this folder for details.
+
