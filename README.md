@@ -12,7 +12,7 @@ To upgrade an existing installation type:
 
 Then start a Python terminal and type
 
-`import financepy`
+`from financepy.utils import *`
 
 Here is a quick check to make sure it all loaded. Type
 
@@ -183,4 +183,5 @@ See the changelog for a detailed history of changes.
 ## License
 
  GPL-3.0 License - See the license file in this folder for details.
+
 
