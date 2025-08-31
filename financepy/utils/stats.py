@@ -5,16 +5,17 @@
 from math import sqrt
 from numpy import ndarray
 from numba import njit, float64, int32
+import numba as nb
 
 ##########################################################################
 
 
-@njit(float64(float64[:]), fastmath=True, cache=True)
+@njit(float64(float64[:]), fastmath=True, cache=True, parallel=True)
 def mean(x: float):
     """Calculate the arithmetic mean of a vector of numbers x."""
     n = len(x)
     m = 0.0
-    for i in range(0, n):
+    for i in nb.prange(n):
         m += x[i]
     m = m / n
     return m
@@ -23,13 +24,13 @@ def mean(x: float):
 ##########################################################################
 
 
-@njit(float64(float64[:]), fastmath=True, cache=True)
+@njit(float64(float64[:]), fastmath=True, cache=True, parallel=True)
 def stdev(x: ndarray):
     """Calculate the standard deviation of a vector of numbers x."""
     n = len(x)
     m = mean(x)
     v = 0.0
-    for i in range(0, n):
+    for i in nb.prange(n):
         v += (x[i] - m) * (x[i] - m)
     sd = sqrt(v / n)
     return sd
@@ -62,12 +63,12 @@ def var(x: ndarray):
 
 
 # TODO `fastmath` seems to cause an error with `pow`
-@njit(float64(float64[:], int32), fastmath=False, cache=True)
+@njit(float64(float64[:], int32), fastmath=False, cache=True, parallel=True)
 def moment(x: ndarray, m: int):
     """Calculate the m-th moment of a vector of numbers x."""
     n = len(x)
     s = 0.0
-    for i in range(0, n):
+    for i in nb.prange(0, n):
         s += pow(x[i], m)
     s = s / n
     return s
@@ -76,7 +77,7 @@ def moment(x: ndarray, m: int):
 ##########################################################################
 
 
-@njit(float64(float64[:], float64[:]), fastmath=True, cache=True)
+@njit(float64(float64[:], float64[:]), fastmath=True, cache=True, parallel=True)
 def correlation(x1: ndarray, x2: ndarray):
     """Calculate the correlation between two series x1 and x2."""
 
@@ -92,7 +93,7 @@ def correlation(x1: ndarray, x2: ndarray):
     sd2 = stdev(x2)
 
     prod = 0.0
-    for i in range(0, n1):
+    for i in nb.prange(n1):
         prod += x1[i] * x2[i]
 
     prod /= n1

@@ -2,6 +2,8 @@
 
 from enum import Enum
 from numba import njit, float64, int64
+import numba as nb
+
 import numpy as np
 from ..utils.helpers import label_to_string
 
@@ -122,7 +124,12 @@ def draw(rt, a, b, sigma, dt):
 ########################################################################################
 
 
-@njit(float64[:](float64, float64, float64, float64, float64, float64, int64, int64))
+@njit(
+    float64[:](float64, float64, float64, float64, float64, float64, int64, int64),
+    parallel=True,
+    fastmath=True,
+    cache=True,
+)
 def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     """Generate a path of CIR rates using a number of numerical schemes."""
 
@@ -136,7 +143,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -154,7 +161,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         x = np.exp(-a * dt)
         y = 1.0 - x
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -171,7 +178,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         sigmasqrt_dt = sigma * np.sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -190,7 +197,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         bhat = b - sigma * sigma / 4.0 / a
         sqrt_dt = np.sqrt(dt)
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -204,7 +211,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
 
     elif scheme == CIRNumericalScheme.EXACT.value:
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
 
@@ -229,7 +236,10 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         int64,
         int64,
         int64,
-    )
+    ),
+    parallel=True,
+    fastmath=True,
+    cache=True,
 )
 def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
     """Determine the CIR zero price using Monte Carlo."""
@@ -246,7 +256,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
         sigmasqrt_dt = sigma * np.sqrt(dt)
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             rsum = r
@@ -268,7 +278,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         x = np.exp(-a * dt)
         y = 1.0 - x
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             rsum = r0
@@ -290,7 +300,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         sigmasqrt_dt = sigma * np.sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             rsum = r
@@ -313,7 +323,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
         bhat = b - sigma * sigma / 4.0 / a
         sqrt_dt = np.sqrt(dt)
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             rsum = r
@@ -331,7 +341,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
 
     elif scheme == CIRNumericalScheme.EXACT.value:
 
-        for _ in range(0, num_paths):
+        for _ in nb.prange(num_paths):
 
             r = r0
             rsum = r

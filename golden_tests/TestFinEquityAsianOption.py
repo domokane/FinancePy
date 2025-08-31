@@ -65,7 +65,7 @@ def test_convergence_fn():
 
         accrued_avg = stock_price * 1.1
 
-        value_mc_fast = asian_option._value_mc_fast(
+        value_mc_fast = asian_option.value_mc_fast(
             value_dt,
             stock_price,
             discount_curve,
@@ -206,7 +206,7 @@ def test_time_evolution_fn():
         discount_curve = DiscountCurveFlat(value_dt, interest_rate)
         dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
-        value_mc_fast = asian_option._value_mc_fast(
+        value_mc_fast = asian_option.value_mc_fast(
             value_dt,
             stock_price,
             discount_curve,
@@ -350,7 +350,7 @@ def test_mc_timings_fn():
         t_mc = end - start
 
         start = time.time()
-        value_mc_fast = asian_option._value_mc_fast(
+        value_mc_fast = asian_option.value_mc_fast(
             value_dt,
             stock_price,
             discount_curve,

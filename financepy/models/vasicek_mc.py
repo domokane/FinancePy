@@ -2,6 +2,7 @@
 
 from math import sqrt, exp
 from numba import njit, float64, int64
+import numba as nb
 import numpy as np
 
 from ..utils.helpers import label_to_string
@@ -71,7 +72,12 @@ def zero_price(r0, a, b, sigma, t):
 ########################################################################################
 
 
-@njit(float64[:](float64, float64, float64, float64, float64, float64, int64))
+@njit(
+    float64[:](float64, float64, float64, float64, float64, float64, int64),
+    parallel=True,
+    fastmath=True,
+    cache=True,
+)
 def rate_path_mc(r0, a, b, sigma, t, dt, seed):
     """Generate a path of short rates using Vasicek model"""
 
@@ -83,7 +89,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
     sigmasqrt_dt = sigma * sqrt(dt)
 
-    for _ in range(0, num_paths):
+    for _ in nb.prange(num_paths):
 
         r = r0
         z = np.random.normal(0.0, 1.0, size=num_steps - 1)
@@ -100,8 +106,9 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 
 @njit(
     float64(float64, float64, float64, float64, float64, float64, int64, int64),
-    fastmath=True,
     cache=True,
+    fastmath=True,
+    parallel=True,
 )
 def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
     """Generate zero price by Monte Carlo using Vasicek model"""
@@ -109,7 +116,7 @@ def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
     num_steps = int(t / dt)
     sigmasqrt_dt = sigma * sqrt(dt)
     zcb = 0.0
-    for _ in range(0, num_paths):
+    for _ in nb.prange(num_paths):
         z = np.random.normal(0.0, 1.0, size=num_steps)
         rsum = 0.0
         r = r0

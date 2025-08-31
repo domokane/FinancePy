@@ -6,6 +6,7 @@ from enum import Enum
 
 import numpy as np
 from numba import njit
+import numba as nb
 
 # TODO: Add perturbatory risk using the analytical methods !!
 # TODO: Add Sobol to Monte Carlo
@@ -65,7 +66,7 @@ error_str = "In averaging period so need to enter accrued average."
 ########################################################################################
 
 
-@njit(cache=True, fastmath=True)
+@njit(cache=True, fastmath=True, parallel=True)
 def _value_mc_numba(
     t0,
     t,
@@ -106,7 +107,7 @@ def _value_mc_numba(
 
     payoff_a = 0.0
 
-    for _ in range(0, num_paths):
+    for _ in nb.prange(num_paths):
 
         # evolve stock price to start of averaging period
         g = np.random.standard_normal(1)
@@ -123,11 +124,12 @@ def _value_mc_numba(
 
         g = np.random.standard_normal(n)
 
+        exp_drift = np.exp((mu - v2 / 2.0) * dt)
+
         for obs in range(0, n):
 
-            s_1 = s_1 * np.exp((mu - v2 / 2.0) * dt + g[obs] * np.sqrt(dt) * volatility)
-
-            s_2 = s_2 * np.exp((mu - v2 / 2.0) * dt - g[obs] * np.sqrt(dt) * volatility)
+            s_1 = s_1 * exp_drift * np.exp(+g[obs] * np.sqrt(dt) * volatility)
+            s_2 = s_2 * exp_drift * np.exp(-g[obs] * np.sqrt(dt) * volatility)
 
             s_1_arithmetic += s_1
             s_2_arithmetic += s_2
@@ -152,7 +154,7 @@ def _value_mc_numba(
 ########################################################################################
 
 
-@njit(cache=True, fastmath=True)
+@njit(cache=True, fastmath=True, parallel=True)
 def _value_mc_fast_numba(
     t0: float,
     t: float,
@@ -196,19 +198,22 @@ def _value_mc_fast_numba(
     # g = np.random.normal(0.0, 1.0, size=(num_paths))
 
     gg = np.empty(num_paths, np.float64)
-    for i_path in range(0, num_paths):
+    for i_path in nb.prange(num_paths):
         rv = np.random.normal()
         gg[i_path] = rv
 
     s_1 = np.empty(num_paths)
     s_2 = np.empty(num_paths)
 
-    for ip in range(0, num_paths):
-        s_1[ip] = stock_price * np.exp(
-            (mu - v2 / 2.0) * t0 + gg[ip] * np.sqrt(t0) * volatility
+    exp_drift_t0 = np.exp((mu - v2 / 2.0) * t0)
+
+    for ip in nb.prange(num_paths):
+
+        s_1[ip] = (
+            stock_price * exp_drift_t0 * np.exp(+gg[ip] * np.sqrt(t0) * volatility)
         )
-        s_2[ip] = stock_price * np.exp(
-            (mu - v2 / 2.0) * t0 - gg[ip] * np.sqrt(t0) * volatility
+        s_2[ip] = (
+            stock_price * exp_drift_t0 * np.exp(-gg[ip] * np.sqrt(t0) * volatility)
         )
 
     s_1_arithmetic = np.zeros(num_paths)
@@ -218,7 +223,7 @@ def _value_mc_fast_numba(
 
         g = np.random.normal(0.0, 1.0, size=num_paths)
 
-        for ip in range(0, num_paths):
+        for ip in nb.prange(num_paths):
             s_1[ip] = s_1[ip] * np.exp(
                 (mu - v2 / 2.0) * dt + g[ip] * np.sqrt(dt) * volatility
             )
@@ -226,7 +231,7 @@ def _value_mc_fast_numba(
                 (mu - v2 / 2.0) * dt - g[ip] * np.sqrt(dt) * volatility
             )
 
-        for ip in range(0, num_paths):
+        for ip in nb.prange(num_paths):
             s_1_arithmetic[ip] += s_1[ip] / n
             s_2_arithmetic[ip] += s_2[ip] / n
 
@@ -247,7 +252,7 @@ def _value_mc_fast_numba(
 ########################################################################################
 
 
-@njit(cache=True, fastmath=True)
+@njit(cache=True, fastmath=True, parallel=True)
 def _value_mc_fast_cv_numba(
     t0,
     t,
@@ -293,7 +298,7 @@ def _value_mc_fast_cv_numba(
     s_1 = np.empty(num_paths)
     s_2 = np.empty(num_paths)
 
-    for ip in range(0, num_paths):
+    for ip in nb.prange(num_paths):
         s_1[ip] = stock_price * np.exp(
             (mu - v2 / 2.0) * t0 + g[ip] * np.sqrt(t0) * volatility
         )
@@ -309,7 +314,7 @@ def _value_mc_fast_cv_numba(
     for _ in range(0, n):
 
         g = np.random.normal(0.0, 1.0, size=num_paths)
-        for ip in range(0, num_paths):
+        for ip in nb.prange(num_paths):
             s_1[ip] = s_1[ip] * np.exp(
                 (mu - v2 / 2.0) * dt + g[ip] * np.sqrt(dt) * volatility
             )
@@ -317,7 +322,7 @@ def _value_mc_fast_cv_numba(
                 (mu - v2 / 2.0) * dt - g[ip] * np.sqrt(dt) * volatility
             )
 
-        for ip in range(0, num_paths):
+        for ip in nb.prange(num_paths):
             s_1_arithmetic[ip] += s_1[ip]
             s_2_arithmetic[ip] += s_2[ip]
             ln_s_1_geometric[ip] += np.log(s_1[ip])
@@ -326,7 +331,7 @@ def _value_mc_fast_cv_numba(
     s_1_geometric = np.empty(num_paths)
     s_2_geometric = np.empty(num_paths)
 
-    for ip in range(0, num_paths):
+    for ip in nb.prange(num_paths):
         s_1_arithmetic[ip] /= n
         s_1_geometric[ip] = np.exp(ln_s_1_geometric[ip] / n)
         s_2_arithmetic[ip] /= n
@@ -442,7 +447,7 @@ class EquityAsianOption:
             )
 
         if method == AsianOptionValuationMethods.GEOMETRIC:
-            v = self._value_geometric(
+            v = self.value_geometric(
                 value_dt,
                 stock_price,
                 discount_curve,
@@ -452,7 +457,7 @@ class EquityAsianOption:
             )
 
         elif method == AsianOptionValuationMethods.TURNBULL_WAKEMAN:
-            v = self._value_turnbull_wakeman(
+            v = self.value_turnbull_wakeman(
                 value_dt,
                 stock_price,
                 discount_curve,
@@ -462,7 +467,7 @@ class EquityAsianOption:
             )
 
         elif method == AsianOptionValuationMethods.CURRAN:
-            v = self._value_curran(
+            v = self.value_curran(
                 value_dt,
                 stock_price,
                 discount_curve,
@@ -477,7 +482,7 @@ class EquityAsianOption:
 
     ####################################################################################
 
-    def _value_geometric(
+    def value_geometric(
         self,
         value_dt,
         stock_price,
@@ -552,7 +557,7 @@ class EquityAsianOption:
 
     ####################################################################################
 
-    def _value_curran(
+    def value_curran(
         self,
         value_dt,
         stock_price,
@@ -627,7 +632,7 @@ class EquityAsianOption:
 
     ####################################################################################
 
-    def _value_turnbull_wakeman(
+    def value_turnbull_wakeman(
         self,
         value_dt,
         stock_price,
@@ -713,7 +718,7 @@ class EquityAsianOption:
 
     ####################################################################################
 
-    def _value_mc(
+    def value_mc(
         self,
         value_dt: Date,
         stock_price: float,
@@ -768,7 +773,7 @@ class EquityAsianOption:
 
     ####################################################################################
 
-    def _value_mc_fast(
+    def value_mc_fast(
         self,
         value_dt,
         stock_price,
@@ -844,7 +849,7 @@ class EquityAsianOption:
         volatility = model.volatility
 
         # For control variate we price a Geometric average option exactly
-        v_g_exact = self._value_geometric(
+        v_g_exact = self.value_geometric(
             value_dt,
             stock_price,
             discount_curve,

@@ -2,6 +2,8 @@
 
 import numpy as np
 from numba import njit  # , float64, int64
+import numba as nb
+
 from ..utils.math import cholesky
 from ..utils.error import FinError
 
@@ -14,7 +16,7 @@ np.random.seed(42)
 ########################################################################################
 
 
-@njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=True, parallel=True)
 def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, seed):
     """Get the simulated GBM process for a single asset with even num paths and
     time steps. Inputs include the number of time steps, paths, the drift mu,
@@ -46,7 +48,7 @@ def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, s
 
     for it in range(1, num_time_steps + 1):
         g_1d = np.random.standard_normal((num_paths_even))
-        for ip in range(0, num_paths_even):
+        for ip in nb.prange(num_paths_even):
             w = np.exp(g_1d[ip] * vsqrt_dt)
             ip_start = ip * 2
             s_all[ip_start, it] = s_all[ip_start, it - 1] * m * w
@@ -121,7 +123,7 @@ def get_assets_paths_times(
     # or use g_corr = np.einsum('ijk,kl->ijl', g, c)
 
     # Calculate the Cholesky dot product
-    for ip in range(0, num_paths_even):
+    for ip in nb.prange(num_paths_even):
         for it in range(0, num_time_steps + 1):
             for ia in range(0, num_assets):
                 g_corr[ip][it][ia] = 0.0
@@ -131,7 +133,7 @@ def get_assets_paths_times(
     for ia in range(0, num_assets):
         s_all[ia, :, 0] = stock_prices[ia]
 
-    for ip in range(0, num_paths_even):
+    for ip in nb.prange(num_paths_even):
         ip_start = ip * 2
         for it in range(1, num_time_steps + 1):
             for ia in range(0, num_assets):
@@ -205,13 +207,13 @@ def get_assets_paths(
 
     # Calculate the dot product
     for ia in range(0, num_assets):
-        for ip in range(0, num_paths_even):
+        for ip in nb.prange(num_paths_even):
             g_corr[ip][ia] = 0.0
             for ib in range(0, num_assets):
                 g_corr[ip][ia] += g[ip][ib] * c[ia][ib]
 
     for ia in range(0, num_assets):
-        for ip in range(0, num_paths_even):
+        for ip in nb.prange(num_paths_even):
             z = g_corr[ip, ia]
             w = np.exp(z * vsqrt_dts[ia])
             ip_start = ip * 2

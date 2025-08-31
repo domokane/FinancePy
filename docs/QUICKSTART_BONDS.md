@@ -1,4 +1,4 @@
-## Quickstart Guide to Bonds
+## Quickstart Guide to Bond Analysis using financepy
 To analyse a bond first load up the Date and other utility classes such as Frequency and DayCounts. The easiest way to do this is to use a wildcard import. The downside is that it imports a lot of unnecessary classes and will take a second or so. But it is probably the simplest way to start until you become familiar with the library structure.
 
 ```

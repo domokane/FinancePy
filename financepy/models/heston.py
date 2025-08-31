@@ -56,6 +56,7 @@ class HestonNumericalScheme(Enum):
     ),
     cache=True,
     fastmath=True,
+    parallel=True,
 )
 def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, scheme):
 

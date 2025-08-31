@@ -6,6 +6,7 @@ from typing import Union
 
 import numpy as np
 from numba import njit
+import numba as nb
 
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.global_types import TouchOptionTypes
@@ -32,7 +33,7 @@ def _barrier_pay_one_at_hit_pv_down(s, hh, r, dt):
     num_paths, num_time_steps = s.shape
     pv = 0.0
 
-    for ip in range(0, num_paths):
+    for ip in nb.prange(num_paths):
         hit_flag = 0
 
         for it in range(0, num_time_steps):
@@ -58,7 +59,7 @@ def _barrier_pay_one_at_hit_pv_up(s, hh, r, dt):
     num_paths, num_time_steps = s.shape
     pv = 0.0
 
-    for ip in range(0, num_paths):
+    for ip in nb.prange(num_paths):
         hit_flag = 0
 
         for it in range(0, num_time_steps):
@@ -83,7 +84,7 @@ def _barrier_pay_asset_at_expiry_down_out(s, hh):
     num_paths, num_time_steps = s.shape
     pv = 0.0
 
-    for ip in range(0, num_paths):
+    for ip in nb.prange(num_paths):
         hit_flag = 1
 
         for it in range(0, num_time_steps):
@@ -107,7 +108,7 @@ def _barrier_pay_asset_at_expiry_up_out(s, hh):
     num_paths, num_time_steps = s.shape
     pv = 0.0
 
-    for ip in range(0, num_paths):
+    for ip in nb.prange(num_paths):
         hit_flag = 1
 
         for it in range(0, num_time_steps):

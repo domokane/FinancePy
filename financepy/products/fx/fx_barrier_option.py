@@ -5,6 +5,7 @@
 from enum import Enum
 from math import exp, log, sqrt
 import numpy as np
+import numba as nb
 
 from ...utils.error import FinError
 from ...utils.math import normcdf
@@ -372,7 +373,7 @@ class FXBarrierOption(FXOption):
 
             barrier_crossed_from_above = [False] * num_paths
 
-            for p in range(0, num_paths):
+            for p in nb.prange(num_paths):
                 barrier_crossed_from_above[p] = np.any(s_all[p] <= b)
 
         if opt_type in (
@@ -383,7 +384,7 @@ class FXBarrierOption(FXOption):
         ):
 
             barrier_crossed_from_below = [False] * num_paths
-            for p in range(0, num_paths):
+            for p in nb.prange(num_paths):
                 barrier_crossed_from_below[p] = np.any(s_all[p] >= b)
 
         payoff = np.zeros(num_paths)
