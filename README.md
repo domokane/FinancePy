@@ -168,7 +168,7 @@ The interface to each product has a value() function that will take a model and 
 
 ## Author
 
-Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 15 years of academic experience.
+I was a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 18 years of academic experience.
 
 Contact me at dominic.okane at edhec.edu.
 
@@ -183,5 +183,6 @@ See the changelog for a detailed history of changes.
 ## License
 
  GPL-3.0 License - See the license file in this folder for details.
+
 
 
