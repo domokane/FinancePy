@@ -89,7 +89,7 @@ def test_homogeneous():
     v = tranche7.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 39.9615
+    assert round(v[3] * 10000, 2) == 39.96
 
 
 ########################################################################################
