@@ -3,6 +3,8 @@
 import time as time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_fwd_fwd_correlation

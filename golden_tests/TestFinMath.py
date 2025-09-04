@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.math import normcdf_integrate
 from financepy.utils.math import normcdf
 from financepy.utils.math import normcdf_slow

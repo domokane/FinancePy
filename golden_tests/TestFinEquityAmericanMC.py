@@ -2,6 +2,7 @@
 
 import time
 
+import add_fp_to_path
 
 from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
 from financepy.models.equity_crr_tree import crr_tree_val

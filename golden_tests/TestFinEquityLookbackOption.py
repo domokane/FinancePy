@@ -1,6 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import time
+import add_fp_to_path
+
 from financepy.products.equity.equity_float_lookback_option import (
     EquityFloatLookbackOption,
 )

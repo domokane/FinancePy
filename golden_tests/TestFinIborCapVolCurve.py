@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve

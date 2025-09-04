@@ -32,9 +32,10 @@ setup(
         "scipy",
         "numba",  # you can add bounds like "numba>=0.59,<0.61"
         "llvmlite",  # keep aligned with numba version
+        "pandas",
     ],
     extras_require={
-        "viz": ["matplotlib", "pandas"],
+        "viz": ["matplotlib"],
         "dev": ["pytest", "build", "twine", "ipython"],
     },
     entry_points={

@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.products.equity.equity_binomial_tree import EquityBinomialTree
 from financepy.products.equity.equity_binomial_tree import (
     EquityTreeExerciseTypes,

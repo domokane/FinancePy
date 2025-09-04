@@ -139,7 +139,7 @@ class FinHestonNumericalScheme(Enum):
     ),
     cache=True,
     fastmath=True,
-    parallel=True,
+    parallel=False,
 )
 def get_heston_paths(
     num_paths,
@@ -285,8 +285,7 @@ class FinGBMNumericalScheme(Enum):
 @njit(
     float64[:, :](int64, int64, float64, float64, float64, float64, int64, int64),
     cache=True,
-    fastmath=True,
-    parallel=True,
+    parallel=False,
 )
 def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme, seed):
 

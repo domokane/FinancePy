@@ -4,6 +4,9 @@
 
 
 from enum import Enum
+from typing import Union
+
+from financepy.models.model import Model
 
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...models.black_scholes import BlackScholes
@@ -18,7 +21,7 @@ BUMP = 1e-4
 
 
 class EquityOptionModelTypes(Enum):
-    BLACKSCHOLES = 1
+    BLACK_SCHOLES = 1
     ANOTHER = 2
 
 
@@ -35,9 +38,9 @@ class EquityOption:
         self,
         value_dt: Date,
         stock_price: float,
-        discount_curve: DiscountCurve,
-        dividend_yield: float,
-        model,
+        discount_curve: Union[DiscountCurve, float],
+        dividend_curve: Union[DiscountCurve, float],
+        model: Model,
     ):
 
         print("You should not be here!")

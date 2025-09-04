@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import add_fp_to_path
+
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.date import Date

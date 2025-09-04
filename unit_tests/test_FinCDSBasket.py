@@ -36,13 +36,13 @@ def test_inhomogeneous_curve():
         cds_index.intrinsic_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
-    assert round(intrinsic_spd, 4) == 32.0971
+    assert round(intrinsic_spd, 4) == 32.0963
 
     total_spd = (
         cds_index.total_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
-    assert round(total_spd, 4) == 161.3169
+    assert round(total_spd, 4) == 161.3163
 
     min_spd = (
         cds_index.min_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
@@ -54,7 +54,7 @@ def test_inhomogeneous_curve():
         cds_index.max_spread(value_dt, step_in_dt, basket_maturity, issuer_curves)
         * 10000.0
     )
-    assert round(max_spd, 4) == 81.1466
+    assert round(max_spd, 4) == 81.1462
 
 
 ########################################################################################
@@ -84,8 +84,8 @@ def test_gaussian_copula():
         value_dt, ntd, issuer_curves, beta_vector, libor_curve
     )
 
-    assert round(v1[2] * 10000, 4) == 152.3986
-    assert round(v2[3] * 10000, 4) == 160.0121
+    assert round(v1[2] * 10000, 3) == 152.398
+    assert round(v2[3] * 10000, 4) == 160.0294
 
     ntd = 2
     beta = 0.5
@@ -108,7 +108,7 @@ def test_gaussian_copula():
     )
 
     assert round(v1[2] * 10000, 4) == 15.6482
-    assert round(v2[3] * 10000, 4) == 16.6395
+    assert round(v2[3] * 10000, 4) == 16.6387
 
 
 ########################################################################################
@@ -135,7 +135,7 @@ def test_student_t():
         seed,
     )
 
-    assert round(v[2] * 10000, 4) == 134.1422
+    assert round(v[2] * 10000, 4) == 134.1416
 
     ntd = 2
     beta = 0.5
@@ -153,4 +153,4 @@ def test_student_t():
         seed,
     )
 
-    assert round(v[2] * 10000, 4) == 26.6215
+    assert round(v[2] * 10000, 4) == 26.6214

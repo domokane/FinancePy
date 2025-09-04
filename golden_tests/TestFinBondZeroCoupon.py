@@ -3,6 +3,8 @@
 import os
 import pandas as pd
 
+import add_fp_to_path
+
 from financepy.products.bonds.bond_zero import BondZero
 from financepy.products.bonds.bond import Bond, YTMCalcType
 

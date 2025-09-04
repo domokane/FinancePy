@@ -3,6 +3,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 

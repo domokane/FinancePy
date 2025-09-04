@@ -52,6 +52,7 @@ def test_geometric():
 
     assert round(value_geometric, 4) == 12.3380
 
+
 ########################################################################################
 
 
@@ -68,6 +69,7 @@ def test_turnbull_wakeman():
     )
 
     assert round(value_turnbull_wakeman, 4) == 12.5381
+
 
 ########################################################################################
 
@@ -86,6 +88,7 @@ def test_curran():
 
     assert round(value_curran, 4) == 12.5368
 
+
 ########################################################################################
 
 
@@ -102,4 +105,4 @@ def test_mc():
         accrued_avg,
     )
 
-    assert round(value_mc, 4) == 12.5269
+    assert round(value_mc, 4) == 12.5722

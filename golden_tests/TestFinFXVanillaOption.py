@@ -3,6 +3,8 @@
 import numpy as np
 import time
 
+import add_fp_to_path
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.models.sabr import SABR

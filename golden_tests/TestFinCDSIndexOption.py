@@ -4,6 +4,8 @@ import os
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -16,6 +18,7 @@ from financepy.products.credit.cds_index_option import CDSIndexOption
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 from FinTestCases import FinTestCases, global_test_case_mode
+from financepy.utils.global_vars import G_BASIS_POINT
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -177,6 +180,8 @@ def test_dirty_price_cds_index_option():
 
             index_portfolio = CDSIndexPortfolio()
 
+            start = time.time()
+
             adjusted_issuer_curves = index_portfolio.hazard_rate_adjust_intrinsic(
                 value_dt,
                 issuer_curves,
@@ -187,6 +192,9 @@ def test_dirty_price_cds_index_option():
                 tolerance,
             )
 
+            end = time.time()
+            elapsed = end - start
+
         else:
 
             index_spread = index / 10000.0
@@ -196,22 +204,23 @@ def test_dirty_price_cds_index_option():
             )
 
             adjusted_issuer_curves = []
-            for i_credit in range(0, 125):
+            for _ in range(0, 125):
                 adjusted_issuer_curves.append(issuer_curve)
 
         # Now loop over strikes
 
-        for strike in [20, 60]:
+        for strike_bps in [20, 60]:
+
+            strike = strike_bps / 10000
 
             start = time.time()
 
-            option = CDSIndexOption(
-                expiry_dt, maturity_dt, index_cpn, strike / 10000.0, notional
-            )
+            option = CDSIndexOption(expiry_dt, maturity_dt, index_cpn, strike, notional)
 
             v_pay_1, v_rec_1, strike_value, mu, exp_h = option.value_anderson(
                 value_dt, adjusted_issuer_curves, index_recovery, volatility
             )
+
             end = time.time()
             elapsed = end - start
 

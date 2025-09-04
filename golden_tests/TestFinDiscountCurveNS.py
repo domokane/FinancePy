@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
 
 from financepy.utils.math import scale
 from financepy.market.curves.discount_curve_ns import DiscountCurveNS

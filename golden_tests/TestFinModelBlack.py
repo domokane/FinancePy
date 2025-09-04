@@ -3,6 +3,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.black import Black
 from financepy.utils.global_types import OptionTypes

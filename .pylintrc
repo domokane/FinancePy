@@ -23,6 +23,7 @@ disable=
 #    E1101,  # no-member (NumPy/Numba dynamic attrs)
     E0401,  # unable to import
     E0411,  # unable to import in some order
+    E0413,  # unable to import in some order
 
 enable=
     unused-import,

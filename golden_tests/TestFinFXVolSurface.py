@@ -3,6 +3,8 @@
 import time
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod

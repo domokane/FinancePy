@@ -3,6 +3,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.models.sabr import SABR
 from financepy.models.sabr_shifted import SABRShifted
 from FinTestCases import FinTestCases, global_test_case_mode

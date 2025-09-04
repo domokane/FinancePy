@@ -4,6 +4,8 @@ import time
 
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
 from financepy.products.bonds.bond import Bond
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

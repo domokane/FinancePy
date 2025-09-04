@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_lmm_products import IborLMMProducts
 from financepy.utils.global_types import FinCapFloorTypes

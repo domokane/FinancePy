@@ -3,6 +3,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.math import scale
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes

@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.gbm_process_simulator import get_assets_paths_times
 from financepy.utils.math import corr_matrix_generator

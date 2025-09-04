@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import add_fp_to_path
+
 from financepy.utils.global_types import TouchOptionTypes
 from financepy.products.fx import FXOneTouchOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

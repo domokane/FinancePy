@@ -1,4 +1,10 @@
 ## CHANGE LOG
+
+28 August 2025
+- Completed pep8 cleanup
+- Ensured caching on as many numba functions as possible
+- Getter and Setter functions for discount curve times and discount factors
+
 1 May 2024 version 0.360 released
 - Fixed all notebooks to ensure they all work with current version
 - Unit tests complete with success

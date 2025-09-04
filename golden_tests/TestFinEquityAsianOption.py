@@ -3,6 +3,12 @@
 import time
 import matplotlib.pyplot as plt
 
+import glob
+from os.path import dirname, basename, join
+import traceback
+
+import add_fp_to_path
+
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

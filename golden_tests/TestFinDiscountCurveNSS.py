@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.math import scale
 from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
 from financepy.utils.date import Date

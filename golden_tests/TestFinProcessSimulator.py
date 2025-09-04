@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import sys
+import add_fp_to_path
+
 from financepy.models.process_simulator import FinVasicekNumericalScheme
 from financepy.models.process_simulator import CIRNumericalScheme
 from financepy.models.process_simulator import FinHestonNumericalScheme
@@ -8,9 +9,6 @@ from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
 from financepy.models.process_simulator import FinProcessSimulator
 from FinTestCases import FinTestCases, global_test_case_mode
-
-sys.path.append("..")
-
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

@@ -1,9 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import add_fp_to_path
+
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.merton_firm_mkt import MertonFirmMkt
 from financepy.models.merton_firm import MertonFirm
-
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

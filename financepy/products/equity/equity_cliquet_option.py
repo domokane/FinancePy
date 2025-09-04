@@ -147,14 +147,12 @@ class EquityCliquetOption(EquityOption):
                     q = -np.log(dq_mat / dq) / tau
 
                     if self.opt_type == call_type:
-                        v_fwd_opt = (
-                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
-                        )
+                        v_call = bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
+                        v_fwd_opt = s * dq * v_call
                         v_cliquet += v_fwd_opt
                     elif self.opt_type == put_type:
-                        v_fwd_opt = (
-                            s * dq * bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
-                        )
+                        v_put = bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
+                        v_fwd_opt = s * dq * v_put
                         v_cliquet += v_fwd_opt
                     else:
                         raise FinError("Unknown option type")

@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.schedule import Schedule
 from financepy.utils.global_types import FinCapFloorTypes
 from financepy.products.rates.ibor_cap_floor import IborCapFloor

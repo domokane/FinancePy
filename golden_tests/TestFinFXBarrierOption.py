@@ -2,6 +2,8 @@
 
 import time
 
+import add_fp_to_path
+
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.fx.fx_barrier_option import FXBarrierOption

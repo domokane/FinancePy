@@ -1,9 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import add_fp_to_path
+
 from financepy.utils.date import Date
-from financepy.products.inflation.FinInflationIndexCurve import (
-    FinInflationIndexCurve,
-)
+from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 

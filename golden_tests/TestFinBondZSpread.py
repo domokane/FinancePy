@@ -2,6 +2,8 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.utils.global_vars import G_PERCENT
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes

@@ -1,6 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+
+import add_fp_to_path
+
 from financepy.models.sabr_shifted import SABRShifted
 from financepy.utils.global_types import OptionTypes
 from FinTestCases import FinTestCases, global_test_case_mode

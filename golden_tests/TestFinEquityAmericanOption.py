@@ -2,9 +2,9 @@
 
 import time
 
-from financepy.products.equity.equity_american_option import (
-    EquityAmericanOption,
-)
+import add_fp_to_path
+
+from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.utils.global_types import OptionTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes

@@ -1,3 +1,5 @@
+import add_fp_to_path
+
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.market.curves.interpolator import InterpTypes

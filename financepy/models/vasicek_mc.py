@@ -74,7 +74,7 @@ def zero_price(r0, a, b, sigma, t):
 
 @njit(
     float64[:](float64, float64, float64, float64, float64, float64, int64),
-    parallel=True,
+    parallel=False,
     fastmath=True,
     cache=True,
 )
@@ -107,8 +107,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
 @njit(
     float64(float64, float64, float64, float64, float64, float64, int64, int64),
     cache=True,
-    fastmath=True,
-    parallel=True,
+    parallel=False,
 )
 def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
     """Generate zero price by Monte Carlo using Vasicek model"""

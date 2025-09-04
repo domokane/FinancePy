@@ -96,8 +96,16 @@ class CDSCurve:
     def dfs(self):
         return self.libor_curve.dfs
 
+    def set_times(self, times: np.array):
+        """Set the times vector"""
+        self._times = times
+
+    def set_qs(self, qvector: np.array):
+        """Set the survival probability curve"""
+        self._qs = qvector
+
     def set_q(self, index, q):
-        """Set the discount factor at a specific index."""
+        """Set the survival probability at a specific index."""
 
         n_points = len(self.qs)
 

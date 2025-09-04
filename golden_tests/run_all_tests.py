@@ -5,19 +5,12 @@
 import glob
 from os.path import dirname, basename, join
 import traceback
+import time
 
 import sys
 import os
 
-# Add the *parent of the script's parent directory* to sys.path
-sys.path.append(
-    os.path.dirname(  # go up one directory
-        os.path.dirname(  # go up two directories
-            os.path.abspath(__file__)  # absolute path to current file
-        )
-    )
-)
-
+import add_fp_to_path
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 
@@ -39,6 +32,8 @@ def main(start_index=0, end_index=None):
     if end_index is None or end_index > num_modules:
         end_index = num_modules
 
+    timings = []
+
     for idx in range(start_index, end_index):
 
         module_path = modules[idx]
@@ -49,13 +44,23 @@ def main(start_index=0, end_index=None):
             end="",
         )
 
+        start_time = time.perf_counter()
+
         try:
             module = __import__(module_name)
 
             num_errors = getattr(module.test_cases, "_global_num_errors", 0)
             num_warnings = getattr(module.test_cases, "_global_num_warnings", 0)
 
-            print(f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end="")
+            elapsed = time.perf_counter() - start_time
+            timings.append((module_name, elapsed))
+
+            # print(f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end="")
+            print(
+                f"TIME: {elapsed:6.3f} s   "
+                f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d}",
+                end="",
+            )
 
             if num_errors > 0:
                 print("*" * num_errors, end="")
@@ -63,11 +68,13 @@ def main(start_index=0, end_index=None):
             print()
 
         except (FinError, ValueError, NameError, TypeError) as e:
-            # Handle known financepy or Python errors gracefully
-            print(f"{type(e).__name__}: {e} ************")
+            elapsed = time.perf_counter() - start_time
+            timings.append((module_name, elapsed))
+            print(f"{type(e).__name__}: {e} ************ (TIME: {elapsed:6.3f} s)")
         except Exception as e:
-            # Catch all other unexpected errors, print traceback for debugging
-            print(f"Unexpected {type(e).__name__}: {e}")
+            elapsed = time.perf_counter() - start_time
+            timings.append((module_name, elapsed))
+            print(f"Unexpected {type(e).__name__}: {e} (TIME: {elapsed:6.3f} s)")
             traceback.print_exc()
 
 

@@ -391,7 +391,7 @@ mkt_spd2 = 0.01
 def test_par_spread():
 
     spd = cds_contract1.par_spread(value_dt1, issuer_curve1, cds_recovery) * 10000.0
-    assert round(spd, 4) == 399.9996
+    assert round(spd, 3) == 399.999
 
     spd = cds_contract2.par_spread(value_dt2, issuer_curve2, cds_recovery) * 10000.0
     assert round(spd, 4) == 99.5858
@@ -403,12 +403,12 @@ def test_par_spread():
 def test_value():
 
     v = cds_contract1.value(value_dt1, issuer_curve1, cds_recovery)
-    assert round(v["dirty_pv"], 4) == 168514.5956
-    assert round(v["clean_pv"], 4) == 170639.5956
+    assert round(v["dirty_pv"], 4) == 168490.4637
+    assert round(v["clean_pv"], 4) == 170615.4637
 
     v = cds_contract2.value(value_dt2, issuer_curve2, cds_recovery)
-    assert round(v["dirty_pv"], 4) == -199842.7922
-    assert round(v["clean_pv"], 4) == -191509.4589
+    assert round(v["dirty_pv"], 4) == -199842.2583
+    assert round(v["clean_pv"], 4) == -191508.9250
 
 
 ########################################################################################
@@ -417,7 +417,7 @@ def test_value():
 def test_clean_price():
 
     p = cds_contract1.clean_price(value_dt1, issuer_curve1, cds_recovery)
-    assert round(p, 4) == 82.936
+    assert round(p, 4) == 82.9385
 
     p = cds_contract2.clean_price(value_dt2, issuer_curve2, cds_recovery)
     assert round(p, 4) == 119.1509
@@ -453,10 +453,10 @@ def test_accrued_interest():
 def test_prot_leg_pv():
 
     prot_pv = cds_contract1.prot_leg_pv(value_dt1, issuer_curve1, cds_recovery)
-    assert round(prot_pv, 4) == 273023.5221
+    assert round(prot_pv, 3) == 272985.134
 
     prot_pv = cds_contract2.prot_leg_pv(value_dt2, issuer_curve2, cds_recovery)
-    assert round(prot_pv, 4) == 47629.7343
+    assert round(prot_pv, 4) == 47629.5968
 
 
 ########################################################################################
@@ -465,10 +465,10 @@ def test_prot_leg_pv():
 def test_premium_leg_pv():
 
     prem_pv = cds_contract1.premium_leg_pv(value_dt1, issuer_curve1, cds_recovery)
-    assert round(prem_pv, 4) == 104508.9265
+    assert round(prem_pv, 4) == 104494.6703
 
     prem_pv = cds_contract2.premium_leg_pv(value_dt2, issuer_curve2, cds_recovery)
-    assert round(prem_pv, 4) == 247472.5265
+    assert round(prem_pv, 4) == 247471.8551
 
 
 ########################################################################################

@@ -31,7 +31,7 @@ from ..utils.math import normcdf
     fastmath=True,
     cache=True,
 )
-def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
+def value_equity_barrier_option_bs(t, k, h, s, r, q, v, opt_type, nobs):
     """This values a single barrier option. Because of its structure it cannot
     easily be vectorised which is why it has been wrapped.
     # number of observations per year
@@ -50,7 +50,7 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
     c = s * dq * normcdf(+d1) - k * df * normcdf(+d2)
     p = k * df * normcdf(-d2) - s * dq * normcdf(-d1)
 
-    if s >= h:
+    if s > h:
 
         if opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
             return 0.0
@@ -61,7 +61,7 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
         if opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
             return p
 
-    else:
+    elif s < h:
 
         if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
             return 0.0
@@ -72,23 +72,24 @@ def value_barrier(t, k, h, s, r, q, v, opt_type, nobs):
         elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
             return p
 
-    # if 1 == 0:
-    #     if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value and s <= h:
-    #         return 0.0
-    #     elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value and s >= h:
-    #         return 0.0
-    #     elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value and s >= h:
-    #         return 0.0
-    #     elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value and s <= h:
-    #         return 0.0
-    #     elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value and s <= h:
-    #         return c
-    #     elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value and s >= h:
-    #         return c
-    #     elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value and s >= h:
-    #         return p
-    #     elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value and s <= h:
-    #         return p
+    else:
+        # exactly at barrier → immediate knock-in/knock-out
+        if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
+            return 0.0
+        elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
+            return 0.0
+        elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
+            return 0.0
+        elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
+            return 0.0
+        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
+            return c
+        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
+            return p
+        elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
+            return c
+        elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
+            return p
 
     num_observations = 1 + t * nobs
 

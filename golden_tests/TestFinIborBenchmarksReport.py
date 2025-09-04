@@ -2,6 +2,8 @@ from os.path import dirname, join
 
 import pandas as pd
 
+import add_fp_to_path
+
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.frequency import FrequencyTypes

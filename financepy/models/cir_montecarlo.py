@@ -126,7 +126,7 @@ def draw(rt, a, b, sigma, dt):
 
 @njit(
     float64[:](float64, float64, float64, float64, float64, float64, int64, int64),
-    parallel=True,
+    parallel=False,
     fastmath=True,
     cache=True,
 )
@@ -237,7 +237,7 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
         int64,
         int64,
     ),
-    parallel=True,
+    parallel=False,
     fastmath=True,
     cache=True,
 )

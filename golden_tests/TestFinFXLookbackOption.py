@@ -1,13 +1,12 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import time
+
+import add_fp_to_path
+
 from financepy.utils.global_types import OptionTypes
-from financepy.products.fx.fx_float_lookback_option import (
-    FXFloatLookbackOption,
-)
-from financepy.products.fx.fx_fixed_lookback_option import (
-    FXFixedLookbackOption,
-)
+from financepy.products.fx.fx_float_lookback_option import FXFloatLookbackOption
+from financepy.products.fx.fx_fixed_lookback_option import FXFixedLookbackOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode

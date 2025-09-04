@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption

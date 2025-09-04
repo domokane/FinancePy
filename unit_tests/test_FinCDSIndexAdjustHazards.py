@@ -104,7 +104,7 @@ def test_perform_cds_index_hazard_rate_adjustment():
         * 10000.0
     )
 
-    assert round(intrinsic_spd_3yr, 4) == 19.6789
-    assert round(intrinsic_spd_5yr, 4) == 35.5394
-    assert round(intrinsic_spd_7yr, 4) == 49.0121
-    assert round(intrinsic_spd_10yr, 4) == 61.4140
+    assert round(intrinsic_spd_3yr, 4) == 19.6787
+    assert round(intrinsic_spd_5yr, 4) == 35.5378
+    assert round(intrinsic_spd_7yr, 4) == 49.0083
+    assert round(intrinsic_spd_10yr, 4) == 61.4076

@@ -39,12 +39,12 @@ def test_european():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
     assert round(value, 4) == 4.6039
-    assert round(values[0], 4) == 4.5587
+    assert round(values[0], 4) == 4.5982
 
     opt_type1 = OptionTypes.EUROPEAN_CALL
     opt_type2 = OptionTypes.EUROPEAN_PUT
@@ -55,12 +55,12 @@ def test_european():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
     assert round(value, 4) == 6.7176
-    assert round(values[0], 4) == 6.7676
+    assert round(values[0], 4) == 6.7053
 
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_CALL
@@ -71,12 +71,12 @@ def test_european():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
     assert round(value, 4) == 2.0165
-    assert round(values[0], 4) == 2.0361
+    assert round(values[0], 4) == 2.0228
 
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_PUT
@@ -87,12 +87,12 @@ def test_european():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
     assert round(value, 4) == 1.0873
-    assert round(values[0], 4) == 1.0789
+    assert round(values[0], 4) == 1.0869
 
 
 ########################################################################################
@@ -111,12 +111,12 @@ def test_american():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 4) == 4.5587
-    assert round(values[0], 4) == 4.5587
+    assert round(value, 4) == 4.5982
+    assert round(values[0], 4) == 4.5982
 
     opt_type1 = OptionTypes.AMERICAN_CALL
     opt_type2 = OptionTypes.AMERICAN_PUT
@@ -127,12 +127,12 @@ def test_american():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 4) == 12.8630
-    assert round(values[0], 4) == 12.8630
+    assert round(value, 4) == 12.8406
+    assert round(values[0], 4) == 12.8406
 
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_CALL
@@ -143,12 +143,12 @@ def test_american():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 4) == 4.6697
-    assert round(values[0], 4) == 4.6697
+    assert round(value, 4) == 4.6652
+    assert round(values[0], 4) == 4.6652
 
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_PUT
@@ -159,12 +159,12 @@ def test_american():
     value = cmpd_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
-    values = cmpd_option._value_tree(
+    values = cmpd_option.value_tree(
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 4) == 4.3034
-    assert round(values[0], 4) == 4.3034
+    assert round(value, 4) == 4.2982
+    assert round(values[0], 4) == 4.2982
 
 
 ########################################################################################

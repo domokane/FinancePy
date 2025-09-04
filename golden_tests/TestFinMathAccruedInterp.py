@@ -3,6 +3,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.math import accrued_interpolator
 from FinTestCases import FinTestCases, global_test_case_mode
 

@@ -1,6 +1,8 @@
 from numba import jit
 import time
 
+import add_fp_to_path
+
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.models.sobol import get_uniform_sobol, get_gaussian_sobol
 

@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import add_fp_to_path
+
 from financepy.products.equity.equity_one_touch_option import (
     EquityOneTouchOption,
 )

@@ -6,6 +6,8 @@ import datetime
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.date_format import set_date_format
 from financepy.utils.date_format import DateFormatTypes
 from financepy.utils.date import Date, date_range

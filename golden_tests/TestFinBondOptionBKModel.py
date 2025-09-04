@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import OptionTypes
 from financepy.products.bonds.bond_option import BondOption

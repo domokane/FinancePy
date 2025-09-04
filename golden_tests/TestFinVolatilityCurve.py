@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.utils.date import Date
 

@@ -4,6 +4,8 @@ import numpy as np
 import time
 from math import sqrt
 
+import add_fp_to_path
+
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
 from financepy.products.equity.equity_rainbow_option import (
     EquityRainbowOptionTypes,

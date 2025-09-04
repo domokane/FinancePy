@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date

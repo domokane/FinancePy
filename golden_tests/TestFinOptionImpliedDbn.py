@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface

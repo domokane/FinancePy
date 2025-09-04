@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_digital_option import FXDigitalOption
 from financepy.models.black_scholes import BlackScholes

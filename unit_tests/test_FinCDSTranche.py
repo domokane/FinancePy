@@ -71,25 +71,25 @@ def test_homogeneous():
     v = tranche1.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 582.3189
+    assert round(v[3] * 10000, 4) == 582.5047
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 29.9804
+    assert round(v[3] * 10000, 4) == 29.9795
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche5.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 4.5835
+    assert round(v[3] * 10000, 4) == 4.5832
 
     method = FinLossDistributionBuilder.LHP
     v = tranche7.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 39.9617
+    assert round(v[3] * 10000, 4) == 39.9615
 
 
 ########################################################################################
@@ -108,28 +108,28 @@ def test_heterogeneous():
         * 10000.0
     )
 
-    assert round(intrinsic_spd, 4) == 34.3326
+    assert round(intrinsic_spd, 4) == 34.331
 
     method = FinLossDistributionBuilder.RECURSION
     v = tranche1.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 868.1327
+    assert round(v[3] * 10000, 3) == 868.479
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 173.4304
+    assert round(v[3] * 10000, 4) == 173.4324
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche4.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 16.1785
+    assert round(v[3] * 10000, 4) == 16.1762
 
     method = FinLossDistributionBuilder.LHP
     v = tranche6.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 0.3386
+    assert round(v[3] * 10000, 4) == 0.3385

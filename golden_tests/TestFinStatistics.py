@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from FinTestCases import FinTestCases, global_test_case_mode
 from financepy.utils.stats import mean, stdev, correlation
 

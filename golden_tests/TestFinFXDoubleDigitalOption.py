@@ -2,9 +2,9 @@
 
 import numpy as np
 
-from financepy.products.fx.fx_double_digital_option import (
-    FXDoubleDigitalOption,
-)
+import add_fp_to_path
+
+from financepy.products.fx.fx_double_digital_option import FXDoubleDigitalOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date

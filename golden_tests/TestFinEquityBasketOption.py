@@ -2,6 +2,8 @@
 
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.products.equity.equity_basket_option import EquityBasketOption
 from financepy.utils.global_types import OptionTypes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

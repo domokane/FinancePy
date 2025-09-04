@@ -4,6 +4,8 @@ import time
 
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import SwapTypes
 from financepy.products.bonds.bond_callable import BondEmbeddedOption

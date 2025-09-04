@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import add_fp_to_path
+
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ois import OIS
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat

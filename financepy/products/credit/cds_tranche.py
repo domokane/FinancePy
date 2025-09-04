@@ -95,7 +95,7 @@ class CDSTranche:
             self.dg_type,
         )
 
-    ###########################################################################
+    ####################################################################################
 
     def value_bc(
         self,
@@ -263,8 +263,8 @@ class CDSTranche:
         curve_recovery = 0.0  # For tranches only
         libor_curve = issuer_curves[0].libor_curve
         tranche_curve = CDSCurve(value_dt, [], libor_curve, curve_recovery)
-        tranche_curve._times = tranche_times
-        tranche_curve._qs = tranche_surv_curve
+        tranche_curve.set_times(tranche_times)
+        tranche_curve.set_qs(tranche_surv_curve)
 
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, tranche_curve, curve_recovery

@@ -3,6 +3,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.global_vars import G_DAYS_IN_YEARS
 from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros

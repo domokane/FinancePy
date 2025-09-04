@@ -4,6 +4,8 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 from financepy.models.gauss_copula_onefactor import (
     loss_dbn_hetero_adj_binomial,

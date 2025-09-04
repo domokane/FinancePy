@@ -1,8 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.products.equity.equity_compound_option import (
-    EquityCompoundOption,
-)
+
+import add_fp_to_path
+
+from financepy.products.equity.equity_compound_option import EquityCompoundOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -55,7 +56,7 @@ def test_equity_compound_option():
                     model,
                 )
 
-                values = cmpd_option._value_tree(
+                values_tree = cmpd_option.value_tree(
                     value_dt,
                     stock_price,
                     discount_curve,
@@ -72,7 +73,7 @@ def test_equity_compound_option():
                     stock_price,
                     num_steps,
                     value,
-                    values[0],
+                    values_tree[0],
                 )
 
     stock_price = 85.0
@@ -99,7 +100,7 @@ def test_equity_compound_option():
                     num_steps,
                 )
 
-                values = cmpd_option._value_tree(
+                values_tree = cmpd_option.value_tree(
                     value_dt,
                     stock_price,
                     discount_curve,
@@ -116,7 +117,7 @@ def test_equity_compound_option():
                     stock_price,
                     num_steps,
                     value,
-                    values[0],
+                    values_tree[0],
                 )
 
     test_cases.header(
@@ -172,7 +173,7 @@ def test_equity_compound_option():
                     model,
                 )
 
-                values = cmpd_option._value_tree(
+                values = cmpd_option.value_tree(
                     value_dt,
                     stock_price,
                     discount_curve,

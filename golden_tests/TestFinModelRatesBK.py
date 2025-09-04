@@ -3,6 +3,8 @@
 import time
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.products.bonds.bond import Bond

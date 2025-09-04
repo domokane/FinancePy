@@ -92,37 +92,28 @@ def _risky_pv01_numba(
 
     # this is the part of the cpn accrued from previous cpn date to now
     # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
-
     # reference credit survives to the premium payment date
     full_rpv01 = q1 * z1 * year_fracs[1]
 
     # cpn accrued from previous cpn to today paid in full at default
     # before cpn payment
-    full_rpv01 = (
-        full_rpv01 + z1 * (qeff - q1) * accrual_factor_pcd_to_now * cpn_accd_indicator
-    )
+    dq = qeff - q1
+    full_rpv01 += z1 * dq * accrual_factor_pcd_to_now * cpn_accd_indicator
 
     # future accrued from now to cpn payment date assuming default roughly
     # midway
     full_rpv01 += (
-        0.5
-        * z1
-        * (qeff - q1)
-        * (year_fracs[1] - accrual_factor_pcd_to_now)
-        * cpn_accd_indicator
+        0.5 * z1 * dq * (year_fracs[1] - accrual_factor_pcd_to_now) * cpn_accd_indicator
     )
 
     for it in range(1, len(payment_times)):
 
         t2 = payment_times[it]
-
         q2 = _uinterpolate(t2, np_surv_times, np_surv_values, method)
         z2 = _uinterpolate(t2, np_ibor_times, np_ibor_values, method)
-
         accrual_factor = year_fracs[it]
 
-        # full cpn is paid at the end of the current period if survives to
-        # payment date
+        # full cpn is paid at the end of the current period if survives
         full_rpv01 += q2 * z2 * accrual_factor
 
         #######################################################################
@@ -143,6 +134,7 @@ def _risky_pv01_numba(
             full_rpv01 = full_rpv01 + d_full_rpv01
 
         q1 = q2
+        z1 = z2
 
     clean_rpv01 = full_rpv01 - accrual_factor_pcd_to_now
 
@@ -195,18 +187,30 @@ def _prot_leg_pv_numba(
 
     if USE_FLAT_HAZARD_RATE_INTEGRAL:
 
+        log_z1 = np.log(z1)
+        log_q1 = np.log(q1)
+
         for _ in range(0, num_steps):
             t = t + dt
             z2 = _uinterpolate(t, np_ibor_times, np_ibor_values, method)
             q2 = _uinterpolate(t, np_surv_times, np_surv_values, method)
+
+            log_z2 = np.log(z2)
+            log_q2 = np.log(q2)
+
             # This needs to be updated to handle small h+r
-            h12 = -log(q2 / q1) / dt
-            r12 = -log(z2 / z1) / dt
+            # h12 = -log(q2 / q1) / dt
+            # r12 = -log(z2 / z1) / dt
+
+            h12 = -(log_q2 - log_q1) / dt
+            r12 = -(log_z2 - log_z1) / dt
+
             exp_term = exp(-(r12 + h12) * dt)
             dprot_pv = h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
             prot_pv += dprot_pv
-            q1 = q2
-            z1 = z2
+
+            q1, z1 = q2, z2
+            log_q1, log_z1 = log_q2, log_z2
 
     else:
 

@@ -4,6 +4,8 @@ import os
 import datetime as dt
 import pandas as pd
 
+import add_fp_to_path
+
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.utils.date import Date, from_datetime

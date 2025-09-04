@@ -5,6 +5,8 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
+import add_fp_to_path
+
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import OptionTypes
 from financepy.products.bonds.bond_option import BondOption

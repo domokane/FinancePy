@@ -5,6 +5,8 @@ import datetime as dt
 
 import pandas as pd
 
+import add_fp_to_path
+
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegelSvensson
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegel
 from financepy.products.bonds.curve_fits import CurveFitBSpline

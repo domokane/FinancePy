@@ -1,6 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+
+import add_fp_to_path
+
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap

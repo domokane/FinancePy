@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import add_fp_to_path
+
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.utils.global_types import SwapTypes
