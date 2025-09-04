@@ -25,37 +25,23 @@ class DateFormatTypes(Enum):
 ########################################################################################
 
 # Private module-level variable to hold current global date format
-_date_format: DateFormatTypes = DateFormatTypes.UK_LONG
+G_DATE_TYPE_FORMAT: DateFormatTypes = DateFormatTypes.UK_LONG
 
 ########################################################################################
 
 
-def set_date_format(format_type: DateFormatTypes):
-    """
-    Set the current global date format type.
-
-    Parameters
-    ----------
-    format_type : DateFormatTypes
-        The new date format to set globally.
-    """
-    global _date_format
-    _date_format = format_type
+def set_date_format(fmt: str) -> None:
+    """Set the global date format."""
+    global G_DATE_TYPE_FORMAT
+    G_DATE_TYPE_FORMAT = fmt
 
 
 ########################################################################################
 
 
-def get_date_format() -> DateFormatTypes:
-    """
-    Get the current global date format type.
-
-    Returns
-    -------
-    DateFormatTypes
-        The currently set global date format.
-    """
-    return _date_format
+def get_date_format() -> str:
+    """Return the current global date format."""
+    return G_DATE_TYPE_FORMAT
 
 
 ########################################################################################
@@ -64,3 +50,6 @@ def get_date_format() -> DateFormatTypes:
 def print_date_format():
     global G_DATE_TYPE_FORMAT
     print("TEST TYPE", G_DATE_TYPE_FORMAT)
+
+
+########################################################################################

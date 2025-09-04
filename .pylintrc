@@ -12,6 +12,8 @@ disable=
     C0114,  # missing-module-docstring
     C0115,  # missing-class-docstring
     C0116,  # missing-function-docstring
+    C0411,  # wrong-import-order (instead of old E0411)
+    C0413,  # wrong-import-position (instead of old E0413)
     R0902,  # too-many-instance-attributes (common in product models)
     R0913,  # too-many-arguments (pricers/calibrators often need them)
     R0914,  # too-many-locals (numerical routines)
@@ -20,10 +22,7 @@ disable=
     W0511,  # fixme (we allow TODO notes, use pre-commit to gate later)
     W1203,  # logging-fstring-interpolation (we prefer f-strings)
     E1136,  # unsubscriptable-object (often false-positive with numpy)
-#    E1101,  # no-member (NumPy/Numba dynamic attrs)
     E0401,  # unable to import
-    E0411,  # unable to import in some order
-    E0413,  # unable to import in some order
 
 enable=
     unused-import,
@@ -43,15 +42,27 @@ max-module-lines=4000
 indent-string='    '
 
 [BASIC]
-good-names=i,j,k,m,n,t,x,y,z,dt,df,pv,dv01,ir,fx,np,va,vc,mu,sigma,qr
+good-names =
+    i, j, k, n, m, t, x, y, z, r, q, p,
+    df, pv, fv, fx, npv, irr,
+    dt, dr, dv, dx,
+    mu, sigma, lam, va, vc, dv01
+    X, Y, Z,
+    s, S, K,
+    u, v, w,
+    __version__
+
 bad-names=foo,bar,baz
-variable-rgx=^[a-z_][a-z0-9_]*$
-argument-rgx=^[a-z_][a-z0-9_]*$
-attr-rgx=^[a-z_][a-z0-9_]*$
-method-rgx=^(test_.+|[a-z_][a-z0-9_]*)$
-function-rgx=^(test_.+|[a-z_][a-z0-9_]*)$
-class-rgx=^[A-Z][a-zA-Z0-9]+$
-const-rgx=^(_?[A-Z][A-Z0-9_]*|k[A-Z][A-Za-z0-9]+)$
+
+# Regexes for naming style checks (keep defaults except constants)
+argument-rgx=[a-z_][a-z0-9_]{0,30}$
+attr-rgx=[a-z_][a-z0-9_]{0,30}$
+class-rgx=[A-Z_][a-zA-Z0-9]+$
+const-rgx=^(_?[A-Z][A-Z0-9_]*|__version__)$
+function-rgx=[a-z_][a-z0-9_]{2,30}$
+method-rgx=[a-z_][a-z0-9_]{2,30}$
+module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
+variable-rgx=[a-z_][a-z0-9_]{0,30}$
 
 [TYPECHECK]
 generated-members=numpy.*,np.*,pandas.*,pd.*

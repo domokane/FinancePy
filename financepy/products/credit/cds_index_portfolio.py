@@ -89,7 +89,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_spd(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def intrinsic_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of the intrinsic spd of the CDS portfolio as the one
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spd."""
@@ -108,7 +108,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def average_spd(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def average_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculates the average par CDS spd of the CDS portfolio."""
 
         num_credits = len(issuer_curves)
@@ -126,7 +126,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def total_spd(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def total_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculates the total CDS spd of the CDS portfolio by summing
         over all of the issuers and adding the spd with no weights."""
 
@@ -144,7 +144,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def min_spd(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def min_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculates the minimum par CDS spd across all of the issuers in
         the CDS portfolio."""
 
@@ -168,7 +168,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def max_spd(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def max_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculates the maximum par CDS spd across all of the issuers in
         the CDS portfolio."""
 

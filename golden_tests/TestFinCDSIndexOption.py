@@ -234,7 +234,7 @@ def test_dirty_price_cds_index_option():
 
             test_cases.print(
                 elapsed,
-                strike,
+                strike_bps,
                 index,
                 v_pay_1,
                 v_rec_1,

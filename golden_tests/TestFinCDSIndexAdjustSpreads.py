@@ -200,7 +200,7 @@ def test_cds_index_adjust_spreads():
     start = time.time()
 
     index_portfolio = CDSIndexPortfolio()
-    adjusted_issuer_curves = index_portfolio.spread_adjust_intrinsic(
+    adjusted_issuer_curves = index_portfolio.spd_adjust_intrinsic(
         value_dt,
         issuer_curves,
         index_cpns,
