@@ -16,7 +16,8 @@ import numpy as np
 from .error import FinError
 from .tenor import Tenor, TenorUnit
 from .date_format import DateFormatTypes, get_date_format
-from .date_arrays import *
+from .date_arrays import short_day_names, short_month_names
+from .date_arrays import month_days_leap_year, month_days_not_leap_year
 
 ########################################################################################
 
@@ -177,10 +178,9 @@ class Date:
         global G_START_YEAR
         global G_END_YEAR
 
-        # If the date has been entered as y, m, d we flip it to d, m, y
-        # This message should be removed after a few releases
-        if d >= G_START_YEAR and d < G_END_YEAR and y > 0 and y <= 31:
-            raise FinError("Date arguments must now be in the order Date(dd, mm, yyyy)")
+        # Guard against mistaken order (yyyy, mm, dd)
+        if G_START_YEAR <= d < G_END_YEAR and 1 <= y <= 31:
+            raise FinError("Date arguments must be in order Date(day, month, year)")
 
         if G_DT_COUNTER_LIST is None:
             calculate_list()
@@ -574,10 +574,10 @@ class Date:
 
             # If yyi is not a whole month I adjust for days using average
             # number of days in a month which is 365.242/12
-            days_in_month = 365.242 / 12.0
+            days_in_month_float = 365.242 / 12.0
 
             mmi = int(yyi * 12.0)
-            ddi = int((yyi * 12.0 - mmi) * days_in_month)
+            ddi = int((yyi * 12.0 - mmi) * days_in_month_float)
             new_dt = self.add_months(mmi)
             new_dt = new_dt.add_days(ddi)
 

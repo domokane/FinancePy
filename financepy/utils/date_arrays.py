@@ -27,7 +27,8 @@ short_month_names = [
     "NOV",
     "DEC",
 ]
-longMonthNames = [
+
+long_month_names = [
     "JANUARY",
     "FEBRUARY",
     "MARCH",
