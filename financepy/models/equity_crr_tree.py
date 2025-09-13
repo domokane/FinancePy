@@ -26,16 +26,31 @@ from ..utils.global_types import OptionTypes
 )
 def crr_tree_val(
     stock_price,
-    interest_rate,  # continuously compounded
-    dividend_rate,  # continuously compounded
-    volatility,  # Black scholes volatility
+    interest_rate,
+    dividend_rate,
+    volatility,
     num_steps_per_year,
     time_to_expiry,
     opt_type,
     strike_price,
     is_even,
-):
-    """Value an American option using a Binomial Treee"""
+) -> np.ndarray:
+    """
+    Value an American option using a Binomial Tree.
+
+    Args:
+        stock_price (float): Initial stock price.
+        interest_rate (float): Continuously compounded risk-free rate.
+        dividend_rate (float): Continuously compounded dividend yield.
+        volatility (float): Black-Scholes volatility.
+        num_steps_per_year (int): Number of tree steps per year.
+        time_to_expiry (float): Time to expiry in years.
+        opt_type (int): Option type (OptionTypes enum value).
+        strike_price (float): Option strike price.
+        is_even (int): 1 for even, 0 for odd number of steps.
+    Returns:
+        np.ndarray: Array of [price, delta, gamma, theta].
+    """
 
     num_steps = int(num_steps_per_year * time_to_expiry)
     num_steps = max(num_steps, 30)
@@ -156,16 +171,18 @@ def crr_tree_val(
 ########################################################################################
 
 
+from typing import Dict, Any
+
 def crr_tree_val_avg(
-    stock_price,
-    interest_rate,  # continuously compounded
-    dividend_rate,  # continuously compounded
-    volatility,  # Black scholes volatility
-    num_steps_per_year,
-    time_to_expiry,
-    opt_type,
-    strike_price,
-):
+    stock_price: float,
+    interest_rate: float,  # continuously compounded
+    dividend_rate: float,  # continuously compounded
+    volatility: float,  # Black scholes volatility
+    num_steps_per_year: int,
+    time_to_expiry: float,
+    opt_type: int,
+    strike_price: float,
+) -> Dict[str, Any]:
     """Calculate the average values off the tree using an even and an odd
     number of time steps."""
 

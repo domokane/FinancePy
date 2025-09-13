@@ -11,6 +11,8 @@ from ..utils.math import normcdf, normcdf_vect
 ########################################################################################
 
 
+from typing import Any
+
 class MertonFirm:
     """Implementation of the Merton Firm Value Model according to the original
     formulation by Merton with the inputs being the asset value of the firm,
@@ -27,7 +29,7 @@ class MertonFirm:
         risk_free_rate: Union[float, list, np.ndarray],
         asset_growth_rate: Union[float, list, np.ndarray],
         asset_volatility: Union[float, list, np.ndarray],
-    ):
+    ) -> None:
         """Create an object that holds all of the model parameters. These
         parameters may be vectorised."""
 
@@ -45,7 +47,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def leverage(self):
+    def leverage(self) -> np.ndarray:
         """Calculate the leverage."""
 
         lvg = self._a / self._l
@@ -53,28 +55,28 @@ class MertonFirm:
 
     ####################################################################################
 
-    def asset_value(self):
+    def asset_value(self) -> np.ndarray:
         """Calculate the asset value."""
 
         return self._a
 
     ####################################################################################
 
-    def debt_face_value(self):
+    def debt_face_value(self) -> np.ndarray:
         """Calculate the asset value."""
 
         return self._l
 
     ####################################################################################
 
-    def asset_vol(self):
+    def asset_vol(self) -> np.ndarray:
         """Return the asset volatility."""
 
         return self._va
 
     ####################################################################################
 
-    def equity_vol(self):
+    def equity_vol(self) -> np.ndarray:
         """Calculate the equity volatility."""
 
         e = self.equity_value()
@@ -89,7 +91,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def equity_value(self):
+    def equity_value(self) -> np.ndarray:
         """Calculate the equity value."""
 
         lvg = self._a / self._l
@@ -104,7 +106,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def debt_value(self):
+    def debt_value(self) -> np.ndarray:
         """Calculate the debt value"""
 
         lvg = self._a / self._l
@@ -119,7 +121,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def credit_spread(self):
+    def credit_spread(self) -> np.ndarray:
         """Calculate the credit spread from the debt value."""
 
         dvalue = self.debt_value()
@@ -128,7 +130,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def prob_default(self):
+    def prob_default(self) -> np.ndarray:
         """Calculate the default probability. This is not risk-neutral so it
         uses the real world drift rather than the risk-free rate."""
 
@@ -140,7 +142,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def dist_default(self):
+    def dist_default(self) -> np.ndarray:
         """Calculate the distance to default. This is not risk-neutral so it
         uses the real world drift rather than the risk-free rate."""
 
@@ -151,7 +153,7 @@ class MertonFirm:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ASSET VALUE", self._a)

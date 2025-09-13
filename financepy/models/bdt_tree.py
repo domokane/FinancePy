@@ -18,7 +18,7 @@ INTERP_TYPE = InterpTypes.FLAT_FWD_RATES.value
 ########################################################################################
 
 
-def option_exercise_types_to_int(option_exercise_type):
+def option_exercise_types_to_int(option_exercise_type: FinExerciseTypes) -> int:
     """Convert the option exercise type to an integer for use in the tree."""
     if option_exercise_type == FinExerciseTypes.EUROPEAN:
         return 1
@@ -38,7 +38,15 @@ def option_exercise_types_to_int(option_exercise_type):
     fastmath=True,
     cache=True,
 )
-def f(x0, m, q_matrix, rt, df_end, dt, sigma):
+def f(
+    x0: float,
+    m: int,
+    q_matrix: np.ndarray,
+    rt: np.ndarray,
+    df_end: float,
+    dt: float,
+    sigma: float,
+) -> float:
 
     # x is the middle value on the short-rate on the tree
     midm = int(m / 2)
@@ -69,7 +77,15 @@ def f(x0, m, q_matrix, rt, df_end, dt, sigma):
     fastmath=True,
     cache=True,
 )
-def search_root(x0, m, q_matrix, rt, df_end, dt, sigma):
+def search_root(
+    x0: float,
+    m: int,
+    q_matrix: np.ndarray,
+    rt: np.ndarray,
+    df_end: float,
+    dt: float,
+    sigma: float,
+) -> float:
     """Search for the root of the function using a numerical method."""
     max_iter = 10
     max_error = 1e-8
@@ -101,20 +117,20 @@ def search_root(x0, m, q_matrix, rt, df_end, dt, sigma):
 
 @njit(fastmath=True, cache=True)
 def bermudan_swaption_tree_fast(
-    t_exp,
-    t_mat,
-    strike_price,
-    face_amount,
-    cpn_times,
-    cpn_flows,
-    exercise_type_int,
-    df_times,
-    df_values,
-    tree_times,
-    qq,
-    rt,
-    dt,
-):
+    t_exp: float,
+    t_mat: float,
+    strike_price: float,
+    face_amount: float,
+    cpn_times: np.ndarray,
+    cpn_flows: np.ndarray,
+    exercise_type_int: int,
+    df_times: np.ndarray,
+    df_values: np.ndarray,
+    tree_times: np.ndarray,
+    qq: np.ndarray,
+    rt: np.ndarray,
+    dt: float,
+) -> tuple[float, float]:
     """Option to enter into a swap that can be exercised on coupon payment
     dates after the start of the exercise period. Due to non-analytical bond
     price we need to extend tree out to bond maturity and take into account
@@ -249,20 +265,20 @@ def bermudan_swaption_tree_fast(
 
 @njit(fastmath=True, cache=True)
 def american_bond_option_tree_fast(
-    t_exp,
-    t_mat,
-    strike_price,
-    face_amount,
-    cpn_times,
-    cpn_flows,
-    exercise_type_int,
-    _df_times,
-    _df_values,
-    _tree_times,
-    _qq,
-    _rt,
-    _dt,
-):
+    t_exp: float,
+    t_mat: float,
+    strike_price: float,
+    face_amount: float,
+    cpn_times: np.ndarray,
+    cpn_flows: np.ndarray,
+    exercise_type_int: int,
+    _df_times: np.ndarray,
+    _df_values: np.ndarray,
+    _tree_times: np.ndarray,
+    _qq: np.ndarray,
+    _rt: np.ndarray,
+    _dt: float,
+) -> tuple[float, float]:
     """Option to buy or sell bond at a specified strike price that can be
     exercised over the exercise period depending on choice of exercise type.
     Due to non-analytical bond price we need to extend tree out to bond
@@ -435,25 +451,25 @@ def american_bond_option_tree_fast(
 
 @njit(fastmath=True, cache=True)
 def callable_puttable_bond_tree_fast(
-    cpn_times,
-    cpn_flows,
-    call_times,
-    call_prices,
-    put_times,
-    put_prices,
-    face_amount,
-    _sigma,
-    _a,
-    _q_matrix,  # IS SIGMA USED ?
-    _pu,
-    _pm,
-    _pd,
-    _rt,
-    _dt,
-    _tree_times,
-    _df_times,
-    _df_values,
-):
+    cpn_times: np.ndarray,
+    cpn_flows: np.ndarray,
+    call_times: np.ndarray,
+    call_prices: np.ndarray,
+    put_times: np.ndarray,
+    put_prices: np.ndarray,
+    face_amount: float,
+    _sigma: float,
+    _a: float,
+    _q_matrix: np.ndarray,  # IS SIGMA USED ?
+    _pu: float,
+    _pm: float,
+    _pd: float,
+    _rt: np.ndarray,
+    _dt: float,
+    _tree_times: np.ndarray,
+    _df_times: np.ndarray,
+    _df_values: np.ndarray,
+) -> dict[str, float]:
     """Value a bond with embedded put and call options that can be exercised
     at any time over the specified list of put and call dates.
     Due to non-analytical bond price we need to extend tree out to bond
@@ -586,7 +602,12 @@ def callable_puttable_bond_tree_fast(
 
 
 @njit(cache=True, fastmath=True)
-def build_tree_fast(sigma, tree_times, num_time_steps, discount_factors):
+def build_tree_fast(
+    sigma: float,
+    tree_times: np.ndarray,
+    num_time_steps: int,
+    discount_factors: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, float]:
     """Unlike the BK and HW Trinomial trees, this Tree is packed into the lower
     diagonal of a square matrix because of its binomial nature. This means
     that the indexing of the arrays is different."""
@@ -660,7 +681,7 @@ class BDTTree:
 
     ####################################################################################
 
-    def __init__(self, sigma: float, num_time_steps: int = 100):
+    def __init__(self, sigma: float, num_time_steps: int = 100) -> None:
         """Constructs the Black-Derman-Toy rate model in the case when the
         volatility is assumed to be constant. The short rate process simplifies
         and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh"""
@@ -689,7 +710,12 @@ class BDTTree:
 
     ####################################################################################
 
-    def build_tree(self, tree_mat, df_times, df_values):
+    def build_tree(
+        self,
+        tree_mat: float,
+        df_times: np.ndarray,
+        df_values: np.ndarray,
+    ) -> None:
 
         if isinstance(df_times, np.ndarray) is False:
             raise FinError("DF TIMES must be a numpy vector")
@@ -723,13 +749,13 @@ class BDTTree:
 
     def bond_option(
         self,
-        t_exp,
-        strike_price,
-        face_amount,
-        cpn_times,
-        cpn_flows,
-        exercise_type,
-    ):
+        t_exp: float,
+        strike_price: float,
+        face_amount: float,
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        exercise_type: FinExerciseTypes,
+    ) -> dict[str, float]:
         """Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree."""
 
@@ -765,14 +791,14 @@ class BDTTree:
 
     def bermudan_swaption(
         self,
-        t_exp,
-        t_mat,
-        strike,
-        face_amount,
-        cpn_times,
-        cpn_flows,
-        exercise_type,
-    ):
+        t_exp: float,
+        t_mat: float,
+        strike: float,
+        face_amount: float,
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        exercise_type: FinExerciseTypes,
+    ) -> dict[str, float]:
         """Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time."""
@@ -809,14 +835,14 @@ class BDTTree:
 
     def callable_puttable_bond_tree(
         self,
-        cpn_times,
-        cpn_flows,
-        call_times,
-        call_prices,
-        put_times,
-        put_prices,
-        face_amount,
-    ):
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        call_times: np.ndarray,
+        call_prices: np.ndarray,
+        put_times: np.ndarray,
+        put_prices: np.ndarray,
+        face_amount: float,
+    ) -> dict[str, float]:
         """Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
         maturity and take into account cash flows through time."""
@@ -851,7 +877,7 @@ class BDTTree:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string with class details."""
 
         s = "Black-Derman-Toy Model\n"

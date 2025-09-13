@@ -14,20 +14,20 @@ error_str = "In averaging period so need to enter accrued average."
 
 @njit(cache=True, fastmath=True, parallel=False)
 def equity_asian_value_mc_numba(
-    t0,
-    t,
-    tau,
-    k,
-    n,
-    opt_type,
-    stock_price,
-    interest_rate,
-    dividend_yield,
-    volatility,
-    num_paths,
-    seed,
-    accrued_average,
-):
+    t0: float,
+    t: float,
+    tau: float,
+    k: float,
+    n: int,
+    opt_type: int,
+    stock_price: float,
+    interest_rate: float,
+    dividend_yield: float,
+    volatility: float,
+    num_paths: int,
+    seed: int,
+    accrued_average: float,
+) -> float:
 
     if opt_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
         raise FinError("Invalid Option Type: Must be EUROPEAN call or put")
@@ -117,7 +117,7 @@ def equity_asian_value_mc_fast_numba(
     num_paths: int,
     seed: int,
     accrued_average: float,
-):
+) -> float:
 
     np.random.seed(seed)
     mu = interest_rate - dividend_yield
@@ -199,21 +199,21 @@ def equity_asian_value_mc_fast_numba(
 
 @njit(cache=True, parallel=False)
 def equity_asian_value_mc_fast_cv_numba(
-    t0,
-    t,
-    tau,
-    k,
-    n,
-    opt_type,
-    stock_price,
-    interest_rate,
-    dividend_yield,
-    volatility,
-    num_paths,
-    seed,
-    accrued_average,
-    v_g_exact,
-):
+    t0: float,
+    t: float,
+    tau: float,
+    k: float,
+    n: int,
+    opt_type: int,
+    stock_price: float,
+    interest_rate: float,
+    dividend_yield: float,
+    volatility: float,
+    num_paths: int,
+    seed: int,
+    accrued_average: float,
+    v_g_exact: float,
+) -> float:
 
     np.random.seed(seed)
     mu = interest_rate - dividend_yield

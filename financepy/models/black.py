@@ -37,10 +37,14 @@ class Black:
 
     def __init__(
         self,
-        volatility,
-        implementation_type=BlackTypes.ANALYTICAL,
-        num_steps=0,
-    ):
+        volatility: float,
+        implementation_type: BlackTypes = BlackTypes.ANALYTICAL,
+        num_steps: int = 0,
+    ) -> None:
+        if volatility < 0.0:
+            raise FinError("Volatility must be non-negative.")
+        if num_steps < 0:
+            raise FinError("num_steps must be non-negative.")
         """Create FinModel black using parameters."""
         self.volatility = volatility
         self.implementation_type = implementation_type
@@ -53,12 +57,20 @@ class Black:
 
     def value(
         self,
-        forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate K
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # df RFR to expiry date
+        forward_rate: float,  # Forward rate F
+        strike_rate: float,  # Strike Rate K
+        time_to_expiry: float,  # Time to Expiry (years)
+        df: float,  # df RFR to expiry date
         opt_type,
-    ):  # Call or put
+    ) -> float:  # Call or put
+        if forward_rate < 0.0:
+            raise FinError("forward_rate must be non-negative.")
+        if strike_rate < 0.0:
+            raise FinError("strike_rate must be non-negative.")
+        if time_to_expiry <= 0.0:
+            raise FinError("time_to_expiry must be positive.")
+        if df <= 0.0 or df > 1.0:
+            raise FinError("df (discount factor) must be in (0, 1].")
         """Price a derivative using Black's model which values in the forward
         measure following a change of measure."""
 
@@ -93,12 +105,20 @@ class Black:
 
     def delta(
         self,
-        forward_rate,  # Forward rate
-        strike_rate,  # Strike Rate
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # Discount factor to expiry date
+        forward_rate: float,  # Forward rate
+        strike_rate: float,  # Strike Rate
+        time_to_expiry: float,  # Time to Expiry (years)
+        df: float,  # Discount factor to expiry date
         opt_type,
-    ):  # Call or put
+    ) -> float:  # Call or put
+        if forward_rate < 0.0:
+            raise FinError("forward_rate must be non-negative.")
+        if strike_rate < 0.0:
+            raise FinError("strike_rate must be non-negative.")
+        if time_to_expiry <= 0.0:
+            raise FinError("time_to_expiry must be positive.")
+        if df <= 0.0 or df > 1.0:
+            raise FinError("df (discount factor) must be in (0, 1].")
         """Calculate delta using Black's model which values in the forward
         measure following a change of measure."""
 
@@ -137,12 +157,20 @@ class Black:
 
     def gamma(
         self,
-        forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate K
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # RFR to expiry date
+        forward_rate: float,  # Forward rate F
+        strike_rate: float,  # Strike Rate K
+        time_to_expiry: float,  # Time to Expiry (years)
+        df: float,  # RFR to expiry date
         opt_type,
-    ):  # Call or put
+    ) -> float:  # Call or put
+        if forward_rate < 0.0:
+            raise FinError("forward_rate must be non-negative.")
+        if strike_rate < 0.0:
+            raise FinError("strike_rate must be non-negative.")
+        if time_to_expiry <= 0.0:
+            raise FinError("time_to_expiry must be positive.")
+        if df <= 0.0 or df > 1.0:
+            raise FinError("df (discount factor) must be in (0, 1].")
         """Calculate gamma using Black's model which values in the forward
         measure following a change of measure."""
 
@@ -178,12 +206,20 @@ class Black:
 
     def theta(
         self,
-        forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate K
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # Discount Factor to expiry date
+        forward_rate: float,  # Forward rate F
+        strike_rate: float,  # Strike Rate K
+        time_to_expiry: float,  # Time to Expiry (years)
+        df: float,  # Discount Factor to expiry date
         opt_type,
-    ):  # Call or put
+    ) -> float:  # Call or put
+        if forward_rate < 0.0:
+            raise FinError("forward_rate must be non-negative.")
+        if strike_rate < 0.0:
+            raise FinError("strike_rate must be non-negative.")
+        if time_to_expiry <= 0.0:
+            raise FinError("time_to_expiry must be positive.")
+        if df <= 0.0 or df > 1.0:
+            raise FinError("df (discount factor) must be in (0, 1].")
         """Calculate theta using Black's model which values in the forward
         measure following a change of measure."""
 
@@ -221,12 +257,20 @@ class Black:
 
     def vega(
         self,
-        forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate K
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # df RFR to expiry date
+        forward_rate: float,  # Forward rate F
+        strike_rate: float,  # Strike Rate K
+        time_to_expiry: float,  # Time to Expiry (years)
+        df: float,  # df RFR to expiry date
         opt_type,
-    ):  # Call or put
+    ) -> float:  # Call or put
+        if forward_rate < 0.0:
+            raise FinError("forward_rate must be non-negative.")
+        if strike_rate < 0.0:
+            raise FinError("strike_rate must be non-negative.")
+        if time_to_expiry <= 0.0:
+            raise FinError("time_to_expiry must be positive.")
+        if df <= 0.0 or df > 1.0:
+            raise FinError("df (discount factor) must be in (0, 1].")
         """Calculate vega using Black's model which values in the forward
         measure following a change of measure."""
 
@@ -285,7 +329,14 @@ class Black:
 ########################################################################################
 
 
-def black_value(fwd, t, k, r, v, opt_type):
+def black_value(
+    fwd: float,
+    t: float,
+    k: float,
+    r: float,
+    v: float,
+    opt_type,
+) -> float:
     """Price a derivative using Black model."""
     d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
@@ -299,7 +350,14 @@ def black_value(fwd, t, k, r, v, opt_type):
 ########################################################################################
 
 
-def black_delta(fwd, t, k, r, v, opt_type):
+def black_delta(
+    fwd: float,
+    t: float,
+    k: float,
+    r: float,
+    v: float,
+    opt_type,
+) -> float:
     """Return delta of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
@@ -313,7 +371,14 @@ def black_delta(fwd, t, k, r, v, opt_type):
 ########################################################################################
 
 
-def black_gamma(fwd, t, k, r, v, opt_type):
+def black_gamma(
+    fwd: float,
+    t: float,
+    k: float,
+    r: float,
+    v: float,
+    opt_type,
+) -> float:
     """Return gamma of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
@@ -325,7 +390,14 @@ def black_gamma(fwd, t, k, r, v, opt_type):
 ########################################################################################
 
 
-def black_vega(fwd, t, k, r, v, opt_type):
+def black_vega(
+    fwd: float,
+    t: float,
+    k: float,
+    r: float,
+    v: float,
+    opt_type,
+) -> float:
     """Return vega of a derivative using Black model."""
     d1, _ = calculate_d1_d2(fwd, t, k, v)
     if opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
@@ -337,7 +409,14 @@ def black_vega(fwd, t, k, r, v, opt_type):
 ########################################################################################
 
 
-def black_theta(fwd, t, k, r, v, opt_type):
+def black_theta(
+    fwd: float,
+    t: float,
+    k: float,
+    r: float,
+    v: float,
+    opt_type,
+) -> float:
     """Return theta of a derivative using Black model."""
     d1, d2 = calculate_d1_d2(fwd, t, k, v)
     if opt_type == OptionTypes.EUROPEAN_CALL:
@@ -360,7 +439,12 @@ def black_theta(fwd, t, k, r, v, opt_type):
 
 
 @njit(float64[:](float64, float64, float64, float64), fastmath=True, cache=True)
-def calculate_d1_d2(f, t, k, v):
+def calculate_d1_d2(
+    f: float,
+    t: float,
+    k: float,
+    v: float,
+) -> np.ndarray:
     """Calculate d1 and d2 for Black-Scholes model."""
 
     t = np.maximum(t, G_SMALL)
@@ -383,7 +467,15 @@ def calculate_d1_d2(f, t, k, v):
 ########################################################################################
 
 
-def implied_volatility(fwd, t, r, k, price, opt_type, debug_print=True):
+def implied_volatility(
+    fwd: float,
+    t: float,
+    r: float,
+    k: float,
+    price: float,
+    opt_type,
+    debug_print: bool = True,
+) -> float:
     """Calculate the Black implied volatility of a European/American
     options on futures contracts using Newton with
     a fallback to bisection."""

@@ -25,7 +25,7 @@ INTERP = InterpTypes.FLAT_FWD_RATES.value
 ########################################################################################
 
 
-def option_exercise_types_to_int(option_exercise_type):
+def option_exercise_types_to_int(option_exercise_type: FinExerciseTypes) -> int:
 
     if option_exercise_type == FinExerciseTypes.EUROPEAN:
         return 1
@@ -45,7 +45,15 @@ def option_exercise_types_to_int(option_exercise_type):
     fastmath=True,
     cache=True,
 )
-def f(alpha, nm, qq, pp, dx, dt, n):
+def f(
+    alpha: float,
+    nm: int,
+    qq: np.ndarray,
+    pp: float,
+    dx: float,
+    dt: float,
+    n: int,
+) -> float:
 
     sum_qz = 0.0
     for j in range(-nm, nm + 1):
@@ -65,7 +73,15 @@ def f(alpha, nm, qq, pp, dx, dt, n):
     fastmath=True,
     cache=True,
 )
-def fprime(alpha, nm, qq, pp, dx, dt, n):
+def fprime(
+    alpha: float,
+    nm: int,
+    qq: np.ndarray,
+    pp: float,
+    dx: float,
+    dt: float,
+    n: int,
+) -> float:
     """Compute the derivative of the objective function."""
     sum_q_zd_z = 0.0
     for j in range(-nm, nm + 1):
@@ -88,7 +104,15 @@ def fprime(alpha, nm, qq, pp, dx, dt, n):
     fastmath=True,
     cache=True,
 )
-def search_root(x0, nm, qq, pp, dx, dt, n):
+def search_root(
+    x0: float,
+    nm: int,
+    qq: np.ndarray,
+    pp: float,
+    dx: float,
+    dt: float,
+    n: int,
+) -> float:
 
     #    print("Searching for root", x0)
     max_iter = 50
@@ -127,7 +151,15 @@ def search_root(x0, nm, qq, pp, dx, dt, n):
     fastmath=True,
     cache=True,
 )
-def search_root_deriv(x0, nm, qq, pp, dx, dt, n):
+def search_root_deriv(
+    x0: float,
+    nm: int,
+    qq: np.ndarray,
+    pp: float,
+    dx: float,
+    dt: float,
+    n: int,
+) -> float:
 
     max_iter = 50
     max_error = 1e-8
@@ -156,24 +188,24 @@ def search_root_deriv(x0, nm, qq, pp, dx, dt, n):
 
 @njit(fastmath=True, cache=True)
 def bermudan_swaption_tree_fast(
-    t_exp,
-    t_mat,
-    strike_price,
-    face_amount,
-    cpn_times,
-    cpn_flows,
-    exercise_type_int,
-    _df_times,
-    _df_values,
-    _tree_times,
-    _qq,
-    _pu,
-    _pm,
-    _pd,
-    _rt,
-    _dt,
-    _a,
-):
+    t_exp: float,
+    t_mat: float,
+    strike_price: float,
+    face_amount: float,
+    cpn_times: np.ndarray,
+    cpn_flows: np.ndarray,
+    exercise_type_int: int,
+    _df_times: np.ndarray,
+    _df_values: np.ndarray,
+    _tree_times: np.ndarray,
+    _qq: np.ndarray,
+    _pu: np.ndarray,
+    _pm: np.ndarray,
+    _pd: np.ndarray,
+    _rt: np.ndarray,
+    _dt: float,
+    _a: float,
+) -> tuple[float, float]:
     """Option to enter into a swap that can be exercised on coupon payment
     dates after the start of the exercise period. Due to multiple exercise
     times we need to extend tree out to bond maturity and take into account
@@ -387,24 +419,24 @@ def bermudan_swaption_tree_fast(
 
 @njit(fastmath=True, cache=True)
 def american_bond_option_tree_fast(
-    t_exp,
-    t_mat,
-    strike_price,
-    face_amount,
-    cpn_times,
-    cpn_flows,
-    exercise_type_int,
-    _df_times,
-    _df_values,
-    _tree_times,
-    _qq,
-    _pu,
-    _pm,
-    _pd,
-    _rt,
-    _dt,
-    _a,
-):
+    t_exp: float,
+    t_mat: float,
+    strike_price: float,
+    face_amount: float,
+    cpn_times: np.ndarray,
+    cpn_flows: np.ndarray,
+    exercise_type_int: int,
+    _df_times: np.ndarray,
+    _df_values: np.ndarray,
+    _tree_times: np.ndarray,
+    _qq: np.ndarray,
+    _pu: np.ndarray,
+    _pm: np.ndarray,
+    _pd: np.ndarray,
+    _rt: np.ndarray,
+    _dt: float,
+    _a: float,
+) -> tuple[float, float]:
     """Option that can be exercised at any time over the exercise period.
     Due to non-analytical bond price we need to extend tree out to bond
     maturity and take into account cash flows through time."""
@@ -619,25 +651,25 @@ def american_bond_option_tree_fast(
 
 @njit(fastmath=True, cache=True)
 def callable_puttable_bond_tree_fast(
-    cpn_times,
-    cpn_flows,
-    call_times,
-    call_prices,
-    put_times,
-    put_prices,
-    face_amount,
-    _sigma,
-    _a,
-    _qq,  # IS SIGMA USED ?
-    _pu,
-    _pm,
-    _pd,
-    _rt,
-    _dt,
-    _tree_times,
-    _df_times,
-    _df_values,
-):
+    cpn_times: np.ndarray,
+    cpn_flows: np.ndarray,
+    call_times: np.ndarray,
+    call_prices: np.ndarray,
+    put_times: np.ndarray,
+    put_prices: np.ndarray,
+    face_amount: float,
+    _sigma: float,
+    _a: float,
+    _qq: np.ndarray,  # IS SIGMA USED ?
+    _pu: np.ndarray,
+    _pm: np.ndarray,
+    _pd: np.ndarray,
+    _rt: np.ndarray,
+    _dt: float,
+    _tree_times: np.ndarray,
+    _df_times: np.ndarray,
+    _df_values: np.ndarray,
+) -> dict[str, float]:
     """Value a bond with embedded put and call options that can be exercised
     at any time over the specified list of put and call dates.
     Due to non-analytical bond price we need to extend tree out to bond
@@ -792,7 +824,13 @@ def callable_puttable_bond_tree_fast(
 
 
 @njit(fastmath=True, cache=True)
-def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
+def build_tree_fast(
+    a: float,
+    sigma: float,
+    tree_times: np.ndarray,
+    num_time_steps: int,
+    discount_factors: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, float]:
     """Calibrate the tree to a term structure of interest rates."""
 
     tree_maturity = tree_times[-1]
@@ -899,7 +937,13 @@ class BKTree:
 
     ####################################################################################
 
-    def __init__(self, sigma: float, a: float, num_time_steps: int = 100):
+    def __init__(self, sigma: float, a: float, num_time_steps: int = 100) -> None:
+        if not isinstance(sigma, float) or sigma < 0.0:
+            raise FinError("Negative volatility not allowed and must be float.")
+        if not isinstance(a, float) or a < 0.0:
+            raise FinError("Mean reversion speed parameter should be >= 0 and float.")
+        if not isinstance(num_time_steps, int) or num_time_steps < 3:
+            raise FinError("Drift fitting requires at least 3 time steps (int >= 3)")
         """Constructs the Black Karasinski rate model. The speed of mean
         reversion a and volatility are passed in. The short rate process
         is given by d(log(r)) = (theta(t) - a*log(r)) * dt  + sigma * dW"""
@@ -933,7 +977,18 @@ class BKTree:
 
     ####################################################################################
 
-    def build_tree(self, t_mat, df_times, df_values):
+    def build_tree(
+        self,
+        t_mat: float,
+        df_times: np.ndarray,
+        df_values: np.ndarray,
+    ) -> None:
+        if not isinstance(t_mat, float) or t_mat <= 0.0:
+            raise FinError("Tree maturity t_mat must be positive float.")
+        if not isinstance(df_times, np.ndarray):
+            raise FinError("DF TIMES must be a numpy vector")
+        if not isinstance(df_values, np.ndarray):
+            raise FinError("DF VALUES must be a numpy vector")
 
         if isinstance(df_times, np.ndarray) is False:
             raise FinError("DF TIMES must be a numpy vector")
@@ -965,13 +1020,23 @@ class BKTree:
 
     def bond_option(
         self,
-        t_exp,
-        strike_price,
-        face_amount,
-        cpn_times,
-        cpn_flows,
-        exercise_type,
-    ):
+        t_exp: float,
+        strike_price: float,
+        face_amount: float,
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        exercise_type: FinExerciseTypes,
+    ) -> dict[str, float]:
+        if not isinstance(t_exp, float) or t_exp < 0.0:
+            raise FinError("Option expiry time t_exp must be non-negative float.")
+        if not isinstance(strike_price, float):
+            raise FinError("Strike price must be float.")
+        if not isinstance(face_amount, float):
+            raise FinError("Face amount must be float.")
+        if not isinstance(cpn_times, np.ndarray):
+            raise FinError("cpn_times must be numpy array.")
+        if not isinstance(cpn_flows, np.ndarray):
+            raise FinError("cpn_flows must be numpy array.")
         """Value a bond option that has European or American exercise using
         the Black-Karasinski model. The model uses a trinomial tree."""
 
@@ -1011,14 +1076,26 @@ class BKTree:
 
     def bermudan_swaption(
         self,
-        t_exp,
-        t_mat,
-        strike_price,
-        face_amount,
-        cpn_times,
-        cpn_flows,
-        exercise_type,
-    ):
+        t_exp: float,
+        t_mat: float,
+        strike_price: float,
+        face_amount: float,
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        exercise_type: FinExerciseTypes,
+    ) -> dict[str, float]:
+        if not isinstance(t_exp, float) or t_exp < 0.0:
+            raise FinError("Option expiry time t_exp must be non-negative float.")
+        if not isinstance(t_mat, float) or t_mat <= 0.0:
+            raise FinError("Maturity t_mat must be positive float.")
+        if not isinstance(strike_price, float):
+            raise FinError("Strike price must be float.")
+        if not isinstance(face_amount, float):
+            raise FinError("Face amount must be float.")
+        if not isinstance(cpn_times, np.ndarray):
+            raise FinError("cpn_times must be numpy array.")
+        if not isinstance(cpn_flows, np.ndarray):
+            raise FinError("cpn_flows must be numpy array.")
         """Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time."""
@@ -1059,14 +1136,28 @@ class BKTree:
 
     def callable_puttable_bond_tree(
         self,
-        cpn_times,
-        cpn_flows,
-        call_times,
-        call_prices,
-        put_times,
-        put_prices,
-        face,
-    ):
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        call_times: np.ndarray,
+        call_prices: np.ndarray,
+        put_times: np.ndarray,
+        put_prices: np.ndarray,
+        face: float,
+    ) -> dict[str, float]:
+        if not isinstance(cpn_times, np.ndarray):
+            raise FinError("cpn_times must be numpy array.")
+        if not isinstance(cpn_flows, np.ndarray):
+            raise FinError("cpn_flows must be numpy array.")
+        if not isinstance(call_times, np.ndarray):
+            raise FinError("call_times must be numpy array.")
+        if not isinstance(call_prices, np.ndarray):
+            raise FinError("call_prices must be numpy array.")
+        if not isinstance(put_times, np.ndarray):
+            raise FinError("put_times must be numpy array.")
+        if not isinstance(put_prices, np.ndarray):
+            raise FinError("put_prices must be numpy array.")
+        if not isinstance(face, float):
+            raise FinError("face must be float.")
         """Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
         maturity and take into account cash flows through time."""
@@ -1105,7 +1196,7 @@ class BKTree:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string with class details."""
 
         s = "Black-Karasinski Model\n"

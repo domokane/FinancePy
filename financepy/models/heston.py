@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+
+from typing import Any
 from enum import Enum
 from math import exp, log, pi
 
@@ -39,7 +41,7 @@ class HestonNumericalScheme(Enum):
 
 
 @njit(
-    float64[:, :](
+    float64[:, :] (
         float64,
         float64,
         float64,
@@ -57,7 +59,21 @@ class HestonNumericalScheme(Enum):
     cache=True,
     parallel=False,
 )
-def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, scheme):
+def get_paths(
+    s0: float,
+    r: float,
+    q: float,
+    v0: float,
+    kappa: float,
+    theta: float,
+    sigma: float,
+    rho: float,
+    t: float,
+    dt: float,
+    num_paths: int,
+    seed: int,
+    scheme: float
+) -> np.ndarray:
 
     np.random.seed(seed)
     num_steps = int(t / dt)
@@ -177,7 +193,14 @@ def get_paths(s0, r, q, v0, kappa, theta, sigma, rho, t, dt, num_paths, seed, sc
 
 class Heston:
 
-    def __init__(self, v0, kappa, theta, sigma, rho):
+    def __init__(
+        self,
+        v0: float,
+        kappa: float,
+        theta: float,
+        sigma: float,
+        rho: float
+    ) -> None:
 
         verbose = False
 
@@ -194,16 +217,16 @@ class Heston:
 
     def value_mc(
         self,
-        value_dt,
-        option,
-        stock_price,
-        interest_rate,
-        dividend_yield,
-        num_paths,
-        num_steps_per_year,
-        seed,
-        scheme=HestonNumericalScheme.EULERLOG,
-    ):
+        value_dt: float,
+        option: Any,
+        stock_price: float,
+        interest_rate: float,
+        dividend_yield: float,
+        num_paths: int,
+        num_steps_per_year: int,
+        seed: int,
+        scheme: HestonNumericalScheme = HestonNumericalScheme.EULERLOG,
+    ) -> float:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -240,7 +263,14 @@ class Heston:
 
     ####################################################################################
 
-    def value_lewis(self, value_dt, option, stock_price, interest_rate, dividend_yield):
+    def value_lewis(
+        self,
+        value_dt: float,
+        option: Any,
+        stock_price: float,
+        interest_rate: float,
+        dividend_yield: float
+    ) -> float:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -290,8 +320,13 @@ class Heston:
     ####################################################################################
 
     def value_lewis_rouah(
-        self, value_dt, option, stock_price, interest_rate, dividend_yield
-    ):
+        self,
+        value_dt: float,
+        option: Any,
+        stock_price: float,
+        interest_rate: float,
+        dividend_yield: float
+    ) -> float:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -334,7 +369,14 @@ class Heston:
     # Taken from Nick Weber's VBA Finance book
     ####################################################################################
 
-    def value_weber(self, value_dt, option, stock_price, interest_rate, dividend_yield):
+    def value_weber(
+        self,
+        value_dt: float,
+        option: Any,
+        stock_price: float,
+        interest_rate: float,
+        dividend_yield: float
+    ) -> float:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 
@@ -383,8 +425,13 @@ class Heston:
     ####################################################################################
 
     def value_gatheral(
-        self, value_dt, option, stock_price, interest_rate, dividend_yield
-    ):
+        self,
+        value_dt: float,
+        option: Any,
+        stock_price: float,
+        interest_rate: float,
+        dividend_yield: float
+    ) -> float:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
 

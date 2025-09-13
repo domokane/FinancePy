@@ -19,14 +19,20 @@ MIN_Z = -6.0
 ########################################################################################
 
 
+from typing import Sequence
+
 @njit(
     float64[:](int64, float64[:], float64[:], float64[:], int64),
     fastmath=True,
     cache=True,
 )
 def loss_dbn_recursion_gcd(
-    num_credits, default_probs, loss_units, beta_vector, num_integration_steps
-):
+    num_credits: int,
+    default_probs: Sequence[float],
+    loss_units: Sequence[float],
+    beta_vector: Sequence[float],
+    num_integration_steps: int
+) -> np.ndarray:
     """Full construction of the loss distribution of a portfolio of credits
     where losses have been calculate as number of units based on the GCD."""
 
@@ -87,8 +93,11 @@ def loss_dbn_recursion_gcd(
     cache=True,
 )
 def homog_basket_loss_dbn(
-    survival_probs, recovery_rates, beta_vector, num_integration_steps
-):
+    survival_probs: Sequence[float],
+    recovery_rates: Sequence[float],
+    beta_vector: Sequence[float],
+    num_integration_steps: int
+) -> np.ndarray:
     """Calculate the loss distribution of a CDS default basket where the
     portfolio is equally weighted and the losses in the portfolio are homo-
     geneous i.e. the credits have the same recovery rates."""
@@ -139,14 +148,14 @@ def homog_basket_loss_dbn(
     fastmath=True,
 )
 def tranche_surv_prob_recursion(
-    k1,
-    k2,
-    num_credits,
-    survival_probs,
-    recovery_rates,
-    beta_vector,
-    num_integration_steps,
-):
+    k1: float,
+    k2: float,
+    num_credits: int,
+    survival_probs: Sequence[float],
+    recovery_rates: Sequence[float],
+    beta_vector: Sequence[float],
+    num_integration_steps: int
+) -> float:
     """Get the tranche survival probability of a portfolio of credits in the
     one-factor GC model using a full recursion calculation of the loss
     distribution and survival probabilities to some time horizon."""
@@ -214,7 +223,12 @@ def tranche_surv_prob_recursion(
 
 
 @njit(float64(float64, float64, float64, float64), fastmath=True, cache=True)
-def gauss_approx_tranche_loss(k1, k2, mu, sigma):
+def gauss_approx_tranche_loss(
+    k1: float,
+    k2: float,
+    mu: float,
+    sigma: float
+) -> float:
 
     if abs(sigma) < 1e-6:
         tranche_loss = 0.0
@@ -250,14 +264,14 @@ def gauss_approx_tranche_loss(k1, k2, mu, sigma):
     cache=True,
 )
 def tranch_surv_prob_gaussian(
-    k1,
-    k2,
-    num_credits,
-    survival_probs,
-    recovery_rates,
-    beta_vector,
-    num_integration_steps,
-):
+    k1: float,
+    k2: float,
+    num_credits: int,
+    survival_probs: Sequence[float],
+    recovery_rates: Sequence[float],
+    beta_vector: Sequence[float],
+    num_integration_steps: int
+) -> float:
     """Get the approximated tranche survival probability of a portfolio
     of credits in the one-factor GC model using a Gaussian fit of the
     conditional loss distribution and survival probabilities to some time
@@ -320,8 +334,12 @@ def tranch_surv_prob_gaussian(
     cache=True,
 )
 def loss_dbn_hetero_adj_binomial(
-    num_credits, default_probs, loss_ratio, beta_vector, num_integration_steps
-):
+    num_credits: int,
+    default_probs: Sequence[float],
+    loss_ratio: Sequence[float],
+    beta_vector: Sequence[float],
+    num_integration_steps: int
+) -> np.ndarray:
     """Get the portfolio loss distribution using the adjusted binomial
     approximation to the conditional loss distribution."""
 
@@ -372,15 +390,14 @@ def loss_dbn_hetero_adj_binomial(
     cache=True,
 )
 def tranche_surv_prob_adj_binomial(
-    k1,
-    k2,
-    num_credits,
-    survival_probs,
-    recovery_rates,
-    beta_vector,
-    num_integration_steps,
-    ########################################################################################
-):
+    k1: float,
+    k2: float,
+    num_credits: int,
+    survival_probs: Sequence[float],
+    recovery_rates: Sequence[float],
+    beta_vector: Sequence[float],
+    num_integration_steps: int
+) -> float:
     """Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the adjusted binomial fit of the
     conditional loss distribution and survival probabilities to some time

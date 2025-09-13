@@ -14,9 +14,17 @@ from ..models.sobol import get_gaussian_sobol
 ########################################################################################
 
 def _value_mc_nonumba_nonumpy(
-
-    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
-):
+    s: float,
+    t: float,
+    k: float,
+    opt_type: int,
+    r: float,
+    q: float,
+    v: float,
+    num_paths: int,
+    seed: int,
+    use_sobol: int,
+) -> float:
     # SLOWEST - No use of NUMPY vectorisation or NUMBA
 
     num_paths = int(num_paths)
@@ -58,9 +66,17 @@ def _value_mc_nonumba_nonumpy(
 ########################################################################################
 
 def _value_mc_numpy_only(
-
-    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
-):
+    s: float,
+    t: float,
+    k: float,
+    opt_type: int,
+    r: float,
+    q: float,
+    v: float,
+    num_paths: int,
+    seed: int,
+    use_sobol: int,
+) -> float:
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -112,9 +128,17 @@ def _value_mc_numpy_only(
     fastmath=True,
 )
 def _value_mc_numpy_numba(
-
-    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
-):
+    s: float,
+    t: float,
+    k: float,
+    opt_type: int,
+    r: float,
+    q: float,
+    v: float,
+    num_paths: int,
+    seed: int,
+    use_sobol: int,
+) -> float:
     # Use of NUMPY ONLY
 
     num_paths = int(num_paths)
@@ -166,9 +190,17 @@ def _value_mc_numpy_numba(
     cache=True,
 )
 def _value_mc_numba_only(
-
-    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
-):
+    s: float,
+    t: float,
+    k: float,
+    opt_type: int,
+    r: float,
+    q: float,
+    v: float,
+    num_paths: int,
+    seed: int,
+    use_sobol: int,
+) -> float:
     # No use of Numpy vectorisation but NUMBA
 
     num_paths = int(num_paths)
@@ -228,11 +260,17 @@ def _value_mc_numba_only(
     cache=True,
 )
 def _value_mc_numba_parallel(
-
-    s, t, k, opt_type, r, q, v, num_paths, seed, use_sobol
-########################################################################################
-
-):
+    s: float,
+    t: float,
+    k: float,
+    opt_type: int,
+    r: float,
+    q: float,
+    v: float,
+    num_paths: int,
+    seed: int,
+    use_sobol: int,
+) -> float:
     # No use of Numpy vectorisation but NUMBA
 
     num_paths = int(num_paths)

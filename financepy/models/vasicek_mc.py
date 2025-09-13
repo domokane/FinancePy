@@ -14,11 +14,14 @@ from ..utils.helpers import label_to_string
 ########################################################################################
 
 
+
+from typing import Any
+
 class ModelRatesVasicek:
 
     ####################################################################################
 
-    def __init__(self, a, b, sigma):
+    def __init__(self, a: float, b: float, sigma: float) -> None:
 
         self._a = a
         self._b = b
@@ -26,7 +29,7 @@ class ModelRatesVasicek:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("a", self._a)
@@ -39,7 +42,12 @@ class ModelRatesVasicek:
 
 
 @njit(fastmath=True, cache=True)
-def meanr(r0, a, b, t):
+def meanr(
+    r0: float,
+    a: float,
+    b: float,
+    t: float
+) -> float:
     """Expectation of short rate at later time t"""
     mr = r0 * exp(-a * t) + b * (1 - exp(-a * t))
     return mr
@@ -49,7 +57,11 @@ def meanr(r0, a, b, t):
 
 
 @njit(fastmath=True, cache=True)
-def variancer(a, sigma, t):
+def variancer(
+    a: float,
+    sigma: float,
+    t: float
+) -> float:
     """Variance of short rate at later time t"""
     vr = sigma * sigma * (1.0 - exp(-2.0 * a * t)) / 2.0 / a
     return vr
@@ -59,7 +71,13 @@ def variancer(a, sigma, t):
 
 
 @njit(fastmath=True, cache=True)
-def zero_price(r0, a, b, sigma, t):
+def zero_price(
+    r0: float,
+    a: float,
+    b: float,
+    sigma: float,
+    t: float
+) -> float:
     """Generate zero price analytically using Vasicek model"""
     bb = (1.0 - exp(-a * t)) / a
     aa = exp(
@@ -78,7 +96,15 @@ def zero_price(r0, a, b, sigma, t):
     fastmath=True,
     cache=True,
 )
-def rate_path_mc(r0, a, b, sigma, t, dt, seed):
+def rate_path_mc(
+    r0: float,
+    a: float,
+    b: float,
+    sigma: float,
+    t: float,
+    dt: float,
+    seed: int
+) -> np.ndarray:
     """Generate a path of short rates using Vasicek model"""
 
     np.random.seed(seed)
@@ -109,7 +135,16 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed):
     cache=True,
     parallel=False,
 )
-def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed):
+def zero_price_mc(
+    r0: float,
+    a: float,
+    b: float,
+    sigma: float,
+    t: float,
+    dt: float,
+    num_paths: int,
+    seed: int
+) -> float:
     """Generate zero price by Monte Carlo using Vasicek model"""
     np.random.seed(seed)
     num_steps = int(t / dt)

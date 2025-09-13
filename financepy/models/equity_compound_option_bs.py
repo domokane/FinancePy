@@ -14,23 +14,22 @@ from .black_scholes_analytic import bs_value
 ########################################################################################
 
 
-def _f(s0, *args):
-
+def _f(s0, *args) -> float:
     opt2_type = args[0]
-    t2 = args[1]
-    k2 = args[2]
-    t1 = args[3]
-    r = args[4]
-    q = args[5]
-    vol = args[6]
-    k1 = args[7]  # Target
+    t2: float = args[1]
+    k2: float = args[2]
+    t1: float = args[3]
+    r: float = args[4]
+    q: float = args[5]
+    vol: float = args[6]
+    k1: float = args[7]  # Target
 
     if s0 <= 0.0:
         raise FinError("Unable to solve for stock price that fits k_1")
 
-    tau = t2 - t1
-    opt_value = bs_value(s0, tau, k2, r, q, vol, opt2_type.value)
-    obj_fn = opt_value - k1
+    tau: float = t2 - t1
+    opt_value: float = bs_value(s0, tau, k2, r, q, vol, opt2_type.value)
+    obj_fn: float = opt_value - k1
 
     return obj_fn
 
@@ -38,10 +37,23 @@ def _f(s0, *args):
 ########################################################################################
 
 
+
+from typing import Any
+
 @njit(fastmath=True, cache=True)
 def value_cmpd_once(
-    s, r, q, volatility, t1, t2, opt_type1, opt_type2, k1, k2, num_steps
-):
+    s: float,
+    r: float,
+    q: float,
+    volatility: float,
+    t1: float,
+    t2: float,
+    opt_type1: Any,  # OptionTypes, but Numba doesn't support Enums in signatures
+    opt_type2: Any,  # OptionTypes
+    k1: float,
+    k2: float,
+    num_steps: int
+) -> np.ndarray:
 
     if num_steps < 3:
         num_steps = 3
@@ -225,17 +237,18 @@ def value_cmpd_once(
 ########################################################################################
 
 
+
 def implied_stock_price(
-    s0,
-    tc,
-    tu,
-    kc,
-    ku,
-    opt_type_u,
-    r,
-    q,
-    vol,
-):
+    s0: float,
+    tc: float,
+    tu: float,
+    kc: float,
+    ku: float,
+    opt_type_u: OptionTypes,
+    r: float,
+    q: float,
+    vol: float,
+) -> float:
 
     argtuple = (
         opt_type_u,
@@ -264,8 +277,8 @@ def implied_stock_price(
 
 
 def equity_compound_option_bs(
-    c_opt_type,
-    u_opt_type,
+    c_opt_type: OptionTypes,
+    u_opt_type: OptionTypes,
     tc: float,
     tu: float,
     kc: float,
@@ -275,7 +288,7 @@ def equity_compound_option_bs(
     qu: float,
     volatility: float,
     num_steps: int = 200,
-):
+) -> float:
     """Value the compound option using an analytical approach if it is
     entirely European style. Otherwise use a Tree approach to handle the
     early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
@@ -351,18 +364,18 @@ def equity_compound_option_bs(
 
 
 def equity_compound_option_value_tree(
-    c_opt_type,
-    u_opt_type,
-    tc,
-    tu,
-    kc,
-    ku,
-    s0,
-    ru,
-    qu,
-    volatility,
-    num_steps=200,
-):
+    c_opt_type: OptionTypes,
+    u_opt_type: OptionTypes,
+    tc: float,
+    tu: float,
+    kc: float,
+    ku: float,
+    s0: float,
+    ru: float,
+    qu: float,
+    volatility: float,
+    num_steps: int = 200,
+) -> np.ndarray:
     """This function is called if the option has American features."""
 
     v1 = value_cmpd_once(

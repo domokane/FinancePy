@@ -12,7 +12,14 @@ from ..utils.helpers import uniform_to_default_time
 ########################################################################################
 
 
-def default_times_gc(issuer_curves, corr_matrix, num_trials, seed):
+from typing import Sequence, Any
+
+def default_times_gc(
+    issuer_curves: Sequence[Any],
+    corr_matrix: np.ndarray,
+    num_trials: int,
+    seed: int
+) -> np.ndarray:
     """Generate a matrix of default times by credit and trial using a
     Gaussian copula model using a full rank correlation matrix."""
 

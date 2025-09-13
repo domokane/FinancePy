@@ -20,7 +20,17 @@ from .black_scholes_analytic import bs_value
 ########################################################################################
 
 
-def option_implied_dbn(s, t, r, q, strikes, sigmas):
+import numpy as np
+from typing import Sequence
+
+def option_implied_dbn(
+    s: float,
+    t: float,
+    r: float,
+    q: float,
+    strikes: Sequence[float],
+    sigmas: Sequence[float]
+) -> np.ndarray:
     """This function calculates the option smile/skew-implied probability
     density function times the interval width."""
 

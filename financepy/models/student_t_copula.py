@@ -9,13 +9,21 @@ from ..utils.helpers import uniform_to_default_time
 ########################################################################################
 
 
+
+from typing import Sequence, Any
+
 class StudentTCopula:
 
     ####################################################################################
 
     def default_times(
-        self, issuer_curves, corr_matrix, degrees_of_freedom, num_trials, seed
-    ):
+        self,
+        issuer_curves: Sequence[Any],
+        corr_matrix: np.ndarray,
+        degrees_of_freedom: float,
+        num_trials: int,
+        seed: int
+    ) -> np.ndarray:
 
         np.random.seed(seed)
         num_credits = len(issuer_curves)

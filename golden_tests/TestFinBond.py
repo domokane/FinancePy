@@ -2,6 +2,8 @@
 
 import os
 
+import add_fp_to_path
+
 import datetime as dt
 import pandas as pd
 import numpy as np

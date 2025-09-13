@@ -29,7 +29,12 @@ class VolFuncTypes(Enum):
 
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
-def vol_function_clark(params, f, k, t):
+def vol_function_clark(
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Volatility Function in book by Iain Clark generalised to allow for
     higher than quadratic power. Care needs to be taken to avoid overfitting.
     The exact reference is Clark Page 59."""
@@ -58,7 +63,12 @@ def vol_function_clark(params, f, k, t):
 
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
-def vol_function_bloomberg(params, f, k, t):
+def vol_function_bloomberg(
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Volatility Function similar to the one used by Bloomberg. It is
     a quadratic function in the spot delta of the option. It can therefore
     go negative so it requires a good initial guess when performing the
@@ -94,7 +104,12 @@ def vol_function_bloomberg(params, f, k, t):
 
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
-def vol_function_svi(params, f, k, t):
+def vol_function_svi(
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Volatility Function proposed by Gatheral in 2004. Increasing a results
     in a vertical translation of the smile in the positive direction.
     Increasing b decreases the angle between the put and call wing, i.e.
@@ -123,7 +138,10 @@ def vol_function_svi(params, f, k, t):
 
 
 @njit(float64(float64, float64), fastmath=True, cache=True)
-def phi_ssvi(theta, gamma):
+def phi_ssvi(
+    theta: float,
+    gamma: float
+) -> float:
 
     if abs(gamma) < 1e-8:
         gamma = 1e-8
@@ -143,7 +161,13 @@ def phi_ssvi(theta, gamma):
     fastmath=True,
     cache=True,
 )
-def ssvi(x, gamma, sigma, rho, t):
+def ssvi(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
     """This is the total variance w = sigma(t) x sigma(t) (0,t) x t"""
 
     theta = sigma * sigma * t
@@ -162,7 +186,13 @@ def ssvi(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def ssvi1(x, gamma, sigma, rho, t):
+def ssvi1(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     # First derivative with respect to x
     theta = sigma * sigma * t
@@ -181,7 +211,13 @@ def ssvi1(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def ssvi2(x, gamma, sigma, rho, t):
+def ssvi2(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     # Second derivative with respect to x
     theta = sigma * sigma * t
@@ -200,7 +236,13 @@ def ssvi2(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def ssvit(x, gamma, sigma, rho, t):
+def ssvit(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     # First derivative with respect to t, by central difference
     eps = 0.0001
@@ -218,7 +260,13 @@ def ssvit(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def g(x, gamma, sigma, rho, t):
+def g(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     w = ssvi(x, gamma, sigma, rho, t)
 
@@ -240,7 +288,13 @@ def g(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def dminus(x, gamma, sigma, rho, t):
+def dminus(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     vsqrt = np.sqrt(ssvi(x, gamma, sigma, rho, t))
     v = -x / vsqrt - 0.5 * vsqrt
@@ -255,7 +309,13 @@ def dminus(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def density_ssvi(x, gamma, sigma, rho, t):
+def density_ssvi(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     dm = dminus(x, gamma, sigma, rho, t)
     v = g(x, gamma, sigma, rho, t) * np.exp(-0.5 * dm * dm)
@@ -271,7 +331,13 @@ def density_ssvi(x, gamma, sigma, rho, t):
     fastmath=True,
     cache=True,
 )
-def ssvi_local_varg(x, gamma, sigma, rho, t):
+def ssvi_local_varg(
+    x: float,
+    gamma: float,
+    sigma: float,
+    rho: float,
+    t: float
+) -> float:
 
     # Compute the equivalent ssvi local variance
     num = ssvit(x, gamma, sigma, rho, t)
@@ -284,7 +350,12 @@ def ssvi_local_varg(x, gamma, sigma, rho, t):
 
 
 @njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
-def vol_function_ssvi(params, f, k, t):
+def vol_function_ssvi(
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Volatility Function proposed by Gatheral in 2004."""
 
     gamma = params[0]

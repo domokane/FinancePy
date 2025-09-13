@@ -46,7 +46,7 @@ def test_bond_option():
     expiry_dt = settle_dt.add_tenor("18m")
     strike_price = 105.0
 
-    strikes = [80, 90, 100, 110, 120]
+    strikes = [80.0, 90.0, 100.0, 110.0, 120.0]
 
     opt_type = OptionTypes.EUROPEAN_CALL
 
@@ -357,7 +357,7 @@ def test_bond_option_zerovol_convergence():
     )
 
     num_time_steps = range(100, 200, 100)
-    strike_prices = [90, 100, 110]
+    strike_prices = [90.0, 100.0, 110.0]
 
     for strike_price in strike_prices:
 

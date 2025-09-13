@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from typing import Union
+from typing import Union, Any
 
 import numpy as np
 from scipy import optimize
@@ -13,7 +13,7 @@ from .merton_firm import MertonFirm
 ########################################################################################
 
 
-def _fobj(x, *args):
+def _fobj(x: Any, *args: Any) -> float:
     """Find value of asset value and vol that fit equity value and vol"""
 
     a, v_a = x
@@ -124,7 +124,7 @@ class MertonFirmMkt(MertonFirm):
 
     ####################################################################################
 
-    def _solve_for_asset_value_and_vol(self):
+    def _solve_for_asset_value_and_vol(self) -> None:
 
         self._a = []
         self._va = []
@@ -171,7 +171,7 @@ class MertonFirmMkt(MertonFirm):
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EQUITY VALUE", self._e)

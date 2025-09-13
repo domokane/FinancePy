@@ -15,8 +15,19 @@ INTERP = InterpTypes.FLAT_FWD_RATES.value
 ########################################################################################
 
 
+from typing import Any, Dict
+
 @njit(fastmath=True, cache=True)
-def p_fast(t, t_mat, rt, delta, pt, ptd, p_mat, sigma):
+def p_fast(
+    t: float,
+    t_mat: float,
+    rt: float,
+    delta: float,
+    pt: float,
+    ptd: float,
+    p_mat: float,
+    sigma: float
+) -> float:
     """Forward discount factor as seen at some time t which may be in the
     future for payment at time T where Rt is the delta-period short rate
     seen at time t and pt is the discount factor to time t, ptd is the one
@@ -37,11 +48,12 @@ def p_fast(t, t_mat, rt, delta, pt, ptd, p_mat, sigma):
 ########################################################################################
 
 
+
 class ModelRatesHoLee:
 
     ####################################################################################
 
-    def __init__(self, sigma):
+    def __init__(self, sigma: float) -> None:
         """Construct Ho-Lee model using single parameter of volatility. The
         dynamical equation is dr = theta(t) dt + sigma * dW. Any no-arbitrage
         fitting is done within functions below."""
@@ -53,7 +65,13 @@ class ModelRatesHoLee:
 
     ####################################################################################
 
-    def zcb(self, rt1, t1, t2, discount_curve):
+    def zcb(
+        self,
+        rt1: float,
+        t1: float,
+        t2: float,
+        discount_curve: Any
+    ) -> float:
 
         delta = t2 - t1
         dt = 1e-10
@@ -66,8 +84,14 @@ class ModelRatesHoLee:
     ####################################################################################
 
     def option_on_zcb(
-        self, t_exp, t_mat, strike_price, face_amount, df_times, df_values
-    ):
+        self,
+        t_exp: float,
+        t_mat: float,
+        strike_price: float,
+        face_amount: float,
+        df_times: np.ndarray,
+        df_values: np.ndarray
+    ) -> Dict[str, float]:
         """Price an option on a zero coupon bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date."""
@@ -101,7 +125,7 @@ class ModelRatesHoLee:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string with class details."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)

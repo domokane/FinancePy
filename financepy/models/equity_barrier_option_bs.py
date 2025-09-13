@@ -31,7 +31,17 @@ from ..utils.math import normcdf
     fastmath=True,
     cache=True,
 )
-def value_equity_barrier_option_bs(t, k, h, s, r, q, v, opt_type, nobs):
+def value_equity_barrier_option_bs(
+    t: float,
+    k: float,
+    h: float,
+    s: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type: int,
+    nobs: int,
+) -> float:
     """This values a single barrier option. Because of its structure it cannot
     easily be vectorised which is why it has been wrapped.
     # number of observations per year

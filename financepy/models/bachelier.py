@@ -21,22 +21,24 @@ class Bachelier:
 
     ####################################################################################
 
-    def __init__(self, volatility):
-
+    def __init__(self, volatility: float) -> None:
         """Create FinModel black using parameters."""
+
+        if volatility <= 0.0:
+                raise FinError("Volatility must be positive")
+
         self.volatility = volatility
 
     ####################################################################################
 
     def value(
-
         self,
-        forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate K
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # Discount Factor to expiry date
-        call_or_put,
-    ):  # Call or put
+        forward_rate: float,  # Forward rate F
+        strike_rate: float,  # Strike Rate K
+        time_to_expiry: float,  # Time to Expiry (years)
+        df: float,  # Discount Factor to expiry date
+        call_or_put: OptionTypes,  # Call or put
+    ) -> float:
         """Price a call or put option using Bachelier's model."""
         f = forward_rate
         t = time_to_expiry
@@ -54,7 +56,7 @@ class Bachelier:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)

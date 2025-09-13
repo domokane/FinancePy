@@ -34,15 +34,22 @@ class FinHWEuropeanCalcType(Enum):
 ########################################################################################
 
 
-def option_exercise_types_to_int(option_exercise_type):
+from typing import Any, Dict, List, Optional, Union
 
+def option_exercise_types_to_int(option_exercise_type: Any) -> int:
+    """
+    Convert option exercise type enum to integer.
+    Args:
+        option_exercise_type (FinExerciseTypes): The exercise type.
+    Returns:
+        int: 1=European, 2=Bermudan, 3=American
+    """
     if option_exercise_type == FinExerciseTypes.EUROPEAN:
         return 1
     if option_exercise_type == FinExerciseTypes.BERMUDAN:
         return 2
     if option_exercise_type == FinExerciseTypes.AMERICAN:
         return 3
-
     raise FinError("Unknown option exercise type.")
 
 
@@ -806,12 +813,20 @@ def callable_puttable_bond_tree_fast(
 ########################################################################################
 
 
-def fwd_dirty_bond_price(r_t, *args):
-    """Price a cpn bearing bond on the option expiry date and return
+
+def fwd_dirty_bond_price(r_t: float, *args: Any) -> float:
+    """
+    Price a cpn bearing bond on the option expiry date and return
     the difference from a strike price. This is used in a root search to
     find the future expiry time short rate that makes the bond price equal
     to the option strike price. It is a key step in the Jamshidian bond
-    decomposition approach. The strike is a clean price."""
+    decomposition approach. The strike is a clean price.
+    Args:
+        r_t (float): Short rate at expiry.
+        *args: See function body for unpacked arguments.
+    Returns:
+        float: Difference between bond price and strike.
+    """
 
     self = args[0]
     t_exp = args[1]
@@ -874,17 +889,18 @@ def fwd_dirty_bond_price(r_t, *args):
 ########################################################################################
 
 
+
 class HWTree:
 
     ####################################################################################
 
     def __init__(
         self,
-        sigma,
-        a,
-        num_time_steps=100,
-        european_calc_type=FinHWEuropeanCalcType.EXPIRY_TREE,
-    ):
+        sigma: float,
+        a: float,
+        num_time_steps: int = 100,
+        european_calc_type: FinHWEuropeanCalcType = FinHWEuropeanCalcType.EXPIRY_TREE,
+    ) -> None:
         """Constructs the Hull-White rate model. The speed of mean reversion
         a and volatility are passed in. The short rate process is given by
         dr = (theta(t) - ar) * dt  + sigma * dW. The model will switch to use
@@ -917,7 +933,15 @@ class HWTree:
 
     ####################################################################################
 
-    def option_on_zcb(self, t_exp, t_mat, strike, face_amount, df_times, df_values):
+    def option_on_zcb(
+        self,
+        t_exp: float,
+        t_mat: float,
+        strike: float,
+        face_amount: float,
+        df_times: np.ndarray,
+        df_values: np.ndarray,
+    ) -> Dict[str, float]:
         """Price an option on a zero cpn bond using analytical solution of
         Hull-White model. User provides bond face and option strike and expiry
         date and maturity date."""
@@ -956,8 +980,15 @@ class HWTree:
     ####################################################################################
 
     def european_bond_option_jamshidian(
-        self, t_exp, strike_price, face, cpn_times, cpn_amounts, df_times, df_values
-    ):
+        self,
+        t_exp: float,
+        strike_price: float,
+        face: float,
+        cpn_times: np.ndarray,
+        cpn_amounts: np.ndarray,
+        df_times: np.ndarray,
+        df_values: np.ndarray,
+    ) -> Dict[str, float]:
         """Valuation of a European bond option using the Jamshidian
         deconstruction of the bond into a strip of zero cpn bonds with the
         short rate that would make the bond option be at the money forward."""
@@ -1038,8 +1069,13 @@ class HWTree:
     ####################################################################################
 
     def european_bond_option_expiry_only(
-        self, t_exp, strike_price, face_amount, cpn_times, cpn_amounts
-    ):
+        self,
+        t_exp: float,
+        strike_price: float,
+        face_amount: float,
+        cpn_times: np.ndarray,
+        cpn_amounts: np.ndarray,
+    ) -> Dict[str, float]:
         """Price a European option on a cpn-paying bond using a tree to
         generate short rates at the expiry date and then to use the analytical
         solution of zero cpn bond prices in the HW model to calculate the
@@ -1112,7 +1148,13 @@ class HWTree:
 
     ####################################################################################
 
-    def option_on_zero_cpn_bond_tree(self, t_exp, t_mat, strike_price, face_amount):
+    def option_on_zero_cpn_bond_tree(
+        self,
+        t_exp: float,
+        t_mat: float,
+        strike_price: float,
+        face_amount: float,
+    ) -> Dict[str, float]:
         """Price an option on a zero cpn bond using a HW trinomial
         tree. The discount curve was already supplied to the tree build."""
 
@@ -1168,8 +1210,15 @@ class HWTree:
     ####################################################################################
 
     def bermudan_swaption(
-        self, t_exp, t_mat, strike, face, cpn_times, cpn_flows, exercise_type
-    ):
+        self,
+        t_exp: float,
+        t_mat: float,
+        strike: float,
+        face: float,
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        exercise_type: Any,
+    ) -> Dict[str, float]:
         """Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time."""
@@ -1210,13 +1259,13 @@ class HWTree:
 
     def bond_option(
         self,
-        t_exp,
-        strike_price,
-        face_amount,
-        cpn_times,
-        cpn_flows,
-        exercise_type,
-    ):
+        t_exp: float,
+        strike_price: float,
+        face_amount: float,
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        exercise_type: Any,
+    ) -> Dict[str, float]:
         """Value a bond option that can have European or American exercise.
         This is done using a trinomial tree that we extend out to bond
         maturity. For European bond options, Jamshidian's model is
@@ -1303,14 +1352,14 @@ class HWTree:
 
     def callable_puttable_bond_tree(
         self,
-        cpn_times,
-        cpn_flows,
-        call_times,
-        call_prices,
-        put_times,
-        put_prices,
-        face_amount,
-    ):
+        cpn_times: Union[np.ndarray, List[float]],
+        cpn_flows: Union[np.ndarray, List[float]],
+        call_times: Union[np.ndarray, List[float]],
+        call_prices: Union[np.ndarray, List[float]],
+        put_times: Union[np.ndarray, List[float]],
+        put_prices: Union[np.ndarray, List[float]],
+        face_amount: float,
+    ) -> Dict[str, float]:
         """Value an option on a bond with cpns that can have European or
         American exercise. Some minor issues to do with handling cpns on
         the option expiry date need to be solved. Also this function should be
@@ -1353,7 +1402,7 @@ class HWTree:
 
     ####################################################################################
 
-    def df_tree(self, t_mat):
+    def df_tree(self, t_mat: float) -> Union[float, tuple]:
         """Discount factor as seen from now to time t_mat as long as the time
         is on the tree grid."""
 
@@ -1377,7 +1426,12 @@ class HWTree:
 
     ####################################################################################
 
-    def build_tree(self, tree_mat, df_times, df_values):
+    def build_tree(
+        self,
+        tree_mat: float,
+        df_times: np.ndarray,
+        df_values: np.ndarray,
+    ) -> None:
         """Build the trinomial tree."""
 
         if isinstance(df_times, np.ndarray) is False:
@@ -1413,7 +1467,7 @@ class HWTree:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string with class details."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)

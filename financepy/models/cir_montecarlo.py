@@ -37,7 +37,7 @@ class CIRMonteCarlo:
 
     ####################################################################################
 
-    def __init__(self, a, b, sigma):
+    def __init__(self, a: float, b: float, sigma: float) -> None:
 
         self._a = a
         self._b = b
@@ -45,7 +45,7 @@ class CIRMonteCarlo:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string with class details."""
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("Sigma", self._sigma)
@@ -58,7 +58,7 @@ class CIRMonteCarlo:
 
 
 @njit(fastmath=True, cache=True)
-def meanr(r0, a, b, t):
+def meanr(r0: float, a: float, b: float, t: float) -> float:
     """Mean value of a CIR process after time t"""
     mr = r0 * np.exp(-a * t) + b * (1.0 - np.exp(-a * t))
     return mr
@@ -68,7 +68,7 @@ def meanr(r0, a, b, t):
 
 
 @njit(fastmath=True, cache=True)
-def variancer(r0, a, b, sigma, t):
+def variancer(r0: float, a: float, b: float, sigma: float, t: float) -> float:
     """Variance of a CIR process after time t"""
     vr = r0 * sigma * sigma * (np.exp(-a * t) - np.exp(-2.0 * a * t)) / a
     vr += b * sigma * sigma * ((1.0 - np.exp(-a * t)) ** 2) / 2.0 / a
@@ -83,7 +83,7 @@ def variancer(r0, a, b, sigma, t):
     fastmath=True,
     cache=True,
 )
-def zero_price(r0, a, b, sigma, t):
+def zero_price(r0: float, a: float, b: float, sigma: float, t: float) -> float:
     """Price of a zero coupon bond in CIR model."""
     sigma2 = sigma * sigma
     h = np.sqrt(a * a + 2.0 * sigma2)
@@ -102,7 +102,7 @@ def zero_price(r0, a, b, sigma, t):
     fastmath=True,
     cache=True,
 )
-def draw(rt, a, b, sigma, dt):
+def draw(rt: float, a: float, b: float, sigma: float, dt: float) -> float:
     """Draw a next rate from the CIR model in Monte Carlo."""
     sigma2 = sigma * sigma
     d = 4.0 * a * b / sigma2
@@ -130,7 +130,16 @@ def draw(rt, a, b, sigma, dt):
     fastmath=True,
     cache=True,
 )
-def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
+def rate_path_mc(
+    r0: float,
+    a: float,
+    b: float,
+    sigma: float,
+    t: float,
+    dt: float,
+    seed: int,
+    scheme: int,
+) -> np.ndarray:
     """Generate a path of CIR rates using a number of numerical schemes."""
 
     np.random.seed(seed)
@@ -241,7 +250,17 @@ def rate_path_mc(r0, a, b, sigma, t, dt, seed, scheme):
     fastmath=True,
     cache=True,
 )
-def zero_price_mc(r0, a, b, sigma, t, dt, num_paths, seed, scheme):
+def zero_price_mc(
+    r0: float,
+    a: float,
+    b: float,
+    sigma: float,
+    t: float,
+    dt: float,
+    num_paths: int,
+    seed: int,
+    scheme: int,
+) -> float:
     """Determine the CIR zero price using Monte Carlo."""
 
     if t == 0.0:

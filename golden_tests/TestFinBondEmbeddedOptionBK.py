@@ -60,7 +60,7 @@ def test_bond_embedded_option_matlab():
     put_dt = Date(1, 1, 2008)
     for _ in range(0, 24):
         put_dts.append(put_dt)
-        put_prices.append(100)
+        put_prices.append(100.0)
         put_dt = put_dt.add_months(1)
 
     test_cases.header("BOND PRICE", "PRICE")

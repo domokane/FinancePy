@@ -20,9 +20,16 @@ from ..utils.solver_1d import bisection, newton, newton_secant
     fastmath=True,
     cache=True,
 )
-def bs_value(s, t, k, r, q, v, opt_type_value):
-    """Calculate the Black-sscholes option value.
-
+def bs_value(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int,
+) -> float:
+    """ Price a derivative using Black-Scholes model.
     Parameters:
     - spot_price: float - the current price of the underlying asset
     - time_to_expiry: float - time to option expiry in years
@@ -66,8 +73,17 @@ def bs_value(s, t, k, r, q, v, opt_type_value):
     fastmath=True,
     cache=True,
 )
-def bs_delta(s, t, k, r, q, v, opt_type_value):
-    """Price a derivative using Black-sscholes model."""
+def bs_delta(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int,
+) -> float:
+
+    """Price a derivative using Black-Scholes model."""
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         phi = +1.0
     elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
@@ -95,7 +111,15 @@ def bs_delta(s, t, k, r, q, v, opt_type_value):
     fastmath=True,
     cache=True,
 )
-def bs_gamma(s, t, k, r, q, v, opt_type_value=None):
+def bs_gamma(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int = None,
+) -> float:
     """Price a derivative using Black-sscholes model."""
 
     k = np.maximum(k, G_SMALL)
@@ -118,8 +142,16 @@ def bs_gamma(s, t, k, r, q, v, opt_type_value=None):
     fastmath=True,
     cache=True,
 )
-def bs_vega(s, t, k, r, q, v, opt_type_value):
-    """Price a derivative using Black-sscholes model."""
+def bs_vega(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int,
+) -> float:
+    """Price a derivative using Black-Scholes model."""
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
@@ -141,8 +173,16 @@ def bs_vega(s, t, k, r, q, v, opt_type_value):
     fastmath=True,
     cache=True,
 )
-def bs_theta(s, t, k, r, q, v, opt_type_value):
-    """Price a derivative using Black-sscholes model."""
+def bs_theta(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int,
+) -> float:
+    """Price a derivative using Black-Scholes model."""
 
     phi = 0
 
@@ -175,8 +215,16 @@ def bs_theta(s, t, k, r, q, v, opt_type_value):
     fastmath=True,
     cache=True,
 )
-def bs_rho(s, t, k, r, q, v, opt_type_value):
-    """Price a derivative using Black-sscholes model."""
+def bs_rho(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int,
+) -> float:
+    """Price a derivative using Black-Scholes model."""
 
     phi = 0
 
@@ -207,7 +255,15 @@ def bs_rho(s, t, k, r, q, v, opt_type_value):
     fastmath=True,
     cache=True,
 )
-def bs_vanna(s, t, k, r, q, v, opt_type_value):
+def bs_vanna(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type_value: int,
+) -> float:
     """Price a derivative using Black-sscholes model."""
 
     k = np.maximum(k, G_SMALL)
@@ -267,8 +323,15 @@ def _fvega(sigma, args):
     fastmath=True,
     cache=True,
 )
-def bs_intrinsic(s, t, k, r, q, opt_type_value):
-    """Calculate the Black-sscholes implied volatility of a European
+def bs_intrinsic(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    opt_type_value: int,
+) -> float:
+    """Calculate the Black-Scholes implied volatility of a European
     vanilla option using Newton with a fallback to bisection."""
 
     fwd = s * np.exp((r - q) * t)
@@ -290,8 +353,16 @@ def bs_intrinsic(s, t, k, r, q, opt_type_value):
     cache=True,
     forceobj=True,
 )
-def bs_implied_volatility(s, t, k, r, q, price, opt_type_value):
-    """Calculate the Black-sscholes implied volatility of a European
+def bs_implied_volatility(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    price: float,
+    opt_type_value: int,
+) -> float:
+    """Calculate the Black-Scholes implied volatility of a European
     vanilla option using Newton with a fallback to bisection."""
 
     fwd = s * np.exp((r - q) * t)

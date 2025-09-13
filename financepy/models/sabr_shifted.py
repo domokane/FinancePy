@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+from typing import Any, Union
 from numba import njit
 from scipy.optimize import minimize
 
@@ -15,7 +16,7 @@ from ..utils.helpers import label_to_string
 
 
 @njit(fastmath=True, cache=True)
-def _x(rho, z):
+def _x(rho: float, z: float) -> float:
     """Return function x used in Hagan's 2002 SABR lognormal vol expansion."""
     a = (1.0 - 2.0 * rho * z + z**2) ** 0.5 + z - rho
     b = 1.0 - rho
@@ -26,7 +27,12 @@ def _x(rho, z):
 
 
 @njit(fastmath=True, cache=True)
-def vol_function_shifted_sabr(params, f, k, t):
+def vol_function_shifted_sabr(
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Black volatility implied by SABR model."""
 
     alpha = params[0]
@@ -80,7 +86,14 @@ class SABRShifted:
 
     ####################################################################################
 
-    def __init__(self, alpha, beta, rho, nu, shift):
+    def __init__(
+        self,
+        alpha: float,
+        beta: float,
+        rho: float,
+        nu: float,
+        shift: float
+    ) -> None:
         """Create SABRShifted with all of the model parameters. We
         also provide functions below to assist with the calibration of the
         value of alpha."""
@@ -93,7 +106,12 @@ class SABRShifted:
 
     ####################################################################################
 
-    def black_vol(self, f, k, t):
+    def black_vol(
+        self,
+        f: Union[float, np.ndarray],
+        k: Union[float, np.ndarray],
+        t: Union[float, np.ndarray]
+    ) -> Union[float, np.ndarray]:
         """Black volatility from SABR model using Hagan et al. approx."""
 
         params = np.array([self._alpha, self._beta, self._rho, self._nu, self._shift])
@@ -123,7 +141,13 @@ class SABRShifted:
 
     ####################################################################################
 
-    def black_vol_with_alpha(self, alpha, f, k, t):
+    def black_vol_with_alpha(
+        self,
+        alpha: np.ndarray,
+        f: float,
+        k: float,
+        t: float
+    ) -> float:
 
         self._alpha = alpha[0]
         black_vol = self.black_vol(f, k, t)
@@ -133,12 +157,12 @@ class SABRShifted:
 
     def value(
         self,
-        forward_rate,  # Forward rate F
-        strike_rate,  # Strike Rate k
-        time_to_expiry,  # Time to Expiry (years)
-        df,  # Discount Factor to expiry date
-        call_or_put,
-    ):  # Call or put
+        forward_rate: float,
+        strike_rate: float,
+        time_to_expiry: float,
+        df: float,
+        call_or_put: Any
+    ) -> float:
         """Price an option using Black's model which values in the forward
         measure following a change of measure."""
 
@@ -160,7 +184,13 @@ class SABRShifted:
 
     ####################################################################################
 
-    def set_alpha_from_black_vol(self, black_vol, forward, strike, time_to_expiry):
+    def set_alpha_from_black_vol(
+        self,
+        black_vol: float,
+        forward: float,
+        strike: float,
+        time_to_expiry: float
+    ) -> None:
         """Estimate the valu normcdf(f the alpha coefficient of the SABR model
         by solving for the value of alpha that makes the SABR black vol equal
         to the input black vol. This uses a numerical 1D solver."""
@@ -196,7 +226,12 @@ class SABRShifted:
 
     ####################################################################################
 
-    def set_alpha_from_atm_black_vol(self, black_vol, atm_strike, time_to_expiry):
+    def set_alpha_from_atm_black_vol(
+        self,
+        black_vol: float,
+        atm_strike: float,
+        time_to_expiry: float
+    ) -> None:
         """We solve cubic equation for the unknown variable alpha for the
         special ATM case of the strike equalling the forward following Hagan
         and al. equation (3.3). We take the smallest real root as the preferred
@@ -225,7 +260,7 @@ class SABRShifted:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return string with class details."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)

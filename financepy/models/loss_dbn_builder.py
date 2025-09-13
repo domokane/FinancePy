@@ -8,8 +8,14 @@ from ..utils.math import pair_gcd
 ########################################################################################
 
 
+from typing import Sequence
+
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
-def indep_loss_dbn_hetero_adj_binomial(num_credits, cond_probs, loss_ratio):
+def indep_loss_dbn_hetero_adj_binomial(
+    num_credits: int,
+    cond_probs: Sequence[float],
+    loss_ratio: Sequence[float]
+) -> np.ndarray:
 
     # Algorithm due to D. O'Kane.
 
@@ -78,7 +84,9 @@ def indep_loss_dbn_hetero_adj_binomial(num_credits, cond_probs, loss_ratio):
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def portfolio_gcd(actual_losses):
+def portfolio_gcd(
+    actual_losses: Sequence[float]
+) -> float:
 
     num_credits = len(actual_losses)
     scaling = 1000000
@@ -97,7 +105,11 @@ def portfolio_gcd(actual_losses):
 
 
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
-def indep_loss_dbn_recursion_gcd(num_credits, cond_default_probs, loss_units):
+def indep_loss_dbn_recursion_gcd(
+    num_credits: int,
+    cond_default_probs: Sequence[float],
+    loss_units: Sequence[float]
+) -> np.ndarray:
 
     num_loss_units = 1
     for i in range(0, len(loss_units)):

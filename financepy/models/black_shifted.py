@@ -20,7 +20,7 @@ class BlackShifted:
 
     ####################################################################################
 
-    def __init__(self, volatility, shift, implementation=0):
+    def __init__(self, volatility: float, shift: float, implementation: int = 0) -> None:
         """Create FinModel black using parameters."""
         self.volatility = volatility
         self.shift = shift
@@ -34,12 +34,12 @@ class BlackShifted:
 
     def value(
         self,
-        forward_rate,  # Forward rate
-        strike_rate,  # Strike Rate
-        time_to_expiry,  # time to expiry in years
-        df,  # Discount Factor to expiry date
-        call_or_put,
-    ):  # Call or put
+        forward_rate: float,  # Forward rate
+        strike_rate: float,  # Strike Rate
+        time_to_expiry: float,  # time to expiry in years
+        df: float,  # Discount Factor to expiry date
+        call_or_put: OptionTypes,  # Call or put
+    ) -> float:
         """Price a derivative using Black's model which values in the forward
         measure following a change of measure. The sign of the shift is the
         same as Matlab."""
@@ -64,7 +64,7 @@ class BlackShifted:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)

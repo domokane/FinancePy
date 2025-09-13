@@ -9,13 +9,25 @@ from ..utils.error import FinError
 ########################################################################################
 
 
+from typing import Any
+
 class LHPlusModel:
     """Large Homogenous Portfolio model with extra asset. Used for
     approximating full Gaussian copula."""
 
     ####################################################################################
 
-    def __init__(self, p, r, h, beta, p0, r0, h0, beta_0):
+    def __init__(
+        self,
+        p: float,
+        r: float,
+        h: float,
+        beta: float,
+        p0: float,
+        r0: float,
+        h0: float,
+        beta_0: float
+    ) -> None:
 
         self._p = p
         self._r = r
@@ -28,7 +40,7 @@ class LHPlusModel:
 
     ####################################################################################
 
-    def prob_loss_gt_k(self, k):
+    def prob_loss_gt_k(self, k: float) -> float:
         """Returns P(L>K) where L is the portfolio loss given by model."""
 
         if k < (1.0 - self._r0) * self._h0:
@@ -66,7 +78,7 @@ class LHPlusModel:
 
     ####################################################################################
 
-    def exp_min_lk_integral(self, k, dk):
+    def exp_min_lk_integral(self, k: float, dk: float) -> float:
 
         k0 = 0.0
         num_steps = int(k / dk)
@@ -91,7 +103,7 @@ class LHPlusModel:
 
     ####################################################################################
 
-    def exp_min_lk(self, k):
+    def exp_min_lk(self, k: float) -> float:
 
         if abs(k) < 1e-6:
             return k
@@ -128,7 +140,7 @@ class LHPlusModel:
 
     ####################################################################################
 
-    def exp_min_lk2(self, k):
+    def exp_min_lk2(self, k: float) -> float:
 
         if abs(k) < 1e-6:
             return k
@@ -170,7 +182,7 @@ class LHPlusModel:
 
     ####################################################################################
 
-    def tranche_survival_prob(self, k1, k2):
+    def tranche_survival_prob(self, k1: float, k2: float) -> float:
 
         if k2 == k1:
             raise FinError("tranche_survival_prob: Same strikes")

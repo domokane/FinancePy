@@ -11,8 +11,17 @@ from ..utils.error import FinError
 ########################################################################################
 
 
+from typing import Sequence
+
 @njit(fastmath=True, cache=True)
-def tr_surv_prob_lhp(k1, k2, num_credits, survival_probs, recovery_rates, beta):
+def tr_surv_prob_lhp(
+    k1: float,
+    k2: float,
+    num_credits: int,
+    survival_probs: Sequence[float],
+    recovery_rates: Sequence[float],
+    beta: float
+) -> float:
     """Get the approximated tranche survival probability of a portfolio of
     credits in the one-factor GC model using the large portfolio limit which
     assumes a homogenous portfolio with an infinite number of credits. This
@@ -48,7 +57,13 @@ def tr_surv_prob_lhp(k1, k2, num_credits, survival_probs, recovery_rates, beta):
 
 
 @njit(fastmath=True, cache=True)
-def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta):
+def portfolio_cdf_lhp(
+    k: float,
+    num_credits: int,
+    qvector: Sequence[float],
+    recovery_rates: Sequence[float],
+    beta: float
+) -> float:
 
     p = 0.0
     portfolio_el = 0.0
@@ -84,7 +99,13 @@ def portfolio_cdf_lhp(k, num_credits, qvector, recovery_rates, beta):
 
 
 @njit(fastmath=True, cache=True)
-def exp_min_lk(k, p, r, n, beta):
+def exp_min_lk(
+    k: float,
+    p: float,
+    r: float,
+    n: float,
+    beta: float
+) -> float:
 
     if beta == 0:
         beta = 0.0000000001
@@ -113,7 +134,12 @@ def exp_min_lk(k, p, r, n, beta):
 
 
 @njit(fastmath=True, cache=True)
-def lhp_density(k, p, r, beta):
+def lhp_density(
+    k: float,
+    p: float,
+    r: float,
+    beta: float
+) -> float:
 
     if beta == 0.0:
         beta = 0.0000000001
@@ -148,7 +174,13 @@ def lhp_density(k, p, r, beta):
 
 
 @njit(fastmath=True, cache=True)
-def lhp_analytical_density_base_corr(k, p, r, beta, dbeta_dk):
+def lhp_analytical_density_base_corr(
+    k: float,
+    p: float,
+    r: float,
+    beta: float,
+    dbeta_dk: float
+) -> float:
 
     if beta == 0:
         beta = 0.0000000001
@@ -184,7 +216,12 @@ def lhp_analytical_density_base_corr(k, p, r, beta, dbeta_dk):
 
 
 @njit(fastmath=True, cache=True)
-def lhp_analytical_density(k, p, r, beta):
+def lhp_analytical_density(
+    k: float,
+    p: float,
+    r: float,
+    beta: float
+) -> float:
 
     if beta == 0.0:
         beta = 1e-8
@@ -247,7 +284,12 @@ def exp_min_lk(k, p, r, n, beta):
 
 
 @njit(fastmath=True, cache=True)
-def prob_l_greater_than_k(k, p, r, beta):
+def prob_l_greater_than_k(
+    k: float,
+    p: float,
+    r: float,
+    beta: float
+) -> float:
 
     c = normpdf(p)
     arga = k / (1.0 - r)

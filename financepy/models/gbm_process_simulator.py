@@ -16,8 +16,18 @@ np.random.seed(42)
 ########################################################################################
 
 
+from typing import Tuple
+
 @njit(cache=True, parallel=False)
-def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, seed):
+def get_paths_times(
+    num_paths: int,
+    num_time_steps: int,
+    t: float,
+    mu: float,
+    stock_price: float,
+    volatility: float,
+    seed: int
+) -> Tuple[np.ndarray, np.ndarray]:
     """Get the simulated GBM process for a single asset with even num paths and
     time steps. Inputs include the number of time steps, paths, the drift mu,
     stock price, volatility and a seed.
@@ -62,16 +72,16 @@ def get_paths_times(num_paths, num_time_steps, t, mu, stock_price, volatility, s
 
 @njit(fastmath=True, cache=True)
 def get_assets_paths_times(
-    num_assets,
-    num_paths,
-    num_time_steps,
-    t,
-    mus,
-    stock_prices,
-    volatilities,
-    corr_matrix,
-    seed,
-):
+    num_assets: int,
+    num_paths: int,
+    num_time_steps: int,
+    t: float,
+    mus: np.ndarray,
+    stock_prices: np.ndarray,
+    volatilities: np.ndarray,
+    corr_matrix: np.ndarray,
+    seed: int
+) -> Tuple[np.ndarray, np.ndarray]:
     """Get the simulated GBM process for a number of assets and paths and num
     time steps. Inputs include the number of assets, paths, the vector of mus,
     stock prices, volatilities, a correlation matrix and a seed.
@@ -151,16 +161,15 @@ def get_assets_paths_times(
 
 @njit(fastmath=True, cache=True)
 def get_assets_paths(
-    num_assets,
-    num_paths,
-    t,
-    mus,
-    stock_prices,
-    volatilities,
-    corr_matrix,
-    seed,
-    ########################################################################################
-):
+    num_assets: int,
+    num_paths: int,
+    t: float,
+    mus: np.ndarray,
+    stock_prices: np.ndarray,
+    volatilities: np.ndarray,
+    corr_matrix: np.ndarray,
+    seed: int
+) -> Tuple[np.ndarray, np.ndarray]:
     """Get the simulated GBM process for a number of assets and paths for one
     time step. Inputs include the number of assets, paths, the vector of mus,
     stock prices, volatilities, a correlation matrix and a seed.

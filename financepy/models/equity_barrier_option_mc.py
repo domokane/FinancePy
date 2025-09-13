@@ -17,12 +17,12 @@ def value_equity_barrier_option_mc(
     notional: float,
     s: float,
     r: float,
-    process_type,
-    model_params,
+    process_type: int,
+    model_params: dict,
     num_obs_per_year: int = 252,
     num_paths: int = 10000,
     seed: int = 4242,
-):
+) -> float:
     """A Monte-Carlo based valuation of the barrier option which simulates
     the evolution of the stock price of at a specified number of annual
     observation times until expiry to examine if the barrier has been
