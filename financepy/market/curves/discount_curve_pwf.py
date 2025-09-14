@@ -28,7 +28,7 @@ class DiscountCurvePWF(DiscountCurve):
     def __init__(
         self,
         value_dt: Date,
-        zero_dts: list,
+        zero_dts: list[Date],
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,

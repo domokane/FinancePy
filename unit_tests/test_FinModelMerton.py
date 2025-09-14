@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
 from financepy.models.merton_firm_mkt import MertonFirmMkt
 from financepy.models.merton_firm import MertonFirm
 
@@ -9,11 +10,11 @@ from financepy.models.merton_firm import MertonFirm
 def test_merton():
 
     # Input Equity values and equity vols
-    equity_value = [2.6406, 2.6817, 3.977, 2.947, 2.528]
-    equity_vol = [0.7103, 0.3929, 0.3121, 0.4595, 0.6181]
-    bond_face = [4.0, 3.5, 3.5, 3.2, 4.0]
-    risk_free_rate = [0.05, 0.05, 0.05, 0.05, 0.05]
-    asset_growth_rate = [0.0306, 0.03, 0.031, 0.0302, 0.0305]
+    equity_value = np.array([2.6406, 2.6817, 3.977, 2.947, 2.528])
+    equity_vol = np.array([0.7103, 0.3929, 0.3121, 0.4595, 0.6181])
+    bond_face = np.array([4.0, 3.5, 3.5, 3.2, 4.0])
+    risk_free_rate = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
+    asset_growth_rate = np.array([0.0306, 0.03, 0.031, 0.0302, 0.0305])
     years_to_maturity = 1.0  # np.linspace(0.1, 10, 100)
 
     model = MertonFirmMkt(

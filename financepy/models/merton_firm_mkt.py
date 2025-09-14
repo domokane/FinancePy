@@ -54,12 +54,12 @@ class MertonFirmMkt(MertonFirm):
 
     def __init__(
         self,
-        equity_value: Union[float, list, np.ndarray],
-        bond_face: Union[float, list, np.ndarray],
-        years_to_maturity: Union[float, list, np.ndarray],
-        risk_free_rate: Union[float, list, np.ndarray],
-        asset_growth_rate: Union[float, list, np.ndarray],
-        equity_volatility: Union[float, list, np.ndarray],
+        equity_value: Union[float, np.ndarray],
+        bond_face: Union[float, np.ndarray],
+        years_to_maturity: Union[float, np.ndarray],
+        risk_free_rate: Union[float, np.ndarray],
+        asset_growth_rate: Union[float, np.ndarray],
+        equity_volatility: Union[float, np.ndarray],
     ):
         """Create an object that holds all of the model parameters. These
         parameters may be vectorised."""
