@@ -40,7 +40,7 @@ num_time_steps = 100
 def test_european_call_bk():
 
     opt_type = OptionTypes.EUROPEAN_CALL
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -60,7 +60,7 @@ def test_european_call_bk():
 def test_american_call_bk():
 
     opt_type = OptionTypes.AMERICAN_CALL
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -79,7 +79,7 @@ def test_american_call_bk():
 def test_european_put_bk():
 
     opt_type = OptionTypes.EUROPEAN_PUT
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -98,7 +98,7 @@ def test_european_put_bk():
 def test_american_put_bk():
 
     opt_type = OptionTypes.AMERICAN_PUT
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -117,7 +117,7 @@ def test_american_put_bk():
 def test_european_call_bdt():
 
     opt_type = OptionTypes.EUROPEAN_CALL
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -135,7 +135,7 @@ def test_european_call_bdt():
 def test_american_call_bdt():
 
     opt_type = OptionTypes.AMERICAN_CALL
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -153,7 +153,7 @@ def test_american_call_bdt():
 def test_european_put_bdt():
 
     opt_type = OptionTypes.EUROPEAN_PUT
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -171,7 +171,7 @@ def test_european_put_bdt():
 def test_american_put_bdt():
 
     opt_type = OptionTypes.AMERICAN_PUT
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -192,7 +192,7 @@ def test_american_put_bdt():
 def test_european_call_hw():
 
     opt_type = OptionTypes.EUROPEAN_CALL
-    strike_price = 100
+    strike_price = 100.0
     num_time_steps = 100
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
@@ -212,7 +212,7 @@ def test_european_call_hw():
 def test_american_call_hw():
 
     opt_type = OptionTypes.AMERICAN_CALL
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -231,7 +231,7 @@ def test_american_call_hw():
 def test_european_put_hw():
 
     opt_type = OptionTypes.EUROPEAN_PUT
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 
@@ -250,7 +250,7 @@ def test_european_put_hw():
 def test_american_put_hw():
 
     opt_type = OptionTypes.AMERICAN_PUT
-    strike_price = 100
+    strike_price = 100.0
 
     bond_option = BondOption(bond, expiry_dt, strike_price, opt_type)
 

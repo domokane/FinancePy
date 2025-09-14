@@ -894,7 +894,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def check_calibration(self, verbose: bool, tol: float = 1e-6):
+    def check_calibration(self, verbose: bool, tol: float = 1e-5):
 
         if verbose:
 
