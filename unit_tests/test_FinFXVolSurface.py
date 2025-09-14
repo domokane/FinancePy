@@ -7,6 +7,7 @@ from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
+import numpy as np
 
 verbose_calibration = False
 
@@ -32,9 +33,9 @@ def test_fin_fx_mkt_vol_surface1(capsys):
     spot_fx_rate = 1.3465
 
     tenors = ["1M", "2M", "3M", "6M", "1Y", "2Y"]
-    atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
-    mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-    rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+    atm_vols = np.array([21.00, 21.00, 20.750, 19.400, 18.250, 17.677])
+    mkt_strangle_25d_vols = np.array([0.65, 0.75, 0.85, 0.90, 0.95, 0.85])
+    rsk_reversal_25d_vols = np.array([-0.20, -0.25, -0.30, -0.50, -0.60, -0.562])
 
     notional_currency = for_name
 
@@ -85,9 +86,9 @@ def test_fin_fx_mkt_vol_surface2(capsys):
     spot_fx_rate = 90.72
 
     tenors = ["1M", "2M", "3M", "6M", "1Y", "2Y"]
-    atm_vols = [21.50, 20.50, 19.85, 18.00, 15.95, 14.009]
-    mkt_strangle_25d_vols = [0.35, 0.325, 0.300, 0.225, 0.175, 0.100]
-    rsk_reversal_25d_vols = [-8.350, -8.650, -8.950, -9.250, -9.550, -9.500]
+    atm_vols = np.array([21.50, 20.50, 19.85, 18.00, 15.95, 14.009])
+    mkt_strangle_25d_vols = np.array([0.35, 0.325, 0.300, 0.225, 0.175, 0.100])
+    rsk_reversal_25d_vols = np.array([-8.350, -8.650, -8.950, -9.250, -9.550, -9.500])
 
     notional_currency = for_name
 
@@ -136,9 +137,9 @@ def test_fin_fx_mkt_vol_surface3(capsys):
     spot_fx_rate = 1.3088
 
     tenors = ["1M"]
-    atm_vols = [21.6215]
-    mkt_strangle_25d_vols = [0.7375]
-    rsk_reversal_25d_vols = [-0.50]
+    atm_vols = np.array([21.6215])
+    mkt_strangle_25d_vols = np.array([0.7375])
+    rsk_reversal_25d_vols = np.array([-0.50])
 
     notional_currency = for_name
 
@@ -186,9 +187,9 @@ def test_fin_fx_mkt_vol_surface4(capsys):
     spot_fx_rate = 90.68
 
     tenors = ["1M"]
-    atm_vols = [21.00]
-    mkt_strangle_25d_vols = [0.184]
-    rsk_reversal_25d_vols = [-5.30]
+    atm_vols = np.array([21.00])
+    mkt_strangle_25d_vols = np.array([0.184])
+    rsk_reversal_25d_vols = np.array([-5.30])
 
     notional_currency = for_name
 

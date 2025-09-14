@@ -114,7 +114,7 @@ class FXRainbowOption(FXOption):
         self,
         expiry_dt: Date,
         payoff_type: FXRainbowOptionTypes,
-        payoff_params: List[float],
+        payoff_params: np.ndarray,
         num_assets: int,
     ):
 

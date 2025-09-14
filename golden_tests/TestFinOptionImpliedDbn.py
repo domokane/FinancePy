@@ -40,9 +40,9 @@ def test_fin_option_implied_dbn():
         spot_fx_rate = 1.3465
 
         tenors = ["1M", "2M", "3M", "6M", "1Y", "2Y"]
-        atm_vols = [21.00, 21.00, 20.750, 19.400, 18.250, 17.677]
-        mkt_strangle_25d_vols = [0.65, 0.75, 0.85, 0.90, 0.95, 0.85]
-        rsk_reversal_25d_vols = [-0.20, -0.25, -0.30, -0.50, -0.60, -0.562]
+        atm_vols = np.array([21.00, 21.00, 20.750, 19.400, 18.250, 17.677])
+        mkt_strangle_25d_vols = np.array([0.65, 0.75, 0.85, 0.90, 0.95, 0.85])
+        rsk_reversal_25d_vols = np.array([-0.20, -0.25, -0.30, -0.50, -0.60, -0.562])
 
         notional_currency = for_name
 

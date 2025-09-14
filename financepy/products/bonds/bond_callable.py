@@ -56,9 +56,9 @@ class BondEmbeddedOption:
         freq_type: FrequencyTypes,
         dc_type: DayCountTypes,
         call_dts: List[Date],
-        call_prices: List[float],
+        call_prices: np.ndarray,
         put_dts: List[Date],
-        put_prices: List[float],
+        put_prices: np.ndarray,
     ):
         """Create a BondEmbeddedOption object with a maturity date, coupon
         and all the bond inputs."""

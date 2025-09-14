@@ -14,6 +14,10 @@ from ...utils.day_count import DayCount, DayCountTypes
 # TODO: Interpolation
 # TODO: Integration kernel for LMM
 
+import numpy as np
+from typing import List
+
+from typing import Any, Sequence, Union
 
 class IborCapVolCurve:
     """Class to manage a term structure of cap (flat) volatilities and to
@@ -25,11 +29,11 @@ class IborCapVolCurve:
 
     def __init__(
         self,
-        curve_dt,  # Valuation date for cap volatility
-        cap_maturity_dts,  # curve date + maturity dates for caps
-        cap_sigmas,  # Flat cap volatility for cap maturity dates
-        dc_type,
-    ):
+        curve_dt: Date,  # Valuation date for cap volatility
+        cap_maturity_dts: List[Date],  # curve date + maturity dates for caps
+        cap_sigmas: np.ndarray,  # Flat cap volatility for cap maturity dates
+        dc_type: Any,
+    ) -> None:
         """Create a cap/floor volatility curve given a curve date, a list of
         cap maturity dates and a vector of cap volatilities. To avoid confusion
         first date of the capDates must be equal to the curve date and first
@@ -81,7 +85,7 @@ class IborCapVolCurve:
 
     ####################################################################################
 
-    def generate_caplet_vols(self):
+    def generate_caplet_vols(self) -> None:
         """Bootstrap caplet volatilities from cap volatilities using similar
         notation to Hull's book (page 32.11). The first volatility in the
         vector of caplet vols is zero."""
@@ -122,7 +126,7 @@ class IborCapVolCurve:
 
     ####################################################################################
 
-    def caplet_vol(self, dt):
+    def caplet_vol(self, dt: Union[Any, float]) -> float:
         """Return the forward rate caplet/floorlet volatility for a specific
         forward caplet expiry date. The period of the volatility is the
         the intercaplet spacing period used when creating the class object.
@@ -154,7 +158,7 @@ class IborCapVolCurve:
 
     ####################################################################################
 
-    def cap_vol(self, dt):
+    def cap_vol(self, dt: Union[Any, float]) -> float:
         """Return the cap flat volatility for a specific cap maturity date for
         the last caplet/floorlet in the cap/floor. The volatility interpolation
         is piecewise flat."""
@@ -182,7 +186,7 @@ class IborCapVolCurve:
 
     ####################################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Output the contents of the FinCapVolCurve class object."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)

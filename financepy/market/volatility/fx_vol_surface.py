@@ -3,7 +3,7 @@
 ##############################################################################
 
 
-from typing import Union
+from typing import Union, Any, Sequence, Optional, Tuple, List
 
 import numpy as np
 
@@ -14,6 +14,7 @@ from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
+from ...utils.tenor import Tenor
 from ...utils.global_vars import G_DAYS_IN_YEARS
 from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
@@ -47,7 +48,7 @@ from ...utils.solver_1d import newton_secant
 
 
 @njit(fastmath=True, cache=True)
-def g(k, *args):
+def g(k: float, *args: Any) -> float:
     """This is the objective function used in the determination of the FX
     option implied strike which is computed in the class below."""
 
@@ -73,7 +74,7 @@ def g(k, *args):
 
 
 @njit(fastmath=True)  # , cache=True)
-def obj_fast(params, *args):
+def obj_fast(params: np.ndarray, *args: Any) -> float:
     """Return a function that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by cvec
     """
@@ -178,18 +179,18 @@ def obj_fast(params, *args):
 
 
 def solve_to_horizon_fast(
-    s,
-    t,
-    rd,
-    rf,
-    k_atm,
-    atm_vol,
-    ms_25d_vol,
-    rr_25d_vol,
-    delta_method_value,
-    vol_type_value,
-    xopt,
-):
+    s: float,
+    t: float,
+    rd: float,
+    rf: float,
+    k_atm: float,
+    atm_vol: float,
+    ms_25d_vol: float,
+    rr_25d_vol: float,
+    delta_method_value: int,
+    vol_type_value: int,
+    xopt: Sequence[float]
+) -> Tuple[np.ndarray, float, float, float, float]:
 
     c0 = xopt
 
@@ -293,7 +294,13 @@ def solve_to_horizon_fast(
     cache=True,
     fastmath=True,
 )
-def vol_function(vol_function_type_value, params, f, k, t):
+def vol_function(
+    vol_function_type_value: int,
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -323,7 +330,7 @@ def vol_function(vol_function_type_value, params, f, k, t):
 
 
 @njit(cache=True, fastmath=True)
-def delta_fit(k, *args):
+def delta_fit(k: float, *args: Any) -> float:
     """This is the objective function used in the determination of the FX
     Option implied strike which is computed in the class below. I map it into
     inverse normcdf space to avoid the flat slope of this function at low vol
@@ -370,17 +377,17 @@ def delta_fit(k, *args):
     cache=False,
 )
 def solver_for_smile_strike_fast(
-    s,
-    t,
-    rd,
-    rf,
-    opt_type_value,
-    volatility_type_value,
-    delta_target,
-    delta_method_value,
-    initial_guess,
-    parameters,
-):
+    s: float,
+    t: float,
+    rd: float,
+    rf: float,
+    opt_type_value: int,
+    volatility_type_value: int,
+    delta_target: float,
+    delta_method_value: int,
+    initial_guess: float,
+    parameters: np.ndarray
+) -> float:
     """Solve for the strike that sets the delta of the option equal to the
     target value of delta allowing the volatility to be a function of the
     strike."""
@@ -412,15 +419,15 @@ def solver_for_smile_strike_fast(
     fastmath=True,
 )
 def solve_for_strike(
-    spot_fx_rate,
-    t_del,
-    rd,
-    rf,
-    opt_type_value,
-    delta_target,
-    delta_method_value,
-    volatility,
-):
+    spot_fx_rate: float,
+    t_del: float,
+    rd: float,
+    rf: float,
+    opt_type_value: int,
+    delta_target: float,
+    delta_method_value: int,
+    volatility: float
+) -> float:
     """This function determines the implied strike of an FX option
     given a delta and the other option details. It uses a one-dimensional
     Newton root search algorithm to determine the strike that matches an
@@ -523,14 +530,14 @@ class FXVolSurface:
         notional_currency: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        tenors: list,
-        atm_vols: Union[list, np.ndarray],
-        ms_25_delta_vols: Union[list, np.ndarray],
-        rr_25_delta_vols: Union[list, np.ndarray],
+        tenors: List[Tenor],
+        atm_vols: np.ndarray,
+        ms_25_delta_vols: np.ndarray,
+        rr_25_delta_vols: np.ndarray,
         atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
         delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
         vol_func_type: VolFuncTypes = VolFuncTypes.CLARK,
-    ):
+    ) -> None:
         """Create the FinFXVolSurface object by passing in market vol data
         for ATM and 25 Delta Market Strangles and Risk Reversals."""
 
@@ -606,7 +613,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def volatility(self, k, expiry_dt):
+    def volatility(self, k: float, expiry_dt: Date) -> float:
         """Interpolate the Black-Scholes volatility from the volatility
         surface given the option strike and expiry date. Linear interpolation
         is done in variance x time."""
@@ -671,7 +678,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def build_vol_surface(self):
+    def build_vol_surface(self) -> None:
 
         s = self.spot_fx_rate
         num_vol_curves = self.num_vol_curves
@@ -848,8 +855,12 @@ class FXVolSurface:
     ###########################################################################
 
     def solver_for_smile_strike(
-        self, opt_type_value, delta_target, tenor_index, initial_value
-    ):
+        self,
+        opt_type_value: int,
+        delta_target: float,
+        tenor_index: int,
+        initial_value: float
+    ) -> float:
         """Solve for the strike that sets the delta of the option equal to the
         target value of delta allowing the volatility to be a function of the
         strike."""
@@ -894,7 +905,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def check_calibration(self, verbose: bool, tol: float = 1e-5):
+    def check_calibration(self, verbose: bool, tol: float = 1e-5) -> None:
 
         if verbose:
 
@@ -1247,7 +1258,12 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def implied_dbns(self, low_fx, high_fx, num_intervals):
+    def implied_dbns(
+        self,
+        low_fx: float,
+        high_fx: float,
+        num_intervals: int
+    ) -> List[FinDistribution]:
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""
 
@@ -1296,7 +1312,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def plot_vol_curves(self):
+    def plot_vol_curves(self) -> None:
 
         plt.figure()
 
@@ -1367,7 +1383,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
@@ -1405,7 +1421,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def _print(self):
+    def _print(self) -> None:
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
         print(self)

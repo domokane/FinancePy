@@ -4,6 +4,8 @@ import time
 
 import matplotlib.pyplot as plt
 
+import numpy as np
+
 import add_fp_to_path
 
 from financepy.models.bk_tree import BKTree
@@ -69,6 +71,9 @@ def test_bond_embedded_option_matlab():
 
     sigma = 0.01  # This volatility is very small for a BK process
     a = 0.1
+
+    put_prices = np.array(put_prices)
+    call_prices = np.array(call_prices)
 
     puttable_bond = BondEmbeddedOption(
         issue_dt,
@@ -141,6 +146,9 @@ def test_bond_embedded_option_quantlib():
     # the value used in blog of 12% bp vol is unrealistic
     sigma = 0.12 / 0.035  # basis point volatility
     a = 0.03
+
+    call_prices = np.array(call_prices)
+    put_prices = np.array(put_prices)
 
     puttable_bond = BondEmbeddedOption(
         issue_dt,

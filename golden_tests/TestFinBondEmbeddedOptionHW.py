@@ -2,6 +2,8 @@
 
 import time
 
+import numpy as np
+
 import matplotlib.pyplot as plt
 
 import add_fp_to_path
@@ -63,6 +65,10 @@ def test_bond_embedded_option_matlab():
         put_dts.append(put_dt)
         put_prices.append(100)
         put_dt = put_dt.add_months(1)
+
+    put_prices = np.array(put_prices)
+    call_prices = np.array(call_prices)
+
 
     test_cases.header("BOND PRICE", "PRICE")
     v = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
@@ -141,6 +147,9 @@ def test_bond_embedded_option_quantlib():
     # the value used in blog of 12% bp vol is unrealistic
     sigma = 0.12  # basis point volatility
     a = 0.03
+
+    put_prices = np.array(put_prices)
+    call_prices = np.array(call_prices)
 
     puttable_bond = BondEmbeddedOption(
         issue_dt,

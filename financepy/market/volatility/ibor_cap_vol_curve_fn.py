@@ -13,11 +13,20 @@ from ...utils.global_vars import G_DAYS_IN_YEARS
 ########################################################################################
 
 
+from typing import Any, Union
+
 class IborCapVolCurveFn:
     """Class to manage a term structure of caplet volatilities using the
     parametric form suggested by Rebonato (1999)."""
 
-    def __init__(self, curve_dt, a, b, c, d):
+    def __init__(
+        self,
+        curve_dt: Date,
+        a: float,
+        b: float,
+        c: float,
+        d: float
+    ) -> None:
 
         self._curve_dt = curve_dt
         self._a = a
@@ -27,7 +36,7 @@ class IborCapVolCurveFn:
 
     ###########################################################################
 
-    def cap_floorlet_vol(self, dt):
+    def cap_floorlet_vol(self, dt: Union[Date, float]) -> float:
         """Return the caplet volatility."""
 
         if isinstance(dt, Date):

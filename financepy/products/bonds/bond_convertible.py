@@ -277,9 +277,9 @@ class BondConvertible:
         start_convert_dt: Date,  # conversion starts on this date
         conversion_ratio: float,  # num shares per face of notional
         call_dts: List[Date],  # list of call dates
-        call_prices: List[float],  # list of call prices
+        call_prices: np.ndarray,  # list of call prices
         put_dts: List[Date],  # list of put dates
-        put_prices: List[float],  # list of put prices
+        put_prices: np.ndarray,  # list of put prices
         dc_type: DayCountTypes,  # day count type for accrued
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
     ):
@@ -378,7 +378,7 @@ class BondConvertible:
         stock_price: float,
         stock_volatility: float,
         dividend_dts: List[Date],
-        dividend_yields: List[float],
+        dividend_yields: np.ndarray,
         discount_curve: DiscountCurve,
         credit_spread: float,
         recovery_rate: float = 0.40,

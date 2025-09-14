@@ -4,7 +4,7 @@
 
 import matplotlib.pyplot as plt
 
-from typing import Union
+from typing import Union, Any, Sequence, Optional, Tuple, List
 
 import numpy as np
 from scipy.optimize import minimize
@@ -100,7 +100,7 @@ from ...utils.global_types import FinSolverTypes
 
 
 @njit(fastmath=True, cache=True)
-def _obj(params, *args):
+def _obj(params: np.ndarray, *args: Any) -> float:
     """Return a value that is minimised when the ATM, MS and RR vols have
     been best fitted using the parametric volatility curve represented by
     params and specified by the vol_type_value at a single time slice only.
@@ -134,15 +134,15 @@ def _obj(params, *args):
 
 
 def _solve_to_horizon(
-    t,
-    f,
-    strikes_grid,
-    time_index,
-    vol_grid,
-    vol_type_value,
-    x_inits,
-    fin_solver_type,
-):
+    t: float,
+    f: float,
+    strikes_grid: np.ndarray,
+    time_index: int,
+    vol_grid: np.ndarray,
+    vol_type_value: int,
+    x_inits: np.ndarray,
+    fin_solver_type: Any
+) -> np.ndarray:
 
     ###########################################################################
     # Determine parameters of vol surface using minimisation
@@ -197,7 +197,13 @@ def _solve_to_horizon(
     cache=True,
     fastmath=True,
 )
-def vol_function(vol_function_type_value, params, f, k, t):
+def vol_function(
+    vol_function_type_value: int,
+    params: np.ndarray,
+    f: float,
+    k: float,
+    t: float
+) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -392,13 +398,13 @@ class SwaptionVolSurface:
     def __init__(
         self,
         value_dt: Date,
-        expiry_dts: list,
-        fwd_swap_rates: Union[list, np.ndarray],
+        expiry_dts: List[Date],
+        fwd_swap_rates: np.ndarray,
         strike_grid: np.ndarray,
         vol_grid: np.ndarray,
         vol_func_type: VolFuncTypes = VolFuncTypes.SABR,
         fin_solver_type: FinSolverTypes = FinSolverTypes.NELDER_MEAD,
-    ):
+    ) -> None:
         """Create the FinSwaptionVolSurface object by passing in market vol
         data for a list of strikes and expiry dates."""
 
@@ -444,7 +450,7 @@ class SwaptionVolSurface:
 
     ###########################################################################
 
-    def vol_from_strike_dt(self, k, expiry_dt):
+    def vol_from_strike_dt(self, k: float, expiry_dt: Date) -> float:
         """Interpolates the Black-Scholes volatility from the volatility
         surface given call option strike and expiry date. Linear interpolation
         is done in variance space. The smile strikes at bracketed dates are
@@ -740,7 +746,7 @@ class SwaptionVolSurface:
 
     ####################################################################################
 
-    def _build_vol_surface(self, fin_solver_type=FinSolverTypes.NELDER_MEAD):
+    def _build_vol_surface(self, fin_solver_type: FinSolverTypes = FinSolverTypes.NELDER_MEAD) -> None:
         """Main function to construct the vol surface."""
 
         if self._vol_func_type == VolFuncTypes.CLARK:
@@ -811,7 +817,7 @@ class SwaptionVolSurface:
 
     ###########################################################################
 
-    def check_calibration(self, verbose: bool, tol: float = 1e-6):
+    def check_calibration(self, verbose: bool, tol: float = 1e-6) -> None:
         """Compare calibrated vol surface with market and output a report
         which sets out the quality of fit to the ATM and 10 and 25 delta market
         strangles and risk reversals."""
@@ -898,7 +904,7 @@ class SwaptionVolSurface:
 
     ###########################################################################
 
-    def plot_vol_curves(self):
+    def plot_vol_curves(self) -> None:
         """Generates a plot of each of the vol discount implied by the market
         and fitted."""
 
@@ -946,7 +952,7 @@ class SwaptionVolSurface:
 
     ###########################################################################
 
-    def __repr__(self):
+    def __repr__(self) -> str:
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
@@ -975,7 +981,7 @@ class SwaptionVolSurface:
 
     ###########################################################################
 
-    def _print(self):
+    def _print(self) -> None:
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
         print(self)

@@ -1352,12 +1352,12 @@ class HWTree:
 
     def callable_puttable_bond_tree(
         self,
-        cpn_times: Union[np.ndarray, List[float]],
-        cpn_flows: Union[np.ndarray, List[float]],
-        call_times: Union[np.ndarray, List[float]],
-        call_prices: Union[np.ndarray, List[float]],
-        put_times: Union[np.ndarray, List[float]],
-        put_prices: Union[np.ndarray, List[float]],
+        cpn_times: np.ndarray,
+        cpn_flows: np.ndarray,
+        call_times: np.ndarray,
+        call_prices: np.ndarray,
+        put_times: np.ndarray,
+        put_prices: np.ndarray,
         face_amount: float,
     ) -> Dict[str, float]:
         """Value an option on a bond with cpns that can have European or

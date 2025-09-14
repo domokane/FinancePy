@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -14,6 +16,7 @@ from financepy.utils.global_types import SwapTypes
 
 from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
+
 
 num_time_steps = 100
 
@@ -49,6 +52,10 @@ for _ in range(0, 24):
     put_dts.append(put_dt)
     put_prices.append(100)
     put_dt = put_dt.add_months(1)
+
+put_prices = np.array(put_prices)
+call_prices = np.array(call_prices)
+
 puttable_bond_matlab = BondEmbeddedOption(
     issue_dt,
     maturity_dt,
@@ -128,6 +135,9 @@ for _ in range(1, 24):
     next_call_date = next_call_date.add_months(3)
     call_dts.append(next_call_date)
     call_prices.append(100.0)
+
+call_prices = np.array(call_prices)
+put_prices = np.array(put_prices)
 
 puttable_bond_quantlib = BondEmbeddedOption(
     issue_dt,
