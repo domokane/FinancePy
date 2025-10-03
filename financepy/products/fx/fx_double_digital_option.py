@@ -32,10 +32,14 @@ class FXDoubleDigitalOption:
         prem_currency: str,
         spot_days: int = 0,
     ):
-        """Create the FX Double Digital Option object. Inputs include
-        expiry date, upper strike, lower strike, currency pair,
-        option type notional and the currency of the notional.
-        An adjustment for spot days is enabled. All currency rates
+        """Create the FX Double Digital Option object. The option pays out
+        the notional in the premium currency if the fx rate is between
+        the upper and lower strike at maturity.
+        The valuation is equivalent to the valuation of the difference of
+        the value of two digital puts, one with the upper and the other
+        with the lower strike. Inputs include expiry date, upper strike,
+        lower strike, currency pair, option type notional and currency of
+        notional. An adjustment for spot days is enabled. All currency rates
         must be entered in the price in domestic currency of one unit
         of foreign. And the currency pair should be in the form FORDOM
         where FOR is the foreign currency pair currency code and DOM is the

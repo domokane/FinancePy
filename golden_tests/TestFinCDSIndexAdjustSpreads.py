@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import time
+
 from os.path import dirname, join
 
 import add_fp_to_path
@@ -195,12 +197,10 @@ def test_cds_index_adjust_spreads():
 
     tolerance = 1e-4  # should be smaller
 
-    import time
-
     start = time.time()
 
     index_portfolio = CDSIndexPortfolio()
-    adjusted_issuer_curves = index_portfolio.spd_adjust_intrinsic(
+    adjusted_issuer_curves = index_portfolio.spread_adjust_intrinsic(
         value_dt,
         issuer_curves,
         index_cpns,

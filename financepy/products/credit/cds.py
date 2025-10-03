@@ -35,6 +35,7 @@ GLOB_NUM_STEPS_PER_YEAR = 25
 ########################################################################################
 
 
+
 @njit(
     float64[:](
         float64,
@@ -280,7 +281,7 @@ class CDS:
         self._generate_adjusted_cds_payment_dts()
         self._calc_flows()
 
-    ###########################################################################
+    ####################################################################################
 
     def _generate_adjusted_cds_payment_dts(self):
         """Generate CDS payment dates which have been holiday adjusted."""
@@ -300,13 +301,11 @@ class CDS:
         if self.dg_type == DateGenRuleTypes.BACKWARD:
 
             # We start at end date and step backwards
-
             next_dt = self.maturity_dt
 
             unadjusted_schedule_dts.append(next_dt)
 
-            # the unadjusted dates start at end date and end at previous
-            # cpn date
+            # the unadjusted dates start at end date and end at previous cpn date
             while next_dt > start_dt:
                 next_dt = next_dt.add_months(-num_months)
                 unadjusted_schedule_dts.append(next_dt)
@@ -350,18 +349,15 @@ class CDS:
         # Accrual End   = [19-MAY-2009, 19-AUG-2009, 19-NOV-2009, 20-MAR-2010]
 
         else:
-
             raise FinError("Unknown DateGenRuleType:" + str(self.dg_type))
 
         # We only include dates which fall after the CDS start date
         self.payment_dts = adjusted_dts[1:]
 
-        # Accrual start dates run from previous cpn date to penultimate
-        # cpn date
+        # Accrual start dates run from previous cpn date to penultimate cpn date
         self.accrual_start_dts = adjusted_dts[:-1]
 
-        # Accrual end dates are one day before the start of the next
-        # accrual period
+        # Accrual end dates are one day before the start of the next accrual period
         self.accrual_end_dts = [
             date.add_days(-1) for date in self.accrual_start_dts[1:]
         ]

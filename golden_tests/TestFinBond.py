@@ -2,11 +2,11 @@
 
 import os
 
-import add_fp_to_path
-
 import datetime as dt
 import pandas as pd
 import numpy as np
+
+import add_fp_to_path
 
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.calendar import CalendarTypes
@@ -721,7 +721,7 @@ def test_div_dts():
     clean_price = 99.7808417  # if face is 1 then this must be 0.99780842
 
     settle_dt = Date(15, 5, 2023)
-    print(bond.bond_payments(settle_dt, face))
+    bond.print_payments(settle_dt, face)
 
     current_yield = bond.current_yield(clean_price) * 100
     print("Currnt Yield: %10.5f %%" % (current_yield))

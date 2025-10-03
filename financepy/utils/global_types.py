@@ -19,6 +19,16 @@ class FinLongShort(Enum):
 ########################################################################################
 
 
+class DoubleBarrierTypes(Enum):
+    """Enumeration of long/short positions."""
+
+    KNOCK_IN = 1
+    KNOCK_OUT = 2
+
+
+########################################################################################
+
+
 class OptionTypes(Enum):
     """Enumeration of option types."""
 

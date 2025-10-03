@@ -192,7 +192,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def spd_adjust_intrinsic(
+    def spread_adjust_intrinsic(
         self,
         value_dt,
         issuer_curves,

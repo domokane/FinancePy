@@ -75,7 +75,7 @@ class EquityCompoundOption(EquityOption):
         self.u_strike_price = float(u_strike_price)
         self.u_opt_type = u_opt_type
 
-    ###########################################################################
+    ####################################################################################
 
     def _preprocess_inputs(
         self,
@@ -157,7 +157,7 @@ class EquityCompoundOption(EquityOption):
 
         return v
 
-    ###########################################################################
+    ####################################################################################
 
     def value_tree(
         self,
@@ -204,7 +204,7 @@ class EquityCompoundOption(EquityOption):
         s += label_to_string("UND OPTION TYPE", self.u_opt_type)
         return s
 
-    ###########################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

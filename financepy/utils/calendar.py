@@ -2,6 +2,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+from functools import lru_cache
 
 ########################################################################################
 # TODO: Do some timings and tidy up logic in adjustment function
@@ -11,8 +12,6 @@ import datetime
 from enum import Enum
 from .date import Date
 from .error import FinError
-
-# from numba import njit, jit, int64, boolean
 
 easter_monday_day = [
     98,
@@ -374,7 +373,13 @@ class Calendar:
         self.day_in_year = None
         self.weekday = None
 
-    ###########################################################################
+    ####################################################################################
+
+    @lru_cache(maxsize=None)
+    def adjust_cached(self, dt: "Date", bd_type: "BusDayAdjustTypes") -> "Date":
+        return self.adjust(dt, bd_type)
+
+    ####################################################################################
 
     def adjust(self, dt: Date, bd_type: BusDayAdjustTypes):
         """Adjust a payment date if it falls on a holiday according to the
@@ -448,6 +453,94 @@ class Calendar:
             return dt
 
         raise FinError("Unknown adjustment convention" + str(bd_type))
+
+    ####################################################################################
+
+    def fast_adjust(self, dt: Date, bd_type: BusDayAdjustTypes):
+        """Fast adjust a payment date using business day conventions."""
+
+        if not isinstance(bd_type, BusDayAdjustTypes):
+            raise FinError("Invalid type passed. Need BusDayAdjustTypes")
+    
+        # If no calendar or no adjustment, nothing to do
+        if self.cal_type == CalendarTypes.NONE or bd_type == BusDayAdjustTypes.NONE:
+            return dt
+    
+        # FOLLOWING convention
+        if bd_type == BusDayAdjustTypes.FOLLOWING:
+            if dt.is_weekend():
+                # jump directly to Monday
+                if dt.weekday == Date.SAT:
+                    dt = dt.add_days(2)
+                elif dt.weekday == Date.SUN:
+                    dt = dt.add_days(1)
+            # if still a holiday (rare), walk forward
+            while not self.is_business_day(dt):
+                dt = dt.add_days(1)
+            return dt
+    
+        # MODIFIED FOLLOWING convention
+        if bd_type == BusDayAdjustTypes.MODIFIED_FOLLOWING:
+            d_start, m_start, y_start = dt.d, dt.m, dt.y
+            orig_dt = dt
+    
+            if dt.is_weekend():
+                if dt.weekday == Date.SAT:
+                    dt = dt.add_days(2)
+                elif dt.weekday == Date.SUN:
+                    dt = dt.add_days(1)
+            while not self.is_business_day(dt):
+                dt = dt.add_days(1)
+    
+            # if moved into a different month → go backwards
+            if dt.m != m_start:
+                dt = orig_dt
+                if dt.is_weekend():
+                    if dt.weekday == Date.SAT:
+                        dt = dt.add_days(-1)
+                    elif dt.weekday == Date.SUN:
+                        dt = dt.add_days(-2)
+                while not self.is_business_day(dt):
+                    dt = dt.add_days(-1)
+            return dt
+    
+        # PRECEDING convention
+        if bd_type == BusDayAdjustTypes.PRECEDING:
+            if dt.is_weekend():
+                if dt.weekday == Date.SAT:
+                    dt = dt.add_days(-1)
+                elif dt.weekday == Date.SUN:
+                    dt = dt.add_days(-2)
+            while not self.is_business_day(dt):
+                dt = dt.add_days(-1)
+            return dt
+    
+        # MODIFIED PRECEDING convention
+        if bd_type == BusDayAdjustTypes.MODIFIED_PRECEDING:
+            d_start, m_start, y_start = dt.d, dt.m, dt.y
+            orig_dt = dt
+    
+            if dt.is_weekend():
+                if dt.weekday == Date.SAT:
+                    dt = dt.add_days(-1)
+                elif dt.weekday == Date.SUN:
+                    dt = dt.add_days(-2)
+            while not self.is_business_day(dt):
+                dt = dt.add_days(-1)
+    
+            # if moved into a different month → go forward
+            if dt.m != m_start:
+                dt = orig_dt
+                if dt.is_weekend():
+                    if dt.weekday == Date.SAT:
+                        dt = dt.add_days(2)
+                    elif dt.weekday == Date.SUN:
+                        dt = dt.add_days(1)
+                while not self.is_business_day(dt):
+                    dt = dt.add_days(1)
+            return dt
+    
+        raise FinError("Unknown adjustment convention: " + str(bd_type))
 
     ####################################################################################
 

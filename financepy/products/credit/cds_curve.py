@@ -16,6 +16,8 @@ from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
 
 
+from numba import njit, float64
+
 ########################################################################################
 
 
@@ -212,15 +214,18 @@ class CDSCurve:
             self._times = np.append(self._times, t_mat)
             self._qs = np.append(self._qs, q)
 
-            optimize.newton(
-                f,
-                x0=q,
-                fprime=None,
-                args=argtuple,
-                tol=1e-7,
-                maxiter=50,
-                fprime2=None,
-            )
+            if 1==1:
+                optimize.newton(
+                    f,
+                    x0=q,
+                    fprime=None,
+                    args=argtuple,
+                    tol=1e-7,
+                    maxiter=50,
+                    fprime2=None,
+                )
+            else:
+                pass
 
     ###########################################################################
 

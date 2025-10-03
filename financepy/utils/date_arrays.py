@@ -43,5 +43,6 @@ long_month_names = [
     "DECEMBER",
 ]
 
-month_days_not_leap_year = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-month_days_leap_year = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+month_days_not_leap_year = (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+month_days_leap_year = (31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+

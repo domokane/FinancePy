@@ -56,8 +56,7 @@ def test_equity_compound_option():
                     model,
                 )
 
-                values_tree = cmpd_option.value_tree(
-                    value_dt,
+                values_tree = cmpd_option.value_tree(value_dt,
                     stock_price,
                     discount_curve,
                     dividend_curve,
