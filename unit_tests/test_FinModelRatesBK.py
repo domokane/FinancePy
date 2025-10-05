@@ -125,7 +125,7 @@ def test_bk_example_two():
     curve = DiscountCurve(settle_dt, dates, dfs)
 
     price = bond.clean_price_from_discount_curve(settle_dt, curve)
-    assert round(price, 4) == 99.5420
+    assert round(price, 4) == 99.524
 
     sigma = 0.20
     a = 0.05

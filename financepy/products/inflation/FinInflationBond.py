@@ -84,7 +84,7 @@ class FinInflationBond(Bond):
         self.accrued_days = 0.0
         self.alpha = 0.0
 
-        self._calculate_unadjusted_cpn_dts()
+        self._calculate_cpn_dts()
         self._calculate_flow_amounts()
 
     ###########################################################################

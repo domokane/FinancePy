@@ -70,12 +70,11 @@ class BondOption:
 
         # We need all the flows in case the option is American
         # and some occur before expiry
-        flow_dts = self.bond.cpn_dts
+        flow_dts = self.bond.payment_dts
         flow_amounts = self.bond.flow_amounts
 
         cpn_times = []
         cpn_flows = []
-
         num_flows = len(self.bond.cpn_dts)
 
         # Want the first flow to be the previous coupon date

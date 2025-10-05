@@ -50,6 +50,7 @@ class BondAnnuity:
         self.par = 100.0
 
         self.cpn_dts = []
+
         self.settle_dt = Date(1, 1, 1900)
         self.accrued_int = None
         self.accrued_days = 0.0

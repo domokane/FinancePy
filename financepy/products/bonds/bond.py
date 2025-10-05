@@ -692,18 +692,20 @@ class Bond:
         df = 1.0
         df_settle_dt = discount_curve.df(settle_dt)
 
-        dt = self.payment_dts[1]
-        if dt > settle_dt:
-            df = discount_curve.df(dt)
+        cpn_dt = self.cpn_dts[1]
+        pmt_dt = self.payment_dts[1]
+
+        if cpn_dt > settle_dt:
+            df = discount_curve.df(pmt_dt)
             flow = self.cpn / self.freq
             pv = flow * df
             px += pv * pay_first_cpn
 
-        for dt in self.payment_dts[2:]:
+        for cpn_dt, pmt_dt in zip(self.cpn_dts[2:], self.payment_dts[2:]):
 
             # coupons paid on a settlement date are paid to the seller
-            if dt > settle_dt:
-                df = discount_curve.df(dt)
+            if cpn_dt > settle_dt:
+                df = discount_curve.df(pmt_dt)
                 flow = self.cpn / self.freq
                 pv = flow * df
                 px += pv

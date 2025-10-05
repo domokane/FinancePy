@@ -121,7 +121,8 @@ class BondEmbeddedOption:
         self.put_dts = put_dts
         self.put_prices = put_prices
         self.par = 100.0
-        self.bond._calculate_unadjusted_cpn_dts()
+        self.bond._calculate_cpn_dts()
+        self.bond._calculate_payment_dts()
 
     ####################################################################################
 
@@ -136,7 +137,7 @@ class BondEmbeddedOption:
         cpn_times = []
         cpn_amounts = []
 
-        for flow_dt in self.bond.cpn_dts[1:]:
+        for flow_dt in self.bond.payment_dts[1:]:
             if flow_dt > settle_dt:
                 cpn_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
                 cpn_times.append(cpn_time)
@@ -209,10 +210,11 @@ class BondEmbeddedOption:
 
         elif isinstance(model, BKTree):
 
-            """Because we not have a closed form bond price we need to build
-            the tree out to the bond maturity which is after option expiry."""
+            # Because we not have a closed form bond price we need to build
+            # the tree out to the bond maturity which is after option expiry.
 
             model.build_tree(t_mat, df_times, df_values)
+
             v1 = model.callable_puttable_bond_tree(
                 cpn_times,
                 cpn_amounts,
@@ -222,8 +224,11 @@ class BondEmbeddedOption:
                 put_prices,
                 face_amount,
             )
+
             model.num_time_steps += 1
+
             model.build_tree(t_mat, df_times, df_values)
+
             v2 = model.callable_puttable_bond_tree(
                 cpn_times,
                 cpn_amounts,

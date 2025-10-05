@@ -508,6 +508,9 @@ def test_bond_ex_dividend():
         test_cases.print(settle_dt, dirty_price, accrued, clean_price)
 
 
+#        print(settle_dt, dirty_price, accrued, clean_price)
+
+
 ########################################################################################
 
 

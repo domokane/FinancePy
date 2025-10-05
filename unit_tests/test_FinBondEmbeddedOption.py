@@ -160,7 +160,7 @@ def test_quantlib_clean_price_from_discount_curve():
         settle_dt_quantlib, discount_curve_quantlib
     )
 
-    assert round(v, 4) == 94.6318
+    assert round(v, 4) == 94.6313
 
 
 ########################################################################################
@@ -174,8 +174,8 @@ def test_quantlib_bk():
 
     v = puttable_bond_quantlib.value(settle_dt_quantlib, discount_curve_quantlib, model)
 
-    assert round(v["bondwithoption"], 4) == 89.7614
-    assert round(v["bondpure"], 4) == 95.0619
+    assert round(v["bondwithoption"], 4) == 89.7546
+    assert round(v["bondpure"], 4) == 95.0614
 
 
 ########################################################################################
@@ -190,5 +190,5 @@ def test_quantlib_hw():
 
     v = puttable_bond_quantlib.value(settle_dt_quantlib, discount_curve_quantlib, model)
 
-    assert round(v["bondwithoption"], 4) == 68.8665
-    assert round(v["bondpure"], 4) == 95.0619
+    assert round(v["bondwithoption"], 4) == 68.8612
+    assert round(v["bondpure"], 4) == 95.0614

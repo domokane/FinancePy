@@ -22,6 +22,7 @@ from ...utils.schedule import Schedule
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
+from ...utils.calendar import Calendar
 
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes, _uinterpolate
@@ -339,7 +340,11 @@ class BondConvertible:
 
         self._pcd = None
         self._ncd = None
+
+        self.cal_type = cal_type
+
         self.cpn_dts = []
+        self.payment_dts = []
 
     ###########################################################################
 
@@ -366,6 +371,17 @@ class BondConvertible:
 
         self._pcd = self.cpn_dts[0]
         self._ncd = self.cpn_dts[1]
+
+        calendar = Calendar(self.cal_type)
+
+        self.payment_dts = []
+
+        # I do not adjust the first date as it is the issue date
+        self.payment_dts.append(self.cpn_dts[0])
+
+        for cpn_dt in self.cpn_dts[1:]:
+            pmt_dt = calendar.adjust(cpn_dt, bd_type)
+            self.payment_dts.append(pmt_dt)
 
         self.accrued_int = None
         self.accrued_interest(settle_dt, 1.0)
@@ -424,7 +440,7 @@ class BondConvertible:
 
         cpn = self.cpn / self.freq
 
-        for dt in self.cpn_dts[1:]:
+        for dt in self.payment_dts[1:]:
             flow_time = (dt - settle_dt) / G_DAYS_IN_YEARS
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)

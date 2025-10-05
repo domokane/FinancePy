@@ -63,7 +63,7 @@ def test_bdt_example_two():
     curve = DiscountCurve(settle_dt, dates, dfs)
 
     price = bond.clean_price_from_discount_curve(settle_dt, curve)
-    assert round(price, 4) == 99.5420
+    assert round(price, 4) == 99.524
 
     sigma = 0.20
 
@@ -143,7 +143,7 @@ def test_bdt_example_three():
         t_exp, t_mat, strike_price, face, cpn_times, cpn_flows, exercise_type
     )
 
-    assert round(price, 5) == 100.01832
+    assert round(price, 5) == 100.01626
     assert round(v["pay"] * 100, 2) == 0.00
     assert round(v["rec"] * 100, 2) == 8883.21
 
@@ -186,6 +186,6 @@ def test_bdt_example_three():
         t_exp, t_mat, strike_price, face, cpn_times, cpn_flows, exercise_type
     )
 
-    assert round(price, 5) == 100.08625
+    assert round(price, 5) == 100.08273
     assert round(v["pay"] * 100, 2) == 263.28
     assert round(v["rec"] * 100, 2) == 7437.00

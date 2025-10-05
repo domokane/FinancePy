@@ -40,7 +40,7 @@ def main(start_index=0, end_index=None):
         module_name = basename(module_path)[:-3]
 
         print(
-            f"TEST: {idx + 1:3d} out of {num_modules:3d}: MODULE: {module_name:<35} ",
+            f"TEST: {idx + 1:3d} of {num_modules:3d}: {module_name:<35} ",
             end="",
         )
 
@@ -57,13 +57,13 @@ def main(start_index=0, end_index=None):
 
             # print(f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end="")
             print(
-                f"TIME: {elapsed:6.3f} s   "
+                f"TIME: {elapsed:6.3f} s "
                 f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d}",
                 end="",
             )
 
             if num_errors > 0:
-                print("*" * num_errors, end="")
+                print("*" * 1, end="")
 
             print()
 
