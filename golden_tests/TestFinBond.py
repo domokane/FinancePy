@@ -513,21 +513,46 @@ def test_bond_ex_dividend():
 
 def test_bond_payment_dates():
 
+    issue_dt = Date(1, 1, 2020)
+    mat_dt = Date(1, 1, 2023)
+    cpn = 0.05
+    ytm = 0.05
+    face = 100.0
+
+    # Use auto generated schedule
     bond = Bond(
-        issue_dt=Date(7, 6, 2021),
-        maturity_dt=Date(7, 6, 2031),
-        coupon=0.0341,
+        issue_dt=issue_dt,
+        maturity_dt=mat_dt,
+        coupon=cpn,
         freq_type=FrequencyTypes.ANNUAL,
         dc_type=DayCountTypes.ACT_ACT_ISDA,
+        cal_type=CalendarTypes.UNITED_STATES,
     )
-    bond._calculate_payment_dts()
 
-    DEBUG = False
+    settle_dt = issue_dt.add_months(3)
+    #    bond.print_payments(settle_dt)
 
-    if DEBUG:
-        print(bond.flow_amounts)
-        print(bond.cpn_dts)
-        print(bond._payment_dts)
+    accrued = bond.accrued_interest(settle_dt, face)
+    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
+    clean_price = dirty_price - accrued
+    test_cases.print(settle_dt, dirty_price, accrued, clean_price)
+    #    print(settle_dt, dirty_price, accrued, clean_price)
+
+    # Use manual schedule where I make payment dates equal coupon dates even weekends
+    cpn_dts = [Date(1, 1, 2020), Date(1, 1, 2021), Date(1, 1, 2022), Date(1, 1, 2023)]
+    pmt_dts = [Date(1, 1, 2020), Date(1, 1, 2021), Date(1, 1, 2022), Date(1, 1, 2023)]
+    flow_amts = np.array([0.0, 0.05, 0.05, 1.05])
+
+    bond.reset_flows(cpn_dts, pmt_dts, flow_amts)
+    #    bond.print_payments(settle_dt)
+
+    accrued = bond.accrued_interest(settle_dt, face)
+    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
+    clean_price = dirty_price - accrued
+    test_cases.print(settle_dt, dirty_price, accrued, clean_price)
+
+
+#    print(settle_dt, dirty_price, accrued, clean_price)
 
 
 ########################################################################################
@@ -601,6 +626,8 @@ def test_bond_eom():
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
     accrued_interest = bond.accrued_interest(settle_dt)  # should be 8406.593406
+
+    # print(accrued_interest)
 
 
 ########################################################################################

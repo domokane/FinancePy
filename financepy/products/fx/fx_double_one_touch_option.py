@@ -24,7 +24,7 @@ from .fx_option import FXOption
 
 
 @njit(fastmath=True, parallel=True, cache=True)
-def _p_touch_bb_parallel(
+def _p_double_touch_bb_parallel(
     S0: float,
     L: float,
     U: float,
@@ -468,7 +468,9 @@ class FXDoubleOneTouchOption(FXOption):
         steps = int(max(1, num_steps_per_year * T))
 
         # Estimate touch probability with Brownian bridge (parallel)
-        p_touch = _p_touch_bb_parallel(S0, L, U, mu, sigma, T, steps, num_paths, seed)
+        p_touch = _p_double_touch_bb_parallel(
+            S0, L, U, mu, sigma, T, steps, num_paths, seed
+        )
 
         if self.option_type == DoubleBarrierTypes.KNOCK_OUT:
             # Double no-touch
