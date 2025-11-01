@@ -54,6 +54,7 @@ class DiscountCurve:
         self._times = [0.0]
         self._dfs = [1.0]
         self._df_dates = df_dates
+        self._dates = [value_dt]
 
         num_points = len(df_dates)
 
@@ -62,13 +63,18 @@ class DiscountCurve:
             if df_dates[0] == value_dt:
                 self._dfs[0] = df_values[0]
                 start_index = 1
+            
+            self._dfs[0] = df_values[0]
+            start_index = 1
 
         for i in range(start_index, num_points):
             t = (df_dates[i] - value_dt) / G_DAYS_IN_YEARS
             self._times.append(t)
             self._dfs.append(df_values[i])
+            self._dates.append(df_dates[i])
 
         self._times = np.array(self._times)
+        self._dates = np.array(self._dates)
 
         if test_monotonicity(self._times) is False:
             print(self._times)
@@ -345,6 +351,46 @@ class DiscountCurve:
             return dfs
 
         return np.array(dfs)
+    
+    ####################################################################################
+
+    def dates_from_df(self, dfs: Union[list, float], day_count=DayCountTypes.ACT_ACT_ISDA):
+        """Function to calculate dates corresponding to given discount factors.
+        This is the inverse of df(): it maps discount factors -> dates.
+        The day count determines how times get converted back to dates."""
+
+        # Ensure discount factors are in list/array form
+        if isinstance(dfs, (float, int)):
+            dfs = [dfs]
+
+        # Step 1: Invert the discount factor function
+        times = []
+        for df_value in dfs:
+            # We need to find t such that df_t(t) = df_value
+            # Use a numerical root-finding method since df_t is typically monotonic decreasing
+            def func(t):
+                return self.df_t(t) - df_value
+
+            # Bounds: assume discount factors decrease from 1 at t=0
+            # Expand upper bound dynamically until df_t < df_value
+            t_low, t_high = 0.0, 1.0
+            while self.df_t(t_high) > df_value and t_high < 100:
+                t_high *= 2
+
+            # Solve for t
+            from scipy.optimize import brentq
+            t_sol = brentq(func, t_low, t_high)
+            times.append(t_sol)
+
+        # Step 2: Convert times -> dates
+        from numpy import array
+        dates = dates_from_times(array(times), self.value_dt, day_count)
+
+        if len(dates) == 1:
+            return dates[0]
+        
+        return dates
+
 
     ####################################################################################
 
@@ -428,13 +474,14 @@ class DiscountCurve:
 
         times = self._times.copy()
         values = self._dfs.copy()
+        dates = self._dates.copy()
 
         n = len(self._times)
         for i in range(0, n):
             t = times[i]
             values[i] = values[i] * np.exp(-bump_size * t)
 
-        disc_curve = DiscountCurve(self.value_dt, times, values, self._interp_type)
+        disc_curve = DiscountCurve(self.value_dt, list(dates), values, self._interp_type)
 
         return disc_curve
 
@@ -494,8 +541,7 @@ class DiscountCurve:
         num_points = len(self._df_dates)
         s += label_to_string("DATES", "DISCOUNT FACTORS")
         for i in range(0, num_points):
-            s += label_to_string(f"{self._df_dates[i]:>12}", f"{self._dfs[i]:12.8f}")
-
+            s += label_to_string(f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}")
         return s
 
     ####################################################################################
