@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from financepy.utils.global_vars import *
+# from financepy.utils.global_vars import
 from financepy.utils.tension_spline import TensionSpline
 from financepy.utils.global_vars import G_SMALL
 

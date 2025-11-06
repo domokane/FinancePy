@@ -17,7 +17,7 @@ from ....utils import ONE_MILLION
 ##########################################################################
 
 
-class IborIborSwap:
+class FloatFloatCrossCurrencySwap:
     """Class for managing an interest rate basis swap contract. This is a
     contract in which a floating leg with one LIBOR tenor is exchanged for a
     floating leg payment in a different LIBOR tenor. There is no exchange of
@@ -32,10 +32,10 @@ class IborIborSwap:
         self,
         effective_dt: Date,  # Date interest starts to accrue
         term_dt_or_tenor: Union[Date, str],  # Date contract ends
-        pay_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        pay_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        rec_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        rec_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        float_pay_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        float_pay_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        float_rec_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
+        float_rec_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         basis_swap_spread: float = 0.0,
         notional: float = ONE_MILLION,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -67,10 +67,13 @@ class IborIborSwap:
         self.effective_dt = effective_dt
         self.notional = notional
         self._basis_swap_spread = basis_swap_spread
-        self._pay_freq_type = pay_freq_type
-        self._rec_freq_type = rec_freq_type
-        self._pay_dc_type = pay_dc_type
-        self._rec_dc_type = rec_dc_type
+
+        self._pay_freq_type = float_pay_freq_type
+        self._rec_freq_type = float_rec_freq_type
+
+        self._pay_dc_type = float_pay_dc_type
+        self._rec_dc_type = float_rec_dc_type
+
         self._cal_type = cal_type
         self._bd_type = bd_type
         self._dg_type = dg_type
@@ -173,7 +176,7 @@ class IborIborSwap:
         self._float_total_pv = []
         self._first_fixing_rate = first_fixing_rate
 
-        basis = DayCount(self._float_dc_type)
+        basis = DayCount(self.float_dc_type)
 
         # The swap may have started in the past but we can only value
         # payments that have occurred after the start date.

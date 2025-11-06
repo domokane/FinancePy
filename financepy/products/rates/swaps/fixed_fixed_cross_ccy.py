@@ -10,7 +10,7 @@ from ....utils import FinError
 from ....utils import Date
 from ....utils import G_SMALL
 from ....utils import DayCount, DayCountTypes
-from ....utils import FrequencyTypes, Frequency
+from ....utils import FrequencyTypes
 from ....utils import CalendarTypes, DateGenRuleTypes
 from ....utils import Calendar, BusDayAdjustTypes
 from ....utils import Schedule
@@ -21,7 +21,7 @@ from ....utils import SwapTypes
 ##########################################################################
 
 
-class FixedFixedXCcySwap:
+class FixedFixedCrossCurrencySwap:
     """Class for managing a cross currency swap contract. This is a contract
     in which a fixed or floating payment leg in one currency is exchanged for a
     series of fixed or floating rates in a second currency. There is an
@@ -313,7 +313,7 @@ class FixedFixedXCcySwap:
     def cash_settled_pv01(self, value_dt, flat_swap_rate, freq_type):
         """Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
-        used in the pricing of a cash-settled swaption in the IborSwaption
+        used in the pricing of a cash-settled swaption in the IborFixedFloatSwaption
         class. This method does not affect the standard valuation methods."""
 
         m = annual_frequency(freq_type)
