@@ -1,10 +1,10 @@
-File Created on:20250831_213005
+File Created on:20251106_163528
 HEADER,================================= CASH ONLY,
 HEADER,TYPE,VALUE,VALUE_MC,
-RESULTS,                    TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT ,  1.01538,  0.98023,
-RESULTS,                 TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY ,  0.97722,  0.95972,
+RESULTS,                    TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT ,  1.01538,  0.98896,
+RESULTS,                 TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY ,  0.97722,  0.95123,
 RESULTS,               TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING ,  0.44963,  0.47561,
 HEADER,TYPE,VALUE,VALUE_MC,
-RESULTS,                      TouchOptionTypes.UP_AND_IN_CASH_AT_HIT ,  1.12853,  1.12924,
-RESULTS,                   TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY ,  1.08667,  1.11260,
-RESULTS,                 TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING ,  0.34018,  0.35954,
+RESULTS,                      TouchOptionTypes.UP_AND_IN_CASH_AT_HIT ,  1.12853,  1.10051,
+RESULTS,                   TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY ,  1.08667,  1.05881,
+RESULTS,                 TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING ,  0.34018,  0.36804,

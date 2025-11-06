@@ -1,4 +1,4 @@
-File Created on:20250831_213032
+File Created on:20251106_163529
 HEADER,value,delta,
 RESULTS,{'v': np.float64(0.025125177202258236), 'cash_dom': np.float64(25125.177202258237), 'cash_for': np.float64(20937.647668548532), 'pips_dom': np.float64(0.025125177202258236), 'pips_for': np.float64(0.016750118134838825), 'pct_dom': np.float64(0.02010014176180659), 'pct_for': np.float64(0.020937647668548533), 'not_dom': 1250000.0, 'not_for': 1000000.0, 'ccy_dom': 'USD', 'ccy_for': 'EUR'},{'pips_spot_delta': np.float64(0.33146163457908373), 'pips_fwd_delta': np.float64(0.34155614418366065), 'pct_spot_delta_prem_adj': np.float64(0.3105239869105352), 'pct_fwd_delta_prem_adj': np.float64(0.31998085021328354)},
 HEADER,value,delta,

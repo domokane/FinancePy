@@ -1,7 +1,7 @@
-File Created on:20250831_212951
+File Created on:20251106_163520
 HEADER,================================= CASH ONLY,
 HEADER,TYPE,VALUE,VALUE_MC,
-RESULTS,                    TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT , 10.15381,  9.94774,
+RESULTS,                    TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT , 10.15381,  9.88882,
 RESULTS,                 TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY ,  9.77218,  9.51229,
 RESULTS,               TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING ,  4.49627,  4.75615,
 HEADER,TYPE,VALUE,VALUE_MC,
