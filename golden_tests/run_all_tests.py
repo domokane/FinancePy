@@ -7,17 +7,15 @@ from os.path import dirname, basename, join
 import traceback
 import time
 
-import sys
-import os
-
 import add_fp_to_path
+
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 
-
 # This only works if I have an init.py in the parent folder
-
 set_date_format(DateFormatTypes.UK_LONG)
+
+########################################################################################
 
 
 def main(start_index=0, end_index=None):
