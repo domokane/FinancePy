@@ -11,7 +11,7 @@ from numba import njit, float64, int64
 from scipy import integrate
 import numpy as np
 
-from ..utils.global_vars import G_DAYS_IN_YEARS
+from ..utils.global_vars import G_DAYS_IN_YEAR
 from ..utils.global_types import OptionTypes
 from ..utils.math import norminvcdf
 from ..utils.error import FinError
@@ -41,7 +41,7 @@ class HestonNumericalScheme(Enum):
 
 
 @njit(
-    float64[:, :] (
+    float64[:, :](
         float64,
         float64,
         float64,
@@ -72,7 +72,7 @@ def get_paths(
     dt: float,
     num_paths: int,
     seed: int,
-    scheme: float
+    scheme: float,
 ) -> np.ndarray:
 
     np.random.seed(seed)
@@ -194,12 +194,7 @@ def get_paths(
 class Heston:
 
     def __init__(
-        self,
-        v0: float,
-        kappa: float,
-        theta: float,
-        sigma: float,
-        rho: float
+        self, v0: float, kappa: float, theta: float, sigma: float, rho: float
     ) -> None:
 
         verbose = False
@@ -228,7 +223,7 @@ class Heston:
         scheme: HestonNumericalScheme = HestonNumericalScheme.EULERLOG,
     ) -> float:
 
-        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         k = option.strike_price
         dt = 1.0 / num_steps_per_year
@@ -269,10 +264,10 @@ class Heston:
         option: Any,
         stock_price: float,
         interest_rate: float,
-        dividend_yield: float
+        dividend_yield: float,
     ) -> float:
 
-        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         rho = self._rho
         sigma = self._sigma
@@ -325,10 +320,10 @@ class Heston:
         option: Any,
         stock_price: float,
         interest_rate: float,
-        dividend_yield: float
+        dividend_yield: float,
     ) -> float:
 
-        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         rho = self._rho
         sigma = self._sigma
@@ -375,10 +370,10 @@ class Heston:
         option: Any,
         stock_price: float,
         interest_rate: float,
-        dividend_yield: float
+        dividend_yield: float,
     ) -> float:
 
-        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         rho = self._rho
         sigma = self._sigma
@@ -430,10 +425,10 @@ class Heston:
         option: Any,
         stock_price: float,
         interest_rate: float,
-        dividend_yield: float
+        dividend_yield: float,
     ) -> float:
 
-        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         rho = self._rho
         sigma = self._sigma

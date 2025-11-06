@@ -9,7 +9,7 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.global_types import FinExerciseTypes
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
@@ -480,11 +480,11 @@ def test_bond_option_deriva_gem():
         if ncd > settle_dt:
 
             if len(coupon_times) == 0:
-                flow_time = (pcd - settle_dt) / G_DAYS_IN_YEARS
+                flow_time = (pcd - settle_dt) / G_DAYS_IN_YEAR
                 coupon_times.append(flow_time)
                 coupon_flows.append(cpn)
 
-            flow_time = (ncd - settle_dt) / G_DAYS_IN_YEARS
+            flow_time = (ncd - settle_dt) / G_DAYS_IN_YEAR
             coupon_times.append(flow_time)
             coupon_flows.append(cpn)
 
@@ -500,8 +500,8 @@ def test_bond_option_deriva_gem():
     model = HWTree(sigma, a, None)
 
     #  Test convergence
-    t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
-    t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
+    t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEAR
+    t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEAR
 
     # Jamshidian approach
     v_jam = model.european_bond_option_jamshidian(

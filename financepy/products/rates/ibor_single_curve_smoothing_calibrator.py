@@ -5,7 +5,7 @@ from scipy import optimize
 
 
 from ...utils.date import datediff
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...products.rates.ibor_single_curve import IborSingleCurve
 from ...products.rates.ibor_benchmarks_report import ibor_benchmarks_report
 
@@ -58,7 +58,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         dates = list(set(dates))
         dates.sort()
         self._knot_dts = dates
-        self._knot_times = np.array([(d - dates[0]) / G_DAYS_IN_YEARS for d in dates])
+        self._knot_times = np.array([(d - dates[0]) / G_DAYS_IN_YEAR for d in dates])
 
     def _repricing_objectives(self, curve_to_use=None):
 

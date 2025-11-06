@@ -9,7 +9,7 @@ import numba as nb
 
 from ...utils.error import FinError
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...products.fx.fx_option import FXOption
 from ...models.process_simulator import FinProcessSimulator
 from ...utils.helpers import label_to_string, check_argument_types
@@ -88,7 +88,7 @@ class FXBarrierOption(FXOption):
         s0 = spot_fx_rate
         h = self.barrier_level
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         ln_s0_k = log(float(s0) / k)
         sqrt_t = sqrt(t)
 
@@ -304,7 +304,7 @@ class FXBarrierOption(FXOption):
     ):
         """Value the FX Barrier Option using Monte Carlo."""
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         num_time_steps = int(t * num_ann_steps)
         k = self.strike_fx_rate
         b = self.barrier_level

@@ -14,7 +14,7 @@ from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.models.black import Black
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.helpers import print_tree
@@ -132,13 +132,13 @@ def test_bdt_example_two():
         pcd = bond.cpn_dts[i - 1]
         ncd = bond.cpn_dts[i]
         if pcd < settle_dt and ncd > settle_dt:
-            flow_time = (pcd - settle_dt) / G_DAYS_IN_YEARS
+            flow_time = (pcd - settle_dt) / G_DAYS_IN_YEAR
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
     for flow_dt in bond.cpn_dts:
         if flow_dt > settle_dt:
-            flow_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
+            flow_time = (flow_dt - settle_dt) / G_DAYS_IN_YEAR
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -148,8 +148,8 @@ def test_bdt_example_two():
     strike_price = 105.0
     face = 100.0
 
-    t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
-    t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
+    t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEAR
+    t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEAR
     times = np.linspace(0, t_mat, 11)
     dates = settle_dt.add_years(times)
     dfs = np.exp(-0.05 * times)
@@ -254,8 +254,8 @@ def test_bdt_example_three():
 
                 expiry_dt = settle_dt.add_years(expiry_years)
 
-                t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
-                t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEARS
+                t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEAR
+                t_exp = (expiry_dt - settle_dt) / G_DAYS_IN_YEAR
 
                 bond = Bond(issue_dt, maturity_dt, cpn, freq_type, dc_type)
 
@@ -264,7 +264,7 @@ def test_bdt_example_three():
                 cpn = bond.cpn / bond.freq
                 for flow_dt in bond.cpn_dts:
                     if flow_dt > expiry_dt:
-                        flow_time = (flow_dt - settle_dt) / G_DAYS_IN_YEARS
+                        flow_time = (flow_dt - settle_dt) / G_DAYS_IN_YEAR
                         cpn_times.append(flow_time)
                         cpn_flows.append(cpn)
 

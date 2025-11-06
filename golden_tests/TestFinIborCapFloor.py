@@ -27,7 +27,7 @@ from financepy.models.black_shifted import BlackShifted
 from financepy.models.sabr import SABR
 from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -253,7 +253,7 @@ def test_ibor_cap_floor_vol_curve():
     #    print(vol_curve._capletGammas)
 
     # Value cap using a single flat cap volatility
-    tcap = (maturity_dt - value_dt) / G_DAYS_IN_YEARS
+    tcap = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
     vol = vol_curve.cap_vol(maturity_dt)
     model = Black(vol)
     value_cap = cap_floor.value(value_dt, libor_curve, model)

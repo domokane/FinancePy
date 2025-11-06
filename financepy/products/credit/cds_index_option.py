@@ -10,7 +10,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, normcdf
 from ...utils.error import FinError
 from ...products.credit.cds_curve import CDSCurve
@@ -93,7 +93,7 @@ class CDSIndexOption:
 
         k = self.strike_cpn
         c = self.index_cpn
-        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df = libor_curve.df(self.expiry_dt)
         q_expiry_index = index_curve.survival_prob(time_to_expiry)
 
@@ -136,8 +136,8 @@ class CDSIndexOption:
         credit triangle to compute the forward RPV01."""
 
         num_credits = len(issuer_curves)
-        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
-        #        timeToMaturity = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
+        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        #        timeToMaturity = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
         df_to_expiry = issuer_curves[0].df(time_to_expiry)
         libor_curve = issuer_curves[0].libor_curve
 
@@ -294,7 +294,7 @@ class CDSIndexOption:
 
         flow_dts = self.cds_contract.payment_dts
         num_flows = len(flow_dts)
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df_to_expiry = libor_curve.df(self.expiry_dt)
         lgd = 1.0 - index_recovery
 
@@ -304,7 +304,7 @@ class CDSIndexOption:
         for i_flow in range(0, num_flows):
             expiry_to_flow_times[i_flow] = (
                 flow_dts[i_flow] - self.expiry_dt
-            ) / G_DAYS_IN_YEARS
+            ) / G_DAYS_IN_YEAR
             fwd_dfs[i_flow] = libor_curve.df(flow_dts[i_flow]) / df_to_expiry
 
         int_h = 0.0

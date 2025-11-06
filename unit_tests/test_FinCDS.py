@@ -6,7 +6,7 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -362,7 +362,7 @@ value_dt1 = trade_dt.add_days(1)
 effective_dt = value_dt1
 
 cds_contract1 = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
-t = (maturity_dt - value_dt1) / G_DAYS_IN_YEARS
+t = (maturity_dt - value_dt1) / G_DAYS_IN_YEAR
 z = libor_curve.df(maturity_dt)
 r1 = -np.log(z) / t
 print(t, z, r1, maturity_dt)
@@ -380,7 +380,7 @@ effective_dt = Date(21, 8, 2020)
 value_dt2 = trade_dt
 
 cds_contract2 = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
-t = (maturity_dt - value_dt2) / G_DAYS_IN_YEARS
+t = (maturity_dt - value_dt2) / G_DAYS_IN_YEAR
 z = libor_curve.df(maturity_dt)
 r2 = -np.log(z) / t
 mkt_spd2 = 0.01

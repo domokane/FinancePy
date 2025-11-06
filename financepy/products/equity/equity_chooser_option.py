@@ -7,7 +7,7 @@ import numpy as np
 from scipy import optimize
 
 from ...utils.math import M
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 
@@ -120,9 +120,9 @@ class EquityChooserOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEARS
-        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEARS
-        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEAR
+        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         rt = discount_curve.cc_rate(self.choose_dt)
         rtc = discount_curve.cc_rate(self.call_expiry_dt)
@@ -200,9 +200,9 @@ class EquityChooserOption(EquityOption):
         dftc = discount_curve.df(self.call_expiry_dt)
         dftp = discount_curve.df(self.put_expiry_dt)
 
-        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEARS
-        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEARS
-        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEAR
+        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         rt = -np.log(dft) / t
         rtc = -np.log(dftc) / tc

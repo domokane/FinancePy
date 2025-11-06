@@ -12,7 +12,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.products.credit.cds_curve import CDSCurve
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.discount_curve import DiscountCurve
@@ -439,7 +439,7 @@ def test_dirty_price_cds():
     dv = v_bump["dirty_pv"] - v["dirty_pv"]
     test_cases.print("INTEREST_DV01", dv)
 
-    t = (maturity_dt - value_dt) / G_DAYS_IN_YEARS
+    t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
     z = libor_curve.df(maturity_dt)
     r = -np.log(z) / t
 
@@ -636,7 +636,7 @@ def test_dirty_price_cds_model_check():
     test_cases.print("INTEREST DV01", interest_dv01)
 
     # Consider fast approximation
-    t = (maturity_dt - value_dt) / G_DAYS_IN_YEARS
+    t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
     z = libor_curve.df(maturity_dt)
     r = -np.log(z) / t
 

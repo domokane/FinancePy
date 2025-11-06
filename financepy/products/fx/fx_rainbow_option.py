@@ -10,7 +10,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.math import normcdf, M
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_assets_paths_times
 from ...products.fx.fx_option import FXOption
@@ -221,7 +221,7 @@ class FXRainbowOption(FXOption):
         self.validate(stock_prices, foreign_curve, volatilities, betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         df = domestic_curve.df(t)
         r = -np.log(df) / t
@@ -301,7 +301,7 @@ class FXRainbowOption(FXOption):
         if value_dt > expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         v = value_mc_fast(
             t,

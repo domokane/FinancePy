@@ -7,7 +7,7 @@ from financepy.models.bk_tree import BKTree
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import OptionTypes
 from financepy.products.bonds.bond_option import BondOption
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
@@ -23,7 +23,7 @@ freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
 bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEARS
+t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEAR
 times = np.linspace(0, t_mat, 20)
 dates = settle_dt.add_years(times)
 dfs = np.exp(-0.05 * times)

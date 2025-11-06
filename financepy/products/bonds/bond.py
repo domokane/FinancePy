@@ -29,7 +29,7 @@ from scipy import optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
+from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
@@ -935,7 +935,7 @@ class Bond:
 
             # coupons paid on a settlement date are paid to the seller
             if dt > settle_dt:
-                t = (dt - settle_dt) / G_DAYS_IN_YEARS
+                t = (dt - settle_dt) / G_DAYS_IN_YEAR
 
                 t = np.maximum(t, G_SMALL)
 

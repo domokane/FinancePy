@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.models.hw_tree import HWTree
 from financepy.utils.date import Date
 
@@ -65,8 +65,8 @@ def test_hull_white_example_two():
     expiry_dt = start_dt.add_tenor("3Y")
     maturity_dt = start_dt.add_tenor("9Y")
 
-    t_exp = (expiry_dt - start_dt) / G_DAYS_IN_YEARS
-    t_mat = (maturity_dt - start_dt) / G_DAYS_IN_YEARS
+    t_exp = (expiry_dt - start_dt) / G_DAYS_IN_YEAR
+    t_mat = (maturity_dt - start_dt) / G_DAYS_IN_YEAR
 
     num_time_steps = None
     model = HWTree(sigma, a, num_time_steps)

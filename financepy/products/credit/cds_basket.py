@@ -12,7 +12,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
@@ -95,7 +95,7 @@ class CDSBasket:
 
         for i_time in range(1, num_payments):
 
-            t = (payment_dts[i_time] - value_dt) / G_DAYS_IN_YEARS
+            t = (payment_dts[i_time] - value_dt) / G_DAYS_IN_YEAR
             dt0 = payment_dts[i_time - 1]
             dt1 = payment_dts[i_time]
             accrual_factor = day_count.year_frac(dt0, dt1)[0]
@@ -106,7 +106,7 @@ class CDSBasket:
 
         avg_acc_factor /= num_payments
 
-        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         rpv01 = 0.0
         prot = 0.0
@@ -197,9 +197,9 @@ class CDSBasket:
 
         # Times in years from value_dt
         pay_times = np.array(
-            [to_years(dt, value_dt, G_DAYS_IN_YEARS) for dt in payment_dts], dtype=float
+            [to_years(dt, value_dt, G_DAYS_IN_YEAR) for dt in payment_dts], dtype=float
         )
-        accrual_start_time = to_years(accrual_start_dt, value_dt, G_DAYS_IN_YEARS)
+        accrual_start_time = to_years(accrual_start_dt, value_dt, G_DAYS_IN_YEAR)
 
         # Period year-fractions and discount factors
         accrual_factors = np.zeros(num_payments, dtype=float)
@@ -215,7 +215,7 @@ class CDSBasket:
         rpv01_to_times = np.cumsum(accrual_factors * df_pay)
 
         # Maturity time and full PV01
-        t_mat = to_years(self.maturity_dt, value_dt, G_DAYS_IN_YEARS)
+        t_mat = to_years(self.maturity_dt, value_dt, G_DAYS_IN_YEAR)
         full_rpv01 = rpv01_to_times[-1]
 
         rpv01_sum = 0.0
@@ -356,7 +356,7 @@ class CDSBasket:
         if n_to_default < 1 or n_to_default > num_credits:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEARS
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         if t_mat < 0.0:
             raise FinError("Value date is after maturity date")
@@ -374,7 +374,7 @@ class CDSBasket:
 
         for i_time in range(0, num_times):
 
-            t = (payment_dts[i_time] - value_dt) / G_DAYS_IN_YEARS
+            t = (payment_dts[i_time] - value_dt) / G_DAYS_IN_YEAR
 
             for i_credit in range(0, num_credits):
                 issuer_curve = issuer_curves[i_credit]

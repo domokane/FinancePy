@@ -15,7 +15,7 @@ from ...utils.date import Tenor
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
@@ -88,11 +88,7 @@ def _g(kk: float, *args: Any) -> float:
 
 
 @njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-def _interpolate_gap(
-    k: float,
-    strikes: np.ndarray,
-    gaps: np.ndarray
-) -> float:
+def _interpolate_gap(k: float, strikes: np.ndarray, gaps: np.ndarray) -> float:
 
     if k <= strikes[0]:
         return 0.0
@@ -609,8 +605,20 @@ def _solve_to_horizon(
     x_inits: Sequence[float],
     ginits: Sequence[float],
     fin_solver_type: Any,
-    tol: float
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, float, float, float, float, float, float, float]:
+    tol: float,
+) -> Tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+]:
 
     ###########################################################################
     # Determine the price of a market strangle from market strangle
@@ -951,7 +959,7 @@ def vol_function(
     gaps: np.ndarray,
     f: float,
     k: float,
-    t: float
+    t: float,
 ) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
@@ -1059,7 +1067,7 @@ def _solver_for_smile_strike(
     initial_guess: float,
     parameters: np.ndarray,
     strikes: np.ndarray,
-    gaps: np.ndarray
+    gaps: np.ndarray,
 ) -> float:
     """Solve for the strike that sets the delta of the option equal to the
     target value of delta allowing the volatility to be a function of the
@@ -1103,7 +1111,7 @@ def solve_for_strike(
     opt_type_value: int,
     delta_target: float,
     delta_method_value: int,
-    volatility: float
+    volatility: float,
 ) -> float:
     """This function determines the implied strike of an FX option
     given a delta and the other option details. It uses a one-dimensional
@@ -1362,7 +1370,7 @@ class FXVolSurfacePlus:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1450,15 +1458,12 @@ class FXVolSurfacePlus:
     ###########################################################################
 
     def delta_to_strike(
-        self,
-        call_delta: float,
-        expiry_dt: Date,
-        delta_method: Optional[Any]
+        self, call_delta: float, expiry_dt: Date, delta_method: Optional[Any]
     ) -> float:
         """Interpolates the strike at a delta and expiry date. Linear
         time to expiry interpolation is used in strike."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1562,7 +1567,7 @@ class FXVolSurfacePlus:
         self,
         call_delta: float,
         expiry_dt: Date,
-        delta_method: Optional[FinFXDeltaMethod] = None
+        delta_method: Optional[FinFXDeltaMethod] = None,
     ) -> Tuple[float, float]:
         """Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
@@ -1574,7 +1579,7 @@ class FXVolSurfacePlus:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1704,9 +1709,7 @@ class FXVolSurfacePlus:
     ###########################################################################
 
     def _build_vol_surface(
-        self,
-        fin_solver_type: Any = FinSolverTypes.NELDER_MEAD,
-        tol: float = 1e-8
+        self, fin_solver_type: Any = FinSolverTypes.NELDER_MEAD, tol: float = 1e-8
     ) -> None:
         """Main function to construct the vol surface."""
 
@@ -1764,7 +1767,7 @@ class FXVolSurfacePlus:
         for i in range(0, num_vol_curves):
 
             expiry_dt = self.expiry_dts[i]
-            t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEARS
+            t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEAR
 
             dom_df = self.domestic_curve.df(expiry_dt)
             for_df = self.foreign_curve.df(expiry_dt)
@@ -2609,10 +2612,7 @@ class FXVolSurfacePlus:
     ###########################################################################
 
     def implied_dbns(
-        self,
-        low_fx: float,
-        high_fx: float,
-        num_intervals: int
+        self, low_fx: float, high_fx: float, num_intervals: int
     ) -> List[FinDistribution]:
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""

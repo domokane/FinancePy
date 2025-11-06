@@ -7,7 +7,7 @@ from typing import Union
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
@@ -78,7 +78,7 @@ class EquityAmericanOption(EquityOption):
             )
 
         if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         else:
             t_exp = value_dt
 

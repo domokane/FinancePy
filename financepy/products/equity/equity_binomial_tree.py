@@ -10,7 +10,7 @@ import numpy as np
 from numba import njit, float64, int64
 
 from ...utils.error import FinError
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import heaviside
 
 ########################################################################################
@@ -227,7 +227,7 @@ class EquityBinomialTree:
     ):
 
         # do some validation
-        t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
         r = discount_curve.zero_rate(expiry_dt)
 
         dq = dividend_curve.df(expiry_dt)

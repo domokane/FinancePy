@@ -15,7 +15,7 @@ from numba import njit, float64, int64
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.tenor import Tenor
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
@@ -189,7 +189,7 @@ def solve_to_horizon_fast(
     rr_25d_vol: float,
     delta_method_value: int,
     vol_type_value: int,
-    xopt: Sequence[float]
+    xopt: Sequence[float],
 ) -> Tuple[np.ndarray, float, float, float, float]:
 
     c0 = xopt
@@ -295,11 +295,7 @@ def solve_to_horizon_fast(
     fastmath=True,
 )
 def vol_function(
-    vol_function_type_value: int,
-    params: np.ndarray,
-    f: float,
-    k: float,
-    t: float
+    vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float
 ) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
@@ -386,7 +382,7 @@ def solver_for_smile_strike_fast(
     delta_target: float,
     delta_method_value: int,
     initial_guess: float,
-    parameters: np.ndarray
+    parameters: np.ndarray,
 ) -> float:
     """Solve for the strike that sets the delta of the option equal to the
     target value of delta allowing the volatility to be a function of the
@@ -426,7 +422,7 @@ def solve_for_strike(
     opt_type_value: int,
     delta_target: float,
     delta_method_value: int,
-    volatility: float
+    volatility: float,
 ) -> float:
     """This function determines the implied strike of an FX option
     given a delta and the other option details. It uses a one-dimensional
@@ -623,7 +619,7 @@ class FXVolSurface:
         index0 = 0
         index1 = 0
 
-        t = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+        t = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
         num_curves = self.num_vol_curves
 
@@ -722,7 +718,7 @@ class FXVolSurface:
         for i in range(0, num_vol_curves):
 
             expiry_dt = self.expiry_dts[i]
-            t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEARS
+            t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEAR
 
             dom_df = self.domestic_curve.df_t(t_exp)
             for_df = self.foreign_curve.df_t(t_exp)
@@ -859,7 +855,7 @@ class FXVolSurface:
         opt_type_value: int,
         delta_target: float,
         tenor_index: int,
-        initial_value: float
+        initial_value: float,
     ) -> float:
         """Solve for the strike that sets the delta of the option equal to the
         target value of delta allowing the volatility to be a function of the
@@ -1259,10 +1255,7 @@ class FXVolSurface:
     ###########################################################################
 
     def implied_dbns(
-        self,
-        low_fx: float,
-        high_fx: float,
-        num_intervals: int
+        self, low_fx: float, high_fx: float, num_intervals: int
     ) -> List[FinDistribution]:
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""

@@ -6,7 +6,7 @@ from enum import Enum
 
 import numpy as np
 
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
@@ -62,8 +62,8 @@ class BondOption:
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
         model which are all implemented as short rate tree models."""
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
-        t_mat = (self.bond.maturity_dt - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_mat = (self.bond.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         df_times = discount_curve.times
         df_values = discount_curve.dfs
@@ -83,7 +83,7 @@ class BondOption:
             pcd = flow_dts[i - 1]
             ncd = flow_dts[i]
             if pcd < value_dt and ncd > value_dt:
-                flow_time = (pcd - value_dt) / G_DAYS_IN_YEARS
+                flow_time = (pcd - value_dt) / G_DAYS_IN_YEAR
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
                 break
@@ -97,7 +97,7 @@ class BondOption:
         for i in range(1, num_flows):
             ncd = flow_dts[i]
             if ncd > value_dt:
-                flow_time = (ncd - value_dt) / G_DAYS_IN_YEARS
+                flow_time = (ncd - value_dt) / G_DAYS_IN_YEAR
                 cpn_times.append(flow_time)
                 cpn_flows.append(flow_amounts[i])
 

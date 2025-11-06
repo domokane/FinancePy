@@ -6,7 +6,7 @@ from financepy.products.equity.equity_index_option import EquityIndexOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black import Black, BlackTypes
 from financepy.models.equity_crr_tree import crr_tree_val_avg
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 
 ########################################################################################
 
@@ -30,14 +30,10 @@ def test_equity_european_index_option_price():
     european_call_option = EquityIndexOption(
         expiry_dt, strike, OptionTypes.EUROPEAN_CALL
     )
-    european_put_option = EquityIndexOption(
-        expiry_dt, strike, OptionTypes.EUROPEAN_PUT
-    )
+    european_put_option = EquityIndexOption(expiry_dt, strike, OptionTypes.EUROPEAN_PUT)
 
     # construct black model
-    model_bs_analytical = Black(
-        volatility, implementation_type=BlackTypes.ANALYTICAL
-    )
+    model_bs_analytical = Black(volatility, implementation_type=BlackTypes.ANALYTICAL)
     for i in range(len(future_prices)):
         price = european_call_option.value(
             value_dt, future_prices[i], discount_curve, model_bs_analytical
@@ -48,6 +44,7 @@ def test_equity_european_index_option_price():
         )
         assert round(price, 1) == round(expected_european_put_prices[i], 1)
 
+
 ########################################################################################
 
 
@@ -57,7 +54,7 @@ def test_equity_american_index_option_price():
     # in case of American exercise
     value_dt = Date(8, 5, 2015)
     expiry_dt = Date(7, 8, 2015, hh=6)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     discount_rate = 0.08
     volatility = 0.15
     discount_curve = DiscountCurveFlat(value_dt, discount_rate)
@@ -68,9 +65,7 @@ def test_equity_american_index_option_price():
     american_call_option = EquityIndexOption(
         expiry_dt, strike, OptionTypes.AMERICAN_CALL
     )
-    american_put_option = EquityIndexOption(
-        expiry_dt, strike, OptionTypes.AMERICAN_PUT
-    )
+    american_put_option = EquityIndexOption(expiry_dt, strike, OptionTypes.AMERICAN_PUT)
     # construct black model
     model_bs_crr_tree = Black(
         volatility,

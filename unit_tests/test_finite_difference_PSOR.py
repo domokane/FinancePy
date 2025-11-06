@@ -6,7 +6,7 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 
 
@@ -158,7 +158,7 @@ def test_european_call():
 
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_CALL
     num_steps_per_year = 2000
@@ -202,7 +202,7 @@ def test_european_put():
 
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     num_steps_per_year = 2000
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_PUT
@@ -246,7 +246,7 @@ def test_american_call():
 
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     num_steps_per_year = 2000
     strike_price = 50.0
     opt_type = OptionTypes.AMERICAN_CALL
@@ -291,7 +291,7 @@ def test_american_put():
 
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     num_steps_per_year = 2000
     strike_price = 50.0
     opt_type = OptionTypes.AMERICAN_PUT
@@ -339,7 +339,7 @@ def test_call_option():
     risk_free_rate = 0.05
     dividend_yield = 0.01
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
@@ -379,7 +379,7 @@ def test_put_option():
     risk_free_rate = 0.05
     dividend_yield = 0.1
     model = BlackScholes(volatility)
-    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEARS
+    time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 

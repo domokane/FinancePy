@@ -5,7 +5,7 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.utils.global_vars import G_DAYS_IN_YEARS
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.market.curves.discount_curve_pwl import DiscountCurvePWL
@@ -41,7 +41,7 @@ def test_fin_discount_curves():
     years2 = []
 
     for dt in dates:
-        y = (dt - value_dt) / G_DAYS_IN_YEARS
+        y = (dt - value_dt) / G_DAYS_IN_YEAR
         years2.append(y)
 
     rates = np.array([0.05, 0.06, 0.065, 0.07, 0.075])

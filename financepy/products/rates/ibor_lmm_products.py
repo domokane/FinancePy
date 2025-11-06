@@ -31,7 +31,7 @@ from ...models.lmm_mc import lmm_simulate_fwds_nf
 from ...models.lmm_mc import ModelLMMModelTypes
 from ...models.lmm_mc import lmm_cap_flr_pricer
 
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
 
 from ...utils.global_types import SwapTypes
@@ -84,7 +84,7 @@ class IborLMMProducts:
 
         for next_dt in self.grid_dts[1:]:
             tau = basis.year_frac(prev_dt, next_dt)[0]
-            t = (next_dt - self.grid_dts[0]) / G_DAYS_IN_YEARS
+            t = (next_dt - self.grid_dts[0]) / G_DAYS_IN_YEAR
             self.accrual_factors.append(tau)
             self.grid_times.append(t)
             prev_dt = next_dt
@@ -135,9 +135,7 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(
-                start_dt, end_dt, self.float_dc_type
-            )
+            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -204,9 +202,7 @@ class IborLMMProducts:
         for i in range(1, self.num_fwds):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(
-                start_dt, end_dt, self.float_dc_type
-            )
+            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -266,9 +262,7 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.forward_rate(
-                start_dt, end_dt, self.float_dc_type
-            )
+            fwd_rate = discount_curve.forward_rate(start_dt, end_dt, self.float_dc_type)
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)

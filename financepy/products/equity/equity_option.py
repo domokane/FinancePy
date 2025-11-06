@@ -8,7 +8,7 @@ from typing import Union
 
 from financepy.models.model import Model
 
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...models.black_scholes import BlackScholes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.date import Date
@@ -155,7 +155,7 @@ class EquityOption:
     ):
         """Calculation of option theta by perturbing value date by one
         calendar date (not a business date) and then doing revaluation and
-        calculating the difference divided by dt = 1 / G_DAYS_IN_YEARS."""
+        calculating the difference divided by dt = 1 / G_DAYS_IN_YEAR."""
 
         v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
@@ -164,7 +164,7 @@ class EquityOption:
         # Need to do this carefully. This is a bit hacky.
         discount_curve.value_dt = next_dt
         dividend_curve.value_dt = next_dt
-        time_bump = (next_dt - value_dt) / G_DAYS_IN_YEARS
+        time_bump = (next_dt - value_dt) / G_DAYS_IN_YEAR
 
         v_bumped = self.value(
             next_dt, stock_price, discount_curve, dividend_curve, model

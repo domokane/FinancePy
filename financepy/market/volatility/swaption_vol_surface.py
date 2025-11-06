@@ -13,7 +13,7 @@ from numba import njit, float64, int64
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.helpers import check_argument_types, label_to_string
 
 from ...models.volatility_fns import VolFuncTypes
@@ -141,7 +141,7 @@ def _solve_to_horizon(
     vol_grid: np.ndarray,
     vol_type_value: int,
     x_inits: np.ndarray,
-    fin_solver_type: Any
+    fin_solver_type: Any,
 ) -> np.ndarray:
 
     ###########################################################################
@@ -198,11 +198,7 @@ def _solve_to_horizon(
     fastmath=True,
 )
 def vol_function(
-    vol_function_type_value: int,
-    params: np.ndarray,
-    f: float,
-    k: float,
-    t: float
+    vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float
 ) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
@@ -461,7 +457,7 @@ class SwaptionVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self._vol_func_type.value
 
@@ -536,7 +532,7 @@ class SwaptionVolSurface:
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -639,7 +635,7 @@ class SwaptionVolSurface:
     #     interpolation is done in variance space and then converted back to a
     #     lognormal volatility."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -746,7 +742,9 @@ class SwaptionVolSurface:
 
     ####################################################################################
 
-    def _build_vol_surface(self, fin_solver_type: FinSolverTypes = FinSolverTypes.NELDER_MEAD) -> None:
+    def _build_vol_surface(
+        self, fin_solver_type: FinSolverTypes = FinSolverTypes.NELDER_MEAD
+    ) -> None:
         """Main function to construct the vol surface."""
 
         if self._vol_func_type == VolFuncTypes.CLARK:
@@ -781,7 +779,7 @@ class SwaptionVolSurface:
         for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
-            t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEARS
+            t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
             self._t_exp[i] = t_exp
 
         #######################################################################

@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import FinLongShort
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
@@ -65,7 +65,7 @@ class EquityForward:
             )
 
         if isinstance(value_dt, Date):
-            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         else:
             t = value_dt
 
@@ -103,7 +103,7 @@ class EquityForward:
         """Calculate the forward price of the equity forward contract."""
 
         if isinstance(value_dt, Date):
-            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         else:
             t = value_dt
 

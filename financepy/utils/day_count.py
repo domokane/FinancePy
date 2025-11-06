@@ -9,7 +9,7 @@ from .date import datediff
 from .date import is_leap_year
 from .error import FinError
 from .frequency import FrequencyTypes, annual_frequency
-from .global_vars import G_DAYS_IN_YEARS
+from .global_vars import G_DAYS_IN_YEAR
 
 
 # A useful source for these definitions can be found at
@@ -57,7 +57,7 @@ class DayCountTypes(Enum):
     ACT_365F = 7
     ACT_360 = 8
     ACT_365L = 9
-    SIMPLE = 10  # actual divided by G_DAYS_IN_YEARS
+    SIMPLE = 10  # actual divided by G_DAYS_IN_YEAR
 
 
 ########################################################################################
@@ -281,7 +281,7 @@ class DayCount:
         elif self._type == DayCountTypes.SIMPLE:
 
             num = dt2 - dt1
-            den = G_DAYS_IN_YEARS
+            den = G_DAYS_IN_YEAR
             acc_factor = num / den
             return acc_factor, num, den
 

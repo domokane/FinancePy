@@ -14,7 +14,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.math import test_monotonicity
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 
@@ -429,7 +429,7 @@ class BondConvertible:
 
         self._calculate_cpn_dts(settle_dt)
 
-        t_mat = (self.maturity_dt - settle_dt) / G_DAYS_IN_YEARS
+        t_mat = (self.maturity_dt - settle_dt) / G_DAYS_IN_YEAR
 
         if t_mat <= 0.0:
             raise FinError("Maturity must not be on or before the value date.")
@@ -441,7 +441,7 @@ class BondConvertible:
         cpn = self.cpn / self.freq
 
         for dt in self.payment_dts[1:]:
-            flow_time = (dt - settle_dt) / G_DAYS_IN_YEARS
+            flow_time = (dt - settle_dt) / G_DAYS_IN_YEAR
             cpn_times.append(flow_time)
             cpn_flows.append(cpn)
 
@@ -457,7 +457,7 @@ class BondConvertible:
         call_times = []
 
         for dt in self.call_dts:
-            call_time = (dt - settle_dt) / G_DAYS_IN_YEARS
+            call_time = (dt - settle_dt) / G_DAYS_IN_YEAR
             call_times.append(call_time)
 
         call_times = np.array(call_times)
@@ -472,7 +472,7 @@ class BondConvertible:
         put_times = []
 
         for dt in self.put_dts:
-            put_time = (dt - settle_dt) / G_DAYS_IN_YEARS
+            put_time = (dt - settle_dt) / G_DAYS_IN_YEAR
             put_times.append(put_time)
 
         put_times = np.array(put_times)
@@ -489,13 +489,13 @@ class BondConvertible:
 
         dividend_times = []
         for dt in dividend_dts:
-            dividend_time = (dt - settle_dt) / G_DAYS_IN_YEARS
+            dividend_time = (dt - settle_dt) / G_DAYS_IN_YEAR
             dividend_times.append(dividend_time)
         dividend_times = np.array(dividend_times)
         dividend_yields = np.array(dividend_yields)
 
         # If it's before today it starts today
-        tconv = (self.start_convert_dt - settle_dt) / G_DAYS_IN_YEARS
+        tconv = (self.start_convert_dt - settle_dt) / G_DAYS_IN_YEAR
         tconv = max(tconv, 0.0)
 
         discount_factors = []

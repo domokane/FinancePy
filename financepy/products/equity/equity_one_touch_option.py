@@ -8,7 +8,7 @@ import numpy as np
 from numba import njit
 import numba as nb
 
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import TouchOptionTypes
 from ...utils.error import FinError
 from ...products.equity.equity_option import EquityOption
@@ -177,7 +177,7 @@ class EquityOneTouchOption(EquityOption):
         if dividend_curve.value_dt != value_dt:
             raise FinError("Dividend Curve date not same as option valuation date")
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         t = max(t, 1e-6)
 
         s0 = stock_price
@@ -441,7 +441,7 @@ class EquityOneTouchOption(EquityOption):
         result as we only observe the barrier a finite number of times. The
         convergence is slow."""
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t

@@ -8,7 +8,7 @@ from numba import njit, prange
 
 from ...utils.global_types import DoubleBarrierTypes
 
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
@@ -261,7 +261,7 @@ class FXDoubleOneTouchOption(FXOption):
         if for_curve.value_dt != value_dt:
             raise FinError("Foreign Curve date not same as valuation date")
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         if t_exp <= 0.0:
             raise FinError("Valuation date after or on expiry date.")
 
@@ -317,7 +317,7 @@ class FXDoubleOneTouchOption(FXOption):
         result as we only observe the barrier a finite number of times. The
         convergence is slow."""
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         df_d = dom_curve.df(self.expiry_dt)
         r_d = -np.log(df_d) / t_exp
@@ -360,7 +360,7 @@ class FXDoubleOneTouchOption(FXOption):
     ):
 
         # Double one-touch option valuation with Brownian-bridge correction.
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         if t_exp <= 0.0:
             return 0.0
 
@@ -449,7 +449,7 @@ class FXDoubleOneTouchOption(FXOption):
         - KNOCK_IN  (double one-touch): pays K if a barrier is touched before expiry.
         - KNOCK_OUT (double no-touch):   pays K if neither barrier is touched before expiry.
         """
-        T = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        T = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         if T <= 0.0:
             return 0.0
 

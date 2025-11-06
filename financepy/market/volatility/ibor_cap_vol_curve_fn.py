@@ -6,7 +6,7 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 
 ########################################################################################
 # TODO: Market calibration (fitting)
@@ -15,18 +15,12 @@ from ...utils.global_vars import G_DAYS_IN_YEARS
 
 from typing import Any, Union
 
+
 class IborCapVolCurveFn:
     """Class to manage a term structure of caplet volatilities using the
     parametric form suggested by Rebonato (1999)."""
 
-    def __init__(
-        self,
-        curve_dt: Date,
-        a: float,
-        b: float,
-        c: float,
-        d: float
-    ) -> None:
+    def __init__(self, curve_dt: Date, a: float, b: float, c: float, d: float) -> None:
 
         self._curve_dt = curve_dt
         self._a = a
@@ -40,7 +34,7 @@ class IborCapVolCurveFn:
         """Return the caplet volatility."""
 
         if isinstance(dt, Date):
-            t = (dt - self._curve_dt) / G_DAYS_IN_YEARS
+            t = (dt - self._curve_dt) / G_DAYS_IN_YEAR
         else:
             t = dt
 

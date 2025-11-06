@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
+from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -82,7 +82,7 @@ class EquityFloatLookbackOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df = discount_curve.df(self.expiry_dt)
 
         r = discount_curve.cc_rate(self.expiry_dt)
@@ -167,7 +167,7 @@ class EquityFloatLookbackOption(EquityOption):
         """Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         num_time_steps = int(t * num_steps_per_year)
 
         df = discount_curve.df(self.expiry_dt)

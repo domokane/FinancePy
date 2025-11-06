@@ -7,7 +7,7 @@ from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, table_to_string
 from ...utils.day_count import DayCount
@@ -145,7 +145,7 @@ class CDSCurve:
         supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / G_DAYS_IN_YEARS
+            t = (dt - self.value_dt) / G_DAYS_IN_YEAR
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -175,7 +175,7 @@ class CDSCurve:
         function supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / G_DAYS_IN_YEARS
+            t = (dt - self.value_dt) / G_DAYS_IN_YEAR
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -208,13 +208,13 @@ class CDSCurve:
                 self.recovery_rate,
             )
 
-            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEARS
+            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
             q = self._qs[i]
 
             self._times = np.append(self._times, t_mat)
             self._qs = np.append(self._qs, q)
 
-            if 1==1:
+            if 1 == 1:
                 optimize.newton(
                     f,
                     x0=q,

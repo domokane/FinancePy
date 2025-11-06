@@ -10,7 +10,7 @@ import numpy as np
 
 from ...utils.math import normcdf
 from ...utils.math import M
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_assets_paths
 from ...products.equity.equity_option import EquityOption
@@ -238,7 +238,7 @@ class EquityRainbowOption(EquityOption):
             raise FinError("Value date after expiry date.")
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         r = discount_curve.zero_rate(self.expiry_dt)
 
         q1 = dividend_curves[0].zero_rate(self.expiry_dt)
@@ -326,7 +326,7 @@ class EquityRainbowOption(EquityOption):
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         v = value_mc_fast(
             t,

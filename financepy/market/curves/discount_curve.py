@@ -8,7 +8,7 @@ from .interpolator import Interpolator, InterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
+from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.math import test_monotonicity
@@ -64,7 +64,7 @@ class DiscountCurve:
                 start_index = 1
 
         for i in range(start_index, num_points):
-            t = (df_dates[i] - value_dt) / G_DAYS_IN_YEARS
+            t = (df_dates[i] - value_dt) / G_DAYS_IN_YEAR
             self._times.append(t)
             self._dfs.append(df_values[i])
 
@@ -395,7 +395,7 @@ class DiscountCurve:
 
         df1 = self.df(dts)
         df2 = self.df(dts_plus_one_days)
-        dt = 1.0 / G_DAYS_IN_YEARS
+        dt = 1.0 / G_DAYS_IN_YEAR
         fwd = np.log(df1 / df2) / (1.0 * dt)
 
         if isinstance(dts, Date):

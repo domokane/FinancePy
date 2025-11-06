@@ -8,7 +8,7 @@ from financepy.models import equity_compound_option_bs
 
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
-from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
+from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.discount_curve_flat import DiscountCurve
@@ -106,8 +106,8 @@ class EquityCompoundOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        tc = (self.c_expiry_dt - value_dt) / G_DAYS_IN_YEARS
-        tu = (self.u_expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        tc = (self.c_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        tu = (self.u_expiry_dt - value_dt) / G_DAYS_IN_YEAR
         kc = self.c_strike_price
         ku = self.u_strike_price
 

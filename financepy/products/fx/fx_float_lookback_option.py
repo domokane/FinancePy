@@ -5,7 +5,7 @@
 import numpy as np
 
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEARS, G_SMALL
+from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_paths_times
 from ...products.fx.fx_option import FXOption
@@ -71,7 +71,7 @@ class FXFloatLookbackOption(FXOption):
         if foreign_curve.value_dt != value_dt:
             raise FinError("Foreign Curve valuation date not same as option value date")
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
         df = domestic_curve.df_t(t)
         r = -np.log(df) / t
@@ -158,7 +158,7 @@ class FXFloatLookbackOption(FXOption):
         seed=4242,
     ):
         """Value FX floating lookback option using Monte Carlo"""
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEARS
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df = domestic_curve.df_t(t)
         r = -np.log(df) / t
 

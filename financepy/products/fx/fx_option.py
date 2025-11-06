@@ -4,7 +4,7 @@
 
 
 from ...models.black_scholes import BlackScholes
-from ...utils.global_vars import G_DAYS_IN_YEARS
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.date import Date
 
 ##########################################################################
@@ -116,7 +116,7 @@ class FXOption:
         )
 
         # Careful the bump here is not BUMP
-        bump = 1.0 / G_DAYS_IN_YEARS
+        bump = 1.0 / G_DAYS_IN_YEAR
 
         if isinstance(v, dict):
             theta = (v_bumped["value"] - v["value"]) / bump
