@@ -3,7 +3,7 @@ name: golden tests
 on: [push, pull_request]
 
 env:
-  PYTHON_VERSION: 3.13
+  PYTHON_VERSION: 3.13.1
 
 jobs:
  build:

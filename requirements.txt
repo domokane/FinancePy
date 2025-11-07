@@ -1,8 +1,20 @@
-##### Imports required by core library
-numba==0.60.0
-numpy==1.26.4
-scipy==1.13.1
-llvmlite==0.43.0
-ipython==8.25.0
-pandas==2.3.1
-matplotlib==3.10.5
+# FinancePy future stack – Python 3.15 compatible
+
+# Core numeric ecosystem
+numpy >= 2.1
+scipy >= 1.14
+pandas >= 2.3
+matplotlib >= 3.10
+
+# JIT compiler and LLVM interface
+numba >= 0.61
+llvmlite >= 0.44.0
+
+# Developer and interactive tools
+ipython == 8.25.0
+
+# Optional testing and type tools (recommended)
+pytest >= 8.3
+pytest-benchmark >= 4.1
+mypy >= 1.13
+typing-extensions >= 4.12
