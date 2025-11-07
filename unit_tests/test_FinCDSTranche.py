@@ -97,7 +97,7 @@ def test_homogeneous():
 
 def test_heterogeneous():
 
-    num_points = 40
+    num_points = 200
 
     issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
 
@@ -120,13 +120,13 @@ def test_heterogeneous():
     v = tranche2.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 173.4324
+    assert round(v[3] * 10000, 4) == 173.4577
 
     method = FinLossDistributionBuilder.GAUSSIAN
     v = tranche4.value_bc(
         value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
     )
-    assert round(v[3] * 10000, 4) == 16.1762
+    assert round(v[3] * 10000, 4) == 16.1754
 
     method = FinLossDistributionBuilder.LHP
     v = tranche6.value_bc(
