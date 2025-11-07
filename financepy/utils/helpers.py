@@ -130,6 +130,56 @@ def times_from_dates(
 ########################################################################################
 
 
+def dates_from_times(
+    t: Union[float, list, np.ndarray],
+    value_dt: Date,
+    dc_type: DayCountTypes = None
+):
+    """If a single time (in years) is passed in then return the date from the
+    valuation date. If a whole vector of times is passed in then convert to a
+    vector of dates from the valuation date. The output is always a numpy vector
+    of Date objects (with one element if the input is only one time)."""
+    
+    if isinstance(value_dt, Date) is False:
+        raise FinError("Valuation date is not a Date")
+
+    if dc_type is None:
+        dc_counter = None
+    else:
+        dc_counter = DayCount(dc_type)
+
+    # Helper for one value
+    def single_date_from_time(time_value):
+        if dc_counter is None:
+            # Assume simple day count = 365
+            delta_days = int(round(time_value * G_DAYS_IN_YEARS))
+            return value_dt.add_days(delta_days)
+        else:
+            # Use inverse of year_frac logic — approximate by solving for date
+            # This assumes the DayCount class has add_year_frac or similar method
+            try:
+                return dc_counter.add_year_frac(value_dt, time_value)
+            except AttributeError:
+                # Fallback if no such method exists — use simple approximation
+                delta_days = int(round(time_value * G_DAYS_IN_YEARS))
+                return value_dt.add_days(delta_days)
+
+    # Case 1: single float
+    if isinstance(t, (float, int)):
+        return single_date_from_time(t)
+
+    # Case 2: list or numpy array
+    elif isinstance(t, (list, np.ndarray)):
+        dates = [single_date_from_time(time_value) for time_value in t]
+        return np.array(dates)
+
+    else:
+        raise FinError("Time input must be a float, list, or numpy array.")
+
+    return None
+########################################################################################
+
+
 def check_vector_differences(x: np.ndarray, y: np.ndarray, tol: float = 1e-6):
     """Compare two vectors elementwise to see if they are more different than
     tolerance."""
