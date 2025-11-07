@@ -106,13 +106,13 @@ def _create_test_swap(valuation_date):
 
     spot_days = 2
     cal = CalendarTypes.UNITED_KINGDOM
-    settlement_date = valuation_date.add_weekdays(spot_days)
+    settle_dt = valuation_date.add_weekdays(spot_days)
     swap_type = SwapTypes.PAY
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     trade = IborSwap(
-        settlement_date.add_tenor("1Y"),
+        settle_dt.add_tenor("1Y"),
         "5Y",
         swap_type,
         2.0 * G_PERCENT,

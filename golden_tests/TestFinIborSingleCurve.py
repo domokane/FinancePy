@@ -110,10 +110,10 @@ def test_fin_ibor_fr_as_only():
 
     # 1 x 4 FRA
     fra_rate = 0.04
-    fra_settlement_date = settle_dt.add_months(1)
+    fra_settle_dt = settle_dt.add_months(1)
     fra_maturity_date = settle_dt.add_months(4)
     fra = IborFRA(
-        fra_settlement_date,
+        fra_settle_dt,
         fra_maturity_date,
         fra_rate,
         depo_dcc_type,
@@ -125,10 +125,10 @@ def test_fin_ibor_fr_as_only():
 
     # 4 x 7 FRA
     fra_rate = 0.08
-    fra_settlement_date = settle_dt.add_months(4)
+    fra_settle_dt = settle_dt.add_months(4)
     fra_maturity_date = settle_dt.add_months(7)
     fra = IborFRA(
-        fra_settlement_date,
+        fra_settle_dt,
         fra_maturity_date,
         fra_rate,
         depo_dcc_type,
@@ -192,23 +192,23 @@ def test_ibor_deposits_fr_as_swaps():
     fras = []
     # 1 x 4 FRA
     fra_rate = 0.04
-    fra_settlement_date = settle_dt.add_months(9)
+    fra_settle_dt = settle_dt.add_months(9)
     fra_maturity_date = settle_dt.add_months(13)
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, dcc_type)
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, dcc_type)
     fras.append(fra)
 
     # 4 x 7 FRA
     fra_rate = 0.03
-    fra_settlement_date = settle_dt.add_months(13)
+    fra_settle_dt = settle_dt.add_months(13)
     fra_maturity_date = settle_dt.add_months(17)
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, dcc_type)
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, dcc_type)
     fras.append(fra)
 
     # 4 x 7 FRA
     fra_rate = 0.07
-    fra_settlement_date = settle_dt.add_months(17)
+    fra_settle_dt = settle_dt.add_months(17)
     fra_maturity_date = settle_dt.add_months(21)
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, dcc_type)
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, dcc_type)
     fras.append(fra)
 
     swaps = []
@@ -439,39 +439,39 @@ def test_ibor_deposits_futures_swaps():
     fras = []
 
     fra_rate = future_tofra_rate(97.6675, -0.00005)
-    fra_settlement_date = spot_dt.next_imm_date()
-    fra_maturity_date = fra_settlement_date.next_imm_date()
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, depo_dcc_type)
+    fra_settle_dt = spot_dt.next_imm_date()
+    fra_maturity_date = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, depo_dcc_type)
     fras.append(fra)
 
     fra_rate = future_tofra_rate(97.5200, -0.00060)
-    fra_settlement_date = fra_maturity_date
-    fra_maturity_date = fra_settlement_date.next_imm_date()
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, depo_dcc_type)
+    fra_settle_dt = fra_maturity_date
+    fra_maturity_date = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, depo_dcc_type)
     fras.append(fra)
 
     fra_rate = future_tofra_rate(97.3550, -0.00146)
-    fra_settlement_date = fra_maturity_date
-    fra_maturity_date = fra_settlement_date.next_imm_date()
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, depo_dcc_type)
+    fra_settle_dt = fra_maturity_date
+    fra_maturity_date = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, depo_dcc_type)
     fras.append(fra)
 
     fra_rate = future_tofra_rate(97.2450, -0.00263)
-    fra_settlement_date = fra_maturity_date
-    fra_maturity_date = fra_settlement_date.next_imm_date()
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, depo_dcc_type)
+    fra_settle_dt = fra_maturity_date
+    fra_maturity_date = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, depo_dcc_type)
     fras.append(fra)
 
     fra_rate = future_tofra_rate(97.1450, -0.00411)
-    fra_settlement_date = fra_maturity_date
-    fra_maturity_date = fra_settlement_date.next_imm_date()
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, depo_dcc_type)
+    fra_settle_dt = fra_maturity_date
+    fra_maturity_date = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, depo_dcc_type)
     fras.append(fra)
 
     fra_rate = future_tofra_rate(97.0750, -0.00589)
-    fra_settlement_date = fra_settlement_date.next_imm_date()
-    fra_maturity_date = fra_settlement_date.next_imm_date()
-    fra = IborFRA(fra_settlement_date, fra_maturity_date, fra_rate, depo_dcc_type)
+    fra_settle_dt = fra_settle_dt.next_imm_date()
+    fra_maturity_date = fra_settle_dt.next_imm_date()
+    fra = IborFRA(fra_settle_dt, fra_maturity_date, fra_rate, depo_dcc_type)
     fras.append(fra)
 
     spot_days = 2

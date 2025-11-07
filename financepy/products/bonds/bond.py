@@ -133,7 +133,7 @@ class Bond:
         if freq_type == FrequencyTypes.ZERO:
             raise FinError("Zero coupon bonds must use BondZero class.")
 
-        if dc_type == dc_type.ZERO:
+        if dc_type == DayCountTypes.ZERO:
             raise FinError("Zero coupon bonds must use BondZero class.")
 
         self.cpn = coupon
@@ -378,6 +378,7 @@ class Bond:
         forward_dt: Date,
         clean_price: float,
         repo_rate: float,
+        repo_dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
 
         if clean_price < 0 or repo_rate < 0:
@@ -386,8 +387,8 @@ class Bond:
         if settle_dt >= forward_dt:
             raise ValueError("Settlement date must be before forward date")
 
-        dc = DayCount(DayCountTypes.ACT_ACT_ISDA)
-        t_fwd, _, _ = dc.year_frac(settle_dt, forward_dt)
+        repo_dc = DayCount(repo_dc_type)
+        t_fwd, _, _ = repo_dc.year_frac(settle_dt, forward_dt)
 
         accrued_settle = self.accrued_interest(settle_dt)
         accrued_forward = self.accrued_interest(forward_dt)
@@ -395,8 +396,8 @@ class Bond:
         fv_cpns = 0.0
         for dt, amt in zip(self.payment_dts[1:], self.flow_amounts[1:]):
             if settle_dt < dt <= forward_dt:
-                t_cpn_to_forward, _, _ = dc.year_frac(dt, forward_dt)
-                fv_cpns += amt * self.par * (1 + repo_rate * t_cpn_to_forward)
+                t_cpn_to_forward, _, _ = repo_dc.year_frac(dt, forward_dt)
+                fv_cpns += amt * self.par * (1.0 + repo_rate * t_cpn_to_forward)
 
         full_price = clean_price + accrued_settle
         fwd_price = full_price * (1.0 + repo_rate * t_fwd)
@@ -679,9 +680,7 @@ class Bond:
             raise FinError("Bond settles after it matures.")
 
         self._calc_pcd_ncd(settle_dt)
-
         cal = Calendar(self.cal_type)
-
         self.ex_div_dt = cal.add_business_days(self._ncd, -self.ex_div_days)
 
         pay_first_cpn = 1.0
@@ -692,34 +691,32 @@ class Bond:
         df = 1.0
         df_settle_dt = discount_curve.df(settle_dt)
 
-        cpn_dt = self.cpn_dts[1]
         pmt_dt = self.payment_dts[1]
 
-        if cpn_dt > settle_dt:
-            df = discount_curve.df(pmt_dt)
-            flow = self.cpn / self.freq
-            pv = flow * df
+        if self.cpn_dts[1] > settle_dt:
+            pv = (self.cpn / self.freq) * discount_curve.df(pmt_dt)
             px += pv * pay_first_cpn
 
         for cpn_dt, pmt_dt in zip(self.cpn_dts[2:], self.payment_dts[2:]):
-
             # coupons paid on a settlement date are paid to the seller
             if cpn_dt > settle_dt:
-                df = discount_curve.df(pmt_dt)
-                flow = self.cpn / self.freq
-                pv = flow * df
+                pv = (self.cpn / self.freq) * discount_curve.df(pmt_dt)
                 px += pv
 
-        px += df
-        px = px / df_settle_dt
+        px += discount_curve.df(self.payment_dts[-1])
 
-        return px * self.par
+        # Forward price bond to settlement date
+        px = self.par * px / df_settle_dt
+        return px
 
     ###########################################################################
 
     def current_yield(self, clean_price):
         """Calculate the current yield of the bond which is the
         coupon divided by the clean price (not the full price)"""
+
+        if clean_price <= 0:
+            raise FinError("Clean price must be positive for current_yield")
 
         y = self.cpn * self.par / clean_price
         return y
@@ -729,7 +726,7 @@ class Bond:
     def yield_to_maturity(
         self,
         settle_dt: Date,
-        clean_price: float,
+        clean_price: float | list | np.ndarray,
         convention: YTMCalcType = YTMCalcType.US_TREASURY,
     ):
         """Calculate the bond's yield to maturity by solving the price
@@ -846,18 +843,18 @@ class Bond:
         self.accrued_interest(settle_dt, 1.0)
         accrued_amount = self.accrued_int * self.par
         bond_price = clean_price + accrued_amount
+
         # Calculate the price of the bond discounted on the Ibor curve
         pv_ibor = 0.0
         prev_dt = self._pcd
 
         for dt in self.payment_dts[1:]:
-
             # coupons paid on a settlement date are paid to the seller
             if dt > settle_dt:
                 df = discount_curve.df(dt)
                 pv_ibor += df * self.cpn / self.freq
 
-        pv_ibor += df
+        pv_ibor += discount_curve.df(self.payment_dts[-1])
 
         # Calculate the PV01 of the floating leg of the asset swap
         # I assume here that the coupon starts accruing on the settlement date
@@ -888,22 +885,22 @@ class Bond:
 
     def z_spread(
         self,
-        settlement_date: Date,
+        settle_dt: Date,
         clean_price: float,
         discount_curve: DiscountCurve,
     ):
         """Calculate the z-spread of the bond. The discount curve
         is a Ibor curve that is passed in."""
 
-        self.accrued_int = self.accrued_interest(settlement_date, 1.0)
+        self.accrued_int = self.accrued_interest(settle_dt, 1.0)
         accrued_amount = self.accrued_int * self.par
         bond_price = clean_price + accrued_amount
 
         def _bond_price_diff_from_z_spread(z_spr_try):
-            flat_curve = DiscountCurvePWFONF.flat_curve(settlement_date, z_spr_try)
+            flat_curve = DiscountCurvePWFONF.flat_curve(settle_dt, z_spr_try)
             bumped_curve = CompositeDiscountCurve([discount_curve, flat_curve])
             curve_bond_price = self.dirty_price_from_discount_curve(
-                settlement_date, bumped_curve
+                settle_dt, bumped_curve
             )
             return curve_bond_price - bond_price
 
@@ -914,7 +911,8 @@ class Bond:
             tol=1e-8,
             maxiter=50,
             fprime2=None,
-        )[0]
+        )
+
         return z_spread
 
     ###########################################################################
@@ -1029,10 +1027,14 @@ class Bond:
         defaulting_pv_pay_start = 0.0
         defaulting_pv_pay_end = 0.0
 
-        for dt in self.payment_dts[1:]:
+        seen_future_flow = False
 
+        for dt in self.payment_dts[1:]:
             # coupons paid on a settlement date are paid to the seller
             if dt > settle_dt:
+
+                seen_future_flow = True
+
                 df = discount_curve.df(dt)
                 q = survival_curve.survival_prob(dt)
 
@@ -1050,9 +1052,13 @@ class Bond:
                 prev_q = q
                 prev_df = df
 
-        pv = pv + 0.50 * defaulting_pv_pay_start
-        pv = pv + 0.50 * defaulting_pv_pay_end
-        pv = pv + df * q
+        if seen_future_flow:
+            pv = pv + 0.50 * defaulting_pv_pay_start
+            pv = pv + 0.50 * defaulting_pv_pay_end
+            pv = pv + df * q
+        else:
+            pv += 0.0
+
         pv *= self.par
         return pv
 

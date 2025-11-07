@@ -40,7 +40,7 @@ def test_par_rate_risk_report_cubic_zero():
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
-    settlement_date, base_curve = _generate_base_curve(
+    settle_dt, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
@@ -56,7 +56,7 @@ def test_par_rate_risk_report_cubic_zero():
         swap_type,
         fixed_dcc_type,
         fixed_freq_type,
-        settlement_date,
+        settle_dt,
         base_curve,
     )
 
@@ -97,7 +97,7 @@ def test_par_rate_risk_report_flat_forward():
 
     valuation_date = Date(6, 10, 2022)
     base_curve = build_ibor_single_curve(valuation_date, "10Y")
-    settlement_date = base_curve.used_swaps[0].effective_dt
+    settle_dt = base_curve.used_swaps[0].effective_dt
     cal = base_curve.used_swaps[0].fixed_leg.cal_type
     fixed_day_count = base_curve.used_swaps[0].fixed_leg.dc_type
     fixed_freq_type = base_curve.used_swaps[0].fixed_leg.freq_type
@@ -108,7 +108,7 @@ def test_par_rate_risk_report_flat_forward():
         SwapTypes.PAY,
         fixed_day_count,
         fixed_freq_type,
-        settlement_date,
+        settle_dt,
         base_curve,
     )
 
@@ -171,7 +171,7 @@ def test_forward_rate_risk_report():
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
-    settlement_date, base_curve = _generate_base_curve(
+    settle_dt, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
@@ -187,7 +187,7 @@ def test_forward_rate_risk_report():
         swap_type,
         fixed_dcc_type,
         fixed_freq_type,
-        settlement_date,
+        settle_dt,
         base_curve,
     )
 
@@ -254,7 +254,7 @@ def test_forward_rate_custom_grid_risk_report():
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
-    settlement_date, base_curve = _generate_base_curve(
+    settle_dt, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
@@ -270,7 +270,7 @@ def test_forward_rate_custom_grid_risk_report():
         swap_type,
         fixed_dcc_type,
         fixed_freq_type,
-        settlement_date,
+        settle_dt,
         base_curve,
     )
 
@@ -319,7 +319,7 @@ def test_carry_rolldown_report():
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
-    settlement_date, base_curve = _generate_base_curve(
+    settle_dt, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
@@ -335,7 +335,7 @@ def test_carry_rolldown_report():
         swap_type,
         fixed_dcc_type,
         fixed_freq_type,
-        settlement_date,
+        settle_dt,
         base_curve,
     )
 
@@ -389,7 +389,7 @@ def test_parallel_shift_ladder_report():
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
-    settlement_date, base_curve = _generate_base_curve(
+    settle_dt, base_curve = _generate_base_curve(
         valuation_date,
         cal,
         interp_type,
@@ -405,7 +405,7 @@ def test_parallel_shift_ladder_report():
         swap_type,
         fixed_dcc_type,
         fixed_freq_type,
-        settlement_date,
+        settle_dt,
         base_curve,
     )
 
@@ -467,11 +467,11 @@ def _generate_trades(
     swap_type,
     fixed_dcc_type,
     fixed_freq_type,
-    settlement_date,
+    settle_dt,
     base_curve,
 ):
     trade1 = IborSwap(
-        settlement_date,
+        settle_dt,
         "4Y",
         swap_type,
         4.20 / 100.0,
@@ -483,7 +483,7 @@ def _generate_trades(
     atm = trade1.swap_rate(valuation_date, base_curve)
     trade1.set_fixed_rate(atm)
     trade2 = IborSwap(
-        settlement_date.add_tenor("6M"),
+        settle_dt.add_tenor("6M"),
         "2Y",
         swap_type,
         4.20 / 100.0,
@@ -514,13 +514,13 @@ def _generate_base_curve(
 ):
     depos = []
     spot_days = 2
-    settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    settle_dt = valuation_date.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fras = []
     fra = IborFRA(
-        settlement_date.add_tenor("3M"),
+        settle_dt.add_tenor("3M"),
         "3M",
         4.20 / 100.0,
         fra_dcc_type,
@@ -530,7 +530,7 @@ def _generate_base_curve(
 
     swaps = []
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "1Y",
         swap_type,
         4.20 / 100.0,
@@ -540,7 +540,7 @@ def _generate_base_curve(
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "2Y",
         swap_type,
         4.30 / 100.0,
@@ -550,7 +550,7 @@ def _generate_base_curve(
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "3Y",
         swap_type,
         4.70 / 100.0,
@@ -560,7 +560,7 @@ def _generate_base_curve(
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "5Y",
         swap_type,
         4.70 / 100.0,
@@ -570,7 +570,7 @@ def _generate_base_curve(
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "7Y",
         swap_type,
         4.70 / 100.0,
@@ -588,7 +588,7 @@ def _generate_base_curve(
         interp_type,
     )
 
-    return settlement_date, base_curve
+    return settle_dt, base_curve
 
 
 ########################################################################################

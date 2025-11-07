@@ -34,7 +34,7 @@ class BondYieldCurve:
 
     def __init__(
         self,
-        settlement_date: Date,
+        settle_dt: Date,
         bonds: list,
         ylds: Union[np.ndarray, list],
         curve_fit,
@@ -43,7 +43,7 @@ class BondYieldCurve:
         specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters."""
 
-        self._settlement_date = settlement_date
+        self._settle_dt = settle_dt
         self._bonds = bonds
         self._ylds = np.array(ylds)
         self._curve_fit = curve_fit
@@ -53,7 +53,7 @@ class BondYieldCurve:
 
         years_to_maturities = []
         for bond in bonds:
-            years_to_maturity = (bond._maturity_dt - settlement_date) / G_DAYS_IN_YEAR
+            years_to_maturity = (bond._maturity_dt - settle_dt) / G_DAYS_IN_YEAR
             years_to_maturities.append(years_to_maturity)
         self._years_to_maturity = np.array(years_to_maturities)
 
@@ -123,7 +123,7 @@ class BondYieldCurve:
     def interpolated_yield(self, maturity_dt: Date):
         """Interpolates the yield for a given maturity date."""
         if isinstance(maturity_dt, Date):
-            t = (maturity_dt - self._settlement_date) / G_DAYS_IN_YEAR
+            t = (maturity_dt - self._settle_dt) / G_DAYS_IN_YEAR
         elif isinstance(maturity_dt, list):
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):
@@ -185,7 +185,7 @@ class BondYieldCurve:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("SETTLEMENT DATE", self._settlement_date)
+        s += label_to_string("SETTLEMENT DATE", self._settle_dt)
         s += label_to_string("BOND", self._bonds)
         s += label_to_string("YIELDS", self._ylds)
         s += label_to_string("CURVE FIT", self._curve_fit)

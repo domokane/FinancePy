@@ -31,14 +31,14 @@ def test_smooth_fit_simple(interp_type):
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    settle_dt = valuation_date.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
     fras = []
     fra = IborFRA(
-        settlement_date.add_tenor("3M"),
+        settle_dt.add_tenor("3M"),
         "3M",
         4.20 / 100.0,
         fra_dcc_type,
@@ -52,7 +52,7 @@ def test_smooth_fit_simple(interp_type):
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "1Y",
         swap_type,
         4.20 / 100.0,
@@ -62,7 +62,7 @@ def test_smooth_fit_simple(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "2Y",
         swap_type,
         4.30 / 100.0,
@@ -117,14 +117,14 @@ def test_smooth_fit(interp_type):
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    settle_dt = valuation_date.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
     fras = []
     fra = IborFRA(
-        settlement_date.add_tenor("3M"),
+        settle_dt.add_tenor("3M"),
         "3M",
         4.20 / 100.0,
         fra_dcc_type,
@@ -138,7 +138,7 @@ def test_smooth_fit(interp_type):
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "1Y",
         swap_type,
         4.20 / 100.0,
@@ -148,7 +148,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "2Y",
         swap_type,
         4.30 / 100.0,
@@ -158,7 +158,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "3Y",
         swap_type,
         4.70 / 100.0,
@@ -168,7 +168,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "5Y",
         swap_type,
         5.40 / 100.0,
@@ -178,7 +178,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "7Y",
         swap_type,
         5.70 / 100.0,
@@ -188,7 +188,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "10Y",
         swap_type,
         6.00 / 100.0,
@@ -198,7 +198,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "12Y",
         swap_type,
         6.10 / 100.0,
@@ -208,7 +208,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "15Y",
         swap_type,
         5.90 / 100.0,
@@ -218,7 +218,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "20Y",
         swap_type,
         5.60 / 100.0,
@@ -228,7 +228,7 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "25Y",
         swap_type,
         5.55 / 100.0,

@@ -25,14 +25,14 @@ def test_ibor_curve_par_rate_shocker():
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settlement_date = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settlement_date, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    settle_dt = valuation_date.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
     fras = []
     fra = IborFRA(
-        settlement_date.add_tenor("3M"),
+        settle_dt.add_tenor("3M"),
         "3M",
         4.20 / 100.0,
         fra_dcc_type,
@@ -46,7 +46,7 @@ def test_ibor_curve_par_rate_shocker():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "1Y",
         swap_type,
         4.20 / 100.0,
@@ -56,7 +56,7 @@ def test_ibor_curve_par_rate_shocker():
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "2Y",
         swap_type,
         4.30 / 100.0,
@@ -66,7 +66,7 @@ def test_ibor_curve_par_rate_shocker():
     )
     swaps.append(swap)
     swap = IborSwap(
-        settlement_date,
+        settle_dt,
         "3Y",
         swap_type,
         4.70 / 100.0,

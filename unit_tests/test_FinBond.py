@@ -269,7 +269,7 @@ def test_bond_cfets():
     test_case_file = "./data/test_cases_bond_cfets.csv"
     path = os.path.join(os.path.dirname(__file__), test_case_file)
 
-    df = pd.read_csv(path, parse_dates=["settlement_date", "issue_date", "maturity_dt"])
+    df = pd.read_csv(path, parse_dates=["settle_dt", "issue_date", "maturity_dt"])
 
     for row in df.itertuples(index=False):
 
@@ -293,9 +293,9 @@ def test_bond_cfets():
         )
 
         settle_dt = Date(
-            row.settlement_date.day,
-            row.settlement_date.month,
-            row.settlement_date.year,
+            row.settle_dt.day,
+            row.settle_dt.month,
+            row.settle_dt.year,
         )
 
         accrued_interest = bond.accrued_interest(settle_dt, face)

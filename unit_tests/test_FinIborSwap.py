@@ -27,10 +27,10 @@ def test_libor_swap():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    first_fixing, swap, settlement_date, libor_curve = _load_test_swap_and_curve(
+    first_fixing, swap, settle_dt, libor_curve = _load_test_swap_and_curve(
         start_dt, end_dt
     )
-    v = swap.value(settlement_date, libor_curve, libor_curve, first_fixing)
+    v = swap.value(settle_dt, libor_curve, libor_curve, first_fixing)
 
     assert round(v, 4) == 318901.6015
 
@@ -44,12 +44,10 @@ def test_libor_swap_cashflow_report():
     start_dt = Date(27, 12, 2017)
     end_dt = Date(27, 12, 2067)
 
-    first_fixing, swap, settlement_date, libor_curve = _load_test_swap_and_curve(
+    first_fixing, swap, settle_dt, libor_curve = _load_test_swap_and_curve(
         start_dt, end_dt
     )
-    v = swap.value(
-        settlement_date, libor_curve, libor_curve, first_fixing, pv_only=False
-    )
+    v = swap.value(settle_dt, libor_curve, libor_curve, first_fixing, pv_only=False)
 
     # print(v[1])
 
@@ -170,9 +168,9 @@ def _load_test_swap_and_curve(start_dt, end_dt):
     future Libor rates. """
 
     valuation_date = Date(30, 11, 2018)
-    settlement_date = valuation_date.add_days(2)
+    settle_dt = valuation_date.add_days(2)
     libor_curve = build_ibor_single_curve(valuation_date)
-    return first_fixing, swap, settlement_date, libor_curve
+    return first_fixing, swap, settle_dt, libor_curve
 
 
 ########################################################################################
