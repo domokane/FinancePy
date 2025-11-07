@@ -3,12 +3,12 @@ name: golden tests
 on: [push, pull_request]
 
 env:
-  PYTHON_VERSION: 3.11
- 
+  PYTHON_VERSION: 3.13
+
 jobs:
  build:
   runs-on: ubuntu-latest
-  steps: 
+  steps:
    - name: checkout repo content
      uses: actions/checkout@v4
    - name: setup python
@@ -20,7 +20,7 @@ jobs:
        pip install -r requirements.txt
        python setup.py install
    - name: Run tests
-     run: 
+     run:
        python golden_tests/run_all_tests.py
    - name: Archive code coverage results
      uses: actions/upload-artifact@v4

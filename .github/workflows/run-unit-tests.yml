@@ -3,12 +3,12 @@ name: unit test action
 on: [push, pull_request]
 
 env:
-  PYTHON_VERSION: 3.11
+  PYTHON_VERSION: 3.13
 
 jobs:
  build:
   runs-on: ubuntu-latest
-  steps: 
+  steps:
    - name: checkout repo content
      uses: actions/checkout@v4
    - name: setup python
@@ -20,14 +20,14 @@ jobs:
        python -m pip install --upgrade pip
        pip install -r requirements.txt
        pip install -r requirements-dev.txt
-       pip install pytest  
-       pip install -e . 
+       pip install pytest
+       pip install -e .
    - name: show package is importable
-     run: |        
+     run: |
         python -c "import financepy as fp"
    - name: list dependencies
-     run: |        
+     run: |
         pip list
    - name: unit tests
-     run: |        
+     run: |
         pytest -vv
