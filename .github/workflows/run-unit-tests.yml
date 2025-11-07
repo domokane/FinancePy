@@ -3,7 +3,7 @@ name: unit test action
 on: [push, pull_request]
 
 env:
-  PYTHON_VERSION: 3.13.1
+  PYTHON_VERSION: 3.13.5
 
 jobs:
  build:
