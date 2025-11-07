@@ -19,7 +19,6 @@ jobs:
      run: |
        python -m pip install --upgrade pip setuptools wheel
        pip install -r requirements.txt
-       pip install -r requirements-dev.txt
        pip install pytest
        pip install -e .
    - name: show package is importable
