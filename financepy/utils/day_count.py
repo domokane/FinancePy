@@ -91,6 +91,7 @@ class DayCount:
         specified day count convention which is useful for calculating year
         fractions for Libor products whose flows are day count adjusted. In
         this case we will set dt3 to be None
+
         2) This function is also for calculating bond accrued where dt1 is the
         last coupon date, dt2 is the settlement date of the bond and date dt3
         must be set to the next coupon date. You will also need to provide a

@@ -19,7 +19,7 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.bonds.bond_market import get_bond_market_conventions
 from financepy.products.bonds.bond_market import BondMarkets
-from financepy.products.bonds.bond import YTMCalcType, Bond
+from financepy.products.bonds.bond import YTMCalcType, Bond, CouponType
 from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -760,9 +760,40 @@ def test_div_dts():
     print("Yield to Mat: %10.5f %%" % (ytm))
 
 
-########################################################################################
+###############################################################################
+
+def test_cpn_types():
+
+    # Normally a coupon if c/f but in some cases we have a long or short
+    # first coupon. I allow this by allowing a coupon type ACCRUAL. In this 
+    # case the coupon is the annual coupon times the year fraction
+    
+    issue_dt = Date(31, 3, 2022)
+    maturity_dt = Date(31, 7, 2023)
+    freq_type = FrequencyTypes.ANNUAL
+
+    # expect coupons on 
+    # 31 July 2022
+    # 31 July 2023
+    # The first coupon is short as it accrues from 31 March to 31 July
+    coupon = 0.0275
+    dc_type = DayCountTypes.ACT_360
+
+    # We do not see that here. All coupons are the same size
+    cpn_type = CouponType.FIXED
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, cpn_type=cpn_type)
+#    print(bond.flow_amounts)
+
+    # We need to set the coupon type to ACCRUED to enable this
+    cpn_type = CouponType.ACCRUED
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, cpn_type=cpn_type)
+#    print(bond.flow_amounts)
+
+###############################################################################
+
 
 test_bond()
+test_cpn_types()
 test_oas()
 test_bond_ex_dividend()
 test_bond_payment_dates()

@@ -52,6 +52,13 @@ from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 ########################################################################################
 
 
+class CouponType(Enum):
+    FIXED = 0 # USES C/F
+    ACCRUED = 1 # USES Accrual_Period * C
+
+########################################################################################
+
+
 class YTMCalcType(Enum):
     ZERO = 0
     UK_DMO = 1
@@ -107,6 +114,7 @@ class Bond:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type=BusDayAdjustTypes.FOLLOWING,
         dg_type=DateGenRuleTypes.BACKWARD,
+        cpn_type=CouponType.FIXED
     ):
         """Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
@@ -137,6 +145,7 @@ class Bond:
             raise FinError("Zero coupon bonds must use BondZero class.")
 
         self.cpn = coupon
+        self.cpn_type = cpn_type
         self.freq_type = freq_type
 
         self.dc_type = dc_type
@@ -226,10 +235,30 @@ class Bond:
 
         self.flow_amounts = [0.0]
 
-        for _ in self.cpn_dts[1:]:
-            cpn = self.cpn / self.freq
-            self.flow_amounts.append(cpn)
+        if self.cpn_type == CouponType.FIXED:
 
+            for _ in self.cpn_dts[1:]:
+            
+                flow = self.cpn / self.freq               
+                self.flow_amounts.append(flow)
+
+        elif self.cpn_type == CouponType.ACCRUED:
+            
+            self_dc = DayCount(self.dc_type)
+            prev_dt = self.cpn_dts[0]
+ 
+            for next_dt in self.cpn_dts[1:]:
+            
+                yf, _, _ = self_dc.year_frac(prev_dt, next_dt)
+                prev_dt = next_dt
+                flow = yf * self.cpn
+                self.flow_amounts.append(flow)
+
+        else:
+            raise FinError("Error: Unknown Coupon Type")
+
+        return
+    
     ####################################################################################
 
     def reset_flows(
