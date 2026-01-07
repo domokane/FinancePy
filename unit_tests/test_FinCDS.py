@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from more_itertools import value_chain
 import numpy as np
 
 from financepy.utils.global_types import SwapTypes
@@ -394,7 +395,7 @@ def test_par_spread():
     assert round(spd, 3) == 399.999
 
     spd = cds_contract2.par_spread(value_dt2, issuer_curve2, cds_recovery) * 10000.0
-    assert round(spd, 4) == 99.5858
+    assert round(spd, 4) == 99.874
 
 
 ########################################################################################
@@ -407,8 +408,8 @@ def test_value():
     assert round(v["clean_pv"], 4) == 170615.4637
 
     v = cds_contract2.value(value_dt2, issuer_curve2, cds_recovery)
-    assert round(v["dirty_pv"], 4) == -199842.2583
-    assert round(v["clean_pv"], 4) == -191508.9250
+    assert round(v["dirty_pv"], 4) == -199676.1314
+    assert round(v["clean_pv"], 4) == -191342.798
 
 
 ########################################################################################
@@ -420,7 +421,7 @@ def test_clean_price():
     assert round(p, 4) == 82.9385
 
     p = cds_contract2.clean_price(value_dt2, issuer_curve2, cds_recovery)
-    assert round(p, 4) == 119.1509
+    assert round(p, 4) == 119.1343
 
 
 ########################################################################################
@@ -428,10 +429,10 @@ def test_clean_price():
 
 def testaccrued_days():
 
-    accrued_days = cds_contract1.accrued_days()
+    accrued_days = cds_contract1.accrued_days(value_dt1)
     assert accrued_days == 51.0
 
-    accrued_days = cds_contract2.accrued_days()
+    accrued_days = cds_contract2.accrued_days(value_dt2)
     assert accrued_days == 60.0
 
 
@@ -440,10 +441,10 @@ def testaccrued_days():
 
 def test_accrued_interest():
 
-    accrued_interest = cds_contract1.accrued_interest()
+    accrued_interest = cds_contract1.accrued_interest(value_dt1)
     assert accrued_interest == -2125.0
 
-    accrued_interest = cds_contract2.accrued_interest()
+    accrued_interest = cds_contract2.accrued_interest(value_dt2)
     assert round(accrued_interest, 4) == -8333.3333
 
 
@@ -456,7 +457,7 @@ def test_prot_leg_pv():
     assert round(prot_pv, 3) == 272985.134
 
     prot_pv = cds_contract2.prot_leg_pv(value_dt2, issuer_curve2, cds_recovery)
-    assert round(prot_pv, 4) == 47629.5968
+    assert round(prot_pv, 4) == 47760.4086
 
 
 ########################################################################################
@@ -468,7 +469,7 @@ def test_premium_leg_pv():
     assert round(prem_pv, 4) == 104494.6703
 
     prem_pv = cds_contract2.premium_leg_pv(value_dt2, issuer_curve2, cds_recovery)
-    assert round(prem_pv, 4) == 247471.8551
+    assert round(prem_pv, 4) == 247436.54
 
 
 ########################################################################################

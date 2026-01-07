@@ -43,10 +43,10 @@ def test_cds_index():
     p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     assert round(p, 4) == 99.6738
 
-    accrued_days = cds_index_contract.accrued_days()
+    accrued_days = cds_index_contract.accrued_days(value_dt)
     assert accrued_days == 50.0
 
-    accrued_interest = cds_index_contract.accrued_interest()
+    accrued_interest = cds_index_contract.accrued_interest(value_dt)
     assert round(accrued_interest, 4) == -5555.5556
 
     prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)

@@ -250,10 +250,10 @@ def test_dirty_price_cd_swaption():
     p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN PRICE", p)
 
-    accrued_days = cds_contract.accrued_days()
+    accrued_days = cds_contract.accrued_days(value_dt)
     test_cases.print("ACCRUED DAYS", accrued_days)
 
-    accrued_interest = cds_contract.accrued_interest()
+    accrued_interest = cds_contract.accrued_interest(value_dt)
     test_cases.print("ACCRUED COUPON", accrued_interest)
 
     prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)

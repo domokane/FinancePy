@@ -685,8 +685,9 @@ class CDS:
         pcd = self.accrual_start_dts[0]
         start_index = 0
 
-        if value_dt < pcd:
-            raise FinError("Value date before start of first accrual period.")
+        # I turned off this warning for CDS Index options
+        #        if value_dt < pcd:
+        #            raise FinError("Value date before start of first accrual period.")
 
         for acc_start_dt in self.accrual_start_dts[1:]:
             if value_dt < acc_start_dt:

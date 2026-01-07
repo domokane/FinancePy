@@ -116,10 +116,10 @@ def test_value_cds_index():
     p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN PRICE", p)
 
-    accrued_days = cds_index_contract.accrued_days()
+    accrued_days = cds_index_contract.accrued_days(value_dt)
     test_cases.print("ACCRUED DAYS", accrued_days)
 
-    accrued_interest = cds_index_contract.accrued_interest()
+    accrued_interest = cds_index_contract.accrued_interest(value_dt)
     test_cases.print("ACCRUED COUPON", accrued_interest)
 
     prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
