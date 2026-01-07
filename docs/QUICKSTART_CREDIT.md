@@ -1,116 +1,154 @@
 ## Quickstart Guide to Credit Derivatives
-To analyse a bond first load up the Date and other utility classes such as Frequency and DayCounts. The easiest way to do this is to use a wildcard import. The downside is that it imports a lot of unnecessary classes and will take a second or so. But it is probably the simplest way to start until you become familiar with the library structure.
+We wish to set up and value a CDS contract.
 
+To do this we need the Date and other utility classes such as Frequency and DayCounts. The easiest way to do this is to use a wildcard import.
 ```
 from financepy.utils import *
 ```
+As we will need interest rates to build the CDS curve we load in the rates modules
+```
+from financepy.products.rates import *
+```
+And of course we need the credit modules
+```
+from financepy.products.credit import *
+```
+In each case we load everything. As we become more expert in the library we can learn to just import exactly what we need.
 
-Then load up all of the bond classes from the bond products module. Once again you will load classes you will not use but this is the simplest way to begin.
+We now define our CDS contract. It was traded first on 1st Dec 2024. We value it today 10th Jan 2026, and it matures on the 20th March 2029. The contractual coupon is set at 100 basis points. And we are long protection with a notional of $1,000,000. We therefore define
 ```
-from financepy.products.bonds import *
+effective_dt = Date(1, 12, 2024)
+maturity_dt = Date(20, 3, 2028)
+cds_coupon = 0.010
+notional = ONE_MILLION
+long_protection = True
 ```
+We can then define the CDS contract as follows
+```
+cds_contract = CDS(value_dt, maturity_dt, cds_coupon, notional, long_protection)
+```
+We can print the contract to ensure that it is as we wish
+***Output***
+```
+OBJECT TYPE: CDS
+STEP-IN DATE: 01-DEC-2024
+MATURITY: 20-MAR-2028
+NOTIONAL: 1000000
+LONG PROTECTION: True
+RUN COUPON: 100.0bp
+DAYCOUNT: DayCountTypes.ACT_360
+FREQUENCY: FrequencyTypes.QUARTERLY
+CALENDAR: CalendarTypes.WEEKEND
+BUSDAYRULE: BusDayAdjustTypes.FOLLOWING
+DATEGENRULE: DateGenRuleTypes.BACKWARD
+PAYMENT_dt, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW
+20-DEC-2024,     0.252778, 20-SEP-2024, 19-DEC-2024,  2527.777778
+20-MAR-2025,     0.250000, 20-DEC-2024, 19-MAR-2025,  2500.000000
+20-JUN-2025,     0.255556, 20-MAR-2025, 19-JUN-2025,  2555.555556
+22-SEP-2025,     0.261111, 20-JUN-2025, 21-SEP-2025,  2611.111111
+22-DEC-2025,     0.252778, 22-SEP-2025, 21-DEC-2025,  2527.777778
+20-MAR-2026,     0.244444, 22-DEC-2025, 19-MAR-2026,  2444.444444
+22-JUN-2026,     0.261111, 20-MAR-2026, 21-JUN-2026,  2611.111111
+21-SEP-2026,     0.252778, 22-JUN-2026, 20-SEP-2026,  2527.777778
+21-DEC-2026,     0.252778, 21-SEP-2026, 20-DEC-2026,  2527.777778
+22-MAR-2027,     0.252778, 21-DEC-2026, 21-MAR-2027,  2527.777778
+21-JUN-2027,     0.252778, 22-MAR-2027, 20-JUN-2027,  2527.777778
+20-SEP-2027,     0.252778, 21-JUN-2027, 19-SEP-2027,  2527.777778
+20-DEC-2027,     0.252778, 20-SEP-2027, 19-DEC-2027,  2527.777778
+20-MAR-2028,     0.255556, 20-DEC-2027, 20-MAR-2028,  2555.555556
+```
+We see the details of the contract that would be found on its term sheet. The premium leg starts paying in December 2024.
 
-Now use the Date class to define the bond issue and maturity dates
+To value this CDS, we first need to load the rates curve. This is usually based on IBOR instruments, specifically Deposits, Futures and Swaps. However to keep things simple for the quick start, we will assume a flat discount curve. We therefore define
 ```
-issue_dt = Date(13, 5, 2010)
-maturity_dt = Date(13, 5, 2022)
+interest_rate = 0.03
 ```
-Now set the 2.7% coupon - this is the annualised coupon which is paid in discrete chunks depending on the payment frequency
+We also pull in the required curve type
 ```
-coupon = 0.027
+from financepy.market.curves import DiscountCurveFlat
 ```
-Here the payment frequency for the coupon is SEMI ANNUAL so there are two payments of 0.0135 paid every six months
+We then construct this flat curve
 ```
-freq_type = FrequencyTypes.SEMI_ANNUAL
+discount_curve = DiscountCurveFlat(value_dt, interest_rate, FrequencyTypes.CONTINUOUS)
 ```
-The Day Count convention used for accrued interest is defined as
+Next we need to construct the CDS curve. For this we need to specify a term structure of CDS contracts with their corresponding par CDS spread. We do not need to use CDS maturity dates - we can simply specify their tenor i.e. how many years they each last. We first create the settlement date which is value date plus one
 ```
-dc_type = DayCountTypes.THIRTY_E_360
+settle_dt = value_dt.add_days(1)
 ```
-Finally create the bond object
+and then we specify the 1Y, 2Y, 3Y and 5Y CDS contracts with CDS par spreads of 80, 85, 90, 95 bps
 ```
-bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+cds1 = CDS(settle_dt, "1Y", 0.0065)
+cds2 = CDS(settle_dt, "2Y", 0.0070)
+cds3 = CDS(settle_dt, "3Y", 0.0075)
+cds5 = CDS(settle_dt, "5Y", 0.0080)
 ```
-We can print the bond object to see what we stored
+We store these in a list
 ```
-print(bond)
+cdss = [cds1, cds2, cds3, cds5]
 ```
-**Output:**
+We also need to specify a recovery rate (market standard is to assume 40%)
 ```
-OBJECT TYPE: Bond
-ISSUE DATE: 13-MAY-2010
-MATURITY DATE: 13-MAY-2022
-COUPON (%): 2.7
-FREQUENCY: FrequencyTypes.SEMI_ANNUAL
-DAY COUNT TYPE: DayCountTypes.THIRTY_E_360
-EX_DIV DAYS: 0
+recovery_rate = 0.40
 ```
----
+and we create our CDS curve
+```
+cds_curve = CDSCurve(value_dt, cds_list, discount_curve, recovery_rate)
+```
+We can print this to see what is stored
+```
+print(cds_curve)
+```
+***Output:***
+```
+OBJECT TYPE: CDSCurve
+TIME,SURVIVAL_PROBABILITY
+ 0.0000000,  1.0000000
+ 1.2136986,  0.9865973
+ 2.2164384,  0.9739514
+ 3.2164384,  0.9597968
+ 5.2164384,  0.9314422
+ ```
+ We see the term structure of years and risk-neutral survival probabilities.
 
-We then get the bond payments for a specific settlement date
+ We can now value the CDS contract. First we calculate the par CDS spread for this maturity. Recall that our CDS contract protection costs us 100bp a year.
 ```
-settle_dt = Date(21, 7, 2017)
+spd = cds_contract.par_spread(value_dt, cds_curve, recovery_rate) * 10000.0
+print("FAIR CDS SPREAD %10.5f bp"% spd)
 ```
-The function to print the bond payments is
+Which gives
 ```
-bond.print_payments(settle_dt)
+***Output:***
+FAIR CDS SPREAD   69.999 bp
 ```
-**Output:**
+This makes sense. It agrees with the current market par spread of 70bps for a 2Y contract. Note that a 2Y contract matures in 2 years on the next IMM date which is the 20 March 2028.
+
+The value of the contract is given by the difference between the par spread of 70bps and the 100bps that we are paying for the 2.25 years of protection remaining. It should be negative and equal to 30bps times 2.25 years. Let us see.
 ```
- 13-NOV-2017      1.35000
- 13-MAY-2018      1.35000
- 13-NOV-2018      1.35000
- 13-MAY-2019      1.35000
- 13-NOV-2019      1.35000
- 13-MAY-2020      1.35000
- 13-NOV-2020      1.35000
- 13-MAY-2021      1.35000
- 13-NOV-2021      1.35000
- 13-MAY-2022    101.35000
----
+v = cds_contract.value(settle_dt, cds_curve, recovery_rate)
 ```
-To get the accrued interest use
+This has two components:
 ```
-print("Accrued = %12.2f"% bond.accrued_int)
+dirty_pv = v['dirty_pv']
+clean_pv = v['clean_pv']
 ```
-**Output:**
 ```
-Accrued =         0.51
+print("DIRTY VALUE %12.2f"% dirty_pv)
+print("CLEAN VALUE %12.2f"% clean_pv)
 ```
-We can also calculate the number of accrued days
+***OUTPUT:***
 ```
-print("Accrued Days = ", bond.accrued_days)
+DIRTY VALUE      -6752.97
+CLEAN VALUE      -6475.19
 ```
-**Output:**
+We see that the dirty price (that the contract is worth) is approximately equal to 30bps x 2.25 x $1m = $6.750.
+
+We can get this as a clean price
 ```
-Accrued Days =  68
+cleanp = cds_contract.clean_price(settle_dt, cds_curve, recovery_rate)
+print("CLEAN PRICE %12.6f"% cleanp)
 ```
-Now we set the bond (clean) price
+***OUTPUT***
 ```
-clean_price = 101.581564
-```
-From this we can extract the current yield
-```
-bond.current_yield(clean_price)*100.0
-```
-**Output:**
-```
-2.657962620067555
-```
-We can get the yield to maturity using US STREET convention
-```
-bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)*100
-```
-**Output:**
-```
-2.3499999794774293
-```
-We can also get the yield to maturity using the US TREASURY convention
-```
-bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)*100
-```
-**Output:**
-```
-2.3496418129692254
+CLEAN PRICE   100.646919
 ```
 

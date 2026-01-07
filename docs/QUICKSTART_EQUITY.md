@@ -1,116 +1,109 @@
 ## Quickstart Guide to Equity Derivatives
-To analyse a bond first load up the Date and other utility classes such as Frequency and DayCounts. The easiest way to do this is to use a wildcard import. The downside is that it imports a lot of unnecessary classes and will take a second or so. But it is probably the simplest way to start until you become familiar with the library structure.
+We start with valuing a plain vanilla Equity Option and calculating its delta.
 
+The easiest way to begin is to use a wildcard import from the utilities folder to pull in Dates and other required utility classes.
 ```
 from financepy.utils import *
 ```
+Then load in the equity derivative classes from the equity products folder. You will load classes you will not use but this is the simplest way to begin.
+```
+from financepy.products.equity import *
+```
+Now use the Date class to define the option expiry date for the 1st of June 2026
+```
+expiry_dt = Date(1, 6, 2026)
+```
+We then need to specify the option strike price
+```
+strike_price = 50.0
+```
+We finally create the option object. We are going to define an option with a payoff of a European call. A European call is a call option with a single expiry date.
+```
+call_option = EquityVanillaOption(expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL)
+```
+There are alternative payoffs such as an AMERICAN_CALL. This can be exercised at any time before expiry.
 
-Then load up all of the bond classes from the bond products module. Once again you will load classes you will not use but this is the simplest way to begin.
-```
-from financepy.products.bonds import *
-```
-
-Now use the Date class to define the bond issue and maturity dates
-```
-issue_dt = Date(13, 5, 2010)
-maturity_dt = Date(13, 5, 2022)
-```
-Now set the 2.7% coupon - this is the annualised coupon which is paid in discrete chunks depending on the payment frequency
-```
-coupon = 0.027
-```
-Here the payment frequency for the coupon is SEMI ANNUAL so there are two payments of 0.0135 paid every six months
-```
-freq_type = FrequencyTypes.SEMI_ANNUAL
-```
-The Day Count convention used for accrued interest is defined as
-```
-dc_type = DayCountTypes.THIRTY_E_360
-```
-Finally create the bond object
-```
-bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
-```
-We can print the bond object to see what we stored
+We can print the option object to check that it is what we wanted
 ```
 print(bond)
 ```
 **Output:**
 ```
-OBJECT TYPE: Bond
-ISSUE DATE: 13-MAY-2010
-MATURITY DATE: 13-MAY-2022
-COUPON (%): 2.7
-FREQUENCY: FrequencyTypes.SEMI_ANNUAL
-DAY COUNT TYPE: DayCountTypes.THIRTY_E_360
-EX_DIV DAYS: 0
+OBJECT TYPE: EquityVanillaOption
+EXPIRY DATE: 01-JUN-2026
+STRIKE PRICE: 50.0
+OPTION TYPE VALUE: OptionTypes.EUROPEAN_CALL
+NUMBER: 1.0
 ```
 ---
+This data is exactly what you would find on the term sheet of this equity call option.
 
-We then get the bond payments for a specific settlement date
+To perform a valuation we need additional market information starting with a stock price
 ```
-settle_dt = Date(21, 7, 2017)
+stock_price = 55.0
 ```
-The function to print the bond payments is
+We need a volatility
 ```
-bond.print_payments(settle_dt)
+volatility = 0.20
 ```
-**Output:**
+We need a risk-free interest rate
 ```
- 13-NOV-2017      1.35000
- 13-MAY-2018      1.35000
- 13-NOV-2018      1.35000
- 13-MAY-2019      1.35000
- 13-NOV-2019      1.35000
- 13-MAY-2020      1.35000
- 13-NOV-2020      1.35000
- 13-MAY-2021      1.35000
- 13-NOV-2021      1.35000
- 13-MAY-2022    101.35000
----
+interest_rate = 0.05
 ```
-To get the accrued interest use
+We need a dividend yield
 ```
-print("Accrued = %12.2f"% bond.accrued_int)
+dividend_yield = 0.02
 ```
-**Output:**
+and we need the valuation date. We choose the 1 Jan 2026 so that the option has exactly six months to expiry.
 ```
-Accrued =         0.51
+value_dt = Date(1, 1, 2026)
 ```
-We can also calculate the number of accrued days
+Now the valuation needs the interest rate in the form of a discount curve. We choose the simple flat curve at the interest rate provided
 ```
-print("Accrued Days = ", bond.accrued_days)
+discount_curve = DiscountCurveFlat(value_dt, interest_rate, FrequencyTypes.CONTINUOUS)
 ```
-**Output:**
+We also need a curve for the dividend yield
 ```
-Accrued Days =  68
+dividend_curve = DiscountCurveFlat(value_dt, dividend_yield, FrequencyTypes.CONTINUOUS)
 ```
-Now we set the bond (clean) price
+We need to specify a model. We use the standard Black-Scholes Model which takes in a single flat volatility
 ```
-clean_price = 101.581564
+model = BlackScholes(volatility)
 ```
-From this we can extract the current yield
+We can then call the model valuation of the call option as so
 ```
-bond.current_yield(clean_price)*100.0
+call_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 ```
 **Output:**
 ```
-2.657962620067555
+np.float64(2.8449436313648704)
 ```
-We can get the yield to maturity using US STREET convention
-```
-bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)*100
-```
-**Output:**
-```
-2.3499999794774293
-```
-We can also get the yield to maturity using the US TREASURY convention
-```
-bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)*100
-```
-**Output:**
-```
-2.3496418129692254
-```
+The option is worth $2.845.
 
+We can also obtain the option's delta
+```
+call_option.delta(value_dt, stock_price, discount_curve, dividend_curve, model)
+```
+**Output**
+```
+np.float64(0.559227735475412)
+```
+It is 0.559.
+
+Finally, we can use vectorisation to plot the option price as a function of the stock price. We write
+```
+stock_prices = np.linspace(20,80,100)
+```
+This produces a vector of prices from $20 to $80 with 100 intervals. We then call the option pricing function again but passing in the vector of stock prices and store the output in variable $value$
+```
+value = call_option.value(value_dt, stock_prices, discount_curve, dividend_curve, model)
+```
+We can then plot this
+```
+plt.plot(stock_prices, value)
+plt.xlabel("Stock Price")
+plt.ylabel("Option Premium")
+```
+![alt text](image.png)
+
+That's all. To see more, look at the notebooks in the notebooks folder.

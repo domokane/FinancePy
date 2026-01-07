@@ -286,9 +286,6 @@ class CDSCurve:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         header = "TIME,SURVIVAL_PROBABILITY"
 
-        print("XXXXX")
-        print(self._qs)
-
         value_table = [self._times, self._qs]
         precision = "10.7f"
         s += table_to_string(header, value_table, precision)

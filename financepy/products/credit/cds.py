@@ -51,7 +51,7 @@ GLOB_NUM_STEPS_PER_YEAR = 25
     cache=True,
 )
 def _risky_pv01_numba(
-    teff,
+    t_eff,
     accrual_factor_pcd_to_now,
     payment_times,
     year_fracs,
@@ -69,7 +69,7 @@ def _risky_pv01_numba(
 
     if debug:
         print("===================")
-        print("Teff", teff)
+        print("t_eff", t_eff)
         print("Acc", accrual_factor_pcd_to_now)
         print("Payments", payment_times)
         print("Alphas", year_fracs)
@@ -82,13 +82,13 @@ def _risky_pv01_numba(
     # accrued is treated as though on average default occurs roughly midway
     # through a cpn period.
 
-    tncd = payment_times[0]
+    t_ncd = payment_times[0]
 
     # The first cpn is a special case which needs to be handled carefully
     # taking into account what cpn has already accrued and what has not
-    qeff = _uinterpolate(teff, np_surv_times, np_surv_values, method)
-    q1 = _uinterpolate(tncd, np_surv_times, np_surv_values, method)
-    z1 = _uinterpolate(tncd, np_ibor_times, np_ibor_values, method)
+    qeff = _uinterpolate(t_eff, np_surv_times, np_surv_values, method)
+    q1 = _uinterpolate(t_ncd, np_surv_times, np_surv_values, method)
+    z1 = _uinterpolate(t_ncd, np_ibor_times, np_ibor_values, method)
 
     # this is the part of the cpn accrued from previous cpn date to now
     # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
@@ -115,6 +115,8 @@ def _risky_pv01_numba(
 
         # full cpn is paid at the end of the current period if survives
         full_rpv01 += q2 * z2 * accrual_factor
+
+        #        print(it, t2, z2, q2, accrual_factor, full_rpv01)
 
         #######################################################################
 
@@ -160,7 +162,7 @@ def _risky_pv01_numba(
     cache=True,
 )
 def _prot_leg_pv_numba(
-    teff,
+    t_eff,
     t_mat,
     np_ibor_times,
     np_ibor_values,
@@ -173,12 +175,15 @@ def _prot_leg_pv_numba(
     """Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time."""
 
+    if t_eff < 0.0:
+        raise FinError("Error: Protection leg starts in past: t_eff < 0")
+
     method = InterpTypes.FLAT_FWD_RATES.value
     dt = 1.0 / num_steps_per_year
-    num_steps = int((t_mat - teff) * num_steps_per_year + 0.50)
-    dt = (t_mat - teff) / num_steps
+    num_steps = int((t_mat - t_eff) * num_steps_per_year + 0.50)
+    dt = (t_mat - t_eff) / num_steps
 
-    t = teff
+    t = t_eff
     z1 = _uinterpolate(t, np_ibor_times, np_ibor_values, method)
     q1 = _uinterpolate(t, np_surv_times, np_surv_values, method)
 
@@ -605,24 +610,29 @@ class CDS:
 
     ###########################################################################
 
-    def accrued_days(self):
+    def accrued_days(self, settle_dt):
         """Number of days between the previous coupon and the currrent step
         in date."""
 
         # I assume accrued runs to the effective date
-        pcd = self.accrual_start_dts[0]
-        accrued_days = self.step_in_dt - pcd
+        pcd, _ = self.get_pcd(settle_dt)
+        eff_dt = max(settle_dt, self.step_in_dt)
+        accrued_days = eff_dt - pcd
         return accrued_days
 
     ###########################################################################
 
-    def accrued_interest(self):
+    def accrued_interest(self, settle_dt):
         """Calculate the amount of accrued interest that has accrued from the
         previous cpn date (PCD) to the step_in_dt of the CDS contract."""
 
         day_count = DayCount(self.dc_type)
-        pcd = self.accrual_start_dts[0]
-        accrual_factor = day_count.year_frac(pcd, self.step_in_dt)[0]
+        pcd, _ = self.get_pcd(settle_dt)
+        eff_dt = max(settle_dt, self.step_in_dt)
+
+        #        print("ACCRUED_INTEREST", pcd, eff_dt)
+        accrual_factor = day_count.year_frac(pcd, eff_dt)[0]
+
         accrued_interest = accrual_factor * self.notional * self.running_cpn
 
         if self.long_protect:
@@ -643,13 +653,19 @@ class CDS:
         """Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above."""
 
-        teff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
+        t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
+
+        # An existing contract may have protection which as of now started in the past
+        # We need to ensure that looking forward the protection starts immediately
+        if t_eff < 0.0:
+            t_eff = 0.0
+
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         libor_curve = issuer_curve.libor_curve
 
         v = _prot_leg_pv_numba(
-            teff,
+            t_eff,
             t_mat,
             libor_curve.times,
             libor_curve.dfs,
@@ -661,6 +677,27 @@ class CDS:
         )
 
         return v * self.notional
+
+    ###########################################################################
+
+    def get_pcd(self, value_dt):
+        """Get the previous coupon date before the value date"""
+        pcd = self.accrual_start_dts[0]
+        start_index = 0
+
+        if value_dt < pcd:
+            raise FinError("Value date before start of first accrual period.")
+
+        for acc_start_dt in self.accrual_start_dts[1:]:
+            if value_dt < acc_start_dt:
+                break
+            else:
+                pcd = acc_start_dt
+                start_index = start_index + 1
+
+        #        print("Value date:", value_dt, "PCD:", pcd, "Start Index", start_index)
+
+        return pcd, start_index
 
     ###########################################################################
 
@@ -677,19 +714,29 @@ class CDS:
             if t > 0.0:
                 payment_times.append(t)
 
-        # this is the part of the cpn accrued from the previous cpn date
-        # to now
-        pcd = self.accrual_start_dts[0]
-        eff = self.step_in_dt
+        # this is the part of the cpn accrued from the previous cpn date to now
+
+        pcd, start_index = self.get_pcd(value_dt)
+
         day_count = DayCount(self.dc_type)
 
-        accrual_factor_pcd_to_now = day_count.year_frac(pcd, eff)[0]
+        eff_dt = self.step_in_dt
 
-        year_fracs = self.accrual_factors
-        teff = (eff - value_dt) / G_DAYS_IN_YEAR
+        # A contract whose protection started in the past starts today
+        eff_dt = max(eff_dt, value_dt)
+
+        accrual_factor_pcd_to_now = day_count.year_frac(pcd, eff_dt)[0]
+
+        #    print("accrued pcd to now", accrual_factor_pcd_to_now)
+
+        year_fracs = self.accrual_factors[start_index:]
+
+        t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
+
+        #    print("riskyPV01 t_eff", t_eff)
 
         value_rpv01 = _risky_pv01_numba(
-            teff,
+            t_eff,
             accrual_factor_pcd_to_now,
             np.array(payment_times),
             np.array(year_fracs),
@@ -733,6 +780,8 @@ class CDS:
             "clean_rpv01"
         ]
 
+        #        print("cleanRPV01", clean_rpv01)
+
         prot = self.prot_leg_pv(
             value_dt,
             issuer_curve,
@@ -740,6 +789,8 @@ class CDS:
             num_steps_per_year,
             prot_method,
         )
+
+        #        print("prot", prot)
 
         # By convention this is calculated using the clean RPV01
         spd = prot / clean_rpv01 / self.notional
@@ -764,6 +815,10 @@ class CDS:
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
         t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
 
+        # If protection started in past it now starts immediately
+        if t_eff < 0.0:
+            t_eff = 0.0
+
         h = flat_cds_curve_spread / (1.0 - curve_recovery)
         r = flat_cont_interest_rate
         fwd_df = 1.0
@@ -774,8 +829,8 @@ class CDS:
         else:
             long_protect = -1
 
-        # The sign of he accrued has already been sign adjusted for direction
-        accrued = self.accrued_interest()
+        # The sign of the accrued has already been sign adjusted for direction
+        accrued = self.accrued_interest(value_dt)
 
         # This is the clean RPV01 as it treats the PV01 stream as though it
         # pays just the accrued for the time between 0 and the maturity
@@ -868,13 +923,13 @@ class CDS:
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
+        s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("RUN COUPON", self.running_cpn * 10000, "bp\n")
         s += label_to_string("DAYCOUNT", self.dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUSDAYRULE", self.bd_type)
         s += label_to_string("DATEGENRULE", self.dg_type)
-        s += label_to_string("ACCRUED DAYS", self.accrued_days())
 
         header = "PAYMENT_dt, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"
         value_table = [
