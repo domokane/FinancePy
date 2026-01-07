@@ -9,6 +9,7 @@ name = "financepy"
 version = "1.0.2"
 description = "A Finance Securities Valuation Library"
 readme = "README.md"
+requires-python = ">=3.9"
 
 dependencies = [
     "numpy>=2.3.4",
