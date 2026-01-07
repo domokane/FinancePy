@@ -3,3 +3,27 @@ line-length = 88
 
 [tool.pyright]
 typeCheckingMode = "off"
+
+[project]
+dependencies = [
+    "numpy>=2.3.4",
+    "scipy>=1.16.3",
+    "pandas>=2.3.3",
+    "matplotlib>=3.10.7",
+    "numba>=0.62.1",
+    "llvmlite>=0.45.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipython==8.25.0",
+    "mypy>=1.13",
+    "typing-extensions>=4.12",
+]
+
+test = [
+    "pytest>=8.3",
+    "pytest-benchmark>=4.1",
+    "more-itertools",
+]
+

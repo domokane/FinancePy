@@ -11,22 +11,25 @@ jobs:
   steps:
    - name: checkout repo content
      uses: actions/checkout@v4
+
    - name: setup python
      uses: actions/setup-python@v4
      with:
        python-version: ${{ env.PYTHON_VERSION }}
+
    - name: install dependencies
      run: |
-       python -m pip install --upgrade pip setuptools wheel
-       pip install -r requirements.txt
-       pip install pytest
-       pip install -e .
+       python -m pip install --upgrade pip
+       pip install .[test]
+
    - name: show package is importable
      run: |
-        python -c "import financepy as fp"
+          python -c "import financepy as fp; print(fp.__version__)"
+
    - name: list dependencies
      run: |
         pip list
+
    - name: unit tests
      run: |
         pytest -vv
