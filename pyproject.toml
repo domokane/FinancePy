@@ -7,6 +7,9 @@ typeCheckingMode = "off"
 [project]
 name = "financepy"
 version = "1.0.2"
+description = "A Finance Securities Valuation Library"
+readme = "README.md"
+
 dependencies = [
     "numpy>=2.3.4",
     "scipy>=1.16.3",
