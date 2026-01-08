@@ -8,7 +8,7 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import ExerciseTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
@@ -511,7 +511,7 @@ def test_bond_option_deriva_gem():
 
     model.num_time_steps = 100
     model.build_tree(t_mat, times, dfs)
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     v_hw = model.bond_option(
         t_exp, strike_price, face, coupon_times, coupon_flows, exercise_type

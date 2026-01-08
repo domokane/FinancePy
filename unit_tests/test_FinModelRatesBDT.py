@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import ExerciseTypes
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.day_count import DayCountTypes
@@ -69,7 +69,7 @@ def test_bdt_example_two():
 
     # Test convergence
     num_time_steps = 5
-    exercise_type = FinExerciseTypes.AMERICAN
+    exercise_type = ExerciseTypes.AMERICAN
 
     model = BDTTree(sigma, num_time_steps)
     model.build_tree(t_mat, times, dfs)
@@ -104,7 +104,7 @@ def test_bdt_example_three():
     # Andersen paper
     num_time_steps = 200
 
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
     years_to_maturity = 4.0
     expiry_years = 2.0
 
@@ -147,7 +147,7 @@ def test_bdt_example_three():
     assert round(v["pay"] * 100, 2) == 0.00
     assert round(v["rec"] * 100, 2) == 8883.21
 
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
     years_to_maturity = 10.0
     expiry_years = 5.0
 

@@ -11,7 +11,7 @@ from ..utils.error import FinError
 from ..utils.math import normcdf, accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
-from ..utils.global_types import FinExerciseTypes
+from ..utils.global_types import ExerciseTypes
 from ..utils.global_vars import G_SMALL
 
 INTERP_TYPE_VALUE = InterpTypes.FLAT_FWD_RATES.value
@@ -36,19 +36,20 @@ class FinHWEuropeanCalcType(Enum):
 
 from typing import Any, Dict, List, Optional, Union
 
+
 def option_exercise_types_to_int(option_exercise_type: Any) -> int:
     """
     Convert option exercise type enum to integer.
     Args:
-        option_exercise_type (FinExerciseTypes): The exercise type.
+        option_exercise_type (ExerciseTypes): The exercise type.
     Returns:
         int: 1=European, 2=Bermudan, 3=American
     """
-    if option_exercise_type == FinExerciseTypes.EUROPEAN:
+    if option_exercise_type == ExerciseTypes.EUROPEAN:
         return 1
-    if option_exercise_type == FinExerciseTypes.BERMUDAN:
+    if option_exercise_type == ExerciseTypes.BERMUDAN:
         return 2
-    if option_exercise_type == FinExerciseTypes.AMERICAN:
+    if option_exercise_type == ExerciseTypes.AMERICAN:
         return 3
     raise FinError("Unknown option exercise type.")
 
@@ -813,7 +814,6 @@ def callable_puttable_bond_tree_fast(
 ########################################################################################
 
 
-
 def fwd_dirty_bond_price(r_t: float, *args: Any) -> float:
     """
     Price a cpn bearing bond on the option expiry date and return
@@ -887,7 +887,6 @@ def fwd_dirty_bond_price(r_t: float, *args: Any) -> float:
 
 
 ########################################################################################
-
 
 
 class HWTree:

@@ -18,7 +18,7 @@ from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.helpers import print_tree
-from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import ExerciseTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -166,7 +166,7 @@ def test_bdt_example_two():
 
     # Test convergence
     num_steps_list = [5]  # [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-    exercise_type = FinExerciseTypes.AMERICAN
+    exercise_type = ExerciseTypes.AMERICAN
 
     test_cases.header("Values")
     tree_vector = []
@@ -232,8 +232,8 @@ def test_bdt_example_three():
     )
 
     for exercise_type in [
-        FinExerciseTypes.EUROPEAN,
-        FinExerciseTypes.BERMUDAN,
+        ExerciseTypes.EUROPEAN,
+        ExerciseTypes.BERMUDAN,
     ]:
 
         for years_to_maturity in [4.0, 5.0, 10.0, 20.0]:

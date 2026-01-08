@@ -7,7 +7,7 @@ from financepy.models.bk_tree import BKTree
 from financepy.products.rates.ibor_bermudan_swaption import (
     IborBermudanSwaption,
 )
-from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import ExerciseTypes
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -35,7 +35,7 @@ num_time_steps = 200
 def test_bk_european_exercise():
 
     fixed_leg_type = SwapTypes.PAY
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = IborBermudanSwaption(
         settle_dt,
@@ -49,7 +49,7 @@ def test_bk_european_exercise():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     bermudan_swaption_rec = IborBermudanSwaption(
         settle_dt,
@@ -91,7 +91,7 @@ def test_bk_european_exercise():
 def test_bk_bermudan_exercise():
 
     fixed_leg_type = SwapTypes.PAY
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = IborBermudanSwaption(
         settle_dt,
@@ -105,7 +105,7 @@ def test_bk_bermudan_exercise():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
 
     bermudan_swaption_rec = IborBermudanSwaption(
         settle_dt,
@@ -147,7 +147,7 @@ def test_bk_bermudan_exercise():
 def test_bdt_european_exercise():
 
     fixed_leg_type = SwapTypes.PAY
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = IborBermudanSwaption(
         settle_dt,
@@ -161,7 +161,7 @@ def test_bdt_european_exercise():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     bermudan_swaption_rec = IborBermudanSwaption(
         settle_dt,
@@ -199,7 +199,7 @@ def test_bdt_european_exercise():
 def test_bdt_bermudan_exercise():
 
     fixed_leg_type = SwapTypes.PAY
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = IborBermudanSwaption(
         settle_dt,
@@ -213,7 +213,7 @@ def test_bdt_bermudan_exercise():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
 
     bermudan_swaption_rec = IborBermudanSwaption(
         settle_dt,
@@ -251,7 +251,7 @@ def test_bdt_bermudan_exercise():
 def test_hw_european_exercise():
 
     fixed_leg_type = SwapTypes.PAY
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     bermudan_swaption_pay = IborBermudanSwaption(
         settle_dt,
@@ -265,7 +265,7 @@ def test_hw_european_exercise():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    exercise_type = FinExerciseTypes.EUROPEAN
+    exercise_type = ExerciseTypes.EUROPEAN
 
     bermudan_swaption_rec = IborBermudanSwaption(
         settle_dt,
@@ -305,7 +305,7 @@ def test_hw_european_exercise():
 def test_hw_bermudan_exercise():
 
     fixed_leg_type = SwapTypes.PAY
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
 
     bermudan_swaption_pay = IborBermudanSwaption(
         settle_dt,
@@ -319,7 +319,7 @@ def test_hw_bermudan_exercise():
     )
 
     fixed_leg_type = SwapTypes.RECEIVE
-    exercise_type = FinExerciseTypes.BERMUDAN
+    exercise_type = ExerciseTypes.BERMUDAN
 
     bermudan_swaption_rec = IborBermudanSwaption(
         settle_dt,

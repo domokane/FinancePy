@@ -35,7 +35,7 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
 
 from ...utils.global_types import SwapTypes
-from ...utils.global_types import FinCapFloorTypes
+from ...utils.global_types import CapFloorTypes
 
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
@@ -370,7 +370,7 @@ class IborLMMProducts:
         self,
         settle_dt: Date,
         maturity_dt: Date,
-        cap_floor_type: FinCapFloorTypes,
+        cap_floor_type: CapFloorTypes,
         cap_floor_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         dc_type: DayCountTypes = DayCountTypes.ACT_360,
@@ -398,7 +398,7 @@ class IborLMMProducts:
         num_paths = self.num_paths
 
         is_cap = 0
-        if cap_floor_type == FinCapFloorTypes.CAP:
+        if cap_floor_type == CapFloorTypes.CAP:
             is_cap = 1
 
         fwd0 = self.fwd_curve

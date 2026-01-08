@@ -12,7 +12,7 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
-from ...utils.global_types import FinExerciseTypes
+from ...utils.global_types import ExerciseTypes
 from ...utils.global_types import SwapTypes
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
@@ -40,7 +40,7 @@ class IborBermudanSwaption:
         exercise_dt: Date,
         maturity_dt: Date,
         fixed_leg_type: SwapTypes,
-        exercise_type: FinExerciseTypes,
+        exercise_type: ExerciseTypes,
         fixed_cpn: float,
         fixed_freq_type: FrequencyTypes,
         fixed_dc_type: DayCountTypes,
@@ -63,7 +63,7 @@ class IborBermudanSwaption:
         if exercise_dt > maturity_dt:
             raise FinError("Exercise date must be before swap maturity date")
 
-        if exercise_type == FinExerciseTypes.AMERICAN:
+        if exercise_type == ExerciseTypes.AMERICAN:
             raise FinError("American optionality not supported.")
 
         self.settle_dt = settle_dt

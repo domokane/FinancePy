@@ -3,7 +3,7 @@
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
-from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
+from financepy.products.fx.fx_barrier_option import BarrierTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
@@ -36,7 +36,7 @@ k = 100.0
 def test_down_and_out_call():
 
     spot_fx_rate = 50
-    opt_type = FinFXBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = BarrierTypes.DOWN_AND_OUT_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -77,7 +77,7 @@ def test_down_and_out_call():
 def test_down_and_in_call():
 
     spot_fx_rate = 100
-    opt_type = FinFXBarrierTypes.DOWN_AND_IN_CALL
+    opt_type = BarrierTypes.DOWN_AND_IN_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -118,7 +118,7 @@ def test_down_and_in_call():
 def test_up_and_out_call():
 
     spot_fx_rate = 50
-    opt_type = FinFXBarrierTypes.UP_AND_OUT_CALL
+    opt_type = BarrierTypes.UP_AND_OUT_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -159,7 +159,7 @@ def test_up_and_out_call():
 def test_up_and_in_call():
 
     spot_fx_rate = 100
-    opt_type = FinFXBarrierTypes.UP_AND_IN_CALL
+    opt_type = BarrierTypes.UP_AND_IN_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -200,7 +200,7 @@ def test_up_and_in_call():
 def test_up_and_out_put():
 
     spot_fx_rate = 50
-    opt_type = FinFXBarrierTypes.UP_AND_OUT_PUT
+    opt_type = BarrierTypes.UP_AND_OUT_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -241,7 +241,7 @@ def test_up_and_out_put():
 def test_up_and_in_put():
 
     spot_fx_rate = 100
-    opt_type = FinFXBarrierTypes.UP_AND_IN_PUT
+    opt_type = BarrierTypes.UP_AND_IN_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -282,7 +282,7 @@ def test_up_and_in_put():
 def test_down_and_out_put():
 
     spot_fx_rate = 50
-    opt_type = FinFXBarrierTypes.DOWN_AND_OUT_PUT
+    opt_type = BarrierTypes.DOWN_AND_OUT_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -323,7 +323,7 @@ def test_down_and_out_put():
 def test_down_and_in_put():
 
     spot_fx_rate = 100
-    opt_type = FinFXBarrierTypes.DOWN_AND_IN_PUT
+    opt_type = BarrierTypes.DOWN_AND_IN_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,

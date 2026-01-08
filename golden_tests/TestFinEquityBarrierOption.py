@@ -7,7 +7,7 @@ from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 
-from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
+from financepy.products.equity.equity_barrier_option import BarrierTypes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 
@@ -26,7 +26,7 @@ def test_equity_barrier_option():
     volatility = 0.20
     interest_rate = 0.05
     dividend_yield = 0.02
-    opt_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = BarrierTypes.DOWN_AND_OUT_CALL
 
     discount_curve = DiscountCurveFlat(value_dt, interest_rate)
     dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
@@ -39,7 +39,7 @@ def test_equity_barrier_option():
 
     test_cases.header("Type", "K", "B", "S:", "Value:", "ValueMC", "Diff", "TIME")
 
-    for opt_type in EquityBarrierTypes:
+    for opt_type in BarrierTypes:
         for stock_price in [80, 100, 120]:
 
             barrier = 110.0
@@ -129,7 +129,7 @@ def test_equity_barrier_option():
 
     test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
-    for opt_type in EquityBarrierTypes:
+    for opt_type in BarrierTypes:
 
         for stock_price in stock_prices:
 

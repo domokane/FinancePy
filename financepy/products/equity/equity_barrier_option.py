@@ -15,7 +15,7 @@ from ...models.process_simulator import ProcessTypes
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_types import EquityBarrierTypes
+from ...utils.global_types import BarrierTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.global_vars import G_DAYS_IN_YEAR
 
@@ -28,13 +28,13 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 class EquityBarrierOption(EquityOption):
     """Class to hold details of an Equity Barrier Option. It also
     calculates the option price using Black Scholes for 8 different
-    variants on the Barrier structure in enum EquityBarrierTypes."""
+    variants on the Barrier structure in enum BarrierTypes."""
 
     def __init__(
         self,
         expiry_dt: Date,
         strike_price: float,
-        opt_type: EquityBarrierTypes,
+        opt_type: BarrierTypes,
         barrier_level: float,
         num_obs_per_year: Union[int, float] = 252,
         notional: float = 1.0,
@@ -50,7 +50,7 @@ class EquityBarrierOption(EquityOption):
         self.barrier_level = float(barrier_level)
         self.num_obs_per_year = int(num_obs_per_year)
 
-        if opt_type not in EquityBarrierTypes:
+        if opt_type not in BarrierTypes:
             raise FinError("Option Type " + str(opt_type) + " unknown.")
 
         self.opt_type = opt_type

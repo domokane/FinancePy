@@ -7,7 +7,7 @@ from ..utils.error import FinError
 from ..utils.math import accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
-from ..utils.global_types import FinExerciseTypes
+from ..utils.global_types import ExerciseTypes
 from ..utils.global_vars import G_SMALL
 
 INTERP_TYPE = InterpTypes.FLAT_FWD_RATES.value
@@ -18,13 +18,13 @@ INTERP_TYPE = InterpTypes.FLAT_FWD_RATES.value
 ########################################################################################
 
 
-def option_exercise_types_to_int(option_exercise_type: FinExerciseTypes) -> int:
+def option_exercise_types_to_int(option_exercise_type: ExerciseTypes) -> int:
     """Convert the option exercise type to an integer for use in the tree."""
-    if option_exercise_type == FinExerciseTypes.EUROPEAN:
+    if option_exercise_type == ExerciseTypes.EUROPEAN:
         return 1
-    if option_exercise_type == FinExerciseTypes.BERMUDAN:
+    if option_exercise_type == ExerciseTypes.BERMUDAN:
         return 2
-    if option_exercise_type == FinExerciseTypes.AMERICAN:
+    if option_exercise_type == ExerciseTypes.AMERICAN:
         return 3
 
     raise FinError("Unknown option exercise type.")
@@ -754,7 +754,7 @@ class BDTTree:
         face_amount: float,
         cpn_times: np.ndarray,
         cpn_flows: np.ndarray,
-        exercise_type: FinExerciseTypes,
+        exercise_type: ExerciseTypes,
     ) -> dict[str, float]:
         """Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree."""
@@ -797,7 +797,7 @@ class BDTTree:
         face_amount: float,
         cpn_times: np.ndarray,
         cpn_flows: np.ndarray,
-        exercise_type: FinExerciseTypes,
+        exercise_type: ExerciseTypes,
     ) -> dict[str, float]:
         """Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to

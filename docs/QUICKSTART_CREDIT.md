@@ -28,8 +28,8 @@ We can then define the CDS contract as follows
 cds_contract = CDS(value_dt, maturity_dt, cds_coupon, notional, long_protection)
 ```
 We can print the contract to ensure that it is as we wish
-***Output***
 ```
+***Output***
 OBJECT TYPE: CDS
 STEP-IN DATE: 01-DEC-2024
 MATURITY: 20-MAR-2028
@@ -111,13 +111,13 @@ TIME,SURVIVAL_PROBABILITY
  We see the term structure of years and risk-neutral survival probabilities.
 
  We can now value the CDS contract. First we calculate the par CDS spread for this maturity. Recall that our CDS contract protection costs us 100bp a year.
+
 ```
 spd = cds_contract.par_spread(value_dt, cds_curve, recovery_rate) * 10000.0
 print("FAIR CDS SPREAD %10.5f bp"% spd)
 ```
 Which gives
 ```
-***Output:***
 FAIR CDS SPREAD   69.999 bp
 ```
 This makes sense. It agrees with the current market par spread of 70bps for a 2Y contract. Note that a 2Y contract matures in 2 years on the next IMM date which is the 20 March 2028.
@@ -131,24 +131,24 @@ This has two components:
 dirty_pv = v['dirty_pv']
 clean_pv = v['clean_pv']
 ```
+We print these
 ```
 print("DIRTY VALUE %12.2f"% dirty_pv)
 print("CLEAN VALUE %12.2f"% clean_pv)
 ```
-***OUTPUT:***
+which gives
 ```
 DIRTY VALUE      -6752.97
 CLEAN VALUE      -6475.19
 ```
-We see that the dirty price (that the contract is worth) is approximately equal to 30bps x 2.25 x $1m = $6.750.
+We see that the dirty price (that the contract is worth) is approximately equal to -30bps x 2.25 x $1m = -$6,750.
 
 We can get this as a clean price
 ```
 cleanp = cds_contract.clean_price(settle_dt, cds_curve, recovery_rate)
 print("CLEAN PRICE %12.6f"% cleanp)
 ```
-***OUTPUT***
+which gives
 ```
 CLEAN PRICE   100.646919
 ```
-

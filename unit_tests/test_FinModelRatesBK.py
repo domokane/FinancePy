@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import ExerciseTypes
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.day_count import DayCountTypes
@@ -133,14 +133,14 @@ def test_bk_example_two():
 
     model = BKTree(sigma, a, num_time_steps)
     model.build_tree(t_mat, times, dfs)
-    exercise_type = FinExerciseTypes.AMERICAN
+    exercise_type = ExerciseTypes.AMERICAN
     v = model.bond_option(
         t_exp, strike_price, face, cpn_times, cpn_flows, exercise_type
     )
 
     # Test convergence
     num_time_steps = 200
-    exercise_type = FinExerciseTypes.AMERICAN
+    exercise_type = ExerciseTypes.AMERICAN
 
     tree_vector = []
     model = BKTree(sigma, a, num_time_steps)

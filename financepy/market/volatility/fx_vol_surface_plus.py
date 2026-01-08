@@ -41,7 +41,7 @@ from ...utils.distribution import FinDistribution
 
 from ...utils.solver_1d import newton_secant
 from ...utils.solver_nm import nelder_mead
-from ...utils.global_types import FinSolverTypes
+from ...utils.global_types import SolverTypes
 
 ########################################################################################
 # ISSUES
@@ -787,7 +787,7 @@ def _solve_to_horizon(
     xopt = None
 
     try:
-        if fin_solver_type == FinSolverTypes.NELDER_MEAD_NUMBA:
+        if fin_solver_type == SolverTypes.NELDER_MEAD_NUMBA:
             xopt = nelder_mead(
                 _obj,
                 np.array(x_inits),
@@ -797,15 +797,15 @@ def _solve_to_horizon(
                 tol_x=tol,
                 max_iter=1000,
             )
-        elif fin_solver_type == FinSolverTypes.NELDER_MEAD:
+        elif fin_solver_type == SolverTypes.NELDER_MEAD:
             opt = minimize(_obj, x_inits, args, method="Nelder-Mead", tol=tol)
             xopt = opt.x
-        elif fin_solver_type == FinSolverTypes.CONJUGATE_GRADIENT:
+        elif fin_solver_type == SolverTypes.CONJUGATE_GRADIENT:
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
     except Exception:
         # If convergence fails try again with CG if necessary
-        if fin_solver_type != FinSolverTypes.CONJUGATE_GRADIENT:
+        if fin_solver_type != SolverTypes.CONJUGATE_GRADIENT:
             print("Failed to converge, will try CG")
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
 
@@ -1232,7 +1232,7 @@ class FXVolSurfacePlus:
         atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
         delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
         vol_func_type: VolFuncTypes = VolFuncTypes.CLARK,
-        fin_solver_type: FinSolverTypes = FinSolverTypes.NELDER_MEAD,
+        fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD,
         tol: float = 1e-8,
     ) -> None:
         """Create the FinFXVolSurfacePlus object by passing in market vol data
@@ -1709,7 +1709,7 @@ class FXVolSurfacePlus:
     ###########################################################################
 
     def _build_vol_surface(
-        self, fin_solver_type: Any = FinSolverTypes.NELDER_MEAD, tol: float = 1e-8
+        self, fin_solver_type: Any = SolverTypes.NELDER_MEAD, tol: float = 1e-8
     ) -> None:
         """Main function to construct the vol surface."""
 

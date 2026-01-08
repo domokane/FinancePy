@@ -3,7 +3,7 @@
 import numpy as np
 
 from ..utils.error import FinError
-from ..utils.global_types import EquityBarrierTypes
+from ..utils.global_types import BarrierTypes
 
 from ..models.process_simulator import FinProcessSimulator
 from ..models.process_simulator import ProcessTypes
@@ -12,7 +12,7 @@ from ..models.process_simulator import ProcessTypes
 def value_equity_barrier_option_mc(
     t: float,
     k: float,
-    opt_type: EquityBarrierTypes,
+    opt_type: BarrierTypes,
     b: float,
     notional: float,
     s: float,
@@ -40,13 +40,13 @@ def value_equity_barrier_option_mc(
 
     #######################################################################
 
-    if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL and s <= b + tol:
+    if opt_type == BarrierTypes.DOWN_AND_OUT_CALL and s <= b + tol:
         return 0.0
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL and s >= b - tol:
+    elif opt_type == BarrierTypes.UP_AND_OUT_CALL and s >= b - tol:
         return 0.0
-    elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT and s <= b + tol:
+    elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT and s <= b + tol:
         return 0.0
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT and s >= b - tol:
+    elif opt_type == BarrierTypes.UP_AND_OUT_PUT and s >= b - tol:
         return 0.0
 
     #######################################################################
@@ -54,13 +54,13 @@ def value_equity_barrier_option_mc(
     simple_call = False
     simple_put = False
 
-    if opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL and s <= b + tol:
+    if opt_type == BarrierTypes.DOWN_AND_IN_CALL and s <= b + tol:
         simple_call = True
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL and s >= b - tol:
+    elif opt_type == BarrierTypes.UP_AND_IN_CALL and s >= b - tol:
         simple_call = True
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT and s >= b + tol:
+    elif opt_type == BarrierTypes.UP_AND_IN_PUT and s >= b + tol:
         simple_put = True
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT and s <= b - tol:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_PUT and s <= b - tol:
         simple_put = True
 
     s_all = None
@@ -87,10 +87,10 @@ def value_equity_barrier_option_mc(
     (num_paths, num_time_steps) = s_all.shape
 
     if (
-        opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL
-        or opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL
-        or opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT
-        or opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT
+        opt_type == BarrierTypes.DOWN_AND_IN_CALL
+        or opt_type == BarrierTypes.DOWN_AND_OUT_CALL
+        or opt_type == BarrierTypes.DOWN_AND_IN_PUT
+        or opt_type == BarrierTypes.DOWN_AND_OUT_PUT
     ):
 
         barrier_crossed_from_above = [False] * num_paths
@@ -99,10 +99,10 @@ def value_equity_barrier_option_mc(
             barrier_crossed_from_above[p] = np.any(s_all[p] <= b)
 
     if (
-        opt_type == EquityBarrierTypes.UP_AND_IN_CALL
-        or opt_type == EquityBarrierTypes.UP_AND_OUT_CALL
-        or opt_type == EquityBarrierTypes.UP_AND_IN_PUT
-        or opt_type == EquityBarrierTypes.UP_AND_OUT_PUT
+        opt_type == BarrierTypes.UP_AND_IN_CALL
+        or opt_type == BarrierTypes.UP_AND_OUT_CALL
+        or opt_type == BarrierTypes.UP_AND_IN_PUT
+        or opt_type == BarrierTypes.UP_AND_OUT_PUT
     ):
 
         barrier_crossed_from_below = [False] * num_paths
@@ -112,28 +112,28 @@ def value_equity_barrier_option_mc(
     payoff = np.zeros(num_paths)
     ones = np.ones(num_paths)
 
-    if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL:
+    if opt_type == BarrierTypes.DOWN_AND_OUT_CALL:
         crossed = (s_all <= b + tol).any(axis=1)
         payoff = np.maximum(s_all[:, -1] - k, 0.0) * (ones - crossed)
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_CALL:
         crossed = (s_all <= b + tol).any(axis=1)
         payoff = np.maximum(s_all[:, -1] - k, 0.0) * crossed
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL:
+    elif opt_type == BarrierTypes.UP_AND_IN_CALL:
         crossed = (s_all >= b - tol).any(axis=1)
         payoff = np.maximum(s_all[:, -1] - k, 0.0) * crossed
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL:
+    elif opt_type == BarrierTypes.UP_AND_OUT_CALL:
         crossed = (s_all >= b - tol).any(axis=1)
         payoff = np.maximum(s_all[:, -1] - k, 0.0) * (ones - crossed)
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT:
+    elif opt_type == BarrierTypes.UP_AND_IN_PUT:
         crossed = (s_all >= b - tol).any(axis=1)
         payoff = np.maximum(k - s_all[:, -1], 0.0) * crossed
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT:
+    elif opt_type == BarrierTypes.UP_AND_OUT_PUT:
         crossed = (s_all >= b - tol).any(axis=1)
         payoff = np.maximum(k - s_all[:, -1], 0.0) * (ones - crossed)
-    elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT:
+    elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT:
         crossed = (s_all <= b + tol).any(axis=1)
         payoff = np.maximum(k - s_all[:, -1], 0.0) * (ones - crossed)
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_PUT:
         crossed = (s_all <= b + tol).any(axis=1)
         payoff = np.maximum(k - s_all[:, -1], 0.0) * crossed
     else:

@@ -47,7 +47,7 @@ class OptionTypes(Enum):
 ########################################################################################
 
 
-class EquityBarrierTypes(Enum):
+class BarrierTypes(Enum):
     """Enumeration of equity barrier types."""
 
     DOWN_AND_OUT_CALL = 1
@@ -63,7 +63,7 @@ class EquityBarrierTypes(Enum):
 ########################################################################################
 
 
-class FinCapFloorTypes(Enum):
+class CapFloorTypes(Enum):
     """Enumeration of cap/floor types."""
 
     CAP = 1
@@ -93,7 +93,7 @@ class ReturnTypes(Enum):
 ########################################################################################
 
 
-class FinExerciseTypes(Enum):
+class ExerciseTypes(Enum):
     """Enumeration of exercise types."""
 
     EUROPEAN = 1
@@ -104,7 +104,7 @@ class FinExerciseTypes(Enum):
 ########################################################################################
 
 
-class FinSolverTypes(Enum):
+class SolverTypes(Enum):
     """Enumeration of solver types."""
 
     CONJUGATE_GRADIENT = 0

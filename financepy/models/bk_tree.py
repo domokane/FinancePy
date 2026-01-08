@@ -9,7 +9,7 @@ from ..utils.error import FinError
 from ..utils.math import accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
-from ..utils.global_types import FinExerciseTypes
+from ..utils.global_types import ExerciseTypes
 from ..utils.global_vars import G_SMALL
 
 INTERP = InterpTypes.FLAT_FWD_RATES.value
@@ -25,13 +25,13 @@ INTERP = InterpTypes.FLAT_FWD_RATES.value
 ########################################################################################
 
 
-def option_exercise_types_to_int(option_exercise_type: FinExerciseTypes) -> int:
+def option_exercise_types_to_int(option_exercise_type: ExerciseTypes) -> int:
 
-    if option_exercise_type == FinExerciseTypes.EUROPEAN:
+    if option_exercise_type == ExerciseTypes.EUROPEAN:
         return 1
-    if option_exercise_type == FinExerciseTypes.BERMUDAN:
+    if option_exercise_type == ExerciseTypes.BERMUDAN:
         return 2
-    if option_exercise_type == FinExerciseTypes.AMERICAN:
+    if option_exercise_type == ExerciseTypes.AMERICAN:
         return 3
     else:
         raise FinError("Unknown option exercise type.")
@@ -1025,7 +1025,7 @@ class BKTree:
         face_amount: float,
         cpn_times: np.ndarray,
         cpn_flows: np.ndarray,
-        exercise_type: FinExerciseTypes,
+        exercise_type: ExerciseTypes,
     ) -> dict[str, float]:
         if not isinstance(t_exp, float) or t_exp < 0.0:
             raise FinError("Option expiry time t_exp must be non-negative float.")
@@ -1082,7 +1082,7 @@ class BKTree:
         face_amount: float,
         cpn_times: np.ndarray,
         cpn_flows: np.ndarray,
-        exercise_type: FinExerciseTypes,
+        exercise_type: ExerciseTypes,
     ) -> dict[str, float]:
         if not isinstance(t_exp, float) or t_exp < 0.0:
             raise FinError("Option expiry time t_exp must be non-negative float.")

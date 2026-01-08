@@ -13,7 +13,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.helpers import print_tree
-from financepy.utils.global_types import FinExerciseTypes
+from financepy.utils.global_types import ExerciseTypes
 
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -239,7 +239,7 @@ def test_hull_white_bond_option():
         model = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
         model.build_tree(t_exp, times, dfs)
 
-        exercise_type = FinExerciseTypes.EUROPEAN
+        exercise_type = ExerciseTypes.EUROPEAN
 
         v1 = model.bond_option(
             t_exp, strike_price, face, cpn_times, cpn_flows, exercise_type

@@ -4,7 +4,7 @@ from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
-from financepy.products.equity.equity_barrier_option import EquityBarrierTypes
+from financepy.products.equity.equity_barrier_option import BarrierTypes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
@@ -17,7 +17,7 @@ interest_rate = 0.05
 dividend_yield = 0.02
 b = 110.0
 k = 100.0
-opt_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+opt_type = BarrierTypes.DOWN_AND_OUT_CALL
 notional = 1.0
 
 drift = interest_rate - dividend_yield
@@ -36,7 +36,7 @@ num_obs_per_year = 100
 
 def test_down_and_out_call():
 
-    opt_type = EquityBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = BarrierTypes.DOWN_AND_OUT_CALL
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -57,7 +57,7 @@ def test_down_and_out_call():
 
 def test_down_and_in_call():
 
-    opt_type = EquityBarrierTypes.DOWN_AND_IN_CALL
+    opt_type = BarrierTypes.DOWN_AND_IN_CALL
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -78,7 +78,7 @@ def test_down_and_in_call():
 
 def test_up_and_out_call():
 
-    opt_type = EquityBarrierTypes.UP_AND_OUT_CALL
+    opt_type = BarrierTypes.UP_AND_OUT_CALL
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -98,7 +98,7 @@ def test_up_and_out_call():
 
 def test_up_and_in_call():
 
-    opt_type = EquityBarrierTypes.UP_AND_IN_CALL
+    opt_type = BarrierTypes.UP_AND_IN_CALL
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -118,7 +118,7 @@ def test_up_and_in_call():
 
 def test_up_and_out_put():
 
-    opt_type = EquityBarrierTypes.UP_AND_OUT_PUT
+    opt_type = BarrierTypes.UP_AND_OUT_PUT
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -138,7 +138,7 @@ def test_up_and_out_put():
 
 def test_up_and_in_put():
 
-    opt_type = EquityBarrierTypes.UP_AND_IN_PUT
+    opt_type = BarrierTypes.UP_AND_IN_PUT
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -158,7 +158,7 @@ def test_up_and_in_put():
 
 def test_down_and_out_put():
 
-    opt_type = EquityBarrierTypes.DOWN_AND_OUT_PUT
+    opt_type = BarrierTypes.DOWN_AND_OUT_PUT
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
@@ -178,7 +178,7 @@ def test_down_and_out_put():
 
 def test_down_and_in_put():
 
-    opt_type = EquityBarrierTypes.DOWN_AND_IN_PUT
+    opt_type = BarrierTypes.DOWN_AND_IN_PUT
     option = EquityBarrierOption(expiry_dt, k, opt_type, b, num_obs_per_year)
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)

@@ -14,7 +14,7 @@ from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
-from financepy.utils.global_types import FinCapFloorTypes
+from financepy.utils.global_types import CapFloorTypes
 
 ########################################################################################
 
@@ -81,7 +81,7 @@ model6 = Bachelier(0.01)
 
 def test_cap():
 
-    cap_floor_type = FinCapFloorTypes.CAP
+    cap_floor_type = CapFloorTypes.CAP
 
     k = 0.02
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
@@ -128,12 +128,13 @@ def test_cap():
     assert round(cvalue5, 4) == 53647.5908
     assert round(cvalue6, 4) == 0.1578
 
+
 ########################################################################################
 
 
 def test_floor():
 
-    cap_floor_type = FinCapFloorTypes.FLOOR
+    cap_floor_type = CapFloorTypes.FLOOR
 
     k = 0.02
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)

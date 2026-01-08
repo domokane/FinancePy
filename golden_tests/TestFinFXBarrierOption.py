@@ -7,7 +7,7 @@ import add_fp_to_path
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
-from financepy.products.fx.fx_barrier_option import FinFXBarrierTypes
+from financepy.products.fx.fx_barrier_option import BarrierTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.models.process_simulator import FinGBMNumericalScheme
 from financepy.models.process_simulator import ProcessTypes
@@ -28,7 +28,7 @@ def test_fin_fx_barrier_option():
     volatility = 0.20
     dom_interest_rate = 0.05
     for_interest_rate = 0.02
-    opt_type = FinFXBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = BarrierTypes.DOWN_AND_OUT_CALL
     notional = 100.0
     notional_currency = "USD"
 
@@ -42,7 +42,7 @@ def test_fin_fx_barrier_option():
     start = time.time()
     num_obs_per_year = 100
 
-    for opt_type in FinFXBarrierTypes:
+    for opt_type in BarrierTypes:
 
         test_cases.header("Type", "K", "B", "S", "Value", "ValueMC", "TIME", "Diff")
 
@@ -141,7 +141,7 @@ def test_fin_fx_barrier_option():
 
     test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
-    for opt_type in FinFXBarrierTypes:
+    for opt_type in BarrierTypes:
         for spot_fx_rate in spot_fx_rates:
             barrier_option = FXBarrierOption(
                 expiry_dt,

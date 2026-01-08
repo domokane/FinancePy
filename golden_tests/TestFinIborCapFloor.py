@@ -6,7 +6,7 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.schedule import Schedule
-from financepy.utils.global_types import FinCapFloorTypes
+from financepy.utils.global_types import CapFloorTypes
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -118,7 +118,7 @@ def test_ibor_cap_floor():
     model6 = Bachelier(0.01)
 
     for k in strikes:
-        cap_floor_type = FinCapFloorTypes.CAP
+        cap_floor_type = CapFloorTypes.CAP
         capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         cvalue1 = capfloor.value(value_dt, libor_curve, model1)
         cvalue2 = capfloor.value(value_dt, libor_curve, model2)
@@ -140,7 +140,7 @@ def test_ibor_cap_floor():
     )
 
     for k in strikes:
-        cap_floor_type = FinCapFloorTypes.FLOOR
+        cap_floor_type = CapFloorTypes.FLOOR
         capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         fvalue1 = capfloor.value(value_dt, libor_curve, model1)
         fvalue2 = capfloor.value(value_dt, libor_curve, model2)
@@ -164,7 +164,7 @@ def test_ibor_cap_floor():
     )
 
     for k in strikes:
-        cap_floor_type = FinCapFloorTypes.CAP
+        cap_floor_type = CapFloorTypes.CAP
         capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         cvalue1 = capfloor.value(value_dt, libor_curve, model1)
         cvalue2 = capfloor.value(value_dt, libor_curve, model2)
@@ -173,7 +173,7 @@ def test_ibor_cap_floor():
         cvalue5 = capfloor.value(value_dt, libor_curve, model5)
         cvalue6 = capfloor.value(value_dt, libor_curve, model6)
 
-        cap_floor_type = FinCapFloorTypes.FLOOR
+        cap_floor_type = CapFloorTypes.FLOOR
         capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
         fvalue1 = capfloor.value(value_dt, libor_curve, model1)
         fvalue2 = capfloor.value(value_dt, libor_curve, model2)
@@ -216,7 +216,7 @@ def test_ibor_cap_floor_vol_curve():
     frequency = FrequencyTypes.ANNUAL
 
     k = 0.04
-    cap_floor_type = FinCapFloorTypes.CAP
+    cap_floor_type = CapFloorTypes.CAP
     cap_floor = IborCapFloor(
         value_dt, maturity_dt, cap_floor_type, k, None, frequency, dc_type
     )
@@ -299,7 +299,7 @@ def test_ibor_caplet_hull():
     )
 
     k = 0.08
-    cap_floor_type = FinCapFloorTypes.CAP
+    cap_floor_type = CapFloorTypes.CAP
     cap_floor = IborCapFloor(
         value_dt,
         maturity_dt,
@@ -381,7 +381,7 @@ def test_ibor_cap_floor_ql_example():
     last_fixing = 0.0065560
     notional = 1000000
     dc_type = DayCountTypes.ACT_360
-    opt_type = FinCapFloorTypes.CAP
+    opt_type = CapFloorTypes.CAP
     strike_rate = 0.02
 
     cap = IborCapFloor(

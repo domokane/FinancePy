@@ -35,7 +35,7 @@ from ...models.bdt_tree import BDTTree
 
 from ...utils.global_types import OptionTypes
 from ...utils.global_types import SwapTypes
-from ...utils.global_types import FinExerciseTypes
+from ...utils.global_types import ExerciseTypes
 
 ########################################################################################
 
@@ -238,7 +238,7 @@ class IborSwaption:
                 face_amount,
                 cpn_times,
                 cpn_flows,
-                FinExerciseTypes.EUROPEAN,
+                ExerciseTypes.EUROPEAN,
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:
@@ -258,7 +258,7 @@ class IborSwaption:
                 face_amount,
                 cpn_times,
                 cpn_flows,
-                FinExerciseTypes.EUROPEAN,
+                ExerciseTypes.EUROPEAN,
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:

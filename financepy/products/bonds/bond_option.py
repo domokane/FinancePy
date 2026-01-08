@@ -11,7 +11,7 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
-from ...utils.global_types import OptionTypes, FinExerciseTypes
+from ...utils.global_types import OptionTypes, ExerciseTypes
 from ...products.bonds.bond import Bond
 
 
@@ -106,13 +106,13 @@ class BondOption:
         cpn_times = np.array(cpn_times)
         cpn_flows = np.array(cpn_flows)
 
-        exercise_type = FinExerciseTypes.AMERICAN
+        exercise_type = ExerciseTypes.AMERICAN
 
         if (
             self.opt_type == OptionTypes.EUROPEAN_CALL
             or self.opt_type == OptionTypes.EUROPEAN_PUT
         ):
-            exercise_type = FinExerciseTypes.EUROPEAN
+            exercise_type = ExerciseTypes.EUROPEAN
 
         # This is wasteful if model is Jamshidian but how to do neat design
         model.build_tree(t_mat, df_times, df_values)

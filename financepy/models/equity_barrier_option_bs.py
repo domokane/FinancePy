@@ -4,7 +4,7 @@ import numpy as np
 from numba import float64, int64, vectorize
 
 from ..utils.error import FinError
-from ..utils.global_types import EquityBarrierTypes
+from ..utils.global_types import BarrierTypes
 from ..utils.math import normcdf
 
 
@@ -62,43 +62,43 @@ def value_equity_barrier_option_bs(
 
     if s > h:
 
-        if opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
+        if opt_type == BarrierTypes.UP_AND_OUT_CALL.value:
             return 0.0
-        if opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
+        if opt_type == BarrierTypes.UP_AND_OUT_PUT.value:
             return 0.0
-        if opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
+        if opt_type == BarrierTypes.UP_AND_IN_CALL.value:
             return c
-        if opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
+        if opt_type == BarrierTypes.UP_AND_IN_PUT.value:
             return p
 
     elif s < h:
 
-        if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
+        if opt_type == BarrierTypes.DOWN_AND_OUT_CALL.value:
             return 0.0
-        elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
+        elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT.value:
             return 0.0
-        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
+        elif opt_type == BarrierTypes.DOWN_AND_IN_CALL.value:
             return c
-        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
+        elif opt_type == BarrierTypes.DOWN_AND_IN_PUT.value:
             return p
 
     else:
         # exactly at barrier → immediate knock-in/knock-out
-        if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
+        if opt_type == BarrierTypes.DOWN_AND_OUT_CALL.value:
             return 0.0
-        elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
+        elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT.value:
             return 0.0
-        elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
+        elif opt_type == BarrierTypes.UP_AND_OUT_CALL.value:
             return 0.0
-        elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
+        elif opt_type == BarrierTypes.UP_AND_OUT_PUT.value:
             return 0.0
-        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
+        elif opt_type == BarrierTypes.DOWN_AND_IN_CALL.value:
             return c
-        elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
+        elif opt_type == BarrierTypes.DOWN_AND_IN_PUT.value:
             return p
-        elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
+        elif opt_type == BarrierTypes.UP_AND_IN_CALL.value:
             return c
-        elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
+        elif opt_type == BarrierTypes.UP_AND_IN_PUT.value:
             return p
 
     num_observations = 1 + t * nobs
@@ -108,21 +108,21 @@ def value_equity_barrier_option_bs(
     h_adj = h
     t = t / num_observations
 
-    if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
+    if opt_type == BarrierTypes.DOWN_AND_OUT_CALL.value:
         h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_CALL.value:
         h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
+    elif opt_type == BarrierTypes.UP_AND_IN_CALL.value:
         h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
+    elif opt_type == BarrierTypes.UP_AND_OUT_CALL.value:
         h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
+    elif opt_type == BarrierTypes.UP_AND_IN_PUT.value:
         h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
+    elif opt_type == BarrierTypes.UP_AND_OUT_PUT.value:
         h_adj = h * np.exp(0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
+    elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT.value:
         h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_PUT.value:
         h_adj = h * np.exp(-0.5826 * v * np.sqrt(t))
     else:
         raise FinError("Unknown barrier option type." + str(opt_type))
@@ -138,7 +138,7 @@ def value_equity_barrier_option_bs(
     y1 = np.log(h / s) / sigma_rt_t + ll * sigma_rt_t
     h_over_s = h / s
 
-    if opt_type == EquityBarrierTypes.DOWN_AND_OUT_CALL.value:
+    if opt_type == BarrierTypes.DOWN_AND_OUT_CALL.value:
         if h >= k:
             c_do = (
                 s * dq * normcdf(x1)
@@ -152,7 +152,7 @@ def value_equity_barrier_option_bs(
                 h_over_s, 2.0 * ll - 2.0
             ) * normcdf(y - sigma_rt_t)
             price = c - c_di
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_CALL.value:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_CALL.value:
         if h <= k:
             c_di = s * dq * pow(h_over_s, 2.0 * ll) * normcdf(y) - k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
@@ -166,7 +166,7 @@ def value_equity_barrier_option_bs(
                 + k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(y1 - sigma_rt_t)
             )
             price = c - c_do
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_CALL.value:
+    elif opt_type == BarrierTypes.UP_AND_IN_CALL.value:
         if h >= k:
             c_ui = (
                 s * dq * normcdf(x1)
@@ -180,7 +180,7 @@ def value_equity_barrier_option_bs(
             price = c_ui
         else:
             price = c
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_CALL.value:
+    elif opt_type == BarrierTypes.UP_AND_OUT_CALL.value:
         if h > k:
             c_ui = (
                 s * dq * normcdf(x1)
@@ -194,7 +194,7 @@ def value_equity_barrier_option_bs(
             price = c - c_ui
         else:
             price = 0.0
-    elif opt_type == EquityBarrierTypes.UP_AND_IN_PUT.value:
+    elif opt_type == BarrierTypes.UP_AND_IN_PUT.value:
         if h > k:
             p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
@@ -208,7 +208,7 @@ def value_equity_barrier_option_bs(
                 - k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(-y1 + sigma_rt_t)
             )
             price = p - p_uo
-    elif opt_type == EquityBarrierTypes.UP_AND_OUT_PUT.value:
+    elif opt_type == BarrierTypes.UP_AND_OUT_PUT.value:
         if h >= k:
             p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
@@ -222,7 +222,7 @@ def value_equity_barrier_option_bs(
                 - k * df * pow(h_over_s, 2.0 * ll - 2.0) * normcdf(-y1 + sigma_rt_t)
             )
             price = p_uo
-    elif opt_type == EquityBarrierTypes.DOWN_AND_OUT_PUT.value:
+    elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT.value:
         if h >= k:
             price = 0.0
         else:
@@ -236,7 +236,7 @@ def value_equity_barrier_option_bs(
                 * (normcdf(y - sigma_rt_t) - normcdf(y1 - sigma_rt_t))
             )
             price = p - p_di
-    elif opt_type == EquityBarrierTypes.DOWN_AND_IN_PUT.value:
+    elif opt_type == BarrierTypes.DOWN_AND_IN_PUT.value:
         if h >= k:
             price = p
         else:
