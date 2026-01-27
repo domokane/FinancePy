@@ -3,33 +3,35 @@ name: unit test action
 on: [push, pull_request]
 
 env:
-  PYTHON_VERSION: 3.13.5
+  PYTHON_VERSION: '3.12'
 
 jobs:
- build:
-  runs-on: ubuntu-latest
-  steps:
-   - name: checkout repo content
-     uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
 
-   - name: setup python
-     uses: actions/setup-python@v4
-     with:
-       python-version: ${{ env.PYTHON_VERSION }}
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v4
 
-   - name: install dependencies
-     run: |
-       python -m pip install --upgrade pip
-       pip install .[test]
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
 
-   - name: show package is importable
-     run: |
+      - name: install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install .[test]
+
+      - name: show package is importable
+        run: |
           python -c "import financepy as fp; print(fp.__version__)"
 
-   - name: list dependencies
-     run: |
-        pip list
+      - name: list dependencies
+        run: |
+          pip list
 
-   - name: unit tests
-     run: |
-        pytest -vv
+      - name: unit tests
+        run: |
+          pytest -vv

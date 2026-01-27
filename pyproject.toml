@@ -1,35 +1,30 @@
-[tool.black]
-line-length = 88
-
-[tool.pyright]
-typeCheckingMode = "off"
-
 [project]
 name = "financepy"
 version = "1.0.2"
 description = "A Finance Securities Valuation Library"
 readme = "README.md"
-requires-python = ">=3.9"
+
+# Python compatibility must match NumPy / SciPy reality
+requires-python = ">=3.10,<3.13"
 
 dependencies = [
-    "numpy>=2.3.4",
-    "scipy>=1.16.3",
-    "pandas>=2.3.3",
-    "matplotlib>=3.10.7",
-    "numba>=0.62.1",
-    "llvmlite>=0.45.1",
+    "numpy>=1.26,<2.1",
+    "scipy>=1.11,<1.14",
+    "pandas>=2.1,<2.3",
+    "matplotlib>=3.8,<3.9",
+    "numba>=0.59,<0.63",
+    "llvmlite>=0.42,<0.45",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ipython==8.25.0",
-    "mypy>=1.13",
-    "typing-extensions>=4.12",
+    "ipython>=8.25,<9",
+    "mypy>=1.13,<2",
+    "typing-extensions>=4.12,<5",
 ]
 
 test = [
-    "pytest>=8.3",
-    "pytest-benchmark>=4.1",
-    "more-itertools",
+    "pytest>=8,<9",
+    "pytest-benchmark>=4,<5",
+    "more-itertools>=10,<11",
 ]
-

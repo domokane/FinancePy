@@ -2,14 +2,13 @@
 # I have pinned versions
 
 # Core numeric ecosystem
-numpy == 2.3.4
-scipy == 1.16.3
-pandas == 2.3.3
-matplotlib == 3.10.7
+numpy==1.26.4
+scipy==1.11.4
+pandas==2.2.2
+matplotlib==3.8.4
+numba==0.61.2
+llvmlite==0.42.0
 
-# JIT compiler and LLVM interface
-numba == 0.62.1
-llvmlite == 0.45.1
 
 # Developer and interactive tools
 ipython == 8.25.0
@@ -20,3 +19,5 @@ pytest-benchmark == 4.1
 mypy == 1.13
 typing-extensions == 4.12
 more-itertools
+
+
