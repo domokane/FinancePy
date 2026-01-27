@@ -8,12 +8,12 @@ readme = "README.md"
 requires-python = ">=3.10,<3.13"
 
 dependencies = [
-    "numpy>=1.26,<2.1",
-    "scipy>=1.11,<1.14",
-    "pandas>=2.1,<2.3",
-    "matplotlib>=3.8,<3.9",
-    "numba>=0.59,<0.63",
-    "llvmlite>=0.42,<0.45",
+    "numpy>=2.3.5,<2.4",
+    "scipy>=1.16.3,<1.17",
+    "pandas>=2.3.3,<=2.4",
+    "matplotlib>=3.10.6,<3.11",
+    "numba>=0.62.1,<0.63",
+    "llvmlite>=0.45.0,<0.46",
 ]
 
 [project.optional-dependencies]
