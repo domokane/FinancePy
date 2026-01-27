@@ -25,7 +25,7 @@ def benchmarks_report(
     include_objects=False,
 ):
     """
-    Generate a DataFrame with one row per bechmark. A benchmark is any object that
+    Generate a DataFrame with one row per benchmark. A benchmark is any object that
     has a function valuation_details(...) that returns a dictionary of the right shape.
     Allowed benchmarks at the moment are depos, fras and swaps. Various useful
     information is reported. This is a bit slow so do not use in performance-critical
@@ -40,7 +40,7 @@ def benchmarks_report(
         if df_bmi is None:
             df_bmi = pd.DataFrame.from_dict(res, orient="index").T
         else:
-            df_bmi = df_bmi._append(res, ignore_index=True)
+            df_bmi = df_bmi.concat(res, ignore_index=True)
 
     if include_objects:
         df_bmi["benchmark_objects"] = benchmarks
