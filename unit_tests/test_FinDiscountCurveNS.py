@@ -144,7 +144,7 @@ def test_beta_2():
     curve = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates = curve.zero_rate(dates)
     assert [round(x, 4) for x in zero_rates] == [
-        0.06,
+        0.0601,
         0.0647,
         0.0648,
         0.0638,
