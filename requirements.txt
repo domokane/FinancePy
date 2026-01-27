@@ -15,7 +15,7 @@ ipython == 8.25.0
 
 # Optional testing and type tools (recommended)
 pytest == 8.3
-pytest-benchmark == 4.1
+pytest-benchmark == 5.2.3
 mypy == 1.13
 typing-extensions == 4.12
 more-itertools
