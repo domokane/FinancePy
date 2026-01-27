@@ -25,6 +25,6 @@ dev = [
 
 test = [
     "pytest>=8,<9",
-    "pytest-benchmark>=4,<5",
+    "pytest-benchmark>=5.2",
     "more-itertools>=10,<11",
 ]
