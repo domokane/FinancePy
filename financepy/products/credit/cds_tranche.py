@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-# TODO: Add __repr__ method
 
 from math import sqrt
 from enum import Enum
@@ -27,7 +26,7 @@ from ...utils.math import ONE_MILLION
 from ...market.curves.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
 
-from ...utils.helpers import check_argument_types
+from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 
 ########################################################################################
@@ -288,3 +287,29 @@ class CDSTranche:
 
 
 ########################################################################################
+
+    def __repr__(self):
+            """Print out details of the CDSTranche contract."""
+            s = label_to_string("OBJECT TYPE", type(self).__name__)
+            s += label_to_string("STEP-IN DATE", self.step_in_dt)
+            s += label_to_string("MATURITY DATE", self.maturity_dt)
+            s += label_to_string("ATTACHMENT POINT (K1)", self.k1)
+            s += label_to_string("DETACHMENT POINT (K2)", self.k2)
+            s += label_to_string("NOTIONAL", self.notional)
+            s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
+            s += label_to_string("LONG PROTECTION", self.long_protect)
+            s += label_to_string("FREQUENCY", self.freq_type)
+            s += label_to_string("DAYCOUNT", self.dc_type)
+            s += label_to_string("CALENDAR", self.cal_type)
+            s += label_to_string("BUSDAYRULE", self.bd_type)
+            s += label_to_string("DATEGENRULE", self.dg_type)
+            return s
+
+        ####################################################################################
+
+    def _print(self):
+        """Simple print function for backward compatibility."""
+        print(self)
+
+
+    ########################################################################################
