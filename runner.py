@@ -47,6 +47,15 @@ INPUT JSON keys:
                                total_exposed_value_usd) to derive an
                                expected-loss yield spread added to
                                risk_free_rate.
+  lambda_annual     float      Modelled annual event rate from         (optional)
+                               hurricane-frequency. When supplied
+                               alongside event_insured_loss_table,
+                               replaces CLIMADA's implicit frequency:
+                               AAI is rescaled by lambda_annual /
+                               sum(per-event freq).
+  event_insured_loss_table list Per-event insured losses from OasisLMF (optional)
+                               with per-event frequency. Used for the
+                               lambda_annual rescaling above.
   risk_free_rate    float      baseline risk-free rate used when       (optional)
                                deriving YTM from OasisLMF EL.
                                (default: 0.045)
@@ -168,7 +177,19 @@ def run(params: dict) -> dict:
         # el_rate = Average Annual Insured Loss / Total Insured Value
         tiv = params.get("total_insured_value_usd") or params.get("total_exposed_value_usd")
         if tiv and float(tiv) > 0:
-            el_rate = float(params["insured_aai_usd"]) / float(tiv)
+            aai = float(params["insured_aai_usd"])
+            # If hurricane-frequency supplied a modelled lambda alongside
+            # OasisLMF's event table, swap CLIMADA's implicit frequency for it:
+            # AAI = E[loss|event] * E[events/yr]; we keep severity (encoded in
+            # the event table) and replace the frequency. lambda_implicit is
+            # CLIMADA's total annual event rate (sum of per-event freq).
+            elt = params.get("event_insured_loss_table")
+            lam = params.get("lambda_annual")
+            if isinstance(elt, list) and elt and isinstance(lam, (int, float)):
+                lambda_implicit = sum(float(ev.get("frequency", 0.0)) for ev in elt)
+                if lambda_implicit > 0:
+                    aai = aai * (float(lam) / lambda_implicit)
+            el_rate = aai / float(tiv)
             risk_free = float(params.get("risk_free_rate", DEFAULT_RISK_FREE_RATE))
             ytm = risk_free + el_rate
 
@@ -209,15 +230,32 @@ def _load_input_json() -> dict:
         "input",
         nargs="?",
         default="-",
-        help="Path to input JSON file, or '-' to read from stdin (default).",
+        help="Path to primary input JSON file (e.g. OasisLMF damage_estimates), "
+             "or '-' to read from stdin (default).",
+    )
+    parser.add_argument(
+        "frequency_input",
+        nargs="?",
+        default=None,
+        help="Optional second input JSON file with lambda_annual "
+             "(e.g. hurricane-frequency output). Merged into primary params.",
     )
     args = parser.parse_args()
 
     if args.input == "-":
-        return json.load(sys.stdin)
+        params = json.load(sys.stdin)
+    else:
+        with open(args.input, "r", encoding="utf-8") as handle:
+            params = json.load(handle)
 
-    with open(args.input, "r", encoding="utf-8") as handle:
-        return json.load(handle)
+    if args.frequency_input:
+        with open(args.frequency_input, "r", encoding="utf-8") as handle:
+            freq = json.load(handle)
+        # hurricane-frequency keys (lambda_annual, etc.) don't collide with
+        # OasisLMF / DicePy keys, so a flat merge is safe.
+        params.update(freq)
+
+    return params
 
 
 if __name__ == "__main__":

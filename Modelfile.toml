@@ -3,10 +3,9 @@ name = "finance_py"
 run = "docker run --rm -v \"$PWD/run:/run\" ${IMAGE} ${ARGS} > run/bond_metrics.output.json"
 image = "financepy-runner:local"
 # args = ["--in", "{input:finance_py_input}", "--out", "{output:output_data}"]
-args = ["{input:damage_estimates}"]
+args = ["{input:damage_estimates}", "{input:hurricane_frequency}"]
 
 [[inputs]]
-# TODO: this should eventually support URLs as well as local files
 name = "damage_estimates"
 
 [inputs.schema]
@@ -17,6 +16,17 @@ type = "object"
 # The runner is expected to supply defaults for any missing bond parameters,
 # making this model composable both standalone (full params via file) and
 # as a downstream step (climate risk data from DicePy, bond params defaulted).
+required = []
+
+[[inputs]]
+# Optional second input: when present, the runner uses lambda_annual to rescale
+# OasisLMF's AAI by (modeled lambda) / (sum of per-event frequencies in
+# event_insured_loss_table). When absent, pricing falls back to the AAI-based
+# path. required = [] keeps standalone use working when this input is unbound.
+name = "hurricane_frequency"
+
+[inputs.schema]
+type = "object"
 required = []
 
 [[outputs]]
