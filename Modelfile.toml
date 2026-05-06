@@ -1,7 +1,7 @@
 name = "finance_py"
 # run = "docker run --rm -v \"$PWD/run:/run\" ${IMAGE} ${ARGS}"
 run = "docker run --rm -v \"$PWD/run:/run\" ${IMAGE} ${ARGS} > run/bond_metrics.output.json"
-image = "domokane/FinancePy:latest"
+image = "domokane/financepy:latest"
 # args = ["--in", "{input:finance_py_input}", "--out", "{output:output_data}"]
 args = ["{input:damage_estimates}", "{input:hurricane_frequency}"]
 
