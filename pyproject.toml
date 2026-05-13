@@ -52,6 +52,9 @@ test = [
 
 [tool.setuptools]
 
+[tool.setuptools.package-data]
+"financepy.models" = ["sobolcoeff.npz"]
+
 [tool.setuptools.packages.find]
 include = ["financepy*"]
 exclude = ["venv*", "notebooks*", "golden_tests*", "tests*"]

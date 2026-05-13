@@ -53,7 +53,7 @@ class CDSOption:
         long_protection: bool = True,
         knockout_flag: bool = True,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
@@ -79,7 +79,7 @@ class CDSOption:
         self.notional = notional
 
         self.freq_type = freq_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -107,7 +107,7 @@ class CDSOption:
             self.notional,
             self.long_protection,
             self.freq_type,
-            self.dc_type,
+            self.accrual_dc_type,
             self.cal_type,
             self.bd_type,
             self.dg_type,
@@ -129,7 +129,9 @@ class CDSOption:
         if self.long_protection:
             option_value = forward_spread * normcdf(d1) - strike * normcdf(d2)
         else:
-            option_value = strike * normcdf(-d2) - forward_spread * normcdf(-d1)
+            option_value = strike * normcdf(-d2) - forward_spread * normcdf(
+                -d1
+            )
 
         option_value = option_value * forward_rpv01
 
@@ -151,7 +153,9 @@ class CDSOption:
     def implied_volatility(self, value_dt, issuer_curve, option_value):
         """Calculate the implied CDS option volatility from a price."""
         arg_tuple = (self, value_dt, issuer_curve, option_value)
-        sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50)
+        sigma = optimize.newton(
+            fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50
+        )
         return sigma
 
 

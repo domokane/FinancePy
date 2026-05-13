@@ -30,7 +30,7 @@ def test_fin_discount_curve_polynomial():
     coeffs = [0.0004, -0.0001, 0.00000010]
     curve1 = DiscountCurvePoly(curve_dt, coeffs)
     zeros = curve1.zero_rate(dates)
-    fwds = curve1.fwd(dates)
+    fwds = curve1.fwd_rate_inst(dates)
 
     if PLOT_GRAPHS:
 

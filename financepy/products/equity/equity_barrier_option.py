@@ -6,6 +6,8 @@ from typing import Union
 
 import numpy as np
 
+from ...utils.frequency import FrequencyTypes
+
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 from ...models.equity_barrier_option_bs import value_equity_barrier_option_bs
@@ -104,13 +106,17 @@ class EquityBarrierOption(EquityOption):
         if t_exp < 0:
             raise FinError("Option expires before value date.")
 
+        cc_freq = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, cc_freq)
+        q = dividend_curve.zero_rate_t(t_exp, cc_freq)
+
         values = value_equity_barrier_option_bs(
             t_exp,
             self.strike_price,
             self.barrier_level,
             stock_prices,
-            discount_curve.cc_rate(self.expiry_dt),
-            dividend_curve.cc_rate(self.expiry_dt),
+            r,
+            q,
             model.volatility,
             self.opt_type.value,
             self.num_obs_per_year,
@@ -157,9 +163,10 @@ class EquityBarrierOption(EquityOption):
         if t_exp < 0:
             raise FinError("Option expires before value date.")
 
-        risk_free_rate = discount_curve.cc_rate(self.expiry_dt)
-        dividend_rate = dividend_curve.cc_rate(self.expiry_dt)
-        drift = risk_free_rate - dividend_rate
+        freq_cc = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, freq_cc)
+        q = dividend_curve.zero_rate_t(t_exp, freq_cc)
+        drift = r - q
 
         scheme = FinGBMNumericalScheme.NORMAL_SCHEME
 
@@ -174,7 +181,7 @@ class EquityBarrierOption(EquityOption):
             self.barrier_level,
             self.notional,
             stock_price,
-            risk_free_rate,
+            r,
             process_type,
             model_params,
             num_obs_per_year,

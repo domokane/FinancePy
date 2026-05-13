@@ -30,7 +30,7 @@ class FinInflationBond(Bond):
         maturity_dt: Date,
         cpn: float,  # Annualised bond coupon before inflation
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        accrual_dc_type: DayCountTypes,
         ex_div_days: int,  # Value of CPI index at bond issue date
         base_cpi_value: float,  # CPI value at issue
         num_ex_dividend_days: int = 0,
@@ -47,7 +47,7 @@ class FinInflationBond(Bond):
             maturity_dt,
             cpn,
             freq_type,
-            dc_type,
+            accrual_dc_type,
             ex_div_days,
             cal_type,
         )
@@ -67,7 +67,7 @@ class FinInflationBond(Bond):
         self.maturity_dt = maturity_dt
         self.cpn = cpn
         self.freq_type = freq_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.freq = annual_frequency(freq_type)
         self.ex_div_days = ex_div_days  # This is the bond holding size
         self.base_cpi_value = base_cpi_value  # CPI value at issue date of bond
@@ -127,7 +127,9 @@ class FinInflationBond(Bond):
 
     ###########################################################################
 
-    def inflation_accrued_interest(self, settle_dt: Date, face: float, reference_cpi):
+    def inflation_accrued_interest(
+        self, settle_dt: Date, face: float, reference_cpi
+    ):
         """Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. This is adjusted by the
         index ratio in line with the CPI growth since the bond base CPI date.
@@ -147,7 +149,7 @@ class FinInflationBond(Bond):
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("COUPON", self.cpn)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("EX-DIV DAYS", self.ex_div_days)
         s += label_to_string("BASE CPI VALUE", self.base_cpi_value, "")
         return s

@@ -27,8 +27,8 @@ def _f(df, *args):
     value_dt = args[1]
     bond = args[2]
     mkt_clean_price = args[3]
-    curve.set_last_df(df)
 
+    curve.set_last_df(df)
     bond_discount_price = bond.clean_price_from_discount_curve(value_dt, curve)
     obj_fn = bond_discount_price - mkt_clean_price
 
@@ -38,7 +38,7 @@ def _f(df, *args):
 ########################################################################################
 
 
-class BondZeroCurve(DiscountCurve):
+class BondExactZeroCurve(DiscountCurve):
     """Class to do bootstrap exact fitting of the bond zero rate curve."""
 
     def __init__(
@@ -47,18 +47,19 @@ class BondZeroCurve(DiscountCurve):
         bonds: list,
         clean_prices: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
-        """Fit a discount curve to a set of bond yields using the type of
+        """Fit a discount curve to a set of bond prices using the type of
         curve specified."""
 
         if len(bonds) != len(clean_prices):
             raise FinError("Num bonds does not equal number of prices.")
 
+        self.time_dc_type = time_dc_type
         self.settle_dt = value_dt
         self.value_dt = value_dt
         self.bonds = bonds
-        self.clean_prices = np.array(clean_prices)
-        self.discount_curve = None
+        self.clean_prices = np.array(clean_prices, dtype=float)
         self._interp_type = interp_type
 
         times = []
@@ -66,7 +67,7 @@ class BondZeroCurve(DiscountCurve):
             t_mat = (bond.maturity_dt - self.settle_dt) / G_DAYS_IN_YEAR
             times.append(t_mat)
 
-        times = np.array(times)
+        times = np.array(times, dtype=float)
         if test_monotonicity(times) is False:
             raise FinError("Times are not sorted in increasing order")
 
@@ -77,8 +78,8 @@ class BondZeroCurve(DiscountCurve):
 
     def _bootstrap_zero_rates(self):
 
-        self._times = np.array([0.0])
-        self._dfs = np.array([1.0])
+        self._times = np.array([0.0], dtype=float)
+        self._dfs = np.array([1.0], dtype=float)
 
         for i in range(0, len(self.bonds)):
 
@@ -94,7 +95,7 @@ class BondZeroCurve(DiscountCurve):
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df)
 
-            optimize.newton(
+            df_star = optimize.newton(
                 _f,
                 x0=df,
                 fprime=None,
@@ -104,73 +105,75 @@ class BondZeroCurve(DiscountCurve):
                 fprime2=None,
             )
 
-    ###########################################################################
+            if i > 0 and df_star > self._dfs[i]:
+                raise FinError(
+                    "Bootstrapped discount factors must be non-increasing"
+                )
 
-    def zero_rate(
-        self,
-        dt: Date,
-        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-    ):
-        """Calculate the zero rate to maturity date."""
-        t = input_time(dt, self)
-        f = annual_frequency(freq_type)
-        df = self.df(t)
+            if df_star <= 0.0:
+                raise FinError("Bootstrapped discount factor must be positive")
 
-        if f == 0:  # Simple interest
-            zero_rate = (1.0 / df - 1.0) / t
-        if f == -1:  # Continuous
-            zero_rate = -np.log(df) / t
-        else:
-            zero_rate = (df ** (-1.0 / t) - 1) * f
-        return zero_rate
+            self.set_last_df(df_star)
 
     ###########################################################################
 
-    def df(self, dt: Date):
-        t = input_time(dt, self)
-        z = interpolate(t, self._times, self._dfs, self._interp_type.value)
-        return z
+    def df_t(self, t):
+        """Discount factor from time or vector of times."""
+        return interpolate(t, self._times, self._dfs, self._interp_type.value)
+
+    # ###########################################################################
+
+    # def zero_rate(
+    #     self,
+    #     dt: Date,
+    #     freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
+    # ):
+    #     """Calculate the zero rate to maturity date."""
+    #     t = input_time(dt, self)
+    #     f = annual_frequency(freq_type)
+    #     df = self.df_t(t)
+
+    #     if f == 0:  # Simple interest
+    #         zero_rate = (1.0 / df - 1.0) / t
+    #     elif f == -1:  # Continuous
+    #         zero_rate = -np.log(df) / t
+    #     else:
+    #         zero_rate = (df ** (-1.0 / (f * t)) - 1) * f
+    #     return zero_rate
+
+    # ###########################################################################
+
+    # def fwd(self, dt):
+    #     """Calculate the continuously compounded fwd rate at date/time dt."""
+    #     t = input_time(dt, self)
+    #     epsilon = 1.0e-6
+    #     df1 = self.df_t(t)
+    #     df2 = self.df_t(t + epsilon)
+    #     fwd = np.log(df1 / df2) / epsilon
+    #     return fwd
+
+    # ###########################################################################
+
+    # def fwd_rate(self, date1: Date, date2: Date, dc_type: DayCountTypes):
+    #     """Calculate the forward rate according to the specified
+    #     day count convention."""
+
+    #     if date1 < self.value_dt:
+    #         raise FinError("Date1 before curve value date.")
+
+    #     if date2 < date1:
+    #         raise FinError("Date2 must not be before Date1")
+
+    #     day_count = DayCount(dc_type)
+    #     year_frac = day_count.year_frac(date1, date2)[0]
+    #     df1 = self.df(date1)
+    #     df2 = self.df(date2)
+    #     fwd = (df1 / df2 - 1.0) / year_frac
+    #     return fwd
 
     ###########################################################################
 
-    def survival_prob(self, dt: Date):
-        t = input_time(dt, self)
-        q = interpolate(t, self._times, self._dfs, self._interp_type.value)
-        return q
-
-    ###########################################################################
-
-    def fwd(self, dt: Date):
-        """Calculate the continuous forward rate at the forward date."""
-        t = input_time(dt, self)
-        dt = 0.000001
-        df1 = self.df(t)
-        df2 = self.df(t + dt)
-        fwd = np.log(df1 / df2) / dt
-        return fwd
-
-    ###########################################################################
-
-    def fwd_rate(self, date1: Date, date2: Date, dc_type: DayCountTypes):
-        """Calculate the forward rate according to the specified
-        day count convention."""
-
-        if date1 < self.value_dt:
-            raise FinError("Date1 before curve value date.")
-
-        if date2 < date1:
-            raise FinError("Date2 must not be before Date1")
-
-        day_count = DayCount(dc_type)
-        year_frac = day_count.year_frac(date1, date2)[0]
-        df1 = self.df(date1)
-        df2 = self.df(date2)
-        fwd = (df1 / df2 - 1.0) / year_frac
-        return fwd
-
-    ###########################################################################
-
-    def plot(self, title: str):
+    def plot_zero_rates(self, title: str):
         """Display yield curve."""
 
         plt.figure(figsize=(12, 6))
@@ -179,11 +182,31 @@ class BondZeroCurve(DiscountCurve):
         plt.ylabel("Zero Rate (%)")
 
         tmax = np.max(self.years_to_maturity)
-        t = np.linspace(0.0, int(tmax + 0.5), 100)
+        t = np.linspace(1.0e-6, float(tmax), 100)
 
-        zero_rate = self.zero_rate(t)
+        zero_rate = self.zero_rate_t(t)
         zero_rate = scale(zero_rate, 100.0)
         plt.plot(t, zero_rate, label="Zero Rate Bootstrap", marker="o")
+        plt.legend(loc="lower right")
+        plt.ylim((min(zero_rate) - 0.3, max(zero_rate) * 1.1))
+        plt.grid(True)
+
+    ###########################################################################
+
+    def plot_fwd_rates(self, title: str):
+        """Display yield curve."""
+
+        plt.figure(figsize=(12, 6))
+        plt.title(title)
+        plt.xlabel("Time to Maturity (years)")
+        plt.ylabel("Forward Rate (%)")
+
+        tmax = np.max(self.years_to_maturity)
+        t = np.linspace(1.0e-6, float(tmax), 100)
+
+        fwd_rate = self.fwd_rate_inst_t(t)
+        zero_rate = scale(fwd_rate, 100.0)
+        plt.plot(t, zero_rate, label="Fwd Rate Bootstrap", marker="o")
         plt.legend(loc="lower right")
         plt.ylim((min(zero_rate) - 0.3, max(zero_rate) * 1.1))
         plt.grid(True)

@@ -58,7 +58,9 @@ class IborSingleCurveSmoothingCalibrator(object):
         dates = list(set(dates))
         dates.sort()
         self._knot_dts = dates
-        self._knot_times = np.array([(d - dates[0]) / G_DAYS_IN_YEAR for d in dates])
+        self._knot_times = np.array(
+            [(d - dates[0]) / G_DAYS_IN_YEAR for d in dates]
+        )
 
     def _repricing_objectives(self, curve_to_use=None):
 
@@ -69,7 +71,9 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         valuation_date = curve.value_dt
         out = np.zeros(
-            len(curve.used_deposits) + len(curve.used_fras) + len(curve.used_swaps)
+            len(curve.used_deposits)
+            + len(curve.used_fras)
+            + len(curve.used_swaps)
         )
 
         idx = 0
@@ -77,7 +81,10 @@ class IborSingleCurveSmoothingCalibrator(object):
             # do not need to be too exact here
             acc_factor = datediff(depo.start_dt, depo.maturity_dt)
             # as rate
-            r = -np.log(depo.value(valuation_date, curve) / depo.notional) / acc_factor
+            r = (
+                -np.log(depo.value(valuation_date, curve) / depo.notional)
+                / acc_factor
+            )
             out[idx] = r
             idx = idx + 1
 
@@ -105,12 +112,12 @@ class IborSingleCurveSmoothingCalibrator(object):
         else:
             curve = self._curve
 
-        start_times = curve.times[:-1]
-        end_times = curve.times[1:]
+        start_times = curve._times[:-1]
+        end_times = curve._times[1:]
         tenors = end_times - start_times
 
-        start_dfs = curve.dfs[:-1]
-        end_dfs = curve.dfs[1:]
+        start_dfs = curve._dfs[:-1]
+        end_dfs = curve._dfs[1:]
         fdfs = end_dfs / start_dfs
 
         # forward cc rates -- first derivative of the yields
@@ -130,7 +137,7 @@ class IborSingleCurveSmoothingCalibrator(object):
             curve = self._curve
             curve._dfs[1:] = dfs
 
-            curve.fit(curve.times, curve.dfs)
+            curve.fit(curve._times, curve._dfs)
 
             fit_tgts = self._repricing_objectives(curve)
             smth_tgts = self._smoothing_objectives(curve)
@@ -168,7 +175,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         )
 
         self._curve._dfs[1:] = np.array(res.x)
-        self._curve.fit(self._curve.times, self._curve.dfs)
+        self._curve.fit(self._curve._times, self._curve._dfs)
 
         fit_report = self._generate_fit_report(smoothness)
 

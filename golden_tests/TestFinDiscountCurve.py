@@ -64,9 +64,12 @@ def test_fin_discount_curve():
     for interp in InterpTypes:
 
         curve = DiscountCurve(start_dt, dates, dfs, interp)
-        fwd_rates = curve.fwd(plot_dts)
+        fwd_rates = curve.fwd_rate_inst(plot_dts)
         zero_rates = curve.zero_rate(plot_dts, FrequencyTypes.ANNUAL)
         par_rates = curve.swap_rate(start_dt, plot_dts, FrequencyTypes.ANNUAL)
+        par_rates2 = curve.swap_rate_old(
+            start_dt, plot_dts, FrequencyTypes.ANNUAL
+        )
 
         if PLOT_GRAPHS:
             plt.figure(figsize=(6, 4))
@@ -80,8 +83,35 @@ def test_fin_discount_curve():
             plt.ylabel("Fwd Rate (%)")
             plt.legend(loc="lower right", frameon=False)
 
+    ###########################################################################
 
-########################################################################################
+    for interp in InterpTypes:
+
+        one_bp = 0.01  # 100bp
+
+        curve = DiscountCurve(start_dt, dates, dfs, interp)
+        fwd_rates = curve.fwd_rate_inst(plot_dts)
+
+        bumped_curve = curve.bump_parallel(one_bp)
+        fwd_rates_bumped = bumped_curve.fwd_rate_inst(plot_dts)
+
+        if PLOT_GRAPHS:
+            plt.figure(figsize=(6, 4))
+            plt.plot(plot_years, scale(fwd_rates, 100), label="FWD RATES")
+            plt.plot(
+                plot_years,
+                scale(fwd_rates_bumped, 100),
+                label="FWD RATES BUMP",
+            )
+            plt.ylim((3.0, 8.5))
+
+            plt.title("Forward Curves using " + str(interp))
+            plt.xlabel("Time (years)")
+            plt.ylabel("Fwd Rate (%)")
+            plt.legend(loc="lower right", frameon=False)
+
+
+###############################################################################
 
 test_fin_discount_curve()
 test_cases.compare_test_cases()

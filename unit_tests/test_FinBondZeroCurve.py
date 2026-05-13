@@ -5,12 +5,13 @@ import os
 
 import pandas as pd
 
-from financepy.products.bonds.bond_zero_curve import BondZeroCurve
 from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_fitted_zero_curve import BondFittedZeroCurve
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
+from financepy.products.bonds.curve_fits import CurveFitPolynomial
 
 path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
 bond_dataframe = pd.read_csv(path, sep="\t")
@@ -34,7 +35,10 @@ for _, bond_row in bond_dataframe.iterrows():
     bonds.append(bond)
     clean_prices.append(clean_price)
 
-bond_curve = BondZeroCurve(settle_dt, bonds, clean_prices)
+    curve_fitter = CurveFitPolynomial(4)
+
+    bond_curve = BondFittedZeroCurve(
+        settle_dt, bonds, clean_prices, curve_fitter)
 
 ########################################################################################
 
@@ -43,12 +47,13 @@ def test_zero_curve():
 
     maturity_dt = Date(7, 3, 2013)
     zero_rate = bond_curve.zero_rate(maturity_dt)
-    assert round(zero_rate, 4) == 0.0022
+    assert round(zero_rate, 4) == -0.0003
 
     maturity_dt = Date(7, 9, 2019)
     zero_rate = bond_curve.zero_rate(maturity_dt)
-    assert round(zero_rate, 4) == 0.0128
+    assert round(zero_rate, 4) == 0.0138
 
     maturity_dt = Date(22, 1, 2060)
     zero_rate = bond_curve.zero_rate(maturity_dt)
-    assert round(zero_rate, 4) == 0.0351
+    assert round(zero_rate, 4) == 0.035
+

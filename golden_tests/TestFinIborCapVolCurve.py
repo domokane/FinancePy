@@ -45,8 +45,10 @@ def test_fin_cap_vol_curve():
     ]
     cap_volatilities = np.array(cap_volatilities) / 100.0
 
-    dc_type = DayCountTypes.ACT_ACT_ISDA
-    vol_curve = IborCapVolCurve(value_dt, cap_vol_dates, cap_volatilities, dc_type)
+    accrual_dc_type = DayCountTypes.ACT_ACT_ISDA
+    vol_curve = IborCapVolCurve(
+        value_dt, cap_vol_dates, accrual_dc_type, cap_volatilities
+    )
 
     test_cases.header("DATE", "CAPVOL", "CAPLETVOL")
     for dt in cap_vol_dates:

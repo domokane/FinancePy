@@ -38,7 +38,7 @@ class SwapFixedLeg:
         leg_type: SwapTypes,
         coupon: float,
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        accrual_dc_type: DayCountTypes,
         notional: float = ONE_MILLION,
         principal: float = 0.0,
         payment_lag: int = 0,
@@ -74,7 +74,7 @@ class SwapFixedLeg:
         self.principal = principal
         self.cpn = coupon
 
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -129,7 +129,7 @@ class SwapFixedLeg:
 
         prev_dt = schedule_dts[0]
 
-        day_counter = DayCount(self.dc_type)
+        day_counter = DayCount(self.accrual_dc_type)
         calendar = Calendar(self.cal_type)
 
         for next_dt in schedule_dts[1:]:
@@ -246,7 +246,7 @@ class SwapFixedLeg:
         print("MATURITY DATE:", self.maturity_dt)
         print("COUPON (%):", self.cpn * 100)
         print("FREQUENCY:", str(self.freq_type))
-        print("DAY COUNT:", str(self.dc_type))
+        print("DAY COUNT:", str(self.accrual_dc_type))
 
         if len(self.payments) == 0:
             print("Payments not calculated.")
@@ -294,7 +294,7 @@ class SwapFixedLeg:
         print("MATURITY DATE:", self.maturity_dt)
         print("COUPON (%):", self.cpn * 100)
         print("FREQUENCY:", str(self.freq_type))
-        print("DAY COUNT:", str(self.dc_type))
+        print("DAY COUNT:", str(self.accrual_dc_type))
 
         if len(self.payments) == 0:
             print("Payments not calculated.")
@@ -343,7 +343,7 @@ class SwapFixedLeg:
         s += label_to_string("LEG TYPE", self.leg_type)
         s += label_to_string("COUPON", self.cpn)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self.dg_type)

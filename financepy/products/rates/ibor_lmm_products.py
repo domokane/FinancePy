@@ -135,7 +135,9 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
+            fwd_rate = discount_curve.fwd_rate(
+                start_dt, end_dt, self.float_dc_type
+            )
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -202,7 +204,9 @@ class IborLMMProducts:
         for i in range(1, self.num_fwds):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.fwd_rate(start_dt, end_dt, self.float_dc_type)
+            fwd_rate = discount_curve.fwd_rate(
+                start_dt, end_dt, self.float_dc_type
+            )
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -262,7 +266,9 @@ class IborLMMProducts:
         for i in range(1, num_grid_points):
             start_dt = self.grid_dts[i - 1]
             end_dt = self.grid_dts[i]
-            fwd_rate = discount_curve.forward_rate(start_dt, end_dt, self.float_dc_type)
+            fwd_rate = discount_curve.forward_rate(
+                start_dt, end_dt, self.float_dc_type
+            )
             self.fwd_curve.append(fwd_rate)
 
         self.fwd_curve = np.array(self.fwd_curve)
@@ -373,7 +379,7 @@ class IborLMMProducts:
         cap_floor_type: CapFloorTypes,
         cap_floor_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         notional: float = ONE_MILLION,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,

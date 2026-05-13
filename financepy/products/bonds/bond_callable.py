@@ -54,7 +54,7 @@ class BondEmbeddedOption:
         maturity_dt: Date,  # Date
         coupon: float,  # Annualised coupon - 0.03 = 3.00%
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        accrual_dc_type: DayCountTypes,
         call_dts: List[Date],
         call_prices: np.ndarray,
         put_dts: List[Date],
@@ -69,12 +69,17 @@ class BondEmbeddedOption:
         self.maturity_dt = maturity_dt
         self.cpn = coupon
         self.freq_type = freq_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
 
         self.ex_div_days = 0
 
         self.bond = Bond(
-            issue_dt, maturity_dt, coupon, freq_type, dc_type, self.ex_div_days
+            issue_dt,
+            maturity_dt,
+            coupon,
+            freq_type,
+            accrual_dc_type,
+            self.ex_div_days,
         )
 
         # Validate call and put schedules
@@ -200,7 +205,9 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
+            v_bond_with_option = (
+                v1["bondwithoption"] + v2["bondwithoption"]
+            ) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -240,7 +247,9 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (v1["bondwithoption"] + v2["bondwithoption"]) / 2
+            v_bond_with_option = (
+                v1["bondwithoption"] + v2["bondwithoption"]
+            ) / 2
             v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
 
             return {
@@ -259,7 +268,7 @@ class BondEmbeddedOption:
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("COUPON", self.cpn)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("EX-DIV DAYS", self.ex_div_days)
 
         s += label_to_string("NUM CALL DATES", len(self.call_dts))

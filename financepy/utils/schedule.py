@@ -226,17 +226,13 @@ class Schedule:
         if len(self.adjusted_dts) < 2:
             raise FinError("Schedule has two dates only.")
 
-        prev_dt = self.adjusted_dts[0]
+        deduped = [self.adjusted_dts[0]]
         for dt in self.adjusted_dts[1:]:
-
-            # if the first date lands on the effective date then remove it
-            if dt == prev_dt:
-                self.adjusted_dts.pop(0)
-
-            if dt < prev_dt:  # Dates must be ordered
-                raise FinError("Dates are not monotonic")
-
-            prev_dt = dt
+            if dt != deduped[-1]:
+                if dt < deduped[-1]:
+                    raise FinError("Dates are not monotonic")
+                deduped.append(dt)
+        self.adjusted_dts = deduped
 
         #######################################################################
 

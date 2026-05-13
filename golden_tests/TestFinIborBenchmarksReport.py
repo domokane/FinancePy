@@ -1,3 +1,4 @@
+import sys
 from os.path import dirname, join
 
 import pandas as pd
@@ -37,7 +38,9 @@ def test_ibor_benchmarks_report():
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    depo = IborDeposit(
+        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
+    )
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -195,7 +198,9 @@ def test_dataframe_to_benchmarks():
 
     df = pd.read_csv(full_filename_path, index_col=0)
 
-    df["start_dt"] = pd.to_datetime(df["start_dt"], format="%d-%b-%y")  # allow tenors
+    df["start_dt"] = pd.to_datetime(
+        df["start_dt"], format="%d-%b-%y"
+    )  # allow tenors
     df["maturity_dt"] = pd.to_datetime(
         df["maturity_dt"], format="%d-%b-%y"
     )  # allow tenors
@@ -211,10 +216,5 @@ def test_dataframe_to_benchmarks():
 
 ########################################################################################
 
-try:
-    test_ibor_benchmarks_report()
-    test_dataframe_to_benchmarks()
-########################################################################################
-
-except Exception as e:
-    print(f"Unexpected error:{e}", sys.exc_info()[0])
+test_ibor_benchmarks_report()
+test_dataframe_to_benchmarks()

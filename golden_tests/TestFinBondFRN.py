@@ -226,7 +226,8 @@ def test_bond_frn():
     accd_amount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Dollar Principal = ", principal)
 
@@ -242,11 +243,11 @@ def test_bond_frn():
 
     test_cases.print("Modified Rate Duration = ", modified_duration)
 
-    macauley_duration = bond.macauley_duration(
+    macaulay_duration = bond.macaulay_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
-    test_cases.print("Macauley Duration = ", macauley_duration)
+    test_cases.print("Macaulay Duration = ", macaulay_duration)
 
     convexity = bond.convexity_from_dm(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -306,7 +307,8 @@ def test_bond_frn():
     accd_amount = bond.accrued_int
     test_cases.print("Accrued Amount = ", accd_amount)
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Dollar Principal = ", principal)
 
@@ -322,11 +324,11 @@ def test_bond_frn():
 
     test_cases.print("Modified Rate Duration = ", modified_duration)
 
-    macauley_duration = bond.macauley_duration(
+    macaulay_duration = bond.macaulay_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
-    test_cases.print("Macauley Duration = ", macauley_duration)
+    test_cases.print("Macaulay Duration = ", macaulay_duration)
 
     convexity = bond.convexity_from_dm(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -334,7 +336,8 @@ def test_bond_frn():
 
     test_cases.print("Convexity = ", convexity)
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     test_cases.print("Principal = ", principal)
 

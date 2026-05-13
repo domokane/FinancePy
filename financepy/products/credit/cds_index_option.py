@@ -37,7 +37,7 @@ class CDSIndexOption:
         notional: float = ONE_MILLION,
         long_protect: bool = True,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
@@ -64,7 +64,7 @@ class CDSIndexOption:
         self.notional = notional
         self.long_protect = long_protect
 
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.dg_type = dg_type
         self.cal_type = cal_type
         self.freq_type = freq_type
@@ -77,7 +77,7 @@ class CDSIndexOption:
             1.0,
             self.long_protect,
             self.freq_type,
-            self.dc_type,
+            self.accrual_dc_type,
             self.cal_type,
             self.bd_type,
             self.dg_type,
@@ -93,9 +93,9 @@ class CDSIndexOption:
 
         k = self.strike_cpn
         c = self.index_cpn
-        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df = libor_curve.df(self.expiry_dt)
-        q_expiry_index = index_curve.survival_prob(time_to_expiry)
+        q_expiry_index = index_curve.survival_prob(t_exp)
 
         cds = CDS(value_dt, self.maturity_dt, k)
         strike_curve = CDSCurve(value_dt, [cds], libor_curve, index_recovery)
@@ -104,7 +104,9 @@ class CDSIndexOption:
         strike_rpv01 = self.cds_contract.risky_pv01(value_dt, strike_curve)[
             "clean_rpv01"
         ]
-        index_rpv01 = self.cds_contract.risky_pv01(value_dt, index_curve)["clean_rpv01"]
+        index_rpv01 = self.cds_contract.risky_pv01(value_dt, index_curve)[
+            "clean_rpv01"
+        ]
 
         s = self.cds_contract.par_spread(value_dt, index_curve)
 
@@ -112,14 +114,18 @@ class CDSIndexOption:
         adj_fwd = s + fep / index_rpv01
         adj_strike = c + (k - c) * strike_rpv01 / index_rpv01 / q_expiry_index
 
-        denom = sigma * sqrt(time_to_expiry)
-        d1 = log(adj_fwd / adj_strike) + 0.5 * sigma * sigma * time_to_expiry
-        d2 = log(adj_fwd / adj_strike) - 0.5 * sigma * sigma * time_to_expiry
+        denom = sigma * sqrt(t_exp)
+        d1 = log(adj_fwd / adj_strike) + 0.5 * sigma * sigma * t_exp
+        d2 = log(adj_fwd / adj_strike) - 0.5 * sigma * sigma * t_exp
         d1 /= denom
         d2 /= denom
 
-        v_pay = (adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)) * index_rpv01
-        v_rec = (adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)) * index_rpv01
+        v_pay = (
+            adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)
+        ) * index_rpv01
+        v_rec = (
+            adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)
+        ) * index_rpv01
 
         v_pay *= self.notional
         v_rec *= self.notional
@@ -136,19 +142,23 @@ class CDSIndexOption:
         credit triangle to compute the forward RPV01."""
 
         num_credits = len(issuer_curves)
-        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         #        timeToMaturity = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
-        df_to_expiry = issuer_curves[0].df(time_to_expiry)
+        df_to_expiry = issuer_curves[0].df(t_exp)
         libor_curve = issuer_curves[0].libor_curve
 
         k = self.strike_cpn
         c = self.index_cpn
 
-        strike_cds = CDS(self.expiry_dt, self.maturity_dt, self.strike_cpn, 1.0)
+        strike_cds = CDS(
+            self.expiry_dt, self.maturity_dt, self.strike_cpn, 1.0
+        )
 
-        strike_curve = CDSCurve(value_dt, [strike_cds], libor_curve, index_recovery)
+        strike_curve = CDSCurve(
+            value_dt, [strike_cds], libor_curve, index_recovery
+        )
         strike_rpv01s = strike_cds.risky_pv01(value_dt, strike_curve)
-        q_to_expiry = strike_curve.survival_prob(time_to_expiry)
+        q_to_expiry = strike_curve.survival_prob(t_exp)
         strike_value = (k - c) * strike_rpv01s["clean_rpv01"]
         strike_value /= df_to_expiry * q_to_expiry
 
@@ -159,7 +169,7 @@ class CDSIndexOption:
         for i_credit in range(0, num_credits):
 
             issuer_curve = issuer_curves[i_credit]
-            q = issuer_curve.survival_prob(time_to_expiry)
+            q = issuer_curve.survival_prob(t_exp)
             dh1 = (1.0 - issuer_curve.recovery_rate) * (1.0 - q)
 
             s = self.cds_contract.par_spread(value_dt, issuer_curve)
@@ -171,7 +181,9 @@ class CDSIndexOption:
 
         exp_h = (h1 + h2) / num_credits
 
-        x = self._solve_for_x(value_dt, sigma, c, index_recovery, libor_curve, exp_h)
+        x = self._solve_for_x(
+            value_dt, sigma, c, index_recovery, libor_curve, exp_h
+        )
 
         v = self._calc_index_payer_option_price(
             value_dt, x, sigma, c, strike_value, libor_curve, index_recovery
@@ -310,7 +322,7 @@ class CDSIndexOption:
         int_h = 0.0
         int_max_h = 0.0
 
-        day_count = DayCount(self.dc_type)
+        day_count = DayCount(self.accrual_dc_type)
 
         #  Previous cpn date is last cpn date before valuation date
         for dt in flow_dts:
@@ -357,10 +369,10 @@ class CDSIndexOption:
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAYCOUNT", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
         return s
 
     ###########################################################################

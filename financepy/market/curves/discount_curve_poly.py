@@ -10,28 +10,25 @@ from ...utils.global_vars import G_SMALL
 from ...utils.helpers import label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
-from ...utils.frequency import FrequencyTypes
-from ...utils.day_count import DayCountTypes
 from ...utils.helpers import times_from_dates
+from ...utils.day_count import DayCountTypes
 
-########################################################################################
+###############################################################################
 
 
 class DiscountCurvePoly(DiscountCurve):
     """Zero Rate Curve of a specified frequency parametrised using a cubic
-    polynomial. The zero rate is assumed to be continuously compounded but
-    this can be amended by providing a frequency when extracting zero rates.
+    polynomial. The zero rate is assumed to be continuously compounded.
     We also need to specify a Day count convention for time calculations.
     The class inherits all of the methods from DiscountCurve."""
 
-    ####################################################################################
+    ###########################################################################
 
     def __init__(
         self,
         value_dt: Date,
         coefficients: Union[list, np.ndarray],
-        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Create zero rate curve parametrised using a cubic curve from
         coefficients and specifying a compounding frequency type and day count
@@ -41,59 +38,27 @@ class DiscountCurvePoly(DiscountCurve):
 
         self.value_dt = value_dt
         self._coefficients = coefficients
-        self.freq_type = freq_type
-        self.dc_type = dc_type
 
-    ####################################################################################
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
 
-    def zero_rate(
-        self,
-        dts: Union[list, Date],
-        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
-    ):
-        """Calculation of zero rates with specified frequency according to
-        polynomial parametrisation. This method overrides DiscountCurve.
-        The parametrisation is not strictly in terms of continuously compounded
-        zero rates, this function allows other compounding and day counts.
-        This function returns a single or vector of zero rates given a vector
-        of dates so must use Numpy functions. The default frequency is a
-        continuously compounded rate and ACT360 day counting."""
+        self.time_dc_type = time_dc_type
+        self._interp_type = None
 
-        if isinstance(freq_type, FrequencyTypes) is False:
-            raise FinError("Invalid Frequency type.")
-
-        if isinstance(dc_type, DayCountTypes) is False:
-            raise FinError("Invalid Day Count type.")
-
-        # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dts, self.value_dt, self.dc_type)
-
-        # We now get the discount factors using these times
-        zero_rates = self._zero_rate(dc_times)
-
-        # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(
-            self.value_dt, zero_rates, dc_times, self.freq_type, self.dc_type
+        # Set up an annual grid of times and discount factors for insight
+        years = np.linspace(0.0, 10.0, 11)
+        self._df_dates = self.value_dt.add_years(years)
+        self._times = times_from_dates(
+            self._df_dates, self.value_dt, self.time_dc_type
         )
+        self._dfs = self.df_t(self._times)
 
-        # Convert these to zero rates in the required frequency and day count
-        zero_rates = self._df_to_zero(dfs, dts, freq_type, dc_type)
+    ###########################################################################
 
-        scalar_input = isinstance(dts, Date)
-
-        if scalar_input:
-            return zero_rates[0]
-
-        return zero_rates
-
-    ####################################################################################
-
-    def _zero_rate(self, times: Union[float, np.ndarray]):
-        """Calculate the zero rate to maturity date but with times as inputs.
+    def poly_cc_zero_rate(self, times: Union[float, np.ndarray]):
+        """Calculate cc zero rate to maturity date but with times as inputs.
         This function is used internally and should be discouraged for external
-        use. The compounding frequency defaults to that specified in the
-        constructor of the curve object. Which may be annual to continuous."""
+        use."""
 
         t = np.maximum(times, G_SMALL)
 
@@ -103,60 +68,53 @@ class DiscountCurvePoly(DiscountCurve):
 
         return zero_rate
 
-    ####################################################################################
+    ###########################################################################
 
-    def df(self, dates: Union[list, Date]):
-        """Calculate the fwd rate to maturity date but with times as inputs.
-        This function is used internally and should be discouraged for external
-        use. The compounding frequency defaults to that specified in the
-        constructor of the curve object."""
+    def df_t(self, t: Union[float, list, np.ndarray]):
+        """Return discount factors for scalar or vector times."""
 
-        # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dates, self.value_dt, self.dc_type)
+        times, scalar_input = self._to_time_array(t)
+        times = np.maximum(times, G_SMALL)
 
-        # We now get the discount factors using these times
-        zero_rates = self._zero_rate(dc_times)
-
-        # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(
-            self.value_dt, zero_rates, dc_times, self.freq_type, self.dc_type
-        )
-
-        scalar_input = isinstance(dates, Date)
+        zero_rates = self.poly_cc_zero_rate(times)
+        dfs = np.exp(-zero_rates * times)
 
         if scalar_input:
-            return dfs[0]
+            return float(dfs[0])
+        else:
+            return np.asarray(dfs, dtype=float)
 
-        return dfs
+    ###########################################################################
 
-    ####################################################################################
+    def bump_parallel(self, bump_size: float):
 
-    def bump(self, bump_size: float):
         bumped_coefficients = np.array(self._coefficients, copy=True)
         bumped_coefficients[0] += bump_size
 
-        return DiscountCurvePoly(
+        discount_curve = DiscountCurvePoly(
             self.value_dt,
             bumped_coefficients,
-            freq_type=self.freq_type,
-            dc_type=self.dc_type,
+            time_dc_type=self.time_dc_type,
         )
 
-    ####################################################################################
+        return discount_curve
+
+    ###########################################################################
 
     def __repr__(self):
         """Display internal parameters of curve."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("POWER", "COEFFICIENT")
-        for i in range(0, len(self._coefficients)):
-            s += label_to_string(str(i), self._coefficients[i])
-        s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT", self.dc_type)
+        for i, coeff in enumerate(self._coefficients):
+            s += label_to_string(str(i), f"{coeff:12.8f}")
 
+        # Then generic DiscountCurve info
+        s += "\n"
+        s += super().__repr__()
         return s
 
-    ####################################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

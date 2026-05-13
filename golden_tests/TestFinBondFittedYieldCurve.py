@@ -11,7 +11,7 @@ from financepy.products.bonds.curve_fits import CurveFitNelsonSiegelSvensson
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegel
 from financepy.products.bonds.curve_fits import CurveFitBSpline
 from financepy.products.bonds.curve_fits import CurveFitPolynomial
-from financepy.products.bonds.bond_yield_curve import BondYieldCurve
+from financepy.products.bonds.bond_fitted_yield_curve import BondFittedYieldCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
@@ -21,14 +21,18 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
+SHOW_PLOTS = False
+
 ########################################################################################
 
 
-def test_bond_yield_curve():
+def test_bond_fitted_yield_curve():
 
-    path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
+    path = os.path.join(os.path.dirname(__file__),
+                        "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
-    bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
+    bond_dataframe["mid"] = 0.5 * \
+        (bond_dataframe["bid"] + bond_dataframe["ask"])
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
@@ -51,24 +55,30 @@ def test_bond_yield_curve():
         ylds.append(yld)
 
     curve_fitter = CurveFitPolynomial()
-    fitted_curve1 = BondYieldCurve(settle_dt, bonds, ylds, curve_fitter)
-    #    fitted_curve1.display("GBP Yield Curve")
+    fitted_curve1 = BondFittedYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+
+    if SHOW_PLOTS:
+        fitted_curve1.display("GBP Yield Curve")
 
     curve_fitter = CurveFitPolynomial(5)
-    fitted_curve2 = BondYieldCurve(settle_dt, bonds, ylds, curve_fitter)
-    #    fitted_curve2.display("GBP Yield Curve")
+    fitted_curve2 = BondFittedYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    if SHOW_PLOTS:
+        fitted_curve2.display("GBP Yield Curve")
 
     curve_fitter = CurveFitNelsonSiegel()
-    fitted_curve3 = BondYieldCurve(settle_dt, bonds, ylds, curve_fitter)
-    #    fitted_curve3.display("GBP Yield Curve")
+    fitted_curve3 = BondFittedYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    if SHOW_PLOTS:
+        fitted_curve3.display("GBP Yield Curve")
 
     curve_fitter = CurveFitNelsonSiegelSvensson()
-    fitted_curve4 = BondYieldCurve(settle_dt, bonds, ylds, curve_fitter)
-    #    fitted_curve4.display("GBP Yield Curve")
+    fitted_curve4 = BondFittedYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    if SHOW_PLOTS:
+        fitted_curve4.display("GBP Yield Curve")
 
     curve_fitter = CurveFitBSpline()
-    fitted_curve5 = BondYieldCurve(settle_dt, bonds, ylds, curve_fitter)
-    #    fitted_curve5.display("GBP Yield Curve")
+    fitted_curve5 = BondFittedYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    if SHOW_PLOTS:
+        fitted_curve5.display("GBP Yield Curve")
 
     test_cases.header("PARAMETER", "VALUE")
     test_cases.print("values", fitted_curve1.curve_fit.coeffs)
@@ -91,11 +101,11 @@ def test_bond_yield_curve():
     test_cases.print("tau_2", fitted_curve4.curve_fit.tau_2)
 
     maturity_dt = Date(19, 9, 2030)
-    interp_yield = fitted_curve5.interp_yield(maturity_dt)
+    interp_yield = fitted_curve5.interp_rate(maturity_dt)
     test_cases.print(maturity_dt, interp_yield)
 
 
 ########################################################################################
 
-test_bond_yield_curve()
+test_bond_fitted_yield_curve()
 test_cases.compare_test_cases()

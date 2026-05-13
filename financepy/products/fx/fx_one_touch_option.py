@@ -181,18 +181,18 @@ class FXOneTouchOption(FXOption):
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        t = max(t, 1e-6)
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = max(t_exp, 1e-6)
 
         s0 = spot_fx_rate
         h = self.barrier_rate
         k = self.payment_size
 
-        sqrt_t = np.sqrt(t)
+        sqrt_t_exp = np.sqrt(t_exp)
 
-        df = domestic_curve.df(self.expiry_dt)
-        r_d = domestic_curve.cc_rate(self.expiry_dt)
-        r_f = foreign_curve.cc_rate(self.expiry_dt)
+        df = domestic_curve.df_t(t_exp)
+        r_d = domestic_curve.zero_rate_t(t_exp)
+        r_f = foreign_curve.zero_rate_t(t_exp)
 
         v = model.volatility
         v = max(v, 1e-6)
@@ -203,7 +203,7 @@ class FXOneTouchOption(FXOption):
         lam = np.sqrt(mu * mu + 2.0 * r_d / v / v)
 
         if debug_mode:
-            print("t:", t)
+            print("t:", t_exp)
             print("vol", v)
             print("b", b)
             print("mu", mu)
@@ -216,10 +216,10 @@ class FXOneTouchOption(FXOption):
                 raise FinError("FX Rate is currently below barrier.")
 
             eta = 1.0
-            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -231,10 +231,10 @@ class FXOneTouchOption(FXOption):
                 raise FinError("FX Rate is currently above barrier.")
 
             eta = -1.0
-            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -247,10 +247,10 @@ class FXOneTouchOption(FXOption):
 
             eta = 1.0
             k = h
-            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -263,10 +263,10 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             k = h
-            z = np.log(h / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -279,14 +279,14 @@ class FXOneTouchOption(FXOption):
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b_2 + b_4
             return v
@@ -300,14 +300,14 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             phi = +1.0
 
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b_2 + b_4
             return v
@@ -320,11 +320,16 @@ class FXOneTouchOption(FXOption):
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-r_f * t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = (
+                s0
+                * dq
+                * np.power(h / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a_2 + a_4
             return v
 
@@ -336,11 +341,16 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             phi = +1.0
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-r_f * t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = (
+                s0
+                * dq
+                * np.power(h / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a_2 + a_4
             return v
 
@@ -353,14 +363,14 @@ class FXOneTouchOption(FXOption):
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b_2 - b_4
             return v
@@ -374,14 +384,14 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b_4 = (
                 k
                 * df
                 * np.power(h / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b_2 - b_4
             return v
@@ -395,11 +405,16 @@ class FXOneTouchOption(FXOption):
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-r_f * t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = (
+                s0
+                * dq
+                * np.power(h / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a_2 - a_4
             return v
 
@@ -412,11 +427,16 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0 / h) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(h / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-r_f * t)
+            x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = (
+                s0
+                * dq
+                * np.power(h / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a_2 - a_4
             return v
 

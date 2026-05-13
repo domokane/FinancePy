@@ -1,5 +1,6 @@
 from .date import Date
 
+
 class DateLite:
     __slots__ = ("excel_dt",)
 
@@ -10,7 +11,7 @@ class DateLite:
     def add_days(self, n: int) -> "DateLite":
         return DateLite(self.excel_dt + n)
 
-    # Weekday using Excel convention (0=Mon … 6=Sun)
+    # Weekday using Excel convention with 0 for Mon to 6 for Sunday
     def weekday(self) -> int:
         return (self.excel_dt + 5) % 7
 
@@ -24,4 +25,3 @@ class DateLite:
 
     def __repr__(self):
         return f"DateLite({self.excel_dt})"
-

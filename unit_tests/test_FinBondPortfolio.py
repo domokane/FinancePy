@@ -202,7 +202,7 @@ def test_10():
 
 def test_11():
 
-    dc_type = DayCountTypes.SIMPLE
+    dc_type = DayCountTypes.ACT_360
     maturity_dt = Date(25, 8, 2017)
     coupon = 0.0875000000
     clean_price = 138.57000000

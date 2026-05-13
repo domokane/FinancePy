@@ -1,5 +1,17 @@
 ## CHANGE LOG
 
+13 May 2026
+- Mosly work on DiscountCurves and all its variants
+- Extended inheritance of DiscountCurves to all curves
+- All inheriting classes have a bump_parallel method
+- Removed alternative calculations of zero, par, swap and forward rates so all such calls use DiscountCurve methods
+- Added argument to determine day count rule for converting dates to times
+- Set default value of time_dc_type to ACT_365F - which means we divide by 365
+- Fixed bug in swap_float_leg so we use specifed accrual basis and not index curve basis
+- Set all references to call directly discountCurve._dfs and ._times to avoid copying using accessor methods
+- Did same for credit curves to access ._qs survival probabilities
+- Added compounding enum to handle rates and separate it from frequency
+
 28 August 2025
 - Completed pep8 cleanup
 - Ensured caching on as many numba functions as possible

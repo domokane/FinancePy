@@ -56,12 +56,12 @@ def test_fin_cds_curve():
         curve_dt, cds_contracts, libor_curve, recovery_rate, use_cache=False
     )
 
-    assert round(issuer_curve.times[0], 4) == 0.0
-    assert round(issuer_curve.times[5], 4) == 5.0027
-    assert round(issuer_curve.times[9], 4) == 9.0055
-    assert round(issuer_curve.qs[0], 4) == 1.0
-    assert round(issuer_curve.qs[5], 4) == 0.9249
-    assert round(issuer_curve.qs[9], 4) == 0.8071
+    assert round(issuer_curve._times[0], 4) == 0.0
+    assert round(issuer_curve._times[5], 4) == 5.0027
+    assert round(issuer_curve._times[9], 4) == 9.0055
+    assert round(issuer_curve._qs[0], 4) == 1.0
+    assert round(issuer_curve._qs[5], 4) == 0.9249
+    assert round(issuer_curve._qs[9], 4) == 0.8071
 
     i = 1
     maturity_dt = curve_dt.add_months(12 * i)

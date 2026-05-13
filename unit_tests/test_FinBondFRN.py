@@ -47,7 +47,8 @@ def test_bond_frn_1():
     accd_amount = bond.accrued_int
     assert round(accd_amount, 4) == 0.0023
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     assert round(principal, 4) == 97.0243
 
@@ -63,11 +64,11 @@ def test_bond_frn_1():
 
     assert round(modified_duration, 4) == 0.0527
 
-    macauley_duration = bond.macauley_duration(
+    macaulay_duration = bond.macaulay_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
-    assert round(macauley_duration, 4) == 0.0530
+    assert round(macaulay_duration, 4) == 0.0530
 
     convexity = bond.convexity_from_dm(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -129,7 +130,8 @@ def test_bond_frn_2():
     accd_amount = bond.accrued_int
     assert round(accd_amount, 4) == 0.0005
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     assert round(principal, 4) == 93.131
 
@@ -145,11 +147,11 @@ def test_bond_frn_2():
 
     assert round(modified_duration, 4) == 0.3425
 
-    macauley_duration = bond.macauley_duration(
+    macaulay_duration = bond.macaulay_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
     )
 
-    assert round(macauley_duration, 4) == 0.3452
+    assert round(macaulay_duration, 4) == 0.3452
 
     convexity = bond.convexity_from_dm(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -157,7 +159,8 @@ def test_bond_frn_2():
 
     assert round(convexity, 4) == 0.0023
 
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+    principal = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
     assert round(principal, 4) == 93.1310
 

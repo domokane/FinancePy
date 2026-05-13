@@ -13,21 +13,19 @@ from scipy.interpolate import splrep
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.day_count import DayCountTypes
 from ...utils.math import scale
 from ...utils.helpers import label_to_string
+from ...utils.helpers import times_from_dates
 
+from ...market.curves.discount_curve import DiscountCurve
 from .curve_fits import CurveFitPolynomial
 from .curve_fits import CurveFitNelsonSiegel
 from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
 
-########################################################################################
-# TO DO: CONSTRAIN TAU'S IN NELSON-SIEGEL
-########################################################################################
 
-
-class BondYieldCurve:
+class BondFittedYieldCurve(DiscountCurve):
     """Class to do fitting of the yield curve and to enable interpolation of
     yields. Because yields assume a flat term structure for each bond, this
     class does not allow discounting to be done and so does not inherit from
@@ -40,6 +38,7 @@ class BondYieldCurve:
         bonds: list,
         ylds: Union[np.ndarray, list],
         curve_fit,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
@@ -52,10 +51,20 @@ class BondYieldCurve:
 
         fit_type = type(self.curve_fit)
 
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
+
+        self.time_dc_type = time_dc_type
+
         years_to_maturities = []
 
         for bond in bonds:
-            years_to_maturity = (bond.maturity_dt - settle_dt) / G_DAYS_IN_YEAR
+
+            years_to_maturity = times_from_dates(
+                bond.maturity_dt,
+                settle_dt,
+                self.time_dc_type,
+            )
             years_to_maturities.append(years_to_maturity)
 
         self.years_to_maturity = np.array(years_to_maturities)
@@ -63,8 +72,11 @@ class BondYieldCurve:
         if fit_type is CurveFitPolynomial:
 
             d = curve_fit.power
-            coeffs = np.polyfit(self.years_to_maturity, self.ylds, deg=d)
-            curve_fit.coeffs = coeffs
+            # Highest powers are first
+            coeffs1 = np.polyfit(self.years_to_maturity, self.ylds, deg=d)
+            # Lowest powers are first
+            coeffs2 = coeffs1[::-1]
+            curve_fit.coeffs = coeffs2
 
         elif fit_type is CurveFitNelsonSiegel:
 
@@ -72,7 +84,7 @@ class BondYieldCurve:
             ydata = self.ylds
 
             popt, _ = scipy.optimize.curve_fit(
-                curve_fit.interp_yield, xdata, ydata, bounds=curve_fit.bounds
+                curve_fit.interp_rate, xdata, ydata, bounds=curve_fit.bounds
             )
 
             curve_fit.beta_1 = popt[0]
@@ -86,7 +98,7 @@ class BondYieldCurve:
             ydata = self.ylds
 
             popt, _ = scipy.optimize.curve_fit(
-                curve_fit.interp_yield, xdata, ydata, bounds=curve_fit.bounds
+                curve_fit.interp_rate, xdata, ydata, bounds=curve_fit.bounds
             )
 
             curve_fit.beta_1 = popt[0]
@@ -110,15 +122,20 @@ class BondYieldCurve:
 
     ###########################################################################
 
-    def interp_yield(self, maturity_dt: Date):
-
+    def interp_rate(self, maturity_dt: Date):
+        """Interpolate rate - which can be a zero rate or yield depending on
+        context of use"""
         if isinstance(maturity_dt, Date):
-            t = (maturity_dt - self.settle_dt) / G_DAYS_IN_YEAR
+            t = times_from_dates(
+                maturity_dt, self.settle_dt, self.time_dc_type
+            )
         elif isinstance(maturity_dt, list):
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):
             t = maturity_dt
-        elif isinstance(maturity_dt, float) or isinstance(maturity_dt, np.float64):
+        elif isinstance(maturity_dt, float) or isinstance(
+            maturity_dt, np.float64
+        ):
             t = maturity_dt
         else:
             raise FinError("Unknown date type.")
@@ -127,12 +144,14 @@ class BondYieldCurve:
         yld = None
 
         if isinstance(fit, CurveFitPolynomial):
-            yld = fit.interp_yield(t)
+            yld = fit.interp_rate(t)
         elif isinstance(fit, CurveFitNelsonSiegel):
-            yld = fit.interp_yield(t, fit.beta_1, fit.beta_2, fit.beta_3, fit.tau)
+            yld = fit.interp_rate(
+                t, fit.beta_1, fit.beta_2, fit.beta_3, fit.tau
+            )
 
         elif isinstance(fit, CurveFitNelsonSiegelSvensson):
-            yld = fit.interp_yield(
+            yld = fit.interp_rate(
                 t,
                 fit.beta_1,
                 fit.beta_2,
@@ -143,7 +162,7 @@ class BondYieldCurve:
             )
 
         elif isinstance(fit, CurveFitBSpline):
-            yld = fit.interp_yield(t)
+            yld = fit.interp_rate(t)
 
         return yld
 
@@ -186,4 +205,4 @@ class BondYieldCurve:
         print(self)
 
 
-########################################################################################
+###############################################################################

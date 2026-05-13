@@ -65,8 +65,8 @@ class BondOption:
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         t_mat = (self.bond.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
-        df_times = discount_curve.times
-        df_values = discount_curve.dfs
+        df_times = discount_curve._times
+        df_values = discount_curve._dfs
 
         # We need all the flows in case the option is American
         # and some occur before expiry
@@ -126,9 +126,15 @@ class BondOption:
             exercise_type,
         )
 
-        if self.opt_type in [OptionTypes.EUROPEAN_CALL, OptionTypes.AMERICAN_CALL]:
+        if self.opt_type in [
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.AMERICAN_CALL,
+        ]:
             return v["call"]
-        elif self.opt_type in [OptionTypes.AMERICAN_PUT, OptionTypes.EUROPEAN_PUT]:
+        elif self.opt_type in [
+            OptionTypes.AMERICAN_PUT,
+            OptionTypes.EUROPEAN_PUT,
+        ]:
             return v["put"]
 
         raise FinError("Unknown option type.")

@@ -27,8 +27,6 @@ class InterpTypes(Enum):
     TENSION_ZERO_RATES = 22
 
 
-# TODO: GET RID OF THIS FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 ########################################################################################
 
 
@@ -63,7 +61,9 @@ def interpolate(
 
     raise FinError("Unknown input type" + type(t))
 
+
 ########################################################################################
+
 
 @njit(
     float64(float64, float64[:], float64[:], int64),
@@ -139,7 +139,9 @@ def _uinterpolate(t, times, dfs, method):
             rt1 = -np.log(dfs[i - 2])
             rt2 = -np.log(dfs[i - 1])
             dt = times[i - 1] - times[i - 2]
-            rtvalue = ((times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2) / dt
+            rtvalue = (
+                (times[i - 1] - t) * rt1 + (t - times[i - 2]) * rt2
+            ) / dt
             yvalue = np.exp(-rtvalue)
 
         return yvalue
@@ -152,23 +154,28 @@ def _uinterpolate(t, times, dfs, method):
             yvalue = np.exp(-yvalue)
         elif i < num_points:
             # If you get a math domain error it is because you need negativ
-            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (
+                times[i - 1] - times[i - 2]
+            )
             fwd2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
             dt = times[i] - times[i - 1]
             fwd = ((times[i] - t) * fwd1 + (t - times[i - 1]) * fwd2) / dt
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
         else:
-            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+            fwd = -np.log(dfs[i - 1] / dfs[i - 2]) / (
+                times[i - 1] - times[i - 2]
+            )
             yvalue = dfs[i - 1] * np.exp(-fwd * (t - times[i - 1]))
 
         return yvalue
 
     else:
         print(method)
-        raise FinError("Invalid interpolation scheme.")
+        raise FinError("Invalid interpolation scheme." + str(method))
 
 
 ########################################################################################
+
 
 @njit(
     float64[:](float64[:], float64[:], float64[:], int64),
@@ -190,13 +197,13 @@ def _vinterpolate(x_values, x_vector, dfs, method):
     return yvalues
 
 
-########################################################################################
+###############################################################################
 
 
 class Interpolator:
     """Interpolator class for curve fitting and value interpolation."""
 
-    ####################################################################################
+    ###########################################################################
 
     def __init__(self, interpolator_type: InterpTypes, **kwargs: dict):
 
@@ -207,7 +214,7 @@ class Interpolator:
         self._refit_curve = False
         self._optional_interp_params = kwargs
 
-    ####################################################################################
+    ###########################################################################
 
     def fit(self, times: np.ndarray, dfs: np.ndarray):
         """
@@ -260,7 +267,9 @@ class Interpolator:
 
             # Second derivatives are clamped to zero at end points
             log_dfs = np.log(self._dfs)
-            self._interp_fn = CubicSpline(self._times, log_dfs, bc_type="natural")
+            self._interp_fn = CubicSpline(
+                self._times, log_dfs, bc_type="natural"
+            )
 
         elif self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
 
@@ -271,7 +280,9 @@ class Interpolator:
             if self._times[0] == 0.0:
                 zero_rates[0] = zero_rates[1]
 
-            self._interp_fn = CubicSpline(self._times, zero_rates, bc_type="natural")
+            self._interp_fn = CubicSpline(
+                self._times, zero_rates, bc_type="natural"
+            )
 
         #        elif self._interp_type  == InterpTypes.LINEAR_LOG_DISCOUNT:
         #            log_dfs = np.log(self.dfs)
@@ -322,7 +333,7 @@ class Interpolator:
                 self._times, zero_rates, sigma=tension_sigma
             )
 
-    ####################################################################################
+    ###########################################################################
 
     def interpolate(self, t: float):
         """Interpolation of discount factors at time x given discount factors
@@ -349,6 +360,9 @@ class Interpolator:
                 print(t)
                 raise FinError("Interpolate times must all be >= 0")
 
+            if np.abs(t[0]) < G_SMALL:
+                return np.array([1.0])
+
             tvec = t
 
         else:
@@ -371,6 +385,7 @@ class Interpolator:
             out = np.exp(-tvec * self._interp_fn(tvec))
 
         elif self._interp_type == InterpTypes.LINEAR_ONFWD_RATES:
+
             if self._interp_fn is None:
                 # not enough data was used to fit the curve -- never reached
                 # the fitting stage
@@ -390,7 +405,7 @@ class Interpolator:
                 # Here we assume constant extrapolation, consistent with how
                 # we set up our interpolator
 
-                ########################################################################
+                ###############################################################
 
                 def true_integral(spline, t):
 
@@ -403,7 +418,9 @@ class Interpolator:
                 out = np.exp(log_dfs)
         else:
 
-            out = _vinterpolate(tvec, self._times, self._dfs, self._interp_type.value)
+            out = _vinterpolate(
+                tvec, self._times, self._dfs, self._interp_type.value
+            )
 
         if isinstance(t, (float, np.float64)):
             return out[0]
@@ -411,9 +428,7 @@ class Interpolator:
         return out
 
     @classmethod
-
-    ####################################################################################
-
+    ###########################################################################
     def suitable_for_bootstrap(cls, interp_type):
         """Check if the interpolation type is suitable for bootstrapping."""
         is_suitable = {

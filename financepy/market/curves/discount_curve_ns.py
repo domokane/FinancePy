@@ -5,7 +5,6 @@ from typing import Union
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 from ...market.curves.discount_curve import DiscountCurve
@@ -33,8 +32,7 @@ class DiscountCurveNS(DiscountCurve):
         beta_1: float,
         beta_2: float,
         tau: float,
-        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Creation of a FinDiscountCurveNS object. Parameters are provided
         individually for beta_0, beta_1, beta_2 and tau. The zero rates
@@ -42,6 +40,7 @@ class DiscountCurveNS(DiscountCurve):
         convention that defaults to continuous but which can be overridden."""
 
         check_argument_types(self.__init__, locals())
+        self._interp_type = None
 
         if tau <= 0:
             raise FinError("Tau must be positive")
@@ -51,55 +50,22 @@ class DiscountCurveNS(DiscountCurve):
         self._beta_1 = beta_1
         self._beta_2 = beta_2
         self._tau = tau
-        self.freq_type = freq_type
-        self.dc_type = dc_type
+        self.time_dc_type = time_dc_type
 
-    ####################################################################################
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
 
-    def zero_rate(
-        self,
-        dts: Union[list, Date],
-        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
-    ):
-        """Calculation of zero rates with specified frequency according to
-        NS parametrisation. This method overrides that in DiscountCurve.
-        The parametrisation is not strictly in terms of continuously compounded
-        zero rates, this function allows other compounding and day counts.
-        This function returns a single or vector of zero rates given a vector
-        of dates so must use Numpy functions. The default frequency is a
-        continuously compounded rate and ACT360 day counting."""
-
-        if isinstance(freq_type, FrequencyTypes) is False:
-            raise FinError("Invalid Frequency type.")
-
-        if isinstance(dc_type, DayCountTypes) is False:
-            raise FinError("Invalid Day Count type.")
-
-        # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dts, self.value_dt, self.dc_type)
-
-        # We now get the discount factors using these times
-        zero_rates = self._zero_rate(dc_times)
-
-        # Now get the discount factors using curve conventions
-        dfs = self._zero_to_df(
-            self.value_dt, zero_rates, dc_times, self.freq_type, self.dc_type
+        # Set up an annual grid of times and discount factors for insight
+        years = np.linspace(0.0, 10.0, 11)
+        self._df_dates = self.value_dt.add_years(years)
+        self._times = times_from_dates(
+            self._df_dates, self.value_dt, self.time_dc_type
         )
+        self._dfs = self.df_t(self._times)
 
-        # Convert these to zero rates in the required frequency and day count
-        zero_rates = self._df_to_zero(dfs, dts, freq_type, dc_type)
+    ###########################################################################
 
-        scalar_input = isinstance(dts, Date)
-
-        if scalar_input:
-            return zero_rates[0]
-
-        return zero_rates
-
-    ####################################################################################
-
-    def _zero_rate(self, times: Union[float, np.ndarray]):
+    def ns_cc_zero_rate(self, times: Union[float, np.ndarray]):
         """Zero rate for Nelson-Siegel curve parametrisation. This means that
         the t vector must use the curve day count."""
 
@@ -112,41 +78,36 @@ class DiscountCurveNS(DiscountCurve):
         zero_rate += self._beta_2 * ((1.0 - e) / theta - e)
         return zero_rate
 
-    ####################################################################################
+    ###########################################################################
 
-    def df(self, dates: Union[Date, list]):
-        """Return discount factors given a single or vector of dates. The
-        discount factor depends on the rate and this in turn depends on its
-        compounding frequency and it defaults to continuous compounding. It
-        also depends on the day count convention. This was set in the
-        construction of the curve to be ACT_ACT_ISDA."""
+    def df_t(self, t: Union[float, list, np.ndarray]):
+        """Return discount factors for scalar or vector times."""
 
-        # Get day count times to use with curve day count convention
-        dc_times = times_from_dates(dates, self.value_dt, self.dc_type)
+        times, scalar_input = self._to_time_array(t)
+        times = np.maximum(times, G_SMALL)
 
-        zero_rates = self._zero_rate(dc_times)
+        zero_rates = self.ns_cc_zero_rate(times)
+        dfs = np.exp(-zero_rates * times)
 
-        df = self._zero_to_df(
-            self.value_dt, zero_rates, dc_times, self.freq_type, self.dc_type
-        )
+        if scalar_input:
+            return float(dfs[0])
+        else:
+            return np.asarray(dfs, dtype=float)
 
-        if isinstance(dates, Date):
-            return df[0]
+    ###########################################################################
 
-        return df
+    def bump_parallel(self, bump_size: float):
 
-    ####################################################################################
-
-    def bump(self, bump_size: float):
-        return DiscountCurveNS(
+        discount_curve = DiscountCurveNS(
             self.value_dt,
             self._beta_0 + bump_size,
             self._beta_1,
             self._beta_2,
             self._tau,
-            freq_type=self.freq_type,
-            dc_type=self.dc_type,
+            time_dc_type=self.time_dc_type,
         )
+
+        return discount_curve
 
     ####################################################################################
 
@@ -154,12 +115,14 @@ class DiscountCurveNS(DiscountCurve):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("PARAMETER", "VALUE")
-        s += label_to_string("beta_0", self._beta_0)
-        s += label_to_string("beta_1", self._beta_1)
-        s += label_to_string("beta_2", self._beta_2)
+        s += label_to_string("BETA_0", self._beta_0)
+        s += label_to_string("BETA_1", self._beta_1)
+        s += label_to_string("BETA_2", self._beta_2)
         s += label_to_string("TAU", self._tau)
-        s += label_to_string("FREQUENCY", (self.freq_type))
-        s += label_to_string("DAY_COUNT", (self.dc_type))
+
+        # Then generic DiscountCurve info
+        s += "\n"
+        s += super().__repr__()
         return s
 
     ####################################################################################

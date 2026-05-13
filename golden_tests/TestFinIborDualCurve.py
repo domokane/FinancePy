@@ -428,12 +428,14 @@ def test_bloomberg_pricing_example():
     )
     swaps.append(swap)
 
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps, interp_type, True)
+    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps, interp_type)
 
     test_cases.banner("======================================================")
     test_cases.banner("SINGLE CURVE VALUATION")
     test_cases.header("LABEL", "VALUE")
-    test_cases.print("VALUE:", swaps[0].value(value_dt, libor_curve, libor_curve, None))
+    test_cases.print(
+        "VALUE:", swaps[0].value(value_dt, libor_curve, libor_curve, None)
+    )
     test_cases.print("FIXED:", swaps[0].fixed_leg.value(value_dt, libor_curve))
     test_cases.print(
         "FLOAT:",
@@ -446,7 +448,9 @@ def test_bloomberg_pricing_example():
     test_cases.print(
         "VALUE:", swaps[0].value(settle_dt, libor_curve, libor_curve, None)
     )
-    test_cases.print("FIXED:", swaps[0].fixed_leg.value(settle_dt, libor_curve))
+    test_cases.print(
+        "FIXED:", swaps[0].fixed_leg.value(settle_dt, libor_curve)
+    )
     test_cases.print(
         "FLOAT:",
         swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None),
@@ -466,6 +470,7 @@ def test_bloomberg_pricing_example():
         fras,
         swaps,
         InterpTypes.FLAT_FWD_RATES,
+        DayCountTypes.ACT_ACT_ISDA,
         True,
     )
     #    print(libor_dual_curve)
@@ -506,13 +511,13 @@ def test_bloomberg_pricing_example():
         years = np.linspace(0, 5, 21)
         dates = settle_dt.add_years(years)
 
-        single_curve_fwds = libor_curve.fwd(dates)
+        single_curve_fwds = libor_curve.fwd_rate_inst(dates)
         plt.plot(years, single_curve_fwds, label="Single Libor Curve")
 
-        ois_curve_fwds = ois_curve.fwd(dates)
+        ois_curve_fwds = ois_curve.fwd_rate_inst(dates)
         plt.plot(years, ois_curve_fwds, label="OIS Curve")
 
-        index_curve_fwds = libor_dual_curve.fwd(dates)
+        index_curve_fwds = libor_dual_curve.fwd_rate_inst(dates)
         plt.plot(years, index_curve_fwds, label="Libor Index Curve")
 
         plt.legend()
@@ -574,29 +579,53 @@ def test_swap_valuation_example():
     fras = []
     fra_dcc_type = DayCountTypes.ACT_360
 
-    fra = IborFRA(settle_dt.add_tenor("1M"), "6M", -0.2450 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("1M"), "6M", -0.2450 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("2M"), "6M", -0.2435 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("2M"), "6M", -0.2435 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("3M"), "6M", -0.2400 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("3M"), "6M", -0.2400 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("4M"), "6M", -0.2360 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("4M"), "6M", -0.2360 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("5M"), "6M", -0.2285 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("5M"), "6M", -0.2285 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("6M"), "6M", -0.2230 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("6M"), "6M", -0.2230 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("7M"), "6M", -0.2110 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("7M"), "6M", -0.2110 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("8M"), "6M", -0.1990 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("8M"), "6M", -0.1990 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("9M"), "6M", -0.1850 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("9M"), "6M", -0.1850 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("10M"), "6M", -0.1680 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("10M"), "6M", -0.1680 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("11M"), "6M", -0.1510 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("11M"), "6M", -0.1510 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
-    fra = IborFRA(settle_dt.add_tenor("12M"), "6M", -0.1360 / 100.0, fra_dcc_type)
+    fra = IborFRA(
+        settle_dt.add_tenor("12M"), "6M", -0.1360 / 100.0, fra_dcc_type
+    )
     fras.append(fra)
 
     swaps = []
@@ -1109,7 +1138,9 @@ def test_swap_valuation_example():
     ois_fras = fras.copy()
     ois_swaps = swaps.copy()
 
-    ois_curve_ff = OISCurve(value_dt, ois_depos, ois_fras, ois_swaps, interp_type)
+    ois_curve_ff = OISCurve(
+        value_dt, ois_depos, ois_fras, ois_swaps, interp_type
+    )
 
     ibor_dual_curve = IborDualCurve(
         value_dt, ois_curve_ff, ibor_depos, ibor_fras, ibor_swaps, interp_type

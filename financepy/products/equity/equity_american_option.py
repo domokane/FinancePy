@@ -9,6 +9,7 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
+from ...utils.frequency import FrequencyTypes
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
@@ -67,6 +68,8 @@ class EquityAmericanOption(EquityOption):
         """Valuation of an American option using a CRR tree to take into
         account the value of early exercise."""
 
+        cc_freq = FrequencyTypes.CONTINUOUS
+
         if discount_curve.value_dt != value_dt:
             raise FinError(
                 "Discount Curve valuation date not same as option value date"
@@ -93,8 +96,8 @@ class EquityAmericanOption(EquityOption):
 
         t_exp = np.maximum(t_exp, 1e-10)
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        r = discount_curve.zero_rate(self.expiry_dt, cc_freq)
+        q = dividend_curve.zero_rate(self.expiry_dt, cc_freq)
 
         s = stock_price
         k = self.strike_price

@@ -15,6 +15,7 @@ from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes
+from ...utils.frequency import FrequencyTypes
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -46,7 +47,10 @@ class EquityFloatLookbackOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if opt_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
+        if opt_type not in [
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT,
+        ]:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt
@@ -82,11 +86,10 @@ class EquityFloatLookbackOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        df = discount_curve.df(self.expiry_dt)
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
+        q = dividend_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
 
         v = volatility
         s0 = stock_price
@@ -96,57 +99,83 @@ class EquityFloatLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > s0:
-                raise FinError("Smin must be less than or equal to the stock price.")
+                raise FinError(
+                    "Smin must be less than or equal to the stock price."
+                )
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < s0:
-                raise FinError("Smax must be greater than or equal to the stock price.")
+                raise FinError(
+                    "Smax must be greater than or equal to the stock price."
+                )
 
         if abs(r - q) < G_SMALL:
             q = r + G_SMALL
 
-        dq = np.exp(-q * t)
-        df = np.exp(-r * t)
+        dq = np.exp(-q * t_exp)
+        df = np.exp(-r * t_exp)
         b = r - q
         u = v * v / 2.0 / b
         w = 2.0 * b / v / v
-        expbt = np.exp(b * t)
+        expbt = np.exp(b * t_exp)
 
         # Taken from Haug Page 142
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
 
-            a1 = (np.log(s0 / smin) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
-            a2 = a1 - v * np.sqrt(t)
+            a1 = (
+                (np.log(s0 / smin) + (b + (v**2) / 2.0) * t_exp)
+                / v
+                / np.sqrt(t_exp)
+            )
+            a2 = a1 - v * np.sqrt(t_exp)
 
             if smin == s0:
-                term = normcdf(-a1 + 2.0 * b * np.sqrt(t) / v) - expbt * normcdf(-a1)
+                term = normcdf(
+                    -a1 + 2.0 * b * np.sqrt(t_exp) / v
+                ) - expbt * normcdf(-a1)
             elif s0 < smin and w < -100:
                 term = -expbt * normcdf(-a1)
             else:
                 term = ((s0 / smin) ** (-w)) * normcdf(
-                    -a1 + 2.0 * b * np.sqrt(t) / v
+                    -a1 + 2.0 * b * np.sqrt(t_exp) / v
                 ) - expbt * normcdf(-a1)
 
-            v = s0 * dq * normcdf(a1) - smin * df * normcdf(a2) + s0 * df * u * term
+            v = (
+                s0 * dq * normcdf(a1)
+                - smin * df * normcdf(a2)
+                + s0 * df * u * term
+            )
 
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
-            b1 = (np.log(s0 / smax) + (b + (v**2) / 2.0) * t) / v / np.sqrt(t)
-            b2 = b1 - v * np.sqrt(t)
+            b1 = (
+                (np.log(s0 / smax) + (b + (v**2) / 2.0) * t_exp)
+                / v
+                / np.sqrt(t_exp)
+            )
+            b2 = b1 - v * np.sqrt(t_exp)
 
             if smax == s0:
-                term = -normcdf(b1 - 2.0 * b * np.sqrt(t) / v) + expbt * normcdf(b1)
+                term = -normcdf(
+                    b1 - 2.0 * b * np.sqrt(t_exp) / v
+                ) + expbt * normcdf(b1)
             elif s0 < smax and w > 100:
                 term = expbt * normcdf(b1)
             else:
                 term = (-((s0 / smax) ** (-w))) * normcdf(
-                    b1 - 2.0 * b * np.sqrt(t) / v
+                    b1 - 2.0 * b * np.sqrt(t_exp) / v
                 ) + expbt * normcdf(b1)
 
-            v = smax * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
+            v = (
+                smax * df * normcdf(-b2)
+                - s0 * dq * normcdf(-b1)
+                + s0 * df * u * term
+            )
 
         else:
-            raise FinError("Unknown lookback option type:" + str(self.opt_type))
+            raise FinError(
+                "Unknown lookback option type:" + str(self.opt_type)
+            )
 
         return v
 
@@ -182,11 +211,15 @@ class EquityFloatLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > stock_price:
-                raise FinError("Smin must be less than or equal to the stock price.")
+                raise FinError(
+                    "Smin must be less than or equal to the stock price."
+                )
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < stock_price:
-                raise FinError("Smax must be greater than or equal to the stock price.")
+                raise FinError(
+                    "Smax must be greater than or equal to the stock price."
+                )
 
         t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed

@@ -20,6 +20,7 @@ def test_year_frace_thirty_360_bond():
 
     assert round(answer[0], 4) == 0.3889
 
+
 ########################################################################################
 
 
@@ -30,6 +31,7 @@ def test_year_frace_thirty_e_360():
     answer = day_count.year_frac(start, end, end, fin_freq)
 
     assert round(answer[0], 4) == 0.3889
+
 
 ########################################################################################
 
@@ -42,6 +44,7 @@ def test_year_frace_thirty_e_360_isda():
 
     assert round(answer[0], 4) == 0.3889
 
+
 ########################################################################################
 
 
@@ -52,6 +55,7 @@ def test_year_frace_thirty_e_plus_360():
     answer = day_count.year_frac(start, end, end, fin_freq)
 
     assert round(answer[0], 4) == 0.3889
+
 
 ########################################################################################
 
@@ -64,6 +68,7 @@ def test_year_frace_act_act_isda():
 
     assert round(answer[0], 4) == 0.3836
 
+
 ########################################################################################
 
 
@@ -74,6 +79,7 @@ def test_year_frace_act_act_icma():
     answer = day_count.year_frac(start, end, end, fin_freq)
 
     assert round(answer[0], 4) == 1.0000
+
 
 ########################################################################################
 
@@ -86,6 +92,7 @@ def test_year_frace_act_365_f():
 
     assert round(answer[0], 4) == 0.3836
 
+
 ########################################################################################
 
 
@@ -96,6 +103,7 @@ def test_year_frace_act_360():
     answer = day_count.year_frac(start, end, end, fin_freq)
 
     assert round(answer[0], 4) == 0.3889
+
 
 ########################################################################################
 
@@ -108,12 +116,13 @@ def test_year_frace_act_365_l():
 
     assert round(answer[0], 4) == 0.3836
 
+
 ########################################################################################
 
 
 def test_year_frace_simple():
 
-    dc_type = DayCountTypes.SIMPLE
+    dc_type = DayCountTypes.ASTRONOMICAL
     day_count = DayCount(dc_type)
     answer = day_count.year_frac(start, end, end, fin_freq)
 

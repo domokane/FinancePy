@@ -56,11 +56,11 @@
 
 # ########################################################################################
 
-#     def macauley_duration(self,
+#     def macaulay_duration(self,
 #                           settle_dt: Date,
 #                           ytm: float,
 #                           convention: YTMCalcType = YTMCalcType.UK_DMO):
-#         """ Calculate the Macauley duration of the bond on a settlement date
+#         """ Calculate the Macaulay duration of the bond on a settlement date
 #         given its yield to maturity. """
 
 #         dd = self.dollar_duration(settle_dt, ytm, convention)
@@ -264,7 +264,7 @@
 #         s += label_to_string("MATURITY DATE", self.maturity_dt)
 #         s += label_to_string("COUPON", self.cpn)
 #         s += label_to_string("FREQUENCY", self.freq_type)
-#         s += label_to_string("DAY COUNT TYPE", self.dc_type)
+#         s += label_to_string("DAY COUNT TYPE", self.accrual_dc_type)
 #         return s
 
 # ########################################################################################

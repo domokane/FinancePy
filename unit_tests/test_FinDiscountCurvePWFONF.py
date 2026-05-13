@@ -38,7 +38,7 @@ def test_fin_discount_curve_pcfonf_01():
         Date(1, 12, 2019),
     ]
     expected_onfwd = [0.02, 0.04, 0.06, 0.08, 0.08]
-    actual_onfwd = curve.fwd(test_dates)
+    actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     one_bp = 1e-4
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
@@ -68,7 +68,7 @@ def test_fin_discount_curve_pcfonf_02():
         Date(1, 8, 2018),
     ]
     expected_onfwd = [0.0, 0.01, 0.0]
-    actual_onfwd = curve.fwd(test_dates)
+    actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
@@ -99,7 +99,7 @@ def test_fin_discount_curve_pcfonf_03():
         Date(1, 8, 2018),
     ]
     expected_onfwd = [0.0, 0.01, 0.0]
-    actual_onfwd = curve.fwd(test_dates)
+    actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
@@ -130,7 +130,7 @@ def test_fin_discount_curve_pcfonf_04():
         Date(1, 8, 2018),
     ]
     expected_onfwd = [0.01, 0.01, 0.0]
-    actual_onfwd = curve.fwd(test_dates)
+    actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
@@ -161,7 +161,7 @@ def test_fin_discount_curve_pcfonf_05():
         Date(1, 8, 2018),
     ]
     expected_onfwd = [0.01, 0.01, 0.0]
-    actual_onfwd = curve.fwd(test_dates)
+    actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
         assert (
@@ -187,12 +187,12 @@ def test_fin_discount_curve_pcfonf_flat():
         Date(1, 8, 2018),
     ]
     expected_onfwd = [0.01, 0.01, 0.01]
-    actual_onfwd = curve.fwd(test_dates)
+    actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     if diagnostics_mode:
         years = np.linspace(0, 10, 100)
         dates = valuation_date.add_years(years)
-        onrates = curve.fwd(dates)
+        onrates = curve.fwd_rate_inst(dates)
         plt.plot(years, onrates)
         plt.show()
 

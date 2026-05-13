@@ -15,10 +15,10 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import scale
 from ...utils.helpers import label_to_string
 
-from .curve_fits import CurveFitPolynomial
-from .curve_fits import CurveFitNelsonSiegel
-from .curve_fits import CurveFitNelsonSiegelSvensson
-from .curve_fits import CurveFitBSpline
+from .yield_curve_fits import CurveFitPolynomial
+from .yield_curve_fits import CurveFitNelsonSiegel
+from .yield_curve_fits import CurveFitNelsonSiegelSvensson
+from .yield_curve_fits import CurveFitBSpline
 
 ########################################################################################
 # TO DO: CONSTRAIN TAU'S IN NELSON-SIEGEL
@@ -53,7 +53,8 @@ class BondYieldCurve:
 
         years_to_maturities = []
         for bond in bonds:
-            years_to_maturity = (bond._maturity_dt - settle_dt) / G_DAYS_IN_YEAR
+            years_to_maturity = (bond._maturity_dt -
+                                 settle_dt) / G_DAYS_IN_YEAR
             years_to_maturities.append(years_to_maturity)
         self._years_to_maturity = np.array(years_to_maturities)
 
@@ -180,6 +181,7 @@ class BondYieldCurve:
         plt.legend(loc="lower right")
         plt.ylim((min(yld) - 0.3, max(yld) * 1.1))
         plt.grid(True)
+        return plt
 
     ####################################################################################
 

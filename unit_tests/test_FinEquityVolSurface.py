@@ -45,11 +45,11 @@ def test_equity_vol_surface():
 
     r = 0.020  # USD
     discount_curve = DiscountCurveFlat(value_dt, r)
-    # discount_curve = DiscountCurveFlat(value_dt, r, dc_type=DayCountTypes.SIMPLE)
+    # discount_curve = DiscountCurveFlat(value_dt, r, dc_type=DayCountTypes.ACT_ACT_ISDA)
 
     q = 0.010  # USD
     dividend_curve = DiscountCurveFlat(value_dt, q)
-    # dividend_curve = DiscountCurveFlat(value_dt, q, dc_type=DayCountTypes.SIMPLE)
+    # dividend_curve = DiscountCurveFlat(value_dt, q, dc_type=DayCountTypes.ACT_ACT_ISDA)
 
     vol_function_type = VolFuncTypes.SVI
 

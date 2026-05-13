@@ -257,7 +257,7 @@
 #         s += label_to_string("EXERCISE DATE", self.exercise_dt)
 #         s += label_to_string("cpn", self.cpn)
 #         s += label_to_string("FREQUENCY", self.freq_type)
-#         s += label_to_string("DAY COUNT TYPE", self.dc_type)
+#         s += label_to_string("DAY COUNT TYPE", self.accrual_dc_type)
 #         s += label_to_string("FACE AMOUNT", self.face)
 #         s += label_to_string("CONVERSION RATIO", self.conversion_ratio)
 #         s += label_to_string("START CONVERT DATE", self.start_convert_dt)

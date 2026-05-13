@@ -5,13 +5,13 @@ import numpy as np
 from scipy import interpolate
 
 from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
 from ...utils.error import FinError
 from ...utils.global_vars import G_SMALL, G_BASIS_POINT
 from ...utils.math import test_monotonicity
 from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
-from ...utils.day_count import DayCountTypes
 from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -31,6 +31,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         value_dt: Date,
         knot_dts: list,
         onfwd_rates: Union[list, np.ndarray],
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """
         Creates a discount curve using a vector of times and ON fwd rates
@@ -51,18 +52,28 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         self._knot_dts = [max(d, value_dt) for d in knot_dts]
         self._onfwd_rates = np.atleast_1d(onfwd_rates)
+        self._df_dates = self._knot_dts
 
         self.freq_type = FrequencyTypes.CONTINUOUS
-        self.dc_type = DayCountTypes.SIMPLE
+
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
+
+        self.time_dc_type = time_dc_type
 
         dc_times = times_from_dates(
-            self._knot_dts, self.value_dt, self.dc_type)
+            self._knot_dts, self.value_dt, self.time_dc_type
+        )
 
         self._times = np.atleast_1d(dc_times)
+        if test_monotonicity(self._times) is False:
+            raise FinError("Times are not sorted in increasing order")
 
         # it is easier to deal in log(dfs), log(df[Ti]) = -\int_0^T_i f(u) du
-        self._logdfs = - \
-            np.cumsum(np.diff(self._times, prepend=0.0) * self._onfwd_rates)
+        self._logdfs = -np.cumsum(
+            np.diff(self._times, prepend=0.0) * self._onfwd_rates
+        )
+
         self._logdfs_interp = interpolate.interp1d(
             np.concatenate(([0.0], self._times)),
             np.concatenate(([0.0], self._logdfs)),
@@ -71,8 +82,8 @@ class DiscountCurvePWFONF(DiscountCurve):
             fill_value="extrapolate",
         )
 
-        if test_monotonicity(self._times) is False:
-            raise FinError("Times are not sorted in increasing order")
+        self._dfs = np.exp(self._logdfs)
+        self._interp_type = None
 
     @classmethod
     ####################################################################################
@@ -104,7 +115,9 @@ class DiscountCurvePWFONF(DiscountCurve):
 
     @classmethod
     ####################################################################################
-    def flat_curve(cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT):
+    def flat_curve(
+        cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT
+    ):
         knot_dts = [valuation_date.add_tenor("1Y")]
         onfwd_rates = [level]
         return cls(valuation_date, knot_dts, onfwd_rates)
@@ -132,29 +145,33 @@ class DiscountCurvePWFONF(DiscountCurve):
         """Return discount factors given a single or vector of times in years.
         The discount factor depends on the rate and this in turn depends on its
         compounding frequency and it defaults to continuous compounding. It
-        also depends on the day count convention. This was set in the
-        construction of the curve to be ACT_ACT_ISDA."""
+        also depends on the day count convention."""
 
-        scalar_input = np.isscalar(t)
+        times, scalar_input = self._to_time_array(t)
 
-        zero_rates = self._zero_rate(t)
+        zero_rates = self._zero_rate(times)
 
-        df = self._zero_to_df(
-            self.value_dt, zero_rates, t, self.freq_type, self.dc_type
+        dfs = self._zero_to_df(
+            zero_rates,
+            times,
+            self.freq_type,
         )
 
-        if scalar_input:
-            return float(df[0])
+        dfs = np.asarray(dfs, dtype=float)
 
-        return df
+        if scalar_input:
+            return float(dfs[0])
+        else:
+            return dfs
 
     ####################################################################################
 
-    def bump(self, bump_size: float):
+    def bump_parallel(self, bump_size: float):
         return DiscountCurvePWFONF(
             self.value_dt,
             self._knot_dts.copy(),
             self._onfwd_rates + bump_size,
+            self.time_dc_type,
         )
 
     ####################################################################################
@@ -162,10 +179,17 @@ class DiscountCurvePWFONF(DiscountCurve):
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
+
+        # Class-specific info first
         s += label_to_string("DATE", "ON_FWD RATE")
-        for i in range(0, len(self._knot_dts)):
-            s += label_to_string(self._knot_dts[i], self._onfwd_rates[i])
-        s += label_to_string("FREQUENCY", (self.freq_type))
+
+        for dt, rate in zip(self._knot_dts, self._onfwd_rates):
+            s += label_to_string(str(dt), f"{rate:12.8f}")
+
+        # Then generic DiscountCurve info
+        s += "\n"
+        s += super().__repr__()
+
         return s
 
     ####################################################################################

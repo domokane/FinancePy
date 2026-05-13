@@ -9,6 +9,7 @@ from scipy import optimize
 
 from ...utils.error import FinError
 from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.global_vars import G_DAYS_IN_YEAR
@@ -59,7 +60,7 @@ def _f(df, *args):
     curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
-    curve.fit(curve.times, curve.dfs)
+    curve.fit(curve._times, curve._dfs)
     v_swap = swap.value(value_dt, curve, None)
     notional = swap.fixed_leg.notional
     v_swap /= notional
@@ -77,7 +78,7 @@ def _g(df, *args):
 
     curve.set_last_df(df)
     # For discount that need a fit function, we fit it now
-    curve.fit(curve.times, curve.dfs)
+    curve.fit(curve._times, curve._dfs)
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
     return v_fra
@@ -109,6 +110,7 @@ class OISCurve(DiscountCurve):
         ois_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
         check_refit_flag: bool = False,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):  # Set to True to test it works
         """Create an instance of an overnight index rate swap curve given a
         valuation date and a set of OIS rates. Some of these may
@@ -127,7 +129,7 @@ class OISCurve(DiscountCurve):
         self._interp_type = interp_type
         self.check_refit_flag = check_refit_flag
         self._interpolator = None
-
+        self.time_dc_type = time_dc_type
         self.build_curve()
 
     ####################################################################################
@@ -327,10 +329,10 @@ class OISCurve(DiscountCurve):
         self.used_swaps = ois_swaps
 
         # Need the floating leg basis for the curve
-        if len(self.used_swaps) > 0:
-            self.dc_type = ois_swaps[0].float_leg.dc_type
-        else:
-            self.dc_type = None
+        # if len(self.used_swaps) > 0:
+        #    self.accrual_dc_type = ois_swaps[0].float_leg.accrual_dc_type
+        # else:
+        #    self.accrual_dc_type = None
 
     ####################################################################################
 
@@ -670,7 +672,9 @@ class OISCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string(f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}")
+            s += label_to_string(
+                f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}"
+            )
 
         return s
 

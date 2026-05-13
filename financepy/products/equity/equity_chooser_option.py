@@ -42,7 +42,9 @@ def _f(ss, *args):
     v = args[7]
     q = args[8]
 
-    v_call = bs_value(ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
+    v_call = bs_value(
+        ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
+    )
     v_put = bs_value(ss, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
     v = v_call - v_put
@@ -120,19 +122,19 @@ class EquityChooserOption(EquityOption):
                 "Dividend Curve valuation date not same as option value date"
             )
 
-        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEAR
-        tc = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        tp = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_choose = (self.choose_dt - value_dt) / G_DAYS_IN_YEAR
+        t_call = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_put = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        rt = discount_curve.cc_rate(self.choose_dt)
-        rtc = discount_curve.cc_rate(self.call_expiry_dt)
-        rtp = discount_curve.cc_rate(self.put_expiry_dt)
+        rt = discount_curve.zero_rate_t(t_choose)
+        rtc = discount_curve.zero_rate_t(t_call)
+        rtp = discount_curve.zero_rate_t(t_put)
 
-        q = dividend_curve.cc_rate(self.choose_dt)
+        q = dividend_curve.zero_rate_t(t_choose)
 
-        t = max(t, G_SMALL)
-        tc = max(tc, G_SMALL)
-        tp = max(tp, G_SMALL)
+        t_choose = max(t_choose, G_SMALL)
+        t_call = max(t_call, G_SMALL)
+        t_put = max(t_put, G_SMALL)
 
         v = model.volatility
         v = max(v, G_SMALL)
@@ -144,7 +146,7 @@ class EquityChooserOption(EquityOption):
         btc = rtc - q
         btp = rtp - q
 
-        argtuple = (t, tc, tp, rtc, rtp, xc, xp, v, q)
+        argtuple = (t_choose, t_call, t_put, rtc, rtp, xc, xp, v, q)
         if DEBUG_MODE:
             print("args", argtuple)
 
@@ -155,31 +157,43 @@ class EquityChooserOption(EquityOption):
         if DEBUG_MODE:
             print("istar", istar)
 
-        d1 = (np.log(s0 / istar) + (bt + v * v / 2) * t) / v / np.sqrt(t)
-        d2 = d1 - v * np.sqrt(t)
+        d1 = (
+            (np.log(s0 / istar) + (bt + v * v / 2) * t_choose)
+            / v
+            / np.sqrt(t_choose)
+        )
+        d2 = d1 - v * np.sqrt(t_choose)
 
         if DEBUG_MODE:
             print("d1", d1)
             print("d2", d2)
 
-        y1 = (np.log(s0 / xc) + (btc + v * v / 2) * tc) / v / np.sqrt(tc)
-        y2 = (np.log(s0 / xp) + (btp + v * v / 2) * tp) / v / np.sqrt(tp)
+        y1 = (
+            (np.log(s0 / xc) + (btc + v * v / 2) * t_call)
+            / v
+            / np.sqrt(t_call)
+        )
+        y2 = (np.log(s0 / xp) + (btp + v * v / 2) * t_put) / v / np.sqrt(t_put)
 
         if DEBUG_MODE:
             print("y1", y1)
             print("y2", y2)
 
-        rho1 = np.sqrt(t / tc)
-        rho2 = np.sqrt(t / tp)
+        rho1 = np.sqrt(t_choose / t_call)
+        rho2 = np.sqrt(t_choose / t_put)
 
         if DEBUG_MODE:
             print("rho1", rho1)
             print("rho2", rho2)
 
-        w = s0 * np.exp(-q * tc) * M(d1, y1, rho1)
-        w = w - xc * np.exp(-rtc * tc) * M(d2, y1 - v * np.sqrt(tc), rho1)
-        w = w - s0 * np.exp(-q * tp) * M(-d1, -y2, rho2)
-        w = w + xp * np.exp(-rtp * tp) * M(-d2, -y2 + v * np.sqrt(tp), rho2)
+        w = s0 * np.exp(-q * t_call) * M(d1, y1, rho1)
+        w = w - xc * np.exp(-rtc * t_call) * M(
+            d2, y1 - v * np.sqrt(t_call), rho1
+        )
+        w = w - s0 * np.exp(-q * t_put) * M(-d1, -y2, rho2)
+        w = w + xp * np.exp(-rtp * t_put) * M(
+            -d2, -y2 + v * np.sqrt(t_put), rho2
+        )
         return w
 
     ###########################################################################
@@ -234,11 +248,19 @@ class EquityChooserOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        v_call_1 = bs_value(s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
-        v_put_1 = bs_value(s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
+        v_call_1 = bs_value(
+            s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
+        )
+        v_put_1 = bs_value(
+            s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
+        )
 
-        v_call_2 = bs_value(s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value)
-        v_put_2 = bs_value(s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
+        v_call_2 = bs_value(
+            s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
+        )
+        v_put_2 = bs_value(
+            s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
+        )
 
         payoff_1 = np.maximum(v_call_1, v_put_1)
         payoff_2 = np.maximum(v_call_2, v_put_2)

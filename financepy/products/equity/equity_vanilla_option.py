@@ -499,7 +499,7 @@ class EquityVanillaOption:
 
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        if t_exp < 1.0 / 365.0:
+        if t_exp < 1.0 / 366.0:
             print("Expiry time is too close to zero.")
             return -999
 
@@ -512,7 +512,9 @@ class EquityVanillaOption:
         k = self.strike_price
         s0 = stock_price
 
-        sigma = bs_implied_volatility(s0, t_exp, k, r, q, price, self.opt_type_value)
+        sigma = bs_implied_volatility(
+            s0, t_exp, k, r, q, price, self.opt_type_value
+        )
 
         return sigma
 

@@ -35,12 +35,16 @@ def benchmarks_report(
     # benchmarks = depos + fras + swaps
     df_bmi = None
     for benchmark in benchmarks:
-        res = benchmark.valuation_details(valuation_date, discount_curve, index_curve)
+        res = benchmark.valuation_details(
+            valuation_date, discount_curve, index_curve
+        )
 
         if df_bmi is None:
             df_bmi = pd.DataFrame.from_dict(res, orient="index").T
         else:
-            df_bmi = pd.concat([df_bmi, pd.DataFrame([res])], ignore_index=True)
+            df_bmi = pd.concat(
+                [df_bmi, pd.DataFrame([res])], ignore_index=True
+            )
 
     if include_objects:
         df_bmi["benchmark_objects"] = benchmarks
@@ -54,7 +58,9 @@ def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
     not use in performance-critical spots
     """
 
-    benchmarks = ibor_curve.used_deposits + ibor_curve.used_fras + ibor_curve.used_swaps
+    benchmarks = (
+        ibor_curve.used_deposits + ibor_curve.used_fras + ibor_curve.used_swaps
+    )
 
     return benchmarks_report(
         benchmarks,
@@ -64,7 +70,9 @@ def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
     )
 
 
-def _date_or_tenor_to_date(date_or_tenor: Union[Date, str, datetime], asof_date: Date):
+def _date_or_tenor_to_date(
+    date_or_tenor: Union[Date, str, datetime], asof_date: Date
+):
     if isinstance(date_or_tenor, str):
         return asof_date.add_tenor(date_or_tenor)
     if isinstance(date_or_tenor, Date):
@@ -92,32 +100,42 @@ def _date_or_tenor_to_date_or_tenor(date_or_tenor: Union[Date, str, datetime]):
     )
 
 
-def _deposit_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
+def _deposit_from_df_row(
+    row: pd.Series, asof_date: Date, calendar_type: CalendarTypes
+):
     cls = globals()[row["type"]]
     return cls(
         start_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
-        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
+        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(
+            row["maturity_dt"]
+        ),
         deposit_rate=row["contract_rate"],
-        dc_type=DayCountTypes[row["day_count_type"]],
+        accrual_dc_type=DayCountTypes[row["day_count_type"]],
         notional=row["notional"],
         cal_type=calendar_type,
     )
 
 
-def _fra_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
+def _fra_from_df_row(
+    row: pd.Series, asof_date: Date, calendar_type: CalendarTypes
+):
     cls = globals()[row["type"]]
     return cls(
         start_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
-        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
+        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(
+            row["maturity_dt"]
+        ),
         fra_rate=row["contract_rate"],
-        dc_type=DayCountTypes[row["day_count_type"]],
+        accrual_dc_type=DayCountTypes[row["day_count_type"]],
         notional=row["notional"],
         pay_fixed_rate=SwapTypes[row["fixed_leg_type"]] == SwapTypes.PAY,
         cal_type=calendar_type,
     )
 
 
-def _swap_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
+def _swap_from_df_row(
+    row: pd.Series, asof_date: Date, calendar_type: CalendarTypes
+):
     cls = globals()[row["type"]]
     return cls(
         effective_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),

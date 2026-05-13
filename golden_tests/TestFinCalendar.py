@@ -5,7 +5,7 @@ import add_fp_to_path
 from financepy.utils.calendar import Calendar, CalendarTypes
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
-
+from financepy.utils.calendar import BusDayAdjustTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -45,7 +45,40 @@ def test_calendar():
     set_date_format(DateFormatTypes.US_LONG)
 
 
+def test_target():
+
+    set_date_format(DateFormatTypes.UK_LONGEST)
+    cal_TARGET = Calendar(CalendarTypes.TARGET)
+    hols = cal_TARGET.get_holiday_list(2028)
+    for dt in hols:
+        print("TARGET Holiday =>", dt)
+
+
+def test_fast_adjust():
+    for cal_type in CalendarTypes:
+        cal = Calendar(cal_type)
+        for y in range(2000, 2081):  # DO NOT NEED ENTIRE 200 YEAR RANGE
+            dt = Date(1, 1, y)
+            end_dt = Date(1, 1, y + 1)
+
+            while dt < end_dt:
+                for bd_type in BusDayAdjustTypes:
+                    a = cal.adjust(dt, bd_type)
+                    b = cal.fast_adjust(dt, bd_type)
+
+                    if a != b:
+                        print(
+                            f"Mismatch: {cal_type}, {bd_type}, {dt}, {a}, {b}"
+                        )
+
+                dt = dt.add_days(1)
+
 ########################################################################################
 
+
 test_calendar()
+# test_target()
+
+test_fast_adjust()
+
 test_cases.compare_test_cases()

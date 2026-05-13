@@ -10,7 +10,6 @@ from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, table_to_string
-from ...utils.day_count import DayCount
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
@@ -53,7 +52,6 @@ class CDSCurve:
         cds_contracts: list,
         libor_curve,
         recovery_rate,
-        use_cache: bool = False,
         interp_method: InterpTypes = InterpTypes.FLAT_FWD_RATES,
     ):
         """Construct a credit curve from a sequence of maturity-ordered CDS
@@ -63,7 +61,9 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if value_dt != libor_curve.value_dt:
-            raise FinError("Curve does not have same valuation date as Issuer curve.")
+            raise FinError(
+                "Curve does not have same valuation date as Issuer curve."
+            )
 
         self.value_dt = value_dt
         self.cds_contracts = cds_contracts
@@ -84,19 +84,19 @@ class CDSCurve:
 
     ###########################################################################
 
-    @property
-    def times(self):
-        return self._times.copy()
+    # @property
+    # def times(self):
+    #     return self._times.copy()
 
-    ###########################################################################
+    # ###########################################################################
 
-    @property
-    def qs(self):
-        return self._qs.copy()
+    # @property
+    # def qs(self):
+    #     return self._qs.copy()
 
-    @property
-    def dfs(self):
-        return self.libor_curve.dfs
+    # @property
+    # def dfs(self):
+    #     return self.libor_curve.dfs
 
     def set_times(self, times: np.array):
         """Set the times vector"""
@@ -109,7 +109,7 @@ class CDSCurve:
     def set_q(self, index, q):
         """Set the survival probability at a specific index."""
 
-        n_points = len(self.qs)
+        n_points = len(self._qs)
 
         if index < 0 or index >= n_points:
             raise IndexError("Index out of bounds")
@@ -117,9 +117,9 @@ class CDSCurve:
         self._qs[index] = q
 
     def set_last_q(self, q):
-        """Set the discount factor at last index."""
+        """Set the survival probability factor at last index."""
 
-        n_points = len(self.qs)
+        n_points = len(self._qs)
         self._qs[n_points - 1] = q
 
     ###########################################################################
@@ -162,8 +162,10 @@ class CDSCurve:
                     t[i], self._times, self._qs, self.interp_method.value
                 )
             return qs
-        elif isinstance(t, float):
-            q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
+        elif np.isscalar(t):
+            q = _uinterpolate(
+                t, self._times, self._qs, self.interp_method.value
+            )
             return q
 
         raise FinError("Unknown time type")
@@ -214,50 +216,59 @@ class CDSCurve:
             self._times = np.append(self._times, t_mat)
             self._qs = np.append(self._qs, q)
 
-            if 1 == 1:
-                optimize.newton(
-                    f,
-                    x0=q,
-                    fprime=None,
-                    args=argtuple,
-                    tol=1e-7,
-                    maxiter=50,
-                    fprime2=None,
-                )
-            else:
-                pass
+            q_star = optimize.newton(
+                f,
+                x0=q,
+                fprime=None,
+                args=argtuple,
+                tol=1e-7,
+                maxiter=50,
+                fprime2=None,
+            )
+
+            if q_star < 0.0 or q_star > 1.0:
+                raise FinError("Calibrated survival probability out of bounds")
+
+            # TODO - DETERMINE WHY THIS FAILS
+            #            if i > 0 and q_star > self._qs[i]:
+            #                print(self._qs)
+            #                raise FinError("Survival probabilities must be non-increasing")
+
+            self.set_last_q(q_star)
 
     ###########################################################################
 
-    def fwd(self, dt):
-        """Calculate the instantaneous forward rate at the forward date dt
-        using the numerical derivative."""
+    def fwd(self, fwd_dt):
+        """Calculate the instantaneous forward rate at date fwd_dt
+        using a numerical derivative."""
 
-        t = input_time(dt, self)
-        epsilon = 1e-8
+        t = input_time(fwd_dt, self)
+        epsilon = 1e-4
         df1 = self.df(t) * self.survival_prob(t)
         df2 = self.df(t + epsilon) * self.survival_prob(t + epsilon)
-        fwd = np.log(df1 / df2) / dt
+        fwd = np.log(df1 / df2) / epsilon
         return fwd
 
     ###########################################################################
 
-    def fwd_rate(self, date1, date2, dc_type):
-        """Calculate the forward rate according between dates date1 and date2
-        according to the specified day count convention."""
+    # def fwd_rate(self, date1, date2, dc_type):
+    #     """Calculate the risky forward rate according between dates date1
+    #     and date2 according to the specified day count convention."""
 
-        if date1 < self.value_dt:
-            raise FinError("Date1 before curve value date.")
+    #     print("WHY AM I USING THIS ???? fwd_rate cds_curve")
 
-        if date2 < date1:
-            raise FinError("Date2 must not be before Date1")
+    #     if date1 < self.value_dt:
+    #         raise FinError("Date1 before curve value date.")
 
-        day_count = DayCount(dc_type)
-        year_frac = day_count.year_frac(date1, date2)[0]
-        df1 = self.df(date1)
-        df2 = self.df(date2)
-        fwd = (df1 / df2 - 1.0) / year_frac
-        return fwd
+    #     if date2 < date1:
+    #         raise FinError("Date2 must not be before Date1")
+
+    #     day_count = DayCount(dc_type)
+    #     year_frac = day_count.year_frac(date1, date2)[0]
+    #     df1 = self.df(date1)
+    #     df2 = self.df(date2)
+    #     fwd = (df1 / df2 - 1.0) / year_frac
+    #     return fwd
 
     ###########################################################################
 
@@ -273,10 +284,11 @@ class CDSCurve:
 
         if f == 0:  # Simple interest
             zero_rate = (1.0 / dfq - 1.0) / t
-        if f == -1:  # Continuous
+        elif f == -1:  # Continuous
             zero_rate = -np.log(dfq) / t
         else:
-            zero_rate = (dfq ** (-1.0 / t) - 1) * f
+            zero_rate = (dfq ** (-1.0 / (f * t)) - 1) * f
+
         return zero_rate
 
     ###########################################################################

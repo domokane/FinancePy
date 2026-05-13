@@ -57,7 +57,7 @@ class DayCountTypes(Enum):
     ACT_365F = 7
     ACT_360 = 8
     ACT_365L = 9
-    SIMPLE = 10  # actual divided by G_DAYS_IN_YEAR
+    JULIAN = 10  # actual divided by 365.25 as in Julian Calendar
 
 
 ########################################################################################
@@ -71,7 +71,7 @@ class DayCount:
         """Create Day Count convention by passing in the Day Count Type."""
 
         if dcc_type not in DayCountTypes:
-            raise FinError("Need to pass FinDayCountType")
+            raise FinError("Need to pass FinDayCountType not " + str(dcc_type))
 
         self._type = dcc_type
 
@@ -279,10 +279,9 @@ class DayCount:
             acc_factor = num / den
             return acc_factor, num, den
 
-        elif self._type == DayCountTypes.SIMPLE:
-
+        elif self._type == DayCountTypes.JULIAN:
             num = dt2 - dt1
-            den = G_DAYS_IN_YEAR
+            den = 365.0
             acc_factor = num / den
             return acc_factor, num, den
 

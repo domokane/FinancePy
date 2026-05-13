@@ -17,3 +17,4 @@ from .ibor_single_curve_smoothing_calibrator import *
 from .dual_curve import *
 from .swap_fixed_leg import *
 from .swap_float_leg import *
+from .ibor_lmm_products import *

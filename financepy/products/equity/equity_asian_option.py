@@ -13,13 +13,16 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 
 from ...utils.global_types import OptionTypes
+from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.math import normcdf
 
-from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_cv_numba
+from ...models.equity_asian_option_mc import (
+    equity_asian_value_mc_fast_cv_numba,
+)
 from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_numba
 from ...models.equity_asian_option_mc import equity_asian_value_mc_numba
 from ...models.equity_asian_option_mc import error_str
@@ -198,8 +201,9 @@ class EquityAsianOption:
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEAR
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        freq_cc = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, freq_cc)
+        q = dividend_curve.zero_rate_t(t_exp, freq_cc)
 
         volatility = model.volatility
 
@@ -271,8 +275,9 @@ class EquityAsianOption:
 
         multiplier = 1.0
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        cc_freq = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, cc_freq)
+        q = dividend_curve.zero_rate_t(t_exp, cc_freq)
 
         volatility = model.volatility
 
@@ -349,8 +354,9 @@ class EquityAsianOption:
         multiplier = 1.0
         n = self.num_observations
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        cc_freq = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, cc_freq)
+        q = dividend_curve.zero_rate_t(t_exp, cc_freq)
 
         volatility = model.volatility
 
@@ -438,8 +444,9 @@ class EquityAsianOption:
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         tau = (self.expiry_dt - self.start_averaging_date) / G_DAYS_IN_YEAR
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        freq_cc = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, freq_cc)
+        q = dividend_curve.zero_rate_t(t_exp, freq_cc)
 
         volatility = model.volatility
 
@@ -488,8 +495,9 @@ class EquityAsianOption:
         k = self.strike_price
         n = self.num_observations
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        freq_cc = FrequencyTypes.CONTINUOUS
+        r = discount_curve.zero_rate_t(t_exp, freq_cc)
+        q = dividend_curve.zero_rate_t(t_exp, freq_cc)
 
         volatility = model.volatility
 
@@ -536,8 +544,10 @@ class EquityAsianOption:
         k = self.strike_price
         n = self.num_observations
 
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        freq_cc = FrequencyTypes.CONTINUOUS
+
+        r = discount_curve.zero_rate_t(t_exp, freq_cc)
+        q = dividend_curve.zero_rate_t(t_exp, freq_cc)
 
         volatility = model.volatility
 

@@ -35,7 +35,7 @@ class EquitySwapLeg:
         term_dt_or_tenor: Union[Date, str],  # Date contract ends
         leg_type: SwapTypes,
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        accrual_dc_type: DayCountTypes,
         strike: float,  # Price at effective date
         quantity: float = 1.0,  # Quantity at effective date
         payment_lag: int = 0,
@@ -73,7 +73,7 @@ class EquitySwapLeg:
         if freq_type in (
             FrequencyTypes.CONTINUOUS,
             FrequencyTypes,
-            FrequencyTypes.SIMPLE,
+            FrequencyTypes.SIMPLE_INTEREST,
         ):
             raise FinError(
                 "Cannot generate payment schedule for this frequency!"
@@ -89,7 +89,7 @@ class EquitySwapLeg:
         self.notional = strike * quantity
         self.return_type = return_type
 
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -144,7 +144,7 @@ class EquitySwapLeg:
 
         prev_dt = schedule_dts[0]
 
-        day_counter = DayCount(self.dc_type)
+        day_counter = DayCount(self.accrual_dc_type)
         calendar = Calendar(self.cal_type)
 
         # All the lists end up with the same length
@@ -220,7 +220,7 @@ class EquitySwapLeg:
         next_notional = last_notional
         num_payments = len(self.payment_dts)
 
-        index_basis = index_curve.dc_type
+        index_basis = index_curve.accrual_dc_type
         index_day_counter = DayCount(index_basis)
 
         for i_pmnt in range(0, num_payments):
@@ -299,7 +299,7 @@ class EquitySwapLeg:
         print("START DATE:", self.effective_dt)
         print("MATURITY DATE:", self.maturity_dt)
         print("FREQUENCY:", str(self.freq_type))
-        print("DAY COUNT:", str(self.dc_type))
+        print("DAY COUNT:", str(self.accrual_dc_type))
 
         if len(self.payment_dts) == 0:
             print("Payments Dates not calculated.")
@@ -386,7 +386,7 @@ class EquitySwapLeg:
         s += label_to_string("SWAP TYPE", self.leg_type)
         s += label_to_string("RETURN TYPE", self.return_type)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self.dg_type)

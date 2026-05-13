@@ -33,9 +33,11 @@ def test_fin_interpolated_forwards():
 
     for interp_type in InterpTypes:
 
-        discount_curve = DiscountCurve(curve_dt, t_dates, df_values, interp_type)
+        discount_curve = DiscountCurve(
+            curve_dt, t_dates, df_values, interp_type
+        )
         df_interp_values = discount_curve.df(t_interp_dates)
-        fwd_interp_values = discount_curve.fwd(t_interp_dates)
+        fwd_interp_values = discount_curve.fwd_rate_inst(t_interp_dates)
         zero_interp_values = discount_curve.zero_rate(t_interp_dates)
 
         if PLOT_GRAPHS:

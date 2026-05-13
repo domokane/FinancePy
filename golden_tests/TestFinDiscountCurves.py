@@ -18,6 +18,9 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.compounding import CompoundingTypes
+from financepy.utils.day_count import DayCountTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -57,7 +60,8 @@ def test_fin_discount_curves():
     curves_list.append(fin_discount_curve_flat)
 
     fin_discount_curve_ns = DiscountCurveNS(
-        value_dt, 0.0305, -0.01, 0.08, 10.0)
+        value_dt, 0.0305, -0.01, 0.08, 10.0
+    )
     curves_list.append(fin_discount_curve_ns)
 
     fin_discount_curve_nss = DiscountCurveNSS(
@@ -66,7 +70,8 @@ def test_fin_discount_curves():
     curves_list.append(fin_discount_curve_nss)
 
     fin_discount_curve_poly = DiscountCurvePoly(
-        value_dt, [0.05, 0.002, -0.00005])
+        value_dt, [0.05, 0.002, -0.00005]
+    )
     curves_list.append(fin_discount_curve_poly)
 
     fin_discount_curve_pwf = DiscountCurvePWF(value_dt, dates, rates)
@@ -95,14 +100,23 @@ def test_fin_discount_curves():
     test_cases.banner("SINGLE CALLS")
     test_cases.banner("######################################################")
 
+    accrual_dc_type = DayCountTypes.ACT_360
+
     for name, curve in zip(curve_names, curves_list):
+
+        #        print(name)
 
         for fwd_maturity_dt in fwd_maturity_dts:
 
             tenor = "3M"
             zero_rate = curve.zero_rate(fwd_maturity_dt)
-            fwd = curve.fwd(fwd_maturity_dt)
-            fwd_rate = curve.fwd_rate(fwd_maturity_dt, tenor)
+            cc_fwd = curve.fwd_rate(
+                fwd_maturity_dt,
+                tenor,
+                accrual_dc_type,
+                CompoundingTypes.CONTINUOUS,
+            )
+            mm_fwd = curve.fwd_rate(fwd_maturity_dt, tenor)
             swap_rate = curve.swap_rate(value_dt, fwd_maturity_dt)
             df = curve.df(fwd_maturity_dt)
 
@@ -111,10 +125,17 @@ def test_fin_discount_curves():
                 "%-12s" % fwd_maturity_dt,
                 "%7.6f" % (zero_rate),
                 "%8.7f" % (df),
-                "%7.6f" % (fwd),
-                "%7.6f" % (fwd_rate),
+                "%7.6f" % (cc_fwd),
+                "%7.6f" % (mm_fwd),
                 "%7.6f" % (swap_rate),
             )
+
+        # print(curve)
+        # bumped_curve = curve.bump_parallel(0.0001)
+        # print("===============>>>>BUMPED")
+        # print(bumped_curve)
+        # print("====================================================")
+        # print("====================================================")
 
     # Examine vectorisation
     test_cases.banner("######################################################")
@@ -124,7 +145,7 @@ def test_fin_discount_curves():
     for name, curve in zip(curve_names, curves_list):
         tenor = "3M"
         zero_rate = curve.zero_rate(fwd_maturity_dts)
-        fwd = curve.fwd(fwd_maturity_dts)
+        fwd = curve.fwd_rate_inst(fwd_maturity_dts)
         fwd_rate = curve.fwd_rate(fwd_maturity_dts, tenor)
         swap_rate = curve.swap_rate(value_dt, fwd_maturity_dts)
         df = curve.df(fwd_maturity_dts)
@@ -156,7 +177,7 @@ def test_fin_discount_curves():
 
         plt.figure()
         for name, curve in zip(curve_names, curves_list):
-            fwd_rates = curve.fwd(fwd_dts)
+            fwd_rates = curve.fwd_rate_inst(fwd_dts)
             plt.plot(years, fwd_rates, label=name)
         plt.legend()
         plt.title("CC Fwd Rates")
@@ -188,23 +209,24 @@ def test_bump():
         y = (dt - value_dt) / G_DAYS_IN_YEAR
         years2.append(y)
 
-    zeros = np.array([0.05, 0.06, 0.065, 0.07, 0.075,
-                     0.08, 0.081, 0.082, 0.083, 0.084])
+    zeros = np.array(
+        [0.05, 0.06, 0.065, 0.07, 0.075, 0.08, 0.081, 0.082, 0.083, 0.084]
+    )
     dfs = np.exp(-np.array(zeros) * np.array(years2))
 
-    curve = DiscountCurve(
-        value_dt, dates, dfs, InterpTypes.FLAT_FWD_RATES
-    )
+    curve = DiscountCurve(value_dt, dates, dfs, InterpTypes.FLAT_FWD_RATES)
 
-#    print(curve)
-#    print(zeros)
+    #    print(curve)
+    #    print(zeros)
 
     bp = 0.0001
-    bumped_curve = curve.bump(bp)
+    bumped_curve = curve.bump_parallel(bp)
     bumped_zeros = bumped_curve.zero_rate(dates)
+
 
 #    print(bumped_curve)
 #    print(bumped_zeros)
+
 
 ########################################################################################
 

@@ -1,18 +1,18 @@
-File Created on:20251106_163545
+File Created on:20260513_233031
 BANNER,######################## GBM NORMAL ###############################
 HEADER,PROCESS,TIME,
-RESULTS,GBM NORMAL,0.04264784,
+RESULTS,GBM NORMAL,0.06155705,
 BANNER,######################## GBM ANTITHETIC ###########################
-RESULTS,GBM ANTITHETIC,0.04627776,
+RESULTS,GBM ANTITHETIC,0.06675076,
 BANNER,###################### HESTON euler ###############################
-RESULTS,HESTON EULER,0.07938576,
+RESULTS,HESTON EULER,0.10553026,
 BANNER,###################### HESTON EULERLOG ############################
-RESULTS,HESTON EULERLOG,0.07778525,
+RESULTS,HESTON EULERLOG,0.12191463,
 BANNER,###################### HESTON QUADEXP #############################
-RESULTS,HESTON QUADEXP,0.13796735,
+RESULTS,HESTON QUADEXP,0.17424202,
 BANNER,######################## VASICEK NORMAL ###########################
-RESULTS,VASICEK_NORMAL,0.03823638,
+RESULTS,VASICEK_NORMAL,0.05845523,
 BANNER,####################### VASICEK ANTITHETIC ########################
-RESULTS,VASICEK_NORMAL ANTI,0.03895736,
+RESULTS,VASICEK_NORMAL ANTI,0.05858994,
 BANNER,############################# CIR #################################
-RESULTS,CIR,0.04846430,
+RESULTS,CIR,0.06840563,

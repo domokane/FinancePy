@@ -28,10 +28,10 @@ class BondAnnuity:
         maturity_dt: Date,
         cpn: float,
         freq_type: FrequencyTypes,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
 
         check_argument_types(self.__init__, locals())
@@ -45,7 +45,7 @@ class BondAnnuity:
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
 
         self.par = 100.0
 
@@ -68,7 +68,9 @@ class BondAnnuity:
         """Calculate the bond price using some discount curve to present-value
         the bond's cash flows."""
 
-        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
+        dirty_price = self.dirty_price_from_discount_curve(
+            settle_dt, discount_curve
+        )
         accrued = self.accrued_int * self.par
         clean_price = dirty_price - accrued
         return clean_price
@@ -123,12 +125,12 @@ class BondAnnuity:
         self.accrued_interest(settle_dt, 1.0)
 
         self.flow_amounts = [0.0]
-        basis = DayCount(self.dc_type)
+        dc_counter = DayCount(self.accrual_dc_type)
 
         prev_dt = self._pcd
 
         for next_dt in self.cpn_dts[1:]:
-            alpha = basis.year_frac(prev_dt, next_dt)[0]
+            alpha = dc_counter.year_frac(prev_dt, next_dt)[0]
             flow = self.cpn * alpha * face
             self.flow_amounts.append(flow)
             prev_dt = next_dt
@@ -145,9 +147,11 @@ class BondAnnuity:
         if len(self.cpn_dts) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        dc = DayCount(self.dc_type)
+        dc_counter = DayCount(self.accrual_dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq)
+        (acc_factor, num, _) = dc_counter.year_frac(
+            self._pcd, settle_dt, self._ncd, self.freq
+        )
 
         self.alpha = 1.0 - acc_factor * self.freq
 
@@ -178,6 +182,7 @@ class BondAnnuity:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.acrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS_DAY_RULE", self.bd_type)
         s += label_to_string("DATE_GEN_RULE", self.dg_type)

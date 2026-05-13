@@ -17,6 +17,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
+from ...utils.day_count import DayCountTypes
 
 SWAP_TOL = 1e-10
 
@@ -35,7 +36,7 @@ def _f(df, *args):
     index_curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
-    index_curve.fit(index_curve.times, index_curve.dfs)
+    index_curve.fit(index_curve._times, index_curve._dfs)
     v_swap = swap.value(value_dt, discount_curve, index_curve, None)
 
     notional = swap.fixed_leg.notional
@@ -56,7 +57,7 @@ def _g(df, *args):
     curve.set_last_df(df)
 
     # For discount that need a fit function, we fit it now
-    curve.fit(curve.times, curve.dfs)
+    curve.fit(curve._times, curve._dfs)
     v_fra = fra.value(value_dt, discount_curve, curve)
     v_fra /= fra.notional
     return v_fra
@@ -80,6 +81,7 @@ class IborDualCurve(DiscountCurve):
         ibor_fras: list,
         ibor_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         check_refit_flag: bool = False,
     ):  # Set to True to test it works
         """Create an instance of a Ibor curve given a valuation date and
@@ -93,6 +95,11 @@ class IborDualCurve(DiscountCurve):
         """
 
         check_argument_types(getattr(self, _func_name(), None), locals())
+
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
+
+        self.time_dc_type = time_dc_type
 
         self.value_dt = value_dt
         self.discount_curve = discount_curve
@@ -224,7 +231,9 @@ class IborDualCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError("Swap cpns are not on the same date grid.")
+                        raise FinError(
+                            "Swap cpns are not on the same date grid."
+                        )
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -279,9 +288,9 @@ class IborDualCurve(DiscountCurve):
 
         # Need the floating leg basis for the curve
         if len(self.used_swaps) > 0:
-            self.dc_type = ibor_swaps[0].float_leg.dc_type
+            self.accrual_dc_type = ibor_swaps[0].float_leg.accrual_dc_type
         else:
-            self.dc_type = None
+            self.accrual_dc_type = None
 
     ###########################################################################
 
@@ -521,7 +530,10 @@ class IborDualCurve(DiscountCurve):
                 raise FinError("Deposit not repriced.")
 
         for fra in self.used_fras:
-            v = fra.value(self.value_dt, self.discount_curve, self) / fra.notional
+            v = (
+                fra.value(self.value_dt, self.discount_curve, self)
+                / fra.notional
+            )
             if abs(v) > fra_tol:
                 print("Value", v)
                 raise FinError("FRA not repriced.")

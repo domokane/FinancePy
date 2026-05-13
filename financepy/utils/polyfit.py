@@ -23,7 +23,7 @@ _eval_poly_impl: Optional[Callable[[np.ndarray, np.ndarray], np.ndarray]] = None
 
 def _coeff_mat_numpy(x: np.ndarray, deg: int) -> np.ndarray:
     # fast and stable: column order matches coefficients of increasing power
-    # (we’ll reverse later to match your API)
+    # we'll reverse later to match your API
     # vander with increasing=True gives [1, x, x^2, ...]
     return np.vander(x, N=deg + 1, increasing=True)
 
@@ -36,7 +36,7 @@ def _fit_poly_numpy(x: np.ndarray, y: np.ndarray, deg: int) -> np.ndarray:
 
 
 def _eval_polynomial_numpy(p: np.ndarray, x: np.ndarray) -> np.ndarray:
-    # Horner with highest-order first (your API)
+    # Horner with highest-order first - your API
     result = np.zeros_like(x, dtype=np.result_type(p.dtype, x.dtype))
     for coeff in p:
         result = x * result + coeff

@@ -1,52 +1,23 @@
+from typing import List
+
 import numpy as np
-from scipy import optimize
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.schedule import Schedule
-from ...utils.calendar import Calendar
-from ...utils.calendar import CalendarTypes
-from ...utils.calendar import BusDayAdjustTypes
-from ...utils.calendar import DateGenRuleTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.frequency import FrequencyTypes
+from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...products.bonds.bond import YTMCalcType
 
-########################################################################################
-# TO DO - THIS CLASS NEEDS TO INHERIT FROM BOND CLASS
-########################################################################################
+
+def validate_yield(ytm):
+    if ytm < -0.20 or ytm > 2.0:
+        raise FinError("YTM must be between -20% and +200%")
 
 
-def _f(ytm, *args):
-    """Function used to do root search in price to yield calculation."""
-    bond = args[0]
-    settle_dt = args[1]
-    price = args[2]
-    convention = args[3]
-    px = bond.dirty_price_from_ytm(settle_dt, ytm, convention)
-    obj_fn = px - price
-    return obj_fn
-
-
-########################################################################################
-
-
-def _g(oas, *args):
-    """Function used to do root search in price to OAS calculation."""
-    bond = args[0]
-    settle_dt = args[1]
-    price = args[2]
-    discount_curve = args[3]
-    px = bond.dirty_price_from_oas(settle_dt, discount_curve, oas)
-    obj_fn = px - price
-    return obj_fn
-
-
-########################################################################################
+###############################################################################
 
 
 class BondZero:
@@ -65,7 +36,8 @@ class BondZero:
         self,
         issue_dt: Date,
         maturity_dt: Date,
-        issue_price: float,  # Issue price usually discounted
+        issue_price: float,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,  # ONLY NEEDED FOR YIELD CALCULATIONS
     ):
         """Create BondZero object by providing the issue date, maturity Date,
         face amount and issue price."""
@@ -77,15 +49,10 @@ class BondZero:
 
         self.issue_dt = issue_dt
         self.maturity_dt = maturity_dt
-        self.dc_type = DayCountTypes.ZERO
-        self.issue_price = issue_price  # Price of issue, usually discounted
+        self.issue_price = issue_price
         self.par = 100.0  # This is how price is quoted and amount at maturity
         self.freq_type = FrequencyTypes.ZERO
-        self.cpn_dts = [issue_dt, maturity_dt]
-        self.payment_dts = [issue_dt, maturity_dt]
-        self.flow_amounts = [0.0, 0.0]  # cpn payments are zero
-        self.cal_type = CalendarTypes.WEEKEND
-        self.ex_div_days = 0
+        self.time_dc_type = time_dc_type
 
         self.accrued_int = None
         self.accrued_days = None
@@ -101,40 +68,28 @@ class BondZero:
         ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate the full price of bond from its yield to maturity. This
-        function is vectorised with respect to the yield input. It implements
-        a number of standard conventions for calculating the YTM."""
-
         if convention != YTMCalcType.ZERO:
-            raise FinError("Need to use YTMCalcType.ZERO for zero cpn bond")
+            raise FinError("Need YTMCalcType.ZERO for zero coupon bond")
 
-        self.accrued_interest(settle_dt, 1.0)
+        if settle_dt > self.maturity_dt:
+            raise FinError("Bond settles on or after maturity")
 
-        ytm = np.array(ytm)  # VECTORIZED
-        ytm = ytm + 0.000000000012345  # SNEAKY LOW-COST TRICK TO AVOID y=0
+        validate_yield(ytm)
 
-        # n is the number of flows after the next cpn
-        n = 0
-        for dt in self.cpn_dts:
-            if dt > settle_dt:
-                n += 1
-        n = n - 1
-
-        if n < 0:
-            raise FinError("No cpns left")
-        # A zero cpn bond has a price equal to the discounted principal
-        # assuming an annualised rate raised to the power of years
-
-        dc = DayCount(self.dc_type)
-        (acc_factor, _, _) = dc.year_frac(
+        # year fraction from settlement to maturity
+        dc = DayCount(self.time_dc_type)
+        T, _, _ = dc.year_frac(
             settle_dt, self.maturity_dt, self.maturity_dt, FrequencyTypes.ZERO
         )
-        if acc_factor <= 1:
-            pv = self.par / (1.0 + ytm * acc_factor)
-        else:
-            pv = self.par / (1.0 + ytm) ** acc_factor
 
-        return pv
+        ytm = np.asarray(ytm)  # keep vectorisation
+
+        if T <= 1.0:
+            # money market convention
+            return self.par / (1.0 + ytm * T)
+        else:
+            # annual compounding
+            return self.par / (1.0 + ytm) ** T
 
     ###########################################################################
 
@@ -145,48 +100,254 @@ class BondZero:
         face: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate the principal value of the bond based on the face
-        amount from its discount margin and making assumptions about the
-        future Ibor rates."""
+        """Return BBG principal value for a given face amount."""
+
+        validate_yield(ytm)
 
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
+        accrued = self.accrued_interest(settle_dt, face)
 
-        principal = dirty_price * face / self.par
-        principal = principal - self.accrued_int
-        return principal
+        return dirty_price * face / self.par - accrued
+
+    ###########################################################################
+
+    def accretion_yield(self, settle_dt: Date, clean_price):
+        """Return average annual accretion yield from settlement."""
+
+        if settle_dt > self.maturity_dt:
+            raise FinError("Settlement on or after maturity")
+
+        clean_price = np.asarray(clean_price)
+
+        dc = DayCount(self.time_dc_type)
+        T, _, _ = dc.year_frac(
+            settle_dt,
+            self.maturity_dt,
+            self.maturity_dt,
+            FrequencyTypes.ZERO,
+        )
+
+        if T <= 0.0:
+            raise FinError("Invalid time to maturity")
+
+        accrued = self.accrued_interest(settle_dt, self.par)
+        dirty_price = clean_price + accrued
+
+        annual_accretion = (self.par - dirty_price) / T
+        y = annual_accretion / clean_price
+
+        if y.ndim:
+            return y
+        else:
+            return float(y)
+
+    ###########################################################################
+
+    def current_yield(self, clean_price):
+        """
+        Calculate the current yield of the bond which is the
+        cpn divided by the clean price (not the full price).
+        The cpn of a zero cpn bond is defined as:
+        (par - issue_price) / tenor
+        """
+        dc = DayCount(self.dc_type)
+        T, _, _ = dc.year_frac(
+            self.issue_dt,
+            self.maturity_dt,
+            self.maturity_dt,
+            FrequencyTypes.ZERO,
+        )
+        virtual_cpn = (self.par - self.issue_price) / T
+        y = virtual_cpn / clean_price
+        return y
+
+    ###########################################################################
+
+    def yield_to_maturity(
+        self,
+        settle_dt: Date,
+        clean_price: float,
+        convention: YTMCalcType = YTMCalcType.ZERO,
+    ):
+        """Return YTM from clean price for a zero coupon bond."""
+
+        if convention != YTMCalcType.ZERO:
+            raise FinError("Need YTMCalcType.ZERO for zero coupon bond")
+
+        if settle_dt > self.maturity_dt:
+            raise FinError("Bond settles on or after maturity")
+
+        clean_price = np.asarray(clean_price)
+
+        # convert to dirty price
+        accrued = self.accrued_interest(settle_dt, self.par)
+        dirty_price = clean_price + accrued
+
+        # time to maturity
+        dc = DayCount(self.time_dc_type)
+        T, _, _ = dc.year_frac(
+            settle_dt,
+            self.maturity_dt,
+            self.maturity_dt,
+            FrequencyTypes.ZERO,
+        )
+
+        if T <= 0:
+            raise FinError("Invalid time to maturity")
+
+        # analytic inversion
+        if T <= 1.0:
+            # simple interest convention
+            ytm = (self.par / dirty_price - 1.0) / T
+        else:
+            # annual compounding
+            ytm = (self.par / dirty_price) ** (1.0 / T) - 1.0
+
+        return ytm if ytm.ndim else float(ytm)
+
+    ###########################################################################
+
+    def discount_rate(
+        self,
+        settle_dt: Date,
+        clean_price: float,
+        convention: YTMCalcType = YTMCalcType.ZERO,
+    ):
+        """Return discount rate for a zero coupon bond."""
+
+        if convention != YTMCalcType.ZERO:
+            raise FinError("Need YTMCalcType.ZERO for zero coupon bond")
+
+        if settle_dt > self.maturity_dt:
+            raise FinError("Bond settles on or after maturity")
+
+        clean_price = np.asarray(clean_price)
+
+        # convert to dirty price
+        accrued = self.accrued_interest(settle_dt, self.par)
+        dirty_price = clean_price + accrued
+
+        # time to maturity
+        dc = DayCount(self.time_dc_type)
+        T, _, _ = dc.year_frac(
+            settle_dt,
+            self.maturity_dt,
+            self.maturity_dt,
+            FrequencyTypes.ZERO,
+        )
+
+        if T <= 0:
+            raise FinError("Invalid time to maturity")
+
+        # analytic inversion
+        if T <= 1.0:
+            # simple interest convention
+            dr = (1.0 - dirty_price / self.par) / T
+        else:
+            # annual compounding
+            dr = (1.0 - dirty_price / self.par) ** (1.0 / T) - 1.0
+
+        return dr if dr.ndim else float(dr)
+
+    ###########################################################################
+
+    def accrued_interest(self, settle_dt: Date, face: float = 100.0):
+        """Return accrued discount on a zero coupon bond.
+
+        Convention:
+            accrued = face * (par - issue_price) / par
+                      * (settle_dt - issue_dt) / (maturity_dt - issue_dt)
+        """
+
+        if settle_dt < self.issue_dt:
+            raise FinError("Settlement date before issue date")
+
+        if settle_dt > self.maturity_dt:
+            raise FinError("Settlement date on or after maturity date")
+
+        elapsed_days = settle_dt - self.issue_dt
+        total_days = self.maturity_dt - self.issue_dt
+
+        accrual_fraction = elapsed_days / total_days
+        total_discount = (self.par - self.issue_price) / self.par
+
+        self.accrued_int = face * total_discount * accrual_fraction
+        self.accrued_days = elapsed_days
+
+        self._pcd = self.issue_dt
+        self._ncd = self.maturity_dt
+        self.alpha = 1.0 - accrual_fraction
+
+        return self.accrued_int
 
     ###########################################################################
 
     def dollar_duration(
         self,
-        settle_dt: Date,
-        ytm: float,
+        settle_dt: (Date, List),
+        ytm: (float, List),
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate the risk or dP/dy of the bond by bumping. This is also
-        known as the DV01 in Bloomberg."""
+        """Calculate dollar duration from a 1bp bumped-yield DV01.
 
-        dy = 0.0001  # 1 basis point
-        p0 = self.dirty_price_from_ytm(settle_dt, ytm - dy, convention)
-        p2 = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
-        d = -(p2 - p0) / dy / 2.0
-        return d
+        Dollar duration is the dirty-price change for a 100bp change in yield,
+        approximated as:
+
+            dollar_duration = 10000 * DV01
+
+        where DV01 is the positive dirty-price change for a +1bp yield shift.
+        """
+
+        validate_yield(ytm)
+
+        if settle_dt < self.issue_dt:
+            raise FinError("Settlement date falls before issue date")
+
+        dd = 10000 * self.dv01(settle_dt, ytm, convention)
+        return dd
 
     ###########################################################################
 
-    def macauley_duration(
+    def dv01(
         self,
         settle_dt: Date,
         ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate the Macauley duration of the bond on a settlement date
-        given its yield to maturity."""
+        """
+        Change in dirty price for a +1 basis point increase in yield.
+        Bloomberg-style DV01 / PV01 is positive for a long fixed-rate bond.
+        """
 
-        dd = self.dollar_duration(settle_dt, ytm, convention)
-        fp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        md = dd * (1.0 + ytm) / fp
-        return md
+        # Change in price for a
+        validate_yield(ytm)
+
+        dy = 0.0001  # 1 bp
+        p_0 = self.dirty_price_from_ytm(settle_dt, ytm, convention)
+        p_1 = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
+        dP = p_0 - p_1
+        return dP
+
+    ###########################################################################
+
+    def macaulay_duration(
+        self,
+        settle_dt: Date,
+        ytm: float,
+        convention: YTMCalcType = YTMCalcType.ZERO,
+    ):
+        """Return Macaulay duration of a zero coupon bond."""
+        validate_yield(ytm)
+
+        dc = DayCount(self.time_dc_type)
+        T, _, _ = dc.year_frac(
+            settle_dt,
+            self.maturity_dt,
+            self.maturity_dt,
+            FrequencyTypes.ZERO,
+        )
+
+        return T
 
     ###########################################################################
 
@@ -198,10 +359,11 @@ class BondZero:
     ):
         """Calculate the modified duration of the bondon a settlement date
         given its yield to maturity."""
+        validate_yield(ytm)
 
         dd = self.dollar_duration(settle_dt, ytm, convention)
         fp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        md = dd / fp
+        md = dd / fp * 10000
         return md
 
     ###########################################################################
@@ -215,11 +377,13 @@ class BondZero:
         """Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input."""
 
+        validate_yield(ytm)
+
         dy = 0.0001
         p0 = self.dirty_price_from_ytm(settle_dt, ytm - dy, convention)
         p1 = self.dirty_price_from_ytm(settle_dt, ytm, convention)
         p2 = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
-        conv = ((p2 + p0) - 2.0 * p1) / dy / dy / p1 / self.par
+        conv = ((p2 + p0) - 2.0 * p1) / (dy * dy * p1)
         return conv
 
     ###########################################################################
@@ -230,8 +394,8 @@ class BondZero:
         ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate the bond clean price from the yield to maturity. This
-        function is vectorised with respect to the yield input."""
+        """Calculate the clean price of a zero coupon bond from its YTM."""
+        validate_yield(ytm)
 
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
         accrued = self.accrued_interest(settle_dt, self.par)
@@ -247,7 +411,9 @@ class BondZero:
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
 
-        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
+        dirty_price = self.dirty_price_from_discount_curve(
+            settle_dt, discount_curve
+        )
 
         accrued = self.accrued_interest(settle_dt, self.par)
         clean_price = dirty_price - accrued
@@ -256,302 +422,30 @@ class BondZero:
     ###########################################################################
 
     def dirty_price_from_discount_curve(
-        self, settle_dt: Date, discount_curve: DiscountCurve
+        self,
+        settle_dt: Date,
+        discount_curve: DiscountCurve,
     ):
-        """Calculate the bond price using a provided discount curve to PV the
-        bond's cash flows to the settlement date. As such it is effectively a
-        forward bond price if the settlement date is after the valuation date.
-        """
+        """Return dirty price per 100 nominal using a discount curve."""
 
         if settle_dt < discount_curve.value_dt:
-            raise FinError("Bond settles before Discount curve date")
+            raise FinError("Bond settles before discount curve date")
 
         if settle_dt > self.maturity_dt:
-            raise FinError("Bond settles after it matures.")
+            raise FinError("Bond settles on or after maturity")
 
-        px = 0.0
-        df = 1.0
-        df_settle = discount_curve.df(
-            settle_dt,
-        )
+        df_settle = discount_curve.df(settle_dt)
+        df_mat = discount_curve.df(self.maturity_dt)
 
-        for dt in self.cpn_dts[1:]:
-
-            # cpns paid on the settlement date are paid to the seller
-            if dt > settle_dt:
-                df = discount_curve.df(dt)
-                flow = 0
-                pv = flow * df
-                px += pv
-
-        px += df * self.par
-        px = px / df_settle
-
-        return px * self.par
-
-    ###########################################################################
-
-    def current_yield(self, clean_price):
-        """
-        Calculate the current yield of the bond which is the
-        cpn divided by the clean price (not the full price).
-        The cpn of a zero cpn bond is defined as:
-        (par - issue_price) / tenor
-        """
-        dc = DayCount(self.dc_type)
-        tenor, _, _ = dc.year_frac(
-            self.issue_dt,
-            self.maturity_dt,
-            self.maturity_dt,
-            FrequencyTypes.ZERO,
-        )
-        virtual_cpn = (self.par - self.issue_price) / tenor
-        y = virtual_cpn / clean_price
-        return y
-
-    ###########################################################################
-
-    def yield_to_maturity(
-        self,
-        settle_dt: Date,
-        clean_price: float,
-        convention: YTMCalcType = YTMCalcType.ZERO,
-    ):
-        """Calculate the bond's yield to maturity by solving the price
-        yield relationship using a one-dimensional root solver."""
-
-        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
-            clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
-            clean_prices = np.array(clean_price)
-        else:
-            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
-
-        accrued_amount = self.accrued_interest(settle_dt, self.par)
-        dirty_prices = clean_prices + accrued_amount
-
-        ytms = []
-
-        for dirty_price in dirty_prices:
-
-            argtuple = (self, settle_dt, dirty_price, convention)
-
-            ytm = optimize.newton(
-                _f,
-                x0=0.05,  # guess initial value of 5%
-                fprime=None,
-                args=argtuple,
-                tol=1e-8,
-                maxiter=50,
-                fprime2=None,
-            )
-
-            ytms.append(ytm)
-
-        if len(ytms) == 1:
-            return ytms[0]
-
-        return np.array(ytms)
-
-    ###########################################################################
-
-    def accrued_interest(self, settle_dt: Date, face: float):
-        """Calculate the amount of cpn that has accrued between the
-        previous cpn date and the settlement date. Note that for some day
-        count schemes (such as 30E/360) this is not actually the number of days
-        between the previous cpn payment date and settlement date. If the
-        bond trades with ex-cpn dates then you need to supply the number of
-        days before the cpn date the ex-cpn date is. You can specify the
-        calendar to be used - NONE means only calendar days, WEEKEND is only
-        weekends or you can specify a country calendar for business days."""
-
-        num_flows = len(self.cpn_dts)
-
-        if num_flows == 0:
-            raise FinError("Accrued interest - not enough flow dates.")
-
-        if settle_dt > self.maturity_dt:
-            raise FinError("Bond Zero settlement after maturity date")
-
-        for i_flow in range(1, num_flows):
-
-            # cpns paid on the settlement date are paid to the seller
-            if self.cpn_dts[i_flow] > settle_dt:
-                self._pcd = self.cpn_dts[i_flow - 1]
-                self._ncd = self.cpn_dts[i_flow]
-                break
-
-        dc = DayCount(self.dc_type)
-        cal = Calendar(self.cal_type)
-
-        ex_dividend_dt = cal.add_business_days(self._ncd, -self.ex_div_days)
-
-        (acc_factor, num, _) = dc.year_frac(
-            self._pcd, settle_dt, self._ncd, FrequencyTypes.ZERO
-        )
-
-        if settle_dt > ex_dividend_dt:
-            acc_factor = acc_factor - 1.0
-
-        self.alpha = 1.0 - acc_factor
-
-        num = settle_dt - self.issue_dt
-        den = self.maturity_dt - self.issue_dt
-
-        f = num / den
-        g = ((self.par - self.issue_price)) / self.par
-
-        self.accrued_int = f * g * face
-        self.accrued_days = num
-
-        return self.accrued_int
-
-    ###########################################################################
-
-    def asset_swap_spread(
-        self,
-        settle_dt: Date,
-        clean_price: float,
-        discount_curve: DiscountCurve,
-        swap_float_dc_type=DayCountTypes.ACT_360,
-        swap_float_freq_type=FrequencyTypes.SEMI_ANNUAL,
-        swap_float_cal_type=CalendarTypes.WEEKEND,
-        swap_float_bus_day_adjust_rule_type=BusDayAdjustTypes.FOLLOWING,
-        swap_float_dategen_type=DateGenRuleTypes.BACKWARD,
-    ):
-        """Calculate the par asset swap spread of the bond. The discount curve
-        is a Ibor curve that is passed in. This function is vectorised with
-        respect to the clean price."""
-
-        clean_price = np.array(clean_price)
-        self.accrued_interest(settle_dt, 1.0)
-        accrued_amount = self.accrued_int * self.par
-        bond_price = clean_price + accrued_amount
-        # Calculate the price of the bond discounted on the Ibor curve
-        pv_ibor = 0.0
-        prev_dt = self._pcd
-
-        df = 0.0
-
-        for dt in self.cpn_dts[1:]:
-
-            # cpns paid on the settlement date are paid to the seller
-            if dt > settle_dt:
-                df = discount_curve.df(dt)
-                # pv_ibor += df * self.cpn / self.freq
-
-        pv_ibor += df * self.par
-
-        # Calculate the PV01 of the floating leg of the asset swap
-        # I assume here that the cpn starts accruing on the settlement date
-        prev_dt = self._pcd
-        schedule = Schedule(
-            settle_dt,
-            self.maturity_dt,
-            swap_float_freq_type,
-            swap_float_cal_type,
-            swap_float_bus_day_adjust_rule_type,
-            swap_float_dategen_type,
-        )
-
-        day_count = DayCount(swap_float_dc_type)
-
-        prev_dt = self._pcd
-        pv01 = 0.0
-        for dt in schedule.adjusted_dts[1:]:
-            df = discount_curve.df(dt)
-            year_frac = day_count.year_frac(prev_dt, dt)[0]
-            pv01 = pv01 + year_frac * df
-            prev_dt = dt
-
-        asw = (pv_ibor - bond_price / self.par) / pv01
-        return asw
-
-    ###########################################################################
-
-    def dirty_price_from_oas(
-        self, settle_dt: Date, discount_curve: DiscountCurve, oas: float
-    ):
-        """Calculate the full price of the bond from its OAS given the bond
-        settlement date, a discount curve and the oas as a number."""
-
-        self.accrued_interest(settle_dt, 1.0)
-
-        df_adjusted = 0.0
-
-        pv = 0.0
-        for dt in self.cpn_dts[1:]:
-
-            # cpns paid on the settlement date are paid to the seller
-            if dt > settle_dt:
-                t = (dt - settle_dt) / G_DAYS_IN_YEAR
-
-                t = np.maximum(t, G_SMALL)
-
-                df = discount_curve.df(dt)
-                # determine the Ibor implied zero rate
-                r = np.power(df, -1.0 / t) - 1.0
-                # determine the OAS adjusted zero rate
-                df_adjusted = np.power(1.0 + (r + oas), -t)
-
-        pv = pv + df_adjusted * self.par
-        pv *= self.par
-        return pv
-
-    ###########################################################################
-
-    def option_adjusted_spread(
-        self,
-        settle_dt: Date,
-        clean_price: float,
-        discount_curve: DiscountCurve,
-    ):
-        """Return OAS for bullet bond given settlement date, clean bond price
-        and the discount relative to which the spread is to be computed."""
-
-        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
-            clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
-            clean_prices = np.array(clean_price)
-        else:
-            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
-
-        self.accrued_interest(settle_dt, 1.0)
-
-        accrued_amount = self.accrued_int * self.par
-        dirty_prices = clean_prices + accrued_amount
-
-        oass = []
-
-        for dirty_price in dirty_prices:
-            argtuple = (self, settle_dt, dirty_price, discount_curve)
-
-            oas = optimize.newton(
-                _g,
-                x0=0.01,  # initial value of 1%
-                fprime=None,
-                args=argtuple,
-                tol=1e-8,
-                maxiter=50,
-                fprime2=None,
-            )
-
-            oass.append(oas)
-
-        if len(oass) == 1:
-            return oass[0]
-
-        return np.array(oass)
-
-    ###########################################################################
+        return self.par * df_mat / df_settle
 
     def bond_payments(self, settle_dt: Date, face: float):
-        """Print a list of the unadjusted cpn payment dates used in
-        analytic calculations for the bond."""
-        flow_str = ""
-        flow_str += "%12s %12.2f \n" % (self.cpn_dts[-1], face)
+        """Return the zero bond redemption payment."""
 
-        return flow_str
+        if settle_dt > self.maturity_dt:
+            return ""
+
+        return "%12s %12.2f \n" % (self.maturity_dt, face)
 
     ###########################################################################
 
@@ -570,46 +464,37 @@ class BondZero:
         survival_curve: DiscountCurve,
         recovery_rate: float,
     ):
-        """Calculate discounted present value of flows assuming default model.
-        The survival curve treats the cpns as zero recovery payments while
-        the recovery fraction of the par amount is paid at default. For the
-        defaulting principal we discretize the time steps using the cpn
-        payment times. A finer discretization may handle the time value with
-        more accuracy. I reduce any error by averaging period start and period
-        end payment present values."""
+        """Return risky dirty price per 100 nominal for a zero coupon bond."""
 
-        pv = 0.0
-        prev_q = 1.0
-        prev_df = 1.0
+        if settle_dt < discount_curve.value_dt:
+            raise FinError("Bond settles before discount curve date")
 
-        defaulting_principal_pv_pay_start = 0.0
-        defaulting_principal_pv_pay_end = 0.0
+        if settle_dt > self.maturity_dt:
+            raise FinError("Bond settles on or after maturity")
 
-        for dt in self.cpn_dts[1:]:
+        df_settle = discount_curve.df(settle_dt)
+        df_mat = discount_curve.df(self.maturity_dt)
 
-            # cpns paid on the settlement date are paid to the seller
-            if dt > settle_dt:
-                df = discount_curve.df(dt)
-                q = survival_curve.survival_prob(dt)
+        q_settle = survival_curve.survival_prob(settle_dt)
 
-                # Add PV of cpn conditional on surviving to payment date
-                # Any default results in all subsequent cpns being lost
-                # with zero recovery
+        if q_settle <= 0.0:
+            raise FinError(
+                "Survival probability at settlement must be positive"
+            )
 
-                dq = q - prev_q
+        q_mat = survival_curve.survival_prob(self.maturity_dt)
 
-                defaulting_principal_pv_pay_start += -dq * recovery_rate * prev_df
-                defaulting_principal_pv_pay_start += -dq * recovery_rate * df
+        df_forward = df_mat / df_settle
+        q_forward = q_mat / q_settle
 
-                # Add on PV of principal if default occurs in cpn period
-                prev_q = q
-                prev_df = df
+        if q_forward < 0.0 or q_forward > 1.0:
+            raise FinError("Invalid conditional survival probability")
 
-        pv = pv + 0.50 * defaulting_principal_pv_pay_start
-        pv = pv + 0.50 * defaulting_principal_pv_pay_end
-        pv = pv + df * q * self.par
-        pv *= self.par
-        return pv
+        survival_pv = self.par * df_forward * q_forward
+
+        default_pv = self.par * recovery_rate * df_forward * (1.0 - q_forward)
+
+        return survival_pv + default_pv
 
     ###########################################################################
 
@@ -620,18 +505,18 @@ class BondZero:
         survival_curve: DiscountCurve,
         recovery_rate: float,
     ):
-        """Calculate clean price value of flows assuming default model.
-        The survival curve treats the cpns as zero recovery payments while
-        the recovery fraction of the par amount is paid at default."""
-
-        self.accrued_interest(settle_dt, 1.0)
+        """Return risky clean price per 100 nominal for a zero coupon bond."""
 
         dirty_price = self.dirty_price_from_survival_curve(
-            settle_dt, discount_curve, survival_curve, recovery_rate
+            settle_dt,
+            discount_curve,
+            survival_curve,
+            recovery_rate,
         )
 
-        clean_price = dirty_price - self.accrued_int
-        return clean_price
+        accrued = self.accrued_interest(settle_dt, self.par)
+
+        return dirty_price - accrued
 
     ###########################################################################
 
@@ -643,57 +528,27 @@ class BondZero:
         end_ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """TODO: TIDY THIS UP !!!!!!!!!!!!!!!!!
+        """Return annualised simple return, IRR, and PnL for a zero coupon bond."""
 
-        Calculates the rate of total return (capital return and interest) given
-        a BUY YTM and a SELL YTM of this bond.
+        if begin_dt >= end_dt:
+            raise FinError("Begin date must be before end date")
 
-        This function computes the full prices at buying and selling, plus the
-        cpn payments during the period.
-
-        It returns a tuple which includes a simple rate of return, a compounded
-        IRR and the PnL.
-        """
+        if begin_dt > self.maturity_dt:
+            raise FinError("Begin date on or after maturity")
 
         buy_price = self.dirty_price_from_ytm(begin_dt, begin_ytm, convention)
-        sell_price = self.dirty_price_from_ytm(end_dt, end_ytm, convention)
 
-        dates_cfs = zip(self.cpn_dts, self.flow_amounts)
-
-        # The cpn or par payments on buying date belong to the buyer.
-        # The cpn or par payments on selling date are given to the new buyer
-        dates_cfs = [
-            (d, c * self.par)
-            for (d, c) in dates_cfs
-            if (d >= begin_dt) and (d < end_dt)
-        ]
-
-        dates_cfs.append((begin_dt, -buy_price))
-
-        dates_cfs.append((end_dt, sell_price))
-        times_cfs = [((d - begin_dt) / 365, c) for (d, c) in dates_cfs]
-
-        pnl = sum(c for (t, c) in times_cfs)
-        simple_rtn = (pnl / buy_price) * 365 / (end_dt - begin_dt)
-        brentq_up_bound = 5
-        brentq_down_bound = -0.9999
-
-        # in case brentq cannot find the irr root
-
-        if simple_rtn > brentq_up_bound or simple_rtn < brentq_down_bound:
-
-            irr = simple_rtn
-
+        if end_dt >= self.maturity_dt:
+            sell_price = self.par
+            end_dt = self.maturity_dt
         else:
+            sell_price = self.dirty_price_from_ytm(end_dt, end_ytm, convention)
 
-            irr = optimize.brentq(
-                npv,
-                # f(a) and f(b) must have opposite signs
-                a=brentq_down_bound,
-                b=brentq_up_bound,
-                xtol=1e-8,
-                args=(np.array(times_cfs),),
-            )
+        holding_period = (end_dt - begin_dt) / G_DAYS_IN_YEAR
+
+        pnl = sell_price - buy_price
+        simple_rtn = pnl / buy_price / holding_period
+        irr = (sell_price / buy_price) ** (1.0 / holding_period) - 1.0
 
         return simple_rtn, irr, pnl
 
@@ -705,9 +560,8 @@ class BondZero:
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("COUPON (%)", 0)
-        s += label_to_string("ISSUE PRICE", self.issue_price)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("TIME DAY COUNT TYPE", self.time_dc_type)
         return s
 
     ###########################################################################

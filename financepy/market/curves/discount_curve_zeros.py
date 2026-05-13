@@ -19,7 +19,7 @@ from .interpolator import InterpTypes, Interpolator
 
 # TODO: Fix up __repr__ function
 
-########################################################################################
+###############################################################################
 
 
 class DiscountCurveZeros(DiscountCurve):
@@ -31,7 +31,7 @@ class DiscountCurveZeros(DiscountCurve):
     between the zero rates given and for this we must specify an interpolation
     convention. The class inherits methods from DiscountCurve."""
 
-    ####################################################################################
+    ###########################################################################
 
     def __init__(
         self,
@@ -39,8 +39,8 @@ class DiscountCurveZeros(DiscountCurve):
         zero_dts: list,
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-        dc_type: DayCountTypes = DayCountTypes.ACT_ACT_ISDA,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Create the discount curve from a vector of dates and zero rates
         factors. The first date is the curve anchor. Then a vector of zero
@@ -62,29 +62,24 @@ class DiscountCurveZeros(DiscountCurve):
         if freq_type not in FrequencyTypes:
             raise FinError("Unknown Frequency type " + str(freq_type))
 
-        if dc_type not in DayCountTypes:
-            raise FinError(
-                "Unknown Cap Floor DayCountRule type " + str(dc_type))
-
         self.value_dt = value_dt
         self.freq_type = freq_type
-        self.dc_type = dc_type
+
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
+
+        self.time_dc_type = time_dc_type
 
         self._zero_rates = np.array(zero_rates)
         self._zero_dts = zero_dts
+        self._df_dates = zero_dts
 
-        self._times = times_from_dates(zero_dts, value_dt, dc_type)
+        self._times = times_from_dates(zero_dts, value_dt, time_dc_type)
 
         if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
 
-        dfs = self._zero_to_df(
-            self.value_dt,
-            self._zero_rates,
-            self._times,
-            self.freq_type,
-            self.dc_type,
-        )
+        dfs = self._zero_to_df(self._zero_rates, self._times, self.freq_type)
 
         self._dfs = np.array(dfs)
 
@@ -92,45 +87,38 @@ class DiscountCurveZeros(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type)
         self.fit(self._times, self._dfs)
 
-    # #########################################################################
+    ###########################################################################
 
-    #     def bump(self, bump_size):
-    #         """ Calculate the continuous forward rate at the forward date."""
+    def bump_parallel(self, bump_size: float):
+        """Return a new curve with all zero rates bumped in parallel."""
 
-    #         times = self.times.copy()
-    #         discount_factors = self._discount_factors.copy()
+        bumped_zero_rates = self._zero_rates + bump_size
 
-    #         n = len(self.times)
-    #         for i in range(0, n):
-    #             t = times[i]
-    #         discount_factors[i] = discount_factors[i] * np.exp(-bump_size*t)
+        return DiscountCurveZeros(
+            self.value_dt,
+            self._zero_dts.copy(),
+            bumped_zero_rates,
+            freq_type=self.freq_type,
+            interp_type=self._interp_type,
+            time_dc_type=self.time_dc_type,
+        )
 
-    #         disc_curve = DiscountCurve(self.value_dt, times,
-    #                                      discount_factors,
-    #                                      self._interp_type)
-
-    #         return disc_curve
-
-    ####################################################################################
+    ###########################################################################
 
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUATION DATE", self.value_dt)
-        s += label_to_string("FREQUENCY TYPE", (self.freq_type))
-        s += label_to_string("DAY COUNT TYPE", (self.dc_type))
-        s += label_to_string("INTERP TYPE", (self._interp_type))
-
+        s += label_to_string("ZERO RATE FREQUENCY", self.freq_type)
         s += label_to_string("DATES", "ZERO RATES")
-        num_points = len(self._times)
-        for i in range(0, num_points):
-            s += label_to_string(
-                "%12s" % self._zero_dts[i], "%10.7f" % self._zero_rates[i]
-            )
 
+        for dt, rate in zip(self._zero_dts, self._zero_rates):
+            s += label_to_string(str(dt), f"{rate:12.8f}")
+
+        s += "\n"
+        s += super().__repr__()
         return s
 
-    ####################################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

@@ -40,7 +40,7 @@ class EquityCliquetOption(EquityOption):
         final_expiry_dt: Date,
         opt_type: OptionTypes,
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        accrual_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
@@ -64,7 +64,7 @@ class EquityCliquetOption(EquityOption):
         self.final_expiry_dt = final_expiry_dt
         self.opt_type = opt_type
         self.freq_type = freq_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -147,11 +147,15 @@ class EquityCliquetOption(EquityOption):
                     q = -np.log(dq_mat / dq) / tau
 
                     if self.opt_type == call_type:
-                        v_call = bs_value(1.0, tau, 1.0, r, q, v, call_type.value)
+                        v_call = bs_value(
+                            1.0, tau, 1.0, r, q, v, call_type.value
+                        )
                         v_fwd_opt = s * dq * v_call
                         v_cliquet += v_fwd_opt
                     elif self.opt_type == put_type:
-                        v_put = bs_value(1.0, tau, 1.0, r, q, v, put_type.value)
+                        v_put = bs_value(
+                            1.0, tau, 1.0, r, q, v, put_type.value
+                        )
                         v_fwd_opt = s * dq * v_put
                         v_cliquet += v_fwd_opt
                     else:
@@ -183,7 +187,7 @@ class EquityCliquetOption(EquityOption):
         s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
         s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
         s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
         s += label_to_string("DATE GEN RULE TYPE", self.dg_type, "")

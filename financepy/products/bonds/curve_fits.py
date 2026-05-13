@@ -1,32 +1,37 @@
-##############################################################################
+###############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-##############################################################################
+###############################################################################
 
 
 import numpy as np
 from scipy.interpolate import splev
 from ...utils.helpers import label_to_string
 
-########################################################################################
+###############################################################################
 
 
-class FinCurveFitMethod:
+class CurveFitMethod:
     pass
 
 
-########################################################################################
+###############################################################################
+# These are parametric curve fitters that can be used in a number of cases
+###############################################################################
 
 
 class CurveFitPolynomial:
     """Polynomial curve fitting."""
 
     def __init__(self, power=3):
-        self.parent_type = FinCurveFitMethod
+        self.parent_type = CurveFitMethod
         self.power = power
-        self.coeffs = []
+        self.coeffs = np.zeros(power)
 
-    def interp_yield(self, t):
-        yld = np.polyval(self.coeffs, t)
+    def interp_rate(self, t):
+        # I store coefficients with lowest power first but numpy wants
+        # the highest power first so I need to reverse the order
+        coeffs = self.coeffs[::-1]
+        yld = np.polyval(coeffs, t)
         return yld
 
     def __repr__(self):
@@ -43,13 +48,13 @@ class CurveFitPolynomial:
         print(self)
 
 
-########################################################################################
+###############################################################################
 
 
 class CurveFitNelsonSiegel:
 
     def __init__(self, tau=None, bounds=[(-1, -1, -1, 0.5), (1, 1, 1, 100)]):
-        self.parent_type = FinCurveFitMethod
+        self.parent_type = CurveFitMethod
         self.beta_1 = None
         self.beta_2 = None
         self.beta_3 = None
@@ -57,7 +62,7 @@ class CurveFitNelsonSiegel:
         """ Fairly permissive bounds. Only tau_1 is 1-100 """
         self.bounds = bounds
 
-    def interp_yield(self, t, beta_1=None, beta_2=None, beta_3=None, tau=None):
+    def interp_rate(self, t, beta_1=None, beta_2=None, beta_3=None, tau=None):
 
         t = np.maximum(t, 1e-10)
 
@@ -93,7 +98,7 @@ class CurveFitNelsonSiegel:
         print(self)
 
 
-########################################################################################
+###############################################################################
 
 
 class CurveFitNelsonSiegelSvensson:
@@ -107,7 +112,7 @@ class CurveFitNelsonSiegelSvensson:
         """Create object to store calibration and functional form of NSS
         parametric fit."""
 
-        self.parent_type = FinCurveFitMethod
+        self.parent_type = CurveFitMethod
         self.beta_1 = None
         self.beta_2 = None
         self.beta_3 = None
@@ -119,7 +124,7 @@ class CurveFitNelsonSiegelSvensson:
         the user does not provide any bounds. Especially for tau_2. """
         self.bounds = bounds
 
-    def interp_yield(
+    def interp_rate(
         self,
         t,
         beta_1=None,
@@ -176,18 +181,18 @@ class CurveFitNelsonSiegelSvensson:
         print(self)
 
 
-########################################################################################
+###############################################################################
 
 
 class CurveFitBSpline:
 
     def __init__(self, power=3, knots=[1, 3, 5, 10]):
-        self.parent_type = FinCurveFitMethod
+        self.parent_type = CurveFitMethod
         self.power = power
         self.knots = knots
         self.spline = None
 
-    def interp_yield(self, t):
+    def interp_rate(self, t):
         t = np.maximum(t, 1e-10)
         yld = splev(t, self.spline)
         return yld
@@ -204,4 +209,4 @@ class CurveFitBSpline:
         print(self)
 
 
-########################################################################################
+###############################################################################

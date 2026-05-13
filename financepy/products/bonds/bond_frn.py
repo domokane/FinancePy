@@ -30,7 +30,9 @@ def _f(dm, *args):
     future_ibor = args[4]
     dirty_price = args[5]
 
-    px = self.dirty_price_from_dm(settle_dt, next_cpn, current_ibor, future_ibor, dm)
+    px = self.dirty_price_from_dm(
+        settle_dt, next_cpn, current_ibor, future_ibor, dm
+    )
 
     obj_fn = px - dirty_price
     return obj_fn
@@ -49,7 +51,7 @@ class BondFRN:
         maturity_dt: Date,
         quoted_margin: float,  # Fixed spread paid on top of index
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        accrual_dc_type: DayCountTypes,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
     ):
         """Create FinFloatingRateNote object given its maturity date, its
@@ -62,7 +64,7 @@ class BondFRN:
         self.maturity_dt = maturity_dt
         self.quoted_margin = quoted_margin
         self.freq_type = freq_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.freq = annual_frequency(freq_type)
         self.cal_type = cal_type
 
@@ -117,18 +119,18 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin."""
 
-        day_counter = DayCount(self.dc_type)
+        dc_counter = DayCount(self.accrual_dc_type)
 
         q = self.quoted_margin
         num_flows = len(self.cpn_dts)
 
         # We discount using Libor over the period from settlement to the ncd
-        (alpha, _, _) = day_counter.year_frac(settle_dt, self._ncd)
+        (alpha, _, _) = dc_counter.year_frac(settle_dt, self._ncd)
 
         df = 1.0 / (1.0 + alpha * (current_ibor + dm))
 
         # A full coupon is paid
-        (alpha, _, _) = day_counter.year_frac(self._pcd, self._ncd)
+        (alpha, _, _) = dc_counter.year_frac(self._pcd, self._ncd)
         pv = next_cpn * alpha * df
 
         # Now do all subsequent coupons that fall after the ncd
@@ -138,7 +140,7 @@ class BondFRN:
 
                 pcd = self.cpn_dts[i_flow - 1]
                 ncd = self.cpn_dts[i_flow]
-                (alpha, _, _) = day_counter.year_frac(pcd, ncd)
+                (alpha, _, _) = dc_counter.year_frac(pcd, ncd)
 
                 df = df / (1.0 + alpha * (future_ibor + dm))
                 c = future_ibor + q
@@ -227,7 +229,7 @@ class BondFRN:
 
     ###########################################################################
 
-    def macauley_duration(
+    def macaulay_duration(
         self,
         settle_dt: Date,
         next_cpn: float,
@@ -235,10 +237,12 @@ class BondFRN:
         future_ibor: float,
         dm: float,
     ):
-        """Calculate the Macauley duration of the FRN on a settlement date
+        """Calculate the Macaulay duration of the FRN on a settlement date
         given its yield to maturity."""
 
-        dd = self.dollar_duration(settle_dt, next_cpn, current_ibor, future_ibor, dm)
+        dd = self.dollar_duration(
+            settle_dt, next_cpn, current_ibor, future_ibor, dm
+        )
 
         fp = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
@@ -264,7 +268,9 @@ class BondFRN:
         is the level of subsequent future Ibor payments and the discount
         margin."""
 
-        dd = self.dollar_duration(settle_dt, next_cpn, current_ibor, future_ibor, dm)
+        dd = self.dollar_duration(
+            settle_dt, next_cpn, current_ibor, future_ibor, dm
+        )
 
         fp = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
@@ -417,7 +423,7 @@ class BondFRN:
         if num_flows == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
 
         for i in range(1, num_flows):
             if self.cpn_dts[i] > settle_dt:
@@ -453,9 +459,11 @@ class BondFRN:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("QUOTED MARGIN (bp)", self.quoted_margin * 10000.0)
+        s += label_to_string(
+            "QUOTED MARGIN (bp)", self.quoted_margin * 10000.0
+        )
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         return s
 
     ###########################################################################

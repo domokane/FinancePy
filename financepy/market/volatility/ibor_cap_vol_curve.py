@@ -14,10 +14,8 @@ from ...utils.day_count import DayCount, DayCountTypes
 # TODO: Interpolation
 # TODO: Integration kernel for LMM
 
-import numpy as np
 from typing import List
-
-from typing import Any, Sequence, Union
+from typing import Any, Union
 
 
 class IborCapVolCurve:
@@ -32,8 +30,8 @@ class IborCapVolCurve:
         self,
         curve_dt: Date,  # Valuation date for cap volatility
         cap_maturity_dts: List[Date],  # curve date + maturity dates for caps
+        accrual_dc_type: DayCountTypes,
         cap_sigmas: np.ndarray,  # Flat cap volatility for cap maturity dates
-        dc_type: Any,
     ) -> None:
         """Create a cap/floor volatility curve given a curve date, a list of
         cap maturity dates and a vector of cap volatilities. To avoid confusion
@@ -77,10 +75,10 @@ class IborCapVolCurve:
 
         self._cap_maturity_dts = cap_maturity_dts
 
-        if isinstance(dc_type, DayCountTypes) is False:
-            raise FinError("DayCountType must be of type DayCountTypes.")
+        if not isinstance(accrual_dc_type, DayCountTypes):
+            raise FinError("Invalid accrual day count type.")
 
-        self._dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
 
         self.generate_caplet_vols()
 
@@ -91,16 +89,16 @@ class IborCapVolCurve:
         notation to Hull's book (page 32.11). The first volatility in the
         vector of caplet vols is zero."""
 
-        self.times = []
+        self._times = []
         self._taus = []
 
-        day_counter = DayCount(self._dc_type)
+        day_counter = DayCount(self.accrual_dc_type)
         prev_dt = self._curve_dt
         num_caps = len(self._cap_maturity_dts)
 
         for dt in self._cap_maturity_dts:
             t = (dt - self._curve_dt) / G_DAYS_IN_YEAR
-            self.times.append(t)
+            self._times.append(t)
             tau = day_counter.year_frac(prev_dt, dt)[0]
             self._taus.append(tau)
             prev_dt = dt
@@ -112,7 +110,7 @@ class IborCapVolCurve:
 
         sum_tau = 0.0
         for i in range(1, len(self._cap_maturity_dts)):
-            t = self.times[i]
+            t = self._times[i]
             tau = self._taus[i]
             sum_tau += tau
             vol_cap = self._cap_sigmas[i]
@@ -138,20 +136,20 @@ class IborCapVolCurve:
         else:
             t = dt
 
-        if t <= self.times[1]:
+        if t <= self._times[1]:
             return self._caplet_gammas[1]
 
         debug = False
         if debug:
-            print(self.times)
+            print(self._times)
             print(self._caplet_gammas)
             print(t)
 
-        num_vols = len(self.times)
+        num_vols = len(self._times)
         vol = self._caplet_gammas[1]
 
         for i in range(1, num_vols):
-            if self.times[i] >= t:
+            if self._times[i] >= t:
                 vol = self._caplet_gammas[i]
                 return vol
 
@@ -169,17 +167,17 @@ class IborCapVolCurve:
         else:
             t = dt
 
-        num_vols = len(self.times)
+        num_vols = len(self._times)
         vol = self._cap_sigmas[0]
 
         debug = False
         if debug:
-            print(self.times)
+            print(self._times)
             print(self._caplet_gammas)
             print(t)
 
         for i in range(1, num_vols):
-            if self.times[i] >= t:
+            if self._times[i] >= t:
                 vol = self._cap_sigmas[i]
                 return vol
 
@@ -191,10 +189,10 @@ class IborCapVolCurve:
         """Output the contents of the FinCapVolCurve class object."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        num_times = len(self.times)
+        num_times = len(self._times)
         s += " TIME     TAU    CAP VOL    CAPLET VOL"
         for i in range(0, num_times):
-            t = self.times[i]
+            t = self._times[i]
             tau = self._taus[i]
             vol_cap = self._cap_sigmas[i]
             fwd_ibor_vol = self._caplet_vols[i]

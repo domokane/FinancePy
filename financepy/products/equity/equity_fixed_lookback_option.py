@@ -9,6 +9,7 @@ from ...utils.math import normcdf
 from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
+from ...utils.frequency import FrequencyTypes
 
 from ...models.gbm_process_simulator import get_paths_times
 from ...products.equity.equity_option import EquityOption
@@ -35,13 +36,18 @@ class EquityFixedLookbackOption(EquityOption):
     the value of the stock price used to determine the payoff is the maximum
     in the case of a call option, and a minimum in the case of a put option."""
 
-    def __init__(self, expiry_dt: Date, opt_type: OptionTypes, strike_price: float):
+    def __init__(
+        self, expiry_dt: Date, opt_type: OptionTypes, strike_price: float
+    ):
         """Create the FixedLookbackOption by specifying the expiry date, the
         option type and the option strike."""
 
         check_argument_types(self.__init__, locals())
 
-        if opt_type not in [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]:
+        if opt_type not in [
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT,
+        ]:
             raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt
@@ -125,7 +131,9 @@ class EquityFixedLookbackOption(EquityOption):
                 d2 = d1 - v * sqrt_t
 
                 if s0 == k:
-                    term = -normcdf(d1 - 2.0 * b * sqrt_t / v) + expbt * normcdf(d1)
+                    term = -normcdf(
+                        d1 - 2.0 * b * sqrt_t / v
+                    ) + expbt * normcdf(d1)
                 elif s0 < k and w > 100.0:
                     term = expbt * normcdf(d1)
                 else:
@@ -133,15 +141,23 @@ class EquityFixedLookbackOption(EquityOption):
                         d1 - 2 * b * sqrt_t / v
                     ) + expbt * normcdf(d1)
 
-                v = s0 * dq * normcdf(d1) - k * df * normcdf(d2) + s0 * df * u * term
+                v = (
+                    s0 * dq * normcdf(d1)
+                    - k * df * normcdf(d2)
+                    + s0 * df * u * term
+                )
 
             else:
 
-                e1 = (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
+                e1 = (
+                    (np.log(s0 / s_max) + (r - q + v * v / 2) * t) / v / sqrt_t
+                )
                 e2 = e1 - v * sqrt_t
 
                 if s0 == s_max:
-                    term = -normcdf(e1 - 2.0 * b * sqrt_t / v) + expbt * normcdf(e1)
+                    term = -normcdf(
+                        e1 - 2.0 * b * sqrt_t / v
+                    ) + expbt * normcdf(e1)
                 elif s0 < s_max and w > 100.0:
                     term = expbt * normcdf(e1)
                 else:
@@ -164,7 +180,9 @@ class EquityFixedLookbackOption(EquityOption):
                 f2 = f1 - v * sqrt_t
 
                 if s0 == s_min:
-                    term = normcdf(-f1 + 2.0 * b * sqrt_t / v) - expbt * normcdf(-f1)
+                    term = normcdf(
+                        -f1 + 2.0 * b * sqrt_t / v
+                    ) - expbt * normcdf(-f1)
                 elif s0 > s_min and w < -100.0:
                     term = -expbt * normcdf(-f1)
                 else:
@@ -185,7 +203,9 @@ class EquityFixedLookbackOption(EquityOption):
                 d2 = d1 - v * sqrt_t
 
                 if s0 == k:
-                    term = normcdf(-d1 + 2.0 * b * sqrt_t / v) - expbt * normcdf(-d1)
+                    term = normcdf(
+                        -d1 + 2.0 * b * sqrt_t / v
+                    ) - expbt * normcdf(-d1)
                 elif s0 > k and w < -100.0:
                     term = -expbt * normcdf(-d1)
                 else:
@@ -193,10 +213,16 @@ class EquityFixedLookbackOption(EquityOption):
                         -d1 + 2.0 * b * sqrt_t / v
                     ) - expbt * normcdf(-d1)
 
-                v = k * df * normcdf(-d2) - s0 * dq * normcdf(-d1) + s0 * df * u * term
+                v = (
+                    k * df * normcdf(-d2)
+                    - s0 * dq * normcdf(-d1)
+                    + s0 * df * u * term
+                )
 
         else:
-            raise FinError("Unknown lookback option type:" + str(self.opt_type))
+            raise FinError(
+                "Unknown lookback option type:" + str(self.opt_type)
+            )
 
         return v
 
@@ -217,14 +243,14 @@ class EquityFixedLookbackOption(EquityOption):
         """Monte Carlo valuation of a fixed strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        df = discount_curve.df(self.expiry_dt)
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        df = discount_curve.df(t_exp)
+        r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
+        q = dividend_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
 
         mu = r - q
-        num_time_steps = int(t * num_steps_per_year)
+        num_time_steps = int(t_exp * num_steps_per_year)
 
         opt_type = self.opt_type
         k = self.strike_price
@@ -235,14 +261,18 @@ class EquityFixedLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             s_max = stock_min_max
             if s_max < stock_price:
-                raise FinError("Smax must be greater than or equal to the stock price.")
+                raise FinError(
+                    "Smax must be greater than or equal to the stock price."
+                )
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             s_min = stock_min_max
             if s_min > stock_price:
-                raise FinError("Smin must be less than or equal to the stock price.")
+                raise FinError(
+                    "Smin must be less than or equal to the stock price."
+                )
 
         _, s_all = get_paths_times(
-            num_paths, num_time_steps, t, mu, stock_price, volatility, seed
+            num_paths, num_time_steps, t_exp, mu, stock_price, volatility, seed
         )
 
         payoff = np.zeros(num_paths)

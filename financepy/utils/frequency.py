@@ -12,8 +12,8 @@ from ..utils.error import FinError
 class FrequencyTypes(Enum):
     """Enumeration of frequency types."""
 
-    ZERO = -1
-    SIMPLE = 0
+    ZERO = -1  # WHEN THERE IS NO COUPON
+    SIMPLE_INTEREST = 0
     ANNUAL = 1
     SEMI_ANNUAL = 2
     TRI_ANNUAL = 3
@@ -34,12 +34,10 @@ def annual_frequency(freq_type: FrequencyTypes) -> float:
         print("FinFrequency:", freq_type)
         raise FinError("Unknown frequency type")
 
-    if freq_type == FrequencyTypes.CONTINUOUS:
+    if freq_type == FrequencyTypes.ZERO:  # Zero coupon bond
         return -1.0
-    if freq_type == FrequencyTypes.SIMPLE:  # THE RETURN VALUE IS NEVER USED
-        return -99
-    if freq_type == FrequencyTypes.ZERO:
-        return 1.0
+    if freq_type == FrequencyTypes.SIMPLE_INTEREST:  # Money market style
+        return 0.0
     if freq_type == FrequencyTypes.ANNUAL:
         return 1.0
     if freq_type == FrequencyTypes.SEMI_ANNUAL:
@@ -50,6 +48,8 @@ def annual_frequency(freq_type: FrequencyTypes) -> float:
         return 4.0
     if freq_type == FrequencyTypes.MONTHLY:
         return 12.0
+    if freq_type == FrequencyTypes.CONTINUOUS:
+        return 99
 
     raise FinError("Invalid frequency type")
 

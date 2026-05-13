@@ -46,7 +46,7 @@ class FinInflationSwap:
         # End of the Ibor rate period
         maturity_dt_or_tenor: Union[Date, str],
         fra_rate: float,  # The fixed contractual FRA rate
-        dc_type: DayCountTypes,  # For interest period
+        accrual_dc_type: DayCountTypes,  # For interest period
         notional: float = 100.0,
         pay_fixed_rate: bool = True,  # True if the FRA rate is being paid
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
@@ -76,7 +76,7 @@ class FinInflationSwap:
         self.maturity_dt = maturity_dt
         self.fra_rate = fra_rate
         self.pay_fixed_rate = pay_fixed_rate
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.notional = notional
 
     ###########################################################################
@@ -86,7 +86,7 @@ class FinInflationSwap:
         market FRA rate. The same curve is used for calculating the forward
         Ibor and for doing discounting on the expected forward payment."""
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df1 = libor_curve.df(self.start_dt)
         df2 = libor_curve.df(self.maturity_dt)
@@ -108,7 +108,7 @@ class FinInflationSwap:
         """Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate."""
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         df1 = libor_curve.df(self.start_dt)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df2 = df1 / (1.0 + acc_factor * self.fra_rate)
@@ -120,7 +120,7 @@ class FinInflationSwap:
         """Determine the value of the Deposit given a Ibor curve."""
 
         flow_settle = self.notional
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         flow_maturity = (1.0 + acc_factor * self.fra_rate) * self.notional
 
@@ -140,7 +140,7 @@ class FinInflationSwap:
         s += label_to_string("FRA RATE", self.fra_rate)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("PAY FIXED RATE", self.pay_fixed_rate)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
         s += label_to_string("CALENDAR", self.cal_type)
         return s

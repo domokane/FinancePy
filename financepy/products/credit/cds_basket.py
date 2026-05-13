@@ -43,7 +43,7 @@ class CDSBasket:
         running_cpn: float = 0.0,
         long_protect: bool = True,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
@@ -56,7 +56,7 @@ class CDSBasket:
         self.notional = notional
         self.running_cpn = running_cpn / 10000.0
         self.long_protect = long_protect
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.dg_type = dg_type
         self.cal_type = cal_type
         self.freq_type = freq_type
@@ -69,7 +69,7 @@ class CDSBasket:
             1.0,
             self.long_protect,
             self.freq_type,
-            self.dc_type,
+            self.accrual_dc_type,
             self.cal_type,
             self.bd_type,
             self.dg_type,
@@ -87,7 +87,7 @@ class CDSBasket:
 
         payment_dts = self.cds_contract.payment_dts
         num_payments = len(payment_dts)
-        day_count = DayCount(self.dc_type)
+        day_count = DayCount(self.accrual_dc_type)
 
         avg_acc_factor = 0.0
 
@@ -134,7 +134,9 @@ class CDSBasket:
 
                 num_payment_amounts_index = int(min_tau / avg_acc_factor)
                 rpv01_trial = rpv01_to_times[num_payment_amounts_index]
-                rpv01_trial += min_tau - num_payment_amounts_index * avg_acc_factor
+                rpv01_trial += (
+                    min_tau - num_payment_amounts_index * avg_acc_factor
+                )
 
                 # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
                 asset_index = 0
@@ -188,7 +190,7 @@ class CDSBasket:
         # Contract schedule
         payment_dts = self.cds_contract.payment_dts
         num_payments = len(payment_dts)
-        day_count = DayCount(self.dc_type)
+        day_count = DayCount(self.accrual_dc_type)
 
         # First accrual start date (stub handling)
         accrual_start_dt = getattr(
@@ -197,19 +199,26 @@ class CDSBasket:
 
         # Times in years from value_dt
         pay_times = np.array(
-            [to_years(dt, value_dt, G_DAYS_IN_YEAR) for dt in payment_dts], dtype=float
+            [to_years(dt, value_dt, G_DAYS_IN_YEAR) for dt in payment_dts],
+            dtype=float,
         )
-        accrual_start_time = to_years(accrual_start_dt, value_dt, G_DAYS_IN_YEAR)
+        accrual_start_time = to_years(
+            accrual_start_dt, value_dt, G_DAYS_IN_YEAR
+        )
 
         # Period year-fractions and discount factors
         accrual_factors = np.zeros(num_payments, dtype=float)
-        accrual_factors[0] = day_count.year_frac(accrual_start_dt, payment_dts[0])[0]
+        accrual_factors[0] = day_count.year_frac(
+            accrual_start_dt, payment_dts[0]
+        )[0]
         for i in range(1, num_payments):
             accrual_factors[i] = day_count.year_frac(
                 payment_dts[i - 1], payment_dts[i]
             )[0]
 
-        df_pay = np.array([libor_curve.df_t(t) for t in pay_times], dtype=float)
+        df_pay = np.array(
+            [libor_curve.df_t(t) for t in pay_times], dtype=float
+        )
 
         # Cumulative PV01 to each payment date
         rpv01_to_times = np.cumsum(accrual_factors * df_pay)
@@ -282,7 +291,9 @@ class CDSBasket:
         if n_to_default > num_credits or n_to_default < 1:
             raise FinError("n_to_default must be 1 to num_credits")
 
-        default_times = default_times_gc(issuer_curves, corr_matrix, num_trials, seed)
+        default_times = default_times_gc(
+            issuer_curves, corr_matrix, num_trials, seed
+        )
 
         rpv01, prot_pv = self.value_legs_mc(
             value_dt, n_to_default, default_times, issuer_curves, libor_curve
@@ -381,8 +392,8 @@ class CDSBasket:
                 recovery_rates[i_credit] = issuer_curve.recovery_rate
                 issuer_surv_probs[i_credit] = interpolate(
                     t,
-                    issuer_curve.times,
-                    issuer_curve.qs,
+                    issuer_curve._times,
+                    issuer_curve._qs,
                     InterpTypes.FLAT_FWD_RATES.value,
                 )
 
@@ -405,7 +416,9 @@ class CDSBasket:
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, basket_curve, curve_recovery
         )
-        risky_pv01 = self.cds_contract.risky_pv01(value_dt, basket_curve)["clean_rpv01"]
+        risky_pv01 = self.cds_contract.risky_pv01(value_dt, basket_curve)[
+            "clean_rpv01"
+        ]
 
         # Long protection
         mtm = self.notional * (prot_leg_pv - risky_pv01 * self.running_cpn)
@@ -430,12 +443,14 @@ class CDSBasket:
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
-        s += label_to_string("DAYCOUNT", self.dc_type)
+        s += label_to_string(
+            "RUNNING COUPON", self.running_cpn * 10000, "bp\n"
+        )
+        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
 
         #  header = "PAYMENT_dt, YEAR_FRAC, FLOW"
         #  value_table = [self.payment_dts, self.accrual_factors, self.flows]

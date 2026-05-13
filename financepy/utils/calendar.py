@@ -367,7 +367,7 @@ class Calendar:
         """Create a calendar based on a specified calendar type."""
 
         if cal_type not in CalendarTypes:
-            raise FinError("Need to pass FinCalendarType and not " + str(cal_type))
+            raise FinError("Invalid calendar type " + str(cal_type))
 
         self.cal_type = cal_type
         self.day_in_year = None
@@ -461,11 +461,11 @@ class Calendar:
 
         if not isinstance(bd_type, BusDayAdjustTypes):
             raise FinError("Invalid type passed. Need BusDayAdjustTypes")
-    
+
         # If no calendar or no adjustment, nothing to do
         if self.cal_type == CalendarTypes.NONE or bd_type == BusDayAdjustTypes.NONE:
             return dt
-    
+
         # FOLLOWING convention
         if bd_type == BusDayAdjustTypes.FOLLOWING:
             if dt.is_weekend():
@@ -478,12 +478,12 @@ class Calendar:
             while not self.is_business_day(dt):
                 dt = dt.add_days(1)
             return dt
-    
+
         # MODIFIED FOLLOWING convention
         if bd_type == BusDayAdjustTypes.MODIFIED_FOLLOWING:
-            d_start, m_start, y_start = dt.d, dt.m, dt.y
+            m_start = dt.m
             orig_dt = dt
-    
+
             if dt.is_weekend():
                 if dt.weekday == Date.SAT:
                     dt = dt.add_days(2)
@@ -491,7 +491,7 @@ class Calendar:
                     dt = dt.add_days(1)
             while not self.is_business_day(dt):
                 dt = dt.add_days(1)
-    
+
             # if moved into a different month → go backwards
             if dt.m != m_start:
                 dt = orig_dt
@@ -503,7 +503,7 @@ class Calendar:
                 while not self.is_business_day(dt):
                     dt = dt.add_days(-1)
             return dt
-    
+
         # PRECEDING convention
         if bd_type == BusDayAdjustTypes.PRECEDING:
             if dt.is_weekend():
@@ -514,12 +514,12 @@ class Calendar:
             while not self.is_business_day(dt):
                 dt = dt.add_days(-1)
             return dt
-    
+
         # MODIFIED PRECEDING convention
         if bd_type == BusDayAdjustTypes.MODIFIED_PRECEDING:
-            d_start, m_start, y_start = dt.d, dt.m, dt.y
+            m_start = dt.m
             orig_dt = dt
-    
+
             if dt.is_weekend():
                 if dt.weekday == Date.SAT:
                     dt = dt.add_days(-1)
@@ -527,7 +527,7 @@ class Calendar:
                     dt = dt.add_days(-2)
             while not self.is_business_day(dt):
                 dt = dt.add_days(-1)
-    
+
             # if moved into a different month → go forward
             if dt.m != m_start:
                 dt = orig_dt
@@ -539,12 +539,53 @@ class Calendar:
                 while not self.is_business_day(dt):
                     dt = dt.add_days(1)
             return dt
-    
+
         raise FinError("Unknown adjustment convention: " + str(bd_type))
 
     ####################################################################################
 
     def add_business_days(self, start_dt: Date, num_days: int):
+        """Return the date num_days business days from start_dt.
+    
+        The start date itself is not counted.
+        """
+    
+        if not isinstance(num_days, int):
+            raise FinError("Num days must be an integer")
+    
+        if num_days == 0:
+            return start_dt
+    
+        if self.cal_type == CalendarTypes.NONE:
+            return start_dt.add_days(num_days)
+    
+        step = 1 if num_days > 0 else -1
+        days_left = abs(num_days)
+        dt = start_dt
+    
+        # Safe fast path for weekend-only calendar
+        if self.cal_type == CalendarTypes.WEEKEND:
+            weeks, days_left = divmod(days_left, 5)
+            dt = dt.add_days(step * 7 * weeks)
+    
+            while days_left > 0:
+                dt = dt.add_days(step)
+                if self.is_business_day(dt):
+                    days_left -= 1
+    
+            return dt
+    
+        # General calendar path: correct for holidays
+        while days_left > 0:
+            dt = dt.add_days(step)
+            if self.is_business_day(dt):
+                days_left -= 1
+    
+        return dt
+
+    ###########################################################################
+
+    def add_business_days_old(self, start_dt: Date, num_days: int):
         """Returns a new date that is num_days business days after Date.
         All holidays in the chosen calendar are assumed not business days."""
 
@@ -581,6 +622,10 @@ class Calendar:
     def is_business_day(self, dt: Date):
         """Determines if a date is a business day according to the specified
         calendar. If it is it returns True, otherwise False."""
+
+        # Every day is a business day when the Calendar is NONE
+        if self.cal_type == CalendarTypes.NONE:
+            return True
 
         # For all calendars so far, SAT and SUN are not business days
         # If this ever changes I will need to add a filter here.
@@ -1430,17 +1475,20 @@ class Calendar:
 
     ###########################################################################
 
-    def get_holiday_list(self, year: float):
-        """generates a list of holidays in a specific year for the specified
-        calendar. Useful for diagnostics."""
+    def get_holiday_list(self, year: int):
+        """Generate a list of declared calendar holidays in a given year.
+
+        This includes declared holidays that fall on weekends, but does not 
+        include ordinary weekends unless the calendar type is WEEKEND.
+        """
+
         start_dt = Date(1, 1, year)
         end_dt = Date(1, 1, year + 1)
+
         holiday_list = []
+
         while start_dt < end_dt:
-            if (
-                self.is_business_day(start_dt) is False
-                and start_dt.is_weekend() is False
-            ):
+            if self.is_holiday(start_dt):
                 holiday_list.append(str(start_dt))
 
             start_dt = start_dt.add_days(1)
@@ -1454,7 +1502,8 @@ class Calendar:
         easy to compute, so we rely on a pre-calculated array."""
 
         if year > 2100:
-            raise FinError("Unable to determine Easter monday in year " + str(year))
+            raise FinError(
+                "Unable to determine Easter monday in year " + str(year))
 
         em_days = easter_monday_day[year - 1901]
         start_dt = Date(1, 1, year)

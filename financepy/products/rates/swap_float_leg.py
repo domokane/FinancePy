@@ -39,7 +39,7 @@ class SwapFloatLeg:
         leg_type: SwapTypes,
         spread: float,
         freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        accrual_dc_type: DayCountTypes,
         notional: float = ONE_MILLION,
         principal: float = 0.0,
         payment_lag: int = 0,
@@ -76,7 +76,7 @@ class SwapFloatLeg:
         self.notional_array = []
         self.spread = spread
 
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -125,7 +125,7 @@ class SwapFloatLeg:
 
         prev_dt = schedule_dts[0]
 
-        day_counter = DayCount(self.dc_type)
+        day_counter = DayCount(self.accrual_dc_type)
         calendar = Calendar(self.cal_type)
 
         # All of the lists end up with the same length
@@ -185,8 +185,8 @@ class SwapFloatLeg:
         if not self.notional_array:
             self.notional_array = [self.notional] * num_payments
 
-        index_basis = index_curve.dc_type
-        index_day_counter = DayCount(index_basis)
+        # FIXED A BUG HERE WHERE IT WAS USING INDEX CURVE DC TYPE
+        index_day_counter = DayCount(self.accrual_dc_type)
 
         for i_pmnt in range(0, num_payments):
 
@@ -287,7 +287,7 @@ class SwapFloatLeg:
         print("MATURITY DATE:", self.maturity_dt)
         print("SPREAD (bp):", self.spread * 10000)
         print("FREQUENCY:", str(self.freq_type))
-        print("DAY COUNT:", str(self.dc_type))
+        print("ACCRUAL DAY COUNT:", str(self.accrual_dc_type))
 
         if len(self.payment_dts) == 0:
             print("Payments Dates not calculated.")
@@ -295,7 +295,7 @@ class SwapFloatLeg:
 
         header = [
             "PAY_NUM",
-            "PAY_dt",
+            "PAY_DT",
             "ACCR_START",
             "ACCR_END",
             "DAYS",
@@ -331,7 +331,7 @@ class SwapFloatLeg:
         print("MATURITY DATE:", self.maturity_dt)
         print("SPREAD (BPS):", self.spread * 10000)
         print("FREQUENCY:", str(self.freq_type))
-        print("DAY COUNT:", str(self.dc_type))
+        print("ACCRUAL DAY COUNT:", str(self.accrual_dc_type))
 
         if len(self.payments) == 0:
             print("Payments not calculated.")
@@ -379,7 +379,7 @@ class SwapFloatLeg:
         s += label_to_string("SWAP TYPE", self.leg_type)
         s += label_to_string("SPREAD (BPS)", self.spread * 10000)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self.dg_type)

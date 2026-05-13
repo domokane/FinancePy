@@ -26,15 +26,9 @@ def test_fin_discount_curve_zeros():
     dates = start_dt.add_years(times)
     zero_rates = np.linspace(5.0, 6.0, 10) / 100
     freq_type = FrequencyTypes.ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ISDA
 
     curve = DiscountCurveZeros(
-        start_dt,
-        dates,
-        zero_rates,
-        freq_type,
-        dc_type,
-        InterpTypes.FLAT_FWD_RATES,
+        start_dt, dates, zero_rates, freq_type, InterpTypes.FLAT_FWD_RATES
     )
 
     test_cases.header("T", "DF")
@@ -88,7 +82,6 @@ def test_fin_discount_curve_zeros():
             dates,
             zero_rates,
             freq_type,
-            dc_type,
             InterpTypes.FLAT_FWD_RATES,
         )
 

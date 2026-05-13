@@ -348,8 +348,6 @@ def test_dp_example():
         dg_type=dg_type,
     )
 
-    #    swap.printFixedLegFlows()
-
     dts = [
         Date(14, 11, 2011),
         Date(14, 5, 2012),
@@ -380,12 +378,14 @@ def test_dp_example():
 
     value_dt = start_dt
 
-    curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
+    curve = DiscountCurve(
+        value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES
+    )
 
     v = swap.value(value_dt, curve, curve)
 
-    #    swap.print_fixed_leg_pv()
-    #    swap.print_float_leg_pv()
+    # swap.print_fixed_leg_pv()
+    # swap.print_float_leg_pv()
 
     # This is essentially zero
     test_cases.header("LABEL", "VALUE")

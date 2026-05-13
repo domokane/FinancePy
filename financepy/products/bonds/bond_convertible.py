@@ -213,7 +213,9 @@ def _value_convertible(
     bullet_pv = (1.0 + flow) * face_amount
     for i_node in range(0, num_levels):
         conv_value = tree_convert_value[num_times - 1, i_node]
-        tree_convert_bond_value[num_times - 1, i_node] = max(bullet_pv, conv_value)
+        tree_convert_bond_value[num_times - 1, i_node] = max(
+            bullet_pv, conv_value
+        )
 
     #  begin backward steps from expiry
     for i_time in range(num_times - 2, -1, -1):
@@ -229,7 +231,9 @@ def _value_convertible(
         for i_node in range(0, i_time + 1):
             fut_value_up = tree_convert_bond_value[i_time + 1, i_node + 1]
             fut_value_dn = tree_convert_bond_value[i_time + 1, i_node]
-            hold = p_up * fut_value_up + p_dn * fut_value_dn  # p_up already embeds Q
+            hold = (
+                p_up * fut_value_up + p_dn * fut_value_dn
+            )  # p_up already embeds Q
             hold_pv = (
                 df * hold
                 + p_def * df * recovery_rate * face_amount
@@ -247,14 +251,18 @@ def _value_convertible(
     delta = (tree_convert_bond_value[1, 1] - tree_convert_bond_value[1, 0]) / (
         tree_stock_value[1, 1] - tree_stock_value[1, 0]
     )
-    delta_up = (tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]) / (
-        tree_stock_value[2, 3] - tree_stock_value[2, 2]
+    delta_up = (
+        tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]
+    ) / (tree_stock_value[2, 3] - tree_stock_value[2, 2])
+    delta_dn = (
+        tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]
+    ) / (tree_stock_value[2, 2] - tree_stock_value[2, 1])
+    gamma = (delta_up - delta_dn) / (
+        tree_stock_value[1, 1] - tree_stock_value[1, 0]
     )
-    delta_dn = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]) / (
-        tree_stock_value[2, 2] - tree_stock_value[2, 1]
+    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (
+        2.0 * dt
     )
-    gamma = (delta_up - delta_dn) / (tree_stock_value[1, 1] - tree_stock_value[1, 0])
-    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (2.0 * dt)
     results = np.array([price, bullet_pv, delta, gamma, theta])
     return results
 
@@ -281,7 +289,7 @@ class BondConvertible:
         call_prices: np.ndarray,  # list of call prices
         put_dts: List[Date],  # list of put dates
         put_prices: np.ndarray,  # list of put prices
-        dc_type: DayCountTypes,  # day count type for accrued
+        accrual_dc_type: DayCountTypes,  # day count type for accrued
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
     ):
         """Create BondConvertible object by providing the bond Maturity
@@ -297,7 +305,7 @@ class BondConvertible:
 
         self.maturity_dt = maturity_dt
         self.cpn = coupon
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.freq = annual_frequency(freq_type)
         self.freq_type = freq_type
         self.cal_type = cal_type
@@ -608,9 +616,11 @@ class BondConvertible:
         if len(self.cpn_dts) == 0:
             raise FinError("Accrued interest - not enough flow dates.")
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq)
+        (acc_factor, num, _) = dc.year_frac(
+            self._pcd, settle_dt, self._ncd, self.freq
+        )
 
         self.alpha = 1.0 - acc_factor * self.freq
 
@@ -636,7 +646,7 @@ class BondConvertible:
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("COUPON", self.cpn)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("CONVERSION RATIO", self.conversion_ratio)
         s += label_to_string("START CONVERT DATE", self.start_convert_dt)
         s += label_to_string("CALL", "DATES")

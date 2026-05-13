@@ -512,7 +512,7 @@ def test_ibor_deposits_futures_swaps():
     times = np.linspace(0.0, 2.0, 25)
     dates = spot_dt.add_years(times)
     zero_rates = libor_curve.zero_rate(dates)
-    fwd_rates = libor_curve.fwd(dates)
+    fwd_rates = libor_curve.fwd_rate_inst(dates)
 
     if PLOT_GRAPHS:
         plt.figure(figsize=(8, 6))
@@ -649,42 +649,60 @@ def test_derivative_pricing_example():
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.0058
-    swap = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "1Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0060
-    swap = IborSwap(settle_dt, "2Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "2Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0072
-    swap = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "3Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0096
-    swap = IborSwap(settle_dt, "4Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "4Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0124
-    swap = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "5Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0173
-    swap = IborSwap(settle_dt, "7Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "7Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0219
-    swap = IborSwap(settle_dt, "10Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "10Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     swap_rate = 0.0283
-    swap = IborSwap(settle_dt, "30Y", fixed_leg_type, swap_rate, freq_type, dc_type)
+    swap = IborSwap(
+        settle_dt, "30Y", fixed_leg_type, swap_rate, freq_type, dc_type
+    )
     swaps.append(swap)
 
     num_repeats = 10
     start = time.time()
 
     for _ in range(0, num_repeats):
-        _ = IborSingleCurve(value_dt, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES)
+        _ = IborSingleCurve(
+            value_dt, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES
+        )
 
     end = time.time()
     elapsed1 = end - start
@@ -692,7 +710,9 @@ def test_derivative_pricing_example():
     start = time.time()
 
     for _ in range(0, num_repeats):
-        _ = IborSingleCurve(value_dt, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES)
+        _ = IborSingleCurve(
+            value_dt, depos, fras, swaps, InterpTypes.FLAT_FWD_RATES
+        )
 
     end = time.time()
     elapsed2 = end - start
@@ -914,8 +934,12 @@ def test_bloomberg_pricing_example(interp_type):
 
     # Pay fixed so make fixed leg value negative
     test_cases.header("VALUATION TO TODAY DATE", " PV")
-    test_cases.print("VALUE:", swaps[0].value(value_dt, libor_curve, libor_curve, None))
-    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(value_dt, libor_curve))
+    test_cases.print(
+        "VALUE:", swaps[0].value(value_dt, libor_curve, libor_curve, None)
+    )
+    test_cases.print(
+        "FIXED:", -swaps[0].fixed_leg.value(value_dt, libor_curve)
+    )
     test_cases.print(
         "FLOAT:",
         swaps[0].float_leg.value(value_dt, libor_curve, libor_curve, None),
@@ -926,7 +950,9 @@ def test_bloomberg_pricing_example(interp_type):
     test_cases.print(
         "VALUE:", swaps[0].value(settle_dt, libor_curve, libor_curve, None)
     )
-    test_cases.print("FIXED:", -swaps[0].fixed_leg.value(settle_dt, libor_curve))
+    test_cases.print(
+        "FIXED:", -swaps[0].fixed_leg.value(settle_dt, libor_curve)
+    )
     test_cases.print(
         "FLOAT:",
         swaps[0].float_leg.value(settle_dt, libor_curve, libor_curve, None),
@@ -940,7 +966,7 @@ def test_bloomberg_pricing_example(interp_type):
 
         years = np.linspace(0, 50, 500)
         dates = settle_dt.add_years(years)
-        fwds = libor_curve.fwd(dates)
+        fwds = libor_curve.fwd_rate_inst(dates)
         plt.plot(years, fwds, label="Fwd Rate")
         plt.title(interp_type)
         plt.xlabel("Years")

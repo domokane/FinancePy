@@ -16,6 +16,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.gbm_process_simulator import get_paths_times
+from ...utils.frequency import FrequencyTypes
 
 from ...utils.math import normcdf_vect
 
@@ -172,23 +173,27 @@ class EquityOneTouchOption(EquityOption):
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
-            raise FinError("Discount Curve date not same as option valuation date")
+            raise FinError(
+                "Discount Curve date not same as option valuation date"
+            )
 
         if dividend_curve.value_dt != value_dt:
-            raise FinError("Dividend Curve date not same as option valuation date")
+            raise FinError(
+                "Dividend Curve date not same as option valuation date"
+            )
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        t = max(t, 1e-6)
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = max(t_exp, 1e-6)
 
         s0 = stock_price
         hh = self.barrier_price
         k = self.payment_size
 
-        sqrt_t = np.sqrt(t)
+        sqrt_t_exp = np.sqrt(t_exp)
 
-        df = discount_curve.df(self.expiry_dt)
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        df = discount_curve.df_t(t_exp)
+        r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
+        q = dividend_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
 
         v = model.volatility
         v = max(v, 1e-6)
@@ -199,7 +204,7 @@ class EquityOneTouchOption(EquityOption):
         lam = np.sqrt(mu * mu + 2.0 * r / v / v)
 
         if DEBUG_MODE:
-            print("t:", t)
+            print("t_exp:", t_exp)
             print("vol", v)
             print("b", b)
             print("mu", mu)
@@ -214,10 +219,10 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Stock price is currently below barrier.")
 
             eta = 1.0
-            z = np.log(hh / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -229,10 +234,10 @@ class EquityOneTouchOption(EquityOption):
                 raise FinError("Stock price is currently above barrier.")
 
             eta = -1.0
-            z = np.log(hh / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -245,10 +250,10 @@ class EquityOneTouchOption(EquityOption):
 
             eta = 1.0
             k = hh
-            z = np.log(hh / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -261,10 +266,10 @@ class EquityOneTouchOption(EquityOption):
 
             eta = -1.0
             k = hh
-            z = np.log(hh / s0) / v / sqrt_t + lam * v * sqrt_t
+            z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
             a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t
+                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
             )
             v = (a5_1 + a5_2) * k
             return v
@@ -277,14 +282,14 @@ class EquityOneTouchOption(EquityOption):
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b4 = (
                 k
                 * df
                 * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b2 + b4
             return v
@@ -298,14 +303,14 @@ class EquityOneTouchOption(EquityOption):
             eta = -1.0
             phi = +1.0
 
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b4 = (
                 k
                 * df
                 * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b2 + b4
             return v
@@ -318,11 +323,16 @@ class EquityOneTouchOption(EquityOption):
 
             eta = +1.0
             phi = -1.0
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-q * t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a4 = (
+                s0
+                * dq
+                * np.power(hh / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a2 + a4
             return v
 
@@ -334,11 +344,16 @@ class EquityOneTouchOption(EquityOption):
 
             eta = -1.0
             phi = +1.0
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-q * t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a4 = (
+                s0
+                * dq
+                * np.power(hh / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a2 + a4
             return v
 
@@ -351,14 +366,14 @@ class EquityOneTouchOption(EquityOption):
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b4 = (
                 k
                 * df
                 * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b2 - b4
             return v
@@ -372,14 +387,14 @@ class EquityOneTouchOption(EquityOption):
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
             b4 = (
                 k
                 * df
                 * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t)
+                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             )
             v = b2 - b4
             return v
@@ -393,11 +408,16 @@ class EquityOneTouchOption(EquityOption):
             eta = +1.0
             phi = +1.0
 
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-q * t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a4 = (
+                s0
+                * dq
+                * np.power(hh / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a2 - a4
             return v
 
@@ -410,11 +430,16 @@ class EquityOneTouchOption(EquityOption):
             eta = -1.0
             phi = -1.0
 
-            x2 = np.log(s0 / hh) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            y2 = np.log(hh / s0) / v / sqrt_t + (mu + 1.0) * v * sqrt_t
-            dq = np.exp(-q * t)
+            x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
+            dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a4 = (
+                s0
+                * dq
+                * np.power(hh / s0, 2.0 * (mu + 1.0))
+                * normcdf_vect(eta * y2)
+            )
             v = a2 - a4
             return v
 
@@ -456,7 +481,9 @@ class EquityOneTouchOption(EquityOption):
         s0 = stock_price
         mu = r - q
 
-        time_grid, s = get_paths_times(num_paths, num_time_steps, t, mu, s0, v, seed)
+        time_grid, s = get_paths_times(
+            num_paths, num_time_steps, t, mu, s0, v, seed
+        )
 
         hh = self.barrier_price
         xx = self.payment_size

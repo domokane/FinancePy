@@ -125,7 +125,9 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            delta = model.delta(forward_price, k, t_exp, df, self.opt_type_value)
+            delta = model.delta(
+                forward_price, k, t_exp, df, self.opt_type_value
+            )
         else:
             raise FinError("Unknown Model Type")
         return delta
@@ -153,7 +155,9 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            gamma = model.gamma(forward_price, k, t_exp, df, self.opt_type_value)
+            gamma = model.gamma(
+                forward_price, k, t_exp, df, self.opt_type_value
+            )
         else:
             raise FinError("Unknown Model Type")
         return gamma
@@ -209,7 +213,9 @@ class EquityIndexOption:
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
         k = self.strike_price
         if isinstance(model, Black):
-            theta = model.theta(forward_price, k, t_exp, df, self.opt_type_value)
+            theta = model.theta(
+                forward_price, k, t_exp, df, self.opt_type_value
+            )
         else:
             raise FinError("Unknown Model Type")
         return theta
@@ -227,7 +233,7 @@ class EquityIndexOption:
         """Calculate the Black implied volatility of a European/American
         Index option."""
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        if t_exp < 1.0 / 365.0:
+        if t_exp < 1.0 / 366.0:
             print("Expiry time is too close to zero.")
             return -999
         df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)

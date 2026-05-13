@@ -129,6 +129,7 @@ def test_fin_flat_curve():
     compounding = FrequencyTypes.CONTINUOUS
 
     flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
+    print(flat_curve)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[0]
 

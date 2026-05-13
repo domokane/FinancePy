@@ -111,7 +111,7 @@ class BondFuture:
             new_mat,
             bond.cpn,
             bond.freq_type,
-            bond.dc_type,
+            bond.accrual_dc_type,
             ex_div_days,
         )
 
@@ -198,7 +198,9 @@ class BondFuture:
         """
         dc = DayCount(DayCountTypes.ACT_ACT_ISDA)
 
-        year_frac, _, _ = dc.year_frac(self.first_delivery_dt, bond.maturity_dt)
+        year_frac, _, _ = dc.year_frac(
+            self.first_delivery_dt, bond.maturity_dt
+        )
 
         years = int(year_frac)
         months = int(12 * (year_frac - years))
@@ -276,7 +278,9 @@ class BondFuture:
             raise ValueError("Prices and repo rate must be non-negative")
 
         fwd_date = self.last_delivery_dt
-        fwd_price = bond.forward_price(settle_dt, fwd_date, clean_price, repo_rate)
+        fwd_price = bond.forward_price(
+            settle_dt, fwd_date, clean_price, repo_rate
+        )
 
         cf = self.conversion_factor(bond)
         net_basis = fwd_price - cf * futures_price
@@ -345,10 +349,11 @@ class BondFuture:
         cf = self.conversion_factor(bond)
         days_settle_to_delivery = float(delivery_dt - settle_dt)
 
-        num = futures_price * cf + ai_delivery - full_price + fv_cpns
-        denom = full_price * (days_settle_to_delivery / days_in_year) - fv_cpns * (
-            avg_coupon_days / days_in_year
-        )
+        total_invoice_amnt = futures_price * cf + ai_delivery
+        num = total_invoice_amnt - full_price + fv_cpns
+        denom = full_price * (
+            days_settle_to_delivery / days_in_year
+        ) - fv_cpns * (avg_coupon_days / days_in_year)
         irr = num / denom
         return irr
 

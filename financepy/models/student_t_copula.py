@@ -9,8 +9,8 @@ from ..utils.helpers import uniform_to_default_time
 ########################################################################################
 
 
-
 from typing import Sequence, Any
+
 
 class StudentTCopula:
 
@@ -22,7 +22,7 @@ class StudentTCopula:
         corr_matrix: np.ndarray,
         degrees_of_freedom: float,
         num_trials: int,
-        seed: int
+        seed: int,
     ) -> np.ndarray:
 
         np.random.seed(seed)
@@ -41,8 +41,8 @@ class StudentTCopula:
                 g = y[i_credit, i_trial] / c
                 u1 = student.cdf(g, degrees_of_freedom)
                 u2 = 1.0 - u1
-                times = issuer_curve.times
-                qs = issuer_curve.qs
+                times = issuer_curve._times
+                qs = issuer_curve._qs
                 t1 = uniform_to_default_time(u1, times, qs)
                 t2 = uniform_to_default_time(u2, times, qs)
                 corr_times[i_credit, i_trial] = t1

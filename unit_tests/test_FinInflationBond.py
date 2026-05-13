@@ -38,7 +38,7 @@ def test_fin_inflation_bond_bbg():
 
     clean_price = 104.03502
 
-    yld = bond.current_yield(clean_price)
+    yld = bond.current_yield(settle_dt, clean_price)
     assert round(yld * 100, 4) == 1.2015
 
     # Inherited functions that just calculate real yield without CPI adjustments
@@ -50,7 +50,8 @@ def test_fin_inflation_bond_bbg():
 
     assert round(ytm, 4) == -0.0010
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
+    ytm = bond.yield_to_maturity(
+        settle_dt, clean_price, YTMCalcType.US_TREASURY)
 
     assert round(ytm, 4) == -0.0010
 
@@ -73,7 +74,8 @@ def test_fin_inflation_bond_bbg():
     assert round(clean_price, 4) == 104.0350
 
     face = 100.0
-    inflation_accd = bond.inflation_accrued_interest(settle_dt, face, ref_cpi_value)
+    inflation_accd = bond.inflation_accrued_interest(
+        settle_dt, face, ref_cpi_value)
 
     assert round(inflation_accd * 100, 4) == 2.2864
 
@@ -97,8 +99,8 @@ def test_fin_inflation_bond_bbg():
     modified_duration = bond.modified_duration(settle_dt, ytm)
     assert round(modified_duration, 4) == 2.9401
 
-    macauley_duration = bond.macauley_duration(settle_dt, ytm)
-    assert round(macauley_duration, 4) == 2.9386
+    macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
+    assert round(macaulay_duration, 4) == 2.9386
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 4) == 0.1020
@@ -130,6 +132,7 @@ def test_fin_inflation_bond_stack():
     )
 
     clean_price = 104.03502
+    settle_dt = issue_dt
 
-    yld = bond.current_yield(clean_price)
+    yld = bond.current_yield(settle_dt, clean_price)
     assert round(yld * 1000, 4) == 1.2015

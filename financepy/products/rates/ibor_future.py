@@ -31,7 +31,7 @@ class IborFuture:
         today_dt: Date,
         future_number: int,  # The number of the future after today_dt
         future_tenor: str = "3M",  # '1M', '2M', '3M'
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         contract_size: float = ONE_MILLION,
     ):
         """Create an interest rate futures contract which has the same
@@ -55,7 +55,7 @@ class IborFuture:
         self.end_of_interest_period = self.delivery_dt.next_imm_date()
 
         self.last_trading_dt = self.delivery_dt.add_days(-2)
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.contract_size = contract_size
 
     ###########################################################################
@@ -71,7 +71,7 @@ class IborFuture:
             self.delivery_dt,
             self.end_of_interest_period,
             fra_rate,
-            self.dc_type,
+            self.accrual_dc_type,
             notional=self.contract_size,
             pay_fixed_rate=False,
         )
@@ -141,8 +141,10 @@ class IborFuture:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("LAST TRADING DATE", self.last_trading_dt)
         s += label_to_string("DELIVERY DATE", self.delivery_dt)
-        s += label_to_string("END INTEREST PERIOD", self.end_of_interest_period)
-        s += label_to_string("DAY COUNT TYPE", self.dc_type)
+        s += label_to_string(
+            "END INTEREST PERIOD", self.end_of_interest_period
+        )
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("CONTRACT SIZE", self.contract_size)
         return s
 

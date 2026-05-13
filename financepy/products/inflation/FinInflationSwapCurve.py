@@ -25,7 +25,7 @@ def _f(df, *args):
     curve = args[0]
     value_dt = args[1]
     swap = args[2]
-    num_points = len(curve.times)
+    num_points = len(curve._times)
     #    curve._dfs[num_points - 1] = df
     curve.set_df(num_points - 1, df)
 
@@ -42,7 +42,7 @@ def _g(df, *args):
     curve = args[0]
     value_dt = args[1]
     fra = args[2]
-    num_points = len(curve.times)
+    num_points = len(curve._times)
     curve._dfs[num_points - 1] = df
     v_fra = fra.value(value_dt, curve)
     v_fra /= fra.notional
@@ -206,7 +206,9 @@ class InflationSwapCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError("Swap cpns are not on the same date grid.")
+                        raise FinError(
+                            "Swap cpns are not on the same date grid."
+                        )
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -241,7 +243,7 @@ class InflationSwapCurve(DiscountCurve):
         self.used_deposits = ibor_deposits
         self.used_fras = ibor_fras
         self.used_swaps = ibor_swaps
-        self.dc_type = None
+        self.accrual_dc_type = None
 
     ###########################################################################
 
@@ -264,8 +266,8 @@ class InflationSwapCurve(DiscountCurve):
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
             t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
-            self._times = np.append(self.times, t_mat)
-            self._dfs = np.append(self.dfs, df_mat)
+            self._times = np.append(self._times, t_mat)
+            self._dfs = np.append(self._dfs, df_mat)
 
         oldt_mat = t_mat
 
@@ -468,13 +470,13 @@ class InflationSwapCurve(DiscountCurve):
             #  print("IN: %12s %12.10f %12.10f %12.10f %12.10f OUT: %14.12f" %
             #                  (dt, swap_rate, acc, pv01, pv01_end, df_mat))
 
-            self._times = np.append(self.times, t_mat)
-            self._dfs = np.append(self.dfs, df_mat)
+            self._times = np.append(self._times, t_mat)
+            self._dfs = np.append(self._dfs, df_mat)
 
             pv01 += acc * df_mat
 
-        #        print(self.times)
-        #        print(self.dfs)
+        #        print(self._times)
+        #        print(self._dfs)
 
         if self.check_refit_flag is True:
             self.check_refit(1e-5, SWAP_TOL, 1e-5)
@@ -536,7 +538,9 @@ class InflationSwapCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
+            s += label_to_string(
+                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
+            )
 
         return s
 

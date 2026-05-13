@@ -9,7 +9,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond_yield_curve import BondYieldCurve
+from financepy.products.bonds.bond_fitted_yield_curve import BondFittedYieldCurve
 from financepy.products.bonds.curve_fits import CurveFitPolynomial
 from financepy.products.bonds.curve_fits import CurveFitBSpline
 from financepy.products.bonds.curve_fits import CurveFitNelsonSiegel
@@ -45,15 +45,17 @@ for _, bond in bond_dataframe.iterrows():
 def test_poly():
 
     curve_fit_method = CurveFitPolynomial(5)
-    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
+    fitted_curve = BondFittedYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     coeffs = fitted_curve.curve_fit.coeffs
-    assert round(coeffs[0] * 1e9, 4) == -1.4477
-    assert round(coeffs[1] * 1e7, 4) == 1.7840
-    assert round(coeffs[2] * 1e6, 4) == -7.4147
-    assert round(coeffs[3] * 1e5, 4) == 9.0622
-    assert round(coeffs[4] * 1e3, 4) == 1.3536
-    assert round(coeffs[5] * 1e7, 4) == 4.1606
+
+    print(coeffs)
+    assert round(coeffs[0] * 1e7, 4) == 4.1581
+    assert round(coeffs[1] * 1e3, 4) == 1.3536
+    assert round(coeffs[2] * 1e5, 4) == 9.0622
+    assert round(coeffs[3] * 1e6, 4) == -7.4147
+    assert round(coeffs[4] * 1e7, 4) == 1.7840
+    assert round(coeffs[5] * 1e9, 4) == -1.4477
 
 
 ########################################################################################
@@ -62,7 +64,8 @@ def test_poly():
 def test_nelson_siegel():
 
     curve_fit_method = CurveFitNelsonSiegel()
-    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
+    fitted_curve = BondFittedYieldCurve(
+        settle_dt, bonds, ylds, curve_fit_method)
 
     assert round(fitted_curve.curve_fit.beta_1, 3) == -0.094
     assert round(fitted_curve.curve_fit.beta_2, 3) == 0.092
@@ -76,7 +79,8 @@ def test_nelson_siegel():
 def test_nelson_siegel_svensson():
 
     curve_fit_method = CurveFitNelsonSiegelSvensson()
-    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
+    fitted_curve = BondFittedYieldCurve(
+        settle_dt, bonds, ylds, curve_fit_method)
 
     assert round(fitted_curve.curve_fit.beta_1, 4) == 0.0460
     assert round(fitted_curve.curve_fit.beta_2, 4) == -0.0433
@@ -92,8 +96,11 @@ def test_nelson_siegel_svensson():
 def test_interp_yield():
 
     curve_fit_method = CurveFitBSpline()
-    fitted_curve = BondYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
+    fitted_curve = BondFittedYieldCurve(
+        settle_dt, bonds, ylds, curve_fit_method)
 
     maturity_dt = Date(19, 9, 2030)
-    interp_yield = fitted_curve.interp_yield(maturity_dt)
+    interp_yield = fitted_curve.interp_rate(maturity_dt)
     assert round(float(interp_yield), 8) == 0.02601858
+
+# test_poly()

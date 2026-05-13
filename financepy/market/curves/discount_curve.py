@@ -8,10 +8,11 @@ from .interpolator import Interpolator, InterpTypes, interpolate
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.compounding import CompoundingTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.math import test_monotonicity
+from ...utils.global_vars import G_SMALL
 from ...utils.schedule import Schedule
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates
@@ -31,8 +32,9 @@ class DiscountCurve:
         self,
         value_dt: Date,
         df_dates: list = None,
-        df_values: np.ndarray = None,
+        df_values: Union[list, np.ndarray] = None,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
@@ -42,12 +44,22 @@ class DiscountCurve:
         convention for interpolating the discount factors in time."""
         check_argument_types(self.__init__, locals())
 
+        if not isinstance(time_dc_type, DayCountTypes):
+            raise FinError("Invalid time day count type.")
+
+        self.time_dc_type = time_dc_type
+
         # Validate curve
         if df_dates is None:
             df_dates = [value_dt]
 
         if df_values is None:
-            df_values = [1.0]
+            df_values = np.array([1.0], dtype=float)
+        else:
+            df_values = np.asarray(df_values, dtype=float)
+
+        if len(df_dates) != len(df_values):
+            raise FinError("df_dates and df_values must have the same length.")
 
         # The internal representation of times and dfs is hidden but
         # access is controlled using getters and setters
@@ -63,7 +75,7 @@ class DiscountCurve:
             start_index = 1
 
         for i in range(start_index, num_points):
-            t = (df_dates[i] - value_dt) / G_DAYS_IN_YEAR
+            t = times_from_dates(df_dates[i], value_dt, time_dc_type)
             self._times.append(t)
             self._dfs.append(df_values[i])
             self._df_dates.append(df_dates[i])
@@ -77,80 +89,32 @@ class DiscountCurve:
 
         self.value_dt = value_dt
         self.freq_type = FrequencyTypes.CONTINUOUS
-        # This needs to be thought about - I just assign an arbitrary value
-        self.dc_type = DayCountTypes.ACT_ACT_ISDA
 
         self._interp_type = interp_type
         self._interpolator = Interpolator(self._interp_type)
         self.fit(self._times, self._dfs)
 
-    @property
-    ####################################################################################
-    def times(self) -> np.ndarray:
-        """Return the internal array of times(in years) from the anchor date."""
-        return self._times.copy()  # return a copy to prevent external modification
-
-    @property
-    ####################################################################################
-    def dfs(self) -> np.ndarray:
-        """Return the internal array of discount factors corresponding to times."""
-        return self._dfs.copy()  # return a copy to prevent external modification
-
     ####################################################################################
 
     def set_times(self, times: np.ndarray):
-        """Set the discount factor at the last maturity time."""
-        self._times = times
+
+        self._times = np.asarray(times, dtype=float)
+
+        if not test_monotonicity(self._times):
+            raise FinError("Times are not sorted in increasing order")
 
     ####################################################################################
 
     def set_dfs(self, dfs: np.ndarray):
         """Set the discount factor at the last maturity time."""
-        self._dfs = dfs
+        self._dfs = np.asarray(dfs, dtype=float)
 
     ####################################################################################
 
     def set_last_df(self, df):
         """Set the discount factor at the last maturity time."""
-        n_points = len(self.dfs)
+        n_points = len(self._dfs)
         self._dfs[n_points - 1] = df
-
-    ####################################################################################
-
-    def _zero_to_df(
-        self,
-        value_dt: Date,  # TODO: why is value_dt not used ?
-        rates: Union[float, np.ndarray],
-        times: Union[float, np.ndarray],
-        freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
-    ):
-        """Convert a zero with a specified compounding frequency and day count
-        convention to a discount factor for a single maturity date or a list of
-        dates. The day count is used to calculate the elapsed year fraction."""
-
-        if isinstance(times, float):
-            times = np.array([times])
-
-        t = np.maximum(times, G_SMALL)
-
-        f = annual_frequency(freq_type)
-
-        if freq_type == FrequencyTypes.CONTINUOUS:
-            df = np.exp(-rates * t)
-        elif freq_type == FrequencyTypes.SIMPLE:
-            df = 1.0 / (1.0 + rates * t)
-        elif freq_type in {
-            FrequencyTypes.ANNUAL,
-            FrequencyTypes.SEMI_ANNUAL,
-            FrequencyTypes.QUARTERLY,
-            FrequencyTypes.MONTHLY,
-        }:
-            df = 1.0 / np.power(1.0 + rates / f, f * t)
-        else:
-            raise FinError("Unknown Frequency type")
-
-        return df
 
     ####################################################################################
 
@@ -161,104 +125,228 @@ class DiscountCurve:
 
     ####################################################################################
 
-    def _df_to_zero(
+    def fwd_rate(
         self,
-        dfs: Union[float, np.ndarray],
-        maturity_dts: Union[Date, list],
-        freq_type: FrequencyTypes,
-        dc_type: DayCountTypes,
+        start_dt: Union[list, Date],
+        date_or_tenor: Union[Date, str, list],
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        comp_type: CompoundingTypes = CompoundingTypes.MMKT,
+        freq_type: FrequencyTypes = None,
     ):
-        """Given a dates this first generates the discount factors. It then
-        converts the discount factors to a zero rate with a chosen compounding
-        frequency which may be continuous, simple, or compounded at a specific
-        frequency which are all choices of FrequencyTypes. Returns a list of
-        discount factor."""
+        """Simple-compounded forward rate between dates.
 
-        f = annual_frequency(freq_type)
+        accrual_dc_type is used for the forward accrual denominator.
+        self.time_dc_type is used for curve time conversion / interpolation.
+        """
 
-        if isinstance(maturity_dts, Date):
-            date_list = [maturity_dts]
+        if not isinstance(accrual_dc_type, DayCountTypes):
+            raise FinError("Invalid Accrual Day Count type.")
+
+        if not isinstance(comp_type, CompoundingTypes):
+            raise FinError("Invalid Compounding type.")
+
+        if comp_type == CompoundingTypes.COMPOUNDED and freq_type == None:
+            raise FinError("Require a Frequency type for COMPOUNDING.")
+
+        scalar_input = isinstance(start_dt, Date)
+        start_dts = [start_dt] if scalar_input else start_dt
+
+        if not isinstance(start_dts, list):
+            raise FinError("Start date must be a Date or list of Dates.")
+
+        if len(start_dts) == 0:
+            return np.array([])
+
+        if not all(isinstance(dt, Date) for dt in start_dts):
+            raise FinError("start_dt list must contain only Dates.")
+
+        if isinstance(date_or_tenor, str):
+            end_dts = [dt.add_tenor(date_or_tenor) for dt in start_dts]
+
+        elif isinstance(date_or_tenor, Date):
+            end_dts = [date_or_tenor for _ in start_dts]
+
+        elif isinstance(date_or_tenor, list):
+            if len(date_or_tenor) != len(start_dts):
+                raise FinError(
+                    "date_or_tenor list must match start_dt list length."
+                )
+
+            if not all(isinstance(dt, Date) for dt in date_or_tenor):
+                raise FinError("date_or_tenor list must contain only Dates.")
+
+            end_dts = date_or_tenor
+
         else:
-            date_list = maturity_dts
+            raise FinError(
+                "date_or_tenor must be a Date, tenor string, or list of Dates."
+            )
 
-        if isinstance(dfs, float):
-            df_list = [dfs]
+        day_counter = DayCount(accrual_dc_type)
+
+        accruals = np.array(
+            [
+                day_counter.year_frac(dt1, dt2)[0]
+                for dt1, dt2 in zip(start_dts, end_dts)
+            ],
+            dtype=float,
+        )
+
+        if np.any(accruals <= 0.0):
+            raise FinError("Forward end date must be after start date.")
+
+        t1 = times_from_dates(start_dts, self.value_dt, self.time_dc_type)
+        t2 = times_from_dates(end_dts, self.value_dt, self.time_dc_type)
+
+        rates = self.fwd_rate_t(t1, t2, accruals, comp_type, freq_type)
+
+        if scalar_input:
+            return float(rates[0])
         else:
-            df_list = dfs
+            return rates
 
-        if len(date_list) != len(df_list):
-            raise FinError("Date list and df list do not have same length")
+    ###########################################################################
 
-        num_dates = len(date_list)
-        zero_rates = []
+    def fwd_rate_t(
+        self,
+        start_t: Union[float, list, np.ndarray],
+        end_t: Union[float, list, np.ndarray],
+        accrual: Union[float, list, np.ndarray] = None,
+        comp_type: CompoundingTypes = CompoundingTypes.MMKT,
+        freq_type: FrequencyTypes = None,
+    ):
+        """Forward rate between curve times."""
 
-        times = times_from_dates(date_list, self.value_dt, dc_type)
+        if comp_type == CompoundingTypes.COMPOUNDED and freq_type == None:
+            raise FinError("Require Frequency type for COMPOUNDED interest.")
 
-        for i in range(0, num_dates):
+        t1, scalar_input_1 = self._to_time_array(start_t)
+        t2, scalar_input_2 = self._to_time_array(end_t)
 
-            df = df_list[i]
-
-            t = max(times[i], G_SMALL)
-
-            if freq_type == FrequencyTypes.CONTINUOUS:
-                r = -np.log(df) / t
-            elif freq_type == FrequencyTypes.SIMPLE:
-                r = (1.0 / df - 1.0) / t
+        if len(t1) != len(t2):
+            if len(t1) == 1:
+                t1 = np.full_like(t2, t1[0])
+            elif len(t2) == 1:
+                t2 = np.full_like(t1, t2[0])
             else:
-                r = (np.power(df, -1.0 / (t * f)) - 1.0) * f
+                raise FinError(
+                    "Start and end time vectors have different lengths."
+                )
 
-            zero_rates.append(r)
+        if accrual is None:
+            accruals = t2 - t1
+        else:
+            accruals = np.array(accrual, ndmin=1, dtype=float)
 
-        return np.array(zero_rates)
+            if len(accruals) != len(t1):
+                if len(accruals) == 1:
+                    accruals = np.full_like(t1, accruals[0])
+                else:
+                    raise FinError("Accrual vector has incorrect length.")
 
-    ####################################################################################
+        if np.any(t2 <= t1):
+            raise FinError("End time must be after start time.")
+
+        if np.any(accruals <= 0.0):
+            raise FinError("Accrual factor must be positive.")
+
+        df1 = self.df_t(t1)
+        df2 = self.df_t(t2)
+        df_ratio = df1 / df2
+
+        if comp_type == CompoundingTypes.CONTINUOUS:
+            fwd_rates = np.log(df_ratio) / accruals
+
+        elif comp_type == CompoundingTypes.MMKT:
+            fwd_rates = (df_ratio - 1.0) / accruals
+
+        else:
+            f = annual_frequency(freq_type)
+            fwd_rates = (np.power(df_ratio, 1.0 / (f * accruals)) - 1.0) * f
+
+        scalar_output = scalar_input_1 and scalar_input_2
+        if scalar_output:
+            return float(fwd_rates[0])
+        else:
+            return fwd_rates
+
+    ###########################################################################
+
+    def fwd_rate_inst(self, dts: Union[Date, list], dt: float = 1.0e-6):
+        """Instantaneous continuously compounded forward rate at date(s)."""
+
+        times = times_from_dates(dts, self.value_dt, self.time_dc_type)
+        return self.fwd_rate_inst_t(times, dt)
+
+    ###########################################################################
+
+    def fwd_rate_inst_t(
+        self,
+        t: Union[float, list, np.ndarray],
+        dt: float = 1.0e-6,
+    ):
+        """Instantaneous continuously compounded forward rate at time t.
+
+        Computes:
+
+            f(t) = - d ln Z(t) / dt
+
+        using a central finite difference.
+        """
+
+        times, scalar_input = self._to_time_array(t)
+        times = np.maximum(times, dt)
+
+        df_minus = self.df_t(times - dt)
+        df_plus = self.df_t(times + dt)
+
+        fwds = np.log(df_minus / df_plus) / (2.0 * dt)
+
+        if scalar_input:
+            return float(fwds[0])
+        else:
+            return fwds
+
+    ###########################################################################
 
     def zero_rate(
         self,
         maturity_dt: Union[list, Date],
-        freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
     ):
-        """Calculation of zero rates with specified frequency. This
-        function can return a vector of zero rates given a vector of
-        dates so must use Numpy functions. Default frequency is a
-        continuously compounded rate."""
+        """Calculate zero rates with specified compounding frequency."""
 
-        if isinstance(freq_type, FrequencyTypes) is False:
+        if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
 
-        if isinstance(dc_type, DayCountTypes) is False:
-            raise FinError("Invalid Day Count type.")
-
-        dfs = self.df(maturity_dt)
-
-        scalar_input = isinstance(maturity_dt, Date)
-
-        if scalar_input:
-            maturity_dts = [maturity_dt]
-        else:
-            maturity_dts = maturity_dt
-
-        zero_rates = self._df_to_zero(dfs, maturity_dts, freq_type, dc_type)
-
-        if scalar_input:
-            return zero_rates[0]
-
+        times = times_from_dates(maturity_dt, self.value_dt, self.time_dc_type)
+        zero_rates = self.zero_rate_t(times, freq_type)
         return zero_rates
 
     ####################################################################################
 
-    def cc_rate(
+    def zero_rate_t(
         self,
-        dts: Union[list, Date],
-        dc_type: DayCountTypes = DayCountTypes.SIMPLE,
+        t,
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
     ):
-        """Calculation of zero rates with continuous compounding. This
-        function can return a vector of cc rates given a vector of
-        dates so must use Numpy functions."""
+        if not isinstance(freq_type, FrequencyTypes):
+            raise FinError("Invalid Frequency type.")
 
-        cc_rates = self.zero_rate(dts, FrequencyTypes.CONTINUOUS, dc_type)
-        return cc_rates
+        times, scalar_input = self._to_time_array(t)
+        times = np.maximum(times, G_SMALL)
+
+        dfs = self.df_t(times)
+        f = annual_frequency(freq_type)
+
+        if freq_type == FrequencyTypes.CONTINUOUS:
+            rates = -np.log(dfs) / times
+        elif freq_type == FrequencyTypes.SIMPLE_INTEREST:
+            rates = (1.0 / dfs - 1.0) / times
+        else:
+            rates = (np.power(dfs, -1.0 / (times * f)) - 1.0) * f
+
+        return float(rates[0]) if scalar_input else rates
 
     ####################################################################################
 
@@ -266,8 +354,22 @@ class DiscountCurve:
         self,
         effective_dt: Date,
         maturity_dt: Union[list, Date],
-        freq_type=FrequencyTypes.ANNUAL,
-        dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+        accrual_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+    ):
+        rate = self.par_rate(
+            effective_dt, maturity_dt, freq_type, accrual_dc_type
+        )
+        return rate
+
+    ####################################################################################
+
+    def swap_rate_old(
+        self,
+        effective_dt: Date,
+        maturity_dt: Union[list, Date],
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+        accrual_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
     ):
         """Calculate the swap rate to maturity date. This is the rate paid by
         a swap that has a price of par today. This is the same as a Libor swap
@@ -283,7 +385,10 @@ class DiscountCurve:
         if isinstance(freq_type, FrequencyTypes) is False:
             raise FinError("Invalid Frequency type.")
 
-        if freq_type == FrequencyTypes.SIMPLE:
+        if not isinstance(accrual_dc_type, DayCountTypes):
+            raise FinError("Invalid Day Count type.")
+
+        if freq_type == FrequencyTypes.SIMPLE_INTEREST:
             raise FinError("Cannot calculate par rate with simple yield freq.")
 
         if freq_type == FrequencyTypes.CONTINUOUS:
@@ -296,36 +401,114 @@ class DiscountCurve:
         else:
             maturity_dts = maturity_dt
 
+        df_start = self.df(effective_dt)
+        accrual_day_counter = DayCount(accrual_dc_type)
         par_rates = []
 
         for maturity_dt in maturity_dts:
-
-            if maturity_dt <= effective_dt:
-                raise FinError("Maturity date is before the swap start date.")
 
             schedule = Schedule(effective_dt, maturity_dt, freq_type)
 
             flow_dts = schedule.generate()
             flow_dts[0] = effective_dt
 
-            day_counter = DayCount(dc_type)
-            prev_dt = flow_dts[0]
             pv01 = 0.0
-            df = 1.0
+            df_end = None
+            prev_dt = effective_dt
 
             for next_dt in flow_dts[1:]:
-                df = self.df(next_dt)
-                alpha = day_counter.year_frac(prev_dt, next_dt)[0]
-                pv01 += alpha * df
+                df_end = self.df(next_dt)
+                alpha = accrual_day_counter.year_frac(prev_dt, next_dt)[0]
+                pv01 += alpha * df_end
                 prev_dt = next_dt
 
             if abs(pv01) < G_SMALL:
                 par_rate = 0.0
             else:
-                df_start = self.df(effective_dt)
-                par_rate = (df_start - df) / pv01
+                par_rate = (df_start - df_end) / pv01
 
             par_rates.append(par_rate)
+
+        par_rates = np.array(par_rates)
+
+        if scalar_input:
+            return par_rates[0]
+        else:
+            return par_rates
+
+    ###########################################################################
+
+    def par_rate(
+        self,
+        effective_dt: Date,
+        maturity_dt: Union[list, Date],
+        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
+        accrual_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
+    ):
+        """Calculate the swap rate to maturity date. This is the rate paid by
+        a swap that has a price of par today. This is the same as a Libor swap
+        rate except that we do not do any business day adjustments."""
+
+        # Note that this function does not call the IborSwap class to
+        # calculate the swap rate since that will create a circular dependency.
+        # I therefore recreate the actual calculation of the swap rate here.
+
+        if effective_dt < self.value_dt:
+            raise FinError("Swap starts before the curve valuation date.")
+
+        if isinstance(freq_type, FrequencyTypes) is False:
+            raise FinError("Invalid Frequency type.")
+
+        if not isinstance(accrual_dc_type, DayCountTypes):
+            raise FinError("Invalid Day Count type.")
+
+        if freq_type == FrequencyTypes.SIMPLE_INTEREST:
+            raise FinError("Cannot calculate par rate with simple yield freq.")
+
+        if freq_type == FrequencyTypes.CONTINUOUS:
+            raise FinError("Cannot calculate par rate with continuous freq.")
+
+        scalar_input = isinstance(maturity_dt, Date)
+
+        if scalar_input:
+            maturity_dts = [maturity_dt]
+        else:
+            maturity_dts = maturity_dt
+
+        acc_day_counter = DayCount(accrual_dc_type)
+
+        t_start = times_from_dates(
+            effective_dt, self.value_dt, self.time_dc_type
+        )
+
+        par_rates = []
+
+        for mat_dt in maturity_dts:
+
+            if mat_dt <= effective_dt:
+                raise FinError(
+                    "Swap maturity date must be after effective date."
+                )
+
+            schedule = Schedule(effective_dt, mat_dt, freq_type)
+            flow_dts = schedule.generate()
+
+            payment_times = np.array(
+                [
+                    times_from_dates(dt, self.value_dt, self.time_dc_type)
+                    for dt in flow_dts[1:]
+                ]
+            )
+
+            accrual_factors = []
+            for prev_dt, next_dt in zip(flow_dts[:-1], flow_dts[1:]):
+                accd = acc_day_counter.year_frac(prev_dt, next_dt)[0]
+                accrual_factors.append(accd)
+
+            accrual_factors = np.array(accrual_factors)
+
+            rate = self.par_rate_t(t_start, payment_times, accrual_factors)
+            par_rates.append(rate)
 
         par_rates = np.array(par_rates)
 
@@ -334,44 +517,166 @@ class DiscountCurve:
 
         return par_rates
 
-    ####################################################################################
+    ###########################################################################
 
-    def df(self, dt: Union[list, Date], day_count=DayCountTypes.ACT_ACT_ISDA):
+    def par_rate_t(
+        self,
+        t_start: float,
+        payment_times: np.ndarray,
+        accrual_factors: np.ndarray,
+    ):
+
+        df_start = self.df_t(t_start)
+        dfs = self.df_t(payment_times)
+
+        pv01 = np.sum(accrual_factors * dfs)
+
+        if abs(pv01) < G_SMALL:
+            return 0.0
+
+        swap_rate = (df_start - dfs[-1]) / pv01
+        return swap_rate
+
+    ###########################################################################
+
+    def df(self, dt: Union[list, Date]):
         """Function to calculate a discount factor from a date or a
-        vector of dates. The day count determines how dates get converted to
-        years. I allow this to default to ACT_ACT_ISDA unless specified."""
+        vector of dates. The time day count determines how dates get converted
+        to years."""
 
-        times = times_from_dates(dt, self.value_dt, day_count)
+        times = times_from_dates(dt, self.value_dt, self.time_dc_type)
         dfs = self.df_t(times)
 
         if isinstance(dt, Date):
-            if isinstance(dfs, float):
-                return dfs
+            if np.isscalar(dfs):
+                return float(dfs)
             else:
-                return dfs[0]
+                return float(dfs[0])
 
-        return np.array(dfs)
+        return np.asarray(dfs, dtype=float)
 
-    ####################################################################################
+    ###########################################################################
 
-    def df_t(self, t: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def df_t(self, t: Union[float, np.ndarray]):
         """Function to calculate a discount factor from a time or a
         vector of times. Discourage usage in favour of passing in dates."""
+
+        times, scalar_input = self._to_time_array(t)
 
         if self._interp_type in (
             InterpTypes.FLAT_FWD_RATES,
             InterpTypes.LINEAR_ZERO_RATES,
             InterpTypes.LINEAR_FWD_RATES,
         ):
-            df = interpolate(t, self.times, self.dfs, self._interp_type.value)
-
+            dfs = interpolate(
+                times, self._times, self._dfs, self._interp_type.value
+            )
         else:
+            dfs = self._interpolator.interpolate(times)
 
-            df = self._interpolator.interpolate(t)
+        if scalar_input:
+            return float(dfs[0])
+        else:
+            return dfs
 
-        return df
+    ###########################################################################
 
-    ####################################################################################
+    def bump_parallel(self, bump_size: float):
+        """Adjust the continuously compounded forward rates by a perturbation
+        upward equal to the bump size and return a curve object with this bumped
+        curve. This is used for interest rate risk."""
+
+        bumped_dfs = self._dfs * np.exp(-bump_size * self._times)
+        bumped_dfs[0] = self._dfs[0]
+
+        bumped_disc_curve = DiscountCurve(
+            self.value_dt,
+            self._df_dates,
+            bumped_dfs,
+            self._interp_type,
+            self.time_dc_type,
+        )
+
+        return bumped_disc_curve
+
+    ###########################################################################
+
+    def bump_bucket(
+        self,
+        bucket_start: float,  # start in years
+        bucket_end: float,  # end in years
+        bump_size: float,  # e.g. 0.0001 = +1bp
+        interp_type=None,
+    ):
+        """
+        Apply a bucket (key rate) shift: shift continuous forward rates
+        only between bucket_start and bucket_end years.
+        """
+
+        if interp_type is None:
+            interp_type = self._interp_type
+
+        if bucket_start < 0.0:
+            raise FinError("Bucket start must be non-negative.")
+
+        if bucket_end <= bucket_start:
+            raise FinError("Bucket end must be after bucket start.")
+
+        times = self._times.copy()
+        dfs = self._dfs.copy()
+
+        shifted_lengths = np.maximum(
+            0.0, np.minimum(times, bucket_end) - bucket_start
+        )
+
+        dfs = dfs * np.exp(-bump_size * shifted_lengths)
+
+        # Build new curve
+        bumped_curve = DiscountCurve(
+            value_dt=self.value_dt,
+            df_dates=self._df_dates,
+            df_values=dfs,
+            interp_type=interp_type,
+            time_dc_type=self.time_dc_type,
+        )
+
+        return bumped_curve
+
+    ###########################################################################
+
+    def _zero_to_df(
+        self,
+        rates: Union[float, np.ndarray],
+        times: Union[float, np.ndarray],
+        freq_type: FrequencyTypes,
+    ):
+        """Convert a zero with a specified compounding frequency and day count
+        convention to a discount factor for a single maturity date or a list of
+        dates."""
+
+        times, scalar_input = self._to_time_array(times)
+        rates = np.asarray(rates, dtype=float)
+
+        t = np.maximum(times, G_SMALL)
+        f = annual_frequency(freq_type)
+
+        if freq_type == FrequencyTypes.CONTINUOUS:
+            dfs = np.exp(-rates * t)
+        elif freq_type == FrequencyTypes.SIMPLE_INTEREST:
+            dfs = 1.0 / (1.0 + rates * t)
+        elif freq_type in {
+            FrequencyTypes.ANNUAL,
+            FrequencyTypes.SEMI_ANNUAL,
+            FrequencyTypes.QUARTERLY,
+            FrequencyTypes.MONTHLY,
+        }:
+            dfs = 1.0 / np.power(1.0 + rates / f, f * t)
+        else:
+            raise FinError("Unknown Frequency type")
+
+        return np.asarray(dfs, dtype=float)
+
+    ###########################################################################
 
     def survival_prob(self, dt: Date) -> float:
         """This returns a survival probability to a specified date based on
@@ -382,136 +687,42 @@ class DiscountCurve:
         q = self.df(dt)
         return q
 
-    ####################################################################################
+    ###########################################################################
 
-    def fwd(self, dts: Union[list, Date]):
-        """Calculate the continuously compounded forward rate at the forward
-        Date provided. This is done by perturbing the time by one day only
-        and measuring the change in the log of the discount factor divided by
-        the time increment dt. I am assuming continuous compounding over the
-        one date."""
+    def _to_time_array(self, t):
+        """Convert a scalar/list/array time input into a 1D NumPy array."""
 
-        if isinstance(dts, Date):
-            dts_list = [dts]
-            scalar_input = True
-        else:
-            dts_list = dts
-            scalar_input = False
-
-        dts_plus_one_days = [dt.add_days(1) for dt in dts_list]
-
-        df1 = self.df(dts_list)
-        df2 = self.df(dts_plus_one_days)
-        dt = 1.0 / G_DAYS_IN_YEAR
-        fwd = np.log(df1 / df2) / dt
+        scalar_input = np.isscalar(t)
 
         if scalar_input:
-            return fwd[0]
+            return np.array([float(t)], dtype=float), True
 
-        return np.array(fwd)
-
-    ###################################################################################
-
-    def _fwd(self, times: Union[np.ndarray, float]):
-        """Calculate the continuously compounded forward rate at the forward
-        time provided. This is done by perturbing the time by a small amount
-        and measuring the change in the log of the discount factor divided by
-        the time increment dt."""
-
-        dt = 1e-8
-        times = np.maximum(times, dt)
-
-        df1 = self.df_t(times - dt)
-        df2 = self.df_t(times + dt)
-        fwd = np.log(df1 / df2) / (2.0 * dt)
-        return fwd
-
-    ####################################################################################
-
-    def bump(self, bump_size: float):
-        """Adjust the continuously compounded forward rates by a perturbation
-        upward equal to the bump size and return a curve object with this bumped
-        curve. This is used for interest rate risk."""
-
-        times = self._times.copy()
-        values = self._dfs.copy() * np.exp(-bump_size * times)
-
-        disc_curve = DiscountCurve.__new__(DiscountCurve)
-        disc_curve.value_dt = self.value_dt
-        disc_curve.freq_type = self.freq_type
-        disc_curve.dc_type = self.dc_type
-        disc_curve._times = times
-        disc_curve._dfs = values
-        disc_curve._df_dates = self._df_dates.copy()
-        disc_curve._interp_type = self._interp_type
-        disc_curve._interpolator = Interpolator(self._interp_type)
-        disc_curve.fit(times, values)
-
-        return disc_curve
-
-    ####################################################################################
-
-    def fwd_rate(
-        self,
-        start_dt: Union[list, Date],
-        date_or_tenor: Union[Date, str],
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
-    ):
-        """Calculate the forward rate between two forward dates according to
-        the specified day count convention. This defaults to Actual 360. The
-        first date is specified and the second is given as a date or as a tenor
-        which is added to the first date."""
-
-        if isinstance(start_dt, Date):
-            start_dts = []
-            start_dts.append(start_dt)
-        elif isinstance(start_dt, list):
-            start_dts = start_dt
-        else:
-            raise FinError("Start date and end date must be same types.")
-
-        day_count = DayCount(dc_type)
-
-        num_dates = len(start_dts)
-        fwd_rates = []
-        for i in range(0, num_dates):
-
-            dt1 = start_dts[i]
-            dt2 = None
-
-            if isinstance(date_or_tenor, str):
-                dt2 = dt1.add_tenor(date_or_tenor)
-            elif isinstance(date_or_tenor, Date):
-                dt2 = date_or_tenor
-            elif isinstance(date_or_tenor, list):
-                dt2 = date_or_tenor[i]
-
-            year_frac = day_count.year_frac(dt1, dt2)[0]
-            df1 = self.df(dt1)
-            df2 = self.df(dt2)
-            fwd_rate = (df1 / df2 - 1.0) / year_frac
-            fwd_rates.append(fwd_rate)
-
-        if isinstance(start_dt, Date):
-            return fwd_rates[0]
-
-        return np.array(fwd_rates)
+        return np.asarray(t, dtype=float), False
 
     ###########################################################################
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        num_points = len(self._df_dates)
-        s += label_to_string("DATES", "DISCOUNT FACTORS")
-        for i in range(0, num_points):
-            dt_str = str(self._df_dates[i])
-            s += label_to_string(f"{dt_str:>12}",
-                                 f"{self._dfs[i]:12.8f}")
+        # Hardcode this as we want this not parent class
+        s = label_to_string("OBJECT TYPE", "DiscountCurve")
+        s += label_to_string("VALUE DATE", (self.value_dt))
+
+        s += "    DATES      TIMES(YRS) DISC FACTORS\n"
+        for dt, t, df in zip(self._df_dates, self._times, self._dfs):
+            s += label_to_string(
+                f"{str(dt):>12}", f"{t:12.6f}", f"{df:12.8f}\n"
+            )
+
+        if hasattr(self, "_interp_type") and self._interp_type is not None:
+            s += label_to_string("INTERPOLATION TYPE", self._interp_type.name)
+        else:
+            s += label_to_string("INTERPOLATION TYPE", "N/A")
+
+        s += label_to_string("TIME DAY COUNT TYPE", (self.time_dc_type.name))
 
         return s
 
-    ####################################################################################
+    ###########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""

@@ -126,7 +126,9 @@ def test_fin_float_ibor_leg():
 
     first_fixing = 0.03
 
-    v = swap_float_leg.value(effective_dt, libor_curve, libor_curve, first_fixing)
+    v = swap_float_leg.value(
+        effective_dt, libor_curve, libor_curve, first_fixing
+    )
 
 
 ########################################################################################
@@ -167,7 +169,9 @@ def test_fin_float_ois_leg():
 
     first_fixing = 0.03
 
-    v = swap_float_leg.value(effective_dt, libor_curve, libor_curve, first_fixing)
+    v = swap_float_leg.value(
+        effective_dt, libor_curve, libor_curve, first_fixing
+    )
 
 
 ########################################################################################
@@ -220,7 +224,7 @@ def test_swap_float_leg():
         end_dt="3Y",
         leg_type=SwapTypes.PAY,
         freq_type=FrequencyTypes.SEMI_ANNUAL,
-        dc_type=DayCountTypes.THIRTY_E_360,
+        accrual_dc_type=DayCountTypes.THIRTY_E_360,
         cal_type=CalendarTypes.UNITED_STATES,
         coupon=0,
     )
@@ -230,7 +234,7 @@ def test_swap_float_leg():
         end_dt="3Y",
         leg_type=SwapTypes.PAY,
         freq_type=FrequencyTypes.SEMI_ANNUAL,
-        dc_type=DayCountTypes.THIRTY_E_360,
+        accrual_dc_type=DayCountTypes.THIRTY_E_360,
         cal_type=CalendarTypes.UNITED_STATES,
         spread=0,
     )
@@ -238,12 +242,8 @@ def test_swap_float_leg():
     fixedleg_2.generate_payments()
     floatleg_2.generate_payment_dts()
 
-    discount_curve = DiscountCurveFlat(
-        effective_dt, 0.05, dc_type=DayCountTypes.THIRTY_E_360
-    )
-    index_curve = DiscountCurveFlat(
-        effective_dt, 0.05, dc_type=DayCountTypes.ACT_ACT_ISDA
-    )
+    discount_curve = DiscountCurveFlat(effective_dt, 0.05)
+    index_curve = DiscountCurveFlat(effective_dt, 0.05)
 
     floatleg_2.value(effective_dt, discount_curve, index_curve)
     # print("leg_2")

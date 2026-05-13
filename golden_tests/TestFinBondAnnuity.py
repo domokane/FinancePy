@@ -32,11 +32,17 @@ def test_bond_annuity():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
-    basis_type = DayCountTypes.ACT_360
+    accrual_dc_type = DayCountTypes.ACT_360
     face = 1000000
 
     annuity = BondAnnuity(
-        maturity_dt, coupon, freq_type, cal_type, bd_type, dg_type, basis_type
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrual_dc_type,
+        cal_type,
+        bd_type,
+        dg_type,
     )
 
     annuity.calculate_payments(settle_dt, face)
@@ -58,10 +64,16 @@ def test_bond_annuity():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
-    basis_type = DayCountTypes.ACT_360
+    accrual_dc_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(
-        maturity_dt, coupon, freq_type, cal_type, bd_type, dg_type, basis_type
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrual_dc_type,
+        cal_type,
+        bd_type,
+        dg_type,
     )
 
     annuity.calculate_payments(settle_dt, face)
@@ -83,10 +95,16 @@ def test_bond_annuity():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
-    basis_type = DayCountTypes.ACT_360
+    accrual_dc_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(
-        maturity_dt, coupon, freq_type, cal_type, bd_type, dg_type, basis_type
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrual_dc_type,
+        cal_type,
+        bd_type,
+        dg_type,
     )
 
     annuity.calculate_payments(settle_dt, face)
@@ -108,10 +126,16 @@ def test_bond_annuity():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.FORWARD
-    basis_type = DayCountTypes.ACT_360
+    accrual_dc_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(
-        maturity_dt, coupon, freq_type, cal_type, bd_type, dg_type, basis_type
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrual_dc_type,
+        cal_type,
+        bd_type,
+        dg_type,
     )
 
     annuity.calculate_payments(settle_dt, face)
@@ -133,10 +157,16 @@ def test_bond_annuity():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.FORWARD
-    basis_type = DayCountTypes.ACT_360
+    accrual_dc_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(
-        maturity_dt, coupon, freq_type, cal_type, bd_type, dg_type, basis_type
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrual_dc_type,
+        cal_type,
+        bd_type,
+        dg_type,
     )
 
     annuity.calculate_payments(settle_dt, face)
@@ -158,10 +188,16 @@ def test_bond_annuity():
     cal_type = CalendarTypes.WEEKEND
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.FORWARD
-    basis_type = DayCountTypes.ACT_360
+    accrual_dc_type = DayCountTypes.ACT_360
 
     annuity = BondAnnuity(
-        maturity_dt, coupon, freq_type, cal_type, bd_type, dg_type, basis_type
+        maturity_dt,
+        coupon,
+        freq_type,
+        accrual_dc_type,
+        cal_type,
+        bd_type,
+        dg_type,
     )
 
     annuity.calculate_payments(settle_dt, face)

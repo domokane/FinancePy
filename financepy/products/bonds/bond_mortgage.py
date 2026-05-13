@@ -37,10 +37,10 @@ class BondMortgage:
         end_dt: Date,
         principal: float,
         freq_type: FrequencyTypes = FrequencyTypes.MONTHLY,
+        accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-        dc_type: DayCountTypes = DayCountTypes.ACT_360,
     ):
         """Create the mortgage using start and end dates and principal."""
 
@@ -56,7 +56,7 @@ class BondMortgage:
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
 
         self.schedule = Schedule(
             start_dt,
@@ -126,9 +126,10 @@ class BondMortgage:
         print("MATURITY DATE:", self.end_dt)
         print("MORTGAGE TYPE:", self.mortgage_type)
         print("FREQUENCY:", self.freq_type)
+        print("ACCRUAL DAY COUNT TYPE:", self.accrual_dc_type)
         print("CALENDAR:", self.cal_type)
-        print("BUSDAYRULE:", self.bd_type)
-        print("DATEGENRULE:", self.dg_type)
+        print("BUS DAY RULE:", self.bd_type)
+        print("DATE GEN RULE:", self.dg_type)
 
         num_flows = len(self.schedule.adjusted_dts)
 
@@ -158,6 +159,7 @@ class BondMortgage:
         s += label_to_string("MATURITY DATE", self.end_dt)
         s += label_to_string("MORTGAGE TYPE", self.mortgage_type)
         s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUSDAYRULE", self.bd_type)
         s += label_to_string("DATEGENRULE", self.dg_type)

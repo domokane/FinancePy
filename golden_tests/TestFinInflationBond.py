@@ -50,7 +50,7 @@ def test_fin_inflation_bond_bbg():
     test_cases.header("FIELD", "VALUE")
     clean_price = 104.03502
 
-    yld = bond.current_yield(clean_price)
+    yld = bond.current_yield(settle_dt, clean_price)
     test_cases.print("Current Yield = ", yld)
 
     # Inherited functions that just calculate real yield without CPI adjustments
@@ -63,7 +63,9 @@ def test_fin_inflation_bond_bbg():
 
     test_cases.print("US STREET REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
+    ytm = bond.yield_to_maturity(
+        settle_dt, clean_price, YTMCalcType.US_TREASURY
+    )
 
     test_cases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -86,7 +88,9 @@ def test_fin_inflation_bond_bbg():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflation_accd = bond.inflation_accrued_interest(settle_dt, face, ref_cpi_value)
+    inflation_accd = bond.inflation_accrued_interest(
+        settle_dt, face, ref_cpi_value
+    )
 
     test_cases.print("Inflation Accrued = ", inflation_accd)
 
@@ -112,8 +116,8 @@ def test_fin_inflation_bond_bbg():
     modified_duration = bond.modified_duration(settle_dt, ytm)
     test_cases.print("Modified Duration = ", modified_duration)
 
-    macauley_duration = bond.macauley_duration(settle_dt, ytm)
-    test_cases.print("Macauley Duration = ", macauley_duration)
+    macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
+    test_cases.print("Macaulay Duration = ", macaulay_duration)
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     test_cases.print("Convexity = ", conv)
@@ -135,8 +139,8 @@ def test_fin_inflation_bond_stack():
     coupon = 0.00125
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
-    face = 100.0
     base_cpi_value = 249.70
+    ref_cpi_value = 244.65884
 
     # Discount curve
     discount_curve = DiscountCurveFlat(
@@ -239,7 +243,6 @@ def test_fin_inflation_bond_stack():
         zc_dates,
         zc_rates,
         FrequencyTypes.ANNUAL,
-        DayCountTypes.ACT_ACT_ISDA,
     )
 
     #    print(inflation_zero_curve)
@@ -259,7 +262,7 @@ def test_fin_inflation_bond_stack():
     test_cases.header("FIELD", "VALUE")
     clean_price = 104.03502
 
-    yld = bond.current_yield(clean_price)
+    yld = bond.current_yield(settle_dt, clean_price)
     test_cases.print("Current Yield = ", yld)
 
     return
@@ -274,7 +277,9 @@ def test_fin_inflation_bond_stack():
 
     test_cases.print("US STREET REAL Yield To Maturity = ", ytm)
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
+    ytm = bond.yield_to_maturity(
+        settle_dt, clean_price, YTMCalcType.US_TREASURY
+    )
 
     test_cases.print("US TREASURY REAL Yield To Maturity = ", ytm)
 
@@ -295,7 +300,9 @@ def test_fin_inflation_bond_stack():
     clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
     test_cases.print("Clean Price from Real YTM = ", clean_price)
 
-    inflation_accd = bond.calc_inflation_accrued_interest(settle_dt, ref_cpi_value)
+    inflation_accd = bond.calc_inflation_accrued_interest(
+        settle_dt, ref_cpi_value
+    )
 
     test_cases.print("Inflation Accrued = ", inflation_accd)
 
@@ -319,8 +326,8 @@ def test_fin_inflation_bond_stack():
     modified_duration = bond.modified_duration(settle_dt, ytm)
     test_cases.print("Modified Duration = ", modified_duration)
 
-    macauley_duration = bond.macauley_duration(settle_dt, ytm)
-    test_cases.print("Macauley Duration = ", macauley_duration)
+    macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
+    test_cases.print("Macaulay Duration = ", macaulay_duration)
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     test_cases.print("Convexity = ", conv)
