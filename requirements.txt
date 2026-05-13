@@ -14,7 +14,7 @@ numba==0.62.1
 ipython == 8.25.0
 
 # Optional testing and type tools (recommended)
-pytest == 8.3
+pytest == 9.0.3
 pytest-benchmark == 5.2.3
 mypy == 1.13
 typing-extensions == 4.12
