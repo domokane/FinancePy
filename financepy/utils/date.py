@@ -37,16 +37,23 @@ for y in range(START_YEAR, END_YEAR + 1):
 YEAR_OFFSETS = np.array(year_offsets_list, dtype=np.int32)
 
 # Cumulative month days
-NONLEAP_CUM = np.array([0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], dtype=np.int32)
-LEAP_CUM    = np.array([0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], dtype=np.int32)
+NONLEAP_CUM = np.array(
+    [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], dtype=np.int32
+)
+LEAP_CUM = np.array(
+    [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], dtype=np.int32
+)
 
 ########################################################################################
+
 
 @njit(cache=True, fastmath=True)
 def is_leap(y: int) -> bool:
     return (y % 4 == 0 and y % 100 != 0) or (y % 400 == 0)
 
+
 ########################################################################################
+
 
 @njit(cache=True, fastmath=True)
 def excel_from_ymd(d: int, m: int, y: int) -> int:
@@ -54,7 +61,9 @@ def excel_from_ymd(d: int, m: int, y: int) -> int:
     cum = LEAP_CUM if (y == 1900 or is_leap(y)) else NONLEAP_CUM
     return y_off + cum[m - 1] + d
 
+
 ########################################################################################
+
 
 @njit(cache=True)
 def ymd_from_excel(excel_dt: int):
@@ -80,13 +89,15 @@ def ymd_from_excel(excel_dt: int):
     leap = (y % 4 == 0 and y % 100 != 0) or (y % 400 == 0)
     mdays = month_days_leap_year if leap else month_days_not_leap_year
     m = 1
-    while days > mdays[m-1]:
-        days -= mdays[m-1]
+    while days > mdays[m - 1]:
+        days -= mdays[m - 1]
         m += 1
     d = days
     return d, m, y
 
+
 ########################################################################################
+
 
 def is_leap_year(y: int):
     """Test whether year y is a leap year - if so return True, else False"""
@@ -103,6 +114,7 @@ def parse_dt(date_str, date_format):
     """
     dt_obj = datetime.datetime.strptime(date_str, date_format)
     return dt_obj.day, dt_obj.month, dt_obj.year
+
 
 ########################################################################################
 
@@ -144,20 +156,12 @@ class Date:
 
     ####################################################################################
 
-class Date:
-    """A date class to manage dates that is simple to use and includes a
-    number of useful date functions used frequently in Finance."""
-
-    __slots__ = ("d", "m", "y", "hh", "mm", "ss", "excel_dt", "weekday")
-
-    MON, TUE, WED, THU, FRI, SAT, SUN = range(7)
-
-    ####################################################################################
-
     def __init__(self, d, m, y, hh=0, mm=0, ss=0):
         # validation checks (as you already had)
         if 1900 <= d <= 2100 and 1 <= y <= 31:
-            raise FinError("Date arguments must be in order Date(day, month, year)")
+            raise FinError(
+                "Date arguments must be in order Date(day, month, year)"
+            )
         if y < 1900:
             raise FinError("Year cannot be before 1900")
         ...
@@ -165,17 +169,27 @@ class Date:
         self.y, self.m, self.d = y, m, d
         self.hh, self.mm, self.ss = hh, mm, ss
         self._refresh()
-        day_fraction = (hh / 24.0) + (mm / (24.0 * 60.0)) + (ss / (24.0 * 3600.0))
+        day_fraction = (
+            (hh / 24.0) + (mm / (24.0 * 60.0)) + (ss / (24.0 * 3600.0))
+        )
         self.excel_dt += day_fraction
 
-    ####################################################################################
+    ###########################################################################
+
+    def day_of_year(self) -> int:
+        """Day of the year (1-based)"""
+        return self.excel_dt - Date(1, 1, self.y).excel_dt + 1
+
+    ###########################################################################
+
+    ###########################################################################
 
     @staticmethod
     def _make(d, m, y, hh=0, mm=0, ss=0):
         """Normal safe constructor."""
         return Date(d, m, y, hh, mm, ss)
 
-    ####################################################################################
+    ###########################################################################
 
     @classmethod
     def _make_fast(cls, d, m, y, excel_dt):
@@ -187,7 +201,7 @@ class Date:
         obj.weekday = (int(excel_dt) + 5) % 7
         return obj
 
-    ####################################################################################
+    ###########################################################################
 
     @classmethod
     def from_ymd_excel(cls, d, m, y, excel_dt):
@@ -230,9 +244,9 @@ class Date:
             return cls(d, m, y)
 
         if isinstance(date, np.datetime64):
-            time_stamp = (date - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
-                1, "s"
-            )
+            time_stamp = (
+                date - np.datetime64("1970-01-01T00:00:00")
+            ) / np.timedelta64(1, "s")
 
             date = datetime.datetime.utcfromtimestamp(time_stamp)
             d, m, y = date.day, date.month, date.year
@@ -673,7 +687,9 @@ class Date:
                 new_dt = self.add_months(int(tenor_obj.num_periods) * 12)
 
             else:
-                raise FinError("Unsupported tenor unit: " + str(tenor_obj.units))
+                raise FinError(
+                    "Unsupported tenor unit: " + str(tenor_obj.units)
+                )
 
             new_dts.append(new_dt)
 
@@ -910,5 +926,3 @@ def date_range(start_dt: Date, end_dt: Date, tenor: str = "1D"):
 
 
 ########################################################################################
-
-

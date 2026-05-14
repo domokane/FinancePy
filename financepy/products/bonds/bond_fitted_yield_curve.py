@@ -18,14 +18,13 @@ from ...utils.math import scale
 from ...utils.helpers import label_to_string
 from ...utils.helpers import times_from_dates
 
-from ...market.curves.discount_curve import DiscountCurve
 from .curve_fits import CurveFitPolynomial
 from .curve_fits import CurveFitNelsonSiegel
 from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
 
 
-class BondFittedYieldCurve(DiscountCurve):
+class BondFittedYieldCurve:
     """Class to do fitting of the yield curve and to enable interpolation of
     yields. Because yields assume a flat term structure for each bond, this
     class does not allow discounting to be done and so does not inherit from
