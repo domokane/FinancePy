@@ -1,0 +1,41 @@
+# Climate-adjusted bond pricing variant of the FinancePy runner.
+#
+# This Modelfile is one of three purpose-specific variants in this bundle.
+# All three reuse the same Dockerfile + runner.py (the polymorphic
+# implementation in runner.py); they differ only in declared inputs +
+# required schema, which lets the Model Home catalog present each use case
+# as a separate Model with an honest IO contract.
+#
+# Climate bond use:  given a climate risk premium (e.g. from DicePy) and
+# default bond parameters baked into the runner, price a 10-year fixed-coupon
+# bond. The runner's _mean_nested helper collapses DicePy's
+# {scenario: {config: float}} dict into one representative scalar YTM.
+#
+# See Modelfile.cat_bond_aai.toml and Modelfile.cat_bond_aai_freq.toml for
+# the catastrophe-bond variants.
+
+name = "finance_py_climate_bond"
+description = "Prices a 10-year fixed-coupon bond by treating a climate risk premium as the yield-to-maturity. Pair with an upstream that emits `climate_risk_premium` (DicePy)."
+
+run = "docker run --rm -v \"$PWD/run:/run\" ${IMAGE} ${ARGS} > run/bond_metrics.output.json"
+image = "domokane/financepy:latest"
+args = ["{input:damage_estimates}"]
+
+[[inputs]]
+name = "damage_estimates"
+description = "Upstream economic / climate damage output containing a climate risk premium."
+
+[inputs.schema]
+type = "object"
+# Tightened from the legacy Modelfile (which declared required = []): a
+# climate bond price requires a yield source. climate_risk_premium is
+# present in every DicePy run; adjusted_ytm and ytm are accepted but
+# optional fall-throughs the runner also recognises.
+required = ["climate_risk_premium"]
+
+[[outputs]]
+name = "bond_metrics"
+
+[outputs.schema]
+type = "object"
+required = ["clean_price", "dirty_price", "accrued_interest", "macauley_duration", "modified_duration", "convexity", "ytm"]

@@ -1,0 +1,38 @@
+# Catastrophe-bond pricing variant of the FinancePy runner — AAI-only path.
+#
+# Given an Average Annual Insured Loss (AAI) from OasisLMF and a Total
+# Insured Value (TIV, or Total Exposed Value as a fallback), derive an
+# expected-loss yield spread:  el_rate = AAI / TIV  →  YTM = risk_free + el_rate.
+# Then price the bond using the runner's polymorphic implementation.
+#
+# This variant ignores hurricane frequency: it inherits CLIMADA's implicit
+# event frequency through OasisLMF's AAI. Use Modelfile.cat_bond_aai_freq.toml
+# when you have a separately-modelled landfall rate to rescale by.
+
+name = "finance_py_cat_bond_aai"
+description = "Prices a 10-year fixed-coupon bond from an insurance Average Annual Loss. Pair with an upstream that emits `insured_aai_usd` (OasisLMF after applying policy terms to a CLIMADA loss table)."
+
+run = "docker run --rm -v \"$PWD/run:/run\" ${IMAGE} ${ARGS} > run/bond_metrics.output.json"
+image = "domokane/financepy:latest"
+args = ["{input:damage_estimates}"]
+
+[[inputs]]
+name = "damage_estimates"
+description = "Insurance loss distribution after OasisLMF FM: AAI, EP curve, per-event insured losses."
+
+[inputs.schema]
+type = "object"
+# Tightened from the legacy Modelfile (which declared required = []): the
+# AAI pricing path needs an expected loss and an exposed/insured value to
+# divide by. total_exposed_value_usd is the fallback when TIV is absent
+# (matches the runner's `params.get("total_insured_value_usd") or
+# params.get("total_exposed_value_usd")` lookup); we require AAI here and
+# leave TIV-vs-TEV resolution to the runner.
+required = ["insured_aai_usd"]
+
+[[outputs]]
+name = "bond_metrics"
+
+[outputs.schema]
+type = "object"
+required = ["clean_price", "dirty_price", "accrued_interest", "macauley_duration", "modified_duration", "convexity", "ytm"]

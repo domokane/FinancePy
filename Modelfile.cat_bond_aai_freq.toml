@@ -1,0 +1,45 @@
+# Catastrophe-bond pricing variant of the FinancePy runner — AAI + frequency.
+#
+# Same as Modelfile.cat_bond_aai.toml, but rescales OasisLMF's AAI by a
+# separately-modelled annual landfall rate before deriving the yield:
+#
+#   lambda_implicit = sum(per-event freq in event_insured_loss_table)
+#   AAI_rescaled    = AAI * (lambda_annual / lambda_implicit)
+#   el_rate         = AAI_rescaled / TIV
+#   YTM             = risk_free + el_rate
+#
+# Use this variant when the bond's contractual peril/region doesn't match
+# CLIMADA's modelled set and a historical-data Poisson fit (e.g. from
+# hurricane-frequency on HURDAT2) is more appropriate for event count.
+
+name = "finance_py_cat_bond_aai_freq"
+description = "Prices a catastrophe bond from an insurance AAI and a separately-modelled annual event rate. Rescales AAI by lambda_annual / Σ(per-event freq) before deriving the yield. Pair with OasisLMF (AAI + per-event table) and hurricane-frequency."
+
+run = "docker run --rm -v \"$PWD/run:/run\" ${IMAGE} ${ARGS} > run/bond_metrics.output.json"
+image = "domokane/financepy:latest"
+args = ["{input:damage_estimates}", "{input:hurricane_frequency}"]
+
+[[inputs]]
+name = "damage_estimates"
+description = "Insurance loss distribution after OasisLMF FM, including the per-event insured loss table needed to compute the implicit annual rate."
+
+[inputs.schema]
+type = "object"
+# event_insured_loss_table is required here (unlike cat_bond_aai) because
+# the rescaling needs each event's frequency to derive lambda_implicit.
+required = ["insured_aai_usd", "event_insured_loss_table"]
+
+[[inputs]]
+name = "hurricane_frequency"
+description = "Independently-modelled annual landfall rate (e.g. from hurricane-frequency / HURDAT2)."
+
+[inputs.schema]
+type = "object"
+required = ["lambda_annual"]
+
+[[outputs]]
+name = "bond_metrics"
+
+[outputs.schema]
+type = "object"
+required = ["clean_price", "dirty_price", "accrued_interest", "macauley_duration", "modified_duration", "convexity", "ytm"]
