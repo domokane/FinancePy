@@ -62,3 +62,9 @@ exclude = ["venv*", "notebooks*", "golden_tests*", "tests*"]
 [project.urls]
 Source = "https://github.com/domokane/FinancePy"
 Tracker = "https://github.com/domokane/FinancePy/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["unit_tests"]
+addopts = [
+    "--ignore=unit_tests/legacy"
+]
