@@ -1,5 +1,10 @@
 ## CHANGE LOG
 
+16 May 2026
+- Rewrote Interpolator class to be easier to understand
+- Ensured it passes test cases
+- Reconfigured unit and golden tests. PLEASE SEE READMEs in each folder for new instructions
+
 13 May 2026
 - Mosly work on DiscountCurves and all its variants
 - Extended inheritance of DiscountCurves to all curves
