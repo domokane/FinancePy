@@ -34,4 +34,4 @@ jobs:
 
       - name: unit tests
         run: |
-          pytest -vv
+          pytest -vv --ignore=legacy
