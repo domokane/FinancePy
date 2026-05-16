@@ -220,7 +220,7 @@ class EquitySwapLeg:
         next_notional = last_notional
         num_payments = len(self.payment_dts)
 
-        index_basis = index_curve.accrual_dc_type
+        index_basis = self.accrual_dc_type
         index_day_counter = DayCount(index_basis)
 
         for i_pmnt in range(0, num_payments):

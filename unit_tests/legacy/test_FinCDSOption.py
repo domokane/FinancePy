@@ -21,10 +21,13 @@ def test_cds_option():
 
     volatility = 0.3
 
-    strike_result = [(100, 4.0004), (150, 1.5873), (200, 0.0955), (300, 0.0)]
+    strike_result = [(100, 4.0006), (150, 1.5873), (200, 0.0955), (300, 0.0)]
 
     for strike, result in strike_result:
-        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional)
+
+        cds_option = CDSOption(
+            expiry_dt, maturity_dt, strike / 10000.0, notional
+        )
 
         v = cds_option.value(value_dt, issuer_curve, volatility)
 

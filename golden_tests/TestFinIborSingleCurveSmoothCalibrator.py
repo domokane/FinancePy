@@ -1,5 +1,7 @@
 import pandas as pd
-import pytest
+
+
+import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.interpolator import InterpTypes
@@ -15,10 +17,11 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 
-REPORT_PROGRESS = True
+from FinTestCases import FinTestCases, global_test_case_mode
 
+test_cases = FinTestCases(__file__, global_test_case_mode)
 
-@pytest.mark.parametrize("interp_type", InterpTypes)
+REPORT_PROGRESS = False
 
 ########################################################################################
 
@@ -32,7 +35,9 @@ def test_smooth_fit_simple(interp_type):
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    depo = IborDeposit(
+        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
+    )
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -104,8 +109,6 @@ def test_smooth_fit_simple(interp_type):
             print(report)
 
 
-@pytest.mark.parametrize("interp_type", [InterpTypes.FLAT_FWD_RATES])
-
 ########################################################################################
 
 
@@ -118,7 +121,9 @@ def test_smooth_fit(interp_type):
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    depo = IborDeposit(
+        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
+    )
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -262,6 +267,7 @@ def test_smooth_fit(interp_type):
     curve, report = calibrator.fit(
         smoothness=smooth_param, report_progress=REPORT_PROGRESS
     )
+
     if REPORT_PROGRESS:
         with pd.option_context(
             "display.max_rows",
@@ -282,4 +288,4 @@ def test_smooth_fit(interp_type):
 if __name__ == "__main__":
     test_smooth_fit_simple(InterpTypes.LINEAR_ZERO_RATES)
     test_smooth_fit(InterpTypes.FLAT_FWD_RATES)
-    # test_smooth_fit(InterpTypes.FINCUBIC_ZERO_RATES)
+    test_smooth_fit(InterpTypes.FINCUBIC_ZERO_RATES)

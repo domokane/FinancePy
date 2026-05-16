@@ -6,9 +6,6 @@ from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_fixed_lookback_option import (
     EquityFixedLookbackOption,
 )
-from financepy.products.equity.equity_float_lookback_option import (
-    EquityFloatLookbackOption,
-)
 
 
 value_dt = Date(1, 1, 2015)
@@ -56,6 +53,7 @@ def test_european_call():
     assert round(value, 4) == 28.7477
     assert round(value_mc, 4) == 27.8713
 
+
 ########################################################################################
 
 
@@ -87,3 +85,7 @@ def test_european_put():
 
     assert round(value, 4) == 20.5366
     assert round(value_mc, 4) == 20.0334
+
+
+test_european_call()
+test_european_put()

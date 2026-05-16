@@ -245,7 +245,7 @@ class EquityFixedLookbackOption(EquityOption):
 
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        df = discount_curve.df(t_exp)
+        df = discount_curve.df_t(t_exp)
         r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
         q = dividend_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
 

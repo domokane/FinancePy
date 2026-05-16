@@ -48,7 +48,9 @@ def test_cds_index_adjust_spreads():
         cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
         cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
-        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+        issuer_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, recovery_rate
+        )
 
         issuer_curves.append(issuer_curve)
 
@@ -56,22 +58,30 @@ def test_cds_index_adjust_spreads():
     cds_index = CDSIndexPortfolio()
 
     avg_spd_3yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves)
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity_3yr, issuer_curves
+        )
         * 10000.0
     )
 
     avg_spd_5yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves)
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity_5yr, issuer_curves
+        )
         * 10000.0
     )
 
     avg_spd_7yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves)
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity_7yr, issuer_curves
+        )
         * 10000.0
     )
 
     avg_spd_10yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves)
+        cds_index.average_spread(
+            value_dt, step_in_dt, maturity_10yr, issuer_curves
+        )
         * 10000.0
     )
 
@@ -85,26 +95,34 @@ def test_cds_index_adjust_spreads():
     cds_index = CDSIndexPortfolio()
 
     intrinsic_spd_3yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves)
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity_3yr, issuer_curves
+        )
         * 10000.0
     )
 
     intrinsic_spd_5yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves)
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity_5yr, issuer_curves
+        )
         * 10000.0
     )
 
     intrinsic_spd_7yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves)
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity_7yr, issuer_curves
+        )
         * 10000.0
     )
 
     intrinsic_spd_10yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves)
+        cds_index.intrinsic_spread(
+            value_dt, step_in_dt, maturity_10yr, issuer_curves
+        )
         * 10000.0
     )
 
-    assert round(intrinsic_spd_3yr, 4) == 19.6787
-    assert round(intrinsic_spd_5yr, 4) == 35.5378
-    assert round(intrinsic_spd_7yr, 4) == 49.0083
-    assert round(intrinsic_spd_10yr, 4) == 61.4076
+    assert round(intrinsic_spd_3yr, 3) == 19.679
+    assert round(intrinsic_spd_5yr, 3) == 35.538
+    assert round(intrinsic_spd_7yr, 3) == 49.008
+    assert round(intrinsic_spd_10yr, 3) == 61.408

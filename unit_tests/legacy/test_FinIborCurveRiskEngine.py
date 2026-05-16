@@ -14,7 +14,7 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 import financepy.products.rates.ibor_curve_risk_engine as re
 
-from .helpers import build_ibor_single_curve
+from unit_tests.helpers import build_ibor_single_curve
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework
@@ -73,6 +73,19 @@ def test_par_rate_risk_report_cubic_zero():
         2.03409619,
         -0.3957559,
     ]
+
+    # Revised values
+    expected_totals = [
+        1.49548616e-03,
+        -2.53270142e-01,
+        -2.41647351e-01,
+        -1.73299248e-02,
+        3.23081731e-01,
+        4.01797349e00,
+        2.03919974e00,
+        -3.98092480e-01,
+    ]
+
     actual_totals = risk_report["total"].values
 
     if diagnostics_mode:
@@ -94,7 +107,7 @@ def test_par_rate_risk_report_flat_forward():
     base_curve = build_ibor_single_curve(valuation_date, "10Y")
     settle_dt = base_curve.used_swaps[0].effective_dt
     cal = base_curve.used_swaps[0].fixed_leg.cal_type
-    fixed_day_count = base_curve.used_swaps[0].fixed_leg.dc_type
+    fixed_day_count = base_curve.used_swaps[0].fixed_leg.accrual_dc_type
     fixed_freq_type = base_curve.used_swaps[0].fixed_leg.freq_type
 
     trades = _generate_trades(
@@ -221,6 +234,28 @@ def test_forward_rate_risk_report():
         0.21396794,
         0.0,
     ]
+
+    # Revised values
+    expected_totals = [
+        0.25196322,
+        0.24648603,
+        0.48750632,
+        0.49286346,
+        0.48160521,
+        0.47113566,
+        0.46547385,
+        0.47058889,
+        0.45981059,
+        0.45481271,
+        0.23189803,
+        0.22408462,
+        0.21910605,
+        0.2142347,
+        0.21175048,
+        0.21396686,
+        0.00232576,
+    ]
+
     actual_totals = risk_report[re.DV01_PREFIX + "total"].values
 
     if diagnostics_mode:
@@ -229,7 +264,11 @@ def test_forward_rate_risk_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.DV01_PREFIX + "total"].values)
-        print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
+        print(
+            risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(
+                axis=0
+            )
+        )
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
@@ -286,6 +325,8 @@ def test_forward_rate_custom_grid_risk_report():
     )
 
     expected_totals = [0.24374713, 1.70089994, 3.65138343]
+    expected_totals = [0.24374713, 1.70090029, 3.65452971]  # DOK REVISED
+
     actual_totals = risk_report[re.DV01_PREFIX + "total"].values
 
     if diagnostics_mode:
@@ -294,7 +335,11 @@ def test_forward_rate_custom_grid_risk_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.DV01_PREFIX + "total"].values)
-        print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
+        print(
+            risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(
+                axis=0
+            )
+        )
 
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
@@ -352,7 +397,11 @@ def test_carry_rolldown_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.ROLL_PREFIX + "total"].values)
-        print(risk_report[roll_trade_labels + [re.ROLL_PREFIX + "total"]].sum(axis=0))
+        print(
+            risk_report[roll_trade_labels + [re.ROLL_PREFIX + "total"]].sum(
+                axis=0
+            )
+        )
 
     expected_totals = [
         -21.07588523,
@@ -365,6 +414,20 @@ def test_carry_rolldown_report():
         0.28310627,
         0.0,
     ]
+
+    # Revised values
+    expected_totals = [
+        -2.10821110e01,
+        1.60740149e01,
+        -2.72764149e01,
+        -2.46948979e-02,
+        -1.03975288e02,
+        2.02494493e-12,
+        3.60652676e01,
+        3.79891312e-01,
+        1.26130524e-02,
+    ]
+
     actual_totals = risk_report[re.ROLL_PREFIX + "total"].values
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
@@ -422,7 +485,9 @@ def test_parallel_shift_ladder_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.PV_PREFIX + "total"].values)
-        print(risk_report[pv_trade_labels + [re.PV_PREFIX + "total"]].sum(axis=0))
+        print(
+            risk_report[pv_trade_labels + [re.PV_PREFIX + "total"]].sum(axis=0)
+        )
 
         # risk_report.plot('shift_bp', re.PV_PREFIX + 'total')
         x = risk_report["shift_bp"].values
@@ -449,6 +514,28 @@ def test_parallel_shift_ladder_report():
         1840.6533982,
         2085.20799948,
     ]
+
+    # Revised values
+    expected_totals = [
+        -2.40876334e03,
+        -2.08841087e03,
+        -1.77375794e03,
+        -1.46470351e03,
+        -1.16114839e03,
+        -8.62995206e02,
+        -5.70148364e02,
+        -2.82514009e02,
+        -2.27373675e-13,
+        2.77484124e02,
+        5.50027177e02,
+        8.17716355e02,
+        1.08063727e03,
+        1.33887397e03,
+        1.59250898e03,
+        1.84162332e03,
+        2.08629655e03,
+    ]
+
     actual_totals = risk_report[re.PV_PREFIX + "total"].values
     assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
 
@@ -510,7 +597,9 @@ def _generate_base_curve(
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    depo = IborDeposit(
+        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
+    )
     depos.append(depo)
 
     fras = []
@@ -596,3 +685,4 @@ if __name__ == "__main__":
     test_forward_rate_custom_grid_risk_report()
     test_carry_rolldown_report()
     test_parallel_shift_ladder_report()
+    test_par_rate_risk_report_flat_forward

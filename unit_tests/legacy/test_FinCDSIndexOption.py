@@ -26,7 +26,9 @@ def test_dirty_price_cds_index_option():
     maturity_7yr = trade_dt.next_cds_date(84)
     maturity_10yr = trade_dt.next_cds_date(120)
 
-    path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
+    path = os.path.join(
+        os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
+    )
     f = open(path, "r")
     data = f.readlines()
     f.close()
@@ -47,7 +49,9 @@ def test_dirty_price_cds_index_option():
         cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
         cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
-        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+        issuer_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, recovery_rate
+        )
 
         issuer_curves.append(issuer_curve)
 
@@ -68,9 +72,9 @@ def test_dirty_price_cds_index_option():
     tolerance = 1e-6
 
     index_strike_results = [
-        (20.0, 20.0, [16.0, 6.2, -70.8, 22.9, -60.8, 16.1, 6.1]),
+        (20.0, 20.0, [16.0, 6.2, -70.8, 22.8, -60.8, 16.1, 6.1]),
         (25.0, 30.0, [11.8, 16.9, -35.3, 28.6, -40.5, 11.8, 16.8]),
-        (50.0, 40.0, [63.3, 4.6, 0.0, 57.3, 60.2, 63.2, 4.7]),
+        (50.0, 40.0, [63.3, 4.6, 0.0, 57.3, 60.2, 63.2, 4.6]),
     ]
 
     for index, strike, results in index_strike_results:
@@ -80,7 +84,9 @@ def test_dirty_price_cds_index_option():
             cds = CDS(value_dt, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(value_dt, cds_contracts, libor_curve, index_recovery)
+        index_curve = CDSCurve(
+            value_dt, cds_contracts, libor_curve, index_recovery
+        )
 
         index_spreads = [index / 10000.0] * 4
 

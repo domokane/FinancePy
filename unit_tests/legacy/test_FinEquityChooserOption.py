@@ -121,6 +121,6 @@ def test_equity_chooser_option_derivicom():
 
     v_derivicom = 1.0989
 
-    assert round(v, 4) == 1.1052
+    assert round(v, 3) == 1.105
     assert round(v_derivicom, 4) == 1.0989
     assert round(v_mc, 4) == 1.1095

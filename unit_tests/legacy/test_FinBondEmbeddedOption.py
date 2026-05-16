@@ -91,8 +91,8 @@ def test_matlab_bk():
 
     v = puttable_bond_matlab.value(settle_dt_matlab, discount_curve_matlab, model)
 
-    assert round(v["bondwithoption"], 4) == 102.3508
-    assert round(v["bondpure"], 4) == 102.0603
+    assert round(v["bondwithoption"], 4) == 102.3625
+    assert round(v["bondpure"], 4) == 102.0746
 
 
 ########################################################################################
@@ -107,8 +107,8 @@ def test_matlab_hw():
 
     v = puttable_bond_matlab.value(settle_dt_matlab, discount_curve_matlab, model)
 
-    assert round(v["bondwithoption"], 4) == 102.8733
-    assert round(v["bondpure"], 4) == 102.0603
+    assert round(v["bondwithoption"], 4) == 102.8835
+    assert round(v["bondpure"], 4) == 102.0746
 
 
 # QUANTLIB EXAMPLE
@@ -160,7 +160,7 @@ def test_quantlib_clean_price_from_discount_curve():
         settle_dt_quantlib, discount_curve_quantlib
     )
 
-    assert round(v, 4) == 94.6313
+    assert round(v, 4) == 94.6199
 
 
 ########################################################################################

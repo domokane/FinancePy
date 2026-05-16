@@ -68,6 +68,7 @@ def test_equity_swap_at_inception():
 
     assert round(value, 5) == 0.00000
 
+
 ########################################################################################
 
 
@@ -104,9 +105,9 @@ def test_equity_swap_not_in_inception():
 
     # Rate determined at last reset date, from that date to maturity
     index_curve_first = DiscountCurveFlat(effective_dt, discount_rate)
-    index_alpha_first = DayCount(index_curve_first.dc_type).year_frac(
-        effective_dt, maturity_dt
-    )[0]
+    index_alpha_first = DayCount(dc_type).year_frac(effective_dt, maturity_dt)[
+        0
+    ]
     first_fixing = (
         (
             index_curve_first.df(effective_dt)
@@ -117,9 +118,7 @@ def test_equity_swap_not_in_inception():
 
     # Rate between valuation date to maturity
     index_curve_period = DiscountCurveFlat(value_dt, discount_rate)
-    index_alpha_period = DayCount(index_curve_period.dc_type).year_frac(
-        value_dt, maturity_dt
-    )[0]
+    index_alpha_period = DayCount(dc_type).year_frac(value_dt, maturity_dt)[0]
     period_fixing = (
         (index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt))
         - 1.0
@@ -161,6 +160,7 @@ def test_equity_swap_not_in_inception():
     )
 
     assert round(value, 5) == 0.00000
+
 
 ########################################################################################
 
@@ -221,3 +221,6 @@ def test_equity_swap_with_dividends():
     )
 
     assert round(value_with_divs) == round(value_higher_disc)
+
+
+test_equity_swap_at_inception()

@@ -122,7 +122,7 @@ def test_year_frace_act_365_l():
 
 def test_year_frace_simple():
 
-    dc_type = DayCountTypes.ASTRONOMICAL
+    dc_type = DayCountTypes.JULIAN
     day_count = DayCount(dc_type)
     answer = day_count.year_frac(start, end, end, fin_freq)
 

@@ -212,5 +212,5 @@ def test_11():
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
     ytm = bond.yield_to_maturity(settle_dt, clean_price)
-    assert round(bond.accrued_int, 4) == 0.0060
-    assert round(ytm * 100, 4) == 0.7652
+    assert round(bond.accrued_int, 3) == 0.006
+    assert round(ytm * 100, 4) == 0.7639

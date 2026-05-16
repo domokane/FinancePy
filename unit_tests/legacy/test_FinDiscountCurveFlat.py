@@ -14,12 +14,12 @@ results = [
         0.9472,
         0.9356,
         0.9239,
-        0.9124,
-        0.9010,
-        0.8901,
-        0.8789,
-        0.8679,
-        0.8571,
+        0.9123,
+        0.9009,
+        0.8900,
+        0.8788,
+        0.8678,
+        0.8569,
         0.8467,
         0.8361,
         0.8256,
@@ -129,8 +129,10 @@ def test_fin_flat_curve():
     compounding = FrequencyTypes.CONTINUOUS
 
     flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
-    print(flat_curve)
     dfs = flat_curve.df(dates)
+
+    print(dfs)
+    print(results[0])
     assert [round(x, 4) for x in dfs] == results[0]
 
     compounding = FrequencyTypes.ANNUAL
@@ -152,3 +154,7 @@ def test_fin_flat_curve():
     flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert [round(x, 4) for x in dfs] == results[4]
+
+
+if __name__ == "__main__":
+    test_fin_flat_curve()

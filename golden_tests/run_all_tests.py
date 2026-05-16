@@ -9,6 +9,11 @@ import time
 
 import add_fp_to_path
 
+import financepy
+
+print("FinancePy imported successfully from:", financepy.__file__)
+
+
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 

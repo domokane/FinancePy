@@ -135,6 +135,7 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         def _obj_f(dfs):
             curve = self._curve
+
             curve._dfs[1:] = dfs
 
             curve.fit(curve._times, curve._dfs)

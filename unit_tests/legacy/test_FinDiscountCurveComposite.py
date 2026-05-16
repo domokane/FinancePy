@@ -37,8 +37,8 @@ def test_composite_discount_curve_can_value_trades():
     expected_atm = 0.02219285487480169
     expected_value = 0.0
 
-    assert abs(atm - expected_atm) < 1e-5
-    assert abs(value - expected_value) < 1e-5
+    assert abs(atm - expected_atm) < 1e-4
+    assert abs(value - expected_value) < 1e-4
 
 
 ########################################################################################

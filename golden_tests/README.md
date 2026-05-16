@@ -1,6 +1,6 @@
-# Test Suite
+# Golden Test Suite
 
-This folder contains the logic for performing comparison testing of code to ensure that code does not inadvertently get broken. 
+This folder contains the logic for performing comparison testing of model-related code to ensure that code does not inadvertently get broken. 
 
 The code tests here can be very broad in type. 
 
@@ -17,7 +17,6 @@ globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
 ## RunAllTests.py
 
 This file executes all of the test files which each report on any errors found.
-
 
 ## Output
 

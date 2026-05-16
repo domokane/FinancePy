@@ -41,7 +41,9 @@ def test_fin_cap_vol_curve():
     cap_volatilities = np.array(cap_volatilities) / 100.0
 
     dc_type = DayCountTypes.ACT_ACT_ISDA
-    vol_curve = IborCapVolCurve(value_dt, cap_vol_dates, cap_volatilities, dc_type)
+    vol_curve = IborCapVolCurve(
+        value_dt, cap_vol_dates, dc_type, cap_volatilities
+    )
 
     dt = Date(1, 1, 2020)
     cap_floor_vol = vol_curve.cap_vol(dt)
@@ -72,3 +74,6 @@ def test_fin_cap_vol_curve():
     cap_floor_let_vol = vol_curve.caplet_vol(dt)
     assert round(cap_floor_vol * 100.0, 2) == 16.010
     assert round(cap_floor_let_vol * 100.0, 2) == 13.81
+
+
+test_fin_cap_vol_curve()

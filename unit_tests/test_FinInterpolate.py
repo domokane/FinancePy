@@ -53,7 +53,8 @@ def test_fin_interpolate__recovers__inputs():
 
         y_interp_values = np.array(y_interp_values)
         assert (
-            np.linalg.norm(y_values - y_interp_values) / np.linalg.norm(y_values)
+            np.linalg.norm(y_values - y_interp_values)
+            / np.linalg.norm(y_values)
             <= 1e-6
         )
 
@@ -71,6 +72,8 @@ def test_flat_fwd_rates():
     index = 0
     x = x_interpolate_values[index]
     y_int = interpolator.interpolate(x)
+
+    print("xxxx", y_int)
     assert round(x, 4) == 0.0
     assert round(y_int, 4) == 1.0
 
@@ -379,5 +382,10 @@ if __name__ == "__main__":
     # test_linear_onfwd_rates_empty_fit()
     # test_linear_onfwd_rates_single_value_at_origin()
     # test_linear_onfwd_rates_single_value_not_at_origin()
+    test_linear_zero_rates()
     test_linear_onfwd_rates_two_values_including_origin()
-    # test_linear_onfwd_rates()
+    test_linear_onfwd_rates()
+    test_flat_fwd_rates()
+    test_linear_onfwd_rates_single_value_at_origin()
+    test_linear_fwd_rates()
+    test_fincubic_zero_rates()
