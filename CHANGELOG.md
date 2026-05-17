@@ -14,7 +14,7 @@
 - Extended inheritance of DiscountCurves to all curves
 - All inheriting classes have a bump_parallel method
 - Removed alternative calculations of zero, par, swap and forward rates so all such calls use DiscountCurve methods
-- Added argument to determine day count rule for converting dates to times
+- Added discount curve level property to determine day count rule for converting dates to times
 - Set default value of time_dc_type to ACT_365F - which means we divide by 365
 - Fixed bug in swap_float_leg so we use specifed accrual basis and not index curve basis
 - Set all references to call directly discountCurve._dfs and ._times to avoid copying using accessor methods

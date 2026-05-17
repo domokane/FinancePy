@@ -28,11 +28,9 @@ SHOW_PLOTS = False
 
 def test_bond_fitted_yield_curve():
 
-    path = os.path.join(os.path.dirname(__file__),
-                        "./data/gilt_bond_prices.txt")
+    path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
     bond_dataframe = pd.read_csv(path, sep="\t")
-    bond_dataframe["mid"] = 0.5 * \
-        (bond_dataframe["bid"] + bond_dataframe["ask"])
+    bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
     freq_type = FrequencyTypes.SEMI_ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ICMA
@@ -101,7 +99,7 @@ def test_bond_fitted_yield_curve():
     test_cases.print("tau_2", fitted_curve4.curve_fit.tau_2)
 
     maturity_dt = Date(19, 9, 2030)
-    interp_yield = fitted_curve5.interp_rate(maturity_dt)
+    interp_yield = fitted_curve5.interp_yield(maturity_dt)
     test_cases.print(maturity_dt, interp_yield)
 
 

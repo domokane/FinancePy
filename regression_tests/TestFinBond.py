@@ -813,6 +813,10 @@ def test_cpn_types():
 
 def test_stack_exchange():
 
+    # https://quant.stackexchange.com/questions/66508/schedule-yield-to-maturity-and-npv-of-fixed-rate-bond-from-quantlib-python
+
+    # Unable to reconcile with strange example
+
     issue_dt = Date(28, 9, 2019)
     maturity_dt = Date(28, 9, 2024)
     coupon = 0.05
@@ -823,9 +827,9 @@ def test_stack_exchange():
 
     value_dt = Date(31, 7, 2020)
     settle_dt = value_dt.add_days(100)
-    print(settle_dt)
+    #    print(settle_dt)
 
-    print(bond.print_payments(settle_dt, 100))
+    #    print(bond.print_payments(settle_dt, 100))
 
     spot_dts = [Date(31, 7, 2020), Date(1, 1, 2027)]
     spot_rates = [0.01, 0.02]
@@ -839,15 +843,15 @@ def test_stack_exchange():
         DayCountTypes.ACT_360,
     )
 
-    print(
-        "Dirty Price = %12.7f"
-        % bond.dirty_price_from_discount_curve(settle_dt, zero_curve)
-    )
+    # print(
+    #     "Dirty Price = %12.7f"
+    #     % bond.dirty_price_from_discount_curve(settle_dt, zero_curve)
+    # )
 
-    print(
-        "Clean Price = %12.7f"
-        % bond.clean_price_from_discount_curve(settle_dt, zero_curve)
-    )
+    # print(
+    #     "Clean Price = %12.7f"
+    #     % bond.clean_price_from_discount_curve(settle_dt, zero_curve)
+    # )
 
 
 ###############################################################################
