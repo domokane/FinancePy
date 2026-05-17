@@ -88,8 +88,8 @@ class EquityFloatLookbackOption(EquityOption):
 
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
-        q = dividend_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
+        r = discount_curve.zero_rate_cc_t(t_exp)
+        q = dividend_curve.zero_rate_cc_t(t_exp)
 
         v = volatility
         s0 = stock_price
@@ -99,15 +99,11 @@ class EquityFloatLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > s0:
-                raise FinError(
-                    "Smin must be less than or equal to the stock price."
-                )
+                raise FinError("Smin must be less than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < s0:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
 
         if abs(r - q) < G_SMALL:
             q = r + G_SMALL
@@ -122,17 +118,13 @@ class EquityFloatLookbackOption(EquityOption):
         # Taken from Haug Page 142
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
 
-            a1 = (
-                (np.log(s0 / smin) + (b + (v**2) / 2.0) * t_exp)
-                / v
-                / np.sqrt(t_exp)
-            )
+            a1 = (np.log(s0 / smin) + (b + (v**2) / 2.0) * t_exp) / v / np.sqrt(t_exp)
             a2 = a1 - v * np.sqrt(t_exp)
 
             if smin == s0:
-                term = normcdf(
-                    -a1 + 2.0 * b * np.sqrt(t_exp) / v
-                ) - expbt * normcdf(-a1)
+                term = normcdf(-a1 + 2.0 * b * np.sqrt(t_exp) / v) - expbt * normcdf(
+                    -a1
+                )
             elif s0 < smin and w < -100:
                 term = -expbt * normcdf(-a1)
             else:
@@ -140,25 +132,15 @@ class EquityFloatLookbackOption(EquityOption):
                     -a1 + 2.0 * b * np.sqrt(t_exp) / v
                 ) - expbt * normcdf(-a1)
 
-            v = (
-                s0 * dq * normcdf(a1)
-                - smin * df * normcdf(a2)
-                + s0 * df * u * term
-            )
+            v = s0 * dq * normcdf(a1) - smin * df * normcdf(a2) + s0 * df * u * term
 
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
-            b1 = (
-                (np.log(s0 / smax) + (b + (v**2) / 2.0) * t_exp)
-                / v
-                / np.sqrt(t_exp)
-            )
+            b1 = (np.log(s0 / smax) + (b + (v**2) / 2.0) * t_exp) / v / np.sqrt(t_exp)
             b2 = b1 - v * np.sqrt(t_exp)
 
             if smax == s0:
-                term = -normcdf(
-                    b1 - 2.0 * b * np.sqrt(t_exp) / v
-                ) + expbt * normcdf(b1)
+                term = -normcdf(b1 - 2.0 * b * np.sqrt(t_exp) / v) + expbt * normcdf(b1)
             elif s0 < smax and w > 100:
                 term = expbt * normcdf(b1)
             else:
@@ -166,16 +148,10 @@ class EquityFloatLookbackOption(EquityOption):
                     b1 - 2.0 * b * np.sqrt(t_exp) / v
                 ) + expbt * normcdf(b1)
 
-            v = (
-                smax * df * normcdf(-b2)
-                - s0 * dq * normcdf(-b1)
-                + s0 * df * u * term
-            )
+            v = smax * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
 
         else:
-            raise FinError(
-                "Unknown lookback option type:" + str(self.opt_type)
-            )
+            raise FinError("Unknown lookback option type:" + str(self.opt_type))
 
         return v
 
@@ -200,8 +176,8 @@ class EquityFloatLookbackOption(EquityOption):
         num_time_steps = int(t * num_steps_per_year)
 
         df = discount_curve.df(self.expiry_dt)
-        r = discount_curve.cc_rate(self.expiry_dt)
-        q = dividend_curve.cc_rate(self.expiry_dt)
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
         mu = r - q
 
         opt_type = self.opt_type
@@ -211,15 +187,11 @@ class EquityFloatLookbackOption(EquityOption):
         if self.opt_type == OptionTypes.EUROPEAN_CALL:
             smin = stock_min_max
             if smin > stock_price:
-                raise FinError(
-                    "Smin must be less than or equal to the stock price."
-                )
+                raise FinError("Smin must be less than or equal to the stock price.")
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             smax = stock_min_max
             if smax < stock_price:
-                raise FinError(
-                    "Smax must be greater than or equal to the stock price."
-                )
+                raise FinError("Smax must be greater than or equal to the stock price.")
 
         t_all, s_all = get_paths_times(
             num_paths, num_time_steps, t, mu, stock_price, volatility, seed

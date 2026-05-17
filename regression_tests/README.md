@@ -24,9 +24,12 @@ Then in the last line of the module add the line
 
     test_cases.compare_test_cases()
 
-To create values, you first define a header for the output. This header has 10 columnns of model output that the tests will produce.
+To create values, you first define a header for the output.
 
-   test_cases.header(
+### Example
+This example header has 10 columns of model output that the tests will produce.
+
+    test_cases.header(
        "STRIKE",
        "STEPS",
        "CALL_INT",
@@ -36,11 +39,10 @@ To create values, you first define a header for the output. This header has 10 c
        "PUT_INT",
        "PUT_INT_PV",
        "PUT_EUR",
-       "PUT_AMER",
-   )
-
+       "PUT_AMER")
     ....
-
+    .... calling model code to get values for all of these variables
+    ....
     test_cases.print(strike_price,
                      num_steps,
                      call_intrinsic,
@@ -52,35 +54,31 @@ To create values, you first define a header for the output. This header has 10 c
                      v3,
                      v4,)
 
-And after that we print the model output.
+When you execute ***run_all_tests.py***, each test is run in order and a one-line summary of the results are output for each test file.
 
-When you execcute run_all_tests.py, each test is run in order and a one line summary of the results are output for each test file
-
-You can see WARNINGS which reflect small value changes and ERRORS which signify large value changes
+You can see WARNINGS which reflect timing changes and ERRORS which signify value changes
 
 To investigate these warnings and errors, look at the output that goes to the data files that will be used to examine model output.
 
-- To see the GOLDEN model output look in the golden subfolder here
-- To see the latest model output look in the compare subfolder here
-- To see the differencesm, look in the differences subfolder
+- To see the GOLDEN model output look in the *regression_tests/golden* subfolder here
+- To see the latest model output look in the *regression_tests/compare* subfolder here
+- To see the differencesm, look in the *regression_tests/differences* subfolder here
 
 Each sub-folder contains a file for each test file that you can examine.
+
+***THESE FILES ARE ACCESSING THE CURRENT CODE IN THE FINANCEPY FOLDER SO REGRESSION TESTING CAN BE USED AS PART OF THE MODEL DEVELOPMENT AND TESTING PROCESS***
 
 ### Creating the Golden files
 
 The test is based on the prior creation of a Golden version of the file output which is stored in the Golden folder. There is a file for each test file. This is considered to be correct and any output that deviates from this is deemed to be incorrect. Creation of the Golden files is done by setting the value of the global flag as follows:
 
-globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
+    globalTestCaseMode = FinTestCaseMode.SAVE_TEST_CASES
 
 This can be found under FinTestCase.py
 
 When you wish to run the tests to check if anything has changed, you need to set the global flag to
 
-globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
-
-## RunAllTests.py
-
-This file executes all of the test files which each report on any errors found.
+    globalTestCaseMode = FinTestCaseMode.ANALYSE_TEST_CASES
 
 ## Output
 

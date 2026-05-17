@@ -97,7 +97,6 @@ def _value_convertible(
         raise FinError("Recovery rate must be between 0 and 0.999.")
 
     num_times = int(num_steps_per_year * t_mat) + 1  # add one for today time 0
-    num_times = num_steps_per_year  # XXXXXXXX!!!!!!!!!!!!!!!!!!!!!
 
     if num_times < 5:
         raise FinError("Numsteps must be greater than 5.")
@@ -213,9 +212,7 @@ def _value_convertible(
     bullet_pv = (1.0 + flow) * face_amount
     for i_node in range(0, num_levels):
         conv_value = tree_convert_value[num_times - 1, i_node]
-        tree_convert_bond_value[num_times - 1, i_node] = max(
-            bullet_pv, conv_value
-        )
+        tree_convert_bond_value[num_times - 1, i_node] = max(bullet_pv, conv_value)
 
     #  begin backward steps from expiry
     for i_time in range(num_times - 2, -1, -1):
@@ -231,9 +228,7 @@ def _value_convertible(
         for i_node in range(0, i_time + 1):
             fut_value_up = tree_convert_bond_value[i_time + 1, i_node + 1]
             fut_value_dn = tree_convert_bond_value[i_time + 1, i_node]
-            hold = (
-                p_up * fut_value_up + p_dn * fut_value_dn
-            )  # p_up already embeds Q
+            hold = p_up * fut_value_up + p_dn * fut_value_dn  # p_up already embeds Q
             hold_pv = (
                 df * hold
                 + p_def * df * recovery_rate * face_amount
@@ -251,18 +246,14 @@ def _value_convertible(
     delta = (tree_convert_bond_value[1, 1] - tree_convert_bond_value[1, 0]) / (
         tree_stock_value[1, 1] - tree_stock_value[1, 0]
     )
-    delta_up = (
-        tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]
-    ) / (tree_stock_value[2, 3] - tree_stock_value[2, 2])
-    delta_dn = (
-        tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]
-    ) / (tree_stock_value[2, 2] - tree_stock_value[2, 1])
-    gamma = (delta_up - delta_dn) / (
-        tree_stock_value[1, 1] - tree_stock_value[1, 0]
+    delta_up = (tree_convert_bond_value[2, 3] - tree_convert_bond_value[2, 2]) / (
+        tree_stock_value[2, 3] - tree_stock_value[2, 2]
     )
-    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (
-        2.0 * dt
+    delta_dn = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[2, 1]) / (
+        tree_stock_value[2, 2] - tree_stock_value[2, 1]
     )
+    gamma = (delta_up - delta_dn) / (tree_stock_value[1, 1] - tree_stock_value[1, 0])
+    theta = (tree_convert_bond_value[2, 2] - tree_convert_bond_value[0, 0]) / (2.0 * dt)
     results = np.array([price, bullet_pv, delta, gamma, theta])
     return results
 
@@ -618,9 +609,7 @@ class BondConvertible:
 
         dc = DayCount(self.accrual_dc_type)
 
-        (acc_factor, num, _) = dc.year_frac(
-            self._pcd, settle_dt, self._ncd, self.freq
-        )
+        acc_factor, num, _ = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq)
 
         self.alpha = 1.0 - acc_factor * self.freq
 

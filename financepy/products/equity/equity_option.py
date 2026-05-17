@@ -195,7 +195,7 @@ class EquityOption:
         v_bumped = self.value(
             value_dt,
             stock_price,
-            discount_curve.bump(BUMP),
+            discount_curve.bump_parallel(BUMP),
             dividend_curve,
             model,
         )

@@ -44,7 +44,6 @@ from ...market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 from .bond_exact_zero_curve import BondExactZeroCurve
 
-
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD
 # JAPANESE SIMPLE YIELD
@@ -109,9 +108,7 @@ def validate_yield(ytm):
 
     for ytm in ytms:
         if ytm < -0.20 or ytm > 2.0:
-            raise FinError(
-                "YTM of " + str(ytm) + " must be between -20% and +200%"
-            )
+            raise FinError("YTM of " + str(ytm) + " must be between -20% and +200%")
 
 
 ###############################################################################
@@ -194,9 +191,7 @@ class Bond:
         self.freq = annual_frequency(freq_type)
 
         if ex_div_days > 90:
-            raise FinError(
-                "Ex dividend days cannot be more than 90" + str(ex_div_days)
-            )
+            raise FinError("Ex dividend days cannot be more than 90" + str(ex_div_days))
 
         self.ex_div_dt = None
         self.ex_div_days = ex_div_days
@@ -349,9 +344,7 @@ class Bond:
         n_flows = len(flow_amounts)
 
         if n_cpn_dts != n_payment_dts:
-            raise FinError(
-                "Number of coupon dates not equal to number payments"
-            )
+            raise FinError("Number of coupon dates not equal to number payments")
 
         if n_cpn_dts != n_flows:
             raise FinError("Number of coupon dates not equal to number flows")
@@ -577,6 +570,7 @@ class Bond:
 
             # Call the core pricing function
             price = self.dirty_price_from_ytm(s_dt, y, convention)
+
             dps.append(price)
 
         if num_to_calculate == 1:
@@ -858,9 +852,7 @@ class Bond:
             raise FinError("Settlement date falls before issue date")
 
         if key_rate_tenors is None:
-            key_rate_tenors = np.array(
-                [0.5, 1, 2, 3, 5, 7, 10, 20, 30], dtype=float
-            )
+            key_rate_tenors = np.array([0.5, 1, 2, 3, 5, 7, 10, 20, 30], dtype=float)
         else:
             key_rate_tenors = np.array(key_rate_tenors, dtype=float)
 
@@ -928,9 +920,7 @@ class Bond:
         # Helper: build a bumped discount curve wrapper
         # ------------------------------------------------------------------
         class BumpedZeroTentCurve:
-            def __init__(
-                self, base_curve, settle_dt, tenors, node_index, bump
-            ):
+            def __init__(self, base_curve, settle_dt, tenors, node_index, bump):
                 self.base_curve = base_curve
                 self.settle_dt = settle_dt
                 self.tenors = tenors
@@ -1014,9 +1004,7 @@ class Bond:
         # if it is None, create an array of key rates from 0.5 to 30 years
 
         if key_rate_tenors is None:
-            key_rate_tenors = np.array(
-                [0.5, 1, 2, 3, 5, 7, 10, 20, 30], dtype=float
-            )
+            key_rate_tenors = np.array([0.5, 1, 2, 3, 5, 7, 10, 20, 30], dtype=float)
         else:
             key_rate_tenors = np.array(key_rate_tenors, dtype=float)
 
@@ -1033,9 +1021,7 @@ class Bond:
         else:
             base_rates = np.array(rates, dtype=float)
             if len(base_rates) != len(key_rate_tenors):
-                raise FinError(
-                    "rates and key_rate_tenors must have the same length"
-                )
+                raise FinError("rates and key_rate_tenors must have the same length")
 
         lin_zero_interp = InterpTypes.LINEAR_ZERO_RATES
         us_street = YTMCalcType.US_STREET
@@ -1087,9 +1073,7 @@ class Bond:
 
             # Reprice target bond
             p_up = self.dirty_price_from_discount_curve(settle_dt, par_crv_up)
-            p_down = self.dirty_price_from_discount_curve(
-                settle_dt, par_crv_down
-            )
+            p_down = self.dirty_price_from_discount_curve(settle_dt, par_crv_down)
 
             # Central-difference KRD
             krd = (p_down - p_up) / (2.0 * shift * p_zero)
@@ -1154,9 +1138,7 @@ class Bond:
 
         self.accrued_interest(settle_dt, self.par)
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
         clean_price = dirty_price - self.accrued_int
         return clean_price
@@ -1249,10 +1231,8 @@ class Bond:
                     maxiter=50,
                 )
             except RuntimeError:
-                print(
-                    f"Warning: YTM calculation did not converge for price {
-                        dirty_price}"
-                )
+                print(f"Warning: YTM calculation did not converge for price {
+                        dirty_price}")
                 ytm = np.nan
 
             ytms.append(ytm)
@@ -1330,11 +1310,9 @@ class Bond:
         cal = Calendar(self.cal_type)
 
         # Calculation of the ex-dividend date
-        self.ex_div_dt = cal.add_business_days(
-            self._ncd, -1 * self.ex_div_days
-        )
+        self.ex_div_dt = cal.add_business_days(self._ncd, -1 * self.ex_div_days)
 
-        (acc_factor, num, _) = dc.year_frac(
+        acc_factor, num, _ = dc.year_frac(
             self._pcd, settle_dt, self._ncd, self.freq_type
         )
 
@@ -1536,18 +1514,12 @@ class Bond:
         """Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed."""
 
-        if isinstance(clean_price, float) or isinstance(
-            clean_price, np.float64
-        ):
+        if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
-        elif isinstance(clean_price, list) or isinstance(
-            clean_price, np.ndarray
-        ):
+        elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
             clean_prices = np.array(clean_price)
         else:
-            raise FinError(
-                "Unknown type for clean_price " + str(type(clean_price))
-            )
+            raise FinError("Unknown type for clean_price " + str(type(clean_price)))
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -1571,10 +1543,8 @@ class Bond:
 
                 oass.append(oas)
             except RuntimeError:
-                print(
-                    f"Warning: OAS calculation did not converge for price {
-                        dirty_price}"
-                )
+                print(f"Warning: OAS calculation did not converge for price {
+                        dirty_price}")
                 oass.append(np.nan)
 
         if len(oass) == 1:
@@ -1638,9 +1608,7 @@ class Bond:
 
                 # --- Principal (Maturity) ---
                 if i == n_flows - 1:
-                    pv_coupons += (
-                        1.0 * df * q
-                    )  # Pay par if survives to maturity
+                    pv_coupons += 1.0 * df * q  # Pay par if survives to maturity
 
                 prev_df = df
                 prev_q = q
@@ -1699,9 +1667,7 @@ class Bond:
         # The coupon or par payments on buying date belong to the buyer. The
         # coupon or par payments on selling date are given to the new buyer.
         dts_cfs = [
-            (d, c * self.par)
-            for (d, c) in dts_cfs
-            if (d >= begin_dt) and (d < end_dt)
+            (d, c * self.par) for (d, c) in dts_cfs if (d >= begin_dt) and (d < end_dt)
         ]
 
         dts_cfs.append((begin_dt, -buy_price))
@@ -1759,7 +1725,7 @@ class Bond:
         sw = 14  # status
         aw = 14  # amount
 
-        header = "%*s   %*s   %*s   %*s\n" % (
+        header = "%*s \t %*s \t %*s  %*s\n" % (
             dw,
             "Coupon Date",
             dw,
@@ -1776,7 +1742,7 @@ class Bond:
 
         status = "SETTLEMENT"
 
-        flow_str += "%*s   %*s   %*s   \n" % (
+        flow_str += "%*s \t %*s \t %*s \n" % (
             dw,
             str(settle_dt),
             dw,
@@ -1804,7 +1770,7 @@ class Bond:
 
             cpn_dt = self.cpn_dts[n_start]
             pmt_dt = self.payment_dts[n_start]
-            flow_str += "%*s   %*s   %*s   %*.2f\n" % (
+            flow_str += "%*s \t  %*s \t %*s \t %*.2f\n" % (
                 dw,
                 str(cpn_dt),
                 dw,
@@ -1833,7 +1799,110 @@ class Bond:
             if i == n_flows - 1:
                 flow += face  # Add principal to the last payment
 
-            flow_str += "%*s   %*s   %*s   %*.2f \n" % (
+            flow_str += "%*s \t %*s \t %*s \t  %*.2f \n" % (
+                dw,
+                str(cpn_dt),
+                dw,
+                str(pmt_dt),
+                sw,
+                status,
+                aw,
+                flow,
+            )
+
+        print(flow_str)
+        return
+
+    ###########################################################################
+
+    def npv(self, settle_dt: Date, discount_curve: DiscountCurve, face: float = 100):
+        """Calculate full NPV of bond."""
+
+        print("Under construction")
+
+        # We MUST call this to update value of self.alpha and ex-div date
+        self.accrued_interest(settle_dt, 1.0)
+
+        n_flows = len(self.cpn_dts)
+        dw = len(str(settle_dt))  # date width
+        sw = 14  # status
+        aw = 14  # amount
+
+        header = "%*s \t %*s \t %*s  %*s\n" % (
+            dw,
+            "Coupon Date",
+            dw,
+            "Payment Date",
+            sw,
+            "Status",
+            aw,
+            "Amount",
+        )
+        flow_str = header
+        flow = 0.0
+
+        #        flow_str += "%*s\n" % (dw, str(settle_dt))
+
+        status = "SETTLEMENT"
+
+        flow_str += "%*s \t %*s \t %*s \n" % (
+            dw,
+            str(settle_dt),
+            dw,
+            "",
+            sw,
+            status,
+        )
+
+        n_start = -1
+        for i in range(0, n_flows):
+
+            cpn_dt = self.cpn_dts[i]
+            pmt_dt = self.payment_dts[i]
+
+            if cpn_dt > settle_dt:
+                n_start = i
+                break
+
+        # If no future coupons found, bond is matured
+        if n_start == -1:
+            print(flow_str + "Bond has matured.")
+            return
+
+        if settle_dt >= self.ex_div_dt:
+
+            cpn_dt = self.cpn_dts[n_start]
+            pmt_dt = self.payment_dts[n_start]
+            flow_str += "%*s \t  %*s \t %*s \t %*.2f\n" % (
+                dw,
+                str(cpn_dt),
+                dw,
+                str(pmt_dt),
+                sw,
+                "EX-DIV",
+                aw,
+                0.0,
+            )
+            n_start += 1
+
+        for i in range(n_start, n_flows):
+            cpn_dt = self.cpn_dts[i]
+            pmt_dt = self.payment_dts[i]
+            flow = self.flow_amounts[i] * face
+
+            status = "UNCHANGED"
+
+            if cpn_dt != pmt_dt:
+                status = "HOLIDAY ROLL"
+
+            if cpn_dt == self.maturity_dt:
+                status = "MATURITY"
+
+            # Check if this is the final payment (Maturity)
+            if i == n_flows - 1:
+                flow += face  # Add principal to the last payment
+
+            flow_str += "%*s \t %*s \t %*s \t  %*.2f \n" % (
                 dw,
                 str(cpn_dt),
                 dw,

@@ -168,9 +168,7 @@ class DiscountCurve:
 
         elif isinstance(date_or_tenor, list):
             if len(date_or_tenor) != len(start_dts):
-                raise FinError(
-                    "date_or_tenor list must match start_dt list length."
-                )
+                raise FinError("date_or_tenor list must match start_dt list length.")
 
             if not all(isinstance(dt, Date) for dt in date_or_tenor):
                 raise FinError("date_or_tenor list must contain only Dates.")
@@ -229,9 +227,7 @@ class DiscountCurve:
             elif len(t2) == 1:
                 t2 = np.full_like(t1, t2[0])
             else:
-                raise FinError(
-                    "Start and end time vectors have different lengths."
-                )
+                raise FinError("Start and end time vectors have different lengths.")
 
         if accrual is None:
             accruals = t2 - t1
@@ -323,6 +319,22 @@ class DiscountCurve:
         zero_rates = self.zero_rate_t(times, freq_type)
         return zero_rates
 
+    ###########################################################################
+
+    def zero_rate_cc(self, maturity_dt: Union[list, Date]):
+        """Calculate zero rates with continuous compounding."""
+
+        times = times_from_dates(maturity_dt, self.value_dt, self.time_dc_type)
+        zero_rates_cc = self.zero_rate_t(times, FrequencyTypes.CONTINUOUS)
+        return zero_rates_cc
+
+    ####################################################################################
+
+    def zero_rate_cc_t(self, t):
+        """Calculate zero rates with continuous compounding."""
+        zero_rates_cc = self.zero_rate_t(t, FrequencyTypes.CONTINUOUS)
+        return zero_rates_cc
+
     ####################################################################################
 
     def zero_rate_t(
@@ -357,9 +369,7 @@ class DiscountCurve:
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
         accrual_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
     ):
-        rate = self.par_rate(
-            effective_dt, maturity_dt, freq_type, accrual_dc_type
-        )
+        rate = self.par_rate(effective_dt, maturity_dt, freq_type, accrual_dc_type)
         return rate
 
     ####################################################################################
@@ -477,18 +487,14 @@ class DiscountCurve:
 
         acc_day_counter = DayCount(accrual_dc_type)
 
-        t_start = times_from_dates(
-            effective_dt, self.value_dt, self.time_dc_type
-        )
+        t_start = times_from_dates(effective_dt, self.value_dt, self.time_dc_type)
 
         par_rates = []
 
         for mat_dt in maturity_dts:
 
             if mat_dt <= effective_dt:
-                raise FinError(
-                    "Swap maturity date must be after effective date."
-                )
+                raise FinError("Swap maturity date must be after effective date.")
 
             schedule = Schedule(effective_dt, mat_dt, freq_type)
             flow_dts = schedule.generate()
@@ -568,9 +574,7 @@ class DiscountCurve:
             InterpTypes.LINEAR_ZERO_RATES,
             InterpTypes.LINEAR_FWD_RATES,
         ):
-            dfs = interpolate(
-                times, self._times, self._dfs, self._interp_type.value
-            )
+            dfs = interpolate(times, self._times, self._dfs, self._interp_type.value)
         else:
             dfs = self._interpolator.interpolate(times)
 
@@ -625,9 +629,7 @@ class DiscountCurve:
         times = self._times.copy()
         dfs = self._dfs.copy()
 
-        shifted_lengths = np.maximum(
-            0.0, np.minimum(times, bucket_end) - bucket_start
-        )
+        shifted_lengths = np.maximum(0.0, np.minimum(times, bucket_end) - bucket_start)
 
         dfs = dfs * np.exp(-bump_size * shifted_lengths)
 
@@ -709,9 +711,7 @@ class DiscountCurve:
 
         s += "    DATES      TIMES(YRS) DISC FACTORS\n"
         for dt, t, df in zip(self._df_dates, self._times, self._dfs):
-            s += label_to_string(
-                f"{str(dt):>12}", f"{t:12.6f}", f"{df:12.8f}\n"
-            )
+            s += label_to_string(f"{str(dt):>12}", f"{t:12.6f}", f"{df:12.8f}\n")
 
         if hasattr(self, "_interp_type") and self._interp_type is not None:
             s += label_to_string("INTERPOLATION TYPE", self._interp_type.name)

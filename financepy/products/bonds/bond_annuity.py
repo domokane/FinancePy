@@ -13,7 +13,6 @@ from ...utils.error import FinError
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 
-
 ########################################################################################
 
 
@@ -68,9 +67,7 @@ class BondAnnuity:
         """Calculate the bond price using some discount curve to present-value
         the bond's cash flows."""
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
         accrued = self.accrued_int * self.par
         clean_price = dirty_price - accrued
         return clean_price
@@ -149,7 +146,7 @@ class BondAnnuity:
 
         dc_counter = DayCount(self.accrual_dc_type)
 
-        (acc_factor, num, _) = dc_counter.year_frac(
+        acc_factor, num, _ = dc_counter.year_frac(
             self._pcd, settle_dt, self._ncd, self.freq
         )
 
@@ -182,7 +179,7 @@ class BondAnnuity:
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.acrual_dc_type)
+        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS_DAY_RULE", self.bd_type)
         s += label_to_string("DATE_GEN_RULE", self.dg_type)

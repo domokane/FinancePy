@@ -1,5 +1,9 @@
 ## CHANGE LOG
 
+17 May 2026
+- Correct all notebooks except FXBarrierOption which needs to be fixed
+- Added methods for continuously compounded zero rates to discount curve
+
 16 May 2026
 - Rewrote Interpolator class to be easier to understand
 - Ensured it passes test cases

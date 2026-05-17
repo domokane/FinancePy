@@ -15,11 +15,10 @@ from ...models.process_simulator import FinProcessSimulator
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 
-
 ########################################################################################
 
 
-class BarrierTypes(Enum):
+class FXBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1
     DOWN_AND_IN_CALL = 2
     UP_AND_OUT_CALL = 3
@@ -40,7 +39,7 @@ class FXBarrierOption(FXOption):
         expiry_dt: Date,
         strike_fx_rate: float,  # 1 unit of foreign in domestic
         currency_pair: str,  # FORDOM
-        opt_type: BarrierTypes,
+        barrier_type: FXBarrierTypes,
         barrier_level: float,
         num_obs_per_year: int,
         notional: float,
@@ -54,9 +53,9 @@ class FXBarrierOption(FXOption):
         self.expiry_dt = expiry_dt
         self.strike_fx_rate = float(strike_fx_rate)
         self.currency_pair = currency_pair
+        self.barrier_type = barrier_type
         self.barrier_level = float(barrier_level)
         self.num_obs_per_year = int(num_obs_per_year)
-        self.opt_type = opt_type
         self.notional = notional
         self.notional_currency = notional_currency
 
@@ -89,13 +88,13 @@ class FXBarrierOption(FXOption):
         h = self.barrier_level
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        ln_s0_k = log(float(s0) / k)
-        sqrt_t = sqrt(t)
+        ln_s0_k = np.log(s0 / k)
+        sqrt_t = np.sqrt(t)
 
         dq = foreign_curve.df_t(t)
         df = domestic_curve.df_t(t)
-        r_d = -log(df) / t
-        rf = -log(dq) / t
+        r_d = -np.log(df) / t
+        rf = -np.log(dq) / t
 
         volatility = model.volatility
         sigma_root_t = volatility * sqrt_t
@@ -108,21 +107,21 @@ class FXBarrierOption(FXOption):
         p = k * df * normcdf(-d2) - s0 * dq * normcdf(-d1)
         #        print("CALL:",c,"PUT:",p)
 
-        if self.opt_type == BarrierTypes.DOWN_AND_OUT_CALL and s0 <= h:
+        if self.barrier_type == FXBarrierTypes.DOWN_AND_OUT_CALL and s0 <= h:
             return 0.0
-        if self.opt_type == BarrierTypes.UP_AND_OUT_CALL and s0 >= h:
+        if self.barrier_type == FXBarrierTypes.UP_AND_OUT_CALL and s0 >= h:
             return 0.0
-        if self.opt_type == BarrierTypes.UP_AND_OUT_PUT and s0 >= h:
+        if self.barrier_type == FXBarrierTypes.UP_AND_OUT_PUT and s0 >= h:
             return 0.0
-        if self.opt_type == BarrierTypes.DOWN_AND_OUT_PUT and s0 <= h:
+        if self.barrier_type == FXBarrierTypes.DOWN_AND_OUT_PUT and s0 <= h:
             return 0.0
-        if self.opt_type == BarrierTypes.DOWN_AND_IN_CALL and s0 <= h:
+        if self.barrier_type == FXBarrierTypes.DOWN_AND_IN_CALL and s0 <= h:
             return c
-        if self.opt_type == BarrierTypes.UP_AND_IN_CALL and s0 >= h:
+        if self.barrier_type == FXBarrierTypes.UP_AND_IN_CALL and s0 >= h:
             return c
-        if self.opt_type == BarrierTypes.UP_AND_IN_PUT and s0 >= h:
+        if self.barrier_type == FXBarrierTypes.UP_AND_IN_PUT and s0 >= h:
             return p
-        if self.opt_type == BarrierTypes.DOWN_AND_IN_PUT and s0 <= h:
+        if self.barrier_type == FXBarrierTypes.DOWN_AND_IN_PUT and s0 <= h:
             return p
 
         num_observations = t * self.num_obs_per_year
@@ -130,24 +129,24 @@ class FXBarrierOption(FXOption):
         # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
         # Adjusts the barrier for discrete and not continuous observations
         h_adj = h
-        if self.opt_type == BarrierTypes.DOWN_AND_OUT_CALL:
+        if self.barrier_type == FXBarrierTypes.DOWN_AND_OUT_CALL:
             h_adj = h * exp(-0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.DOWN_AND_IN_CALL:
+        elif self.barrier_type == FXBarrierTypes.DOWN_AND_IN_CALL:
             h_adj = h * exp(-0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.UP_AND_IN_CALL:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_IN_CALL:
             h_adj = h * exp(0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.UP_AND_OUT_CALL:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_OUT_CALL:
             h_adj = h * exp(0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.UP_AND_IN_PUT:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_IN_PUT:
             h_adj = h * exp(0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.UP_AND_OUT_PUT:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_OUT_PUT:
             h_adj = h * exp(0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.DOWN_AND_OUT_PUT:
+        elif self.barrier_type == FXBarrierTypes.DOWN_AND_OUT_PUT:
             h_adj = h * exp(-0.5826 * volatility * sqrt(t / num_observations))
-        elif self.opt_type == BarrierTypes.DOWN_AND_IN_PUT:
+        elif self.barrier_type == FXBarrierTypes.DOWN_AND_IN_PUT:
             h_adj = h * exp(-0.5826 * volatility * sqrt(t / num_observations))
         else:
-            raise FinError("Unknown barrier option type." + str(self.opt_type))
+            raise FinError("Unknown barrier option type." + str(self.barrier_type))
 
         h = h_adj
 
@@ -155,12 +154,12 @@ class FXBarrierOption(FXOption):
             volatility = 1e-5
 
         ll = (mu + v2 / 2.0) / v2
-        y = log(h * h / (s0 * k)) / sigma_root_t + ll * sigma_root_t
-        x1 = log(s0 / h) / sigma_root_t + ll * sigma_root_t
-        y1 = log(h / s0) / sigma_root_t + ll * sigma_root_t
+        y = np.log(h * h / (s0 * k)) / sigma_root_t + ll * sigma_root_t
+        x1 = np.log(s0 / h) / sigma_root_t + ll * sigma_root_t
+        y1 = np.log(h / s0) / sigma_root_t + ll * sigma_root_t
         h_over_s = h / s0
 
-        if self.opt_type == BarrierTypes.DOWN_AND_OUT_CALL:
+        if self.barrier_type == FXBarrierTypes.DOWN_AND_OUT_CALL:
             if h >= k:
                 c_do = (
                     s0 * dq * normcdf(x1)
@@ -177,7 +176,7 @@ class FXBarrierOption(FXOption):
                     h_over_s, 2.0 * ll - 2.0
                 ) * normcdf(y - sigma_root_t)
                 price = c - c_di
-        elif self.opt_type == BarrierTypes.DOWN_AND_IN_CALL:
+        elif self.barrier_type == FXBarrierTypes.DOWN_AND_IN_CALL:
             if h <= k:
                 c_di = s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(y) - k * df * pow(
                     h_over_s, 2.0 * ll - 2.0
@@ -194,7 +193,7 @@ class FXBarrierOption(FXOption):
                     * normcdf(y1 - sigma_root_t)
                 )
                 price = c - c_do
-        elif self.opt_type == BarrierTypes.UP_AND_IN_CALL:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_IN_CALL:
             if h >= k:
                 c_ui = (
                     s0 * dq * normcdf(x1)
@@ -208,7 +207,7 @@ class FXBarrierOption(FXOption):
                 price = c_ui
             else:
                 price = c
-        elif self.opt_type == BarrierTypes.UP_AND_OUT_CALL:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_OUT_CALL:
             if h > k:
                 c_ui = (
                     s0 * dq * normcdf(x1)
@@ -222,7 +221,7 @@ class FXBarrierOption(FXOption):
                 price = c - c_ui
             else:
                 price = 0.0
-        elif self.opt_type == BarrierTypes.UP_AND_IN_PUT:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_IN_PUT:
             if h > k:
                 p_ui = -s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                     h_over_s, 2.0 * ll - 2.0
@@ -239,7 +238,7 @@ class FXBarrierOption(FXOption):
                     * normcdf(-y1 + sigma_root_t)
                 )
                 price = p - p_uo
-        elif self.opt_type == BarrierTypes.UP_AND_OUT_PUT:
+        elif self.barrier_type == FXBarrierTypes.UP_AND_OUT_PUT:
             if h >= k:
                 p_ui = -s0 * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                     h_over_s, 2.0 * ll - 2.0
@@ -256,7 +255,7 @@ class FXBarrierOption(FXOption):
                     * normcdf(-y1 + sigma_root_t)
                 )
                 price = p_uo
-        elif self.opt_type == BarrierTypes.DOWN_AND_OUT_PUT:
+        elif self.barrier_type == FXBarrierTypes.DOWN_AND_OUT_PUT:
             if h >= k:
                 price = 0.0
             else:
@@ -270,7 +269,7 @@ class FXBarrierOption(FXOption):
                     * (normcdf(y - sigma_root_t) - normcdf(y1 - sigma_root_t))
                 )
                 price = p - p_di
-        elif self.opt_type == BarrierTypes.DOWN_AND_IN_PUT:
+        elif self.barrier_type == FXBarrierTypes.DOWN_AND_IN_PUT:
             if h >= k:
                 price = p
             else:
@@ -285,7 +284,7 @@ class FXBarrierOption(FXOption):
                 )
                 price = p_di
         else:
-            raise FinError("Unknown barrier option type." + str(self.opt_type))
+            raise FinError("Unknown barrier option type." + str(self.barrier_type))
 
         return price
 
@@ -309,21 +308,20 @@ class FXBarrierOption(FXOption):
         k = self.strike_fx_rate
         b = self.barrier_level
         s0 = spot_fx_rate
-        opt_type = self.opt_type
-
+        barrier_type = self.barrier_type
         process = FinProcessSimulator()
 
         r_d = dom_interest_rate
 
         #######################################################################
 
-        if opt_type == BarrierTypes.DOWN_AND_OUT_CALL and s0 <= b:
+        if barrier_type == FXBarrierTypes.DOWN_AND_OUT_CALL and s0 <= b:
             return 0.0
-        elif opt_type == BarrierTypes.UP_AND_OUT_CALL and s0 >= b:
+        elif barrier_type == FXBarrierTypes.UP_AND_OUT_CALL and s0 >= b:
             return 0.0
-        elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT and s0 <= b:
+        elif barrier_type == FXBarrierTypes.DOWN_AND_OUT_PUT and s0 <= b:
             return 0.0
-        elif opt_type == BarrierTypes.UP_AND_OUT_PUT and s0 >= b:
+        elif barrier_type == FXBarrierTypes.UP_AND_OUT_PUT and s0 >= b:
             return 0.0
 
         #######################################################################
@@ -331,13 +329,13 @@ class FXBarrierOption(FXOption):
         simple_call = False
         simple_put = False
 
-        if opt_type == BarrierTypes.DOWN_AND_IN_CALL and s0 <= b:
+        if barrier_type == FXBarrierTypes.DOWN_AND_IN_CALL and s0 <= b:
             simple_call = True
-        elif opt_type == BarrierTypes.UP_AND_IN_CALL and s0 >= b:
+        elif barrier_type == FXBarrierTypes.UP_AND_IN_CALL and s0 >= b:
             simple_call = True
-        elif opt_type == BarrierTypes.UP_AND_IN_PUT and s0 >= b:
+        elif barrier_type == FXBarrierTypes.UP_AND_IN_PUT and s0 >= b:
             simple_put = True
-        elif opt_type == BarrierTypes.DOWN_AND_IN_PUT and s0 <= b:
+        elif barrier_type == FXBarrierTypes.DOWN_AND_IN_PUT and s0 <= b:
             simple_put = True
 
         if simple_put or simple_call:
@@ -362,13 +360,13 @@ class FXBarrierOption(FXOption):
             process_type, t, model_params, num_time_steps, num_paths, seed
         )
 
-        (num_paths, num_time_steps) = s_all.shape
+        num_paths, num_time_steps = s_all.shape
 
-        if opt_type in (
-            BarrierTypes.DOWN_AND_IN_CALL,
-            BarrierTypes.DOWN_AND_OUT_CALL,
-            BarrierTypes.DOWN_AND_IN_PUT,
-            BarrierTypes.DOWN_AND_OUT_PUT,
+        if barrier_type in (
+            FXBarrierTypes.DOWN_AND_IN_CALL,
+            FXBarrierTypes.DOWN_AND_OUT_CALL,
+            FXBarrierTypes.DOWN_AND_IN_PUT,
+            FXBarrierTypes.DOWN_AND_OUT_PUT,
         ):
 
             barrier_crossed_from_above = [False] * num_paths
@@ -376,11 +374,11 @@ class FXBarrierOption(FXOption):
             for p in nb.prange(num_paths):
                 barrier_crossed_from_above[p] = np.any(s_all[p] <= b)
 
-        if opt_type in (
-            BarrierTypes.UP_AND_IN_CALL,
-            BarrierTypes.UP_AND_OUT_CALL,
-            BarrierTypes.UP_AND_IN_PUT,
-            BarrierTypes.UP_AND_OUT_PUT,
+        if barrier_type in (
+            FXBarrierTypes.UP_AND_IN_CALL,
+            FXBarrierTypes.UP_AND_OUT_CALL,
+            FXBarrierTypes.UP_AND_IN_PUT,
+            FXBarrierTypes.UP_AND_OUT_PUT,
         ):
 
             barrier_crossed_from_below = [False] * num_paths
@@ -390,32 +388,32 @@ class FXBarrierOption(FXOption):
         payoff = np.zeros(num_paths)
         ones = np.ones(num_paths)
 
-        if opt_type == BarrierTypes.DOWN_AND_OUT_CALL:
+        if barrier_type == FXBarrierTypes.DOWN_AND_OUT_CALL:
             payoff = np.maximum(s_all[:, -1] - k, 0.0) * (
                 ones - barrier_crossed_from_above
             )
-        elif opt_type == BarrierTypes.DOWN_AND_IN_CALL:
+        elif barrier_type == FXBarrierTypes.DOWN_AND_IN_CALL:
             payoff = np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_above
-        elif opt_type == BarrierTypes.UP_AND_IN_CALL:
+        elif barrier_type == FXBarrierTypes.UP_AND_IN_CALL:
             payoff = np.maximum(s_all[:, -1] - k, 0.0) * barrier_crossed_from_below
-        elif opt_type == BarrierTypes.UP_AND_OUT_CALL:
+        elif barrier_type == FXBarrierTypes.UP_AND_OUT_CALL:
             payoff = np.maximum(s_all[:, -1] - k, 0.0) * (
                 ones - barrier_crossed_from_below
             )
-        elif opt_type == BarrierTypes.UP_AND_IN_PUT:
+        elif barrier_type == FXBarrierTypes.UP_AND_IN_PUT:
             payoff = np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_below
-        elif opt_type == BarrierTypes.UP_AND_OUT_PUT:
+        elif barrier_type == FXBarrierTypes.UP_AND_OUT_PUT:
             payoff = np.maximum(k - s_all[:, -1], 0.0) * (
                 ones - barrier_crossed_from_below
             )
-        elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT:
+        elif barrier_type == FXBarrierTypes.DOWN_AND_OUT_PUT:
             payoff = np.maximum(k - s_all[:, -1], 0.0) * (
                 ones - barrier_crossed_from_above
             )
-        elif opt_type == BarrierTypes.DOWN_AND_IN_PUT:
+        elif barrier_type == FXBarrierTypes.DOWN_AND_IN_PUT:
             payoff = np.maximum(k - s_all[:, -1], 0.0) * barrier_crossed_from_above
         else:
-            raise FinError("Unknown barrier option type." + str(self.opt_type))
+            raise FinError("Unknown barrier option type." + str(self.barrier_type))
 
         v = payoff.mean() * exp(-r_d * t)
 
@@ -428,7 +426,7 @@ class FXBarrierOption(FXOption):
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("BARRIER TYPE", self.barrier_type)
         s += label_to_string("BARRIER LEVEL", self.barrier_level)
         s += label_to_string("NUM OBSERVATIONS", self.num_obs_per_year)
         s += label_to_string("NOTIONAL", self.notional)

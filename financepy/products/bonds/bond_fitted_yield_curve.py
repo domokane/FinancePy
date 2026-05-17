@@ -121,20 +121,15 @@ class BondFittedYieldCurve:
 
     ###########################################################################
 
-    def interp_rate(self, maturity_dt: Date):
-        """Interpolate rate - which can be a zero rate or yield depending on
-        context of use"""
+    def interp_yield(self, maturity_dt: Date):
+        """Interpolate yield"""
         if isinstance(maturity_dt, Date):
-            t = times_from_dates(
-                maturity_dt, self.settle_dt, self.time_dc_type
-            )
+            t = times_from_dates(maturity_dt, self.settle_dt, self.time_dc_type)
         elif isinstance(maturity_dt, list):
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):
             t = maturity_dt
-        elif isinstance(maturity_dt, float) or isinstance(
-            maturity_dt, np.float64
-        ):
+        elif isinstance(maturity_dt, float) or isinstance(maturity_dt, np.float64):
             t = maturity_dt
         else:
             raise FinError("Unknown date type.")
@@ -145,9 +140,7 @@ class BondFittedYieldCurve:
         if isinstance(fit, CurveFitPolynomial):
             yld = fit.interp_rate(t)
         elif isinstance(fit, CurveFitNelsonSiegel):
-            yld = fit.interp_rate(
-                t, fit.beta_1, fit.beta_2, fit.beta_3, fit.tau
-            )
+            yld = fit.interp_rate(t, fit.beta_1, fit.beta_2, fit.beta_3, fit.tau)
 
         elif isinstance(fit, CurveFitNelsonSiegelSvensson):
             yld = fit.interp_rate(

@@ -153,9 +153,7 @@ class IborCapFloor:
         end_dt = self.caplet_floorlet_dates[1]
 
         if self.last_fixing is None:
-            fwd_rate = libor_curve.fwd_rate(
-                start_dt, end_dt, self.accrual_dc_type
-            )
+            fwd_rate = libor_curve.fwd_rate(start_dt, end_dt, self.accrual_dc_type)
         else:
             fwd_rate = self.last_fixing
 
@@ -163,13 +161,9 @@ class IborCapFloor:
         df = libor_curve.df(end_dt)
 
         if self.opt_type == CapFloorTypes.CAP:
-            caplet_floorlet_value = (
-                df * alpha * max(fwd_rate - strike_rate, 0.0)
-            )
+            caplet_floorlet_value = df * alpha * max(fwd_rate - strike_rate, 0.0)
         elif self.opt_type == CapFloorTypes.FLOOR:
-            caplet_floorlet_value = (
-                df * alpha * max(strike_rate - fwd_rate, 0.0)
-            )
+            caplet_floorlet_value = df * alpha * max(strike_rate - fwd_rate, 0.0)
 
         caplet_floorlet_value *= self.notional
         cap_floor_value += caplet_floorlet_value
@@ -188,9 +182,7 @@ class IborCapFloor:
             alpha = dc_counter.year_frac(start_dt, end_dt)[0]
 
             df = libor_curve.df(end_dt)
-            fwd_rate = libor_curve.fwd_rate(
-                start_dt, end_dt, self.accrual_dc_type
-            )
+            fwd_rate = libor_curve.fwd_rate(start_dt, end_dt, self.accrual_dc_type)
 
             if self.opt_type == CapFloorTypes.CAP:
                 intrinsic_value = df * alpha * max(fwd_rate - strike_rate, 0.0)
@@ -225,9 +217,7 @@ class IborCapFloor:
         dc_counter = DayCount(self.accrual_dc_type)
         alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
 
-        fwd = libor_curve.fwd_rate(
-            caplet_start_dt, caplet_end_dt, self.accrual_dc_type
-        )
+        fwd = libor_curve.fwd_rate(caplet_start_dt, caplet_end_dt, self.accrual_dc_type)
 
         k = self.strike_rate
         df = libor_curve.df(caplet_end_dt)
@@ -331,7 +321,6 @@ class IborCapFloor:
         print("STRIKE (%):", self.strike_rate * 100)
         print("FREQUENCY:", str(self.freq_type))
         print("ACCRUAL DAY COUNT TYPE:", str(self.accrual_dc_type))
-        print("VALUATION DATE", self.value_dt)
 
         if len(self.caplet_floorlet_values) == 0:
             print("Caplets not calculated.")
@@ -387,9 +376,7 @@ class IborCapFloor:
         s += label_to_string("STRIKE COUPON", self.strike_rate * 100)
         s += label_to_string("OPTION TYPE", str(self.opt_type))
         s += label_to_string("FREQUENCY", str(self.freq_type))
-        s += label_to_string(
-            "ACCRUAL DAY COUNT", str(self.accrual_dc_type), ""
-        )
+        s += label_to_string("ACCRUAL DAY COUNT", str(self.accrual_dc_type), "")
         return s
 
     ###########################################################################
