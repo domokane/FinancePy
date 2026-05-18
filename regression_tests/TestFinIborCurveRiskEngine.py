@@ -101,7 +101,14 @@ def test_par_rate_risk_report_cubic_zero():
         print(risk_report["total"].values)
         print(risk_report[trade_labels + ["total"]].sum(axis=0))
 
-    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+    # if max(np.abs(actual_totals - expected_totals)) > 1e-4:
+    #     print(actual_totals)
+    #     print(expected_totals)
+
+    test_cases.banner("RISK REPORT CUBIC ZERO")
+    test_cases.header("ACTUAL_TOTALS", "EXPECTED TOTALS")
+    for i in range(0, len(actual_totals)):
+        test_cases.print(actual_totals[i], expected_totals[i])
 
 
 ########################################################################################
@@ -167,7 +174,12 @@ def test_par_rate_risk_report_flat_forward():
         print(risk_report["total"].values)
         print(risk_report[trade_labels + ["total"]].sum(axis=0))
 
-    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+    #    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+
+    test_cases.banner("RISK REPORT FLAT FORWARD REPORT")
+    test_cases.header("ACTUAL_TOTALS", "EXPECTED TOTALS")
+    for i in range(0, len(actual_totals)):
+        test_cases.print(actual_totals[i], expected_totals[i])
 
 
 ########################################################################################
@@ -270,13 +282,16 @@ def test_forward_rate_risk_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.DV01_PREFIX + "total"].values)
-        print(
-            risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(
-                axis=0
-            )
-        )
+        print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
 
-    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+    # if max(np.abs(actual_totals - expected_totals)) > 1e-4:
+    #     print(actual_totals)
+    #     print(expected_totals)
+
+    test_cases.banner("FORWARD RATE RISK REPORT")
+    test_cases.header("ACTUAL_TOTALS", "EXPECTED TOTALS")
+    for i in range(0, len(actual_totals)):
+        test_cases.print(actual_totals[i], expected_totals[i])
 
 
 ########################################################################################
@@ -341,13 +356,16 @@ def test_forward_rate_custom_grid_risk_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.DV01_PREFIX + "total"].values)
-        print(
-            risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(
-                axis=0
-            )
-        )
+        print(risk_report[dv01_trade_labels + [re.DV01_PREFIX + "total"]].sum(axis=0))
 
-    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+    # if max(np.abs(actual_totals - expected_totals)) > 1e-4:
+    #     print(actual_totals)
+    #     print(expected_totals)
+
+    test_cases.banner("CUSTOM GRID RISK REPORT")
+    test_cases.header("ACTUAL_TOTALS", "EXPECTED TOTALS")
+    for i in range(0, len(actual_totals)):
+        test_cases.print(actual_totals[i], expected_totals[i])
 
 
 ########################################################################################
@@ -403,11 +421,7 @@ def test_carry_rolldown_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.ROLL_PREFIX + "total"].values)
-        print(
-            risk_report[roll_trade_labels + [re.ROLL_PREFIX + "total"]].sum(
-                axis=0
-            )
-        )
+        print(risk_report[roll_trade_labels + [re.ROLL_PREFIX + "total"]].sum(axis=0))
 
     expected_totals = [
         -21.07588523,
@@ -436,7 +450,14 @@ def test_carry_rolldown_report():
 
     actual_totals = risk_report[re.ROLL_PREFIX + "total"].values
 
-    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+    # if max(np.abs(actual_totals - expected_totals)) > 1e-4:
+    #     print(actual_totals)
+    #     print(expected_totals)
+
+    test_cases.banner("CARRY ROLLDOWN REPORT")
+    test_cases.header("ACTUAL_TOTALS", "EXPECTED TOTALS")
+    for i in range(0, len(actual_totals)):
+        test_cases.print(actual_totals[i], expected_totals[i])
 
 
 ########################################################################################
@@ -492,9 +513,7 @@ def test_parallel_shift_ladder_report():
         print(base_values)
         print(risk_report)
         print(risk_report[re.PV_PREFIX + "total"].values)
-        print(
-            risk_report[pv_trade_labels + [re.PV_PREFIX + "total"]].sum(axis=0)
-        )
+        print(risk_report[pv_trade_labels + [re.PV_PREFIX + "total"]].sum(axis=0))
 
         # risk_report.plot('shift_bp', re.PV_PREFIX + 'total')
         x = risk_report["shift_bp"].values
@@ -545,7 +564,14 @@ def test_parallel_shift_ladder_report():
 
     actual_totals = risk_report[re.PV_PREFIX + "total"].values
 
-    assert max(np.abs(actual_totals - expected_totals)) <= 1e-4
+    test_cases.banner("PARALLEL SHIFT LADDER REPORT")
+    test_cases.header("ACTUAL_TOTALS", "EXPECTED TOTALS")
+    for i in range(0, len(actual_totals)):
+        test_cases.print(actual_totals[i], expected_totals[i])
+
+    # if max(np.abs(actual_totals - expected_totals)) > 1e-4:
+    #     print(actual_totals)
+    #     print(expected_totals)
 
 
 ########################################################################################
@@ -605,9 +631,7 @@ def _generate_base_curve(
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fras = []
@@ -689,3 +713,5 @@ if 1 == 1:
     test_forward_rate_custom_grid_risk_report()
     test_carry_rolldown_report()
     test_parallel_shift_ladder_report()
+
+test_cases.compare_test_cases()

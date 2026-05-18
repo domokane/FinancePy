@@ -20,7 +20,6 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
-
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 ########################################################################################
@@ -363,7 +362,7 @@ def test_dp_example():
     ]
 
     dfs = [
-        0.9999843,
+        0.9999999,
         0.9966889,
         0.9942107,
         0.9911884,
@@ -378,9 +377,7 @@ def test_dp_example():
 
     value_dt = start_dt
 
-    curve = DiscountCurve(
-        value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES
-    )
+    curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
 
     v = swap.value(value_dt, curve, curve)
 

@@ -11,7 +11,6 @@ from .frequency import annual_frequency, FrequencyTypes
 from .helpers import label_to_string
 from .helpers import check_argument_types
 
-
 ########################################################################################
 # TODO: Start and end date to allow for long stubs
 ########################################################################################
@@ -212,8 +211,7 @@ class Schedule:
         # We change it if the adjust_termination_dt flag is True.
         if self.adjust_termination_dt is True:
 
-            self.termination_dt = calendar.adjust(
-                self.termination_dt, self.bd_type)
+            self.termination_dt = calendar.adjust(self.termination_dt, self.bd_type)
 
             self.adjusted_dts[-1] = self.termination_dt
 
@@ -224,7 +222,7 @@ class Schedule:
         #######################################################################
 
         if len(self.adjusted_dts) < 2:
-            raise FinError("Schedule has two dates only.")
+            raise FinError("Schedule has fewer than two dates.")
 
         deduped = [self.adjusted_dts[0]]
         for dt in self.adjusted_dts[1:]:
@@ -262,8 +260,7 @@ class Schedule:
 
             if len(self.adjusted_dts) > 1:
                 s += "\n"
-                s += label_to_string("FLW",
-                                     self.adjusted_dts[1:], "", list_format=True)
+                s += label_to_string("FLW", self.adjusted_dts[1:], "", list_format=True)
 
         return s
 

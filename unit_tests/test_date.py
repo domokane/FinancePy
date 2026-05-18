@@ -408,3 +408,56 @@ def test_list_of_date():
     # Test finding date difference
     assert (Date(1, 1, 2019) - dates) == [Date(1, 1, 2019) - d for d in dates]
     assert (dates - Date(1, 1, 2019)) == [Date(1, 1, 2019) - d for d in dates]
+
+
+import pytest
+
+from financepy.utils.date import Date
+from financepy.utils.error import FinError
+
+
+@pytest.mark.parametrize(
+    "d,m,y",
+    [
+        (31, 2, 2023),
+        (29, 2, 2023),
+        (32, 1, 2023),
+        (0, 1, 2023),
+        (1, 0, 2023),
+        (1, 13, 2023),
+        (31, 4, 2023),
+        (31, 6, 2023),
+        (31, 9, 2023),
+        (31, 11, 2023),
+        (1, 1, 1899),
+        (1, 1, 2201),
+    ],
+)
+def test_invalid_dates_raise_finerror(d, m, y):
+    with pytest.raises(FinError):
+        Date(d, m, y)
+
+
+@pytest.mark.parametrize(
+    "d,m,y",
+    [
+        (1, 1, 1900),
+        (28, 2, 2023),
+        (29, 2, 2024),
+        (31, 1, 2023),
+        (30, 4, 2023),
+        (31, 12, 2200),
+    ],
+)
+def test_valid_dates_construct_successfully(d, m, y):
+    dt = Date(d, m, y)
+    assert dt.d == d
+    assert dt.m == m
+    assert dt.y == y
+
+
+def test_leap_day_only_valid_in_leap_year():
+    assert Date(29, 2, 2024).d == 29
+
+    with pytest.raises(FinError):
+        Date(29, 2, 2023)

@@ -55,9 +55,7 @@ class DiscountCurveFlat(DiscountCurve):
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 10.0, 11)
         self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates(
-            self._df_dates, self.value_dt, self.time_dc_type
-        )
+        self._times = times_from_dates(self._df_dates, self.value_dt, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################

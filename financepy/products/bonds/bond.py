@@ -493,6 +493,7 @@ class Bond:
                 n_start = n_next + 1
                 g = g / d
 
+            last_g = 0.0
             # n represents 'periods from today'
             for dt in self.cpn_dts[n_start:]:
                 dp += flow * g

@@ -159,19 +159,27 @@ class Date:
     def __init__(self, d, m, y, hh=0, mm=0, ss=0):
         # validation checks (as you already had)
         if 1900 <= d <= 2100 and 1 <= y <= 31:
-            raise FinError(
-                "Date arguments must be in order Date(day, month, year)"
-            )
-        if y < 1900:
-            raise FinError("Year cannot be before 1900")
-        ...
+            raise FinError("Date arguments must be in order Date(day, month, year)")
+
+        if not 1 <= m <= 12:
+            raise FinError("Month must be in 1..12")
+
+        if is_leap_year(y):
+            max_day = month_days_leap_year[m - 1]
+        else:
+            max_day = month_days_not_leap_year[m - 1]
+
+        if not 1 <= d <= max_day:
+            raise FinError("Invalid day for month/year")
+
+        if not START_YEAR <= y <= END_YEAR:
+            raise FinError("Year outside supported range")
+
         # set fields
         self.y, self.m, self.d = y, m, d
         self.hh, self.mm, self.ss = hh, mm, ss
         self._refresh()
-        day_fraction = (
-            (hh / 24.0) + (mm / (24.0 * 60.0)) + (ss / (24.0 * 3600.0))
-        )
+        day_fraction = (hh / 24.0) + (mm / (24.0 * 60.0)) + (ss / (24.0 * 3600.0))
         self.excel_dt += day_fraction
 
     ###########################################################################
@@ -244,13 +252,15 @@ class Date:
             return cls(d, m, y)
 
         if isinstance(date, np.datetime64):
-            time_stamp = (
-                date - np.datetime64("1970-01-01T00:00:00")
-            ) / np.timedelta64(1, "s")
+            time_stamp = (date - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
+                1, "s"
+            )
 
             date = datetime.datetime.utcfromtimestamp(time_stamp)
             d, m, y = date.day, date.month, date.year
             return cls(d, m, y)
+        else:
+            raise FinError("Expected datetime.date or np.datetime64")
 
     ####################################################################################
 
@@ -687,9 +697,7 @@ class Date:
                 new_dt = self.add_months(int(tenor_obj.num_periods) * 12)
 
             else:
-                raise FinError(
-                    "Unsupported tenor unit: " + str(tenor_obj.units)
-                )
+                raise FinError("Unsupported tenor unit: " + str(tenor_obj.units))
 
             new_dts.append(new_dt)
 

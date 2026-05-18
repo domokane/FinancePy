@@ -61,6 +61,9 @@ class DiscountCurve:
         if len(df_dates) != len(df_values):
             raise FinError("df_dates and df_values must have the same length.")
 
+        if np.any(~np.isfinite(df_values)) or np.any(df_values <= 0.0):
+            raise FinError("Discount factors must be finite and positive")
+
         # The internal representation of times and dfs is hidden but
         # access is controlled using getters and setters
         self._times = [0.0]
@@ -71,6 +74,8 @@ class DiscountCurve:
         start_index = 0
 
         if num_points > 0 and df_dates[0] == value_dt:
+            if np.abs(df_values[0] - 1.0) > 1e-6:
+                raise FinError("Value date discount factor should equal 1.0")
             self._dfs[0] = df_values[0]
             start_index = 1
 
@@ -107,12 +112,20 @@ class DiscountCurve:
 
     def set_dfs(self, dfs: np.ndarray):
         """Set the discount factor at the last maturity time."""
+
+        if np.any(~np.isfinite(dfs)) or np.any(dfs <= 0.0):
+            raise FinError("Discount factors must be finite and positive")
+
         self._dfs = np.asarray(dfs, dtype=float)
 
     ####################################################################################
 
     def set_last_df(self, df):
         """Set the discount factor at the last maturity time."""
+
+        if np.any(~np.isfinite(df)) or np.any(df <= 0.0):
+            raise FinError("Discount factor must be finite and positive")
+
         n_points = len(self._dfs)
         self._dfs[n_points - 1] = df
 
@@ -270,7 +283,6 @@ class DiscountCurve:
 
     def fwd_rate_inst(self, dts: Union[Date, list], dt: float = 1.0e-6):
         """Instantaneous continuously compounded forward rate at date(s)."""
-
         times = times_from_dates(dts, self.value_dt, self.time_dc_type)
         return self.fwd_rate_inst_t(times, dt)
 

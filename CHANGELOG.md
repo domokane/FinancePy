@@ -1,5 +1,9 @@
 ## CHANGE LOG
 
+18 May 2026
+- Imposed bounds checks on discount factors
+- Fixed FXForward value calculations
+
 17 May 2026
 - Correct all notebooks except FXBarrierOption which needs to be fixed
 - Added methods for continuously compounded zero rates to discount curve
@@ -16,7 +20,7 @@
 - Removed alternative calculations of zero, par, swap and forward rates so all such calls use DiscountCurve methods
 - Added discount curve level property to determine day count rule for converting dates to times
 - Set default value of time_dc_type to ACT_365F - which means we divide by 365
-- Fixed bug in swap_float_leg so we use specifed accrual basis and not index curve basis
+- Fixed bug in swap_float_leg so we use specified accrual basis and not index curve basis
 - Set all references to call directly discountCurve._dfs and ._times to avoid copying using accessor methods
 - Did same for credit curves to access ._qs survival probabilities
 - Added compounding enum to handle rates and separate it from frequency

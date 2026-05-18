@@ -16,7 +16,6 @@ from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.error import FinError
 
-
 ########################################################################################
 
 
@@ -117,11 +116,11 @@ class CDSOption:
         forward_spread = cds.par_spread(value_dt, issuer_curve)
         forward_rpv01 = cds.risky_pv01(value_dt, issuer_curve)["dirty_rpv01"]
 
-        time_to_expiry = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         log_moneyness = log(forward_spread / strike)
 
-        half_vol_squared_t = 0.5 * volatility * volatility * time_to_expiry
-        vol_sqrt_t = volatility * sqrt(time_to_expiry)
+        half_vol_squared_t = 0.5 * volatility * volatility * t_exp
+        vol_sqrt_t = volatility * sqrt(t_exp)
 
         d1 = (log_moneyness + half_vol_squared_t) / vol_sqrt_t
         d2 = (log_moneyness - half_vol_squared_t) / vol_sqrt_t
@@ -129,9 +128,7 @@ class CDSOption:
         if self.long_protection:
             option_value = forward_spread * normcdf(d1) - strike * normcdf(d2)
         else:
-            option_value = strike * normcdf(-d2) - forward_spread * normcdf(
-                -d1
-            )
+            option_value = strike * normcdf(-d2) - forward_spread * normcdf(-d1)
 
         option_value = option_value * forward_rpv01
 
@@ -139,8 +136,8 @@ class CDSOption:
         # need to include the cost of protection which is provided between
         # the value date and the expiry date
         if self.knockout_flag is False and self.long_protection is True:
-            df = issuer_curve.getDF(time_to_expiry)
-            q = issuer_curve.getSurvProb(time_to_expiry)
+            df = issuer_curve.getDF(t_exp)
+            q = issuer_curve.getSurvProb(t_exp)
             recovery = issuer_curve.recovery_rate
             front_end_protection = df * (1.0 - q) * (1.0 - recovery)
             option_value += front_end_protection
@@ -153,9 +150,7 @@ class CDSOption:
     def implied_volatility(self, value_dt, issuer_curve, option_value):
         """Calculate the implied CDS option volatility from a price."""
         arg_tuple = (self, value_dt, issuer_curve, option_value)
-        sigma = optimize.newton(
-            fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50
-        )
+        sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50)
         return sigma
 
 

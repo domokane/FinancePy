@@ -19,7 +19,7 @@ def test_black():
     forward = 0.034
     strike = 0.050
     risk_free_ir = 0.00
-    time_to_expiry = 2.0
+    t_exp = 2.0
     volatility = 0.20
 
     test_cases.header("ITEM", "CALL", "PUT")
@@ -27,15 +27,15 @@ def test_black():
     call_option_type = OptionTypes.EUROPEAN_CALL
     put_option_type = OptionTypes.EUROPEAN_PUT
 
-    df = np.exp(-risk_free_ir * time_to_expiry)
+    df = np.exp(-risk_free_ir * t_exp)
     model = Black(volatility)
 
     dp = 12  # Precision
 
     try:
 
-        value_call = model.value(forward, strike, time_to_expiry, df, call_option_type)
-        value_put = model.value(forward, strike, time_to_expiry, df, put_option_type)
+        value_call = model.value(forward, strike, t_exp, df, call_option_type)
+        value_put = model.value(forward, strike, t_exp, df, put_option_type)
 
         assert round((value_call - value_put), dp) == round(
             df * (forward - strike), dp
@@ -43,8 +43,8 @@ def test_black():
 
         test_cases.print("VALUE", value_call, value_put)
 
-        delta_call = model.delta(forward, strike, time_to_expiry, df, call_option_type)
-        delta_put = model.delta(forward, strike, time_to_expiry, df, put_option_type)
+        delta_call = model.delta(forward, strike, t_exp, df, call_option_type)
+        delta_put = model.delta(forward, strike, t_exp, df, put_option_type)
 
         assert (
             round((1 / df) * (delta_call - delta_put), dp) == 1.0
@@ -52,8 +52,8 @@ def test_black():
 
         test_cases.print("DELTA", delta_call, delta_put)
 
-        gamma_call = model.gamma(forward, strike, time_to_expiry, df, call_option_type)
-        gamma_put = model.gamma(forward, strike, time_to_expiry, df, put_option_type)
+        gamma_call = model.gamma(forward, strike, t_exp, df, call_option_type)
+        gamma_put = model.gamma(forward, strike, t_exp, df, put_option_type)
 
         assert (
             round(gamma_call - gamma_put, dp) == 0.0
@@ -61,17 +61,17 @@ def test_black():
 
         test_cases.print("GAMMA", gamma_call, gamma_put)
 
-        theta_call = model.theta(forward, strike, time_to_expiry, df, call_option_type)
-        theta_put = model.theta(forward, strike, time_to_expiry, df, put_option_type)
+        theta_call = model.theta(forward, strike, t_exp, df, call_option_type)
+        theta_put = model.theta(forward, strike, t_exp, df, put_option_type)
 
         assert round((theta_call - theta_put), dp) == round(
-            (risk_free_ir * time_to_expiry) * (forward - strike) * df, dp
+            (risk_free_ir * t_exp) * (forward - strike) * df, dp
         ), "The method called 'theta()' doesn't comply with Call-Put parity"
 
         test_cases.print("THETA", theta_call, theta_put)
 
-        vega_call = model.vega(forward, strike, time_to_expiry, df, call_option_type)
-        vega_put = model.vega(forward, strike, time_to_expiry, df, put_option_type)
+        vega_call = model.vega(forward, strike, t_exp, df, call_option_type)
+        vega_put = model.vega(forward, strike, t_exp, df, put_option_type)
 
         assert (
             round(vega_call - vega_put, dp) == 0.0

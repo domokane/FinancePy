@@ -63,8 +63,8 @@ class FXForward:
         self.spot_days = spot_days
         self.notional_dom = None
         self.notional_for = None
-        self.cash_dom = None
-        self.cash_for = None
+        self.npv_dom = None
+        self.npv_for = None
 
     ###########################################################################
 
@@ -105,11 +105,9 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        newfwd_fx_rate = self.forward(
+        new_fwd_fx_rate = self.forward(
             value_dt, spot_fx_rate, domestic_curve, foreign_curve
         )
-
-        dom_df = domestic_curve.df_t(t)
 
         if self.notional_currency == self.dom_name:
             self.notional_dom = self.notional
@@ -120,20 +118,21 @@ class FXForward:
         else:
             raise FinError("Invalid notional currency.")
 
-        if self.notional_currency == self.for_name:
-            v = newfwd_fx_rate - self.strike_fx_rate
-            v = v * self.notional * dom_df
-        elif self.notional_currency == self.dom_name:
-            v = newfwd_fx_rate - self.strike_fx_rate
-            v = v * self.notional * dom_df * newfwd_fx_rate
+        dom_df = domestic_curve.df_t(t)
 
-        self.cash_dom = v * self.notional_dom / self.strike_fx_rate
-        self.cash_for = v * self.notional_for / spot_fx_rate
+        # ==============================================================
+        # Standard FX Forward valuation (in domestic currency)
+        # PV = DF_dom * (N_for * F - N_dom)
+        # ==============================================================
+        v = dom_df * (self.notional_for * new_fwd_fx_rate - self.notional_dom)
+
+        # Valuing in domestic and foreign
+        self.npv_dom = v
+        self.npv_for = v / new_fwd_fx_rate
 
         return {
-            "value": v,
-            "cash_dom": self.cash_dom,
-            "cash_for": self.cash_for,
+            "npv_dom": self.npv_dom,
+            "npv_for": self.npv_for,
             "not_dom": self.notional_dom,
             "not_for": self.notional_for,
             "ccy_dom": self.dom_name,

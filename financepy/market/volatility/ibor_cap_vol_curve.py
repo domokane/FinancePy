@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
-from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.day_count import DayCount, DayCountTypes
 
 # TODO: Calibration
@@ -103,24 +103,23 @@ class IborCapVolCurve:
             self._taus.append(tau)
             prev_dt = dt
 
-        fwd_rate_vol = self._cap_sigmas[0]
-        self._caplet_gammas = np.zeros(num_caps)
-        self._caplet_gammas[0] = 0.0
-        cum_ibor2_tau = (fwd_rate_vol**2) * self._taus[0]
-
+        self._caplet_vols = np.zeros(num_caps)
+        self._caplet_vols[0] = 0.0
+        cum_ibor2_tau = 0.0
         sum_tau = 0.0
-        for i in range(1, len(self._cap_maturity_dts)):
-            t = self._times[i]
+
+        for i in range(1, num_caps):
             tau = self._taus[i]
             sum_tau += tau
+
             vol_cap = self._cap_sigmas[i]
             vol_ibor2 = ((vol_cap**2) * sum_tau - cum_ibor2_tau) / tau
 
-            if vol_ibor2 < 0.0:
+            if vol_ibor2 < G_SMALL:
                 raise FinError("Error due to negative caplet variance.")
 
             vol_ibor = np.sqrt(vol_ibor2)
-            self._caplet_gammas[i] = vol_ibor
+            self._caplet_vols[i] = vol_ibor
             cum_ibor2_tau += vol_ibor2 * self._taus[i]
 
     ####################################################################################
@@ -137,23 +136,23 @@ class IborCapVolCurve:
             t = dt
 
         if t <= self._times[1]:
-            return self._caplet_gammas[1]
+            return self._caplet_vols[1]
 
         debug = False
         if debug:
             print(self._times)
-            print(self._caplet_gammas)
+            print(self._caplet_vols)
             print(t)
 
         num_vols = len(self._times)
-        vol = self._caplet_gammas[1]
+        vol = self._caplet_vols[1]
 
         for i in range(1, num_vols):
             if self._times[i] >= t:
-                vol = self._caplet_gammas[i]
+                vol = self._caplet_vols[i]
                 return vol
 
-        return self._caplet_gammas[-1]
+        return self._caplet_vols[-1]
 
     ####################################################################################
 
@@ -173,7 +172,7 @@ class IborCapVolCurve:
         debug = False
         if debug:
             print(self._times)
-            print(self._caplet_gammas)
+            print(self._caplet_vols)
             print(t)
 
         for i in range(1, num_vols):

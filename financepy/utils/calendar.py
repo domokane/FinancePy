@@ -546,41 +546,41 @@ class Calendar:
 
     def add_business_days(self, start_dt: Date, num_days: int):
         """Return the date num_days business days from start_dt.
-    
+
         The start date itself is not counted.
         """
-    
+
         if not isinstance(num_days, int):
             raise FinError("Num days must be an integer")
-    
+
         if num_days == 0:
             return start_dt
-    
+
         if self.cal_type == CalendarTypes.NONE:
             return start_dt.add_days(num_days)
-    
+
         step = 1 if num_days > 0 else -1
         days_left = abs(num_days)
         dt = start_dt
-    
+
         # Safe fast path for weekend-only calendar
         if self.cal_type == CalendarTypes.WEEKEND:
             weeks, days_left = divmod(days_left, 5)
             dt = dt.add_days(step * 7 * weeks)
-    
+
             while days_left > 0:
                 dt = dt.add_days(step)
                 if self.is_business_day(dt):
                     days_left -= 1
-    
+
             return dt
-    
+
         # General calendar path: correct for holidays
         while days_left > 0:
             dt = dt.add_days(step)
             if self.is_business_day(dt):
                 days_left -= 1
-    
+
         return dt
 
     ###########################################################################
@@ -645,8 +645,8 @@ class Calendar:
         weekend date."""
 
         start_dt = Date(1, 1, dt.y)
-        self.day_in_year = dt.excel_dt - start_dt.excel_dt + 1
-        self.weekday = dt.weekday
+        #        self.day_in_year = dt.excel_dt - start_dt.excel_dt + 1
+        #        self.weekday = dt.weekday
 
         if self.cal_type == CalendarTypes.NONE:
             return self.holiday_none(dt)
@@ -1478,7 +1478,7 @@ class Calendar:
     def get_holiday_list(self, year: int):
         """Generate a list of declared calendar holidays in a given year.
 
-        This includes declared holidays that fall on weekends, but does not 
+        This includes declared holidays that fall on weekends, but does not
         include ordinary weekends unless the calendar type is WEEKEND.
         """
 
@@ -1502,8 +1502,7 @@ class Calendar:
         easy to compute, so we rely on a pre-calculated array."""
 
         if year > 2100:
-            raise FinError(
-                "Unable to determine Easter monday in year " + str(year))
+            raise FinError("Unable to determine Easter monday in year " + str(year))
 
         em_days = easter_monday_day[year - 1901]
         start_dt = Date(1, 1, year)

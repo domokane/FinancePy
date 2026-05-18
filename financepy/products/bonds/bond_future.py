@@ -7,7 +7,6 @@ from ...utils.date import Date
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 
-
 # TODO: Examine other exchange conventions.
 # TODO: Delivery option model
 ########################################################################################
@@ -109,7 +108,7 @@ class BondFuture:
         new_bond = Bond(
             issue_dt,
             new_mat,
-            bond.cpn,
+            self.cpn,  # coupon is that of the standard contract bond
             bond.freq_type,
             bond.accrual_dc_type,
             ex_div_days,
@@ -198,9 +197,7 @@ class BondFuture:
         """
         dc = DayCount(DayCountTypes.ACT_ACT_ISDA)
 
-        year_frac, _, _ = dc.year_frac(
-            self.first_delivery_dt, bond.maturity_dt
-        )
+        year_frac, _, _ = dc.year_frac(self.first_delivery_dt, bond.maturity_dt)
 
         years = int(year_frac)
         months = int(12 * (year_frac - years))
@@ -274,13 +271,13 @@ class BondFuture:
             If any price or repo_rate is negative.
         """
 
-        if clean_price < 0 or futures_price < 0 or repo_rate < 0:
-            raise ValueError("Prices and repo rate must be non-negative")
+        if clean_price < 0 or futures_price < 0:
+            raise ValueError(
+                "Prices must be non-negative"
+            )  # repo rates can be negative
 
         fwd_date = self.last_delivery_dt
-        fwd_price = bond.forward_price(
-            settle_dt, fwd_date, clean_price, repo_rate
-        )
+        fwd_price = bond.forward_price(settle_dt, fwd_date, clean_price, repo_rate)
 
         cf = self.conversion_factor(bond)
         net_basis = fwd_price - cf * futures_price
@@ -351,9 +348,9 @@ class BondFuture:
 
         total_invoice_amnt = futures_price * cf + ai_delivery
         num = total_invoice_amnt - full_price + fv_cpns
-        denom = full_price * (
-            days_settle_to_delivery / days_in_year
-        ) - fv_cpns * (avg_coupon_days / days_in_year)
+        denom = full_price * (days_settle_to_delivery / days_in_year) - fv_cpns * (
+            avg_coupon_days / days_in_year
+        )
         irr = num / denom
         return irr
 
@@ -363,7 +360,7 @@ class BondFuture:
         """
         Determine the Cheapest to Deliver (CTD) bond among candidates.
 
-        The CTD is the bond with the highest gross basis
+        The CTD is the bond with the lowest gross basis
         (= clean price - cf × futures price).
 
         Parameters
@@ -382,14 +379,13 @@ class BondFuture:
         """
 
         ctd_bond = None
-        ctd_net = float("-inf")
+        ctd_net = float("inf")
 
         for bond_clean_price, bond in zip(bond_clean_prices, bonds):
 
-            # CHANGE THIS TO NET BASIS ?
             net = self.gross_basis(bond, bond_clean_price, futures_price)
 
-            if net > ctd_net:
+            if net < ctd_net:
                 ctd_bond = bond
                 ctd_net = net
 
