@@ -2,6 +2,28 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+########################################################################################
+# TODO LIST
+########################################################################################
+
+# 1. Add SSVI no-arbitrage constraints
+# 2. Add raw SVI parameter bounds and butterfly constraints
+# 3. Add calendar arbitrage checks across expiries
+# 4. Add short-expiry protection (t_exp > 0)
+# 5. Add bounded strike solving for delta inversion
+# 6. Add SLSQP constrained optimisation support
+# 7. Add weighted calibration (vega / bid-ask / moneyness)
+# 8. Add calibration diagnostics and convergence reporting
+# 9. Add analytic gradients/Jacobians for optimisation
+# 10. Vectorise interpolation and calibration loops
+# 11. Refactor vol function dispatch architecture
+# 12. Add total variance API and interpolation utilities
+# 13. Add local volatility extraction and arbitrage diagnostics
+# 14. Improve plotting, reporting and surface visualisation
+# 15. Add comprehensive unit and stress tests
+
+########################################################################################
+
 from typing import Union, Any, Sequence, Optional, Tuple, List
 import matplotlib.pyplot as plt
 
@@ -182,7 +204,7 @@ def vol_function(
         vol = vol_function_ssvi(params, f, k, t)
         return vol
 
-    return 0.0
+    raise FinError("Unknown volatility function type")
 
 
 ########################################################################################
@@ -260,7 +282,7 @@ def _solver_for_smile_strike(
 
 class EquityVolSurface:
     """Class to perform a calibration of a chosen parametrised surface to the
-    prices of equity options at different strikes and expiry tenors. There is0
+    prices of equity options at different strikes and expiry tenors. There is
     a choice of volatility function from cubic in delta to full SABR and SSVI.
     Check out VolFuncTypes. Visualising the volatility curve is useful.
     Also, there is no guarantee that the implied pdf will be positive."""
@@ -324,6 +346,9 @@ class EquityVolSurface:
         lognormal volatility."""
 
         t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+
+        if t_exp <= 0.0:
+            raise FinError("Expiry time must be positive.")
 
         vol_type_value = self._vol_func_type.value
 
@@ -479,7 +504,7 @@ class EquityVolSurface:
 
     #     if np.abs(t1-t0) > 1e-6:
 
-    #         K = ((t_exp-t0) * k_1 + (t1-t_exp) * k_1) / (t1 - t0)
+    #         K = ((t_exp-t0) * k_1 + (t1-t_exp) * k_0) / (t1 - t0)
 
     #     else:
 
@@ -506,6 +531,9 @@ class EquityVolSurface:
         lognormal volatility."""
 
         t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+
+        if t_exp <= 0.0:
+            raise FinError("Expiry time must be positive.")
 
         vol_type_value = self._vol_func_type.value
 
@@ -665,6 +693,9 @@ class EquityVolSurface:
 
             expiry_dt = self._expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEAR
+
+            if t_exp <= 0.0:
+                raise FinError("Expiry time must be positive.")
 
             dis_df = self._discount_curve.df_t(t_exp)
             div_df = self._dividend_curve.df_t(t_exp)
@@ -843,6 +874,7 @@ class EquityVolSurface:
             title = str(self._vol_func_type)
             plt.title(title)
             plt.legend()
+            plt.show()
 
     ####################################################################################
 

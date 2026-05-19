@@ -61,7 +61,7 @@ def f(
     sum_inner = 0.0
     for i in range(0, m + 1):
         r = rt[m, i]
-        next_period_df = 1.0 / ((1.0 + r) ** dt)
+        next_period_df = np.exp(-r * dt)
         q = q_matrix[m, i]
         sum_inner += q * next_period_df
 
@@ -87,10 +87,14 @@ def search_root(
     sigma: float,
 ) -> float:
     """Search for the root of the function using a numerical method."""
-    max_iter = 10
-    max_error = 1e-8
+    max_iter = 50
+    max_error = 1e-10
 
-    x1 = x0 * 1.0001
+    if abs(x0) < 1e-10:
+        x1 = 1e-4
+    else:
+        x1 = x0 * 1.0001
+
     f0 = f(x0, m, q_matrix, rt, df_end, dt, sigma)
     f1 = f(x1, m, q_matrix, rt, df_end, dt, sigma)
 
@@ -98,10 +102,12 @@ def search_root(
 
         df = f1 - f0
 
-        if df == 0.0:
+        if abs(df) < 1e-14:
             raise FinError("Search for alpha fails due to zero derivative")
 
         x = x1 - f1 * (x1 - x0) / df
+        x = max(x, 1e-10)  # require positivity
+
         x0, f0 = x1, f1
         x1 = x
         f1 = f(x1, m, q_matrix, rt, df_end, dt, sigma)
@@ -257,7 +263,7 @@ def bermudan_swaption_tree_fast(
                 # pay_values[m, k] = max(pay_exercise, hold_pay)
                 # rec_values[m, k] = max(rec_exercise, hold_rec)
 
-    return pay_values[0, 0], rec_values[0, 0]
+    return (pay_values[0, 0], rec_values[0, 0])
 
 
 ########################################################################################
@@ -275,7 +281,6 @@ def american_bond_option_tree_fast(
     _df_times: np.ndarray,
     _df_values: np.ndarray,
     _tree_times: np.ndarray,
-    _qq: np.ndarray,
     _rt: np.ndarray,
     _dt: float,
 ) -> tuple[float, float]:
@@ -293,7 +298,7 @@ def american_bond_option_tree_fast(
         print("COUPON TIMES", cpn_times)
         print("COUPON AMOUNTS", cpn_flows)
 
-    num_time_steps, num_nodes = _qq.shape
+    num_time_steps, num_nodes = _rt.shape
     expiry_step = int(t_exp / _dt + 0.50)
     maturity_step = int(t_mat / _dt + 0.50)
 
@@ -443,7 +448,7 @@ def american_bond_option_tree_fast(
                 put_exercise,
             )
 
-    return call_option_values[0, 0], put_option_values[0, 0]
+    return (call_option_values[0, 0], put_option_values[0, 0])
 
 
 ########################################################################################
@@ -458,33 +463,27 @@ def callable_puttable_bond_tree_fast(
     put_times: np.ndarray,
     put_prices: np.ndarray,
     face_amount: float,
-    _sigma: float,
-    _a: float,
-    _q_matrix: np.ndarray,  # IS SIGMA USED ?
-    _pu: float,
-    _pm: float,
-    _pd: float,
     _rt: np.ndarray,
     _dt: float,
     _tree_times: np.ndarray,
     _df_times: np.ndarray,
     _df_values: np.ndarray,
-) -> dict[str, float]:
+):
     """Value a bond with embedded put and call options that can be exercised
     at any time over the specified list of put and call dates.
     Due to non-analytical bond price we need to extend tree out to bond
     maturity and take into account cash flows through time."""
 
+    # binomial tree with equal up-down probabilities
     pu = 0.50
     pd = 0.50
 
-    num_time_steps, num_nodes = _q_matrix.shape
+    num_time_steps, num_nodes = _rt.shape
     dt = _dt
     t_mat = cpn_times[-1]
     maturity_step = int(t_mat / dt + 0.50)
 
     # Map coupons onto tree while preserving their present value
-
     tree_flows = np.zeros(num_time_steps)
 
     num_cpns = len(cpn_times)
@@ -536,7 +535,6 @@ def callable_puttable_bond_tree_fast(
         tree_put_value[n] = put_prices[i]
 
     # Value the bond by backward induction starting at bond maturity
-
     call_put_bond_values = np.zeros(shape=(num_time_steps, num_nodes))
     bond_values = np.zeros(shape=(num_time_steps, num_nodes))
 
@@ -592,10 +590,7 @@ def callable_puttable_bond_tree_fast(
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
             call_put_bond_values[m, k] = value
 
-    return {
-        "bondwithoption": call_put_bond_values[0, 0],
-        "bondpure": bond_values[0, 0],
-    }
+    return (call_put_bond_values[0, 0], bond_values[0, 0])
 
 
 ########################################################################################
@@ -648,7 +643,7 @@ def build_tree_fast(
     for m in range(1, num_time_steps + 1):
 
         df_end = discount_factors[m + 1]
-        search_root(r0, m, qq, rt, df_end, dt, sigma)
+        r0 = search_root(r0, m, qq, rt, df_end, dt, sigma)
 
         if cont_compounded:
             qq[m + 1, 0] = 0.50 * qq[m, 0] * np.exp(-rt[m, 0] * dt)
@@ -684,7 +679,7 @@ class BDTTree:
     def __init__(self, sigma: float, num_time_steps: int = 100) -> None:
         """Constructs the Black-Derman-Toy rate model in the case when the
         volatility is assumed to be constant. The short rate process simplifies
-        and is given by d(log(r)) = theta(t) * dt + sigma * dW. Althopugh"""
+        and is given by d(log(r)) = theta(t) * dt + sigma * dW."""
 
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
@@ -698,9 +693,7 @@ class BDTTree:
 
         self.qq = None
         self.rt = None
-        #        self.dfs = None
-        self.pu = 0.50
-        self.pd = 0.50
+
         self.discount_curve = None
 
         self._dt = None
@@ -755,7 +748,7 @@ class BDTTree:
         cpn_times: np.ndarray,
         cpn_flows: np.ndarray,
         exercise_type: ExerciseTypes,
-    ) -> dict[str, float]:
+    ):
         """Value a bond option that can have European or American exercise
         using the Black-Derman-Toy model. The model uses a binomial tree."""
 
@@ -769,6 +762,9 @@ class BDTTree:
         if t_exp < 0.0:
             raise FinError("Option expiry time negative.")
 
+        if self.rt is None or self.qq is None:
+            raise FinError("Tree has not been built.")
+
         call_value, put_value = american_bond_option_tree_fast(
             t_exp,
             t_mat,
@@ -780,12 +776,11 @@ class BDTTree:
             self._df_times,
             self._df_values,
             self._tree_times,
-            self.qq,
             self.rt,
             self._dt,
         )
 
-        return {"call": call_value, "put": put_value}
+        return (call_value, put_value)
 
     ####################################################################################
 
@@ -798,7 +793,7 @@ class BDTTree:
         cpn_times: np.ndarray,
         cpn_flows: np.ndarray,
         exercise_type: ExerciseTypes,
-    ) -> dict[str, float]:
+    ):
         """Swaption that can be exercised on specific dates over the exercise
         period. Due to non-analytical bond price we need to extend tree out to
         bond maturity and take into account cash flows through time."""
@@ -829,7 +824,7 @@ class BDTTree:
             self._dt,
         )
 
-        return {"pay": pay_value, "rec": rec_value}
+        return (pay_value, rec_value)
 
     ####################################################################################
 
@@ -842,7 +837,7 @@ class BDTTree:
         put_times: np.ndarray,
         put_prices: np.ndarray,
         face_amount: float,
-    ) -> dict[str, float]:
+    ):
         """Option that can be exercised at any time over the exercise period.
         Due to non-analytical bond price we need to extend tree out to bond
         maturity and take into account cash flows through time."""
@@ -861,8 +856,6 @@ class BDTTree:
             put_times,
             put_prices,
             face_amount,
-            self.sigma,
-            self.qq,
             self.rt,
             self._dt,
             self._tree_times,
@@ -870,10 +863,7 @@ class BDTTree:
             self._df_values,
         )
 
-        return {
-            "bondwithoption": v["bondwithoption"],
-            "bondpure": v["bondpure"],
-        }
+        return v
 
     ####################################################################################
 

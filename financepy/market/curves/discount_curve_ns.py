@@ -34,10 +34,11 @@ class DiscountCurveNS(DiscountCurve):
         tau: float,
         time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
-        """Creation of a FinDiscountCurveNS object. Parameters are provided
-        individually for beta_0, beta_1, beta_2 and tau. The zero rates
-        produced by this parametrisation have an implicit compounding
-        convention that defaults to continuous but which can be overridden."""
+        """Create a Nelson-Siegel discount curve. The parameters
+        beta_0, beta_1, beta_2 and tau define continuously compounded
+        zero rates. Other inherited methods may convert these zero
+        rates to alternative compounding conventions.
+        """
 
         check_argument_types(self.__init__, locals())
         self._interp_type = None
@@ -58,9 +59,7 @@ class DiscountCurveNS(DiscountCurve):
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 10.0, 11)
         self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates(
-            self._df_dates, self.value_dt, self.time_dc_type
-        )
+        self._times = times_from_dates(self._df_dates, self.value_dt, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################

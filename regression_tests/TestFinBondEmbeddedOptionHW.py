@@ -69,7 +69,6 @@ def test_bond_embedded_option_matlab():
     put_prices = np.array(put_prices)
     call_prices = np.array(call_prices)
 
-
     test_cases.header("BOND PRICE", "PRICE")
     v = bond.clean_price_from_discount_curve(settle_dt, discount_curve)
     test_cases.print("Bond Pure Price:", v)
@@ -99,8 +98,8 @@ def test_bond_embedded_option_matlab():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
-        values.append(v["bondwithoption"])
+        test_cases.print(period, num_time_steps, v[0], v[1])
+        values.append(v[1])
 
     if PLOT_GRAPHS:
         plt.figure()
@@ -176,8 +175,8 @@ def test_bond_embedded_option_quantlib():
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
         period = end - start
-        test_cases.print(period, num_time_steps, v["bondwithoption"], v["bondpure"])
-        values.append(v["bondwithoption"])
+        test_cases.print(period, num_time_steps, v[0], v[1])
+        values.append(v[0])
 
     if PLOT_GRAPHS:
         plt.figure()

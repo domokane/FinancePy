@@ -2,6 +2,22 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane, Saeed Amen
 ##############################################################################
 
+########################################################################################
+# TODO LIST
+########################################################################################
+# 1. Add constrained optimisation support using SLSQP or trust-constr.
+# 2. Add parameter bounds for SABR, CLARK, BBG and CLARK5 models.
+# 3. Check optimiser convergence using opt.success and opt.message.
+# 4. Add bounded/bracketed strike solving to replace unconstrained newton_secant.
+# 5. Add arbitrage diagnostics for implied density positivity.
+# 6. Add calendar arbitrage checks across tenor expiries.
+# 7. Improve SABR initial guesses and warm-start calibration across tenors.
+# 8. Add calibration error diagnostics: ATM, MS, RR, RMS error and max error.
+# 9. Review long-expiry extrapolation: flat volatility vs flat total variance.
+# 10. Replace FinError raises inside njit functions where needed.
+# 11. Add unit tests for short expiries, non-positive strikes and tenor ordering.
+# 12. Add stress tests for inverted skews, high vol regimes and premium-adjusted deltas.
+
 
 from typing import Union, Any, Sequence, Optional, Tuple, List
 
@@ -254,6 +270,9 @@ def solve_to_horizon_fast(
     opt = minimize(obj_fast, c0, fargs, method="CG", tol=tol)
     xopt = opt.x
 
+    if not opt.success:
+        raise FinError(opt.message)
+
     params = np.array(xopt)
 
     k_25d_c = solver_for_smile_strike_fast(
@@ -319,7 +338,7 @@ def vol_function(
         vol = vol_function_clark(params, f, k, t)
         return vol
     else:
-        raise FinError("Unknown Model Type")
+        return np.nan
 
 
 ########################################################################################
@@ -403,6 +422,10 @@ def solver_for_smile_strike_fast(
     )
 
     k = newton_secant(delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
+
+    if k <= 0.0:
+        raise FinError("Non-positive strike.")
+
     return k
 
 
@@ -503,6 +526,10 @@ def solve_for_strike(
         )
 
         k = newton_secant(g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
+
+        if k <= 0.0:
+            raise FinError("Non-positive strike.")
+
         return k
 
     raise FinError("Unknown FinFXDeltaMethod")
@@ -553,9 +580,6 @@ class FXVolSurface:
         self.domestic_curve = domestic_curve
         self.foreign_curve = foreign_curve
         self.num_vol_curves = len(tenors)
-
-        if len(atm_vols) != self.num_vol_curves:
-            raise FinError("Number ATM vols must equal number of tenors")
 
         if len(atm_vols) != self.num_vol_curves:
             raise FinError("Number ATM vols must equal number of tenors")
@@ -669,8 +693,11 @@ class FXVolSurface:
         if vart < 0.0:
             raise FinError("Negative variance.")
 
-        volt = np.sqrt(vart / t)
-        return volt
+        if t <= 0.0:
+            return self.atm_vols[0]
+        else:
+            volt = np.sqrt(vart / t)
+            return volt
 
     ###########################################################################
 
@@ -720,6 +747,9 @@ class FXVolSurface:
             expiry_dt = self.expiry_dts[i]
             t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEAR
 
+            if t_exp <= 0.0:
+                raise FinError("Expiry time must be positive.")
+
             dom_df = self.domestic_curve.df_t(t_exp)
             for_df = self.foreign_curve.df_t(t_exp)
             f = s * for_df / dom_df
@@ -742,6 +772,9 @@ class FXVolSurface:
                 self.k_atm[i] = f * np.exp(-atm_vol * atm_vol * t_exp / 2.0)
             else:
                 raise FinError("Unknown Delta Type")
+
+        if np.any(np.diff(self.t_exp) <= 0.0):
+            raise FinError("Tenors must be increasing.")
 
         #######################################################################
         # THE ACTUAL COMPUTATION LOOP STARTS HERE
@@ -896,6 +929,9 @@ class FXVolSurface:
         k = newton_secant(
             delta_fit, x0=initial_value, args=argtuple, tol=1e-5, maxiter=50
         )
+
+        if k <= 0.0:
+            raise FinError("Non-positive strike.")
 
         return k
 
@@ -1267,6 +1303,9 @@ class FXVolSurface:
             f = self.fwd[i_tenor]
             t_exp = self.t_exp[i_tenor]
 
+            if t_exp <= 0.0:
+                raise FinError("Expiry time must be positive.")
+
             d_fx = (high_fx - low_fx) / num_intervals
 
             dom_df = self.domestic_curve.df_t(t_exp)
@@ -1371,8 +1410,8 @@ class FXVolSurface:
             plt.plot(key_strikes, key_vols, "bo", markersize=4)
 
         plt.title(title)
-
-    #        plt.legend(loc="lower left", bbox_to_anchor=(1,0))
+        #        plt.legend(loc="lower left", bbox_to_anchor=(1,0))
+        plt.show()
 
     ###########################################################################
 

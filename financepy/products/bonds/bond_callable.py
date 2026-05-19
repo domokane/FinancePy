@@ -10,6 +10,7 @@ import numpy as np
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...models.hw_tree import HWTree
 from ...models.bk_tree import BKTree
+from ...models.bdt_tree import BDTTree
 from ...utils.error import FinError
 from ...utils.frequency import FrequencyTypes
 from ...utils.day_count import DayCountTypes
@@ -18,7 +19,6 @@ from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
-
 
 ########################################################################################
 # TODO: Make it possible to specify start and end of American Callable/Puttable
@@ -30,6 +30,7 @@ class BondModelTypes(Enum):
     HO_LEE = 2
     HULL_WHITE = 3
     BLACK_KARASINSKI = 4
+    BLACK_DERMAN_TOY = 5
 
 
 ########################################################################################
@@ -205,15 +206,10 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (
-                v1["bondwithoption"] + v2["bondwithoption"]
-            ) / 2
-            v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
+            v_bond_with_option = (v1[0] + v2[0]) / 2
+            v_bond_pure = (v1[1] + v2[1]) / 2
 
-            return {
-                "bondwithoption": v_bond_with_option,
-                "bondpure": v_bond_pure,
-            }
+            return (v_bond_with_option, v_bond_pure)
 
         elif isinstance(model, BKTree):
 
@@ -247,15 +243,47 @@ class BondEmbeddedOption:
             )
             model.num_time_steps -= 1
 
-            v_bond_with_option = (
-                v1["bondwithoption"] + v2["bondwithoption"]
-            ) / 2
-            v_bond_pure = (v1["bondpure"] + v2["bondpure"]) / 2
+            v_bond_with_option = (v1[0] + v2[0]) / 2
+            v_bond_pure = (v1[1] + v2[1]) / 2
 
-            return {
-                "bondwithoption": v_bond_with_option,
-                "bondpure": v_bond_pure,
-            }
+            return (v_bond_with_option, v_bond_pure)
+
+        elif isinstance(model, BDTTree):
+
+            # Because we not have a closed form bond price we need to build
+            # the tree out to the bond maturity which is after option expiry.
+
+            model.build_tree(t_mat, df_times, df_values)
+
+            v1 = model.callable_puttable_bond_tree(
+                cpn_times,
+                cpn_amounts,
+                call_times,
+                call_prices,
+                put_times,
+                put_prices,
+                face_amount,
+            )
+
+            model.num_time_steps += 1
+
+            model.build_tree(t_mat, df_times, df_values)
+
+            v2 = model.callable_puttable_bond_tree(
+                cpn_times,
+                cpn_amounts,
+                call_times,
+                call_prices,
+                put_times,
+                put_prices,
+                face_amount,
+            )
+            model.num_time_steps -= 1
+
+            v_bond_with_option = (v1[0] + v2[0]) / 2
+            v_bond_pure = (v1[1] + v2[1]) / 2
+
+            return (v_bond_with_option, v_bond_pure)
         else:
             raise FinError("Unknown model type")
 

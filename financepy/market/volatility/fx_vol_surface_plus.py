@@ -2,6 +2,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+########################################################################################
+# TODO LIST
+########################################################################################
+
+# 1. Fix self.gaps row assignment: use self.gaps[i, :] not self.gaps[i:].
+# 2. Ensure smile strike arrays are strictly increasing.
+# 3. Add short-expiry protection for t_exp <= 0.
+# 4. Add bounded strike solving for delta inversion.
+# 5. Guard plotting when 10d or 25d market data is missing.
+# 6. Remove or fully redesign discontinuous gap adjustment logic.
+# 7. Add calibration diagnostics and solver convergence reporting.
+# 8. Add arbitrage and implied-density diagnostics.
+# 9. Add constrained optimisation for SABR/other parameterisations.
+# 10. Add unit tests for missing 10d/25d data cases.
+
+########################################################################################
+
 from typing import Union, Any, Sequence, Optional, Tuple, List
 
 import matplotlib.pyplot as plt
@@ -813,7 +830,7 @@ def _solve_to_horizon(
 
     params = np.array(xopt)
 
-    strikes = [k_10d_p_ms, k_25d_p_ms, k_atm, k_10d_c_ms, k_25d_c_ms]
+    strikes = [k_10d_p_ms, k_25d_p_ms, k_atm, k_25d_c_ms, k_10d_c_ms]
     strikes = np.array(strikes)
     gaps = np.zeros(5)
 
@@ -1091,6 +1108,9 @@ def _solver_for_smile_strike(
 
     k = newton_secant(_delta_fit, x0=initial_guess, args=argtuple, tol=1e-8, maxiter=50)
 
+    if k <= 0.0:
+        raise FinError("Solved strike is non-positive.")
+
     return k
 
 
@@ -1177,6 +1197,9 @@ def solve_for_strike(
 
         kk = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
 
+        if kk <= 0.0:
+            raise FinError("Solved strike is non-positive.")
+
         return kk
 
     if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
@@ -1193,6 +1216,9 @@ def solve_for_strike(
         )
 
         kk = newton_secant(_g, x0=spot_fx_rate, args=argtuple, tol=1e-7, maxiter=50)
+
+        if kk <= 0.0:
+            raise FinError("Solved strike is non-positive.")
 
         return kk
 
@@ -1371,6 +1397,9 @@ class FXVolSurfacePlus:
         lognormal volatility."""
 
         t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+
+        if t_exp <= 0.0:
+            raise FinError("Expiry time must be positive.")
 
         vol_type_value = self.vol_func_type.value
 
@@ -1966,7 +1995,7 @@ class FXVolSurfacePlus:
             (
                 self.parameters[i, :],
                 self.strikes[i, :],
-                self.gaps[i:],
+                self.gaps[i, :],
                 self.k_25d_c_ms[i],
                 self.k_25d_p_ms[i],
                 self.k_25d_c[i],

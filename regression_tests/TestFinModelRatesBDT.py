@@ -178,7 +178,7 @@ def test_bdt_example_two():
         )
 
         test_cases.print(v)
-        tree_vector.append(v["call"])
+        tree_vector.append(v[0])
 
     if PLOT_GRAPHS:
         plt.plot(num_steps_list, tree_vector)
@@ -293,8 +293,8 @@ def test_bdt_example_three():
                     "%9.5f" % expiry_years,
                     "%9.5f" % years_to_maturity,
                     "%9.5f" % price,
-                    "%9.2f" % (v["pay"] * 100.0),
-                    "%9.2f" % (v["rec"] * 100.0),
+                    "%9.2f" % (v[0] * 100.0),
+                    "%9.2f" % (v[1] * 100.0),
                 )
 
 

@@ -16,7 +16,6 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import check_argument_types
 from .interpolator import InterpTypes, Interpolator
 
-
 # TODO: Fix up __repr__ function
 
 ###############################################################################
@@ -69,15 +68,14 @@ class DiscountCurveZeros(DiscountCurve):
             raise FinError("Invalid time day count type.")
 
         self.time_dc_type = time_dc_type
-
-        self._zero_rates = np.array(zero_rates)
-        self._zero_dts = zero_dts
-        self._df_dates = zero_dts
-
         self._times = times_from_dates(zero_dts, value_dt, time_dc_type)
 
         if test_monotonicity(self._times) is False:
             raise FinError("Times or dates are not sorted in increasing order")
+
+        self._zero_rates = np.asarray(zero_rates, dtype=float)
+        self._zero_dts = zero_dts
+        self._df_dates = zero_dts
 
         dfs = self._zero_to_df(self._zero_rates, self._times, self.freq_type)
 

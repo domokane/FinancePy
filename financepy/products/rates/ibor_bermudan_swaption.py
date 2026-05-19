@@ -1,6 +1,6 @@
-# ##############################################################################
+############################################################################
 # # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-# ##############################################################################
+############################################################################
 
 import numpy as np
 
@@ -23,16 +23,15 @@ from ...models.bdt_tree import BDTTree
 from ...models.bk_tree import BKTree
 from ...models.hw_tree import HWTree
 
-
-########################################################################################
+#########################################################################
 
 
 class IborBermudanSwaption:
-    """This is the class for the Bermudan-style swaption, an option to enter
-    into a swap (payer or receiver of the fixed coupon), that starts in the
-    future and with a fixed maturity, at a swap rate fixed today. This swaption
-    can be exercised on any of the fixed coupon payment dates after the first
-    exercise date."""
+    """This is the class for the Bermudan-style swaption, an option to
+    enter into a swap (payer or receiver of the fixed coupon), that
+    starts in the future and with a fixed maturity, at a swap rate
+    fixed today. This swaption can be exercised on any of the fixed
+    coupon payment dates after the first exercise date."""
 
     def __init__(
         self,
@@ -72,10 +71,12 @@ class IborBermudanSwaption:
         self.fixed_leg_type = fixed_leg_type
         self.exercise_type = exercise_type
 
+        self.notional = notional
+
         self.fixed_cpn = fixed_cpn
         self.fixed_freq_type = fixed_freq_type
         self.fixed_dc_type = fixed_dc_type
-        self.notional = notional
+
         self.float_freq_type = float_freq_type
         self.float_dc_type = float_dc_type
 
@@ -91,12 +92,12 @@ class IborBermudanSwaption:
         self.cpn_flows = None
         self.call_times = None
 
-    ###########################################################################
+    ###################################################################
 
     def value(self, value_dt, discount_curve, model):
         """Value the Bermudan swaption using the specified model and a
-        discount curve. The choices of model are the Hull-White model, the
-        Black-Karasinski model and the Black-Derman-Toy model."""
+        discount curve. The choices of model are the Hull-White model,
+        the Black-Karasinski model and the Black-Derman-Toy model."""
 
         float_spread = 0.0
 
@@ -119,13 +120,12 @@ class IborBermudanSwaption:
 
         #  I need to do this to generate the fixed leg flows
         self.pv01 = self.underlying_swap.pv01(value_dt, discount_curve)
-
         t_exp = (self.exercise_dt - value_dt) / G_DAYS_IN_YEAR
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
-        #######################################################################
+        #################################################################
         # For the tree models we need to generate a vector of the coupons
-        #######################################################################
+        #################################################################
 
         cpn_times = [t_exp]
         cpn_flows = [0.0]
@@ -160,15 +160,14 @@ class IborBermudanSwaption:
         face_amount = 1.0
         strike_price = 1.0  # Floating leg is assumed to price at par
 
-        #######################################################################
-        # For both models, the tree needs to extend out to maturity because of
-        # the multi-callable nature of the Bermudan Swaption
-        #######################################################################
+        ##################################################################
+        # For both models, the tree needs to extend out to maturity
+        # because of the multi-callable nature of the Bermudan Swaption
+        ##################################################################
 
         if isinstance(model, (BDTTree, BKTree, HWTree)):
 
             model.build_tree(t_mat, df_times, df_values)
-
             v = model.bermudan_swaption(
                 t_exp,
                 t_mat,
@@ -183,29 +182,28 @@ class IborBermudanSwaption:
             raise FinError("Invalid model choice for Bermudan Swaption")
 
         if self.fixed_leg_type == SwapTypes.RECEIVE:
-            v = self.notional * v["rec"]
+            v = self.notional * v[1]
         elif self.fixed_leg_type == SwapTypes.PAY:
-            v = self.notional * v["pay"]
+            v = self.notional * v[0]
 
         return v
 
-    ###########################################################################
+    ######################################################################
 
     def print_swaption_value(self):
         """Print the swaption value and the underlying swap details."""
+
         print("SWAP PV01:", self.pv01)
 
         n = len(self.cpn_times)
-
         for i in range(0, n):
             print("CPN TIME: ", self.cpn_times[i], "FLOW", self.cpn_flows[i])
 
         n = len(self.call_times)
-
         for i in range(0, n):
             print("CALL TIME: ", self.call_times[i])
 
-    ###########################################################################
+    ######################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
@@ -215,16 +213,16 @@ class IborBermudanSwaption:
         s += label_to_string("EXERCISE TYPE", self.exercise_type)
         s += label_to_string("FIXED COUPON", self.fixed_cpn)
         s += label_to_string("FIXED FREQUENCY", self.fixed_freq_type)
-        s += label_to_string("FIXED DAYCOUNT TYPE", self.fixed_dc_type)
+        s += label_to_string("FIXED DAYCOUNT", self.fixed_dc_type)
         s += label_to_string("FLOAT FREQUENCY", self.float_freq_type)
         s += label_to_string("FLOAT DAYCOUNT TYPE", self.float_dc_type)
         s += label_to_string("NOTIONAL", self.notional)
         return s
 
-    ###########################################################################
+    #####################################################################
 
     def _print(self):
         print(self)
 
 
-########################################################################################
+#########################################################################

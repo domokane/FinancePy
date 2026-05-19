@@ -146,20 +146,20 @@ def test_hull_white_example_two():
 
         end = time.time()
         period = end - start
-        tree_vector.append(v_tree1["put"])
-        anal_vector.append(v_anal["put"])
-        v_tree_call = (v_tree1["call"] + v_tree2["call"]) / 2.0
-        v_tree_put = (v_tree1["put"] + v_tree2["put"]) / 2.0
-        diff_c = v_tree_call - v_anal["call"]
-        diff_p = v_tree_put - v_anal["put"]
+        tree_vector.append(v_tree1[1])
+        anal_vector.append(v_anal[1])
+        v_tree_call = (v_tree1[0] + v_tree2[0]) / 2.0
+        v_tree_put = (v_tree1[1] + v_tree2[1]) / 2.0
+        diff_c = v_tree_call - v_anal[0]
+        diff_p = v_tree_put - v_anal[1]
 
         test_cases.print(
             num_time_steps,
             period,
             v_tree_call,
-            v_anal["call"],
+            v_anal[0],
             v_tree_put,
-            v_anal["put"],
+            v_anal[1],
             diff_c,
             diff_p,
         )

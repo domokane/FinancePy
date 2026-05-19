@@ -438,7 +438,7 @@ def american_bond_option_tree_fast(
                 put_exercise,
             )
 
-    return call_option_values[0, j_max], put_option_values[0, j_max]
+    return (call_option_values[0, j_max], put_option_values[0, j_max])
 
 
 ########################################################################################
@@ -632,7 +632,7 @@ def bermudan_swaption_tree_fast(
 
                 raise FinError("American optionality not tested.")
 
-    return pay_values[0, j_max], rec_values[0, j_max]
+    return (pay_values[0, j_max], rec_values[0, j_max])
 
 
 # TODO: CHECK ACCRUED AND COUPONS TO SEE IF IT WORKS FOR LOW TREE STEPS
@@ -821,10 +821,7 @@ def callable_puttable_bond_tree_fast(
             value = min(max(vhold - accrued[m], vput), vcall) + accrued[m]
             call_put_bond_values[m, k_n] = value
 
-    return {
-        "bondwithoption": call_put_bond_values[0, j_max],
-        "bondpure": bond_values[0, j_max],
-    }
+    return (call_put_bond_values[0, j_max], bond_values[0, j_max])
 
 
 ########################################################################################
@@ -994,7 +991,7 @@ class HWTree:
             -h + sigmap
         ) - face_amount * pt_mat * normcdf(-h)
 
-        return {"call": call_value, "put": put_value}
+        return (call_value, put_value)
 
     ####################################################################################
 
@@ -1007,7 +1004,7 @@ class HWTree:
         cpn_amounts: np.ndarray,
         df_times: np.ndarray,
         df_values: np.ndarray,
-    ) -> Dict[str, float]:
+    ):
         """Valuation of a European bond option using the Jamshidian
         deconstruction of the bond into a strip of zero cpn bonds with the
         short rate that would make the bond option be at the money forward."""
@@ -1074,8 +1071,8 @@ class HWTree:
 
                 v = self.option_on_zcb(t_exp, t_cpn, strike, 1.0, df_times, df_values)
 
-                call = v["call"]
-                put = v["put"]
+                call = v[0]
+                put = v[1]
 
                 call_value += call * cpn * face
                 put_value += put * cpn * face
@@ -1083,7 +1080,7 @@ class HWTree:
         call_value += call * face
         put_value += put * face
 
-        return {"call": call_value, "put": put_value}
+        return (call_value, put_value)
 
     ####################################################################################
 
@@ -1163,7 +1160,7 @@ class HWTree:
             put_value += q * put_payoff
             call_value += q * call_payoff
 
-        return {"call": call_value, "put": put_value}
+        return (call_value, put_value)
 
     ####################################################################################
 
@@ -1224,7 +1221,7 @@ class HWTree:
             put_value += q * put_payoff
             call_value += q * call_payoff
 
-        return {"call": call_value, "put": put_value}
+        return (call_value, put_value)
 
     ####################################################################################
 
@@ -1272,7 +1269,7 @@ class HWTree:
             self.a,
         )
 
-        return {"pay": pay_value, "rec": rec_value}
+        return (pay_value, rec_value)
 
     ####################################################################################
 
@@ -1306,8 +1303,8 @@ class HWTree:
                     self.dfs,
                 )
 
-                call_value = v["call"]
-                put_value = v["put"]
+                call_value = v[0]
+                put_value = v[1]
 
             elif self.european_calc_type == FinHWEuropeanCalcType.EXPIRY_ONLY:
 
@@ -1315,8 +1312,8 @@ class HWTree:
                     t_exp, strike_price, face_amount, cpn_times, cpn_flows
                 )
 
-                call_value = v["call"]
-                put_value = v["put"]
+                call_value = v[0]
+                put_value = v[1]
 
             elif self.european_calc_type == FinHWEuropeanCalcType.EXPIRY_TREE:
 
@@ -1365,7 +1362,7 @@ class HWTree:
                 self.dfs,
             )
 
-        return {"call": call_value, "put": put_value}
+        return (call_value, put_value)
 
     ####################################################################################
 
@@ -1414,10 +1411,7 @@ class HWTree:
             self.dfs,
         )
 
-        return {
-            "bondwithoption": v["bondwithoption"],
-            "bondpure": v["bondpure"],
-        }
+        return (v[0], v[1])
 
     ####################################################################################
 

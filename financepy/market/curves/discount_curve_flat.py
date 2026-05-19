@@ -17,17 +17,18 @@ from ...market.curves.interpolator import InterpTypes
 
 
 class DiscountCurveFlat(DiscountCurve):
-    """A very simple discount curve based on a single zero rate with its
-    own specified compounding method. Hence, the curve is assumed to be flat.
-    It is used for quick and dirty analysis and when limited information is
-    available. It inherits several methods from DiscountCurve."""
+    """A simple discount curve based on a single zero rate with a specified
+    compounding method. The zero curve is flat, so no interpolation is.
+    required. This class is useful for quick testing, simple analysis, and
+    cases where only limited market information is available.
+    """
 
     ###########################################################################
 
     def __init__(
         self,
         value_dt: Date,
-        flat_rate: Union[float, np.ndarray],
+        flat_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):

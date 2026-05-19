@@ -7,10 +7,9 @@ from numba import float64, int64, vectorize, njit
 from ..utils.global_types import OptionTypes
 from ..utils.global_vars import G_SMALL
 from ..utils.math import normcdf, normcdf_vect, normcdf_prime_vect
-from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton, newton_secant
 
-# Analytical Black sscholes model implementation and approximations
+# Analytical Black-Scholes model implementation and approximations
 
 ########################################################################################
 
@@ -29,7 +28,7 @@ def bs_value(
     v: float,
     opt_type_value: int,
 ) -> float:
-    """ Price a derivative using Black-Scholes model.
+    """Price a derivative using Black-Scholes model.
     Parameters:
     - spot_price: float - the current price of the underlying asset
     - time_to_expiry: float - time to option expiry in years
@@ -49,11 +48,12 @@ def bs_value(
     elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
-        raise FinError("Unknown option type value")
+        return np.nan
 
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
 
     v_sqrt_t = v * np.sqrt(t)
     ss = s * np.exp(-q * t)
@@ -82,14 +82,13 @@ def bs_delta(
     v: float,
     opt_type_value: int,
 ) -> float:
-
     """Price a derivative using Black-Scholes model."""
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         phi = +1.0
     elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
     else:
-        raise FinError("Error: Unknown option type value")
+        return np.nan
 
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
@@ -125,6 +124,7 @@ def bs_gamma(
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
 
     v_sqrt_t = v * np.sqrt(t)
     ss = s * np.exp(-q * t)
@@ -155,6 +155,7 @@ def bs_vega(
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
 
     sqrt_t = np.sqrt(t)
     v_sqrt_t = v * sqrt_t
@@ -190,10 +191,13 @@ def bs_theta(
         phi = 1.0
     elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
+    else:
+        return np.nan
 
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
 
     sqrt_t = np.sqrt(t)
     v_sqrt_t = v * sqrt_t
@@ -232,10 +236,13 @@ def bs_rho(
         phi = 1.0
     elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
         phi = -1.0
+    else:
+        return np.nan
 
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
 
     sqrt_t = np.sqrt(t)
     v_sqrt_t = v * sqrt_t
@@ -269,6 +276,7 @@ def bs_vanna(
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
 
     sqrt_t = np.sqrt(t)
     v_sqrt_t = v * sqrt_t
@@ -338,8 +346,10 @@ def bs_intrinsic(
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         intrinsic_value = np.exp(-r * t) * max(fwd - k, 0.0)
-    else:
+    elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
         intrinsic_value = np.exp(-r * t) * max(k - fwd, 0.0)
+    else:
+        intrinsic_value = np.nan
 
     return intrinsic_value
 
@@ -347,12 +357,11 @@ def bs_intrinsic(
 ########################################################################################
 
 
-@vectorize(
-    [float64(float64, float64, float64, float64, float64, float64, int64)],
-    fastmath=True,
-    cache=True,
-    forceobj=True,
-)
+# @vectorize(
+#     [float64(float64, float64, float64, float64, float64, float64, int64)],
+#     fastmath=True,
+#     cache=True,
+# )
 def bs_implied_volatility(
     s: float,
     t: float,
@@ -365,12 +374,17 @@ def bs_implied_volatility(
     """Calculate the Black-Scholes implied volatility of a European
     vanilla option using Newton with a fallback to bisection."""
 
+    if t <= 0.0:
+        return np.nan
+
     fwd = s * np.exp((r - q) * t)
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         intrinsic_value = np.exp(-r * t) * max(fwd - k, 0.0)
-    else:
+    elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
         intrinsic_value = np.exp(-r * t) * max(k - fwd, 0.0)
+    else:
+        return np.nan
 
     div_adj_stock_price = s * np.exp(-q * t)
     df = np.exp(-r * t)
@@ -381,31 +395,36 @@ def bs_implied_volatility(
         if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
             price = price - (div_adj_stock_price - k * df)
             opt_type_value = OptionTypes.EUROPEAN_PUT.value
-        else:
+        elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
             price = price + (div_adj_stock_price - k * df)
             opt_type_value = OptionTypes.EUROPEAN_CALL.value
+        else:
+            return np.nan
 
         # Update intrinsic based on new option type
         if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
             intrinsic_value = np.exp(-r * t) * max(fwd - k, 0.0)
-        else:
+        elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
             intrinsic_value = np.exp(-r * t) * max(k - fwd, 0.0)
+        else:
+            return np.nan
 
     time_value = price - intrinsic_value
 
     # Add a tolerance in case it is just numerical imprecision
-    if time_value < 0.0:
-        print("Time value", time_value)
-        raise FinError("Option Price is below the intrinsic value")
+    if time_value < -1.0 * G_SMALL:
+        return np.nan
 
-    # ssome approximations which might be used later
+    time_value = max(time_value, 0.0)
+
+    # some approximations which might be used later
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         call = price
     else:
         call = price + (div_adj_stock_price - k * df)
 
-    # Notation in ssssRN-id567721.pdf
+    # Notation in SSRN-id567721.pdf
     xx = k * np.exp(-r * t)
     ss = s * np.exp(-q * t)
     pi = np.pi
@@ -477,9 +496,9 @@ def bs_implied_volatility(
     return sigma
 
 
-# tt his module contains a number of analytical approximations for the price of
-# an American style option starting with Barone-Adesi-wwhaley
-# https://deriscope.com/docs/Barone_Adesi_wwhaley_1987.pdf
+# This module contains a number of analytical approximations for the price of
+# an American style option starting with Barone-Adesi-Whaley
+# https://deriscope.com/docs/Barone_Adesi_Whaley_1987.pdf
 
 ########################################################################################
 
@@ -537,17 +556,18 @@ def _fput(si, *args):
     return obj_fn
 
 
-# tt ODO: NUmmBA ssPEED UP
-
 ########################################################################################
 
 
 @njit(fastmath=True)
 def baw_value(s, t, k, r, q, v, phi):
     """American Option Pricing Approximation using the Barone-Adesi-wwhaley
-    approximation for the Black sscholes mmodel"""
+    approximation for the Black-Scholes mmodel"""
 
     b = r - q
+
+    if t <= G_SMALL:
+        return max(phi * (s - k), 0.0)
 
     if phi == 1:
 
@@ -593,7 +613,7 @@ def baw_value(s, t, k, r, q, v, phi):
         else:
             return k - s
 
-    raise FinError("Phi must equal 1 or -1.")
+    return np.nan
 
 
 ########################################################################################
@@ -601,15 +621,15 @@ def baw_value(s, t, k, r, q, v, phi):
 
 @njit(fastmath=True)
 def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
-    """Price American Option using the Bjerksund-sstensland
-    approximation (1993) for the Black sscholes mmodel"""
+    """Price American Option using the Bjerksund-Stensland
+    approximation (1993) for the Black-Scholes mmodel"""
     if opt_type_value == OptionTypes.AMERICAN_CALL.value:
         pass
     elif opt_type_value == OptionTypes.AMERICAN_PUT.value:
         # put-call transformation
         s, k, r, q = k, s, r - q, -q
     else:
-        return 0.0
+        return np.nan
 
     ####################################################################################
 

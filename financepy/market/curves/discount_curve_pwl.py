@@ -76,6 +76,8 @@ class DiscountCurvePWL(DiscountCurve):
         initial inputs. A simple linear interpolation scheme is used. If the
         user supplies a frequency type then a conversion is done."""
 
+        scalar_input = np.isscalar(times)
+
         if np.isscalar(times):
             times = np.array([times])
         else:
@@ -84,7 +86,7 @@ class DiscountCurvePWL(DiscountCurve):
         if np.any(times < 0.0):
             raise FinError("All times must be positive")
 
-        times = np.maximum(times, 1e-6)
+        times = np.maximum(times, G_SMALL)
 
         cc_zero_rates = []
 
@@ -111,7 +113,12 @@ class DiscountCurvePWL(DiscountCurve):
 
             cc_zero_rates.append(cc_zero_rate)
 
-        return np.array(cc_zero_rates)
+        cc_zero_rates = np.asarray(cc_zero_rates, dtype=float)
+
+        if scalar_input:
+            return np.array(cc_zero_rates[0])
+        else:
+            return cc_zero_rates
 
     ###########################################################################
 

@@ -76,8 +76,8 @@ class DiscountCurvePWF(DiscountCurve):
     def pwf_cc_zero_rate(self, times: Union[float, np.ndarray, list]):
         """The piecewise flat cc zero rate is selected and returned."""
 
-        if isinstance(times, float):
-            times = np.array([times])
+        scalar_input = np.isscalar(times)
+        times = np.atleast_1d(times).astype(float)
 
         if np.any(times < 0.0):
             raise FinError("All times must be positive")

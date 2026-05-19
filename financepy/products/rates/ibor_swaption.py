@@ -181,46 +181,30 @@ class IborSwaption:
         if isinstance(model, Black):
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, BlackShifted):
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABR):
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABRShifted):
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, HWTree):
 
@@ -235,13 +219,11 @@ class IborSwaption:
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaption_px["put"]
+                swaption_price = swaption_px[0]
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = swaption_px["call"]
+                swaption_price = swaption_px[1]
             else:
-                raise FinError(
-                    "Unknown swaption option type" + str(self.swap_type)
-                )
+                raise FinError("Unknown swaption option type" + str(self.swap_type))
 
             # Cancel the multiplication at the end below
             swaption_price /= pv01
@@ -260,9 +242,9 @@ class IborSwaption:
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaption_px["pay"]
+                swaption_price = swaption_px[0]
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = swaption_px["rec"]
+                swaption_price = swaption_px[1]
 
             swaption_price /= pv01
 
@@ -280,9 +262,9 @@ class IborSwaption:
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaption_px["pay"]
+                swaption_price = swaption_px[0]
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = swaption_px["rec"]
+                swaption_price = swaption_px[1]
 
             swaption_price /= pv01
         else:
@@ -332,9 +314,7 @@ class IborSwaption:
         k = self.fixed_cpn
         s = swap_rate
 
-        pv01 = swap.cash_settled_pv01(
-            value_dt, swap_rate, self.fixed_freq_type
-        )
+        pv01 = swap.cash_settled_pv01(value_dt, swap_rate, self.fixed_freq_type)
 
         t_exp = (self.exercise_dt - self.settle_dt) / G_DAYS_IN_YEAR
 
@@ -345,17 +325,12 @@ class IborSwaption:
         if isinstance(model, Black):
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
-                swaption_price = model.value(
-                    s, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
         else:
             raise FinError(
-                "Cash settled swaptions must be priced using"
-                + " Black's model."
+                "Cash settled swaptions must be priced using" + " Black's model."
             )
 
         self.fwd_swap_rate = swap_rate
@@ -368,9 +343,7 @@ class IborSwaption:
         # value the swaption on the provided valuation date - which could be
         # the settlement date or may be a different date.
         df_value_dt = discount_curve.df(value_dt)
-        swaption_price = (
-            swaption_price * self.pv01 * self.notional / df_value_dt
-        )
+        swaption_price = swaption_price * self.pv01 * self.notional / df_value_dt
         return swaption_price
 
     ###########################################################################

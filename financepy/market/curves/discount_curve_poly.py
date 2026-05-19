@@ -17,10 +17,12 @@ from ...utils.day_count import DayCountTypes
 
 
 class DiscountCurvePoly(DiscountCurve):
-    """Zero Rate Curve of a specified frequency parametrised using a cubic
-    polynomial. The zero rate is assumed to be continuously compounded.
-    We also need to specify a Day count convention for time calculations.
-    The class inherits all of the methods from DiscountCurve."""
+    """Zero Rate Curve of a specified frequency parametrised using an
+    arbitrary polynomial. The zero rate is assumed to be continuously
+    compounded. The degree of the polynomial is determined by the number
+    of coefficients supplied. We also need to specify a Day count
+    convention for time calculations. The class inherits all of the
+    methods from DiscountCurve."""
 
     ###########################################################################
 
@@ -37,7 +39,7 @@ class DiscountCurvePoly(DiscountCurve):
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
-        self._coefficients = coefficients
+        self._coefficients = np.asarray(coefficients, dtype=float)
 
         if not isinstance(time_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
@@ -48,9 +50,7 @@ class DiscountCurvePoly(DiscountCurve):
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 10.0, 11)
         self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates(
-            self._df_dates, self.value_dt, self.time_dc_type
-        )
+        self._times = times_from_dates(self._df_dates, self.value_dt, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################
@@ -60,13 +60,17 @@ class DiscountCurvePoly(DiscountCurve):
         This function is used internally and should be discouraged for external
         use."""
 
+        times, scalar_input = self._to_time_array(times)
         t = np.maximum(times, G_SMALL)
 
         zero_rate = 0.0
-        for n in range(0, len(self._coefficients)):
-            zero_rate += self._coefficients[n] * np.power(t, n)
+        for n, coeff in enumerate(self._coefficients):
+            zero_rate += coeff * np.power(t, n)
 
-        return zero_rate
+        if scalar_input:
+            return float(zero_rate[0])
+        else:
+            return zero_rate
 
     ###########################################################################
 

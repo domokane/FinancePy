@@ -12,7 +12,8 @@ from ...utils.date import Date
 # TODO: This should be deleted and replaced with equity_vol_surface
 
 
-from typing import Any, Sequence, Optional
+from typing import Any, Optional
+
 
 class EquityVolCurve:
     """Class to manage a smile or skew in volatility at a single maturity
@@ -28,7 +29,7 @@ class EquityVolCurve:
         expiry_dt: Date,
         strikes: np.ndarray,
         volatilities: np.ndarray,
-        polynomial: int = 3
+        polynomial: int = 3,
     ) -> None:
 
         if expiry_dt <= curve_dt:
@@ -39,6 +40,12 @@ class EquityVolCurve:
 
         if test_monotonicity(strikes) is False:
             raise FinError("Strikes must be strictly monotonic.")
+
+        if polynomial < 0:
+            raise FinError("Polynomial degree must be non-negative.")
+
+        if polynomial >= len(strikes):
+            raise FinError("Polynomial degree must be less than number of strikes.")
 
         num_strikes = len(strikes)
         num_vols = len(volatilities)
@@ -51,6 +58,7 @@ class EquityVolCurve:
                 raise FinError("Grid Strikes are not in increasing order")
 
         self._curve_dt = curve_dt
+        self._expiry_dt = expiry_dt
         self._strikes = np.array(strikes)
         self._volatilities = np.array(volatilities)
 
@@ -59,13 +67,13 @@ class EquityVolCurve:
 
     ####################################################################################
 
-    def volatility(self, strike: float) -> float:
+    def volatility(self, strike: float | np.ndarray):
         """Return the volatility for a strike using a given polynomial
         interpolation."""
 
         vol = self._f(strike)
 
-        if vol.any() < 0.0:
+        if np.any(vol < 0.0):
             raise FinError("Negative volatility. Not permitted.")
 
         return vol

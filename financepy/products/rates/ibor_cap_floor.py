@@ -299,9 +299,9 @@ class IborCapFloor:
 
             # we divide by alpha to offset the multiplication above
             if self.opt_type == CapFloorTypes.CAP:
-                caplet_floorlet_value = v["put"] * notional_adj / alpha
+                caplet_floorlet_value = v[1] * notional_adj / alpha
             elif self.opt_type == CapFloorTypes.FLOOR:
-                caplet_floorlet_value = v["call"] * notional_adj / alpha
+                caplet_floorlet_value = v[0] * notional_adj / alpha
 
         else:
             raise FinError("Unknown model type " + str(model))

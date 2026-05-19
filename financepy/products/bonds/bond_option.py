@@ -14,7 +14,6 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes, ExerciseTypes
 from ...products.bonds.bond import Bond
 
-
 ########################################################################################
 # TODO: Add BDT model to valuation
 # TODO: Reorganise code - too much duplication
@@ -130,12 +129,12 @@ class BondOption:
             OptionTypes.EUROPEAN_CALL,
             OptionTypes.AMERICAN_CALL,
         ]:
-            return v["call"]
+            return v[0]
         elif self.opt_type in [
             OptionTypes.AMERICAN_PUT,
             OptionTypes.EUROPEAN_PUT,
         ]:
-            return v["put"]
+            return v[1]
 
         raise FinError("Unknown option type.")
 

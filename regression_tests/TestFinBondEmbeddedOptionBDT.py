@@ -8,7 +8,7 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.models.bk_tree import BKTree
+from financepy.models.bdt_tree import BDTTree
 from financepy.utils.global_types import SwapTypes
 from financepy.products.bonds.bond_callable import BondEmbeddedOption
 from financepy.products.bonds.bond import Bond
@@ -92,7 +92,7 @@ def test_bond_embedded_option_matlab():
     time_steps = range(100, 200, 50)  # 1000, 10)
     values = []
     for num_time_steps in time_steps:
-        model = BKTree(sigma, a, num_time_steps)
+        model = BDTTree(sigma, num_time_steps)
         start = time.time()
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()
@@ -170,7 +170,7 @@ def test_bond_embedded_option_quantlib():
     time_steps = range(100, 200, 50)  # 1000, 10)
     values = []
     for num_time_steps in time_steps:
-        model = BKTree(sigma, a, num_time_steps)
+        model = BDTTree(sigma, num_time_steps)
         start = time.time()
         v = puttable_bond.value(settle_dt, discount_curve, model)
         end = time.time()

@@ -66,9 +66,7 @@ class DiscountCurveNSS(DiscountCurve):
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 10.0, 11)
         self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates(
-            self._df_dates, self.value_dt, self.time_dc_type
-        )
+        self._times = times_from_dates(self._df_dates, self.value_dt, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ####################################################################################
@@ -126,12 +124,12 @@ class DiscountCurveNSS(DiscountCurve):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("PARAMETER", "VALUE")
-        s += label_to_string("BETA0", f"{self._beta_0:12.8f}")
-        s += label_to_string("BETA1", f"{self._beta_1:12.8f}")
-        s += label_to_string("BETA2", f"{self._beta_2:12.8f}")
-        s += label_to_string("BETA3", f"{self._beta_3:12.8f}")
-        s += label_to_string("TAU1", f"{self._tau_1:12.8f}")
-        s += label_to_string("TAU2", f"{self._tau_2:12.8f}")
+        s += label_to_string("BETA_0", f"{self._beta_0:12.8f}")
+        s += label_to_string("BETA_1", f"{self._beta_1:12.8f}")
+        s += label_to_string("BETA_2", f"{self._beta_2:12.8f}")
+        s += label_to_string("BETA_3", f"{self._beta_3:12.8f}")
+        s += label_to_string("TAU_1", f"{self._tau_1:12.8f}")
+        s += label_to_string("TAU_2", f"{self._tau_2:12.8f}")
 
         # Then generic DiscountCurve info
         s += "\n"

@@ -33,7 +33,6 @@ global_test_case_mode = FinTestCaseMode.ANALYSE_TEST_CASES
 
 TOLERANCE = 1e-8
 
-
 ########################################################################################
 ########################################################################################
 
@@ -127,9 +126,7 @@ class FinTestCases:
 
             if exists(self._golden_file_name) and self._careful_mode:
                 overwrite = input(
-                    "File "
-                    + self._golden_file_name
-                    + " exists. Overwrite (Y/N) ?"
+                    "File " + self._golden_file_name + " exists. Overwrite (Y/N) ?"
                 )
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
@@ -150,9 +147,7 @@ class FinTestCases:
 
             if exists(self._compare_file_name) and self._careful_mode:
                 overwrite = input(
-                    "File "
-                    + self._compare_file_name
-                    + " exists. Overwrite (Y/N) ?"
+                    "File " + self._compare_file_name + " exists. Overwrite (Y/N) ?"
                 )
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
@@ -247,17 +242,13 @@ class FinTestCases:
             return
 
         if not self._folders_exist:
-            self.print_log(
-                "Cannot print as GOLDEN and COMPARE folders do not exist"
-            )
+            self.print_log("Cannot print as GOLDEN and COMPARE folders do not exist")
             return
 
         self._header_fields = args
 
         if len(self._header_fields) == 0:
-            self.print_log(
-                "ERROR: Number of header fields must be greater than 0"
-            )
+            self.print_log("ERROR: Number of header fields must be greater than 0")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
             file_name = self._golden_file_name
@@ -370,8 +361,7 @@ class FinTestCases:
                         self.print_log(
                             "Row# ",
                             row_num,
-                            " WARNING: Calculation time has changed by %5.2f"
-                            % change,
+                            " WARNING: Calculation time has changed by %5.2f" % change,
                             " percent.",
                         )
 
@@ -461,36 +451,22 @@ class FinTestCases:
                         self._header_fields[0:-1],
                     )
 
-                self.print_log(
-                    "Row# ", row_num, " GOLDEN : ==>", golden_row[:-2]
-                )
-                self.print_log(
-                    "Row# ", row_num, " COMPARE: ==>", compare_row[:-2]
-                )
+                self.print_log("Row# ", row_num, " GOLDEN : ==>", golden_row[:-2])
+                self.print_log("Row# ", row_num, " COMPARE: ==>", compare_row[:-2])
                 self.print_log("")
 
             total_num_warnings += num_warnings
             total_num_errors += num_errors
 
-        if (
-            num_golden_lines == min_num_lines
-            and num_compare_lines > min_num_lines
-        ):
-            self.print_log(
-                "ERROR:The COMPARE file is longer than the GOLDEN file"
-            )
+        if num_golden_lines == min_num_lines and num_compare_lines > min_num_lines:
+            self.print_log("ERROR:The COMPARE file is longer than the GOLDEN file")
 
         #            for row_num in range(min_num_lines,maxNumLines):
         #                num_warnings, num_errors = compare_contents[row_num]
         #                print(row_num,"COMPARE: ==>",compare_row)
 
-        if (
-            num_compare_lines == min_num_lines
-            and num_golden_lines > min_num_lines
-        ):
-            self.print_log(
-                "ERROR:The GOLDEN file is longer than the COMPARE file"
-            )
+        if num_compare_lines == min_num_lines and num_golden_lines > min_num_lines:
+            self.print_log("ERROR:The GOLDEN file is longer than the COMPARE file")
 
         #            for row_num in range(min_num_lines,maxNumLines):
         #                num_warnings, num_errors = compare_contents[row_num]
