@@ -3,7 +3,7 @@
 - Further tidying up of Discount Curves folder
 - Tidying up of vol curve and surfaces
 - Extension of BDT tree to cover same cases as BK and HW trees
-- Tidying up model code for bachelier and black scholes
+- Tidying up model code for Bachelier and Black-Scholes
 
 18 May 2026
 - Imposed bounds checks on discount factors

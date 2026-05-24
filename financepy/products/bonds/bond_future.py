@@ -108,7 +108,7 @@ class BondFuture:
         new_bond = Bond(
             issue_dt,
             new_mat,
-            self.cpn,  # coupon is that of the standard contract bond
+            bond.cpn,  # coupon must be that of actual bond
             bond.freq_type,
             bond.accrual_dc_type,
             ex_div_days,

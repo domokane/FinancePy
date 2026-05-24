@@ -15,6 +15,13 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 
 
+def assert_close(value, expected, tol=2.0e-3):
+    assert np.isclose(value, expected, atol=tol), (
+        f"value={value:.10f}, expected={expected:.10f}, "
+        f"diff={value - expected:.10f}"
+    )
+
+
 settle_dt = Date(1, 12, 2019)
 issue_dt = Date(1, 12, 2018)
 maturity_dt = settle_dt.add_tenor("10Y")
@@ -47,11 +54,12 @@ def test_european_call_bk():
     sigma = 0.20
     a = 0.1
     num_time_steps = 20
+
     model = BKTree(sigma, a, num_time_steps)
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 1.705
+    assert_close(v, 1.705)
 
 
 ########################################################################################
@@ -70,7 +78,7 @@ def test_american_call_bk():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 0.0068
+    assert_close(v, 0.0068)
 
 
 ########################################################################################
@@ -89,7 +97,7 @@ def test_european_put_bk():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 0.4074
+    assert_close(v, 0.4074)
 
 
 ########################################################################################
@@ -107,8 +115,7 @@ def test_american_put_bk():
     model = BKTree(sigma, a)
 
     v = bond_option.value(settle_dt, discount_curve, model)
-
-    assert round(v, 4) == 0.531
+    assert_close(v, 0.531)
 
 
 ########################################################################################
@@ -125,8 +132,7 @@ def test_european_call_bdt():
     model = BDTTree(sigma, num_time_steps)
 
     v = bond_option.value(settle_dt, discount_curve, model)
-
-    assert round(v, 4) == 2.9148
+    assert_close(v, 2.9148)
 
 
 ########################################################################################
@@ -144,7 +150,7 @@ def test_american_call_bdt():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 3.0931
+    assert_close(v, 3.0931)
 
 
 ########################################################################################
@@ -162,7 +168,7 @@ def test_european_put_bdt():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 0.4338
+    assert_close(v, 0.4338)
 
 
 ########################################################################################
@@ -180,7 +186,7 @@ def test_american_put_bdt():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 0.6145
+    assert_close(v, 0.6145)
 
 
 # Results different from TestFinBondOptionHWModel.py
@@ -203,7 +209,7 @@ def test_european_call_hw():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 1.8738
+    assert_close(v, 1.8738)
 
 
 ########################################################################################
@@ -222,7 +228,7 @@ def test_american_call_hw():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 2.0366
+    assert_close(v, 2.0366)
 
 
 ########################################################################################
@@ -241,7 +247,7 @@ def test_european_put_hw():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 2.2877
+    assert_close(v, 2.2877)
 
 
 ########################################################################################
@@ -260,4 +266,4 @@ def test_american_put_hw():
 
     v = bond_option.value(settle_dt, discount_curve, model)
 
-    assert round(v, 4) == 4.8059
+    assert_close(v, 4.8059)

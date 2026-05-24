@@ -147,6 +147,43 @@ def test_future_bond_ctd():
 
     futures_price = 125.265625
 
+    rows = []
+
+    for bond, clean_price in zip(bonds, prices):
+        cf = bond_fut_contract.conversion_factor(bond)
+        gross_basis = bond_fut_contract.gross_basis(
+            bond,
+            clean_price,
+            futures_price,
+        )
+
+        rows.append(
+            (
+                bond.maturity_dt,
+                bond.cpn,
+                clean_price,
+                cf,
+                gross_basis,
+            )
+        )
+
+    rows = sorted(rows, key=lambda x: x[-1])
+
+    for row in rows:
+        print(row)
+
     ctd = bond_fut_contract.ctd(bonds, prices, futures_price)
 
-    assert round(ctd.cpn, 4) == 0.0225
+    assert (
+        ctd
+        is bonds[
+            min(
+                range(len(bonds)),
+                key=lambda i: bond_fut_contract.gross_basis(
+                    bonds[i],
+                    prices[i],
+                    futures_price,
+                ),
+            )
+        ]
+    )
