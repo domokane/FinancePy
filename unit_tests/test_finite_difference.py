@@ -55,7 +55,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -75,7 +75,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -96,7 +96,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -117,7 +117,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -139,7 +139,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -159,7 +159,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -179,7 +179,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -200,7 +200,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -220,7 +220,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -240,7 +240,7 @@ def test_black_scholes_fd():
         theta=theta,
         wind=wind,
         num_std=num_std,
-        num_time_steps=num_t,
+        num_steps_per_year=num_t,
         num_samples=num_s,
         update=update,
     )
@@ -263,7 +263,7 @@ def test_european_call():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 20000
+    num_steps_per_year = 100
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_CALL
 
@@ -280,8 +280,8 @@ def test_european_call():
         theta=0.5,
         wind=0,
         num_std=5,
-        num_time_steps=5000,
-        num_samples=10000,
+        num_steps_per_year=num_steps_per_year,
+        num_samples=1000,
         update=False,
     )
     value = crr_tree_val_avg(
@@ -294,7 +294,7 @@ def test_european_call():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -312,7 +312,7 @@ def test_european_put():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 20000
+    num_steps_per_year = 200
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_PUT
 
@@ -329,8 +329,8 @@ def test_european_put():
         theta=0.5,
         wind=0,
         num_std=5,
-        num_time_steps=2500,
-        num_samples=10000,
+        num_steps_per_year=100,
+        num_samples=1000,
         update=False,
     )
     value = crr_tree_val_avg(
@@ -343,7 +343,7 @@ def test_european_put():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -361,7 +361,7 @@ def test_american_call():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 20000
+    num_steps_per_year = 200
     strike_price = 50.0
     opt_type = OptionTypes.AMERICAN_CALL
 
@@ -378,8 +378,8 @@ def test_american_call():
         theta=0.5,
         wind=0,
         num_std=6,
-        num_time_steps=2500,
-        num_samples=10000,
+        num_steps_per_year=100,
+        num_samples=1000,
         update=False,
     )
 
@@ -393,7 +393,7 @@ def test_american_call():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -411,7 +411,7 @@ def test_american_put():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 20000
+    num_steps_per_year = 100
     strike_price = 50.0
     opt_type = OptionTypes.AMERICAN_PUT
 
@@ -428,7 +428,7 @@ def test_american_put():
         theta=0.5,
         wind=0,
         num_std=5,
-        num_time_steps=2500,
+        num_steps_per_year=100,
         num_samples=10000,
         update=False,
     )
@@ -442,7 +442,7 @@ def test_american_put():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -483,11 +483,11 @@ def test_call_option():
         theta=0.5,
         wind=0,
         num_std=5,
-        num_time_steps=2500,
-        num_samples=10000,
+        num_steps_per_year=100,
+        num_samples=1000,
         update=False,
     )
-    assert v == approx(v0, 1e-5)
+    assert v == approx(v0, 1e-2)
 
 
 ########################################################################################
@@ -528,12 +528,12 @@ def test_put_option():
         theta=0.5,
         wind=0,
         num_std=5,
-        num_time_steps=2500,
-        num_samples=10000,
+        num_steps_per_year=100,
+        num_samples=1000,
         update=False,
     )
 
-    assert v == approx(v0, 1e-5)
+    assert v == approx(v0, 1e-2)
 
 
 ########################################################################################

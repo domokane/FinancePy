@@ -2,15 +2,76 @@ from copy import deepcopy
 from functools import partial
 
 import numpy as np
+from numba import njit
+
 
 from ..utils.math import band_matrix_multiplication
 from ..utils.math import solve_tridiagonal_matrix
 from ..utils.math import transpose_tridiagonal_matrix
 from ..utils.global_types import OptionTypes
 
-# @njit
-
 ########################################################################################
+
+
+def validate_black_scholes_fd_inputs(
+    spot_price,
+    volatility,
+    time_to_expiry,
+    strike_price,
+    risk_free_rate,
+    dividend_yield,
+    opt_type,
+    num_steps_per_year,
+    num_samples,
+    num_std,
+    theta,
+    wind,
+):
+    if spot_price <= 0.0:
+        raise ValueError("spot_price must be positive")
+
+    if strike_price <= 0.0:
+        raise ValueError("strike_price must be positive")
+
+    if risk_free_rate < 0.0:
+        raise ValueError("risk_free_rate must be positive")
+
+    if dividend_yield < 0.0:
+        raise ValueError("dividend_yield must be positive")
+
+    if volatility < 0.0:
+        raise ValueError("volatility must be non-negative")
+
+    if time_to_expiry < 0.0:
+        raise ValueError("time_to_expiry must be non-negative")
+
+    if num_samples < 3:
+        raise ValueError("num_samples must be at least 3")
+
+    if num_std <= 0.0:
+        raise ValueError("num_std must be positive")
+
+    if not (0.0 <= theta <= 1.0):
+        raise ValueError("theta must be between 0 and 1")
+
+    if wind not in {-1, 0, 1, 2}:
+        raise ValueError("wind must be one of {-1, 0, 1, 2}")
+
+    if num_steps_per_year is not None and num_steps_per_year <= 0:
+        raise ValueError("num_steps_per_year must be positive or None")
+
+    if isinstance(opt_type, OptionTypes):
+        opt_type = opt_type.value
+
+    valid_types = {
+        OptionTypes.EUROPEAN_CALL.value,
+        OptionTypes.EUROPEAN_PUT.value,
+        OptionTypes.AMERICAN_CALL.value,
+        OptionTypes.AMERICAN_PUT.value,
+    }
+
+    if opt_type not in valid_types:
+        raise ValueError(f"Unsupported option type: {opt_type}")
 
 
 def fn_dx(x, wind=0):
@@ -208,44 +269,47 @@ def smooth_call(xl, xu, strike):
 ########################################################################################
 
 
-def option_payoff(s, strike, smooth, dig, opt_type):
+def option_payoff(s, strike, smooth, dig, opt_type_int):
 
-    if isinstance(opt_type, OptionTypes):
-        opt_type = opt_type.value
+    is_put = opt_type_int in {
+        OptionTypes.AMERICAN_PUT.value,
+        OptionTypes.EUROPEAN_PUT.value,
+    }
 
     # Generate middle values (i.e. not first or last, which are
     # overwritten later)
     if not smooth:
         if dig:
-            res = digital(s, strike)
+            res = (s >= strike).astype(float)
         else:
-            res = s - strike
-            # Set negative values to zero
-            res[res < 0] = 0
+            res = np.maximum(s - strike, 0.0)
     else:
-        # Set lower and upper bound for s.
-        # Note: As we are only interested in elements 1:-1 here,
-        # we can use roll without worrying about end values.
         sl = 0.5 * (np.roll(s, 1) + s)
         su = 0.5 * (s + np.roll(s, -1))
+        width = su - sl
 
-        # Define the curve, fix the strike_price value, and map into res
-        func = smooth_digital if dig else smooth_call
-        func = partial(func, strike=strike)
-        res = list(map(func, sl, su))
+        if dig:
+            res = np.where(
+                su <= strike, 0.0, np.where(strike <= sl, 1.0, (su - strike) / width)
+            )
+        else:
+            res = np.where(
+                su <= strike,
+                0.0,
+                np.where(
+                    strike <= sl,
+                    0.5 * (sl + su) - strike,
+                    0.5 * (su - strike) ** 2 / width,
+                ),
+            )
 
-    # Handle first and last values separately
-    res[0] = digital(s[0], strike) if dig else max(0, s[0] - strike)
-    res[-1] = digital(s[-1], strike) if dig else max(0, s[-1] - strike)
+        res[0] = 1.0 if s[0] >= strike else 0.0 if dig else max(0.0, s[0] - strike)
+        res[-1] = 1.0 if s[-1] >= strike else 0.0 if dig else max(0.0, s[-1] - strike)
 
-    # Invert for put options
-    if opt_type in {
-        OptionTypes.AMERICAN_PUT.value,
-        OptionTypes.EUROPEAN_PUT.value,
-    }:
-        res = 1 - res if dig else res - (s - strike)
+    if is_put:
+        res = 1.0 - res if dig else res - (s - strike)
 
-    return np.atleast_2d(res)
+    return res[None, :]
 
 
 ########################################################################################
@@ -259,7 +323,7 @@ def black_scholes_fd(
     risk_free_rate,
     dividend_yield,
     opt_type,
-    num_time_steps=None,
+    num_steps_per_year=None,
     num_samples=2000,
     num_std=5,
     theta=0.5,
@@ -270,8 +334,32 @@ def black_scholes_fd(
     return_grid=False,
 ):
 
+    validate_black_scholes_fd_inputs(
+        spot_price,
+        volatility,
+        time_to_expiry,
+        strike_price,
+        risk_free_rate,
+        dividend_yield,
+        opt_type,
+        num_steps_per_year,
+        num_samples,
+        num_std,
+        theta,
+        wind,
+    )
+
     if isinstance(opt_type, OptionTypes):
         opt_type = opt_type.value
+
+    if time_to_expiry == 0.0:
+        return option_payoff(
+            np.array([spot_price]),
+            strike_price,
+            False,
+            digital,
+            opt_type,
+        )[0, 0]
 
     # Define grid
     std = volatility * (time_to_expiry**0.5)
@@ -290,7 +378,12 @@ def black_scholes_fd(
     payoff = option_payoff(s, strike_price, smooth, digital, opt_type)
 
     # time steps
-    num_steps = num_time_steps or num_samples // 2
+    if num_steps_per_year is not None:
+        num_steps = int(num_steps_per_year * time_to_expiry)
+    else:
+        num_steps = num_samples // 2
+
+    num_steps = max(num_steps, 1)
     dt = time_to_expiry / max(1, num_steps)
 
     # Make time series for interest rate, drift, and variance
@@ -303,7 +396,7 @@ def black_scholes_fd(
     ae = np.array([])
 
     # Store original res as res0
-    res = deepcopy(payoff)
+    res = payoff.copy()
 
     for h in range(num_steps):
         if update or h == 0:

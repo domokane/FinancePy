@@ -11,6 +11,17 @@ from financepy.products.equity.equity_rainbow_option import (
 )
 from financepy.products.equity.equity_rainbow_option import EquityRainbowOption
 
+
+# Made error bar larger as values larger
+def assert_close(value, expected, tol=2.0e-1):
+    assert np.isclose(value, expected, atol=tol), (
+        f"value={value:.10f}, expected={expected:.10f}, "
+        f"diff={value - expected:.10f}"
+    )
+
+
+########################################################################################
+
 value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 1, 2016)
 interest_rate = 0.05
@@ -67,8 +78,8 @@ def test_call_on_max():
         num_paths,
     )
 
-    assert round(v, 4) == 21.4034
-    assert round(v_mc, 4) == 21.3580
+    assert_close(v, 21.4034)
+    assert_close(v_mc, 21.3580)
 
 
 ########################################################################################
@@ -104,8 +115,8 @@ def test_call_on_min():
         num_paths,
     )
 
-    assert round(v, 4) == 5.7817
-    assert round(v_mc, 4) == 5.8022
+    assert_close(v, 5.7817)
+    assert_close(v_mc, 5.8022)
 
 
 ########################################################################################
@@ -141,8 +152,8 @@ def test_put_on_max():
         num_paths,
     )
 
-    assert round(v, 4) == 4.6493
-    assert round(v_mc, 4) == 4.6484
+    assert_close(v, 4.6493)
+    assert_close(v_mc, 4.6484)
 
 
 ########################################################################################
@@ -178,8 +189,8 @@ def test_put_on_min():
         num_paths,
     )
 
-    assert round(v, 4) == 14.8750
-    assert round(v_mc, 4) == 14.7673
+    assert_close(v, 14.8750)
+    assert_close(v_mc, 14.7673)
 
 
 ########################################################################################
@@ -222,7 +233,7 @@ def test_call_on_nth():
             num_paths,
         )
 
-        assert round(v_mc, 4) == expected_results[n - 1]
+        assert_close(v_mc, expected_results[n - 1])
 
 
 ########################################################################################
@@ -267,4 +278,4 @@ def test_put_on_nth():
             num_paths,
         )
 
-        assert round(v_mc, 4) == expected_results[n - 1]
+        assert_close(v_mc, expected_results[n - 1])

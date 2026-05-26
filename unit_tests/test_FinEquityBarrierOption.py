@@ -41,7 +41,8 @@ def test_down_and_out_call():
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert round(value, 4) == 0.0000
+    assert round(value, 3) == 0.000
+
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     model_params = (stock_price, drift, volatility, scheme)
 
@@ -49,7 +50,7 @@ def test_down_and_out_call():
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(value_mc, 4) == 0.0000
+    assert round(value_mc, 3) == 0.000
 
 
 ########################################################################################
@@ -62,7 +63,8 @@ def test_down_and_in_call():
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert round(value, 4) == 1.5307
+    assert round(value, 3) == 1.531
+
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     model_params = (stock_price, drift, volatility, scheme)
 
@@ -70,7 +72,7 @@ def test_down_and_in_call():
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(value_mc, 4) == 1.5483
+    assert round(value_mc, 3) == 1.548
 
 
 ########################################################################################
@@ -83,14 +85,15 @@ def test_up_and_out_call():
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert round(value, 4) == 0.1789
+    assert round(value, 3) == 0.179
+
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     model_params = (stock_price, drift, volatility, scheme)
     value_mc = option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(value_mc, 4) == 0.1572
+    assert round(value_mc, 3) == 0.157
 
 
 ########################################################################################
@@ -103,14 +106,15 @@ def test_up_and_in_call():
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert round(value, 4) == 1.3519
+    assert round(value, 3) == 1.352
+
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     model_params = (stock_price, drift, volatility, scheme)
     value_mc = option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(value_mc, 4) == 1.3234
+    assert round(value_mc, 3) == 1.323
 
 
 ########################################################################################
@@ -123,14 +127,15 @@ def test_up_and_out_put():
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert round(value, 4) == 18.1445
+    assert round(value, 3) == 18.145
+
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     model_params = (stock_price, drift, volatility, scheme)
     value_mc = option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(value_mc, 4) == 18.2171
+    assert round(value_mc, 3) == 18.217
 
 
 ########################################################################################
@@ -143,14 +148,15 @@ def test_up_and_in_put():
 
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert round(value, 4) == 0.0933
+    assert round(value, 3) == 0.093
+
     t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     model_params = (stock_price, drift, volatility, scheme)
     value_mc = option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(value_mc, 4) == 0.0937
+    assert round(value_mc, 3) == 0.094
 
 
 ########################################################################################

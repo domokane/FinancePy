@@ -4,9 +4,7 @@ import numpy as np
 
 from ..utils.error import FinError
 from ..utils.global_types import BarrierTypes
-
 from ..models.process_simulator import FinProcessSimulator
-from ..models.process_simulator import ProcessTypes
 
 
 def value_equity_barrier_option_mc(
@@ -29,12 +27,28 @@ def value_equity_barrier_option_mc(
     crossed and the corresponding value of the final payoff, if any. It
     assumes a GBM model for the stock price."""
 
+    if t < 0.0:
+        raise FinError("t must be non-negative")
+
+    if k <= 0.0:
+        raise FinError("k must be positive")
+
+    if b <= 0.0:
+        raise FinError("b must be positive")
+
+    if s <= 0.0:
+        raise FinError("s must be positive")
+
+    if num_paths <= 0:
+        raise FinError("num_paths must be positive")
+
+    if num_obs_per_year <= 0:
+        raise FinError("num_obs_per_year must be positive")
+
     tol = 1e-12  # barrier tolerance
 
     t = max(t, 1e-6)
-    num_time_steps = int(t * num_obs_per_year)
-
-    process_type = ProcessTypes.GBM_PROCESS
+    num_time_steps = max(1, int(np.ceil(t * num_obs_per_year)))
 
     process = FinProcessSimulator()
 
@@ -84,7 +98,7 @@ def value_equity_barrier_option_mc(
         process_type, t, model_params, num_time_steps, num_paths, seed
     )
 
-    (num_paths, num_time_steps) = s_all.shape
+    num_paths, num_time_steps = s_all.shape
 
     if (
         opt_type == BarrierTypes.DOWN_AND_IN_CALL

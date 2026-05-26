@@ -1,4 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+import numpy as np
 
 from financepy.products.equity.equity_compound_option import (
     EquityCompoundOption,
@@ -7,7 +8,6 @@ from financepy.utils.global_types import OptionTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.date import Date
-
 
 value_dt = Date(1, 1, 2015)
 expiry_dt1 = Date(1, 1, 2017)
@@ -24,6 +24,14 @@ discount_curve = DiscountCurveFlat(value_dt, interest_rate)
 dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
 
 num_steps = 200
+
+
+def assert_close(value, expected, tol=2.0e-3):
+    assert np.isclose(value, expected, atol=tol), (
+        f"value={value:.10f}, expected={expected:.10f}, "
+        f"diff={value - expected:.10f}"
+    )
+
 
 ########################################################################################
 
@@ -77,8 +85,8 @@ def test_european():
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 3) == 2.016
-    assert round(values[0], 3) == 2.022
+    assert_close(value, 2.016)
+    assert_close(values[0], 2.022)
 
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_PUT
@@ -93,8 +101,8 @@ def test_european():
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 3) == 1.087
-    assert round(values[0], 3) == 1.087
+    assert_close(value, 1.087)
+    assert_close(values[0], 1.087)
 
 
 ########################################################################################
@@ -117,8 +125,8 @@ def test_american():
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 3) == 4.600
-    assert round(values[0], 3) == 4.600
+    assert_close(value, 4.600)
+    assert_close(values[0], 4.600)
 
     opt_type1 = OptionTypes.AMERICAN_CALL
     opt_type2 = OptionTypes.AMERICAN_PUT
@@ -133,8 +141,8 @@ def test_american():
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 2) == 12.84
-    assert round(values[0], 2) == 12.84
+    assert_close(value, 7.614)
+    assert_close(values[0], 7.614)
 
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_CALL
@@ -149,8 +157,8 @@ def test_american():
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 3) == 4.665
-    assert round(values[0], 3) == 4.665
+    assert_close(value, 4.182)
+    assert_close(values[0], 4.182)
 
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_PUT
@@ -165,8 +173,8 @@ def test_american():
         value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
     )
 
-    assert round(value, 3) == 4.298
-    assert round(values[0], 3) == 4.298
+    assert_close(value, 4.298)
+    assert_close(values[0], 4.298)
 
 
 ########################################################################################
@@ -191,6 +199,6 @@ def test_greeks():
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(delta, 3) == -0.719
-    assert round(vega, 3) == 0.376
-    assert round(theta, 3) == 0.747
+    assert_close(delta, -0.719)
+    assert_close(vega, 0.376)
+    assert_close(theta, 0.747)

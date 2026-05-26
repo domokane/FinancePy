@@ -18,12 +18,11 @@ from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.math import normcdf_vect
 
-
 ########################################################################################
 
 
 class FinDigitalOptionTypes(Enum):
-    CASH_OR_NOTHING = (1,)
+    CASH_OR_NOTHING = 1
     ASSET_OR_NOTHING = 2
 
 
@@ -77,7 +76,7 @@ class EquityDigitalOption(EquityOption):
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
         options."""
 
-        if isinstance(value_dt, Date) is False:
+        if not isinstance(value_dt, Date):
             raise FinError("Valuation date is not a Date")
 
         if value_dt > self.expiry_dt:
@@ -154,6 +153,8 @@ class EquityDigitalOption(EquityOption):
 
         np.random.seed(seed)
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t = max(t, G_SMALL)
+
         df = discount_curve.df(self.expiry_dt)
         r = -np.log(df) / t
 
@@ -165,7 +166,7 @@ class EquityDigitalOption(EquityOption):
         sqrt_dt = np.sqrt(t)
 
         # Use Antithetic variables
-        g = np.random.normal(0.0, 1.0, size=(1, num_paths))
+        g = np.random.normal(0.0, 1.0, size=num_paths)
         s = stock_price * np.exp((r - q - volatility * volatility / 2.0) * t)
         m = np.exp(g * sqrt_dt * volatility)
 

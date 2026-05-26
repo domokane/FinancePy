@@ -15,7 +15,7 @@ from .black_scholes_analytic import bs_value
 
 
 def _f(s0, *args) -> float:
-    opt2_type = args[0]
+    opt2_int = args[0]
     t2: float = args[1]
     k2: float = args[2]
     t1: float = args[3]
@@ -28,7 +28,7 @@ def _f(s0, *args) -> float:
         raise FinError("Unable to solve for stock price that fits k_1")
 
     tau: float = t2 - t1
-    opt_value: float = bs_value(s0, tau, k2, r, q, vol, opt2_type.value)
+    opt_value: float = bs_value(s0, tau, k2, r, q, vol, opt2_int)
     obj_fn: float = opt_value - k1
 
     return obj_fn
@@ -37,8 +37,8 @@ def _f(s0, *args) -> float:
 ########################################################################################
 
 
-
 from typing import Any
+
 
 @njit(fastmath=True, cache=True)
 def value_cmpd_once(
@@ -48,11 +48,11 @@ def value_cmpd_once(
     volatility: float,
     t1: float,
     t2: float,
-    opt_type1: Any,  # OptionTypes, but Numba doesn't support Enums in signatures
-    opt_type2: Any,  # OptionTypes
+    opt_type1: int,
+    opt_type2: int,
     k1: float,
     k2: float,
-    num_steps: int
+    num_steps: int,
 ) -> np.ndarray:
 
     if num_steps < 3:
@@ -119,13 +119,13 @@ def value_cmpd_once(
     for i_node in range(0, i_time + 1):
         s = stock_vals[index + i_node]
         if (
-            opt_type2 == OptionTypes.EUROPEAN_CALL
-            or opt_type2 == OptionTypes.AMERICAN_CALL
+            opt_type2 == OptionTypes.EUROPEAN_CALL.value
+            or opt_type2 == OptionTypes.AMERICAN_CALL.value
         ):
             option_vals[index + i_node] = max(s - k2, 0.0)
         elif (
-            opt_type2 == OptionTypes.EUROPEAN_PUT
-            or opt_type2 == OptionTypes.AMERICAN_PUT
+            opt_type2 == OptionTypes.EUROPEAN_PUT.value
+            or opt_type2 == OptionTypes.AMERICAN_PUT.value
         ):
             option_vals[index + i_node] = max(k2 - s, 0.0)
 
@@ -145,9 +145,9 @@ def value_cmpd_once(
 
             exercise_value = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
-            if opt_type1 == OptionTypes.AMERICAN_CALL:
+            if opt_type2 == OptionTypes.AMERICAN_CALL.value:
                 exercise_value = max(s - k2, 0.0)
-            elif opt_type1 == OptionTypes.AMERICAN_PUT:
+            elif opt_type2 == OptionTypes.AMERICAN_PUT.value:
                 exercise_value = max(k2 - s, 0.0)
 
             option_vals[index + i_node] = max(exercise_value, hold_value)
@@ -168,13 +168,13 @@ def value_cmpd_once(
         hold_value = period_dfs[i_time] * future_exp_val
 
         if (
-            opt_type1 == OptionTypes.EUROPEAN_CALL
-            or opt_type1 == OptionTypes.AMERICAN_CALL
+            opt_type1 == OptionTypes.EUROPEAN_CALL.value
+            or opt_type1 == OptionTypes.AMERICAN_CALL.value
         ):
             option_vals[index + i_node] = max(hold_value - k1, 0.0)
         elif (
-            opt_type1 == OptionTypes.EUROPEAN_PUT
-            or opt_type1 == OptionTypes.AMERICAN_PUT
+            opt_type1 == OptionTypes.EUROPEAN_PUT.value
+            or opt_type1 == OptionTypes.AMERICAN_PUT.value
         ):
             option_vals[index + i_node] = max(k1 - hold_value, 0.0)
 
@@ -202,9 +202,9 @@ def value_cmpd_once(
 
             exercise_value = 0.0  # NUMBA NEEDS HELP TO DETERMINE THE TYPE
 
-            if opt_type1 == OptionTypes.AMERICAN_CALL:
+            if opt_type1 == OptionTypes.AMERICAN_CALL.value:
                 exercise_value = max(hold_value - k1, 0.0)
-            elif opt_type1 == OptionTypes.AMERICAN_PUT:
+            elif opt_type1 == OptionTypes.AMERICAN_PUT.value:
                 exercise_value = max(k1 - hold_value, 0.0)
 
             option_vals[index + i_node] = max(exercise_value, hold_value)
@@ -237,14 +237,13 @@ def value_cmpd_once(
 ########################################################################################
 
 
-
 def implied_stock_price(
     s0: float,
     tc: float,
     tu: float,
     kc: float,
     ku: float,
-    opt_type_u: OptionTypes,
+    opt_type_u: int,
     r: float,
     q: float,
     vol: float,
@@ -277,8 +276,8 @@ def implied_stock_price(
 
 
 def equity_compound_option_bs(
-    c_opt_type: OptionTypes,
-    u_opt_type: OptionTypes,
+    c_opt_type: int,
+    u_opt_type: int,
     tc: float,
     tu: float,
     kc: float,
@@ -296,10 +295,10 @@ def equity_compound_option_bs(
 
     # If the option has any American feature then use the tree
     if (
-        c_opt_type == OptionTypes.AMERICAN_CALL
-        or u_opt_type == OptionTypes.AMERICAN_CALL
-        or c_opt_type == OptionTypes.AMERICAN_PUT
-        or u_opt_type == OptionTypes.AMERICAN_PUT
+        c_opt_type == OptionTypes.AMERICAN_CALL.value
+        or u_opt_type == OptionTypes.AMERICAN_CALL.value
+        or c_opt_type == OptionTypes.AMERICAN_PUT.value
+        or u_opt_type == OptionTypes.AMERICAN_PUT.value
     ):
 
         v = equity_compound_option_value_tree(
@@ -327,8 +326,8 @@ def equity_compound_option_bs(
 
     # Taken from Hull Page 532 (6th edition)
 
-    call_type = OptionTypes.EUROPEAN_CALL
-    put_type = OptionTypes.EUROPEAN_PUT
+    call_type = OptionTypes.EUROPEAN_CALL.value
+    put_type = OptionTypes.EUROPEAN_PUT.value
 
     if c_opt_type == call_type and u_opt_type == call_type:
         v = (
@@ -364,8 +363,8 @@ def equity_compound_option_bs(
 
 
 def equity_compound_option_value_tree(
-    c_opt_type: OptionTypes,
-    u_opt_type: OptionTypes,
+    c_opt_type: int,
+    u_opt_type: int,
     tc: float,
     tu: float,
     kc: float,

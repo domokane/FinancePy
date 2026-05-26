@@ -706,7 +706,7 @@ class Calendar:
 
     ####################################################################################
 
-    def holiday_australia(self, dt: Date, day_in_year, weekday):
+    def holiday_australia(self, dt: Date, day_in_year: int, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -770,7 +770,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_united_kingdom(self, dt, day_in_year, weekday):
+    def holiday_united_kingdom(self, dt: Date, day_in_year: int, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -831,7 +831,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_france(self, dt, day_in_year):
+    def holiday_france(self, dt: Date, day_in_year: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -883,7 +883,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_sweden(self, dt, day_in_year, weekday):
+    def holiday_sweden(self, dt: Date, day_in_year: int, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -932,7 +932,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_germany(self, dt, day_in_year):
+    def holiday_germany(self, dt: Date, day_in_year: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -975,7 +975,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_switzerland(self, dt, day_in_year):
+    def holiday_switzerland(self, dt: Date, day_in_year: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -1018,7 +1018,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_japan(self, dt: Date, weekday):
+    def holiday_japan(self, dt: Date, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -1119,7 +1119,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_new_zealand(self, dt, day_in_year, weekday):
+    def holiday_new_zealand(self, dt: Date, day_in_year: int, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -1180,7 +1180,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_norway(self, dt, day_in_year):
+    def holiday_norway(self, dt: Date, day_in_year: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -1293,7 +1293,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_canada(self, dt, day_in_year, weekday):
+    def holiday_canada(self, dt: Date, day_in_year: int, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -1418,7 +1418,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_target(self, dt, day_in_year):
+    def holiday_target(self, dt: Date, day_in_year):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
@@ -1449,7 +1449,7 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_none(self, dt=None):
+    def holiday_none(self, dt: Date = None):
         """No day is a holiday."""
         return False
 

@@ -6,6 +6,7 @@ import numpy as np
 
 from financepy.models import equity_compound_option_bs
 
+from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
@@ -13,11 +14,8 @@ from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.discount_curve_flat import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.date import Date
-from ...models.equity_compound_option_bs import (
-    equity_compound_option_bs,
-    equity_compound_option_value_tree,
-)
+from ...models.equity_compound_option_bs import equity_compound_option_bs
+from ...models.equity_compound_option_bs import equity_compound_option_value_tree
 
 ########################################################################################
 # TODO: Vectorise pricer
@@ -87,6 +85,9 @@ class EquityCompoundOption(EquityOption):
     ):
         """Validate inputs and compute (tc, tu, kc, ku, ru, qu, vol)."""
 
+        if stock_price < 0:
+            raise FinError("Stock price must be positive.")
+
         if not isinstance(value_dt, Date):
             raise FinError("Valuation date is not a Date")
 
@@ -142,8 +143,8 @@ class EquityCompoundOption(EquityOption):
         )
 
         v = equity_compound_option_bs(
-            self.c_opt_type,
-            self.u_opt_type,
+            self.c_opt_type.value,
+            self.u_opt_type.value,
             tc,
             tu,
             kc,
@@ -177,8 +178,8 @@ class EquityCompoundOption(EquityOption):
         )
 
         v = equity_compound_option_value_tree(
-            self.c_opt_type,
-            self.u_opt_type,
+            self.c_opt_type.value,
+            self.u_opt_type.value,
             tc,
             tu,
             kc,

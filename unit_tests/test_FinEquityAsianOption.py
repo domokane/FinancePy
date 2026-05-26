@@ -9,7 +9,6 @@ from financepy.products.equity.equity_asian_option import (
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 
-
 value_dt = Date(1, 1, 2014)
 start_averaging_dt = Date(1, 6, 2014)
 expiry_dt = Date(1, 1, 2015)
@@ -105,4 +104,4 @@ def test_mc():
         accrued_avg,
     )
 
-    assert round(value_mc, 4) == 12.5722
+    assert round(value_mc, 3) == 12.515

@@ -56,26 +56,28 @@ def equity_lsmc(
     np.random.seed(seed)
 
     num_steps = int(num_steps_per_year * time_to_expiry)
-    num_times = num_steps + 1
+    num_steps = max(num_steps, 1)
 
-    dt = time_to_expiry / num_times
-    times = np.linspace(0, time_to_expiry, num_times)
+    num_times = num_steps + 1
+    dt = time_to_expiry / num_steps
+    times = np.linspace(0.0, time_to_expiry, num_times)
     rootdt = np.sqrt(dt)
 
     mu = risk_free_rate - dividend_yield - 0.5 * sigma**2
 
     if num_paths % 2 == 1:
-        num_paths = num_paths + 1
+        num_paths += 1
 
-    half_num_paths = int(num_paths / 2.0)
+    half_num_paths = num_paths // 2
 
-    st = np.zeros((num_times, num_paths), "d")  # stock price matrix
+    st = np.zeros((num_times, num_paths))
     st[0] = spot_price
 
-    gp = np.random.standard_normal((half_num_paths, num_times))
+    gp = np.random.standard_normal((half_num_paths, num_times - 1))
     g = np.concatenate((gp, -gp))
+
     for it in range(1, num_times):
-        st[it] = st[it - 1] * np.exp(mu * dt + sigma * g[:, it] * rootdt)
+        st[it] = st[it - 1] * np.exp(mu * dt + sigma * g[:, it - 1] * rootdt)
 
     # ensure forward price is recovered exactly
     for it in range(0, num_times):
@@ -84,9 +86,9 @@ def equity_lsmc(
         st[it] = st[it] * fexact / fmean
 
     exercise_matrix = np.zeros_like(st)
-    for i in range(exercise_matrix.shape[0]):
-        exercise_matrix[i] = option_payoff(
-            st[i],
+    for it in range(0, num_times):
+        exercise_matrix[it] = option_payoff(
+            st[it],
             strike_price,
             smooth=False,
             dig=False,
@@ -96,66 +98,74 @@ def equity_lsmc(
     # Set final values for value_matrix and stopping matrix
     value_matrix = np.zeros((exercise_matrix.shape))
     value_matrix[-1] = exercise_matrix[-1]
+
     stopping = np.zeros_like(value_matrix)
     stopping[-1] = np.where(exercise_matrix[-1] > 0, 1, 0)
 
     df = np.exp(-risk_free_rate * dt)
 
     for it in range(num_times - 2, 0, -1):
-        if fit_type_value == BoundaryFitTypes.HERMITE_E.value:
-            regression2 = np.polynomial.hermite_e.hermefit(
-                st[it], value_matrix[it + 1] * df, poly_degree
-            )
-            cont_value = np.polynomial.hermite_e.hermeval(st[it], regression2)
-        elif fit_type_value == BoundaryFitTypes.LAGUERRE.value:
-            regression2 = np.polynomial.laguerre.lagfit(
-                st[it], value_matrix[it + 1] * df, poly_degree
-            )
-            cont_value = np.polynomial.laguerre.lagval(st[it], regression2)
-        elif fit_type_value == BoundaryFitTypes.HERMITE.value:
-            regression2 = np.polynomial.hermite.hermfit(
-                st[it], value_matrix[it + 1] * df, poly_degree
-            )
-            cont_value = np.polynomial.hermite.hermval(st[it], regression2)
-        elif fit_type_value == BoundaryFitTypes.LEGENDRE.value:
-            regression2 = np.polynomial.legendre.legfit(
-                st[it], value_matrix[it + 1] * df, poly_degree
-            )
-            cont_value = np.polynomial.legendre.legval(st[it], regression2)
-        elif fit_type_value == BoundaryFitTypes.CHEBYCHEV.value:
-            regression2 = np.polynomial.chebyshev.chebfit(
-                st[it], value_matrix[it + 1] * df, poly_degree
-            )
-            cont_value = np.polynomial.chebyshev.chebval(st[it], regression2)
-        elif fit_type_value == BoundaryFitTypes.POLYNOMIAL.value:
-            regression2 = fit_poly(st[it], value_matrix[it + 1] * df, poly_degree)
-            cont_value = eval_polynomial(regression2, st[it])
-        else:
-            raise ValueError(f"Unknown _fit_type: {fit_type_value}")
-        cont_value[cont_value < 0] = 0
 
-        # Should we exercise at this timestep?
-        stopping[it] = np.where(exercise_matrix[it] > cont_value, 1, 0)
+        itm = exercise_matrix[it] > 0.0
+
+        if np.sum(itm) <= poly_degree:
+            cont_value = value_matrix[it + 1] * df
+        else:
+            x = st[it][itm]
+            y = value_matrix[it + 1][itm] * df
+
+            if fit_type_value == BoundaryFitTypes.HERMITE_E.value:
+                regression = np.polynomial.hermite_e.hermefit(x, y, poly_degree)
+                cont_value = np.polynomial.hermite_e.hermeval(st[it], regression)
+            elif fit_type_value == BoundaryFitTypes.LAGUERRE.value:
+                regression = np.polynomial.laguerre.lagfit(x, y, poly_degree)
+                cont_value = np.polynomial.laguerre.lagval(st[it], regression)
+            elif fit_type_value == BoundaryFitTypes.HERMITE.value:
+                regression = np.polynomial.hermite.hermfit(x, y, poly_degree)
+                cont_value = np.polynomial.hermite.hermval(st[it], regression)
+            elif fit_type_value == BoundaryFitTypes.LEGENDRE.value:
+                regression = np.polynomial.legendre.legfit(x, y, poly_degree)
+                cont_value = np.polynomial.legendre.legval(st[it], regression)
+            elif fit_type_value == BoundaryFitTypes.CHEBYCHEV.value:
+                regression = np.polynomial.chebyshev.chebfit(x, y, poly_degree)
+                cont_value = np.polynomial.chebyshev.chebval(st[it], regression)
+            elif fit_type_value == BoundaryFitTypes.POLYNOMIAL.value:
+                regression = fit_poly(x, y, poly_degree)
+                cont_value = eval_polynomial(regression, st[it])
+            else:
+                raise ValueError(f"Unknown _fit_type: {fit_type_value}")
+            cont_value[cont_value < 0] = 0
+
+        exercise_now = exercise_matrix[it] > cont_value
+        stopping[it] = np.where(exercise_now, 1.0, 0.0)
 
         value_matrix[it] = np.where(
-            exercise_matrix[it] > cont_value, exercise_matrix[it], cont_value
+            exercise_now, exercise_matrix[it], value_matrix[it + 1] * df
         )
 
     # for each path find the earliest stopping time
     values = np.zeros(value_matrix.shape[1])
 
-    for i in range(value_matrix.shape[1]):
-        if opt_type_value in {
-            OptionTypes.AMERICAN_PUT.value,
-            OptionTypes.AMERICAN_CALL.value,
-        }:
-            # first value in row of stopping matrix that is greater than zero
-            s = np.argmax(stopping.T[i])
+    is_american = opt_type_value in {
+        OptionTypes.AMERICAN_CALL.value,
+        OptionTypes.AMERICAN_PUT.value,
+    }
+
+    for i in range(0, num_paths):
+        if is_american:
+            exercise_times = np.where(stopping[:, i] > 0.0)[0]
+
+            if len(exercise_times) > 0:
+                stop_time = exercise_times[0]
+            else:
+                stop_time = num_times - 1
         else:
-            s = -1
+            stop_time = num_times - 1
 
         # This is the value of the path discounted to present value
-        values[i] = value_matrix[s, i] * np.exp(-risk_free_rate * times[s])
+        values[i] = value_matrix[stop_time, i] * np.exp(
+            -risk_free_rate * times[stop_time]
+        )
 
     value = np.mean(values)
 

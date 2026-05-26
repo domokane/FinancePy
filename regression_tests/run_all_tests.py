@@ -37,7 +37,7 @@ def main(start_index=0, end_index=None):
 
     timings = []
 
-    # start_index = 82
+    start_index = 40
     #    end_index = 115
 
     for idx in range(start_index, end_index):
@@ -56,9 +56,7 @@ def main(start_index=0, end_index=None):
             module = __import__(module_name)
 
             num_errors = getattr(module.test_cases, "_global_num_errors", 0)
-            num_warnings = getattr(
-                module.test_cases, "_global_num_warnings", 0
-            )
+            num_warnings = getattr(module.test_cases, "_global_num_warnings", 0)
 
             elapsed = time.perf_counter() - start_time
             timings.append((module_name, elapsed))
@@ -78,15 +76,11 @@ def main(start_index=0, end_index=None):
         except (FinError, ValueError, NameError, TypeError) as e:
             elapsed = time.perf_counter() - start_time
             timings.append((module_name, elapsed))
-            print(
-                f"{type(e).__name__}: {e} ************ (TIME: {elapsed:6.3f} s)"
-            )
+            print(f"{type(e).__name__}: {e} ************ (TIME: {elapsed:6.3f} s)")
         except Exception as e:
             elapsed = time.perf_counter() - start_time
             timings.append((module_name, elapsed))
-            print(
-                f"Unexpected {type(e).__name__}: {e} (TIME: {elapsed:6.3f} s)"
-            )
+            print(f"Unexpected {type(e).__name__}: {e} (TIME: {elapsed:6.3f} s)")
             traceback.print_exc()
 
 

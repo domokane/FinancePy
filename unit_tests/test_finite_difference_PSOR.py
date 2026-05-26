@@ -9,7 +9,6 @@ from financepy.utils.date import Date
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 
-
 ########################################################################################
 
 
@@ -26,7 +25,7 @@ def test_black_scholes_fd_psor():
     dividend_yield = 0.07
     volatility = 0.2
 
-    time_to_expiry = 5
+    time_to_expiry = 5.0
     strike = 1.025
     dig = False
     smooth = False
@@ -161,7 +160,7 @@ def test_european_call():
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_CALL
-    num_steps_per_year = 2000
+    num_steps_per_year = 200
 
     v = black_scholes_fd_psor(
         spot_price=spot_price,
@@ -203,7 +202,7 @@ def test_european_put():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 2000
+    num_steps_per_year = 200
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_PUT
 
@@ -247,7 +246,7 @@ def test_american_call():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 2000
+    num_steps_per_year = 200
     strike_price = 50.0
     opt_type = OptionTypes.AMERICAN_CALL
 
@@ -292,7 +291,7 @@ def test_american_put():
     value_dt = Date(1, 1, 2016)
     expiry_dt = Date(1, 1, 2021)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    num_steps_per_year = 2000
+    num_steps_per_year = 200
     strike_price = 50.0
     opt_type = OptionTypes.AMERICAN_PUT
 

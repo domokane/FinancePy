@@ -20,11 +20,13 @@ class BlackShifted:
 
     ####################################################################################
 
-    def __init__(self, volatility: float, shift: float, implementation: int = 0) -> None:
+    def __init__(
+        self, volatility: float, shift: float, implementation: int = 0
+    ) -> None:
         """Create FinModel black using parameters."""
         self.volatility = volatility
         self.shift = shift
-        self.implementation = 0
+        self.implementation = implementation
         self.num_steps = 0
         self.seed = 0
         self.param1 = 0
@@ -44,12 +46,37 @@ class BlackShifted:
         measure following a change of measure. The sign of the shift is the
         same as Matlab."""
 
+        if call_or_put not in (
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT,
+        ):
+            raise ValueError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
+
+        if time_to_expiry < 0.0:
+            raise ValueError("time_to_expiry must be non-negative")
+
+        if df < 0.0:
+            raise ValueError("df must be non-negative")
+
+        if forward_rate + self.shift <= 0.0:
+            raise ValueError("forward_rate + shift must be positive")
+
+        if strike_rate + self.shift <= 0.0:
+            raise ValueError("strike_rate + shift must be positive")
+
         s = self.shift
         f = forward_rate
         t = time_to_expiry
         k = strike_rate
         sqrt_t = np.sqrt(t)
         vol = self.volatility
+
+        if t == 0.0 or vol == 0.0:
+            if call_or_put == OptionTypes.EUROPEAN_CALL:
+                return df * max(f - k, 0.0)
+
+            if call_or_put == OptionTypes.EUROPEAN_PUT:
+                return df * max(k - f, 0.0)
 
         d1 = np.log((f + s) / (k + s)) + vol * vol * t / 2
         d1 = d1 / (vol * sqrt_t)

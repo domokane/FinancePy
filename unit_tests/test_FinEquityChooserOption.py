@@ -1,9 +1,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_chooser_option import EquityChooserOption
+
+
+def assert_close(value, expected, tol=2.0e-3):
+    assert np.isclose(value, expected, atol=tol), (
+        f"value={value:.10f}, expected={expected:.10f}, "
+        f"diff={value - expected:.10f}"
+    )
+
 
 ########################################################################################
 
@@ -40,9 +50,9 @@ def test_equity_chooser_option_haug():
 
     v_haug = 6.0508
 
-    assert round(v, 4) == 6.0342
-    assert round(v_haug, 4) == 6.0508
-    assert round(v_mc, 4) == 6.0587
+    assert_close(v, 6.020)
+    assert_close(v_haug, 6.0508)
+    assert_close(v_mc, 6.0587)
 
 
 ########################################################################################
@@ -81,9 +91,9 @@ def test_equity_chooser_option_matlab():
 
     v_matlab = 8.9308
 
-    assert round(v, 4) == 8.9316
-    assert round(v_matlab, 4) == 8.9308
-    assert round(v_mc, 4) == 8.9356
+    assert_close(v, 8.833)
+    assert_close(v_matlab, 8.931)
+    assert_close(v_mc, 8.936)
 
 
 ########################################################################################

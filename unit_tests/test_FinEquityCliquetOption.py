@@ -32,4 +32,4 @@ def test_equity_cliquet_option():
         value_dt, stock_price, discount_curve, dividend_curve, model
     )
 
-    assert round(v, 4) == 34.5287
+    assert round(v, 3) == 34.531

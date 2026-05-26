@@ -7,7 +7,6 @@ from ..utils.error import FinError
 from ..utils.global_types import BarrierTypes
 from ..utils.math import normcdf
 
-
 # Calculates the Barrier option price using an Analytical Approach
 # and the Black Scholes Model
 
@@ -46,6 +45,62 @@ def value_equity_barrier_option_bs(
     easily be vectorised which is why it has been wrapped.
     # number of observations per year
     """
+
+    if t < 0.0:
+        raise FinError("Time to expiry must be non-negative.")
+
+    if k <= 0.0:
+        raise FinError("Strike must be positive.")
+
+    if h <= 0.0:
+        raise FinError("Barrier must be positive.")
+
+    if s <= 0.0:
+        raise FinError("Stock price must be positive.")
+
+    if v < 0.0:
+        raise FinError("Volatility must be non-negative.")
+
+    if nobs <= 0:
+        raise FinError("Number of observations must be positive.")
+
+    if abs(v) < 1e-10:
+        v = 1e-10
+
+    # Handle expiry immediately
+    if t == 0.0:
+
+        intrinsic_call = max(s - k, 0.0)
+        intrinsic_put = max(k - s, 0.0)
+
+        # Up barriers
+        if opt_type == BarrierTypes.UP_AND_OUT_CALL.value:
+            return 0.0 if s >= h else intrinsic_call
+
+        elif opt_type == BarrierTypes.UP_AND_OUT_PUT.value:
+            return 0.0 if s >= h else intrinsic_put
+
+        elif opt_type == BarrierTypes.UP_AND_IN_CALL.value:
+            return intrinsic_call if s >= h else 0.0
+
+        elif opt_type == BarrierTypes.UP_AND_IN_PUT.value:
+            return intrinsic_put if s >= h else 0.0
+
+        # Down barriers
+        elif opt_type == BarrierTypes.DOWN_AND_OUT_CALL.value:
+            return 0.0 if s <= h else intrinsic_call
+
+        elif opt_type == BarrierTypes.DOWN_AND_OUT_PUT.value:
+            return 0.0 if s <= h else intrinsic_put
+
+        elif opt_type == BarrierTypes.DOWN_AND_IN_CALL.value:
+            return intrinsic_call if s <= h else 0.0
+
+        elif opt_type == BarrierTypes.DOWN_AND_IN_PUT.value:
+            return intrinsic_put if s <= h else 0.0
+
+        raise FinError("Unknown barrier option type.")
+
     ln_s0_k = np.log(s / k)
     sqrt_t = np.sqrt(t)
 
@@ -101,7 +156,7 @@ def value_equity_barrier_option_bs(
         elif opt_type == BarrierTypes.UP_AND_IN_PUT.value:
             return p
 
-    num_observations = 1 + t * nobs
+    num_observations = max(1, int(t * nobs + 0.5))
 
     # Correction by Broadie, Glasserman and Kou, Mathematical Finance, 1997
     # Adjusts the barrier for discrete and not continuous observations
@@ -128,10 +183,6 @@ def value_equity_barrier_option_bs(
         raise FinError("Unknown barrier option type." + str(opt_type))
 
     h = h_adj
-
-    if abs(v) < 1e-5:
-        v = 1e-5
-
     ll = (mu + v * v / 2.0) / v2
     y = np.log(h * h / (s * k)) / sigma_rt_t + ll * sigma_rt_t
     x1 = np.log(s / h) / sigma_rt_t + ll * sigma_rt_t
@@ -181,7 +232,7 @@ def value_equity_barrier_option_bs(
         else:
             price = c
     elif opt_type == BarrierTypes.UP_AND_OUT_CALL.value:
-        if h > k:
+        if h >= k:
             c_ui = (
                 s * dq * normcdf(x1)
                 - k * df * normcdf(x1 - sigma_rt_t)
@@ -195,7 +246,7 @@ def value_equity_barrier_option_bs(
         else:
             price = 0.0
     elif opt_type == BarrierTypes.UP_AND_IN_PUT.value:
-        if h > k:
+        if h >= k:
             p_ui = -s * dq * pow(h_over_s, 2.0 * ll) * normcdf(-y) + k * df * pow(
                 h_over_s, 2.0 * ll - 2.0
             ) * normcdf(-y + sigma_rt_t)

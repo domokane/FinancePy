@@ -27,7 +27,6 @@ from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_numba
 from ...models.equity_asian_option_mc import equity_asian_value_mc_numba
 from ...models.equity_asian_option_mc import error_str
 
-
 ########################################################################################
 
 
@@ -459,7 +458,7 @@ class EquityAsianOption:
             tau,
             k,
             n,
-            self.opt_type,
+            self.opt_type.value,
             stock_price,
             r,
             q,
@@ -567,7 +566,7 @@ class EquityAsianOption:
             tau,
             k,
             n,
-            self.opt_type,
+            self.opt_type.value,
             stock_price,
             r,
             q,
