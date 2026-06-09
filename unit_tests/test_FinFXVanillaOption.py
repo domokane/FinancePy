@@ -2,6 +2,7 @@
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
+from financepy.models.black import Black
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
 from financepy.utils.day_count import DayCountTypes
@@ -9,6 +10,49 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
+
+########################################################################################
+
+
+def test_fin_fx_vanilla_option_black76_matches_black_scholes_forward_value():
+
+    value_dt = Date(13, 2, 2018)
+    expiry_dt = Date(13, 2, 2019)
+
+    spot_fx_rate = 1.20
+    strike_fx_rate = 1.25
+    volatility = 0.10
+
+    domestic_curve = DiscountCurveFlat(value_dt, 0.025)
+    foreign_curve = DiscountCurveFlat(value_dt, 0.030)
+
+    call_option = FXVanillaOption(
+        expiry_dt,
+        strike_fx_rate,
+        "EURUSD",
+        OptionTypes.EUROPEAN_CALL,
+        1000000.0,
+        "USD",
+    )
+
+    black_scholes_value = call_option.value(
+        value_dt,
+        spot_fx_rate,
+        domestic_curve,
+        foreign_curve,
+        BlackScholes(volatility),
+    )
+    black76_value = call_option.value(
+        value_dt,
+        spot_fx_rate,
+        domestic_curve,
+        foreign_curve,
+        Black(volatility),
+    )
+
+    assert abs(black76_value["v"] - black_scholes_value["v"]) < 1e-12
+    assert abs(black76_value["cash_dom"] - black_scholes_value["cash_dom"]) < 1e-8
+
 
 ########################################################################################
 

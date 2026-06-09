@@ -22,6 +22,7 @@ from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...models.equity_crr_tree import crr_tree_val_avg
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import SABR
+from ...models.black import Black
 from ...models.black_scholes import BlackScholes
 
 from ...models.black_scholes_analytic import bs_value, bs_delta
@@ -297,7 +298,11 @@ class FXVanillaOption:
 
         vdf = None
 
-        if isinstance(model, BlackScholes) or isinstance(model, SABR):
+        if isinstance(model, Black):
+
+            vdf = model.value(f0t, k, t_exp, dom_df, self.opt_type)
+
+        elif isinstance(model, BlackScholes) or isinstance(model, SABR):
 
             if isinstance(model, BlackScholes):
                 volatility = model.volatility
