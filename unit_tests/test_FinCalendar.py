@@ -3,6 +3,7 @@
 from financepy.utils.calendar import Calendar, CalendarTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.date import Date
+from financepy.utils.error import FinError
 
 bus_days_in_decade = {
     CalendarTypes.NONE: 3653,
@@ -39,7 +40,11 @@ MONTHS = {
 
 
 def date_from_string(s):
-    _, d, m, y = s.split()
+    parts = s.split()
+    if len(parts) == 4:
+        _, d, m, y = parts
+    else:
+        d, m, y = s.split("-")
     return Date(int(d), MONTHS[m], int(y))
 
 
@@ -216,6 +221,42 @@ def test_modified_following_does_not_cross_month():
     adjusted = cal.adjust(dt, BusDayAdjustTypes.MODIFIED_FOLLOWING)
 
     assert adjusted == Date(30, 7, 2021)
+
+
+def test_joint_calendar_uses_union_of_holidays():
+    joint = Calendar((CalendarTypes.UNITED_STATES, CalendarTypes.TARGET))
+    us = Calendar(CalendarTypes.UNITED_STATES)
+    target = Calendar(CalendarTypes.TARGET)
+
+    us_holiday = Date(4, 7, 2022)
+    target_holiday = Date(1, 5, 2024)
+
+    assert not us.is_business_day(us_holiday)
+    assert target.is_business_day(us_holiday)
+    assert not joint.is_business_day(us_holiday)
+    assert joint.is_holiday(us_holiday)
+
+    assert us.is_business_day(target_holiday)
+    assert not target.is_business_day(target_holiday)
+    assert not joint.is_business_day(target_holiday)
+    assert joint.is_holiday(target_holiday)
+
+
+def test_joint_calendar_adjusts_and_adds_business_days():
+    joint = Calendar([CalendarTypes.TARGET, CalendarTypes.UNITED_STATES])
+
+    assert joint.adjust(
+        Date(4, 7, 2022), BusDayAdjustTypes.FOLLOWING
+    ) == Date(5, 7, 2022)
+    assert joint.adjust(
+        Date(1, 5, 2024), BusDayAdjustTypes.FOLLOWING
+    ) == Date(2, 5, 2024)
+    assert joint.add_business_days(Date(1, 7, 2022), 1) == Date(5, 7, 2022)
+
+
+def test_joint_calendar_rejects_invalid_member():
+    with pytest.raises(FinError):
+        Calendar((CalendarTypes.TARGET, "UNITED_STATES"))
 
 
 @pytest.mark.parametrize("cal_type", list(CalendarTypes))

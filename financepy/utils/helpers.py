@@ -444,6 +444,8 @@ def to_usable_type(t):
         # t is a normal type
         if t is float:
             return (int, float, np.float64)
+        if getattr(t, "__name__", None) == "CalendarTypes":
+            return (t, list, tuple)
         if isinstance(t, tuple):
             return tuple(to_usable_type(tp) for tp in t)
 

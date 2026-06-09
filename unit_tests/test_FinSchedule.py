@@ -101,6 +101,27 @@ def test_forward_frequencies():
 ########################################################################################
 
 
+def test_schedule_accepts_joint_calendar():
+
+    d1 = Date(4, 1, 2022)
+    d2 = Date(4, 7, 2022)
+
+    schedule = Schedule(
+        d1,
+        d2,
+        FrequencyTypes.SEMI_ANNUAL,
+        (CalendarTypes.TARGET, CalendarTypes.UNITED_STATES),
+        BusDayAdjustTypes.FOLLOWING,
+        DateGenRuleTypes.BACKWARD,
+        termination_date_adjust,
+    )
+
+    assert schedule.adjusted_dts[-1] == Date(5, 7, 2022)
+
+
+########################################################################################
+
+
 def test_backward_front_stub():
 
     # BACKWARD SHORT STUB AT FRONT

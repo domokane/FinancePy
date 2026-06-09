@@ -364,12 +364,60 @@ class Calendar:
     specified calendar."""
 
     def __init__(self, cal_type: CalendarTypes):
-        """Create a calendar based on a specified calendar type."""
+        """Create a calendar based on one or more specified calendar types."""
 
-        if cal_type not in CalendarTypes:
-            raise FinError("Invalid calendar type " + str(cal_type))
+        self.cal_types = self._validate_calendar_types(cal_type)
+        self.cal_type = self.cal_types[0] if len(self.cal_types) == 1 else self.cal_types
+        self._calendars = (
+            tuple(Calendar(cal_type) for cal_type in self.cal_types)
+            if len(self.cal_types) > 1
+            else ()
+        )
 
-        self.cal_type = cal_type
+    ####################################################################################
+
+    @staticmethod
+    def _validate_calendar_types(cal_type):
+        """Validate and normalize a single or joint calendar specification."""
+
+        if isinstance(cal_type, CalendarTypes):
+            return (cal_type,)
+
+        if isinstance(cal_type, (list, tuple)):
+            if len(cal_type) == 0:
+                raise FinError("Calendar type list cannot be empty")
+
+            cal_types = []
+            for single_cal_type in cal_type:
+                if isinstance(single_cal_type, CalendarTypes) is False:
+                    raise FinError("Invalid calendar type " + str(single_cal_type))
+                if single_cal_type not in cal_types:
+                    cal_types.append(single_cal_type)
+
+            return tuple(cal_types)
+
+        raise FinError("Invalid calendar type " + str(cal_type))
+
+    ####################################################################################
+
+    def _is_single_calendar_type(self, cal_type: CalendarTypes):
+        """Return True when this calendar is exactly one calendar type."""
+
+        return len(self.cal_types) == 1 and self.cal_types[0] == cal_type
+
+    ####################################################################################
+
+    def _is_all_calendar_type(self, cal_type: CalendarTypes):
+        """Return True when every component calendar has the requested type."""
+
+        return all(single_cal_type == cal_type for single_cal_type in self.cal_types)
+
+    ####################################################################################
+
+    def _calendar_name(self):
+        """Return a display name for a single or joint calendar."""
+
+        return "+".join(cal_type.name for cal_type in self.cal_types)
 
     ####################################################################################
 
@@ -387,7 +435,7 @@ class Calendar:
             raise FinError("Invalid type passed. Need Finbd_type")
 
         # If calendar type is NONE then every day is a business day
-        if self.cal_type == CalendarTypes.NONE:
+        if self._is_all_calendar_type(CalendarTypes.NONE):
             return dt
 
         if bd_type == BusDayAdjustTypes.NONE:
@@ -461,7 +509,10 @@ class Calendar:
             raise FinError("Invalid type passed. Need BusDayAdjustTypes")
 
         # If no calendar or no adjustment, nothing to do
-        if self.cal_type == CalendarTypes.NONE or bd_type == BusDayAdjustTypes.NONE:
+        if (
+            self._is_all_calendar_type(CalendarTypes.NONE)
+            or bd_type == BusDayAdjustTypes.NONE
+        ):
             return dt
 
         # FOLLOWING convention
@@ -554,7 +605,7 @@ class Calendar:
         if num_days == 0:
             return start_dt
 
-        if self.cal_type == CalendarTypes.NONE:
+        if self._is_all_calendar_type(CalendarTypes.NONE):
             return start_dt.add_days(num_days)
 
         step = 1 if num_days > 0 else -1
@@ -562,7 +613,7 @@ class Calendar:
         dt = start_dt
 
         # Safe fast path for weekend-only calendar
-        if self.cal_type == CalendarTypes.WEEKEND:
+        if self._is_single_calendar_type(CalendarTypes.WEEKEND):
             weeks, days_left = divmod(days_left, 5)
             dt = dt.add_days(step * 7 * weeks)
 
@@ -622,8 +673,11 @@ class Calendar:
         calendar. If it is it returns True, otherwise False."""
 
         # Every day is a business day when the Calendar is NONE
-        if self.cal_type == CalendarTypes.NONE:
+        if self._is_all_calendar_type(CalendarTypes.NONE):
             return True
+
+        if self._calendars:
+            return all(calendar.is_business_day(dt) for calendar in self._calendars)
 
         # For all calendars so far, SAT and SUN are not business days
         # If this ever changes I will need to add a filter here.
@@ -641,6 +695,9 @@ class Calendar:
         """Determines if a date is a Holiday according to the specified
         calendar. Weekends are not holidays unless the holiday falls on a
         weekend date."""
+
+        if self._calendars:
+            return any(calendar.is_holiday(dt) for calendar in self._calendars)
 
         start_dt = Date(1, 1, dt.y)
         day_in_year = dt.excel_dt - start_dt.excel_dt + 1
@@ -1492,13 +1549,13 @@ class Calendar:
     ###########################################################################
 
     def __str__(self):
-        s = self.cal_type.name
+        s = self._calendar_name()
         return s
 
     ###########################################################################
 
     def __repr__(self):
-        s = self.cal_type.name
+        s = self._calendar_name()
         return s
 
 
