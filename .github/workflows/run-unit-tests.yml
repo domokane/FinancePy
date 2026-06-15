@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
@@ -22,17 +22,18 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-          python -m pip install .[test]
+          python -m pip install --no-deps .[test]
 
       - name: show package is importable
         run: |
           python -c "import financepy as fp; print(fp.__version__)"
 
-      - name: list dependencies
+      - name: show environment
         run: |
           pip --version
+          python -c "import financepy as fp; print(fp.__version__)"
+          python -c "import numpy, scipy, numba, llvmlite; print(numpy.__version__, scipy.__version__, numba.__version__, llvmlite.__version__)"
           pip freeze
-          pip list
 
       - name: unit tests
         run: |

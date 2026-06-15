@@ -203,7 +203,7 @@ class BondParametricYieldCurve:
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("SETTLEMENT DATE", self.settle_dt)
-        s += label_to_string("BOND", self.bonds)
+#        s += label_to_string("BOND", self.bonds)
         s += label_to_string("YIELDS", self.ylds)
         s += label_to_string("CURVE FIT", self.curve_fit)
         return s
