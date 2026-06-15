@@ -35,9 +35,7 @@ def test_smooth_fit_simple(interp_type):
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -92,9 +90,7 @@ def test_smooth_fit_simple(interp_type):
     calibrator = IborSingleCurveSmoothingCalibrator(init_curve)
 
     smooth_param = 1.0
-    curve, report = calibrator.fit(
-        smoothness=smooth_param, report_progress=REPORT_PROGRESS
-    )
+    _, report = calibrator.fit(smoothness=smooth_param, report_progress=REPORT_PROGRESS)
 
     if REPORT_PROGRESS:
         with pd.option_context(
@@ -121,9 +117,7 @@ def test_smooth_fit(interp_type):
     depos = []
     spot_days = 2
     settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -264,9 +258,7 @@ def test_smooth_fit(interp_type):
 
     # here we go
     smooth_param = 1e-2
-    curve, report = calibrator.fit(
-        smoothness=smooth_param, report_progress=REPORT_PROGRESS
-    )
+    _, report = calibrator.fit(smoothness=smooth_param, report_progress=REPORT_PROGRESS)
 
     if REPORT_PROGRESS:
         with pd.option_context(

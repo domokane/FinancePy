@@ -75,9 +75,9 @@ def test_bdt_example_one():
     # http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote23.pdf
 
     value_dt = Date(1, 1, 2020)
-    years = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
+    years = [1.0, 2.0, 3.0, 4.0, 5.0]
     zero_dts = value_dt.add_years(years)
-    zero_rates = [0.00, 0.10, 0.11, 0.12, 0.125, 0.13]
+    zero_rates = [0.10, 0.11, 0.12, 0.125, 0.13]
 
     test_cases.header("DATES")
     test_cases.print(zero_dts)

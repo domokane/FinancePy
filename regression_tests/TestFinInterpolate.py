@@ -148,36 +148,6 @@ def test_flat_fwd_rates():
     assert round(x, 4) == 5.2632
     assert round(y_int, 4) == 0.6260
 
-
-########################################################################################
-
-
-def test_linear_fwd_rates():
-
-    interp_type = InterpTypes.LINEAR_FWD_RATES
-
-    interpolator = Interpolator(interp_type)
-    interpolator.fit(x_values, y_values)
-
-    index = 3
-    x = x_interpolate_values[index]
-    y_int = interpolator.interpolate(x)
-    assert round(x, 4) == 1.5789
-    assert round(y_int, 4) == 0.8581
-
-    index = 15
-    x = x_interpolate_values[index]
-    y_int = interpolator.interpolate(x)
-    assert round(x, 4) == 7.8947
-    assert round(y_int, 4) == 0.5119
-
-    index = 19
-    x = x_interpolate_values[index]
-    y_int = interpolator.interpolate(x)
-    assert round(x, 4) == 10.0
-    assert round(y_int, 4) == 0.4493
-
-
 ########################################################################################
 
 
@@ -437,7 +407,6 @@ test_fin_interpolate()
 test_fin_interpolate__runs()
 test_fin_interpolate__recovers__inputs()
 test_flat_fwd_rates()
-test_linear_fwd_rates()
 test_linear_zero_rates()
 test_fincubic_zero_rates()
 test_natcubic_log_discount()

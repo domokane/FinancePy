@@ -66,12 +66,12 @@ def get_bond_market_conventions(country):
     thirtye360 = DayCountTypes.THIRTY_E_360
     thirty360 = DayCountTypes.THIRTY_360_BOND
 
-    # TODO: CHECK CONVENTIONS
     # RETURNS
-    # ACCRUAL CONVENTION
-    # COUPON FREQUENCY
-    # SETTLEMENT DAYS
-    # NUM EX DIVIDEND DAYS AND CALENDAR TO USE
+    # - ACCRUAL CONVENTION
+    # - COUPON FREQUENCY
+    # - SETTLEMENT DAYS
+    # - NUM EX DIVIDEND DAYS
+    # - CALENDAR TYPER TO USE
 
     if country == BondMarkets.AUSTRIA:
         return (act_act, annual, 2, 0, None)

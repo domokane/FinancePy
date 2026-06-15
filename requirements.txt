@@ -19,5 +19,3 @@ pytest-benchmark == 5.2.3
 mypy == 1.13
 typing-extensions == 4.12
 more-itertools
-
-

@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import os
 from typing import Union
 
 import numpy as np
@@ -17,6 +18,8 @@ from ...utils.schedule import Schedule
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates
 from ...utils.helpers import label_to_string
+
+import matplotlib.pyplot as plt
 
 ########################################################################################
 
@@ -80,7 +83,7 @@ class DiscountCurve:
             start_index = 1
 
         for i in range(start_index, num_points):
-            t = times_from_dates(df_dates[i], value_dt, time_dc_type)
+            t = times_from_dates(value_dt, df_dates[i], time_dc_type)
             self._times.append(t)
             self._dfs.append(df_values[i])
             self._df_dates.append(df_dates[i])
@@ -206,8 +209,8 @@ class DiscountCurve:
         if np.any(accruals <= 0.0):
             raise FinError("Forward end date must be after start date.")
 
-        t1 = times_from_dates(start_dts, self.value_dt, self.time_dc_type)
-        t2 = times_from_dates(end_dts, self.value_dt, self.time_dc_type)
+        t1 = times_from_dates(self.value_dt, start_dts, self.time_dc_type)
+        t2 = times_from_dates(self.value_dt, end_dts, self.time_dc_type)
 
         rates = self.fwd_rate_t(t1, t2, accruals, comp_type, freq_type)
 
@@ -228,7 +231,7 @@ class DiscountCurve:
     ):
         """Forward rate between curve times."""
 
-        if comp_type == CompoundingTypes.COMPOUNDED and freq_type == None:
+        if comp_type == CompoundingTypes.COMPOUNDED and freq_type is None:
             raise FinError("Require Frequency type for COMPOUNDED interest.")
 
         t1, scalar_input_1 = self._to_time_array(start_t)
@@ -283,7 +286,7 @@ class DiscountCurve:
 
     def fwd_rate_inst(self, dts: Union[Date, list], dt: float = 1.0e-6):
         """Instantaneous continuously compounded forward rate at date(s)."""
-        times = times_from_dates(dts, self.value_dt, self.time_dc_type)
+        times = times_from_dates(self.value_dt, dts, self.time_dc_type)
         return self.fwd_rate_inst_t(times, dt)
 
     ###########################################################################
@@ -291,7 +294,7 @@ class DiscountCurve:
     def fwd_rate_inst_t(
         self,
         t: Union[float, list, np.ndarray],
-        dt: float = 1.0e-6,
+        dt: float = 1.0e-4,
     ):
         """Instantaneous continuously compounded forward rate at time t.
 
@@ -327,7 +330,7 @@ class DiscountCurve:
         if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
 
-        times = times_from_dates(maturity_dt, self.value_dt, self.time_dc_type)
+        times = times_from_dates(self.value_dt, maturity_dt, self.time_dc_type)
         zero_rates = self.zero_rate_t(times, freq_type)
         return zero_rates
 
@@ -336,7 +339,7 @@ class DiscountCurve:
     def zero_rate_cc(self, maturity_dt: Union[list, Date]):
         """Calculate zero rates with continuous compounding."""
 
-        times = times_from_dates(maturity_dt, self.value_dt, self.time_dc_type)
+        times = times_from_dates(self.value_dt, maturity_dt, self.time_dc_type)
         zero_rates_cc = self.zero_rate_t(times, FrequencyTypes.CONTINUOUS)
         return zero_rates_cc
 
@@ -356,6 +359,9 @@ class DiscountCurve:
     ):
         if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
+
+        if np.any(t < 0):
+            raise FinError("Times to maturity cannot be negative.")
 
         times, scalar_input = self._to_time_array(t)
         times = np.maximum(times, G_SMALL)
@@ -499,7 +505,7 @@ class DiscountCurve:
 
         acc_day_counter = DayCount(accrual_dc_type)
 
-        t_start = times_from_dates(effective_dt, self.value_dt, self.time_dc_type)
+        t_start = times_from_dates(self.value_dt, effective_dt, self.time_dc_type)
 
         par_rates = []
 
@@ -513,7 +519,7 @@ class DiscountCurve:
 
             payment_times = np.array(
                 [
-                    times_from_dates(dt, self.value_dt, self.time_dc_type)
+                    times_from_dates(self.value_dt, dt, self.time_dc_type)
                     for dt in flow_dts[1:]
                 ]
             )
@@ -536,6 +542,35 @@ class DiscountCurve:
         return par_rates
 
     ###########################################################################
+
+    def par_rate_simple_t(self, t_maturity, freq=2):
+        """
+        Simple spot-starting par rate from curve times. Handles bonds with coupons
+        equal to c/f. Calculates payments backwards from maturity. Not exact for swaps
+        as it ignores accrual factor weighted coupon payments.
+
+        Parameters
+        ----------
+        maturity : float
+            Final maturity in years.
+        freq : int
+            Fixed-leg payments per year.
+        """
+
+        dt = 1.0 / freq
+        payment_times = [t_maturity]
+        t = t_maturity
+
+        while t > dt:
+            t -= dt
+            payment_times.append(t)
+
+        payment_times = np.array(sorted(payment_times), dtype=float)
+        accrual_factors = np.diff(np.concatenate(([0.0], payment_times)))
+        p = self.par_rate_t(0.0, payment_times, accrual_factors)
+        return p
+
+    #############################################################################
 
     def par_rate_t(
         self,
@@ -562,7 +597,7 @@ class DiscountCurve:
         vector of dates. The time day count determines how dates get converted
         to years."""
 
-        times = times_from_dates(dt, self.value_dt, self.time_dc_type)
+        times = times_from_dates(self.value_dt, dt, self.time_dc_type)
         dfs = self.df_t(times)
 
         if isinstance(dt, Date):
@@ -583,8 +618,8 @@ class DiscountCurve:
 
         if self._interp_type in (
             InterpTypes.FLAT_FWD_RATES,
+            InterpTypes.LINEAR_DISCOUNT,
             InterpTypes.LINEAR_ZERO_RATES,
-            InterpTypes.LINEAR_FWD_RATES,
         ):
             dfs = interpolate(times, self._times, self._dfs, self._interp_type.value)
         else:
@@ -712,6 +747,66 @@ class DiscountCurve:
             return np.array([float(t)], dtype=float), True
 
         return np.asarray(t, dtype=float), False
+
+    ###########################################################################
+
+    def plot(
+        self,
+        title,
+        times: np.ndarray = None,
+        ymin: float = None,
+        ymax: float = None,
+        filename: str = None,
+    ):
+        """Display discount curve."""
+
+        plt.rcParams.update(
+            {
+                "lines.linewidth": 3,
+                "font.size": 14,
+                "axes.labelsize": 14,
+                "axes.titlesize": 16,
+                "legend.fontsize": 14,
+            }
+        )
+
+        plt.figure(figsize=(12, 6))
+        plt.title(title)
+
+        if times is None:
+            tmax = np.max(self._times)
+            times = np.linspace(0.0, tmax, int(tmax * 12.0))
+        else:
+            times = np.asarray(times, dtype=float)
+
+        if np.any(times < 0.0):
+            raise FinError("Plot times must be strictly positive.")
+
+        times = np.maximum(times, 1e-8)
+
+        zeros = self.zero_rate_cc_t(times)
+        fwds = self.fwd_rate_inst_t(times)
+
+        # Bump the forwards by 1bp in case the curve is flat so they can be seen
+        fwds = fwds + 1e-4
+
+        plt.plot(times, zeros * 100, label="CC Zero Rates")
+        plt.plot(times, fwds * 100, label="Inst Fwd Rates")
+
+        plt.xlabel("Time to Maturity (years)")
+        plt.ylabel("Rate (%)")
+        plt.legend()
+
+        if ymin is not None and ymax is not None:
+            plt.ylim(ymin, ymax)
+
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+
+        if filename is not None:
+            plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
+
+        plt.show()
 
     ###########################################################################
 

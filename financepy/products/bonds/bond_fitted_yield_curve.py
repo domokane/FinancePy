@@ -43,6 +43,9 @@ class BondFittedYieldCurve:
         specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters."""
 
+        print("Class BondFittedYieldCurve is Deprecated.")
+        print("Use BondParametricYieldCurve in market/curves")
+
         self.settle_dt = settle_dt
         self.bonds = bonds
         self.ylds = np.array(ylds)
@@ -60,8 +63,8 @@ class BondFittedYieldCurve:
         for bond in bonds:
 
             years_to_maturity = times_from_dates(
-                bond.maturity_dt,
                 settle_dt,
+                bond.maturity_dt,
                 self.time_dc_type,
             )
             years_to_maturities.append(years_to_maturity)
@@ -124,7 +127,7 @@ class BondFittedYieldCurve:
     def interp_yield(self, maturity_dt: Date):
         """Interpolate yield"""
         if isinstance(maturity_dt, Date):
-            t = times_from_dates(maturity_dt, self.settle_dt, self.time_dc_type)
+            t = times_from_dates(self.settle_dt, maturity_dt, self.time_dc_type)
         elif isinstance(maturity_dt, list):
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):
@@ -160,25 +163,66 @@ class BondFittedYieldCurve:
 
     ###########################################################################
 
-    def plot(self, title, ylabel="Yield To Maturity (%)"):
+    def plot(
+        self,
+        title,
+        times: np.ndarray = None,
+        ymin: float = None,
+        ymax: float = None,
+        filename: str = None,
+    ):
         """Display yield curve."""
 
+        plt.rcParams.update(
+            {
+                "lines.linewidth": 3,
+                "font.size": 14,
+                "axes.labelsize": 14,
+                "axes.titlesize": 16,
+                "legend.fontsize": 14,
+            }
+        )
+
         plt.figure(figsize=(12, 6))
+
+        title = title + " - " + self.curve_fit.name
         plt.title(title)
+
+        if times is None:
+            tmax = np.max(self.years_to_maturity)
+            times = np.linspace(0.0, tmax, int(12 * tmax))
+        else:
+            times = np.asarray(times, dtype=float)
+
+        if np.any(times < 0.0):
+            raise FinError("Plot times must be strictly positive.")
+
+        times = np.maximum(times, 1e-8)
+
         bond_ylds_scaled = scale(self.ylds, 100.0)
-        plt.plot(self.years_to_maturity, bond_ylds_scaled, "o")
+
+        # Plot actual bond yields
+        plt.plot(self.years_to_maturity, bond_ylds_scaled, "o", label="Bond Yields")
+
+        ytm = self.interp_yield(times)
+
         plt.xlabel("Time to Maturity (years)")
-        plt.ylabel(ylabel)
+        plt.ylabel("Yield (%)")
 
-        tmax = np.max(self.years_to_maturity)
-        t = np.linspace(0.0, int(tmax + 0.5), 100)
-
-        yld = self.interp_yield(t)
-        yld = scale(yld, 100.0)
-        plt.plot(t, yld, label=str(self.curve_fit))
+        plt.plot(times, ytm * 100, label=str(self.curve_fit.name))
         plt.legend(loc="lower right")
-        plt.ylim((min(yld) - 0.3, max(yld) * 1.1))
-        plt.grid(True)
+
+        if ymin is not None and ymax is not None:
+            plt.ylim(ymin, ymax)
+
+        plt.xlim(np.min(times), np.max(times))
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+
+        if filename is not None:
+            plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
+
+        plt.show()
 
     ###########################################################################
 

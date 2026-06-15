@@ -37,7 +37,7 @@ def main(start_index=0, end_index=None):
 
     timings = []
 
-    start_index = 40
+    # start_index = 40
     #    end_index = 115
 
     for idx in range(start_index, end_index):

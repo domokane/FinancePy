@@ -10,12 +10,12 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, normcdf
 from ...utils.error import FinError
 from ...products.credit.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
+from ...utils.helpers import times_from_dates
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
 
@@ -93,7 +93,11 @@ class CDSIndexOption:
 
         k = self.strike_cpn
         c = self.index_cpn
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+
+        time_dc_type = libor_curve.time_dc_type
+        t_exp = times_from_dates(value_dt, self.expiry_dt, time_dc_type)
+
+#        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df = libor_curve.df(self.expiry_dt)
         q_expiry_index = index_curve.survival_prob(t_exp)
 
@@ -141,8 +145,14 @@ class CDSIndexOption:
         the forward spread as a log-normally distributed quantity and uses the
         credit triangle to compute the forward RPV01."""
 
+        if len(issuer_curves) > 0:
+            time_dc_type = issuer_curves[0].libor_curve.time_dc_type
+        else:
+            raise FinError("Need at least one issuer curve")
+
         num_credits = len(issuer_curves)
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+#        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = times_from_dates(value_dt, self.expiry_dt, time_dc_type)
         #        timeToMaturity = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
         df_to_expiry = issuer_curves[0].df(t_exp)
         libor_curve = issuer_curves[0].libor_curve
@@ -300,13 +310,17 @@ class CDSIndexOption:
         value of the index payer option which are both returned in an array.
         """
 
+        time_dc_type = libor_curve.time_dc_type
+
         z = -6.0
         dz = 0.2
         num_z_steps = int(2.0 * abs(z) / dz)
 
         flow_dts = self.cds_contract.payment_dts
         num_flows = len(flow_dts)
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+#        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = times_from_dates(value_dt, self.expiry_dt, time_dc_type)
+
         df_to_expiry = libor_curve.df(self.expiry_dt)
         lgd = 1.0 - index_recovery
 
@@ -314,9 +328,13 @@ class CDSIndexOption:
         expiry_to_flow_times = [1.0] * (num_flows)
 
         for i_flow in range(0, num_flows):
-            expiry_to_flow_times[i_flow] = (
-                flow_dts[i_flow] - self.expiry_dt
-            ) / G_DAYS_IN_YEAR
+
+#            expiry_to_flow_times[i_flow] = (flow_dts[i_flow] - self.expiry_dt) / G_DAYS_IN_YEAR
+
+            expiry_to_flow_times[i_flow] = times_from_dates(self.expiry_dt,
+                                                            flow_dts[i_flow],
+                                                            time_dc_type)
+
             fwd_dfs[i_flow] = libor_curve.df(flow_dts[i_flow]) / df_to_expiry
 
         int_h = 0.0

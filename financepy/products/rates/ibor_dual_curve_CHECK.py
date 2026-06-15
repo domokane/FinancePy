@@ -320,8 +320,8 @@ class IborDualCurve(DiscountCurve):
 
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = times_from_dates(
-                depo.maturity_dt, self.value_dt, self.time_dc_type
+            t_mat = times_from_dates(self.value_dt,
+                depo.maturity_dt, self.time_dc_type
             )
 
             self._times = np.append(self._times, t_mat)
@@ -332,12 +332,12 @@ class IborDualCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = times_from_dates(
-                fra.start_dt, self.value_dt, self.time_dc_type
+            t_set = times_from_dates(self.value_dt,
+                fra.start_dt, self.time_dc_type
             )
 
-            t_mat = times_from_dates(
-                fra.maturity_dt, self.value_dt, self.time_dc_type
+            t_mat = times_from_dates(self.value_dt,
+                fra.maturity_dt, self.time_dc_type
             )
 
             # if both dates are after the previous FRA/FUT then need to
@@ -366,8 +366,8 @@ class IborDualCurve(DiscountCurve):
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
 
-            t_mat = times_from_dates(
-                maturity_dt, self.value_dt, self.time_dc_type
+            t_mat = times_from_dates(self.value_dt,
+                maturity_dt, self.time_dc_type
             )
 
             self._times = np.append(self._times, t_mat)

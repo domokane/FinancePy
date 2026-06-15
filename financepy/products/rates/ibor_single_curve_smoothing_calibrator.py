@@ -32,8 +32,8 @@ class IborSingleCurveSmoothingCalibrator(object):
 
     def _collect_all_knot_dts(self):
         """
-        Collect all dats on which the discount factors are explicitly required
-        to price bechmarks. Interpolation only used for times in between knot dates
+        Collect all dates on which the discount factors are explicitly required
+        to price benchmarks. Interpolation only used for times in between knot dates
         """
 
         # shorter name
@@ -58,9 +58,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         dates = list(set(dates))
         dates.sort()
         self._knot_dts = dates
-        self._knot_times = np.array(
-            [(d - dates[0]) / G_DAYS_IN_YEAR for d in dates]
-        )
+        self._knot_times = np.array([(d - dates[0]) / G_DAYS_IN_YEAR for d in dates])
 
     def _repricing_objectives(self, curve_to_use=None):
 
@@ -71,9 +69,7 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         valuation_date = curve.value_dt
         out = np.zeros(
-            len(curve.used_deposits)
-            + len(curve.used_fras)
-            + len(curve.used_swaps)
+            len(curve.used_deposits) + len(curve.used_fras) + len(curve.used_swaps)
         )
 
         idx = 0
@@ -81,10 +77,7 @@ class IborSingleCurveSmoothingCalibrator(object):
             # do not need to be too exact here
             acc_factor = datediff(depo.start_dt, depo.maturity_dt)
             # as rate
-            r = (
-                -np.log(depo.value(valuation_date, curve) / depo.notional)
-                / acc_factor
-            )
+            r = -np.log(depo.value(valuation_date, curve) / depo.notional) / acc_factor
             out[idx] = r
             idx = idx + 1
 

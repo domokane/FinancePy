@@ -73,6 +73,19 @@ from ...utils.global_types import SolverTypes
 # find python version of cg minimiser to apply numba to
 ########################################################################################
 
+def _check_optimizer_result(opt, solver_name: str, accept_tol: float = 1e-8) -> None:
+    if opt.success:
+        return
+
+    if opt.fun <= accept_tol:
+        return
+
+    raise FinError(
+        f"{solver_name} failed. "
+        f"Objective={opt.fun:.3e}. "
+        f"Message={opt.message}"
+    )
+
 ########################################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
 #       delta fit.
@@ -814,19 +827,54 @@ def _solve_to_horizon(
                 tol_x=tol,
                 max_iter=1000,
             )
+
+            obj = _obj(xopt, *args)
+
+            if obj > 1e-8:
+                raise FinError(
+                    f"Numba Nelder-Mead failed. Objective={obj:.3e}"
+                )
+
         elif fin_solver_type == SolverTypes.NELDER_MEAD:
-            opt = minimize(_obj, x_inits, args, method="Nelder-Mead", tol=tol)
+            opt = minimize(_obj,
+                           x_inits,
+                           args,
+                           method="Nelder-Mead",
+                           tol=tol,
+                           options={"maxfev": 5000,"maxiter": 5000},)
             xopt = opt.x
+
+            _check_optimizer_result(opt, "Nelder-Mead", accept_tol=1e-8)
+
         elif fin_solver_type == SolverTypes.CONJUGATE_GRADIENT:
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
-    except Exception:
-        # If convergence fails try again with CG if necessary
+
+            _check_optimizer_result(opt, "Conjugate-Gradient", accept_tol=1e-8)
+
+    except FinError:
         if fin_solver_type != SolverTypes.CONJUGATE_GRADIENT:
+
             print("Failed to converge, will try CG")
-            opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
+
+            opt = minimize(
+                _obj,
+                x_inits,
+                args,
+                method="CG",
+                tol=tol,
+            )
+
+            _check_optimizer_result(
+                opt,
+                "CG fallback",
+                accept_tol=1e-8,
+            )
 
             xopt = opt.x
+
+        else:
+            raise
 
     params = np.array(xopt)
 
@@ -1249,11 +1297,11 @@ class FXVolSurfacePlus:
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         tenors: List[Tenor],
-        atm_vols: np.ndarray,
-        ms_25_delta_vols: Union[np.ndarray, None],
-        rr_25_delta_vols: Union[np.ndarray, None],
-        ms_10_delta_vols: Union[np.ndarray, None],
-        rr_10_delta_vols: Union[np.ndarray, None],
+        atm_vols: Union[np.ndarray,List],
+        ms_25_delta_vols: Union[np.ndarray, List],
+        rr_25_delta_vols: Union[np.ndarray, List],
+        ms_10_delta_vols: Union[np.ndarray, List],
+        rr_10_delta_vols: Union[np.ndarray, List],
         alpha: float,
         atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
         delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
@@ -1278,6 +1326,11 @@ class FXVolSurfacePlus:
 
         if rr_25_delta_vols is None:
             rr_25_delta_vols = np.array([])
+
+        ms_10_delta_vols = np.array(ms_10_delta_vols)
+        rr_10_delta_vols = np.array(rr_10_delta_vols)
+        ms_25_delta_vols = np.array(ms_25_delta_vols)
+        rr_25_delta_vols = np.array(rr_25_delta_vols)
 
         check_argument_types(self.__init__, locals())
 

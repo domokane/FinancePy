@@ -1080,7 +1080,10 @@ class HWTree:
         call_value += call * face
         put_value += put * face
 
-        return (call_value, put_value)
+        # payer swaption   -> put on coupon bond
+        # receiver swaption -> call on coupon bond
+        # payer, receiver
+        return (put_value, call_value)
 
     ####################################################################################
 

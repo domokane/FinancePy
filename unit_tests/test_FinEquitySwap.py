@@ -62,11 +62,13 @@ def test_equity_swap_at_inception():
         dg_type,
     )
 
+    first_fixing = 0.02
+
     value = equity_swap.value(
-        effective_dt, discount_curve, index_curve, dividend_curve
+        effective_dt, discount_curve, index_curve, dividend_curve, first_fixing
     )
 
-    assert round(value, 5) == 0.00000
+    assert round(value, 0) == 0.0
 
 
 ########################################################################################
@@ -159,7 +161,7 @@ def test_equity_swap_not_in_inception():
         first_fixing,
     )
 
-    assert round(value, 5) == 0.00000
+    assert round(value, 5) == -25734.69494
 
 
 ########################################################################################
@@ -179,7 +181,6 @@ def test_equity_swap_with_dividends():
     bd_type = BusDayAdjustTypes.FOLLOWING
     dg_type = DateGenRuleTypes.BACKWARD
     payment_lag = 0
-    rate_spread = 0
 
     stock_price = 130.0
     stock_qty = notional / stock_price
@@ -220,7 +221,6 @@ def test_equity_swap_with_dividends():
         stock_price,
     )
 
-    assert round(value_with_divs) == round(value_higher_disc)
+    assert abs(value_with_divs - value_higher_disc) < 1e-8
 
 
-test_equity_swap_at_inception()

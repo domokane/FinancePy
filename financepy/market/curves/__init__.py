@@ -7,3 +7,6 @@ from .discount_curve_pwf import *
 from .discount_curve_pwl import *
 from .discount_curve_poly import *
 from .discount_curve_zeros import *
+from .bond_bootstrap_discount_curve import *
+from .bond_parametric_discount_curve import *
+from .bond_parametric_yield_curve import *

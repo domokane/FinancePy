@@ -126,9 +126,7 @@ def test_ibor_cap_floor():
         cvalue4 = capfloor.value(value_dt, libor_curve, model4)
         cvalue5 = capfloor.value(value_dt, libor_curve, model5)
         cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6
-        )
+        test_cases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6)
 
     test_cases.header(
         "LABEL",
@@ -150,9 +148,7 @@ def test_ibor_cap_floor():
         fvalue4 = capfloor.value(value_dt, libor_curve, model4)
         fvalue5 = capfloor.value(value_dt, libor_curve, model5)
         fvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6
-        )
+        test_cases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
 
     # PUT CALL CHECK
 
@@ -232,14 +228,10 @@ def test_ibor_cap_floor_vol_curve():
         accrual_dc_type,
     )
 
-    cap_vol_dates = Schedule(
-        value_dt, value_dt.add_tenor("10Y"), frequency
-    ).generate()
+    cap_vol_dates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
 
     flat_rate = 0.04
-    libor_curve = DiscountCurveFlat(
-        value_dt, flat_rate, frequency, accrual_dc_type
-    )
+    libor_curve = DiscountCurveFlat(value_dt, flat_rate, frequency, accrual_dc_type)
 
     flat = False
     if flat is True:
@@ -347,7 +339,6 @@ def test_ibor_cap_floor_ql_example():
     value_dt = Date(14, 6, 2016)
 
     dates = [
-        Date(14, 6, 2016),
         Date(14, 9, 2016),
         Date(14, 12, 2016),
         Date(14, 6, 2017),
@@ -360,7 +351,6 @@ def test_ibor_cap_floor_ql_example():
     ]
 
     rates = [
-        0.000000,
         0.006616,
         0.007049,
         0.007795,

@@ -3,6 +3,8 @@
 from financepy.utils.calendar import Calendar, CalendarTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.date import Date
+from financepy.utils.date_format import set_date_format
+from financepy.utils.date_format import DateFormatTypes
 
 bus_days_in_decade = {
     CalendarTypes.NONE: 3653,
@@ -148,36 +150,6 @@ def test_add_business_days_round_trip_from_business_days(cal_type):
                 f"then back gives {back}"
             )
 
-
-@pytest.mark.parametrize("cal_type", list(CalendarTypes))
-def test_add_business_days_round_trip_from_business_days(cal_type):
-
-    cal = Calendar(cal_type)
-
-    start_dates = [
-        Date(3, 1, 2020),
-        Date(28, 2, 2020),
-        Date(23, 12, 2021),
-        Date(31, 12, 2024),
-    ]
-
-    steps = [0, 1, 2, 5, 10, 50, 250, -1, -2, -5, -10, -50, -250]
-
-    for start in start_dates:
-
-        if not cal.is_business_day(start):
-            continue
-
-        for n in steps:
-            end = cal.add_business_days(start, n)
-            back = cal.add_business_days(end, -n)
-
-            assert back == start, (
-                f"{cal_type}: {start} + {n} business days = {end}, "
-                f"then back gives {back}"
-            )
-
-
 @pytest.mark.parametrize("cal_type", list(CalendarTypes))
 def test_adjust_none_returns_same_date(cal_type):
     cal = Calendar(cal_type)
@@ -239,7 +211,24 @@ def test_add_business_days_old_matches_new(cal_type):
 def test_get_holiday_list_contains_only_holidays(cal_type):
 
     cal = Calendar(cal_type)
-
+    set_date_format(DateFormatTypes.UK_LONGEST)
     for holiday in cal.get_holiday_list(2021):
         dt = date_from_string(holiday)
         assert cal.is_holiday(dt)
+
+@pytest.mark.parametrize("cal_type", list(CalendarTypes))
+@pytest.mark.parametrize("bd_type", list(BusDayAdjustTypes))
+def test_fast_adjust_matches_adjust(cal_type, bd_type):
+
+    cal = Calendar(cal_type)
+
+    dates = [
+        Date(31,1,2021),
+        Date(28,2,2021),
+        Date(24,12,2021),
+        Date(25,12,2021),
+        Date(31,12,2021),
+    ]
+
+    for dt in dates:
+        assert cal.fast_adjust(dt, bd_type) == cal.adjust(dt, bd_type)

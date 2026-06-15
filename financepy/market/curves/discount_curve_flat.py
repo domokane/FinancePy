@@ -28,7 +28,7 @@ class DiscountCurveFlat(DiscountCurve):
     def __init__(
         self,
         value_dt: Date,
-        flat_rate: float,
+        flat_zero_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
@@ -42,7 +42,7 @@ class DiscountCurveFlat(DiscountCurve):
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
-        self.flat_rate = flat_rate
+        self.flat_zero_rate = flat_zero_rate
         self.freq_type = freq_type
 
         if not isinstance(time_dc_type, DayCountTypes):
@@ -51,12 +51,12 @@ class DiscountCurveFlat(DiscountCurve):
         self.time_dc_type = time_dc_type
 
         # This is used by some inherited functions, so we choose the simplest
-        self._interp_type = InterpTypes.FLAT_FWD_RATES
+        self._interp_type = None
 
         # Set up an annual grid of times and discount factors for insight
-        years = np.linspace(0.0, 10.0, 11)
+        years = np.linspace(0.0, 5.0, 6)
         self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates(self._df_dates, self.value_dt, self.time_dc_type)
+        self._times = times_from_dates(self.value_dt, self._df_dates, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################
@@ -67,7 +67,7 @@ class DiscountCurveFlat(DiscountCurve):
         times, scalar_input = self._to_time_array(t)
         times = np.maximum(times, 0.0)
 
-        dfs = self._zero_to_df(self.flat_rate, times, self.freq_type)
+        dfs = self._zero_to_df(self.flat_zero_rate, times, self.freq_type)
 
         if scalar_input:
             return float(dfs[0])
@@ -82,7 +82,7 @@ class DiscountCurveFlat(DiscountCurve):
 
         disc_curve = DiscountCurveFlat(
             self.value_dt,
-            self.flat_rate + bump_size,
+            self.flat_zero_rate + bump_size,
             freq_type=self.freq_type,
             time_dc_type=self.time_dc_type,
         )
@@ -93,7 +93,7 @@ class DiscountCurveFlat(DiscountCurve):
     def __repr__(self):
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("FLAT RATE", self.flat_rate)
+        s += label_to_string("FLAT ZERO RATE", self.flat_zero_rate)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
 
         # Then generic DiscountCurve info

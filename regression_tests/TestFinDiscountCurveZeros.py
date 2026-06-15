@@ -21,79 +21,63 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 def test_fin_discount_curve_zeros():
 
-    start_dt = Date(1, 1, 2018)
-    times = np.linspace(1.0, 10.0, 10)
-    dates = start_dt.add_years(times)
-    zero_rates = np.linspace(5.0, 6.0, 10) / 100
-    freq_type = FrequencyTypes.ANNUAL
+    dates = [
+        Date(14, 9, 2016),
+        Date(14, 12, 2016),
+        Date(14, 6, 2017),
+        Date(14, 6, 2019),
+        Date(14, 6, 2021),
+        Date(15, 6, 2026),
+        Date(16, 6, 2031),
+        Date(16, 6, 2036),
+        Date(14, 6, 2046),
+    ]
 
-    curve = DiscountCurveZeros(
-        start_dt, dates, zero_rates, freq_type, InterpTypes.FLAT_FWD_RATES
-    )
+    zero_rates = [
+        0.006616,
+        0.007049,
+        0.007795,
+        0.009599,
+        0.011203,
+        0.015068,
+        0.017583,
+        0.018998,
+        0.020080,
+    ]
 
-    test_cases.header("T", "DF")
+    start_dt = Date(14, 6, 2016)
 
-    years = np.linspace(0, 10, 21)
-    dates = start_dt.add_years(years)
-    for dt in dates:
-        df = curve.df(dt)
-        test_cases.print(dt, df)
+    times = np.linspace(0.0, 30, 100)
 
-    #    print(curve)
+    test_cases.header("Interp_type", "Time", "Zero_cc", "Fwd_cc", "Calc_Time")
 
-    num_repeats = 100
+    for interp_type in InterpTypes:
 
-    start = time.time()
+        start = time.time()
 
-    for i in range(0, num_repeats):
         freq_type = FrequencyTypes.ANNUAL
-        dc_type = DayCountTypes.ACT_ACT_ISDA
-
-        dates = [
-            Date(14, 6, 2016),
-            Date(14, 9, 2016),
-            Date(14, 12, 2016),
-            Date(14, 6, 2017),
-            Date(14, 6, 2019),
-            Date(14, 6, 2021),
-            Date(15, 6, 2026),
-            Date(16, 6, 2031),
-            Date(16, 6, 2036),
-            Date(14, 6, 2046),
-        ]
-
-        zero_rates = [
-            0.000000,
-            0.006616,
-            0.007049,
-            0.007795,
-            0.009599,
-            0.011203,
-            0.015068,
-            0.017583,
-            0.018998,
-            0.020080,
-        ]
-
-        start_dt = dates[0]
+        time_dc_type = DayCountTypes.ACT_ACT_ISDA
 
         curve = DiscountCurveZeros(
             start_dt,
             dates,
             zero_rates,
             freq_type,
-            InterpTypes.FLAT_FWD_RATES,
+            interp_type,
+            time_dc_type,
         )
 
-    end = time.time()
-    period = end - start
+        zeros_cc = curve.zero_rate_cc_t(times) * 100.0
+        fwd_cc = curve.fwd_rate_inst_t(times) * 100.0
+
+        end = time.time()
+        period = end - start
+
+        for t, z, f in zip(times, zeros_cc, fwd_cc):
+            test_cases.print(interp_type, t, z, f, period)
 
 
 ########################################################################################
-
-#    print("Time taken:", period)
-
-#    print(curve)
 
 
 test_fin_discount_curve_zeros()

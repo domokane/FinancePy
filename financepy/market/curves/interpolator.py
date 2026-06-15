@@ -17,21 +17,24 @@ from ...utils.tension_spline import TensionSpline
 
 class InterpTypes(Enum):
     FLAT_FWD_RATES = 1
-    LINEAR_FWD_RATES = 2
-    LINEAR_ZERO_RATES = 4
-    FINCUBIC_ZERO_RATES = 7
-    NATCUBIC_LOG_DISCOUNT = 8
-    NATCUBIC_ZERO_RATES = 9
-    PCHIP_ZERO_RATES = 10
-    PCHIP_LOG_DISCOUNT = 11
-    LINEAR_ONFWD_RATES = 21
-    TENSION_ZERO_RATES = 22
+    LINEAR_DISCOUNT = 2
+    LINEAR_ZERO_RATES = 3
+    LINEAR_ONFWD_RATES = 4
+    FINCUBIC_ZERO_RATES = 5
+    NATCUBIC_LOG_DISCOUNT = 6
+    NATCUBIC_ZERO_RATES = 7
+    PCHIP_ZERO_RATES = 8
+    PCHIP_LOG_DISCOUNT = 9
+    TENSION_ZERO_RATES = 10
+
+
+#    LINEAR_AVG_FWD_RATES = 11
 
 
 # Groups used to make dispatch readable and cheap.
 _FAST_NUMBA_TYPES = (
     InterpTypes.FLAT_FWD_RATES,
-    InterpTypes.LINEAR_FWD_RATES,
+    InterpTypes.LINEAR_DISCOUNT,
     InterpTypes.LINEAR_ZERO_RATES,
 )
 _LOG_DF_SPLINE_TYPES = (
@@ -103,9 +106,7 @@ def _find_interval(t: float, times: np.ndarray) -> int:
     fastmath=True,
     nogil=True,
 )
-def _uinterpolate(
-    t: float, times: np.ndarray, dfs: np.ndarray, method: int
-) -> float:
+def _uinterpolate(t: float, times: np.ndarray, dfs: np.ndarray, method: int) -> float:
     if t < 0.0:
         print(t, times, dfs, method)
         raise ValueError("Interpolation times must be non-negative.")
@@ -157,20 +158,59 @@ def _uinterpolate(
         y = ((times[right] - t) * y1 + (t - times[left]) * y2) / dt
         return np.exp(-y)
 
-    if method == InterpTypes.LINEAR_FWD_RATES.value:
-        if i == 1:
-            y = t * (-np.log(dfs[1] + 1.0e-10)) / (times[1] + 1.0e-10)
-            return np.exp(-y)
+    if method == InterpTypes.LINEAR_DISCOUNT.value:
+        if i == 0:
+            return dfs[0]
+
         if i < n:
-            f1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (
-                times[i - 1] - times[i - 2]
-            )
-            f2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
-            dt = times[i] - times[i - 1]
-            f = ((times[i] - t) * f1 + (t - times[i - 1]) * f2) / dt
-            return dfs[i - 1] * np.exp(-f * (t - times[i - 1]))
-        f = -np.log(dfs[n - 1] / dfs[n - 2]) / (times[n - 1] - times[n - 2])
-        return dfs[n - 1] * np.exp(-f * (t - times[n - 1]))
+            left = i - 1
+            right = i
+        else:
+            left = n - 2
+            right = n - 1
+
+        dt = times[right] - times[left]
+
+        df = (
+            (times[right] - t) * dfs[left]
+            + (t - times[left]) * dfs[right]
+        ) / dt
+
+        return df
+
+    # Removed this method as it is not doing exactly what it claims
+    # if method == InterpTypes.LINEAR_FWD_RATES.value:
+    #     if i == 1:
+    #         y = t * (-np.log(dfs[1] + 1.0e-10)) / (times[1] + 1.0e-10)
+    #         return np.exp(-y)
+    #     if i < n:
+    #         f1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+    #         f2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
+    #         dt = times[i] - times[i - 1]
+    #         f = ((times[i] - t) * f1 + (t - times[i - 1]) * f2) / dt
+    #         return dfs[i - 1] * np.exp(-f * (t - times[i - 1]))
+    #     f = -np.log(dfs[n - 1] / dfs[n - 2]) / (times[n - 1] - times[n - 2])
+    #     return dfs[n - 1] * np.exp(-f * (t - times[n - 1]))
+
+    # if method == InterpTypes.LINEAR_AVG_FWD_RATES.value:
+    #     if i == 1:
+    #         y = t * (-np.log(dfs[1] + 1.0e-10)) / (times[1] + 1.0e-10)
+    #         return np.exp(-y)
+
+    #     if i < n:
+    #         f1 = -np.log(dfs[i - 1] / dfs[i - 2]) / (times[i - 1] - times[i - 2])
+    #         f2 = -np.log(dfs[i] / dfs[i - 1]) / (times[i] - times[i - 1])
+
+    #         dt_total = times[i] - times[i - 1]
+    #         dt = t - times[i - 1]
+
+    #         slope = (f2 - f1) / dt_total
+    #         integral = f1 * dt + 0.5 * slope * dt * dt
+
+    #         return dfs[i - 1] * np.exp(-integral)
+
+    #     f = -np.log(dfs[n - 1] / dfs[n - 2]) / (times[n - 1] - times[n - 2])
+    #     return dfs[n - 1] * np.exp(-f * (t - times[n - 1]))
 
     raise ValueError("Invalid fast interpolation scheme.")
 
@@ -287,9 +327,7 @@ def _linear_onf_dfs(
     for i in range(tvec.size):
         if tvec[i] < 0.0:
             raise ValueError("Interpolation times must be non-negative.")
-        out[i] = np.exp(
-            -_linear_onf_integral(tvec[i], onf_times, onf_rates, cum)
-        )
+        out[i] = np.exp(-_linear_onf_integral(tvec[i], onf_times, onf_rates, cum))
     return out
 
 
@@ -312,9 +350,7 @@ def interpolate(
     if isinstance(t, (float, np.float64)):
         return _uinterpolate(float(t), times, dfs, int(method))
     if isinstance(t, np.ndarray):
-        return _vinterpolate(
-            np.asarray(t, dtype=np.float64), times, dfs, int(method)
-        )
+        return _vinterpolate(np.asarray(t, dtype=np.float64), times, dfs, int(method))
     raise FinError(f"Unknown input type {type(t)}")
 
 
@@ -369,9 +405,7 @@ class Interpolator:
             return
 
         if self._interp_type == InterpTypes.PCHIP_LOG_DISCOUNT:
-            self._interp_fn = PchipInterpolator(
-                times, np.log(dfs), extrapolate=True
-            )
+            self._interp_fn = PchipInterpolator(times, np.log(dfs), extrapolate=True)
             return
 
         if self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
@@ -405,9 +439,7 @@ class Interpolator:
             return
 
         if self._interp_type == InterpTypes.LINEAR_ONFWD_RATES:
-            self._onf_times, self._onf_rates = _build_linear_onf_curve(
-                times, dfs
-            )
+            self._onf_times, self._onf_rates = _build_linear_onf_curve(times, dfs)
             self._onf_integrals = _linear_onf_cumulative_integrals(
                 self._onf_times, self._onf_rates
             )
@@ -461,7 +493,7 @@ class Interpolator:
     def suitable_for_bootstrap(cls, interp_type: InterpTypes) -> bool:
         return interp_type in {
             InterpTypes.FLAT_FWD_RATES,
-            InterpTypes.LINEAR_FWD_RATES,
+            InterpTypes.LINEAR_DISCOUNT,
             InterpTypes.LINEAR_ZERO_RATES,
             InterpTypes.LINEAR_ONFWD_RATES,
         }

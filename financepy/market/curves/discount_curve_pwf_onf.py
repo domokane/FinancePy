@@ -19,10 +19,10 @@ from ...market.curves.discount_curve import DiscountCurve
 
 
 class DiscountCurvePWFONF(DiscountCurve):
-    """Curve with piece-wise flat instantaneous (ON) fwd rates.
-    Curve is made up of a series of sections with each having
-    a flat instantaneous forward rate. The default compounding assumption is
-    continuous. The class inherits methods from DiscountCurve."""
+    """Curve with piece-wise flat instantaneous (ON) fwd rates. Curve
+    is made up of a series of sections with each having a flat instantaneous
+    forward rate. The default compounding assumption is continuous. The
+    class inherits methods from DiscountCurve."""
 
     ####################################################################################
 
@@ -62,7 +62,7 @@ class DiscountCurvePWFONF(DiscountCurve):
         self.time_dc_type = time_dc_type
 
         dc_times = times_from_dates(
-            self._knot_dts, self.value_dt, self.time_dc_type
+            self.value_dt, self._knot_dts, self.time_dc_type
         )
 
         self._times = np.atleast_1d(dc_times)
@@ -85,8 +85,8 @@ class DiscountCurvePWFONF(DiscountCurve):
         self._dfs = np.exp(self._logdfs)
         self._interp_type = None
 
-    @classmethod
     ####################################################################################
+    @classmethod
     def brick_wall_curve(
         cls,
         valuation_date: Date,
@@ -113,8 +113,8 @@ class DiscountCurvePWFONF(DiscountCurve):
         onfwd_rates = [0.0, level, 0.0]
         return cls(valuation_date, knot_dts, onfwd_rates)
 
-    @classmethod
     ####################################################################################
+    @classmethod
     def flat_curve(
         cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT
     ):
@@ -124,7 +124,7 @@ class DiscountCurvePWFONF(DiscountCurve):
 
     ####################################################################################
 
-    def _zero_rate(self, times: Union[float, np.ndarray, list]):
+    def _zero_rate_t(self, times: Union[float, np.ndarray, list]):
         """
         Piecewise flat instantaneous (ON) fwd rate is the same as linear logDfs
         """
@@ -149,7 +149,7 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         times, scalar_input = self._to_time_array(t)
 
-        zero_rates = self._zero_rate(times)
+        zero_rates = self._zero_rate_t(times)
 
         dfs = self._zero_to_df(
             zero_rates,

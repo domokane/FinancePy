@@ -29,6 +29,8 @@ def _f(
     *args,
 ):
     """Root search objective function for IRS"""
+    if not np.isfinite(df) or df <= 0.0:
+        return 1.0e10
 
     curve = args[0]
     value_dt = args[1]
@@ -231,9 +233,7 @@ class IborSingleCurve(DiscountCurve):
                 start_dt = depo.start_dt
 
                 if start_dt < self.value_dt:
-                    raise FinError(
-                        "First deposit starts before valuation date."
-                    )
+                    raise FinError("First deposit starts before valuation date.")
 
                 if start_dt < depo_start_dt:
                     depo_start_dt = start_dt
@@ -324,9 +324,7 @@ class IborSingleCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dates[i_flow]:
-                        raise FinError(
-                            "Swap coupons are not on the same date grid."
-                        )
+                        raise FinError("Swap coupons are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -412,8 +410,8 @@ class IborSingleCurve(DiscountCurve):
             df_mat = depo.maturity_df() * df_settle_dt
 
             t_mat = times_from_dates(
-                depo.maturity_dt,
                 self.value_dt,
+                depo.maturity_dt,
                 self.time_dc_type,
             )
             self._times = np.append(self._times, t_mat)
@@ -425,14 +423,14 @@ class IborSingleCurve(DiscountCurve):
         for fra in self.used_fras:
 
             t_set = times_from_dates(
-                fra.start_dt,
                 self.value_dt,
+                fra.start_dt,
                 self.time_dc_type,
             )
 
             t_mat = times_from_dates(
-                fra.maturity_dt,
                 self.value_dt,
+                fra.maturity_dt,
                 self.time_dc_type,
             )
 
@@ -447,6 +445,7 @@ class IborSingleCurve(DiscountCurve):
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
                 argtuple = (self, self.value_dt, fra)
+
                 df_mat = optimize.newton(
                     _g,
                     x0=df_mat,
@@ -463,8 +462,8 @@ class IborSingleCurve(DiscountCurve):
             maturity_dt = swap.fixed_leg.payment_dts[-1]
 
             t_mat = times_from_dates(
-                maturity_dt,
                 self.value_dt,
+                maturity_dt,
                 self.time_dc_type,
             )
 
@@ -529,11 +528,7 @@ class IborSingleCurve(DiscountCurve):
             for fra in libor_curve.used_fras:
                 # do not need to be too exact here
                 acc_factor = datediff(fra.start_dt, fra.maturity_dt)
-                v = (
-                    fra.value(value_dt, libor_curve)
-                    / fra.notional
-                    / acc_factor
-                )
+                v = fra.value(value_dt, libor_curve) / fra.notional / acc_factor
                 out[idx] = v
                 idx = idx + 1
 
@@ -558,6 +553,9 @@ class IborSingleCurve(DiscountCurve):
             self.check_refit_flag = orig_check_refit_flag
         else:
 
+            # THIS IS NEVER USED BECAUSE BOOTSTRAP FIRST IS SET TO TRUE!!
+            # THIS LEGACY CODE NEEDS TO BE CLEANED UP
+
             # Populate time grid and then fill in initial dfs in one go
             t_mat = 0.0
             grid_times = [t_mat]
@@ -565,20 +563,20 @@ class IborSingleCurve(DiscountCurve):
             self._interpolator = Interpolator(self._interp_type, **kwargs)
 
             for depo in self.used_deposits:
-                t_mat = times_from_dates(
-                    depo.maturity_dt, self.value_dt, self.time_dc_type
+                t_mat = times_from_dates(self.value_dt,
+                    depo.maturity_dt, self.time_dc_type
                 )
                 grid_times.append(t_mat)
 
             for fra in self.used_fras:
-                t_mat = times_from_dates(
-                    fra.maturity_dt, self.value_dt, self.time_dc_type
+                t_mat = times_from_dates(self.value_dt,
+                    fra.maturity_dt, self.time_dc_type
                 )
                 grid_times.append(t_mat)
 
             for swap in self.used_swaps:
-                t_mat = times_from_dates(
-                    swap.maturity_dt, self.value_dt, self.time_dc_type
+                t_mat = times_from_dates(self.value_dt,
+                    swap.maturity_dt, self.time_dc_type
                 )
                 grid_times.append(t_mat)
 
@@ -590,7 +588,7 @@ class IborSingleCurve(DiscountCurve):
         res = optimize.least_squares(
             _obj_f_curve_build_ls,
             self._dfs[1:],
-            bounds=(0, np.inf),
+            bounds=(1e-8, 5.0),  # revised bounds
             ftol=1e-4,
             xtol=1e-6,
         )
@@ -624,9 +622,9 @@ class IborSingleCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
-            t_mat = times_from_dates(
-                depo.maturity_dt, self.value_dt, self.time_dc_type
-            )
+            t_mat = times_from_dates(self.value_dt,
+                                     depo.maturity_dt,
+                                     self.time_dc_type)
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self.fit(self._times, self._dfs)
@@ -635,13 +633,8 @@ class IborSingleCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = times_from_dates(
-                fra.start_dt, self.value_dt, self.time_dc_type
-            )
-
-            t_mat = times_from_dates(
-                fra.maturity_dt, self.value_dt, self.time_dc_type
-            )
+            t_set = times_from_dates(self.value_dt, fra.start_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.value_dt, fra.maturity_dt, self.time_dc_type)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -718,8 +711,8 @@ class IborSingleCurve(DiscountCurve):
             maturity_dt = swap.adjusted_fixed_dts[-1]
 
             t_swap = times_from_dates(
-                maturity_dt,
                 self.value_dt,
+                maturity_dt,
                 self.time_dc_type,
             )
 
@@ -732,8 +725,8 @@ class IborSingleCurve(DiscountCurve):
         for dt in cpn_dts[1:]:
 
             swap_years = times_from_dates(
-                dt,
                 self.value_dt,
+                dt,
                 self.time_dc_type,
             )
 
@@ -761,8 +754,8 @@ class IborSingleCurve(DiscountCurve):
 
             dt = cpn_dts[i]
             t_mat = times_from_dates(
-                dt,
                 self.value_dt,
+                dt,
                 self.time_dc_type,
             )
             swap_rate = interpolated_swap_rates[i]
@@ -794,9 +787,7 @@ class IborSingleCurve(DiscountCurve):
         for fra in self.used_fras:
             v = fra.value(self.value_dt, self, self) / fra.notional
             if abs(v) > fra_tol:
-                raise FinError(
-                    f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}"
-                )
+                raise FinError(f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}")
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap

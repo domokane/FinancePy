@@ -62,7 +62,7 @@ class DiscountCurvePWL(DiscountCurve):
 
         self.time_dc_type = time_dc_type
 
-        dc_times = times_from_dates(zero_dts, self.value_dt, self.time_dc_type)
+        dc_times = times_from_dates(self.value_dt, zero_dts, self.time_dc_type)
         self._times = np.array(dc_times)
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")

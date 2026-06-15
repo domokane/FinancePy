@@ -267,11 +267,13 @@ def solve_to_horizon_fast(
         vol_type_value,
     )
 
-    opt = minimize(obj_fast, c0, fargs, method="CG", tol=tol)
+    calibration_tol = 1.0e-10
+
+    opt = minimize(obj_fast, c0, fargs, method="BFGS", tol=tol)
     xopt = opt.x
 
-    if not opt.success:
-        raise FinError(opt.message)
+    if not opt.success and opt.fun > calibration_tol:
+        raise FinError(f"{opt.message}. Objective={opt.fun:12.6g}")
 
     params = np.array(xopt)
 
@@ -554,9 +556,9 @@ class FXVolSurface:
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         tenors: List[Tenor],
-        atm_vols: np.ndarray,
-        ms_25_delta_vols: np.ndarray,
-        rr_25_delta_vols: np.ndarray,
+        atm_vols: Union[List, np.ndarray],
+        ms_25_delta_vols: Union[List, np.ndarray],
+        rr_25_delta_vols: Union[List, np.ndarray],
         atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
         delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
         vol_func_type: VolFuncTypes = VolFuncTypes.CLARK,

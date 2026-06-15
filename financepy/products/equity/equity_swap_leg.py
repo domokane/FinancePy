@@ -72,11 +72,11 @@ class EquitySwapLeg:
         # To generate ISDA pmnt schedule properly we can't use these types
         if freq_type in (
             FrequencyTypes.CONTINUOUS,
-            FrequencyTypes,
             FrequencyTypes.SIMPLE_INTEREST,
         ):
+            print(freq_type)
             raise FinError(
-                "Cannot generate payment schedule for this frequency!"
+                "Cannot generate payment schedule for this frequency type"
             )
 
         self.effective_dt = effective_dt
@@ -177,29 +177,223 @@ class EquitySwapLeg:
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve,
         dividend_curve: DiscountCurve = None,
-        current_price: float = None,
+        current_price: float = None
+    ):
+        """Value the equity leg with payments from an equity price, quantity,
+        an index curve and an [optional] dividend curve. Discounting is based
+        on a supplied discount curve as of the valuation date supplied.
+
+        Each reset period is treated as an independent forward contract:
+
+            PV_i = Q * S_0 * df_idx(0, t_{i-1}) * df_div(0, t_{i-1}) * df(0, t_i)
+                    * [1 / (df_idx(0, t_i) * df_div(0, t_i)) - 1]
+
+        For the current (in-progress) period where t_{i-1} < value_dt <= t_i,
+        the period-start equity price is known (current_price or strike), so
+        we value it as a single forward from value_dt to t_i.
+        """
+
+        if discount_curve is None:
+            raise FinError("Discount curve not provided!")
+
+        if index_curve is None:
+            index_curve = discount_curve
+
+        if dividend_curve is None:
+            dividend_curve = DiscountCurveFlat(value_dt, 0.0)
+
+        if discount_curve.value_dt != value_dt:
+            raise FinError("Discount Curve valuation date not same as value date")
+
+        self.current_price = current_price if current_price is not None else self.strike
+
+        # Reset all result lists
+        self.fwd_rates = []
+        self.div_fwd_rates = []
+        self.eq_fwd_rates = []
+        self.last_notionals = []
+        self.payment_amounts = []
+        self.payment_dfs = []
+        self.payment_pvs = []
+        self.cumulative_pvs = []
+
+        df_value = discount_curve.df(value_dt)
+        leg_pv = 0.0
+        num_payments = len(self.payment_dts)
+
+        for i_pmnt in range(num_payments):
+
+            payment_dt = self.payment_dts[i_pmnt]
+            start_accrued_dt = self.start_accd_dts[i_pmnt]
+            end_accrued_dt = self.end_accd_dts[i_pmnt]
+
+            if payment_dt <= value_dt:
+                # Period already paid — no value
+                self.fwd_rates.append(0.0)
+                self.div_fwd_rates.append(0.0)
+                self.eq_fwd_rates.append(0.0)
+                self.last_notionals.append(0.0)
+                self.payment_amounts.append(0.0)
+                self.payment_dfs.append(0.0)
+                self.payment_pvs.append(0.0)
+                self.cumulative_pvs.append(leg_pv)
+                continue
+
+            # ------------------------------------------------------------------
+            # Discount factors from the curve's anchor date
+            # ------------------------------------------------------------------
+            df_pay = discount_curve.df(payment_dt)
+
+            if start_accrued_dt <= value_dt:
+                # ----------------------------------------------------------------
+                # Current (in-progress) period:
+                #   - Equity price at period start is already fixed = current_price
+                #     (or strike if no current price supplied and value_dt ==
+                #     effective_dt).
+                #   - We only need to forward from value_dt to end_accrued_dt.
+                #   - Period-start notional is known: S_reset * quantity.
+                # ----------------------------------------------------------------
+                period_start_notional = self.current_price * self.quantity
+
+                df_idx_end = index_curve.df(end_accrued_dt)
+                df_div_end = dividend_curve.df(end_accrued_dt)
+                df_idx_now = index_curve.df(value_dt)
+                df_div_now = dividend_curve.df(value_dt)
+
+                # Forward equity price from value_dt to end of period
+                # F = S_now * (df_idx_now / df_idx_end) * (df_div_now / df_div_end)
+                eq_growth = (df_idx_now / df_idx_end) * (df_div_now / df_div_end)
+                fwd_end_notional = self.current_price * self.quantity * eq_growth
+
+                payment_amount = fwd_end_notional - period_start_notional
+
+                # Convenience rates for reporting (from value_dt to period end)
+                index_alpha = self.year_fracs[i_pmnt]  # approximation; period may be partial
+                fwd_rate    = (df_idx_now / df_idx_end - 1.0) / index_alpha if index_alpha > 0 else 0.0
+                div_fwd_rate = (df_div_now / df_div_end - 1.0) / index_alpha if index_alpha > 0 else 0.0
+                eq_fwd_rate  = (eq_growth - 1.0) / index_alpha if index_alpha > 0 else 0.0
+
+            else:
+                # ----------------------------------------------------------------
+                # Future period: both t_{i-1} and t_i are beyond value_dt.
+                #   Each such period is an independent forward contract.
+                #
+                #   PV_i = Q * S_0
+                #          * [df_idx(0,t_{i-1}) * df_div(0,t_{i-1})]   <- growth to reset
+                #          * df_disc(0,t_i)                              <- discount payment
+                #          * [1/(df_idx(0,t_i)*df_div(0,t_i)) - 1]      <- net equity return
+                #
+                #   which equals:
+                #     Q * S_0 * (df_idx_start * df_div_start / (df_idx_end * df_div_end) - 1)
+                #             * df_disc(0,t_i)                           [after cancellation]
+                # ----------------------------------------------------------------
+                df_idx_start = index_curve.df(start_accrued_dt)
+                df_idx_end   = index_curve.df(end_accrued_dt)
+                df_div_start = dividend_curve.df(start_accrued_dt)
+                df_div_end   = dividend_curve.df(end_accrued_dt)
+
+                # Forward equity growth over the reset period
+                eq_growth = (df_idx_start / df_idx_end) * (df_div_start / df_div_end)
+
+                # Notional at period start (in expectation, funded from today)
+                period_start_notional = self.current_price * self.quantity * df_idx_start * df_div_start
+
+                # Expected notional at period end
+                fwd_end_notional = period_start_notional * eq_growth  # = S_0 * Q * df_idx_start^2...
+                # Rewrite cleanly:
+                #   payment_amount (undiscounted, in forward measure) =
+                #     S_0 * Q * (eq_growth_cumulative_to_end - eq_growth_cumulative_to_start)
+                # Simplification: the forward payoff from the receiver's perspective is:
+                #   S_{t_i} - S_{t_{i-1}}  (both unknown today)
+                # Its PV = S_0 * Q * (df_idx_start*df_div_start/(df_idx_end*df_div_end) - 1) * df_pay/df_value
+                #        = (fwd_price_end - fwd_price_start) * df_pay / df_value
+                # where fwd_price_k = S_0 * df_idx(0,k) * df_div(0,k) / df_value [already in spot measure]
+
+                fwd_price_start = self.current_price * (df_idx_start / df_value) * (df_div_start / df_value)
+                fwd_price_end   = self.current_price * (df_idx_end   / df_value) * (df_div_end   / df_value)
+
+                # *** Wait — cleaner canonical form (see note below) ***
+                # PV_i = Q * [F(0,t_{i-1}) * df(0,t_i) - F(0,t_i) * df(0,t_i)]  ... doesn't simplify
+                # Correct PV (standard result, no approximation):
+                #   PV_i = Q * S_0 * df_div_start * df_idx_start   (long equity fwd to t_{i-1}, settled at t_i)
+                #        - Q * S_0 * df_div_end   * df_idx_end      (short funded position at t_i)
+                # Both already relative to curve anchor = value_dt base, so divide by df_value^2 ...
+                # Actually if curves are anchored at value_dt, df(value_dt)=1 and this is exact:
+                period_start_notional = self.current_price * self.quantity  # S_0 * Q, known today
+                payment_amount = period_start_notional * (
+                    (df_idx_start * df_div_start) / (df_idx_end * df_div_end) - 1.0
+                )
+
+                index_alpha  = self.year_fracs[i_pmnt]
+
+                if index_alpha > 0:
+                    fwd_rate = (df_idx_start / df_idx_end - 1.0) / index_alpha
+                else:
+                    fwd_rate = 0.0
+
+                if index_alpha > 0:
+                    div_fwd_rate = (df_div_start / df_div_end - 1.0) / index_alpha
+                else:
+                    div_fwd_rate = 0.0
+
+                if index_alpha > 0:
+                    eq_fwd_rate = ((df_idx_start * df_div_start) / (df_idx_end * df_div_end) - 1.0) / index_alpha
+                else:
+                    eq_fwd_rate = 0.0
+
+            # Discount the payment — curves anchored at value_dt so df_value cancels
+            df_payment = df_pay / df_value
+            payment_pv = payment_amount * df_payment
+
+            leg_pv += payment_pv
+
+            self.fwd_rates.append(fwd_rate)
+            self.div_fwd_rates.append(div_fwd_rate)
+            self.eq_fwd_rates.append(eq_fwd_rate)
+            self.last_notionals.append(period_start_notional)
+            self.payment_amounts.append(payment_amount)
+            self.payment_dfs.append(df_payment)
+            self.payment_pvs.append(payment_pv)
+            self.cumulative_pvs.append(leg_pv)
+
+        if self.leg_type == SwapTypes.PAY:
+            leg_pv *= -1.0
+
+        return leg_pv
+
+    ####################################################################################
+    # THIS IS FROM A PULL REQUEST - I BELIEVE IT TO BE INCORRECT - IT ALREADY HAD A BUG
+    ####################################################################################
+
+    def value_bug(
+        self,
+        value_dt: Date,
+        discount_curve: DiscountCurve,
+        index_curve: DiscountCurve,
+        dividend_curve: DiscountCurve = None,
+        current_price: float = None
     ):
         """Value the equity leg with payments from an equity price, quantity,
         an index curve and an [optional] dividend curve. Discounting is based
         on a supplied discount curve as of the valuation date supplied.
         """
 
-        if discount_curve is None:
-            raise FinError("Discount curve not provided!")
-
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
-
         if index_curve is None:
             index_curve = discount_curve
+
+        if discount_curve is None:
+            raise FinError("Discount curve not provided!")
 
         # Assume a naive dividend curve if nothing provided
         if dividend_curve is None:
             dividend_curve = DiscountCurveFlat(value_dt, 0)
 
-        # Current price can't be different than strike at effective date
+        if discount_curve.value_dt != value_dt:
+            raise FinError(
+                "Discount Curve valuation date not same as value date"
+            )
+
+        # Current price can't be different from strike at effective date
         if current_price is not None:
             self.current_price = current_price
         else:
@@ -215,13 +409,13 @@ class EquitySwapLeg:
         self.cumulative_pvs = []
 
         df_value = discount_curve.df(value_dt)
-        leg_pv, eq_term_rate = 0.0, 0.0
-        last_notional = self.notional
+        leg_pv = 0.0
+        eq_term_rate = 0.0
+        last_notional = self.notional # self.current_price * self.quantity
         next_notional = last_notional
         num_payments = len(self.payment_dts)
 
-        index_basis = self.accrual_dc_type
-        index_day_counter = DayCount(index_basis)
+        index_day_counter = DayCount(self.accrual_dc_type)
 
         for i_pmnt in range(0, num_payments):
 
@@ -231,15 +425,22 @@ class EquitySwapLeg:
 
                 start_accrued_dt = self.start_accd_dts[i_pmnt]
                 end_accrued_dt = self.end_accd_dts[i_pmnt]
+
+                # CHANGED !!!! I BELIEVE I HAVE FIXED A BUG HERE FROM PR
+                # Do not ask curves for dates before their valuation date.
+                curve_start_dt = value_dt
+                if start_accrued_dt > value_dt:
+                    curve_start_dt = start_accrued_dt
+
                 index_alpha = index_day_counter.year_frac(
-                    start_accrued_dt, end_accrued_dt
+                    curve_start_dt, end_accrued_dt
                 )[0]
 
-                df_start = index_curve.df(start_accrued_dt)
+                df_start = index_curve.df(curve_start_dt)
                 df_end = index_curve.df(end_accrued_dt)
                 fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
-                div_start = dividend_curve.df(start_accrued_dt)
+                div_start = dividend_curve.df(curve_start_dt)
                 div_end = dividend_curve.df(end_accrued_dt)
                 div_fwd_rate = (div_start / div_end - 1.0) / index_alpha
 

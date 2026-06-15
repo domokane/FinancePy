@@ -18,11 +18,12 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.schedule import Schedule
-from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import label_to_string
+from ...utils.helpers import check_argument_types
+from ...utils.helpers import times_from_dates
 from ...models.black import Black
 from ...models.black_shifted import BlackShifted
 from ...models.bachelier import Bachelier
@@ -213,7 +214,10 @@ class IborCapFloor:
     ):
         """Value the caplet or floorlet using a specific model."""
 
-        t_exp = (caplet_start_dt - self.start_dt) / G_DAYS_IN_YEAR
+        time_dc_type = libor_curve.time_dc_type
+        t_exp = times_from_dates(self.start_dt, caplet_start_dt, time_dc_type)
+#        t_exp = (caplet_start_dt - self.start_dt) / G_DAYS_IN_YEAR
+
         dc_counter = DayCount(self.accrual_dc_type)
         alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
 
@@ -284,7 +288,9 @@ class IborCapFloor:
 
         elif isinstance(model, HWTree):
 
-            t_mat = (caplet_end_dt - value_dt) / G_DAYS_IN_YEAR
+            time_dc_type = libor_curve.time_dc_type
+            t_mat = times_from_dates(value_dt, caplet_end_dt, time_dc_type)
+#            t_mat = (caplet_end_dt - value_dt) / G_DAYS_IN_YEAR
             alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
             strike_price = 1.0 / (1.0 + alpha * self.strike_rate)
             notional_adj = 1.0 + self.strike_rate * alpha

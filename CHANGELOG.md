@@ -1,4 +1,23 @@
 ## CHANGE LOG
+15 June 2026
+- Added bond boostrap discount curve to dop exact fit to bond prices
+- Added bond parametric discount curve to do parametric best fit to bond prices
+- Added bond parametric yield curve to do parametric best fit to yields
+- Removed BondFittedZeroCurve (replaced by BondParametricDiscountCurve)
+- Removed BondFittedYieldCurve (replaced by BondParametricYieldCurve)
+- Removed BondExactZeroCurve (replaced by BondBootstrapDiscountCurve)
+- Widespread switch to use times_from_dates to avoid G_DAYS_IN_YEAR to be completed
+- Removed LINEAR_FWD_RATE interpolation as incorrect
+- Added LINEAR_DISCOUNT interpolation
+- Fixed optimiser use in FXVolSurfaces to handle precision
+- Bond curve files all moved under market->curves
+
+26 May 2026
+- Cleaning up code in models folder - adding validation of inputs, type checking
+- Fixed minor bug in Compound Option on tree
+- Fixed bug in LSMC - I now regress on ITM paths only
+- Tidied up finite_difference module
+
 19 May 2026
 - Further tidying up of Discount Curves folder
 - Tidying up of vol curve and surfaces

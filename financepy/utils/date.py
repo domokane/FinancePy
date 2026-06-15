@@ -27,12 +27,12 @@ END_YEAR = 2200
 # Precompute year offsets
 year_offsets_list = []
 days = 0
-for y in range(START_YEAR, END_YEAR + 1):
+for yy in range(START_YEAR, END_YEAR + 1):
     year_offsets_list.append(days)
-    if y == 1900:
+    if yy == 1900:
         days += 366
     else:
-        days += 366 if (y % 4 == 0 and y % 100 != 0) or (y % 400 == 0) else 365
+        days += 366 if (yy % 4 == 0 and yy % 100 != 0) or (yy % 400 == 0) else 365
 
 YEAR_OFFSETS = np.array(year_offsets_list, dtype=np.int32)
 
@@ -398,8 +398,6 @@ class Date:
         that only weekends are taken into account. Other Holidays are not. If
         you want to include regional holidays then use add_business_days from
         the FinCalendar class."""
-
-        # TODO: REMOVE DATETIME DEPENDENCE HERE
 
         end_dt = self
 

@@ -13,6 +13,7 @@ disable=
     C0114,  # missing-module-docstring
     C0115,  # missing-class-docstring
     C0116,  # missing-function-docstring
+    C0200,  #
     C0411,  # wrong-import-order (instead of old E0411)
     C0413,  # wrong-import-position (instead of old E0413)
     R0902,  # too-many-instance-attributes (common in product models)
@@ -22,6 +23,7 @@ disable=
     R0801,  # duplicate-code (can be noisy across product variants)
     W0511,  # fixme (we allow TODO notes, use pre-commit to gate later)
     W1203,  # logging-fstring-interpolation (we prefer f-strings)
+    W0231,  # logging-fstring-interpolation (we prefer f-strings)
     E1136,  # unsubscriptable-object (often false-positive with numpy)
     E0401,  # unable to import
 

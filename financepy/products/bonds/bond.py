@@ -29,20 +29,22 @@ from scipy import optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
+from ...utils.global_vars import G_SMALL
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import DateGenRuleTypes
-from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import label_to_string
+from ...utils.helpers import check_argument_types
+from ...utils.helpers import times_from_dates
 from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes
 from ...market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
-from .bond_exact_zero_curve import BondExactZeroCurve
+from ...market.curves.bond_bootstrap_discount_curve import BondBootstrapDiscountCurve
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD
@@ -100,6 +102,8 @@ def _g(oas, *args):
 
 
 def validate_yield(ytm):
+
+    ytms = []
 
     if isinstance(ytm, float) or isinstance(ytm, np.float64):
         ytms = np.array([ytm])
@@ -267,32 +271,31 @@ class Bond:
             pmt_dt = calendar.adjust(cpn_dt, bus_day_adj_type)
             self.payment_dts.append(pmt_dt)
 
-    ###########################################################################
+    ############################################################################
 
-    def times(self, settlement_dt):
-        """Times from settlement to payments"""
+    def times(self, settle_dt, time_dc_type:DayCountTypes = DayCountTypes.ACT_365F):
+        """Years from settlement to payments using day count convention"""
+        times = times_from_dates(settle_dt, self.payment_dts, time_dc_type)
 
-        times = []
-        for cpn_dt in self.payment_dts:
-            t = (cpn_dt - settlement_dt) / G_DAYS_IN_YEAR
-            if t >= 0:
-                times.append(t)
-
+        print("TIMES")
+        print(times)
+        print(len(times))
         return times
 
-    ###########################################################################
+    ############################################################################
 
-    def flows(self, settlement_dt):
+    def flows(self, settle_dt):
         """Times from settlement to payments"""
-
         n_flows = len(self.flow_amounts)
         flows = []
         for i in range(0, n_flows):
-            t = (self.payment_dts[i] - settlement_dt) / G_DAYS_IN_YEAR
             flow = self.flow_amounts[i]
-            if t >= 0:
+            if self.payment_dts[i] >= settle_dt:
                 flows.append(flow)
 
+        print("Flows")
+        print(flows)
+        print(len(flows))
         return flows
 
     ###########################################################################
@@ -1049,7 +1052,7 @@ class Bond:
                 )
                 clean_prices.append(clean_price)
 
-            return BondExactZeroCurve(
+            return BondBootstrapDiscountCurve(
                 settle_dt, par_bonds, clean_prices, lin_zero_interp
             )
 
@@ -1173,6 +1176,7 @@ class Bond:
 
             # Only consider flows where the coupon date is in the future
             if cpn_dt > settle_dt:
+
                 df = discount_curve.df(pmt_dt)
 
                 # Check for ex-dividend status on the next immediate coupon
@@ -1194,7 +1198,6 @@ class Bond:
         # 4. Re-base to settlement date
         df_settle = discount_curve.df(settle_dt)
         dirty_price = (px_pv / df_settle) * self.par
-
         return dirty_price
 
     ###########################################################################
@@ -1248,19 +1251,17 @@ class Bond:
     def current_yield(
         self,
         settle_dt: Date,
-        clean_price: float | list | np.ndarray,
-        convention: YTMCalcType = YTMCalcType.US_TREASURY,
+        clean_price: float | list | np.ndarray
     ):
         """Calculate the bond's simple yield."""
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
 
-        clean_prices = vectorise_price(clean_price)
-
         self.accrued_interest(settle_dt, 1.0)
-
         accrued_amount = self.accrued_int * self.par
+
+        clean_prices = vectorise_price(clean_price)
         dirty_prices = clean_prices + accrued_amount
         simple_ys = []
 
@@ -1467,6 +1468,7 @@ class Bond:
         f = self.freq
         cpn_flow = self.cpn / f
         pv = 0.0
+        time_dc_type = discount_curve.time_dc_type
 
         # We need the settle DF to re-base the price to the settlement date
         df_settle = discount_curve.df(settle_dt)
@@ -1479,7 +1481,7 @@ class Bond:
 
             if cpn_dt > settle_dt:
 
-                t = (pmt_dt - settle_dt) / G_DAYS_IN_YEAR
+                t = times_from_dates(settle_dt, pmt_dt, time_dc_type)
                 t = np.maximum(t, G_SMALL)
 
                 # Get base discount factor from curve

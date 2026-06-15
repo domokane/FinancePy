@@ -63,7 +63,7 @@ class DiscountCurvePWF(DiscountCurve):
 
         self.time_dc_type = time_dc_type
 
-        dc_times = times_from_dates(zero_dts, self.value_dt, self.time_dc_type)
+        dc_times = times_from_dates(self.value_dt, zero_dts, self.time_dc_type)
 
         self._times = np.array(dc_times)
         self._dfs = self.df_t(self._times)

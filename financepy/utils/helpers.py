@@ -79,54 +79,68 @@ def pv01_times(t: float, f: float):
 
 
 def times_from_dates(
-    dt: Union[Date, list],
     value_dt: Date,
-    dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+    dt: Union[Date, list],
+    time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
 ):
-    """If a single date is passed in then return the year from valuation date
-    but if a whole vector of dates is passed in then convert to a vector of
-    times from the valuation date. The output is always a numpy vector of times
-    which has only one element if the input is only one date."""
+    """Return year fractions from value_dt to dt.
 
-    if isinstance(value_dt, Date) is False:
-        raise FinError("Valuation date is not a Date")
+    If dt is a single Date, return a float.
+    If dt is a list of Dates, return a numpy array of floats.
+    """
 
-    if dc_type is None:
-        dc_counter = None
-    else:
-        dc_counter = DayCount(dc_type)
+    if not isinstance(value_dt, Date):
+        raise FinError("Valuation date must be a Date")
 
+    value_dt_int = value_dt.excel_dt
+
+    # Single Date path
     if isinstance(dt, Date):
-        num_dts = 1
-        times = [None]
-        if dc_counter is None:
-            times[0] = (dt - value_dt) / G_DAYS_IN_YEAR
-        else:
-            times[0] = dc_counter.year_frac(value_dt, dt)[0]
+        dt_int = dt.excel_dt
 
-        return times[0]
+        if value_dt_int > dt_int:
+            raise FinError("Negative time period")
 
-    elif isinstance(dt, list) and isinstance(dt[0], Date):
-        num_dts = len(dt)
-        times = []
-        for i in range(0, num_dts):
-            if dc_counter is None:
-                t = (dt[i] - value_dt) / G_DAYS_IN_YEAR
-            else:
-                t = dc_counter.year_frac(value_dt, dt[i])[0]
-            times.append(t)
+        if time_dc_type is None:
+            return (dt_int - value_dt_int) / G_DAYS_IN_YEAR
 
-        return np.array(times)
+        return DayCount(time_dc_type).year_frac(value_dt, dt)[0]
 
-    elif isinstance(dt, np.ndarray):
-
+    # Reject ndarray explicitly
+    if isinstance(dt, np.ndarray):
         raise FinError("You passed an ndarray instead of dates.")
 
-    else:
+    # List path
+    if not isinstance(dt, list):
+        raise FinError("Input must be a Date or list of Dates.")
 
-        raise FinError("Discount factor must take dates.")
+    num_dts = len(dt)
+    if num_dts == 0:
+        return np.array([])
 
-    return None
+    if not isinstance(dt[0], Date):
+        raise FinError("All dates must be Date objects.")
+
+    times = np.empty(num_dts, dtype=np.float64)
+
+    if time_dc_type is None:
+        inv_days = 1.0 / G_DAYS_IN_YEAR
+        for i, d in enumerate(dt):
+            d_int = d.excel_dt
+            if value_dt_int > d_int:
+                raise FinError("Negative time period")
+            times[i] = (d_int - value_dt_int) * inv_days
+        return times
+
+    dc_counter = DayCount(time_dc_type)
+    yf = dc_counter.year_frac
+
+    for i, d in enumerate(dt):
+        if value_dt_int > d.excel_dt:
+            raise FinError("Negative time period")
+        times[i] = yf(value_dt, d)[0]
+
+    return times
 
 
 ########################################################################################

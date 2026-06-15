@@ -831,7 +831,7 @@ def test_stack_exchange():
 
     #    print(bond.print_payments(settle_dt, 100))
 
-    spot_dts = [Date(31, 7, 2020), Date(1, 1, 2027)]
+    spot_dts = [Date(31, 7, 2021), Date(1, 1, 2027)]
     spot_rates = [0.01, 0.02]
 
     zero_curve = DiscountCurveZeros(

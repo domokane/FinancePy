@@ -92,7 +92,7 @@ def equity_lsmc(
             strike_price,
             smooth=False,
             dig=False,
-            opt_type=opt_type_value,
+            opt_type_int=opt_type_value,
         )
 
     # Set final values for value_matrix and stopping matrix
