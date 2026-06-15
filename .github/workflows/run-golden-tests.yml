@@ -3,7 +3,7 @@ name: regression tests
 on: [push, pull_request]
 
 env:
-  PYTHON_VERSION: '3.12'
+  PYTHON_VERSION: '3.13.9'
 
 jobs:
   build:

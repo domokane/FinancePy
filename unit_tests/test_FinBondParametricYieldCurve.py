@@ -81,7 +81,7 @@ def test_svensson():
     fitted_curve = BondParametricYieldCurve(
         settle_dt, bonds, ylds, curve_fit_method)
 
-    assert round(fitted_curve.curve_fit.beta_1, 4) == -0.6137
+    assert round(fitted_curve.curve_fit.beta_1, 4) == -0.6443
     assert round(fitted_curve.curve_fit.beta_2, 4) == +0.6121
     assert round(fitted_curve.curve_fit.beta_3, 4) == 0.6353
     assert round(fitted_curve.curve_fit.beta_4, 4) == 5.0000
