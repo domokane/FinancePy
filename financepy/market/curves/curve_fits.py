@@ -90,7 +90,8 @@ class CurveFitNelsonSiegel(CurveFitMethod):
 
         # Fairly permissive bounds. Only tau is restricted to 0.5-100.
         if bounds is None:
-            bounds = [(-5, -5, -5, 0.01), (5, 5, 5, 30.0)]
+            bounds = [(-5.0, -5.0, -5.0, 0.01),
+                      (10.0, 10.0, 10.0, 100.0)]
 
         self._bounds = bounds
 
@@ -158,8 +159,8 @@ class CurveFitSvensson(CurveFitMethod):
         self.tau_2 = tau2
 
         if bounds is None:
-            bounds = [(-5, -5, -5, -5, 0.01, 5.0),
-                      (5, 5, 5, 5, 4.9, 50.0)]
+            bounds = [(-5.0, -5.0, -5.0, -5.0, 0.01, 0.1),
+                      (10.0, 10.0, 10.0, 10.0, 10.0, 100.0)]
         self._bounds = bounds
 
     def get_params(self):
