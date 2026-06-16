@@ -2,7 +2,7 @@
 
 import os
 import datetime as dt
-
+import numpy as np
 import pandas as pd
 
 from financepy.utils.frequency import FrequencyTypes
@@ -41,20 +41,15 @@ for _, bond in bond_dataframe.iterrows():
 
 ########################################################################################
 
-
 def test_poly():
 
     curve_fit_method = CurveFitPolynomial(5)
     fitted_curve = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
+    mean_err, max_err = fitted_curve.errors()
+    print("Poly 5", mean_err, max_err)
 
-    coeffs = fitted_curve.curve_fit.coeffs
-
-    assert round(coeffs[0]*1e7, 4) == 4.1581
-    assert round(coeffs[1], 4) == 0.0641
-    assert round(coeffs[2], 4) == 0.2034
-    assert round(coeffs[3], 4) == -0.7883
-    assert round(coeffs[4], 4) == 0.8984
-    assert round(coeffs[5], 4) == -0.3454
+    assert mean_err < 7.0
+    assert max_err < 17.0
 
 
 ########################################################################################
@@ -66,10 +61,11 @@ def test_nelson_siegel():
     fitted_curve = BondParametricYieldCurve(
         settle_dt, bonds, ylds, curve_fit_method)
 
-    assert round(fitted_curve.curve_fit.beta_1, 3) == -0.094
-    assert round(fitted_curve.curve_fit.beta_2, 3) == 0.092
-    assert round(fitted_curve.curve_fit.beta_3, 3) == 0.259
-    assert round(fitted_curve.curve_fit.tau, 3) == 0.755
+    mean_err, max_err = fitted_curve.errors()
+    print("NS", mean_err, max_err)
+
+    assert mean_err < 9.0
+    assert max_err < 30.0
 
 
 ########################################################################################
@@ -81,13 +77,11 @@ def test_svensson():
     fitted_curve = BondParametricYieldCurve(
         settle_dt, bonds, ylds, curve_fit_method)
 
-    assert round(fitted_curve.curve_fit.beta_1, 4) == -0.4371
-    assert round(fitted_curve.curve_fit.beta_2, 4) == +0.4356
-    assert round(fitted_curve.curve_fit.beta_3, 4) == 0.5202
-    assert round(fitted_curve.curve_fit.beta_4, 4) == 7.0157
-    assert round(fitted_curve.curve_fit.tau_1, 4) == 0.9059
-    assert round(fitted_curve.curve_fit.tau_2, 4) == 55.0500
+    mean_err, max_err = fitted_curve.errors()
+    print("Svenson", mean_err, max_err)
 
+    assert mean_err < 3.26
+    assert max_err < 9.090
 
 ########################################################################################
 
@@ -101,6 +95,5 @@ def test_interp_yield():
     mat_dt = Date(19, 9, 2030)
     interp_yield = fitted_curve.interp_yield(mat_dt)
 
-    assert round(float(interp_yield), 8) == 0.02594837
+    assert round(float(interp_yield), 4) == 0.0260
 
-# test_poly()

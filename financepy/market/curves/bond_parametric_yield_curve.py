@@ -60,15 +60,17 @@ class BondParametricYieldCurve:
             years_to_maturities.append(t)
 
         self.years_to_maturity = np.asarray(years_to_maturities, dtype=float)
-        self._t_max = max(np.max(self.years_to_maturity), 1.0e-8)
+        self.t_max = max(np.max(self.years_to_maturity), 1.0e-8)
 
-        xdata = self.years_to_maturity / self._t_max
-        ydata = self.ylds
+        tdata = self.years_to_maturity
+        ylds = self.ylds
 
         fit_type = type(self.curve_fit)
 
         if fit_type is CurveFitPolynomial:
 
+            self.curve_fit.t_scale = self.t_max
+            xdata = tdata / self.curve_fit.t_scale
             d = curve_fit.power
             coeffs_high_first = np.polyfit(xdata, self.ylds, deg=d)
             curve_fit.coeffs = coeffs_high_first[::-1]
@@ -77,27 +79,39 @@ class BondParametricYieldCurve:
 
             popt, _ = scipy.optimize.curve_fit(
                 curve_fit.interp_rate,
-                xdata,
-                ydata,
+                tdata,
+                ylds,
                 bounds=curve_fit.bounds
             )
             curve_fit.set_params(popt)
 
         elif fit_type is CurveFitSvensson:
 
+            p0 = np.array([
+                0.03,    # beta_1 long rate
+                -0.03,   # beta_2 short slope
+                0.02,    # beta_3 medium curvature
+                0.01,    # beta_4 long curvature
+                1.0,     # tau_1
+                10.0,    # tau_2
+            ])
+
             popt, _ = scipy.optimize.curve_fit(
                 curve_fit.interp_rate,
-                xdata,
-                ydata,
-                bounds=curve_fit.bounds
+                tdata,
+                ylds,
+                p0=p0,
+                bounds=curve_fit.bounds,
+                maxfev=10000,
             )
+
             curve_fit.set_params(popt)
 
         elif fit_type is CurveFitBSpline:
 
             def residuals(params):
                 curve_fit.set_params(params)
-                return curve_fit.interp_rate(xdata) - ydata
+                return curve_fit.interp_rate(tdata) - ylds
 
             result = least_squares(
                 residuals,
@@ -131,8 +145,21 @@ class BondParametricYieldCurve:
         else:
             raise FinError("Unknown date type.")
 
-        tau = np.asarray(t, dtype=float) / self._t_max
-        return self.curve_fit.interp_rate(tau)
+        return self.curve_fit.interp_rate(t)
+
+    ##############################################################################
+
+    def errors(self):
+
+        ylds = self.ylds
+        times = self.years_to_maturity
+        y_fit = self.curve_fit.interp_rate(times)
+
+        res = (ylds - y_fit)
+        mean_err = np.sqrt(np.mean(res * res))
+        max_err = np.max(np.abs(res))
+        BP = 10000
+        return (mean_err*BP, max_err*BP)
 
     ###########################################################################
 

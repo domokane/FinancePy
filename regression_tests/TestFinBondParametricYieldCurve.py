@@ -2,7 +2,8 @@
 
 import os
 import datetime as dt
-
+from docutils.languages import fi
+import numpy as np
 import pandas as pd
 
 import add_fp_to_path
@@ -56,6 +57,8 @@ def test_bond_parametric_yield_curve():
     curve_fitter = CurveFitPolynomial()
     fitted_curve1 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
 
+    # print(fitted_curve1.errors())
+
     if SHOW_PLOTS:
         fitted_curve1.plot("GBP Yield Curve")
 
@@ -64,18 +67,27 @@ def test_bond_parametric_yield_curve():
     if SHOW_PLOTS:
         fitted_curve2.plot("GBP Yield Curve")
 
+    # print(fitted_curve2.errors())
+
     curve_fitter = CurveFitNelsonSiegel()
     fitted_curve3 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
     if SHOW_PLOTS:
         fitted_curve3.plot("GBP Yield Curve")
+
+    # print(fitted_curve3.errors())
 
     curve_fitter = CurveFitSvensson()
     fitted_curve4 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
     if SHOW_PLOTS:
         fitted_curve4.plot("GBP Yield Curve")
 
+    # print(fitted_curve4.errors())
+
     curve_fitter = CurveFitBSpline()
     fitted_curve5 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+
+    # print(fitted_curve5.errors())
+
     if SHOW_PLOTS:
         fitted_curve5.plot("GBP Yield Curve")
 

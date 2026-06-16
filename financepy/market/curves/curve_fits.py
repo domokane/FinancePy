@@ -42,9 +42,10 @@ class CurveFitMethod:
 class CurveFitPolynomial(CurveFitMethod):
     """Polynomial curve fitting."""
 
-    def __init__(self, power=3):
+    def __init__(self, power=3, t_scale=1.0):
         self.name = "Polynomial (" + str(power) + ")"
         self.power = power
+        self.t_scale = t_scale
         n_coeffs = power + 1
         self.coeffs = np.full(n_coeffs, 0.03)
         self._bounds = (-np.inf, np.inf)
@@ -52,9 +53,9 @@ class CurveFitPolynomial(CurveFitMethod):
     def interp_rate(self, t):
         # I store coefficients with lowest power first but numpy wants
         # the highest power first so I need to reverse the order
+        x = np.asarray(t, dtype=float) / self.t_scale
         coeffs = self.coeffs[::-1]
-        t = np.asarray(t, dtype=float)
-        yld = np.polyval(coeffs, t)
+        yld = np.polyval(coeffs, x)
         return yld
 
     def get_params(self):
@@ -70,6 +71,7 @@ class CurveFitPolynomial(CurveFitMethod):
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("Power", self.power)
+        s += label_to_string("t_scale", self.t_scale)
 
         for c in self.coeffs:
             s += label_to_string("Coefficient", c)
@@ -286,8 +288,9 @@ class CurveFitBSpline(CurveFitMethod):
         return self._bounds
 
     def interp_rate(self, t):
-        t = np.clip(np.asarray(t, dtype=float), self.t_min, self.t_max)
-        return self._spline(t)
+        x = np.asarray(t, dtype=float) / self.t_max
+        x = np.clip(x, 0.0, 1.0)
+        return self._spline(x)
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)

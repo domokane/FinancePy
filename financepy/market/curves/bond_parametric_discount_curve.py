@@ -19,6 +19,10 @@ from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
 
 from .curve_fits import CurveFitMethod
+from .curve_fits import CurveFitPolynomial
+from .curve_fits import CurveFitNelsonSiegel
+from .curve_fits import CurveFitSvensson
+from .curve_fits import CurveFitBSpline
 
 ########################################################################################
 
@@ -51,11 +55,16 @@ def f_fast(params, *args):
     curve_fit.set_params(params)
     errors = np.zeros(len(flow_times))
 
+    fit_type = type(curve_fit)
+
     for i_bond in range(len(flow_times)):
         times_i = flow_times[i_bond]
         amounts_i = flow_amounts[i_bond]
-        tau = times_i / t_max
-        zero_rates = curve_fit.interp_rate(tau)
+
+        if fit_type == CurveFitPolynomial:
+            curve_fit.t_scale = t_max
+
+        zero_rates = curve_fit.interp_rate(times_i)
 
         if not np.all(np.isfinite(zero_rates)):
             errors[i_bond] = 1.0e25
@@ -80,7 +89,7 @@ def f_fast(params, *args):
 
 
 class BondParametricDiscountCurve(DiscountCurve):
-    """Fit a parametric discount curve to dirty bond prices."""
+    """Fit a parametric discount curve to bond prices."""
 
     def __init__(
         self,
@@ -122,7 +131,7 @@ class BondParametricDiscountCurve(DiscountCurve):
                                      self.time_dc_type)
             self._t_mats.append(t_mat)
 
-        self._t_max = max(np.max(self._t_mats), 1.0e-8)
+        self.t_max = max(np.max(self._t_mats), 1.0e-8)
 
         if do_build:
             self.build_curve()
@@ -148,7 +157,7 @@ class BondParametricDiscountCurve(DiscountCurve):
             self._bond_flow_amounts,
             dirty_prices,
             self._curve_fit,
-            self._t_max,
+            self.t_max,
         )
 
         x0 = self._curve_fit.get_params()
@@ -182,8 +191,14 @@ class BondParametricDiscountCurve(DiscountCurve):
         self._curve_fit.set_params(result.x)
 
         self._times = np.concatenate(([0.0], self._t_mats))
-        taus = self._times / self._t_max
-        self._zero_rates = self._curve_fit.interp_rate(taus)
+
+        fit_type = type(self.curve_fit)
+
+        if fit_type == CurveFitPolynomial:
+            self._curve_fit.t_scale = self.t_max
+
+        self._zero_rates = self._curve_fit.interp_rate(self._times)
+
         self._dfs = np.exp(-self._times * self._zero_rates)
 
     ####################################################################################
@@ -248,8 +263,12 @@ class BondParametricDiscountCurve(DiscountCurve):
         """Discount factor from fitted parametric zero-rate curve."""
 
         times, scalar_input = self._to_time_array(t)
-        taus = times / self._t_max
-        zero_rates = self.curve_fit.interp_rate(taus)
+        fit_type = type(self.curve_fit)
+
+        if fit_type is CurveFitPolynomial:
+            self.curve_fit.t_scale = self.t_max
+
+        zero_rates = self._curve_fit.interp_rate(times)
 
         expo = np.clip(-zero_rates * times, -100.0, 100.0)
         dfs = np.exp(expo)
@@ -270,8 +289,7 @@ class BondParametricDiscountCurve(DiscountCurve):
             times_i = self._bond_flow_times[i_bond]
             amounts_i = self._bond_flow_amounts[i_bond]
 
-            tau = times_i / self._t_max
-            zero_rates = self._curve_fit.interp_rate(tau)
+            zero_rates = self._curve_fit.interp_rate(times_i)
 
             dfs = np.exp(-zero_rates * times_i)
 

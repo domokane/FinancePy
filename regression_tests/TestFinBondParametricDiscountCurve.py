@@ -23,7 +23,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-SHOW_PLOTS = False
+SHOW_PLOTS = True
 
 ########################################################################################
 
