@@ -10,3 +10,4 @@ from .discount_curve_zeros import *
 from .bond_bootstrap_discount_curve import *
 from .bond_parametric_discount_curve import *
 from .bond_parametric_yield_curve import *
+from .fx_discount_curve import *
