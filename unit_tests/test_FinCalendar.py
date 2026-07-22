@@ -5,6 +5,7 @@ from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.date import Date
 from financepy.utils.date_format import set_date_format
 from financepy.utils.date_format import DateFormatTypes
+from financepy.utils.error import FinError
 
 bus_days_in_decade = {
     CalendarTypes.NONE: 3653,
@@ -232,3 +233,127 @@ def test_fast_adjust_matches_adjust(cal_type, bd_type):
 
     for dt in dates:
         assert cal.fast_adjust(dt, bd_type) == cal.adjust(dt, bd_type)
+
+
+########################################################################################
+# Joint calendars — a list of calendar types unions their holidays
+########################################################################################
+
+
+JOINT_US_UK = [CalendarTypes.UNITED_STATES, CalendarTypes.UNITED_KINGDOM]
+
+
+def test_joint_calendar_holiday_is_union():
+
+    us = Calendar(CalendarTypes.UNITED_STATES)
+    uk = Calendar(CalendarTypes.UNITED_KINGDOM)
+    joint = Calendar(JOINT_US_UK)
+
+    july_4_2023 = Date(4, 7, 2023)  # US Independence Day, UK business day
+    assert us.is_holiday(july_4_2023)
+    assert not uk.is_holiday(july_4_2023)
+    assert joint.is_holiday(july_4_2023)
+
+    aug_28_2023 = Date(28, 8, 2023)  # UK late summer bank holiday, US business day
+    assert not us.is_holiday(aug_28_2023)
+    assert uk.is_holiday(aug_28_2023)
+    assert joint.is_holiday(aug_28_2023)
+
+    plain_day = Date(6, 6, 2023)
+    assert not joint.is_holiday(plain_day)
+    assert joint.is_business_day(plain_day)
+
+
+def test_joint_business_day_is_intersection_over_full_years():
+
+    us = Calendar(CalendarTypes.UNITED_STATES)
+    uk = Calendar(CalendarTypes.UNITED_KINGDOM)
+    joint = Calendar(JOINT_US_UK)
+
+    dt = Date(1, 1, 2020)
+    end = Date(1, 1, 2024)
+
+    while dt < end:
+        assert joint.is_business_day(dt) == (
+            us.is_business_day(dt) and uk.is_business_day(dt)
+        ), f"joint disagrees with single-calendar intersection on {dt}"
+        dt = dt.add_days(1)
+
+
+def test_joint_adjust_skips_holidays_of_both_markets():
+
+    # Good Friday 2021-04-02 and Easter Monday 2021-04-05 are UK bank
+    # holidays but US business days, so a joint US+UK calendar must jump
+    # from the Friday all the way to Tuesday 2021-04-06
+    us = Calendar(CalendarTypes.UNITED_STATES)
+    joint = Calendar(JOINT_US_UK)
+
+    good_friday = Date(2, 4, 2021)
+    assert us.adjust(good_friday, BusDayAdjustTypes.FOLLOWING) == good_friday
+    assert joint.adjust(good_friday, BusDayAdjustTypes.FOLLOWING) == Date(6, 4, 2021)
+
+
+@pytest.mark.parametrize("bd_type", list(BusDayAdjustTypes))
+def test_joint_fast_adjust_matches_adjust(bd_type):
+
+    joint = Calendar(JOINT_US_UK)
+
+    dates = [
+        Date(2, 4, 2021),
+        Date(31, 1, 2021),
+        Date(24, 12, 2021),
+        Date(25, 12, 2021),
+        Date(31, 12, 2021),
+    ]
+
+    for dt in dates:
+        assert joint.fast_adjust(dt, bd_type) == joint.adjust(dt, bd_type)
+
+
+def test_joint_add_business_days_round_trip():
+
+    joint = Calendar(JOINT_US_UK)
+    start = Date(3, 1, 2020)
+
+    for n in [0, 1, 5, 50, 250, -1, -5, -50, -250]:
+        end = joint.add_business_days(start, n)
+        back = joint.add_business_days(end, -n)
+        assert back == start
+
+
+def test_joint_holiday_list_is_union_of_lists():
+
+    us = Calendar(CalendarTypes.UNITED_STATES)
+    uk = Calendar(CalendarTypes.UNITED_KINGDOM)
+    joint = Calendar(JOINT_US_UK)
+
+    year = 2023
+    us_holidays = set(us.get_holiday_list(year))
+    uk_holidays = set(uk.get_holiday_list(year))
+
+    assert set(joint.get_holiday_list(year)) == us_holidays | uk_holidays
+
+
+def test_joint_single_entry_and_duplicates_collapse():
+
+    single = Calendar([CalendarTypes.UNITED_STATES])
+    assert single.cal_type == CalendarTypes.UNITED_STATES
+
+    duplicate = Calendar([CalendarTypes.UNITED_STATES, CalendarTypes.UNITED_STATES])
+    assert duplicate.cal_type == CalendarTypes.UNITED_STATES
+
+
+def test_joint_str_and_repr():
+
+    joint = Calendar(JOINT_US_UK)
+    assert str(joint) == "JOINT(UNITED_STATES,UNITED_KINGDOM)"
+    assert repr(joint) == str(joint)
+
+
+def test_joint_invalid_inputs_raise():
+
+    with pytest.raises(FinError):
+        Calendar([])
+
+    with pytest.raises(FinError):
+        Calendar([CalendarTypes.UNITED_STATES, "TARGET"])
