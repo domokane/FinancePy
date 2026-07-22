@@ -1,30 +1,7 @@
-# Latest News and Versions
+# FinancePy
+A one-stop library for pricing and risk-managing options, futures and other financial instruments. See below for a comprehensive overview.
 
-22 Nov 22
-Version 0.260 has been released and pushed to PyPI
-- Create Date from python datetime
-- Zero coupon bond class
-- Fixed bug in bond payment date
-
-31-Aug-2022
-Version 0.240 has just been released and pushed to PyPI with changes
-- Negative terms in date class
-- Recovery rates do not default to standard value for CDS curves 
-
-# DISCLAIMER
-
-This software is distributed FREE AND WITHOUT ANY WARRANTY. 
-
-Report any bugs or suggestions here as an issue. 
-
-# CONTRIBUTORS WANTED !
-
-If you have a knowledge of Quantitative Finance and a reasonable knowledge of Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. 
-
-If you are a user and require some additional functionality, then please add it as an issue.
-
-# Quick Start Guide
-
+## First Installation
 FinancePy can be installed from pip using the following command:
 
 `pip install financepy`
@@ -33,15 +10,111 @@ To upgrade an existing installation type:
 
 `pip install --upgrade financepy`
 
-I have encountered problems using Anaconda3-2020.07 due to some Numba and LLVMLite problems. However Anaconda3-2020.02 works.
+Then start a Python terminal and type
 
-## Using FinancePy in a Jupyter Notebook
+`from financepy.utils import *`
 
-Once financepy has been installed, it is easy to get started.
+Here is a quick check to make sure it all loaded. Type
 
-Just download the project and examine the set of Jupyter Notebooks in the notebooks folder.
+```>>> Date(19,2,2026).add_days(2)```
 
-A pdf manual describing all of the functions can be found in the project directory.
+You should see
+
+```21-FEB-2026```
+
+Warning: You may notice that the library can take several seconds to import after the first install if you do a wildcard import of classes which rely on certain models. This is because financepy relies upon Numba to compile a lot of the models - resulting in calculation speeds similar to C/C++. This compile only takes place on the first import of the model and the compiled code is then cached on your machine. No further compilation will be required. As a consequence subsequent imports will be almost instant.
+
+## Quickstart Guide
+
+👉 See [Quick Start Guide](./docs/QUICKSTART.md) to get going in 2 minutes!
+
+
+## Structure of Financepy
+
+The structure of financepy is as follows
+```
+├── market/
+├── models/
+├── products/
+├── utils/
+```
+
+The market folder contains objects linked to structured market data such as interest rate term structures, i.e. `curves` and volatility term structures and surfaces.
+
+```
+├── market/
+│   ├── curves
+│       ├── composite_discount_curve.py
+│       ├── discount_curve_flat.py
+│       ├── ...
+│       ├── discount_curve.py
+│   ├── prices
+│   ├── volatility
+│       ├── equity_vol_curve.py
+│       ├── ...
+│       ├── fx_vol_surface.py
+│       ├── swaption_vol_surface.py
+```
+The models folder contains mathematical pricing models.
+```
+├── models/
+│   ├── bachelier.py
+│   ├── bdt_tree.py
+│   ├── black_scholes.py
+│   ├── ...
+│   ├── vasicek_mc.py
+```
+These model pricing functions are not usually called directly but are called from the products objects in the products folder. There is a module for each of the covered product types which are grouped into bonds, credit, equity, fx and rates as follows:
+```
+├── products/
+│   ├── bonds
+│       ├── bond_convertible.py
+│       ├── bond_future.py
+│       ├── ...
+│       ├── bond.py
+│   ├── credit
+│       ├── cds_basket.py
+│       ├── ...
+│       ├── cds.py
+│   ├── equity
+│       ├── equity_american_option.py
+│       ├── ...
+│       ├── equity_variance_swap.py
+│   ├── fx
+│       ├── fx_barrier_option.py
+│       ├── ...
+│       ├── fx_variance_swap.py
+│   ├── rates
+│       ├── callable_swap.py
+│       ├── ...
+│       ├── ibor_swaption.py
+```
+Finally, we have the utils folder that contains useful classes such as dates, day counts and schedule generation
+```
+├── utils/
+│   ├── calendar.py
+│   ├── day_count.py
+│   ├── date.py
+│   ├── schedule.py
+```
+and many more.
+
+## Notebooks
+The notebooks folder contains over 90 example notebooks on how to use the library.
+
+## Disclaimer
+This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or concerns here as an issue.
+
+## Contributing
+If you have a knowledge of Quantitative Finance and Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. There are a number of requirements:
+
+* The code should be Pep8 compliant.
+* Comments are required for every class and function, and they should give a clear description.
+* At least one broad test case and a set of unit tests must be provided for every function.
+* Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability and speed are the priorities.
+
+## Users
+If you are a user and require some additional functionality, then please add it as an issue.
 
 ## Overview
 
@@ -80,8 +153,6 @@ Important Note:
 * IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
 * IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
 
-## The Library Design
-
 The underlying Python library is split into a number of major modules:
 
 * Utils - These are utility functions used to assist you with modelling a security. These include dates (Date), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
@@ -97,7 +168,7 @@ The interface to each product has a value() function that will take a model and 
 
 ## Author
 
-Dominic O'Kane. I am a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 15 years of academic experience.
+I was a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 18 years of academic experience.
 
 Contact me at dominic.okane at edhec.edu.
 
@@ -108,15 +179,6 @@ FinancePy depends on Numpy, Numba, Scipy and basic python libraries such as os, 
 ## Changelog
 
 See the changelog for a detailed history of changes.
-
-## Contributions
-
-Contributions are very welcome. There are a number of requirements:
-
-* The code should be Pep8 compliant.
-* Comments are required for every class and function and they should be a clear description.
-* At least one broad test case and a set of unit tests must be provided for every function.
-* Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability is the priority.
 
 ## License
 
