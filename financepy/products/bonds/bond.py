@@ -1235,8 +1235,7 @@ class Bond:
                     maxiter=50,
                 )
             except RuntimeError:
-                print(f"Warning: YTM calculation did not converge for price {
-                        dirty_price}")
+                print(f"Warning: YTM calculation did not converge for price {dirty_price}")
                 ytm = np.nan
 
             ytms.append(ytm)
@@ -1546,8 +1545,7 @@ class Bond:
 
                 oass.append(oas)
             except RuntimeError:
-                print(f"Warning: OAS calculation did not converge for price {
-                        dirty_price}")
+                print(f"Warning: OAS calculation did not converge for price {dirty_price}")
                 oass.append(np.nan)
 
         if len(oass) == 1:
