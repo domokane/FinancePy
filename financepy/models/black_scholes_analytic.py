@@ -284,7 +284,7 @@ def bs_vanna(
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
     d2 = d1 - v_sqrt_t
-    vanna = np.exp(-q * t) * sqrt_t * normcdf_prime_vect(d1) * (d2 / v)
+    vanna = -np.exp(-q * t) * normcdf_prime_vect(d1) * (d2 / v)
     return vanna
 
 
