@@ -8,8 +8,8 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.cds_curve import CDSCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
@@ -18,6 +18,9 @@ from financepy.products.credit.cds_option import CDSOption
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
+
+DIRTY = 0
+CLEAN = 1
 
 # TO DO
 
@@ -244,8 +247,8 @@ def test_dirty_price_cd_swaption():
     test_cases.print("PAR SPREAD:", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    test_cases.print("DIRTY VALUE", v["dirty_pv"])
-    test_cases.print("CLEAN VALUE", v["clean_pv"])
+    test_cases.print("DIRTY VALUE", v[DIRTY])
+    test_cases.print("CLEAN VALUE", v[CLEAN])
 
     p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN PRICE", p)
@@ -262,7 +265,7 @@ def test_dirty_price_cd_swaption():
     prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PREMIUM LEG PV", prem_pv)
 
-    full_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
+    full_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
     test_cases.print("FULL  RPV01", full_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
 
@@ -280,8 +283,8 @@ def test_dirty_price_cd_swaption():
     test_cases.print("PAR SPREAD", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    test_cases.print("DIRTY VALUE", v["dirty_pv"])
-    test_cases.print("CLEAN VALUE", v["clean_pv"])
+    test_cases.print("DIRTY VALUE", v[DIRTY])
+    test_cases.print("CLEAN VALUE", v[CLEAN])
 
     prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
@@ -289,7 +292,7 @@ def test_dirty_price_cd_swaption():
     prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PREMIUM LEG PV", prem_pv)
 
-    dirty_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
+    dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
     test_cases.print("DIRTY RPV01", dirty_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
 

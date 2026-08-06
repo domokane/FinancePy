@@ -369,7 +369,7 @@ class IborSwaption:
     def __repr__(self):
         """Function to allow us to print the swaption details."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("SETTLEMENT DATE", self.settle_dt)
         s += label_to_string("EXERCISE DATE", self.exercise_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", str(self.fixed_leg_type))

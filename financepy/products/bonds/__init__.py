@@ -2,7 +2,7 @@ from .bond import *
 from .bond_zero import *
 from .bond_annuity import *
 from .bond_convertible import *
-from .bond_callable import *
+from .bond_embedded_option import *
 from .bond_frn import *
 from .bond_future import *
 from .bond_market import *

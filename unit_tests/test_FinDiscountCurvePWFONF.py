@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
+from financepy.market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.utils.date import Date
 
@@ -24,7 +24,7 @@ def test_fin_discount_curve_pcfonf_01():
     ]
     ondfwd_rates = [0, 0.02, 0.04, 0.06, 0.08]
 
-    curve = DiscountCurvePWFONF(
+    curve = PWFONFDiscountCurve(
         start_dt,
         knot_dts,
         ondfwd_rates,
@@ -56,7 +56,7 @@ def test_fin_discount_curve_pcfonf_02():
     knot_dts = [Date(1, 6, 2017), Date(1, 6, 2018), Date(2, 6, 2018)]
     ondfwd_rates = [0, 0.01, 0.0]
 
-    curve = DiscountCurvePWFONF(
+    curve = PWFONFDiscountCurve(
         start_dt,
         knot_dts,
         ondfwd_rates,
@@ -86,7 +86,7 @@ def test_fin_discount_curve_pcfonf_03():
     end_dt = Date(1, 6, 2018)
     level = 0.01
 
-    curve = DiscountCurvePWFONF.brick_wall_curve(
+    curve = PWFONFDiscountCurve.brick_wall_curve(
         valuation_date,
         start_dt,
         end_dt,
@@ -117,7 +117,7 @@ def test_fin_discount_curve_pcfonf_04():
     end_dt = Date(1, 6, 2018)
     level = 0.01
 
-    curve = DiscountCurvePWFONF.brick_wall_curve(
+    curve = PWFONFDiscountCurve.brick_wall_curve(
         valuation_date,
         start_dt,
         end_dt,
@@ -148,7 +148,7 @@ def test_fin_discount_curve_pcfonf_05():
     end_dt = Date(1, 6, 2018)
     level = 0.01
 
-    curve = DiscountCurvePWFONF.brick_wall_curve(
+    curve = PWFONFDiscountCurve.brick_wall_curve(
         valuation_date,
         start_dt,
         end_dt,
@@ -176,7 +176,7 @@ def test_fin_discount_curve_pcfonf_flat():
 
     valuation_date = Date(1, 1, 2015)
     level = 0.01
-    curve = DiscountCurvePWFONF.flat_curve(
+    curve = PWFONFDiscountCurve.flat_curve(
         valuation_date,
         level,
     )

@@ -6,14 +6,14 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
-from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.market.curves.discount_curve_pwl import DiscountCurvePWL
-from financepy.market.curves.discount_curve_pwf import DiscountCurvePWF
-from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
-from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
-from financepy.market.curves.discount_curve_ns import DiscountCurveNS
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.poly_discount_curve import PolyDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
+from financepy.market.curves.pwl_discount_curve import PWLDiscountCurve
+from financepy.market.curves.pwf_discount_curve import PWFDiscountCurve
+from financepy.market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
+from financepy.market.curves.nss_discount_curve import NSSDiscountCurve
+from financepy.market.curves.ns_discount_curve import NSDiscountCurve
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date_format import set_date_format, DateFormatTypes
@@ -54,34 +54,34 @@ def test_fin_discount_curves():
     )
     curves_list.append(fin_discount_curve)
 
-    fin_discount_curve_flat = DiscountCurveFlat(value_dt, 0.05)
-    curves_list.append(fin_discount_curve_flat)
+    fin_flat_discount_curve = FlatDiscountCurve(value_dt, 0.05)
+    curves_list.append(fin_flat_discount_curve)
 
-    fin_discount_curve_ns = DiscountCurveNS(
+    fin_discount_curve_ns = NSDiscountCurve(
         value_dt, 0.0305, -0.01, 0.08, 10.0
     )
     curves_list.append(fin_discount_curve_ns)
 
-    fin_discount_curve_nss = DiscountCurveNSS(
+    fin_discount_curve_nss = NSSDiscountCurve(
         value_dt, 0.035, -0.02, 0.09, 0.1, 1.0, 2.0
     )
     curves_list.append(fin_discount_curve_nss)
 
-    fin_discount_curve_poly = DiscountCurvePoly(
+    fin_discount_curve_poly = PolyDiscountCurve(
         value_dt, [0.05, 0.002, -0.00005]
     )
     curves_list.append(fin_discount_curve_poly)
 
-    fin_discount_curve_pwf = DiscountCurvePWF(value_dt, dates, rates)
+    fin_discount_curve_pwf = PWFDiscountCurve(value_dt, dates, rates)
     curves_list.append(fin_discount_curve_pwf)
 
-    fin_discount_curve_pwl = DiscountCurvePWL(value_dt, dates, rates)
+    fin_discount_curve_pwl = PWLDiscountCurve(value_dt, dates, rates)
     curves_list.append(fin_discount_curve_pwl)
 
-    fin_discount_curve_zeros = DiscountCurveZeros(value_dt, dates, rates)
+    fin_discount_curve_zeros = ZeroRatesDiscountCurve(value_dt, dates, rates)
     curves_list.append(fin_discount_curve_zeros)
 
-    fin_discount_curve_pwfonf = DiscountCurvePWFONF(value_dt, dates, rates)
+    fin_discount_curve_pwfonf = PWFONFDiscountCurve(value_dt, dates, rates)
     curves_list.append(fin_discount_curve_pwfonf)
 
     curve_names = []

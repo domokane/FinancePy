@@ -4,7 +4,7 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.rates.ois import OIS
 from financepy.utils.math import ONE_MILLION
 
@@ -49,7 +49,7 @@ def test_fin_fixed_ois():
 
     time_dc_type = DayCountTypes.ACT_365F
 
-    ois_curve = DiscountCurveFlat(value_dt, market_rate, FrequencyTypes.ANNUAL, time_dc_type)
+    ois_curve = FlatDiscountCurve(value_dt, market_rate, FrequencyTypes.ANNUAL, time_dc_type)
 
     v = ois.value(effective_dt, ois_curve)
     assert round(v, 1) == 40906.6

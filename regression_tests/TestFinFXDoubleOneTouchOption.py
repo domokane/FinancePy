@@ -3,7 +3,7 @@
 import add_fp_to_path
 
 from financepy.products.fx import FXDoubleOneTouchOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -31,8 +31,8 @@ def test_fin_fx_double_barrier_one_touch_option():
     num_paths = 10000
     num_steps_per_year = 252 * 2
 
-    dom_curve = DiscountCurveFlat(value_dt, domestic_rate)
-    for_curve = DiscountCurveFlat(value_dt, foreign_rate)
+    dom_curve = FlatDiscountCurve(value_dt, domestic_rate)
+    for_curve = FlatDiscountCurve(value_dt, foreign_rate)
 
     payment_size = 10.0
 

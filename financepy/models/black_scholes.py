@@ -16,7 +16,7 @@ from .equity_lsmc import equity_lsmc, BoundaryFitTypes
 # both European and American equity options.
 
 from .black_scholes_analytic import (
-    bs_value,
+    european_value,
     baw_value,
     bjerksund_stensland_value,
 )
@@ -130,7 +130,7 @@ class BlackScholes(Model):
     ) -> float:
 
         if bs_type is BlackScholesTypes.ANALYTICAL:
-            return bs_value(
+            return european_value(
                 spot_price,
                 time_to_expiry,
                 strike_price,
@@ -194,15 +194,14 @@ class BlackScholes(Model):
     ) -> float:
 
         if bs_type is BlackScholesTypes.BARONE_ADESI:
-            phi = 1 if opt_type is OptionTypes.AMERICAN_CALL else -1
-            return baw_value(
+             return baw_value(
                 spot_price,
                 time_to_expiry,
                 strike_price,
                 risk_free_rate,
                 dividend_rate,
                 self.volatility,
-                phi,
+                opt_type.value,
             )
 
         if bs_type is BlackScholesTypes.BJERKSUND_STENSLAND:

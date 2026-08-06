@@ -3,7 +3,7 @@
 ##############################################################################
 
 from enum import Enum
-from math import exp, log, sqrt
+from math import exp, sqrt
 import numpy as np
 import numba as nb
 
@@ -14,6 +14,8 @@ from ...products.fx.fx_option import FXOption
 from ...models.process_simulator import FinProcessSimulator
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
+from ...models.fx_barrier_model import fx_barrier_value
+from ...market.curves.discount_curve import DiscountCurve
 
 ########################################################################################
 
@@ -61,7 +63,7 @@ class FXBarrierOption(FXOption):
 
     ##########################################################################
 
-    def value(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def value_old(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
         """Value FX Barrier Option using Black-Scholes model with closed-form
         analytical models."""
 
@@ -290,6 +292,51 @@ class FXBarrierOption(FXOption):
 
     ###########################################################################
 
+    def value(
+        self,
+        value_dt: Date,
+        spot_fx_rate: float | np.ndarray,
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model,
+    ) -> float | np.ndarray:
+        """Value an FX barrier option for a scalar or array of spot rates."""
+    
+        if not isinstance(value_dt, Date):
+            raise FinError("Valuation date is not a Date")
+    
+        if value_dt > self.expiry_dt:
+            raise FinError("Valuation date after expiry date.")
+    
+        if domestic_curve.value_dt != value_dt:
+            raise FinError(
+                "Domestic Curve valuation date not same as option value date"
+            )
+    
+        if foreign_curve.value_dt != value_dt:
+            raise FinError(
+                "Foreign Curve valuation date not same as option value date"
+            )
+    
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+    
+        domestic_df = domestic_curve.df_t(t)
+        foreign_df = foreign_curve.df_t(t)
+    
+        return fx_barrier_value(
+            spot_fx_rate=spot_fx_rate,
+            strike_fx_rate=self.strike_fx_rate,
+            barrier_level=self.barrier_level,
+            time_to_expiry=t,
+            domestic_df=domestic_df,
+            foreign_df=foreign_df,
+            volatility=model.volatility,
+            num_obs_per_year=self.num_obs_per_year,
+            barrier_type=self.barrier_type.value,
+        )
+
+    ###########################################################################
+
     def value_mc(
         self,
         value_dt,
@@ -422,7 +469,7 @@ class FXBarrierOption(FXOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)
@@ -435,10 +482,3 @@ class FXBarrierOption(FXOption):
 
     ###########################################################################
 
-    def _print(self):
-        """Print a lis_t of the unadjusted coupon payment dates used in
-        analytic calculations for the bond."""
-        print(self)
-
-
-########################################################################################

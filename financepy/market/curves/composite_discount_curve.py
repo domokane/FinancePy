@@ -60,7 +60,7 @@ class CompositeDiscountCurve(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("CHILDREN", (self._children))
         return s
 

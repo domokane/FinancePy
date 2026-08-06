@@ -12,14 +12,16 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, normcdf
 from ...utils.error import FinError
-from ...products.credit.cds_curve import CDSCurve
+from ...market.curves.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
 
-RPV01_INDEX = 1  # 0 is FULL, 1 is CLEAN
+RPV01_INDEX = 1
+DIRTY = 0
+CLEAN = 1
 
 ########################################################################################
 
@@ -105,11 +107,11 @@ class CDSIndexOption:
         strike_curve = CDSCurve(value_dt, [cds], libor_curve, index_recovery)
         #        qExpiryStrike = strike_curve.surv_prob(time_to_expiry)
 
-        strike_rpv01 = self.cds_contract.risky_pv01(value_dt, strike_curve)[
-            "clean_rpv01"
+        strike_rpv01 = self.cds_contract.rpv01(value_dt, strike_curve)[
+            CLEAN
         ]
-        index_rpv01 = self.cds_contract.risky_pv01(value_dt, index_curve)[
-            "clean_rpv01"
+        index_rpv01 = self.cds_contract.rpv01(value_dt, index_curve)[
+            CLEAN
         ]
 
         s = self.cds_contract.par_spread(value_dt, index_curve)
@@ -167,9 +169,9 @@ class CDSIndexOption:
         strike_curve = CDSCurve(
             value_dt, [strike_cds], libor_curve, index_recovery
         )
-        strike_rpv01s = strike_cds.risky_pv01(value_dt, strike_curve)
+        strike_rpv01s = strike_cds.rpv01(value_dt, strike_curve)
         q_to_expiry = strike_curve.survival_prob(t_exp)
-        strike_value = (k - c) * strike_rpv01s["clean_rpv01"]
+        strike_value = (k - c) * strike_rpv01s[CLEAN]
         strike_value /= df_to_expiry * q_to_expiry
 
         exp_h = 0.0
@@ -183,8 +185,8 @@ class CDSIndexOption:
             dh1 = (1.0 - issuer_curve.recovery_rate) * (1.0 - q)
 
             s = self.cds_contract.par_spread(value_dt, issuer_curve)
-            rpv01 = self.cds_contract.risky_pv01(value_dt, issuer_curve)
-            dh2 = (s - c) * rpv01["clean_rpv01"] / (df_to_expiry * q_to_expiry)
+            rpv01 = self.cds_contract.rpv01(value_dt, issuer_curve)
+            dh2 = (s - c) * rpv01[CLEAN] / (df_to_expiry * q_to_expiry)
 
             h1 = h1 + dh1
             h2 = h2 + dh2
@@ -380,14 +382,14 @@ class CDSIndexOption:
     def __repr__(self):
         """print out details of the CDS contract and all of the calculated
         cash flows"""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("INDEX cpn", self.index_cpn * 10000, "bp\n")
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("DATE GEN RULE", self.dg_type)

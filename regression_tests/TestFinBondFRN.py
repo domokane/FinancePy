@@ -8,7 +8,7 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond_frn import BondFRN
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.date import Date
 
 

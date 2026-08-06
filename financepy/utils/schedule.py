@@ -242,13 +242,13 @@ class Schedule:
         """Print out the details of the schedule and the actual dates. This
         can be used for providing transparency on schedule calculations."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EFFECTIVE DATE", self.effective_dt)
         s += label_to_string("END DATE", self.termination_dt)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
         s += label_to_string("ADJUST TERM DATE", self.adjust_termination_dt)
         s += label_to_string("END OF MONTH", self.end_of_month, "")
 

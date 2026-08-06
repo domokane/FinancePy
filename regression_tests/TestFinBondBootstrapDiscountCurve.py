@@ -11,11 +11,14 @@ from financepy.products.bonds import get_bond_market_conventions, BondMarkets
 from financepy.market.curves import BondBootstrapDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date, from_datetime
+from financepy.utils.date_format import set_date_format, DateFormatTypes
 import matplotlib.pyplot as plt
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
+
+set_date_format(DateFormatTypes.UK_LONG)
 
 PLOT_GRAPHS = False
 

@@ -41,7 +41,7 @@ class EquityFloatLookbackOption(EquityOption):
 
     def __init__(self, expiry_dt: Date, opt_type: OptionTypes):
         """Create the FloatLookbackOption by specifying the expiry date and
-        the option type. The strike is determined internally as the maximum or
+        the OPTION_TYPE. The strike is determined internally as the maximum or
         minimum of the stock price depending on whether it is a put or a call
         option."""
 
@@ -51,7 +51,7 @@ class EquityFloatLookbackOption(EquityOption):
             OptionTypes.EUROPEAN_CALL,
             OptionTypes.EUROPEAN_PUT,
         ]:
-            raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
+            raise FinError("OPTION_TYPE must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt
         self.opt_type = opt_type
@@ -151,7 +151,7 @@ class EquityFloatLookbackOption(EquityOption):
             v = smax * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
 
         else:
-            raise FinError("Unknown lookback option type:" + str(self.opt_type))
+            raise FinError("Unknown lookback OPTION_TYPE:" + str(self.opt_type))
 
         return v
 
@@ -209,7 +209,7 @@ class EquityFloatLookbackOption(EquityOption):
             s_max = np.maximum(s_max, smax)
             payoff = np.maximum(s_max - s_all[:, -1], 0.0)
         else:
-            raise FinError("Unknown lookback option type:" + str(opt_type))
+            raise FinError("Unknown lookback OPTION_TYPE:" + str(opt_type))
 
         v = payoff.mean() * df
         return v
@@ -217,9 +217,9 @@ class EquityFloatLookbackOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
-        s += label_to_string("OPTION TYPE", self.opt_type, "")
+        s += label_to_string("OPTION_TYPE", self.opt_type, "")
         return s
 
     ###########################################################################

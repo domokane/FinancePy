@@ -138,13 +138,13 @@ class IborFuture:
     def __repr__(self):
         """Print a list of the unadjusted coupon payment _dts used in
         analytic calculations for the bond."""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("LAST TRADING DATE", self.last_trading_dt)
         s += label_to_string("DELIVERY DATE", self.delivery_dt)
         s += label_to_string(
             "END INTEREST PERIOD", self.end_of_interest_period
         )
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CONTRACT SIZE", self.contract_size)
         return s
 

@@ -375,7 +375,7 @@ class IborSwap:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += self.fixed_leg.__repr__()
         s += "\n"
         s += self.float_leg.__repr__()

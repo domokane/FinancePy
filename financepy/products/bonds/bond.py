@@ -42,7 +42,7 @@ from ...utils.helpers import times_from_dates
 from ...utils.math import npv
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes
-from ...market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
+from ...market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 from ...market.curves.bond_bootstrap_discount_curve import BondBootstrapDiscountCurve
 
@@ -1405,7 +1405,7 @@ class Bond:
         bond_price = clean_price + accrued_amount
 
         def _bond_price_diff_from_z_spread(z_spr_try):
-            flat_curve = DiscountCurvePWFONF.flat_curve(settle_dt, z_spr_try)
+            flat_curve = PWFONFDiscountCurve.flat_curve(settle_dt, z_spr_try)
             bumped_curve = CompositeDiscountCurve([discount_curve, flat_curve])
             curve_bond_price = self.dirty_price_from_discount_curve(
                 settle_dt, bumped_curve
@@ -1700,12 +1700,12 @@ class Bond:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("COUPON (%)", self.cpn * 100.0)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DC TYPE", self.accrual_dc_type)
+        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
         s += label_to_string("EX-DIVIDEND DAYS", self.ex_div_days)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
         s += label_to_string("BUS DAYS ADJUST", self.bd_type)

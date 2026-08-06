@@ -88,7 +88,7 @@ class EquityAsianOption:
         num_obs: int = 100,
     ):
         """Create an EquityAsian option object which takes a start date for
-        the averaging, an expiry date, a strike price, an option type and a
+        the averaging, an expiry date, a strike price, an OPTION_TYPE and a
         number of observations."""
 
         check_argument_types(self.__init__, locals())
@@ -246,7 +246,7 @@ class EquityAsianOption:
             put_g = call_g - (eg - k) * np.exp(-r * t_exp)
             v = put_g
         else:
-            raise FinError("Unknown option type " + str(self.opt_type))
+            raise FinError("Unknown OPTION_TYPE " + str(self.opt_type))
 
         v = v * multiplier
         return v
@@ -582,11 +582,11 @@ class EquityAsianOption:
     ####################################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("START AVERAGING DATE", self.start_averaging_date)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("NUM OBSERVATIONS", self.num_observations, "")
         return s
 

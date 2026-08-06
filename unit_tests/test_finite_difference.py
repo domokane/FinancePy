@@ -3,7 +3,7 @@ from pytest import approx
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
@@ -464,8 +464,8 @@ def test_call_option():
     dividend_yield = 0.01
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     # Call option
     v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
@@ -509,8 +509,8 @@ def test_put_option():
     dividend_yield = 0.1
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     # Call option
     v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)

@@ -21,7 +21,7 @@ bus_days_in_decade = {
     CalendarTypes.SWITZERLAND: 2530,
     CalendarTypes.TARGET: 2562,
     CalendarTypes.UNITED_STATES: 2507,
-    CalendarTypes.UNITED_KINGDOM: 2527,
+    CalendarTypes.LONDON: 2527,
 }
 
 MONTHS = {

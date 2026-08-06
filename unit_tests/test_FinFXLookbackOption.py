@@ -1,7 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_fixed_lookback_option import (
     FXFixedLookbackOption,
 )
@@ -20,10 +20,10 @@ stock_price_range = range(90, 110, 5)
 num_steps_per_year = 252
 
 domestic_rate = 0.05
-domestic_curve = DiscountCurveFlat(value_dt, domestic_rate)
+domestic_curve = FlatDiscountCurve(value_dt, domestic_rate)
 
 foreign_rate = 0.02
-foreign_curve = DiscountCurveFlat(value_dt, foreign_rate)
+foreign_curve = FlatDiscountCurve(value_dt, foreign_rate)
 
 ########################################################################################
 

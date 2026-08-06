@@ -40,7 +40,7 @@ class EquityFixedLookbackOption(EquityOption):
         self, expiry_dt: Date, opt_type: OptionTypes, strike_price: float
     ):
         """Create the FixedLookbackOption by specifying the expiry date, the
-        option type and the option strike."""
+        OPTION_TYPE and the option strike."""
 
         check_argument_types(self.__init__, locals())
 
@@ -48,7 +48,7 @@ class EquityFixedLookbackOption(EquityOption):
             OptionTypes.EUROPEAN_CALL,
             OptionTypes.EUROPEAN_PUT,
         ]:
-            raise FinError("Option type must be EUROPEAN_CALL or EUROPEAN_PUT")
+            raise FinError("OPTION_TYPE must be EUROPEAN_CALL or EUROPEAN_PUT")
 
         self.expiry_dt = expiry_dt
         self.opt_type = opt_type
@@ -221,7 +221,7 @@ class EquityFixedLookbackOption(EquityOption):
 
         else:
             raise FinError(
-                "Unknown lookback option type:" + str(self.opt_type)
+                "Unknown lookback OPTION_TYPE:" + str(self.opt_type)
             )
 
         return v
@@ -288,7 +288,7 @@ class EquityFixedLookbackOption(EquityOption):
             payoff = np.maximum(k - s_minormcdf_vector, 0.0)
             payoff = np.maximum(payoff, k - s_mins)
         else:
-            raise FinError("Unknown lookback option type:" + str(opt_type))
+            raise FinError("Unknown lookback OPTION_TYPE:" + str(opt_type))
 
         v = payoff.mean() * df
         return v
@@ -296,10 +296,10 @@ class EquityFixedLookbackOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.opt_type, "")
+        s += label_to_string("OPTION_TYPE", self.opt_type, "")
         return s
 
     ###########################################################################

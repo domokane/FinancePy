@@ -9,7 +9,7 @@ from ..utils.global_vars import G_SMALL
 from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
 
-from .black_scholes_analytic import bs_value
+from .black_scholes_analytic import european_value
 
 ########################################################################################
 
@@ -28,7 +28,7 @@ def _f(s0, *args) -> float:
         raise FinError("Unable to solve for stock price that fits k_1")
 
     tau: float = t2 - t1
-    opt_value: float = bs_value(s0, tau, k2, r, q, vol, opt2_int)
+    opt_value: float = european_value(s0, tau, k2, r, q, vol, opt2_int)
     obj_fn: float = opt_value - k1
 
     return obj_fn

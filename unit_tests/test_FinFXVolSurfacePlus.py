@@ -6,7 +6,7 @@ from financepy.utils.date import Date
 from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
 from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
 from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 import numpy as np
 
@@ -27,8 +27,8 @@ def test_fin_fx_mkt_vol_surface1(capsys):
     for_cc_rate = 0.03460  # EUR
     dom_cc_rate = 0.02940  # USD
 
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
     currency_pair = for_name + dom_name
     spot_fx_rate = 1.3465
@@ -86,8 +86,8 @@ def test_fin_fx_mkt_vol_surface2(capsys):
     for_cc_rate = 0.0294  # EUR
     dom_cc_rate = 0.0171  # USD
 
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
     currency_pair = for_name + dom_name
     spot_fx_rate = 90.72
@@ -152,8 +152,8 @@ def test_fin_fx_mkt_vol_surface3(capsys):
     for_cc_rate = 0.03460  # EUR
     dom_cc_rate = 0.02940  # USD
 
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
     currency_pair = for_name + dom_name
     spot_fx_rate = 1.3465
@@ -216,8 +216,8 @@ def test_fin_fx_mkt_vol_surface4(capsys):
     for_cc_rate = 0.03460  # EUR
     dom_cc_rate = 0.02940  # USD
 
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
     currency_pair = for_name + dom_name
     spot_fx_rate = 1.3465
@@ -280,8 +280,8 @@ def test_fin_fx_mkt_vol_surface5(capsys):
     for_cc_rate = 0.03460  # EUR
     dom_cc_rate = 0.02940  # USD
 
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
     currency_pair = for_name + dom_name
     spot_fx_rate = 1.3465

@@ -348,7 +348,7 @@ class EquityRainbowOption(EquityOption):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("PAYOFF TYPE", self.payoff_type)
         s += label_to_string("PAYOFF PARAMS", self.payoff_params)

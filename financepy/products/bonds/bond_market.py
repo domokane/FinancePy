@@ -147,7 +147,7 @@ def get_bond_market_conventions(country):
         return (act_act, semi_annual, 2, 0, None)
     if country == BondMarkets.UNITED_KINGDOM:
         # OR 7 DAYS ?
-        return (act_act, semi_annual, 1, 6, CalendarTypes.UNITED_KINGDOM)
+        return (act_act, semi_annual, 1, 6, CalendarTypes.LONDON)
 
     print("Unknown Country:", country)
     return (None, None, None, None, None)

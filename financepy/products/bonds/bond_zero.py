@@ -556,9 +556,9 @@ class BondZero:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("COUPON (%)", 0)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("TIME DAY COUNT TYPE", self.time_dc_type)

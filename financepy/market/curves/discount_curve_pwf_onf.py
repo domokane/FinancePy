@@ -40,6 +40,8 @@ class DiscountCurvePWFONF(DiscountCurve):
         The last fwd rate is extrapolated into the future
         """
 
+        print("Warning: Deprecated. Use PWFONFDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
@@ -167,7 +169,7 @@ class DiscountCurvePWFONF(DiscountCurve):
     ####################################################################################
 
     def bump_parallel(self, bump_size: float):
-        return DiscountCurvePWFONF(
+        return PWFONFDiscountCurve(
             self.value_dt,
             self._knot_dts.copy(),
             self._onfwd_rates + bump_size,
@@ -178,13 +180,15 @@ class DiscountCurvePWFONF(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
 
         # Class-specific info first
         s += label_to_string("DATE", "ON_FWD RATE")
 
         for dt, rate in zip(self._knot_dts, self._onfwd_rates):
             s += label_to_string(str(dt), f"{rate:12.8f}")
+
+        s += label_to_string("FREQ TYPE", self.freq_type)
 
         # Then generic DiscountCurve info
         s += "\n"

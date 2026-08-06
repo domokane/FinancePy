@@ -18,7 +18,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.dual_curve import IborDualCurve
 from financepy.products.rates.ois_curve import OISCurve
 from financepy.products.rates.ois import OIS

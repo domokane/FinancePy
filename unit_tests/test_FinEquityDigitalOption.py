@@ -4,7 +4,7 @@ from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_digital_option import FinDigitalOptionTypes
 from financepy.products.equity.equity_digital_option import EquityDigitalOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 
 
@@ -16,8 +16,8 @@ stock_price = 100.0
 volatility = 0.30
 interest_rate = 0.05
 dividend_yield = 0.01
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 model = BlackScholes(volatility)
 

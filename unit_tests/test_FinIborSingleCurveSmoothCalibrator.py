@@ -26,7 +26,7 @@ REPORT_PROGRESS = True
 def test_smooth_fit_simple(interp_type):
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
@@ -114,7 +114,7 @@ def test_smooth_fit_simple(interp_type):
 def test_smooth_fit(interp_type):
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []

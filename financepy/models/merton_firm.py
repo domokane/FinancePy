@@ -155,7 +155,7 @@ class MertonFirm:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("ASSET VALUE", self._a)
         s += label_to_string("BOND FACE", self._l)
         s += label_to_string("YEARS TO MATURITY", self._t)

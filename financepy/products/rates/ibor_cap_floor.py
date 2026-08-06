@@ -323,32 +323,32 @@ class IborCapFloor:
 
         print("START DATE:", self.start_dt)
         print("MATURITY DATE:", self.maturity_dt)
-        print("OPTION TYPE", str(self.opt_type))
+        print("OPTION_TYPE", str(self.opt_type))
         print("STRIKE (%):", self.strike_rate * 100)
         print("FREQUENCY:", str(self.freq_type))
-        print("ACCRUAL DAY COUNT TYPE:", str(self.accrual_dc_type))
+        print("DC_TYPE:", str(self.accrual_dc_type))
 
         if len(self.caplet_floorlet_values) == 0:
             print("Caplets not calculated.")
             return
 
         if self.opt_type == CapFloorTypes.CAP:
-            header = "PAYMENT_dt     YEAR_FRAC   FWD_RATE    INTRINSIC      "
+            header = "PAYMENT_DT     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    CAPLET_PV       CUM_PV"
         elif self.opt_type == CapFloorTypes.FLOOR:
-            header = "PAYMENT_dt     YEAR_FRAC   FWD_RATE    INTRINSIC      "
+            header = "PAYMENT_DT     YEAR_FRAC   FWD_RATE    INTRINSIC      "
             header += "     DF    FLRLET_PV       CUM_PV"
 
         print(header)
 
         i_flow = 0
 
-        for payment_dt in self.caplet_floorlet_dates[i_flow:]:
+        for PAYMENT_DT in self.caplet_floorlet_dates[i_flow:]:
             if i_flow == 0:
                 print(
                     "%15s %10s %9s %12s %12.6f %12s %12s"
                     % (
-                        payment_dt,
+                        PAYMENT_DT,
                         "-",
                         "-",
                         "-",
@@ -361,7 +361,7 @@ class IborCapFloor:
                 print(
                     "%15s %10.7f %9.5f %12.2f %12.6f %12.2f %12.2f"
                     % (
-                        payment_dt,
+                        PAYMENT_DT,
                         self.caplet_floorlet_alphas[i_flow],
                         self.caplet_floorlet_fwd_rates[i_flow] * 100,
                         self.caplet_floorlet_intrinsic[i_flow],
@@ -376,13 +376,13 @@ class IborCapFloor:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.start_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.start_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("STRIKE COUPON", self.strike_rate * 100)
-        s += label_to_string("OPTION TYPE", str(self.opt_type))
+        s += label_to_string("OPTION_TYPE", str(self.opt_type))
         s += label_to_string("FREQUENCY", str(self.freq_type))
-        s += label_to_string("ACCRUAL DAY COUNT", str(self.accrual_dc_type), "")
+        s += label_to_string("DAY_COUNT", str(self.accrual_dc_type), "")
         return s
 
     ###########################################################################

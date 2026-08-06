@@ -31,7 +31,7 @@ class ModelRatesVasicek:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("a", self._a)
         s += label_to_string("b", self._b)
         s += label_to_string("sigma", self._sigma)

@@ -8,7 +8,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_single_curve_smoothing_calibrator import (
     IborSingleCurveSmoothingCalibrator,
 )
@@ -29,7 +29,7 @@ REPORT_PROGRESS = False
 def test_smooth_fit_simple(interp_type):
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
@@ -111,7 +111,7 @@ def test_smooth_fit_simple(interp_type):
 def test_smooth_fit(interp_type):
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []

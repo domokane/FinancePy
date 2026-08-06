@@ -16,6 +16,9 @@ from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.error import FinError
 
+DIRTY = 0
+CLEAN = 1
+
 ########################################################################################
 
 
@@ -114,7 +117,7 @@ class CDSOption:
 
         strike = self.strike_cpn
         forward_spread = cds.par_spread(value_dt, issuer_curve)
-        forward_rpv01 = cds.risky_pv01(value_dt, issuer_curve)["dirty_rpv01"]
+        forward_rpv01 = cds.rpv01(value_dt, issuer_curve)[DIRTY]
 
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         log_moneyness = log(forward_spread / strike)

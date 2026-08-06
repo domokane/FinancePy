@@ -11,7 +11,7 @@ import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
@@ -44,8 +44,8 @@ def test_convergence_fn():
     seed = 1976
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     asian_option = EquityAsianOption(
         start_averaging_date,
@@ -209,8 +209,8 @@ def test_time_evolution_fn():
 
         accrued_avg = stock_price * 0.9
 
-        discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-        dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+        discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+        dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
         value_mc_fast = asian_option.value_mc_fast(
             value_dt,
@@ -311,8 +311,8 @@ def test_mc_timings_fn():
     seed = 1976
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     asian_option = EquityAsianOption(
         start_averaging_date,

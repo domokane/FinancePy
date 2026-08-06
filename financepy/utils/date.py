@@ -19,6 +19,8 @@ from .date_format import DateFormatTypes, get_date_format
 from .date_arrays import short_day_names, short_month_names
 from .date_arrays import month_days_leap_year, month_days_not_leap_year
 
+SECONDS_PER_DAY = 24 * 60 * 60
+
 ########################################################################################
 # --- Precomputed day offsets ---
 START_YEAR = 1900
@@ -92,7 +94,7 @@ def ymd_from_excel(excel_dt: int):
     while days > mdays[m - 1]:
         days -= mdays[m - 1]
         m += 1
-    d = days
+    d = int(days)
     return d, m, y
 
 
@@ -179,13 +181,15 @@ class Date:
         self.y, self.m, self.d = y, m, d
         self.hh, self.mm, self.ss = hh, mm, ss
         self._refresh()
+
+        # We allow intraday to be captured
         day_fraction = (hh / 24.0) + (mm / (24.0 * 60.0)) + (ss / (24.0 * 3600.0))
         self.excel_dt += day_fraction
 
     ###########################################################################
 
-    def day_of_year(self) -> int:
-        """Day of the year (1-based)"""
+    def day_of_year(self) -> float:
+        """Day of the year which can be float for intraday"""
         return self.excel_dt - Date(1, 1, self.y).excel_dt + 1
 
     ###########################################################################
@@ -222,10 +226,30 @@ class Date:
 
     ####################################################################################
 
+    # @staticmethod
+    # def from_excel(excel_dt: int) -> "Date":
+    #    d, m, y = ymd_from_excel(int(excel_dt))
+    #    return Date(d, m, y)
+
     @staticmethod
-    def from_excel(excel_dt: int) -> "Date":
-        d, m, y = ymd_from_excel(int(excel_dt))
-        return Date(d, m, y)
+    def from_excel(excel_dt: float) -> "Date":
+        excel_dt = float(excel_dt)
+    
+        whole_day = math.floor(excel_dt)
+        fraction = excel_dt - whole_day
+    
+        total_seconds = int(round(fraction * SECONDS_PER_DAY))
+    
+        # Handle rounding such as 23:59:59.999 -> next day.
+        if total_seconds >= SECONDS_PER_DAY:
+            whole_day += 1
+            total_seconds = 0
+    
+        hh, remainder = divmod(total_seconds, 3600)
+        mm, ss = divmod(remainder, 60)
+    
+        d, m, y = ymd_from_excel(int(whole_day))
+        return Date(d, m, y, hh, mm, ss)
 
     ####################################################################################
 
@@ -241,26 +265,37 @@ class Date:
     ####################################################################################
 
     @classmethod
-    def from_date(cls, date: Union[datetime.date, np.datetime64]):
-        """Create a Date from a python datetime.date object or from a
-        Numpy datetime64 object.
-        Example Input:
-        start_dt = Date.from_dt(datetime.date(2022, 11, 8))"""
-
-        if isinstance(date, datetime.date):
-            d, m, y = date.day, date.month, date.year
-            return cls(d, m, y)
-
-        if isinstance(date, np.datetime64):
-            time_stamp = (date - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
-                1, "s"
+    def from_date(cls, value):
+        if isinstance(value, datetime.datetime):
+            return cls(
+                value.day,
+                value.month,
+                value.year,
+                value.hour,
+                value.minute,
+                value.second,
             )
-
-            date = datetime.datetime.utcfromtimestamp(time_stamp)
-            d, m, y = date.day, date.month, date.year
-            return cls(d, m, y)
-        else:
-            raise FinError("Expected datetime.date or np.datetime64")
+    
+        if isinstance(value, datetime.date):
+            return cls(value.day, value.month, value.year)
+    
+        if isinstance(value, np.datetime64):
+            timestamp = (
+                value - np.datetime64("1970-01-01T00:00:00")
+            ) / np.timedelta64(1, "s")
+    
+            value = datetime.datetime.utcfromtimestamp(float(timestamp))
+    
+            return cls(
+                value.day,
+                value.month,
+                value.year,
+                value.hour,
+                value.minute,
+                value.second,
+            )
+    
+        raise FinError("Expected datetime, date or numpy datetime64")
 
     ####################################################################################
 
@@ -365,31 +400,71 @@ class Date:
 
     ####################################################################################
 
+    # def add_hours(self, hours:int):
+    #     """Returns a new date that is h hours after the Date."""
+
+    #     if hours < 0:
+    #         raise FinError("Number of hours must be positive")
+
+    #     start_hour = self.hh
+    #     final_hour = start_hour + hours
+    #     days = int(final_hour / 24)
+    #     hour = final_hour % 24
+
+    #     # Move forward a specific number of days
+    #     dt_1 = self.add_days(days)
+
+    #     # On that date we then move to the correct hour
+    #     dt_2 = Date(dt_1.d, dt_1.m, dt_1.y, hour, dt_1.mm, dt_1.ss)
+    #     return dt_2
+
     def add_hours(self, hours):
-        """Returns a new date that is h hours after the Date."""
-
-        if hours < 0:
-            raise FinError("Number of hours must be positive")
-
-        start_hour = self.hh
-        final_hour = start_hour + hours
-        days = int(final_hour / 24)
-        hour = final_hour % 24
-
-        # Move forward a specific number of days
-        dt_1 = self.add_days(days)
-
-        # On that date we then move to the correct hour
-        dt_2 = Date(dt_1.d, dt_1.m, dt_1.y, hour, dt_1.mm, dt_1.ss)
-        return dt_2
+        return Date.from_excel(
+            self.excel_dt + float(hours) / 24.0
+        )
+    
+    
+    def add_minutes(self, minutes):
+        return Date.from_excel(
+            self.excel_dt + float(minutes) / (24.0 * 60.0)
+        )
+    
+    
+    def add_seconds(self, seconds):
+        return Date.from_excel(
+            self.excel_dt + float(seconds) / (24.0 * 60.0 * 60.0)
+        )
 
     ####################################################################################
 
-    def add_days(self, num_days: int = 1):
-        new_excel_dt = int(self.excel_dt) + int(num_days)
-        d, m, y = ymd_from_excel(new_excel_dt)
-        new_dt = Date._make_fast(d, m, y, new_excel_dt)
-        return new_dt
+    # def add_days(self, num_days:int=1):
+    
+    #     if np.isscalar(num_days):
+    #         new_excel_dt = self.excel_dt + int(num_days)
+    #         d, m, y = ymd_from_excel(new_excel_dt)
+    #         return Date._make_fast(d, m, y, new_excel_dt)
+    
+    #     new_excel_dts = self.excel_dt + np.asarray(num_days, dtype=np.int64)
+    
+    #     dates = []
+    
+    #     for excel_dt in new_excel_dts:
+    #         d, m, y = ymd_from_excel(int(excel_dt))
+    #         dt = Date._make_fast(d, m, y, int(excel_dt))
+    #         dates.append(dt)
+    
+    #     return dates
+
+    ####################################################################################
+
+    def add_days(self, num_days=1):
+        if np.isscalar(num_days):
+            return Date.from_excel(self.excel_dt + float(num_days))
+    
+        return [
+            Date.from_excel(self.excel_dt + float(x))
+            for x in num_days
+        ]
 
     ####################################################################################
 
@@ -501,8 +576,11 @@ class Date:
                 if d > month_days_not_leap_year[m - 1]:
                     d = month_days_not_leap_year[m - 1]
 
-            excel_dt = excel_from_ymd(d, m, y)
-            new_dt = Date._make_fast(d, m, y, excel_dt)
+            # excel_dt = excel_from_ymd(d, m, y)
+            # new_dt = Date._make_fast(d, m, y, excel_dt)
+
+            new_dt = Date(d, m, y, self.hh, self.mm, self.ss)
+
             date_list.append(new_dt)
 
         if scalar_flag is True:
@@ -668,7 +746,8 @@ class Date:
 
             # start with current date
             d, m, y = self.d, self.m, self.y
-            excel_dt = int(self.excel_dt)
+            # Do not int this to keep HMS
+            excel_dt = self.excel_dt
 
             if tenor_obj.units == TenorUnit.DAYS:
                 new_excel_dt = excel_dt + int(tenor_obj.num_periods)
@@ -706,8 +785,7 @@ class Date:
     def datetime(self):
         """Returns a datetime of the date"""
 
-        # Remember that datetime likes inputs in opposite order
-        return datetime.date(self.y, self.m, self.d)
+        return datetime.datetime(self.y, self.m, self.d, self.hh, self.mm, self.ss)
 
     ###########################################################################
     # TODO: Find elegant way to return long and short strings

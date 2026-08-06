@@ -1,5 +1,6 @@
 ##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# Global fit due to V. Piterbarg 2024
 ##############################################################################
 
 import matplotlib.pyplot as plt
@@ -328,6 +329,9 @@ class BondBootstrapDiscountCurve(DiscountCurve):
 
         orig_check_refit_flag = self.check_refit_flag
         self.check_refit_flag = False
+
+        # Basic bootstrap using non-local interpolation
+
         self._build_curve_using_1d_solver()
         self.check_refit_flag = orig_check_refit_flag
 

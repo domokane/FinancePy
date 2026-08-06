@@ -9,10 +9,12 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.error import FinError
 from ...products.credit.cds import CDS
-from ...products.credit.cds_curve import CDSCurve
+from ...market.curves.cds_curve import CDSCurve
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import label_to_string
 
+DIRTY = 0
+CLEAN = 1
 
 ###########################################################################
 # TODO: Move index spd details into class and then pass in issuer discount
@@ -59,9 +61,9 @@ class CDSIndexPortfolio:
 
         for m in range(0, num_credits):
 
-            ret_value = cds_contract.risky_pv01(value_dt, issuer_curves[m])
+            ret_value = cds_contract.rpv01(value_dt, issuer_curves[m])
 
-            clean_rpv01 = ret_value["clean_rpv01"]
+            clean_rpv01 = ret_value[CLEAN]
 
             intrinsic_rpv01 += clean_rpv01
 
@@ -450,11 +452,11 @@ class CDSIndexPortfolio:
                         index_recovery_rate,
                     )
 
-                    rpv01_ret = cds_index.risky_pv01(
+                    rpv01_ret = cds_index.rpv01(
                         value_dt, adjusted_issuer_curves[i_credit]
                     )
 
-                    clean_rpv01 = rpv01_ret["clean_rpv01"]
+                    clean_rpv01 = rpv01_ret[CLEAN]
                     sum_rpv01 += clean_rpv01
                     sum_prot += index_prot_pv
 
@@ -479,11 +481,11 @@ class CDSIndexPortfolio:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_RULE", self.bd_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         s += label_to_string("DATE_GEN_RULE", self.dg_type)
         return s
 

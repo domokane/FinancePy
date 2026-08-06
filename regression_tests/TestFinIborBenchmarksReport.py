@@ -14,7 +14,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 
 from financepy.products.rates.ibor_benchmarks_report import (
     ibor_benchmarks_report,
@@ -31,7 +31,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 def test_ibor_benchmarks_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -206,7 +206,7 @@ def test_dataframe_to_benchmarks():
     )  # allow tenors
 
     benchmarks = dataframe_to_benchmarks(
-        df, asof_date=asof, calendar_type=CalendarTypes.UNITED_KINGDOM
+        df, asof_date=asof, calendar_type=CalendarTypes.LONDON
     )
 
     assert len(benchmarks["IborDeposit"]) == 2

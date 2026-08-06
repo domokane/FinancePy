@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.rates.swap_float_leg import SwapFloatLeg
 from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
 from financepy.utils.date import Date
@@ -46,7 +46,7 @@ def test_fin_fixed_ibor_swap_leg():
         dg_type,
     )
 
-    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
+    libor_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     v = swap_fixed_leg.value(effective_dt, libor_curve)
     assert round(v, 0) == 194004.0
@@ -86,7 +86,7 @@ def test_fin_fixed_ois_swap_leg():
         dg_type,
     )
 
-    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
+    libor_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     v = swap_fixed_leg.value(effective_dt, libor_curve)
     assert round(v, 0) == 225351.0
@@ -126,7 +126,7 @@ def test_fin_float_ibor_leg():
         dg_type,
     )
 
-    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
+    libor_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     first_fixing = 0.03
 
@@ -168,7 +168,7 @@ def test_fin_float_ois_leg():
         dg_type,
     )
 
-    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
+    libor_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     first_fixing = 0.03
 

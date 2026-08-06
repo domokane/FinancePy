@@ -6,7 +6,7 @@ from financepy.products.equity.equity_compound_option import (
 )
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 
 value_dt = Date(1, 1, 2015)
@@ -20,8 +20,8 @@ interest_rate = 0.035
 dividend_yield = 0.01
 
 model = BlackScholes(volatility)
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 num_steps = 200
 

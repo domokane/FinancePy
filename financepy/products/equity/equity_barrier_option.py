@@ -42,7 +42,7 @@ class EquityBarrierOption(EquityOption):
         notional: float = 1.0,
     ):
         """Create the EquityBarrierOption by specifying the expiry date,
-        strike price, option type, barrier level, the number of observations
+        strike price, OPTION_TYPE, barrier level, the number of observations
         per year and the notional."""
 
         check_argument_types(self.__init__, locals())
@@ -53,7 +53,7 @@ class EquityBarrierOption(EquityOption):
         self.num_obs_per_year = int(num_obs_per_year)
 
         if opt_type not in BarrierTypes:
-            raise FinError("Option Type " + str(opt_type) + " unknown.")
+            raise FinError("OPTION_TYPE " + str(opt_type) + " unknown.")
 
         self.opt_type = opt_type
         self.notional = notional
@@ -201,10 +201,10 @@ class EquityBarrierOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("BARRIER LEVEL", self.barrier_level)
         s += label_to_string("NUM OBSERVATIONS", self.num_obs_per_year)
         s += label_to_string("NOTIONAL", self.notional, "")

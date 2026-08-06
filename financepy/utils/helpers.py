@@ -133,12 +133,11 @@ def times_from_dates(
         return times
 
     dc_counter = DayCount(time_dc_type)
-    yf = dc_counter.year_frac
 
     for i, d in enumerate(dt):
         if value_dt_int > d.excel_dt:
             raise FinError("Negative time period")
-        times[i] = yf(value_dt, d)[0]
+        times[i] = dc_counter.year_frac(value_dt, d)[0]
 
     return times
 

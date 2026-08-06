@@ -36,6 +36,8 @@ class DiscountCurvePWL(DiscountCurve):
     ):
         """Curve is defined by a vector of increasing times and zero rates."""
 
+        print("Warning: Deprecated. Use PWLDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
@@ -151,7 +153,7 @@ class DiscountCurvePWL(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("DATE", "CC ZERO RATE")
         for i in range(0, len(self._zero_dts)):
             s += label_to_string(self._zero_dts[i], self._cc_zero_rates[i])

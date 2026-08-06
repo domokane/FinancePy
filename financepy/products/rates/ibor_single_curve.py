@@ -163,6 +163,8 @@ class IborSingleCurve(DiscountCurve):
         assumed to be flat out to the first instrument using its zero rate.
         """
 
+        print("Deprecation Warning: IborSingleCurve has been moved. Use version under market->curves")
+
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         self.value_dt = value_dt
@@ -775,6 +777,43 @@ class IborSingleCurve(DiscountCurve):
 
     ####################################################################################
 
+    def bump_parallel(self, bump_size: float):
+        """Return a new curve with all calibration quotes bumped in parallel."""
+    
+        if not np.isscalar(bump_size):
+            raise FinError("Bump size must be a scalar.")
+    
+        bump_size = float(bump_size)
+        bumped_curve = copy.deepcopy(self)
+    
+        for depo in bumped_curve.used_deposits:
+            depo.deposit_rate += bump_size
+    
+        for fra in bumped_curve.used_fras:
+            fra.fra_rate += bump_size
+    
+        for swap in bumped_curve.used_swaps:
+            old_cpn = swap.fixed_leg.cpn
+            new_cpn = old_cpn + bump_size
+    
+            swap.fixed_leg.cpn = new_cpn
+    
+            if old_cpn == 0.0:
+                # Payments cannot be rescaled from a zero coupon.
+                swap.fixed_leg.generate_payments()
+            else:
+                scale = new_cpn / old_cpn
+                swap.fixed_leg.payments = [
+                    payment * scale
+                    for payment in swap.fixed_leg.payments
+                ]
+    
+        bumped_curve.build_curve(**bumped_curve._optional_interp_params)
+    
+        return bumped_curve
+
+    ###########################################################################
+
     def check_refit(self, depo_tol, fra_tol, swap_tol):
         """Ensure that the Ibor curve refits the calibration instruments."""
         for depo in self.used_deposits:
@@ -824,7 +863,7 @@ class IborSingleCurve(DiscountCurve):
     def __repr__(self):
         """Print out the details of the Ibor curve."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUATION DATE", self.value_dt)
 
         for depo in self.used_deposits:

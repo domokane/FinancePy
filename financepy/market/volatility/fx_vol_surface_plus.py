@@ -52,7 +52,7 @@ from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
-from ...models.black_scholes_analytic import bs_value
+from ...models.black_scholes_analytic import european_value
 from ...products.fx.fx_vanilla_option import fast_delta
 from ...utils.distribution import FinDistribution
 
@@ -199,7 +199,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             vol_type_value, params, strikes_null, gaps_null, f, k_25d_c_ms, t
         )
 
-        v_25d_c_ms = bs_value(
+        v_25d_c_ms = european_value(
             s,
             t,
             k_25d_c_ms,
@@ -213,7 +213,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             vol_type_value, params, strikes_null, gaps_null, f, k_25d_p_ms, t
         )
 
-        v_25d_p_ms = bs_value(
+        v_25d_p_ms = european_value(
             s,
             t,
             k_25d_p_ms,
@@ -291,7 +291,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             vol_type_value, params, strikes_null, gaps_null, f, k_10d_c_ms, t
         )
 
-        v_10d_c_ms = bs_value(
+        v_10d_c_ms = european_value(
             s,
             t,
             k_10d_c_ms,
@@ -305,7 +305,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             vol_type_value, params, strikes_null, gaps_null, f, k_10d_p_ms, t
         )
 
-        v_10d_p_ms = bs_value(
+        v_10d_p_ms = european_value(
             s,
             t,
             k_10d_p_ms,
@@ -443,7 +443,7 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
 
     print("sigma_k_25d_c_ms", sigma_k_25d_c_ms)
 
-    v_25d_c_ms = bs_value(
+    v_25d_c_ms = european_value(
         s,
         t,
         k_25d_c_ms,
@@ -459,7 +459,7 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
 
     print("sigma_k_25d_p_ms", sigma_k_25d_p_ms)
 
-    v_25d_p_ms = bs_value(
+    v_25d_p_ms = european_value(
         s,
         t,
         k_25d_p_ms,
@@ -527,7 +527,7 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
 
     print("sigma_k_10d_c_ms", sigma_k_10d_c_ms)
 
-    v_10d_c_ms = bs_value(
+    v_10d_c_ms = european_value(
         s,
         t,
         k_10d_c_ms,
@@ -543,7 +543,7 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
 
     print("sigma_k_10d_p_ms", sigma_k_10d_p_ms)
 
-    v_10d_p_ms = bs_value(
+    v_10d_p_ms = european_value(
         s,
         t,
         k_10d_p_ms,
@@ -691,7 +691,7 @@ def _solve_to_horizon(
         )
 
         # USE MARkkET STRANGLE VOL TO DETERMINE PRICE OF A MARkkET STRANGLE
-        v_25d_c_ms = bs_value(
+        v_25d_c_ms = european_value(
             s,
             t,
             k_25d_c_ms,
@@ -701,7 +701,7 @@ def _solve_to_horizon(
             OptionTypes.EUROPEAN_CALL.value,
         )
 
-        v_25d_p_ms = bs_value(
+        v_25d_p_ms = european_value(
             s,
             t,
             k_25d_p_ms,
@@ -752,7 +752,7 @@ def _solve_to_horizon(
         )
 
         # USE MARkkET STRANGLE VOL TO DETERMINE PRICE OF A MARkkET STRANGLE
-        v_10d_c_ms = bs_value(
+        v_10d_c_ms = european_value(
             s,
             t,
             k_10d_c_ms,
@@ -762,7 +762,7 @@ def _solve_to_horizon(
             OptionTypes.EUROPEAN_CALL.value,
         )
 
-        v_10d_p_ms = bs_value(
+        v_10d_p_ms = european_value(
             s,
             t,
             k_10d_p_ms,
@@ -2852,7 +2852,7 @@ class FXVolSurfacePlus:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
         s += label_to_string("CCY PAIR", self.currency_pair)

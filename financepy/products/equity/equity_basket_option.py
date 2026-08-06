@@ -179,7 +179,7 @@ class EquityBasketOption:
             v = self.strike_price * np.exp(-r * t_exp) * normcdf(-d2)
             v = v - smean * np.exp(-qhat * t_exp) * normcdf(-d1)
         else:
-            raise FinError("Unknown option type")
+            raise FinError("Unknown OPTION_TYPE")
 
         return v
 
@@ -245,7 +245,7 @@ class EquityBasketOption:
         elif self.opt_type == OptionTypes.EUROPEAN_PUT:
             payoff = np.maximum(k - np.mean(s_all, axis=0), 0.0)
         else:
-            raise FinError("Unknown option type.")
+            raise FinError("Unknown OPTION_TYPE.")
 
         payoff = np.mean(payoff)
         v = payoff * np.exp(-r * t_exp)
@@ -254,10 +254,10 @@ class EquityBasketOption:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("NUM ASSETS", self.num_assets, "")
         return s
 

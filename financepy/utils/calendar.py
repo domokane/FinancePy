@@ -343,7 +343,9 @@ class CalendarTypes(Enum):
     SWITZERLAND = 12
     TARGET = 13
     UNITED_STATES = 14
-    UNITED_KINGDOM = 15
+    NEW_YORK = 15
+    LONDON = 16
+#    UNITED_KINGDOM = 15 REMOVED FOR AMBIGUITY NEED SCOTLAND AND NORTHERN IRELAND
 
 
 class DateGenRuleTypes(Enum):
@@ -685,11 +687,17 @@ class Calendar:
         if self.cal_type == CalendarTypes.TARGET:
             return self.holiday_target(dt, day_in_year)
 
-        if self.cal_type == CalendarTypes.UNITED_KINGDOM:
-            return self.holiday_united_kingdom(dt, day_in_year, weekday)
+        # if self.cal_type == CalendarTypes.UNITED_KINGDOM:
+        #     return self.holiday_united_kingdom(dt, day_in_year, weekday)
 
         if self.cal_type == CalendarTypes.UNITED_STATES:
             return self.holiday_united_states(dt, weekday)
+
+        if self.cal_type == CalendarTypes.NEW_YORK:
+            return self.holiday_new_york(dt, weekday)
+
+        if self.cal_type == CalendarTypes.LONDON:
+            return self.holiday_london(dt, day_in_year, weekday)
 
         print(self.cal_type)
         raise FinError("Unknown calendar")
@@ -770,12 +778,85 @@ class Calendar:
 
     ###########################################################################
 
-    def holiday_united_kingdom(self, dt: Date, day_in_year: int, weekday: int):
+    # def holiday_united_kingdom(self, dt: Date, day_in_year: int, weekday: int):
+    #     """Only bank holidays. Weekends by themselves are not a holiday."""
+
+    #     m = dt.m
+    #     d = dt.d
+    #     y = dt.y
+
+    #     if m == 1 and d == 1:  # new years day
+    #         return True
+
+    #     if m == 1 and d == 2 and weekday == Date.MON:  # new years day
+    #         return True
+
+    #     if m == 1 and d == 3 and weekday == Date.MON:  # new years day
+    #         return True
+
+    #     em = easter_monday_day[y - 1901]
+
+    #     if day_in_year == em:  # Easter Monday
+    #         return True
+
+    #     if day_in_year == em - 3:  # good friday
+    #         return True
+
+    #     if m == 5 and d <= 7 and weekday == Date.MON:
+    #         return True
+
+    #     if m == 5 and d >= 25 and weekday == Date.MON:
+    #         return True
+
+    #     if m == 6 and d == 2 and y == 2022:  # SPRING BANK HOLIDAY
+    #         return True
+
+    #     if m == 6 and d == 3 and y == 2022:  # QUEEN PLAT JUB
+    #         return True
+
+    #     if m == 8 and d > 24 and weekday == Date.MON:  # Late Summer
+    #         return True
+
+    #     if m == 12 and d == 25:  # Xmas
+    #         return True
+
+    #     if m == 12 and d == 26:  # Boxing day
+    #         return True
+
+    #     if m == 12 and d == 27 and weekday == Date.MON:  # Xmas
+    #         return True
+
+    #     if m == 12 and d == 27 and weekday == Date.TUE:  # Xmas
+    #         return True
+
+    #     if m == 12 and d == 28 and weekday == Date.MON:  # Xmas
+    #         return True
+
+    #     if m == 12 and d == 28 and weekday == Date.TUE:  # Xmas
+    #         return True
+
+    #     return False
+
+    ###########################################################################
+
+    def holiday_london(self, dt: Date, day_in_year: int, weekday: int):
         """Only bank holidays. Weekends by themselves are not a holiday."""
 
         m = dt.m
         d = dt.d
         y = dt.y
+
+        # One-off or moved bank holidays.
+        special_holidays = {
+                (2020, 5, 8),   # Early May bank holiday moved for VE Day
+                (2022, 6, 2),   # Spring bank holiday moved from 30 May
+                (2022, 6, 3),   # Platinum Jubilee
+                (2022, 9, 19),  # State funeral of Queen Elizabeth II
+                (2023, 5, 8),   # Coronation of King Charles III
+            }
+
+        if (y, m, d) in special_holidays:
+            return True
 
         if m == 1 and d == 1:  # new years day
             return True
@@ -806,7 +887,8 @@ class Calendar:
         if m == 6 and d == 3 and y == 2022:  # QUEEN PLAT JUB
             return True
 
-        if m == 8 and d > 24 and weekday == Date.MON:  # Late Summer
+        # Summer bank holiday: last Monday in August.
+        if m == 8 and 25 <= d <= 31 and weekday == Date.MON:
             return True
 
         if m == 12 and d == 25:  # Xmas
@@ -815,16 +897,10 @@ class Calendar:
         if m == 12 and d == 26:  # Boxing day
             return True
 
-        if m == 12 and d == 27 and weekday == Date.MON:  # Xmas
+        if m == 12 and d == 27 and weekday in (Date.MON, Date.TUE):  # Xmas
             return True
 
-        if m == 12 and d == 27 and weekday == Date.TUE:  # Xmas
-            return True
-
-        if m == 12 and d == 28 and weekday == Date.MON:  # Xmas
-            return True
-
-        if m == 12 and d == 28 and weekday == Date.TUE:  # Xmas
+        if m == 12 and d == 28 and weekday in (Date.MON, Date.TUE):  # Xmas
             return True
 
         return False
@@ -1287,6 +1363,79 @@ class Calendar:
             return True
 
         if m == 12 and d == 31 and weekday == Date.FRI:
+            return True
+
+        return False
+
+    ###########################################################################
+
+    def holiday_new_york(self, dt: Date, weekday: int):
+        """Only bank holidays. Weekends by themselves are not a holiday.
+        This is a NY specific US calendar close to Federal Reserve calendar."""
+
+        m = dt.m
+        d = dt.d
+
+        if m == 1 and d == 1:  # NYD
+            return True
+
+        if m == 1 and d == 2 and weekday == Date.MON:  # NYD
+            return True
+
+        if m == 1 and d >= 15 and d < 22 and weekday == Date.MON:  # MLK
+            return True
+
+        if m == 2 and d >= 15 and d < 22 and weekday == Date.MON:  # GW
+            return True
+
+
+        if m == 5 and d >= 25 and d <= 31 and weekday == Date.MON:  # MD
+            return True
+
+        # Juneteenth
+        if m == 6 and d == 19:
+            return True
+        
+        if m == 6 and d == 18 and weekday == Date.FRI:
+            return True
+        
+        if m == 6 and d == 20 and weekday == Date.MON:
+            return True
+
+        if m == 7 and d == 4:  # Indep day
+            return True
+
+        if m == 7 and d == 5 and weekday == Date.MON:  # Indep day
+            return True
+
+        if m == 7 and d == 3 and weekday == Date.FRI:  # Indep day
+            return True
+
+        if m == 9 and d >= 1 and d < 8 and weekday == Date.MON:  # Lab
+            return True
+
+        if m == 10 and d >= 8 and d < 15 and weekday == Date.MON:  # CD
+            return True
+
+        if m == 11 and d == 11:  # Veterans day
+            return True
+
+        if m == 11 and d == 12 and weekday == Date.MON:  # Vets
+            return True
+
+        if m == 11 and d == 10 and weekday == Date.FRI:  # Vets
+            return True
+
+        if m == 11 and d >= 22 and d < 29 and weekday == Date.THU:  # TG
+            return True
+
+        if m == 12 and d == 24 and weekday == Date.FRI:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 25:  # Xmas holiday
+            return True
+
+        if m == 12 and d == 26 and weekday == Date.MON:  # Xmas holiday
             return True
 
         return False

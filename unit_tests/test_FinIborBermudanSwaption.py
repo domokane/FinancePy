@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.bdt_tree import BDTTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.bk_tree import BKTree
@@ -23,7 +23,7 @@ swap_fixed_cpn = 0.060
 swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 swap_fixed_day_count_type = DayCountTypes.ACT_365F
 
-libor_curve = DiscountCurveFlat(
+libor_curve = FlatDiscountCurve(
     value_dt, 0.0625, FrequencyTypes.SEMI_ANNUAL, DayCountTypes.ACT_365F
 )
 

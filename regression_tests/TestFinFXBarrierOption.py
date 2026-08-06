@@ -5,7 +5,7 @@ import time
 import add_fp_to_path
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.products.fx.fx_barrier_option import FXBarrierTypes
 from financepy.models.black_scholes import BlackScholes
@@ -35,8 +35,8 @@ def test_fin_fx_barrier_option():
     drift = dom_interest_rate - for_interest_rate
     scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
     process_type = ProcessTypes.GBM_PROCESS
-    domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
     model = BlackScholes(volatility)
 
     start = time.time()

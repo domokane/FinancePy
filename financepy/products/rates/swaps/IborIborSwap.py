@@ -275,8 +275,8 @@ class IborIborSwap:
         if self._first_fixing_rate is None:
             print("         *** FIRST FLOATING RATE PAYMENT IS IMPLIED ***")
 
-        header = "PAYMENT_dt     YEAR_FRAC    RATE(%)       FLOW         DF"
-        header += "         DF*FLOW       CUM_PV"
+        header = "PAYMENT_DT     YEAR_FRAC    RATE(%)       PAYMENT         DF"
+        header += "         DF*PAYMENT       CUM_PV"
         print(header)
 
         start_index = self._float_start_index
@@ -289,11 +289,11 @@ class IborIborSwap:
         )
 
         i_flow = 0
-        for payment_dt in self._adjusted_float_dts[start_index:]:
+        for PAYMENT_DT in self._adjusted_float_dts[start_index:]:
             print(
                 "%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f"
                 % (
-                    payment_dt,
+                    PAYMENT_DT,
                     self._float_year_fracs[i_flow],
                     self._float_rates[i_flow] * 100.0,
                     self._float_flows[i_flow],
@@ -308,10 +308,10 @@ class IborIborSwap:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.effective_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self.termination_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("SWAP FIXED LEG TYPE", self.fixed_leg_swap_type)
         s += label_to_string("FIXED COUPON", self.fixed_cpn)

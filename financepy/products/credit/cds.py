@@ -7,6 +7,7 @@ from typing import Union
 from copy import deepcopy
 from math import exp, log
 
+
 import numpy as np
 from numba import njit, float64, int64
 
@@ -26,6 +27,16 @@ from ...utils.helpers import check_argument_types
 USE_FLAT_HAZARD_RATE_INTEGRAL = True
 STANDARD_RECOVERY_RATE = 0.40
 GLOB_NUM_STEPS_PER_YEAR = 25
+ONE_BP = 0.0001
+ONE_PCT = 0.01
+
+# Premium accrues on an Act/360 basis while time is measured in
+# calendar years, hence the 365/360 adjustment to the clean RPV01.
+KAPPA = 365.0 / 360.0
+
+# RETURN ORDER
+DIRTY = 0
+CLEAN = 1
 
 ########################################################################################
 # TODO: Perform protection leg pv analytically using fact that hazard rate and
@@ -93,16 +104,16 @@ def _risky_pv01_numba(
     # this is the part of the cpn accrued from previous cpn date to now
     # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
     # reference credit survives to the premium payment date
-    full_rpv01 = q1 * z1 * year_fracs[1]
+    dirty_rpv01 = q1 * z1 * year_fracs[1]
 
     # cpn accrued from previous cpn to today paid in full at default
     # before cpn payment
     dq = qeff - q1
-    full_rpv01 += z1 * dq * accrual_factor_pcd_to_now * cpn_accd_indicator
+    dirty_rpv01 += z1 * dq * accrual_factor_pcd_to_now * cpn_accd_indicator
 
     # future accrued from now to cpn payment date assuming default roughly
     # midway
-    full_rpv01 += (
+    dirty_rpv01 += (
         0.5
         * z1
         * dq
@@ -118,7 +129,7 @@ def _risky_pv01_numba(
         accrual_factor = year_fracs[it]
 
         # full cpn is paid at the end of the current period if survives
-        full_rpv01 += q2 * z2 * accrual_factor
+        dirty_rpv01 += q2 * z2 * accrual_factor
 
         #        print(it, t2, z2, q2, accrual_factor, full_rpv01)
 
@@ -135,20 +146,20 @@ def _risky_pv01_numba(
                 exp_term = (
                     1.0 - exp(-alpha * tau) - alpha * tau * exp(-alpha * tau)
                 )
-                d_full_rpv01 = (
+                d_dirty_rpv01 = (
                     q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
                 )
             else:
-                d_full_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
+                d_dirty_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
 
-            full_rpv01 = full_rpv01 + d_full_rpv01
+            dirty_rpv01 = dirty_rpv01 + d_dirty_rpv01
 
         q1 = q2
         z1 = z2
 
-    clean_rpv01 = full_rpv01 - accrual_factor_pcd_to_now
+    clean_rpv01 = dirty_rpv01 - accrual_factor_pcd_to_now
 
-    return np.array([full_rpv01, clean_rpv01])
+    return np.array([dirty_rpv01, clean_rpv01])
 
 
 ########################################################################################
@@ -363,7 +374,7 @@ class CDS:
         # Accrual End   = [19-MAY-2009, 19-AUG-2009, 19-NOV-2009, 20-MAR-2010]
 
         else:
-            raise FinError("Unknown DateGenRuleType:" + str(self.dg_type))
+            raise FinError("Unknown DATE_GEN_RULEType:" + str(self.dg_type))
 
         # We only include dates which fall after the CDS start date
         self.payment_dts = adjusted_dts[1:]
@@ -414,10 +425,10 @@ class CDS:
         """Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate."""
 
-        rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)
+        rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)
 
-        dirty_rpv01 = rpv01["dirty_rpv01"]
-        clean_rpv01 = rpv01["clean_rpv01"]
+        dirty_rpv01 = rpv01[DIRTY]
+        clean_rpv01 = rpv01[CLEAN]
 
         prot_pv = self.prot_leg_pv(
             value_dt,
@@ -430,26 +441,27 @@ class CDS:
         fwd_df = 1.0
 
         if self.long_protect:
-            long_prot = +1
+            omega = +1
         else:
-            long_prot = -1
+            omega = -1
 
         dirty_pv = (
             fwd_df
-            * long_prot
+            * omega
             * (prot_pv - self.running_cpn * dirty_rpv01 * self.notional)
         )
+
         clean_pv = (
             fwd_df
-            * long_prot
+            * omega
             * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
         )
 
-        return {"dirty_pv": dirty_pv, "clean_pv": clean_pv}
+        return (dirty_pv, clean_pv)
 
     ###########################################################################
 
-    def credit_dv01(
+    def spread_dv01(
         self,
         value_dt,
         issuer_curve,
@@ -488,12 +500,12 @@ class CDS:
             num_steps_per_year,
         )
 
-        credit_dv01 = v1["dirty_pv"] - v0["dirty_pv"]
+        credit_dv01 = v1[DIRTY] - v0[DIRTY]
         return credit_dv01
 
     ###########################################################################
 
-    def interest_dv01(
+    def ir_dv01(
         self,
         value_dt: Date,
         issuer_curve,
@@ -515,46 +527,157 @@ class CDS:
         )
 
         # we create a deep copy to avoid state issues
-        new_issuer_curve = deepcopy(issuer_curve)
+        bumped_issuer_curve = deepcopy(issuer_curve)
+        original_discount_curve = bumped_issuer_curve.libor_curve
 
-        bump = 0.0001  # 1 basis point
+        if not hasattr(original_discount_curve, "bump_parallel"):
+            raise FinError(
+            f"Discount curve type "
+            f"{type(original_discount_curve).__name__} "
+            "does not implement bump_parallel()."
+        )
 
-        for depo in new_issuer_curve.libor_curve.used_deposits:
-
-            depo.deposit_rate += bump
-
-        for fra in new_issuer_curve.libor_curve.used_fras:
-
-            fra.fra_rate += bump
-
-        for swap in new_issuer_curve.libor_curve.used_swaps:
-
-            cpn = swap.fixed_leg.cpn
-            swap.fixed_leg.cpn = cpn + bump
-
-            # Need to regenerate fixed leg payments with bumped cpn
-            # I could call swap.fixed_leg.generate_payments() but it is
-            # overkill as it has to do all the schedule generation which is
-            # not needed as the dates are unchanged
-            num_payments = len(swap.fixed_leg.payments)
-            for i in range(0, num_payments):
-                old_pmt = swap.fixed_leg.payments[i]
-                swap.fixed_leg.payments[i] = old_pmt * (cpn + bump) / cpn
-
-        new_issuer_curve.libor_curve.build_curve()
-        new_issuer_curve.build_curve()
+        bumped_issuer_curve.libor_curve = (original_discount_curve.bump_parallel(ONE_BP))
+        bumped_issuer_curve.build_curve()
 
         v1 = self.value(
             value_dt,
-            new_issuer_curve,
+            bumped_issuer_curve,
             contract_recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
         )
 
-        interest_dv01 = v1["dirty_pv"] - v0["dirty_pv"]
+        interest_dv01 = v1[DIRTY] - v0[DIRTY]
         return interest_dv01
+
+    ###########################################################################
+
+    def recovery_dv01(
+        self,
+        value_dt: Date,
+        issuer_curve,
+        contract_recovery_rate: float,
+        pv01_method: int = 0,
+        prot_method: int = 0,
+        num_steps_per_year=GLOB_NUM_STEPS_PER_YEAR,
+    ):
+        """PV change when contract and curve recovery both increase by 1%.
+
+        The market CDS calibration quotes and discount curve are held fixed.
+
+        Returns:
+            PV(curve recovery + 0.01, contract recovery + 0.01)
+            - PV(curve recovery, contract recovery)
+        """
+
+        bump = ONE_PCT  # 0.01
+
+        if not 0.0 <= contract_recovery_rate < 1.0:
+            raise FinError(
+                "Contract recovery rate must lie in [0.0, 1.0)."
+            )
+
+        if contract_recovery_rate + bump >= 1.0:
+            raise FinError(
+                "Bumped contract recovery rate must be less than 1.0."
+            )
+
+        if not hasattr(issuer_curve, "recovery_rate"):
+            raise FinError(
+                f"Issuer curve type {type(issuer_curve).__name__} "
+                "does not expose recovery_rate."
+            )
+
+        curve_recovery_rate = issuer_curve.recovery_rate
+
+        if not 0.0 <= curve_recovery_rate < 1.0:
+            raise FinError(
+                "Issuer curve recovery rate must lie in [0.0, 1.0)."
+            )
+
+        if curve_recovery_rate + bump >= 1.0:
+            raise FinError(
+                "Bumped issuer curve recovery rate must be less than 1.0."
+            )
+
+        # Base valuation:
+        # - original survival curve
+        # - original contract recovery
+        value_base = self.value(
+            value_dt,
+            issuer_curve,
+            contract_recovery_rate,
+            pv01_method,
+            prot_method,
+            num_steps_per_year,
+        )
+
+        # Bump the recovery used to calibrate the survival curve.
+        bumped_issuer_curve = deepcopy(issuer_curve)
+        bumped_issuer_curve.recovery_rate = curve_recovery_rate + bump
+
+        # Rebuild survival probabilities while holding CDS quotes and
+        # the discount curve unchanged.
+        bumped_issuer_curve.build_curve()
+
+        # Value using both:
+        # - bumped survival curve
+        # - bumped contract recovery
+        value_bumped = self.value(
+            value_dt,
+            bumped_issuer_curve,
+            contract_recovery_rate + bump,
+            pv01_method,
+            prot_method,
+            num_steps_per_year,
+        )
+
+        return value_bumped[DIRTY] - value_base[DIRTY]
+
+    ###########################################################################
+
+    def upfront(
+        self,
+        value_dt,
+        settle_dt,
+        issuer_curve,
+        contract_recovery_rate,
+        pv01_method=0,
+        prot_method=0,
+        num_steps_per_year=GLOB_NUM_STEPS_PER_YEAR,
+    ):
+        """Return clean percentage PV expressed on T+3 settlement date."""
+
+        discount_curve = issuer_curve.libor_curve
+
+        if settle_dt < discount_curve.value_dt:
+            raise FinError(
+                "Settlement date cannot precede the discount curve date: "
+                f"settle_dt={settle_dt}, "
+                f"curve.value_dt={discount_curve.value_dt}"
+            )
+
+        values = self.value(
+            value_dt,
+            issuer_curve,
+            contract_recovery_rate,
+            pv01_method,
+            prot_method,
+            num_steps_per_year,
+        )
+
+        settlement_df = discount_curve.df(settle_dt)
+
+        if not np.isfinite(settlement_df) or settlement_df <= 0.0:
+            raise FinError(
+            "Settlement-date discount factor must be finite and positive: "
+            f"df={settlement_df}"
+        )
+
+        upfront = values[CLEAN] / settlement_df / self.notional
+        return upfront
 
     ###########################################################################
 
@@ -568,10 +691,18 @@ class CDS:
         prot_method=0,
         num_steps_per_year=GLOB_NUM_STEPS_PER_YEAR,
     ):
-        """Value of the contract on the settlement date including accrued
-        interest."""
+        """Return dirty amount paid on the T+3 settlement date."""
 
-        v = self.value(
+        discount_curve = issuer_curve.libor_curve
+
+        if settle_dt < discount_curve.value_dt:
+            raise FinError(
+                "Settlement date cannot precede the discount curve date: "
+                f"settle_dt={settle_dt}, "
+                f"curve.value_dt={discount_curve.value_dt}"
+            )
+
+        values = self.value(
             value_dt,
             issuer_curve,
             contract_recovery_rate,
@@ -580,10 +711,16 @@ class CDS:
             num_steps_per_year,
         )
 
-        libor_curve = issuer_curve.libor_curve
-        df = libor_curve.df(settle_dt)
-        v = v / df
-        return v
+        settlement_df = discount_curve.df(settle_dt)
+
+        if not np.isfinite(settlement_df) or settlement_df <= 0.0:
+            raise FinError(
+            "Settlement-date discount factor must be finite and positive: "
+            f"df={settlement_df}"
+        )
+
+        csa_pv = values[DIRTY] / settlement_df
+        return csa_pv
 
     ###########################################################################
 
@@ -598,9 +735,9 @@ class CDS:
     ):
         """Value of the CDS contract excluding accrued interest."""
 
-        risky_pv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)
+        risky_pv01 = self.rpv01(value_dt, issuer_curve, pv01_method)
 
-        clean_rpv01 = risky_pv01["clean_rpv01"]
+        clean_rpv01 = risky_pv01[CLEAN]
 
         prot_pv = self.prot_leg_pv(
             value_dt,
@@ -641,15 +778,9 @@ class CDS:
         day_count = DayCount(self.accrual_dc_type)
         pcd, _ = self.get_pcd(settle_dt)
         eff_dt = max(settle_dt, self.step_in_dt)
-
-        #        print("ACCRUED_INTEREST", pcd, eff_dt)
         accrual_factor = day_count.year_frac(pcd, eff_dt)[0]
-
+        # This is always a positive quantity
         accrued_interest = accrual_factor * self.notional * self.running_cpn
-
-        if self.long_protect:
-            accrued_interest *= -1.0
-
         return accrued_interest
 
     ###########################################################################
@@ -714,7 +845,7 @@ class CDS:
 
     ###########################################################################
 
-    def risky_pv01(self, value_dt, issuer_curve, pv01_method=0):
+    def rpv01(self, value_dt, issuer_curve, pv01_method=0):
         """The risky_pv01 is the present value of a risky one dollar paid on
         the premium leg of a CDS contract."""
 
@@ -760,21 +891,18 @@ class CDS:
             pv01_method,
         )
 
-        full_rpv01 = value_rpv01[0]
-        clean_rpv01 = value_rpv01[1]
+        dirty_rpv01 = value_rpv01[DIRTY]
+        clean_rpv01 = value_rpv01[CLEAN]
 
-        return {"dirty_rpv01": full_rpv01, "clean_rpv01": clean_rpv01}
+        return (dirty_rpv01, clean_rpv01)
 
     ###########################################################################
 
     def premium_leg_pv(self, value_dt, issuer_curve, pv01_method=0):
         """Value of the premium leg of a CDS."""
 
-        full_rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)[
-            "dirty_rpv01"
-        ]
-
-        v = full_rpv01 * self.notional * self.running_cpn
+        dirty_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[DIRTY]
+        v = dirty_rpv01 * self.notional * self.running_cpn
         return v
 
     ###########################################################################
@@ -791,9 +919,7 @@ class CDS:
         """Breakeven CDS cpn that would make the value of the CDS contract
         equal to zero."""
 
-        clean_rpv01 = self.risky_pv01(value_dt, issuer_curve, pv01_method)[
-            "clean_rpv01"
-        ]
+        clean_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[CLEAN]
 
         #        print("cleanRPV01", clean_rpv01)
 
@@ -820,99 +946,206 @@ class CDS:
         flat_cds_curve_spread,
         curve_recovery=STANDARD_RECOVERY_RATE,
         contract_recovery_rate=STANDARD_RECOVERY_RATE,
+        bump_size=ONE_BP,
+        recovery_bump_size=ONE_PCT,
     ):
-        """Implementation of fast valuation of the CDS contract using an
-        accurate approximation that avoids curve building."""
+        """Fast approximate CDS valuation using flat hazard and discount curves.
 
-        if isinstance(value_dt, Date) is False:
+        The hazard rate is implied from the flat CDS spread via the credit
+        triangle ``h = spread / (1 - curve_recovery)`` and both survival
+        and discounting are treated as flat exponentials. The premium leg
+        ignores the actual coupon schedule; accrual-on-default is captured
+        only heuristically through the 365/360 clean-RPV01 adjustment. All
+        PVs are in currency units of the contract notional.
+
+        Args:
+            value_dt: Valuation date (a ``Date``). Scalar only.
+            flat_cont_interest_rate: Flat continuously compounded discount
+                rate. Scalar or array-like.
+            flat_cds_curve_spread: Flat CDS par spread (decimal, e.g. 0.01
+                for 100 bp). Must be non-negative. Scalar or array-like.
+            curve_recovery: Recovery rate used to imply the hazard rate
+                from the spread. Must lie in ``[0, 1)``. Scalar or
+                array-like.
+            contract_recovery_rate: Contractual recovery rate used on the
+                protection leg. Must lie in ``[0, 1]``. Scalar or
+                array-like.
+            bump_size: Absolute bump applied to the spread and to the
+                interest rate for the finite-difference sensitivities.
+                Scalar or array-like, strictly positive.
+            recovery_bump_size: Absolute bump applied to the contractual
+                recovery rate for the recovery sensitivity. Scalar or
+                array-like, strictly positive.
+
+        Returns:
+            A tuple ``(full_pv, clean_pv, spread_dv01, ir_dv01, recovery01)``:
+                full_pv: Clean PV plus accrued interest.
+                clean_pv: PV excluding accrued interest.
+                credit01: PV change for a 1 bp increase in the CDS spread.
+                ir01: PV change for a 1 bp increase in the interest rate.
+                recovery01: PV change for a 1 percentage-point increase in
+                    the contractual recovery.
+
+            Elements are floats if every input was scalar, otherwise ndarrays
+            with the broadcast shape of the inputs. The sensitivities are
+            one-sided (upward) finite differences, rescaled to the stated
+            units whatever bump sizes are supplied. Recovery01 bumps the
+            recovery assumption everywhere it enters: the hazard rate is
+            re-implied from the unchanged quoted spread under the bumped
+            curve recovery, and the contractual loss uses the bumped
+            contract recovery. It is therefore small and vanishes for an
+            at-market contract.
+
+        Raises:
+            FinError: If any input is invalid, the inputs cannot be
+                broadcast together, or the contract has matured.
+        """
+        if not isinstance(value_dt, Date):
             raise FinError(
                 "Valuation date must be a Date and not " + str(value_dt)
             )
 
+        rate = np.asarray(flat_cont_interest_rate, dtype=float)
+        spread = np.asarray(flat_cds_curve_spread, dtype=float)
+        curve_rec = np.asarray(curve_recovery, dtype=float)
+        contract_rec = np.asarray(contract_recovery_rate, dtype=float)
+        bump = np.asarray(bump_size, dtype=float)
+        rec_bump = np.asarray(recovery_bump_size, dtype=float)
+
+        inputs = (rate, spread, curve_rec, contract_rec, bump, rec_bump)
+        scalar_output = all(arr.ndim == 0 for arr in inputs)
+
+        try:
+            out_shape = np.broadcast_shapes(*(arr.shape for arr in inputs))
+        except ValueError as exc:
+            raise FinError(
+                "Inputs could not be broadcast together: " + str(exc))
+
+        if np.any(curve_rec < 0.0) or np.any(curve_rec >= 1.0):
+            raise FinError("Curve recovery must lie in [0.0, 1.0).")
+
+        if np.any(contract_rec < 0.0) or np.any(contract_rec > 1.0):
+            raise FinError("Contract recovery rate must lie in [0.0, 1.0].")
+
+        if np.any(bump <= 0.0):
+            raise FinError("Bump size must be positive.")
+
+        if np.any(rec_bump <= 0.0):
+            raise FinError("Recovery bump size must be positive.")
+
+        if np.any(contract_rec + rec_bump > 1.0):
+            raise FinError("Bumped contract recovery rate cannot exceed 1.0.")
+
+        if np.any(curve_rec + rec_bump >= 1.0):
+            raise FinError("Bumped curve recovery must be less than 1.0.")
+
+        if np.any(spread < 0.0):
+            raise FinError("CDS spread cannot be negative.")
+
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
-        t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
 
-        # If protection started in past it now starts immediately
-        if t_eff < 0.0:
-            t_eff = 0.0
+        if t_mat <= 0.0:
+            raise FinError(
+                "Contract has matured: maturity date is on or before the "
+                "valuation date."
+            )
 
-        h = flat_cds_curve_spread / (1.0 - curve_recovery)
-        r = flat_cont_interest_rate
-        fwd_df = 1.0
-        bump_size = 0.0001
+        t_eff = max((self.step_in_dt - value_dt) / G_DAYS_IN_YEAR, 0.0)
+
+        if t_mat <= t_eff:
+            raise FinError(
+                "Maturity date must be after the effective protection "
+                "start date."
+            )
 
         if self.long_protect:
-            long_protect = +1
+            direction = 1.0
         else:
-            long_protect = -1
+            direction = -1.0
 
-        # The sign of the accrued has already been sign adjusted for direction
-        accrued = self.accrued_interest(value_dt)
+        accrued = self.accrued_interest(value_dt) # positive
+        delta = accrued / self.notional / self.running_cpn
 
-        # This is the clean RPV01 as it treats the PV01 stream as though it
-        # pays just the accrued for the time between 0 and the maturity
-        # It therefore omits the part that has accrued
+        horizon = t_mat - t_eff
 
-        w = r + h
-        z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
-        clean_rpv01 = (z / w) * 365.0 / 360.0
-        prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self.notional
-        clean_pv = (
-            fwd_df
-            * long_protect
-            * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
-        )
-        full_pv = clean_pv + fwd_df * accrued
+        def _dirty_and_clean_pv(spread_, rate_, curve_recovery_, contract_recovery_):
+            """Dirty and clean PV under flat spread/rate/recovery inputs.
 
-        #######################################################################
-        # bump CDS spread and calculate
-        #######################################################################
+            All arguments broadcast; returns arrays of the broadcast shape.
+            """
+            hazard_rate = KAPPA * spread_ / (1.0 - curve_recovery_)
+            decay_rate = rate_ + hazard_rate
 
-        h = (flat_cds_curve_spread + bump_size) / (
-            1.0 - contract_recovery_rate
-        )
-        r = flat_cont_interest_rate
-        w = r + h
-        z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
-        clean_rpv01 = (z / w) * 365.0 / 360.0
-        prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self.notional
-        clean_pv_credit_bumped = (
-            fwd_df
-            * long_protect
-            * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
-        )
-        full_pv_credit_bumped = (
-            clean_pv_credit_bumped + fwd_df * long_protect * accrued
-        )
-        credit01 = full_pv_credit_bumped - full_pv
+            # Risky annuity: integral of exp(-decay_rate * t) over
+            # [t_eff, t_mat]. Written with expm1 so it is stable as
+            # decay_rate -> 0, where it tends to the horizon length. The
+            # zero-decay elements are masked out of the division and
+            # replaced with the exact limit.
+            x = decay_rate * horizon
+            is_zero = x == 0.0
+            safe_decay = np.where(is_zero, 1.0, decay_rate)
+            annuity_per_df = np.where(
+                is_zero,
+                horizon,
+                -np.expm1(-x) / safe_decay,
+            )
 
-        #######################################################################
-        # bump Rate and calculate
-        #######################################################################
+            risky_annuity = np.exp(-decay_rate * t_eff) * annuity_per_df
 
-        h = flat_cds_curve_spread / (1.0 - contract_recovery_rate)
-        r = flat_cont_interest_rate + bump_size
+            rpv01_dirty = risky_annuity * KAPPA + delta
+            rpv01_clean = risky_annuity * KAPPA
 
-        w = r + h
-        z = np.exp(-w * t_eff) - np.exp(-w * t_mat)
+            protection_pv = (
+                hazard_rate
+                * (1.0 - contract_recovery_)
+                * risky_annuity
+                * self.notional
+            )
 
-        clean_rpv01 = (z / w) * 365.0 / 360.0
+            premium_pv_dirty = self.running_cpn * rpv01_dirty * self.notional
+            premium_pv_clean = self.running_cpn * rpv01_clean * self.notional
 
-        prot_pv = h * (1.0 - contract_recovery_rate) * (z / w) * self.notional
+            dirty_pv = direction * (protection_pv - premium_pv_dirty)
+            clean_pv = direction * (protection_pv - premium_pv_clean)
 
-        clean_pv_ir_bumped = (
-            fwd_df
-            * long_protect
-            * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
+            return dirty_pv, clean_pv, rpv01_dirty, rpv01_clean
+
+        dirty_pv, clean_pv, rpv01_dirty, rpv01_clean = _dirty_and_clean_pv(
+            spread, rate, curve_rec, contract_rec
         )
 
-        full_pv_ir_bumped = (
-            clean_pv_ir_bumped + fwd_df * long_protect * accrued
+        dirty_pv_spread_up, _, _, _ = _dirty_and_clean_pv(
+            spread + bump, rate, curve_rec, contract_rec
         )
 
-        ir01 = full_pv_ir_bumped - full_pv
+        dirty_pv_rate_up, _ , _, _  = _dirty_and_clean_pv(
+            spread, rate + bump, curve_rec, contract_rec
+        )
 
-        return (full_pv, clean_pv, credit01, ir01)
+        # The recovery bump moves the recovery assumption everywhere it
+        # enters: the hazard rate is re-implied from the (unchanged) quoted
+        # spread under the bumped curve recovery, and the contractual loss
+        # uses the bumped contract recovery. Bumping the contractual
+        # recovery alone while holding the implied hazard fixed would mix
+        # two inconsistent recovery assumptions in one valuation.
+        dirty_pv_recovery_up, _ , _, _ = _dirty_and_clean_pv(
+            spread, rate, curve_rec + rec_bump, contract_rec + rec_bump
+        )
+
+        # One-sided differences, rescaled to the conventional units so the
+        # reported figures stay "per 1 bp" / "per 1 pp" for any bump size.
+        spread_dv01 = (dirty_pv_spread_up - dirty_pv) * (ONE_BP / bump)
+        ir_dv01 = (dirty_pv_rate_up - dirty_pv) * (ONE_BP / bump)
+        rec_dv01 = (dirty_pv_recovery_up - dirty_pv) * (ONE_PCT / rec_bump)
+
+        results = (dirty_pv, clean_pv, rpv01_dirty, rpv01_clean, spread_dv01, ir_dv01, rec_dv01)
+
+        if scalar_output:
+            return tuple(float(arr) for arr in results)
+
+        return tuple(
+            np.broadcast_to(arr, out_shape).copy() for arr in results
+        )
 
     ###########################################################################
 
@@ -921,7 +1154,7 @@ class CDS:
         num_flows = len(self.payment_dts)
 
         print(
-            "PAYMENT_dt      YEAR_FRAC      FLOW           DF       SURV_PROB      NPV"
+            "PAYMENT_DT      YEAR_FRAC      PAYMENT           DF       SURV_PROB      NPV"
         )
 
         for it in range(0, num_flows):
@@ -942,19 +1175,19 @@ class CDS:
     def __repr__(self):
         """print out details of the CDS contract and all the calculated
         cash flows"""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("STEP-IN DATE", self.step_in_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("STEP_IN_DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("LONG PROTECTION", self.long_protect)
-        s += label_to_string("RUN COUPON", self.running_cpn * 10000, "bp\n")
-        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
+        s += label_to_string("LONG_PROT", self.long_protect)
+        s += label_to_string("COUPON", self.running_cpn * 10000, "bp\n")
+        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
 
-        header = "PAYMENT_dt, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, FLOW"
+        header = "PAYMENT_DT, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, PAYMENT"
         value_table = [
             self.payment_dts,
             self.accrual_factors,

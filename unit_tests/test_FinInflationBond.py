@@ -1,7 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
 from financepy.products.bonds import YTMCalcType
 from financepy.products.inflation.FinInflationBond import FinInflationBond

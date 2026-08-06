@@ -8,7 +8,8 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.curves import *
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -16,11 +17,12 @@ from financepy.utils.date import Date, from_datetime
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.bonds.bond_market import get_bond_market_conventions
 from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond, CouponType
 from financepy.utils.global_types import SwapTypes
+from financepy.market.curves.interpolator import InterpTypes
 
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 
@@ -314,7 +316,7 @@ def test_bond():
 
     # When the libor curve is the flat bond curve then the ASW is zero by
     # definition
-    flat_curve = DiscountCurveFlat(settle_dt, ytm, FrequencyTypes.SEMI_ANNUAL)
+    flat_curve = FlatDiscountCurve(settle_dt, ytm, FrequencyTypes.SEMI_ANNUAL)
 
     test_cases.header("FIELD", "VALUE")
 
@@ -735,7 +737,7 @@ def test_oas():
     libor_flat_rate = 0.0275
     settle_dt = Date(21, 7, 2017)
 
-    libor_flat_curve = DiscountCurveFlat(
+    libor_flat_curve = FlatDiscountCurve(
         settle_dt, libor_flat_rate, FrequencyTypes.SEMI_ANNUAL
     )
 
@@ -834,7 +836,7 @@ def test_stack_exchange():
     spot_dts = [Date(31, 7, 2021), Date(1, 1, 2027)]
     spot_rates = [0.01, 0.02]
 
-    zero_curve = DiscountCurveZeros(
+    zero_curve = ZeroRatesDiscountCurve(
         value_dt,
         spot_dts,
         spot_rates,

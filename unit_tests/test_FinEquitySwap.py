@@ -12,7 +12,7 @@ from financepy.utils.math import ONE_MILLION
 from financepy.products.equity.equity_swap import EquitySwap
 from financepy.products.equity.equity_swap_leg import EquitySwapLeg
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 ########################################################################################
 
@@ -38,8 +38,8 @@ def test_equity_swap_at_inception():
     discount_rate = 0.05
     dividend_rate = 0.00
 
-    discount_curve = DiscountCurveFlat(effective_dt, discount_rate)
-    dividend_curve = DiscountCurveFlat(effective_dt, dividend_rate)
+    discount_curve = FlatDiscountCurve(effective_dt, discount_rate)
+    dividend_curve = FlatDiscountCurve(effective_dt, dividend_rate)
 
     index_curve = discount_curve
 
@@ -100,13 +100,13 @@ def test_equity_swap_not_in_inception():
     discount_rate = 0.05
     dividend_rate = 0.00
 
-    discount_curve = DiscountCurveFlat(value_dt, discount_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
+    discount_curve = FlatDiscountCurve(value_dt, discount_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_rate)
 
     index_curve = discount_curve
 
     # Rate determined at last reset date, from that date to maturity
-    index_curve_first = DiscountCurveFlat(effective_dt, discount_rate)
+    index_curve_first = FlatDiscountCurve(effective_dt, discount_rate)
     index_alpha_first = DayCount(dc_type).year_frac(effective_dt, maturity_dt)[
         0
     ]
@@ -119,7 +119,7 @@ def test_equity_swap_not_in_inception():
     ) / index_alpha_first
 
     # Rate between valuation date to maturity
-    index_curve_period = DiscountCurveFlat(value_dt, discount_rate)
+    index_curve_period = FlatDiscountCurve(value_dt, discount_rate)
     index_alpha_period = DayCount(dc_type).year_frac(value_dt, maturity_dt)[0]
     period_fixing = (
         (index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt))
@@ -188,9 +188,9 @@ def test_equity_swap_with_dividends():
     dividend_rate = 0.02
     index_rate = 0.03
 
-    discount_curve = DiscountCurveFlat(effective_dt, discount_rate)
-    dividend_curve = DiscountCurveFlat(effective_dt, dividend_rate)
-    index_curve = DiscountCurveFlat(effective_dt, index_rate)
+    discount_curve = FlatDiscountCurve(effective_dt, discount_rate)
+    dividend_curve = FlatDiscountCurve(effective_dt, dividend_rate)
+    index_curve = FlatDiscountCurve(effective_dt, index_rate)
 
     equity_swap_leg = EquitySwapLeg(
         effective_dt,

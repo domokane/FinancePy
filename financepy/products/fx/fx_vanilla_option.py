@@ -24,7 +24,7 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import SABR
 from ...models.black_scholes import BlackScholes
 
-from ...models.black_scholes_analytic import bs_value, bs_delta
+from ...models.black_scholes_analytic import european_value, delta
 
 from ...utils.helpers import check_argument_types, label_to_string
 
@@ -86,7 +86,7 @@ def fast_delta(s, t, k, rd, rf, vol, delta_type_value, opt_type_value):
     the volatility surface. Avoids discount curve interpolation so it
     should be slightly faster than the full calculation of delta."""
 
-    pips_spot_delta = bs_delta(s, t, k, rd, rf, vol, opt_type_value)
+    pips_spot_delta = delta(s, t, k, rd, rf, vol, opt_type_value)
 
     if delta_type_value == FinFXDeltaMethod.SPOT_DELTA.value:
         return pips_spot_delta
@@ -94,11 +94,11 @@ def fast_delta(s, t, k, rd, rf, vol, delta_type_value, opt_type_value):
         pips_fwd_delta = pips_spot_delta * np.exp(rf * t)
         return pips_fwd_delta
     elif delta_type_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
-        vpctf = bs_value(s, t, k, rd, rf, vol, opt_type_value) / s
+        vpctf = european_value(s, t, k, rd, rf, vol, opt_type_value) / s
         pct_spot_delta_prem_adj = pips_spot_delta - vpctf
         return pct_spot_delta_prem_adj
     elif delta_type_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
-        vpctf = bs_value(s, t, k, rd, rf, vol, opt_type_value) / s
+        vpctf = european_value(s, t, k, rd, rf, vol, opt_type_value) / s
         pct_fwd_delta_prem_adj = np.exp(rf * t) * (pips_spot_delta - vpctf)
         return pct_fwd_delta_prem_adj
     else:
@@ -190,7 +190,7 @@ class FXVanillaOption:
         spot_days: int = 0,
     ):
         """Create the FX Vanilla Option object. Inputs include expiry date,
-        strike, currency pair, option type (call or put), notional and the
+        strike, currency pair, OPTION_TYPE (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
         currency rates must be entered in the price in domestic currency of
         one unit of foreign. And the currency pair should be in the form FORDOM
@@ -236,7 +236,7 @@ class FXVanillaOption:
             and opt_type != OptionTypes.AMERICAN_CALL
             and opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError("Unknown Option Type:" + opt_type)
+            raise FinError("Unknown OPTION_TYPE:" + opt_type)
 
         self.opt_type = opt_type
         self.spot_days = spot_days
@@ -314,13 +314,13 @@ class FXVanillaOption:
 
             if self.opt_type == OptionTypes.EUROPEAN_CALL:
 
-                vdf = bs_value(
+                vdf = european_value(
                     s0, t_exp, k, r_d, r_f, v, OptionTypes.EUROPEAN_CALL.value
                 )
 
             elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
-                vdf = bs_value(
+                vdf = european_value(
                     s0, t_exp, k, r_d, r_f, v, OptionTypes.EUROPEAN_PUT.value
                 )
 
@@ -354,7 +354,7 @@ class FXVanillaOption:
                     k,
                 )["value"]
             else:
-                raise FinError("Unknown option type")
+                raise FinError("Unknown OPTION_TYPE")
 
         # The option value v is in domestic currency terms but the value of
         # the option may be quoted in either currency terms and so we calculate
@@ -474,9 +474,9 @@ class FXVanillaOption:
 
             v = np.maximum(v, G_SMALL)
 
-            pips_spot_delta = bs_delta(s0, t_exp, k, r_d, r_f, v, self.opt_type.value)
+            pips_spot_delta = delta(s0, t_exp, k, r_d, r_f, v, self.opt_type.value)
             pips_fwd_delta = pips_spot_delta * np.exp(r_f * t_del)
-            vpctf = bs_value(s0, t_exp, k, r_d, r_f, v, self.opt_type.value) / s0
+            vpctf = european_value(s0, t_exp, k, r_d, r_f, v, self.opt_type.value) / s0
             pct_spot_delta_prem_adj = pips_spot_delta - vpctf
             pct_fwd_delta_prem_adj = np.exp(r_f * t_del) * (pips_spot_delta - vpctf)
 
@@ -507,10 +507,10 @@ class FXVanillaOption:
 
         #        print("FAST DELTA IN OPTION CLASS", s,t,k,rd,rf,vol)
 
-        pips_spot_delta = bs_delta(s, t, k, rd, rf, vol, self.opt_type.value)
+        pips_spot_delta = delta(s, t, k, rd, rf, vol, self.opt_type.value)
         pips_fwd_delta = pips_spot_delta * np.exp(rf * t)
 
-        vpctf = bs_value(s, t, k, rd, rf, vol, self.opt_type.value) / s
+        vpctf = european_value(s, t, k, rd, rf, vol, self.opt_type.value) / s
 
         pct_spot_delta_prem_adj = pips_spot_delta - vpctf
         pct_fwd_delta_prem_adj = np.exp(rf * t) * (pips_spot_delta - vpctf)
@@ -693,7 +693,7 @@ class FXVanillaOption:
                 v = v + r_d * k * np.exp(-r_d * t) * normcdf(-d2)
                 v = v - r_f * s0 * np.exp(-r_f * t) * normcdf(-d1)
             else:
-                raise FinError("Unknown option type")
+                raise FinError("Unknown OPTION_TYPE")
 
         else:
             raise FinError("Unknown Model Type")
@@ -780,7 +780,7 @@ class FXVanillaOption:
             payoff_a_1 = np.maximum(k - s_1, 0.0)
             payoff_a_2 = np.maximum(k - s_2, 0.0)
         else:
-            raise FinError("Unknown option type.")
+            raise FinError("Unknown OPTION_TYPE.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
         v = payoff * np.exp(-r_d * t) / 2.0
@@ -789,12 +789,12 @@ class FXVanillaOption:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)
         s += label_to_string("PREMIUM CCY", self.prem_currency)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("SPOT DAYS", self.spot_days)
         s += label_to_string("NOTIONAL", self.notional, "")
         return s

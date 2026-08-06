@@ -41,6 +41,8 @@ class DiscountCurveNSS(DiscountCurve):
         rates produced by this parametrisation have an implicit compounding
         convention that defaults to continuous but can be overriden."""
 
+        print("Warning: Deprecated. Use NSSDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         if tau_1 <= 0:
@@ -105,7 +107,7 @@ class DiscountCurveNSS(DiscountCurve):
 
     def bump_parallel(self, bump_size: float):
 
-        discount_curve = DiscountCurveNSS(
+        discount_curve = NSSDiscountCurve(
             self.value_dt,
             self._beta_0 + bump_size,
             self._beta_1,
@@ -122,7 +124,7 @@ class DiscountCurveNSS(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("PARAMETER", "VALUE")
         s += label_to_string("BETA_0", f"{self._beta_0:12.8f}")
         s += label_to_string("BETA_1", f"{self._beta_1:12.8f}")

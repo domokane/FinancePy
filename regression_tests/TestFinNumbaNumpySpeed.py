@@ -8,7 +8,7 @@ import add_fp_to_path
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 
@@ -30,7 +30,7 @@ def test_fin_numba_numpy_speed(use_sobol):
     seed = 1999
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
     use_sobol_int = int(use_sobol)
 
@@ -344,7 +344,7 @@ def test_fin_numba_numba_parallel(use_sobol):
     seed = 2021
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
     use_sobol_int = int(use_sobol)
 

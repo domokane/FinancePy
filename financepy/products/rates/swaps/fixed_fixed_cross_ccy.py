@@ -91,18 +91,18 @@ class FixedFixedCrossCurrencySwap:
         # These are generated immediately as they are for the entire
         # life of the swap. Given a valuation date we can determine
         # which cash flows are in the future and value the swap
-        self._generate_fixed_leg_payment_dts()
-        self._generate_float_leg_payment_dts()
+        self._generate_fixed_leg_PAYMENT_DTs()
+        self._generate_float_leg_PAYMENT_DTs()
 
         self._adjusted_maturity_dt = self._adjusted_fixed_dts[-1]
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
-        self._last_payment_dt = self.maturity_dt
-        if self._adjusted_fixed_dts[-1] > self._last_payment_dt:
-            self._last_payment_dt = self._adjusted_fixed_dts[-1]
+        self._last_PAYMENT_DT = self.maturity_dt
+        if self._adjusted_fixed_dts[-1] > self._last_PAYMENT_DT:
+            self._last_PAYMENT_DT = self._adjusted_fixed_dts[-1]
 
-        if self._adjusted_float_dts[-1] > self._last_payment_dt:
-            self._last_payment_dt = self._adjusted_float_dts[-1]
+        if self._adjusted_float_dts[-1] > self._last_PAYMENT_DT:
+            self._last_PAYMENT_DT = self._adjusted_float_dts[-1]
 
         self.value_dt = None
 
@@ -154,7 +154,7 @@ class FixedFixedCrossCurrencySwap:
 
     ##########################################################################
 
-    def _generate_fixed_leg_payment_dts(self):
+    def _generate_fixed_leg_PAYMENT_DTs(self):
         """Generate the fixed leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjusted_fixed_dts = Schedule(
@@ -168,7 +168,7 @@ class FixedFixedCrossCurrencySwap:
 
     ##########################################################################
 
-    def _generate_float_leg_payment_dts(self):
+    def _generate_float_leg_PAYMENT_DTs(self):
         """Generate the floating leg payment dates all the way back to
         the start date of the swap which may precede the valuation date"""
         self._adjusted_float_dts = Schedule(
@@ -468,8 +468,8 @@ class FixedFixedCrossCurrencySwap:
             print("Fixed Flows not calculated.")
             return
 
-        header = "PAYMENT_dt     YEAR_FRAC        FLOW         DF"
-        header += "         DF*FLOW       CUM_PV"
+        header = "PAYMENT_DT     YEAR_FRAC        PAYMENT         DF"
+        header += "         DF*PAYMENT       CUM_PV"
         print(header)
 
         if self._fixed_start_index is None:
@@ -483,11 +483,11 @@ class FixedFixedCrossCurrencySwap:
         )
 
         i_flow = 0
-        for payment_dt in self._adjusted_fixed_dts[start_index:]:
+        for PAYMENT_DT in self._adjusted_fixed_dts[start_index:]:
             print(
                 "%15s %10.7f %12.2f %12.8f %12.2f %12.2f"
                 % (
-                    payment_dt,
+                    PAYMENT_DT,
                     self._fixed_year_fracs[i_flow],
                     self._fixed_flows[i_flow],
                     self._fixed_dfs[i_flow],
@@ -514,17 +514,17 @@ class FixedFixedCrossCurrencySwap:
             print("Fixed Flows not calculated.")
             return
 
-        header = "PAYMENT_dt     YEAR_FRAC        FLOW"
+        header = "PAYMENT_DT     YEAR_FRAC        PAYMENT"
         print(header)
 
         start_index = 1
 
         i_flow = 0
-        for payment_dt in self._adjusted_fixed_dts[start_index:]:
+        for PAYMENT_DT in self._adjusted_fixed_dts[start_index:]:
             print(
                 "%15s %12.8f %12.2f"
                 % (
-                    payment_dt,
+                    PAYMENT_DT,
                     self._fixed_year_fracs[i_flow],
                     self._fixed_flows[i_flow],
                 )
@@ -553,8 +553,8 @@ class FixedFixedCrossCurrencySwap:
         if self._first_fixing_rate is None:
             print("         *** FIRST FLOATING RATE PAYMENT IS IMPLIED ***")
 
-        header = "PAYMENT_dt     YEAR_FRAC    RATE(%)       FLOW         DF"
-        header += "         DF*FLOW       CUM_PV"
+        header = "PAYMENT_DT     YEAR_FRAC    RATE(%)       PAYMENT         DF"
+        header += "         DF*PAYMENT       CUM_PV"
         print(header)
 
         start_index = self._float_start_index
@@ -567,11 +567,11 @@ class FixedFixedCrossCurrencySwap:
         )
 
         i_flow = 0
-        for payment_dt in self._adjusted_float_dts[start_index:]:
+        for PAYMENT_DT in self._adjusted_float_dts[start_index:]:
             print(
                 "%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f"
                 % (
-                    payment_dt,
+                    PAYMENT_DT,
                     self._float_year_fracs[i_flow],
                     self._float_rates[i_flow] * 100.0,
                     self._float_flows[i_flow],
@@ -587,9 +587,9 @@ class FixedFixedCrossCurrencySwap:
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.effective_dt)
+        s += label_to_string("START_DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self._termination_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("FIXED LEG TYPE", self._fixed_leg_type)
         s += label_to_string("FIXED CPN", self._fixed_cpn)

@@ -24,8 +24,11 @@ from ...models.student_t_copula import StudentTCopula
 
 from ...market.curves.interpolator import interpolate, InterpTypes
 
-from ...products.credit.cds_curve import CDSCurve
+from ...market.curves.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
+
+DIRTY = 0
+CLEAN = 1
 
 ########################################################################################
 # TODO: Convert functions to use NUMBA!!
@@ -167,9 +170,10 @@ class CDSBasket:
         self, value_dt, n_to_default, default_times, issuer_curves, libor_curve
     ):
         """
-        Value the premium PV01 and protection legs of an n-to-default basket via Monte Carlo.
-        `default_times` is (num_credits x num_trials) of default times in YEARS from value_dt.
-        The valuation is pathwise (no model dependence beyond the given default times).
+        Value the premium PV01 and protection legs of an n-to-default basket via
+        Monte Carlo `default_times` is (num_credits x num_trials) of default times
+        in YEARS from value_dt. The valuation is pathwise (no model dependence
+        beyond the given default times).
         """
 
         # TODO: You can do it much faster by vectorizing on trials
@@ -416,9 +420,7 @@ class CDSBasket:
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, basket_curve, curve_recovery
         )
-        risky_pv01 = self.cds_contract.risky_pv01(value_dt, basket_curve)[
-            "clean_rpv01"
-        ]
+        risky_pv01 = self.cds_contract.rpv01(value_dt, basket_curve)[CLEAN]
 
         # Long protection
         mtm = self.notional * (prot_leg_pv - risky_pv01 * self.running_cpn)
@@ -439,20 +441,20 @@ class CDSBasket:
     def __repr__(self):
         """print out details of the CDS contract and all of the calculated
         cash flows"""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string(
             "RUNNING COUPON", self.running_cpn * 10000, "bp\n"
         )
-        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("DATE GEN RULE", self.dg_type)
 
-        #  header = "PAYMENT_dt, YEAR_FRAC, FLOW"
+        #  header = "PAYMENT_DT, YEAR_FRAC, PAYMENT"
         #  value_table = [self.payment_dts, self.accrual_factors, self.flows]
         #  precision = "12.6f"
         #  s += tableToString(header, value_table, precision)

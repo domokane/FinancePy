@@ -39,6 +39,8 @@ class DiscountCurveFlat(DiscountCurve):
         As the curve is flat, no interpolation scheme is required.
         """
 
+        print("Warning: Deprecated. Use FlatDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
@@ -77,10 +79,10 @@ class DiscountCurveFlat(DiscountCurve):
     ###########################################################################
 
     def bump_parallel(self, bump_size: float):
-        """Create a new FinDiscountCurveFlat object with the entire curve
+        """Create a new FlatDiscountCurve object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
-        disc_curve = DiscountCurveFlat(
+        disc_curve = FlatDiscountCurve(
             self.value_dt,
             self.flat_zero_rate + bump_size,
             freq_type=self.freq_type,
@@ -92,7 +94,7 @@ class DiscountCurveFlat(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("FLAT ZERO RATE", self.flat_zero_rate)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
 

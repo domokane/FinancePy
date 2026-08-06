@@ -18,9 +18,9 @@ from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
 from financepy.models.bk_tree import BKTree
 from financepy.models.bdt_tree import BDTTree
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -377,7 +377,7 @@ def test_ibor_swaption_matlab_examples():
     test_cases.header("=======================================")
 
     value_dt = Date(1, 1, 2010)
-    libor_curve = DiscountCurveFlat(
+    libor_curve = FlatDiscountCurve(
         value_dt, 0.06, FrequencyTypes.CONTINUOUS, DayCountTypes.THIRTY_E_360
     )
 
@@ -431,7 +431,7 @@ def test_ibor_swaption_matlab_examples():
     cont_freq = FrequencyTypes.CONTINUOUS
     interp_type = InterpTypes.LINEAR_ZERO_RATES
 
-    libor_curve = DiscountCurveZeros(
+    libor_curve = ZeroRatesDiscountCurve(
         value_dt, dates, zero_rates, cont_freq, interp_type
     )
 
@@ -489,7 +489,7 @@ def test_ibor_swaption_matlab_examples():
     cont_freq = FrequencyTypes.ANNUAL
     interp_type = InterpTypes.LINEAR_ZERO_RATES
 
-    libor_curve = DiscountCurveZeros(
+    libor_curve = ZeroRatesDiscountCurve(
         value_dt, dates, zero_rates, cont_freq, interp_type
     )
 
@@ -553,7 +553,7 @@ def test_ibor_swaption_matlab_examples():
     interp_type = InterpTypes.FLAT_FWD_RATES
     cont_freq = FrequencyTypes.SEMI_ANNUAL
 
-    libor_curve = DiscountCurveZeros(
+    libor_curve = ZeroRatesDiscountCurve(
         value_dt, dates, zero_rates, cont_freq, interp_type
     )
 
@@ -612,7 +612,7 @@ def test_ibor_swaption_matlab_examples():
     interp_type = InterpTypes.FLAT_FWD_RATES
     cont_freq = FrequencyTypes.SEMI_ANNUAL
 
-    libor_curve = DiscountCurveZeros(
+    libor_curve = ZeroRatesDiscountCurve(
         value_dt, dates, zero_rates, cont_freq, interp_type
     )
 
@@ -694,7 +694,7 @@ def test_ibor_swaption_matlab_examples():
     interp_type = InterpTypes.FLAT_FWD_RATES
     cont_freq = FrequencyTypes.ANNUAL
 
-    libor_curve = DiscountCurveZeros(
+    libor_curve = ZeroRatesDiscountCurve(
         value_dt, dates, zero_rates, cont_freq, interp_type
     )
 

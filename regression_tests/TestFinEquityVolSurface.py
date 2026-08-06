@@ -9,7 +9,7 @@ import add_fp_to_path
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -55,10 +55,10 @@ def test_equity_vol_surface(verbose_calibration):
     vol_surface = vol_surface / 100.0
 
     r = 0.020  # USD
-    discount_curve = DiscountCurveFlat(value_dt, r)
+    discount_curve = FlatDiscountCurve(value_dt, r)
 
     q = 0.010  # USD
-    dividend_curve = DiscountCurveFlat(value_dt, q)
+    dividend_curve = FlatDiscountCurve(value_dt, q)
 
     vol_function_type = VolFuncTypes.SVI
 

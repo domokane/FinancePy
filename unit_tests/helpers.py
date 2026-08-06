@@ -8,7 +8,7 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.credit.cds_curve import CDSCurve
+from financepy.market.curves.cds_curve import CDSCurve
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap

@@ -18,7 +18,7 @@ from ...utils.helpers import (
 )
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
-from ...market.curves.discount_curve_flat import DiscountCurveFlat
+from ...market.curves.flat_discount_curve import FlatDiscountCurve
 
 ##########################################################################
 
@@ -200,7 +200,7 @@ class EquitySwapLeg:
             index_curve = discount_curve
 
         if dividend_curve is None:
-            dividend_curve = DiscountCurveFlat(value_dt, 0.0)
+            dividend_curve = FlatDiscountCurve(value_dt, 0.0)
 
         if discount_curve.value_dt != value_dt:
             raise FinError("Discount Curve valuation date not same as value date")
@@ -386,7 +386,7 @@ class EquitySwapLeg:
 
         # Assume a naive dividend curve if nothing provided
         if dividend_curve is None:
-            dividend_curve = DiscountCurveFlat(value_dt, 0)
+            dividend_curve = FlatDiscountCurve(value_dt, 0)
 
         if discount_curve.value_dt != value_dt:
             raise FinError(
@@ -580,14 +580,14 @@ class EquitySwapLeg:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EFFECTIVE DATE", self.effective_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.strike * self.quantity)
         s += label_to_string("SWAP TYPE", self.leg_type)
         s += label_to_string("RETURN TYPE", self.return_type)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self.dg_type)

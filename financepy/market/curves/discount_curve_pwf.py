@@ -36,6 +36,8 @@ class DiscountCurvePWF(DiscountCurve):
         """Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat."""
 
+        print("Warning: Deprecated. Use PWFDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
@@ -139,7 +141,7 @@ class DiscountCurvePWF(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("DATE", "CC ZERO RATES")
         for dt, rate in zip(self._zero_dts, self._cc_zero_rates):
             s += label_to_string(str(dt), f"{rate:12.8f}")

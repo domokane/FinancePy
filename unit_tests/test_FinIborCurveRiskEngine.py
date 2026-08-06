@@ -26,7 +26,7 @@ diagnostics_mode = False
 def test_par_rate_risk_report_cubic_zero():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -173,7 +173,7 @@ def test_par_rate_risk_report_flat_forward():
 def test_forward_rate_risk_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -282,7 +282,7 @@ def test_forward_rate_risk_report():
 def test_forward_rate_custom_grid_risk_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -353,7 +353,7 @@ def test_forward_rate_custom_grid_risk_report():
 def test_carry_rolldown_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -441,7 +441,7 @@ def test_carry_rolldown_report():
 def test_parallel_shift_ladder_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360

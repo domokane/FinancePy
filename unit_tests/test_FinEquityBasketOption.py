@@ -4,7 +4,7 @@ import numpy as np
 
 from financepy.utils.date import Date
 from financepy.utils.helpers import beta_vector_to_corr_matrix
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_basket_option import EquityBasketOption
 
@@ -13,7 +13,7 @@ value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 1, 2016)
 volatility = 0.30
 interest_rate = 0.05
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 num_assets = 5
 beta = 0.999999
 betas = np.ones(num_assets) * beta
@@ -31,7 +31,7 @@ def test_homogeneous_call():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
@@ -72,7 +72,7 @@ def test_homogeneous_put():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
@@ -113,7 +113,7 @@ def test_inhomogeneous_call():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(
@@ -154,7 +154,7 @@ def test_inhomogeneous_put():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     call_option = EquityBasketOption(

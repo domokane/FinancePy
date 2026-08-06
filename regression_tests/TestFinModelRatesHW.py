@@ -7,7 +7,7 @@ import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -346,7 +346,7 @@ def test_hull_white_callable_bond():
         put_times.append(t)
 
     t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEAR
-    curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
+    curve = FlatDiscountCurve(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     dfs = []
     times = []

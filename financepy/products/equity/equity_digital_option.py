@@ -198,7 +198,7 @@ class EquityDigitalOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("BARRIER LEVEL", self.barrier)
         s += label_to_string("CALL-PUT TYPE", self.call_put_type)

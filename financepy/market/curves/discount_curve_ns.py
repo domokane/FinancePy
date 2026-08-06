@@ -40,6 +40,8 @@ class DiscountCurveNS(DiscountCurve):
         rates to alternative compounding conventions.
         """
 
+        print("Warning: Deprecated. Use NSDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
         self._interp_type = None
 
@@ -112,7 +114,7 @@ class DiscountCurveNS(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("PARAMETER", "VALUE")
         s += label_to_string("BETA_0", self._beta_0)
         s += label_to_string("BETA_1", self._beta_1)

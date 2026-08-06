@@ -257,7 +257,7 @@ def test_reprice_inputs_for_all_interp_choices(interp_type):
 
     valuation_date = Date(6, 10, 2001)
 
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []

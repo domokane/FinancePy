@@ -41,7 +41,7 @@ def dump_schedule(desc, schedule):
         adjusted_date = schedule.adjusted_dts[i_flow]
         years = (adjusted_date - eff_date) / 365.0
         diff = (adjusted_date - prev_dt) / 365.0
-        test_cases.print(i_flow, "FLOW DATE", str(adjusted_date), years, diff)
+        test_cases.print(i_flow, "PAYMENT DATE", str(adjusted_date), years, diff)
         prev_dt = adjusted_date
 
     term_date = schedule.adjusted_dts[-1]

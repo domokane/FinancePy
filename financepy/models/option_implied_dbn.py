@@ -9,7 +9,7 @@ import numpy as np
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 
-from .black_scholes_analytic import bs_value
+from .black_scholes_analytic import european_value
 
 # Analytical Black Scholes model implementation and approximations
 
@@ -52,7 +52,7 @@ def option_implied_dbn(
     for ik in range(0, num_steps):
         strike = strikes[ik]
         sigma = sigmas[ik]
-        v = bs_value(s, t, strike, r, q, sigma, OptionTypes.EUROPEAN_CALL.value)
+        v = european_value(s, t, strike, r, q, sigma, OptionTypes.EUROPEAN_CALL.value)
 
         values[ik] = v
 

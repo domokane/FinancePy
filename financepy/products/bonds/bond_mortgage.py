@@ -126,7 +126,7 @@ class BondMortgage:
         print("MATURITY DATE:", self.end_dt)
         print("MORTGAGE TYPE:", self.mortgage_type)
         print("FREQUENCY:", self.freq_type)
-        print("ACCRUAL DAY COUNT TYPE:", self.accrual_dc_type)
+        print("DC_TYPE:", self.accrual_dc_type)
         print("CALENDAR:", self.cal_type)
         print("BUS DAY RULE:", self.bd_type)
         print("DATE GEN RULE:", self.dg_type)
@@ -154,15 +154,15 @@ class BondMortgage:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.start_dt)
-        s += label_to_string("MATURITY DATE", self.end_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.start_dt)
+        s += label_to_string("MATURITY_DATE", self.end_dt)
         s += label_to_string("MORTGAGE TYPE", self.mortgage_type)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
         return s
 
     ###########################################################################

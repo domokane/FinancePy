@@ -17,9 +17,9 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.schedule import Schedule
 from ...products.equity.equity_option import EquityOption
-from ...market.curves.discount_curve_flat import DiscountCurve
+from ...market.curves.flat_discount_curve import DiscountCurve
 
-from ...models.black_scholes_analytic import bs_value
+from ...models.black_scholes_analytic import european_value
 from ...models.black_scholes import BlackScholes
 from ...models.model import Model
 
@@ -55,7 +55,7 @@ class EquityCliquetOption(EquityOption):
             opt_type != OptionTypes.EUROPEAN_CALL
             and opt_type != OptionTypes.EUROPEAN_PUT
         ):
-            raise FinError("Unknown Option Type" + str(opt_type))
+            raise FinError("Unknown OPTION_TYPE" + str(opt_type))
 
         if final_expiry_dt < start_dt:
             raise FinError("Expiry date precedes start date")
@@ -147,19 +147,19 @@ class EquityCliquetOption(EquityOption):
                     q = -np.log(dq_mat / dq) / tau
 
                     if self.opt_type == call_type:
-                        v_call = bs_value(
+                        v_call = european_value(
                             1.0, tau, 1.0, r, q, v, call_type.value
                         )
                         v_fwd_opt = s * dq * v_call
                         v_cliquet += v_fwd_opt
                     elif self.opt_type == put_type:
-                        v_put = bs_value(
+                        v_put = european_value(
                             1.0, tau, 1.0, r, q, v, put_type.value
                         )
                         v_fwd_opt = s * dq * v_put
                         v_cliquet += v_fwd_opt
                     else:
-                        raise FinError("Unknown option type")
+                        raise FinError("Unknown OPTION_TYPE")
 
                     #  print(dt, r, df, q, v_fwd_opt, v_cliquet)
 
@@ -182,14 +182,14 @@ class EquityCliquetOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.start_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.start_dt)
         s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         s += label_to_string("DATE GEN RULE TYPE", self.dg_type, "")
         return s
 

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import add_fp_to_path
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_poly import DiscountCurvePoly
+from financepy.market.curves.poly_discount_curve import PolyDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -28,7 +28,7 @@ def test_fin_discount_curve_polynomial():
     curve_dt = Date(2, 2, 2019)
     dates = curve_dt.add_years(times)
     coeffs = [0.0004, -0.0001, 0.00000010]
-    curve1 = DiscountCurvePoly(curve_dt, coeffs)
+    curve1 = PolyDiscountCurve(curve_dt, coeffs)
     zeros = curve1.zero_rate(dates)
     fwds = curve1.fwd_rate_inst(dates)
 

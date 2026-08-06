@@ -4,8 +4,8 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.global_vars import G_PERCENT
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from financepy.market.curves.composite_discount_curve import (
     CompositeDiscountCurve,
 )
@@ -19,12 +19,12 @@ from .helpers import build_ibor_single_curve
 def test_composite_discount_curve_can_value_trades():
     """Test that we can use a composite discount curve to value trades"""
     valuation_date = Date(6, 10, 2022)
-    base_curve = DiscountCurveFlat(valuation_date, 0.02)
+    base_curve = FlatDiscountCurve(valuation_date, 0.02)
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 1.0 * G_PERCENT
-    fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
         base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -47,12 +47,12 @@ def test_composite_discount_curve_can_value_trades():
 def test_zero_bump_has_no_effect_on_base_discount_curve():
     """Test that adding a zero bump to a DiscountCurve does not affect valuation"""
     valuation_date = Date(6, 10, 2022)
-    base_curve = DiscountCurveFlat(valuation_date, 0.02)
+    base_curve = FlatDiscountCurve(valuation_date, 0.02)
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * G_PERCENT
-    fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
         base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -81,7 +81,7 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * G_PERCENT
-    fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
         base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
     )
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -105,7 +105,7 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
 def _create_test_swap(valuation_date):
 
     spot_days = 2
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     settle_dt = valuation_date.add_weekdays(spot_days)
     swap_type = SwapTypes.PAY
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA

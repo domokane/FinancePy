@@ -954,7 +954,7 @@ class SwaptionVolSurface:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("ATM METHOD", self._atm_method)

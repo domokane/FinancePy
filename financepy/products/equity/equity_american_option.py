@@ -48,7 +48,7 @@ class EquityAmericanOption(EquityOption):
             and opt_type != OptionTypes.AMERICAN_CALL
             and opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError("Unknown Option Type" + str(opt_type))
+            raise FinError("Unknown OPTION_TYPE" + str(opt_type))
 
         self.expiry_dt = expiry_dt
         self.strike_price = strike_price
@@ -113,10 +113,10 @@ class EquityAmericanOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 

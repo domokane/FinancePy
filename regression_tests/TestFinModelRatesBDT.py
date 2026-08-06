@@ -7,7 +7,7 @@ import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import SwapTypes
@@ -15,7 +15,7 @@ from financepy.models.black import Black
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.models.bdt_tree import BDTTree
 from financepy.utils.helpers import print_tree
 from financepy.utils.global_types import ExerciseTypes
@@ -36,7 +36,7 @@ def test_black_model_check():
     # Expect a price around 122 cents which is what I find.
 
     value_dt = Date(1, 1, 2020)
-    libor_curve = DiscountCurveFlat(value_dt, 0.06, FrequencyTypes.SEMI_ANNUAL)
+    libor_curve = FlatDiscountCurve(value_dt, 0.06, FrequencyTypes.SEMI_ANNUAL)
 
     settle_dt = Date(1, 1, 2020)
     exercise_dt = Date(1, 1, 2021)
@@ -85,7 +85,7 @@ def test_bdt_example_one():
     test_cases.header("RATES")
     test_cases.print(zero_rates)
 
-    curve = DiscountCurveZeros(value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL)
+    curve = ZeroRatesDiscountCurve(value_dt, zero_dts, zero_rates, FrequencyTypes.ANNUAL)
 
     yield_vol = 0.16
 

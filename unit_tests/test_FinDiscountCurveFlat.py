@@ -3,7 +3,7 @@
 import numpy as np
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 
 results = [
@@ -129,7 +129,7 @@ def test_fin_flat_curve():
     dates = curve_dt.add_months(months)
     compounding = FrequencyTypes.CONTINUOUS
 
-    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
+    flat_curve = FlatDiscountCurve(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
 
     print(dfs)
@@ -137,22 +137,22 @@ def test_fin_flat_curve():
     assert np.allclose(dfs, results[0], atol=1e-3)
 
     compounding = FrequencyTypes.ANNUAL
-    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
+    flat_curve = FlatDiscountCurve(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert np.allclose(dfs, results[1], atol=1e-3)
 
     compounding = FrequencyTypes.SEMI_ANNUAL
-    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
+    flat_curve = FlatDiscountCurve(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert np.allclose(dfs, results[2], atol=1e-3)
 
     compounding = FrequencyTypes.QUARTERLY
-    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
+    flat_curve = FlatDiscountCurve(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert np.allclose(dfs, results[3], atol=1e-3)
 
     compounding = FrequencyTypes.MONTHLY
-    flat_curve = DiscountCurveFlat(curve_dt, 0.05, compounding)
+    flat_curve = FlatDiscountCurve(curve_dt, 0.05, compounding)
     dfs = flat_curve.df(dates)
     assert np.allclose(dfs, results[4], atol=1e-3)
 

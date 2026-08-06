@@ -7,7 +7,7 @@ from financepy.models.equity_crr_tree import crr_tree_val_avg
 from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 
 NUM_STEPS = 300
@@ -139,8 +139,8 @@ def test_call_option():
     poly_degree = 5
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     # Call option
     v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
@@ -185,8 +185,8 @@ def test_put_option():
     poly_degree = 5
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     # Call option
     v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)

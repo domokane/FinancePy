@@ -83,6 +83,7 @@ class BondParametricYieldCurve:
                 ylds,
                 bounds=curve_fit.bounds
             )
+
             curve_fit.set_params(popt)
 
         elif fit_type is CurveFitSvensson:

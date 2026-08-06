@@ -6,7 +6,7 @@ import add_fp_to_path
 from financepy.products.equity.equity_compound_option import EquityCompoundOption
 from financepy.utils.global_types import OptionTypes
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -28,8 +28,8 @@ def test_equity_compound_option():
     dividend_yield = 0.01
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     num_steps_list = [100, 200, 500, 1000]
 

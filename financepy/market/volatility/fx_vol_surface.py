@@ -51,7 +51,7 @@ from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
-from ...models.black_scholes_analytic import bs_value
+from ...models.black_scholes_analytic import european_value
 from ...products.fx.fx_vanilla_option import fast_delta
 from ...utils.distribution import FinDistribution
 
@@ -122,7 +122,7 @@ def obj_fast(params: np.ndarray, *args: Any) -> float:
 
     sigma_k_25d_c_ms = vol_function(vol_type_value, params, f, k_25d_c_ms, t)
 
-    v_25d_c_ms = bs_value(
+    v_25d_c_ms = european_value(
         s,
         t,
         k_25d_c_ms,
@@ -134,7 +134,7 @@ def obj_fast(params: np.ndarray, *args: Any) -> float:
 
     sigma_k_25d_p_ms = vol_function(vol_type_value, params, f, k_25d_p_ms, t)
 
-    v_25d_p_ms = bs_value(
+    v_25d_p_ms = european_value(
         s,
         t,
         k_25d_p_ms,
@@ -238,11 +238,11 @@ def solve_to_horizon_fast(
     )
 
     # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
-    v_25d_c_ms = bs_value(
+    v_25d_c_ms = european_value(
         s, t, k_25d_c_ms, rd, rf, vol_25d_ms, OptionTypes.EUROPEAN_CALL.value
     )
 
-    v_25d_p_ms = bs_value(
+    v_25d_p_ms = european_value(
         s, t, k_25d_p_ms, rd, rf, vol_25d_ms, OptionTypes.EUROPEAN_PUT.value
     )
 
@@ -1418,7 +1418,7 @@ class FXVolSurface:
     ###########################################################################
 
     def __repr__(self) -> str:
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
         s += label_to_string("CCY PAIR", self.currency_pair)

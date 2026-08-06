@@ -21,7 +21,7 @@ from financepy.utils.helpers import check_vector_differences
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black import Black
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -144,7 +144,7 @@ def get_forward_curve(num_fwds, r):
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
 #         value_dt = Date(1, 1, 2010)
-#         libor_curve = FinDiscountCurveFlat(value_dt, r,
+#         libor_curve = FinFlatDiscountCurve(value_dt, r,
 #                                           FrequencyTypes.QUARTERLY)
 
 #         settle_dt = value_dt

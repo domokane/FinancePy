@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from financepy.products.equity.equity_index_option import EquityIndexOption
 from financepy.utils.global_types import OptionTypes
@@ -19,7 +19,7 @@ def test_equity_european_index_option_price():
     expiry_dt = Date(7, 8, 2015, hh=6)
     discount_rate = 0.08
     volatility = 0.15
-    discount_curve = DiscountCurveFlat(value_dt, discount_rate)
+    discount_curve = FlatDiscountCurve(value_dt, discount_rate)
     strike = 100.0
     future_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
     # expected result
@@ -57,7 +57,7 @@ def test_equity_american_index_option_price():
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     discount_rate = 0.08
     volatility = 0.15
-    discount_curve = DiscountCurveFlat(value_dt, discount_rate)
+    discount_curve = FlatDiscountCurve(value_dt, discount_rate)
     strike = 100.0
     future_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
     num_steps = 200

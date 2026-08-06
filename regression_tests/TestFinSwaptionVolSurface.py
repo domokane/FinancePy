@@ -5,7 +5,7 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
 from financepy.utils.date import Date
 from financepy.models.volatility_fns import VolFuncTypes

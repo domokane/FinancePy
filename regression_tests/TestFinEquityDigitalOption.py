@@ -8,7 +8,7 @@ from financepy.products.equity.equity_digital_option import (
     FinDigitalOptionTypes,
 )
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -28,8 +28,8 @@ def test_equity_digital_option():
     volatility = 0.30
     interest_rate = 0.05
     dividend_yield = 0.01
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     model = BlackScholes(volatility)
     import time

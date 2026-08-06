@@ -6,7 +6,7 @@ from financepy.products.equity.equity_american_option import EquityAmericanOptio
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.models.black_scholes import BlackScholesTypes
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -31,11 +31,11 @@ ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
 
 eu_option = EquityVanillaOption(expiry_dt, strike_price, eu_option_type)
 
-discount_curve = DiscountCurveFlat(
+discount_curve = FlatDiscountCurve(
     value_dt, interest_rate, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
 )
 
-dividend_curve = DiscountCurveFlat(
+dividend_curve = FlatDiscountCurve(
     value_dt, dividend_yield, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
 )
 
@@ -93,14 +93,14 @@ def test_bjerksund_stensland():
     stock_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
 
     # model setting
-    discount_curve = DiscountCurveFlat(
+    discount_curve = FlatDiscountCurve(
         value_dt,
         interest_rate,
         FrequencyTypes.CONTINUOUS,
         DayCountTypes.ACT_365F,
     )
 
-    borrow_curve = DiscountCurveFlat(
+    borrow_curve = FlatDiscountCurve(
         value_dt,
         borrow_rate,
         FrequencyTypes.CONTINUOUS,

@@ -3,7 +3,7 @@
 from os.path import dirname, join
 
 from financepy.utils.date import Date
-from financepy.products.credit.cds_curve import CDSCurve
+from financepy.market.curves.cds_curve import CDSCurve
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 

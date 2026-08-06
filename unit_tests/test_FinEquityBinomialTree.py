@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
@@ -24,8 +24,8 @@ value_dt = Date(1, 1, 2016)
 expiry_dt = Date(1, 1, 2017)
 
 model = BlackScholes(volatility)
-discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 num_steps = 100
 

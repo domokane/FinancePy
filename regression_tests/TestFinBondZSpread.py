@@ -11,9 +11,9 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_benchmarks_report import (
     dataframe_to_benchmarks,
 )
@@ -31,7 +31,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 def test_z_spread_flat_curve():
 
     settle_dt = Date(19, 9, 2012)
-    base_curve = DiscountCurveFlat(settle_dt, flat_rate=1 * G_PERCENT)
+    base_curve = FlatDiscountCurve(settle_dt, flat_rate=1 * G_PERCENT)
     return _test_z_spread_for_curve(base_curve)
 
 
@@ -54,7 +54,7 @@ def test_z_spread_actual_curve():
     )  # allow tenors
 
     valuation_date = from_datetime(dfbm.loc[0, "base_date"])
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     bms = dataframe_to_benchmarks(dfbm, asof_date=valuation_date, calendar_type=cal)
     depos = bms["IborDeposit"]
     fras = bms["IborFRA"]

@@ -7,7 +7,7 @@ import add_fp_to_path
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -36,7 +36,7 @@ def test_equity_variance_swap():
     value_dt = Date(20, 3, 2018)
     stock_price = 100.0
     dividend_yield = 0.0
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     maturity_dt = start_dt.add_months(3)
 
@@ -52,7 +52,7 @@ def test_equity_variance_swap():
     num_put_options = 10
     r = 0.05
 
-    discount_curve = DiscountCurveFlat(value_dt, r)
+    discount_curve = FlatDiscountCurve(value_dt, r)
 
     use_forward = False
 

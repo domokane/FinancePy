@@ -253,7 +253,7 @@
 
 #     def __repr__(self):
 
-#         s = label_to_string("MATURITY DATE", self.maturity_dt)
+#         s = label_to_string("MATURITY_DATE", self.maturity_dt)
 #         s += label_to_string("EXERCISE DATE", self.exercise_dt)
 #         s += label_to_string("cpn", self.cpn)
 #         s += label_to_string("FREQUENCY", self.freq_type)

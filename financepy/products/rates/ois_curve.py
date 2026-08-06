@@ -124,6 +124,8 @@ class OISCurve(DiscountCurve):
         The curve will assign a discount factor of 1.0 to the valuation date.
         """
 
+        print("Deprecation Warning: OISCurve has moved to market->curves folder. This version will be removed.")
+
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         self.value_dt = value_dt
@@ -667,7 +669,7 @@ class OISCurve(DiscountCurve):
     def __repr__(self):
         """Print out the details of the Libor curve."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUATION DATE", self.value_dt)
 
         for depo in self.used_deposits:

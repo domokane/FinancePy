@@ -51,6 +51,8 @@ class DiscountCurveZeros(DiscountCurve):
         we must do to calculate discount factors. Finally we specify the
         interpolation scheme for off-grid dates."""
 
+        print("Warning: Deprecated. Use ZeroRatesDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         # Validate curve
@@ -100,7 +102,7 @@ class DiscountCurveZeros(DiscountCurve):
 
         bumped_zero_rates = self._zero_rates + bump_size
 
-        return DiscountCurveZeros(
+        return ZeroRatesDiscountCurve(
             self.value_dt,
             self._zero_dts.copy(),
             bumped_zero_rates,
@@ -182,7 +184,7 @@ class DiscountCurveZeros(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("ZERO RATE FREQUENCY", self.freq_type)
         s += label_to_string("DATES", "ZERO RATES")
 

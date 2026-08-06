@@ -11,8 +11,8 @@ from financepy.products.bonds import YTMCalcType
 from financepy.products.inflation.FinInflationIndexCurve import (
     FinInflationIndexCurve,
 )
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -143,7 +143,7 @@ def test_fin_inflation_bond_stack():
     ref_cpi_value = 244.65884
 
     # Discount curve
-    discount_curve = DiscountCurveFlat(
+    discount_curve = FlatDiscountCurve(
         settle_dt,
         0.01033692,
         FrequencyTypes.ANNUAL,
@@ -238,7 +238,7 @@ def test_fin_inflation_bond_stack():
         zc_dates.append(zciis_data[i][0])
         zc_rates.append(zciis_data[i][1] / 100.0)
 
-    inflation_zero_curve = DiscountCurveZeros(
+    inflation_zero_curve = ZeroRatesDiscountCurve(
         settle_dt,
         zc_dates,
         zc_rates,

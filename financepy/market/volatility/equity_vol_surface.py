@@ -51,7 +51,7 @@ from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
-from ...models.black_scholes_analytic import bs_delta
+from ...models.black_scholes_analytic import delta
 
 from ...utils.distribution import FinDistribution
 
@@ -229,7 +229,7 @@ def _delta_fit(k: float, *args: Any) -> float:
 
     f = s * np.exp((r - q) * t)
     v = vol_function(vol_type_value, params, f, k, t)
-    delta_out = bs_delta(s, t, k, r, q, v, opt_type_value)
+    delta_out = delta(s, t, k, r, q, v, opt_type_value)
     inverse_delta_out = norminvcdf(np.abs(delta_out))
     inv_obj_fn = inverse_delta_target - inverse_delta_out
 
@@ -879,7 +879,7 @@ class EquityVolSurface:
     ####################################################################################
 
     def __repr__(self) -> str:
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("VOL FUNCTION", self._vol_func_type)

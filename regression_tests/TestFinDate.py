@@ -98,6 +98,7 @@ def test_dt_range():
     test_cases.print(tenor, date_range(start_dt, end_dt))
 
     end_dt = start_dt.add_days(20)
+
     tenor = "1W"
     test_cases.print(tenor, date_range(start_dt, end_dt, tenor))
 

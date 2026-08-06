@@ -12,7 +12,7 @@ from financepy.utils.global_types import ExerciseTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.date import Date
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -137,7 +137,7 @@ def test_bond_option_european_convergence():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
-    discount_curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
+    discount_curve = FlatDiscountCurve(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     # Bond details
     issue_dt = Date(1, 12, 2015)
@@ -198,7 +198,7 @@ def test_bond_option_american_convergence_one():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
-    discount_curve = DiscountCurveFlat(settle_dt, 0.05)
+    discount_curve = FlatDiscountCurve(settle_dt, 0.05)
 
     # Bond details
     issue_dt = Date(1, 9, 2014)
@@ -262,7 +262,7 @@ def test_bond_option_american_convergence_two():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
-    discount_curve = DiscountCurveFlat(settle_dt, 0.05)
+    discount_curve = FlatDiscountCurve(settle_dt, 0.05)
 
     # Bond details
     issue_dt = Date(1, 12, 2015)
@@ -345,7 +345,7 @@ def test_bond_option_zerovol_convergence():
     # Build discount curve
     settle_dt = Date(1, 9, 2019)
     rate = 0.05
-    discount_curve = DiscountCurveFlat(settle_dt, rate, FrequencyTypes.ANNUAL)
+    discount_curve = FlatDiscountCurve(settle_dt, rate, FrequencyTypes.ANNUAL)
 
     # Bond details
     issue_dt = Date(1, 9, 2014)
@@ -438,7 +438,7 @@ def test_bond_option_deriva_gem():
     rate = 0.05
     dc_type = DayCountTypes.THIRTY_360_BOND
     fixed_freq = FrequencyTypes.SEMI_ANNUAL
-    discount_curve = DiscountCurveFlat(settle_dt, rate, fixed_freq, dc_type)
+    discount_curve = FlatDiscountCurve(settle_dt, rate, fixed_freq, dc_type)
 
     issue_dt = Date(1, 12, 2018)
     expiry_dt = settle_dt.add_tenor("18m")

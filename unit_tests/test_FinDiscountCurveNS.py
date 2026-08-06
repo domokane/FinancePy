@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from financepy.market.curves.discount_curve_ns import DiscountCurveNS
+from financepy.market.curves.ns_discount_curve import NSDiscountCurve
 from financepy.utils.date import Date
 
 

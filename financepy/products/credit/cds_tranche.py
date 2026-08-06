@@ -19,7 +19,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 
 from ...products.credit.cds import CDS
-from ...products.credit.cds_curve import CDSCurve
+from ...market.curves.cds_curve import CDSCurve
 
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
@@ -28,6 +28,9 @@ from ...utils.error import FinError
 
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
+
+DIRTY = 0
+CLEAN = 1
 
 ########################################################################################
 
@@ -274,8 +277,8 @@ class CDSTranche:
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, tranche_curve, curve_recovery
         )
-        risky_pv01 = self.cds_contract.risky_pv01(value_dt, tranche_curve)[
-            "clean_rpv01"
+        risky_pv01 = self.cds_contract.rpv01(value_dt, tranche_curve)[
+            CLEAN
         ]
 
         mtm = self.notional * (
@@ -300,7 +303,7 @@ class CDSTranche:
             """Print out details of the CDSTranche contract."""
             s = label_to_string("OBJECT TYPE", type(self).__name__)
             s += label_to_string("STEP-IN DATE", self.step_in_dt)
-            s += label_to_string("MATURITY DATE", self.maturity_dt)
+            s += label_to_string("MATURITY_DATE", self.maturity_dt)
             s += label_to_string("ATTACHMENT POINT (K1)", self.k1)
             s += label_to_string("DETACHMENT POINT (K2)", self.k2)
             s += label_to_string("NOTIONAL", self.notional)
@@ -309,8 +312,8 @@ class CDSTranche:
             s += label_to_string("FREQUENCY", self.freq_type)
             s += label_to_string("DAYCOUNT", self.dc_type)
             s += label_to_string("CALENDAR", self.cal_type)
-            s += label_to_string("BUSDAYRULE", self.bd_type)
-            s += label_to_string("DATEGENRULE", self.dg_type)
+            s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+            s += label_to_string("DATE_GEN_RULE", self.dg_type)
             return s
 
         ####################################################################################

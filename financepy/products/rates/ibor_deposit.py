@@ -178,14 +178,14 @@ class IborDeposit:
 
     def __repr__(self):
         """Print the contractual details of the Libor deposit."""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.start_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.start_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("DEPOSIT RATE", self.deposit_rate)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         return s
 
     #####################################################$###############################

@@ -14,8 +14,10 @@ from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
 
+DIRTY = 0
+CLEAN = 1
 
-from numba import njit, float64
+# from numba import njit, float64
 
 ########################################################################################
 
@@ -33,7 +35,7 @@ def f(q, *args):
 
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    obj_fn = cds.value(value_dt, curve, recovery_rate)["clean_pv"]
+    obj_fn = cds.value(value_dt, curve, recovery_rate)[CLEAN]
     return obj_fn
 
 
@@ -57,6 +59,8 @@ class CDSCurve:
         """Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the
         same interpolation method."""
+
+        print("Deprecation Warning: CDSCurve has been moved. Use version under market->curves")
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
@@ -295,7 +299,7 @@ class CDSCurve:
 
     def __repr__(self):
         """Print out the details of the survival probability curve."""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         header = "TIME,SURVIVAL_PROBABILITY"
 
         value_table = [self._times, self._qs]

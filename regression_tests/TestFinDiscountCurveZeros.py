@@ -5,7 +5,7 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -58,7 +58,7 @@ def test_fin_discount_curve_zeros():
         freq_type = FrequencyTypes.ANNUAL
         time_dc_type = DayCountTypes.ACT_ACT_ISDA
 
-        curve = DiscountCurveZeros(
+        curve = ZeroRatesDiscountCurve(
             start_dt,
             dates,
             zero_rates,

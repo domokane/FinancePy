@@ -394,7 +394,7 @@ class BondFuture:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("TICKER NAME", self.ticker_name)
         s += label_to_string("FIRST DELIVERY DATE", self.first_delivery_dt)
         s += label_to_string("LAST DELIVERY DATE", self.last_delivery_dt)

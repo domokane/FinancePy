@@ -558,7 +558,7 @@ class IborDualCurve(DiscountCurve):
     def __repr__(self):
         """Print out the details of the Ibor curve."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VALUATION DATE", self.value_dt)
 
         for depo in self.used_deposits:

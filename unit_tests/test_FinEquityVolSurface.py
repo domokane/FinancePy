@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from financepy.models.volatility_fns import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.day_count import DayCountTypes
 
 ########################################################################################
@@ -44,12 +44,12 @@ def test_equity_vol_surface():
     vol_surface = vol_surface / 100.0
 
     r = 0.020  # USD
-    discount_curve = DiscountCurveFlat(value_dt, r)
-    # discount_curve = DiscountCurveFlat(value_dt, r, dc_type=DayCountTypes.ACT_ACT_ISDA)
+    discount_curve = FlatDiscountCurve(value_dt, r)
+    # discount_curve = FlatDiscountCurve(value_dt, r, dc_type=DayCountTypes.ACT_ACT_ISDA)
 
     q = 0.010  # USD
-    dividend_curve = DiscountCurveFlat(value_dt, q)
-    # dividend_curve = DiscountCurveFlat(value_dt, q, dc_type=DayCountTypes.ACT_ACT_ISDA)
+    dividend_curve = FlatDiscountCurve(value_dt, q)
+    # dividend_curve = FlatDiscountCurve(value_dt, q, dc_type=DayCountTypes.ACT_ACT_ISDA)
 
     vol_function_type = VolFuncTypes.SVI
 

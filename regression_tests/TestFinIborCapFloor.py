@@ -10,7 +10,7 @@ from financepy.utils.global_types import CapFloorTypes
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -18,16 +18,15 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.global_types import SwapTypes
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black import Black
 from financepy.models.bachelier import Bachelier
 from financepy.models.black_shifted import BlackShifted
 from financepy.models.sabr import SABR
 from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
-from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -231,7 +230,7 @@ def test_ibor_cap_floor_vol_curve():
     cap_vol_dates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
 
     flat_rate = 0.04
-    libor_curve = DiscountCurveFlat(value_dt, flat_rate, frequency, accrual_dc_type)
+    libor_curve = FlatDiscountCurve(value_dt, flat_rate, frequency, accrual_dc_type)
 
     flat = False
     if flat is True:
@@ -297,7 +296,7 @@ def test_ibor_caplet_hull():
     today_date = Date(20, 6, 2019)
     value_dt = today_date
     maturity_dt = value_dt.add_tenor("2Y")
-    libor_curve = DiscountCurveFlat(
+    libor_curve = FlatDiscountCurve(
         value_dt, 0.070, FrequencyTypes.QUARTERLY, DayCountTypes.THIRTY_E_360
     )
 
@@ -365,7 +364,7 @@ def test_ibor_cap_floor_ql_example():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ISDA
 
-    discount_curve = DiscountCurveZeros(
+    discount_curve = ZeroRatesDiscountCurve(
         value_dt, dates, rates, freq_type, InterpTypes.LINEAR_ZERO_RATES
     )
 

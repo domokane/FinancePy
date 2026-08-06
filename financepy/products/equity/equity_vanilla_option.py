@@ -17,15 +17,15 @@ from ...market.curves.discount_curve import DiscountCurve
 
 from ...models.model import Model
 from ...models.black_scholes import BlackScholes
-from ...models.black_scholes_analytic import bs_value
-from ...models.black_scholes_analytic import bs_delta
-from ...models.black_scholes_analytic import bs_vega
-from ...models.black_scholes_analytic import bs_gamma
-from ...models.black_scholes_analytic import bs_rho
-from ...models.black_scholes_analytic import bs_vanna
-from ...models.black_scholes_analytic import bs_theta
-from ...models.black_scholes_analytic import bs_implied_volatility
-from ...models.black_scholes_analytic import bs_intrinsic
+from ...models.black_scholes_analytic import european_value
+from ...models.black_scholes_analytic import delta
+from ...models.black_scholes_analytic import vega
+from ...models.black_scholes_analytic import gamma
+from ...models.black_scholes_analytic import rho
+from ...models.black_scholes_analytic import vanna
+from ...models.black_scholes_analytic import theta
+from ...models.black_scholes_analytic import implied_volatility
+from ...models.black_scholes_analytic import intrinsic
 
 from ...models.black_scholes_mc import _value_mc_nonumba_nonumpy
 from ...models.black_scholes_mc import _value_mc_numpy_numba
@@ -47,7 +47,7 @@ def _f(v, args):
     k = args[5]
     price = args[6]
 
-    obj_fn = bs_value(s0, t_exp, k, r, q, v, opt_type_value)
+    obj_fn = european_value(s0, t_exp, k, r, q, v, opt_type_value)
     obj_fn = obj_fn - price
     return obj_fn
 
@@ -64,7 +64,7 @@ def _fvega(v, *args):
     q = args[4]
     k = args[5]
 
-    fprime = bs_vega(s0, t_exp, k, r, q, v, self.opt_type.value)
+    fprime = vega(s0, t_exp, k, r, q, v, self.opt_type.value)
     return fprime
 
 
@@ -141,7 +141,7 @@ class EquityVanillaOption:
 
         k = self.strike_price
 
-        intrinsic_value = bs_intrinsic(s0, t_exp, k, r, q, self.opt_type_value)
+        intrinsic_value = intrinsic(s0, t_exp, k, r, q, self.opt_type_value)
 
         intrinsic_value = intrinsic_value * self.num_options
         return intrinsic_value
@@ -151,7 +151,7 @@ class EquityVanillaOption:
     def value(
         self,
         value_dt: Union[Date, list],
-        stock_price: Union[np.ndarray, float],
+        stock_price: float | np.ndarray,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,
@@ -215,7 +215,7 @@ class EquityVanillaOption:
         if isinstance(model, BlackScholes):
 
             v = model.volatility
-            value = bs_value(s0, t_exp, k, r, q, v, self.opt_type_value)
+            value = european_value(s0, t_exp, k, r, q, v, self.opt_type_value)
 
         else:
             raise FinError("Unknown Model Type")
@@ -262,12 +262,12 @@ class EquityVanillaOption:
         if isinstance(model, BlackScholes):
 
             v = model.volatility
-            delta = bs_delta(s0, t_exp, k, r, q, v, self.opt_type_value)
+            d = delta(s0, t_exp, k, r, q, v, self.opt_type_value)
 
         else:
             raise FinError("Unknown Model Type")
 
-        return delta
+        return d
 
     ###########################################################################
 
@@ -307,12 +307,12 @@ class EquityVanillaOption:
         if isinstance(model, BlackScholes):
 
             v = model.volatility
-            gamma = bs_gamma(s0, t_exp, k, r, q, v, self.opt_type_value)
+            g = gamma(s0, t_exp, k, r, q, v, self.opt_type_value)
 
         else:
             raise FinError("Unknown Model Type")
 
-        return gamma
+        return g
 
     ###########################################################################
 
@@ -351,12 +351,12 @@ class EquityVanillaOption:
         if isinstance(model, BlackScholes):
 
             v = model.volatility
-            vega = bs_vega(s0, t_exp, k, r, q, v, self.opt_type_value)
+            veg = vega(s0, t_exp, k, r, q, v, self.opt_type_value)
 
         else:
             raise FinError("Unknown Model Type")
 
-        return vega
+        return veg
 
     ###########################################################################
 
@@ -394,11 +394,11 @@ class EquityVanillaOption:
 
         if isinstance(model, BlackScholes):
             v = model.volatility
-            theta = bs_theta(s0, t_exp, k, r, q, v, self.opt_type_value)
+            thet = theta(s0, t_exp, k, r, q, v, self.opt_type_value)
         else:
             raise FinError("Unknown Model Type")
 
-        return theta
+        return thet
 
     ###########################################################################
 
@@ -436,11 +436,11 @@ class EquityVanillaOption:
 
         if isinstance(model, BlackScholes):
             v = model.volatility
-            rho = bs_rho(s0, t_exp, k, r, q, v, self.opt_type_value)
+            r = rho(s0, t_exp, k, r, q, v, self.opt_type_value)
         else:
             raise FinError("Unknown Model Type")
 
-        return rho
+        return r
 
     ###########################################################################
 
@@ -478,11 +478,11 @@ class EquityVanillaOption:
 
         if isinstance(model, BlackScholes):
             v = model.volatility
-            vanna = bs_vanna(s0, t_exp, k, r, q, v, self.opt_type_value)
+            van = vanna(s0, t_exp, k, r, q, v, self.opt_type_value)
         else:
             raise FinError("Unknown Model Type")
 
-        return vanna
+        return van
 
     ###########################################################################
 
@@ -512,7 +512,7 @@ class EquityVanillaOption:
         k = self.strike_price
         s0 = stock_price
 
-        sigma = bs_implied_volatility(
+        sigma = implied_volatility(
             s0, t_exp, k, r, q, price, self.opt_type_value
         )
 

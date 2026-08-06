@@ -4,7 +4,7 @@ import add_fp_to_path
 
 from financepy.products.equity.equity_chooser_option import EquityChooserOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -29,8 +29,8 @@ def test_equity_chooser_option_haug():
     dividend_yield = 0.05
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     chooser_option = EquityChooserOption(
         choose_dt, call_expiry_dt, put_expiry_dt, call_strike, put_strike
@@ -68,8 +68,8 @@ def test_equity_chooser_option_matlab():
 
     model = BlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     chooser_option = EquityChooserOption(
         choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike
@@ -106,8 +106,8 @@ def test_equity_chooser_option_derivicom():
     dividend_yield = 0.0625
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     chooser_option = EquityChooserOption(
         choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike

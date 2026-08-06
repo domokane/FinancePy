@@ -15,7 +15,7 @@ from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -163,7 +163,7 @@ def test_bond_option_american_convergence_one():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
-    discount_curve = DiscountCurveFlat(settle_dt, 0.05)
+    discount_curve = FlatDiscountCurve(settle_dt, 0.05)
 
     # Bond details
     maturity_dt = Date(1, 9, 2025)
@@ -222,7 +222,7 @@ def test_bond_option_american_convergence_two():
 
     # Build discount curve
     settle_dt = Date(1, 12, 2019)
-    discount_curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
+    discount_curve = FlatDiscountCurve(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     # Bond details
     issue_dt = Date(1, 9, 2014)
@@ -321,7 +321,7 @@ def test_bond_option_zerovol_convergence():
     # Build discount curve
     settle_dt = Date(1, 9, 2019)
     rate = 0.05
-    discount_curve = DiscountCurveFlat(settle_dt, rate, FrequencyTypes.ANNUAL)
+    discount_curve = FlatDiscountCurve(settle_dt, rate, FrequencyTypes.ANNUAL)
 
     # Bond details
     issue_dt = Date(1, 9, 2014)

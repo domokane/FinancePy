@@ -6,7 +6,7 @@ import add_fp_to_path
 
 from financepy.products.equity.equity_basket_option import EquityBasketOption
 from financepy.utils.global_types import OptionTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.utils.date import Date
 
@@ -25,7 +25,7 @@ def test_equity_basket_option():
     expiry_dt = Date(1, 1, 2016)
     volatility = 0.30
     interest_rate = 0.05
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
     # Homogeneous Basket
 
@@ -36,7 +36,7 @@ def test_equity_basket_option():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     beta_list = np.linspace(0.0, 0.999999, 11)
@@ -83,7 +83,7 @@ def test_equity_basket_option():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     beta_list = np.linspace(0.0, 0.999999, 11)
@@ -135,7 +135,7 @@ def test_equity_basket_option():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     test_cases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")
@@ -180,7 +180,7 @@ def test_equity_basket_option():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     test_cases.header("NumPaths", "Beta", "Value", "ValueMC", "TIME")

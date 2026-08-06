@@ -9,12 +9,15 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
+
 from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+import financepy.market.curves.ibor_curve_risk_engine as re
+
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-import financepy.products.rates.ibor_curve_risk_engine as re
+
 
 from helpers import build_ibor_single_curve
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -31,7 +34,7 @@ diagnostics_mode = False
 def test_par_rate_risk_report_cubic_zero():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -188,7 +191,7 @@ def test_par_rate_risk_report_flat_forward():
 def test_forward_rate_risk_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -300,7 +303,7 @@ def test_forward_rate_risk_report():
 def test_forward_rate_custom_grid_risk_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -374,7 +377,7 @@ def test_forward_rate_custom_grid_risk_report():
 def test_carry_rolldown_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
@@ -466,7 +469,7 @@ def test_carry_rolldown_report():
 def test_parallel_shift_ladder_report():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360

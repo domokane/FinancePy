@@ -1,7 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.products.fx.fx_barrier_option import FXBarrierTypes
 from financepy.models.black_scholes import BlackScholes
@@ -22,8 +22,8 @@ notional_currency = "USD"
 drift = dom_interest_rate - for_interest_rate
 scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
 process_type = ProcessTypes.GBM_PROCESS
-domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
+domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
+foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
 model = BlackScholes(volatility)
 num_obs_per_year = 100
 
@@ -107,7 +107,7 @@ def test_down_and_in_call():
     )
 
     assert round(value, 4) == 9.2270
-    assert round(delta, 4) == 0.5868
+    assert round(delta, 4) == 0.5869
     assert round(vega, 4) == 0.3791
     assert round(theta, 4) == -5.0924
 
@@ -191,7 +191,7 @@ def test_up_and_in_call():
     assert round(value, 4) == 9.2067
     assert round(delta, 4) == 0.5900
     assert round(vega, 4) == 0.3811
-    assert round(theta, 4) == -5.1229
+    assert round(theta, 4) == -5.1228
 
 
 ########################################################################################
@@ -353,6 +353,6 @@ def test_down_and_in_put():
     )
 
     assert round(value, 4) == 6.3301
-    assert round(delta, 4) == -0.3934
+    assert round(delta, 4) == -0.3933
     assert round(vega, 4) == 0.3791
     assert round(theta, 4) == -2.2964

@@ -631,11 +631,11 @@ class BondConvertible:
     def __repr__(self):
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("COUPON", self.cpn)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CONVERSION RATIO", self.conversion_ratio)
         s += label_to_string("START CONVERT DATE", self.start_convert_dt)
         s += label_to_string("CALL", "DATES")

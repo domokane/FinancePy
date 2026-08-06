@@ -3,11 +3,13 @@ import add_fp_to_path
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.global_vars import G_BASIS_POINT
 from financepy.market.curves.interpolator import InterpTypes
+
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_single_curve_par_shocker import (
+
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve_par_shocker import (
     IborSingleCurveParShocker,
 )
 from financepy.utils.frequency import FrequencyTypes
@@ -25,7 +27,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 def test_ibor_curve_par_rate_shocker():
 
     valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []

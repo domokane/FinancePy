@@ -12,8 +12,8 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.credit.cds_curve import CDSCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.cds_curve import CDSCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 

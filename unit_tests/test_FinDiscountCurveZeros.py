@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -19,7 +19,7 @@ def test_fin_discount_curve_zeros():
     zero_rates = np.linspace(5.0, 6.0, 10) / 100
     freq_type = FrequencyTypes.ANNUAL
 
-    curve = DiscountCurveZeros(
+    curve = ZeroRatesDiscountCurve(
         start_dt,
         dates,
         zero_rates,

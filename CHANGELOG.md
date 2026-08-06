@@ -1,6 +1,47 @@
 ## CHANGE LOG
+
+
+6 August 2026
+RELEASE OF FINANCEPY  V1.2
+List of changes
+
+- This release renames a wide set of the Discount curves
+    - DiscountCurveFlat -> FlatDiscountCurve
+    - DiscountCurveNS -> NSDiscountCurve
+    - DiscountCurveNSS -> NSSDiscountCurve
+    - DiscountCurvePoly -> PolyDiscountCurve
+    - DiscountCurvePWFONF -> PWFONFDiscountCurve
+    - DiscountCurvePWF -> PWFDiscountCurve
+    - DiscountCurveZeros -> ZeroRatesDiscountCurve
+- This release moves some product-based curves from product folders to market->curves
+    - IborSingleCurve moves
+    - IborCurveRiskEngine moves
+    - IborSingleCurveParShocker moves
+    - IborSingleCurveSmoothingCalibrator moves
+    - IborDualCurve moves
+    - OISCurve moves
+    - CDSCurve moves
+- A number of changes in CDS valuation
+    - Renamed credit01 to spread dv01 like Bloomberg
+    - Renamed rate01 to ir dv01 like Bloomberg
+    - Renamed risky_pv01 function name rpv01
+    - Removed dicts and define pair returns to be (DIRTY, CLEAN)
+    - Improved accuracy of fast approximator
+- Tweaked solver1D to be more gentle on convergence
+- Added vectorised American pricers to black_scholes_analytic using numerical approximations
+- FXBarrierModel code moved to models folder
+- Renamed bond_callable.py to bond_embedded_option.py as this is what it contains
+- Removed UNITED_KINGDOM from Calendars as UK is England + Wales + Scotland
+- Added LONDON to Calendars for England to replace UNITED_KINGDOM
+- Repaired intraday date functionality in Date class
+- Updated all notebooks to ensure they work
+- Updated regression and unit tests
+
+###############################################################################
+
 15 June 2026
-- Added bond boostrap discount curve to dop exact fit to bond prices
+
+- Added bond boostrap discount curve to do exact fit to bond prices
 - Added bond parametric discount curve to do parametric best fit to bond prices
 - Added bond parametric yield curve to do parametric best fit to yields
 - Removed BondFittedZeroCurve (replaced by BondParametricDiscountCurve)

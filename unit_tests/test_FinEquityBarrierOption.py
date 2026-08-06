@@ -1,7 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_barrier_option import BarrierTypes
@@ -24,8 +24,8 @@ drift = interest_rate - dividend_yield
 scheme = FinGBMNumericalScheme.NORMAL_SCHEME
 process_type = ProcessTypes.GBM_PROCESS
 
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 model = BlackScholes(volatility)
 

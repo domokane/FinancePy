@@ -13,10 +13,10 @@ from ...utils.error import FinError
 
 from ...products.equity.equity_option import EquityOption
 from ...utils.global_types import OptionTypes
-from ...market.curves.discount_curve_flat import DiscountCurve
+from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-from ...models.black_scholes_analytic import bs_value
+from ...models.black_scholes_analytic import european_value
 
 DEBUG_MODE = False
 
@@ -42,10 +42,10 @@ def _f(ss, *args):
     v = args[7]
     q = args[8]
 
-    v_call = bs_value(
+    v_call = european_value(
         ss, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
     )
-    v_put = bs_value(ss, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
+    v_put = european_value(ss, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value)
 
     v = v_call - v_put
     return v
@@ -248,17 +248,17 @@ class EquityChooserOption(EquityOption):
         s_1 = s * m
         s_2 = s / m
 
-        v_call_1 = bs_value(
+        v_call_1 = european_value(
             s_1, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
         )
-        v_put_1 = bs_value(
+        v_put_1 = european_value(
             s_1, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
         )
 
-        v_call_2 = bs_value(
+        v_call_2 = european_value(
             s_2, tc - t, kc, rtc, q, v, OptionTypes.EUROPEAN_CALL.value
         )
-        v_put_2 = bs_value(
+        v_put_2 = european_value(
             s_2, tp - t, kp, rtp, q, v, OptionTypes.EUROPEAN_PUT.value
         )
 
@@ -272,7 +272,7 @@ class EquityChooserOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("CHOOSER DATE", self.choose_dt)
         s += label_to_string("CALL EXPIRY DATE", self.call_expiry_dt)
         s += label_to_string("CALL STRIKE PRICE", self.call_strike)

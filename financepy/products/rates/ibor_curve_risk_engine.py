@@ -9,7 +9,7 @@ from ...utils.compounding import CompoundingTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.global_vars import G_BASIS_POINT
 from ...market.curves.discount_curve import DiscountCurve
-from ...market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
+from ...market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 
 from ...products.rates.ibor_single_curve import IborSingleCurve
@@ -206,7 +206,7 @@ def forward_rate_risk_report_custom_grid(
         )
         risk_report.loc[fwdrate_idx, "market_rate"] = base_rate
 
-        fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
+        fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
             base_curve.value_dt, start_dt, maturity_dt, bump_size
         )
         bumped_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
@@ -313,7 +313,7 @@ def parallel_shift_ladder_report(
         base_values[trade_label] = trade.value(base_curve.value_dt, base_curve)
 
     for shift_idx, shift in enumerate(curve_shifts):
-        fwd_rate_shock = DiscountCurvePWFONF.flat_curve(
+        fwd_rate_shock = PWFONFDiscountCurve.flat_curve(
             base_curve.value_dt, shift
         )
         bumped_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
