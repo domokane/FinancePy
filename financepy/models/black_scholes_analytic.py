@@ -270,8 +270,8 @@ def vanna(
     v: float,
     opt_type_value: int,
 ) -> float:
-    """Price a derivative using Black-sscholes model."""
-
+    """Calculate European option vanna under the Black–Scholes model."""
+    
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
@@ -283,9 +283,8 @@ def vanna(
     kk = k * np.exp(-r * t)
     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
     d2 = d1 - v_sqrt_t
-#    v = np.exp(-q * t) * sqrt_t * normcdf_prime_vect(d1) * (d2 / v)
-    v = -np.exp(-q * t) * normcdf_prime_vect(d1) * (d2 / v)
-    return v
+    vanna = -np.exp(-q * t) * normcdf_prime_vect(d1) * (d2 / v)
+    return vanna
 
 
 ########################################################################################
