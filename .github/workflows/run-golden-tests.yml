@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
