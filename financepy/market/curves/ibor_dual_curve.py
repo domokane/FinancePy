@@ -16,9 +16,9 @@ from ...market.curves.interpolator import InterpTypes, Interpolator
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.day_count import DayCountTypes
 
-from .ibor_deposit import IborDeposit
-from .ibor_fra import IborFRA
-from .ibor_fixed_float_swap import IborFixedFloatSwap
+from ...products.rates.ibor_deposit import IborDeposit
+from ...products.rates.ibor_fra import IborFRA
+from ...products.rates.ibor_fixed_float_swap import IborFixedFloatSwap
 
 SWAP_TOL = 1e-10
 
