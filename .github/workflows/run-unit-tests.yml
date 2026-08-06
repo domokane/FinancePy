@@ -2,6 +2,9 @@ name: unit test action
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 env:
   PYTHON_VERSION: '3.13.9'
 
@@ -11,10 +14,10 @@ jobs:
 
     steps:
       - name: checkout repo content
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
