@@ -128,8 +128,8 @@ v = cds_contract.value(settle_dt, cds_curve, recovery_rate)
 ```
 This has two components:
 ```
-dirty_pv = v['dirty_pv']
-clean_pv = v['clean_pv']
+dirty_pv = v[0]
+clean_pv = v[1]
 ```
 We print these
 ```
