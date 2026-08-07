@@ -365,8 +365,37 @@ class Calendar:
     convention and then applies that to any date that falls on a holiday in the
     specified calendar."""
 
-    def __init__(self, cal_type: CalendarTypes):
-        """Create a calendar based on a specified calendar type."""
+    def __init__(self, cal_type: CalendarTypes | list | tuple):
+        """Create a calendar based on a specified calendar type.
+
+        A list or tuple of calendar types creates a joint calendar whose
+        holidays are the union of the holidays of the constituent calendars,
+        so a date is a business day only if it is a business day in every
+        one of them. This is needed for cross-market products, e.g. a swap
+        with a USD SOFR leg and a EUR fixed leg would use
+        Calendar([CalendarTypes.UNITED_STATES, CalendarTypes.TARGET])."""
+
+        if isinstance(cal_type, (list, tuple)):
+
+            cal_types = []
+            for ct in cal_type:
+                if not isinstance(ct, CalendarTypes):
+                    raise FinError("Invalid calendar type " + str(ct))
+                if ct not in cal_types:
+                    cal_types.append(ct)
+
+            if len(cal_types) == 0:
+                raise FinError("Calendar type list is empty")
+
+            if len(cal_types) == 1:
+                # A single-entry list is just that calendar
+                cal_type = cal_types[0]
+            else:
+                # Joint calendar: cal_type holds the constituent types as a
+                # tuple so it never compares equal to a CalendarTypes member
+                self.cal_type = tuple(cal_types)
+                self._joint_cals = [Calendar(ct) for ct in cal_types]
+                return
 
         if cal_type not in CalendarTypes:
             raise FinError("Invalid calendar type " + str(cal_type))
@@ -643,6 +672,13 @@ class Calendar:
         """Determines if a date is a Holiday according to the specified
         calendar. Weekends are not holidays unless the holiday falls on a
         weekend date."""
+
+        if isinstance(self.cal_type, tuple):
+            # Joint calendar: a holiday in any constituent calendar
+            for cal in self._joint_cals:
+                if cal.is_holiday(dt):
+                    return True
+            return False
 
         start_dt = Date(1, 1, dt.y)
         day_in_year = dt.excel_dt - start_dt.excel_dt + 1
@@ -1641,14 +1677,16 @@ class Calendar:
     ###########################################################################
 
     def __str__(self):
+        if isinstance(self.cal_type, tuple):
+            s = "JOINT(" + ",".join(ct.name for ct in self.cal_type) + ")"
+            return s
         s = self.cal_type.name
         return s
 
     ###########################################################################
 
     def __repr__(self):
-        s = self.cal_type.name
-        return s
+        return self.__str__()
 
 
 ########################################################################################
