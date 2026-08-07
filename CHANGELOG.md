@@ -2,7 +2,7 @@
 
 
 6 August 2026
-RELEASE OF FINANCEPY  V1.2
+RELEASE OF FINANCEPY  V1.1.0
 List of changes
 
 - This release renames a wide set of the Discount curves
