@@ -8,7 +8,6 @@ pandas==2.3.3
 matplotlib==3.10.6
 numba==0.62.1
 llvmlite==0.45.1
-financepy==0.360
 
 # Developer and interactive tools
 ipython == 8.25.0

@@ -16,16 +16,18 @@ license = "GPL-3.0-or-later"
 # Move keywords here
 keywords = ["FINANCE", "OPTIONS", "BONDS", "VALUATION", "DERIVATIVES"]
 
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-]
 
 description = "A Finance Securities Valuation Library"
 
 # Python compatibility must match NumPy / SciPy reality
 requires-python = ">=3.10,<3.14"
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
 
 # 1. This is where your package list belongs
 dependencies = [

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 
 import add_fp_to_path
 
+import inspect
+
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -462,6 +464,7 @@ def test_bloomberg_pricing_example():
 
     ois_curve = build_ois(value_dt)
     #    print(ois_curve)
+
 
     libor_dual_curve = IborDualCurve(
         value_dt,

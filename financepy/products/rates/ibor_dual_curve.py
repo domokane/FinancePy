@@ -16,9 +16,9 @@ from ...market.curves.interpolator import InterpTypes, Interpolator
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.day_count import DayCountTypes
 
-from .ibor_deposit import IborDeposit
-from .ibor_fra import IborFRA
-from .ibor_fixed_float_swap import IborFixedFloatSwap
+from ...products.ibor_deposit import IborDeposit
+from ...products.ibor_fra import IborFRA
+from ...products.ibor_swap import IborSwap
 
 SWAP_TOL = 1e-10
 
@@ -201,8 +201,8 @@ class IborDualCurve(DiscountCurve):
 
             for swap in ibor_swaps:
 
-                if isinstance(swap, IborFixedFloatSwap) is False:
-                    raise FinError("Swap is not of type IborFixedFloatSwap")
+                if isinstance(swap, IborSwap) is False:
+                    raise FinError("Swap is not of type IborSwap")
 
                 start_dt = swap.effective_dt
                 if start_dt < self.value_dt:

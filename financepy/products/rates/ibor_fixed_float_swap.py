@@ -17,6 +17,7 @@ from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import SwapTypes
+
 from ...market.curves.discount_curve import DiscountCurve
 
 from .swap_fixed_leg import SwapFixedLeg
@@ -64,6 +65,8 @@ class IborFixedFloatSwap:
         on which interest starts to accrue. The end of the contract is the
         termination date. This is not adjusted for business days. The adjusted
         termination date is called the maturity date. This is calculated."""
+
+        print("Warning: DO NOT USE. TRY IBORSWAP instead")
 
         check_argument_types(self.__init__, locals())
 

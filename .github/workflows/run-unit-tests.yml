@@ -6,7 +6,7 @@ permissions:
   contents: read
 
 env:
-  PYTHON_VERSION: '3.13.9'
+  PYTHON_VERSION: '3.12'
 
 jobs:
   build:
