@@ -377,6 +377,66 @@ def test_fin_schedule_alignment_leap_year_eom():
     assert compare == eom_flag
 
 
+###############################################################################
+
+def test_fin_schedule_joint_calendars():
+
+    freq_type = FrequencyTypes.QUARTERLY
+    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+    dg_type = DateGenRuleTypes.BACKWARD
+    cal_ny = CalendarTypes.NEW_YORK
+    cal_tgt = CalendarTypes.TARGET
+    cal_jnt = (cal_ny, cal_tgt)
+
+    adjust_termination_dt = True
+
+    eff_date = Date(4, 4, 2023)
+    mat_date = Date(4, 7, 2023)
+
+    eom_flag = True
+
+    sched_ny = Schedule(
+        eff_date,
+        mat_date,
+        freq_type,
+        cal_ny,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eom_flag,
+    )
+
+    sched_tgt = Schedule(
+        eff_date,
+        mat_date,
+        freq_type,
+        cal_tgt,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eom_flag,
+    )
+
+    sched_jnt = Schedule(
+        eff_date,
+        mat_date,
+        freq_type,
+        cal_jnt,
+        bd_type,
+        dg_type,
+        adjust_termination_dt,
+        eom_flag,
+    )
+
+    # TARGET is open on 4-Jul-2023
+    assert sched_tgt.adjusted_dts[-1] == Date(4, 7, 2023)
+    
+    # New York is closed for Independence Day
+    assert sched_ny.adjusted_dts[-1] == Date(5, 7, 2023)
+    
+    # Joint calendar must also be closed if either market is closed
+    assert sched_jnt.adjusted_dts[-1] == Date(5, 7, 2023)
+
 ########################################################################################
 
 
@@ -490,6 +550,8 @@ test_fin_schedule_alignment_leap_year_eom()
 test_fin_schedule_alignment_leap_year_not_eom()
 
 test_fin_schedule_alignment_eff31()
+
+test_fin_schedule_joint_calendars()
 
 test_cases.compare_test_cases()
 

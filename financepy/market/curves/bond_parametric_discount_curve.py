@@ -384,7 +384,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         plt.legend(loc="best")
         plt.grid(True)
-        plt.tight_layout()
+#        plt.tight_layout()
         plt.show()
 
     ####################################################################################
@@ -413,7 +413,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         )
 
         plt.grid(True)
-        plt.tight_layout()
+#        plt.tight_layout()
         return plt
 
     ####################################################################################

@@ -43,7 +43,7 @@ class IborBasisSwap:
         leg_2_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         leg_2_spread: float = 0.0,
         notional: float = ONE_MILLION,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):

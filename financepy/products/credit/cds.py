@@ -272,8 +272,7 @@ class CDS:
         long_protect: bool = True,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):
         """Create a CDS from the step-in date, maturity date and cpn"""

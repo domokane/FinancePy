@@ -29,8 +29,7 @@ class Schedule:
         # This is UNADJUSTED (set flag to adjust it)
         termination_dt: Date,
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         adjust_termination_dt: bool = True,  # Default is to adjust
         end_of_month: bool = False,  # All flow dates are EOM if True

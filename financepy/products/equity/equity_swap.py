@@ -50,7 +50,7 @@ class EquitySwap:
         rate_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         rate_spread: float = 0.0,
         rate_payment_lag: int = 0,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         end_of_month: bool = False,

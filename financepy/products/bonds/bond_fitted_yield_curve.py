@@ -217,7 +217,7 @@ class BondFittedYieldCurve:
 
         plt.xlim(np.min(times), np.max(times))
         plt.grid(True, alpha=0.3)
-        plt.tight_layout()
+#        plt.tight_layout()
 
         if filename is not None:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)

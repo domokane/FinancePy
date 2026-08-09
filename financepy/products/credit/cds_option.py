@@ -56,7 +56,7 @@ class CDSOption:
         knockout_flag: bool = True,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):

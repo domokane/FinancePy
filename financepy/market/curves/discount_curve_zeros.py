@@ -173,7 +173,7 @@ class DiscountCurveZeros(DiscountCurve):
             plt.ylim(ymin, ymax)
 
         plt.grid(True, alpha=0.3)
-        plt.tight_layout()
+#        plt.tight_layout()
 
         if filename is not None:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)

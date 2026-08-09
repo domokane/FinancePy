@@ -53,7 +53,7 @@ class IborFixedFloatSwap:
         float_spread: float = 0.0,
         float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):
