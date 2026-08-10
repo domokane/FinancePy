@@ -6,7 +6,7 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
-from financepy.models.cir_montecarlo import CIRNumericalScheme
+from financepy.utils.global_types import CIRNumericalSchemeTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -50,7 +50,7 @@ def test_fin_model_rates_cir():
             dt,
             num_paths,
             seed,
-            CIRNumericalScheme.EULER.value,
+            CIRNumericalSchemeTypes.EULER.value,
         )
         p_mc2 = zero_price_mc(
             r0,
@@ -61,7 +61,7 @@ def test_fin_model_rates_cir():
             dt,
             num_paths,
             seed,
-            CIRNumericalScheme.LOGNORMAL.value,
+            CIRNumericalSchemeTypes.LOGNORMAL.value,
         )
         p_mc3 = zero_price_mc(
             r0,
@@ -72,7 +72,7 @@ def test_fin_model_rates_cir():
             dt,
             num_paths,
             seed,
-            CIRNumericalScheme.MILSTEIN.value,
+            CIRNumericalSchemeTypes.MILSTEIN.value,
         )
         p_mc4 = zero_price_mc(
             r0,
@@ -83,7 +83,7 @@ def test_fin_model_rates_cir():
             dt,
             num_paths,
             seed,
-            CIRNumericalScheme.KAHLJACKEL.value,
+            CIRNumericalSchemeTypes.KAHLJACKEL.value,
         )
         p_mc5 = zero_price_mc(
             r0,
@@ -94,7 +94,7 @@ def test_fin_model_rates_cir():
             dt,
             num_paths,
             seed,
-            CIRNumericalScheme.EXACT.value,
+            CIRNumericalSchemeTypes.EXACT.value,
         )
         end = time.time()
         elapsed = end - start

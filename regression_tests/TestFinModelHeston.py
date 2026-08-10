@@ -5,8 +5,8 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.models.heston import Heston, HestonNumericalScheme
-from financepy.utils.global_types import OptionTypes
+from financepy.models.heston import Heston
+from financepy.utils.global_types import OptionTypes, HestonNumericalSchemeTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.utils.date import Date
 
@@ -169,7 +169,7 @@ def test_monte_carlo():
                     num_paths,
                     num_steps,
                     seed,
-                    HestonNumericalScheme.EULER,
+                    HestonNumericalSchemeTypes.EULER,
                 )
                 value_mc_euler_log = heston_model.value_mc(
                     value_dt,
@@ -180,7 +180,7 @@ def test_monte_carlo():
                     num_paths,
                     num_steps,
                     seed,
-                    HestonNumericalScheme.EULERLOG,
+                    HestonNumericalSchemeTypes.EULERLOG,
                 )
                 value_mc_quadexp = heston_model.value_mc(
                     value_dt,
@@ -191,7 +191,7 @@ def test_monte_carlo():
                     num_paths,
                     num_steps,
                     seed,
-                    HestonNumericalScheme.QUADEXP,
+                    HestonNumericalSchemeTypes.QUADEXP,
                 )
 
                 err_euler = value_mc_euler - value_weber

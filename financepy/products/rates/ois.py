@@ -24,12 +24,6 @@ from .swap_float_leg import SwapFloatLeg
 ########################################################################################
 
 
-class FinCompoundingTypes(Enum):
-    COMPOUNDED = 1
-    OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2
-    AVERAGED = 3
-    AVERAGED_DAILY = 4
-
 
 ########################################################################################
 

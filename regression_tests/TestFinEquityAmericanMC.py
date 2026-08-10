@@ -7,9 +7,8 @@ import add_fp_to_path
 from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
 from financepy.models.equity_crr_tree import crr_tree_val
 from financepy.models.black_scholes_analytic import value
-from financepy.products.equity.equity_american_option import (
-    EquityAmericanOption,
-)
+from financepy.products.equity.equity_american_option import EquityAmericanOption
+
 
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve

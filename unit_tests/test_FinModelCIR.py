@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.models.cir_montecarlo import CIRNumericalScheme
+from financepy.utils.global_types import CIRNumericalSchemeTypes
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
 
 r0 = 0.05
@@ -22,7 +22,7 @@ def test_model_cir():
 
     p = zero_price(r0, a, b, sigma, t)
     p_mc1 = zero_price_mc(
-        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.EULER.value
+        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalSchemeTypes.EULER.value
     )
     p_mc2 = zero_price_mc(
         r0,
@@ -33,7 +33,7 @@ def test_model_cir():
         dt,
         num_paths,
         seed,
-        CIRNumericalScheme.LOGNORMAL.value,
+        CIRNumericalSchemeTypes.LOGNORMAL.value,
     )
     p_mc3 = zero_price_mc(
         r0,
@@ -44,7 +44,7 @@ def test_model_cir():
         dt,
         num_paths,
         seed,
-        CIRNumericalScheme.MILSTEIN.value,
+        CIRNumericalSchemeTypes.MILSTEIN.value,
     )
     p_mc4 = zero_price_mc(
         r0,
@@ -55,10 +55,18 @@ def test_model_cir():
         dt,
         num_paths,
         seed,
-        CIRNumericalScheme.KAHLJACKEL.value,
+        CIRNumericalSchemeTypes.KAHLJACKEL.value,
     )
     p_mc5 = zero_price_mc(
-        r0, a, b, sigma, t, dt, num_paths, seed, CIRNumericalScheme.EXACT.value
+        r0, 
+        a, 
+        b, 
+        sigma, 
+        t, 
+        dt, 
+        num_paths, 
+        seed, 
+        CIRNumericalSchemeTypes.EXACT.value
     )
 
     assert round(p, 4) == 0.7935

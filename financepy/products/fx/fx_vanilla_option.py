@@ -13,11 +13,11 @@ from ...utils.math import normcdf_prime
 from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
+from ...utils.global_types import FXDeltaMethodTypes
 
 # from ...products.fx.FinFXModelTypes import FinFXModel
 # from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
 # from ...products.fx.FinFXModelTypes import FinFXModelSABR
-from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 
 from ...models.equity_crr_tree import crr_tree_val_avg
 from ...models.sabr import vol_function_sabr
@@ -88,16 +88,16 @@ def fast_delta(s, t, k, rd, rf, vol, delta_type_value, opt_type_value):
 
     pips_spot_delta = delta(s, t, k, rd, rf, vol, opt_type_value)
 
-    if delta_type_value == FinFXDeltaMethod.SPOT_DELTA.value:
+    if delta_type_value == FXDeltaMethodTypes.SPOT_DELTA.value:
         return pips_spot_delta
-    elif delta_type_value == FinFXDeltaMethod.FORWARD_DELTA.value:
+    elif delta_type_value == FXDeltaMethodTypes.FORWARD_DELTA.value:
         pips_fwd_delta = pips_spot_delta * np.exp(rf * t)
         return pips_fwd_delta
-    elif delta_type_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+    elif delta_type_value == FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ.value:
         vpctf = european_value(s, t, k, rd, rf, vol, opt_type_value) / s
         pct_spot_delta_prem_adj = pips_spot_delta - vpctf
         return pct_spot_delta_prem_adj
-    elif delta_type_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+    elif delta_type_value == FXDeltaMethodTypes.FORWARD_DELTA_PREM_ADJ.value:
         vpctf = european_value(s, t, k, rd, rf, vol, opt_type_value) / s
         pct_fwd_delta_prem_adj = np.exp(rf * t) * (pips_spot_delta - vpctf)
         return pct_fwd_delta_prem_adj

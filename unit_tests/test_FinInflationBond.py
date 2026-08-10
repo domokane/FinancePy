@@ -2,9 +2,9 @@
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.products.inflation.InflationIndexCurve import InflationIndexCurve
 from financepy.products.bonds import YTMCalcType
-from financepy.products.inflation.FinInflationBond import FinInflationBond
+from financepy.products.inflation.InflationBond import InflationBond
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -26,7 +26,7 @@ def test_fin_inflation_bond_bbg():
     base_cpi_value = 218.08532
     ex_dividend_days = 0
 
-    bond = FinInflationBond(
+    bond = InflationBond(
         issue_dt,
         maturity_dt,
         coupon,
@@ -121,7 +121,7 @@ def test_fin_inflation_bond_stack():
     base_cpi_value = 249.70
     ex_dividend_days = 0
 
-    bond = FinInflationBond(
+    bond = InflationBond(
         issue_dt,
         maturity_dt,
         coupon,

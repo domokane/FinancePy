@@ -1,19 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from enum import Enum
-
 import numpy as np
 from numba import njit, float64, int64
 
 from ..utils.helpers import label_to_string
-
-
-class CIRNumericalScheme(Enum):
-    EULER = 1
-    LOGNORMAL = 2
-    MILSTEIN = 3
-    KAHLJACKEL = 4
-    EXACT = 5
+from ..utils.global_types import CIRNumericalSchemeTypes
 
 
 class CIRMonteCarlo:
@@ -194,7 +185,7 @@ def rate_path_mc(
     if num_steps == 0:
         return rate_path
 
-    if scheme == CIRNumericalScheme.EULER.value:
+    if scheme == CIRNumericalSchemeTypes.EULER.value:
 
         sigmasqrt_dt = sigma * np.sqrt(dt_eff)
         r = r0
@@ -204,7 +195,7 @@ def rate_path_mc(
             r = r + a * (b - r) * dt_eff + z * sigmasqrt_dt * np.sqrt(max(r, 0.0))
             rate_path[i_step] = r
 
-    elif scheme == CIRNumericalScheme.LOGNORMAL.value:
+    elif scheme == CIRNumericalSchemeTypes.LOGNORMAL.value:
 
         x = np.exp(-a * dt_eff)
         y = 1.0 - x
@@ -223,7 +214,7 @@ def rate_path_mc(
 
             rate_path[i_step] = max(r, 0.0)
 
-    elif scheme == CIRNumericalScheme.MILSTEIN.value:
+    elif scheme == CIRNumericalSchemeTypes.MILSTEIN.value:
 
         sigmasqrt_dt = sigma * np.sqrt(dt_eff)
         sigma2dt = sigma * sigma * dt_eff / 4.0
@@ -235,7 +226,7 @@ def rate_path_mc(
             r = r + sigma2dt * (z * z - 1.0)
             rate_path[i_step] = r
 
-    elif scheme == CIRNumericalScheme.KAHLJACKEL.value:
+    elif scheme == CIRNumericalSchemeTypes.KAHLJACKEL.value:
 
         if sigma == 0.0:
             r = r0
@@ -256,7 +247,7 @@ def rate_path_mc(
                 r = r + (a * (bhat - r) + sigma * beta * rootr) * c * dt_eff
                 rate_path[i_step] = r
 
-    elif scheme == CIRNumericalScheme.EXACT.value:
+    elif scheme == CIRNumericalSchemeTypes.EXACT.value:
 
         r = r0
 
@@ -319,7 +310,7 @@ def zero_price_mc(
         r = r0
         rsum = r0
 
-        if scheme == CIRNumericalScheme.EULER.value:
+        if scheme == CIRNumericalSchemeTypes.EULER.value:
 
             sigmasqrt_dt = sigma * np.sqrt(dt_eff)
 
@@ -329,7 +320,7 @@ def zero_price_mc(
                 r = r + a * (b - r) * dt_eff + z * sigmasqrt_dt * np.sqrt(max(r, 0.0))
                 rsum += r + r_prev
 
-        elif scheme == CIRNumericalScheme.LOGNORMAL.value:
+        elif scheme == CIRNumericalSchemeTypes.LOGNORMAL.value:
 
             x = np.exp(-a * dt_eff)
             y = 1.0 - x
@@ -349,7 +340,7 @@ def zero_price_mc(
                 r = max(r, 0.0)
                 rsum += r + r_prev
 
-        elif scheme == CIRNumericalScheme.MILSTEIN.value:
+        elif scheme == CIRNumericalSchemeTypes.MILSTEIN.value:
 
             sigmasqrt_dt = sigma * np.sqrt(dt_eff)
             sigma2dt = sigma * sigma * dt_eff / 4.0
@@ -361,7 +352,7 @@ def zero_price_mc(
                 r = r + sigma2dt * (z * z - 1.0)
                 rsum += r + r_prev
 
-        elif scheme == CIRNumericalScheme.KAHLJACKEL.value:
+        elif scheme == CIRNumericalSchemeTypes.KAHLJACKEL.value:
 
             if sigma == 0.0:
                 for _ in range(1, num_steps + 1):
@@ -382,7 +373,7 @@ def zero_price_mc(
                     r = r + (a * (bhat - r) + sigma * beta * rootr) * c * dt_eff
                     rsum += r + r_prev
 
-        elif scheme == CIRNumericalScheme.EXACT.value:
+        elif scheme == CIRNumericalSchemeTypes.EXACT.value:
 
             for _ in range(1, num_steps + 1):
                 r_prev = r

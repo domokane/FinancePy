@@ -34,10 +34,11 @@ from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
+from ...utils.global_types import FXATMMethodTypes
+from ...utils.global_types import FXDeltaMethodTypes
+
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
-from ...products.fx.fx_mkt_conventions import FinFXATMMethod
-from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -45,7 +46,7 @@ from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
-from ...models.volatility_fns import VolFuncTypes
+from ...utils.global_types import VolFuncTypes
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_one
 from ...models.sabr import vol_function_sabr_beta_half
@@ -1196,7 +1197,7 @@ def solve_for_strike(
     # places. It should however agree to 6-7 decimal places. Which is Okk.
     # =========================================================================
 
-    if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
+    if delta_method_value == FXDeltaMethodTypes.SPOT_DELTA.value:
 
         dom_df = np.exp(-rd * t_del)
         for_df = np.exp(-rf * t_del)
@@ -1213,7 +1214,7 @@ def solve_for_strike(
         kk = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
         return kk
 
-    if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
+    if delta_method_value == FXDeltaMethodTypes.FORWARD_DELTA.value:
 
         dom_df = np.exp(-rd * t_del)
         for_df = np.exp(-rf * t_del)
@@ -1230,7 +1231,7 @@ def solve_for_strike(
         kk = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
         return kk
 
-    if delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+    if delta_method_value == FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ.value:
 
         argtuple = (
             spot_fx_rate,
@@ -1250,7 +1251,7 @@ def solve_for_strike(
 
         return kk
 
-    if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+    if delta_method_value == FXDeltaMethodTypes.FORWARD_DELTA_PREM_ADJ.value:
 
         argtuple = (
             spot_fx_rate,
@@ -1303,8 +1304,8 @@ class FXVolSurfacePlus:
         ms_10_delta_vols: Union[np.ndarray, List],
         rr_10_delta_vols: Union[np.ndarray, List],
         alpha: float,
-        atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
-        delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
+        atm_method: FXATMMethodTypes = FXATMMethodTypes.FWD_DELTA_NEUTRAL,
+        delta_method: FXDeltaMethodTypes = FXDeltaMethodTypes.SPOT_DELTA,
         vol_func_type: VolFuncTypes = VolFuncTypes.CLARK,
         fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD,
         tol: float = 1e-8,
@@ -1415,13 +1416,13 @@ class FXVolSurfacePlus:
         self.atm_method = atm_method
         self.delta_method = delta_method
 
-        if self.delta_method == FinFXDeltaMethod.SPOT_DELTA:
+        if self.delta_method == FXDeltaMethodTypes.SPOT_DELTA:
             self.delta_method_string = "pips_spot_delta"
-        elif self.delta_method == FinFXDeltaMethod.FORWARD_DELTA:
+        elif self.delta_method == FXDeltaMethodTypes.FORWARD_DELTA:
             self.delta_method_string = "pips_fwd_delta"
-        elif self.delta_method == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ:
+        elif self.delta_method == FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ:
             self.delta_method_string = "pct_spot_delta_prem_adj"
-        elif self.delta_method == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ:
+        elif self.delta_method == FXDeltaMethodTypes.FORWARD_DELTA_PREM_ADJ:
             self.delta_method_string = "pct_fwd_delta_prem_adj"
         else:
             raise FinError("Unknown Delta Type")
@@ -1649,7 +1650,7 @@ class FXVolSurfacePlus:
         self,
         call_delta: float,
         expiry_dt: Date,
-        delta_method: Optional[FinFXDeltaMethod] = None,
+        delta_method: Optional[FXDeltaMethodTypes] = None,
     ) -> Tuple[float, float]:
         """Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
@@ -1863,13 +1864,13 @@ class FXVolSurfacePlus:
             atm_vol = self.atm_vols[i]
 
             # This follows exposition in Clarke Page 52
-            if self.atm_method == FinFXATMMethod.SPOT:
+            if self.atm_method == FXATMMethodTypes.SPOT:
                 self.k_atm[i] = s
-            elif self.atm_method == FinFXATMMethod.FWD:
+            elif self.atm_method == FXATMMethodTypes.FWD:
                 self.k_atm[i] = f
-            elif self.atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL:
+            elif self.atm_method == FXATMMethodTypes.FWD_DELTA_NEUTRAL:
                 self.k_atm[i] = f * np.exp(atm_vol * atm_vol * t_exp / 2.0)
-            elif self.atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ:
+            elif self.atm_method == FXATMMethodTypes.FWD_DELTA_NEUTRAL_PREM_ADJ:
                 self.k_atm[i] = f * np.exp(-atm_vol * atm_vol * t_exp / 2.0)
             else:
                 raise FinError("Unknown Delta Type")

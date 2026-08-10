@@ -40,7 +40,7 @@ from ...models.option_implied_dbn import option_implied_dbn
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 
-from ...models.volatility_fns import VolFuncTypes
+from ...utils.global_types import VolFuncTypes
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import vol_function_svi

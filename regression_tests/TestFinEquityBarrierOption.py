@@ -5,7 +5,6 @@ import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.process_simulator import FinGBMNumericalScheme
 
 from financepy.products.equity.equity_barrier_option import BarrierTypes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption

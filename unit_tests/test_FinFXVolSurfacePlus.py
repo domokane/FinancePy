@@ -1,14 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
 
-from financepy.models.volatility_fns import VolFuncTypes
+from financepy.utils.global_types import VolFuncTypes
 from financepy.utils.date import Date
-from financepy.market.volatility.fx_vol_surface_plus import FinFXDeltaMethod
-from financepy.market.volatility.fx_vol_surface_plus import FinFXATMMethod
+from financepy.utils.global_types import FXDeltaMethodTypes
+from financepy.utils.global_types import FXATMMethodTypes
 from financepy.market.volatility.fx_vol_surface_plus import FXVolSurfacePlus
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
-import numpy as np
 
 verbose_calibration = False
 
@@ -42,8 +42,8 @@ def test_fin_fx_mkt_vol_surface1(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA
     vol_function_type = VolFuncTypes.CLARK5
     alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
@@ -108,8 +108,8 @@ def test_fin_fx_mkt_vol_surface2(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
-    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL_PREM_ADJ
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ
     vol_function_type = VolFuncTypes.CLARK5
 
     fx_market_plus = FXVolSurfacePlus(
@@ -170,8 +170,8 @@ def test_fin_fx_mkt_vol_surface3(capsys):
     # I HAVE NO YET MADE DELTA METHOD A VECTOR FOR EACH TERM AS I WOULD
     # NEED TO DO AS DESCRIBED IN CLARK PAGE 70
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.FORWARD_DELTA  # THIS IS DIFFERENT
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.FORWARD_DELTA  # THIS IS DIFFERENT
     vol_function_type = VolFuncTypes.CLARK5
     alpha = 0.5  # FIT WINGS AT 10D if ALPHA = 1.0
 
@@ -234,8 +234,8 @@ def test_fin_fx_mkt_vol_surface4(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA
     vol_function_type = VolFuncTypes.CLARK
     alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 
@@ -298,8 +298,8 @@ def test_fin_fx_mkt_vol_surface5(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA
     vol_function_type = VolFuncTypes.CLARK
     alpha = 0.50  # FIT WINGS AT 10D if ALPHA = 1.0
 

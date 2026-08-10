@@ -1,14 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_digital_option import FinDigitalOptionTypes
+from financepy.utils.global_types import DigitalOptionTypes
 from financepy.products.equity.equity_digital_option import EquityDigitalOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 
 
-underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
+underlying_type = DigitalOptionTypes.CASH_OR_NOTHING
 
 value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 1, 2016)

@@ -2,9 +2,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from enum import Enum
 
 from ...utils.error import FinError
+from ...utils.global_types import FXDeltaMethodTypes
 
 # Non exhaustive list of country codes and currency names
 
@@ -70,20 +70,6 @@ ccyQuotes = {
 ########################################################################################
 
 
-class FinFXATMMethod(Enum):
-    SPOT = 1  # Spot FX Rate
-    FWD = 2  # At the money forward
-    FWD_DELTA_NEUTRAL = 3  # K = F*exp(0.5*sigma*sigma*T)
-    FWD_DELTA_NEUTRAL_PREM_ADJ = 4  # K = F*exp(-0.5*sigma*sigma*T)
-
-
-class FinFXDeltaMethod(Enum):
-    SPOT_DELTA = 1
-    FORWARD_DELTA = 2
-    SPOT_DELTA_PREM_ADJ = 3
-    FORWARD_DELTA_PREM_ADJ = 4
-
-
 ########################################################################################
 
 
@@ -103,18 +89,18 @@ prem_currency = {
 }
 
 delta_convention = {
-    "EURUSD": FinFXDeltaMethod.SPOT_DELTA,
-    "USDJPY": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "EURJPY": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "USDCHF": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "EURCHF": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "GBPUSD": FinFXDeltaMethod.SPOT_DELTA,
-    "EURGBP": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "AUDUSD": FinFXDeltaMethod.SPOT_DELTA,
-    "AUDJPY": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "USDCAD": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "USDBRL": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
-    "USDMXN": FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ,
+    "EURUSD": FXDeltaMethodTypes.SPOT_DELTA,
+    "USDJPY": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "EURJPY": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "USDCHF": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "EURCHF": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "GBPUSD": FXDeltaMethodTypes.SPOT_DELTA,
+    "EURGBP": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "AUDUSD": FXDeltaMethodTypes.SPOT_DELTA,
+    "AUDJPY": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "USDCAD": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "USDBRL": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
+    "USDMXN": FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ,
 }
 
 ########################################################################################

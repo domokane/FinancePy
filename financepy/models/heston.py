@@ -4,7 +4,6 @@
 
 
 from typing import Any
-from enum import Enum
 from math import exp, log, pi
 
 from numba import njit, float64, int64
@@ -13,6 +12,7 @@ import numpy as np
 
 from ..utils.global_vars import G_DAYS_IN_YEAR
 from ..utils.global_types import OptionTypes
+from ..utils.global_types import HestonNumericalSchemeTypes
 from ..utils.math import norminvcdf
 from ..utils.error import FinError
 
@@ -31,10 +31,6 @@ from ..utils.error import FinError
 ########################################################################################
 
 
-class HestonNumericalScheme(Enum):
-    EULER = 1
-    EULERLOG = 2
-    QUADEXP = 3
 
 
 ########################################################################################
@@ -83,7 +79,7 @@ def get_paths(
     rhohat = np.sqrt(1.0 - rho * rho)
     sigma2 = sigma * sigma
 
-    if scheme == HestonNumericalScheme.EULER.value:
+    if scheme == HestonNumericalSchemeTypes.EULER.value:
         # Basic scheme to first order with truncation on variance
         for i_path in range(0, num_paths):
             s = s0
@@ -107,7 +103,7 @@ def get_paths(
                 )
                 s_paths[i_path, i_step] = s
 
-    elif scheme == HestonNumericalScheme.EULERLOG.value:
+    elif scheme == HestonNumericalSchemeTypes.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
         for i_path in range(0, num_paths):
             x = log(s0)
@@ -125,7 +121,7 @@ def get_paths(
                 )
                 s_paths[i_path, i_step] = exp(x)
 
-    elif scheme == HestonNumericalScheme.QUADEXP.value:
+    elif scheme == HestonNumericalSchemeTypes.QUADEXP.value:
         # Due to Leif Andersen(2006)
         qq = exp(-kappa * dt)
         psic = 1.50
@@ -183,7 +179,7 @@ def get_paths(
                 s_paths[i_path, i_step] = exp(x)
                 vn = vnp
     else:
-        raise FinError("Unknown FinHestonNumericalSchme")
+        raise FinError("Unknown HestonNumericalSchme")
 
     return s_paths
 
@@ -220,7 +216,7 @@ class Heston:
         num_paths: int,
         num_steps_per_year: int,
         seed: int,
-        scheme: HestonNumericalScheme = HestonNumericalScheme.EULERLOG,
+        scheme: HestonNumericalSchemeTypes = HestonNumericalSchemeTypes.EULERLOG,
     ) -> float:
 
         tau = (option.expiry_dt - value_dt) / G_DAYS_IN_YEAR

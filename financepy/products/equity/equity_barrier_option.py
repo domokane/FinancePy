@@ -6,20 +6,18 @@ from typing import Union
 
 import numpy as np
 
-from ...utils.frequency import FrequencyTypes
-
-from ...market.curves.discount_curve import DiscountCurve
-from ...products.equity.equity_option import EquityOption
-from ...models.equity_barrier_option_bs import value_equity_barrier_option_bs
-from ...models.equity_barrier_option_mc import value_equity_barrier_option_mc
-from ...models.process_simulator import FinGBMNumericalScheme
-from ...models.process_simulator import ProcessTypes
-
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import BarrierTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.frequency import FrequencyTypes
+from ...utils.global_types import GBMNumericalSchemeTypes
+from ...market.curves.discount_curve import DiscountCurve
+from ...products.equity.equity_option import EquityOption
+from ...models.equity_barrier_option_bs import value_equity_barrier_option_bs
+from ...models.equity_barrier_option_mc import value_equity_barrier_option_mc
+from ...models.process_simulator import ProcessTypes
 
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
@@ -168,7 +166,7 @@ class EquityBarrierOption(EquityOption):
         q = dividend_curve.zero_rate_t(t_exp, freq_cc)
         drift = r - q
 
-        scheme = FinGBMNumericalScheme.NORMAL_SCHEME
+        scheme = GBMNumericalSchemeTypes.NORMAL
 
         model_params = (stock_price, drift, model.volatility, scheme)
 

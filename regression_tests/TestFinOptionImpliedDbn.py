@@ -4,8 +4,8 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
-from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
+from financepy.utils.global_types import FXDeltaMethodTypes
+from financepy.utils.global_types import FXATMMethodTypes
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.models.volatility_fns import vol_function_clark
 from financepy.utils.date import Date
@@ -46,8 +46,8 @@ def test_fin_option_implied_dbn():
 
         notional_currency = for_name
 
-        atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-        delta_method = FinFXDeltaMethod.SPOT_DELTA
+        atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+        delta_method = FXDeltaMethodTypes.SPOT_DELTA
 
         fx_market = FXVolSurface(
             value_dt,

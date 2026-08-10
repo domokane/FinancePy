@@ -5,10 +5,9 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.volatility.swaption_vol_surface import SwaptionVolSurface
 from financepy.utils.date import Date
-from financepy.models.volatility_fns import VolFuncTypes
+from financepy.utils.global_types import VolFuncTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

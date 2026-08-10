@@ -3,7 +3,7 @@
 import add_fp_to_path
 
 from financepy.utils.date import Date
-from financepy.products.inflation.FinInflationIndexCurve import FinInflationIndexCurve
+from financepy.products.inflation.InflationIndexCurve import InflationIndexCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -19,7 +19,7 @@ def test_fin_inflation_index_curve():
     index_values = [209.49645, 214.823, 216.632]
     lag = 3  # months
 
-    curve = FinInflationIndexCurve(index_dates, index_values, lag)
+    curve = InflationIndexCurve(index_dates, index_values, lag)
 
     ref_date = Date(22, 7, 2008)
 

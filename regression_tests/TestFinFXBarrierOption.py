@@ -9,7 +9,7 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.products.fx.fx_barrier_option import FXBarrierTypes
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.process_simulator import FinGBMNumericalScheme
+from financepy.utils.global_types import GBMNumericalSchemeTypes
 from financepy.models.process_simulator import ProcessTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -33,7 +33,7 @@ def test_fin_fx_barrier_option():
     notional_currency = "USD"
 
     drift = dom_interest_rate - for_interest_rate
-    scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
+    scheme = GBMNumericalSchemeTypes.ANTITHETIC
     process_type = ProcessTypes.GBM_PROCESS
     domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
     foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)

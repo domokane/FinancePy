@@ -25,10 +25,10 @@ from ...utils.error import FinError
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
+from ...utils.global_types import LMMModelTypes
 from ...models.lmm_mc import lmm_simulate_fwds_1f
 from ...models.lmm_mc import lmm_simulate_fwds_mf
 from ...models.lmm_mc import lmm_simulate_fwds_nf
-from ...models.lmm_mc import ModelLMMModelTypes
 from ...models.lmm_mc import lmm_cap_flr_pricer
 
 from ...utils.global_vars import G_DAYS_IN_YEAR
@@ -230,7 +230,7 @@ class IborLMMProducts:
         discount_curve,
         vol_curve: IborCapVolCurve,
         corr_matrix: np.ndarray,
-        model_type: ModelLMMModelTypes,
+        model_type: LMMModelTypes,
         num_paths: int = 1000,
         numeraire_index: int = 0,
         use_sobol: bool = True,
@@ -245,7 +245,7 @@ class IborLMMProducts:
         if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if isinstance(model_type, ModelLMMModelTypes) is False:
+        if isinstance(model_type, LMMModelTypes) is False:
             raise FinError("Model type must be type FinRateModelLMMModelTypes")
 
         if discount_curve.curve_dt != self.start_dt:

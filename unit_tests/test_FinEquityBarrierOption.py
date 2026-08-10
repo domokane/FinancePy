@@ -5,7 +5,7 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_barrier_option import BarrierTypes
-from financepy.models.process_simulator import FinGBMNumericalScheme
+from financepy.utils.global_types import GBMNumericalSchemeTypes
 from financepy.models.process_simulator import ProcessTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 
@@ -21,7 +21,7 @@ opt_type = BarrierTypes.DOWN_AND_OUT_CALL
 notional = 1.0
 
 drift = interest_rate - dividend_yield
-scheme = FinGBMNumericalScheme.NORMAL_SCHEME
+scheme = GBMNumericalSchemeTypes.NORMAL
 process_type = ProcessTypes.GBM_PROCESS
 
 discount_curve = FlatDiscountCurve(value_dt, interest_rate)
@@ -42,9 +42,6 @@ def test_down_and_out_call():
     value = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
     assert round(value, 3) == 0.000
-
-    t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    model_params = (stock_price, drift, volatility, scheme)
 
     value_mc = option.value_mc(
         value_dt, stock_price, discount_curve, dividend_curve, model

@@ -2,12 +2,12 @@
 
 import add_fp_to_path
 
-from financepy.models.process_simulator import FinVasicekNumericalScheme
-from financepy.models.process_simulator import CIRNumericalScheme
-from financepy.models.process_simulator import FinHestonNumericalScheme
-from financepy.models.process_simulator import FinGBMNumericalScheme
-from financepy.models.process_simulator import ProcessTypes
-from financepy.models.process_simulator import FinProcessSimulator
+from financepy.utils.global_types import VasicekNumericalSchemeTypes
+from financepy.utils.global_types import CIRNumericalSchemeTypes
+from financepy.utils.global_types import HestonNumericalSchemeTypes
+from financepy.utils.global_types import GBMNumericalSchemeTypes
+from financepy.utils.global_types import ProcessTypes
+from financepy.models.process_simulator import ProcessSimulator
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -23,7 +23,7 @@ def test_fin_process_simulator():
     num_annual_steps = 100
     seed = 1919
     t = 1.0
-    model_sim = FinProcessSimulator()
+    model_sim = ProcessSimulator()
     print_paths = False
 
     test_cases.banner(
@@ -32,7 +32,7 @@ def test_fin_process_simulator():
     sigma = 0.10
     stock_price = 100.0
     drift = 0.04
-    scheme = FinGBMNumericalScheme.NORMAL_SCHEME
+    scheme = GBMNumericalSchemeTypes.NORMAL
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -51,7 +51,7 @@ def test_fin_process_simulator():
     sigma = 0.10
     stock_price = 100.0
     drift = 0.04
-    scheme = FinGBMNumericalScheme.ANTITHETIC_SCHEME
+    scheme = GBMNumericalSchemeTypes.ANTITHETIC
     model_params = (stock_price, drift, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -72,7 +72,7 @@ def test_fin_process_simulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.EULER_SCHEME
+    scheme = HestonNumericalSchemeTypes.EULER
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -93,7 +93,7 @@ def test_fin_process_simulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.EULERLOG_SCHEME
+    scheme = HestonNumericalSchemeTypes.EULERLOG
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -114,7 +114,7 @@ def test_fin_process_simulator():
     theta = 0.05
     sigma = 0.90
     rho = -0.9
-    scheme = FinHestonNumericalScheme.QUADEXP_SCHEME
+    scheme = HestonNumericalSchemeTypes.QUADEXP
     model_params = (stock_price, drift, v0, kappa, theta, sigma, rho, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -133,7 +133,7 @@ def test_fin_process_simulator():
     kappa = 0.50
     theta = 0.05
     sigma = 0.90
-    scheme = FinVasicekNumericalScheme.NORMAL
+    scheme = VasicekNumericalSchemeTypes.NORMAL
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -157,7 +157,7 @@ def test_fin_process_simulator():
     kappa = 0.50
     theta = 0.05
     sigma = 0.90
-    scheme = FinVasicekNumericalScheme.ANTITHETIC
+    scheme = VasicekNumericalSchemeTypes.ANTITHETIC
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(
@@ -181,7 +181,7 @@ def test_fin_process_simulator():
     kappa = 0.50
     theta = 0.05
     sigma = 0.90
-    scheme = CIRNumericalScheme.MILSTEIN_SCHEME
+    scheme = CIRNumericalSchemeTypes.MILSTEIN
     model_params = (r0, kappa, theta, sigma, scheme)
     start = time.time()
     paths = model_sim.get_process(

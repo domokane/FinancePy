@@ -1,9 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.models.volatility_fns import VolFuncTypes
+from financepy.utils.global_types import VolFuncTypes
 from financepy.utils.date import Date
-from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
-from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
+from financepy.utils.global_types import FXDeltaMethodTypes
+from financepy.utils.global_types import FXATMMethodTypes
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
@@ -39,8 +39,8 @@ def test_fin_fx_mkt_vol_surface1(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA
     vol_function_type = VolFuncTypes.CLARK
 
     fx_market = FXVolSurface(
@@ -92,8 +92,8 @@ def test_fin_fx_mkt_vol_surface2(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ
-    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL_PREM_ADJ
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ
 
     fx_market = FXVolSurface(
         value_dt,
@@ -143,8 +143,8 @@ def test_fin_fx_mkt_vol_surface3(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.SPOT_DELTA
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA
 
     fx_market = FXVolSurface(
         value_dt,
@@ -193,8 +193,8 @@ def test_fin_fx_mkt_vol_surface4(capsys):
 
     notional_currency = for_name
 
-    atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-    delta_method = FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ
+    atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+    delta_method = FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ
 
     fx_market = FXVolSurface(
         value_dt,

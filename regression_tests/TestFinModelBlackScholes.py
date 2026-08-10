@@ -8,13 +8,13 @@ from financepy.utils.day_count import DayCountTypes
 
 
 from financepy.utils.global_types import OptionTypes
+from financepy.utils.global_types import BlackScholesTypes
+
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.black_scholes import BlackScholesTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.products.equity.equity_american_option import (
-    EquityAmericanOption,
-)
+from financepy.products.equity.equity_american_option import EquityAmericanOption
+
 
 PLOT_GRAPHS = False
 

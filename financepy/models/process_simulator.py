@@ -1,7 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from math import sqrt, exp, log
-from enum import Enum
 
 from numba import njit, float64, int64
 import numba as nb
@@ -10,24 +9,17 @@ import numpy as np
 
 from ..utils.error import FinError
 from ..utils.math import norminvcdf
-
-########################################################################################
-
-
-class ProcessTypes(Enum):
-
-    GBM_PROCESS = 1
-    CIR_PROCESS = 2
-    HESTON_PROCESS = 3
-    VASICEK_PROCESS = 4
-    CEV_PROCESS = 5
-    JUMP_DIFFUSION_PROCESS = 6
+from ..utils.global_types import ProcessTypes
+from ..utils.global_types import GBMNumericalSchemeTypes
+from ..utils.global_types import VasicekNumericalSchemeTypes
+from ..utils.global_types import CIRNumericalSchemeTypes
+from ..utils.global_types import HestonNumericalSchemeTypes
 
 
 ########################################################################################
 
 
-class FinProcessSimulator:
+class ProcessSimulator:
 
     ####################################################################################
 
@@ -109,17 +101,7 @@ class FinProcessSimulator:
             raise FinError("Unknown process" + str(process_type))
 
 
-########################################################################################
-
-
-class FinHestonNumericalScheme(Enum):
-
-    EULER_SCHEME = 1
-    EULERLOG_SCHEME = 2
-    QUADEXP_SCHEME = 3
-
-
-########################################################################################
+###############################################################################
 
 
 @njit(
@@ -165,7 +147,7 @@ def get_heston_paths(
     rhohat = sqrt(1.0 - rho * rho)
     sigma2 = sigma * sigma
 
-    if scheme == FinHestonNumericalScheme.EULER_SCHEME.value:
+    if scheme == HestonNumericalSchemeTypes.EULER.value:
         # Basic scheme to first order with truncation on variance
         for i_path in nb.prange(num_paths):
             s = s0
@@ -189,7 +171,7 @@ def get_heston_paths(
                 )
                 s_paths[i_path, i_step] = s
 
-    elif scheme == FinHestonNumericalScheme.EULERLOG_SCHEME.value:
+    elif scheme == HestonNumericalSchemeTypes.EULERLOG.value:
         # Basic scheme to first order with truncation on variance
         for i_path in nb.prange(num_paths):
             x = log(s0)
@@ -207,7 +189,7 @@ def get_heston_paths(
                 )
                 s_paths[i_path, i_step] = exp(x)
 
-    elif scheme == FinHestonNumericalScheme.QUADEXP_SCHEME.value:
+    elif scheme == HestonNumericalSchemeTypes.QUADEXP.value:
         # Due to Leif Andersen(2006)
         q = exp(-kappa * dt)
         psic = 1.50
@@ -273,11 +255,6 @@ def get_heston_paths(
 ########################################################################################
 
 
-class FinGBMNumericalScheme(Enum):
-
-    NORMAL_SCHEME = 1
-    ANTITHETIC_SCHEME = 2
-
 
 ########################################################################################
 
@@ -295,7 +272,7 @@ def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme
     vsqrt_dt = sigma * sqrt(dt)
     m = exp((mu - sigma * sigma / 2.0) * dt)
 
-    if scheme == FinGBMNumericalScheme.NORMAL_SCHEME.value:
+    if scheme == GBMNumericalSchemeTypes.NORMAL.value:
 
         s_all = np.empty((num_paths, num_time_steps + 1))
         s_all[:, 0] = stock_price
@@ -305,7 +282,7 @@ def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme
                 w = np.exp(g1_d[ip] * vsqrt_dt)
                 s_all[ip, it] = s_all[ip, it - 1] * m * w
 
-    elif scheme == FinGBMNumericalScheme.ANTITHETIC_SCHEME.value:
+    elif scheme == GBMNumericalSchemeTypes.ANTITHETIC.value:
 
         s_all = np.empty((2 * num_paths, num_time_steps + 1))
         s_all[:, 0] = stock_price
@@ -318,7 +295,7 @@ def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme
 
     else:
 
-        raise FinError("Unknown FinGBMNumericalScheme")
+        raise FinError("Unknown GBMNumericalScheme")
 
     #  m = np.mean(s_all[:, -1])
     #  v = np.var(s_all[:, -1]/s_all[:, 0])
@@ -328,12 +305,6 @@ def get_gbm_paths(num_paths, num_annual_steps, t, mu, stock_price, sigma, scheme
 
 
 ########################################################################################
-
-
-class FinVasicekNumericalScheme(Enum):
-
-    NORMAL = 1
-    ANTITHETIC = 2
 
 
 ########################################################################################
@@ -355,7 +326,7 @@ def get_vasicek_paths(
     num_steps = int(t / dt)
     sigma_sqrt_dt = sigma * sqrt(dt)
 
-    if scheme == FinVasicekNumericalScheme.NORMAL.value:
+    if scheme == VasicekNumericalSchemeTypes.NORMAL.value:
         rate_path = np.empty((num_paths, num_steps + 1))
         rate_path[:, 0] = r0
         for i_path in nb.prange(num_paths):
@@ -364,7 +335,7 @@ def get_vasicek_paths(
             for i_step in range(1, num_steps + 1):
                 r += kappa * (theta - r) * dt + z[i_step - 1] * sigma_sqrt_dt
                 rate_path[i_path, i_step] = r
-    elif scheme == FinVasicekNumericalScheme.ANTITHETIC.value:
+    elif scheme == VasicekNumericalSchemeTypes.ANTITHETIC.value:
         rate_path = np.empty((2 * num_paths, num_steps + 1))
         rate_path[:, 0] = r0
         for i_path in nb.prange(num_paths):
@@ -381,14 +352,6 @@ def get_vasicek_paths(
 
 ########################################################################################
 
-
-class CIRNumericalScheme(Enum):
-
-    EULER_SCHEME = 1
-    LOGNORMAL_SCHEME = 2
-    MILSTEIN_SCHEME = 3
-    KAHLJACKEL_SCHEME = 4
-    EXACT_SCHEME = 5  # SAMPLES exact DISTRIBUTION
 
 
 ########################################################################################
@@ -411,7 +374,7 @@ def get_cir_paths(
     rate_path = np.empty(shape=(num_paths, num_steps + 1))
     rate_path[:, 0] = r0
 
-    if scheme == CIRNumericalScheme.EULER_SCHEME.value:
+    if scheme == CIRNumericalSchemeTypes.EULER.value:
         sigma_sqrt_dt = sigma * sqrt(dt)
         for i_path in nb.prange(num_paths):
             r = r0
@@ -426,7 +389,7 @@ def get_cir_paths(
                 )
                 rate_path[i_path, i_step] = r
 
-    elif scheme == CIRNumericalScheme.LOGNORMAL_SCHEME.value:
+    elif scheme == CIRNumericalSchemeTypes.LOGNORMAL.value:
         x = exp(-kappa * dt)
         y = 1.0 - x
         for i_path in nb.prange(num_paths):
@@ -439,7 +402,7 @@ def get_cir_paths(
                 r = mean * exp(-0.5 * sig * sig + sig * z[i_step - 1])
                 rate_path[i_path, i_step] = r
 
-    elif scheme == CIRNumericalScheme.MILSTEIN_SCHEME.value:
+    elif scheme == CIRNumericalSchemeTypes.MILSTEIN.value:
         sigma_sqrt_dt = sigma * sqrt(dt)
         sigma2dt = sigma * sigma * dt / 4.0
         for i_path in nb.prange(num_paths):
@@ -455,7 +418,7 @@ def get_cir_paths(
                 r = r + sigma2dt * (z[i_step - 1] ** 2 - 1.0)
                 rate_path[i_path, i_step] = r
 
-    elif scheme == CIRNumericalScheme.KAHLJACKEL_SCHEME.value:
+    elif scheme == CIRNumericalSchemeTypes.KAHLJACKEL.value:
         bhat = theta - sigma * sigma / 4.0 / kappa
         sqrt_dt = sqrt(dt)
         for i_path in nb.prange(num_paths):

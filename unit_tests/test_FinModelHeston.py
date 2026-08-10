@@ -4,8 +4,8 @@ import numpy as np
 
 from financepy.utils.date import Date
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.utils.global_types import OptionTypes
-from financepy.models.heston import Heston, HestonNumericalScheme
+from financepy.utils.global_types import OptionTypes, HestonNumericalSchemeTypes
+from financepy.models.heston import Heston
 
 
 # Reference see table 4.1 of Rouah book

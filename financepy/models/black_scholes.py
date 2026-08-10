@@ -1,10 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from typing import Union
-from enum import Enum
 import numpy as np
 
-from ..utils.global_types import OptionTypes
+from ..utils.global_types import OptionTypes, BlackScholesTypes
 from ..utils.error import FinError
 from ..utils.helpers import check_argument_types
 from .model import Model
@@ -21,23 +20,10 @@ from .black_scholes_analytic import (
     bjerksund_stensland_value,
 )
 
-
 from .finite_difference import black_scholes_fd
 from .finite_difference_psor import black_scholes_fd_psor
 
 ########################################################################################
-
-
-class BlackScholesTypes(Enum):
-
-    DEFAULT = 0
-    ANALYTICAL = 1
-    CRR_TREE = 2
-    BARONE_ADESI = 3
-    LSMC = 4
-    BJERKSUND_STENSLAND = 5
-    FINITE_DIFFERENCE = 6
-    PSOR = 7
 
 
 ########################################################################################

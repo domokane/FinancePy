@@ -3,8 +3,9 @@
 import numpy as np
 import pytest
 
+from financepy.utils.global_types import CIRNumericalSchemeTypes
+
 from financepy.models.cir_montecarlo import (
-    CIRNumericalScheme,
     CIRMonteCarlo,
     satisfies_feller,
     meanr,
@@ -109,11 +110,11 @@ def test_draw_is_non_negative():
 @pytest.mark.parametrize(
     "scheme",
     [
-        CIRNumericalScheme.EULER,
-        CIRNumericalScheme.LOGNORMAL,
-        CIRNumericalScheme.MILSTEIN,
-        CIRNumericalScheme.KAHLJACKEL,
-        CIRNumericalScheme.EXACT,
+        CIRNumericalSchemeTypes.EULER,
+        CIRNumericalSchemeTypes.LOGNORMAL,
+        CIRNumericalSchemeTypes.MILSTEIN,
+        CIRNumericalSchemeTypes.KAHLJACKEL,
+        CIRNumericalSchemeTypes.EXACT,
     ],
 )
 def test_rate_path_has_expected_length(scheme):
@@ -141,8 +142,8 @@ def test_rate_path_has_expected_length(scheme):
 @pytest.mark.parametrize(
     "scheme",
     [
-        CIRNumericalScheme.LOGNORMAL,
-        CIRNumericalScheme.EXACT,
+        CIRNumericalSchemeTypes.LOGNORMAL,
+        CIRNumericalSchemeTypes.EXACT,
     ],
 )
 def test_positive_schemes_produce_non_negative_paths(scheme):
@@ -164,11 +165,11 @@ def test_positive_schemes_produce_non_negative_paths(scheme):
 @pytest.mark.parametrize(
     "scheme",
     [
-        CIRNumericalScheme.EULER,
-        CIRNumericalScheme.LOGNORMAL,
-        CIRNumericalScheme.MILSTEIN,
-        CIRNumericalScheme.KAHLJACKEL,
-        CIRNumericalScheme.EXACT,
+        CIRNumericalSchemeTypes.EULER,
+        CIRNumericalSchemeTypes.LOGNORMAL,
+        CIRNumericalSchemeTypes.MILSTEIN,
+        CIRNumericalSchemeTypes.KAHLJACKEL,
+        CIRNumericalSchemeTypes.EXACT,
     ],
 )
 def test_rate_path_is_reproducible_with_same_seed(scheme):
@@ -201,11 +202,11 @@ def test_rate_path_is_reproducible_with_same_seed(scheme):
 @pytest.mark.parametrize(
     "scheme",
     [
-        CIRNumericalScheme.EULER,
-        CIRNumericalScheme.LOGNORMAL,
-        CIRNumericalScheme.MILSTEIN,
-        CIRNumericalScheme.KAHLJACKEL,
-        CIRNumericalScheme.EXACT,
+        CIRNumericalSchemeTypes.EULER,
+        CIRNumericalSchemeTypes.LOGNORMAL,
+        CIRNumericalSchemeTypes.MILSTEIN,
+        CIRNumericalSchemeTypes.KAHLJACKEL,
+        CIRNumericalSchemeTypes.EXACT,
     ],
 )
 def test_zero_price_mc_at_zero_time(scheme):
@@ -228,8 +229,8 @@ def test_zero_price_mc_at_zero_time(scheme):
 @pytest.mark.parametrize(
     "scheme",
     [
-        CIRNumericalScheme.LOGNORMAL,
-        CIRNumericalScheme.EXACT,
+        CIRNumericalSchemeTypes.LOGNORMAL,
+        CIRNumericalSchemeTypes.EXACT,
     ],
 )
 def test_zero_price_mc_reasonable_against_analytic(scheme):
@@ -265,7 +266,7 @@ def test_exact_scheme_terminal_mean_matches_analytic_mean():
             1.0,
             1.0 / 12.0,
             SEED + i,
-            CIRNumericalScheme.EXACT.value,
+            CIRNumericalSchemeTypes.EXACT.value,
         )
         terminal_rates[i] = path[-1]
 
@@ -288,7 +289,7 @@ def test_exact_scheme_terminal_variance_matches_analytic_variance():
             1.0,
             1.0 / 12.0,
             SEED + i,
-            CIRNumericalScheme.EXACT.value,
+            CIRNumericalSchemeTypes.EXACT.value,
         )
         terminal_rates[i] = path[-1]
 
@@ -321,7 +322,7 @@ def test_rate_path_rejects_bad_inputs(bad_args):
             t,
             dt,
             SEED,
-            CIRNumericalScheme.EXACT.value,
+            CIRNumericalSchemeTypes.EXACT.value,
         )
 
 
@@ -337,5 +338,5 @@ def test_zero_price_mc_rejects_non_positive_num_paths():
             DT,
             0,
             SEED,
-            CIRNumericalScheme.EXACT.value,
+            CIRNumericalSchemeTypes.EXACT.value,
         )

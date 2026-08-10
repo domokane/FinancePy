@@ -1,8 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 # Greeks added thanks to Guillaume Lefieux
 
-from enum import Enum
-
 import numpy as np
 from numba import njit, float64, types
 
@@ -10,14 +8,11 @@ from ..utils.math import normcdf_vect, normcdf_prime_vect
 from ..utils.global_vars import G_SMALL
 from ..utils.helpers import label_to_string
 from ..utils.global_types import OptionTypes
+from ..utils.global_types import BlackTypes
 from ..utils.error import FinError
 from ..utils.solver_1d import bisection, newton
 from ..models.equity_crr_tree import crr_tree_val_avg
 
-
-class BlackTypes(Enum):
-    ANALYTICAL = 1
-    CRR_TREE = 2
 
 
 class Black:

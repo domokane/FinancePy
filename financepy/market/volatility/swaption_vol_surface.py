@@ -18,7 +18,7 @@ from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.helpers import check_argument_types, label_to_string
 
-from ...models.volatility_fns import VolFuncTypes
+from ...utils.global_types import VolFuncTypes
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import vol_function_svi

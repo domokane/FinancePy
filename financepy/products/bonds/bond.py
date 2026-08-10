@@ -29,7 +29,8 @@ from scipy import optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import G_SMALL
+from ...utils.global_vars import G_SMALL, G_DAYS_IN_YEAR
+from ...utils.global_types import YTMCalcType
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.schedule import Schedule
 from ...utils.calendar import Calendar
@@ -60,14 +61,6 @@ class CouponType(Enum):
 
 ########################################################################################
 
-
-class YTMCalcType(Enum):
-    ZERO = 0
-    UK_DMO = 1
-    US_STREET = 2
-    US_TREASURY = 3
-    CFETS = 4  # China Foreign Exchange Trade System
-    CALCULUS = 5  # Using Calculus for duration
 
 
 ########################################################################################

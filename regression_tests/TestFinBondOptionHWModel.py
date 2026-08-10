@@ -18,7 +18,7 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.global_types import OptionTypes
-from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
+from financepy.models.hw_tree import HWTree, HWEuropeanCalcTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -171,7 +171,7 @@ def test_bond_option_european_convergence():
 
         bond_option2 = BondOption(bond, expiry_dt, strike_price, opt_type)
 
-        model2 = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
+        model2 = HWTree(sigma, a, num_time_steps, HWEuropeanCalcTypes.EXPIRY_ONLY)
         v2put = bond_option2.value(settle_dt, discount_curve, model2)
 
         opt_type = OptionTypes.EUROPEAN_CALL
@@ -183,7 +183,7 @@ def test_bond_option_european_convergence():
 
         bond_option2 = BondOption(bond, expiry_dt, strike_price, opt_type)
 
-        model2 = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
+        model2 = HWTree(sigma, a, num_time_steps, HWEuropeanCalcTypes.EXPIRY_TREE)
         v2call = bond_option2.value(settle_dt, discount_curve, model2)
 
         end = time.time()
@@ -233,7 +233,7 @@ def test_bond_option_american_convergence_one():
         opt_type = OptionTypes.EUROPEAN_PUT
         bond_option2 = BondOption(bond, expiry_dt, strike_price, opt_type)
 
-        model2 = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
+        model2 = HWTree(sigma, a, num_time_steps, HWEuropeanCalcTypes.EXPIRY_ONLY)
         v2put = bond_option2.value(settle_dt, discount_curve, model2)
 
         opt_type = OptionTypes.AMERICAN_CALL
@@ -245,7 +245,7 @@ def test_bond_option_american_convergence_one():
         opt_type = OptionTypes.EUROPEAN_CALL
         bond_option2 = BondOption(bond, expiry_dt, strike_price, opt_type)
 
-        model2 = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
+        model2 = HWTree(sigma, a, num_time_steps, HWEuropeanCalcTypes.EXPIRY_TREE)
         v2call = bond_option2.value(settle_dt, discount_curve, model2)
 
         end = time.time()

@@ -15,7 +15,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 def test_amount():
 
     test_cases.header("LABEL", "AMOUNT")
-    x = Amount(101000.232)
+    x = Amount(101000.232, CurrencyTypes.USD)
 
     test_cases.print("Amount", x)
 

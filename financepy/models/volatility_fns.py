@@ -1,7 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from enum import Enum
-
 import numpy as np
 from numba import njit, float64
 
@@ -9,20 +7,6 @@ from ..utils.math import normcdf
 from ..utils.error import FinError
 
 # Parametric functions for option volatility to use in a Black-Scholes model
-
-########################################################################################
-
-
-class VolFuncTypes(Enum):
-
-    CLARK = 0
-    SABR = 1
-    SABR_BETA_ONE = 2
-    SABR_BETA_HALF = 3
-    BBG = 4
-    CLARK5 = 5
-    SVI = 6
-    SSVI = 7
 
 
 ########################################################################################

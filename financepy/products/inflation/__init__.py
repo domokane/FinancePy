@@ -1,1 +1,1 @@
-from .FinInflationBond import *
+from .InflationBond import *

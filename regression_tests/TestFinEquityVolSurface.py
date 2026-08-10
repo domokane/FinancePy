@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import add_fp_to_path
 
-from financepy.models.volatility_fns import VolFuncTypes
+from financepy.utils.global_types import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_surface import EquityVolSurface
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve

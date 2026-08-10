@@ -2,7 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from enum import Enum
 from math import exp, sqrt
 import numpy as np
 import numba as nb
@@ -10,25 +9,13 @@ import numba as nb
 from ...utils.error import FinError
 from ...utils.math import normcdf
 from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.global_types import FXBarrierTypes
 from ...products.fx.fx_option import FXOption
-from ...models.process_simulator import FinProcessSimulator
+from ...models.process_simulator import ProcessSimulator
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...models.fx_barrier_model import fx_barrier_value
 from ...market.curves.discount_curve import DiscountCurve
-
-########################################################################################
-
-
-class FXBarrierTypes(Enum):
-    DOWN_AND_OUT_CALL = 1
-    DOWN_AND_IN_CALL = 2
-    UP_AND_OUT_CALL = 3
-    UP_AND_IN_CALL = 4
-    UP_AND_OUT_PUT = 5
-    UP_AND_IN_PUT = 6
-    DOWN_AND_OUT_PUT = 7
-    DOWN_AND_IN_PUT = 8
 
 
 ########################################################################################
@@ -356,7 +343,7 @@ class FXBarrierOption(FXOption):
         b = self.barrier_level
         s0 = spot_fx_rate
         barrier_type = self.barrier_type
-        process = FinProcessSimulator()
+        process = ProcessSimulator()
 
         r_d = dom_interest_rate
 

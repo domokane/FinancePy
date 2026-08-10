@@ -7,7 +7,7 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.global_types import FinLongShort
+from ...utils.global_types import LongShortTypes
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 
@@ -24,7 +24,7 @@ class EquityForward:
         expiry_dt: Date,
         forward_price: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
         notional: float,
-        long_short: FinLongShort = FinLongShort.LONG,
+        long_short: LongShortTypes = LongShortTypes.LONG,
     ):
         """Creates a EquityForward which allows the owner to buy the stock
         at a price agreed today. Need to specify if LONG or SHORT."""
@@ -86,7 +86,7 @@ class EquityForward:
         v = fwd_stock_price - self.forward_price
         v = v * self.notional * discount_df
 
-        if self.long_short == FinLongShort.SHORT:
+        if self.long_short == LongShortTypes.SHORT:
             v = v * (-1.0)
 
         return v

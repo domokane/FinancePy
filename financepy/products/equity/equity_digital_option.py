@@ -11,19 +11,13 @@ import numpy as np
 from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
+from ...utils.global_types import DigitalOptionTypes
 from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
-
+from ...models.bs_digital_option import bs_digital_option_value
 from ...utils.math import normcdf_vect
-
-########################################################################################
-
-
-class FinDigitalOptionTypes(Enum):
-    CASH_OR_NOTHING = 1
-    ASSET_OR_NOTHING = 2
 
 
 ########################################################################################
@@ -42,7 +36,7 @@ class EquityDigitalOption(EquityOption):
         expiry_dt: Date,
         barrier: float,
         call_put_type: OptionTypes,
-        digital_type: FinDigitalOptionTypes,
+        digital_type: DigitalOptionTypes,
     ):
         """Create the digital option by specifying the expiry date, the
         barrier price and the type of option which is either a EUROPEAN_CALL
@@ -95,6 +89,52 @@ class EquityDigitalOption(EquityOption):
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         t = max(t, 1e-6)
 
+        df = discount_curve.df(self.expiry_dt)
+        r = -np.log(df) / t
+
+        dq = dividend_curve.df(self.expiry_dt)
+        q = -np.log(dq) / t
+
+        v = bs_digital_option_value(stock_price, t, self.barrier, r, q,
+                                    model.volatility,
+                                    self.call_put_type.value,
+                                    self.digital_type.value)
+
+        return v
+
+    ###########################################################################
+
+    def value_old(
+        self,
+        value_dt: Date,
+        stock_price: Union[float, np.ndarray],
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,
+    ):
+        """Digital Option valuation using the Black-Scholes model assuming a
+        barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
+        options."""
+
+        if not isinstance(value_dt, Date):
+            raise FinError("Valuation date is not a Date")
+
+        if value_dt > self.expiry_dt:
+            raise FinError("Valuation date after expiry date.")
+
+        if discount_curve.value_dt != value_dt:
+            raise FinError(
+                "Discount Curve valuation date not same as option value date"
+            )
+
+        if dividend_curve.value_dt != value_dt:
+            raise FinError(
+                "Dividend Curve valuation date not same as option value date"
+            )
+
+        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t = max(t, 1e-6)
+
         s0 = stock_price
         x = self.barrier
         ln_s0_k = np.log(s0 / x)
@@ -116,14 +156,14 @@ class EquityDigitalOption(EquityOption):
         d2 = d1 - volatility * sqrt_t
         v = None
 
-        if self.digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
+        if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
 
             if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 v = np.exp(-r * t) * normcdf_vect(d2)
             elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
                 v = np.exp(-r * t) * normcdf_vect(-d2)
 
-        elif self.digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
+        elif self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
 
             if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 v = s0 * np.exp(-q * t) * normcdf_vect(d1)
@@ -134,7 +174,6 @@ class EquityDigitalOption(EquityOption):
             raise FinError("Unknown underlying type.")
 
         return v
-
     ###########################################################################
 
     def value_mc(
@@ -176,14 +215,14 @@ class EquityDigitalOption(EquityOption):
         payoff_a_1 = None
         payoff_a_2 = None
 
-        if self.digital_type == FinDigitalOptionTypes.CASH_OR_NOTHING:
+        if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
             if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 payoff_a_1 = np.heaviside(s_1 - k, 0.0)
                 payoff_a_2 = np.heaviside(s_2 - k, 0.0)
             elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
                 payoff_a_1 = np.heaviside(k - s_1, 0.0)
                 payoff_a_2 = np.heaviside(k - s_2, 0.0)
-        elif self.digital_type == FinDigitalOptionTypes.ASSET_OR_NOTHING:
+        elif self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
             if self.call_put_type == OptionTypes.EUROPEAN_CALL:
                 payoff_a_1 = s_1 * np.heaviside(s_1 - k, 0.0)
                 payoff_a_2 = s_2 * np.heaviside(s_2 - k, 0.0)
