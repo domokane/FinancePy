@@ -1,3 +1,6 @@
+# CHANGES
+Some major changes are being made to the library at the moment and I apologise for any inconvenience this may cause. Please examine the CHANGELOG file to see what these are and how to amend your code. It is expected that these are one-off improvements after which the library API will become stable again. 
+
 # FinancePy
 A one-stop library for pricing and risk-managing options, futures and other financial instruments. See below for a comprehensive overview.
 
