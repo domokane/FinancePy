@@ -1,5 +1,8 @@
 ## CHANGE LOG
 
+9 August 2026
+- Joint calendars are now possible by passing a list of unique calendar types to calendar
+- Cross currency and other multi-leg swaps now accept joint calendars
 
 6 August 2026
 RELEASE OF FINANCEPY  V1.1.0
