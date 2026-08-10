@@ -2,7 +2,7 @@
 
 10 August 2026
 - To facilitate separation of models and products, all enum types have been moved into utils/global_types.py
-- Any enums starting with Fin have had Fin removed\
+- Any enums starting with Fin have had Fin removed
 - All enums end with Types
 - This may break some of your code. To fix it point all type imports to global_types.py
 
