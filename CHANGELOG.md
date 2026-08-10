@@ -1,8 +1,15 @@
 ## CHANGE LOG
 
+10 August 2026
+- To facilitate separation of models and products, all enum types have been moved into utils/global_types.py
+- Any enums starting with Fin have had Fin removed\
+- All enums end with Types
+- This may break some of your code. To fix it point all type imports to global_types.py
+
 9 August 2026
 - Joint calendars are now possible by passing a list of unique calendar types to calendar
 - Cross currency and other multi-leg swaps now accept joint calendars
+- There should be no noticeable impact
 
 6 August 2026
 RELEASE OF FINANCEPY  V1.1.0
