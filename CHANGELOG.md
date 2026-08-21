@@ -13,6 +13,7 @@ List of changes
 - option_implied_dbn - improved
 - EquityForwardStart - new product type
 - math.py - vectorisation of M function for bivariates
+- Fast solver in IborSingleCurve
 
 10 August 2026
 List of changes

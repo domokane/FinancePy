@@ -68,9 +68,7 @@ def test_par_rate_risk_report_cubic_zero():
     par_rate_bump = 1 * G_BASIS_POINT
 
     # run the report
-    base_values, risk_report = re.par_rate_risk_report(
-        base_curve, trades, bump_size=par_rate_bump
-    )
+    base_values, risk_report = re.par_rate_risk_report(base_curve, trades, bump_size=par_rate_bump)
 
     expected_totals = [
         0.00122854,
@@ -140,9 +138,7 @@ def test_par_rate_risk_report_flat_forward():
     par_rate_bump = 1 * G_BASIS_POINT
 
     # run the report
-    base_values, risk_report = re.par_rate_risk_report(
-        base_curve, trades, bump_size=par_rate_bump
-    )
+    base_values, risk_report = re.par_rate_risk_report(base_curve, trades, bump_size=par_rate_bump)
 
     expected_totals = [
         -0.08629015,
@@ -499,9 +495,7 @@ def test_parallel_shift_ladder_report():
     )
 
     # the curve shift grids on which we calculate the PV ladder
-    curve_shifts = np.linspace(
-        -400 * G_BASIS_POINT, 400 * G_BASIS_POINT, 17, endpoint=True
-    )
+    curve_shifts = np.linspace(-400 * G_BASIS_POINT, 400 * G_BASIS_POINT, 17, endpoint=True)
 
     # run the report
     base_values, risk_report = re.parallel_shift_ladder_report(
@@ -701,9 +695,7 @@ def _generate_base_curve(
     )
     swaps.append(swap)
 
-    base_curve = IborSingleCurve(
-        valuation_date, depos, fras, swaps, interp_type, check_refit_flag=True
-    )
+    base_curve = IborSingleCurve(valuation_date, depos, fras, swaps, interp_type, check_refit_flag=True)
 
     return settle_dt, base_curve
 

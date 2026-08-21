@@ -97,85 +97,84 @@ def european_value(
 #########################################################################################
 
 
-@vectorize(
-    [float64(float64, float64, float64, float64, float64, float64)],
-    fastmath=True,
-    cache=True,
-)
-def d1(
-    s: float,
-    t: float,
-    k: float,
-    r: float,
-    q: float,
-    v: float,
-) -> float:
-    """Return d1 and d2
-    - spot_price: float - the current price of the underlying asset
-    - time_to_expiry: float - time to option expiry in years
-    - strike_price: float - the option's strike price
-    - risk_free_rate: float - risk-free interest rate
-    - dividend_rate: float - dividend yield of the underlying asset
-    - volatility: Union[float, np.ndarray] - volatility of the underlying
-                                             asset (annualized)
+# @vectorize(
+#     [float64(float64, float64, float64, float64, float64, float64)],
+#     fastmath=True,
+#     cache=True,
+# )
+# def d1(
+#     s: float,
+#     t: float,
+#     k: float,
+#     r: float,
+#     q: float,
+#     v: float,
+# ) -> float:
+#     """Return d1 and d2
+#     - spot_price: float - the current price of the underlying asset
+#     - time_to_expiry: float - time to option expiry in years
+#     - strike_price: float - the option's strike price
+#     - risk_free_rate: float - risk-free interest rate
+#     - dividend_rate: float - dividend yield of the underlying asset
+#     - volatility: Union[float, np.ndarray] - volatility of the underlying
+#                                              asset (annualized)
 
-    Returns:
-    - float - the calculated d1
-    """
+#     Returns:
+#     - float - the calculated d1
+#     """
 
-    k = np.maximum(k, G_SMALL)
-    t = np.maximum(t, G_SMALL)
-    v = np.maximum(v, G_SMALL)
-    s = np.maximum(s, G_SMALL)
+#     k = np.maximum(k, G_SMALL)
+#     t = np.maximum(t, G_SMALL)
+#     v = np.maximum(v, G_SMALL)
+#     s = np.maximum(s, G_SMALL)
 
-    v_sqrt_t = v * np.sqrt(t)
-    ss = s * np.exp(-q * t)
-    kk = k * np.exp(-r * t)
-    d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
-
-    return d1
-
-
-#########################################################################################
+#     v_sqrt_t = v * np.sqrt(t)
+#     ss = s * np.exp(-q * t)
+#     kk = k * np.exp(-r * t)
+#     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
+#     return d1
 
 
-@vectorize(
-    [float64(float64, float64, float64, float64, float64, float64)],
-    fastmath=True,
-    cache=True,
-)
-def d2(
-    s: float,
-    t: float,
-    k: float,
-    r: float,
-    q: float,
-    v: float,
-) -> float:
-    """Return d1 and d2
-    - spot_price: float - the current price of the underlying asset
-    - time_to_expiry: float - time to option expiry in years
-    - strike_price: float - the option's strike price
-    - risk_free_rate: float - risk-free interest rate
-    - dividend_rate: float - dividend yield of the underlying asset
-    - volatility: Union[float, np.ndarray] - volatility of the underlying
-                                             asset (annualized)
-    Returns:
-    - float - the calculated d2
-    """
+# #########################################################################################
 
-    k = np.maximum(k, G_SMALL)
-    t = np.maximum(t, G_SMALL)
-    v = np.maximum(v, G_SMALL)
-    s = np.maximum(s, G_SMALL)
 
-    v_sqrt_t = v * np.sqrt(t)
-    ss = s * np.exp(-q * t)
-    kk = k * np.exp(-r * t)
-    d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
-    d2 = d1 - v_sqrt_t
+# @vectorize(
+#     [float64(float64, float64, float64, float64, float64, float64)],
+#     fastmath=True,
+#     cache=True,
+# )
+# def d2(
+#     s: float,
+#     t: float,
+#     k: float,
+#     r: float,
+#     q: float,
+#     v: float,
+# ) -> float:
+#     """Return d1 and d2
+#     - spot_price: float - the current price of the underlying asset
+#     - time_to_expiry: float - time to option expiry in years
+#     - strike_price: float - the option's strike price
+#     - risk_free_rate: float - risk-free interest rate
+#     - dividend_rate: float - dividend yield of the underlying asset
+#     - volatility: Union[float, np.ndarray] - volatility of the underlying
+#                                              asset (annualized)
+#     Returns:
+#     - float - the calculated d2
+#     """
 
-    return d2
+#     k = np.maximum(k, G_SMALL)
+#     t = np.maximum(t, G_SMALL)
+#     v = np.maximum(v, G_SMALL)
+#     s = np.maximum(s, G_SMALL)
+
+#     v_sqrt_t = v * np.sqrt(t)
+#     ss = s * np.exp(-q * t)
+#     kk = k * np.exp(-r * t)
+#     d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
+#     d2 = d1 - v_sqrt_t
+
+#     return d2
 
 
 ########################################################################################

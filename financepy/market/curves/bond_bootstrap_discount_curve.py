@@ -24,6 +24,9 @@ FAST = True
 
 
 def _f_slow(df, *args):
+    """Root search objective function for IRS"""
+    if not np.isfinite(df) or df <= 0.0:
+        return 1.0e10
 
     curve = args[0]
     value_dt = args[1]
@@ -38,7 +41,9 @@ def _f_slow(df, *args):
 
     return obj_fn
 
+
 ########################################################################################
+
 
 def _f_fast(df, *args):
 
@@ -285,9 +290,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
             idx = 0
 
             for i in range(0, n_bonds):
-                p_fit = self.used_bonds[i].clean_price_from_discount_curve(
-                    value_dt, bond_curve
-                )
+                p_fit = self.used_bonds[i].clean_price_from_discount_curve(value_dt, bond_curve)
                 p_mkt = self.clean_prices[i]
                 out[idx] = p_fit - p_mkt
                 idx = idx + 1
