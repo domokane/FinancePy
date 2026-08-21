@@ -1,5 +1,5 @@
 ## CHANGE LOG
-21 August 2026
+21 August 2026 - RELEASE OF FINANCEPY V1.1.2
 List of changes
 - EquityChooserOption - enforced term structure for q and r
 - EquityChooserOption - handled t = t_c
