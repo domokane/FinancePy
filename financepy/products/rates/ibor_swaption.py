@@ -219,9 +219,9 @@ class IborSwaption:
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaption_px[0]
-            elif self.fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = swaption_px[1]
+            elif self.fixed_leg_type == SwapTypes.RECEIVE:
+                swaption_price = swaption_px[0]
             else:
                 raise FinError("Unknown swaption option type" + str(self.swap_type))
 

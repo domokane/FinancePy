@@ -1076,8 +1076,8 @@ class HWTree:
 
         # payer swaption   -> put on coupon bond
         # receiver swaption -> call on coupon bond
-        # payer, receiver
-        return (put_value, call_value)
+        # receiver, payer
+        return (call_value, put_value)
 
     ####################################################################################
 
