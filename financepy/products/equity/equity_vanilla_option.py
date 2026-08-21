@@ -27,11 +27,11 @@ from ...models.black_scholes_analytic import theta
 from ...models.black_scholes_analytic import implied_volatility
 from ...models.black_scholes_analytic import intrinsic
 
-from ...models.black_scholes_mc import _value_mc_nonumba_nonumpy
-from ...models.black_scholes_mc import _value_mc_numpy_numba
-from ...models.black_scholes_mc import _value_mc_numba_only
-from ...models.black_scholes_mc import _value_mc_numpy_only
-from ...models.black_scholes_mc import _value_mc_numba_parallel
+from ...models.black_scholes_mc import value_mc_nonumba_nonumpy
+from ...models.black_scholes_mc import value_mc_numpy_numba
+from ...models.black_scholes_mc import value_mc_numba_only
+from ...models.black_scholes_mc import value_mc_numpy_only
+from ...models.black_scholes_mc import value_mc_numba_parallel
 
 ########################################################################################
 
@@ -168,14 +168,10 @@ class EquityVanillaOption:
             raise FinError("Valuation date after expiry date.")
 
         if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
+            raise FinError("Discount Curve valuation date not same as option value date")
 
         if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve valuation date not same as option value date"
-            )
+            raise FinError("Dividend Curve valuation date not same as option value date")
 
         if isinstance(self.expiry_dt, Date):
             t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
@@ -512,9 +508,7 @@ class EquityVanillaOption:
         k = self.strike_price
         s0 = stock_price
 
-        sigma = implied_volatility(
-            s0, t_exp, k, r, q, price, self.opt_type_value
-        )
+        sigma = implied_volatility(s0, t_exp, k, r, q, price, self.opt_type_value)
 
         return sigma
 
@@ -542,7 +536,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = _value_mc_numpy_only(
+        v = value_mc_numpy_only(
             stock_price,
             t_exp,
             self.strike_price,
@@ -581,7 +575,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = _value_mc_numba_only(
+        v = value_mc_numba_only(
             stock_price,
             t_exp,
             self.strike_price,
@@ -620,7 +614,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = _value_mc_numba_parallel(
+        v = value_mc_numba_parallel(
             stock_price,
             t_exp,
             self.strike_price,
@@ -661,7 +655,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = _value_mc_numpy_numba(
+        v = value_mc_numpy_numba(
             stock_price,
             t_exp,
             self.strike_price,
@@ -700,7 +694,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = _value_mc_nonumba_nonumpy(
+        v = value_mc_nonumba_nonumpy(
             stock_price,
             t_exp,
             self.strike_price,
@@ -741,7 +735,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = _value_mc_numba_only(
+        v = value_mc_numba_only(
             stock_price,
             t_exp,
             self.strike_price,

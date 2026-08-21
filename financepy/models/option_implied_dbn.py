@@ -4,24 +4,14 @@
 
 import numpy as np
 
-# from numba import njit, float64
-
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 
 from .black_scholes_analytic import european_value
-
-# Analytical Black Scholes model implementation and approximations
-
-
-# @njit(float64[:](float64, float64, float64, float64, float64[:],
-#                 float64[:]), cache=True, fastmath=True)
-
-########################################################################################
-
-
-import numpy as np
 from typing import Sequence
+
+###############################################################################
+
 
 def option_implied_dbn(
     s: float,
@@ -29,42 +19,120 @@ def option_implied_dbn(
     r: float,
     q: float,
     strikes: Sequence[float],
-    sigmas: Sequence[float]
+    sigmas: Sequence[float],
 ) -> np.ndarray:
-    """This function calculates the option smile/skew-implied probability
-    density function times the interval width."""
+    """Calculate the option smile/skew-implied risk-neutral distribution.
+
+    Uses the Breeden-Litzenberger result
+
+        f(K) = exp(rT) * d²C/dK²
+
+    and returns
+
+        f(K) * dK
+
+    at each strike, rather than the raw probability density f(K).
+
+    Parameters
+    ----------
+    s : float
+        Current underlying spot price.
+    t : float
+        Time to expiry in years.
+    r : float
+        Continuously compounded risk-free rate.
+    q : float
+        Continuously compounded dividend yield.
+    strikes : Sequence[float]
+        Increasing, equally spaced strike grid.
+    sigmas : Sequence[float]
+        Black-Scholes implied volatility corresponding to each strike.
+
+    Returns
+    -------
+    np.ndarray
+        Probability mass f(K) * dK associated with each strike-grid point.
+        The first and last values are zero because a central finite
+        difference cannot be calculated there.
+    """
+
+    strikes = np.asarray(strikes, dtype=float)
+    sigmas = np.asarray(sigmas, dtype=float)
+
+    if strikes.ndim != 1 or sigmas.ndim != 1:
+        raise FinError("Strikes and sigmas must be one-dimensional.")
 
     if len(strikes) != len(sigmas):
-        raise FinError("Strike and Sigma vector do not have same length.")
+        raise FinError("Strike and Sigma vectors do not have same length.")
 
     num_steps = len(strikes)
 
-    sigma = sigmas[0]
-    strike = strikes[0]
+    if num_steps < 3:
+        raise FinError("At least three strikes are required.")
 
-    sigma = sigmas[1]
-    strike = strikes[1]
+    if s <= 0.0:
+        raise FinError("Spot price must be positive.")
 
-    inflator = np.exp((r - 0) * t)
-    dk = strikes[1] - strikes[0]
-    values = np.zeros(num_steps)
+    if t <= 0.0:
+        raise FinError("Time to expiry must be positive.")
 
-    for ik in range(0, num_steps):
-        strike = strikes[ik]
-        sigma = sigmas[ik]
-        v = european_value(s, t, strike, r, q, sigma, OptionTypes.EUROPEAN_CALL.value)
+    if np.any(strikes <= 0.0):
+        raise FinError("Strikes must be positive.")
 
-        values[ik] = v
+    if np.any(sigmas <= 0.0):
+        raise FinError("Volatilities must be positive.")
 
-    # Calculate the density rho(K) dk
-    densitydk = np.zeros(num_steps)
+    strike_diffs = np.diff(strikes)
 
-    for ik in range(1, num_steps - 1):
-        d2_vdk2 = (values[ik + 1] - 2.0 * values[ik] + values[ik - 1]) / dk
+    if np.any(strike_diffs <= 0.0):
+        raise FinError("Strikes must be strictly increasing.")
 
-        #       print("%d %12.8f %12.8f %12.8f" %
-        #             (ik, strikes[ik], values[ik], d2_vdk2))
+    # This finite-difference implementation assumes an equally spaced grid.
+    dk = strike_diffs[0]
 
-        densitydk[ik] = d2_vdk2 * inflator
+    if not np.allclose(strike_diffs, dk):
+        raise FinError("Strikes must be equally spaced.")
 
-    return densitydk
+    # Calculate European call values at every strike using the
+    # strike-dependent implied volatility.
+    values = np.empty(num_steps)
+
+    for ik in range(num_steps):
+        values[ik] = european_value(
+            s,
+            t,
+            strikes[ik],
+            r,
+            q,
+            sigmas[ik],
+            OptionTypes.EUROPEAN_CALL.value,
+        )
+
+    # Breeden-Litzenberger:
+    #
+    #     f(K) = exp(rT) * d²C/dK²
+    #
+    # Central finite difference:
+    #
+    #              C(K+dK) - 2C(K) + C(K-dK)
+    #     d²C/dK² ≈ --------------------------
+    #                         dK²
+    #
+    # This function returns f(K) * dK, so:
+    #
+    #     f(K) dK ≈ exp(rT)
+    #                * [C(K+dK) - 2C(K) + C(K-dK)] / dK
+    #
+
+    density_dk = np.zeros(num_steps)
+
+    inflator = np.exp(r * t)
+
+    second_diffs = values[2:] - 2.0 * values[1:-1] + values[:-2]
+
+    density_dk[1:-1] = inflator * second_diffs / dk
+
+    return density_dk
+
+
+########################################################################################

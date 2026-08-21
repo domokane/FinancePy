@@ -27,23 +27,22 @@ def test_equity_variance_swap():
     vol_swap = EquityVarianceSwap(start_dt, tenor, strike)
 
     value_dt = Date(20, 3, 2018)
-    stock_price = 100.0
-    dividend_yield = 0.0
-    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
+    s = 100.0
+    r = 0.05
+    q = 0.0
+    dividend_curve = FlatDiscountCurve(value_dt, q)
 
-    maturity_dt = start_dt.add_months(3)
-
+    t = 0.25
     atm_vol = 0.20
     atm_k = 100.0
     skew = -0.02 / 5.0  # defined as dsigma/dk
     strikes = np.linspace(50.0, 135.0, 18)
     vols = vol_skew(strikes, atm_vol, atm_k, skew)
-    vol_curve = EquityVolCurve(value_dt, maturity_dt, strikes, vols)
+    vol_curve = EquityVolCurve(strikes, vols, s, t, r, q)
 
     strike_spacing = 5.0
     num_call_options = 10
     num_put_options = 10
-    r = 0.05
 
     discount_curve = FlatDiscountCurve(value_dt, r)
 
@@ -51,7 +50,7 @@ def test_equity_variance_swap():
 
     k1 = vol_swap.fair_strike(
         value_dt,
-        stock_price,
+        s,
         dividend_curve,
         vol_curve,
         num_call_options,
@@ -62,5 +61,5 @@ def test_equity_variance_swap():
     )
     assert round(k1, 4) == 0.0447
 
-    k2 = vol_swap.fair_strike_approx(value_dt, stock_price, strikes, vols)
+    k2 = vol_swap.fair_strike_approx(value_dt, s, strikes, vols)
     assert round(k2, 4) == 0.0424

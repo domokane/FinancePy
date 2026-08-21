@@ -1,8 +1,84 @@
 ## CHANGE LOG
 
+21 August 2026
+List of changes
+- EquityChooserOption - enforced term structure for q and r
+- EquityChooserOption - handled t = t_c
+- EquityVolCurve - Amended constructor to hold all internal info
+- EquityVolCurve - Added new and improved interpolation schemes
+- EquityVolCurve - Added new and improved extrapolation schemes
+- black_scholes_analytic - Added fwd, d1, and d2 functions
+- black_scholes_analytic - fixed and vectorised American option analytic approximations
+- black_scholes_hedging_sim - added new numba BS delta hedging simulator
+- black_scholes_mc - moved option_type to last argument in line with black_scholes_analytic
+- option_implied_dbn - improved
+- EquityForwardStart - new product type
+- math.py - vectorisation of M function for bivariates
+
+10 August 2026
+List of changes
+- Renaming changes
+    - FinCompoundingTypes renamed OISCompoundingTypes
+    - FinProcessSimulator renamed ProcessSimulator
+    - FinFXATMTypes renamed FXATMTypes
+    - FinFXDeltaMethodTypes renamed FXDeltaMethodTypes
+    - FinInflationIndexCurve renamed InflationIndexCurve
+    - FinInflationSwap renamed InflationSwap
+    - FinInflationBond renamed InflationBond
+- Migration of types to global_types file
+    - InterpTypes moved to global_types.py
+    - VolFuncTypes moved to global_types.py
+    - FXATMTypes moved to global_types.py
+    - FXDeltaMethodTypes moved to global_types.py
+    - BlackTypes moved to global_types.py
+    - BlackScholesTypes moved to global_types.py
+    - CIRNumericalSchemeTypes moved to global_types.py
+    - HestonNumericalSchemeTypes moved to global_types
+    - LMMModelTypes moved to global_types.py
+    - GBMNumericalSchemeTypes moved to global_types.py
+    - YTMCalcType moved to global_types.py
+    - ProcessTypes moved to global_types.py
+    - FXBarrierTypes moved to global_types.py
+    - OISCompoundingTypes moved to global_types.py
+    - HWEuropeanCalcTypes moved to global_types.py
+    - DigitalOptionTypes moved to global_types.py
+
+
 9 August 2026
-- Joint calendars are now possible by passing a list of unique calendar types to calendar
-- Cross currency and other multi-leg swaps now accept joint calendars
+- Added more calendars
+    - AUSTRALIA_RITS
+    - SINGAPORE
+    - ZURICH
+    - TOKYO
+    - US GOVERNMENT SECURITIES
+    - US FEDERAL RESERVE
+    - TORONTO
+    - HONK KONG
+- Joint calendars are now possible for following classes
+    - CDS
+    - CDS_BASKET
+    - CDS_TRANCHE
+    - CDS_OPTION
+    - EQUITY_SWAP
+    - EQUITY_SWAP_LEG
+    - IBOR_BASIS_SWAP
+    - IBOR_FIXED_FLOAT_SWAP
+    - IBOR_SWAP
+    - IBOR_SWAPTION
+    - FinFixedFixedXCCySwap
+    - IborIborSwap
+    - fixed_fixed_cross_ccy
+    - fixed_float_cross_ccy_swap
+    - float_float_cross_ccy_swap
+    - Schedule
+- Upgraded Amount class for potential future use
+    - Amount now takes currency
+    - Added overloaded math functionality
+- Date changes
+    - Removed datelite class
+    - Moved date_arrays into date class
+- Removed singleton class
+
 
 6 August 2026
 RELEASE OF FINANCEPY  V1.1.0

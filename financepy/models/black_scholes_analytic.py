@@ -13,6 +13,36 @@ from ..utils.solver_1d import bisection, newton, newton_secant
 
 ########################################################################################
 
+
+@vectorize(
+    [float64(float64, float64, float64, float64)],
+    fastmath=True,
+    cache=True,
+)
+def fwd(
+    s: float,
+    t: float,
+    r: float,
+    q: float,
+) -> float:
+    """Return the forward price.
+    Parameters:
+    - spot_price: float - the current price of the underlying asset
+    - time_to_expiry: float - time to option expiry in years
+    - risk_free_rate: float - risk-free interest rate
+    - dividend_rate: float - dividend yield of the underlying asset
+
+    Returns:
+    - float - the calculated fwd price
+    """
+
+    fwd = s * np.exp((r - q) * t)
+    return fwd
+
+
+#########################################################################################
+
+
 @vectorize(
     [float64(float64, float64, float64, float64, float64, float64, int64)],
     fastmath=True,
@@ -62,6 +92,90 @@ def european_value(
 
     v = phi * ss * normcdf(phi * d1) - phi * kk * normcdf(phi * d2)
     return v
+
+
+#########################################################################################
+
+
+@vectorize(
+    [float64(float64, float64, float64, float64, float64, float64)],
+    fastmath=True,
+    cache=True,
+)
+def d1(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+) -> float:
+    """Return d1 and d2
+    - spot_price: float - the current price of the underlying asset
+    - time_to_expiry: float - time to option expiry in years
+    - strike_price: float - the option's strike price
+    - risk_free_rate: float - risk-free interest rate
+    - dividend_rate: float - dividend yield of the underlying asset
+    - volatility: Union[float, np.ndarray] - volatility of the underlying
+                                             asset (annualized)
+
+    Returns:
+    - float - the calculated d1
+    """
+
+    k = np.maximum(k, G_SMALL)
+    t = np.maximum(t, G_SMALL)
+    v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
+
+    v_sqrt_t = v * np.sqrt(t)
+    ss = s * np.exp(-q * t)
+    kk = k * np.exp(-r * t)
+    d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
+
+    return d1
+
+
+#########################################################################################
+
+
+@vectorize(
+    [float64(float64, float64, float64, float64, float64, float64)],
+    fastmath=True,
+    cache=True,
+)
+def d2(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+) -> float:
+    """Return d1 and d2
+    - spot_price: float - the current price of the underlying asset
+    - time_to_expiry: float - time to option expiry in years
+    - strike_price: float - the option's strike price
+    - risk_free_rate: float - risk-free interest rate
+    - dividend_rate: float - dividend yield of the underlying asset
+    - volatility: Union[float, np.ndarray] - volatility of the underlying
+                                             asset (annualized)
+    Returns:
+    - float - the calculated d2
+    """
+
+    k = np.maximum(k, G_SMALL)
+    t = np.maximum(t, G_SMALL)
+    v = np.maximum(v, G_SMALL)
+    s = np.maximum(s, G_SMALL)
+
+    v_sqrt_t = v * np.sqrt(t)
+    ss = s * np.exp(-q * t)
+    kk = k * np.exp(-r * t)
+    d1 = np.log(ss / kk) / v_sqrt_t + v_sqrt_t / 2.0
+    d2 = d1 - v_sqrt_t
+
+    return d2
 
 
 ########################################################################################
@@ -271,7 +385,7 @@ def vanna(
     opt_type_value: int,
 ) -> float:
     """Calculate European option vanna under the Black–Scholes model."""
-    
+
     k = np.maximum(k, G_SMALL)
     t = np.maximum(t, G_SMALL)
     v = np.maximum(v, G_SMALL)
@@ -449,9 +563,7 @@ def implied_volatility(
 
     hsigma = 0.0
     gam = 2.0
-    arg = (2 * call + xx - ss) ** 2 - gam * (ss + xx) * (ss - xx) * (
-        ss - xx
-    ) / pi / ss
+    arg = (2 * call + xx - ss) ** 2 - gam * (ss + xx) * (ss - xx) * (ss - xx) / pi / ss
     arg = max(arg, 0.0)
 
     hsigma = 2.0 * call + xx - ss + np.sqrt(arg)
@@ -551,7 +663,15 @@ def _fput(si, *args):
     q1 = (1.0 - ww - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
     obj_fn = si - k
-    obj_fn = obj_fn + european_value(si, t, k, r, q, v, OptionTypes.EUROPEAN_PUT.value,)
+    obj_fn = obj_fn + european_value(
+        si,
+        t,
+        k,
+        r,
+        q,
+        v,
+        OptionTypes.EUROPEAN_PUT.value,
+    )
     obj_fn = obj_fn - (1.0 - np.exp(-q * t) * normcdf_vect(-d1)) * si / q1
     return obj_fn
 
@@ -588,9 +708,7 @@ def baw_value(s, t, k, r, q, v, opt_type_value):
         a2 = (sstar / q2) * (1.0 - np.exp(-q * t) * normcdf_vect(d1))
 
         if s < sstar:
-            return european_value(s, t, k, r, q, v, euro_type) + a2 * (
-                (s / sstar) ** q2
-            )
+            return european_value(s, t, k, r, q, v, euro_type) + a2 * ((s / sstar) ** q2)
 
         return s - k
 
@@ -645,7 +763,7 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
     def phi(ss, tt, gamma, hh, xx):
         """Eq.(13) in Bjerksund-Stensland approximation (1993)."""
         nonlocal r, b
-        v2 = v*v
+        v2 = v * v
         sqrt_t = np.sqrt(t)
 
         lambda0 = (-r + gamma * b + 0.5 * gamma * (gamma - 1.0) * v2) * tt
@@ -654,15 +772,11 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
         return (
             np.exp(lambda0)
             * (ss**gamma)
-            * (
-                normcdf(d)
-                - normcdf(d - (2.0 * np.log(xx / ss) / v / sqrt_t))
-                * ((xx / ss) ** kappa)
-            )
+            * (normcdf(d) - normcdf(d - (2.0 * np.log(xx / ss) / v / sqrt_t)) * ((xx / ss) ** kappa))
         )
 
     # calc trigger price x_t
-    beta = (0.5 - b / (v**2)) + np.sqrt((b/(v**2)-0.5) ** 2 + 2.0 * r / v**2)
+    beta = (0.5 - b / (v**2)) + np.sqrt((b / (v**2) - 0.5) ** 2 + 2.0 * r / v**2)
     # avoid division by zero
     if abs(b) < 1.0e-10:
         beta = 1.0
@@ -686,8 +800,8 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
     return value
 
 
-
 ###############################################################################
+
 
 @njit(cache=True)
 def _bs93_phi(s, t, gamma, h, i, r, b, v):
@@ -696,37 +810,15 @@ def _bs93_phi(s, t, gamma, h, i, r, b, v):
     v2 = v * v
     sqrt_t = np.sqrt(t)
 
-    lambda_ = (
-        -r
-        + gamma * b
-        + 0.5 * gamma * (gamma - 1.0) * v2
-    ) * t
+    lambda_ = (-r + gamma * b + 0.5 * gamma * (gamma - 1.0) * v2) * t
 
-    d = -(
-        np.log(s / h)
-        + (b + (gamma - 0.5) * v2) * t
-    ) / (v * sqrt_t)
+    d = -(np.log(s / h) + (b + (gamma - 0.5) * v2) * t) / (v * sqrt_t)
 
-    kappa = (
-        2.0 * gamma
-        - 1.0
-        + 2.0 * b / v2
-    )
+    kappa = 2.0 * gamma - 1.0 + 2.0 * b / v2
 
-    reflected_d = (
-        d
-        - 2.0 * np.log(i / s) / (v * sqrt_t)
-    )
+    reflected_d = d - 2.0 * np.log(i / s) / (v * sqrt_t)
 
-    return (
-        np.exp(lambda_)
-        * s**gamma
-        * (
-            normcdf(d)
-            - (i / s) ** kappa
-            * normcdf(reflected_d)
-        )
-    )
+    return np.exp(lambda_) * s**gamma * (normcdf(d) - (i / s) ** kappa * normcdf(reflected_d))
 
 
 ########################################################################################
@@ -753,14 +845,8 @@ def bjerksund_stensland_value2(
         q >= 0
     """
 
-    is_call = (
-        opt_type_value
-        == OptionTypes.AMERICAN_CALL.value
-    )
-    is_put = (
-        opt_type_value
-        == OptionTypes.AMERICAN_PUT.value
-    )
+    is_call = opt_type_value == OptionTypes.AMERICAN_CALL.value
+    is_put = opt_type_value == OptionTypes.AMERICAN_PUT.value
 
     if not is_call and not is_put:
         return np.nan
@@ -815,14 +901,7 @@ def bjerksund_stensland_value2(
             euro_call_type,
         )
 
-    beta = (
-        0.5
-        - b / v2
-        + np.sqrt(
-            (b / v2 - 0.5) ** 2
-            + 2.0 * r / v2
-        )
-    )
+    beta = 0.5 - b / v2 + np.sqrt((b / v2 - 0.5) ** 2 + 2.0 * r / v2)
 
     if not np.isfinite(beta) or beta <= 1.0:
         return np.nan
@@ -841,17 +920,9 @@ def bjerksund_stensland_value2(
     if denominator <= 0.0 or not np.isfinite(denominator):
         return np.nan
 
-    h_t = (
-        -(b * t + 2.0 * v * sqrt_t)
-        * b_0
-        / denominator
-    )
+    h_t = -(b * t + 2.0 * v * sqrt_t) * b_0 / denominator
 
-    x_t = (
-        b_0
-        + denominator
-        * (-np.expm1(h_t))
-    )
+    x_t = b_0 + denominator * (-np.expm1(h_t))
 
     if not np.isfinite(x_t) or x_t <= k:
         return np.nan
@@ -860,31 +931,15 @@ def bjerksund_stensland_value2(
     if s >= x_t:
         return s - k
 
-    alpha = (
-        (x_t - k)
-        * x_t ** (-beta)
-    )
+    alpha = (x_t - k) * x_t ** (-beta)
 
     value = (
         alpha * s**beta
-        - alpha
-        * _bs93_phi(
-            s, t, beta, x_t, x_t, r, b, v
-        )
-        + _bs93_phi(
-            s, t, 1.0, x_t, x_t, r, b, v
-        )
-        - _bs93_phi(
-            s, t, 1.0, k, x_t, r, b, v
-        )
-        - k
-        * _bs93_phi(
-            s, t, 0.0, x_t, x_t, r, b, v
-        )
-        + k
-        * _bs93_phi(
-            s, t, 0.0, k, x_t, r, b, v
-        )
+        - alpha * _bs93_phi(s, t, beta, x_t, x_t, r, b, v)
+        + _bs93_phi(s, t, 1.0, x_t, x_t, r, b, v)
+        - _bs93_phi(s, t, 1.0, k, x_t, r, b, v)
+        - k * _bs93_phi(s, t, 0.0, x_t, x_t, r, b, v)
+        + k * _bs93_phi(s, t, 0.0, k, x_t, r, b, v)
     )
 
     european_value_transformed = european_value(
@@ -910,8 +965,9 @@ def bjerksund_stensland_value2(
 
 ###############################################################################
 
+
 @vectorize(
-    [float64(float64,float64,float64,float64,float64,float64,int64)],
+    [float64(float64, float64, float64, float64, float64, float64, int64)],
     fastmath=True,
     cache=False,
 )
@@ -926,8 +982,8 @@ def value(
 ) -> float:
     """Price European or American vanilla options."""
 
-    BAW = False #True
-#    BAW = True
+    BAW = False  # True
+    #    BAW = True
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         return european_value(s, t, k, r, q, v, opt_type_value)
@@ -949,6 +1005,5 @@ def value(
 
     return np.nan
 
+
 ########################################################################################
-
-
