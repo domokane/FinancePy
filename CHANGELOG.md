@@ -1,5 +1,4 @@
 ## CHANGE LOG
-
 21 August 2026
 List of changes
 - EquityChooserOption - enforced term structure for q and r
@@ -78,7 +77,6 @@ List of changes
     - Removed datelite class
     - Moved date_arrays into date class
 - Removed singleton class
-
 
 6 August 2026
 RELEASE OF FINANCEPY  V1.1.0
