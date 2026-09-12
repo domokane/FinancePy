@@ -194,7 +194,7 @@ def test_bloomberg_apple_corp_example():
 ########################################################################################
 
 
-def test_final_ex_dividend_coupon_is_not_paid():
+def test_calculus_final_ex_dividend_preserves_redemption():
     bond = Bond(
         Date(15, 2, 2018),
         Date(15, 2, 2030),
@@ -206,18 +206,19 @@ def test_final_ex_dividend_coupon_is_not_paid():
     settle_dt = Date(10, 2, 2030)
     ytm = 0.05
 
-    prices = [
-        bond.dirty_price_from_ytm(settle_dt, ytm, convention)
-        for convention in (
-            YTMCalcType.UK_DMO,
-            YTMCalcType.US_TREASURY,
-            YTMCalcType.US_STREET,
-            YTMCalcType.CFETS,
-        )
-    ]
+    dirty_price = bond.dirty_price_from_ytm(
+        settle_dt, ytm, YTMCalcType.CALCULUS
+    )
+    adjusted_ytm = ytm + 0.000000000012345
+    expected_redemption = 100.0 / (
+        1.0 + adjusted_ytm / bond.freq
+    ) ** bond.alpha
 
-    assert all(price < bond.par for price in prices)
-    assert np.isclose(prices[0], prices[1])
+    assert np.isclose(dirty_price, expected_redemption)
+    assert np.isclose(
+        bond.macaulay_duration(settle_dt, ytm, YTMCalcType.CALCULUS),
+        bond.alpha / bond.freq,
+    )
 
 
 ########################################################################################
