@@ -426,7 +426,7 @@ class Bond:
                 dp = (v ** (self.alpha)) * (term1 + term2 + term3 + term4)
         elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
-                dp = (v ** (self.alpha)) * (1.0 + c / f)
+                dp = (v ** (self.alpha)) * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
@@ -437,7 +437,7 @@ class Bond:
         elif convention == YTMCalcType.US_STREET:
             if n == 0:
                 vw = 1.0 / (1.0 + self.alpha * ytm / f)
-                dp = vw * (1.0 + c / f)
+                dp = vw * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
@@ -461,7 +461,7 @@ class Bond:
                 )
 
                 vw = 1.0 / (1.0 + alpha * ytm)
-                dp = vw * (1.0 + c / f)
+                dp = vw * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
