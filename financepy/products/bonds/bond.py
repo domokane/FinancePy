@@ -475,6 +475,8 @@ class Bond:
             d = 1.0 + ytm / f
             # g starts at the discount factor for the NEXT coupon date
             g = 1.0 / np.pow(d, self.alpha)
+            # Redemption remains payable even when the next coupon is ex-dividend.
+            last_g = g
             flow = self.cpn / self.freq
 
             n_next = 0
@@ -489,7 +491,6 @@ class Bond:
                 n_start = n_next + 1
                 g = g / d
 
-            last_g = 0.0
             # n represents 'periods from today'
             for dt in self.cpn_dts[n_start:]:
                 dp += flow * g
@@ -711,6 +712,9 @@ class Bond:
             dp = 0.0
             # g starts at the discount factor for the NEXT coupon date
             g = 1.0 / np.pow(d, self.alpha)
+            # Seed the redemption values before a potentially empty coupon loop.
+            last_g = g
+            last_t = self.alpha / self.freq
             flow = self.cpn / self.freq
 
             # 1. Find the index of the next coupon date

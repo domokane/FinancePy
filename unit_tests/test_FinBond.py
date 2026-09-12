@@ -194,6 +194,36 @@ def test_bloomberg_apple_corp_example():
 ########################################################################################
 
 
+def test_calculus_final_ex_dividend_preserves_redemption():
+    bond = Bond(
+        Date(15, 2, 2018),
+        Date(15, 2, 2030),
+        0.06,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+        ex_div_days=7,
+    )
+    settle_dt = Date(10, 2, 2030)
+    ytm = 0.05
+
+    dirty_price = bond.dirty_price_from_ytm(
+        settle_dt, ytm, YTMCalcType.CALCULUS
+    )
+    adjusted_ytm = ytm + 0.000000000012345
+    expected_redemption = 100.0 / (
+        1.0 + adjusted_ytm / bond.freq
+    ) ** bond.alpha
+
+    assert np.isclose(dirty_price, expected_redemption)
+    assert np.isclose(
+        bond.macaulay_duration(settle_dt, ytm, YTMCalcType.CALCULUS),
+        bond.alpha / bond.freq,
+    )
+
+
+########################################################################################
+
+
 def test_zero_bond():
 
     # A 3 months treasure with 0 coupon per year.
