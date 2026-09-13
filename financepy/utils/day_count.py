@@ -255,9 +255,9 @@ class DayCount:
             frequency = annual_frequency(freq_type)
 
             if dt3 is None:
-                y3 = y2
-            else:
-                y3 = dt3.y
+                dt3 = dt2
+
+            y3 = dt3.y
 
             num = dt2 - dt1
             den = 365
