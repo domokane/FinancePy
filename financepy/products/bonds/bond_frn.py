@@ -360,11 +360,10 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
+        self.accrued_interest(settle_dt, next_cpn)
         dirty_price = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
         )
-
-        self.accrued_interest(settle_dt, next_cpn)
 
         self.accrued = self.accrual_factor * next_cpn * self.par
 

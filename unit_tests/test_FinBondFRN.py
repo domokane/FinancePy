@@ -195,6 +195,17 @@ def test_bond_frn_principal_scales_with_face_without_prior_state():
     future_ibor = 0.0130522
     dm = 0.01031985
 
+    clean_price_bond = BondFRN(
+        issue_dt,
+        maturity_dt,
+        quoted_margin,
+        FrequencyTypes.QUARTERLY,
+        DayCountTypes.THIRTY_E_360,
+    )
+    clean_price = clean_price_bond.clean_price_from_dm(
+        settle_dt, reset_ibor, current_ibor, future_ibor, dm
+    )
+
     bond = BondFRN(
         issue_dt,
         maturity_dt,
@@ -202,7 +213,6 @@ def test_bond_frn_principal_scales_with_face_without_prior_state():
         FrequencyTypes.QUARTERLY,
         DayCountTypes.THIRTY_E_360,
     )
-
     principal_1 = bond.principal(
         settle_dt, reset_ibor, current_ibor, future_ibor, dm, 1.0
     )
@@ -212,10 +222,6 @@ def test_bond_frn_principal_scales_with_face_without_prior_state():
     principal_million = bond.principal(
         settle_dt, reset_ibor, current_ibor, future_ibor, dm, 1_000_000.0
     )
-    clean_price = bond.clean_price_from_dm(
-        settle_dt, reset_ibor, current_ibor, future_ibor, dm
-    )
-
     assert np.isclose(principal_1, clean_price / bond.par)
     assert np.isclose(principal_100, clean_price)
     assert np.isclose(
