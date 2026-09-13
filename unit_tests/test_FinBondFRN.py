@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.utils.date import Date
 from financepy.products.bonds.bond_frn import BondFRN
 from financepy.utils.frequency import FrequencyTypes
@@ -48,9 +50,10 @@ def test_bond_frn_1():
     assert round(accd_amount, 4) == 0.0023
 
     principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
-    assert round(principal, 4) == 97.0243
+    assert round(principal, 4) == 96.7930
 
     duration = bond.dollar_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -131,9 +134,10 @@ def test_bond_frn_2():
     assert round(accd_amount, 4) == 0.0005
 
     principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
-    assert round(principal, 4) == 93.131
+    assert round(principal, 4) == 93.0800
 
     duration = bond.dollar_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -160,9 +164,10 @@ def test_bond_frn_2():
     assert round(convexity, 4) == 0.0023
 
     principal = bond.principal(
-        settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+        settle_dt, reset_ibor, current_ibor, future_ibors, dm
+    )
 
-    assert round(principal, 4) == 93.1310
+    assert round(principal, 4) == 93.0800
 
     duration = bond.dollar_credit_duration(
         settle_dt, reset_ibor, current_ibor, future_ibors, dm
@@ -175,6 +180,47 @@ def test_bond_frn_2():
     )
 
     assert round(modified_duration, 4) == 6.0480
+
+
+########################################################################################
+
+
+def test_bond_frn_principal_scales_with_face_without_prior_state():
+    issue_dt = Date(10, 11, 2010)
+    maturity_dt = Date(10, 11, 2021)
+    settle_dt = Date(21, 7, 2017)
+    quoted_margin = 0.0025
+    reset_ibor = 0.0143456 - quoted_margin
+    current_ibor = 0.0120534
+    future_ibor = 0.0130522
+    dm = 0.01031985
+
+    bond = BondFRN(
+        issue_dt,
+        maturity_dt,
+        quoted_margin,
+        FrequencyTypes.QUARTERLY,
+        DayCountTypes.THIRTY_E_360,
+    )
+
+    principal_1 = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibor, dm, 1.0
+    )
+    principal_100 = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibor, dm, 100.0
+    )
+    principal_million = bond.principal(
+        settle_dt, reset_ibor, current_ibor, future_ibor, dm, 1_000_000.0
+    )
+    clean_price = bond.clean_price_from_dm(
+        settle_dt, reset_ibor, current_ibor, future_ibor, dm
+    )
+
+    assert np.isclose(principal_1, clean_price / bond.par)
+    assert np.isclose(principal_100, clean_price)
+    assert np.isclose(
+        principal_million, clean_price * 1_000_000.0 / bond.par
+    )
 
 
 ########################################################################################
