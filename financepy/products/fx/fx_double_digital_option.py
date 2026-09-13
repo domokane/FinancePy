@@ -148,15 +148,17 @@ class FXDoubleDigitalOption:
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = r_d - r_f
+            lower_d1 = (ln_s0_k1 + (mu + v2 / 2.0) * t_del) / den
+            upper_d1 = (ln_s0_k2 + (mu + v2 / 2.0) * t_del) / den
             lower_d2 = (ln_s0_k1 + (mu - v2 / 2.0) * t_del) / den
             upper_d2 = (ln_s0_k2 + (mu - v2 / 2.0) * t_del) / den
 
             if self.prem_currency == self.for_name:
-                lower_digital = s0 * np.exp(-r_f * t_del) * normcdf_vect(-lower_d2)
-                upper_digital = s0 * np.exp(-r_f * t_del) * normcdf_vect(-upper_d2)
+                lower_digital = s0 * for_df * normcdf_vect(-lower_d1)
+                upper_digital = s0 * for_df * normcdf_vect(-upper_d1)
             elif self.prem_currency == self.dom_name:
-                lower_digital = np.exp(-r_f * t_del) * normcdf_vect(-lower_d2)
-                upper_digital = np.exp(-r_f * t_del) * normcdf_vect(-upper_d2)
+                lower_digital = dom_df * normcdf_vect(-lower_d2)
+                upper_digital = dom_df * normcdf_vect(-upper_d2)
 
             v = (upper_digital - lower_digital) * self.notional
 
