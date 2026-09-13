@@ -123,7 +123,7 @@ class EquityVanillaOption:
             t_exp = []
             for exp_dt in self.expiry_dt:
                 t = (exp_dt - value_dt) / G_DAYS_IN_YEAR
-            t_exp.append(t)
+                t_exp.append(t)
             t_exp = np.array(t_exp)
         else:
             t_exp = value_dt
@@ -179,7 +179,7 @@ class EquityVanillaOption:
             t_exp = []
             for exp_dt in self.expiry_dt:
                 t = (exp_dt - value_dt) / G_DAYS_IN_YEAR
-            t_exp.append(t)
+                t_exp.append(t)
             t_exp = np.array(t_exp)
         else:
             t_exp = value_dt
