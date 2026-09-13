@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.products.inflation.InflationIndexCurve import InflationIndexCurve
@@ -91,7 +93,7 @@ def test_fin_inflation_bond_bbg():
         settle_dt, face, ytm, ref_cpi_value, YTMCalcType.US_TREASURY
     )
 
-    assert round(principal, 4) == 116.7342
+    assert round(principal, 4) == 116.7116
 
     duration = bond.dollar_duration(settle_dt, ytm)
     assert round(duration, 4) == 305.8767
@@ -104,6 +106,44 @@ def test_fin_inflation_bond_bbg():
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 3) == 10.195
+
+
+########################################################################################
+
+
+def test_inflation_bond_principal_scales_with_face():
+    settle_dt = Date(21, 7, 2017)
+    bond = InflationBond(
+        Date(15, 7, 2010),
+        Date(15, 7, 2020),
+        0.0125,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+        0,
+        218.08532,
+    )
+    ytm = -0.0010
+    reference_cpi = 244.65884
+    convention = YTMCalcType.US_TREASURY
+
+    principal_1 = bond.inflation_principal(
+        settle_dt, 1.0, ytm, reference_cpi, convention
+    )
+    principal_100 = bond.inflation_principal(
+        settle_dt, 100.0, ytm, reference_cpi, convention
+    )
+    principal_million = bond.inflation_principal(
+        settle_dt, 1_000_000.0, ytm, reference_cpi, convention
+    )
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm, convention)
+    index_ratio = reference_cpi / bond.base_cpi_value
+
+    assert np.isclose(principal_1, clean_price * index_ratio / bond.par)
+    assert np.isclose(principal_100, clean_price * index_ratio)
+    assert np.isclose(
+        principal_million,
+        clean_price * index_ratio * 1_000_000.0 / bond.par,
+    )
 
 
 ########################################################################################
