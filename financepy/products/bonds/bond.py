@@ -628,8 +628,8 @@ class Bond:
             raise FinError("Settlement date falls before issue date")
 
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        principal = dirty_price * face / self.par
-        principal = principal - self.accrued_int
+        accrued = self.accrued_interest(settle_dt, face)
+        principal = dirty_price * face / self.par - accrued
         return principal
 
     ###########################################################################

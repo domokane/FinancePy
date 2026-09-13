@@ -194,6 +194,30 @@ def test_bloomberg_apple_corp_example():
 ########################################################################################
 
 
+def test_principal_scales_accrued_interest_with_face():
+    bond = Bond(
+        Date(1, 1, 2024),
+        Date(1, 1, 2027),
+        0.06,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+    )
+    settle_dt = Date(1, 3, 2025)
+    ytm = 0.05
+    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
+
+    principal_100 = bond.principal(settle_dt, ytm, 100.0, YTMCalcType.UK_DMO)
+    principal_million = bond.principal(
+        settle_dt, ytm, ONE_MILLION, YTMCalcType.UK_DMO
+    )
+
+    assert np.isclose(principal_100, clean_price)
+    assert np.isclose(principal_million, clean_price * ONE_MILLION / bond.par)
+
+
+########################################################################################
+
+
 def test_calculus_final_ex_dividend_preserves_redemption():
     bond = Bond(
         Date(15, 2, 2018),
