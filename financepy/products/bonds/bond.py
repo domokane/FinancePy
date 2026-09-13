@@ -1631,13 +1631,12 @@ class Bond:
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default."""
 
-        self.accrued_interest(settle_dt, 1.0)
-
         dirty_price = self.dirty_price_from_survival_curve(
             settle_dt, discount_curve, survival_curve, recovery_rate
         )
 
-        clean_price = dirty_price - self.accrued_int
+        accrued = self.accrued_interest(settle_dt, self.par)
+        clean_price = dirty_price - accrued
         return clean_price
 
     ###########################################################################

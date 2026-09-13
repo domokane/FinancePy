@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -213,6 +214,36 @@ def test_principal_scales_accrued_interest_with_face():
 
     assert np.isclose(principal_100, clean_price)
     assert np.isclose(principal_million, clean_price * ONE_MILLION / bond.par)
+
+
+########################################################################################
+
+
+def test_survival_curve_clean_price_subtracts_accrued_interest_per_par():
+    settle_dt = Date(1, 3, 2025)
+    bond = Bond(
+        Date(1, 1, 2024),
+        Date(1, 1, 2027),
+        0.06,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+    )
+    discount_curve = FlatDiscountCurve(
+        settle_dt, 0.03, FrequencyTypes.CONTINUOUS
+    )
+    survival_curve = FlatDiscountCurve(
+        settle_dt, 0.02, FrequencyTypes.CONTINUOUS
+    )
+
+    dirty_price = bond.dirty_price_from_survival_curve(
+        settle_dt, discount_curve, survival_curve, 0.40
+    )
+    clean_price = bond.clean_price_from_survival_curve(
+        settle_dt, discount_curve, survival_curve, 0.40
+    )
+    accrued = bond.accrued_interest(settle_dt, bond.par)
+
+    assert np.isclose(clean_price, dirty_price - accrued)
 
 
 ########################################################################################
