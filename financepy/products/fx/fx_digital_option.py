@@ -139,18 +139,19 @@ class FXDigitalOption:
             den = volatility * np.sqrt(t_exp)
             v2 = volatility * volatility
             mu = r_d - r_f
+            d1 = (ln_s0_k + (mu + v2 / 2.0) * t_del) / den
             d2 = (ln_s0_k + (mu - v2 / 2.0) * t_del) / den
 
             if (
                 self.opt_type == OptionTypes.DIGITAL_CALL
                 and self.for_name == self.prem_currency
             ):
-                v = s0 * np.exp(-r_f * t_del) * normcdf_vect(d2)
+                v = s0 * np.exp(-r_f * t_del) * normcdf_vect(d1)
             elif (
                 self.opt_type == OptionTypes.DIGITAL_PUT
                 and self.for_name == self.prem_currency
             ):
-                v = s0 * np.exp(-r_f * t_del) * normcdf_vect(-d2)
+                v = s0 * np.exp(-r_f * t_del) * normcdf_vect(-d1)
             elif (
                 self.opt_type == OptionTypes.DIGITAL_CALL
                 and self.dom_name == self.prem_currency
