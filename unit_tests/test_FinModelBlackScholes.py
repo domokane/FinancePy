@@ -77,6 +77,43 @@ def test_black_scholes():
 ########################################################################################
 
 
+def test_barone_adesi_zero_and_near_zero_rates():
+    """The BAW rate ratio has a finite limit as the risk-free rate tends to zero."""
+
+    baw_model = BlackScholes(0.20, BlackScholesTypes.BARONE_ADESI)
+    tree_model = BlackScholes(0.20, BlackScholesTypes.CRR_TREE, 2000)
+    analytical_model = BlackScholes(0.20, BlackScholesTypes.ANALYTICAL)
+
+    call_at_zero = baw_model.value(
+        100.0, 1.0, 100.0, 0.0, 0.02, OptionTypes.AMERICAN_CALL
+    )
+    call_near_zero = baw_model.value(
+        100.0, 1.0, 100.0, 1.0e-12, 0.02, OptionTypes.AMERICAN_CALL
+    )
+    call_tree = tree_model.value(
+        100.0, 1.0, 100.0, 0.0, 0.02, OptionTypes.AMERICAN_CALL
+    )
+
+    assert call_at_zero == approx(call_near_zero, abs=1.0e-6)
+    assert call_at_zero == approx(call_tree, abs=2.0e-2)
+
+    put_at_zero = baw_model.value(
+        100.0, 1.0, 100.0, 0.0, 0.0, OptionTypes.AMERICAN_PUT
+    )
+    put_near_zero = baw_model.value(
+        100.0, 1.0, 100.0, 1.0e-12, 0.0, OptionTypes.AMERICAN_PUT
+    )
+    european_put = analytical_model.value(
+        100.0, 1.0, 100.0, 0.0, 0.0, OptionTypes.EUROPEAN_PUT
+    )
+
+    assert put_at_zero == approx(european_put, abs=1.0e-12)
+    assert put_near_zero == approx(put_at_zero, abs=1.0e-9)
+
+
+########################################################################################
+
+
 def test_bjerksund_stensland():
 
     # Valuation of American call option as in Bjerksund and Sensland's paper published in 1993.
