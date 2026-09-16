@@ -3,6 +3,7 @@
 ##############################################################################
 
 from enum import Enum
+from math import exp, expm1, log1p
 
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
@@ -80,11 +81,21 @@ class BondMortgage:
 
         frequency = annual_frequency(self.freq_type)
 
-        num_flows = len(self.schedule.adjusted_dts)
-        p = (1.0 + zero_rate / frequency) ** (num_flows - 1)
-        m = zero_rate * p / (p - 1.0) / frequency
-        m = m * self.principal
-        return m
+        num_payments = len(self.schedule.adjusted_dts) - 1
+        rate = zero_rate / frequency
+        if rate == 0.0:
+            return self.principal / num_payments
+        if rate <= -1.0:
+            raise FinError("Periodic mortgage rate must be greater than -1.")
+
+        # Preserve the small rate and the small difference from one. Choose
+        # the sign of the exponent to avoid unnecessary exponential overflow.
+        exponent = num_payments * log1p(rate)
+        if rate > 0.0:
+            payment_factor = rate / -expm1(-exponent)
+        else:
+            payment_factor = rate * exp(exponent) / expm1(exponent)
+        return self.principal * payment_factor
 
     ###########################################################################
 
