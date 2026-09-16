@@ -3,6 +3,7 @@
 ##############################################################################
 
 from typing import Union
+from typing import List
 
 import numpy as np
 from numba import njit
@@ -82,7 +83,7 @@ class EquityVanillaOption:
 
     def __init__(
         self,
-        expiry_dt: Date,
+        expiry_dt: Date | List,
         strike_price: Union[float, np.ndarray],
         opt_type: OptionTypes,
         num_options: float = 1.0,
