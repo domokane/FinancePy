@@ -9,11 +9,9 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.products.bonds.bond import Bond
-from financepy.market.curves.bond_parametric_yield_curve import BondParametricYieldCurve
-from financepy.market.curves.curve_fits import CurveFitPolynomial
-from financepy.market.curves.curve_fits import CurveFitBSpline
-from financepy.market.curves.curve_fits import CurveFitNelsonSiegel
-from financepy.market.curves.curve_fits import CurveFitSvensson
+
+from financepy.market.curves import CurveFitTypes
+from financepy.market.curves import BondParametricYieldCurve
 
 path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
 bond_dataframe = pd.read_csv(path, sep="\t")
@@ -41,9 +39,10 @@ for _, bond in bond_dataframe.iterrows():
 
 ########################################################################################
 
+
 def test_poly():
 
-    curve_fit_method = CurveFitPolynomial(5)
+    curve_fit_method = CurveFitTypes.QUINTIC_POLYNOMIAL
     fitted_curve = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
     mean_err, max_err = fitted_curve.errors()
     print("Poly 5", mean_err, max_err)
@@ -57,9 +56,8 @@ def test_poly():
 
 def test_nelson_siegel():
 
-    curve_fit_method = CurveFitNelsonSiegel()
-    fitted_curve = BondParametricYieldCurve(
-        settle_dt, bonds, ylds, curve_fit_method)
+    curve_fit_method = CurveFitTypes.NELSON_SIEGEL
+    fitted_curve = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     mean_err, max_err = fitted_curve.errors()
     print("NS", mean_err, max_err)
@@ -73,9 +71,8 @@ def test_nelson_siegel():
 
 def test_svensson():
 
-    curve_fit_method = CurveFitSvensson()
-    fitted_curve = BondParametricYieldCurve(
-        settle_dt, bonds, ylds, curve_fit_method)
+    curve_fit_method = CurveFitTypes.NELSON_SIEGEL_SVENSSON
+    fitted_curve = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     mean_err, max_err = fitted_curve.errors()
     print("Svenson", mean_err, max_err)
@@ -83,17 +80,16 @@ def test_svensson():
     assert mean_err < 3.26
     assert max_err < 9.090
 
+
 ########################################################################################
 
 
 def test_interp_yield():
 
-    curve_fit_method = CurveFitBSpline()
-    fitted_curve = BondParametricYieldCurve(
-        settle_dt, bonds, ylds, curve_fit_method)
+    curve_fit_method = CurveFitTypes.BSPLINE
+    fitted_curve = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fit_method)
 
     mat_dt = Date(19, 9, 2030)
     interp_yield = fitted_curve.interp_yield(mat_dt)
 
     assert round(float(interp_yield), 4) == 0.0260
-

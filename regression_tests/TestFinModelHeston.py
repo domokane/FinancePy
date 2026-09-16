@@ -4,15 +4,18 @@ import time
 import numpy as np
 
 import add_fp_to_path
+import matplotlib.pyplot as plt
 
-from financepy.models.heston import Heston
+from financepy.models.heston import Heston, HestonValueTypes
 from financepy.utils.global_types import OptionTypes, HestonNumericalSchemeTypes
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
+
+PLOT = False
 
 ########################################################################################
 
@@ -30,6 +33,9 @@ def test_analytical_models():
     interest_rate = 0.05
     dividend_yield = 0.01
     seed = 2838
+
+    tau = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+    opt_type = OptionTypes.EUROPEAN_CALL.value
 
     num_steps = 100
     num_paths = 20000
@@ -51,64 +57,76 @@ def test_analytical_models():
     for sigma in [0.5, 0.75, 1.0]:
         for rho in [-0.9, -0.5, 0.0]:
             heston_model = Heston(v0, kappa, theta, sigma, rho)
+
             for strike_price in np.linspace(95, 105, 3):
-                call_option = EquityVanillaOption(
-                    expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
-                )
                 value_mc_heston = heston_model.value_mc(
-                    value_dt,
-                    call_option,
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
                     num_paths,
                     num_steps,
                     seed,
                 )
+
                 start = time.time()
-                value_gatheral = heston_model.value_gatheral(
-                    value_dt,
-                    call_option,
+                value_gatheral = heston_model.value(
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
+                    method=HestonValueTypes.GATHERAL,
                 )
-                value_lewis_rouah = heston_model.value_lewis_rouah(
-                    value_dt,
-                    call_option,
+
+                value_lewis_rouah = heston_model.value(
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
+                    method=HestonValueTypes.LEWIS_ROUAH,
                 )
-                value_lewis = heston_model.value_lewis(
-                    value_dt,
-                    call_option,
+
+                value_lewis = heston_model.value(
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
+                    method=HestonValueTypes.LEWIS,
                 )
-                value_weber = heston_model.value_weber(
-                    value_dt,
-                    call_option,
+
+                value_weber = heston_model.value(
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
+                    method=HestonValueTypes.WEBER,
                 )
-                err = value_mc_heston - value_weber
-                end = time.time()
-                elapsed = end - start
-                test_cases.print(
-                    f"{elapsed:6.3f}",
-                    f"{rho: 7.5f}",
-                    f"{sigma:7.5f}",
-                    f"{strike_price:7.2f}",
-                    f"{value_mc_heston:12.9f}",
-                    f"{value_gatheral:12.9f}",
-                    f"{value_lewis_rouah:12.9f}",
-                    f"{value_lewis:12.9f}",
-                    f"{value_weber:12.9f}",
-                    f"{err:12.9f}",
-                )
+
+        err = value_mc_heston - value_weber
+        end = time.time()
+        elapsed = end - start
+        test_cases.print(
+            f"{elapsed:6.3f}",
+            f"{rho: 7.5f}",
+            f"{sigma:7.5f}",
+            f"{strike_price:7.2f}",
+            f"{value_mc_heston:12.9f}",
+            f"{value_gatheral:12.9f}",
+            f"{value_lewis_rouah:12.9f}",
+            f"{value_lewis:12.9f}",
+            f"{value_weber:12.9f}",
+            f"{err:12.9f}",
+        )
 
 
 ########################################################################################
@@ -143,27 +161,32 @@ def test_monte_carlo():
         "QE_ERR",
     )
 
+    tau = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+    opt_type = OptionTypes.EUROPEAN_CALL.value
+
     for strike_price in np.linspace(95, 105, 3):
         for num_steps in [25, 50]:
             for num_paths in [10000, 20000]:
+
                 heston_model = Heston(v0, kappa, theta, sigma, rho)
-                call_option = EquityVanillaOption(
-                    expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
-                )
-                value_weber = heston_model.value_weber(
-                    value_dt,
-                    call_option,
+
+                value_weber = heston_model.value(
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
+                    method=HestonValueTypes.WEBER,
                 )
 
                 start = time.time()
 
                 value_mc_euler = heston_model.value_mc(
-                    value_dt,
-                    call_option,
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
                     num_paths,
@@ -172,9 +195,10 @@ def test_monte_carlo():
                     HestonNumericalSchemeTypes.EULER,
                 )
                 value_mc_euler_log = heston_model.value_mc(
-                    value_dt,
-                    call_option,
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
                     num_paths,
@@ -183,9 +207,10 @@ def test_monte_carlo():
                     HestonNumericalSchemeTypes.EULERLOG,
                 )
                 value_mc_quadexp = heston_model.value_mc(
-                    value_dt,
-                    call_option,
                     stock_price,
+                    tau,
+                    strike_price,
+                    opt_type,
                     interest_rate,
                     dividend_yield,
                     num_paths,
@@ -217,6 +242,70 @@ def test_monte_carlo():
 
 ########################################################################################
 
+
+def test_heston_volatility_smile():
+
+    model = Heston(
+        v0=0.04,
+        kappa=2.0,
+        theta=0.04,
+        xi=0.50,
+        rho=-0.70,
+    )
+
+    model = Heston(
+        v0=0.04,
+        kappa=2.0,
+        theta=0.04,
+        xi=0.80,
+        rho=0.0,
+    )
+
+    t_exp = 1.0
+    stock_price = 100.0
+    interest_rate = 0.05
+    dividend_yield = 0.02
+
+    strikes = np.linspace(60.0, 140.0, 41)
+
+    vols = model.volatility_smile(
+        t_exp,
+        strikes,
+        stock_price,
+        interest_rate,
+        dividend_yield,
+        HestonValueTypes.LEWIS,
+    )
+
+    # Only check finite values after diagnostics have been printed
+    valid = np.isfinite(vols)
+
+    assert np.all(valid)
+    assert np.all(vols[valid] > 0.0)
+
+    # Plot
+    if PLOT == True:
+        plt.figure()
+        plt.plot(
+            strikes[valid],
+            100.0 * vols[valid],
+            marker="o",
+            markersize=3,
+        )
+
+        plt.axvline(stock_price, linestyle="--")
+        plt.xlabel("Strike")
+        plt.ylabel("Implied Volatility (%)")
+        plt.title("Heston Implied Volatility Smile")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+
+########################################################################################
+
 test_analytical_models()
 test_monte_carlo()
+test_heston_volatility_smile()
+
 test_cases.compare_test_cases()

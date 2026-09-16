@@ -78,9 +78,7 @@ class BondZero:
 
         # year fraction from settlement to maturity
         dc = DayCount(self.time_dc_type)
-        T, _, _ = dc.year_frac(
-            settle_dt, self.maturity_dt, self.maturity_dt, FrequencyTypes.ZERO
-        )
+        T, _, _ = dc.year_frac(settle_dt, self.maturity_dt, self.maturity_dt, FrequencyTypes.ZERO)
 
         ytm = np.asarray(ytm)  # keep vectorisation
 
@@ -363,7 +361,7 @@ class BondZero:
 
         dd = self.dollar_duration(settle_dt, ytm, convention)
         fp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        md = dd / fp * 10000
+        md = dd / fp
         return md
 
     ###########################################################################
@@ -404,16 +402,12 @@ class BondZero:
 
     ###########################################################################
 
-    def clean_price_from_discount_curve(
-        self, settle_dt: Date, discount_curve: DiscountCurve
-    ):
+    def clean_price_from_discount_curve(self, settle_dt: Date, discount_curve: DiscountCurve):
         """Calculate the clean bond value using some discount curve to
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
 
-        dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve
-        )
+        dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
         accrued = self.accrued_interest(settle_dt, self.par)
         clean_price = dirty_price - accrued
@@ -478,9 +472,7 @@ class BondZero:
         q_settle = survival_curve.survival_prob(settle_dt)
 
         if q_settle <= 0.0:
-            raise FinError(
-                "Survival probability at settlement must be positive"
-            )
+            raise FinError("Survival probability at settlement must be positive")
 
         q_mat = survival_curve.survival_prob(self.maturity_dt)
 

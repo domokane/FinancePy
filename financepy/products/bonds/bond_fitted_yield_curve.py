@@ -11,6 +11,7 @@ import numpy as np
 import scipy
 from scipy.interpolate import splrep
 
+from ...utils.format_graphs import *
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
@@ -85,9 +86,7 @@ class BondFittedYieldCurve:
             xdata = self.years_to_maturity
             ydata = self.ylds
 
-            popt, _ = scipy.optimize.curve_fit(
-                curve_fit.interp_rate, xdata, ydata, bounds=curve_fit.bounds
-            )
+            popt, _ = scipy.optimize.curve_fit(curve_fit.interp_rate, xdata, ydata, bounds=curve_fit.bounds)
 
             curve_fit.beta_1 = popt[0]
             curve_fit.beta_2 = popt[1]
@@ -99,9 +98,7 @@ class BondFittedYieldCurve:
             xdata = self.years_to_maturity
             ydata = self.ylds
 
-            popt, _ = scipy.optimize.curve_fit(
-                curve_fit.interp_rate, xdata, ydata, bounds=curve_fit.bounds
-            )
+            popt, _ = scipy.optimize.curve_fit(curve_fit.interp_rate, xdata, ydata, bounds=curve_fit.bounds)
 
             curve_fit.beta_1 = popt[0]
             curve_fit.beta_2 = popt[1]
@@ -183,7 +180,7 @@ class BondFittedYieldCurve:
             }
         )
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
 
         title = title + " - " + self.curve_fit.name
         plt.title(title)
@@ -217,7 +214,7 @@ class BondFittedYieldCurve:
 
         plt.xlim(np.min(times), np.max(times))
         plt.grid(True, alpha=0.3)
-#        plt.tight_layout()
+        #        plt.tight_layout()
 
         if filename is not None:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)

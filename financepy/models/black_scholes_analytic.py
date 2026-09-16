@@ -548,7 +548,7 @@ def implied_volatility(
 
     # Corrado mmiller from Hallerbach equation (7)
 
-    cmsigma = 0.0
+    # cmsigma = 0.0
     # arg = (C - 0.5*(ss-xx))**2 - ((ss-xx)**2)/ pi
 
     # if arg < 0.0:
@@ -571,44 +571,33 @@ def implied_volatility(
 
     sigma0 = hsigma
 
+    if not np.isfinite(sigma0) or sigma0 <= 0.0:
+        sigma0 = 0.20
+
     arglist = [s, t, k, r, q, price, opt_type_value]
     argsv = np.array(arglist)
 
     tol = 1e-6
-    sigma = newton(_f, sigma0, _fvega, argsv, tol=tol)
 
-    if sigma is None:
-        sigma = bisection(_f, 1e-4, 10.0, argsv, xtol=tol)
-        if sigma is None:
-            method = "Failed"
-        else:
-            method = "Bisection"
-    else:
-        method = "Newton"
+    sigma = newton(
+        _f,
+        sigma0,
+        _fvega,
+        argsv,
+        tol=tol,
+    )
 
-    debug = False
-    if debug:
-        print(
-            "ss: %7.2f kk: %7.3f tt :%5.3f V:%10.7f ssig0: %7.5f Cmm: %7.5f hh L: %7.5f Nww: %7.5f %10s"
-            % (
-                s,
-                k,
-                t,
-                price,
-                sigma0 * 100.0,
-                cmsigma * 100.0,
-                hsigma * 100.0,
-                sigma * 100.0,
-                method,
-            )
+    if sigma is None or not np.isfinite(sigma) or sigma <= 0.0:
+        sigma = bisection(
+            _f,
+            1e-4,
+            10.0,
+            argsv,
+            xtol=tol,
         )
 
     return sigma
 
-
-# This module contains a number of analytical approximations for the price of
-# an American style option starting with Barone-Adesi-Whaley
-# https://deriscope.com/docs/Barone_Adesi_Whaley_1987.pdf
 
 ########################################################################################
 

@@ -13,10 +13,7 @@ from financepy.products.bonds.bond import Bond
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
-from financepy.market.curves import CurveFitSvensson
-from financepy.market.curves import CurveFitNelsonSiegel
-from financepy.market.curves import CurveFitBSpline
-from financepy.market.curves import CurveFitPolynomial
+from financepy.market.curves.curve_fits import CurveFitTypes
 from financepy.market.curves import BondParametricDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -54,15 +51,14 @@ def test_bond_parametric_discount_curve():
         bonds.append(bond)
 
     curve_fitters = [
-        CurveFitPolynomial(power=3),
-        CurveFitPolynomial(power=5),
-        CurveFitNelsonSiegel(),
-        CurveFitSvensson(),
-        CurveFitBSpline(power=3),
+        CurveFitTypes.CUBIC_POLYNOMIAL,
+        CurveFitTypes.QUINTIC_POLYNOMIAL,
+        CurveFitTypes.NELSON_SIEGEL,
+        CurveFitTypes.NELSON_SIEGEL_SVENSSON,
+        CurveFitTypes.BSPLINE,
     ]
 
-    test_cases.header("CURVE_FITTER", "Time", "DISCOUNT FACTOR",
-                      "ZERO_RATE", "FORWARD RATE")
+    test_cases.header("CURVE_FITTER", "Time", "DISCOUNT FACTOR", "ZERO_RATE", "FORWARD RATE")
     times = np.linspace(1e-6, 50, 100)
 
     for curve_fitter in curve_fitters:
@@ -94,6 +90,7 @@ def test_bond_parametric_discount_curve():
         test_cases.header("CURVE_FITTER", "ERROR TYPE", "VALUE")
         test_cases.print(name, "RMS_YIELD_ERROR", rms_yield_err)
         test_cases.print(name, "RMS_PRICE_ERROR", rms_price_err)
+
 
 ########################################################################################
 

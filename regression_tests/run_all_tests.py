@@ -13,7 +13,6 @@ import financepy
 
 print("FinancePy imported successfully from:", financepy.__file__)
 
-
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
 
@@ -63,8 +62,7 @@ def main(start_index=0, end_index=None):
 
             # print(f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d} ", end="")
             print(
-                f"TIME: {elapsed:6.3f} s "
-                f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d}",
+                f"TIME: {elapsed:6.3f} s " f"WARNINGS: {num_warnings:3d} ERRORS: {num_errors:3d}",
                 end="",
             )
 

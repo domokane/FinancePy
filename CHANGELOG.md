@@ -1,4 +1,35 @@
 ## CHANGE LOG
+16 Sep 2026
+List of changes
+- Added check_values module to init to check values of specific input types in one place
+- Reordered inputs to ZeroRatesDiscountCurve so dc_type is 5th not 6th input
+- Added format_graphs.py to utils to standardise plotting look
+- Renamed Svensson curve type to NelsonSiegelSvensson
+- Renamed Polynomial(3) curve type to CubicPolynomial
+- Renamed Polynomial(4) curve type to QuarticPolynomial
+- Renamed Polynomial(5) curve type to QuinticPolynomial
+- Renamed Svensson curve types to NelsonSiegelSvensson
+- BondParametricYieldCurve now takes a CurveFitType rather than a stateful object
+- BondParametricDiscountCurve now takes a CurveFitType rather than a stateful object
+- black_scholes_analytic - fixed implied volatility stability
+- Added CEV model to models
+- Added Dupire model to models
+- Added forward pricers to models for FX, equity, rates, commodities
+- Enhance Heston model in models
+- Added implied_volatility_surface to models
+- Added lognormal mixture model to models
+- Added lognormal mixture surface model to models
+- Improved MertonFirm model function names
+- Improved MertonFirmMkt model function names
+- Added MertonJumpDiffusion model to models
+- Added dedicated SVI model to models
+- Added dedicated SVISurface model to models
+- Added dedicated SSVISurface model to models
+- Fixed bug in units in bond_zero
+- Updated regression tests
+- Updated unit tests
+- Updated notebooks
+
 21 August 2026
 List of changes
 - EquityChooserOption - enforced term structure for q and r

@@ -49,7 +49,7 @@ def test_fin_discount_curve_zeros():
 
     times = np.linspace(0.0, 30, 100)
 
-    test_cases.header("Interp_type", "Time", "Zero_cc", "Fwd_cc", "Calc_Time")
+    test_cases.header("Interp_type", "Time", "Zero_cc", "Fwd_cc", "TIME")
 
     for interp_type in InterpTypes:
 
@@ -63,8 +63,8 @@ def test_fin_discount_curve_zeros():
             dates,
             zero_rates,
             freq_type,
-            interp_type,
             time_dc_type,
+            interp_type,
         )
 
         zeros_cc = curve.zero_rate_cc_t(times) * 100.0

@@ -36,6 +36,8 @@ class DiscountCurvePoly(DiscountCurve):
         coefficients and specifying a compounding frequency type and day count
         convention."""
 
+        print("Warning: Deprecated. Use PolyDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
@@ -108,7 +110,7 @@ class DiscountCurvePoly(DiscountCurve):
     def __repr__(self):
         """Display internal parameters of curve."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("POWER", "COEFFICIENT")
         for i, coeff in enumerate(self._coefficients):
             s += label_to_string(str(i), f"{coeff:12.8f}")

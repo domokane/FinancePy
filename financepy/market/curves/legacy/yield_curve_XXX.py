@@ -53,8 +53,7 @@ class BondYieldCurve:
 
         years_to_maturities = []
         for bond in bonds:
-            years_to_maturity = (bond._maturity_dt -
-                                 settle_dt) / G_DAYS_IN_YEAR
+            years_to_maturity = (bond._maturity_dt - settle_dt) / G_DAYS_IN_YEAR
             years_to_maturities.append(years_to_maturity)
         self._years_to_maturity = np.array(years_to_maturities)
 
@@ -140,9 +139,7 @@ class BondYieldCurve:
         if isinstance(fit, CurveFitPolynomial):
             yld = fit._interpolated_yield(t)
         elif isinstance(fit, CurveFitNelsonSiegel):
-            yld = fit._interpolated_yield(
-                t, fit._beta1, fit._beta2, fit._beta3, fit._tau
-            )
+            yld = fit._interpolated_yield(t, fit._beta1, fit._beta2, fit._beta3, fit._tau)
 
         elif isinstance(fit, CurveFitNelsonSiegelSvensson):
             yld = fit._interpolated_yield(
@@ -165,7 +162,7 @@ class BondYieldCurve:
     def plot(self, title, ylabel="Yield To Maturity (%)"):
         """Display yield curve."""
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
         bond_ylds_scaled = scale(self._ylds, 100.0)
         plt.plot(self._years_to_maturity, bond_ylds_scaled, "o")

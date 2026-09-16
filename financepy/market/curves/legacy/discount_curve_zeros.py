@@ -13,6 +13,7 @@ from ...utils.math import test_monotonicity
 from ...utils.helpers import label_to_string
 from ...utils.helpers import times_from_dates
 from ...market.curves.discount_curve import DiscountCurve
+from ...market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from ...utils.helpers import check_argument_types
 from ...market.curves.interpolator import InterpTypes, Interpolator
 
@@ -50,6 +51,8 @@ class DiscountCurveZeros(DiscountCurve):
         zero rates and also a day count convention for calculating times which
         we must do to calculate discount factors. Finally we specify the
         interpolation scheme for off-grid dates."""
+
+        print("Warning: Deprecated. Use ZeroRatesDiscountCurve instead.")
 
         check_argument_types(self.__init__, locals())
 
@@ -131,7 +134,7 @@ class DiscountCurveZeros(DiscountCurve):
             }
         )
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
 
         if times is None:
@@ -152,15 +155,14 @@ class DiscountCurveZeros(DiscountCurve):
         # Bump the forwards by 1bp in case the curve is flat so they can be seen
         cc_fwds = cc_fwds + 1e-4
 
-        plt.plot(times, zeros * 100, label="Zero Rates", color="blue")
-        plt.plot(times, cc_fwds * 100, label="Inst Fwd Rates", color="orange")
+        plt.plot(times, zeros * 100, label="Zero Rates")
+        plt.plot(times, cc_fwds * 100, label="Inst Fwd Rates")
         plt.plot(
             self._times,
             self._zero_rates * 100,
             "o",
             markersize=10,
             label="Input Zero Rates",
-            color="blue",
         )
 
         plt.xlabel("Time to Maturity (years)")
@@ -171,7 +173,7 @@ class DiscountCurveZeros(DiscountCurve):
             plt.ylim(ymin, ymax)
 
         plt.grid(True, alpha=0.3)
-#        plt.tight_layout()
+        #        plt.tight_layout()
 
         if filename is not None:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
@@ -182,7 +184,7 @@ class DiscountCurveZeros(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("ZERO RATE FREQUENCY", self.freq_type)
         s += label_to_string("DATES", "ZERO RATES")
 

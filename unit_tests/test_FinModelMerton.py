@@ -40,14 +40,14 @@ def test_merton():
         1.2391,
         25.7206,
     ]
-    assert [round(x, 4) for x in model.leverage()] == [
+    assert [round(x, 4) for x in model.asset_to_debt_ratio()] == [
         1.6052,
         1.7174,
         2.0875,
         1.8720,
         1.5808,
     ]
-    assert [round(x * 1e2, 4) for x in model.prob_default()] == [
+    assert [round(x * 1e2, 4) for x in model.physical_default_probability()] == [
         6.3791,
         0.0768,
         0.0005,
@@ -56,7 +56,7 @@ def test_merton():
     ]
 
     asset_value = model.asset_value()
-    asset_vol = model.asset_vol()
+    asset_vol = model.asset_volatility()
 
     model = MertonFirm(
         asset_value,
@@ -81,21 +81,21 @@ def test_merton():
         1.2391,
         25.7206,
     ]
-    assert [round(x, 4) for x in model.leverage()] == [
+    assert [round(x, 4) for x in model.asset_to_debt_ratio()] == [
         1.6052,
         1.7174,
         2.0875,
         1.8720,
         1.5808,
     ]
-    assert [round(x * 1e2, 4) for x in model.prob_default()] == [
+    assert [round(x * 1e2, 4) for x in model.physical_default_probability()] == [
         6.3791,
         0.0768,
         0.0005,
         0.2622,
         3.4408,
     ]
-    assert [round(x, 4) for x in model.dist_default()] == [
+    assert [round(x, 4) for x in model.distance_to_default()] == [
         1.5237,
         3.1679,
         4.4298,
@@ -121,6 +121,6 @@ def test_merton():
 
     assert round(model.debt_value(), 4) == 94.8894
     assert round(model.credit_spread() * 10000, 4) == 24.5833
-    assert model.leverage() == 1.4
-    assert round(model.prob_default(), 4) == 0.0334
-    assert round(model.dist_default(), 4) == 1.8324
+    assert model.asset_to_debt_ratio() == 1.4
+    assert round(model.physical_default_probability(), 4) == 0.0334
+    assert round(model.distance_to_default(), 4) == 1.8324

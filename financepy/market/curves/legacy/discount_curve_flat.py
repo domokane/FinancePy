@@ -39,6 +39,8 @@ class DiscountCurveFlat(DiscountCurve):
         As the curve is flat, no interpolation scheme is required.
         """
 
+        print("Warning: Deprecated. Use FlatDiscountCurve instead.")
+
         check_argument_types(self.__init__, locals())
 
         self.value_dt = value_dt
@@ -92,7 +94,7 @@ class DiscountCurveFlat(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("FLAT ZERO RATE", self.flat_zero_rate)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
 

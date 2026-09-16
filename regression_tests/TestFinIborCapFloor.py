@@ -61,15 +61,9 @@ def test_ibor_deposits_and_swaps(value_dt):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(
-        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
-    )
-    swap2 = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
-    )
-    swap3 = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
-    )
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis)
+    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis)
+    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -269,9 +263,7 @@ def test_ibor_cap_floor_vol_curve():
     for caplet_end_dt in cap_floor.caplet_floorlet_dates[2:]:
         vol = vol_curve.caplet_vol(caplet_end_dt)
         model_caplet = Black(vol)
-        v_caplet = cap_floor.value_caplet_floor_let(
-            value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model_caplet
-        )
+        v_caplet = cap_floor.value_caplet_floor_let(value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model_caplet)
 
         v_caplets += v_caplet
         test_cases.print(
@@ -296,9 +288,7 @@ def test_ibor_caplet_hull():
     today_date = Date(20, 6, 2019)
     value_dt = today_date
     maturity_dt = value_dt.add_tenor("2Y")
-    libor_curve = FlatDiscountCurve(
-        value_dt, 0.070, FrequencyTypes.QUARTERLY, DayCountTypes.THIRTY_E_360
-    )
+    libor_curve = FlatDiscountCurve(value_dt, 0.070, FrequencyTypes.QUARTERLY, DayCountTypes.THIRTY_E_360)
 
     k = 0.08
     cap_floor_type = CapFloorTypes.CAP
@@ -321,9 +311,7 @@ def test_ibor_caplet_hull():
     capletstart_dt = value_dt.add_tenor("1Y")
     caplet_end_dt = capletstart_dt.add_tenor("3M")
 
-    v_caplet = cap_floor.value_caplet_floor_let(
-        value_dt, capletstart_dt, caplet_end_dt, libor_curve, model
-    )
+    v_caplet = cap_floor.value_caplet_floor_let(value_dt, capletstart_dt, caplet_end_dt, libor_curve, model)
 
     # Cannot match Hull due to dates being adjusted
     test_cases.header("CORRECT PRICE", "MODEL_PRICE")
@@ -364,9 +352,7 @@ def test_ibor_cap_floor_ql_example():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ISDA
 
-    discount_curve = ZeroRatesDiscountCurve(
-        value_dt, dates, rates, freq_type, InterpTypes.LINEAR_ZERO_RATES
-    )
+    discount_curve = ZeroRatesDiscountCurve(value_dt, dates, rates, freq_type, dc_type, InterpTypes.LINEAR_ZERO_RATES)
 
     start_dt = Date(14, 6, 2016)
     end_dt = Date(14, 6, 2026)

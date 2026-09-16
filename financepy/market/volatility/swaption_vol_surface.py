@@ -13,6 +13,7 @@ from scipy.optimize import minimize
 
 from numba import njit, float64, int64
 
+from ...utils.format_graphs import *
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
@@ -199,9 +200,7 @@ def _solve_to_horizon(
     cache=True,
     fastmath=True,
 )
-def vol_function(
-    vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float
-) -> float:
+def vol_function(vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -744,9 +743,7 @@ class SwaptionVolSurface:
 
     ####################################################################################
 
-    def _build_vol_surface(
-        self, fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD
-    ) -> None:
+    def _build_vol_surface(self, fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD) -> None:
         """Main function to construct the vol surface."""
 
         if self._vol_func_type == VolFuncTypes.CLARK:

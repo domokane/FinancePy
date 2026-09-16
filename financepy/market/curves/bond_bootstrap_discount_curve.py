@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import optimize
 
+from ...utils.format_graphs import *
 from ...utils.date import Date
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import times_from_dates
@@ -390,7 +391,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
     def plot_zero_rates(self, title: str):
         """Display yield curve."""
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel("Zero Rate (%)")
@@ -408,7 +409,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
     def plot_fwd_rates(self, title: str):
         """Display yield curve."""
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel("Forward Rate (%)")

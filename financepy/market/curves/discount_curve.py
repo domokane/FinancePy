@@ -192,17 +192,12 @@ class DiscountCurve:
             end_dts = date_or_tenor
 
         else:
-            raise FinError(
-                "date_or_tenor must be a Date, tenor string, or list of Dates."
-            )
+            raise FinError("date_or_tenor must be a Date, tenor string, or list of Dates.")
 
         day_counter = DayCount(accrual_dc_type)
 
         accruals = np.array(
-            [
-                day_counter.year_frac(dt1, dt2)[0]
-                for dt1, dt2 in zip(start_dts, end_dts)
-            ],
+            [day_counter.year_frac(dt1, dt2)[0] for dt1, dt2 in zip(start_dts, end_dts)],
             dtype=float,
         )
 
@@ -517,12 +512,7 @@ class DiscountCurve:
             schedule = Schedule(effective_dt, mat_dt, freq_type)
             flow_dts = schedule.generate()
 
-            payment_times = np.array(
-                [
-                    times_from_dates(self.value_dt, dt, self.time_dc_type)
-                    for dt in flow_dts[1:]
-                ]
-            )
+            payment_times = np.array([times_from_dates(self.value_dt, dt, self.time_dc_type) for dt in flow_dts[1:]])
 
             accrual_factors = []
             for prev_dt, next_dt in zip(flow_dts[:-1], flow_dts[1:]):
@@ -770,7 +760,7 @@ class DiscountCurve:
             }
         )
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
 
         if times is None:
@@ -801,7 +791,7 @@ class DiscountCurve:
             plt.ylim(ymin, ymax)
 
         plt.grid(True, alpha=0.3)
-#        plt.tight_layout()
+        #        plt.tight_layout()
 
         if filename is not None:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
