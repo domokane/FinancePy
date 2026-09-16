@@ -2,6 +2,8 @@
 
 import math
 
+import numpy as np
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
@@ -33,10 +35,39 @@ def test_call_option():
     v = call_option.value(
         value_date, stock_price, discount_curve, dividend_curve, model
     )
-    call_optionormcdf_vector.value(
+    vector_values = call_optionormcdf_vector.value(
         value_date, stock_price, discount_curve, dividend_curve, model
-    ) == [v] * 3
+    )
+    assert np.allclose(vector_values, [v] * 3)
     assert v.round(4) == 9.3021
+
+
+########################################################################################
+
+
+def test_call_option_vector_of_distinct_expiries_matches_scalar_valuations():
+    expiry_dates = [Date(1, 7, 2015), Date(1, 1, 2016), Date(1, 1, 2017)]
+    vector_option = EquityVanillaOption(
+        expiry_dates, 100.0, OptionTypes.EUROPEAN_CALL
+    )
+
+    vector_values = vector_option.value(
+        value_date, stock_price, discount_curve, dividend_curve, model
+    )
+    scalar_values = np.array(
+        [
+            EquityVanillaOption(
+                expiry_date, 100.0, OptionTypes.EUROPEAN_CALL
+            ).value(value_date, stock_price, discount_curve, dividend_curve, model)
+            for expiry_date in expiry_dates
+        ]
+    )
+
+    assert np.allclose(vector_values, scalar_values)
+    assert np.allclose(
+        vector_option.t_exp,
+        [(expiry_date - value_date) / 365.0 for expiry_date in expiry_dates],
+    )
 
 
 ########################################################################################

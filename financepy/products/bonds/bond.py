@@ -426,7 +426,7 @@ class Bond:
                 dp = (v ** (self.alpha)) * (term1 + term2 + term3 + term4)
         elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
-                dp = (v ** (self.alpha)) * (1.0 + c / f)
+                dp = (v ** (self.alpha)) * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
@@ -437,7 +437,7 @@ class Bond:
         elif convention == YTMCalcType.US_STREET:
             if n == 0:
                 vw = 1.0 / (1.0 + self.alpha * ytm / f)
-                dp = vw * (1.0 + c / f)
+                dp = vw * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
@@ -461,7 +461,7 @@ class Bond:
                 )
 
                 vw = 1.0 / (1.0 + alpha * ytm)
-                dp = vw * (1.0 + c / f)
+                dp = vw * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
@@ -475,6 +475,8 @@ class Bond:
             d = 1.0 + ytm / f
             # g starts at the discount factor for the NEXT coupon date
             g = 1.0 / np.pow(d, self.alpha)
+            # Redemption remains payable even when the next coupon is ex-dividend.
+            last_g = g
             flow = self.cpn / self.freq
 
             n_next = 0
@@ -489,7 +491,6 @@ class Bond:
                 n_start = n_next + 1
                 g = g / d
 
-            last_g = 0.0
             # n represents 'periods from today'
             for dt in self.cpn_dts[n_start:]:
                 dp += flow * g
@@ -711,6 +712,9 @@ class Bond:
             dp = 0.0
             # g starts at the discount factor for the NEXT coupon date
             g = 1.0 / np.pow(d, self.alpha)
+            # Seed the redemption values before a potentially empty coupon loop.
+            last_g = g
+            last_t = self.alpha / self.freq
             flow = self.cpn / self.freq
 
             # 1. Find the index of the next coupon date

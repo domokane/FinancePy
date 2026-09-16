@@ -280,8 +280,10 @@ class DayCount:
             return acc_factor, num, den
 
         elif self._type == DayCountTypes.JULIAN:
+            # The Julian year is 365.25 days by definition. With den = 365
+            # this convention is indistinguishable from ACT_365F.
             num = dt2 - dt1
-            den = 365.0
+            den = 365.25
             acc_factor = num / den
             return acc_factor, num, den
 

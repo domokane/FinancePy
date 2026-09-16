@@ -126,4 +126,9 @@ def test_year_frace_simple():
     day_count = DayCount(dc_type)
     answer = day_count.year_frac(start, end, end, fin_freq)
 
-    assert round(answer[0], 4) == 0.3836
+    # 1 Jan 2019 -> 21 May 2019 is 140 days; 140 / 365.25 = 0.38330
+    assert round(answer[0], 4) == 0.3833
+
+    # A Julian year is 365.25 days, so this must not collapse onto ACT_365F.
+    act_365f = DayCount(DayCountTypes.ACT_365F).year_frac(start, end, end, fin_freq)
+    assert answer[0] != act_365f[0]
