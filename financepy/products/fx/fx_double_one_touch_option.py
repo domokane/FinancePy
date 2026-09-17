@@ -165,16 +165,15 @@ def _fast_double_no_touch_pricer(S0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
     # Heuristic n_max from damping bound
     # exp(-0.5*sig2*(n*pi/Z)^2 * t) <= eps  => n >= ...
     eps = 1e-14
-    base = (Z / (np.pi * sigma * np.sqrt(2.0 * t_exp))) * np.sqrt(np.log(1.0 / eps))
+    base = (Z / (np.pi * sigma)) * np.sqrt(2.0 * np.log(1.0 / eps) / t_exp)
     n_max = int(base) + 5
     if n_max < 50:
         n_max = 50
     if n_max > 2000:
         n_max = 2000
 
-    # Series sum
+    # Sum the selected range: a zero individual term does not bound the tail.
     c = 0.0
-    rel_tol = 1e-12  # finance-grade precision
 
     for i in range(1, n_max + 1):
         # m = i * pi / Z
@@ -201,9 +200,6 @@ def _fast_double_no_touch_pricer(S0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
 
         c += term
 
-        # relative early-stop
-        if np.abs(term) < rel_tol * (1.0 + np.abs(c)):
-            break
 
     return c  # DNT price (PV)
 
