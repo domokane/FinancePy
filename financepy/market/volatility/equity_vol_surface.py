@@ -288,7 +288,7 @@ class EquityVolSurface:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
@@ -303,7 +303,7 @@ class EquityVolSurface:
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self._stock_price = stock_price
 
         self._discount_curve = discount_curve
@@ -344,7 +344,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         if t_exp <= 0.0:
             raise FinError("Expiry time must be positive.")
@@ -422,7 +422,7 @@ class EquityVolSurface:
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+    #     t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -529,7 +529,7 @@ class EquityVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         if t_exp <= 0.0:
             raise FinError("Expiry time must be positive.")
@@ -684,7 +684,7 @@ class EquityVolSurface:
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        spot_dt = self.value_dt
+        spot_dt = self.anchor_dt
 
         for i in range(0, num_expiry_dts):
 
@@ -747,7 +747,7 @@ class EquityVolSurface:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self.value_dt)
+            print("VALUE DATE:", self.anchor_dt)
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
@@ -872,7 +872,7 @@ class EquityVolSurface:
 
     def __repr__(self) -> str:
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self.value_dt)
+        s += label_to_string("VALUE DATE", self.anchor_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("VOL FUNCTION", self._vol_func_type)
 

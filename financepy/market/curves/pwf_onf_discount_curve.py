@@ -42,7 +42,7 @@ class PWFONFDiscountCurve(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = value_dt
 
         if len(knot_dts) != len(onfwd_rates):
             raise FinError("Dates and rates vectors must have same length")
@@ -61,7 +61,7 @@ class PWFONFDiscountCurve(DiscountCurve):
 
         self.time_dc_type = time_dc_type
 
-        dc_times = times_from_dates(self.value_dt, self._knot_dts, self.time_dc_type)
+        dc_times = times_from_dates(self.anchor_dt, self._knot_dts, self.time_dc_type)
 
         self._times = np.atleast_1d(dc_times)
         if test_monotonicity(self._times) is False:
@@ -162,7 +162,7 @@ class PWFONFDiscountCurve(DiscountCurve):
 
     def bump_parallel(self, bump_size: float):
         return type(self)(
-            self.value_dt,
+            self.anchor_dt,
             self._knot_dts.copy(),
             self._onfwd_rates + bump_size,
             self.time_dc_type,

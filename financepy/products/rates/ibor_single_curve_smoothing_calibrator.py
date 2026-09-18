@@ -40,7 +40,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         c = self._curve
 
         dates = []
-        dates.append(self._curve.value_dt)
+        dates.append(self._curve.anchor_dt)
 
         for depo in c.used_deposits:
             dates.append(depo.start_dt)
@@ -67,7 +67,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         else:
             curve = self._curve
 
-        value_date = curve.value_dt
+        value_date = curve.anchor_dt
         out = np.zeros(len(curve.used_deposits) + len(curve.used_fras) + len(curve.used_swaps))
 
         idx = 0

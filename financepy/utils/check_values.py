@@ -10,13 +10,13 @@ from .error import FinError
 ###########################################################################
 
 
-def check_curve_dt(value_dt, *curves):
+def check_curve_dt(anchor_dt, *curves):
     """Check that curves are valid for the requested valuation date."""
 
     for curve in curves:
-        if curve.value_dt > value_dt:
+        if curve.anchor_dt > anchor_dt:
             raise FinError(
-                f"{type(curve).__name__} valuation date {curve.value_dt} " f"is after valuation date {value_dt}."
+                f"{type(curve).__name__} valuation date {curve.anchor_dt} " f"is after valuation date {anchor_dt}."
             )
 
 

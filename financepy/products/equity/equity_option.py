@@ -60,9 +60,7 @@ class EquityOption:
         revaluation."""
         v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-        v_bumped = self.value(
-            value_dt, stock_price + BUMP, discount_curve, dividend_curve, model
-        )
+        v_bumped = self.value(value_dt, stock_price + BUMP, discount_curve, dividend_curve, model)
 
         delta = (v_bumped - v) / BUMP
         return delta
@@ -82,13 +80,9 @@ class EquityOption:
 
         v = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-        v_bumped_dn = self.value(
-            value_dt, stock_price - BUMP, discount_curve, dividend_curve, model
-        )
+        v_bumped_dn = self.value(value_dt, stock_price - BUMP, discount_curve, dividend_curve, model)
 
-        v_bumped_up = self.value(
-            value_dt, stock_price + BUMP, discount_curve, dividend_curve, model
-        )
+        v_bumped_up = self.value(value_dt, stock_price + BUMP, discount_curve, dividend_curve, model)
 
         gamma = (v_bumped_up - 2.0 * v + v_bumped_dn) / BUMP / BUMP
         return gamma
@@ -112,9 +106,7 @@ class EquityOption:
 
         model = BlackScholes(model.volatility + bump)
 
-        v_bumped = self.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v_bumped = self.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         vega = v_bumped - v
         return vega
@@ -136,9 +128,7 @@ class EquityOption:
 
         model = BlackScholes(model.volatility + BUMP)
 
-        delta_bumped = self.delta(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        delta_bumped = self.delta(value_dt, stock_price, discount_curve, dividend_curve, model)
 
         vanna = (delta_bumped - delta) / BUMP
         return vanna
@@ -162,17 +152,15 @@ class EquityOption:
         next_dt = value_dt.add_days(1)
 
         # Need to do this carefully. This is a bit hacky.
-        discount_curve.value_dt = next_dt
-        dividend_curve.value_dt = next_dt
+        discount_curve.anchor_dt = next_dt
+        dividend_curve.anchor_dt = next_dt
         time_bump = (next_dt - value_dt) / G_DAYS_IN_YEAR
 
-        v_bumped = self.value(
-            next_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        v_bumped = self.value(next_dt, stock_price, discount_curve, dividend_curve, model)
 
         # restore valuation dates
-        discount_curve.value_dt = value_dt
-        dividend_curve.value_dt = value_dt
+        discount_curve.anchor_dt = value_dt
+        dividend_curve.anchor_dt = value_dt
 
         theta = (v_bumped - v) / time_bump
         return theta

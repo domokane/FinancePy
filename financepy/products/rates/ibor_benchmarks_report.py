@@ -64,7 +64,7 @@ def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
 
     return benchmarks_report(
         benchmarks,
-        ibor_curve.value_dt,
+        ibor_curve.anchor_dt,
         ibor_curve,
         include_objects=include_objects,
     )

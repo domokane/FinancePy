@@ -1263,7 +1263,7 @@ class FXVolSurfacePlus:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         spot_fx_rate: float,
         currency_pair: str,
         notional_currency: str,
@@ -1307,7 +1307,7 @@ class FXVolSurfacePlus:
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.spot_fx_rate = spot_fx_rate
         self.currency_pair = currency_pair
 
@@ -1404,7 +1404,7 @@ class FXVolSurfacePlus:
 
         self.expiry_dts = []
         for i in range(0, self.num_vol_curves):
-            expiry_dt = value_dt.add_tenor(tenors[i])
+            expiry_dt = anchor_dt.add_tenor(tenors[i])
             self.expiry_dts.append(expiry_dt)
 
         self._build_vol_surface(fin_solver_type=fin_solver_type, tol=tol)
@@ -1422,7 +1422,7 @@ class FXVolSurfacePlus:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         if t_exp <= 0.0:
             raise FinError("Expiry time must be positive.")
@@ -1516,7 +1516,7 @@ class FXVolSurfacePlus:
         """Interpolates the strike at a delta and expiry date. Linear
         time to expiry interpolation is used in strike."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1632,7 +1632,7 @@ class FXVolSurfacePlus:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1813,7 +1813,7 @@ class FXVolSurfacePlus:
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        spot_dt = self.value_dt
+        spot_dt = self.anchor_dt
 
         for i in range(0, num_vol_curves):
 
@@ -2038,7 +2038,7 @@ class FXVolSurfacePlus:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self.value_dt)
+            print("VALUE DATE:", self.anchor_dt)
             print("SPOT FX RATE:", self.spot_fx_rate)
             print("ALPHA WEIGHT:", self.alpha)
             print("ATM METHOD:", self.atm_method)
@@ -2126,7 +2126,7 @@ class FXVolSurfacePlus:
             model = BlackScholes(sigma_atm_out)
 
             delta_call = call.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -2134,7 +2134,7 @@ class FXVolSurfacePlus:
             )[self.delta_method_string]
 
             delta_put = put.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -2167,7 +2167,7 @@ class FXVolSurfacePlus:
                 model = BlackScholes(ms_vol)
 
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2175,7 +2175,7 @@ class FXVolSurfacePlus:
                 )[self.delta_method_string]
 
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2196,7 +2196,7 @@ class FXVolSurfacePlus:
                     )
 
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2204,7 +2204,7 @@ class FXVolSurfacePlus:
                 )["v"]
 
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2237,7 +2237,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_25d_c_ms)
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2246,7 +2246,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE 0.25 AS WE USED A DIFFERENT SkkEW VOL
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2266,7 +2266,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_25d_p_ms)
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2275,7 +2275,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE -0.25 AS WE USED A DIFFERENT SkkEW VOL
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2336,7 +2336,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE +0.25
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2357,7 +2357,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE -0.25
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2417,7 +2417,7 @@ class FXVolSurfacePlus:
                 model = BlackScholes(ms_vol)
 
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2425,7 +2425,7 @@ class FXVolSurfacePlus:
                 )[self.delta_method_string]
 
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2447,7 +2447,7 @@ class FXVolSurfacePlus:
                     )
 
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2455,7 +2455,7 @@ class FXVolSurfacePlus:
                 )["v"]
 
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2489,7 +2489,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_10d_c_ms)
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2498,7 +2498,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE 0.10 AS WE HAVE USED A DIFFERENT SkkEW VOL
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2518,7 +2518,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_10d_p_ms)
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2527,7 +2527,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE -0.10 AS WE HAVE USED A DIFFERENT SkkEW VOL
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2585,7 +2585,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE +0.25
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2606,7 +2606,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE -0.25
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2798,7 +2798,7 @@ class FXVolSurfacePlus:
     def __repr__(self) -> str:
 
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self.value_dt)
+        s += label_to_string("VALUE DATE", self.anchor_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
         s += label_to_string("CCY PAIR", self.currency_pair)
         s += label_to_string("NOTIONAL CCY", self.notional_currency)

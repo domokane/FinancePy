@@ -93,8 +93,6 @@ class IborIborSwap:
 
         self._first_fixing_rate = None
 
-        self.value_dt = None
-
     ##########################################################################
 
     def _generate_float_leg_dts(self, freq_type):
@@ -283,10 +281,7 @@ class IborIborSwap:
 
         # By definition the discount factor is 1.0 on the valuation date
 
-        print(
-            "%15s %10s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", "-", 1.0, "-", "-")
-        )
+        print("%15s %10s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for PAYMENT_DT in self._adjusted_float_dts[start_index:]:

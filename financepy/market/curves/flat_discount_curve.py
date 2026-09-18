@@ -26,7 +26,7 @@ class FlatDiscountCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         flat_zero_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
@@ -40,7 +40,7 @@ class FlatDiscountCurve(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.flat_zero_rate = flat_zero_rate
         self.freq_type = freq_type
 
@@ -54,8 +54,8 @@ class FlatDiscountCurve(DiscountCurve):
 
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 5.0, 6)
-        self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates(self.value_dt, self._df_dates, self.time_dc_type)
+        self._df_dates = self.anchor_dt.add_years(years)
+        self._times = times_from_dates(self.anchor_dt, self._df_dates, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################
@@ -80,7 +80,7 @@ class FlatDiscountCurve(DiscountCurve):
         bumped up by the bumpsize. All other parameters are preserved."""
 
         disc_curve = FlatDiscountCurve(
-            self.value_dt,
+            self.anchor_dt,
             self.flat_zero_rate + bump_size,
             freq_type=self.freq_type,
             time_dc_type=self.time_dc_type,

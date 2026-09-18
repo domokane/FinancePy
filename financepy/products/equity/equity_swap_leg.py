@@ -385,7 +385,7 @@ class EquitySwapLeg:
         if dividend_curve is None:
             dividend_curve = FlatDiscountCurve(value_dt, 0)
 
-        if discount_curve.value_dt != value_dt:
+        if discount_curve.anchor_dt != value_dt:
             raise FinError("Discount Curve valuation date not same as value date")
 
         # Current price can't be different from strike at effective date

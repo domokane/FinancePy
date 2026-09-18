@@ -83,7 +83,7 @@ class InflationSwapCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         ibor_deposits: list,
         ibor_fras: list,
         ibor_swaps: list,
@@ -103,7 +103,7 @@ class InflationSwapCurve(DiscountCurve):
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
         self._interp_type = interp_type
         self.check_refit_flag = check_refit_flag
@@ -135,7 +135,7 @@ class InflationSwapCurve(DiscountCurve):
         if num_depos > 0:
             for depo in ibor_deposits:
                 start_dt = depo.start_dt
-                if start_dt < self.value_dt:
+                if start_dt < self.anchor_dt:
                     raise FinError("First deposit starts before value date.")
 
             for depo in ibor_deposits:
@@ -156,13 +156,13 @@ class InflationSwapCurve(DiscountCurve):
 
         # Ensure that valuation date is on or after first deposit start date
         if num_depos > 1:
-            if ibor_deposits[0].start_dt > self.value_dt:
+            if ibor_deposits[0].start_dt > self.anchor_dt:
                 raise FinError("Valuation date must not be before first deposit settles.")
 
         if num_fras > 0:
             for fra in ibor_fras:
                 start_dt = fra.start_dt
-                if start_dt <= self.value_dt:
+                if start_dt <= self.anchor_dt:
                     raise FinError("FRAs starts before valuation date")
 
         if num_fras > 1:
@@ -176,7 +176,7 @@ class InflationSwapCurve(DiscountCurve):
         if num_swaps > 0:
             for swap in ibor_swaps:
                 start_dt = swap.start_dt
-                if start_dt < self.value_dt:
+                if start_dt < self.anchor_dt:
                     raise FinError("Swaps starts before valuation date.")
 
         if num_swaps > 1:
@@ -261,7 +261,7 @@ class InflationSwapCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_mat = (depo.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
 
@@ -269,8 +269,8 @@ class InflationSwapCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEAR
-            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_set = (fra.start_dt - self.anchor_dt) / G_DAYS_IN_YEAR
+            t_mat = (fra.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -283,7 +283,7 @@ class InflationSwapCurve(DiscountCurve):
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
 
-                argtuple = (self, self.value_dt, fra)
+                argtuple = (self, self.anchor_dt, fra)
                 df_mat = optimize.newton(
                     _g,
                     x0=df_mat,
@@ -298,12 +298,12 @@ class InflationSwapCurve(DiscountCurve):
             # I use the last_payment_dt in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.last_payment_dt
-            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self.dfs, df_mat)
 
-            argtuple = (self, self.value_dt, swap)
+            argtuple = (self, self.anchor_dt, swap)
 
             df_mat = optimize.newton(
                 _f,
@@ -338,7 +338,7 @@ class InflationSwapCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_mat = (depo.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self.dfs, df_mat)
 
@@ -346,8 +346,8 @@ class InflationSwapCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEAR
-            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_set = (fra.start_dt - self.anchor_dt) / G_DAYS_IN_YEAR
+            t_mat = (fra.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -360,7 +360,7 @@ class InflationSwapCurve(DiscountCurve):
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self.dfs, df_mat)
 
-                argtuple = (self, self.value_dt, fra)
+                argtuple = (self, self.anchor_dt, fra)
                 df_mat = optimize.newton(
                     _g,
                     x0=df_mat,
@@ -386,7 +386,7 @@ class InflationSwapCurve(DiscountCurve):
 
         # Find where the FRAs and Depos go up to as this bit of curve is done
         found_start = False
-        last_dt = self.value_dt
+        last_dt = self.anchor_dt
         if len(self.used_deposits) != 0:
             last_dt = self.used_deposits[-1].maturity_dt
 
@@ -419,7 +419,7 @@ class InflationSwapCurve(DiscountCurve):
         for swap in self.used_swaps:
             swap_rate = swap.fixed_cpn
             maturity_dt = swap.adjusted_fixed_dts[-1]
-            tswap = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            tswap = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             swap_times.append(tswap)
             swap_rates.append(swap_rate)
 
@@ -427,7 +427,7 @@ class InflationSwapCurve(DiscountCurve):
         interpolated_swap_times = [0.0]
 
         for dt in cpn_dts[1:]:
-            swap_years = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            swap_years = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
             swap_rate = np.interp(swap_years, swap_times, swap_rates)
             interpolated_swap_rates.append(swap_rate)
             interpolated_swap_times.append(swap_years)
@@ -456,7 +456,7 @@ class InflationSwapCurve(DiscountCurve):
         for i in range(start_index, num_flows):
 
             dt = cpn_dts[i]
-            t_mat = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_mat = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i - 1]
             pv01_end = acc * swap_rate + 1.0
@@ -482,20 +482,20 @@ class InflationSwapCurve(DiscountCurve):
     def check_refit(self, depo_tol, fra_tol, swap_tol):
         """Ensure that the Ibor curve refits the calibration instruments."""
         for depo in self.used_deposits:
-            v = depo.value(self.value_dt, self) / depo.notional
+            v = depo.value(self.anchor_dt, self) / depo.notional
             if abs(v - 1.0) > depo_tol:
                 print("Value", v)
                 raise FinError("Deposit not repriced.")
 
         for fra in self.used_fras:
-            v = fra.value(self.value_dt, self) / fra.notional
+            v = fra.value(self.anchor_dt, self) / fra.notional
             if abs(v) > fra_tol:
                 print("Value", v)
                 raise FinError("FRA not repriced.")
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
-            v = swap.value(self.value_dt, self, self, None, principal=0.0)
+            v = swap.value(self.anchor_dt, self, self, None, principal=0.0)
             v = v / swap.notional
             if abs(v) > swap_tol:
                 print(
@@ -512,7 +512,7 @@ class InflationSwapCurve(DiscountCurve):
         """Print out the details of the Ibor curve."""
 
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUATION DATE", self.value_dt)
+        s += label_to_string("VALUATION DATE", self.anchor_dt)
 
         for depo in self.used_deposits:
             s += label_to_string("DEPOSIT", "")

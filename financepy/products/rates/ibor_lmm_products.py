@@ -118,7 +118,7 @@ class IborLMMProducts:
         if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discount_curve.value_dt != self.start_dt:
+        if discount_curve.anchor_dt != self.start_dt:
             raise FinError("Curve anchor date not the same as LMM start date.")
 
         self.num_paths = num_paths

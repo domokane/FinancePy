@@ -27,7 +27,7 @@ class PWFDiscountCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         zero_dts: list[Date],
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
@@ -38,7 +38,7 @@ class PWFDiscountCurve(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self._interp_type = None
 
         if len(zero_dts) != len(zero_rates):
@@ -63,7 +63,7 @@ class PWFDiscountCurve(DiscountCurve):
 
         self.time_dc_type = time_dc_type
 
-        dc_times = times_from_dates(self.value_dt, zero_dts, self.time_dc_type)
+        dc_times = times_from_dates(self.anchor_dt, zero_dts, self.time_dc_type)
 
         self._times = np.array(dc_times)
         self._dfs = self.df_t(self._times)
@@ -127,7 +127,7 @@ class PWFDiscountCurve(DiscountCurve):
 
     def bump_parallel(self, bump_size: float):
         return PWFDiscountCurve(
-            self.value_dt,
+            self.anchor_dt,
             self._zero_dts.copy(),
             self._cc_zero_rates + bump_size,
             freq_type=FrequencyTypes.CONTINUOUS,

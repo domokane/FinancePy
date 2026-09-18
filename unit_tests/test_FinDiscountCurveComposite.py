@@ -24,7 +24,7 @@ def test_composite_discount_curve_can_value_trades():
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 1.0 * G_PERCENT
-    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size)
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.anchor_dt, bump_start_dt, bump_end_dt, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
     trade = _create_test_swap(value_dt)
@@ -50,7 +50,7 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * G_PERCENT
-    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size)
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.anchor_dt, bump_start_dt, bump_end_dt, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
     trade = _create_test_swap(value_dt)
@@ -77,7 +77,7 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * G_PERCENT
-    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size)
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.anchor_dt, bump_start_dt, bump_end_dt, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
     trade = _create_test_swap(value_dt)

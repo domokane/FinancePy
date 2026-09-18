@@ -25,9 +25,7 @@ class IborSingleCurveParShocker:
 
         """
         self._base_curve = base_curve
-        self._benchmarks_report = ibor_benchmarks_report(
-            self._base_curve, include_objects=True
-        )
+        self._benchmarks_report = ibor_benchmarks_report(self._base_curve, include_objects=True)
 
     def benchmarks_report(self):
         """
@@ -41,9 +39,7 @@ class IborSingleCurveParShocker:
         """
         return len(self._benchmarks_report)
 
-    def apply_bump_to_benchmark(
-        self, benchmark_idx: int, bump_size=1.0 * G_BASIS_POINT
-    ):
+    def apply_bump_to_benchmark(self, benchmark_idx: int, bump_size=1.0 * G_BASIS_POINT):
         """
         Apply a shock of a given size to a given bechmark.
         Indexing is per the benchmark report
@@ -67,9 +63,7 @@ class IborSingleCurveParShocker:
         bumped_fras = []
         bumped_swaps = []
 
-        for benchmark, bump_size in zip(
-            self._benchmarks_report["benchmark_objects"].values, bump_sizes
-        ):
+        for benchmark, bump_size in zip(self._benchmarks_report["benchmark_objects"].values, bump_sizes):
             bumped_benchmark = copy.deepcopy(benchmark)
             if isinstance(bumped_benchmark, IborDeposit):
                 bumped_benchmark.deposit_rate += bump_size
@@ -78,9 +72,7 @@ class IborSingleCurveParShocker:
                 bumped_benchmark.fra_rate += bump_size
                 bumped_fras.append(bumped_benchmark)
             if isinstance(bumped_benchmark, IborSwap):
-                bumped_benchmark.set_fixed_rate(
-                    bumped_benchmark.get_fixed_rate() + bump_size
-                )
+                bumped_benchmark.set_fixed_rate(bumped_benchmark.get_fixed_rate() + bump_size)
                 bumped_swaps.append(bumped_benchmark)
 
         # This assumes that the base curve was built using the default method as defined
@@ -90,7 +82,7 @@ class IborSingleCurveParShocker:
         # track of what exactly we used to build the base curve and use the same
         # method here
         bumped_curve = IborSingleCurve(
-            self._base_curve.value_dt,
+            self._base_curve.anchor_dt,
             bumped_depos,
             bumped_fras,
             bumped_swaps,

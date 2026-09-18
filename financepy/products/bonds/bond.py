@@ -1136,7 +1136,7 @@ class Bond:
         # 1. Validation checks
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
-        if settle_dt < discount_curve.value_dt:
+        if settle_dt < discount_curve.anchor_dt:
             raise FinError("Bond settles before Discount curve date")
         if settle_dt > self.maturity_dt:
             raise FinError("Bond settles after it matures.")

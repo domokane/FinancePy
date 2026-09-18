@@ -64,13 +64,13 @@ class FXBarrierOption(FXOption):
         if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        check_curve_dt(value_dt, domestic_cuvre)
+        check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
 
-        if domestic_curve.value_dt != value_dt:
+        if domestic_curve.anchor_dt != value_dt:
             raise FinError("Domestic Curve valuation date not same as option value date")
 
-        if foreign_curve.value_dt != value_dt:
+        if foreign_curve.anchor_dt != value_dt:
             raise FinError("Foreign Curve valuation date not same as option value date")
 
         k = self.strike_fx_rate

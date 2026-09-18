@@ -49,7 +49,7 @@ class CDSCurve:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         cds_contracts: list,
         libor_curve,
         recovery_rate,
@@ -61,14 +61,14 @@ class CDSCurve:
 
         print("Deprecation Warning: CDSCurve has been moved. Use version under market->curves")
 
-        check_curve_dt(value_dt, libor_curve)
+        check_curve_dt(anchor_dt, libor_curve)
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if value_dt != libor_curve.value_dt:
+        if anchor_dt != libor_curve.anchor_dt:
             raise FinError("Curve does not have same valuation date as Issuer curve.")
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.cds_contracts = cds_contracts
         self.recovery_rate = recovery_rate
         self.libor_curve = libor_curve
@@ -148,7 +148,7 @@ class CDSCurve:
         supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            t = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -176,7 +176,7 @@ class CDSCurve:
         function supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            t = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -204,12 +204,12 @@ class CDSCurve:
 
             argtuple = (
                 self,
-                self.value_dt,
+                self.anchor_dt,
                 self.cds_contracts[i],
                 self.recovery_rate,
             )
 
-            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             q = self._qs[i]
 
             self._times = np.append(self._times, t_mat)
@@ -256,7 +256,7 @@ class CDSCurve:
 
     #     print("WHY AM I USING THIS ???? fwd_rate cds_curve")
 
-    #     if date1 < self.value_dt:
+    #     if date1 < self.anchor_dt:
     #         raise FinError("Date1 before curve value date.")
 
     #     if date2 < date1:

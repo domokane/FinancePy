@@ -1,4 +1,7 @@
 ## CHANGE LOG
+18 Sep 2026 Part 3
+- Global renaming of curve value date to anchor date for better clarity
+
 18 Sep 2026 Part 2
 List of changes
 - Small change to indep_loss_dbn_hetero_adj_binomial using floor - see change in file

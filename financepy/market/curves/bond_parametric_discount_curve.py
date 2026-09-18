@@ -105,7 +105,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         bonds: list,
         clean_prices: list | np.ndarray,
         curve_fit_type: CurveFitTypes,
@@ -124,7 +124,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         if not isinstance(time_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.time_dc_type = time_dc_type
         self.curve_fit_type = curve_fit_type
 
@@ -179,7 +179,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         for bond in bonds:
 
             t_mat = times_from_dates(
-                self.value_dt,
+                self.anchor_dt,
                 bond.maturity_dt,
                 self.time_dc_type,
             )
@@ -311,7 +311,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         for bond in self.used_bonds:
 
             bond.accrued_interest(
-                self.value_dt,
+                self.anchor_dt,
                 bond.par,
             )
 
@@ -326,7 +326,7 @@ class BondParametricDiscountCurve(DiscountCurve):
                 bond.flow_amounts,
             ):
 
-                if cpn_dt > self.value_dt:
+                if cpn_dt > self.anchor_dt:
 
                     amt = flow
 
@@ -334,7 +334,7 @@ class BondParametricDiscountCurve(DiscountCurve):
                         amt += bond.par / 100.0
 
                     t = times_from_dates(
-                        self.value_dt,
+                        self.anchor_dt,
                         pmt_dt,
                         self.time_dc_type,
                     )
@@ -429,12 +429,12 @@ class BondParametricDiscountCurve(DiscountCurve):
             fitted_clean[i] = fitted_dirty - accrued_i
 
             market_ytm[i] = bond.yield_to_maturity(
-                self.value_dt,
+                self.anchor_dt,
                 market_clean[i],
             )
 
             fitted_ytm[i] = bond.yield_to_maturity(
-                self.value_dt,
+                self.anchor_dt,
                 fitted_clean[i],
             )
 
@@ -621,8 +621,8 @@ class BondParametricDiscountCurve(DiscountCurve):
         )
 
         s += label_to_string(
-            "VALUE DATE",
-            self.value_dt,
+            "ANCHOR DATE",
+            self.anchor_dt,
         )
 
         s += label_to_string(

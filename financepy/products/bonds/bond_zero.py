@@ -426,7 +426,7 @@ class BondZero:
     ):
         """Return dirty price per 100 nominal using a discount curve."""
 
-        if settle_dt < discount_curve.value_dt:
+        if settle_dt < discount_curve.anchor_dt:
             raise FinError("Bond settles before discount curve date")
 
         if settle_dt > self.maturity_dt:
@@ -469,7 +469,7 @@ class BondZero:
         check_curve_dt(settle_dt, discount_curve)
         check_curve_dt(settle_dt, survival_curve)
 
-        if settle_dt < discount_curve.value_dt:
+        if settle_dt < discount_curve.anchor_dt:
             raise FinError("Bond settles before discount curve date")
 
         if settle_dt > self.maturity_dt:

@@ -155,9 +155,12 @@ def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
     if n_max > 2000:
         n_max = 2000
 
+    # (s0/L)^alpha and (s0/U)^alpha
+    SL_alpha = np.exp(alpha * logSL)
+    SU_alpha = np.exp(alpha * logSU)
+
     # Series sum
     c = 0.0
-    rel_tol = 1e-12  # finance-grade precision
 
     for i in range(1, n_max + 1):
         # m = i * pi / Z
@@ -165,10 +168,6 @@ def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
 
         # (-1)^i without pow
         alt = -1.0 if (i & 1) else 1.0
-
-        # (s0/L)^alpha and (s0/U)^alpha
-        SL_alpha = np.exp(alpha * logSL)
-        SU_alpha = np.exp(alpha * logSU)
 
         denom = (alpha * alpha) + (m * m)
         term_i_b = SL_alpha - alt * SU_alpha
@@ -183,9 +182,5 @@ def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
         term = (2.0 * np.pi * i * K / (Z * Z)) * (term_i_b / denom) * s * damp
 
         c += term
-
-        # relative early-stop
-        if np.abs(term) < rel_tol * (1.0 + np.abs(c)):
-            break
 
     return c  # DNT price (PV)

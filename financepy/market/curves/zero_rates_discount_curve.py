@@ -36,7 +36,7 @@ class ZeroRatesDiscountCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         zero_dts: list,
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
@@ -63,19 +63,19 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         if freq_type not in FrequencyTypes:
             raise FinError("Unknown Frequency type " + str(freq_type))
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.freq_type = freq_type
 
         if not isinstance(dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        if zero_dts[0] < value_dt:
+        if zero_dts[0] < anchor_dt:
             raise FinError("Zero rate dates must be on or after the valuation date.")
 
         self.dc_type = dc_type
         zero_rates = np.asarray(zero_rates, dtype=float)
 
-        zero_times = times_from_dates(value_dt, zero_dts, dc_type)
+        zero_times = times_from_dates(anchor_dt, zero_dts, dc_type)
         zero_times = np.asarray(zero_times, dtype=float)
 
         if test_monotonicity(zero_times) is False:
@@ -87,8 +87,8 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         if zero_times[0] > 0.0:
             self._times = np.concatenate(([0.0], zero_times))
             self._dfs = np.concatenate(([1.0], dfs))
-            self._df_dates = [value_dt] + list(zero_dts)
-            self._zero_dts = [value_dt] + list(zero_dts)
+            self._df_dates = [anchor_dt] + list(zero_dts)
+            self._zero_dts = [anchor_dt] + list(zero_dts)
             self._zero_rates = np.concatenate(([np.nan], zero_rates))
         else:
             self._times = zero_times
@@ -117,7 +117,7 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         zero_dts = self._zero_dts[1:]
 
         return ZeroRatesDiscountCurve(
-            value_dt=self.value_dt,
+            value_dt=self.anchor_dt,
             zero_dts=zero_dts.copy(),
             zero_rates=bumped_zero_rates,
             freq_type=self.freq_type,

@@ -414,11 +414,11 @@ class CDS:
 
         discount_curve = issuer_curve.libor_curve
 
-        if settle_dt < discount_curve.value_dt:
+        if settle_dt < discount_curve.anchor_dt:
             raise FinError(
                 "Settlement date cannot precede the discount curve date: "
                 f"settle_dt={settle_dt}, "
-                f"curve.value_dt={discount_curve.value_dt}"
+                f"curve.anchor_dt={discount_curve.anchor_dt}"
             )
 
         values = self.value(
@@ -454,11 +454,11 @@ class CDS:
 
         discount_curve = issuer_curve.libor_curve
 
-        if settle_dt < discount_curve.value_dt:
+        if settle_dt < discount_curve.anchor_dt:
             raise FinError(
                 "Settlement date cannot precede the discount curve date: "
                 f"settle_dt={settle_dt}, "
-                f"curve.value_dt={discount_curve.value_dt}"
+                f"curve.anchor_dt={discount_curve.anchor_dt}"
             )
 
         values = self.value(

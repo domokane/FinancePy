@@ -78,8 +78,8 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
         coupon = bond_row["coupon"] / 100.0
         clean_price = bond_row["mid"]
         bond = Bond(issue_dt, maturity_dt, coupon, freq_type, accrual_type)
-        z_spread = bond.z_spread(base_curve.value_dt, clean_price, base_curve)
-        asset_swap_spread = bond.asset_swap_spread(base_curve.value_dt, clean_price, base_curve)
+        z_spread = bond.z_spread(base_curve.anchor_dt, clean_price, base_curve)
+        asset_swap_spread = bond.asset_swap_spread(base_curve.anchor_dt, clean_price, base_curve)
         bond_dataframe.loc[bdf_index, "z_spread"] = z_spread
         bond_dataframe.loc[bdf_index, "asset_swap_spread"] = asset_swap_spread
 
