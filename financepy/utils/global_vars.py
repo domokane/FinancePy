@@ -11,4 +11,8 @@ G_NOTEBOOK_SMALL = False
 G_BASIS_POINT = 1e-4
 G_PERCENT = 1e-2
 
+# RETURN ORDER
+DIRTY = 0
+CLEAN = 1
+
 ########################################################################################

@@ -42,9 +42,7 @@ def test_fin_discount_curve_pcfonf_01():
 
     one_bp = 1e-4
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
-        assert (
-            abs(e - a) < one_bp / 100
-        ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
+        assert abs(e - a) < one_bp / 100, f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
 ########################################################################################
@@ -71,9 +69,7 @@ def test_fin_discount_curve_pcfonf_02():
     actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
-        assert (
-            abs(e - a) < G_BASIS_POINT / 100
-        ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
+        assert abs(e - a) < G_BASIS_POINT / 100, f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
 ########################################################################################
@@ -81,13 +77,13 @@ def test_fin_discount_curve_pcfonf_02():
 
 def test_fin_discount_curve_pcfonf_03():
 
-    valuation_date = Date(1, 1, 2015)
+    value_dt = Date(1, 1, 2015)
     start_dt = Date(1, 6, 2017)
     end_dt = Date(1, 6, 2018)
     level = 0.01
 
     curve = PWFONFDiscountCurve.brick_wall_curve(
-        valuation_date,
+        value_dt,
         start_dt,
         end_dt,
         level,
@@ -102,9 +98,7 @@ def test_fin_discount_curve_pcfonf_03():
     actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
-        assert (
-            abs(e - a) < G_BASIS_POINT / 100
-        ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
+        assert abs(e - a) < G_BASIS_POINT / 100, f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
 ########################################################################################
@@ -112,13 +106,13 @@ def test_fin_discount_curve_pcfonf_03():
 
 def test_fin_discount_curve_pcfonf_04():
 
-    valuation_date = Date(1, 1, 2015)
-    start_dt = valuation_date
+    value_dt = Date(1, 1, 2015)
+    start_dt = value_dt
     end_dt = Date(1, 6, 2018)
     level = 0.01
 
     curve = PWFONFDiscountCurve.brick_wall_curve(
-        valuation_date,
+        value_dt,
         start_dt,
         end_dt,
         level,
@@ -133,9 +127,7 @@ def test_fin_discount_curve_pcfonf_04():
     actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
-        assert (
-            abs(e - a) < G_BASIS_POINT / 100
-        ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
+        assert abs(e - a) < G_BASIS_POINT / 100, f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
 ########################################################################################
@@ -143,13 +135,13 @@ def test_fin_discount_curve_pcfonf_04():
 
 def test_fin_discount_curve_pcfonf_05():
 
-    valuation_date = Date(1, 1, 2015)
-    start_dt = valuation_date.add_months(-6)
+    value_dt = Date(1, 1, 2015)
+    start_dt = value_dt.add_months(-6)
     end_dt = Date(1, 6, 2018)
     level = 0.01
 
     curve = PWFONFDiscountCurve.brick_wall_curve(
-        valuation_date,
+        value_dt,
         start_dt,
         end_dt,
         level,
@@ -164,9 +156,7 @@ def test_fin_discount_curve_pcfonf_05():
     actual_onfwd = curve.fwd_rate_inst(test_dates)
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
-        assert (
-            abs(e - a) < G_BASIS_POINT / 100
-        ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
+        assert abs(e - a) < G_BASIS_POINT / 100, f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
 ########################################################################################
@@ -174,10 +164,10 @@ def test_fin_discount_curve_pcfonf_05():
 
 def test_fin_discount_curve_pcfonf_flat():
 
-    valuation_date = Date(1, 1, 2015)
+    value_dt = Date(1, 1, 2015)
     level = 0.01
     curve = PWFONFDiscountCurve.flat_curve(
-        valuation_date,
+        value_dt,
         level,
     )
 
@@ -191,15 +181,13 @@ def test_fin_discount_curve_pcfonf_flat():
 
     if diagnostics_mode:
         years = np.linspace(0, 10, 100)
-        dates = valuation_date.add_years(years)
+        dates = value_dt.add_years(years)
         onrates = curve.fwd_rate_inst(dates)
         plt.plot(years, onrates)
         plt.show()
 
     for d, e, a in zip(test_dates, expected_onfwd, actual_onfwd):
-        assert (
-            abs(e - a) < G_BASIS_POINT / 100
-        ), f"Mismatch for date {d}, expected = {e}, actual = {a}"
+        assert abs(e - a) < G_BASIS_POINT / 100, f"Mismatch for date {d}, expected = {e}, actual = {a}"
 
 
 ########################################################################################

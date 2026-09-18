@@ -133,6 +133,9 @@ class EquitySwap:
     ):
         """Value the Equity swap on a valuation date."""
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
         self.equity_leg_value = self.equity_leg.value(
             value_dt,
             discount_curve,
@@ -142,9 +145,7 @@ class EquitySwap:
         )
         self._fill_rate_notional_array()
 
-        self.rate_leg_value = self.rate_leg.value(
-            value_dt, discount_curve, index_curve, first_fixing_rate
-        )
+        self.rate_leg_value = self.rate_leg.value(value_dt, discount_curve, index_curve, first_fixing_rate)
 
         return self.equity_leg_value + self.rate_leg_value
 

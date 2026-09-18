@@ -794,11 +794,8 @@ class EquityVolSurface:
 
             ds = (high_s - low_s) / num_intervals
 
-            dis_df = self._discount_curve.df_t(t)
-            div_df = self._dividend_curve.df_t(t)
-
-            r = -np.log(dis_df) / t
-            q = -np.log(div_df) / t
+            r = self._discount_curve.zero_rate_cc_t(t)
+            q = self._dividend_curve.zero_rate_cc_t(t)
 
             k_s = []
             vols = []

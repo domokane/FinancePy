@@ -46,6 +46,7 @@ from ...market.curves.interpolator import InterpTypes
 from ...market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 from ...market.curves.bond_bootstrap_discount_curve import BondBootstrapDiscountCurve
+from ...utils.check_values import check_curve_dt
 
 # References https://www.dmo.gov.uk/media/15011/yldeqns_v1.pdf
 # DO TRUE YIELD
@@ -60,7 +61,6 @@ class CouponType(Enum):
 
 
 ########################################################################################
-
 
 
 ########################################################################################
@@ -266,7 +266,7 @@ class Bond:
 
     ############################################################################
 
-    def times(self, settle_dt, time_dc_type:DayCountTypes = DayCountTypes.ACT_365F):
+    def times(self, settle_dt, time_dc_type: DayCountTypes = DayCountTypes.ACT_365F):
         """Years from settlement to payments using day count convention"""
         times = times_from_dates(settle_dt, self.payment_dts, time_dc_type)
 
@@ -554,9 +554,7 @@ class Bond:
                 ytm_vector.append(ytm_list[i])
 
         else:
-            raise FinError(
-                "Number of dates and yields must match, or one must be a scalar."
-            )
+            raise FinError("Number of dates and yields must match, or one must be a scalar.")
 
         # Execute the loop using the standardized vectors
         dps = []
@@ -617,9 +615,7 @@ class Bond:
 
     ###########################################################################
 
-    def principal(
-        self, settle_dt: Date, ytm: float, face: float, convention: YTMCalcType
-    ):
+    def principal(self, settle_dt: Date, ytm: float, face: float, convention: YTMCalcType):
         """Calculate the principal value of the bond based on the face
         amount from its discount margin and making assumptions about the
         future Ibor rates."""
@@ -947,12 +943,8 @@ class Bond:
         krds = []
 
         for i in range(len(key_rate_tenors)):
-            curve_up = BumpedZeroTentCurve(
-                zero_curve, settle_dt, key_rate_tenors, i, +shift
-            )
-            curve_dn = BumpedZeroTentCurve(
-                zero_curve, settle_dt, key_rate_tenors, i, -shift
-            )
+            curve_up = BumpedZeroTentCurve(zero_curve, settle_dt, key_rate_tenors, i, +shift)
+            curve_dn = BumpedZeroTentCurve(zero_curve, settle_dt, key_rate_tenors, i, -shift)
 
             p_up = self.dirty_price_from_discount_curve(settle_dt, curve_up)
             p_dn = self.dirty_price_from_discount_curve(settle_dt, curve_dn)
@@ -1044,14 +1036,10 @@ class Bond:
                 par_bonds.append(par_bond)
 
             for par_bond, par_rate in zip(par_bonds, rate_vec):
-                clean_price = par_bond.clean_price_from_ytm(
-                    settle_dt, par_rate, us_street
-                )
+                clean_price = par_bond.clean_price_from_ytm(settle_dt, par_rate, us_street)
                 clean_prices.append(clean_price)
 
-            return BondBootstrapDiscountCurve(
-                settle_dt, par_bonds, clean_prices, lin_zero_interp
-            )
+            return BondBootstrapDiscountCurve(settle_dt, par_bonds, clean_prices, lin_zero_interp)
 
         # Base curve and base price: compute once
         par_crv = build_par_curve(base_rates)
@@ -1127,9 +1115,7 @@ class Bond:
 
     ###########################################################################
 
-    def clean_price_from_discount_curve(
-        self, settle_dt: Date, discount_curve: DiscountCurve
-    ):
+    def clean_price_from_discount_curve(self, settle_dt: Date, discount_curve: DiscountCurve):
         """Calculate the clean bond value using some discount curve to
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
@@ -1146,9 +1132,7 @@ class Bond:
 
     ###########################################################################
 
-    def dirty_price_from_discount_curve(
-        self, settle_dt: Date, discount_curve: DiscountCurve
-    ):
+    def dirty_price_from_discount_curve(self, settle_dt: Date, discount_curve: DiscountCurve):
         # 1. Validation checks
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -1244,11 +1228,7 @@ class Bond:
 
     ###########################################################################
 
-    def current_yield(
-        self,
-        settle_dt: Date,
-        clean_price: float | list | np.ndarray
-    ):
+    def current_yield(self, settle_dt: Date, clean_price: float | list | np.ndarray):
         """Calculate the bond's simple yield."""
 
         if settle_dt < self.issue_dt:
@@ -1310,9 +1290,7 @@ class Bond:
         # Calculation of the ex-dividend date
         self.ex_div_dt = cal.add_business_days(self._ncd, -1 * self.ex_div_days)
 
-        acc_factor, num, _ = dc.year_frac(
-            self._pcd, settle_dt, self._ncd, self.freq_type
-        )
+        acc_factor, num, _ = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq_type)
 
         self.alpha = 1.0 - acc_factor * self.freq
 
@@ -1342,6 +1320,8 @@ class Bond:
         """Calculate the par asset swap spread of the bond. The discount curve
         is an Ibor curve that is passed in. This function is vectorised with
         respect to the clean price."""
+
+        check_curve_dt(settle_dt, discount_curve)
 
         clean_price = np.array(clean_price)
         self.accrued_interest(settle_dt, 1.0)
@@ -1395,6 +1375,7 @@ class Bond:
     ):
         """Calculate the z-spread of the bond. The discount curve
         is a Ibor curve that is passed in."""
+        check_curve_dt(settle_dt, discount_curve)
 
         self.accrued_int = self.accrued_interest(settle_dt, 1.0)
         accrued_amount = self.accrued_int * self.par
@@ -1403,9 +1384,7 @@ class Bond:
         def _bond_price_diff_from_z_spread(z_spr_try):
             flat_curve = PWFONFDiscountCurve.flat_curve(settle_dt, z_spr_try)
             bumped_curve = CompositeDiscountCurve([discount_curve, flat_curve])
-            curve_bond_price = self.dirty_price_from_discount_curve(
-                settle_dt, bumped_curve
-            )
+            curve_bond_price = self.dirty_price_from_discount_curve(settle_dt, bumped_curve)
             return curve_bond_price - bond_price
 
         z_spread = optimize.newton(
@@ -1454,11 +1433,11 @@ class Bond:
 
     ###########################################################################
 
-    def dirty_price_from_oas(
-        self, settle_dt: Date, discount_curve: DiscountCurve, oas: float
-    ):
+    def dirty_price_from_oas(self, settle_dt: Date, discount_curve: DiscountCurve, oas: float):
         """Calculate the price of the bond by adding a spread (OAS)
         to the curve."""
+
+        check_curve_dt(settle_dt, discount_curve)
 
         self.accrued_interest(settle_dt, 1.0)
         f = self.freq
@@ -1513,6 +1492,8 @@ class Bond:
         """Return OAS for bullet bond given settlement date, clean bond price
         and the discount relative to which the spread is to be computed."""
 
+        check_curve_dt(settle_dt, discount_curve)
+
         if isinstance(clean_price, float) or isinstance(clean_price, np.float64):
             clean_prices = np.array([clean_price])
         elif isinstance(clean_price, list) or isinstance(clean_price, np.ndarray):
@@ -1566,6 +1547,9 @@ class Bond:
         payment times. A finer discretization may handle the time value with
         more accuracy. I reduce any error by averaging period start and period
         end payment present values."""
+
+        check_curve_dt(settle_dt, discount_curve)
+        check_curve_dt(settle_dt, survival_curve)
 
         f = self.freq
         cpn_flow = self.cpn / f
@@ -1631,11 +1615,12 @@ class Bond:
         The survival curve treats the coupons as zero recovery payments while
         the recovery fraction of the par amount is paid at default."""
 
+        check_curve_dt(settle_dt, discount_curve)
+        check_curve_dt(settle_dt, survival_curve)
+
         self.accrued_interest(settle_dt, 1.0)
 
-        dirty_price = self.dirty_price_from_survival_curve(
-            settle_dt, discount_curve, survival_curve, recovery_rate
-        )
+        dirty_price = self.dirty_price_from_survival_curve(settle_dt, discount_curve, survival_curve, recovery_rate)
 
         clean_price = dirty_price - self.accrued_int
         return clean_price
@@ -1664,9 +1649,7 @@ class Bond:
 
         # The coupon or par payments on buying date belong to the buyer. The
         # coupon or par payments on selling date are given to the new buyer.
-        dts_cfs = [
-            (d, c * self.par) for (d, c) in dts_cfs if (d >= begin_dt) and (d < end_dt)
-        ]
+        dts_cfs = [(d, c * self.par) for (d, c) in dts_cfs if (d >= begin_dt) and (d < end_dt)]
 
         dts_cfs.append((begin_dt, -buy_price))
         dts_cfs.append((end_dt, sell_price))

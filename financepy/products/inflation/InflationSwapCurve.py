@@ -157,9 +157,7 @@ class InflationSwapCurve(DiscountCurve):
         # Ensure that valuation date is on or after first deposit start date
         if num_depos > 1:
             if ibor_deposits[0].start_dt > self.value_dt:
-                raise FinError(
-                    "Valuation date must not be before first deposit settles."
-                )
+                raise FinError("Valuation date must not be before first deposit settles.")
 
         if num_fras > 0:
             for fra in ibor_fras:
@@ -206,9 +204,7 @@ class InflationSwapCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError(
-                            "Swap cpns are not on the same date grid."
-                        )
+                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -499,13 +495,11 @@ class InflationSwapCurve(DiscountCurve):
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap.start_dt, self, self, None, principal=0.0)
+            v = swap.value(self.value_dt, self, self, None, principal=0.0)
             v = v / swap.notional
             if abs(v) > swap_tol:
                 print(
-                    "Swap with maturity "
-                    + str(swap.maturity_dt)
-                    + " Not Repriced. Has Value",
+                    "Swap with maturity " + str(swap.maturity_dt) + " Not Repriced. Has Value",
                     v,
                 )
                 swap.print_fixed_leg_pv()
@@ -538,9 +532,7 @@ class InflationSwapCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string(
-                "% 10.6f" % self._times[i], "%12.10f" % self._dfs[i]
-            )
+            s += label_to_string("% 10.6f" % self._times[i], "%12.10f" % self._dfs[i])
 
         return s
 

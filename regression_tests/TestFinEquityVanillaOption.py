@@ -301,7 +301,7 @@ if 1 == 0:
     value_dt = Date(30, 11, 2021)
     expiry_dt = value_dt.add_years(1)
 
-    stock_price = 100
+    stock_price = 100.0
     volatility = 0.20
     model = BlackScholes(volatility)
 

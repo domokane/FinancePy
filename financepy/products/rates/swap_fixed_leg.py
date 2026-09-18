@@ -22,6 +22,7 @@ from ...utils.helpers import (
 )
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 
@@ -140,13 +141,11 @@ class SwapFixedLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 
-            (year_frac, num, _) = day_counter.year_frac(prev_dt, next_dt)
+            year_frac, num, _ = day_counter.year_frac(prev_dt, next_dt)
 
             self.rates.append(self.cpn)
 
@@ -160,13 +159,13 @@ class SwapFixedLeg:
 
     ###########################################################################
 
-    def value(
-        self, value_dt: Date, discount_curve: DiscountCurve, pv_only=True
-    ):
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, pv_only=True):
 
         self.payment_dfs = []
         self.payment_pvs = []
         self.cumulative_pvs = []
+
+        check_curve_dt(value_dt, discount_curve)
 
         notional = self.notional
         df_value = discount_curve.df(value_dt)

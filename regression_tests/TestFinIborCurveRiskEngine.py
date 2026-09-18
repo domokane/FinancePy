@@ -33,7 +33,7 @@ diagnostics_mode = False
 
 def test_par_rate_risk_report_cubic_zero():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FINCUBIC_ZERO_RATES
 
@@ -44,7 +44,7 @@ def test_par_rate_risk_report_cubic_zero():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settle_dt, base_curve = _generate_base_curve(
-        valuation_date,
+        value_dt,
         cal,
         interp_type,
         depo_dcc_type,
@@ -55,7 +55,7 @@ def test_par_rate_risk_report_cubic_zero():
     )
 
     trades = _generate_trades(
-        valuation_date,
+        value_dt,
         cal,
         swap_type,
         fixed_dcc_type,
@@ -117,15 +117,15 @@ def test_par_rate_risk_report_cubic_zero():
 
 def test_par_rate_risk_report_flat_forward():
 
-    valuation_date = Date(6, 10, 2022)
-    base_curve = build_ibor_single_curve(valuation_date, "10Y")
+    value_dt = Date(6, 10, 2022)
+    base_curve = build_ibor_single_curve(value_dt, "10Y")
     settle_dt = base_curve.used_swaps[0].effective_dt
     cal = base_curve.used_swaps[0].fixed_leg.cal_type
     fixed_day_count = base_curve.used_swaps[0].fixed_leg.dc_type
     fixed_freq_type = base_curve.used_swaps[0].fixed_leg.freq_type
 
     trades = _generate_trades(
-        valuation_date,
+        value_dt,
         cal,
         SwapTypes.PAY,
         fixed_day_count,
@@ -186,7 +186,7 @@ def test_par_rate_risk_report_flat_forward():
 
 def test_forward_rate_risk_report():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
@@ -197,7 +197,7 @@ def test_forward_rate_risk_report():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settle_dt, base_curve = _generate_base_curve(
-        valuation_date,
+        value_dt,
         cal,
         interp_type,
         depo_dcc_type,
@@ -207,7 +207,7 @@ def test_forward_rate_risk_report():
         fixed_freq_type,
     )
     trades = _generate_trades(
-        valuation_date,
+        value_dt,
         cal,
         swap_type,
         fixed_dcc_type,
@@ -298,7 +298,7 @@ def test_forward_rate_risk_report():
 
 def test_forward_rate_custom_grid_risk_report():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
@@ -309,7 +309,7 @@ def test_forward_rate_custom_grid_risk_report():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settle_dt, base_curve = _generate_base_curve(
-        valuation_date,
+        value_dt,
         cal,
         interp_type,
         depo_dcc_type,
@@ -319,7 +319,7 @@ def test_forward_rate_custom_grid_risk_report():
         fixed_freq_type,
     )
     trades = _generate_trades(
-        valuation_date,
+        value_dt,
         cal,
         swap_type,
         fixed_dcc_type,
@@ -330,10 +330,10 @@ def test_forward_rate_custom_grid_risk_report():
 
     # the grid on which we generate the risk report
     grid = [
-        valuation_date,
-        valuation_date.add_tenor("3M"),
-        valuation_date.add_tenor("15M"),
-        valuation_date.add_tenor("10Y"),
+        value_dt,
+        value_dt.add_tenor("3M"),
+        value_dt.add_tenor("15M"),
+        value_dt.add_tenor("10Y"),
     ]
 
     # size of bump to apply. In all cases par risk is reported as change in value to 1 bp rate bump
@@ -372,7 +372,7 @@ def test_forward_rate_custom_grid_risk_report():
 
 def test_carry_rolldown_report():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
@@ -383,7 +383,7 @@ def test_carry_rolldown_report():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settle_dt, base_curve = _generate_base_curve(
-        valuation_date,
+        value_dt,
         cal,
         interp_type,
         depo_dcc_type,
@@ -393,7 +393,7 @@ def test_carry_rolldown_report():
         fixed_freq_type,
     )
     trades = _generate_trades(
-        valuation_date,
+        value_dt,
         cal,
         swap_type,
         fixed_dcc_type,
@@ -464,7 +464,7 @@ def test_carry_rolldown_report():
 
 def test_parallel_shift_ladder_report():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
@@ -475,7 +475,7 @@ def test_parallel_shift_ladder_report():
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
 
     settle_dt, base_curve = _generate_base_curve(
-        valuation_date,
+        value_dt,
         cal,
         interp_type,
         depo_dcc_type,
@@ -485,7 +485,7 @@ def test_parallel_shift_ladder_report():
         fixed_freq_type,
     )
     trades = _generate_trades(
-        valuation_date,
+        value_dt,
         cal,
         swap_type,
         fixed_dcc_type,
@@ -575,7 +575,7 @@ def test_parallel_shift_ladder_report():
 
 
 def _generate_trades(
-    valuation_date,
+    value_dt,
     cal,
     swap_type,
     fixed_dcc_type,
@@ -593,7 +593,7 @@ def _generate_trades(
         cal_type=cal,
         notional=10000,
     )
-    atm = trade1.swap_rate(valuation_date, base_curve)
+    atm = trade1.swap_rate(value_dt, base_curve)
     trade1.set_fixed_rate(atm)
     trade2 = IborSwap(
         settle_dt.add_tenor("6M"),
@@ -605,7 +605,7 @@ def _generate_trades(
         cal_type=cal,
         notional=10000,
     )
-    atm = trade2.swap_rate(valuation_date, base_curve)
+    atm = trade2.swap_rate(value_dt, base_curve)
     trade2.set_fixed_rate(atm)
     trades = [trade1, trade2]
     return trades
@@ -615,7 +615,7 @@ def _generate_trades(
 
 
 def _generate_base_curve(
-    valuation_date,
+    value_dt,
     cal,
     interp_type,
     depo_dcc_type,
@@ -627,7 +627,7 @@ def _generate_base_curve(
 ):
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
@@ -695,7 +695,7 @@ def _generate_base_curve(
     )
     swaps.append(swap)
 
-    base_curve = IborSingleCurve(valuation_date, depos, fras, swaps, interp_type, check_refit_flag=True)
+    base_curve = IborSingleCurve(value_dt, depos, fras, swaps, interp_type, check_refit_flag=True)
 
     return settle_dt, base_curve
 

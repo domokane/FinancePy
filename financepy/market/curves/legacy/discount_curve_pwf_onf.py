@@ -63,18 +63,14 @@ class DiscountCurvePWFONF(DiscountCurve):
 
         self.time_dc_type = time_dc_type
 
-        dc_times = times_from_dates(
-            self.value_dt, self._knot_dts, self.time_dc_type
-        )
+        dc_times = times_from_dates(self.value_dt, self._knot_dts, self.time_dc_type)
 
         self._times = np.atleast_1d(dc_times)
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
 
         # it is easier to deal in log(dfs), log(df[Ti]) = -\int_0^T_i f(u) du
-        self._logdfs = -np.cumsum(
-            np.diff(self._times, prepend=0.0) * self._onfwd_rates
-        )
+        self._logdfs = -np.cumsum(np.diff(self._times, prepend=0.0) * self._onfwd_rates)
 
         self._logdfs_interp = interpolate.interp1d(
             np.concatenate(([0.0], self._times)),
@@ -91,7 +87,7 @@ class DiscountCurvePWFONF(DiscountCurve):
     @classmethod
     def brick_wall_curve(
         cls,
-        valuation_date: Date,
+        value_dt: Date,
         start_dt: Date,
         end_dt: Date,
         level: float = 1.0 * G_BASIS_POINT,
@@ -102,7 +98,7 @@ class DiscountCurvePWFONF(DiscountCurve):
            Mostly useful for applying bumps to other discount_curve's,
            see composite_discount_curve.py
         Args:
-            valuation_date (Date): valuation date for the discount_curve
+            value_dt (Date): valuation date for the discount_curve
             start_dt (Date): start of the non-zero ON forward rate
             end_dt (Date): end of the non-zero ON forward rate
             level (float, optional): ON forward rate between the
@@ -113,16 +109,14 @@ class DiscountCurvePWFONF(DiscountCurve):
         """
         knot_dts = [start_dt, end_dt, end_dt.add_tenor("1D")]
         onfwd_rates = [0.0, level, 0.0]
-        return cls(valuation_date, knot_dts, onfwd_rates)
+        return cls(value_dt, knot_dts, onfwd_rates)
 
     ####################################################################################
     @classmethod
-    def flat_curve(
-        cls, valuation_date: Date, level: float = 1.0 * G_BASIS_POINT
-    ):
-        knot_dts = [valuation_date.add_tenor("1Y")]
+    def flat_curve(cls, value_dt: Date, level: float = 1.0 * G_BASIS_POINT):
+        knot_dts = [value_dt.add_tenor("1Y")]
         onfwd_rates = [level]
-        return cls(valuation_date, knot_dts, onfwd_rates)
+        return cls(value_dt, knot_dts, onfwd_rates)
 
     ####################################################################################
 

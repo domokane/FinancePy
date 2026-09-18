@@ -30,17 +30,15 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 def test_ibor_benchmarks_report():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
     interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    settle_dt = value_dt.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -163,7 +161,7 @@ def test_ibor_benchmarks_report():
     # Create but do not build the initial curve
     do_build = True
     curve = IborSingleCurve(
-        valuation_date,
+        value_dt,
         depos,
         fras,
         swaps,
@@ -178,11 +176,7 @@ def test_ibor_benchmarks_report():
 
     # Confirm that there are no NaNs. In particular this means that different types of benchmarks
     # return exactly the same keys, just like we want it, with a couple of exceptions
-    assert (
-        benchmarks_report.drop(columns=["fixed_freq_type", "fixed_leg_type"])
-        .isnull()
-        .values.any()
-    ) == False
+    assert (benchmarks_report.drop(columns=["fixed_freq_type", "fixed_leg_type"]).isnull().values.any()) == False
 
 
 ########################################################################################
@@ -198,16 +192,10 @@ def test_dataframe_to_benchmarks():
 
     df = pd.read_csv(full_filename_path, index_col=0)
 
-    df["start_dt"] = pd.to_datetime(
-        df["start_dt"], format="%d-%b-%y"
-    )  # allow tenors
-    df["maturity_dt"] = pd.to_datetime(
-        df["maturity_dt"], format="%d-%b-%y"
-    )  # allow tenors
+    df["start_dt"] = pd.to_datetime(df["start_dt"], format="%d-%b-%y")  # allow tenors
+    df["maturity_dt"] = pd.to_datetime(df["maturity_dt"], format="%d-%b-%y")  # allow tenors
 
-    benchmarks = dataframe_to_benchmarks(
-        df, asof_date=asof, calendar_type=CalendarTypes.LONDON
-    )
+    benchmarks = dataframe_to_benchmarks(df, asof_date=asof, calendar_type=CalendarTypes.LONDON)
 
     assert len(benchmarks["IborDeposit"]) == 2
     assert len(benchmarks["IborFRA"]) == 1

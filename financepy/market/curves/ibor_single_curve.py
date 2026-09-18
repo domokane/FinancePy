@@ -891,10 +891,8 @@ class IborSingleCurve(DiscountCurve):
                 raise FinError(f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}")
 
         for swap in self.used_swaps:
-            # We value it as of the start date of the swap
-            v = swap.value(swap.effective_dt, self, self, None)
+            v = swap.value(self.value_dt, self, self, None)
             v = v / swap.fixed_leg.notional / swap.pv01(self.value_dt, self)  # express in terms of the rate
-            #            print("REFIT SWAP VALUATION:", swap._adjusted_maturity_dt, v)
             if abs(v) > swap_tol:
                 print(
                     "Swap with maturity " + str(swap.maturity_dt) + " Not Repriced. Has Value",

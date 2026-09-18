@@ -3,7 +3,6 @@
 ##############################################################################
 
 from typing import Union
-from enum import Enum
 
 import numpy as np
 
@@ -17,12 +16,12 @@ from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.math import ONE_MILLION
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.check_values import check_curve_dt
 
 from .swap_fixed_leg import SwapFixedLeg
 from .swap_float_leg import SwapFloatLeg
 
 ########################################################################################
-
 
 
 ########################################################################################
@@ -136,17 +135,15 @@ class OIS:
 
     ##########################################################################
 
-    def value(
-        self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None
-    ):
+    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
+        check_curve_dt(value_dt, ois_curve)
+
         fixed_leg_value = self.fixed_leg.value(value_dt, ois_curve)
 
-        float_leg_value = self.float_leg.value(
-            value_dt, ois_curve, ois_curve, first_fixing_rate
-        )
+        float_leg_value = self.float_leg.value(value_dt, ois_curve, ois_curve, first_fixing_rate)
 
         value = fixed_leg_value + float_leg_value
         return value
@@ -175,9 +172,7 @@ class OIS:
 
         pv01 = self.pv01(value_dt, ois_curve)
 
-        float_leg_value = self.float_leg.value(
-            value_dt, ois_curve, ois_curve, first_fixing_rate
-        )
+        float_leg_value = self.float_leg.value(value_dt, ois_curve, ois_curve, first_fixing_rate)
 
         cpn = float_leg_value / pv01 / self.fixed_leg.notional
         return cpn

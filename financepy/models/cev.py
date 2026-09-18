@@ -14,6 +14,7 @@ from math import exp
 import numpy as np
 from scipy.stats import ncx2
 
+
 from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
 from ..models.black_scholes_analytic import (
@@ -382,7 +383,7 @@ class CEV:
         self,
         stock_price,
         t_exp,
-        strike,
+        strike_price,
         option_type,
         interest_rate,
         dividend_yield,
@@ -400,7 +401,7 @@ class CEV:
         self._validate_inputs(
             stock_price,
             t_exp,
-            strike,
+            strike_price,
         )
 
         if num_paths <= 0:
@@ -457,14 +458,14 @@ class CEV:
         if option_type == OptionTypes.EUROPEAN_CALL.value:
 
             payoff = np.maximum(
-                s - strike,
+                s - strike_price,
                 0.0,
             )
 
         else:
 
             payoff = np.maximum(
-                strike - s,
+                strike_price - s,
                 0.0,
             )
 

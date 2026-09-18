@@ -1,4 +1,18 @@
 ## CHANGE LOG
+18 Sep 2026
+List of changes
+- Moved DIRTY and CLEAN indices to global vars
+- Added dc_type to CDS curve
+- Added curve_years function to discount_curve
+- Global enforcement of value_dt removing valuation_date
+- Ensure all swap calibration is based on value_dt
+- Move calculation of r and q to curve.zero_rate_cc
+- Migrated several valuation models from products to models folder
+- Added checks for curve anchor dates - check_curve_dt
+- Added checks for stock prices
+- Added function option_years
+- Enforced use of t_exp in options as much as possible
+
 16 Sep 2026
 List of changes
 - Added check_values module to init to check values of specific input types in one place

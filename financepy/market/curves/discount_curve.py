@@ -331,6 +331,30 @@ class DiscountCurve:
 
     ###########################################################################
 
+    def curve_years(self, maturity_dt: Union[list, Date]):
+        """Calculate zero rates with continuous compounding."""
+
+        times = times_from_dates(self.value_dt, maturity_dt, self.time_dc_type)
+        return times
+
+    ###########################################################################
+
+    def fwd_zero_rate_cc(self, start_dt: Date, end_dt: Date):
+        """Calculate fwd zero rates with continuous compounding."""
+
+        df_start = self.df(start_dt)
+        df_end = self.df(end_dt)
+        df_fwd = df_end / df_start
+
+        start_t = times_from_dates(self.value_dt, start_dt, self.time_dc_type)
+        end_t = times_from_dates(self.value_dt, end_dt, self.time_dc_type)
+        t_fwd = end_t - start_t
+
+        fwd_zero_cc = -np.log(df_fwd) / t_fwd
+        return fwd_zero_cc
+
+    ###########################################################################
+
     def zero_rate_cc(self, maturity_dt: Union[list, Date]):
         """Calculate zero rates with continuous compounding."""
 

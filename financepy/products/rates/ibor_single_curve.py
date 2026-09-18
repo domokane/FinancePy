@@ -89,11 +89,7 @@ def _cost_function(dfs, *args):
         cost += v * v
 
     for swap in libor_curve.used_swaps:
-        v = (
-            swap.value(value_dt, libor_curve)
-            / swap.fixed_leg.notional
-            / swap.pv01(value_dt, libor_curve)
-        )
+        v = swap.value(value_dt, libor_curve) / swap.fixed_leg.notional / swap.pv01(value_dt, libor_curve)
         #        print("SWAP:", swap.maturity_dt, v)
         cost += v * v
 
@@ -509,21 +505,14 @@ class IborSingleCurve(DiscountCurve):
 
             libor_curve.fit(libor_curve._times, libor_curve._dfs)
 
-            out = np.zeros(
-                len(libor_curve.used_deposits)
-                + len(libor_curve.used_fras)
-                + len(libor_curve.used_swaps)
-            )
+            out = np.zeros(len(libor_curve.used_deposits) + len(libor_curve.used_fras) + len(libor_curve.used_swaps))
 
             idx = 0
             for depo in libor_curve.used_deposits:
                 # do not need to be too exact here
                 acc_factor = datediff(depo.start_dt, depo.maturity_dt)
                 # as rate
-                r = (
-                    -np.log(depo.value(value_dt, libor_curve) / depo.notional)
-                    / acc_factor
-                )
+                r = -np.log(depo.value(value_dt, libor_curve) / depo.notional) / acc_factor
                 out[idx] = r
                 idx = idx + 1
 
@@ -535,11 +524,7 @@ class IborSingleCurve(DiscountCurve):
                 idx = idx + 1
 
             for swap in libor_curve.used_swaps:
-                v = (
-                    swap.value(value_dt, libor_curve)
-                    / swap.fixed_leg.notional
-                    / swap.pv01(value_dt, libor_curve)
-                )
+                v = swap.value(value_dt, libor_curve) / swap.fixed_leg.notional / swap.pv01(value_dt, libor_curve)
                 out[idx] = v
                 idx = idx + 1
 
@@ -565,21 +550,15 @@ class IborSingleCurve(DiscountCurve):
             self._interpolator = Interpolator(self._interp_type, **kwargs)
 
             for depo in self.used_deposits:
-                t_mat = times_from_dates(self.value_dt,
-                    depo.maturity_dt, self.time_dc_type
-                )
+                t_mat = times_from_dates(self.value_dt, depo.maturity_dt, self.time_dc_type)
                 grid_times.append(t_mat)
 
             for fra in self.used_fras:
-                t_mat = times_from_dates(self.value_dt,
-                    fra.maturity_dt, self.time_dc_type
-                )
+                t_mat = times_from_dates(self.value_dt, fra.maturity_dt, self.time_dc_type)
                 grid_times.append(t_mat)
 
             for swap in self.used_swaps:
-                t_mat = times_from_dates(self.value_dt,
-                    swap.maturity_dt, self.time_dc_type
-                )
+                t_mat = times_from_dates(self.value_dt, swap.maturity_dt, self.time_dc_type)
                 grid_times.append(t_mat)
 
             self._times = np.array(grid_times)
@@ -624,9 +603,7 @@ class IborSingleCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
-            t_mat = times_from_dates(self.value_dt,
-                                     depo.maturity_dt,
-                                     self.time_dc_type)
+            t_mat = times_from_dates(self.value_dt, depo.maturity_dt, self.time_dc_type)
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self.fit(self._times, self._dfs)
@@ -779,37 +756,34 @@ class IborSingleCurve(DiscountCurve):
 
     def bump_parallel(self, bump_size: float):
         """Return a new curve with all calibration quotes bumped in parallel."""
-    
+
         if not np.isscalar(bump_size):
             raise FinError("Bump size must be a scalar.")
-    
+
         bump_size = float(bump_size)
         bumped_curve = copy.deepcopy(self)
-    
+
         for depo in bumped_curve.used_deposits:
             depo.deposit_rate += bump_size
-    
+
         for fra in bumped_curve.used_fras:
             fra.fra_rate += bump_size
-    
+
         for swap in bumped_curve.used_swaps:
             old_cpn = swap.fixed_leg.cpn
             new_cpn = old_cpn + bump_size
-    
+
             swap.fixed_leg.cpn = new_cpn
-    
+
             if old_cpn == 0.0:
                 # Payments cannot be rescaled from a zero coupon.
                 swap.fixed_leg.generate_payments()
             else:
                 scale = new_cpn / old_cpn
-                swap.fixed_leg.payments = [
-                    payment * scale
-                    for payment in swap.fixed_leg.payments
-                ]
-    
+                swap.fixed_leg.payments = [payment * scale for payment in swap.fixed_leg.payments]
+
         bumped_curve.build_curve(**bumped_curve._optional_interp_params)
-    
+
         return bumped_curve
 
     ###########################################################################
@@ -819,9 +793,7 @@ class IborSingleCurve(DiscountCurve):
         for depo in self.used_deposits:
             v = depo.value(self.value_dt, self) / depo.notional
             if abs(v - 1.0) > depo_tol:
-                raise FinError(
-                    f"Deposit not repriced, error = {abs(v - 1.0)} vs tol={depo_tol}"
-                )
+                raise FinError(f"Deposit not repriced, error = {abs(v - 1.0)} vs tol={depo_tol}")
 
         for fra in self.used_fras:
             v = fra.value(self.value_dt, self, self) / fra.notional
@@ -830,16 +802,12 @@ class IborSingleCurve(DiscountCurve):
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap.effective_dt, self, self, None)
-            v = (
-                v / swap.fixed_leg.notional / swap.pv01(self.value_dt, self)
-            )  # express in terms of the rate
+            v = swap.value(self.value_dt, self, self, None)
+            v = v / swap.fixed_leg.notional / swap.pv01(self.value_dt, self)  # express in terms of the rate
             #            print("REFIT SWAP VALUATION:", swap._adjusted_maturity_dt, v)
             if abs(v) > swap_tol:
                 print(
-                    "Swap with maturity "
-                    + str(swap.maturity_dt)
-                    + " Not Repriced. Has Value",
+                    "Swap with maturity " + str(swap.maturity_dt) + " Not Repriced. Has Value",
                     v,
                 )
                 swap.print_fixed_leg_pv()
@@ -853,9 +821,7 @@ class IborSingleCurve(DiscountCurve):
         Override from DiscountCurve so we can check if the curve
         has actually been built.
         """
-        assert (
-            self.is_built
-        ), "The curve has not yet been built, call build_curve() first"
+        assert self.is_built, "The curve has not yet been built, call build_curve() first"
         return super().df_t(t)
 
     ####################################################################################
@@ -885,9 +851,7 @@ class IborSingleCurve(DiscountCurve):
             num_points = len(self._times)
             s += label_to_string("GRID TIMES", "GRID DFS")
             for i in range(num_points):
-                s += label_to_string(
-                    f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}"
-                )
+                s += label_to_string(f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}")
 
         return s
 

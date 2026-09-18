@@ -9,6 +9,8 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.check_values import check_curve_dt
+
 from ...products.bonds.bond import YTMCalcType
 
 
@@ -407,6 +409,8 @@ class BondZero:
         present-value the bond's cash flows back to the curve anchor date and
         not to the settlement date."""
 
+        check_curve_dt(settle_dt, discount_curve)
+
         dirty_price = self.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
         accrued = self.accrued_interest(settle_dt, self.par)
@@ -427,6 +431,8 @@ class BondZero:
 
         if settle_dt > self.maturity_dt:
             raise FinError("Bond settles on or after maturity")
+
+        check_curve_dt(settle_dt, discount_curve)
 
         df_settle = discount_curve.df(settle_dt)
         df_mat = discount_curve.df(self.maturity_dt)
@@ -459,6 +465,9 @@ class BondZero:
         recovery_rate: float,
     ):
         """Return risky dirty price per 100 nominal for a zero coupon bond."""
+
+        check_curve_dt(settle_dt, discount_curve)
+        check_curve_dt(settle_dt, survival_curve)
 
         if settle_dt < discount_curve.value_dt:
             raise FinError("Bond settles before discount curve date")
@@ -498,6 +507,9 @@ class BondZero:
         recovery_rate: float,
     ):
         """Return risky clean price per 100 nominal for a zero coupon bond."""
+
+        check_curve_dt(settle_dt, discount_curve)
+        check_curve_dt(settle_dt, survival_curve)
 
         dirty_price = self.dirty_price_from_survival_curve(
             settle_dt,

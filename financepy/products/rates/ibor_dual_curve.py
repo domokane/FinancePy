@@ -236,9 +236,7 @@ class IborDualCurve(DiscountCurve):
                 num_flows = len(swap_cpn_dts)
                 for i_flow in range(0, num_flows):
                     if swap_cpn_dts[i_flow] != longest_swap_cpn_dts[i_flow]:
-                        raise FinError(
-                            "Swap cpns are not on the same date grid."
-                        )
+                        raise FinError("Swap cpns are not on the same date grid.")
 
         #######################################################################
         # Now we have ensure they are in order check for overlaps and the like
@@ -322,9 +320,7 @@ class IborDualCurve(DiscountCurve):
 
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = times_from_dates(self.value_dt,
-                depo.maturity_dt, self.time_dc_type
-            )
+            t_mat = times_from_dates(self.value_dt, depo.maturity_dt, self.time_dc_type)
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -334,13 +330,9 @@ class IborDualCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = times_from_dates(self.value_dt,
-                fra.start_dt, self.time_dc_type
-            )
+            t_set = times_from_dates(self.value_dt, fra.start_dt, self.time_dc_type)
 
-            t_mat = times_from_dates(self.value_dt,
-                fra.maturity_dt, self.time_dc_type
-            )
+            t_mat = times_from_dates(self.value_dt, fra.maturity_dt, self.time_dc_type)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -368,9 +360,7 @@ class IborDualCurve(DiscountCurve):
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
 
-            t_mat = times_from_dates(self.value_dt,
-                maturity_dt, self.time_dc_type
-            )
+            t_mat = times_from_dates(self.value_dt, maturity_dt, self.time_dc_type)
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -545,23 +535,18 @@ class IborDualCurve(DiscountCurve):
                 raise FinError("Deposit not repriced.")
 
         for fra in self.used_fras:
-            v = (
-                fra.value(self.value_dt, self.discount_curve, self)
-                / fra.notional
-            )
+            v = fra.value(self.value_dt, self.discount_curve, self) / fra.notional
             if abs(v) > fra_tol:
                 print("Value", v)
                 raise FinError("FRA not repriced.")
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap.effective_dt, self.discount_curve, self, None)
+            v = swap.value(self.value_dt, self.discount_curve, self, None)
             v = v / swap.fixed_leg.notional
             if abs(v) > swap_tol:
                 print(
-                    "Swap with maturity "
-                    + str(swap.maturity_dt)
-                    + " Not Repriced. Has Value",
+                    "Swap with maturity " + str(swap.maturity_dt) + " Not Repriced. Has Value",
                     v,
                 )
                 swap.print_fixed_leg_pv()

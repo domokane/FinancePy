@@ -64,8 +64,6 @@ def test_fin_option_implied_dbn():
             delta_method,
         )
 
-        #        fx_market.check_calibration(True)
-
         if PLOT_GRAPHS:
             fx_market.plot_vol_curves()
 
@@ -79,11 +77,6 @@ def test_fin_option_implied_dbn():
 
             num_steps = 10000
             d_fx = (end_fx - start_fx) / num_steps
-
-            #            dom_df = domestic_curve.df_t(t_exp)
-            #            for_df = foreign_curve.df_t(t_exp)
-            #            r_d = -np.log(dom_df) / t_exp
-            #            r_f = -np.log(for_df) / t_exp
 
             params = fx_market.parameters[i_tenor]
 
@@ -101,11 +94,6 @@ def test_fin_option_implied_dbn():
 
 
 ########################################################################################
-
-#            dbn = optionImpliedDbn(spot_fx_rate, t_exp, rd, rf, strikes, vols)
-#            print("SUM:", dbn.sum())
-#            plt.figure()
-#            plt.plot(dbn._x, dbn._densitydx)
 
 
 test_fin_option_implied_dbn()

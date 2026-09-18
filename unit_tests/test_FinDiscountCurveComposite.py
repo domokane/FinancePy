@@ -18,21 +18,19 @@ from .helpers import build_ibor_single_curve
 
 def test_composite_discount_curve_can_value_trades():
     """Test that we can use a composite discount curve to value trades"""
-    valuation_date = Date(6, 10, 2022)
-    base_curve = FlatDiscountCurve(valuation_date, 0.02)
+    value_dt = Date(6, 10, 2022)
+    base_curve = FlatDiscountCurve(value_dt, 0.02)
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 1.0 * G_PERCENT
-    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
-        base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
-    )
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
-    trade = _create_test_swap(valuation_date)
-    atm = trade.swap_rate(valuation_date, composite_curve)
+    trade = _create_test_swap(value_dt)
+    atm = trade.swap_rate(value_dt, composite_curve)
     trade.set_fixed_rate(atm)
-    value = trade.value(valuation_date, composite_curve)
+    value = trade.value(value_dt, composite_curve)
 
     expected_atm = 0.02219285487480169
     expected_value = 0.0
@@ -46,26 +44,24 @@ def test_composite_discount_curve_can_value_trades():
 
 def test_zero_bump_has_no_effect_on_base_discount_curve():
     """Test that adding a zero bump to a DiscountCurve does not affect valuation"""
-    valuation_date = Date(6, 10, 2022)
-    base_curve = FlatDiscountCurve(valuation_date, 0.02)
+    value_dt = Date(6, 10, 2022)
+    base_curve = FlatDiscountCurve(value_dt, 0.02)
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * G_PERCENT
-    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
-        base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
-    )
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
-    trade = _create_test_swap(valuation_date)
-    atm_base = trade.swap_rate(valuation_date, base_curve)
-    atm_comp = trade.swap_rate(valuation_date, composite_curve)
+    trade = _create_test_swap(value_dt)
+    atm_base = trade.swap_rate(value_dt, base_curve)
+    atm_comp = trade.swap_rate(value_dt, composite_curve)
 
     assert abs(atm_base - atm_comp) < 1e-8
 
     trade.set_fixed_rate(atm_base)
-    value_base = trade.value(valuation_date, base_curve)
-    value_comp = trade.value(valuation_date, composite_curve)
+    value_base = trade.value(value_dt, base_curve)
+    value_comp = trade.value(value_dt, composite_curve)
 
     assert abs(value_base - value_comp) < 1e-8
 
@@ -75,26 +71,24 @@ def test_zero_bump_has_no_effect_on_base_discount_curve():
 
 def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
     """Test that adding a zero bump to an IborSingleCurve does not affect valuation"""
-    valuation_date = Date(6, 10, 2022)
-    base_curve = build_ibor_single_curve(valuation_date, last_tenor="10Y")
+    value_dt = Date(6, 10, 2022)
+    base_curve = build_ibor_single_curve(value_dt, last_tenor="10Y")
 
     bump_start_dt = Date(6, 10, 2023)
     bump_end_dt = Date(6, 10, 2024)
     bump_size = 0.0 * G_PERCENT
-    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(
-        base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size
-    )
+    fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.value_dt, bump_start_dt, bump_end_dt, bump_size)
     composite_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
-    trade = _create_test_swap(valuation_date)
-    atm_base = trade.swap_rate(valuation_date, base_curve)
-    atm_comp = trade.swap_rate(valuation_date, composite_curve)
+    trade = _create_test_swap(value_dt)
+    atm_base = trade.swap_rate(value_dt, base_curve)
+    atm_comp = trade.swap_rate(value_dt, composite_curve)
 
     assert abs(atm_base - atm_comp) < 1e-8
 
     trade.set_fixed_rate(atm_base)
-    value_base = trade.value(valuation_date, base_curve)
-    value_comp = trade.value(valuation_date, composite_curve)
+    value_base = trade.value(value_dt, base_curve)
+    value_comp = trade.value(value_dt, composite_curve)
 
     assert abs(value_base - value_comp) < 1e-8
 
@@ -102,11 +96,11 @@ def test_zero_bump_has_no_effect_on_base_ibor_single_curve():
 ########################################################################################
 
 
-def _create_test_swap(valuation_date):
+def _create_test_swap(value_dt):
 
     spot_days = 2
     cal = CalendarTypes.LONDON
-    settle_dt = valuation_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     swap_type = SwapTypes.PAY
     fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
     fixed_freq_type = FrequencyTypes.SEMI_ANNUAL

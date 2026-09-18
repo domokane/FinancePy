@@ -13,9 +13,7 @@ from ...utils.helpers import input_time, table_to_string
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
-
-DIRTY = 0
-CLEAN = 1
+from ...utils.global_vars import CLEAN
 
 # from numba import njit, float64
 
@@ -63,9 +61,7 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if value_dt != libor_curve.value_dt:
-            raise FinError(
-                "Curve does not have same valuation date as Issuer curve."
-            )
+            raise FinError("Curve does not have same valuation date as Issuer curve.")
 
         self.value_dt = value_dt
         self.cds_contracts = cds_contracts
@@ -160,14 +156,10 @@ class CDSCurve:
             n = len(t)
             qs = np.zeros(n)
             for i in range(0, n):
-                qs[i] = _uinterpolate(
-                    t[i], self._times, self._qs, self.interp_method.value
-                )
+                qs[i] = _uinterpolate(t[i], self._times, self._qs, self.interp_method.value)
             return qs
         elif np.isscalar(t):
-            q = _uinterpolate(
-                t, self._times, self._qs, self.interp_method.value
-            )
+            q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
             return q
 
         raise FinError("Unknown time type")

@@ -17,6 +17,10 @@ from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...models.black_scholes_analytic import european_value
+from ...utils.helpers import option_years
+from ...utils.check_values import check_curve_dt
+
+from ...models.equity_chooser_bs import equity_chooser_value
 
 DEBUG_MODE = False
 
@@ -27,38 +31,38 @@ DEBUG_MODE = False
 ########################################################################################
 
 
-def _f(ss, *args):
-    """Complex chooser option solve for critical stock price that makes the
-    forward starting call and put options have the same price on the chooser
-    date."""
+# def _f(ss, *args):
+#     """Complex chooser option solve for critical stock price that makes the
+#     forward starting call and put options have the same price on the chooser
+#     date."""
 
-    t = args[0]
-    tc = args[1]
-    tp = args[2]
-    rtc = args[3]
-    rtp = args[4]
-    kc = args[5]
-    kp = args[6]
-    v = args[7]
-    qc = args[8]
-    qp = args[9]
+#     t_choose = args[0]
+#     tc = args[1]
+#     tp = args[2]
+#     rtc = args[3]
+#     rtp = args[4]
+#     kc = args[5]
+#     kp = args[6]
+#     v = args[7]
+#     qc = args[8]
+#     qp = args[9]
 
-    call_int = OptionTypes.EUROPEAN_CALL.value
-    put_int = OptionTypes.EUROPEAN_PUT.value
+#     call_int = OptionTypes.EUROPEAN_CALL.value
+#     put_int = OptionTypes.EUROPEAN_PUT.value
 
-    if tc == t:
-        v_call = np.maximum(ss - kc, 0.0)
-    else:
+#     if tc == t_choose:
+#         v_call = np.maximum(ss - kc, 0.0)
+#     else:
 
-        v_call = european_value(ss, tc - t, kc, rtc, qc, v, call_int)
+#         v_call = european_value(ss, tc - t_choose, kc, rtc, qc, v, call_int)
 
-    if tp == t:
-        v_put = np.maximum(kp - ss, 0.0)
-    else:
-        v_put = european_value(ss, tp - t, kp, rtp, qp, v, put_int)
+#     if tp == t_choose:
+#         v_put = np.maximum(kp - ss, 0.0)
+#     else:
+#         v_put = european_value(ss, tp - t_choose, kp, rtp, qp, v, put_int)
 
-    v = v_call - v_put
-    return v
+#     v = v_call - v_put
+#     return v
 
 
 ########################################################################################
@@ -122,19 +126,16 @@ class EquityChooserOption(EquityOption):
         if value_dt > self.put_expiry_dt:
             raise FinError("Valuation date after put expiry date.")
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError("Discount Curve valuation date not same as option value date")
-
-        if dividend_curve.value_dt != value_dt:
-            raise FinError("Dividend Curve valuation date not same as option value date")
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
 
         if value_dt == self.choose_dt:
             v = self.value_dt_on_choose_dt(value_dt, stock_price, discount_curve, dividend_curve, model)
             return v
 
-        t_choose = (self.choose_dt - value_dt) / G_DAYS_IN_YEAR
-        t_call = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        t_put = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_choose = option_years(value_dt, self.choose_dt)
+        t_call = option_years(value_dt, self.call_expiry_dt)
+        t_put = option_years(value_dt, self.put_expiry_dt)
 
         df_t = discount_curve.df(self.choose_dt)
         df_c = discount_curve.df(self.call_expiry_dt)
@@ -145,84 +146,95 @@ class EquityChooserOption(EquityOption):
         dq_p = dividend_curve.df(self.put_expiry_dt)
 
         if t_call > t_choose:
-            rfc = -np.log(df_c / df_t) / (t_call - t_choose)
-            qfc = -np.log(dq_c / dq_t) / (t_call - t_choose)
+
+            rfc = discount_curve.fwd_zero_rate_cc(self.choose_dt, self.call_expiry_dt)
+            qfc = dividend_curve.fwd_zero_rate_cc(self.choose_dt, self.call_expiry_dt)
+
         else:
             rfc = 0.0
             qfc = 0.0
 
         if t_put > t_choose:
-            rfp = -np.log(df_p / df_t) / (t_put - t_choose)
-            qfp = -np.log(dq_p / dq_t) / (t_put - t_choose)
+
+            rfp = discount_curve.fwd_zero_rate_cc(self.choose_dt, self.put_expiry_dt)
+            qfp = dividend_curve.fwd_zero_rate_cc(self.choose_dt, self.put_expiry_dt)
+
         else:
             rfp = 0.0
             qfp = 0.0
 
         vol = model.volatility
         vol = max(vol, G_SMALL)
-        vol2 = vol * vol
+        #        vol2 = vol * vol
 
-        scalar_input = np.isscalar(stock_price)
+        #        scalar_input = np.isscalar(stock_price)
         s0 = np.atleast_1d(np.asarray(stock_price, dtype=float))
 
-        xc = self.call_strike
-        xp = self.put_strike
+        k_c = self.call_strike
+        k_p = self.put_strike
 
-        argtuple = (t_choose, t_call, t_put, rfc, rfp, xc, xp, vol, qfc, qfp)
-        if DEBUG_MODE:
-            print("args", argtuple)
+        # argtuple = (t_choose, t_call, t_put, rfc, rfp, k_c, k_p, vol, qfc, qfp)
+        # if DEBUG_MODE:
+        #     print("args", argtuple)
 
-        x_init = 0.5 * (xc + xp)
-        istar = optimize.newton(_f, x0=x_init, args=argtuple, tol=1e-8, maxiter=50)
+        # x_init = 0.5 * (k_c + k_p)
 
-        if DEBUG_MODE:
-            print("istar", istar)
+        # istar = optimize.newton(_f, x0=x_init, args=argtuple, tol=1e-8, maxiter=50)
 
-        sqrt_tc = np.sqrt(t_call)
-        sqrt_tp = np.sqrt(t_put)
-        sqrt_t = np.sqrt(t_choose)
+        # if DEBUG_MODE:
+        #     print("istar", istar)
 
-        d1 = (np.log(s0 / istar) + np.log(dq_t / df_t) + 0.5 * vol2 * t_choose) / vol / sqrt_t
-        d2 = d1 - vol * sqrt_t
+        # sqrt_tc = np.sqrt(t_call)
+        # sqrt_tp = np.sqrt(t_put)
+        # sqrt_t = np.sqrt(t_choose)
 
-        if DEBUG_MODE:
-            print("d1", d1)
-            print("d2", d2)
+        # d1 = (np.log(s0 / istar) + np.log(dq_t / df_t) + 0.5 * vol2 * t_choose) / vol / sqrt_t
+        # d2 = d1 - vol * sqrt_t
 
-        y1 = (np.log(s0 / xc) + np.log(dq_c / df_c) + 0.5 * vol2 * t_call) / vol / sqrt_tc
-        y2 = (np.log(s0 / xp) + np.log(dq_p / df_p) + 0.5 * vol2 * t_put) / vol / sqrt_tp
+        # if DEBUG_MODE:
+        #     print("d1", d1)
+        #     print("d2", d2)
 
-        if DEBUG_MODE:
-            print("y1", y1)
-            print("y2", y2)
+        # y1 = (np.log(s0 / k_c) + np.log(dq_c / df_c) + 0.5 * vol2 * t_call) / vol / sqrt_tc
+        # y2 = (np.log(s0 / k_p) + np.log(dq_p / df_p) + 0.5 * vol2 * t_put) / vol / sqrt_tp
 
-        rho1 = sqrt_t / sqrt_tc
-        rho2 = sqrt_t / sqrt_tp
+        # if DEBUG_MODE:
+        #     print("y1", y1)
+        #     print("y2", y2)
 
-        if DEBUG_MODE:
-            print("rho1", rho1)
-            print("rho2", rho2)
+        # rho1 = sqrt_t / sqrt_tc
+        # rho2 = sqrt_t / sqrt_tp
 
-        if 1 == 1:
-            w = s0 * dq_c * M(d1, y1, rho1)
-            w = w - xc * df_c * M(d2, y1 - vol * sqrt_tc, rho1)
-            w = w - s0 * dq_p * M(-d1, -y2, rho2)
-            w = w + xp * df_p * M(-d2, -y2 + vol * sqrt_tp, rho2)
-        else:
-            m1 = np.array([M(a, b, rho1) for a, b in zip(d1, y1)])
-            m2 = np.array([M(a, b, rho1) for a, b in zip(d2, y1 - vol * sqrt_tc)])
-            m3 = np.array([M(a, b, rho2) for a, b in zip(-d1, -y2)])
-            m4 = np.array([M(a, b, rho2) for a, b in zip(-d2, -y2 + vol * sqrt_tp)])
+        # if DEBUG_MODE:
+        #     print("rho1", rho1)
+        #     print("rho2", rho2)
 
-            w = s0 * dq_c * m1
-            w -= xc * df_c * m2
-            w -= s0 * dq_p * m3
-            w += xp * df_p * m4
+        # if 1 == 1:
+        #     w = s0 * dq_c * M(d1, y1, rho1)
+        #     w = w - k_c * df_c * M(d2, y1 - vol * sqrt_tc, rho1)
+        #     w = w - s0 * dq_p * M(-d1, -y2, rho2)
+        #     w = w + k_p * df_p * M(-d2, -y2 + vol * sqrt_tp, rho2)
+        # else:
+        #     m1 = np.array([M(a, b, rho1) for a, b in zip(d1, y1)])
+        #     m2 = np.array([M(a, b, rho1) for a, b in zip(d2, y1 - vol * sqrt_tc)])
+        #     m3 = np.array([M(a, b, rho2) for a, b in zip(-d1, -y2)])
+        #     m4 = np.array([M(a, b, rho2) for a, b in zip(-d2, -y2 + vol * sqrt_tp)])
 
-        if scalar_input:
-            return w[0]
+        #     w = s0 * dq_c * m1
+        #     w -= k_c * df_c * m2
+        #     w -= s0 * dq_p * m3
+        #     w += k_p * df_p * m4
 
-        return w
+        # if scalar_input:
+        #     return w[0]
+
+        v = equity_chooser_value(
+            t_choose, t_call, t_put, k_c, k_p, s0, df_t, df_c, df_p, dq_t, dq_c, dq_p, rfc, qfc, rfp, qfp, vol
+        )
+
+        #        print(v, w)
+
+        return v
 
     ###########################################################################
 
@@ -242,68 +254,71 @@ class EquityChooserOption(EquityOption):
             v = self.value_dt_on_choose_dt(value_dt, stock_price, discount_curve, dividend_curve, model)
             return v
 
-        t = (self.choose_dt - value_dt) / G_DAYS_IN_YEAR
-        t_c = (self.call_expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        t_p = (self.put_expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
+        t_choose = option_years(value_dt, self.choose_dt)
+        t_c = option_years(value_dt, self.call_expiry_dt)
+        t_p = option_years(value_dt, self.put_expiry_dt)
 
         vol = model.volatility
         vol = max(vol, 1e-6)
 
-        df_t = discount_curve.df(self.choose_dt)
+        df_t_choose = discount_curve.df(self.choose_dt)
         df_c = discount_curve.df(self.call_expiry_dt)
         df_p = discount_curve.df(self.put_expiry_dt)
 
-        dq_t = dividend_curve.df(self.choose_dt)
+        dq_t_choose = dividend_curve.df(self.choose_dt)
         dq_c = dividend_curve.df(self.call_expiry_dt)
         dq_p = dividend_curve.df(self.put_expiry_dt)
 
-        if t_c > t:
-            rfc = -np.log(df_c / df_t) / (t_c - t)
-            qfc = -np.log(dq_c / dq_t) / (t_c - t)
+        if t_c > t_choose:
+            rfc = -np.log(df_c / df_t_choose) / (t_c - t_choose)
+            qfc = -np.log(dq_c / dq_t_choose) / (t_c - t_choose)
         else:
             rfc = 0.0
             qfc = 0.0
 
-        if t_p > t:
-            rfp = -np.log(df_p / df_t) / (t_p - t)
-            qfp = -np.log(dq_p / dq_t) / (t_p - t)
+        if t_p > t_choose:
+            rfp = -np.log(df_p / df_t_choose) / (t_p - t_choose)
+            qfp = -np.log(dq_p / dq_t_choose) / (t_p - t_choose)
         else:
             rfp = 0.0
             qfp = 0.0
 
-        kc = self.call_strike
-        kp = self.put_strike
+        k_c = self.call_strike
+        k_p = self.put_strike
 
         rng = np.random.default_rng(seed)
         g = rng.normal(0.0, 1.0, size=(1, num_paths))
-        sqrt_dt = np.sqrt(t)
+        sqrt_dt = np.sqrt(t_choose)
 
-        forward_growth = dq_t / df_t
-        s = stock_price * forward_growth * np.exp(-0.5 * vol * vol * t)
+        forward_growth = dq_t_choose / df_t_choose
+        s = stock_price * forward_growth * np.exp(-0.5 * vol * vol * t_choose)
         m = np.exp(g * sqrt_dt * vol)
 
         s_1 = s * m
         s_2 = s / m
 
-        if t_c == t:
-            v_call_1 = np.maximum(s_1 - kc, 0.0)
-            v_call_2 = np.maximum(s_2 - kc, 0.0)
+        if t_c == t_choose:
+            v_call_1 = np.maximum(s_1 - k_c, 0.0)
+            v_call_2 = np.maximum(s_2 - k_c, 0.0)
         else:
-            v_call_1 = european_value(s_1, t_c - t, kc, rfc, qfc, vol, OptionTypes.EUROPEAN_CALL.value)
-            v_call_2 = european_value(s_2, t_c - t, kc, rfc, qfc, vol, OptionTypes.EUROPEAN_CALL.value)
+            v_call_1 = european_value(s_1, t_c - t_choose, k_c, rfc, qfc, vol, OptionTypes.EUROPEAN_CALL.value)
+            v_call_2 = european_value(s_2, t_c - t_choose, k_c, rfc, qfc, vol, OptionTypes.EUROPEAN_CALL.value)
 
-        if t_p == t:
-            v_put_1 = np.maximum(kp - s_1, 0.0)
-            v_put_2 = np.maximum(kp - s_2, 0.0)
+        if t_p == t_choose:
+            v_put_1 = np.maximum(k_p - s_1, 0.0)
+            v_put_2 = np.maximum(k_p - s_2, 0.0)
         else:
-            v_put_1 = european_value(s_1, t_p - t, kp, rfp, qfp, vol, OptionTypes.EUROPEAN_PUT.value)
-            v_put_2 = european_value(s_2, t_p - t, kp, rfp, qfp, vol, OptionTypes.EUROPEAN_PUT.value)
+            v_put_1 = european_value(s_1, t_p - t_choose, k_p, rfp, qfp, vol, OptionTypes.EUROPEAN_PUT.value)
+            v_put_2 = european_value(s_2, t_p - t_choose, k_p, rfp, qfp, vol, OptionTypes.EUROPEAN_PUT.value)
 
         payoff_1 = np.maximum(v_call_1, v_put_1)
         payoff_2 = np.maximum(v_call_2, v_put_2)
 
         payoff = np.mean(payoff_1) + np.mean(payoff_2)
-        v = payoff * df_t / 2.0
+        v = payoff * df_t_choose / 2.0
         return v
 
     ###########################################################################
@@ -320,18 +335,15 @@ class EquityChooserOption(EquityOption):
         if t_call == 0.0:
             call_value = np.maximum(stock_price - self.call_strike, 0.0)
         else:
-            df_c = discount_curve.df(self.call_expiry_dt)
-            dq_c = dividend_curve.df(self.call_expiry_dt)
-
-            rc = -np.log(df_c) / t_call
-            qc = -np.log(dq_c) / t_call
+            r_c = discount_curve.zero_rate_cc(self.call_expiry_dt)
+            q_c = dividend_curve.zero_rate_cc(self.call_expiry_dt)
 
             call_value = european_value(
                 stock_price,
                 t_call,
                 self.call_strike,
-                rc,
-                qc,
+                r_c,
+                q_c,
                 vol,
                 OptionTypes.EUROPEAN_CALL.value,
             )
@@ -339,18 +351,15 @@ class EquityChooserOption(EquityOption):
         if t_put == 0.0:
             put_value = np.maximum(self.put_strike - stock_price, 0.0)
         else:
-            df_p = discount_curve.df(self.put_expiry_dt)
-            dq_p = dividend_curve.df(self.put_expiry_dt)
-
-            rp = -np.log(df_p) / t_put
-            qp = -np.log(dq_p) / t_put
+            r_p = discount_curve.zero_rate_cc(self.put_expiry_dt)
+            q_p = dividend_curve.zero_rate_cc(self.put_expiry_dt)
 
             put_value = european_value(
                 stock_price,
                 t_put,
                 self.put_strike,
-                rp,
-                qp,
+                r_p,
+                q_p,
                 vol,
                 OptionTypes.EUROPEAN_PUT.value,
             )

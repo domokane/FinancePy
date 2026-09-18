@@ -26,6 +26,38 @@ def _func_name():
 ########################################################################################
 
 
+def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
+
+    t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+
+    if t_exp < 0 and fail is True:
+        raise FinError("Option expires before value date.")
+
+    return t_exp
+
+    if isinstance(expiry_dt, Date):
+        t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        if t_exp < 0 and fail is True:
+            raise FinError("Option expires before value date.")
+
+    elif isinstance(expiry_dt, list):
+        t_exps = []
+        for exp_dt in expiry_dt:
+            t_exp = (exp_dt - value_dt) / G_DAYS_IN_YEAR
+            if t_exp < 0 and fail is True:
+                raise FinError("Option expires before value date.")
+
+            t_exps.append(t_exp)
+        t_exp = np.array(t_exps)
+
+    t_exp = np.maximum(t_exp, floor)
+
+    return t_exp
+
+
+########################################################################################
+
+
 def grid_index(t, grid_times):
     n = len(grid_times)
     for i in range(0, n):

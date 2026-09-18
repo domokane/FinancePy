@@ -13,6 +13,7 @@ from ...utils.day_count import DayCount
 from ...utils.day_count import DayCountTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -116,7 +117,7 @@ class IborDeposit:
 
     def valuation_details(
         self,
-        valuation_date: Date,
+        value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
     ):
@@ -131,8 +132,13 @@ class IborDeposit:
 
         TODO: make a test of this
         """
-        if valuation_date > self.maturity_dt:
+        if value_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
+
+        check_curve_dt(value_dt, discount_curve)
+
+        if index_curve is not None:
+            check_curve_dt(value_dt, index_curve)
 
         dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]

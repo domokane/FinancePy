@@ -12,7 +12,7 @@ import add_fp_to_path
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.products.equity.equity_asian_option import AsianOptionValuationMethods
+from financepy.products.equity.equity_asian_option import AsianOptionValuationTypes
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 
@@ -55,9 +55,7 @@ def test_convergence_fn():
         num_observations,
     )
 
-    test_cases.header(
-        "K", "Geometric", "Turnbull_Wakeman", "Curran", "FastMC", "FastMC_CV"
-    )
+    test_cases.header("K", "Geometric", "Turnbull_Wakeman", "Curran", "FastMC", "FastMC_CV")
 
     values_turnbull = []
     values_curran = []
@@ -83,14 +81,7 @@ def test_convergence_fn():
         )
 
         value_mc_cv = asian_option.value_mc(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            model,
-            num_paths,
-            seed,
-            accrued_avg,
+            value_dt, stock_price, discount_curve, dividend_curve, model, num_paths, seed, accrued_avg
         )
 
         value_geometric = asian_option.value(
@@ -99,7 +90,7 @@ def test_convergence_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationMethods.GEOMETRIC,
+            AsianOptionValuationTypes.GEOMETRIC,
             accrued_avg,
         )
 
@@ -109,7 +100,7 @@ def test_convergence_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationMethods.TURNBULL_WAKEMAN,
+            AsianOptionValuationTypes.TURNBULL_WAKEMAN,
             accrued_avg,
         )
 
@@ -119,7 +110,7 @@ def test_convergence_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationMethods.CURRAN,
+            AsianOptionValuationTypes.CURRAN,
             accrued_avg,
         )
 
@@ -138,20 +129,19 @@ def test_convergence_fn():
             value_mc_cv,
         )
 
+    if PLOT_FLAG:
 
-if PLOT_FLAG:
-    import matplotlib.pyplot as plt
+        x = num_paths_list
+        plt.figure(figsize=(8, 6))
+        plt.plot(x, values_geometric, label="Geometric")
+        plt.plot(x, values_turnbull, label="Turbull_Wakeman")
+        plt.plot(x, values_curran, label="Curran")
+        plt.plot(x, values_mc_fast, label="MC_Fast")
+        plt.plot(x, values_mc_cv, label="MC_CV")
+        plt.legend()
+        plt.xlabel("Number of Paths")
+        plt.show()
 
-    x = num_paths_list
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, values_geometric, label="Geometric")
-    plt.plot(x, values_turnbull, label="Turbull_Wakeman")
-    plt.plot(x, values_curran, label="Curran")
-    plt.plot(x, values_mc_fast, label="MC_Fast")
-    plt.plot(x, values_mc_cv, label="MC_CV")
-    plt.legend()
-    plt.xlabel("Number of Paths")
-    plt.show()
 
 ########################################################################################
 
@@ -240,7 +230,7 @@ def test_time_evolution_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationMethods.GEOMETRIC,
+            AsianOptionValuationTypes.GEOMETRIC,
             accrued_avg,
         )
 
@@ -250,7 +240,7 @@ def test_time_evolution_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationMethods.TURNBULL_WAKEMAN,
+            AsianOptionValuationTypes.TURNBULL_WAKEMAN,
             accrued_avg,
         )
 
@@ -260,7 +250,7 @@ def test_time_evolution_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationMethods.CURRAN,
+            AsianOptionValuationTypes.CURRAN,
             accrued_avg,
         )
 
@@ -279,19 +269,19 @@ def test_time_evolution_fn():
             value_mc_cv,
         )
 
+    if PLOT_FLAG is True:
 
-if PLOT_FLAG:
+        x = [dt.date() for dt in value_dts]
+        plt.figure(figsize=(8, 6))
+        plt.plot(x, values_geometric, label="Geometric")
+        plt.plot(x, values_turnbull, label="Turbull_Wakeman")
+        plt.plot(x, values_curran, label="Curran")
+        plt.plot(x, values_mc_fast, label="MC_Fast")
+        plt.plot(x, values_mc_cv, label="MC_CV")
+        plt.legend()
+        plt.xlabel("Valuation Date")
+        plt.show()
 
-    x = [dt.date() for dt in value_dts]
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, values_geometric, label="Geometric")
-    plt.plot(x, values_turnbull, label="Turbull_Wakeman")
-    plt.plot(x, values_curran, label="Curran")
-    plt.plot(x, values_mc_fast, label="MC_Fast")
-    plt.plot(x, values_mc_cv, label="MC_CV")
-    plt.legend()
-    plt.xlabel("Valuation Date")
-    plt.show()
 
 ########################################################################################
 
@@ -322,9 +312,7 @@ def test_mc_timings_fn():
         num_observations,
     )
 
-    test_cases.header(
-        "NUMPATHS", "VALUE", "TIME", "VALUE_MC", "TIME", "VALUE_MC_CV", "TIME"
-    )
+    test_cases.header("NUMPATHS", "VALUE", "TIME", "VALUE_MC", "TIME", "VALUE_MC_CV", "TIME")
 
     values_mc = []
     values_mc_fast = []
@@ -403,19 +391,18 @@ def test_mc_timings_fn():
             t_mc_fast_cv,
         )
 
+    ########################################################################################
 
-########################################################################################
+    if PLOT_FLAG:
 
-if PLOT_FLAG:
-
-    x = num_paths_list
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, values_mc, label="Basic MC")
-    plt.plot(x, values_mc_fast, label="MC_Fast")
-    plt.plot(x, values_mc_fast_cv, label="MC_Fast CV")
-    plt.legend()
-    plt.xlabel("Number of Paths")
-    plt.show()
+        x = num_paths_list
+        plt.figure(figsize=(8, 6))
+        plt.plot(x, values_mc, label="Basic MC")
+        plt.plot(x, values_mc_fast, label="MC_Fast")
+        plt.plot(x, values_mc_fast_cv, label="MC_Fast CV")
+        plt.legend()
+        plt.xlabel("Number of Paths")
+        plt.show()
 
 
 test_convergence_fn()

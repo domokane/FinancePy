@@ -29,19 +29,13 @@ def test_equity_forward():
     discount_curve = FlatDiscountCurve(value_dt, discount_rate)
     dividend_curve = FlatDiscountCurve(value_dt, dividend_rate)
 
-    equity_forward = EquityForward(
-        expiry_dt, forward_price, notional, LongShortTypes.LONG
-    )
+    equity_forward = EquityForward(expiry_dt, forward_price, notional, LongShortTypes.LONG)
 
     test_cases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwd_price = equity_forward.forward(
-        value_dt, stock_price, discount_curve, dividend_curve
-    )
+    fwd_price = equity_forward.forward(value_dt, stock_price, discount_curve, dividend_curve)
 
-    fwd_value = equity_forward.value(
-        value_dt, stock_price, discount_curve, dividend_curve
-    )
+    fwd_value = equity_forward.value(value_dt, stock_price, discount_curve, dividend_curve)
 
     #    print(stock_price, fwd_price, fwd_value)
     test_cases.print(stock_price, fwd_price, fwd_value)

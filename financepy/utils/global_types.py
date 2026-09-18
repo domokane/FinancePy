@@ -9,6 +9,12 @@ from enum import Enum
 ########################################################################################
 
 
+class AsianOptionValuationTypes(Enum):
+    GEOMETRIC = 1
+    TURNBULL_WAKEMAN = 2
+    CURRAN = 3
+
+
 class LMMModelTypes(Enum):
 
     ONE_FACTOR = 1
@@ -26,6 +32,7 @@ class HestonNumericalSchemeTypes(Enum):
     EULERLOG = 2
     QUADEXP = 3
 
+
 class CIRNumericalSchemeTypes(Enum):
     EULER = 1
     LOGNORMAL = 2
@@ -37,6 +44,7 @@ class CIRNumericalSchemeTypes(Enum):
 class GBMNumericalSchemeTypes(Enum):
     NORMAL = 1
     ANTITHETIC = 2
+
 
 class VolFuncTypes(Enum):
 
@@ -92,10 +100,12 @@ class ProcessTypes(Enum):
     VASICEK_PROCESS = 4
     CEV_PROCESS = 5
     JUMP_DIFFUSION_PROCESS = 6
-    
+
+
 class VasicekNumericalSchemeTypes(Enum):
     NORMAL = 1
     ANTITHETIC = 2
+
 
 class FXBarrierTypes(Enum):
     DOWN_AND_OUT_CALL = 1
@@ -154,6 +164,7 @@ class DoubleBarrierTypes(Enum):
 
 
 ########################################################################################
+
 
 class DigitalOptionTypes(Enum):
     CASH_OR_NOTHING = 1

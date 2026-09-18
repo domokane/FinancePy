@@ -16,9 +16,15 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.gbm_process_simulator import get_paths_times
-from ...utils.frequency import FrequencyTypes
+from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_stock_price
+from ...utils.helpers import option_years
 
 from ...utils.math import normcdf_vect
+from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_down
+from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_up
+from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_down_out
+from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_up_out
 
 ########################################################################################
 # TODO: Implement Sobol random numbers
@@ -26,102 +32,6 @@ from ...utils.math import normcdf_vect
 ########################################################################################
 
 DEBUG_MODE = False
-
-
-@njit(fastmath=True, cache=True)
-def _barrier_pay_one_at_hit_pv_down(s, hh, r, dt):
-    """Pay $1 if the stock crosses the barrier hh from above. PV payment."""
-    num_paths, num_time_steps = s.shape
-    pv = 0.0
-
-    for ip in nb.prange(num_paths):
-        hit_flag = 0
-
-        for it in range(0, num_time_steps):
-            if s[ip][it] <= hh:
-                hit_time = dt * it
-                v = np.exp(-r * hit_time)
-                hit_flag = 1
-                break
-
-        pv = pv + v * hit_flag
-
-    pv = pv / num_paths
-    return pv
-
-
-########################################################################################
-
-
-@njit(fastmath=True, cache=True)
-def _barrier_pay_one_at_hit_pv_up(s, hh, r, dt):
-    """Pay $1 if the stock crosses the barrier hh from below. PV payment."""
-
-    num_paths, num_time_steps = s.shape
-    pv = 0.0
-
-    for ip in nb.prange(num_paths):
-        hit_flag = 0
-
-        for it in range(0, num_time_steps):
-            if s[ip][it] >= hh:
-                hit_time = dt * it
-                v = np.exp(-r * hit_time)
-                hit_flag = 1
-                break
-
-        pv = pv + v * hit_flag
-
-    pv = pv / num_paths
-    return pv
-
-
-########################################################################################
-
-
-@njit(fastmath=True, cache=True)
-def _barrier_pay_asset_at_expiry_down_out(s, hh):
-    """Pay $1 if the stock crosses the barrier hh from above. PV payment."""
-    num_paths, num_time_steps = s.shape
-    pv = 0.0
-
-    for ip in nb.prange(num_paths):
-        hit_flag = 1
-
-        for it in range(0, num_time_steps):
-            if s[ip][it] <= hh:
-                hit_flag = 0
-                break
-
-        pv = pv + hit_flag * s[ip][num_time_steps - 1]
-
-    pv = pv / num_paths
-    return pv
-
-
-########################################################################################
-
-
-@njit(fastmath=True, cache=True)
-def _barrier_pay_asset_at_expiry_up_out(s, hh):
-    """Pay $1 if the stock crosses the barrier hh from below. PV payment."""
-
-    num_paths, num_time_steps = s.shape
-    pv = 0.0
-
-    for ip in nb.prange(num_paths):
-        hit_flag = 1
-
-        for it in range(0, num_time_steps):
-            if s[ip][it] >= hh:
-                hit_flag = 0
-                break
-
-        pv = pv + hit_flag * s[ip][num_time_steps - 1]
-
-    pv = pv / num_paths
-    return pv
-
 
 ########################################################################################
 
@@ -166,34 +76,21 @@ class EquityOneTouchOption(EquityOption):
         assuming a continuous (American) barrier from value date to expiry.
         Handles both cash-or-nothing and asset-or-nothing options."""
 
-        if isinstance(value_dt, Date) is False:
-            raise FinError("Valuation date is not a Date")
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_stock_price(stock_price)
 
-        if value_dt > self.expiry_dt:
-            raise FinError("Valuation date after expiry date.")
-
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve date not same as option valuation date"
-            )
-
-        if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve date not same as option valuation date"
-            )
-
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        t_exp = max(t_exp, 1e-6)
+        df = discount_curve.df(self.expiry_dt)
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
         s0 = stock_price
         hh = self.barrier_price
         k = self.payment_size
 
+        t_exp = option_years(value_dt, self.expiry_dt)
+        t_exp = max(t_exp, 1e-10)
         sqrt_t_exp = np.sqrt(t_exp)
-
-        df = discount_curve.df_t(t_exp)
-        r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
-        q = dividend_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
 
         v = model.volatility
         v = max(v, 1e-6)
@@ -221,9 +118,7 @@ class EquityOneTouchOption(EquityOption):
             eta = 1.0
             z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
-            )
+            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -236,9 +131,7 @@ class EquityOneTouchOption(EquityOption):
             eta = -1.0
             z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
-            )
+            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -252,9 +145,7 @@ class EquityOneTouchOption(EquityOption):
             k = hh
             z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
-            )
+            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -268,9 +159,7 @@ class EquityOneTouchOption(EquityOption):
             k = hh
             z = np.log(hh / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
             a5_1 = np.power(hh / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(
-                eta * z - 2.0 * eta * lam * v * sqrt_t_exp
-            )
+            a5_2 = np.power(hh / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -285,12 +174,7 @@ class EquityOneTouchOption(EquityOption):
             x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b4 = (
-                k
-                * df
-                * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
-            )
+            b4 = k * df * np.power(hh / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             v = b2 + b4
             return v
 
@@ -306,12 +190,7 @@ class EquityOneTouchOption(EquityOption):
             x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b4 = (
-                k
-                * df
-                * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
-            )
+            b4 = k * df * np.power(hh / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             v = b2 + b4
             return v
 
@@ -327,12 +206,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = (
-                s0
-                * dq
-                * np.power(hh / s0, 2.0 * (mu + 1.0))
-                * normcdf_vect(eta * y2)
-            )
+            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a2 + a4
             return v
 
@@ -348,12 +222,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = (
-                s0
-                * dq
-                * np.power(hh / s0, 2.0 * (mu + 1.0))
-                * normcdf_vect(eta * y2)
-            )
+            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a2 + a4
             return v
 
@@ -369,12 +238,7 @@ class EquityOneTouchOption(EquityOption):
             x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b4 = (
-                k
-                * df
-                * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
-            )
+            b4 = k * df * np.power(hh / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             v = b2 - b4
             return v
 
@@ -390,12 +254,7 @@ class EquityOneTouchOption(EquityOption):
             x2 = np.log(s0 / hh) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b4 = (
-                k
-                * df
-                * np.power(hh / s0, 2.0 * mu)
-                * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
-            )
+            b4 = k * df * np.power(hh / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
             v = b2 - b4
             return v
 
@@ -412,12 +271,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = (
-                s0
-                * dq
-                * np.power(hh / s0, 2.0 * (mu + 1.0))
-                * normcdf_vect(eta * y2)
-            )
+            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a2 - a4
             return v
 
@@ -434,12 +288,7 @@ class EquityOneTouchOption(EquityOption):
             y2 = np.log(hh / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-q * t_exp)
             a2 = s0 * dq * normcdf_vect(phi * x2)
-            a4 = (
-                s0
-                * dq
-                * np.power(hh / s0, 2.0 * (mu + 1.0))
-                * normcdf_vect(eta * y2)
-            )
+            a4 = s0 * dq * np.power(hh / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
             v = a2 - a4
             return v
 
@@ -466,24 +315,24 @@ class EquityOneTouchOption(EquityOption):
         result as we only observe the barrier a finite number of times. The
         convergence is slow."""
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_stock_price(stock_price)
 
-        df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df) / t
+        t_exp = option_years(value_dt, self.expiry_dt)
+        t_exp = max(t_exp, 1e-10)
 
-        dq = dividend_curve.df(self.expiry_dt)
-        q = -np.log(dq) / t
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        num_time_steps = int(t * num_steps_per_year) + 1
-        dt = t / num_time_steps
+        num_time_steps = int(t_exp * num_steps_per_year) + 1
+        dt = t_exp / num_time_steps
 
         v = model.volatility
         s0 = stock_price
         mu = r - q
 
-        time_grid, s = get_paths_times(
-            num_paths, num_time_steps, t, mu, s0, v, seed
-        )
+        time_grid, s = get_paths_times(num_paths, num_time_steps, t_exp, mu, s0, v, seed)
 
         hh = self.barrier_price
         xx = self.payment_size
@@ -496,7 +345,7 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, hh, r, dt)
+            v = barrier_pay_one_at_hit_pv_down(s, hh, r, dt)
             v = v * xx
             return v
 
@@ -506,7 +355,7 @@ class EquityOneTouchOption(EquityOption):
             if s0 >= hh:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, hh, r, dt)
+            v = barrier_pay_one_at_hit_pv_up(s, hh, r, dt)
             v = v * xx
             return v
 
@@ -516,7 +365,7 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, hh, r, dt) * hh
+            v = barrier_pay_one_at_hit_pv_down(s, hh, r, dt) * hh
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT:
@@ -525,7 +374,7 @@ class EquityOneTouchOption(EquityOption):
             if s0 >= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, hh, r, dt) * hh
+            v = barrier_pay_one_at_hit_pv_up(s, hh, r, dt) * hh
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY:
@@ -534,8 +383,8 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Barrier has  ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt)
-            v = v * xx * np.exp(-r * t)
+            v = barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt)
+            v = v * xx * np.exp(-r * t_exp)
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY:
@@ -544,8 +393,8 @@ class EquityOneTouchOption(EquityOption):
             if s0 >= hh:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt)
-            v = v * xx * np.exp(-r * t)
+            v = barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt)
+            v = v * xx * np.exp(-r * t_exp)
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY:
@@ -554,7 +403,7 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt) * hh
+            v = barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt) * hh
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
@@ -563,7 +412,7 @@ class EquityOneTouchOption(EquityOption):
             if s0 >= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt) * hh
+            v = barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt) * hh
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
@@ -572,8 +421,8 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = 1.0 - _barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt)
-            v = v * xx * np.exp(-r * t)
+            v = 1.0 - barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt)
+            v = v * xx * np.exp(-r * t_exp)
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING:
@@ -582,8 +431,8 @@ class EquityOneTouchOption(EquityOption):
             if s0 >= hh:
                 raise FinError("Barrier has ALREADY been crossed.")
 
-            v = 1.0 - _barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt)
-            v = v * xx * np.exp(-r * t)
+            v = 1.0 - barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt)
+            v = v * xx * np.exp(-r * t_exp)
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING:
@@ -592,8 +441,8 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_asset_at_expiry_down_out(s, hh)
-            v = v * np.exp(-r * t)
+            v = barrier_pay_asset_at_expiry_down_out(s, hh)
+            v = v * np.exp(-r * t_exp)
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING:
@@ -602,8 +451,8 @@ class EquityOneTouchOption(EquityOption):
             if s0 >= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = _barrier_pay_asset_at_expiry_up_out(s, hh)
-            v = v * np.exp(-r * t)
+            v = barrier_pay_asset_at_expiry_up_out(s, hh)
+            v = v * np.exp(-r * t_exp)
             return v
         else:
             raise FinError("Unknown OPTION_TYPE.")

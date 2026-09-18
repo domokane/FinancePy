@@ -362,7 +362,7 @@ class OISCurve(DiscountCurve):
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
             t_mat = times_from_dates(self.value_dt, depo.maturity_dt, time_dc_type)
-#            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self.fit(self._times, self._dfs)
@@ -371,8 +371,8 @@ class OISCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-#            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEAR
-#            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
 
             t_set = times_from_dates(self.value_dt, fra.start_dt, time_dc_type)
             t_mat = times_from_dates(self.value_dt, fra.maturity_dt, time_dc_type)
@@ -402,7 +402,7 @@ class OISCurve(DiscountCurve):
             # I use the last_payment_dt in case a date has been adjusted fwd
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
-#            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
             t_mat = times_from_dates(self.value_dt, maturity_dt, time_dc_type)
 
             self._times = np.append(self._times, t_mat)
@@ -446,7 +446,7 @@ class OISCurve(DiscountCurve):
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
             t_mat = times_from_dates(self.value_dt, depo.maturity_dt, time_dc_type)
-#            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (depo.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self._interpolator.fit(self._times, self._dfs)
@@ -455,8 +455,8 @@ class OISCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-#            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEAR
-#            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_set = (fra.start_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (fra.maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
 
             t_set = times_from_dates(self.value_dt, fra.start_dt, time_dc_type)
             t_mat = times_from_dates(self.value_dt, fra.maturity_dt, time_dc_type)
@@ -529,7 +529,7 @@ class OISCurve(DiscountCurve):
         for swap in self.used_swaps:
             swap_rate = swap.fixed_cpn
             maturity_dt = swap.adjusted_fixed_dts[-1]
-#            t_swap = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_swap = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
             t_swap = times_from_dates(self.value_dt, maturity_dt, time_dc_type)
             swap_times.append(t_swap)
             swap_rates.append(swap_rate)
@@ -538,7 +538,7 @@ class OISCurve(DiscountCurve):
         interpolated_swap_times = [0.0]
 
         for dt in cpn_dts[1:]:
-#            swap_time = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            swap_time = (dt - self.value_dt) / G_DAYS_IN_YEAR
             swap_time = times_from_dates(self.value_dt, dt, time_dc_type)
             swap_rate = np.interp(swap_time, swap_times, swap_rates)
             interpolated_swap_rates.append(swap_rate)
@@ -563,7 +563,7 @@ class OISCurve(DiscountCurve):
 
             dt = cpn_dts[i]
             t_mat = times_from_dates(self.value_dt, dt, time_dc_type)
-#            t_mat = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (dt - self.value_dt) / G_DAYS_IN_YEAR
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i - 1]
             pv01_end = acc * swap_rate + 1.0
@@ -593,13 +593,11 @@ class OISCurve(DiscountCurve):
 
         for swap in self.used_swaps:
             # We value it as of the start date of the swap
-            v = swap.value(swap.effective_dt, self, self, None, principal=0.0)
+            v = swap.value(self.value_dt, self, self, None, principal=0.0)
             v = v / swap.notional
             if abs(v) > swap_tol:
                 print(
-                    "Swap with maturity "
-                    + str(swap.maturity_dt)
-                    + " Not Repriced. Has Value",
+                    "Swap with maturity " + str(swap.maturity_dt) + " Not Repriced. Has Value",
                     v,
                 )
                 swap.print_fixed_leg_pv()
@@ -690,9 +688,7 @@ class OISCurve(DiscountCurve):
 
         s += label_to_string("GRID TIMES", "GRID DFS")
         for i in range(0, num_points):
-            s += label_to_string(
-                f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}"
-            )
+            s += label_to_string(f"{self._times[i]:10.6f}", f"{self._dfs[i]:12.10f}")
 
         return s
 

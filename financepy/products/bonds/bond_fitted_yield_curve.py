@@ -2,8 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import matplotlib.pyplot as plt
-
 from typing import Union
 
 import numpy as np
@@ -11,7 +9,7 @@ import numpy as np
 import scipy
 from scipy.interpolate import splrep
 
-from ...utils.format_graphs import *
+from ...utils.format_graphs import plt
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes

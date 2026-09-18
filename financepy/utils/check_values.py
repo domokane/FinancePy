@@ -10,16 +10,14 @@ from .error import FinError
 ###########################################################################
 
 
-def check_curve_dt(value_dt: Date, curve):
-    """Check that curve and valuation dates agree."""
+def check_curve_dt(value_dt, *curves):
+    """Check that curves are valid for the requested valuation date."""
 
-    if not isinstance(value_dt, Date):
-        raise FinError("Valuation date must be a Date.")
-
-    if curve.value_dt != value_dt:
-        raise FinError(
-            f"{type(curve).__name__} valuation date {curve.value_dt} " f"does not match valuation date {value_dt}."
-        )
+    for curve in curves:
+        if curve.value_dt > value_dt:
+            raise FinError(
+                f"{type(curve).__name__} valuation date {curve.value_dt} " f"is after valuation date {value_dt}."
+            )
 
 
 ###########################################################################
@@ -75,7 +73,25 @@ def check_stock_price(stock_price):
     if np.any(s0 <= 0.0):
         raise FinError("Stock price must be greater than zero.")
 
-    return stock_price
+
+########################################################################################
+
+
+def check_volatility(volatility):
+
+    v = np.asarray(volatility, dtype=float)
+
+    if v.ndim > 1:
+        raise FinError("Volatility must be a scalar or one-dimensional array.")
+
+    if v.size == 0:
+        raise FinError("Volatility cannot be empty.")
+
+    if not np.all(np.isfinite(v)):
+        raise FinError("Volatility must be finite.")
+
+    if np.any(v <= 0.0):
+        raise FinError("Volatility must be greater than zero.")
 
 
 ########################################################################################

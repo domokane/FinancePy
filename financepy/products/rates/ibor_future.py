@@ -103,7 +103,7 @@ class IborFuture:
 
     ###########################################################################
 
-    def convexity(self, value__dt, volatility, mean_reversion):
+    def convexity(self, value_dt, volatility, mean_reversion):
         """Calculation of the convexity adjustment between FRAs and interest
         rate futures using the Hull-White model as described in technical note
         in link below:
@@ -114,8 +114,8 @@ class IborFuture:
 
         a = mean_reversion
         t0 = 0.0
-        t1 = (self.last_trading_dt - value__dt) / G_DAYS_IN_YEAR
-        t2 = (self.end_of_interest_period - value__dt) / G_DAYS_IN_YEAR
+        t1 = (self.last_trading_dt - value_dt) / G_DAYS_IN_YEAR
+        t2 = (self.end_of_interest_period - value_dt) / G_DAYS_IN_YEAR
 
         # Hull White model for short rate dr = (theta(t)-ar) dt + sigma * dz
         # This reduces to Ho-Lee when a = 0 so to avoid divergences I provide
@@ -141,9 +141,7 @@ class IborFuture:
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("LAST TRADING DATE", self.last_trading_dt)
         s += label_to_string("DELIVERY DATE", self.delivery_dt)
-        s += label_to_string(
-            "END INTEREST PERIOD", self.end_of_interest_period
-        )
+        s += label_to_string("END INTEREST PERIOD", self.end_of_interest_period)
         s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CONTRACT SIZE", self.contract_size)
         return s

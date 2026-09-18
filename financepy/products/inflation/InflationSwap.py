@@ -86,6 +86,8 @@ class InflationSwap:
         market FRA rate. The same curve is used for calculating the forward
         Ibor and for doing discounting on the expected forward payment."""
 
+        check_curve_dt(value_dt, libor_curve)
+
         dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df1 = libor_curve.df(self.start_dt)
@@ -107,6 +109,8 @@ class InflationSwap:
     def maturity_df(self, libor_curve):
         """Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate."""
+
+        check_curve_dt(value_dt, libor_curve)
 
         dc = DayCount(self.accrual_dc_type)
         df1 = libor_curve.df(self.start_dt)

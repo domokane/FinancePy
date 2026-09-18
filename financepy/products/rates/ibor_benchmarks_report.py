@@ -11,6 +11,7 @@ from ...utils.date import Date, from_datetime
 from ...utils.frequency import FrequencyTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.ibor_single_curve import IborSingleCurve
+from ...utils.check_values import check_curve_dt
 
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
@@ -19,7 +20,7 @@ from ...products.rates.ibor_deposit import IborDeposit
 
 def benchmarks_report(
     benchmarks,
-    valuation_date: Date,
+    value_dt: Date,
     discount_curve: DiscountCurve,
     index_curve: DiscountCurve = None,
     include_objects=False,
@@ -32,19 +33,20 @@ def benchmarks_report(
     spots
     """
 
+    check_curve_dt(value_dt, discount_curve)
+
+    if index_curve is not None:
+        check_curve_dt(value_dt, index_curve)
+
     # benchmarks = depos + fras + swaps
     df_bmi = None
     for benchmark in benchmarks:
-        res = benchmark.valuation_details(
-            valuation_date, discount_curve, index_curve
-        )
+        res = benchmark.valuation_details(value_dt, discount_curve, index_curve)
 
         if df_bmi is None:
             df_bmi = pd.DataFrame.from_dict(res, orient="index").T
         else:
-            df_bmi = pd.concat(
-                [df_bmi, pd.DataFrame([res])], ignore_index=True
-            )
+            df_bmi = pd.concat([df_bmi, pd.DataFrame([res])], ignore_index=True)
 
     if include_objects:
         df_bmi["benchmark_objects"] = benchmarks
@@ -58,9 +60,7 @@ def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
     not use in performance-critical spots
     """
 
-    benchmarks = (
-        ibor_curve.used_deposits + ibor_curve.used_fras + ibor_curve.used_swaps
-    )
+    benchmarks = ibor_curve.used_deposits + ibor_curve.used_fras + ibor_curve.used_swaps
 
     return benchmarks_report(
         benchmarks,
@@ -70,9 +70,7 @@ def ibor_benchmarks_report(ibor_curve: IborSingleCurve, include_objects=False):
     )
 
 
-def _date_or_tenor_to_date(
-    date_or_tenor: Union[Date, str, datetime], asof_date: Date
-):
+def _date_or_tenor_to_date(date_or_tenor: Union[Date, str, datetime], asof_date: Date):
     if isinstance(date_or_tenor, str):
         return asof_date.add_tenor(date_or_tenor)
     if isinstance(date_or_tenor, Date):
@@ -81,8 +79,7 @@ def _date_or_tenor_to_date(
         return from_datetime(date_or_tenor)
 
     raise FinError(
-        f"{date_or_tenor} is of type {type(date_or_tenor)}, "
-        f"expecting one of: Date, tenor string, datetime"
+        f"{date_or_tenor} is of type {type(date_or_tenor)}, " f"expecting one of: Date, tenor string, datetime"
     )
 
 
@@ -95,20 +92,15 @@ def _date_or_tenor_to_date_or_tenor(date_or_tenor: Union[Date, str, datetime]):
         return from_datetime(date_or_tenor)
 
     raise FinError(
-        f"{date_or_tenor} is of type {type(date_or_tenor)}, "
-        f"expecting a Date, a tenor string, or a datetime"
+        f"{date_or_tenor} is of type {type(date_or_tenor)}, " f"expecting a Date, a tenor string, or a datetime"
     )
 
 
-def _deposit_from_df_row(
-    row: pd.Series, asof_date: Date, calendar_type: CalendarTypes
-):
+def _deposit_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
     cls = globals()[row["type"]]
     return cls(
         start_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
-        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(
-            row["maturity_dt"]
-        ),
+        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
         deposit_rate=row["contract_rate"],
         accrual_dc_type=DayCountTypes[row["day_count_type"]],
         notional=row["notional"],
@@ -116,15 +108,11 @@ def _deposit_from_df_row(
     )
 
 
-def _fra_from_df_row(
-    row: pd.Series, asof_date: Date, calendar_type: CalendarTypes
-):
+def _fra_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
     cls = globals()[row["type"]]
     return cls(
         start_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
-        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(
-            row["maturity_dt"]
-        ),
+        maturity_dt_or_tenor=_date_or_tenor_to_date_or_tenor(row["maturity_dt"]),
         fra_rate=row["contract_rate"],
         accrual_dc_type=DayCountTypes[row["day_count_type"]],
         notional=row["notional"],
@@ -133,9 +121,7 @@ def _fra_from_df_row(
     )
 
 
-def _swap_from_df_row(
-    row: pd.Series, asof_date: Date, calendar_type: CalendarTypes
-):
+def _swap_from_df_row(row: pd.Series, asof_date: Date, calendar_type: CalendarTypes):
     cls = globals()[row["type"]]
     return cls(
         effective_dt=_date_or_tenor_to_date(row["start_dt"], asof_date),
@@ -154,9 +140,7 @@ def _unknown_from_df_row(row: pd.Series):
     raise FinError(f"No benchmark creator found for type {instr_type}")
 
 
-def dataframe_to_benchmarks(
-    df: pd.DataFrame, asof_date: Date, calendar_type: CalendarTypes
-):
+def dataframe_to_benchmarks(df: pd.DataFrame, asof_date: Date, calendar_type: CalendarTypes):
     """Crete IborBenchmarks from a dataframe. The dataframe should have at least these columns
     with these sample inputs:
                 type   start_dt maturity_dt     dc_type notional contract_rate fixed_leg_type fixed_freq_type
@@ -181,8 +165,6 @@ def dataframe_to_benchmarks(
     benchmarks = {}
     for _, row in df.iterrows():
         bm_type = row["type"]
-        bm = benchmark_creators.get(bm_type, _unknown_from_df_row)(
-            row, asof_date, calendar_type
-        )
+        bm = benchmark_creators.get(bm_type, _unknown_from_df_row)(row, asof_date, calendar_type)
         benchmarks[bm_type] = benchmarks.get(bm_type, []) + [bm]
     return benchmarks

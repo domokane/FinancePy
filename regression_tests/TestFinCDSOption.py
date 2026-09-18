@@ -5,6 +5,7 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
+from financepy.utils.global_vars import CLEAN, DIRTY
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -18,9 +19,6 @@ from financepy.products.credit.cds_option import CDSOption
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
-
-DIRTY = 0
-CLEAN = 1
 
 # TO DO
 
@@ -226,7 +224,7 @@ def test_dirty_price_cd_swaption():
     trade_dt = Date(5, 2, 2014)
     _, issuer_curve = build_full_issuer_curve(trade_dt)
     step_in_dt = trade_dt.add_days(1)
-    value_dt = step_in_dt
+    value_dt = trade_dt
     expiry_dt = Date(20, 3, 2014)
     maturity_dt = Date(20, 6, 2019)
 
@@ -237,9 +235,7 @@ def test_dirty_price_cd_swaption():
 
     cds_contract = CDS(step_in_dt, maturity_dt, cds_cpn, notional, long_protection)
 
-    test_cases.banner(
-        "=============================== CDS ==============================="
-    )
+    test_cases.banner("=============================== CDS ===============================")
     #    cds_contract.print(value_dt)
 
     test_cases.header("LABEL", "VALUE")
@@ -271,9 +267,7 @@ def test_dirty_price_cd_swaption():
 
     #    cds_contract.print_payments(issuer_curve)
 
-    test_cases.banner(
-        "=========================== FORWARD CDS ==========================="
-    )
+    test_cases.banner("=========================== FORWARD CDS ===========================")
 
     cds_contract = CDS(expiry_dt, maturity_dt, cds_cpn, notional, long_protection)
 
@@ -298,9 +292,7 @@ def test_dirty_price_cd_swaption():
 
     #    cds_contract.print_payments(issuer_curve)
 
-    test_cases.banner(
-        "========================== CDS OPTIONS ============================"
-    )
+    test_cases.banner("========================== CDS OPTIONS ============================")
 
     cds_cpn = 0.01
     volatility = 0.3
@@ -314,9 +306,7 @@ def test_dirty_price_cd_swaption():
 
         long_protection = True  # long protection
 
-        cds_option = CDSOption(
-            expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection
-        )
+        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
 
         v = cds_option.value(value_dt, issuer_curve, volatility)
 
@@ -328,9 +318,7 @@ def test_dirty_price_cd_swaption():
 
         long_protection = False  # long protection
 
-        cds_option = CDSOption(
-            expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection
-        )
+        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
 
         v = cds_option.value(value_dt, issuer_curve, volatility)
 

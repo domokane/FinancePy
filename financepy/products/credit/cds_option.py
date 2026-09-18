@@ -15,6 +15,7 @@ from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.error import FinError
+from ...utils.check_values import check_curve_dt
 
 DIRTY = 0
 CLEAN = 1
@@ -98,6 +99,8 @@ class CDSOption:
 
         if volatility < 0.0:
             raise FinError("Volatility must be greater than zero")
+
+        check_curve_dt(value_dt, issuer_curve)
 
         # The underlying is a forward starting option that steps in on
         # the expiry date and matures on the expiry date with a coupon
