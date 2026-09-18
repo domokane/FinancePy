@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
+from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
 

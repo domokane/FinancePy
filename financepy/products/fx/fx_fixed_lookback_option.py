@@ -7,7 +7,7 @@ import numpy as np
 
 
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
+from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 from ...models.gbm_process_simulator import get_paths_times
 from ...utils.helpers import check_argument_types

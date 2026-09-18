@@ -10,12 +10,10 @@ from ...utils.global_types import OptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.helpers import option_years
 from ...utils.date import Date
-from ...utils.day_count import DayCountTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.schedule import Schedule
 from ...utils.check_values import check_curve_dt
-from ...utils.day_count import DayCount, DayCountTypes
 
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
@@ -100,15 +98,12 @@ class EquityCliquetOption(EquityOption):
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
-        s = stock_price
+        s0 = stock_price
         v_cliquet = 0.0
 
         self.v_options = []
-        self._dfs = []
+        self.dfs = []
         self.actual_dts = []
-
-        call_type = OptionTypes.EUROPEAN_CALL
-        put_type = OptionTypes.EUROPEAN_PUT
 
         if isinstance(model, BlackScholes):
 
@@ -121,27 +116,20 @@ class EquityCliquetOption(EquityOption):
 
                 if dt > value_dt:
 
+                    t_vol = option_years(dt_prev, dt)
+
                     df_end = discount_curve.df(dt)
                     dq_start = dividend_curve.df(dt_prev)
-
-                    t_exp = option_years(value_dt, dt)
 
                     # The deflator is out to the option reset time
                     fwd_r = discount_curve.fwd_zero_rate_cc(dt_prev, dt)
                     fwd_q = dividend_curve.fwd_zero_rate_cc(dt_prev, dt)
 
-                    if self.opt_type == call_type:
-                        v_call = european_value(1.0, t_exp, 1.0, fwd_r, fwd_q, fwd_vol, call_type.value)
-                        v_fwd_opt = s * dq_start * v_call
-                        v_cliquet += v_fwd_opt
-                    elif self.opt_type == put_type:
-                        v_put = european_value(1.0, t_exp, 1.0, fwd_r, fwd_q, fwd_vol, put_type.value)
-                        v_fwd_opt = s * dq_start * v_put
-                        v_cliquet += v_fwd_opt
-                    else:
-                        raise FinError("Unknown OPTION_TYPE")
+                    v = european_value(1.0, t_vol, 1.0, fwd_r, fwd_q, fwd_vol, self.opt_type.value)
+                    v_fwd_opt = s0 * dq_start * v
+                    v_cliquet += v_fwd_opt
 
-                    self._dfs.append(df_end)
+                    self.dfs.append(df_end)
                     self.v_options.append(v_fwd_opt)
                     self.actual_dts.append(dt)
 
@@ -154,9 +142,13 @@ class EquityCliquetOption(EquityOption):
     ###########################################################################
 
     def print_payments(self):
+
+        if self.v_options is None:
+            raise FinError("Options not created yet.")
+
         num_options = len(self.v_options)
         for i in range(0, num_options):
-            print(self.actual_dts[i], self._dfs[i], self.v_options[i])
+            print(self.actual_dts[i], self.dfs[i], self.v_options[i])
 
     ###########################################################################
 
@@ -166,7 +158,6 @@ class EquityCliquetOption(EquityOption):
         s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
         s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
-        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
         s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         s += label_to_string("DATE GEN RULE TYPE", self.dg_type, "")

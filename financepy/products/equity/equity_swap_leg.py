@@ -19,6 +19,7 @@ from ...utils.helpers import (
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.flat_discount_curve import FlatDiscountCurve
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 

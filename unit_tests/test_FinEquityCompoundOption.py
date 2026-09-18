@@ -28,8 +28,7 @@ num_steps = 200
 
 def assert_close(value, expected, tol=2.0e-3):
     assert np.isclose(value, expected, atol=tol), (
-        f"value={value:.10f}, expected={expected:.10f}, "
-        f"diff={value - expected:.10f}"
+        f"value={value:.10f}, expected={expected:.10f}, " f"diff={value - expected:.10f}"
     )
 
 
@@ -43,15 +42,9 @@ def test_european():
     opt_type1 = OptionTypes.EUROPEAN_CALL
     opt_type2 = OptionTypes.EUROPEAN_CALL
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert round(value, 3) == 4.606
     assert round(values[0], 3) == 4.600
@@ -59,15 +52,9 @@ def test_european():
     opt_type1 = OptionTypes.EUROPEAN_CALL
     opt_type2 = OptionTypes.EUROPEAN_PUT
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert round(value, 3) == 6.714
     assert round(values[0], 3) == 6.702
@@ -75,15 +62,9 @@ def test_european():
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_CALL
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 2.016)
     assert_close(values[0], 2.022)
@@ -91,15 +72,9 @@ def test_european():
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_PUT
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 1.087)
     assert_close(values[0], 1.087)
@@ -115,15 +90,9 @@ def test_american():
     opt_type1 = OptionTypes.AMERICAN_CALL
     opt_type2 = OptionTypes.AMERICAN_CALL
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 4.600)
     assert_close(values[0], 4.600)
@@ -131,15 +100,9 @@ def test_american():
     opt_type1 = OptionTypes.AMERICAN_CALL
     opt_type2 = OptionTypes.AMERICAN_PUT
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 7.614)
     assert_close(values[0], 7.614)
@@ -147,15 +110,9 @@ def test_american():
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_CALL
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 4.182)
     assert_close(values[0], 4.182)
@@ -163,15 +120,9 @@ def test_american():
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_PUT
 
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
-    value = cmpd_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    values = cmpd_option.value_tree(
-        value_dt, stock_price, discount_curve, dividend_curve, model, num_steps
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
+    value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
+    values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 4.298)
     assert_close(values[0], 4.298)
@@ -185,20 +136,15 @@ def test_greeks():
     stock_price = 70
     opt_type1 = OptionTypes.EUROPEAN_CALL
     opt_type2 = OptionTypes.EUROPEAN_PUT
-    cmpd_option = EquityCompoundOption(
-        expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-    )
+    cmpd_option = EquityCompoundOption(expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2)
 
-    delta = cmpd_option.delta(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    vega = cmpd_option.vega(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
-    theta = cmpd_option.theta(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    delta = cmpd_option.delta(value_dt, stock_price, discount_curve, dividend_curve, model)
+    vega = cmpd_option.vega(value_dt, stock_price, discount_curve, dividend_curve, model)
+    theta = cmpd_option.theta(value_dt, stock_price, discount_curve, dividend_curve, model)
 
     assert_close(delta, -0.719)
     assert_close(vega, 0.376)
     assert_close(theta, 0.747)
+
+
+test_american()

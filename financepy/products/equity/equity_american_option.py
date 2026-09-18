@@ -8,15 +8,12 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.frequency import FrequencyTypes
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
-from ...utils.check_values import check_t_exp
-from ...utils.check_values import check_shapes
 from ...utils.helpers import option_years
 
 # from ...models.black_scholes_analytic import baw_value

@@ -11,7 +11,6 @@ import numpy as np
 
 from ...models.gbm_process_simulator import get_assets_paths
 
-from ...utils.frequency import FrequencyTypes
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
@@ -23,7 +22,6 @@ from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.math import normcdf
 from ...utils.check_values import check_curve_dt
-from ...utils.check_values import check_t_exp
 
 ########################################################################################
 

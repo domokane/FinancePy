@@ -8,7 +8,6 @@ import numpy as np
 
 from numba import njit
 
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.global_types import TouchOptionTypes
 from ...utils.helpers import label_to_string, check_argument_types

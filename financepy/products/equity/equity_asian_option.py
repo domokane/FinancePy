@@ -2,10 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from enum import Enum
-
-import numpy as np
-
 # TODO: Add perturbatory risk using the analytical methods !!
 # TODO: Add Sobol to Monte Carlo
 
@@ -14,14 +10,12 @@ from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.global_types import AsianOptionValuationTypes
 
-from ...utils.frequency import FrequencyTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
-from ...utils.check_values import check_t_exp
 from ...utils.helpers import option_years
 
 from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_cv_numba
@@ -115,7 +109,7 @@ class EquityAsianOption:
     ):
         """Calculate the value of an Asian option using one of the specified
         analytical approximations for an average rate option. These are the
-        three enumerated values in the enum AsianOptionValuationMethods. The
+        three enumerated values in the enum AsianOptionValuationTypes. The
         choices of approximation are (i) GEOMETRIC - the average is a geometric
         one as in paper by Kenna and Worst (1990), (ii) TURNBULL_WAKEMAN -
         this is a value based on an edgeworth expansion of the moments of the

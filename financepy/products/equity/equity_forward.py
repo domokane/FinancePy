@@ -2,8 +2,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-import numpy as np
-
 
 from ...utils.date import Date
 from ...utils.global_types import LongShortTypes

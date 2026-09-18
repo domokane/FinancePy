@@ -4,7 +4,6 @@
 
 from typing import Union
 import numpy as np
-from numba import njit, prange
 
 from ...utils.global_types import DoubleBarrierTypes
 

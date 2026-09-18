@@ -4,8 +4,6 @@
 
 from enum import Enum
 
-from typing import List
-
 import numpy as np
 
 from ...utils.date import Date

@@ -4,9 +4,7 @@
 
 
 import numpy as np
-from scipy import optimize
 
-from ...utils.math import M
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError

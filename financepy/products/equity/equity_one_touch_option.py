@@ -5,10 +5,7 @@
 from typing import Union
 
 import numpy as np
-from numba import njit
-import numba as nb
 
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import TouchOptionTypes
 from ...utils.error import FinError
 from ...products.equity.equity_option import EquityOption

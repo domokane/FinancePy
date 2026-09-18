@@ -28,7 +28,7 @@ from ...market.curves.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
 
 from ...utils.check_values import check_curve_dt
-from ...utils.global_vars import CLEAN, DIRTY
+from ...utils.global_vars import CLEAN
 
 ########################################################################################
 # TODO: Convert functions to use NUMBA!!

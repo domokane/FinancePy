@@ -56,9 +56,7 @@ def test_fin_fx_vanilla_option_wystup_example1():
         2,
     )
 
-    value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     notional = 1250000.0
     call_option = FXVanillaOption(
@@ -71,9 +69,7 @@ def test_fin_fx_vanilla_option_wystup_example1():
         2,
     )
 
-    value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(value["v"], 4) == 0.0251
     assert round(value["cash_dom"], 4) == 25125.1772
@@ -87,9 +83,7 @@ def test_fin_fx_vanilla_option_wystup_example1():
     assert value["ccy_dom"] == "USD"
     assert value["ccy_for"] == "EUR"
 
-    delta = call_option.delta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(delta["pips_spot_delta"], 4) == 0.3315
     assert round(delta["pips_fwd_delta"], 4) == 0.3416
@@ -141,9 +135,7 @@ def test_fin_fx_vanilla_option_wystup_example2():
         2,
     )
 
-    value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(value["v"], 4) == 0.0436
     assert round(value["cash_dom"], 4) == 43612.8769
@@ -157,9 +149,7 @@ def test_fin_fx_vanilla_option_wystup_example2():
     assert value["ccy_dom"] == "USD"
     assert value["ccy_for"] == "EUR"
 
-    delta = call_option.delta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(delta["pips_spot_delta"], 4) == -0.4700
     assert round(delta["pips_fwd_delta"], 4) == -0.4890
@@ -238,9 +228,7 @@ def test_fin_fx_vanilla_option_bloomberg_example():
         2,
     )
 
-    value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(value["v"], 4) == 0.0601
     assert round(value["cash_dom"], 4) == 60145.5078
@@ -254,9 +242,7 @@ def test_fin_fx_vanilla_option_bloomberg_example():
     assert value["ccy_dom"] == "USD"
     assert value["ccy_for"] == "EUR"
 
-    delta = call_option.delta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(delta["pips_spot_delta"], 4) == 0.3671
     assert round(delta["pips_fwd_delta"], 4) == 0.3859
@@ -292,9 +278,7 @@ def test_value_mc():
         "USD",
     )
 
-    value_mc = call_option.value_mc(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, num_paths
-    )
+    value_mc = call_option.value_mc(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, num_paths)
 
     assert round(value_mc, 4) == 0.0429
 
@@ -307,9 +291,7 @@ def test_value_mc():
         "USD",
     )
 
-    value_mc = put_option.value_mc(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, num_paths
-    )
+    value_mc = put_option.value_mc(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, num_paths)
 
     assert round(value_mc, 4) == 0.0582
 
@@ -341,14 +323,10 @@ def test_vega_theta():
         "USD",
     )
 
-    vega = call_option.vega(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    vega = call_option.vega(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(vega, 4) == 0.3518
 
-    theta = call_option.theta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    theta = call_option.theta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(theta, 4) == -0.0504

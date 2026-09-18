@@ -1,5 +1,11 @@
 ## CHANGE LOG
-18 Sep 2026
+18 Sep 2026 Part 2
+List of changes
+- Small change to indep_loss_dbn_hetero_adj_binomial using floor - see change in file
+- AsianOptionValuationMethods changed to AsianOptionValuationTypes
+- Cleaned up unused imports
+
+18 Sep 2026 Part 1
 List of changes
 - Moved DIRTY and CLEAN indices to global vars
 - Added dc_type to CDS curve

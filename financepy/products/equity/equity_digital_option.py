@@ -4,11 +4,9 @@
 
 from typing import Union
 
-from enum import Enum
 import numpy as np
 
 
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.global_types import DigitalOptionTypes

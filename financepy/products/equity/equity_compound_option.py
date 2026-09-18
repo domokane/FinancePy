@@ -4,8 +4,6 @@
 
 import numpy as np
 
-from financepy.models import equity_compound_option_bs
-
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
@@ -14,8 +12,8 @@ from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
-from ...models.equity_compound_option_bs import equity_compound_option_bs
 from ...models.equity_compound_option_bs import equity_compound_option_value_tree
+from ...models.equity_compound_option_bs import equity_compound_option_bs
 from ...utils.check_values import check_curve_dt
 from ...utils.helpers import option_years
 

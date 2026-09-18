@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
+from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.check_values import check_curve_dt
@@ -17,7 +17,6 @@ from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes
-from ...utils.helpers import option_years
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -196,14 +195,14 @@ class EquityFixedLookbackOption(EquityOption):
         """Monte Carlo valuation of a fixed strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
+        t_exp = option_years(value_dt, self.expiry_dt)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
-        t_exp = check_t_exp(value_dt, self.expiry_dt)
-
-        df = discount_curve.df_t(t_exp)
-        r = discount_curve.zero_rate_cc_t(t_exp)
-        q = dividend_curve.zero_rate_cc_t(t_exp)
+        df = discount_curve.df(self.expiry_dt)
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
         mu = r - q
         num_time_steps = int(t_exp * num_steps_per_year)
