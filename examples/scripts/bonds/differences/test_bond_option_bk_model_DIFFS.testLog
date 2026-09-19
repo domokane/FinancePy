@@ -1,6 +1,0 @@
-EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: TestFinBondOptionBKModel 
-Row#  53  WARNING: Calculation time has changed by -100.00  percent. 
-Row#  54  WARNING: Calculation time has changed by 1004459900.00  percent. 
-Row#  55  WARNING: Calculation time has changed by -52.60  percent. 
-Analysis of  TestFinBondOptionBKModel  completed with  0  errors and  3  warnings. 
-NUM LINES: 61 ====> ERRORS: 0  WARNINGS: 3 

@@ -1,8 +1,0 @@
-EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: TestFinInflationBond 
-Row#  14  ERROR -  1  DIFFERENCE(S) IN ROW  14 
-Row#  14  HEADER:  ==> ['HEADER', 'FIELD', 'VALUE'] 
-Row#  14  GOLDEN : ==> RESULTS,Inflation Principal = ,116.73423823 
-Row#  14  COMPARE: ==> RESULTS,Inflation Principal = ,116.71160310 
- 
-Analysis of  TestFinInflationBond  completed with  1  errors and  0  warnings. 
-NUM LINES: 24 ====> ERRORS: 1  WARNINGS: 0 
