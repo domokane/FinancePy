@@ -6,8 +6,7 @@ numpy==2.3.5
 scipy==1.16.3
 pandas==2.3.3
 matplotlib==3.10.6
-numba==0.62.1
-llvmlite==0.45.1
+numba==0.67.0
 
 # Developer and interactive tools
 ipython == 8.25.0

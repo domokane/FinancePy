@@ -797,7 +797,7 @@ def test_cpn_types():
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, cpn_type=cpn_type)
     settle_dt = Date(1, 5, 2022)
     face = 1000000
-    # bond.print_payments(settle_dt, face)
+    bond.print_payments(settle_dt, face)
 
     # We need to set the coupon type to ACCRUED to enable this
     cpn_type = CouponType.ACCRUED

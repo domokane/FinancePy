@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import optimize
 
-from ...utils.format_graphs import *
 from ...utils.date import Date
+from ...utils.format_graphs import *
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import times_from_dates
 from ...utils.day_count import DayCountTypes
