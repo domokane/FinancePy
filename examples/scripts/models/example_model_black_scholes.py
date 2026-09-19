@@ -2,14 +2,6 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
-import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
@@ -31,162 +23,182 @@ PLOT_GRAPHS = False
 
 import matplotlib.pyplot as plt
 
+# ============================================================================
+# FINANCEPY EXAMPLES - BlackScholes
+# ============================================================================
+
 # TODO Complete output of results to log files
 
 ########################################################################################
 
 
-def test_black_scholes():
-
-    value_dt = Date(8, 5, 2015)
-    expiry_dt = Date(15, 1, 2016)
-
-    strike_price = 130.0
-    stock_price = 127.62
-    volatility = 0.20
-    interest_rate = 0.001
-    dividend_yield = 0.0163
-
-    opt_type = OptionTypes.AMERICAN_CALL
-    eu_option_type = OptionTypes.EUROPEAN_CALL
-
-    # Pure American Option TREE
-    am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
-
-    # American with European style exercise TREE
-    ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
-
-    # European Option and European Exercise so Black Scholes
-    eu_option = EquityVanillaOption(expiry_dt, strike_price, eu_option_type)
-
-    discount_curve = FlatDiscountCurve(
-        value_dt,
-        interest_rate,
-        FrequencyTypes.CONTINUOUS,
-    )
-
-    dividend_curve = FlatDiscountCurve(
-        value_dt,
-        dividend_yield,
-        FrequencyTypes.CONTINUOUS,
-    )
-
-    am_tree_value = []
-    am_baw_value = []
-    eu_tree_value = []
-    eu_anal_value = []
-    volatility = 0.20
-
-    num_steps_per_year = range(5, 200, 1)
-
-    print(
-        "STEPS PER YEAR",
-        "AMERICAN_TREE",
-        "AMERICAN_BAW",
-        "EUROPEAN_TREE",
-        "EUROPEAN_BS",
-    )
-
-    for num_steps in num_steps_per_year:
-
-        model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
-        model_anal = BlackScholes(volatility, BlackScholesTypes.ANALYTICAL)
-        model_BAW = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
-
-        v_am = am_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_tree
-        )
-
-        v_eu = ameu_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_tree
-        )
-
-        v_bs = eu_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_anal
-        )
-
-        v_am_baw = am_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_BAW
-        )
-
-        am_tree_value.append(v_am)
-        eu_tree_value.append(v_eu)
-        eu_anal_value.append(v_bs)
-        am_baw_value.append(v_am_baw)
-
-        print(num_steps, v_am, v_am_baw, v_eu, v_bs)
-
-    if PLOT_GRAPHS:
-        plt.title("American Option Price Convergence Analysis")
-        plt.plot(num_steps_per_year, am_tree_value, label="American Tree")
-        plt.plot(num_steps_per_year, am_baw_value, label="American BAW")
-        plt.plot(num_steps_per_year, eu_tree_value, label="European Tree")
-        plt.plot(num_steps_per_year, eu_anal_value, label="European Anal", lw=2)
-        plt.xlabel("Num Steps")
-        plt.ylabel("Value")
-        plt.legend()
-        plt.show()
 
 
 ########################################################################################
 
-def test_barone_edesi():
+# ============================================================================
+# 1. BARONE EDESI
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The original example contains an accuracy/consistency assertion; the surrounding values show what is being checked numerically.
 
-    value_dt = Date(8, 5, 2015)
-    expiry_dt = Date(15, 1, 2016)
+print("\n" + "=" * 78)
+print("1. BARONE EDESI")
+print("=" * 78)
 
-    strike_price = 130.0
-    stock_price = 127.62
-    volatility = 0.20
-    interest_rate = 0.001
-    dividend_yield = 0.0163
+value_dt = Date(8, 5, 2015)
+expiry_dt = Date(15, 1, 2016)
 
-    opt_type = OptionTypes.AMERICAN_CALL
-    eu_option_type = OptionTypes.EUROPEAN_CALL
+strike_price = 130.0
+stock_price = 127.62
+volatility = 0.20
+interest_rate = 0.001
+dividend_yield = 0.0163
 
-    am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
+opt_type = OptionTypes.AMERICAN_CALL
+eu_option_type = OptionTypes.EUROPEAN_CALL
 
-    ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
+am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
 
-    eu_option = EquityVanillaOption(expiry_dt, strike_price, eu_option_type)
+ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
 
-    discount_curve = FlatDiscountCurve(
-        value_dt, interest_rate, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
+eu_option = EquityVanillaOption(expiry_dt, strike_price, eu_option_type)
+
+discount_curve = FlatDiscountCurve(
+    value_dt, interest_rate, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
+)
+
+dividend_curve = FlatDiscountCurve(
+    value_dt, dividend_yield, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
+)
+
+num_steps_per_year = 400
+
+model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
+
+v = am_option.value(
+     value_dt, stock_price, discount_curve, dividend_curve, model_tree
+ )
+assert round(v, 4) == 6.8398
+
+model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+
+v = am_option.value(
+     value_dt, stock_price, discount_curve, dividend_curve, model_approx
+)
+
+assert round(v, 4) == 6.8277
+
+v = ameu_option.value(
+     value_dt, stock_price, discount_curve, dividend_curve, model_tree
+)
+
+assert round(v, 4) == 6.7512
+
+v = eu_option.value(
+     value_dt, stock_price, discount_curve, dividend_curve, model_tree
+)
+
+assert round(v, 4) == 6.7493
+
+# ============================================================================
+# 2. BLACK SCHOLES
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("2. BLACK SCHOLES")
+print("=" * 78)
+
+value_dt = Date(8, 5, 2015)
+expiry_dt = Date(15, 1, 2016)
+
+strike_price = 130.0
+stock_price = 127.62
+volatility = 0.20
+interest_rate = 0.001
+dividend_yield = 0.0163
+
+opt_type = OptionTypes.AMERICAN_CALL
+eu_option_type = OptionTypes.EUROPEAN_CALL
+
+# Pure American Option TREE
+am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
+
+# American with European style exercise TREE
+ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
+
+# European Option and European Exercise so Black Scholes
+eu_option = EquityVanillaOption(expiry_dt, strike_price, eu_option_type)
+
+discount_curve = FlatDiscountCurve(
+    value_dt,
+    interest_rate,
+    FrequencyTypes.CONTINUOUS,
+)
+
+dividend_curve = FlatDiscountCurve(
+    value_dt,
+    dividend_yield,
+    FrequencyTypes.CONTINUOUS,
+)
+
+am_tree_value = []
+am_baw_value = []
+eu_tree_value = []
+eu_anal_value = []
+volatility = 0.20
+
+num_steps_per_year = range(5, 200, 1)
+
+print(
+    "STEPS PER YEAR",
+    "AMERICAN_TREE",
+    "AMERICAN_BAW",
+    "EUROPEAN_TREE",
+    "EUROPEAN_BS",
+)
+
+for num_steps in num_steps_per_year:
+
+    model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
+    model_anal = BlackScholes(volatility, BlackScholesTypes.ANALYTICAL)
+    model_BAW = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+
+    v_am = am_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_tree
     )
 
-    dividend_curve = FlatDiscountCurve(
-        value_dt, dividend_yield, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
+    v_eu = ameu_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_tree
     )
 
-    num_steps_per_year = 400
-
-    model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
-
-    v = am_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_tree
-     )
-    assert round(v, 4) == 6.8398
-
-    model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
-
-    v = am_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_approx
+    v_bs = eu_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_anal
     )
 
-    assert round(v, 4) == 6.8277
-
-    v = ameu_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_tree
+    v_am_baw = am_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model_BAW
     )
 
-    assert round(v, 4) == 6.7512
+    am_tree_value.append(v_am)
+    eu_tree_value.append(v_eu)
+    eu_anal_value.append(v_bs)
+    am_baw_value.append(v_am_baw)
 
-    v = eu_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_tree
-    )
+    print(num_steps, v_am, v_am_baw, v_eu, v_bs)
 
-    assert round(v, 4) == 6.7493
+if PLOT_GRAPHS:
+    plt.title("American Option Price Convergence Analysis")
+    plt.plot(num_steps_per_year, am_tree_value, label="American Tree")
+    plt.plot(num_steps_per_year, am_baw_value, label="American BAW")
+    plt.plot(num_steps_per_year, eu_tree_value, label="European Tree")
+    plt.plot(num_steps_per_year, eu_anal_value, label="European Anal", lw=2)
+    plt.xlabel("Num Steps")
+    plt.ylabel("Value")
+    plt.legend()
+    plt.show()
 
-
-test_barone_edesi()
-test_black_scholes()

@@ -2,17 +2,9 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import time
 import matplotlib.pyplot as plt
 
-import add_fp_to_path
 
 from financepy.utils.global_types import VolFuncTypes
 from financepy.utils.date import Date
@@ -20,6 +12,10 @@ from financepy.utils.global_types import FXDeltaMethodTypes
 from financepy.utils.global_types  import FXATMMethodTypes
 from financepy.market.volatility.fx_vol_surface  import FXVolSurface
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+
+# ============================================================================
+# FINANCEPY EXAMPLES - FXVolSurface
+# ============================================================================
 
 
 

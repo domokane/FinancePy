@@ -2,16 +2,8 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import os
 
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -22,6 +14,10 @@ from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+
+# ============================================================================
+# FINANCEPY EXAMPLES - CDSIndexPortfolio
+# ============================================================================
 
 
 
@@ -92,82 +88,90 @@ def build_issuer_curve(trade_dt, libor_curve):
 ########################################################################################
 
 
-def test_cds_index_portfolio():
-
-    trade_dt = Date(1, 8, 2007)
-    step_in_dt = trade_dt.add_days(1)
-    value_dt = step_in_dt
-
-    libor_curve = build_ibor_curve(trade_dt)
-
-    maturity_3yr = trade_dt.next_cds_date(36)
-    maturity_5yr = trade_dt.next_cds_date(60)
-    maturity_7yr = trade_dt.next_cds_date(84)
-    maturity_10yr = trade_dt.next_cds_date(120)
-
-    path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
-    f = open(path, "r")
-    data = f.readlines()
-    f.close()
-    issuer_curves = []
-
-    for row in data[1:]:
-
-        split_row = row.split(",")
-        spd_3yr = float(split_row[1]) / 10000.0
-        spd_5yr = float(split_row[2]) / 10000.0
-        spd_7yr = float(split_row[3]) / 10000.0
-        spd_10yr = float(split_row[4]) / 10000.0
-        recovery_rate = float(split_row[5])
-
-        cds_3yr = CDS(step_in_dt, maturity_3yr, spd_3yr)
-        cds_5yr = CDS(step_in_dt, maturity_5yr, spd_5yr)
-        cds_7yr = CDS(step_in_dt, maturity_7yr, spd_7yr)
-        cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
-        cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
-
-        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
-
-        issuer_curves.append(issuer_curve)
-
-    # Now determine the average spread of the index
-
-    cds_index = CDSIndexPortfolio()
-
-    avg_spd_3yr = cds_index.average_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
-
-    avg_spd_5yr = cds_index.average_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
-
-    avg_spd_7yr = cds_index.average_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
-
-    avg_spd_10yr = cds_index.average_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
-
-    print("LABEL", "VALUE")
-    print("AVERAGE SPD 3Y", avg_spd_3yr)
-    print("AVERAGE SPD 5Y", avg_spd_5yr)
-    print("AVERAGE SPD 7Y", avg_spd_7yr)
-    print("AVERAGE SPD 10Y", avg_spd_10yr)
-
-    # Now determine the intrinsic spread of the index to the same maturity
-    # dates. As the single name CDS contracts
-
-    cds_index = CDSIndexPortfolio()
-
-    intrinsic_spd_3yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
-
-    intrinsic_spd_5yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
-
-    intrinsic_spd_7yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
-
-    intrinsic_spd_10yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
-
-    print("LABEL", "VALUE")
-    print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)
-    print("INTRINSIC SPD 5Y", intrinsic_spd_5yr)
-    print("INTRINSIC SPD 7Y", intrinsic_spd_7yr)
-    print("INTRINSIC SPD 10Y", intrinsic_spd_10yr)
 
 
 ########################################################################################
 
-test_cds_index_portfolio()
+# ============================================================================
+# 1. CDS INDEX PORTFOLIO
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. CDS INDEX PORTFOLIO")
+print("=" * 78)
+
+trade_dt = Date(1, 8, 2007)
+step_in_dt = trade_dt.add_days(1)
+value_dt = step_in_dt
+
+libor_curve = build_ibor_curve(trade_dt)
+
+maturity_3yr = trade_dt.next_cds_date(36)
+maturity_5yr = trade_dt.next_cds_date(60)
+maturity_7yr = trade_dt.next_cds_date(84)
+maturity_10yr = trade_dt.next_cds_date(120)
+
+path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
+f = open(path, "r")
+data = f.readlines()
+f.close()
+issuer_curves = []
+
+for row in data[1:]:
+
+    split_row = row.split(",")
+    spd_3yr = float(split_row[1]) / 10000.0
+    spd_5yr = float(split_row[2]) / 10000.0
+    spd_7yr = float(split_row[3]) / 10000.0
+    spd_10yr = float(split_row[4]) / 10000.0
+    recovery_rate = float(split_row[5])
+
+    cds_3yr = CDS(step_in_dt, maturity_3yr, spd_3yr)
+    cds_5yr = CDS(step_in_dt, maturity_5yr, spd_5yr)
+    cds_7yr = CDS(step_in_dt, maturity_7yr, spd_7yr)
+    cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
+    cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
+
+    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+
+    issuer_curves.append(issuer_curve)
+
+# Now determine the average spread of the index
+
+cds_index = CDSIndexPortfolio()
+
+avg_spd_3yr = cds_index.average_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
+
+avg_spd_5yr = cds_index.average_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
+
+avg_spd_7yr = cds_index.average_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
+
+avg_spd_10yr = cds_index.average_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
+
+print("LABEL", "VALUE")
+print("AVERAGE SPD 3Y", avg_spd_3yr)
+print("AVERAGE SPD 5Y", avg_spd_5yr)
+print("AVERAGE SPD 7Y", avg_spd_7yr)
+print("AVERAGE SPD 10Y", avg_spd_10yr)
+
+# Now determine the intrinsic spread of the index to the same maturity
+# dates. As the single name CDS contracts
+
+cds_index = CDSIndexPortfolio()
+
+intrinsic_spd_3yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
+
+intrinsic_spd_5yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
+
+intrinsic_spd_7yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
+
+intrinsic_spd_10yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
+
+print("LABEL", "VALUE")
+print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)
+print("INTRINSIC SPD 5Y", intrinsic_spd_5yr)
+print("INTRINSIC SPD 7Y", intrinsic_spd_7yr)
+print("INTRINSIC SPD 10Y", intrinsic_spd_10yr)
+

@@ -2,19 +2,11 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
 import time
 import os
 
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -27,6 +19,10 @@ from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_tranche import CDSTranche
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
+
+# ============================================================================
+# FINANCEPY EXAMPLES - CDSTranche
+# ============================================================================
 
 # TO DO
 
@@ -146,132 +142,140 @@ def load_hetero_spread_curves(value_dt, libor_curve):
 ########################################################################################
 
 
-def test_cds_tranche():
-
-    trade_dt = Date(1, 3, 2007)
-    step_in_dt = trade_dt.add_days(1)
-    value_dt = trade_dt.add_days(1)
-
-    print("DATE")
-    print(str((trade_dt)))
-    print(str((step_in_dt)))
-    print(str((value_dt)))
-
-    libor_curve = build_ibor_curve(trade_dt)
-
-    tranche_maturity = Date(20, 12, 2011)
-    tranche1 = CDSTranche(value_dt, tranche_maturity, 0.00, 0.03)
-    tranche2 = CDSTranche(value_dt, tranche_maturity, 0.03, 0.06)
-    tranche3 = CDSTranche(value_dt, tranche_maturity, 0.06, 0.09)
-    tranche4 = CDSTranche(value_dt, tranche_maturity, 0.09, 0.12)
-    tranche5 = CDSTranche(value_dt, tranche_maturity, 0.12, 0.22)
-    tranche6 = CDSTranche(value_dt, tranche_maturity, 0.22, 0.60)
-    tranche7 = CDSTranche(value_dt, tranche_maturity, 0.00, 0.60)
-    tranches = [
-        tranche1,
-        tranche2,
-        tranche3,
-        tranche4,
-        tranche5,
-        tranche6,
-        tranche7,
-    ]
-
-    corr1 = 0.30
-    corr2 = 0.35
-    upfront = 0.0
-    spd = 0.0
-
-    cds_index = CDSIndexPortfolio()
-
-    print("===================================================================")
-    print("====================== HOMOGENEOUS CURVE ==========================")
-    print("===================================================================")
-    num_credits = 125
-    spd_3yr = 0.0012
-    spd_5yr = 0.0025
-    spd_7yr = 0.0034
-    spd_10yr = 0.0046
-
-    issuer_curves = load_homogeneous_cds_curves(value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits)
-
-    intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
-
-    print("LABEL", "VALUE")
-    print("INTRINSIC SPD TRANCHE MATURITY", intrinsic_spd)
-    adjusted_spd = intrinsic_spd / 0.6
-    print("ADJUSTED  SPD TRANCHE MATURITY", adjusted_spd)
-
-    print("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
-
-    for method in FinLossDistributionBuilder:
-        for tranche in tranches:
-            for num_points in [40]:
-                start = time.time()
-                v = tranche.value_bc(
-                    value_dt,
-                    issuer_curves,
-                    upfront,
-                    spd,
-                    corr1,
-                    corr2,
-                    num_points,
-                    method,
-                )
-                end = time.time()
-                period = end - start
-                print(
-                    method,
-                    period,
-                    num_points,
-                    tranche.k1,
-                    tranche.k2,
-                    v[3] * 10000,
-                )
-
-    print("===================================================================")
-    print("=================== HETEROGENEOUS CURVES ==========================")
-    print("===================================================================")
-
-    issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
-
-    intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
-
-    print("LABEL", "VALUE")
-    print("INTRINSIC SPD TRANCHE MATURITY", intrinsic_spd)
-    adjusted_spd = intrinsic_spd / 0.6
-    print("ADJUSTED  SPD TRANCHE MATURITY", adjusted_spd)
-
-    print("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
-
-    for method in FinLossDistributionBuilder:
-        for tranche in tranches:
-            for num_points in [40]:
-                start = time.time()
-                v = tranche.value_bc(
-                    value_dt,
-                    issuer_curves,
-                    upfront,
-                    spd,
-                    corr1,
-                    corr2,
-                    num_points,
-                    method,
-                )
-                end = time.time()
-                period = end - start
-                print(
-                    method,
-                    period,
-                    num_points,
-                    tranche.k1,
-                    tranche.k2,
-                    v[3] * 10000,
-                )
-
-    print("===================================================================")
 
 
 ########################################################################################
 
-test_cds_tranche()
+# ============================================================================
+# 1. CDS TRANCHE
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. CDS TRANCHE")
+print("=" * 78)
+
+trade_dt = Date(1, 3, 2007)
+step_in_dt = trade_dt.add_days(1)
+value_dt = trade_dt.add_days(1)
+
+print("DATE")
+print(str((trade_dt)))
+print(str((step_in_dt)))
+print(str((value_dt)))
+
+libor_curve = build_ibor_curve(trade_dt)
+
+tranche_maturity = Date(20, 12, 2011)
+tranche1 = CDSTranche(value_dt, tranche_maturity, 0.00, 0.03)
+tranche2 = CDSTranche(value_dt, tranche_maturity, 0.03, 0.06)
+tranche3 = CDSTranche(value_dt, tranche_maturity, 0.06, 0.09)
+tranche4 = CDSTranche(value_dt, tranche_maturity, 0.09, 0.12)
+tranche5 = CDSTranche(value_dt, tranche_maturity, 0.12, 0.22)
+tranche6 = CDSTranche(value_dt, tranche_maturity, 0.22, 0.60)
+tranche7 = CDSTranche(value_dt, tranche_maturity, 0.00, 0.60)
+tranches = [
+    tranche1,
+    tranche2,
+    tranche3,
+    tranche4,
+    tranche5,
+    tranche6,
+    tranche7,
+]
+
+corr1 = 0.30
+corr2 = 0.35
+upfront = 0.0
+spd = 0.0
+
+cds_index = CDSIndexPortfolio()
+
+print("===================================================================")
+print("====================== HOMOGENEOUS CURVE ==========================")
+print("===================================================================")
+num_credits = 125
+spd_3yr = 0.0012
+spd_5yr = 0.0025
+spd_7yr = 0.0034
+spd_10yr = 0.0046
+
+issuer_curves = load_homogeneous_cds_curves(value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits)
+
+intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
+
+print("LABEL", "VALUE")
+print("INTRINSIC SPD TRANCHE MATURITY", intrinsic_spd)
+adjusted_spd = intrinsic_spd / 0.6
+print("ADJUSTED  SPD TRANCHE MATURITY", adjusted_spd)
+
+print("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
+
+for method in FinLossDistributionBuilder:
+    for tranche in tranches:
+        for num_points in [40]:
+            start = time.time()
+            v = tranche.value_bc(
+                value_dt,
+                issuer_curves,
+                upfront,
+                spd,
+                corr1,
+                corr2,
+                num_points,
+                method,
+            )
+            end = time.time()
+            period = end - start
+            print(
+                method,
+                period,
+                num_points,
+                tranche.k1,
+                tranche.k2,
+                v[3] * 10000,
+            )
+
+print("===================================================================")
+print("=================== HETEROGENEOUS CURVES ==========================")
+print("===================================================================")
+
+issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
+
+intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
+
+print("LABEL", "VALUE")
+print("INTRINSIC SPD TRANCHE MATURITY", intrinsic_spd)
+adjusted_spd = intrinsic_spd / 0.6
+print("ADJUSTED  SPD TRANCHE MATURITY", adjusted_spd)
+
+print("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
+
+for method in FinLossDistributionBuilder:
+    for tranche in tranches:
+        for num_points in [40]:
+            start = time.time()
+            v = tranche.value_bc(
+                value_dt,
+                issuer_curves,
+                upfront,
+                spd,
+                corr1,
+                corr2,
+                num_points,
+                method,
+            )
+            end = time.time()
+            period = end - start
+            print(
+                method,
+                period,
+                num_points,
+                tranche.k1,
+                tranche.k2,
+                v[3] * 10000,
+            )
+
+print("===================================================================")
+

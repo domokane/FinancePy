@@ -1,5 +1,9 @@
 from pathlib import Path
 
+# ============================================================================
+# FINANCEPY EXAMPLES - Rename
+# ============================================================================
+
 root = Path(__file__).parent
 
 for file in root.rglob("*.py"):

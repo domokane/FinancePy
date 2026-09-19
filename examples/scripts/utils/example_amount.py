@@ -1,36 +1,39 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
-import add_fp_to_path
 
 from financepy.utils.currency import CurrencyTypes
 from financepy.utils.amount import Amount
 
+# ============================================================================
+# FINANCEPY EXAMPLES - Amount
+# ============================================================================
 
-
-########################################################################################
-
-
-def test_amount():
-
-    print("LABEL", "AMOUNT")
-    x = Amount(101000.232, CurrencyTypes.USD)
-
-    print("Amount", x)
-
-    x = Amount(101000.232, CurrencyTypes.CAD)
-
-    print("Amount", x)
 
 
 ########################################################################################
 
-test_amount()
+
+
+
+########################################################################################
+
+# ============================================================================
+# 1. AMOUNT
+# ============================================================================
+# What this section demonstrates:
+# Runs the original FinancePy calculation with explicit inputs so the numerical result and the effect of the chosen assumptions can be inspected.
+
+print("\n" + "=" * 78)
+print("1. AMOUNT")
+print("=" * 78)
+
+print("LABEL", "AMOUNT")
+x = Amount(101000.232, CurrencyTypes.USD)
+
+print("Amount", x)
+
+x = Amount(101000.232, CurrencyTypes.CAD)
+
+print("Amount", x)
 

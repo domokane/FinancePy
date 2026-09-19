@@ -2,21 +2,17 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+
+# ============================================================================
+# FINANCEPY EXAMPLES - EquityVolCurve
+# ============================================================================
 
 
 
@@ -32,55 +28,63 @@ def vol_skew(k, atm_vol, atm_k, skew):
 ########################################################################################
 
 
-def test_equity_variance_swap():
-
-    start_dt = Date(20, 3, 2018)
-    tenor = "3M"
-    strike = 0.3 * 0.3
-
-    vol_swap = EquityVarianceSwap(start_dt, tenor, strike)
-
-    value_dt = Date(20, 3, 2018)
-    s = 100.0
-    r = 0.05
-    q = 0.0
-    dividend_curve = FlatDiscountCurve(value_dt, q)
-    discount_curve = FlatDiscountCurve(value_dt, r)
-
-    t = 0.25
-    atm_vol = 0.20
-    atm_k = 100.0
-    skew = -0.02 / 5.0  # defined as dsigma/dk
-    strikes = np.linspace(50.0, 135.0, 18)
-    vols = vol_skew(strikes, atm_vol, atm_k, skew)
-    vol_curve = EquityVolCurve(strikes, vols, s, t, r, q)
-
-    strike_spacing = 5.0
-    num_call_options = 10
-    num_put_options = 10
-
-    use_forward = False
-
-    print("LABEL", "VALUE")
-
-    k1 = vol_swap.fair_strike(
-        value_dt,
-        s,
-        dividend_curve,
-        vol_curve,
-        num_call_options,
-        num_put_options,
-        strike_spacing,
-        discount_curve,
-        use_forward,
-    )
-
-    print("REPLICATION VARIANCE:", k1)
-
-    k2 = vol_swap.fair_strike_approx(value_dt, s, strikes, vols)
-    print("DERMAN SKEW APPROX for K:", k2)
 
 
 ########################################################################################
 
-test_equity_variance_swap()
+# ============================================================================
+# 1. EQUITY VARIANCE SWAP
+# ============================================================================
+# What this section demonstrates:
+# Runs the original FinancePy calculation with explicit inputs so the numerical result and the effect of the chosen assumptions can be inspected.
+
+print("\n" + "=" * 78)
+print("1. EQUITY VARIANCE SWAP")
+print("=" * 78)
+
+start_dt = Date(20, 3, 2018)
+tenor = "3M"
+strike = 0.3 * 0.3
+
+vol_swap = EquityVarianceSwap(start_dt, tenor, strike)
+
+value_dt = Date(20, 3, 2018)
+s = 100.0
+r = 0.05
+q = 0.0
+dividend_curve = FlatDiscountCurve(value_dt, q)
+discount_curve = FlatDiscountCurve(value_dt, r)
+
+t = 0.25
+atm_vol = 0.20
+atm_k = 100.0
+skew = -0.02 / 5.0  # defined as dsigma/dk
+strikes = np.linspace(50.0, 135.0, 18)
+vols = vol_skew(strikes, atm_vol, atm_k, skew)
+vol_curve = EquityVolCurve(strikes, vols, s, t, r, q)
+
+strike_spacing = 5.0
+num_call_options = 10
+num_put_options = 10
+
+use_forward = False
+
+print("LABEL", "VALUE")
+
+k1 = vol_swap.fair_strike(
+    value_dt,
+    s,
+    dividend_curve,
+    vol_curve,
+    num_call_options,
+    num_put_options,
+    strike_spacing,
+    discount_curve,
+    use_forward,
+)
+
+print("REPLICATION VARIANCE:", k1)
+
+k2 = vol_swap.fair_strike_approx(value_dt, s, strikes, vols)
+print("DERMAN SKEW APPROX for K:", k2)
+

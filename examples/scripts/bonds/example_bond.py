@@ -1,863 +1,772 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+"""
+FinancePy Bond Class - Student Demonstration
+=============================================
 
+A single, linear Python script demonstrating the main functionality
+of FinancePy's Bond class.
 
-# Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
+There are deliberately NO user-defined functions in this script.
+Run it from top to bottom and follow each section in order.
+"""
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-
-_install_double_click_pause()
-import os
-
-import datetime as dt
-import pandas as pd
 import numpy as np
 
-import add_fp_to_path
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+
+from financepy.products.bonds.bond import Bond, YTMCalcType, CouponType
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date, from_datetime
-from financepy.utils.math import ONE_MILLION
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.products.bonds.bond_market import get_bond_market_conventions
-from financepy.products.bonds.bond_market import BondMarkets
-from financepy.products.bonds.bond import YTMCalcType, Bond, CouponType
-from financepy.utils.global_types import SwapTypes, InterpTypes
-
-from financepy.utils.date_format import set_date_format, DateFormatTypes
-
-########################################################################################
-
-
-def build_ibor_curve(value_dt):
-
-    depo_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
-    depos = []
-    deposit_rate = 0.050
-
-    depo0 = IborDeposit(value_dt, "1D", deposit_rate, depo_dcc_type)
-
-    spot_days = 2
-    settle_dt = value_dt.add_weekdays(spot_days)
-
-    maturity_dt = settle_dt.add_months(1)
-    depo1 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(3)
-    depo2 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(6)
-    depo3 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(9)
-    depo4 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(12)
-    depo5 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    depos.append(depo0)
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-
-    fras = []
-    fixed_dcc_type = DayCountTypes.ACT_365F
-    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-
-    swaps = []
-
-    swap_rate = 0.05
-    maturity_dt = settle_dt.add_months(24)
-    swap1 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-
-    #    print(swap1.fixed_leg._payment_dts)
-
-    swaps.append(swap1)
-
-    maturity_dt = settle_dt.add_months(36)
-    swap2 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap2)
-
-    #    print(swap2.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(48)
-    swap3 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap3)
-
-    #    print(swap3.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(60)
-    swap4 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap4)
-
-    #    print(swap4.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(72)
-    swap5 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap5)
-
-    #    print(swap5.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(84)
-    swap6 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap6)
-
-    #    print(swap6.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(96)
-    swap7 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap7)
-
-    #    print(swap7.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(108)
-    swap8 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap8)
-
-    #    print(swap8.fixed_leg._payment_dts)
-
-    maturity_dt = settle_dt.add_months(120)
-    swap9 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        swap_rate,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap9)
-
-    #    print(swap9.fixed_leg._payment_dts)
-
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-
-    if 1 == 0:
-
-        num_steps = 40
-        dt = 10 / num_steps
-        times = np.linspace(0.0, 10.0, num_steps + 1)
-
-        df0 = 1.0
-        for t in times[1:]:
-            df1 = libor_curve.df_t(t)
-            fwd = (df0 / df1 - 1.0) / dt
-            print(t, df1, fwd)
-            df0 = df1
-
-    return libor_curve
-
-
-########################################################################################
-
-
-def test_bond():
-
-    path = os.path.join(os.path.dirname(__file__), ".//data//gilt_bond_prices.txt")
-    bond_dataframe = pd.read_csv(path, sep="\t")
-    bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
-
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    settle_dt = Date(19, 9, 2012)
-    face = ONE_MILLION
-    ex_div_days = 0
-
-    for dc_type in DayCountTypes:
-        if dc_type == DayCountTypes.ZERO:
-            continue
-        print("MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS", "ACCRUED", "YTM")
-
-        for _, bond in bond_dataframe.iterrows():
-            date_string = bond["maturity"]
-            mat_dt_time = dt.datetime.strptime(date_string, "%d-%b-%y")
-            maturity_dt = from_datetime(mat_dt_time)
-            issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
-
-            coupon = bond["coupon"] / 100.0
-            clean_price = bond["mid"]
-            bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
-
-            ytm = bond.yield_to_maturity(settle_dt, clean_price)
-            accrued_int = bond.accrued_int
-            accd_days = bond.accrued_days
-
-            print(
-                "%18s" % maturity_dt,
-                "%8.4f" % coupon,
-                "%10.4f" % clean_price,
-                "%6.0f" % accd_days,
-                "%10.4f" % accrued_int,
-                "%8.4f" % ytm,
-            )
-
-    #  EXAMPLE FROM http://bondtutor.com/btchp4/topic6/topic6.htm
-
-    accrual_convention = DayCountTypes.ACT_ACT_ICMA
-    y = 0.062267
-    settle_dt = Date(19, 4, 1994)
-    issue_dt = Date(15, 7, 1990)
-    maturity_dt = Date(15, 7, 1997)
-    coupon = 0.085
-    ex_div_days = 0
-    face = 1000000.0
-
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-
-    bond = Bond(
-        issue_dt,
-        maturity_dt,
-        coupon,
-        freq_type,
-        accrual_convention,
-        ex_div_days,
-    )
-
-    print("FIELD", "VALUE")
-    dirty_price = bond.dirty_price_from_ytm(settle_dt, y)
-    print("Dirty Price = ", dirty_price)
-
-    clean_price = bond.clean_price_from_ytm(settle_dt, y)
-    print("Clean Price = ", clean_price)
-
-    accrued_interest = bond.accrued_interest(settle_dt, face)
-    print("Accrued = ", accrued_interest)
-
-    ytm = bond.yield_to_maturity(settle_dt, clean_price)
-    print("Yield to Maturity = ", ytm)
-
-    bump = 1e-4
-    price_bumped_up = bond.dirty_price_from_ytm(settle_dt, y + bump)
-    print("Price Bumped Up:", price_bumped_up)
-
-    price_bumped_dn = bond.dirty_price_from_ytm(settle_dt, y - bump)
-    print("Price Bumped Dn:", price_bumped_dn)
-
-    duration_by_bump = -(price_bumped_up - dirty_price) / bump
-    print("Duration by Bump = ", duration_by_bump)
-
-    duration = bond.dollar_duration(settle_dt, y)
-    print("Dollar Duration = ", duration)
-    print("Duration Difference:", duration - duration_by_bump)
-
-    modified_duration = bond.modified_duration(settle_dt, y)
-    print("Modified Duration = ", modified_duration)
-
-    macaulay_duration = bond.macaulay_duration(settle_dt, y)
-    print("Macaulay Duration = ", macaulay_duration)
-
-    conv = bond.convexity_from_ytm(settle_dt, y)
-    print("Convexity = ", conv)
-
-    # ASSET SWAP SPREAD
-
-    # When the libor curve is the flat bond curve then the ASW is zero by
-    # definition
-    flat_curve = FlatDiscountCurve(settle_dt, ytm, FrequencyTypes.SEMI_ANNUAL)
-
-    print("FIELD", "VALUE")
-
-    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
-    asw = bond.asset_swap_spread(settle_dt, clean_price, flat_curve)
-    print("Discounted on Bond Curve ASW:", asw * 10000)
-
-    # When the libor curve is the Libor curve then the ASW is positive
-    libor_curve = build_ibor_curve(settle_dt)
-    asw = bond.asset_swap_spread(settle_dt, clean_price, libor_curve)
-    oas = bond.option_adjusted_spread(settle_dt, clean_price, libor_curve)
-    print("Discounted on LIBOR Curve ASW:", asw * 10000)
-    print("Discounted on LIBOR Curve OAS:", oas * 10000)
-
-    p = 90.0
-    asw = bond.asset_swap_spread(settle_dt, p, libor_curve)
-    oas = bond.option_adjusted_spread(settle_dt, p, libor_curve)
-    print("Deep discount bond at 90 ASW:", asw * 10000)
-    print("Deep discount bond at 90 OAS:", oas * 10000)
-
-    p = 100.0
-    asw = bond.asset_swap_spread(settle_dt, p, libor_curve)
-    oas = bond.option_adjusted_spread(settle_dt, p, libor_curve)
-    print("Par bond at 100 ASW:", asw * 10000)
-    print("Par bond at 100 OAS:", oas * 10000)
-
-    p = 120.0
-    asw = bond.asset_swap_spread(settle_dt, p, libor_curve)
-    oas = bond.option_adjusted_spread(settle_dt, p, libor_curve)
-    print("Above par bond at 120 ASW:", asw * 10000)
-    print("Above par bond at 120 OAS:", oas * 10000)
-
-    # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
-    # Page 10 TREASURY NOTE SCREENSHOT
-
-    print("BLOOMBERG US TREASURY EXAMPLE")
-    settle_dt = Date(21, 7, 2017)
-    issue_dt = Date(15, 5, 2010)
-    maturity_dt = Date(15, 5, 2027)
-    coupon = 0.02375
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-    ex_div_days = 0
-    face = 1000000.0
-
-    bond = Bond(
-        issue_dt,
-        maturity_dt,
-        coupon,
-        freq_type,
-        dc_type,
-        ex_div_days,
-        CalendarTypes.UNITED_STATES,
-    )
-
-    print("FIELD", "VALUE")
-    clean_price = 99.7808417
+from financepy.utils.global_types import InterpTypes
+import matplotlib.pyplot as plt
 
-    yld = bond.current_yield(settle_dt, clean_price)
-    print("Current Yield = ", yld)
+# ============================================================================
+# FINANCEPY EXAMPLES - Bond
+# ============================================================================
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.UK_DMO)
-    print("UK DMO Yield To Maturity = ", ytm)
+# =============================================================================
+# 0. DISPLAY HELPERS
+# =============================================================================
+# We are not defining separate functions, so simple formatting strings are
+# reused throughout the script.
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
-    print("US STREET Yield To Maturity = ", ytm)
-
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
-    print("US TREASURY Yield To Maturity = ", ytm)
+LINE = "=" * 78
+SUBLINE = "-" * 78
 
-    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm, YTMCalcType.US_TREASURY)
-
-    print("Dirty Price = ", dirty_price)
+print("\n" + LINE)
+print("                 FINANCEPY BOND CLASS DEMONSTRATION")
+print(LINE)
+print("This script demonstrates the main calculations available on a Bond.")
+print("Prices are quoted per 100 of face value unless otherwise stated.")
+print(LINE)
 
-    clean_price = bond.clean_price_from_ytm(settle_dt, ytm, YTMCalcType.US_TREASURY)
 
-    print("Clean Price = ", clean_price)
+# =============================================================================
+# 1. CREATE A BOND
+# =============================================================================
 
-    accrued_interest = bond.accrued_interest(settle_dt, face)
-    print("Accrued = ", accrued_interest)
+print("\n" + LINE)
+print("1. CREATING A STANDARD FIXED-COUPON BOND")
+print(LINE)
 
-    accddays = bond.accrued_days
-    print("Accrued Days = ", accddays)
-
-    duration = bond.dollar_duration(settle_dt, ytm, YTMCalcType.US_STREET)
-    print("Dollar Duration = ", duration)
-
-    modified_duration = bond.modified_duration(settle_dt, ytm)
-    print("Modified Duration = ", modified_duration)
+issue_dt = Date(15, 5, 2020)
+maturity_dt = Date(15, 5, 2030)
 
-    macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
-    print("Macaulay Duration = ", macaulay_duration)
+coupon = 0.05  # 5% annual coupon
+freq_type = FrequencyTypes.SEMI_ANNUAL
+dc_type = DayCountTypes.ACT_ACT_ICMA
+ex_div_days = 0
 
-    conv = bond.convexity_from_ytm(settle_dt, ytm)
-    print("Convexity = ", conv)
+bond = Bond(
+    issue_dt,
+    maturity_dt,
+    coupon,
+    freq_type,
+    dc_type,
+    ex_div_days,
+)
 
-    # Page 11 APPLE NOTE SCREENSHOT
+settle_dt = Date(15, 9, 2026)
+face = 100.0
+market_clean_price = 102.50
 
-    print("BLOOMBERG APPLE CORP BOND EXAMPLE")
-    settle_dt = Date(21, 7, 2017)
-    issue_dt = Date(13, 5, 2012)
-    maturity_dt = Date(13, 5, 2022)
-    coupon = 0.027
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    ex_div_days = 0
-    face = 100.0
+print(f"{'Issue date':30s}: {issue_dt}")
+print(f"{'Settlement date':30s}: {settle_dt}")
+print(f"{'Maturity date':30s}: {maturity_dt}")
+print(f"{'Coupon rate':30s}: {coupon * 100:10.4f}%")
+print(f"{'Coupon frequency':30s}: {freq_type}")
+print(f"{'Day-count convention':30s}: {dc_type}")
+print(f"{'Face value':30s}: {face:10.2f}")
+print(f"{'Observed clean price':30s}: {market_clean_price:10.4f}")
 
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
-    print("FIELD", "VALUE")
-    clean_price = 101.581564
+# =============================================================================
+# 2. DISPLAY THE BOND OBJECT
+# =============================================================================
 
-    yld = bond.current_yield(settle_dt, clean_price)
-    print("Current Yield", yld)
+print("\n" + LINE)
+print("2. BOND OBJECT")
+print(LINE)
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.UK_DMO)
-    print("UK DMO Yield To Maturity", ytm)
+print(bond)
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
-    print("US STREET Yield To Maturity", ytm)
 
-    ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
-    print("US TREASURY Yield To Maturity", ytm)
+# =============================================================================
+# 3. PAYMENT SCHEDULE
+# =============================================================================
 
-    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
-    print("Dirty Price", dirty_price)
+print("\n" + LINE)
+print("3. FUTURE BOND PAYMENTS")
+print(LINE)
+print("FinancePy can display the remaining coupon/principal cash flows.\n")
 
-    clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
-    print("Clean Price", clean_price)
+bond.print_payments(settle_dt, face)
 
-    accddays = bond.accrued_days
-    print("Accrued Days", accddays)
 
-    accrued_interest = bond.accrued_interest(settle_dt, face)
-    print("Accrued", accrued_interest)
+# =============================================================================
+# 4. ACCRUED INTEREST
+# =============================================================================
 
-    duration = bond.dollar_duration(settle_dt, ytm)
-    print("Dollar Duration", duration)
+print("\n" + LINE)
+print("4. ACCRUED INTEREST")
+print(LINE)
 
-    modified_duration = bond.modified_duration(settle_dt, ytm)
-    print("Modified Duration", modified_duration)
+accrued_interest = bond.accrued_interest(settle_dt, face)
+accrued_days = bond.accrued_days
 
-    macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
-    print("Macaulay Duration", macaulay_duration)
+print(f"{'Accrued days':35s}: {accrued_days:12.0f}")
+print(f"{'Accrued interest':35s}: {accrued_interest:12.6f}")
 
-    conv = bond.convexity_from_ytm(settle_dt, ytm)
-    print("Convexity", conv)
+print("\nAccrued interest is the coupon interest earned since the previous " "coupon date.")
 
-    set_date_format(DateFormatTypes.UK_LONGEST)
 
-    # bond.print_payments(settle_dt, ONE_MILLION)
+# =============================================================================
+# 5. CURRENT YIELD
+# =============================================================================
 
+print("\n" + LINE)
+print("5. CURRENT YIELD")
+print(LINE)
 
-########################################################################################
+current_yield = bond.current_yield(settle_dt, market_clean_price)
 
+print(f"{'Clean price':35s}: {market_clean_price:12.6f}")
+print(f"{'Current yield':35s}: {current_yield * 100:12.6f}%")
 
-def test_bond_ex_dividend():
+print("\nCurrent yield considers the annual coupon relative to the bond's " "current market price.")
 
-    issue_dt = Date(7, 9, 2000)
-    maturity_dt = Date(7, 9, 2020)
-    coupon = 0.05
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-    face = 100.0
-    ex_div_days = 7
-    print("LABEL", "VALUE")
 
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
-    settle_dt = Date(7, 9, 2003)
-    accrued = bond.accrued_interest(settle_dt, face)
+# =============================================================================
+# 6. YIELD TO MATURITY
+# =============================================================================
 
-    print("settle_dt:", settle_dt)
-    print("Accrued:", accrued)
+print("\n" + LINE)
+print("6. YIELD TO MATURITY")
+print(LINE)
 
-    print("=======================================================")
-    print("SETTLEMENT", "DIRTY PRICE", "ACCRUED", "CLEAN PRICE")
+ytm = bond.yield_to_maturity(settle_dt, market_clean_price)
 
-    issue_dt = Date(7, 9, 2000)
-    maturity_dt = Date(7, 9, 2020)
-    coupon = 0.05
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-    face = 100.0
-    ex_div_days = 7
+print(f"{'Clean price':35s}: {market_clean_price:12.6f}")
+print(f"{'Yield to maturity':35s}: {ytm * 100:12.6f}%")
 
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
+print(
+    "\nYTM is the discount rate that makes the present value of the "
+    "bond's cash flows consistent with its market price."
+)
 
-    settle_dt = Date(25, 8, 2010)
 
-    ytm = 0.05
+# =============================================================================
+# 7. DIFFERENT YTM CALCULATION CONVENTIONS
+# =============================================================================
 
-    for _ in range(0, 13):
-        settle_dt = settle_dt.add_days(1)
-        accrued = bond.accrued_interest(settle_dt, face)
-        dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
-        clean_price = dirty_price - accrued
-        print(settle_dt, dirty_price, accrued, clean_price)
+print("\n" + LINE)
+print("7. YTM CALCULATION CONVENTIONS")
+print(LINE)
 
+ytm_uk = bond.yield_to_maturity(
+    settle_dt,
+    market_clean_price,
+    YTMCalcType.UK_DMO,
+)
 
-#        print(settle_dt, dirty_price, accrued, clean_price)
+ytm_street = bond.yield_to_maturity(
+    settle_dt,
+    market_clean_price,
+    YTMCalcType.US_STREET,
+)
 
+ytm_treasury = bond.yield_to_maturity(
+    settle_dt,
+    market_clean_price,
+    YTMCalcType.US_TREASURY,
+)
 
-########################################################################################
+print(f"{'Convention':25s} {'Yield':>18s}")
+print(SUBLINE)
+print(f"{'UK DMO':25s} {ytm_uk * 100:17.6f}%")
+print(f"{'US Street':25s} {ytm_street * 100:17.6f}%")
+print(f"{'US Treasury':25s} {ytm_treasury * 100:17.6f}%")
 
 
-def test_bond_payment_dates():
+# =============================================================================
+# 8. PRICE FROM YIELD
+# =============================================================================
 
-    issue_dt = Date(1, 1, 2020)
-    mat_dt = Date(1, 1, 2023)
-    cpn = 0.05
-    ytm = 0.05
-    face = 100.0
+print("\n" + LINE)
+print("8. CLEAN AND DIRTY PRICE FROM YTM")
+print(LINE)
 
-    # Use auto generated schedule
-    bond = Bond(
-        issue_dt=issue_dt,
-        maturity_dt=mat_dt,
-        coupon=cpn,
-        freq_type=FrequencyTypes.ANNUAL,
-        accrual_dc_type=DayCountTypes.ACT_ACT_ISDA,
-        cal_type=CalendarTypes.UNITED_STATES,
-    )
+dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
+clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
 
-    settle_dt = issue_dt.add_months(3)
-    #    bond.print_payments(settle_dt)
+print(f"{'YTM':35s}: {ytm * 100:12.6f}%")
+print(f"{'Dirty price':35s}: {dirty_price:12.6f}")
+print(f"{'Clean price':35s}: {clean_price:12.6f}")
+print(f"{'Accrued interest':35s}: {accrued_interest:12.6f}")
 
-    accrued = bond.accrued_interest(settle_dt, face)
-    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
-    clean_price = dirty_price - accrued
-    print(settle_dt, dirty_price, accrued, clean_price)
-    #    print(settle_dt, dirty_price, accrued, clean_price)
+print("\nRelationship:")
+print(f"  Dirty price - accrued interest = {dirty_price - accrued_interest:.6f}")
+print(f"  Clean price                    = {clean_price:.6f}")
 
-    # Use manual schedule where I make payment dates equal coupon dates even weekends
-    cpn_dts = [
-        Date(1, 1, 2020),
-        Date(1, 1, 2021),
-        Date(1, 1, 2022),
-        Date(1, 1, 2023),
+
+# =============================================================================
+# 9. PRICE/YIELD ROUND-TRIP CHECK
+# =============================================================================
+
+print("\n" + LINE)
+print("9. PRICE / YIELD ROUND-TRIP CHECK")
+print(LINE)
+
+recovered_ytm = bond.yield_to_maturity(settle_dt, clean_price)
+recovered_price = bond.clean_price_from_ytm(settle_dt, recovered_ytm)
+
+print(f"{'Original clean price':35s}: {market_clean_price:12.8f}")
+print(f"{'Calculated YTM':35s}: {ytm * 100:12.8f}%")
+print(f"{'Price recovered from YTM':35s}: {recovered_price:12.8f}")
+print(f"{'Pricing difference':35s}: {recovered_price-market_clean_price:12.8f}")
+
+
+# =============================================================================
+# 10. DOLLAR DURATION
+# =============================================================================
+
+print("\n" + LINE)
+print("10. DOLLAR DURATION")
+print(LINE)
+
+dollar_duration = bond.dollar_duration(settle_dt, ytm)
+
+print(f"{'Dollar duration':35s}: {dollar_duration:12.6f}")
+
+print("\nDollar duration measures the approximate price sensitivity of the " "bond to a change in yield.")
+
+
+# =============================================================================
+# 11. MODIFIED DURATION
+# =============================================================================
+
+print("\n" + LINE)
+print("11. MODIFIED DURATION")
+print(LINE)
+
+modified_duration = bond.modified_duration(settle_dt, ytm)
+
+print(f"{'Modified duration':35s}: {modified_duration:12.6f}")
+
+print("\nModified duration measures the approximate percentage change in " "price for a small change in yield.")
+
+
+# =============================================================================
+# 12. MACAULAY DURATION
+# =============================================================================
+
+print("\n" + LINE)
+print("12. MACAULAY DURATION")
+print(LINE)
+
+macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
+
+print(f"{'Macaulay duration':35s}: {macaulay_duration:12.6f} years")
+
+print("\nMacaulay duration is the present-value-weighted average time at " "which the bond's cash flows are received.")
+
+
+# =============================================================================
+# 13. CONVEXITY
+# =============================================================================
+
+print("\n" + LINE)
+print("13. CONVEXITY")
+print(LINE)
+
+convexity = bond.convexity_from_ytm(settle_dt, ytm)
+
+print(f"{'Convexity':35s}: {convexity:12.6f}")
+
+print("\nConvexity captures the curvature in the relationship between " "bond price and yield.")
+
+
+# =============================================================================
+# 14. VERIFY DURATION WITH A SMALL YIELD BUMP
+# =============================================================================
+
+print("\n" + LINE)
+print("14. PRICE SENSITIVITY TO A 1 BASIS-POINT YIELD MOVE")
+print(LINE)
+
+bump = 0.0001  # 1 basis point
+
+price_at_ytm = bond.dirty_price_from_ytm(settle_dt, ytm)
+price_yield_up = bond.dirty_price_from_ytm(settle_dt, ytm + bump)
+price_yield_down = bond.dirty_price_from_ytm(settle_dt, ytm - bump)
+
+print(f"{'Yield - 1 bp':30s}: {(ytm-bump)*100:11.6f}%" f"   Price = {price_yield_down:12.6f}")
+print(f"{'Original yield':30s}: {ytm*100:11.6f}%" f"   Price = {price_at_ytm:12.6f}")
+print(f"{'Yield + 1 bp':30s}: {(ytm+bump)*100:11.6f}%" f"   Price = {price_yield_up:12.6f}")
+
+print("\nNotice the inverse price/yield relationship: when yield rises, " "bond price falls.")
+
+
+# =============================================================================
+# 15. PRICE FROM A DISCOUNT CURVE
+# =============================================================================
+
+print("\n" + LINE)
+print("15. PRICING FROM A DISCOUNT CURVE")
+print(LINE)
+
+# Construct a simple flat discount curve at the bond's YTM.
+flat_curve = FlatDiscountCurve(
+    settle_dt,
+    ytm,
+    FrequencyTypes.SEMI_ANNUAL,
+)
+
+dirty_curve_price = bond.dirty_price_from_discount_curve(
+    settle_dt,
+    flat_curve,
+)
+
+clean_curve_price = bond.clean_price_from_discount_curve(
+    settle_dt,
+    flat_curve,
+)
+
+print(f"{'Dirty price from curve':35s}: {dirty_curve_price:12.6f}")
+print(f"{'Clean price from curve':35s}: {clean_curve_price:12.6f}")
+
+
+# =============================================================================
+# 16. OPTION-ADJUSTED SPREAD (OAS)
+# =============================================================================
+
+print("\n" + LINE)
+print("16. OPTION-ADJUSTED SPREAD (OAS)")
+print(LINE)
+
+# Use a deliberately different benchmark rate so the spread is visible.
+benchmark_rate = 0.035
+
+benchmark_curve = FlatDiscountCurve(
+    settle_dt,
+    benchmark_rate,
+    FrequencyTypes.SEMI_ANNUAL,
+)
+
+oas = bond.option_adjusted_spread(
+    settle_dt,
+    market_clean_price,
+    benchmark_curve,
+)
+
+print(f"{'Benchmark curve rate':35s}: {benchmark_rate * 100:12.6f}%")
+print(f"{'Bond clean price':35s}: {market_clean_price:12.6f}")
+print(f"{'OAS':35s}: {oas * 10000:12.4f} bp")
+
+
+# =============================================================================
+# 17. ASSET SWAP SPREAD
+# =============================================================================
+
+print("\n" + LINE)
+print("17. ASSET SWAP SPREAD")
+print(LINE)
+
+asw = bond.asset_swap_spread(
+    settle_dt,
+    market_clean_price,
+    benchmark_curve,
+)
+
+print(f"{'Asset swap spread':35s}: {asw * 10000:12.4f} bp")
+print(f"{'Option-adjusted spread':35s}: {oas * 10000:12.4f} bp")
+
+
+# =============================================================================
+# 18. KEY-RATE DURATIONS
+# =============================================================================
+
+print("\n" + LINE)
+print("18. KEY-RATE DURATIONS")
+print(LINE)
+
+key_rate_tenors, key_rate_durations = bond.key_rate_durations(
+    settle_dt,
+    ytm,
+)
+
+print(f"{'Key-rate tenor':>20s} {'Duration':>20s}")
+print(SUBLINE)
+
+for tenor, krd in zip(key_rate_tenors, key_rate_durations):
+    print(f"{tenor:20.2f} {krd:20.6f}")
+
+print("\nKey-rate duration decomposes interest-rate sensitivity across " "different points on the yield curve.")
+
+
+# =============================================================================
+# 19. KEY-RATE DURATIONS WITH USER-SUPPLIED MARKET RATES
+# =============================================================================
+
+print("\n" + LINE)
+print("19. KEY-RATE DURATIONS USING SPECIFIED MARKET RATES")
+print(LINE)
+
+market_tenors = np.array([0.5, 1.0, 2.0, 3.0, 5.0, 7.0, 10.0])
+
+market_rates = np.array(
+    [
+        0.0400,
+        0.0390,
+        0.0380,
+        0.0375,
+        0.0370,
+        0.0368,
+        0.0365,
     ]
-    pmt_dts = [
-        Date(1, 1, 2020),
-        Date(1, 1, 2021),
-        Date(1, 1, 2022),
-        Date(1, 1, 2023),
+)
+
+kr_tenors, kr_durations = bond.key_rate_durations(
+    settle_dt,
+    ytm,
+    key_rate_tenors=market_tenors,
+    rates=market_rates,
+)
+
+print(f"{'Tenor':>12s} {'Market rate':>18s} {'Key-rate duration':>22s}")
+print(SUBLINE)
+
+for tenor, rate, krd in zip(kr_tenors, market_rates, kr_durations):
+    print(f"{tenor:12.2f} {rate*100:17.4f}% {krd:22.6f}")
+
+
+# =============================================================================
+# 20. HOLDING-PERIOD RETURN / RATE OF RETURN
+# =============================================================================
+
+print("\n" + LINE)
+print("20. BOND RATE OF RETURN")
+print(LINE)
+
+buy_dt = Date(15, 9, 2024)
+sell_dt = Date(15, 9, 2026)
+
+buy_ytm = 0.045
+sell_ytm = 0.040
+
+buy_price = bond.dirty_price_from_ytm(
+    buy_dt,
+    buy_ytm,
+    YTMCalcType.US_STREET,
+)
+
+sell_price = bond.dirty_price_from_ytm(
+    sell_dt,
+    sell_ytm,
+    YTMCalcType.US_STREET,
+)
+
+simple_return, irr, pnl = bond.calc_ror(
+    buy_dt,
+    sell_dt,
+    buy_ytm,
+    sell_ytm,
+)
+
+print(f"{'Buy date':35s}: {buy_dt}")
+print(f"{'Buy YTM':35s}: {buy_ytm * 100:12.6f}%")
+print(f"{'Buy dirty price':35s}: {buy_price:12.6f}")
+print()
+print(f"{'Sell date':35s}: {sell_dt}")
+print(f"{'Sell YTM':35s}: {sell_ytm * 100:12.6f}%")
+print(f"{'Sell dirty price':35s}: {sell_price:12.6f}")
+print()
+print(f"{'Simple return':35s}: {simple_return * 100:12.6f}%")
+print(f"{'IRR':35s}: {irr * 100:12.6f}%")
+print(f"{'P&L':35s}: {pnl:12.6f}")
+
+
+# =============================================================================
+# 21. EX-DIVIDEND BOND
+# =============================================================================
+
+print("\n" + LINE)
+print("21. EX-DIVIDEND PERIOD")
+print(LINE)
+
+ex_div_bond = Bond(
+    Date(7, 9, 2020),
+    Date(7, 9, 2030),
+    0.05,
+    FrequencyTypes.SEMI_ANNUAL,
+    DayCountTypes.ACT_ACT_ICMA,
+    7,  # 7 ex-dividend days
+)
+
+ex_div_ytm = 0.05
+ex_div_face = 100.0
+
+print("The following shows how accrued interest and price behave as " "settlement approaches a coupon date.\n")
+
+print(f"{'Settlement':>15s}" f"{'Dirty Price':>18s}" f"{'Accrued':>18s}" f"{'Clean Price':>18s}")
+print(SUBLINE)
+
+ex_settle_dt = Date(25, 8, 2026)
+
+for _ in range(13):
+    ex_settle_dt = ex_settle_dt.add_days(1)
+
+    ex_accrued = ex_div_bond.accrued_interest(
+        ex_settle_dt,
+        ex_div_face,
+    )
+
+    ex_dirty = ex_div_bond.dirty_price_from_ytm(
+        ex_settle_dt,
+        ex_div_ytm,
+    )
+
+    ex_clean = ex_dirty - ex_accrued
+
+    print(f"{str(ex_settle_dt):>15s}" f"{ex_dirty:18.6f}" f"{ex_accrued:18.6f}" f"{ex_clean:18.6f}")
+
+
+# =============================================================================
+# 22. CUSTOM / MANUAL CASH-FLOW SCHEDULE
+# =============================================================================
+
+print("\n" + LINE)
+print("22. RESETTING THE BOND'S CASH FLOWS MANUALLY")
+print(LINE)
+
+custom_bond = Bond(
+    issue_dt=Date(1, 1, 2025),
+    maturity_dt=Date(1, 1, 2028),
+    coupon=0.05,
+    freq_type=FrequencyTypes.ANNUAL,
+    accrual_dc_type=DayCountTypes.ACT_ACT_ISDA,
+    cal_type=CalendarTypes.UNITED_STATES,
+)
+
+custom_settle_dt = Date(1, 4, 2025)
+custom_ytm = 0.05
+
+print("Automatically generated schedule:")
+custom_bond.print_payments(custom_settle_dt, 100.0)
+
+# Coupon dates.
+coupon_dates = [
+    Date(1, 1, 2025),
+    Date(1, 1, 2026),
+    Date(1, 1, 2027),
+    Date(1, 1, 2028),
+]
+
+# Actual payment dates.
+payment_dates = [
+    Date(1, 1, 2025),
+    Date(1, 1, 2026),
+    Date(1, 1, 2027),
+    Date(1, 1, 2028),
+]
+
+# Cash flows are expressed per unit of face value.
+flow_amounts = np.array(
+    [
+        0.00,
+        0.05,
+        0.05,
+        1.05,  # final coupon + principal
     ]
-    flow_amts = np.array([0.0, 0.05, 0.05, 1.05])
-
-    bond.reset_flows(cpn_dts, pmt_dts, flow_amts)
-    #    bond.print_payments(settle_dt)
-
-    accrued = bond.accrued_interest(settle_dt, face)
-    dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
-    clean_price = dirty_price - accrued
-    print(settle_dt, dirty_price, accrued, clean_price)
-
-
-#    print(settle_dt, dirty_price, accrued, clean_price)
-
-
-########################################################################################
-
-
-def test_bond_ror():
-
-    path = os.path.join(os.path.dirname(__file__), ".//data//test_cases_bond_ror.csv")
-    df = pd.read_csv(path, parse_dates=["buy_date", "sell_date"])
-    # A 10-year bond with 1 coupon per year. code: 210215
-
-    bond = Bond(
-        issue_dt=Date(13, 9, 2021),
-        maturity_dt=Date(13, 9, 2031),
-        coupon=0.0312,
-        freq_type=FrequencyTypes.ANNUAL,
-        accrual_dc_type=DayCountTypes.ACT_ACT_ICMA,
-    )
-
-    print(
-        "bond_code",
-        "buy_date",
-        "buy_ytm",
-        "buy_price",
-        "sell_date",
-        "sell_ytm",
-        "sell_price",
-        "simple_return",
-        "irr",
-    )
-
-    for row in df.itertuples(index=False):
-
-        buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
-        sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
-        buy_price = bond.dirty_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.US_STREET)
-        sell_price = bond.dirty_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.US_STREET)
-        simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
-
-        print(
-            row.bond_code,
-            buy_date,
-            row.buy_ytm,
-            buy_price,
-            sell_date,
-            row.sell_ytm,
-            sell_price,
-            simple,
-            irr,
-        )
-
-
-########################################################################################
-
-
-def test_bond_eom():
-
-    # Bonds that mature on an EOM date have flows on EOM dates
-    issue_dt = Date(30, 11, 2022)
-    settle_dt = Date(6, 2, 2023)
-    maturity_dt = Date(30, 11, 2024)
-    coupon = 0.045
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-    ex_div_days = 0
-
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
-
-    accrued_interest = bond.accrued_interest(settle_dt)  # should be 8406.593406
-
-    # print(accrued_interest)
-
-
-########################################################################################
-
-
-def test_key_rate_durations():
-
-    issue_dt = Date(31, 7, 2022)
-    maturity_dt = Date(31, 7, 2027)
-    coupon = 0.0275
-    ex_div_days = 0
-
-    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(BondMarkets.UNITED_STATES)
-
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
-
-    settle_dt = Date(24, 4, 2023)
-
-    ytm = 3.725060 / 100.0
-
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(settle_dt, ytm)
-
-
-#    print(key_rate_tenors)
-#    print(key_rate_durations)
-
-########################################################################################
-
-
-def test_key_rate_durations_bloomberg_example():
-
-    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(BondMarkets.UNITED_STATES)
-
-    # interest accrues on this date. Issue date is 01/08/2022
-    issue_dt = Date(31, 7, 2022)
-    maturity_dt = Date(31, 7, 2027)
-    coupon = 2.75 / 100.0
-    ex_div_days = 0
-
-    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(BondMarkets.UNITED_STATES)
-
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
-
-    settle_dt = Date(24, 4, 2023)
-
-    # US Street yield on Bloomberg as of 20 April 2023
-    # with settle date 24 April 2023
-    ytm = 3.725060 / 100
-
-    # Details of yields of market bonds at KRD maturity points
-    my_tenors = np.array([0.5, 1, 2, 3, 5, 7, 10])
-
-    my_rates = np.array([5.0367, 4.7327, 4.1445, 3.8575, 3.6272, 3.5825, 3.5347]) / 100
-
-    key_rate_tenors, key_rate_durations = bond.key_rate_durations(
-        settle_dt, ytm, key_rate_tenors=my_tenors, rates=my_rates
-    )
-
-
-#    print(key_rate_tenors)
-#    print(key_rate_durations)
-
-# Differences due to bonds not sitting exactly on these maturity points ?
-# Did BBG interpolate ?
-
-########################################################################################
-
-
-def test_oas():
-
-    issue_dt = Date(15, 5, 2010)
-    maturity_dt = Date(15, 5, 2027)
-    coupon = 0.02375
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
-
-    libor_flat_rate = 0.0275
-    settle_dt = Date(21, 7, 2017)
-
-    libor_flat_curve = FlatDiscountCurve(settle_dt, libor_flat_rate, FrequencyTypes.SEMI_ANNUAL)
-
-    # I specified face to be 100 - if face is 1 then this must be 0.99780842
-    clean_price = 99.780842
-
-    oas = bond.option_adjusted_spread(settle_dt, clean_price, libor_flat_curve) * 10000
-
-    if (oas - (-34.60)) > 0.01:
-        print("OAS incorrect")
-
-
-########################################################################################
-
-
-def test_div_dts():
-
-    issue_dt = Date(15, 5, 2020)
-    maturity_dt = Date(15, 5, 2035)
-    coupon = 0.02375
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    accrual_type = DayCountTypes.ACT_ACT_ICMA
-    face = 125000
-    ex_div_days = 10
-
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, accrual_type, ex_div_days)
-
-    #    print(bond)
-
-    clean_price = 99.7808417  # if face is 1 then this must be 0.99780842
-
-    settle_dt = Date(15, 5, 2023)
-    #    bond.print_payments(settle_dt, face)
-
-    current_yield = bond.current_yield(settle_dt, clean_price) * 100
-    #    print("Currnt Yield: %10.5f %%" % (current_yield))
-
-    ytm = bond.yield_to_maturity(settle_dt, clean_price) * 100.0
-
-
-#    print("Yield to Mat: %10.5f %%" % (ytm))
-
-
-###############################################################################
-
-
-def test_cpn_types():
-
-    # Normally a coupon if c/f but in some cases we have a long or short
-    # first coupon. I allow this by allowing a coupon type ACCRUAL. In this
-    # case the coupon is the annual coupon times the year fraction
-
-    issue_dt = Date(31, 3, 2022)
-    maturity_dt = Date(31, 7, 2023)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-
-    # expect coupons on
-    # 31 July 2022
-    # 31 July 2023
-    # The first coupon is short as it accrues from 31 March to 31 July
-    coupon = 0.0275
-    dc_type = DayCountTypes.ACT_360
-
-    # We do not see that here. All coupons are the same size
-    cpn_type = CouponType.FIXED
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, cpn_type=cpn_type)
-    settle_dt = Date(1, 5, 2022)
-    face = 1000000
-    bond.print_payments(settle_dt, face)
-
-    # We need to set the coupon type to ACCRUED to enable this
-    cpn_type = CouponType.ACCRUED
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, cpn_type=cpn_type)
-
-
-def test_stack_exchange():
-
-    # https://quant.stackexchange.com/questions/66508/schedule-yield-to-maturity-and-npv-of-fixed-rate-bond-from-quantlib-python
-
-    # Unable to reconcile with strange example
-
-    issue_dt = Date(28, 9, 2019)
-    maturity_dt = Date(28, 9, 2024)
-    coupon = 0.05
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    acc_dc_type = DayCountTypes.ACT_ACT_ICMA
-
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, acc_dc_type)
-
-    value_dt = Date(31, 7, 2020)
-    settle_dt = value_dt.add_days(100)
-    #    print(settle_dt)
-
-    #    print(bond.print_payments(settle_dt, 100))
-
-    spot_dts = [Date(31, 7, 2021), Date(1, 1, 2027)]
-    spot_rates = [0.01, 0.02]
-
-    zero_curve = ZeroRatesDiscountCurve(
-        value_dt,
-        spot_dts,
-        spot_rates,
-        freq_type,
-        DayCountTypes.ACT_360,
-        InterpTypes.LINEAR_ZERO_RATES,
-    )
-
-    # print(
-    #     "Dirty Price = %12.7f"
-    #     % bond.dirty_price_from_discount_curve(settle_dt, zero_curve)
-    # )
-
-    # print(
-    #     "Clean Price = %12.7f"
-    #     % bond.clean_price_from_discount_curve(settle_dt, zero_curve)
-    # )
-
-
-###############################################################################
-
-
-test_bond()
-test_cpn_types()
-test_oas()
-test_bond_ex_dividend()
-test_bond_payment_dates()
-test_bond_ror()
-test_bond_eom()
-test_key_rate_durations()
-test_key_rate_durations_bloomberg_example()
-test_div_dts()
-test_stack_exchange()
+)
+
+custom_bond.reset_flows(
+    coupon_dates,
+    payment_dates,
+    flow_amounts,
+)
+
+print("\nAfter reset_flows():")
+custom_bond.print_payments(custom_settle_dt, 100.0)
+
+custom_accrued = custom_bond.accrued_interest(
+    custom_settle_dt,
+    100.0,
+)
+
+custom_dirty = custom_bond.dirty_price_from_ytm(
+    custom_settle_dt,
+    custom_ytm,
+)
+
+custom_clean = custom_dirty - custom_accrued
+
+print()
+print(f"{'Dirty price':35s}: {custom_dirty:12.6f}")
+print(f"{'Accrued interest':35s}: {custom_accrued:12.6f}")
+print(f"{'Clean price':35s}: {custom_clean:12.6f}")
+
+
+# =============================================================================
+# 23. FIXED VS ACCRUED COUPON TYPES
+# =============================================================================
+
+print("\n" + LINE)
+print("23. COUPON TYPES: FIXED VS ACCRUED")
+print(LINE)
+
+short_issue_dt = Date(31, 3, 2022)
+short_maturity_dt = Date(31, 7, 2023)
+short_settle_dt = Date(1, 5, 2022)
+
+short_coupon = 0.0275
+short_freq = FrequencyTypes.SEMI_ANNUAL
+short_dc = DayCountTypes.ACT_360
+short_face = 1_000_000.0
+
+print("\nA) CouponType.FIXED")
+print(SUBLINE)
+
+fixed_coupon_bond = Bond(
+    short_issue_dt,
+    short_maturity_dt,
+    short_coupon,
+    short_freq,
+    short_dc,
+    cpn_type=CouponType.FIXED,
+)
+
+fixed_coupon_bond.print_payments(
+    short_settle_dt,
+    short_face,
+)
+
+print("\nB) CouponType.ACCRUED")
+print(SUBLINE)
+
+accrued_coupon_bond = Bond(
+    short_issue_dt,
+    short_maturity_dt,
+    short_coupon,
+    short_freq,
+    short_dc,
+    cpn_type=CouponType.ACCRUED,
+)
+
+accrued_coupon_bond.print_payments(
+    short_settle_dt,
+    short_face,
+)
+
+print("\nThe ACCRUED coupon type allows irregular first/last coupons to " "reflect the actual accrual period.")
+
+
+# =============================================================================
+# 24. NON-FLAT ZERO-RATE CURVE
+# =============================================================================
+
+print("\n" + LINE)
+print("24. PRICING USING A NON-FLAT ZERO-RATE CURVE")
+print(LINE)
+
+curve_value_dt = settle_dt
+
+spot_dates = [
+    Date(15, 9, 2027),
+    Date(15, 9, 2028),
+    Date(15, 9, 2030),
+]
+
+spot_rates = [
+    0.0300,
+    0.0350,
+    0.0400,
+]
+
+zero_curve = ZeroRatesDiscountCurve(
+    curve_value_dt,
+    spot_dates,
+    spot_rates,
+    FrequencyTypes.SEMI_ANNUAL,
+    DayCountTypes.ACT_360,
+    InterpTypes.LINEAR_ZERO_RATES,
+)
+
+zero_dirty = bond.dirty_price_from_discount_curve(
+    settle_dt,
+    zero_curve,
+)
+
+zero_clean = bond.clean_price_from_discount_curve(
+    settle_dt,
+    zero_curve,
+)
+
+print(f"{'Curve point':>20s} {'Zero rate':>20s}")
+print(SUBLINE)
+
+for date, rate in zip(spot_dates, spot_rates):
+    print(f"{str(date):>20s} {rate*100:19.4f}%")
+
+print()
+print(f"{'Dirty price from zero curve':35s}: {zero_dirty:12.6f}")
+print(f"{'Clean price from zero curve':35s}: {zero_clean:12.6f}")
+
+
+# =============================================================================
+# 25. SUMMARY
+# =============================================================================
+
+print("\n" + LINE)
+print("25. SUMMARY OF THE MAIN BOND RESULTS")
+print(LINE)
+
+print(f"{'Market clean price':40s}: {market_clean_price:12.6f}")
+print(f"{'Accrued interest':40s}: {accrued_interest:12.6f}")
+print(f"{'Current yield':40s}: {current_yield * 100:11.6f}%")
+print(f"{'Yield to maturity':40s}: {ytm * 100:11.6f}%")
+print(f"{'Dirty price from YTM':40s}: {dirty_price:12.6f}")
+print(f"{'Clean price from YTM':40s}: {clean_price:12.6f}")
+print(f"{'Dollar duration':40s}: {dollar_duration:12.6f}")
+print(f"{'Modified duration':40s}: {modified_duration:12.6f}")
+print(f"{'Macaulay duration':40s}: {macaulay_duration:12.6f}")
+print(f"{'Convexity':40s}: {convexity:12.6f}")
+print(f"{'Asset swap spread':40s}: {asw * 10000:11.4f} bp")
+print(f"{'Option-adjusted spread':40s}: {oas * 10000:11.4f} bp")
+
+print("\n" + LINE)
+print("                     END OF BOND DEMONSTRATION")
+print(LINE)
+
+# =============================================================================
+# 26. VISUALISE PRICE/YIELD CONVEXITY
+# =============================================================================
+# A bond's price falls as its yield rises, but the relationship is curved rather
+# than linear. This plot makes both the inverse relationship and convexity easy
+# to see. The marked point is the market price/yield used above.
+plot_yields = np.linspace(max(0.0001, ytm - 0.03), ytm + 0.03, 61)
+plot_prices = [bond.clean_price_from_ytm(settle_dt, y) for y in plot_yields]
+
+plt.figure()
+plt.plot(plot_yields * 100.0, plot_prices, label="Clean price")
+plt.scatter([ytm * 100.0], [market_clean_price], label="Market point")
+plt.xlabel("Yield to maturity (%)")
+plt.ylabel("Clean price per 100 face")
+plt.title("Bond price versus yield")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# Key-rate durations show where on the yield curve the bond is most sensitive.
+plt.figure()
+plt.bar(key_rate_tenors, key_rate_durations)
+plt.xlabel("Key-rate tenor (years)")
+plt.ylabel("Key-rate duration")
+plt.title("Bond key-rate duration profile")
+plt.grid(True, axis="y")
+plt.tight_layout()
+plt.show()

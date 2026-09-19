@@ -2,18 +2,10 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.global_vars import CLEAN, DIRTY
@@ -26,6 +18,10 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_option import CDSOption
+
+# ============================================================================
+# FINANCEPY EXAMPLES - CDSOption
+# ============================================================================
 
 # TO DO
 
@@ -225,115 +221,124 @@ def build_full_issuer_curve(value_dt):
 ########################################################################################
 
 
-def test_dirty_price_cd_swaption():
-
-    # This reproduces example on page 38 of Open Gamma note on CDS Option
-    trade_dt = Date(5, 2, 2014)
-    _, issuer_curve = build_full_issuer_curve(trade_dt)
-    step_in_dt = trade_dt.add_days(1)
-    value_dt = trade_dt
-    expiry_dt = Date(20, 3, 2014)
-    maturity_dt = Date(20, 6, 2019)
-
-    cds_recovery = 0.40
-    notional = 100.0
-    long_protection = False
-    cds_cpn = 0.0  # NOT KNOWN
-
-    cds_contract = CDS(step_in_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-    print("=============================== CDS ===============================")
-    #    cds_contract.print(value_dt)
-
-    print("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-    print("PAR SPREAD:", spd)
-
-    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    print("DIRTY VALUE", v[DIRTY])
-    print("CLEAN VALUE", v[CLEAN])
-
-    p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-    print("CLEAN PRICE", p)
-
-    accrued_days = cds_contract.accrued_days(value_dt)
-    print("ACCRUED DAYS", accrued_days)
-
-    accrued_interest = cds_contract.accrued_interest(value_dt)
-    print("ACCRUED COUPON", accrued_interest)
-
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PROTECTION LEG PV", prot_pv)
-
-    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PREMIUM LEG PV", prem_pv)
-
-    full_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
-    print("FULL  RPV01", full_rpv01)
-    print("CLEAN RPV01", clean_rpv01)
-
-    #    cds_contract.print_payments(issuer_curve)
-
-    print("=========================== FORWARD CDS ===========================")
-
-    cds_contract = CDS(expiry_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-    #    cds_contract.print(value_dt)
-
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-    print("PAR SPREAD", spd)
-
-    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    print("DIRTY VALUE", v[DIRTY])
-    print("CLEAN VALUE", v[CLEAN])
-
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PROTECTION LEG PV", prot_pv)
-
-    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PREMIUM LEG PV", prem_pv)
-
-    dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
-    print("DIRTY RPV01", dirty_rpv01)
-    print("CLEAN RPV01", clean_rpv01)
-
-    #    cds_contract.print_payments(issuer_curve)
-
-    print("========================== CDS OPTIONS ============================")
-
-    cds_cpn = 0.01
-    volatility = 0.3
-    print("Expiry Date:", str(expiry_dt))
-    print("Maturity Date:", str(maturity_dt))
-    print("CDS Coupon:", cds_cpn)
-
-    print("STRIKE", "LONG PROTECTION", "DIRTY VALUE", "IMPLIED VOL")
-
-    for strike in np.linspace(100, 300, 41):
-
-        long_protection = True  # long protection
-
-        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
-
-        v = cds_option.value(value_dt, issuer_curve, volatility)
-
-        vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
-
-        print(strike, long_protection, v, vol)
-
-    for strike in np.linspace(100, 300, 41):
-
-        long_protection = False  # long protection
-
-        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
-
-        v = cds_option.value(value_dt, issuer_curve, volatility)
-
-        vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
-
-        print(strike, long_protection, v, vol)
 
 
 ########################################################################################
 
-test_dirty_price_cd_swaption()
+# ============================================================================
+# 1. DIRTY PRICE CD SWAPTION
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# Calculates coupon interest earned since the previous coupon date and illustrates the clean/dirty price adjustment.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. DIRTY PRICE CD SWAPTION")
+print("=" * 78)
+
+trade_dt = Date(5, 2, 2014)
+_, issuer_curve = build_full_issuer_curve(trade_dt)
+step_in_dt = trade_dt.add_days(1)
+value_dt = trade_dt
+expiry_dt = Date(20, 3, 2014)
+maturity_dt = Date(20, 6, 2019)
+
+cds_recovery = 0.40
+notional = 100.0
+long_protection = False
+cds_cpn = 0.0  # NOT KNOWN
+
+cds_contract = CDS(step_in_dt, maturity_dt, cds_cpn, notional, long_protection)
+
+print("=============================== CDS ===============================")
+#    cds_contract.print(value_dt)
+
+print("LABEL", "VALUE")
+spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
+print("PAR SPREAD:", spd)
+
+v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
+print("DIRTY VALUE", v[DIRTY])
+print("CLEAN VALUE", v[CLEAN])
+
+p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
+print("CLEAN PRICE", p)
+
+accrued_days = cds_contract.accrued_days(value_dt)
+print("ACCRUED DAYS", accrued_days)
+
+accrued_interest = cds_contract.accrued_interest(value_dt)
+print("ACCRUED COUPON", accrued_interest)
+
+prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PROTECTION LEG PV", prot_pv)
+
+prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PREMIUM LEG PV", prem_pv)
+
+full_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
+print("FULL  RPV01", full_rpv01)
+print("CLEAN RPV01", clean_rpv01)
+
+#    cds_contract.print_payments(issuer_curve)
+
+print("=========================== FORWARD CDS ===========================")
+
+cds_contract = CDS(expiry_dt, maturity_dt, cds_cpn, notional, long_protection)
+
+#    cds_contract.print(value_dt)
+
+spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
+print("PAR SPREAD", spd)
+
+v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
+print("DIRTY VALUE", v[DIRTY])
+print("CLEAN VALUE", v[CLEAN])
+
+prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PROTECTION LEG PV", prot_pv)
+
+prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PREMIUM LEG PV", prem_pv)
+
+dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
+print("DIRTY RPV01", dirty_rpv01)
+print("CLEAN RPV01", clean_rpv01)
+
+#    cds_contract.print_payments(issuer_curve)
+
+print("========================== CDS OPTIONS ============================")
+
+cds_cpn = 0.01
+volatility = 0.3
+print("Expiry Date:", str(expiry_dt))
+print("Maturity Date:", str(maturity_dt))
+print("CDS Coupon:", cds_cpn)
+
+print("STRIKE", "LONG PROTECTION", "DIRTY VALUE", "IMPLIED VOL")
+
+for strike in np.linspace(100, 300, 41):
+
+    long_protection = True  # long protection
+
+    cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
+
+    v = cds_option.value(value_dt, issuer_curve, volatility)
+
+    vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
+
+    print(strike, long_protection, v, vol)
+
+for strike in np.linspace(100, 300, 41):
+
+    long_protection = False  # long protection
+
+    cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
+
+    v = cds_option.value(value_dt, issuer_curve, volatility)
+
+    vol = cds_option.implied_volatility(value_dt, issuer_curve, v)
+
+    print(strike, long_protection, v, vol)
+

@@ -2,14 +2,6 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -20,6 +12,10 @@ from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Cds Index
+# ============================================================================
 
 
 
@@ -93,59 +89,66 @@ def build_issuer_curve(trade_dt, libor_curve):
 ########################################################################################
 
 
-def test_value_cds_index():
-
-    # We treat an index as a CDS contract with a flat CDS curve
-    trade_dt = Date(7, 2, 2006)
-    libor_curve = build_ibor_curve(trade_dt)
-    issuer_curve = build_issuer_curve(trade_dt, libor_curve)
-    step_in_dt = trade_dt.add_days(1)
-    value_dt = step_in_dt
-    maturity_dt = Date(20, 6, 2010)
-
-    cds_recovery = 0.40
-    notional = 10.0 * ONE_MILLION
-    long_protection = True
-    index_cpn = 0.004
-
-    cds_index_contract = CDS(
-        step_in_dt, maturity_dt, index_cpn, notional, long_protection
-    )
-
-    #    cds_index_contract.print(value_dt)
-
-    print("LABEL", "VALUE")
-
-    spd = cds_index_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-    print("PAR SPREAD", spd)
-
-    v = cds_index_contract.value(value_dt, issuer_curve, cds_recovery)
-    print("DIRTY VALUE", v[DIRTY])
-    print("CLEAN VALUE", v[CLEAN])
-
-    p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-    print("CLEAN PRICE", p)
-
-    accrued_days = cds_index_contract.accrued_days(value_dt)
-    print("ACCRUED DAYS", accrued_days)
-
-    accrued_interest = cds_index_contract.accrued_interest(value_dt)
-    print("ACCRUED COUPON", accrued_interest)
-
-    prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PROTECTION LEG PV", prot_pv)
-
-    prem_pv = cds_index_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PREMIUM LEG PV", prem_pv)
-
-    dirty_rpv01, clean_rpv01 = cds_index_contract.rpv01(value_dt, issuer_curve)
-    print("DIRTY RPV01", dirty_rpv01)
-    print("CLEAN RPV01", clean_rpv01)
 
 
 ########################################################################################
 
 #    cds_index_contract.print_payments(issuer_curve)
 
+# ============================================================================
+# 1. VALUE CDS INDEX
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# Calculates coupon interest earned since the previous coupon date and illustrates the clean/dirty price adjustment.
 
-test_value_cds_index()
+print("\n" + "=" * 78)
+print("1. VALUE CDS INDEX")
+print("=" * 78)
+
+trade_dt = Date(7, 2, 2006)
+libor_curve = build_ibor_curve(trade_dt)
+issuer_curve = build_issuer_curve(trade_dt, libor_curve)
+step_in_dt = trade_dt.add_days(1)
+value_dt = step_in_dt
+maturity_dt = Date(20, 6, 2010)
+
+cds_recovery = 0.40
+notional = 10.0 * ONE_MILLION
+long_protection = True
+index_cpn = 0.004
+
+cds_index_contract = CDS(
+    step_in_dt, maturity_dt, index_cpn, notional, long_protection
+)
+
+#    cds_index_contract.print(value_dt)
+
+print("LABEL", "VALUE")
+
+spd = cds_index_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
+print("PAR SPREAD", spd)
+
+v = cds_index_contract.value(value_dt, issuer_curve, cds_recovery)
+print("DIRTY VALUE", v[DIRTY])
+print("CLEAN VALUE", v[CLEAN])
+
+p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
+print("CLEAN PRICE", p)
+
+accrued_days = cds_index_contract.accrued_days(value_dt)
+print("ACCRUED DAYS", accrued_days)
+
+accrued_interest = cds_index_contract.accrued_interest(value_dt)
+print("ACCRUED COUPON", accrued_interest)
+
+prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PROTECTION LEG PV", prot_pv)
+
+prem_pv = cds_index_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PREMIUM LEG PV", prem_pv)
+
+dirty_rpv01, clean_rpv01 = cds_index_contract.rpv01(value_dt, issuer_curve)
+print("DIRTY RPV01", dirty_rpv01)
+print("CLEAN RPV01", clean_rpv01)
+

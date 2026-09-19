@@ -2,16 +2,8 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.utils.math import ONE_MILLION
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
@@ -27,6 +19,10 @@ from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
+
+# ============================================================================
+# FINANCEPY EXAMPLES - IborSingleCurve
+# ============================================================================
 
 
 ########################################################################################
@@ -266,137 +262,149 @@ def build_ibor_single_curve(value_dt):
 ########################################################################################
 
 
-def test_libor_swap():
-
-    # I have tried to reproduce the example from the blog by Ioannis Rigopoulos
-    # https://blog.deriscope.com/index.php/en/excel-interest-rate-swap-price-dual-bootstrapping-curve
-    start_dt = Date(27, 12, 2017)
-    end_dt = Date(27, 12, 2067)
-
-    fixed_cpn = 0.015
-    fixed_freq_type = FrequencyTypes.ANNUAL
-    fixed_dc_type = DayCountTypes.THIRTY_E_360
-
-    float_spread = 0.0
-    float_freq_type = FrequencyTypes.SEMI_ANNUAL
-    float_dc_type = DayCountTypes.ACT_360
-    first_fixing = -0.00268
-
-    swap_cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    fixed_leg_type = SwapTypes.RECEIVE
-
-    notional = 10.0 * ONE_MILLION
-
-    swap = IborSwap(
-        start_dt,
-        end_dt,
-        fixed_leg_type,
-        fixed_cpn,
-        fixed_freq_type,
-        fixed_dc_type,
-        notional,
-        float_spread,
-        float_freq_type,
-        float_dc_type,
-        swap_cal_type,
-        bd_type,
-        dg_type,
-    )
-
-    """ Now perform a valuation after the swap has seasoned but with the
-    same curve being used for discounting and working out the implied
-    future Libor rates. """
-
-    value_dt = Date(30, 11, 2018)
-    settle_dt = value_dt.add_days(2)
-    libor_curve = build_ibor_single_curve(value_dt)
-    v = swap.value(settle_dt, libor_curve, libor_curve, first_fixing)
-
-    v_bbg = 388147.0
-    print("LABEL", "VALUE")
-    print("SWAP_VALUE USING ONE_CURVE", v)
-    print("BLOOMBERG VALUE", v_bbg)
-    print("DIFFERENCE VALUE", v_bbg - v)
 
 
 ########################################################################################
 
 
-def test_dp_example():
-
-    #  http://www.derivativepricing.com/blogpage.asp?id=8
-
-    start_dt = Date(14, 11, 2011)
-    end_dt = Date(14, 11, 2016)
-    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-    swap_cal_type = CalendarTypes.TARGET
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_leg_type = SwapTypes.PAY
-    fixed_cpn = 0.0124
-    notional = ONE_MILLION
-
-    swap = IborSwap(
-        start_dt,
-        end_dt,
-        fixed_leg_type,
-        fixed_cpn=fixed_cpn,
-        fixed_freq_type=fixed_freq_type,
-        fixed_dc_type=fixed_dc_type,
-        float_freq_type=FrequencyTypes.SEMI_ANNUAL,
-        float_dc_type=DayCountTypes.ACT_360,
-        notional=notional,
-        cal_type=swap_cal_type,
-        bd_type=bd_type,
-        dg_type=dg_type,
-    )
-
-    dts = [
-        Date(14, 11, 2011),
-        Date(14, 5, 2012),
-        Date(14, 11, 2012),
-        Date(14, 5, 2013),
-        Date(14, 11, 2013),
-        Date(14, 5, 2014),
-        Date(14, 11, 2014),
-        Date(14, 5, 2015),
-        Date(16, 11, 2015),
-        Date(16, 5, 2016),
-        Date(14, 11, 2016),
-    ]
-
-    dfs = [
-        0.9999999,
-        0.9966889,
-        0.9942107,
-        0.9911884,
-        0.9880738,
-        0.9836490,
-        0.9786276,
-        0.9710461,
-        0.9621778,
-        0.9514315,
-        0.9394919,
-    ]
-
-    value_dt = start_dt
-
-    curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
-
-    v = swap.value(value_dt, curve, curve)
-
-    # swap.print_fixed_leg_pv()
-    # swap.print_float_leg_pv()
-
-    # This is essentially zero
-    print("LABEL", "VALUE")
-    print("Swap Value on a Notional of $1M:", v)
 
 
 ########################################################################################
 
-test_libor_swap()
-test_dp_example()
+# ============================================================================
+# 1. LIBOR SWAP
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+
+print("\n" + "=" * 78)
+print("1. LIBOR SWAP")
+print("=" * 78)
+
+start_dt = Date(27, 12, 2017)
+end_dt = Date(27, 12, 2067)
+
+fixed_cpn = 0.015
+fixed_freq_type = FrequencyTypes.ANNUAL
+fixed_dc_type = DayCountTypes.THIRTY_E_360
+
+float_spread = 0.0
+float_freq_type = FrequencyTypes.SEMI_ANNUAL
+float_dc_type = DayCountTypes.ACT_360
+first_fixing = -0.00268
+
+swap_cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+fixed_leg_type = SwapTypes.RECEIVE
+
+notional = 10.0 * ONE_MILLION
+
+swap = IborSwap(
+    start_dt,
+    end_dt,
+    fixed_leg_type,
+    fixed_cpn,
+    fixed_freq_type,
+    fixed_dc_type,
+    notional,
+    float_spread,
+    float_freq_type,
+    float_dc_type,
+    swap_cal_type,
+    bd_type,
+    dg_type,
+)
+
+""" Now perform a valuation after the swap has seasoned but with the
+same curve being used for discounting and working out the implied
+future Libor rates. """
+
+value_dt = Date(30, 11, 2018)
+settle_dt = value_dt.add_days(2)
+libor_curve = build_ibor_single_curve(value_dt)
+v = swap.value(settle_dt, libor_curve, libor_curve, first_fixing)
+
+v_bbg = 388147.0
+print("LABEL", "VALUE")
+print("SWAP_VALUE USING ONE_CURVE", v)
+print("BLOOMBERG VALUE", v_bbg)
+print("DIFFERENCE VALUE", v_bbg - v)
+
+# ============================================================================
+# 2. DP EXAMPLE
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+
+print("\n" + "=" * 78)
+print("2. DP EXAMPLE")
+print("=" * 78)
+
+start_dt = Date(14, 11, 2011)
+end_dt = Date(14, 11, 2016)
+fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
+swap_cal_type = CalendarTypes.TARGET
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+fixed_dc_type = DayCountTypes.THIRTY_E_360_ISDA
+fixed_leg_type = SwapTypes.PAY
+fixed_cpn = 0.0124
+notional = ONE_MILLION
+
+swap = IborSwap(
+    start_dt,
+    end_dt,
+    fixed_leg_type,
+    fixed_cpn=fixed_cpn,
+    fixed_freq_type=fixed_freq_type,
+    fixed_dc_type=fixed_dc_type,
+    float_freq_type=FrequencyTypes.SEMI_ANNUAL,
+    float_dc_type=DayCountTypes.ACT_360,
+    notional=notional,
+    cal_type=swap_cal_type,
+    bd_type=bd_type,
+    dg_type=dg_type,
+)
+
+dts = [
+    Date(14, 11, 2011),
+    Date(14, 5, 2012),
+    Date(14, 11, 2012),
+    Date(14, 5, 2013),
+    Date(14, 11, 2013),
+    Date(14, 5, 2014),
+    Date(14, 11, 2014),
+    Date(14, 5, 2015),
+    Date(16, 11, 2015),
+    Date(16, 5, 2016),
+    Date(14, 11, 2016),
+]
+
+dfs = [
+    0.9999999,
+    0.9966889,
+    0.9942107,
+    0.9911884,
+    0.9880738,
+    0.9836490,
+    0.9786276,
+    0.9710461,
+    0.9621778,
+    0.9514315,
+    0.9394919,
+]
+
+value_dt = start_dt
+
+curve = DiscountCurve(value_dt, dts, np.array(dfs), InterpTypes.FLAT_FWD_RATES)
+
+v = swap.value(value_dt, curve, curve)
+
+# swap.print_fixed_leg_pv()
+# swap.print_float_leg_pv()
+
+# This is essentially zero
+print("LABEL", "VALUE")
+print("Swap Value on a Notional of $1M:", v)
+

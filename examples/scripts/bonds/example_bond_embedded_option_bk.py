@@ -2,20 +2,12 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import time
 
 import matplotlib.pyplot as plt
 
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import SwapTypes
@@ -28,6 +20,10 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 
+# ============================================================================
+# FINANCEPY EXAMPLES - BondEmbeddedOption
+# ============================================================================
+
 
 
 PLOT_GRAPHS = False
@@ -35,163 +31,172 @@ PLOT_GRAPHS = False
 ########################################################################################
 
 
-def test_bond_embedded_option_matlab():
-
-    # https://fr.mathworks.com/help/fininst/optembndbybk.html
-    # I FIND THAT THE PRICE CONVERGES TO 102.365 WHICH IS CLOSE TO 102.382
-    # FOUND BY MATLAB ALTHOUGH THEY DO NOT EXAMINE THE ASYMPTOTIC PRICE
-    # WHICH MIGHT BE A BETTER MATCH - ALSO THEY DO NOT USE A REALISTIC VOL
-
-    value_dt = Date(1, 1, 2007)
-    settle_dt = value_dt
-
-    fixed_leg_type = SwapTypes.PAY
-    dc_type = DayCountTypes.THIRTY_E_360
-    fixed_freq = FrequencyTypes.ANNUAL
-    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type)
-    swap2 = IborSwap(settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type)
-    swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type)
-    swaps = [swap1, swap2, swap3]
-    discount_curve = IborSingleCurve(value_dt, [], [], swaps)
-
-    issue_dt = Date(1, 1, 2005)
-    maturity_dt = Date(1, 1, 2010)
-    coupon = 0.0525
-    freq_type = FrequencyTypes.ANNUAL
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
-
-    call_dts = []
-    call_prices = []
-    put_dts = []
-    put_prices = []
-
-    put_dt = Date(1, 1, 2008)
-    for _ in range(0, 24):
-        put_dts.append(put_dt)
-        put_prices.append(100.0)
-        put_dt = put_dt.add_months(1)
-
-    print("BOND PRICE", "PRICE")
-    v = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
-    print("Bond Pure Price:", v)
-
-    sigma = 0.01  # This volatility is very small for a BK process
-    a = 0.1
-
-    put_prices = np.array(put_prices)
-    call_prices = np.array(call_prices)
-
-    puttable_bond = BondEmbeddedOption(
-        issue_dt,
-        maturity_dt,
-        coupon,
-        freq_type,
-        dc_type,
-        call_dts,
-        call_prices,
-        put_dts,
-        put_prices,
-    )
-
-    print("TIME", "Numtime_steps", "BondWithOption", "BondPure")
-
-    time_steps = range(100, 200, 50)  # 1000, 10)
-    values = []
-    for num_time_steps in time_steps:
-        model = BKTree(sigma, a, num_time_steps)
-        start = time.time()
-        v = puttable_bond.value(settle_dt, discount_curve, model)
-        end = time.time()
-        period = end - start
-        print(period, num_time_steps, v[0], v[1])
-
-        values.append(v[0])
-
-    if PLOT_GRAPHS:
-        plt.figure()
-        plt.plot(time_steps, values)
 
 
 ########################################################################################
 
 
-def test_bond_embedded_option_quantlib():
-
-    # Based on example at the nice blog on Quantlib at
-    # http://gouthamanbalaraman.com/blog/callable-bond-quantlib-python.html
-    # I get a price of 68.97 for 1000 time steps which is higher than the
-    # 68.38 found in blog article. But this is for 40 grid points.
-    # Note also that a basis point vol of 0.120 is 12% which is VERY HIGH!
-
-    value_dt = Date(16, 8, 2016)
-    settle_dt = value_dt.add_weekdays(3)
-
-    discount_curve = FlatDiscountCurve(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
-
-    issue_dt = Date(15, 9, 2010)
-    maturity_dt = Date(15, 9, 2022)
-    coupon = 0.025
-    freq_type = FrequencyTypes.QUARTERLY
-    dc_type = DayCountTypes.ACT_ACT_ICMA
-    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
-
-    # Set up the call and put times and prices
-
-    next_call_date = Date(15, 9, 2016)
-    call_dts = [next_call_date]
-    call_prices = [100.0]
-
-    for _ in range(1, 24):
-        next_call_date = next_call_date.add_months(3)
-        call_dts.append(next_call_date)
-        call_prices.append(100.0)
-
-    put_dts = []
-    put_prices = []
-
-    # the value used in blog of 12% bp vol is unrealistic
-    sigma = 0.12 / 0.035  # basis point volatility
-    a = 0.03
-
-    call_prices = np.array(call_prices)
-    put_prices = np.array(put_prices)
-
-    puttable_bond = BondEmbeddedOption(
-        issue_dt,
-        maturity_dt,
-        coupon,
-        freq_type,
-        dc_type,
-        call_dts,
-        call_prices,
-        put_dts,
-        put_prices,
-    )
-
-    print("BOND PRICE", "PRICE")
-    v = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
-    print("Bond Pure Price:", v)
-
-    print("TIME", "Numtime_steps", "BondWithOption", "BondPure")
-    time_steps = range(100, 200, 50)  # 1000, 10)
-    values = []
-    for num_time_steps in time_steps:
-        model = BKTree(sigma, a, num_time_steps)
-        start = time.time()
-        v = puttable_bond.value(settle_dt, discount_curve, model)
-        end = time.time()
-        period = end - start
-        print(period, num_time_steps, v[0], v[1])
-        values.append(v[0])
-
-    if PLOT_GRAPHS:
-        plt.figure()
-        plt.title("Puttable Bond Price Convergence")
-        plt.plot(time_steps, values)
 
 
 ########################################################################################
 
-test_bond_embedded_option_matlab()
-test_bond_embedded_option_quantlib()
+# ============================================================================
+# 1. BOND EMBEDDED OPTION MATLAB
+# ============================================================================
+# What this section demonstrates:
+# Values cash flows directly from discount factors and includes accrued interest.
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. BOND EMBEDDED OPTION MATLAB")
+print("=" * 78)
+
+value_dt = Date(1, 1, 2007)
+settle_dt = value_dt
+
+fixed_leg_type = SwapTypes.PAY
+dc_type = DayCountTypes.THIRTY_E_360
+fixed_freq = FrequencyTypes.ANNUAL
+swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq, dc_type)
+swap2 = IborSwap(settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq, dc_type)
+swap3 = IborSwap(settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq, dc_type)
+swaps = [swap1, swap2, swap3]
+discount_curve = IborSingleCurve(value_dt, [], [], swaps)
+
+issue_dt = Date(1, 1, 2005)
+maturity_dt = Date(1, 1, 2010)
+coupon = 0.0525
+freq_type = FrequencyTypes.ANNUAL
+dc_type = DayCountTypes.ACT_ACT_ICMA
+bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+
+call_dts = []
+call_prices = []
+put_dts = []
+put_prices = []
+
+put_dt = Date(1, 1, 2008)
+for _ in range(0, 24):
+    put_dts.append(put_dt)
+    put_prices.append(100.0)
+    put_dt = put_dt.add_months(1)
+
+print("BOND PRICE", "PRICE")
+v = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
+print("Bond Pure Price:", v)
+
+sigma = 0.01  # This volatility is very small for a BK process
+a = 0.1
+
+put_prices = np.array(put_prices)
+call_prices = np.array(call_prices)
+
+puttable_bond = BondEmbeddedOption(
+    issue_dt,
+    maturity_dt,
+    coupon,
+    freq_type,
+    dc_type,
+    call_dts,
+    call_prices,
+    put_dts,
+    put_prices,
+)
+
+print("TIME", "Numtime_steps", "BondWithOption", "BondPure")
+
+time_steps = range(100, 200, 50)  # 1000, 10)
+values = []
+for num_time_steps in time_steps:
+    model = BKTree(sigma, a, num_time_steps)
+    start = time.time()
+    v = puttable_bond.value(settle_dt, discount_curve, model)
+    end = time.time()
+    period = end - start
+    print(period, num_time_steps, v[0], v[1])
+
+    values.append(v[0])
+
+if PLOT_GRAPHS:
+    plt.figure()
+    plt.plot(time_steps, values)
+
+# ============================================================================
+# 2. BOND EMBEDDED OPTION QUANTLIB
+# ============================================================================
+# What this section demonstrates:
+# Values cash flows directly from discount factors and includes accrued interest.
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("2. BOND EMBEDDED OPTION QUANTLIB")
+print("=" * 78)
+
+value_dt = Date(16, 8, 2016)
+settle_dt = value_dt.add_weekdays(3)
+
+discount_curve = FlatDiscountCurve(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
+
+issue_dt = Date(15, 9, 2010)
+maturity_dt = Date(15, 9, 2022)
+coupon = 0.025
+freq_type = FrequencyTypes.QUARTERLY
+dc_type = DayCountTypes.ACT_ACT_ICMA
+bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
+
+# Set up the call and put times and prices
+
+next_call_date = Date(15, 9, 2016)
+call_dts = [next_call_date]
+call_prices = [100.0]
+
+for _ in range(1, 24):
+    next_call_date = next_call_date.add_months(3)
+    call_dts.append(next_call_date)
+    call_prices.append(100.0)
+
+put_dts = []
+put_prices = []
+
+# the value used in blog of 12% bp vol is unrealistic
+sigma = 0.12 / 0.035  # basis point volatility
+a = 0.03
+
+call_prices = np.array(call_prices)
+put_prices = np.array(put_prices)
+
+puttable_bond = BondEmbeddedOption(
+    issue_dt,
+    maturity_dt,
+    coupon,
+    freq_type,
+    dc_type,
+    call_dts,
+    call_prices,
+    put_dts,
+    put_prices,
+)
+
+print("BOND PRICE", "PRICE")
+v = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
+print("Bond Pure Price:", v)
+
+print("TIME", "Numtime_steps", "BondWithOption", "BondPure")
+time_steps = range(100, 200, 50)  # 1000, 10)
+values = []
+for num_time_steps in time_steps:
+    model = BKTree(sigma, a, num_time_steps)
+    start = time.time()
+    v = puttable_bond.value(settle_dt, discount_curve, model)
+    end = time.time()
+    period = end - start
+    print(period, num_time_steps, v[0], v[1])
+    values.append(v[0])
+
+if PLOT_GRAPHS:
+    plt.figure()
+    plt.title("Puttable Bond Price Convergence")
+    plt.plot(time_steps, values)
+

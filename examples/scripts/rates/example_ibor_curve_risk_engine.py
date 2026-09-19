@@ -1,17 +1,9 @@
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
 import numpy as np
 import matplotlib.pyplot as plt
 
-import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_BASIS_POINT
@@ -30,6 +22,10 @@ from financepy.products.rates.ibor_swap import IborSwap
 
 
 from helpers import build_ibor_single_curve
+
+# ============================================================================
+# FINANCEPY EXAMPLES - IborSingleCurve
+# ============================================================================
 
 # when set to True this file can be run standalone and will produce some useful output.
 # Set to False to use as part of a testing framework

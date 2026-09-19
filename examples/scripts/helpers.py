@@ -17,6 +17,10 @@ from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 
+# ============================================================================
+# FINANCEPY EXAMPLES - Helpers
+# ============================================================================
+
 
 def build_ibor_curve(trade_dt):
 

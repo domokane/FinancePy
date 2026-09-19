@@ -2,23 +2,20 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import time
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
+import matplotlib.pyplot as plt
+
+# ============================================================================
+# FINANCEPY EXAMPLES - EquityVanillaOption
+# ============================================================================
 
 
 ########################################################################################
@@ -331,3 +328,32 @@ else:
 
     # print("Elapsed:", elapsed)
 
+# =============================================================================
+# VISUALISE EUROPEAN CALL AND PUT VALUES VERSUS SPOT
+# =============================================================================
+# Option values are nonlinear functions of the underlying price. This plot
+# complements the numerical tables by showing call and put curvature around
+# the strike in one view.
+plot_value_dt = Date(1, 1, 2015)
+plot_expiry_dt = Date(1, 7, 2015)
+plot_model = BlackScholes(0.30)
+plot_discount_curve = FlatDiscountCurve(plot_value_dt, 0.05)
+plot_dividend_curve = FlatDiscountCurve(plot_value_dt, 0.01)
+plot_call = EquityVanillaOption(plot_expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
+plot_put = EquityVanillaOption(plot_expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT)
+plot_spots = np.linspace(60.0, 140.0, 81)
+plot_call_values = [plot_call.value(plot_value_dt, s, plot_discount_curve,
+                                    plot_dividend_curve, plot_model) for s in plot_spots]
+plot_put_values = [plot_put.value(plot_value_dt, s, plot_discount_curve,
+                                  plot_dividend_curve, plot_model) for s in plot_spots]
+plt.figure()
+plt.plot(plot_spots, plot_call_values, label="European call")
+plt.plot(plot_spots, plot_put_values, label="European put")
+plt.axvline(100.0, linestyle="--", label="Strike")
+plt.xlabel("Stock price")
+plt.ylabel("Option value")
+plt.title("European option value versus stock price")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()

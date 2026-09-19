@@ -2,16 +2,8 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
-import add_fp_to_path
 
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
@@ -20,6 +12,10 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.calendar import CalendarTypes, Calendar
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.date import Date
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Schedule
+# ============================================================================
 
 set_date_format(DateFormatTypes.UK_LONGEST)
 
@@ -60,193 +56,6 @@ def dump_schedule(desc, schedule):
 ########################################################################################
 
 
-def test_fin_schedule():
-
-    # BACKWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    termination_dt_adjust = True
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("BACKWARD SEMI-ANNUAL FREQUENCY", schedule)
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.QUARTERLY
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("BACKWARD QUARTERLY FREQUENCY", schedule)
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.MONTHLY
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("BACKWARD MONTHLY FREQUENCY", schedule)
-
-    # FORWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.FORWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("FORWARD ANNUAL", schedule)
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type)
-
-    dump_schedule("FORWARD SEMI-ANNUAL", schedule)
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.MONTHLY
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("FORWARD MONTHLY", schedule)
-
-    # BACKWARD SHORT STUB AT FRONT
-
-    d1 = Date(20, 8, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.QUARTERLY
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-    dump_schedule("BACKWARD GEN WITH SHORT END STUB", schedule)
-
-    # BACKWARD SUPER SHORT STUB AT FRONT
-
-    d1 = Date(19, 9, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.QUARTERLY
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("BACKWARD GEN WITH VERY SHORT END STUB", schedule)
-
-    # FORWARD SHORT STUB AT END
-
-    d1 = Date(20, 8, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.FORWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("FORWARD GEN WITH END STUB", schedule)
-
-    d1 = Date(19, 9, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.QUARTERLY
-    cal_type = CalendarTypes.TARGET
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.FORWARD
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type)
-
-    dump_schedule("FORWARD GEN WITH VERY SHORT END STUB", schedule)
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    termination_dt_adjust = True
-
-    schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
-
-    dump_schedule("TERMINATION DATE ADJUSTED", schedule)
-
-    d1 = Date(20, 6, 2018)
-    d2 = Date(20, 6, 2020)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    termination_dt_adjust = True
-    eom_flag = True
-
-    schedule = Schedule(
-        d1,
-        d2,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        termination_dt_adjust,
-        eom_flag,
-    )
-
-    dump_schedule("END OF MONTH - NOT EOM TERM DATE - USING MOD FOLL", schedule)
-
-    d1 = Date(30, 6, 2018)
-    d2 = Date(30, 6, 2020)
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    cal_type = CalendarTypes.WEEKEND
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    termination_dt_adjust = True
-    eom_flag = True
-
-    schedule = Schedule(
-        d1,
-        d2,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        termination_dt_adjust,
-        eom_flag,
-    )
-
-    dump_schedule("END OF MONTH - EOM TERM DATE - USING MOD FOLL", schedule)
-
-    # PROBLEM WITH THIS ONE AS DATES COLLIDE BUT REMOVE FIRST ONE
-    schedule = Schedule(
-        Date(28, 4, 2023),
-        Date(30, 4, 2024),
-        FrequencyTypes.ANNUAL,
-        CalendarTypes.UNITED_STATES,
-        BusDayAdjustTypes.MODIFIED_FOLLOWING,
-        DateGenRuleTypes.BACKWARD,
-    )
 
 
 #    print(schedule)
@@ -255,60 +64,6 @@ def test_fin_schedule():
 ########################################################################################
 
 
-def test_fin_schedule_alignment(eom_flag):
-
-    value_dt = Date(29, 3, 2005)
-    eff_date = value_dt.add_tenor("2d")
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    cal_type = CalendarTypes.UNITED_STATES
-    adjust_termination_dt = False
-
-    mat_date1 = eff_date.add_tenor("4Y")
-    mat_date2 = eff_date.add_tenor("50Y")
-
-    #    print(mat_date1)
-    #    print(mat_date2)
-
-    my_cal = Calendar(cal_type)
-
-    adjusted_mat_date1 = my_cal.adjust(mat_date1, bd_type)
-    adjusted_mat_date2 = my_cal.adjust(mat_date2, bd_type)
-
-    #    print(adjusted_mat_date1)
-    #    print(adjusted_mat_date2)
-
-    sched1 = Schedule(
-        eff_date,
-        adjusted_mat_date1,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    #    print(sched1)
-
-    sched2 = Schedule(
-        eff_date,
-        adjusted_mat_date2,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    #    print(sched1.adjusted_dts[-1])
-    #    print(sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
-
-    # THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
-
-    compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
 
 
 #    print(compare, eom_flag)
@@ -317,223 +72,576 @@ def test_fin_schedule_alignment(eom_flag):
 ########################################################################################
 
 
-def test_fin_schedule_alignment_leap_year_eom():
-    """Effective date on leap year."""
-
-    value_dt = Date(26, 2, 2006)
-    eff_date = value_dt.add_tenor("2D")
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    cal_type = CalendarTypes.UNITED_STATES
-    adjust_termination_dt = True
-
-    mat_date1 = eff_date.add_tenor("4Y")
-    mat_date2 = eff_date.add_tenor("50Y")
-    eom_flag = True
-
-    sched1 = Schedule(
-        eff_date,
-        mat_date1,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    sched2 = Schedule(
-        eff_date,
-        mat_date2,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    #    print(sched1.adjusted_dts)
-    #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
-
-    compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
-    assert compare == eom_flag
 
 
 ###############################################################################
 
 
-def test_fin_schedule_joint_calendars():
-
-    freq_type = FrequencyTypes.QUARTERLY
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    cal_ny = CalendarTypes.NEW_YORK
-    cal_tgt = CalendarTypes.TARGET
-    cal_jnt = (cal_ny, cal_tgt)
-
-    adjust_termination_dt = True
-
-    eff_date = Date(4, 4, 2023)
-    mat_date = Date(4, 7, 2023)
-
-    eom_flag = True
-
-    sched_ny = Schedule(
-        eff_date,
-        mat_date,
-        freq_type,
-        cal_ny,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    sched_tgt = Schedule(
-        eff_date,
-        mat_date,
-        freq_type,
-        cal_tgt,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    sched_jnt = Schedule(
-        eff_date,
-        mat_date,
-        freq_type,
-        cal_jnt,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    # TARGET is open on 4-Jul-2023
-    assert sched_tgt.adjusted_dts[-1] == Date(4, 7, 2023)
-
-    # New York is closed for Independence Day
-    assert sched_ny.adjusted_dts[-1] == Date(5, 7, 2023)
-
-    # Joint calendar must also be closed if either market is closed
-    assert sched_jnt.adjusted_dts[-1] == Date(5, 7, 2023)
 
 
 ########################################################################################
 
 
-def test_fin_schedule_alignment_leap_year_not_eom():
-    """Effective date on leap year. Not EOM."""
-
-    eom_flag = False
-
-    value_dt = Date(26, 2, 2006)
-    eff_date = value_dt.add_tenor("2D")
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    cal_type = CalendarTypes.UNITED_STATES
-    adjust_termination_dt = True
-
-    mat_date1 = eff_date.add_tenor("4Y")
-    mat_date2 = eff_date.add_tenor("50Y")
-
-    #    print(mat_date1, mat_date2)
-
-    sched1 = Schedule(
-        eff_date,
-        mat_date1,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    sched2 = Schedule(
-        eff_date,
-        mat_date2,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    #    print(sched1.adjusted_dts)
-    #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
-
-    compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
-    assert compare is True
 
 
 ########################################################################################
 
 
-def test_fin_schedule_alignment_eff31():
-    """EOM schedule so all unadjusted dates fall on month end."""
-
-    eom_flag = True
-    value_dt = Date(29, 7, 2006)
-    eff_date = value_dt.add_tenor("2D")
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
-    dg_type = DateGenRuleTypes.BACKWARD
-    cal_type = CalendarTypes.UNITED_STATES
-    adjust_termination_dt = True
-
-    mat_date1 = eff_date.add_tenor("4Y")
-    mat_date2 = eff_date.add_tenor("50Y")
-
-    #    print(mat_date1, mat_date2)
-
-    sched1 = Schedule(
-        eff_date,
-        mat_date1,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    sched2 = Schedule(
-        eff_date,
-        mat_date2,
-        freq_type,
-        cal_type,
-        bd_type,
-        dg_type,
-        adjust_termination_dt,
-        eom_flag,
-    )
-
-    #    print(sched1.adjusted_dts)
-    #    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
-
-    compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
-    assert compare is True
 
 
 ########################################################################################
 
-test_fin_schedule()
-test_fin_schedule_alignment(True)
-test_fin_schedule_alignment(False)
 
-test_fin_schedule_alignment_leap_year_eom()
-test_fin_schedule_alignment_leap_year_not_eom()
 
-test_fin_schedule_alignment_eff31()
 
-test_fin_schedule_joint_calendars()
 
 
 set_date_format(DateFormatTypes.UK_LONGEST)
+
+# ============================================================================
+# 1. FIN SCHEDULE
+# ============================================================================
+# What this section demonstrates:
+# Runs the original FinancePy calculation with explicit inputs so the numerical result and the effect of the chosen assumptions can be inspected.
+
+print("\n" + "=" * 78)
+print("1. FIN SCHEDULE")
+print("=" * 78)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.SEMI_ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+termination_dt_adjust = True
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("BACKWARD SEMI-ANNUAL FREQUENCY", schedule)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.QUARTERLY
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("BACKWARD QUARTERLY FREQUENCY", schedule)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.MONTHLY
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("BACKWARD MONTHLY FREQUENCY", schedule)
+
+# FORWARD SCHEDULES TESTING DIFFERENT FREQUENCIES
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.FORWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("FORWARD ANNUAL", schedule)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.SEMI_ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type)
+
+dump_schedule("FORWARD SEMI-ANNUAL", schedule)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.MONTHLY
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("FORWARD MONTHLY", schedule)
+
+# BACKWARD SHORT STUB AT FRONT
+
+d1 = Date(20, 8, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.QUARTERLY
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+dump_schedule("BACKWARD GEN WITH SHORT END STUB", schedule)
+
+# BACKWARD SUPER SHORT STUB AT FRONT
+
+d1 = Date(19, 9, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.QUARTERLY
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("BACKWARD GEN WITH VERY SHORT END STUB", schedule)
+
+# FORWARD SHORT STUB AT END
+
+d1 = Date(20, 8, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.SEMI_ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.FORWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("FORWARD GEN WITH END STUB", schedule)
+
+d1 = Date(19, 9, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.QUARTERLY
+cal_type = CalendarTypes.TARGET
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.FORWARD
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type)
+
+dump_schedule("FORWARD GEN WITH VERY SHORT END STUB", schedule)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.SEMI_ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+termination_dt_adjust = True
+
+schedule = Schedule(d1, d2, freq_type, cal_type, bd_type, dg_type, termination_dt_adjust)
+
+dump_schedule("TERMINATION DATE ADJUSTED", schedule)
+
+d1 = Date(20, 6, 2018)
+d2 = Date(20, 6, 2020)
+freq_type = FrequencyTypes.SEMI_ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+termination_dt_adjust = True
+eom_flag = True
+
+schedule = Schedule(
+    d1,
+    d2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    termination_dt_adjust,
+    eom_flag,
+)
+
+dump_schedule("END OF MONTH - NOT EOM TERM DATE - USING MOD FOLL", schedule)
+
+d1 = Date(30, 6, 2018)
+d2 = Date(30, 6, 2020)
+freq_type = FrequencyTypes.SEMI_ANNUAL
+cal_type = CalendarTypes.WEEKEND
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+termination_dt_adjust = True
+eom_flag = True
+
+schedule = Schedule(
+    d1,
+    d2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    termination_dt_adjust,
+    eom_flag,
+)
+
+dump_schedule("END OF MONTH - EOM TERM DATE - USING MOD FOLL", schedule)
+
+# PROBLEM WITH THIS ONE AS DATES COLLIDE BUT REMOVE FIRST ONE
+schedule = Schedule(
+    Date(28, 4, 2023),
+    Date(30, 4, 2024),
+    FrequencyTypes.ANNUAL,
+    CalendarTypes.UNITED_STATES,
+    BusDayAdjustTypes.MODIFIED_FOLLOWING,
+    DateGenRuleTypes.BACKWARD,
+)
+
+# ============================================================================
+# 2. FIN SCHEDULE ALIGNMENT
+# ============================================================================
+# What this section demonstrates:
+# Runs the original FinancePy calculation with explicit inputs so the numerical result and the effect of the chosen assumptions can be inspected.
+
+print("\n" + "=" * 78)
+print("2. FIN SCHEDULE ALIGNMENT")
+print("=" * 78)
+
+value_dt = Date(29, 3, 2005)
+eff_date = value_dt.add_tenor("2d")
+freq_type = FrequencyTypes.SEMI_ANNUAL
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+cal_type = CalendarTypes.UNITED_STATES
+adjust_termination_dt = False
+
+mat_date1 = eff_date.add_tenor("4Y")
+mat_date2 = eff_date.add_tenor("50Y")
+
+#    print(mat_date1)
+#    print(mat_date2)
+
+my_cal = Calendar(cal_type)
+
+adjusted_mat_date1 = my_cal.adjust(mat_date1, bd_type)
+adjusted_mat_date2 = my_cal.adjust(mat_date2, bd_type)
+
+#    print(adjusted_mat_date1)
+#    print(adjusted_mat_date2)
+
+sched1 = Schedule(
+    eff_date,
+    adjusted_mat_date1,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1)
+
+sched2 = Schedule(
+    eff_date,
+    adjusted_mat_date2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1.adjusted_dts[-1])
+#    print(sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
+
+# THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
+
+compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+
+# ============================================================================
+# 3. FIN SCHEDULE ALIGNMENT
+# ============================================================================
+# What this section demonstrates:
+# Runs the original FinancePy calculation with explicit inputs so the numerical result and the effect of the chosen assumptions can be inspected.
+
+print("\n" + "=" * 78)
+print("3. FIN SCHEDULE ALIGNMENT")
+print("=" * 78)
+
+value_dt = Date(29, 3, 2005)
+eff_date = value_dt.add_tenor("2d")
+freq_type = FrequencyTypes.SEMI_ANNUAL
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+cal_type = CalendarTypes.UNITED_STATES
+adjust_termination_dt = False
+
+mat_date1 = eff_date.add_tenor("4Y")
+mat_date2 = eff_date.add_tenor("50Y")
+
+#    print(mat_date1)
+#    print(mat_date2)
+
+my_cal = Calendar(cal_type)
+
+adjusted_mat_date1 = my_cal.adjust(mat_date1, bd_type)
+adjusted_mat_date2 = my_cal.adjust(mat_date2, bd_type)
+
+#    print(adjusted_mat_date1)
+#    print(adjusted_mat_date2)
+
+sched1 = Schedule(
+    eff_date,
+    adjusted_mat_date1,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1)
+
+sched2 = Schedule(
+    eff_date,
+    adjusted_mat_date2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1.adjusted_dts[-1])
+#    print(sched2.adjusted_dts[len(sched1.adjusted_dts)-1])
+
+# THIS TEST IS NO LONGER CORRECT AS I HAVE CHANGED THE  LOGIC TO STEP IN MULTIPLES
+
+compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+
+# ============================================================================
+# 4. FIN SCHEDULE ALIGNMENT LEAP YEAR EOM
+# ============================================================================
+# What this section demonstrates:
+# The original example contains an accuracy/consistency assertion; the surrounding values show what is being checked numerically.
+
+print("\n" + "=" * 78)
+print("4. FIN SCHEDULE ALIGNMENT LEAP YEAR EOM")
+print("=" * 78)
+
+"""Effective date on leap year."""
+
+value_dt = Date(26, 2, 2006)
+eff_date = value_dt.add_tenor("2D")
+freq_type = FrequencyTypes.SEMI_ANNUAL
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+cal_type = CalendarTypes.UNITED_STATES
+adjust_termination_dt = True
+
+mat_date1 = eff_date.add_tenor("4Y")
+mat_date2 = eff_date.add_tenor("50Y")
+eom_flag = True
+
+sched1 = Schedule(
+    eff_date,
+    mat_date1,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+sched2 = Schedule(
+    eff_date,
+    mat_date2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1.adjusted_dts)
+#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
+
+compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+assert compare == eom_flag
+
+# ============================================================================
+# 5. FIN SCHEDULE ALIGNMENT LEAP YEAR NOT EOM
+# ============================================================================
+# What this section demonstrates:
+# The original example contains an accuracy/consistency assertion; the surrounding values show what is being checked numerically.
+
+print("\n" + "=" * 78)
+print("5. FIN SCHEDULE ALIGNMENT LEAP YEAR NOT EOM")
+print("=" * 78)
+
+"""Effective date on leap year. Not EOM."""
+
+eom_flag = False
+
+value_dt = Date(26, 2, 2006)
+eff_date = value_dt.add_tenor("2D")
+freq_type = FrequencyTypes.SEMI_ANNUAL
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+cal_type = CalendarTypes.UNITED_STATES
+adjust_termination_dt = True
+
+mat_date1 = eff_date.add_tenor("4Y")
+mat_date2 = eff_date.add_tenor("50Y")
+
+#    print(mat_date1, mat_date2)
+
+sched1 = Schedule(
+    eff_date,
+    mat_date1,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+sched2 = Schedule(
+    eff_date,
+    mat_date2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1.adjusted_dts)
+#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
+
+compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+assert compare is True
+
+# ============================================================================
+# 6. FIN SCHEDULE ALIGNMENT EFF31
+# ============================================================================
+# What this section demonstrates:
+# The original example contains an accuracy/consistency assertion; the surrounding values show what is being checked numerically.
+
+print("\n" + "=" * 78)
+print("6. FIN SCHEDULE ALIGNMENT EFF31")
+print("=" * 78)
+
+"""EOM schedule so all unadjusted dates fall on month end."""
+
+eom_flag = True
+value_dt = Date(29, 7, 2006)
+eff_date = value_dt.add_tenor("2D")
+freq_type = FrequencyTypes.SEMI_ANNUAL
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+cal_type = CalendarTypes.UNITED_STATES
+adjust_termination_dt = True
+
+mat_date1 = eff_date.add_tenor("4Y")
+mat_date2 = eff_date.add_tenor("50Y")
+
+#    print(mat_date1, mat_date2)
+
+sched1 = Schedule(
+    eff_date,
+    mat_date1,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+sched2 = Schedule(
+    eff_date,
+    mat_date2,
+    freq_type,
+    cal_type,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+#    print(sched1.adjusted_dts)
+#    print(sched2.adjusted_dts[:len(sched1.adjusted_dts)])
+
+compare = sched1.adjusted_dts[-1] == sched2.adjusted_dts[len(sched1.adjusted_dts) - 1]
+assert compare is True
+
+# ============================================================================
+# 7. FIN SCHEDULE JOINT CALENDARS
+# ============================================================================
+# What this section demonstrates:
+# The original example contains an accuracy/consistency assertion; the surrounding values show what is being checked numerically.
+
+print("\n" + "=" * 78)
+print("7. FIN SCHEDULE JOINT CALENDARS")
+print("=" * 78)
+
+freq_type = FrequencyTypes.QUARTERLY
+bd_type = BusDayAdjustTypes.MODIFIED_FOLLOWING
+dg_type = DateGenRuleTypes.BACKWARD
+cal_ny = CalendarTypes.NEW_YORK
+cal_tgt = CalendarTypes.TARGET
+cal_jnt = (cal_ny, cal_tgt)
+
+adjust_termination_dt = True
+
+eff_date = Date(4, 4, 2023)
+mat_date = Date(4, 7, 2023)
+
+eom_flag = True
+
+sched_ny = Schedule(
+    eff_date,
+    mat_date,
+    freq_type,
+    cal_ny,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+sched_tgt = Schedule(
+    eff_date,
+    mat_date,
+    freq_type,
+    cal_tgt,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+sched_jnt = Schedule(
+    eff_date,
+    mat_date,
+    freq_type,
+    cal_jnt,
+    bd_type,
+    dg_type,
+    adjust_termination_dt,
+    eom_flag,
+)
+
+# TARGET is open on 4-Jul-2023
+assert sched_tgt.adjusted_dts[-1] == Date(4, 7, 2023)
+
+# New York is closed for Independence Day
+assert sched_ny.adjusted_dts[-1] == Date(5, 7, 2023)
+
+# Joint calendar must also be closed if either market is closed
+assert sched_jnt.adjusted_dts[-1] == Date(5, 7, 2023)
+

@@ -2,16 +2,8 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -21,6 +13,10 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond_frn import BondFRN
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.date import Date
+
+# ============================================================================
+# FINANCEPY EXAMPLES - BondFRN
+# ============================================================================
 
 ########################################################################################
 
@@ -185,146 +181,149 @@ def build_ibor_curve(value_dt):
 ########################################################################################
 
 
-def test_bond_frn():
-
-    # https://data.bloomberglp.com/bat/sites/3/2017/07/SF-2017_Paul-Fjeldsted.pdf
-    # I have a day out problem on the accrued interest - should be 71 and
-    # not 72 days
-    # Other than that agreement on the DM is very good.
-
-    # CITIGROUP FRN SCREENSHOT
-
-    print("BLOOMBERG CITIGROUP FRN EXAMPLE")
-    issue_dt = Date(10, 11, 2010)
-    maturity_dt = Date(10, 11, 2021)
-    quoted_margin = 0.0025
-    freq_type = FrequencyTypes.QUARTERLY
-    dc_type = DayCountTypes.THIRTY_E_360
-
-    bond = BondFRN(issue_dt, maturity_dt, quoted_margin, freq_type, dc_type)
-
-    print("FIELD", "VALUE")
-    clean_price = 96.793
-    reset_ibor = 0.0143456 - quoted_margin
-    current_ibor = 0.0120534
-    future_ibors = 0.0130522
-
-    settle_dt = Date(21, 7, 2017)
-
-    dm = bond.discount_margin(settle_dt, reset_ibor, current_ibor, future_ibors, clean_price)
-
-    print("Discount Margin (bp) = ", dm * 10000)
-
-    dirty_price = bond.dirty_price_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dirty Price = ", dirty_price)
-
-    last_coupon_dt = bond._pcd
-    print("Last Coupon Date = ", str(last_coupon_dt))
-
-    accddays = bond.accrued_days
-    print("Accrued Days = ", accddays)
-
-    accd_amount = bond.accrued_int
-    print("Accrued Amount = ", accd_amount)
-
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dollar Principal = ", principal)
-
-    duration = bond.dollar_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dollar Rate Duration = ", duration)
-
-    modified_duration = bond.modified_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Modified Rate Duration = ", modified_duration)
-
-    macaulay_duration = bond.macaulay_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Macaulay Duration = ", macaulay_duration)
-
-    convexity = bond.convexity_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Convexity = ", convexity)
-
-    duration = bond.dollar_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dollar Credit Duration = ", duration)
-
-    modified_duration = bond.modified_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Modified Credit Duration = ", modified_duration)
-
-    # EXAMPLE
-    # https://ebrary.net/14293/economics/actual_floater
-
-    print("BLOOMBERG CITIGROUP FRN EXAMPLE II")
-    issue_dt = Date(28, 3, 2000)
-    settle_dt = Date(28, 3, 2014)
-    maturity_dt = Date(3, 2, 2021)
-    quoted_margin = 0.0020
-    freq_type = FrequencyTypes.SEMI_ANNUAL
-    dc_type = DayCountTypes.THIRTY_E_360_ISDA
-
-    bond = BondFRN(issue_dt, maturity_dt, quoted_margin, freq_type, dc_type)
-
-    print("FIELD", "VALUE")
-    clean_price = 93.08
-    reset_ibor = 0.00537 - quoted_margin
-    current_ibor = 0.027558
-    future_ibors = 0.03295
-
-    dm = bond.discount_margin(settle_dt, reset_ibor, current_ibor, future_ibors, clean_price)
-
-    print("Discount Margin (bp) = ", dm * 10000)
-
-    dirty_price = bond.dirty_price_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dirty Price = ", dirty_price)
-
-    last_coupon_dt = bond._pcd
-    print("Last Coupon Date = ", str(last_coupon_dt))
-
-    accddays = bond.accrued_days
-    print("Accrued Days = ", accddays)
-
-    accd_amount = bond.accrued_int
-    print("Accrued Amount = ", accd_amount)
-
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dollar Principal = ", principal)
-
-    duration = bond.dollar_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dollar Rate Duration = ", duration)
-
-    modified_duration = bond.modified_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Modified Rate Duration = ", modified_duration)
-
-    macaulay_duration = bond.macaulay_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Macaulay Duration = ", macaulay_duration)
-
-    convexity = bond.convexity_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Convexity = ", convexity)
-
-    principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Principal = ", principal)
-
-    duration = bond.dollar_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Dollar Credit Duration = ", duration)
-
-    modified_duration = bond.modified_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-    print("Modified Credit Duration = ", modified_duration)
 
 
 ########################################################################################
 
-test_bond_frn()
+# ============================================================================
+# 1. BOND FRN
+# ============================================================================
+# What this section demonstrates:
+# Measures first-order price sensitivity to yield changes in price units.
+# Measures approximate percentage price sensitivity to a small change in yield.
+# Measures the present-value-weighted average timing of the bond cash flows.
+
+print("\n" + "=" * 78)
+print("1. BOND FRN")
+print("=" * 78)
+
+print("BLOOMBERG CITIGROUP FRN EXAMPLE")
+issue_dt = Date(10, 11, 2010)
+maturity_dt = Date(10, 11, 2021)
+quoted_margin = 0.0025
+freq_type = FrequencyTypes.QUARTERLY
+dc_type = DayCountTypes.THIRTY_E_360
+
+bond = BondFRN(issue_dt, maturity_dt, quoted_margin, freq_type, dc_type)
+
+print("FIELD", "VALUE")
+clean_price = 96.793
+reset_ibor = 0.0143456 - quoted_margin
+current_ibor = 0.0120534
+future_ibors = 0.0130522
+
+settle_dt = Date(21, 7, 2017)
+
+dm = bond.discount_margin(settle_dt, reset_ibor, current_ibor, future_ibors, clean_price)
+
+print("Discount Margin (bp) = ", dm * 10000)
+
+dirty_price = bond.dirty_price_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dirty Price = ", dirty_price)
+
+last_coupon_dt = bond._pcd
+print("Last Coupon Date = ", str(last_coupon_dt))
+
+accddays = bond.accrued_days
+print("Accrued Days = ", accddays)
+
+accd_amount = bond.accrued_int
+print("Accrued Amount = ", accd_amount)
+
+principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dollar Principal = ", principal)
+
+duration = bond.dollar_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dollar Rate Duration = ", duration)
+
+modified_duration = bond.modified_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Modified Rate Duration = ", modified_duration)
+
+macaulay_duration = bond.macaulay_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Macaulay Duration = ", macaulay_duration)
+
+convexity = bond.convexity_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Convexity = ", convexity)
+
+duration = bond.dollar_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dollar Credit Duration = ", duration)
+
+modified_duration = bond.modified_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Modified Credit Duration = ", modified_duration)
+
+# EXAMPLE
+# https://ebrary.net/14293/economics/actual_floater
+
+print("BLOOMBERG CITIGROUP FRN EXAMPLE II")
+issue_dt = Date(28, 3, 2000)
+settle_dt = Date(28, 3, 2014)
+maturity_dt = Date(3, 2, 2021)
+quoted_margin = 0.0020
+freq_type = FrequencyTypes.SEMI_ANNUAL
+dc_type = DayCountTypes.THIRTY_E_360_ISDA
+
+bond = BondFRN(issue_dt, maturity_dt, quoted_margin, freq_type, dc_type)
+
+print("FIELD", "VALUE")
+clean_price = 93.08
+reset_ibor = 0.00537 - quoted_margin
+current_ibor = 0.027558
+future_ibors = 0.03295
+
+dm = bond.discount_margin(settle_dt, reset_ibor, current_ibor, future_ibors, clean_price)
+
+print("Discount Margin (bp) = ", dm * 10000)
+
+dirty_price = bond.dirty_price_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dirty Price = ", dirty_price)
+
+last_coupon_dt = bond._pcd
+print("Last Coupon Date = ", str(last_coupon_dt))
+
+accddays = bond.accrued_days
+print("Accrued Days = ", accddays)
+
+accd_amount = bond.accrued_int
+print("Accrued Amount = ", accd_amount)
+
+principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dollar Principal = ", principal)
+
+duration = bond.dollar_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dollar Rate Duration = ", duration)
+
+modified_duration = bond.modified_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Modified Rate Duration = ", modified_duration)
+
+macaulay_duration = bond.macaulay_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Macaulay Duration = ", macaulay_duration)
+
+convexity = bond.convexity_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Convexity = ", convexity)
+
+principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Principal = ", principal)
+
+duration = bond.dollar_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Dollar Credit Duration = ", duration)
+
+modified_duration = bond.modified_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+
+print("Modified Credit Duration = ", modified_duration)
+

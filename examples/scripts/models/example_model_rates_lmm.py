@@ -2,41 +2,22 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
 import time as time
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.models.lmm_mc import lmm_sticky_caplet_pricer
 from financepy.models.lmm_mc import lmm_ratchet_caplet_pricer
 from financepy.models.lmm_mc import lmm_fwd_fwd_correlation
-from financepy.models.lmm_mc import lmm_swap_pricer
-from financepy.models.lmm_mc import lmm_price_caps_black
-from financepy.models.lmm_mc import lmm_cap_flr_pricer
-from financepy.models.lmm_mc import lmm_swaption_vol_approx
-from financepy.models.lmm_mc import lmm_sim_swaption_vol
-from financepy.models.lmm_mc import lmm_swaption_pricer
 from financepy.models.lmm_mc import lmm_simulate_fwds_mf
 from financepy.models.lmm_mc import lmm_simulate_fwds_1f
-from financepy.models.lmm_mc import lmm_simulate_fwds_nf
 from financepy.utils.helpers import check_vector_differences
-from financepy.products.rates.ibor_swaption import IborSwaption
-from financepy.products.rates.ibor_swaption import SwapTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.models.black import Black
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Model Rates Lmm
+# ============================================================================
 
 ########################################################################################
 
@@ -242,382 +223,6 @@ def get_forward_curve(num_fwds, r):
 ########################################################################################
 
 
-def test_hull_book_examples():
-    """Examining examples on page 770 of Hull OFODS
-    Last cap product has caplet starting in 10 years so we have to model
-    the forward curve from time 0 out to 11 forwards, not 10 forwards.
-    We have to model forward rates 0-1, 1-2, 2-3, ..., 10-11"""
-
-    verbose = True
-
-    # We go out 11 periods because last caplet resets in 10 years
-    num_fwds = 11
-    dt = 1.00
-    taus = np.array([dt] * num_fwds)
-    seed = 438
-
-    r = 0.05127
-    fwd0 = np.zeros(num_fwds)
-    for i in range(0, num_fwds):
-        fwd0[i] = r
-
-    num_paths = 500000
-    spread = 0.0025  # basis points
-
-    print("COMMENTS", "VALUES")
-
-    # HULL TABLE 32.1
-
-    use_sobol = 1
-    numeraire_index = 0
-
-    # We need the volatility for the forward rates out to the one starting in
-    # 10 years. So we have 11 elements. The one starting today has zero vol.
-    num_factors = 1
-    gammas1_f_list = [
-        0.00,
-        0.1550,
-        0.2063674,
-        0.1720986,
-        0.1721993,
-        0.1524579,
-        0.1414779,
-        0.1297711,
-        0.1381053,
-        0.135955,
-        0.1339842,
-    ]
-    gammas1_f = np.array(gammas1_f_list)
-
-    # One factor model
-    fwds1_f = lmm_simulate_fwds_1f(
-        num_fwds,
-        num_paths,
-        numeraire_index,
-        fwd0,
-        gammas1_f,
-        taus,
-        use_sobol,
-        seed,
-    )
-
-    #    LMMPrintForwards(fwds1_f)
-
-    v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds1_f, taus) * 100.0
-
-    hull_ratchet_caplets1_f = [
-        0.00,
-        0.196,
-        0.207,
-        0.201,
-        0.194,
-        0.187,
-        0.1890,
-        0.172,
-        0.167,
-        0.160,
-        0.153,
-    ]
-    hull_ratchet_caplets1_f = np.array(hull_ratchet_caplets1_f)
-
-    if verbose:
-        print("Ratchet ONE FACTOR IMPLEMENTATION")
-        print("FINANCEPY GETS:", v_ratchet_caplets)
-        print("HULL GETS:", hull_ratchet_caplets1_f)
-
-    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets1_f, 1e-2)
-
-    v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds1_f, taus) * 100.0
-
-    hull_sticky_caplets1_f = [
-        0.0,
-        0.196,
-        0.336,
-        0.412,
-        0.458,
-        0.484,
-        0.498,
-        0.502,
-        0.501,
-        0.497,
-        0.488,
-    ]
-
-    if verbose:
-        print("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
-        print("FINANCEPY GETS:", v_sticky_caplets)
-        print("HULL GETS:", hull_sticky_caplets1_f)
-
-    check_vector_differences(v_sticky_caplets, hull_sticky_caplets1_f, 1e-2)
-
-    num_factors = 1
-    lambdas1_f_list = [
-        [
-            0.0,
-            0.1550,
-            0.2064,
-            0.1721,
-            0.1722,
-            0.1525,
-            0.1415,
-            0.1298,
-            0.1381,
-            0.1360,
-            0.1340,
-        ]
-    ]
-    lambdas1_f = np.array(lambdas1_f_list)
-
-    # One factor model
-    fwds_mf = lmm_simulate_fwds_mf(
-        num_fwds,
-        num_factors,
-        num_paths,
-        numeraire_index,
-        fwd0,
-        lambdas1_f,
-        taus,
-        use_sobol,
-        seed,
-    )
-
-    v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds_mf, taus) * 100.0
-
-    hull_ratchet_caplets1_f = [
-        0.0,
-        0.196,
-        0.207,
-        0.201,
-        0.194,
-        0.187,
-        0.1890,
-        0.172,
-        0.167,
-        0.160,
-        0.153,
-    ]
-
-    if verbose:
-        print("RATCHET - NUM FACTORS 1F")
-        print("FINANCEPY GETS:", v_ratchet_caplets)
-        print("HULL GETS:", hull_ratchet_caplets1_f)
-
-    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets1_f, 1e-2)
-
-    v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds_mf, taus) * 100.0
-
-    hull_sticky_caplets1_f = [
-        0.00,
-        0.196,
-        0.336,
-        0.412,
-        0.458,
-        0.484,
-        0.498,
-        0.502,
-        0.501,
-        0.497,
-        0.488,
-    ]
-
-    check_vector_differences(v_sticky_caplets, hull_sticky_caplets1_f, 1e-2)
-
-    if verbose:
-        print("STICKY RATCHET - NUM FACTORS 1")
-        print("FINANCEPY GETS:", v_sticky_caplets)
-        print("HULL GETS:", hull_sticky_caplets1_f)
-
-    num_factors = 2
-    lambdas2_f_list = [
-        [
-            0.00,
-            0.1410,
-            0.1952,
-            0.1678,
-            0.1711,
-            0.1525,
-            0.1406,
-            0.1265,
-            0.1306,
-            0.1236,
-            0.1163,
-        ],
-        [
-            0.00,
-            -0.0645,
-            -0.0670,
-            -0.0384,
-            -0.0196,
-            0.00,
-            0.0161,
-            0.0289,
-            0.0448,
-            0.0565,
-            0.0665,
-        ],
-    ]
-    lambdas2_f = np.array(lambdas2_f_list)
-
-    # Two factor model
-    fwds2_f = lmm_simulate_fwds_mf(
-        num_fwds,
-        num_factors,
-        num_paths,
-        numeraire_index,
-        fwd0,
-        lambdas2_f,
-        taus,
-        use_sobol,
-        seed,
-    )
-
-    v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds2_f, taus) * 100.0
-    hull_ratchet_caplets2_f = [
-        0.00,
-        0.194,
-        0.207,
-        0.205,
-        0.198,
-        0.193,
-        0.189,
-        0.180,
-        0.174,
-        0.168,
-        0.162,
-    ]
-
-    if verbose:
-        print("RATCHET - NUM FACTORS:2")
-        print("FINANCEPY GETS:", v_ratchet_caplets)
-        print("HULL GETS:", hull_ratchet_caplets2_f)
-
-    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets2_f, 1e-2)
-
-    v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds2_f, taus) * 100.0
-
-    hull_sticky_caplets2_f = [
-        0.00,
-        0.196,
-        0.334,
-        0.413,
-        0.462,
-        0.492,
-        0.512,
-        0.520,
-        0.523,
-        0.523,
-        0.519,
-    ]
-
-    if verbose:
-        print("STICKY RATCHET - NUM FACTORS:2")
-        print("FINANCEPY GETS:", v_sticky_caplets)
-        print("HULL GETS:", hull_sticky_caplets2_f)
-
-    check_vector_differences(v_sticky_caplets, hull_sticky_caplets2_f, 1e-2)
-
-    num_factors = 3
-    lambdas3_f_list = [
-        [
-            0.00,
-            0.1365,
-            0.1928,
-            0.1672,
-            0.1698,
-            0.1485,
-            0.1395,
-            0.1261,
-            0.1290,
-            0.1197,
-            0.1097,
-        ],
-        [
-            0.0,
-            -0.0662,
-            -0.0702,
-            -0.0406,
-            -0.0206,
-            0.00,
-            0.0169,
-            0.0306,
-            0.0470,
-            0.0581,
-            0.0666,
-        ],
-        [
-            0.0,
-            0.0319,
-            0.0225,
-            0.000,
-            -0.0198,
-            -0.0347,
-            -0.0163,
-            0.000,
-            0.0151,
-            0.0280,
-            0.0384,
-        ],
-    ]
-    lambdas3_f = np.array(lambdas3_f_list)
-
-    # Three factor model
-    fwds3_f = lmm_simulate_fwds_mf(
-        num_fwds,
-        num_factors,
-        num_paths,
-        numeraire_index,
-        fwd0,
-        lambdas3_f,
-        taus,
-        use_sobol,
-        seed,
-    )
-
-    hull_ratchet_caplets3_f = [
-        0.00,
-        0.194,
-        0.207,
-        0.205,
-        0.198,
-        0.193,
-        0.189,
-        0.180,
-        0.174,
-        0.168,
-        0.162,
-    ]
-
-    v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds3_f, taus) * 100.0
-
-    if verbose:
-        print("RATCHET - NUM FACTORS:3")
-        print("FINANCEPY GETS:", v_ratchet_caplets)
-        print("HULL GETS:", hull_ratchet_caplets3_f)
-
-    check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets3_f, 1e-2)
-
-    v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds3_f, taus) * 100.0
-
-    hull_sticky_caplets3_f = [
-        0.00,
-        0.195,
-        0.336,
-        0.418,
-        0.472,
-        0.506,
-        0.524,
-        0.533,
-        0.537,
-        0.537,
-        0.534,
-    ]
-
-    if verbose:
-        print("STICKY RATCHET - NUM FACTORS:3")
-        print("FINANCEPY GETS:", v_sticky_caplets)
-        print("HULL GETS:", hull_sticky_caplets3_f)
-
-    check_vector_differences(v_sticky_caplets, hull_sticky_caplets3_f, 1e-2)
 
 
 """ def test_Swap():
@@ -664,6 +269,392 @@ def fwdfwd_correlation(fwds):
 #    print(fwd_corr)
 
 
-test_hull_book_examples()
 # test_CapsFloors()
 # test_Swaptions()
+
+# ============================================================================
+# 1. HULL BOOK EXAMPLES
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. HULL BOOK EXAMPLES")
+print("=" * 78)
+
+"""Examining examples on page 770 of Hull OFODS
+Last cap product has caplet starting in 10 years so we have to model
+the forward curve from time 0 out to 11 forwards, not 10 forwards.
+We have to model forward rates 0-1, 1-2, 2-3, ..., 10-11"""
+
+verbose = True
+
+# We go out 11 periods because last caplet resets in 10 years
+num_fwds = 11
+dt = 1.00
+taus = np.array([dt] * num_fwds)
+seed = 438
+
+r = 0.05127
+fwd0 = np.zeros(num_fwds)
+for i in range(0, num_fwds):
+    fwd0[i] = r
+
+num_paths = 500000
+spread = 0.0025  # basis points
+
+print("COMMENTS", "VALUES")
+
+# HULL TABLE 32.1
+
+use_sobol = 1
+numeraire_index = 0
+
+# We need the volatility for the forward rates out to the one starting in
+# 10 years. So we have 11 elements. The one starting today has zero vol.
+num_factors = 1
+gammas1_f_list = [
+    0.00,
+    0.1550,
+    0.2063674,
+    0.1720986,
+    0.1721993,
+    0.1524579,
+    0.1414779,
+    0.1297711,
+    0.1381053,
+    0.135955,
+    0.1339842,
+]
+gammas1_f = np.array(gammas1_f_list)
+
+# One factor model
+fwds1_f = lmm_simulate_fwds_1f(
+    num_fwds,
+    num_paths,
+    numeraire_index,
+    fwd0,
+    gammas1_f,
+    taus,
+    use_sobol,
+    seed,
+)
+
+#    LMMPrintForwards(fwds1_f)
+
+v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds1_f, taus) * 100.0
+
+hull_ratchet_caplets1_f = [
+    0.00,
+    0.196,
+    0.207,
+    0.201,
+    0.194,
+    0.187,
+    0.1890,
+    0.172,
+    0.167,
+    0.160,
+    0.153,
+]
+hull_ratchet_caplets1_f = np.array(hull_ratchet_caplets1_f)
+
+if verbose:
+    print("Ratchet ONE FACTOR IMPLEMENTATION")
+    print("FINANCEPY GETS:", v_ratchet_caplets)
+    print("HULL GETS:", hull_ratchet_caplets1_f)
+
+check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets1_f, 1e-2)
+
+v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds1_f, taus) * 100.0
+
+hull_sticky_caplets1_f = [
+    0.0,
+    0.196,
+    0.336,
+    0.412,
+    0.458,
+    0.484,
+    0.498,
+    0.502,
+    0.501,
+    0.497,
+    0.488,
+]
+
+if verbose:
+    print("STICKY CAPLETS ONE FACTOR IMPLEMENTATION")
+    print("FINANCEPY GETS:", v_sticky_caplets)
+    print("HULL GETS:", hull_sticky_caplets1_f)
+
+check_vector_differences(v_sticky_caplets, hull_sticky_caplets1_f, 1e-2)
+
+num_factors = 1
+lambdas1_f_list = [
+    [
+        0.0,
+        0.1550,
+        0.2064,
+        0.1721,
+        0.1722,
+        0.1525,
+        0.1415,
+        0.1298,
+        0.1381,
+        0.1360,
+        0.1340,
+    ]
+]
+lambdas1_f = np.array(lambdas1_f_list)
+
+# One factor model
+fwds_mf = lmm_simulate_fwds_mf(
+    num_fwds,
+    num_factors,
+    num_paths,
+    numeraire_index,
+    fwd0,
+    lambdas1_f,
+    taus,
+    use_sobol,
+    seed,
+)
+
+v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds_mf, taus) * 100.0
+
+hull_ratchet_caplets1_f = [
+    0.0,
+    0.196,
+    0.207,
+    0.201,
+    0.194,
+    0.187,
+    0.1890,
+    0.172,
+    0.167,
+    0.160,
+    0.153,
+]
+
+if verbose:
+    print("RATCHET - NUM FACTORS 1F")
+    print("FINANCEPY GETS:", v_ratchet_caplets)
+    print("HULL GETS:", hull_ratchet_caplets1_f)
+
+check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets1_f, 1e-2)
+
+v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds_mf, taus) * 100.0
+
+hull_sticky_caplets1_f = [
+    0.00,
+    0.196,
+    0.336,
+    0.412,
+    0.458,
+    0.484,
+    0.498,
+    0.502,
+    0.501,
+    0.497,
+    0.488,
+]
+
+check_vector_differences(v_sticky_caplets, hull_sticky_caplets1_f, 1e-2)
+
+if verbose:
+    print("STICKY RATCHET - NUM FACTORS 1")
+    print("FINANCEPY GETS:", v_sticky_caplets)
+    print("HULL GETS:", hull_sticky_caplets1_f)
+
+num_factors = 2
+lambdas2_f_list = [
+    [
+        0.00,
+        0.1410,
+        0.1952,
+        0.1678,
+        0.1711,
+        0.1525,
+        0.1406,
+        0.1265,
+        0.1306,
+        0.1236,
+        0.1163,
+    ],
+    [
+        0.00,
+        -0.0645,
+        -0.0670,
+        -0.0384,
+        -0.0196,
+        0.00,
+        0.0161,
+        0.0289,
+        0.0448,
+        0.0565,
+        0.0665,
+    ],
+]
+lambdas2_f = np.array(lambdas2_f_list)
+
+# Two factor model
+fwds2_f = lmm_simulate_fwds_mf(
+    num_fwds,
+    num_factors,
+    num_paths,
+    numeraire_index,
+    fwd0,
+    lambdas2_f,
+    taus,
+    use_sobol,
+    seed,
+)
+
+v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds2_f, taus) * 100.0
+hull_ratchet_caplets2_f = [
+    0.00,
+    0.194,
+    0.207,
+    0.205,
+    0.198,
+    0.193,
+    0.189,
+    0.180,
+    0.174,
+    0.168,
+    0.162,
+]
+
+if verbose:
+    print("RATCHET - NUM FACTORS:2")
+    print("FINANCEPY GETS:", v_ratchet_caplets)
+    print("HULL GETS:", hull_ratchet_caplets2_f)
+
+check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets2_f, 1e-2)
+
+v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds2_f, taus) * 100.0
+
+hull_sticky_caplets2_f = [
+    0.00,
+    0.196,
+    0.334,
+    0.413,
+    0.462,
+    0.492,
+    0.512,
+    0.520,
+    0.523,
+    0.523,
+    0.519,
+]
+
+if verbose:
+    print("STICKY RATCHET - NUM FACTORS:2")
+    print("FINANCEPY GETS:", v_sticky_caplets)
+    print("HULL GETS:", hull_sticky_caplets2_f)
+
+check_vector_differences(v_sticky_caplets, hull_sticky_caplets2_f, 1e-2)
+
+num_factors = 3
+lambdas3_f_list = [
+    [
+        0.00,
+        0.1365,
+        0.1928,
+        0.1672,
+        0.1698,
+        0.1485,
+        0.1395,
+        0.1261,
+        0.1290,
+        0.1197,
+        0.1097,
+    ],
+    [
+        0.0,
+        -0.0662,
+        -0.0702,
+        -0.0406,
+        -0.0206,
+        0.00,
+        0.0169,
+        0.0306,
+        0.0470,
+        0.0581,
+        0.0666,
+    ],
+    [
+        0.0,
+        0.0319,
+        0.0225,
+        0.000,
+        -0.0198,
+        -0.0347,
+        -0.0163,
+        0.000,
+        0.0151,
+        0.0280,
+        0.0384,
+    ],
+]
+lambdas3_f = np.array(lambdas3_f_list)
+
+# Three factor model
+fwds3_f = lmm_simulate_fwds_mf(
+    num_fwds,
+    num_factors,
+    num_paths,
+    numeraire_index,
+    fwd0,
+    lambdas3_f,
+    taus,
+    use_sobol,
+    seed,
+)
+
+hull_ratchet_caplets3_f = [
+    0.00,
+    0.194,
+    0.207,
+    0.205,
+    0.198,
+    0.193,
+    0.189,
+    0.180,
+    0.174,
+    0.168,
+    0.162,
+]
+
+v_ratchet_caplets = lmm_ratchet_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds3_f, taus) * 100.0
+
+if verbose:
+    print("RATCHET - NUM FACTORS:3")
+    print("FINANCEPY GETS:", v_ratchet_caplets)
+    print("HULL GETS:", hull_ratchet_caplets3_f)
+
+check_vector_differences(v_ratchet_caplets, hull_ratchet_caplets3_f, 1e-2)
+
+v_sticky_caplets = lmm_sticky_caplet_pricer(spread, num_fwds, num_paths, fwd0, fwds3_f, taus) * 100.0
+
+hull_sticky_caplets3_f = [
+    0.00,
+    0.195,
+    0.336,
+    0.418,
+    0.472,
+    0.506,
+    0.524,
+    0.533,
+    0.537,
+    0.537,
+    0.534,
+]
+
+if verbose:
+    print("STICKY RATCHET - NUM FACTORS:3")
+    print("FINANCEPY GETS:", v_sticky_caplets)
+    print("HULL GETS:", hull_sticky_caplets3_f)
+
+check_vector_differences(v_sticky_caplets, hull_sticky_caplets3_f, 1e-2)
+

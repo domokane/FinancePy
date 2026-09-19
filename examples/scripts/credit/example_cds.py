@@ -2,17 +2,9 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import time
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -31,6 +23,10 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.math import ONE_MILLION
 from financepy.products.credit.cds import CDS
 
+# ============================================================================
+# FINANCEPY EXAMPLES - Cds
+# ============================================================================
+
 DIRTY = 0
 CLEAN = 1
 
@@ -42,77 +38,16 @@ CLEAN = 1
 ########################################################################################
 
 
-def test_cds_fast_approximation():
-
-    value_dt = Date(20, 6, 2018)
-    # I build a discount curve that requires no bootstrap
-    times = np.linspace(0, 10.0, 11)
-    r = 0.05
-
-    discount_factors = np.power((1.0 + r), -times)
-    dates = value_dt.add_years(times)
-
-    libor_curve = DiscountCurve(value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES)
-
-    maturity_dt = value_dt.next_cds_date(120)
-    t = (maturity_dt - value_dt) / 365.242
-    z = libor_curve.df(maturity_dt)
-    r = -np.log(z) / t
-
-    recovery_rate = 0.40
-
-    contract_cpn = 0.010
-
-    print("MKT_SPD", "EXACT_VALUE", "APPROX_VALUE", "DIFF(%NOT)")
-
-    for mkt_cpn in np.linspace(0.000, 0.05, 21):
-
-        cds_contracts = []
-
-        cds_mkt = CDS(value_dt, maturity_dt, mkt_cpn, ONE_MILLION)
-
-        cds_contracts.append(cds_mkt)
-
-        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
-
-        cds_contract = CDS(value_dt, maturity_dt, contract_cpn)
-        v_exact = cds_contract.value(value_dt, issuer_curve, recovery_rate)[DIRTY]
-        v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_cpn, recovery_rate)[0]
-        pct_diff = (v_exact - v_approx) / ONE_MILLION * 100.0
-        print(mkt_cpn * 10000, v_exact, v_approx, pct_diff)
 
 
 ########################################################################################
 
 
-def test_cds_curve_repricing():
-
-    value_dt = Date(20, 6, 2018)
-    recovery_rate = 0.40
-
-    cds_contracts, issuer_curve = test_issuer_curve_build()
-    print("CDS_MATURITY_dt", "PAR_SPREAD")
-    for cds in cds_contracts:
-        spd = cds.par_spread(value_dt, issuer_curve, recovery_rate)
-        print(str(cds.maturity_dt), spd * 10000.0)
 
 
 ########################################################################################
 
 
-def test_cds_curve_build_timing():
-
-    num_curves = 1000
-
-    start = time.time()
-    for _ in range(0, num_curves):
-        test_issuer_curve_build()
-
-    end = time.time()
-
-    print("LABEL", "TIME")
-    duration = (end - start) / num_curves
-    print(str(num_curves) + " Libor curves", duration)
 
 
 ########################################################################################
@@ -378,84 +313,6 @@ def build_full_issuer_curve1(mkt_spd_bump, ir_bump):
 ########################################################################################
 
 
-def test_dirty_price_cds():
-
-    mkt_spd = 0.040
-
-    print("Example", "Markit 9 Aug 2019")
-
-    libor_curve, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
-
-    # This is the 10 year contract at an off market cpn
-    maturity_dt = Date(20, 6, 2029)
-    cds_cpn = 0.0150
-    notional = ONE_MILLION
-    long_protection = True
-    trade_dt = Date(9, 8, 2019)
-    value_dt = trade_dt.add_days(1)
-    effective_dt = value_dt
-
-    cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-    cds_recovery = 0.40
-
-    print("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-    print("PAR_SPREAD", spd)
-
-    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    print("DIRTY_VALUE", v[DIRTY])
-    print("CLEAN_VALUE", v[CLEAN])
-
-    p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-    print("CLEAN_PRICE", p)
-
-    # MARKIT PRICE IS 168517
-
-    accrued_days = cds_contract.accrued_days(value_dt)
-    print("ACCRUED_DAYS", accrued_days)
-
-    accrued_interest = cds_contract.accrued_interest(value_dt)
-    print("ACCRUED_COUPON", accrued_interest)
-
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("prot_PV", prot_pv)
-
-    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PREMIUM_PV", prem_pv)
-
-    dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
-    print("DIRTY_RPV01", dirty_rpv01)
-    print("CLEAN_RPV01", clean_rpv01)
-
-    # cds_contract.print_payments(issuer_curve)
-
-    bump = 1.0 / 10000.0  # 1 bp
-
-    libor_curve, issuer_curve = build_full_issuer_curve1(bump, 0)
-    v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    dv = v_bump[DIRTY] - v[DIRTY]
-    print("CREDIT_DV01", dv)
-
-    # Interest Rate Bump
-    libor_curve, issuer_curve = build_full_issuer_curve1(0, bump)
-    v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    dv = v_bump[DIRTY] - v[DIRTY]
-    print("INTEREST_DV01", dv)
-
-    t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
-    z = libor_curve.df(maturity_dt)
-    r = -np.log(z) / t
-
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
-
-    print("DIRTY APPROX VALUE", v_approx[0])
-    print("CLEAN APPROX VALUE", v_approx[1])
-    print("DIRTY RPV01 VALUE", v_approx[2])
-    print("CLEAN RPV01 VALUE", v_approx[3])
-    print("APPROX SPREAD DV01", v_approx[4])
-    print("APPROX INTEREST DV01", v_approx[5])
-    print("APPROX RECOVERY DV01", v_approx[6])
 
 
 ########################################################################################
@@ -590,147 +447,344 @@ def build_full_issuer_curve2(mkt_spd_bump, ir_bump):
 ########################################################################################
 
 
-def test_dirty_price_cds_model_check():
-
-    print("Example", "MARKIT CHECK 19 Aug 2020")
-
-    libor_curve, issuer_curve = build_full_issuer_curve2(0.0, 0.0)
-
-    # This is the 10 year contract at an off market cpn
-    maturity_dt = Date(20, 6, 2025)
-    cds_cpn = 0.050
-    notional = ONE_MILLION
-    long_protection = True
-    trade_dt = Date(20, 8, 2020)
-    effective_dt = Date(21, 8, 2020)
-    value_dt = trade_dt
-
-    cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-    cds_recovery = 0.40
-
-    print("LABEL", "VALUE")
-    spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-    print("PAR_SPREAD", spd)
-
-    v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    print("DIRTY_VALUE", v[DIRTY])
-    print("CLEAN_VALUE", v[CLEAN])
-
-    p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-    print("CLEAN_PRICE", p)
-
-    accrued_days = cds_contract.accrued_days(value_dt)
-    print("ACCRUED_DAYS", accrued_days)
-
-    accrued_interest = cds_contract.accrued_interest(value_dt)
-    print("ACCRUED_COUPON", accrued_interest)
-
-    prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("prot_PV", prot_pv)
-
-    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-    print("PREMIUM_PV", prem_pv)
-
-    rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
-    print("FULL_RPV01", rpv01[DIRTY])
-    print("CLEAN_RPV01", rpv01[CLEAN])
-
-    credit_dv01 = cds_contract.spread_dv01(value_dt, issuer_curve, cds_recovery)
-    print("CREDIT DV01", credit_dv01)
-
-    interest_dv01 = cds_contract.ir_dv01(value_dt, issuer_curve, cds_recovery)
-    print("INTEREST DV01", interest_dv01)
-
-    recovery_dv01 = cds_contract.recovery_dv01(value_dt, issuer_curve, cds_recovery)
-    print("RECOVERY DV01", recovery_dv01)
-
-    #    csa = cds_contract.cash_settlement_amount(value_dt, value_dt, issuer_curve, cds_recovery)
-    #    print("CSA", csa)
-
-    # Consider fast approximation
-    t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
-    z = libor_curve.df(maturity_dt)
-    r = -np.log(z) / t
-
-    mkt_spd = 0.01
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
-
-    print("FAST VALUATIONS", "VALUE")
-
-    print("DIRTY APPROX VALUE", v_approx[0])
-    print("CLEAN APPROX VALUE", v_approx[1])
-    print("APPROX CREDIT DV01", v_approx[2])
-    print("APPROX INTEREST DV01", v_approx[3])
 
 
 ########################################################################################
 
 
-def test_dirty_price_cds_convergence():
-
-    _, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
-
-    # This is the 10 year contract at an off market cpn
-    maturity_dt = Date(20, 6, 2029)
-    cds_cpn = 0.0150
-    notional = ONE_MILLION
-    long_protection = False
-    trade_dt = Date(9, 8, 2019)
-    value_dt = trade_dt.add_days(1)
-
-    cds_contract = CDS(value_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-    cds_recovery = 0.40
-
-    print("NumSteps", "Value")
-    for n in [10, 50, 100, 500, 1000]:
-        v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[DIRTY]
-        print(n, v_dirty)
 
 
 ########################################################################################
 
 
-def test_cds_date_generation():
 
-    # This is the 10 year contract at an off market cpn
-    maturity_dt = Date(20, 6, 2029)
-    cds_cpn = 0.0100
 
-    trade_dt = Date(9, 8, 2019)
-    value_dt = trade_dt.add_days(1)
+########################################################################################
 
-    cds_contract = CDS(
-        value_dt,
-        maturity_dt,
-        cds_cpn,
-        ONE_MILLION,
-        True,
-        FrequencyTypes.QUARTERLY,
-        DayCountTypes.ACT_360,
-        CalendarTypes.WEEKEND,
-        BusDayAdjustTypes.FOLLOWING,
-        DateGenRuleTypes.BACKWARD,
+# ============================================================================
+# 1. CDS CURVE BUILD TIMING
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. CDS CURVE BUILD TIMING")
+print("=" * 78)
+
+num_curves = 1000
+
+start = time.time()
+for _ in range(0, num_curves):
+    test_issuer_curve_build()
+
+end = time.time()
+
+print("LABEL", "TIME")
+duration = (end - start) / num_curves
+print(str(num_curves) + " Libor curves", duration)
+
+# ============================================================================
+# 2. DIRTY PRICE CDS MODEL CHECK
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# Calculates coupon interest earned since the previous coupon date and illustrates the clean/dirty price adjustment.
+
+print("\n" + "=" * 78)
+print("2. DIRTY PRICE CDS MODEL CHECK")
+print("=" * 78)
+
+print("Example", "MARKIT CHECK 19 Aug 2020")
+
+libor_curve, issuer_curve = build_full_issuer_curve2(0.0, 0.0)
+
+# This is the 10 year contract at an off market cpn
+maturity_dt = Date(20, 6, 2025)
+cds_cpn = 0.050
+notional = ONE_MILLION
+long_protection = True
+trade_dt = Date(20, 8, 2020)
+effective_dt = Date(21, 8, 2020)
+value_dt = trade_dt
+
+cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
+
+cds_recovery = 0.40
+
+print("LABEL", "VALUE")
+spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
+print("PAR_SPREAD", spd)
+
+v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
+print("DIRTY_VALUE", v[DIRTY])
+print("CLEAN_VALUE", v[CLEAN])
+
+p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
+print("CLEAN_PRICE", p)
+
+accrued_days = cds_contract.accrued_days(value_dt)
+print("ACCRUED_DAYS", accrued_days)
+
+accrued_interest = cds_contract.accrued_interest(value_dt)
+print("ACCRUED_COUPON", accrued_interest)
+
+prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("prot_PV", prot_pv)
+
+prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PREMIUM_PV", prem_pv)
+
+rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
+print("FULL_RPV01", rpv01[DIRTY])
+print("CLEAN_RPV01", rpv01[CLEAN])
+
+credit_dv01 = cds_contract.spread_dv01(value_dt, issuer_curve, cds_recovery)
+print("CREDIT DV01", credit_dv01)
+
+interest_dv01 = cds_contract.ir_dv01(value_dt, issuer_curve, cds_recovery)
+print("INTEREST DV01", interest_dv01)
+
+recovery_dv01 = cds_contract.recovery_dv01(value_dt, issuer_curve, cds_recovery)
+print("RECOVERY DV01", recovery_dv01)
+
+#    csa = cds_contract.cash_settlement_amount(value_dt, value_dt, issuer_curve, cds_recovery)
+#    print("CSA", csa)
+
+# Consider fast approximation
+t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
+z = libor_curve.df(maturity_dt)
+r = -np.log(z) / t
+
+mkt_spd = 0.01
+v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
+
+print("FAST VALUATIONS", "VALUE")
+
+print("DIRTY APPROX VALUE", v_approx[0])
+print("CLEAN APPROX VALUE", v_approx[1])
+print("APPROX CREDIT DV01", v_approx[2])
+print("APPROX INTEREST DV01", v_approx[3])
+
+# ============================================================================
+# 3. CDS DATE GENERATION
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("3. CDS DATE GENERATION")
+print("=" * 78)
+
+maturity_dt = Date(20, 6, 2029)
+cds_cpn = 0.0100
+
+trade_dt = Date(9, 8, 2019)
+value_dt = trade_dt.add_days(1)
+
+cds_contract = CDS(
+    value_dt,
+    maturity_dt,
+    cds_cpn,
+    ONE_MILLION,
+    True,
+    FrequencyTypes.QUARTERLY,
+    DayCountTypes.ACT_360,
+    CalendarTypes.WEEKEND,
+    BusDayAdjustTypes.FOLLOWING,
+    DateGenRuleTypes.BACKWARD,
+)
+
+print("Flow Date", "AccrualFactor", "Flow")
+num_flows = len(cds_contract.payment_dts)
+for n in range(0, num_flows):
+    print(
+        str(cds_contract.payment_dts[n]),
+        cds_contract.accrual_factors[n],
+        cds_contract.flows[n],
     )
 
-    print("Flow Date", "AccrualFactor", "Flow")
-    num_flows = len(cds_contract.payment_dts)
-    for n in range(0, num_flows):
-        print(
-            str(cds_contract.payment_dts[n]),
-            cds_contract.accrual_factors[n],
-            cds_contract.flows[n],
-        )
+# ============================================================================
+# 4. DIRTY PRICE CDS
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# Calculates coupon interest earned since the previous coupon date and illustrates the clean/dirty price adjustment.
 
+print("\n" + "=" * 78)
+print("4. DIRTY PRICE CDS")
+print("=" * 78)
 
-########################################################################################
+mkt_spd = 0.040
 
-test_cds_curve_build_timing()
-test_dirty_price_cds_model_check()
-test_cds_date_generation()
-test_dirty_price_cds()
-test_dirty_price_cds_convergence()
-test_cds_curve_repricing()
-test_cds_fast_approximation()
+print("Example", "Markit 9 Aug 2019")
+
+libor_curve, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
+
+# This is the 10 year contract at an off market cpn
+maturity_dt = Date(20, 6, 2029)
+cds_cpn = 0.0150
+notional = ONE_MILLION
+long_protection = True
+trade_dt = Date(9, 8, 2019)
+value_dt = trade_dt.add_days(1)
+effective_dt = value_dt
+
+cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
+
+cds_recovery = 0.40
+
+print("LABEL", "VALUE")
+spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
+print("PAR_SPREAD", spd)
+
+v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
+print("DIRTY_VALUE", v[DIRTY])
+print("CLEAN_VALUE", v[CLEAN])
+
+p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
+print("CLEAN_PRICE", p)
+
+# MARKIT PRICE IS 168517
+
+accrued_days = cds_contract.accrued_days(value_dt)
+print("ACCRUED_DAYS", accrued_days)
+
+accrued_interest = cds_contract.accrued_interest(value_dt)
+print("ACCRUED_COUPON", accrued_interest)
+
+prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("prot_PV", prot_pv)
+
+prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+print("PREMIUM_PV", prem_pv)
+
+dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
+print("DIRTY_RPV01", dirty_rpv01)
+print("CLEAN_RPV01", clean_rpv01)
+
+# cds_contract.print_payments(issuer_curve)
+
+bump = 1.0 / 10000.0  # 1 bp
+
+libor_curve, issuer_curve = build_full_issuer_curve1(bump, 0)
+v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
+dv = v_bump[DIRTY] - v[DIRTY]
+print("CREDIT_DV01", dv)
+
+# Interest Rate Bump
+libor_curve, issuer_curve = build_full_issuer_curve1(0, bump)
+v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
+dv = v_bump[DIRTY] - v[DIRTY]
+print("INTEREST_DV01", dv)
+
+t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
+z = libor_curve.df(maturity_dt)
+r = -np.log(z) / t
+
+v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
+
+print("DIRTY APPROX VALUE", v_approx[0])
+print("CLEAN APPROX VALUE", v_approx[1])
+print("DIRTY RPV01 VALUE", v_approx[2])
+print("CLEAN RPV01 VALUE", v_approx[3])
+print("APPROX SPREAD DV01", v_approx[4])
+print("APPROX INTEREST DV01", v_approx[5])
+print("APPROX RECOVERY DV01", v_approx[6])
+
+# ============================================================================
+# 5. DIRTY PRICE CDS CONVERGENCE
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("5. DIRTY PRICE CDS CONVERGENCE")
+print("=" * 78)
+
+_, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
+
+# This is the 10 year contract at an off market cpn
+maturity_dt = Date(20, 6, 2029)
+cds_cpn = 0.0150
+notional = ONE_MILLION
+long_protection = False
+trade_dt = Date(9, 8, 2019)
+value_dt = trade_dt.add_days(1)
+
+cds_contract = CDS(value_dt, maturity_dt, cds_cpn, notional, long_protection)
+
+cds_recovery = 0.40
+
+print("NumSteps", "Value")
+for n in [10, 50, 100, 500, 1000]:
+    v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[DIRTY]
+    print(n, v_dirty)
+
+# ============================================================================
+# 6. CDS CURVE REPRICING
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("6. CDS CURVE REPRICING")
+print("=" * 78)
+
+value_dt = Date(20, 6, 2018)
+recovery_rate = 0.40
+
+cds_contracts, issuer_curve = test_issuer_curve_build()
+print("CDS_MATURITY_dt", "PAR_SPREAD")
+for cds in cds_contracts:
+    spd = cds.par_spread(value_dt, issuer_curve, recovery_rate)
+    print(str(cds.maturity_dt), spd * 10000.0)
+
+# ============================================================================
+# 7. CDS FAST APPROXIMATION
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("7. CDS FAST APPROXIMATION")
+print("=" * 78)
+
+value_dt = Date(20, 6, 2018)
+# I build a discount curve that requires no bootstrap
+times = np.linspace(0, 10.0, 11)
+r = 0.05
+
+discount_factors = np.power((1.0 + r), -times)
+dates = value_dt.add_years(times)
+
+libor_curve = DiscountCurve(value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES)
+
+maturity_dt = value_dt.next_cds_date(120)
+t = (maturity_dt - value_dt) / 365.242
+z = libor_curve.df(maturity_dt)
+r = -np.log(z) / t
+
+recovery_rate = 0.40
+
+contract_cpn = 0.010
+
+print("MKT_SPD", "EXACT_VALUE", "APPROX_VALUE", "DIFF(%NOT)")
+
+for mkt_cpn in np.linspace(0.000, 0.05, 21):
+
+    cds_contracts = []
+
+    cds_mkt = CDS(value_dt, maturity_dt, mkt_cpn, ONE_MILLION)
+
+    cds_contracts.append(cds_mkt)
+
+    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+
+    cds_contract = CDS(value_dt, maturity_dt, contract_cpn)
+    v_exact = cds_contract.value(value_dt, issuer_curve, recovery_rate)[DIRTY]
+    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_cpn, recovery_rate)[0]
+    pct_diff = (v_exact - v_approx) / ONE_MILLION * 100.0
+    print(mkt_cpn * 10000, v_exact, v_approx, pct_diff)
 

@@ -2,14 +2,6 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
-import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.products.rates.ibor_deposit import IborDeposit
@@ -18,80 +10,89 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.products.fx.fx_forward import FXForward
 
+# ============================================================================
+# FINANCEPY EXAMPLES - FXForward
+# ============================================================================
 
-
-########################################################################################
-
-
-def test_fin_fx_forward():
-
-    #  https://stackoverflow.com/questions/48778712
-    #  /fx-vanilla-call-price-in-quantlib-doesnt-match-bloomberg
-
-    value_dt = Date(13, 2, 2018)
-    expiry_dt = value_dt.add_months(12)
-    # Forward is on EURUSD which is expressed as number of USD per EUR
-    # ccy1 = EUR and ccy2 = USD
-    for_name = "EUR"
-    dom_name = "USD"
-    currency_pair = for_name + dom_name  # Always ccy1ccy2
-    spot_fx_rate = 1.300  # USD per EUR
-    strike_fx_rate = 1.365  # USD per EUR
-    ccy1_interest_rate = 0.02  # USD Rates
-    ccy2_interest_rate = 0.05  # EUR rates
-
-    spot_days = 0
-    settle_dt = value_dt.add_weekdays(spot_days)
-    maturity_dt = settle_dt.add_months(12)
-    notional = 100.0
-    cal_type = CalendarTypes.TARGET
-
-    depos = []
-    fras = []
-    swaps = []
-    deposit_rate = ccy1_interest_rate
-    depo = IborDeposit(
-        settle_dt,
-        maturity_dt,
-        deposit_rate,
-        DayCountTypes.ACT_360,
-        notional,
-        cal_type,
-    )
-    depos.append(depo)
-    foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-
-    depos = []
-    fras = []
-    swaps = []
-    deposit_rate = ccy2_interest_rate
-    depo = IborDeposit(
-        settle_dt,
-        maturity_dt,
-        deposit_rate,
-        DayCountTypes.ACT_360,
-        notional,
-        cal_type,
-    )
-    depos.append(depo)
-    domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-
-    notional = 100.0
-    notional_currency = for_name
-
-    fx_fwd = FXForward(
-        expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency
-    )
-
-    print("SPOT FX", "FX FWD", "VALUE_BS")
-
-    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
-
-    fwd_fx_rate = fx_fwd.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
-
-    print(spot_fx_rate, fwd_fx_rate, fwd_value)
 
 
 ########################################################################################
 
-test_fin_fx_forward()
+
+
+
+########################################################################################
+
+# ============================================================================
+# 1. FIN FX FORWARD
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+
+print("\n" + "=" * 78)
+print("1. FIN FX FORWARD")
+print("=" * 78)
+
+value_dt = Date(13, 2, 2018)
+expiry_dt = value_dt.add_months(12)
+# Forward is on EURUSD which is expressed as number of USD per EUR
+# ccy1 = EUR and ccy2 = USD
+for_name = "EUR"
+dom_name = "USD"
+currency_pair = for_name + dom_name  # Always ccy1ccy2
+spot_fx_rate = 1.300  # USD per EUR
+strike_fx_rate = 1.365  # USD per EUR
+ccy1_interest_rate = 0.02  # USD Rates
+ccy2_interest_rate = 0.05  # EUR rates
+
+spot_days = 0
+settle_dt = value_dt.add_weekdays(spot_days)
+maturity_dt = settle_dt.add_months(12)
+notional = 100.0
+cal_type = CalendarTypes.TARGET
+
+depos = []
+fras = []
+swaps = []
+deposit_rate = ccy1_interest_rate
+depo = IborDeposit(
+    settle_dt,
+    maturity_dt,
+    deposit_rate,
+    DayCountTypes.ACT_360,
+    notional,
+    cal_type,
+)
+depos.append(depo)
+foreign_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+
+depos = []
+fras = []
+swaps = []
+deposit_rate = ccy2_interest_rate
+depo = IborDeposit(
+    settle_dt,
+    maturity_dt,
+    deposit_rate,
+    DayCountTypes.ACT_360,
+    notional,
+    cal_type,
+)
+depos.append(depo)
+domestic_curve = IborSingleCurve(value_dt, depos, fras, swaps)
+
+notional = 100.0
+notional_currency = for_name
+
+fx_fwd = FXForward(
+    expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency
+)
+
+print("SPOT FX", "FX FWD", "VALUE_BS")
+
+fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
+
+fwd_fx_rate = fx_fwd.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
+
+print(spot_fx_rate, fwd_fx_rate, fwd_value)
+

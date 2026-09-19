@@ -8,7 +8,6 @@ import traceback
 import time
 import runpy
 
-import add_fp_to_path
 
 import financepy
 
@@ -16,6 +15,10 @@ print("FinancePy imported successfully from:", financepy.__file__)
 
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 from financepy.utils.error import FinError
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Run All Tests
+# ============================================================================
 
 # This only works if I have an init.py in the parent folder
 set_date_format(DateFormatTypes.UK_LONG)

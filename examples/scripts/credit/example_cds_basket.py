@@ -2,19 +2,11 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
 
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
 
-_install_double_click_pause()
 import time
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
@@ -27,6 +19,10 @@ from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_basket import CDSBasket
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.utils.math import corr_matrix_generator
+
+# ============================================================================
+# FINANCEPY EXAMPLES - CDSBasket
+# ============================================================================
 
 # TO DO
 
@@ -150,117 +146,84 @@ def load_hetero_spread_curves(value_dt, libor_curve):
 ########################################################################################
 
 
-def test_fin_cds_basket():
 
-    trade_dt = Date(1, 3, 2007)
-    step_in_dt = trade_dt.add_days(1)
-    value_dt = trade_dt.add_days(1)
 
-    libor_curve = build_ibor_curve(trade_dt)
+########################################################################################
 
-    basket_maturity = Date(20, 12, 2011)
+# ============================================================================
+# 1. FIN CDS BASKET
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-    cds_index = CDSIndexPortfolio()
+print("\n" + "=" * 78)
+print("1. FIN CDS BASKET")
+print("=" * 78)
 
-    print("===================================================================")
-    print("====================== INHOMOGENEOUS CURVE ==========================")
-    print("===================================================================")
+trade_dt = Date(1, 3, 2007)
+step_in_dt = trade_dt.add_days(1)
+value_dt = trade_dt.add_days(1)
 
-    num_credits = 5
-    spd_3yr = 0.0012
-    spd_5yr = 0.0025
-    spd_7yr = 0.0034
-    spd_10yr = 0.0046
+libor_curve = build_ibor_curve(trade_dt)
 
-    print("LABELS", "VALUE")
+basket_maturity = Date(20, 12, 2011)
 
-    if 1 == 1:
-        issuer_curves = load_homogeneous_spread_curves(
-            value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits
-        )
-    else:
-        issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
-        issuer_curves = issuer_curves[0:num_credits]
+cds_index = CDSIndexPortfolio()
 
-    intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
+print("===================================================================")
+print("====================== INHOMOGENEOUS CURVE ==========================")
+print("===================================================================")
 
-    print("INTRINSIC SPD BASKET MATURITY", intrinsic_spd)
+num_credits = 5
+spd_3yr = 0.0012
+spd_5yr = 0.0025
+spd_7yr = 0.0034
+spd_10yr = 0.0046
 
-    total_spd = cds_index.total_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
+print("LABELS", "VALUE")
 
-    print("SUMMED UP SPD BASKET MATURITY", total_spd)
+if 1 == 1:
+    issuer_curves = load_homogeneous_spread_curves(
+        value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits
+    )
+else:
+    issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
+    issuer_curves = issuer_curves[0:num_credits]
 
-    min_spd = cds_index.min_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
+intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
 
-    print("MINIMUM SPD BASKET MATURITY", min_spd)
+print("INTRINSIC SPD BASKET MATURITY", intrinsic_spd)
 
-    max_spd = cds_index.max_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
+total_spd = cds_index.total_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
 
-    print("MAXIMUM SPD BASKET MATURITY", max_spd)
+print("SUMMED UP SPD BASKET MATURITY", total_spd)
 
-    seed = 1967
-    basket = CDSBasket(value_dt, basket_maturity)
+min_spd = cds_index.min_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
 
-    print("===================================================================")
-    print("======================= GAUSSIAN COPULA ===========================")
-    print("===================================================================")
+print("MINIMUM SPD BASKET MATURITY", min_spd)
 
-    print("TIME", "Trials", "RHO", "NTD", "SPRD", "SPRD_HOMO")
+max_spd = cds_index.max_spread(value_dt, step_in_dt, basket_maturity, issuer_curves) * 10000.0
 
-    for ntd in range(1, num_credits + 1):
-        for beta in [0.0, 0.5]:
-            rho = beta * beta
-            beta_vector = np.ones(num_credits) * beta
-            corr_matrix = corr_matrix_generator(rho, num_credits)
-            for num_trials in [1000]:  # [1000,5000,10000,20000,50000,100000]:
-                start = time.time()
+print("MAXIMUM SPD BASKET MATURITY", max_spd)
 
-                v1 = basket.value_gaussian_mc(
-                    value_dt,
-                    ntd,
-                    issuer_curves,
-                    corr_matrix,
-                    libor_curve,
-                    num_trials,
-                    seed,
-                )
+seed = 1967
+basket = CDSBasket(value_dt, basket_maturity)
 
-                v2 = basket.value_1f_gaussian_homo(value_dt, ntd, issuer_curves, beta_vector, libor_curve)
+print("===================================================================")
+print("======================= GAUSSIAN COPULA ===========================")
+print("===================================================================")
 
-                end = time.time()
-                period = end - start
-                print(period, num_trials, rho, ntd, v1[2] * 10000, v2[3] * 10000)
+print("TIME", "Trials", "RHO", "NTD", "SPRD", "SPRD_HOMO")
 
-    print("===================================================================")
-    print("==================== STUDENT'S-T CONVERGENCE ======================")
-    print("===================================================================")
-
-    print("TIME", "TRIALS", "RHO", "DOF", "NTD", "SPRD")
-
+for ntd in range(1, num_credits + 1):
     for beta in [0.0, 0.5]:
-        rho = beta**2
+        rho = beta * beta
+        beta_vector = np.ones(num_credits) * beta
         corr_matrix = corr_matrix_generator(rho, num_credits)
-        for ntd in range(1, num_credits + 1):
-            for do_f in [3, 4]:
-                start = time.time()
-
-                v = basket.value_student_t_mc(
-                    value_dt,
-                    ntd,
-                    issuer_curves,
-                    corr_matrix,
-                    do_f,
-                    libor_curve,
-                    num_trials,
-                    seed,
-                )
-
-                end = time.time()
-                period = end - start
-                print(period, num_trials, rho, do_f, ntd, v[2] * 10000)
-
+        for num_trials in [1000]:  # [1000,5000,10000,20000,50000,100000]:
             start = time.time()
-            v = basket.value_gaussian_mc(
+
+            v1 = basket.value_gaussian_mc(
                 value_dt,
                 ntd,
                 issuer_curves,
@@ -269,38 +232,79 @@ def test_fin_cds_basket():
                 num_trials,
                 seed,
             )
+
+            v2 = basket.value_1f_gaussian_homo(value_dt, ntd, issuer_curves, beta_vector, libor_curve)
+
             end = time.time()
             period = end - start
+            print(period, num_trials, rho, ntd, v1[2] * 10000, v2[3] * 10000)
 
-            print(period, num_trials, rho, "GC", ntd, v[2] * 10000)
+print("===================================================================")
+print("==================== STUDENT'S-T CONVERGENCE ======================")
+print("===================================================================")
 
-    print("===================================================================")
-    print("=================== STUDENT'S T WITH DOF = 5 ======================")
-    print("===================================================================")
-    do_f = 5
-    print("TIME", "NUMTRIALS", "RHO", "NTD", "SPD")
-    for beta in [0.0, 0.5]:
-        rho = beta**2
-        corr_matrix = corr_matrix_generator(rho, num_credits)
-        for ntd in range(1, num_credits + 1):
-            for num_trials in [1000]:
-                start = time.time()
+print("TIME", "TRIALS", "RHO", "DOF", "NTD", "SPRD")
 
-                v = basket.value_student_t_mc(
-                    value_dt,
-                    ntd,
-                    issuer_curves,
-                    corr_matrix,
-                    do_f,
-                    libor_curve,
-                    num_trials,
-                    seed,
-                )
-                end = time.time()
-                period = end - start
-                print(period, num_trials, rho, ntd, v[2] * 10000)
+for beta in [0.0, 0.5]:
+    rho = beta**2
+    corr_matrix = corr_matrix_generator(rho, num_credits)
+    for ntd in range(1, num_credits + 1):
+        for do_f in [3, 4]:
+            start = time.time()
 
+            v = basket.value_student_t_mc(
+                value_dt,
+                ntd,
+                issuer_curves,
+                corr_matrix,
+                do_f,
+                libor_curve,
+                num_trials,
+                seed,
+            )
 
-########################################################################################
+            end = time.time()
+            period = end - start
+            print(period, num_trials, rho, do_f, ntd, v[2] * 10000)
 
-test_fin_cds_basket()
+        start = time.time()
+        v = basket.value_gaussian_mc(
+            value_dt,
+            ntd,
+            issuer_curves,
+            corr_matrix,
+            libor_curve,
+            num_trials,
+            seed,
+        )
+        end = time.time()
+        period = end - start
+
+        print(period, num_trials, rho, "GC", ntd, v[2] * 10000)
+
+print("===================================================================")
+print("=================== STUDENT'S T WITH DOF = 5 ======================")
+print("===================================================================")
+do_f = 5
+print("TIME", "NUMTRIALS", "RHO", "NTD", "SPD")
+for beta in [0.0, 0.5]:
+    rho = beta**2
+    corr_matrix = corr_matrix_generator(rho, num_credits)
+    for ntd in range(1, num_credits + 1):
+        for num_trials in [1000]:
+            start = time.time()
+
+            v = basket.value_student_t_mc(
+                value_dt,
+                ntd,
+                issuer_curves,
+                corr_matrix,
+                do_f,
+                libor_curve,
+                num_trials,
+                seed,
+            )
+            end = time.time()
+            period = end - start
+            print(period, num_trials, rho, ntd, v[2] * 10000)
+

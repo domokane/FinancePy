@@ -2,23 +2,19 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-import add_fp_to_path
 
 from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
 from financepy.models.gauss_copula_onefactor import (
     loss_dbn_hetero_adj_binomial,
 )
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Loss Dbn Builder
+# ============================================================================
 
 
 PLOT_GRAPHS = False
@@ -26,74 +22,46 @@ PLOT_GRAPHS = False
 ########################################################################################
 
 
-def test_fin_loss_dbn_builder():
 
-    num_credits = 125
 
-    x = np.linspace(0, num_credits, num_credits + 1)
-    default_prob = 0.30
-    num_steps = 25
-    loss_units = np.ones(num_credits)
-    loss_ratio = np.ones(num_credits)
+########################################################################################
 
-    print("BETA", "BUILDER", "LOSS0", "LOSS1", "LOSS2", "LOSS3", "TIME")
+# ============================================================================
+# 1. FIN LOSS DBN BUILDER
+# ============================================================================
+# What this section demonstrates:
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-    for beta in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
+print("\n" + "=" * 78)
+print("1. FIN LOSS DBN BUILDER")
+print("=" * 78)
 
-        default_probs = np.ones(num_credits) * default_prob
-        beta_vector = np.ones(num_credits) * beta
+num_credits = 125
 
-        start = time.time()
+x = np.linspace(0, num_credits, num_credits + 1)
+default_prob = 0.30
+num_steps = 25
+loss_units = np.ones(num_credits)
+loss_ratio = np.ones(num_credits)
 
-        dbn1 = loss_dbn_recursion_gcd(
-            num_credits, default_probs, loss_units, beta_vector, num_steps
-        )
+print("BETA", "BUILDER", "LOSS0", "LOSS1", "LOSS2", "LOSS3", "TIME")
 
-        end = time.time()
+for beta in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
 
-        print(
-            beta, "FULL_GCD", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start
-        )
-
-        start = time.time()
-        dbn2 = loss_dbn_hetero_adj_binomial(
-            num_credits, default_probs, loss_ratio, beta_vector, num_steps
-        )
-        end = time.time()
-
-        print(
-            beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start
-        )
-
-        if PLOT_GRAPHS:
-            plt.figure()
-            plt.plot(x, dbn1, label="GCD FULL")
-            plt.plot(x, dbn2, label="ADJ BIN")
-            plt.legend()
-            plt.show()
-
-            dbn3 = dbn2 - dbn1
-            plt.plot(x, dbn3, label="DIFF")
-            plt.legend()
-            plt.show()
-
-    # INHOMOGENEOUS CASE
-
-    num_credits = 100
-    beta = 0.0
-    default_prob = 0.10
-
-    default_probs = np.random.randint(3, 4, size=num_credits) / 10.0
-    beta_vector = np.random.randint(5, 6, size=num_credits) / 10.0
-    loss_units = np.random.randint(1, 3, size=num_credits) / 1.0
+    default_probs = np.ones(num_credits) * default_prob
+    beta_vector = np.ones(num_credits) * beta
 
     start = time.time()
+
     dbn1 = loss_dbn_recursion_gcd(
         num_credits, default_probs, loss_units, beta_vector, num_steps
     )
+
     end = time.time()
 
-    print(beta, "ADJ_BIN", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start)
+    print(
+        beta, "FULL_GCD", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start
+    )
 
     start = time.time()
     dbn2 = loss_dbn_hetero_adj_binomial(
@@ -101,9 +69,45 @@ def test_fin_loss_dbn_builder():
     )
     end = time.time()
 
-    print(beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start)
+    print(
+        beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start
+    )
 
+    if PLOT_GRAPHS:
+        plt.figure()
+        plt.plot(x, dbn1, label="GCD FULL")
+        plt.plot(x, dbn2, label="ADJ BIN")
+        plt.legend()
+        plt.show()
 
-########################################################################################
+        dbn3 = dbn2 - dbn1
+        plt.plot(x, dbn3, label="DIFF")
+        plt.legend()
+        plt.show()
 
-test_fin_loss_dbn_builder()
+# INHOMOGENEOUS CASE
+
+num_credits = 100
+beta = 0.0
+default_prob = 0.10
+
+default_probs = np.random.randint(3, 4, size=num_credits) / 10.0
+beta_vector = np.random.randint(5, 6, size=num_credits) / 10.0
+loss_units = np.random.randint(1, 3, size=num_credits) / 1.0
+
+start = time.time()
+dbn1 = loss_dbn_recursion_gcd(
+    num_credits, default_probs, loss_units, beta_vector, num_steps
+)
+end = time.time()
+
+print(beta, "ADJ_BIN", dbn1[0], dbn1[1], dbn1[2], dbn1[3], end - start)
+
+start = time.time()
+dbn2 = loss_dbn_hetero_adj_binomial(
+    num_credits, default_probs, loss_ratio, beta_vector, num_steps
+)
+end = time.time()
+
+print(beta, "ADJ_BIN", dbn2[0], dbn2[1], dbn2[2], dbn2[3], end - start)
+

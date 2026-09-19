@@ -2,15 +2,7 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import time
-import add_fp_to_path
 
 from financepy.products.equity.equity_float_lookback_option import (
     EquityFloatLookbackOption,
@@ -21,6 +13,10 @@ from financepy.products.equity.equity_fixed_lookback_option import (
 from financepy.utils.global_types import OptionTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
+
+# ============================================================================
+# FINANCEPY EXAMPLES - EquityFloatLookbackOption
+# ============================================================================
 
 
 
@@ -557,38 +553,48 @@ def test_equity_look_back_option():
 ########################################################################################
 
 
-def test_example():
-
-    expiry_dt = Date(1, 1, 2021)
-    strike_price = 105.0
-    opt_type_call = OptionTypes.EUROPEAN_CALL
-    lookback_call = EquityFixedLookbackOption(expiry_dt, opt_type_call, strike_price)
-
-    value_dt = Date(1, 1, 2020)
-    interest_rate = 0.10
-    stock_price = 100.0
-    dividend_yield = 0.0
-    stock_min_max = 100.0
-
-    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
-    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
-
-    volatilities = [0.30]
-
-    print("VALUE")
-    for vol in volatilities:
-        v = lookback_call.value(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            vol,
-            stock_min_max,
-        )
-        print(v)
 
 
 ########################################################################################
 
-test_example()
 # test_equity_look_back_option()
+
+# ============================================================================
+# 1. EXAMPLE
+# ============================================================================
+# What this section demonstrates:
+# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
+# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+
+print("\n" + "=" * 78)
+print("1. EXAMPLE")
+print("=" * 78)
+
+expiry_dt = Date(1, 1, 2021)
+strike_price = 105.0
+opt_type_call = OptionTypes.EUROPEAN_CALL
+lookback_call = EquityFixedLookbackOption(expiry_dt, opt_type_call, strike_price)
+
+value_dt = Date(1, 1, 2020)
+interest_rate = 0.10
+stock_price = 100.0
+dividend_yield = 0.0
+stock_min_max = 100.0
+
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
+
+volatilities = [0.30]
+
+print("VALUE")
+for vol in volatilities:
+    v = lookback_call.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        vol,
+        stock_min_max,
+    )
+    print(v)
+

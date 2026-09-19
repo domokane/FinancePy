@@ -8,6 +8,10 @@ import sys
 import time
 from os.path import join, exists, split
 
+# ============================================================================
+# FINANCEPY EXAMPLES - FinError
+# ============================================================================
+
 sys.path.append("..")
 
 

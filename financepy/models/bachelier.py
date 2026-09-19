@@ -20,7 +20,7 @@ class Bachelier:
 
     ####################################################################################
 
-    def __init__(self, volatility: float) -> None:
+    def __init__(self, volatility: float):
         """Create FinModel black using parameters."""
 
         if volatility <= 0.0:

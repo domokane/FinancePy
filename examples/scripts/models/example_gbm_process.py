@@ -2,50 +2,74 @@
 
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import numpy as np
 
-import add_fp_to_path
 
 from financepy.models.gbm_process_simulator import get_assets_paths_times
 from financepy.utils.math import corr_matrix_generator
+import matplotlib.pyplot as plt
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Gbm Process
+# ============================================================================
 
 
 ########################################################################################
 
 
-def test_fin_gbm_process():
-
-    num_assets = 3
-    num_paths = 6
-    num_time_steps = 1
-    t = 1.0
-    mus = 0.03 * np.ones(num_assets)
-    stock_prices = 100.0 * np.ones(num_assets)
-    volatilities = 0.2 * np.ones(num_assets)
-    rho = 0.8
-    corr_matrix = corr_matrix_generator(rho, num_assets)
-    seed = 1912
-
-    times, paths = get_assets_paths_times(
-        num_assets,
-        num_paths,
-        num_time_steps,
-        t,
-        mus,
-        stock_prices,
-        volatilities,
-        corr_matrix,
-        seed,
-    )
 
 
 ########################################################################################
 
-test_fin_gbm_process()
+# ============================================================================
+# 1. FIN GBM PROCESS
+# ============================================================================
+# What this section demonstrates:
+# Runs the original FinancePy calculation with explicit inputs so the numerical result and the effect of the chosen assumptions can be inspected.
+
+print("\n" + "=" * 78)
+print("1. FIN GBM PROCESS")
+print("=" * 78)
+
+num_assets = 3
+num_paths = 6
+num_time_steps = 1
+t = 1.0
+mus = 0.03 * np.ones(num_assets)
+stock_prices = 100.0 * np.ones(num_assets)
+volatilities = 0.2 * np.ones(num_assets)
+rho = 0.8
+corr_matrix = corr_matrix_generator(rho, num_assets)
+seed = 1912
+
+times, paths = get_assets_paths_times(
+    num_assets,
+    num_paths,
+    num_time_steps,
+    t,
+    mus,
+    stock_prices,
+    volatilities,
+    corr_matrix,
+    seed,
+)
+
+# =============================================================================
+# 2. VISUALISE SIMULATED CORRELATED ASSET OUTCOMES
+# =============================================================================
+# With one time step, the most useful view is the distribution of terminal
+# values across assets and paths. Assets share a high positive correlation, so
+# their simulated outcomes tend to move in the same broad direction.
+plot_paths = np.asarray(paths)
+plt.figure()
+for asset_index in range(num_assets):
+    terminal_values = plot_paths[:, asset_index, -1] if plot_paths.ndim == 3 else plot_paths[asset_index]
+    plt.plot(range(1, len(terminal_values) + 1), terminal_values,
+             marker="o", label=f"Asset {asset_index + 1}")
+plt.xlabel("Simulation path")
+plt.ylabel("Terminal asset value")
+plt.title("Correlated GBM terminal values")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()

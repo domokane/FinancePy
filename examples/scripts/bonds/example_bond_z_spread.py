@@ -1,18 +1,10 @@
 
 # Allow this example to run directly from its category folder.
-import sys as _sys
-from pathlib import Path as _Path
-_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
-if str(_EXAMPLES_CODE) not in _sys.path:
-    _sys.path.insert(0, str(_EXAMPLES_CODE))
-from double_click_pause import install_double_click_pause as _install_double_click_pause
-_install_double_click_pause()
 import os
 import pandas as pd
 
 import matplotlib.pyplot as plt
 
-import add_fp_to_path
 
 from financepy.utils.global_vars import G_PERCENT
 from financepy.utils.calendar import CalendarTypes
@@ -27,6 +19,10 @@ from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_benchmarks_report import (
     dataframe_to_benchmarks,
 )
+
+# ============================================================================
+# FINANCEPY EXAMPLES - Bond
+# ============================================================================
 
 # Set to True to run this file spandalone and see some useful info
 diagnostics_mode = False
