@@ -56,8 +56,8 @@ class FXDigitalOption:
         self.expiry_dt = expiry_dt
         self.delivery_dt = delivery_dt
 
-        if np.any(strike_fx_rate < 0.0):
-            raise FinError("Negative strike.")
+        if np.any(strike_fx_rate <= 0.0):
+            raise FinError("Strike must be greater than zero.")
 
         self.strike_fx_rate = strike_fx_rate
 
@@ -122,33 +122,35 @@ class FXDigitalOption:
         # TODO RESOLVE t_del versus TEXP
         dom_df = domestic_curve.df_t(t_del)
         for_df = foreign_curve.df_t(t_del)
-        r_d = -np.log(dom_df) / t_del
-        r_f = -np.log(for_df) / t_del
 
-        s0 = spot_fx_rate
-        k = self.strike_fx_rate
+        if not isinstance(model, BlackScholes):
+            raise FinError("Model must be BlackScholes.")
 
-        if isinstance(model, BlackScholes):
+        volatility = model.volatility
+        vol_sqrt_t = volatility * np.sqrt(t_exp)
 
-            volatility = model.volatility
-            ln_s0_k = np.log(s0 / k)
-            den = volatility * np.sqrt(t_exp)
-            v2 = volatility * volatility
-            mu = r_d - r_f
-            d2 = (ln_s0_k + (mu - v2 / 2.0) * t_del) / den
+        forward = spot_fx_rate * for_df / dom_df
 
-            if self.opt_type == OptionTypes.DIGITAL_CALL and self.for_name == self.prem_currency:
-                v = s0 * np.exp(-r_f * t_del) * normcdf_vect(d2)
-            elif self.opt_type == OptionTypes.DIGITAL_PUT and self.for_name == self.prem_currency:
-                v = s0 * np.exp(-r_f * t_del) * normcdf_vect(-d2)
-            elif self.opt_type == OptionTypes.DIGITAL_CALL and self.dom_name == self.prem_currency:
-                v = np.exp(-r_d * t_del) * normcdf_vect(d2)
-            elif self.opt_type == OptionTypes.DIGITAL_PUT and self.dom_name == self.prem_currency:
-                v = np.exp(-r_d * t_del) * normcdf_vect(-d2)
-            else:
-                raise FinError("Unknown option type")
+        d1 = (np.log(forward / self.strike_fx_rate) + 0.5 * volatility**2 * t_exp) / vol_sqrt_t
 
-            v = v * self.notional
+        d2 = d1 - vol_sqrt_t
+
+        if self.opt_type == OptionTypes.DIGITAL_CALL and self.for_name == self.prem_currency:
+            v = spot_fx_rate * for_df * normcdf_vect(d1)
+
+        elif self.opt_type == OptionTypes.DIGITAL_PUT and self.for_name == self.prem_currency:
+            v = spot_fx_rate * for_df * normcdf_vect(-d1)
+
+        elif self.opt_type == OptionTypes.DIGITAL_CALL and self.dom_name == self.prem_currency:
+            v = dom_df * normcdf_vect(d2)
+
+        elif self.opt_type == OptionTypes.DIGITAL_PUT and self.dom_name == self.prem_currency:
+            v = dom_df * normcdf_vect(-d2)
+
+        else:
+            raise FinError("Unknown option type")
+
+        v *= self.notional
 
         return v
 

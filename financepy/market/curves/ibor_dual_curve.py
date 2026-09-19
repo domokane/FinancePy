@@ -255,8 +255,8 @@ class IborDualCurve(DiscountCurve):
 
         if num_depos > 0 and num_fras > 0:
             if first_fra_maturity_dt <= last_deposit_maturity_dt:
-                print("FRA Maturity Date:", first_fra_maturity_dt)
-                print("Last Deposit Date:", last_deposit_maturity_dt)
+                #                print("FRA Maturity Date:", first_fra_maturity_dt)
+                #                print("Last Deposit Date:", last_deposit_maturity_dt)
                 raise FinError("First FRA must end after last Deposit")
 
         if num_swaps > 0:
@@ -276,7 +276,7 @@ class IborDualCurve(DiscountCurve):
             if depo_start_dt > self.anchor_dt:
                 first_depo = ibor_deposits[0]
                 if first_depo.start_dt > self.anchor_dt:
-                    print("Inserting synthetic deposit")
+                    #                    print("Inserting synthetic deposit")
                     synthetic_deposit = copy.deepcopy(first_depo)
                     synthetic_deposit.start_dt = self.anchor_dt
                     synthetic_deposit.maturity_dt = first_depo.start_dt
@@ -537,7 +537,7 @@ class IborDualCurve(DiscountCurve):
         for fra in self.used_fras:
             v = fra.value(self.anchor_dt, self.discount_curve, self) / fra.notional
             if abs(v) > fra_tol:
-                print("Value", v)
+                #                print("Value", v)
                 raise FinError("FRA not repriced.")
 
         for swap in self.used_swaps:

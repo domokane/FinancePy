@@ -8,11 +8,12 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_future import IborFuture
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.calendar import Calendar, CalendarTypes
+from financepy.utils.helpers import times_from_dates
 
 ########################################################################################
 
@@ -62,7 +63,6 @@ def test_bloomberg_pricing_example():
 
     spot_days = 2
     settle_dt = value_dt.add_weekdays(spot_days)
-    notional = ONE_MILLION
     fixed_leg_type = SwapTypes.PAY
 
     swaps = []
@@ -223,7 +223,6 @@ def test_bloomberg_pricing_example():
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps, interp_type)
 
     # The valuation of 53714.55 is very close to the spreadsheet value 53713.96
-    principal = 0.0
 
     # Pay fixed so make fixed leg value negative
     assert round(swaps[0].value(value_dt, libor_curve, libor_curve, None), 4) == 0.0
@@ -390,3 +389,43 @@ def test_reprice_inputs_for_all_interp_choices(interp_type):
 
     # If no exception, we are good
     assert True
+
+
+#####################################################################################
+
+
+def test_df_uses_ibor_single_curve_time_day_count():
+    """Regression test for inherited DiscountCurve.df date conversion."""
+
+    value_dt = Date(1, 1, 2024)
+    maturity_dt = Date(1, 1, 2025)
+    depo = IborDeposit(
+        value_dt,
+        maturity_dt,
+        0.05,
+        DayCountTypes.ACT_360,
+    )
+
+    curve = IborSingleCurve(
+        value_dt,
+        [depo],
+        [],
+        [],
+        InterpTypes.FLAT_FWD_RATES,
+        time_dc_type=DayCountTypes.ACT_360,
+    )
+
+    curve_df = curve.df(maturity_dt)
+    act_360_time = times_from_dates(
+        value_dt,
+        maturity_dt,
+        DayCountTypes.ACT_360,
+    )
+    act_365f_time = times_from_dates(
+        value_dt,
+        maturity_dt,
+        DayCountTypes.ACT_365F,
+    )
+
+    assert curve_df == pytest.approx(curve.df_t(act_360_time))
+    assert curve_df != pytest.approx(curve.df_t(act_365f_time))

@@ -14,8 +14,6 @@ from ...utils.global_vars import G_SMALL
 from ...utils.global_types import InterpTypes
 from ...utils.tension_spline import TensionSpline
 
-
-
 #    LINEAR_AVG_FWD_RATES = 11
 
 
@@ -96,7 +94,7 @@ def _find_interval(t: float, times: np.ndarray) -> int:
 )
 def _uinterpolate(t: float, times: np.ndarray, dfs: np.ndarray, method: int) -> float:
     if t < 0.0:
-        print(t, times, dfs, method)
+        #        print(t, times, dfs, method)
         raise ValueError("Interpolation times must be non-negative.")
     if np.abs(t) < G_SMALL:
         return 1.0
@@ -159,10 +157,7 @@ def _uinterpolate(t: float, times: np.ndarray, dfs: np.ndarray, method: int) -> 
 
         dt = times[right] - times[left]
 
-        df = (
-            (times[right] - t) * dfs[left]
-            + (t - times[left]) * dfs[right]
-        ) / dt
+        df = ((times[right] - t) * dfs[left] + (t - times[left]) * dfs[right]) / dt
 
         return df
 
@@ -212,9 +207,7 @@ def _uinterpolate(t: float, times: np.ndarray, dfs: np.ndarray, method: int) -> 
     fastmath=True,
     nogil=True,
 )
-def _vinterpolate(
-    tvec: np.ndarray, times: np.ndarray, dfs: np.ndarray, method: int
-) -> np.ndarray:
+def _vinterpolate(tvec: np.ndarray, times: np.ndarray, dfs: np.ndarray, method: int) -> np.ndarray:
     out = np.empty(tvec.size, dtype=np.float64)
     for j in range(tvec.size):
         out[j] = _uinterpolate(tvec[j], times, dfs, method)
@@ -264,9 +257,7 @@ def _build_linear_onf_curve(times: np.ndarray, dfs: np.ndarray):
 
 
 @njit(cache=True, fastmath=True, nogil=True)
-def _linear_onf_cumulative_integrals(
-    onf_times: np.ndarray, onf_rates: np.ndarray
-) -> np.ndarray:
+def _linear_onf_cumulative_integrals(onf_times: np.ndarray, onf_rates: np.ndarray) -> np.ndarray:
     n = onf_times.size
     cum = np.zeros(n, dtype=np.float64)
     for i in range(1, n):
@@ -279,9 +270,7 @@ def _linear_onf_cumulative_integrals(
 
 
 @njit(cache=True, fastmath=True, nogil=True)
-def _linear_onf_integral(
-    t: float, onf_times: np.ndarray, onf_rates: np.ndarray, cum: np.ndarray
-) -> float:
+def _linear_onf_integral(t: float, onf_times: np.ndarray, onf_rates: np.ndarray, cum: np.ndarray) -> float:
     if t <= 0.0:
         return 0.0
     n = onf_times.size
@@ -397,9 +386,7 @@ class Interpolator:
             return
 
         if self._interp_type == InterpTypes.PCHIP_ZERO_RATES:
-            self._interp_fn = PchipInterpolator(
-                times, _zero_rates_from_dfs(times, dfs), extrapolate=True
-            )
+            self._interp_fn = PchipInterpolator(times, _zero_rates_from_dfs(times, dfs), extrapolate=True)
             return
 
         if self._interp_type == InterpTypes.FINCUBIC_ZERO_RATES:
@@ -412,9 +399,7 @@ class Interpolator:
             return
 
         if self._interp_type == InterpTypes.NATCUBIC_LOG_DISCOUNT:
-            self._interp_fn = CubicSpline(
-                times, np.log(dfs), bc_type="natural", extrapolate=True
-            )
+            self._interp_fn = CubicSpline(times, np.log(dfs), bc_type="natural", extrapolate=True)
             return
 
         if self._interp_type == InterpTypes.NATCUBIC_ZERO_RATES:
@@ -428,16 +413,12 @@ class Interpolator:
 
         if self._interp_type == InterpTypes.LINEAR_ONFWD_RATES:
             self._onf_times, self._onf_rates = _build_linear_onf_curve(times, dfs)
-            self._onf_integrals = _linear_onf_cumulative_integrals(
-                self._onf_times, self._onf_rates
-            )
+            self._onf_integrals = _linear_onf_cumulative_integrals(self._onf_times, self._onf_rates)
             return
 
         if self._interp_type == InterpTypes.TENSION_ZERO_RATES:
             sigma = self._optional_interp_params.get("sigma", 1.0)
-            self._interp_fn = TensionSpline(
-                times, _zero_rates_from_dfs(times, dfs), sigma=sigma
-            )
+            self._interp_fn = TensionSpline(times, _zero_rates_from_dfs(times, dfs), sigma=sigma)
             return
 
         raise FinError(f"Unknown interpolation type {self._interp_type}")
@@ -466,9 +447,7 @@ class Interpolator:
         elif self._interp_type in _ZERO_RATE_SPLINE_TYPES:
             out = np.exp(-tvec * self._interp_fn(tvec))
         elif self._interp_type == InterpTypes.LINEAR_ONFWD_RATES:
-            out = _linear_onf_dfs(
-                tvec, self._onf_times, self._onf_rates, self._onf_integrals
-            )
+            out = _linear_onf_dfs(tvec, self._onf_times, self._onf_rates, self._onf_integrals)
         else:
             raise FinError(f"Unknown interpolation type {self._interp_type}")
 

@@ -1,5 +1,13 @@
 ## CHANGE LOG
+19 Sep 2026
+List of changes
+- Renamed all camel case inflation modules to be snake case
+- Renamed all camel case swap modules to be snake case
+- Removed various print statements
+- In IborDepo renamed accrual_cdc_type to dc_type
+
 18 Sep 2026 Part 3
+List of changes
 - Global renaming of curve value date to anchor date for better clarity
 
 18 Sep 2026 Part 2

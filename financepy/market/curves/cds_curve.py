@@ -219,11 +219,6 @@ class CDSCurve:
             if q_star < 0.0 or q_star > 1.0:
                 raise FinError("Calibrated survival probability out of bounds")
 
-            # TODO - DETERMINE WHY THIS FAILS
-            #            if i > 0 and q_star > self._qs[i]:
-            #                print(self._qs)
-            #                raise FinError("Survival probabilities must be non-increasing")
-
             self.set_last_q(q_star)
 
     ###########################################################################
@@ -238,27 +233,6 @@ class CDSCurve:
         df2 = self.df(t + epsilon) * self.survival_prob(t + epsilon)
         fwd = np.log(df1 / df2) / epsilon
         return fwd
-
-    ###########################################################################
-
-    # def fwd_rate(self, date1, date2, dc_type):
-    #     """Calculate the risky forward rate according between dates date1
-    #     and date2 according to the specified day count convention."""
-
-    #     print("WHY AM I USING THIS ???? fwd_rate cds_curve")
-
-    #     if date1 < self.anchor_dt:
-    #         raise FinError("Date1 before curve value date.")
-
-    #     if date2 < date1:
-    #         raise FinError("Date2 must not be before Date1")
-
-    #     day_count = DayCount(dc_type)
-    #     year_frac = day_count.year_frac(date1, date2)[0]
-    #     df1 = self.df(date1)
-    #     df2 = self.df(date2)
-    #     fwd = (df1 / df2 - 1.0) / year_frac
-    #     return fwd
 
     ###########################################################################
 

@@ -129,7 +129,7 @@ def _cost_function(dfs, *args):
         #        print("SWAP:", swap.maturity_dt, v)
         cost += v * v
 
-    print("Cost:", cost)
+    #    print("Cost:", cost)
     return cost
 
 
@@ -383,8 +383,8 @@ class IborSingleCurve(DiscountCurve):
 
         if num_depos > 0 and num_fras > 0:
             if first_fra_maturity_dt <= last_deposit_maturity_dt:
-                print("FRA Maturity Date:", first_fra_maturity_dt)
-                print("Last Deposit Date:", last_deposit_maturity_dt)
+                #                print("FRA Maturity Date:", first_fra_maturity_dt)
+                #                print("Last Deposit Date:", last_deposit_maturity_dt)
                 raise FinError("First FRA must end after last Deposit")
 
         if num_fras > 0 and num_swaps > 0:
