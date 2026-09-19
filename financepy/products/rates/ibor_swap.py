@@ -52,9 +52,10 @@ class IborSwap:
         float_spread: float = 0.0,
         float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+        end_of_month: bool = False,
     ):
         """Create an interest rate swap contract giving the contract start
         date, its maturity, fixed cpn, fixed leg frequency, fixed leg day
@@ -100,6 +101,7 @@ class IborSwap:
             cal_type,
             bd_type,
             dg_type,
+            end_of_month,
         )
 
         self.float_leg = SwapFloatLeg(
@@ -115,6 +117,7 @@ class IborSwap:
             cal_type,
             bd_type,
             dg_type,
+            end_of_month,
         )
 
     ###########################################################################
