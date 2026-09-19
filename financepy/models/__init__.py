@@ -19,5 +19,5 @@
 # from .FinModelRatesVasicek import *
 # from .SABR import *
 # from .SABRShifted import *
-# from .FinModelStudentTCopula import *
-# from .FinProcessSimulator import *
+# from .ModelStudentTCopula import *
+# from .ProcessSimulator import *

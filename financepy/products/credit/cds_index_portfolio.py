@@ -9,10 +9,11 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.error import FinError
 from ...products.credit.cds import CDS
-from ...products.credit.cds_curve import CDSCurve
+from ...market.curves.cds_curve import CDSCurve
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import label_to_string
-
+from ...utils.check_values import check_curve_dt
+from ...utils.global_vars import CLEAN
 
 ###########################################################################
 # TODO: Move index spd details into class and then pass in issuer discount
@@ -45,9 +46,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_rpv01(
-        self, value_dt, step_in_dt, maturity_dt, issuer_curves
-    ):
+    def intrinsic_rpv01(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of the risky PV01 of the CDS portfolio by taking the
         average of the risky PV01s of each contract."""
 
@@ -59,9 +58,9 @@ class CDSIndexPortfolio:
 
         for m in range(0, num_credits):
 
-            ret_value = cds_contract.risky_pv01(value_dt, issuer_curves[m])
+            ret_value = cds_contract.rpv01(value_dt, issuer_curves[m])
 
-            clean_rpv01 = ret_value["clean_rpv01"]
+            clean_rpv01 = ret_value[CLEAN]
 
             intrinsic_rpv01 += clean_rpv01
 
@@ -70,9 +69,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_prot_leg_pv(
-        self, value_dt, step_in_dt, maturity_dt, issuer_curves
-    ):
+    def intrinsic_prot_leg_pv(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of intrinsic protection leg value of the CDS portfolio
         by taking the average sum the protection legs of each contract."""
 
@@ -93,20 +90,16 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_spread(
-        self, value_dt, step_in_dt, maturity_dt, issuer_curves
-    ):
+    def intrinsic_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculation of the intrinsic spd of the CDS portfolio as the one
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spd."""
 
-        intrinsic_prot_pv = self.intrinsic_prot_leg_pv(
-            value_dt, step_in_dt, maturity_dt, issuer_curves
-        )
+        check_curve_dt(value_dt, *issuer_curves)
 
-        intrinsic_rpv01 = self.intrinsic_rpv01(
-            value_dt, step_in_dt, maturity_dt, issuer_curves
-        )
+        intrinsic_prot_pv = self.intrinsic_prot_leg_pv(value_dt, step_in_dt, maturity_dt, issuer_curves)
+
+        intrinsic_rpv01 = self.intrinsic_rpv01(value_dt, step_in_dt, maturity_dt, issuer_curves)
 
         intrinsic_spd = intrinsic_prot_pv / intrinsic_rpv01
 
@@ -116,6 +109,8 @@ class CDSIndexPortfolio:
 
     def average_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
         """Calculates the average par CDS spd of the CDS portfolio."""
+
+        check_curve_dt(value_dt, *issuer_curves)
 
         num_credits = len(issuer_curves)
 
@@ -136,6 +131,8 @@ class CDSIndexPortfolio:
         """Calculates the total CDS spd of the CDS portfolio by summing
         over all of the issuers and adding the spd with no weights."""
 
+        check_curve_dt(value_dt, *issuer_curves)
+
         num_credits = len(issuer_curves)
 
         cds_contract = CDS(step_in_dt, maturity_dt, 0.0)
@@ -154,13 +151,12 @@ class CDSIndexPortfolio:
         """Calculates the minimum par CDS spd across all of the issuers in
         the CDS portfolio."""
 
+        check_curve_dt(value_dt, *issuer_curves)
+
         num_credits = len(issuer_curves)
 
         if num_credits < 1:
-            raise FinError(
-                "Number of credits in index must be > 1 and not"
-                + str(num_credits)
-            )
+            raise FinError("Number of credits in index must be > 1 and not" + str(num_credits))
 
         cds_contract = CDS(step_in_dt, maturity_dt, 0.0)
 
@@ -179,13 +175,12 @@ class CDSIndexPortfolio:
         """Calculates the maximum par CDS spd across all of the issuers in
         the CDS portfolio."""
 
+        check_curve_dt(value_dt, *issuer_curves)
+
         num_credits = len(issuer_curves)
 
         if num_credits < 1:
-            raise FinError(
-                "Number of credits in index must be > 1 and not "
-                + str(num_credits)
-            )
+            raise FinError("Number of credits in index must be > 1 and not " + str(num_credits))
 
         cds_contract = CDS(step_in_dt, maturity_dt, 0.0)
 
@@ -214,11 +209,9 @@ class CDSIndexPortfolio:
         This approach uses an iterative scheme but is slow as it has to use a
         CDS curve bootstrap required when each trial spd adjustment is made
         """
+        check_curve_dt(value_dt, *issuer_curves)
 
         verbose = False
-
-        if not issuer_curves:
-            raise FinError("issuer_curves cannot be empty")
 
         num_credits = len(issuer_curves)
 
@@ -227,9 +220,7 @@ class CDSIndexPortfolio:
 
         n = len(index_cpns)
         if len(index_upfronts) != n or len(index_maturity_dts) != n:
-            raise FinError(
-                "index_cpns, index_upfronts, and index_maturity_dts must have the same length"
-            )
+            raise FinError("index_cpns, index_upfronts, and index_maturity_dts must have the same length")
 
         libor_curve = issuer_curves[0].libor_curve
         num_index_maturity_points = len(index_cpns)
@@ -240,18 +231,14 @@ class CDSIndexPortfolio:
             cds_maturity_dts.append(cds_dts)
 
         # Pre-create index CDS objects
-        cds_index_list = [
-            CDS(value_dt, mat_dt, 0.0, 1.0) for mat_dt in index_maturity_dts
-        ]
+        cds_index_list = [CDS(value_dt, mat_dt, 0.0, 1.0) for mat_dt in index_maturity_dts]
 
         num_cds_mat_points = len(cds_maturity_dts)
 
         for issuer_curve in issuer_curves:
             n = len(issuer_curve.cds_contracts)
             if n != len(cds_maturity_dts):
-                raise FinError(
-                    "All issuer discount must be from same cds maturities"
-                )
+                raise FinError("All issuer discount must be from same cds maturities")
 
         cds_spd_multipliers = [1.0] * num_cds_mat_points
 
@@ -307,13 +294,9 @@ class CDSIndexPortfolio:
 
                     cds_index = cds_index_list[i_mat]
 
-                    index_prot_pv = cds_index.prot_leg_pv(
-                        value_dt, adjusted_issuer_curve, index_recovery_rate
-                    )
+                    index_prot_pv = cds_index.prot_leg_pv(value_dt, adjusted_issuer_curve, index_recovery_rate)
 
-                    index_rpv01 = cds_index.risky_pv01(
-                        value_dt, adjusted_issuer_curve
-                    )["clean_rpv01"]
+                    index_rpv01 = cds_index.risky_pv01(value_dt, adjusted_issuer_curve)["clean_rpv01"]
 
                     sum_rpv01 += index_rpv01
                     sum_prot += index_prot_pv
@@ -327,9 +310,7 @@ class CDSIndexPortfolio:
                 cds_spd_multipliers[i_mat] *= alpha
 
                 if verbose and iterations % 5 == 0:
-                    print(
-                        f"Mat {i_mat:2d} | Iter {iterations:3d} | Alpha {alpha:9.6f}"
-                    )
+                    print(f"Mat {i_mat:2d} | Iter {iterations:3d} | Alpha {alpha:9.6f}")
 
         # use spd multipliers to build and store adjusted discount
         adjusted_issuer_curves = []
@@ -344,9 +325,7 @@ class CDSIndexPortfolio:
                 orig_spd = issuer.cds_contracts[j].running_cpn
                 new_spd = orig_spd * cds_spd_multipliers[j]
 
-                adjusted_cds_contracts.append(
-                    CDS(value_dt, cds_maturity_dts[j], new_spd)
-                )
+                adjusted_cds_contracts.append(CDS(value_dt, cds_maturity_dts[j], new_spd))
 
             adjusted_curve = CDSCurve(
                 value_dt,
@@ -378,6 +357,8 @@ class CDSIndexPortfolio:
 
         verbose = False
 
+        check_curve_dt(value_dt, *issuer_curves)
+
         if 1 == 0:
             print("=========================================")
             print(value_dt)
@@ -403,9 +384,7 @@ class CDSIndexPortfolio:
 
         # making a copy of the issuer discount
         for issuer_curve in issuer_curves:
-            adj_curve = CDSCurve(
-                value_dt, [], libor_curve, index_recovery_rate
-            )
+            adj_curve = CDSCurve(value_dt, [], libor_curve, index_recovery_rate)
 
             # Make a copy
             adj_curve._times = issuer_curve._times.copy()
@@ -450,11 +429,9 @@ class CDSIndexPortfolio:
                         index_recovery_rate,
                     )
 
-                    rpv01_ret = cds_index.risky_pv01(
-                        value_dt, adjusted_issuer_curves[i_credit]
-                    )
+                    rpv01_ret = cds_index.rpv01(value_dt, adjusted_issuer_curves[i_credit])
 
-                    clean_rpv01 = rpv01_ret["clean_rpv01"]
+                    clean_rpv01 = rpv01_ret[CLEAN]
                     sum_rpv01 += clean_rpv01
                     sum_prot += index_prot_pv
 
@@ -469,9 +446,7 @@ class CDSIndexPortfolio:
                 alpha = alpha * ratio
 
                 if verbose and iterations % 20 == 0:
-                    print(
-                        f"Maturity {i_mat} | Iter {iterations:3d} | Ratio {ratio:8.6f} | Alpha {alpha:8.6f}"
-                    )
+                    print(f"Maturity {i_mat} | Iter {iterations:3d} | Ratio {ratio:8.6f} | Alpha {alpha:8.6f}")
 
         return adjusted_issuer_curves
 
@@ -479,11 +454,11 @@ class CDSIndexPortfolio:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_RULE", self.bd_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         s += label_to_string("DATE_GEN_RULE", self.dg_type)
         return s
 

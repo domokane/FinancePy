@@ -8,7 +8,8 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.curves import *
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -16,11 +17,11 @@ from financepy.utils.date import Date, from_datetime
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.bonds.bond_market import get_bond_market_conventions
 from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond, CouponType
-from financepy.utils.global_types import SwapTypes
+from financepy.utils.global_types import SwapTypes, InterpTypes
 
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 
@@ -225,9 +226,7 @@ def test_bond():
     for dc_type in DayCountTypes:
         if dc_type == DayCountTypes.ZERO:
             continue
-        test_cases.header(
-            "MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS", "ACCRUED", "YTM"
-        )
+        test_cases.header("MATURITY", "COUPON", "CLEAN_PRICE", "ACCD_DAYS", "ACCRUED", "YTM")
 
         for _, bond in bond_dataframe.iterrows():
             date_string = bond["maturity"]
@@ -314,7 +313,7 @@ def test_bond():
 
     # When the libor curve is the flat bond curve then the ASW is zero by
     # definition
-    flat_curve = DiscountCurveFlat(settle_dt, ytm, FrequencyTypes.SEMI_ANNUAL)
+    flat_curve = FlatDiscountCurve(settle_dt, ytm, FrequencyTypes.SEMI_ANNUAL)
 
     test_cases.header("FIELD", "VALUE")
 
@@ -608,12 +607,8 @@ def test_bond_ror():
 
         buy_date = Date(row.buy_date.day, row.buy_date.month, row.buy_date.year)
         sell_date = Date(row.sell_date.day, row.sell_date.month, row.sell_date.year)
-        buy_price = bond.dirty_price_from_ytm(
-            buy_date, row.buy_ytm, YTMCalcType.US_STREET
-        )
-        sell_price = bond.dirty_price_from_ytm(
-            sell_date, row.sell_ytm, YTMCalcType.US_STREET
-        )
+        buy_price = bond.dirty_price_from_ytm(buy_date, row.buy_ytm, YTMCalcType.US_STREET)
+        sell_price = bond.dirty_price_from_ytm(sell_date, row.sell_ytm, YTMCalcType.US_STREET)
         simple, irr, pnl = bond.calc_ror(buy_date, sell_date, row.buy_ytm, row.sell_ytm)
 
         test_cases.print(
@@ -660,9 +655,7 @@ def test_key_rate_durations():
     coupon = 0.0275
     ex_div_days = 0
 
-    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(
-        BondMarkets.UNITED_STATES
-    )
+    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
@@ -681,9 +674,7 @@ def test_key_rate_durations():
 
 def test_key_rate_durations_bloomberg_example():
 
-    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(
-        BondMarkets.UNITED_STATES
-    )
+    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     # interest accrues on this date. Issue date is 01/08/2022
     issue_dt = Date(31, 7, 2022)
@@ -691,9 +682,7 @@ def test_key_rate_durations_bloomberg_example():
     coupon = 2.75 / 100.0
     ex_div_days = 0
 
-    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(
-        BondMarkets.UNITED_STATES
-    )
+    dc_type, freq_type, settle_days, ex_div, calendar = get_bond_market_conventions(BondMarkets.UNITED_STATES)
 
     bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type, ex_div_days)
 
@@ -735,9 +724,7 @@ def test_oas():
     libor_flat_rate = 0.0275
     settle_dt = Date(21, 7, 2017)
 
-    libor_flat_curve = DiscountCurveFlat(
-        settle_dt, libor_flat_rate, FrequencyTypes.SEMI_ANNUAL
-    )
+    libor_flat_curve = FlatDiscountCurve(settle_dt, libor_flat_rate, FrequencyTypes.SEMI_ANNUAL)
 
     # I specified face to be 100 - if face is 1 then this must be 0.99780842
     clean_price = 99.780842
@@ -831,16 +818,16 @@ def test_stack_exchange():
 
     #    print(bond.print_payments(settle_dt, 100))
 
-    spot_dts = [Date(31, 7, 2020), Date(1, 1, 2027)]
+    spot_dts = [Date(31, 7, 2021), Date(1, 1, 2027)]
     spot_rates = [0.01, 0.02]
 
-    zero_curve = DiscountCurveZeros(
+    zero_curve = ZeroRatesDiscountCurve(
         value_dt,
         spot_dts,
         spot_rates,
         freq_type,
-        InterpTypes.LINEAR_ZERO_RATES,
         DayCountTypes.ACT_360,
+        InterpTypes.LINEAR_ZERO_RATES,
     )
 
     # print(

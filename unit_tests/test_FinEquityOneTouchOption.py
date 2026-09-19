@@ -4,7 +4,7 @@ import numpy as np
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.global_types import TouchOptionTypes
 from financepy.products.equity.equity_one_touch_option import (
     EquityOneTouchOption,
@@ -20,8 +20,8 @@ dividend_yield = 0.03
 num_paths = 10000
 num_steps_per_year = 252
 
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 payment_size = 15.0
 

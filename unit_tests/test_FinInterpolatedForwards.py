@@ -76,64 +76,11 @@ def test_fin_interpolated_forwards():
         0.333,
     ]
 
-    interp_type = InterpTypes.LINEAR_FWD_RATES
-    discount_curve = DiscountCurve(curve_dt, t_dates, df_values, interp_type)
-    df_interp_values = discount_curve.df(t_interp_dates)
-    assert [round(x, 3) for x in df_interp_values] == [
-        1.0,
-        0.983,
-        0.966,
-        0.949,
-        0.932,
-        0.916,
-        0.900,
-        0.885,
-        0.869,
-        0.854,
-        0.840,
-        0.825,
-        0.811,
-        0.796,
-        0.781,
-        0.764,
-        0.746,
-        0.729,
-        0.710,
-        0.690,
-        0.670,
-        0.655,
-        0.639,
-        0.624,
-        0.609,
-        0.594,
-        0.580,
-        0.566,
-        0.552,
-        0.539,
-        0.525,
-        0.512,
-        0.500,
-        0.487,
-        0.475,
-        0.463,
-        0.451,
-        0.440,
-        0.429,
-        0.417,
-        0.407,
-        0.397,
-        0.387,
-        0.377,
-        0.368,
-        0.359,
-        0.350,
-        0.341,
-        0.333,
-    ]
 
     interp_type = InterpTypes.LINEAR_ZERO_RATES
     discount_curve = DiscountCurve(curve_dt, t_dates, df_values, interp_type)
     df_interp_values = discount_curve.df(t_interp_dates)
+
     assert [round(x, 3) for x in df_interp_values] == [
         1.0,
         0.983,

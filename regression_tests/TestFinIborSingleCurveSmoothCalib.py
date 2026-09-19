@@ -8,7 +8,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_single_curve_smoothing_calibrator import (
     IborSingleCurveSmoothingCalibrator,
 )
@@ -28,16 +28,14 @@ REPORT_PROGRESS = False
 
 def test_smooth_fit_simple(interp_type):
 
-    valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    value_dt = Date(6, 10, 2001)
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    settle_dt = value_dt.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -80,7 +78,7 @@ def test_smooth_fit_simple(interp_type):
     # Create but do not build the initial curve
     do_build = False
     init_curve = IborSingleCurve(
-        valuation_date,
+        value_dt,
         depos,
         fras,
         swaps,
@@ -92,9 +90,7 @@ def test_smooth_fit_simple(interp_type):
     calibrator = IborSingleCurveSmoothingCalibrator(init_curve)
 
     smooth_param = 1.0
-    curve, report = calibrator.fit(
-        smoothness=smooth_param, report_progress=REPORT_PROGRESS
-    )
+    _, report = calibrator.fit(smoothness=smooth_param, report_progress=REPORT_PROGRESS)
 
     if REPORT_PROGRESS:
         with pd.option_context(
@@ -114,16 +110,14 @@ def test_smooth_fit_simple(interp_type):
 
 def test_smooth_fit(interp_type):
 
-    valuation_date = Date(6, 10, 2001)
-    cal = CalendarTypes.UNITED_KINGDOM
+    value_dt = Date(6, 10, 2001)
+    cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
-    depo = IborDeposit(
-        settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal
-    )
+    settle_dt = value_dt.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
     fra_dcc_type = DayCountTypes.ACT_360
@@ -243,14 +237,12 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
 
-    optional_interp_params = {
-        "sigma": 5.0
-    }  # only relevant for interp_type == InterpTypes.TENSION_ZERO_RATES
+    optional_interp_params = {"sigma": 5.0}  # only relevant for interp_type == InterpTypes.TENSION_ZERO_RATES
 
     # Create but do not build the initial curve
     do_build = False
     init_curve = IborSingleCurve(
-        valuation_date,
+        value_dt,
         depos,
         fras,
         swaps,
@@ -264,9 +256,7 @@ def test_smooth_fit(interp_type):
 
     # here we go
     smooth_param = 1e-2
-    curve, report = calibrator.fit(
-        smoothness=smooth_param, report_progress=REPORT_PROGRESS
-    )
+    _, report = calibrator.fit(smoothness=smooth_param, report_progress=REPORT_PROGRESS)
 
     if REPORT_PROGRESS:
         with pd.option_context(

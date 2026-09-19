@@ -5,11 +5,10 @@ import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.process_simulator import FinGBMNumericalScheme
 
 from financepy.products.equity.equity_barrier_option import BarrierTypes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -28,8 +27,8 @@ def test_equity_barrier_option():
     dividend_yield = 0.02
     opt_type = BarrierTypes.DOWN_AND_OUT_CALL
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
     model = BlackScholes(volatility)
 
     start = time.time()

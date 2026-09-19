@@ -3,12 +3,10 @@
 import add_fp_to_path
 
 from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_digital_option import (
-    EquityDigitalOption,
-    FinDigitalOptionTypes,
-)
+from financepy.utils.global_types import DigitalOptionTypes
+from financepy.products.equity.equity_digital_option import EquityDigitalOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -20,7 +18,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 def test_equity_digital_option():
 
-    underlying_type = FinDigitalOptionTypes.CASH_OR_NOTHING
+    underlying_type = DigitalOptionTypes.CASH_OR_NOTHING
 
     value_dt = Date(1, 1, 2015)
     expiry_dt = Date(1, 1, 2016)
@@ -28,8 +26,8 @@ def test_equity_digital_option():
     volatility = 0.30
     interest_rate = 0.05
     dividend_yield = 0.01
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     model = BlackScholes(volatility)
     import time

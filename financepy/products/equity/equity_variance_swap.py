@@ -13,6 +13,7 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.check_values import check_curve_dt
 
 from .equity_vanilla_option import EquityVanillaOption
 
@@ -116,6 +117,9 @@ class EquityVarianceSwap:
         portfolio of put and call options across a range of strikes using the
         approximate method set out by Demeterfi et al. 1999."""
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
         self.num_put_options = num_put_options
         self.num_call_options = num_call_options
 
@@ -170,9 +174,7 @@ class EquityVarianceSwap:
 
         self.call_strikes = call_k
 
-        option_total = (
-            2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
-        )
+        option_total = 2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
 
         self.call_wts = np.zeros(num_call_options)
         self.put_wts = np.zeros(num_put_options)
@@ -268,9 +270,9 @@ class EquityVarianceSwap:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.start_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.start_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("STRIKE VARIANCE", self.strike_variance)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("PAY STRIKE FLAG", self.pay_strike_flag, "")

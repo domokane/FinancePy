@@ -4,7 +4,7 @@ import add_fp_to_path
 
 from financepy.utils.global_types import TouchOptionTypes
 from financepy.products.fx import FXOneTouchOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -32,8 +32,8 @@ def test_fin_fx_one_touch_option():
     num_paths = 50000
     num_steps_per_year = 252 * 2
 
-    dom_curve = DiscountCurveFlat(value_dt, domestic_rate)
-    for_curve = DiscountCurveFlat(value_dt, foreign_rate)
+    dom_curve = FlatDiscountCurve(value_dt, domestic_rate)
+    for_curve = FlatDiscountCurve(value_dt, foreign_rate)
 
     spot_fx_rate = 1.050
     payment_size = 1.5
@@ -122,8 +122,8 @@ def test_bbg_one_touch_option():
     num_paths = 50000
     num_steps_per_year = 252
 
-    dom_curve = DiscountCurveFlat(value_dt, dom_rate)
-    for_curve = DiscountCurveFlat(value_dt, for_rate)
+    dom_curve = FlatDiscountCurve(value_dt, dom_rate)
+    for_curve = FlatDiscountCurve(value_dt, for_rate)
 
     payment_size = 1000000  # EUR
 

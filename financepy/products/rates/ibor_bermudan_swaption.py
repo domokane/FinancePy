@@ -16,6 +16,7 @@ from ...utils.global_types import ExerciseTypes
 from ...utils.global_types import SwapTypes
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.check_values import check_curve_dt
 
 from .ibor_swap import IborSwap
 
@@ -100,6 +101,8 @@ class IborBermudanSwaption:
         the Black-Karasinski model and the Black-Derman-Toy model."""
 
         float_spread = 0.0
+
+        check_curve_dt(value_dt, discount_curve)
 
         # The underlying is a swap in which we pay the fixed amount
         self.underlying_swap = IborSwap(
@@ -197,7 +200,7 @@ class IborBermudanSwaption:
 
         n = len(self.cpn_times)
         for i in range(0, n):
-            print("CPN TIME: ", self.cpn_times[i], "FLOW", self.cpn_flows[i])
+            print("CPN TIME: ", self.cpn_times[i], "PAYMENT", self.cpn_flows[i])
 
         n = len(self.call_times)
         for i in range(0, n):
@@ -206,9 +209,9 @@ class IborBermudanSwaption:
     ######################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXERCISE DATE", self.exercise_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", self.fixed_leg_type)
         s += label_to_string("EXERCISE TYPE", self.exercise_type)
         s += label_to_string("FIXED COUPON", self.fixed_cpn)

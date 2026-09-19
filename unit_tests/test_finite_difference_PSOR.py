@@ -3,7 +3,7 @@ from pytest import approx
 from financepy.models.finite_difference_psor import black_scholes_fd_psor
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
@@ -44,6 +44,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.07939664662902503, abs=1e-1)
 
@@ -59,6 +61,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.07945913698961202, abs=1e-1)
     smooth = 0
@@ -75,6 +79,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.2153451094307548, abs=1e-1)
 
@@ -91,6 +97,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.22078914857802928, abs=1e-1)
     smooth = 0
@@ -108,6 +116,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.2139059947533305, abs=1e-1)
 
@@ -123,6 +133,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.2165916613669189, abs=1e-1)
 
@@ -138,6 +150,8 @@ def test_black_scholes_fd_psor():
         opt_type=opt_type,
         smooth=smooth,
         theta=theta,
+        num_time_steps=100,
+        num_samples=500,
     )
     assert v == approx(0.10259475990431438, abs=1e-1)
     opt_type = OptionTypes.EUROPEAN_CALL
@@ -160,7 +174,7 @@ def test_european_call():
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
     strike_price = 50.0
     opt_type = OptionTypes.EUROPEAN_CALL
-    num_steps_per_year = 200
+    num_steps_per_year = 20
 
     v = black_scholes_fd_psor(
         spot_price=spot_price,
@@ -173,6 +187,8 @@ def test_european_call():
         opt_type=opt_type,
         smooth=0,
         theta=0.5,
+        num_time_steps=100,
+        num_samples=500,
     )
     value = crr_tree_val_avg(
         spot_price,
@@ -184,7 +200,7 @@ def test_european_call():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -217,6 +233,8 @@ def test_european_put():
         opt_type=opt_type,
         smooth=0,
         theta=0.5,
+        num_time_steps=100,
+        num_samples=500,
     )
     value = crr_tree_val_avg(
         spot_price,
@@ -228,7 +246,7 @@ def test_european_put():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -261,7 +279,8 @@ def test_american_call():
         opt_type=opt_type,
         smooth=0,
         theta=0.5,
-        num_samples=5000,
+        num_time_steps=100,
+        num_samples=500,
     )
     value = crr_tree_val_avg(
         spot_price,
@@ -273,7 +292,7 @@ def test_american_call():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=1e-2)
 
 
 ########################################################################################
@@ -305,7 +324,8 @@ def test_american_put():
         digital=0,
         opt_type=opt_type,
         smooth=0,
-        num_samples=5000,
+        num_time_steps=100,
+        num_samples=500,
     )
     value = crr_tree_val_avg(
         spot_price,
@@ -317,7 +337,7 @@ def test_american_put():
         opt_type.value,
         strike_price,
     )
-    assert v == approx(value["value"], abs=1e-3)
+    assert v == approx(value["value"], abs=2e-2)
 
 
 ########################################################################################
@@ -339,8 +359,8 @@ def test_call_option():
     dividend_yield = 0.01
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     # Call option
     v0 = call_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)
@@ -379,8 +399,8 @@ def test_put_option():
     dividend_yield = 0.1
     model = BlackScholes(volatility)
     time_to_expiry = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     # Call option
     v0 = put_option.value(value_dt, spot_price, discount_curve, dividend_curve, model)

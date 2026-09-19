@@ -26,14 +26,14 @@ from ..models.sobol import get_gaussian_sobol
 ########################################################################################
 
 
-def _value_mc_nonumba_nonumpy(
+def value_mc_nonumba_nonumpy(
     s: float,
     t: float,
     k: float,
-    opt_type: int,
     r: float,
     q: float,
     v: float,
+    opt_type: int,
     num_paths: int,
     seed: int,
     use_sobol: int,
@@ -79,14 +79,14 @@ def _value_mc_nonumba_nonumpy(
 ########################################################################################
 
 
-def _value_mc_numpy_only(
+def value_mc_numpy_only(
     s: float,
     t: float,
     k: float,
-    opt_type: int,
     r: float,
     q: float,
     v: float,
+    opt_type: int,
     num_paths: int,
     seed: int,
     use_sobol: int,
@@ -131,10 +131,10 @@ def _value_mc_numpy_only(
         float64,
         float64,
         float64,
+        float64,
+        float64,
+        float64,
         int64,
-        float64,
-        float64,
-        float64,
         int64,
         int64,
         int64,
@@ -142,14 +142,14 @@ def _value_mc_numpy_only(
     cache=True,
     fastmath=True,
 )
-def _value_mc_numpy_numba(
+def value_mc_numpy_numba(
     s: float,
     t: float,
     k: float,
-    opt_type: int,
     r: float,
     q: float,
     v: float,
+    opt_type: int,
     num_paths: int,
     seed: int,
     use_sobol: int,
@@ -194,10 +194,10 @@ def _value_mc_numpy_numba(
         float64,
         float64,
         float64,
+        float64,
+        float64,
+        float64,
         int64,
-        float64,
-        float64,
-        float64,
         int64,
         int64,
         int64,
@@ -205,14 +205,14 @@ def _value_mc_numpy_numba(
     fastmath=True,
     cache=True,
 )
-def _value_mc_numba_only(
+def value_mc_numba_only(
     s: float,
     t: float,
     k: float,
-    opt_type: int,
     r: float,
     q: float,
     v: float,
+    opt_type: int,
     num_paths: int,
     seed: int,
     use_sobol: int,
@@ -265,10 +265,78 @@ def _value_mc_numba_only(
         float64,
         float64,
         float64,
+        float64,
+        float64,
+        float64,
         int64,
+        int64,
+        int64,
+        int64,
+    ),
+    fastmath=True,
+    cache=True,
+)
+def value_mc_numba_noanti(
+    s: float,
+    t: float,
+    k: float,
+    r: float,
+    q: float,
+    v: float,
+    opt_type: int,
+    num_paths: int,
+    seed: int,
+    use_sobol: int,
+) -> float:
+    # No use of Numpy vectorisation but NUMBA
+    # No use of antithetic variables
+
+    np.random.seed(seed)
+    mu = r - q
+    v2 = v**2
+    v_sqrt_t = v * np.sqrt(t)
+    payoff = 0.0
+
+    if use_sobol == 1:
+        g = get_gaussian_sobol(num_paths, 1)[:, 0]
+    else:
+        g = np.random.standard_normal(num_paths)
+
+    ss = s * np.exp((mu - v2 / 2.0) * t)
+
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
+
+        for i in range(0, num_paths):
+            gg = g[i]
+            s_1 = ss * np.exp(+gg * v_sqrt_t)
+            payoff += max(s_1 - k, 0.0)
+
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+
+        for i in range(0, num_paths):
+            gg = g[i]
+            s_1 = ss * np.exp(+gg * v_sqrt_t)
+            payoff += max(k - s_1, 0.0)
+
+    else:
+        return np.nan
+
+    value = payoff * np.exp(-r * t) / num_paths
+    return value
+
+
+########################################################################################
+
+
+@njit(
+    float64(
         float64,
         float64,
         float64,
+        float64,
+        float64,
+        float64,
+        int64,
         int64,
         int64,
         int64,
@@ -277,14 +345,14 @@ def _value_mc_numba_only(
     cache=True,
     parallel=True,
 )
-def _value_mc_numba_parallel(
+def value_mc_numba_parallel(
     s: float,
     t: float,
     k: float,
-    opt_type: int,
     r: float,
     q: float,
     v: float,
+    opt_type: int,
     num_paths: int,
     seed: int,
     use_sobol: int,

@@ -1,7 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.global_types import FinLongShort
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.utils.global_types import LongShortTypes
 from financepy.utils.date import Date
 from financepy.products.equity.equity_forward import EquityForward
 
@@ -21,11 +21,11 @@ def test_equity_forward():
     expiry_dt = value_dt.add_months(12)
     notional = 100.0
 
-    discount_curve = DiscountCurveFlat(value_dt, discount_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
+    discount_curve = FlatDiscountCurve(value_dt, discount_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_rate)
 
     equity_forward = EquityForward(
-        expiry_dt, forward_price, notional, FinLongShort.LONG
+        expiry_dt, forward_price, notional, LongShortTypes.LONG
     )
 
     fwd_price = equity_forward.forward(

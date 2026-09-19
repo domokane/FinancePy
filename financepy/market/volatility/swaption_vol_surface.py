@@ -13,12 +13,13 @@ from scipy.optimize import minimize
 
 from numba import njit, float64, int64
 
+from ...utils.format_graphs import *
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.helpers import check_argument_types, label_to_string
 
-from ...models.volatility_fns import VolFuncTypes
+from ...utils.global_types import VolFuncTypes
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
 from ...models.volatility_fns import vol_function_svi
@@ -199,9 +200,7 @@ def _solve_to_horizon(
     cache=True,
     fastmath=True,
 )
-def vol_function(
-    vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float
-) -> float:
+def vol_function(vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -395,7 +394,7 @@ class SwaptionVolSurface:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         expiry_dts: List[Date],
         fwd_swap_rates: np.ndarray,
         strike_grid: np.ndarray,
@@ -408,7 +407,7 @@ class SwaptionVolSurface:
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
 
         if len(strike_grid.shape) != 2:
             raise FinError("Strike grid must be a 2D grid of values")
@@ -459,7 +458,7 @@ class SwaptionVolSurface:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self._vol_func_type.value
 
@@ -534,7 +533,7 @@ class SwaptionVolSurface:
     #     """ Interpolates the strike at a delta and expiry date. Linear
     #     interpolation is used in strike."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+    #     t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -637,7 +636,7 @@ class SwaptionVolSurface:
     #     interpolation is done in variance space and then converted back to a
     #     lognormal volatility."""
 
-    #     t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+    #     t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
     #     vol_type_value = self._vol_func_type.value
 
@@ -744,9 +743,7 @@ class SwaptionVolSurface:
 
     ####################################################################################
 
-    def _build_vol_surface(
-        self, fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD
-    ) -> None:
+    def _build_vol_surface(self, fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD) -> None:
         """Main function to construct the vol surface."""
 
         if self._vol_func_type == VolFuncTypes.CLARK:
@@ -781,7 +778,7 @@ class SwaptionVolSurface:
         for i in range(0, num_expiry_dts):
 
             expiry_dt = self._expiry_dts[i]
-            t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             self._t_exp[i] = t_exp
 
         #######################################################################
@@ -828,7 +825,7 @@ class SwaptionVolSurface:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self.value_dt)
+            print("VALUE DATE:", self.anchor_dt)
             print("STOCK PRICE:", self._stock_price)
             print("==========================================================")
 
@@ -954,8 +951,8 @@ class SwaptionVolSurface:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self.value_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("VALUE DATE", self.anchor_dt)
         s += label_to_string("STOCK PRICE", self._stock_price)
         s += label_to_string("ATM METHOD", self._atm_method)
         s += label_to_string("DELTA METHOD", self._delta_method)

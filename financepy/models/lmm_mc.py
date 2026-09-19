@@ -1,6 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from enum import Enum
 import numpy as np
 from numba import njit, float64, int64  # , prange DOES NOT WORK ON GITHUB
 
@@ -25,12 +24,6 @@ DEBUG = False
 
 ########################################################################################
 
-
-class ModelLMMModelTypes(Enum):
-
-    LMM_ONE_FACTOR = 1
-    LMM_HW_M_FACTOR = 2
-    LMM_FULL_N_FACTOR = 3
 
 
 ########################################################################################

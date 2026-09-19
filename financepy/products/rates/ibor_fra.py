@@ -15,7 +15,7 @@ from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
-
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -130,12 +130,7 @@ class IborFRA:
             df["end_accrual_date"] = self.maturity_dt
             df["year_frac"] = acc_factor
             df["rate"] = libor_fwd - self.fra_rate
-            df["payment"] = (
-                pay_fixed_sign
-                * acc_factor
-                * (libor_fwd - self.fra_rate)
-                * self.notional
-            )
+            df["payment"] = pay_fixed_sign * acc_factor * (libor_fwd - self.fra_rate) * self.notional
             df["payment_df"] = df_mat / df_value
             df["payment_pv"] = v
             df["leg"] = "FRA"
@@ -146,7 +141,7 @@ class IborFRA:
 
     def valuation_details(
         self,
-        valuation_date: Date,
+        value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
     ):
@@ -163,6 +158,9 @@ class IborFRA:
         if index_curve is None:
             index_curve = discount_curve
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve)
+
         # Get the Libor index from the index curve
         dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
@@ -175,12 +173,10 @@ class IborFRA:
         v = acc_factor * (libor_fwd - self.fra_rate) * df_discount_2
 
         # Forward value the FRA to the value date
-        df_to_valuation_date = discount_curve.df(valuation_date)
-        v = v * self.notional / df_to_valuation_date
+        df_to_value_date = discount_curve.df(value_dt)
+        v = v * self.notional / df_to_value_date
 
-        if (
-            self.pay_fixed_rate is True
-        ):  # VP: ??? pay fixed should be positive notional
+        if self.pay_fixed_rate is True:  # VP: ??? pay fixed should be positive notional
             v *= -1.0
 
         out = {
@@ -188,21 +184,13 @@ class IborFRA:
             "start_dt": self.start_dt,
             "maturity_dt": self.maturity_dt,
             "accrual_dc_type": self.accrual_dc_type.name,
-            "fixed_leg_type": (
-                SwapTypes.PAY.name
-                if self.pay_fixed_rate
-                else SwapTypes.RECEIVE.name
-            ),
+            "fixed_leg_type": (SwapTypes.PAY.name if self.pay_fixed_rate else SwapTypes.RECEIVE.name),
             "notional": self.notional,
             "contract_rate": self.fra_rate,
             "market_rate": libor_fwd,
             "spot_pvbp": acc_factor * df_discount_2,
-            "fwd_pvbp": acc_factor
-            * df_discount_2
-            / discount_curve.df(self.start_dt),
-            "unit_value": acc_factor
-            * df_discount_2
-            * (libor_fwd - self.fra_rate),
+            "fwd_pvbp": acc_factor * df_discount_2 / discount_curve.df(self.start_dt),
+            "unit_value": acc_factor * df_discount_2 * (libor_fwd - self.fra_rate),
             "value": v,
             # ignoring pay_fixed flag (which is wrong anyway I think),
             # bus day adj type, calendar for now
@@ -242,14 +230,14 @@ class IborFRA:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START ACCD DATE", self.start_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
-        s += label_to_string("FRA RATE", self.fra_rate)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_ACCD_DATE", self.start_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("FRA_RATE", self.fra_rate)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("PAY FIXED RATE", self.pay_fixed_rate)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
+        s += label_to_string("BUS_DAY_ADJUST TYPE", self.bd_type)
         s += label_to_string("CALENDAR", self.cal_type)
         return s
 

@@ -66,12 +66,12 @@ def get_bond_market_conventions(country):
     thirtye360 = DayCountTypes.THIRTY_E_360
     thirty360 = DayCountTypes.THIRTY_360_BOND
 
-    # TODO: CHECK CONVENTIONS
     # RETURNS
-    # ACCRUAL CONVENTION
-    # COUPON FREQUENCY
-    # SETTLEMENT DAYS
-    # NUM EX DIVIDEND DAYS AND CALENDAR TO USE
+    # - ACCRUAL CONVENTION
+    # - COUPON FREQUENCY
+    # - SETTLEMENT DAYS
+    # - NUM EX DIVIDEND DAYS
+    # - CALENDAR TYPER TO USE
 
     if country == BondMarkets.AUSTRIA:
         return (act_act, annual, 2, 0, None)
@@ -147,7 +147,7 @@ def get_bond_market_conventions(country):
         return (act_act, semi_annual, 2, 0, None)
     if country == BondMarkets.UNITED_KINGDOM:
         # OR 7 DAYS ?
-        return (act_act, semi_annual, 1, 6, CalendarTypes.UNITED_KINGDOM)
+        return (act_act, semi_annual, 1, 6, CalendarTypes.LONDON)
 
     print("Unknown Country:", country)
     return (None, None, None, None, None)

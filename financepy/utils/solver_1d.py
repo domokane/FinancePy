@@ -108,12 +108,21 @@ def newton_secant(func, x0, args=(), tol=1.48e-8, maxiter=50, disp=True):
     for _ in range(maxiter):
 
         if q1 == q0:
-            if p1 != p0:
-                raise FinError("Tolerance reached")
-
             p = (p1 + p0) / 2.0
-            status = _ECONVERGED
-            break
+
+            # The function values may become identical because of floating-point
+            # rounding when the iterations are already sufficiently close.
+            if np.abs(q1) <= tol or np.abs(p1 - p0) <= tol:
+                return p
+
+            raise FinError("Secant slope is zero before convergence")
+#        if q1 == q0:
+#            if p1 != p0:
+#                raise FinError("Tolerance reached")
+
+#            p = (p1 + p0) / 2.0
+#            status = _ECONVERGED
+#            break
         else:
             if np.abs(q1) > np.abs(q0):
                 p = (-q0 / q1 * p1 + p0) / (1.0 - q0 / q1)

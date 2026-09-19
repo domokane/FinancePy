@@ -7,13 +7,14 @@ from typing import Union
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
-from ...utils.frequency import FrequencyTypes
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
+from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_stock_price
+from ...utils.helpers import option_years
 
 # from ...models.black_scholes_analytic import baw_value
 from ...models.model import Model
@@ -48,7 +49,7 @@ class EquityAmericanOption(EquityOption):
             and opt_type != OptionTypes.AMERICAN_CALL
             and opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError("Unknown Option Type" + str(opt_type))
+            raise FinError("Unknown OPTION_TYPE" + str(opt_type))
 
         self.expiry_dt = expiry_dt
         self.strike_price = strike_price
@@ -68,36 +69,15 @@ class EquityAmericanOption(EquityOption):
         """Valuation of an American option using a CRR tree to take into
         account the value of early exercise."""
 
-        cc_freq = FrequencyTypes.CONTINUOUS
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_stock_price(stock_price)
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve valuation date not same as option value date"
-            )
-
-        if isinstance(value_dt, Date):
-            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        else:
-            t_exp = value_dt
-
-        if np.any(stock_price <= 0.0):
-            raise FinError("Stock price must be greater than zero.")
-
-        if isinstance(model, Model) is False:
-            raise FinError("Model is not inherited off type FinModel.")
-
-        if np.any(t_exp < 0.0):
-            raise FinError("Time to expiry must be positive.")
-
+        t_exp = option_years(value_dt, self.expiry_dt)
         t_exp = np.maximum(t_exp, 1e-10)
-
-        r = discount_curve.zero_rate(self.expiry_dt, cc_freq)
-        q = dividend_curve.zero_rate(self.expiry_dt, cc_freq)
 
         s = stock_price
         k = self.strike_price
@@ -113,10 +93,10 @@ class EquityAmericanOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 

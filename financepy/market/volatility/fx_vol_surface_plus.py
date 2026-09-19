@@ -28,16 +28,19 @@ from scipy.optimize import minimize
 
 from numba import njit, float64, int64
 
-from ...utils.date import Tenor
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.error import FinError
+from ...utils.format_graphs import *
+from ...utils.date import Tenor
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
+from ...utils.global_types import FXATMMethodTypes
+from ...utils.global_types import FXDeltaMethodTypes
+
 from ...products.fx.fx_vanilla_option import FXVanillaOption
 from ...models.option_implied_dbn import option_implied_dbn
-from ...products.fx.fx_mkt_conventions import FinFXATMMethod
-from ...products.fx.fx_mkt_conventions import FinFXDeltaMethod
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -45,14 +48,14 @@ from ...models.black_scholes import BlackScholes
 
 from ...models.volatility_fns import vol_function_clark
 from ...models.volatility_fns import vol_function_bloomberg
-from ...models.volatility_fns import VolFuncTypes
+from ...utils.global_types import VolFuncTypes
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_one
 from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
-from ...models.black_scholes_analytic import bs_value
+from ...models.black_scholes_analytic import european_value
 from ...products.fx.fx_vanilla_option import fast_delta
 from ...utils.distribution import FinDistribution
 
@@ -72,6 +75,17 @@ from ...utils.global_types import SolverTypes
 #
 # find python version of cg minimiser to apply numba to
 ########################################################################################
+
+
+def _check_optimizer_result(opt, solver_name: str, accept_tol: float = 1e-8) -> None:
+    if opt.success:
+        return
+
+    if opt.fun <= accept_tol:
+        return
+
+    raise FinError(f"{solver_name} failed. " f"Objective={opt.fun:.3e}. " f"Message={opt.message}")
+
 
 ########################################################################################
 # TODO: Speed up search for strike by providing derivative function to go with
@@ -93,9 +107,7 @@ def _g(kk: float, *args: Any) -> float:
     opt_type_value = args[6]
     delta_target = args[7]
 
-    delta_out = fast_delta(
-        s, t, kk, r_d, r_f, volatility, delta_method_value, opt_type_value
-    )
+    delta_out = fast_delta(s, t, kk, r_d, r_f, volatility, delta_method_value, opt_type_value)
 
     obj_fn = delta_target - delta_out
     return obj_fn
@@ -170,9 +182,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
     # new volatility curve
 
     # Match the at-the-money option volatility
-    atm_curve_vol = vol_function(
-        vol_type_value, params, strikes_null, gaps_null, f, k_atm, t
-    )
+    atm_curve_vol = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_atm, t)
 
     term_atm = (atm_vol - atm_curve_vol) ** 2
 
@@ -182,11 +192,9 @@ def _obj(params: np.ndarray, *args: Any) -> float:
 
     if target_25d_rr_vol > -999.0:
 
-        sigma_k_25d_c_ms = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_25d_c_ms, t
-        )
+        sigma_k_25d_c_ms = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_25d_c_ms, t)
 
-        v_25d_c_ms = bs_value(
+        v_25d_c_ms = european_value(
             s,
             t,
             k_25d_c_ms,
@@ -196,11 +204,9 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             OptionTypes.EUROPEAN_CALL.value,
         )
 
-        sigma_k_25d_p_ms = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_25d_p_ms, t
-        )
+        sigma_k_25d_p_ms = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_25d_p_ms, t)
 
-        v_25d_p_ms = bs_value(
+        v_25d_p_ms = european_value(
             s,
             t,
             k_25d_p_ms,
@@ -238,9 +244,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             gaps_null,
         )
 
-        sigma_k_25d_c = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_25d_c, t
-        )
+        sigma_k_25d_c = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_25d_c, t)
 
         k_25d_p = _solver_for_smile_strike(
             s,
@@ -257,9 +261,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             gaps_null,
         )
 
-        sigma_k_25d_p = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_25d_p, t
-        )
+        sigma_k_25d_p = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_25d_p, t)
 
         sigma_25d_rr = sigma_k_25d_c - sigma_k_25d_p
         term_25d_2 = (sigma_25d_rr - target_25d_rr_vol) ** 2
@@ -274,11 +276,9 @@ def _obj(params: np.ndarray, *args: Any) -> float:
 
     if target_10d_rr_vol > -999.0:
 
-        sigma_k_10d_c_ms = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_10d_c_ms, t
-        )
+        sigma_k_10d_c_ms = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_10d_c_ms, t)
 
-        v_10d_c_ms = bs_value(
+        v_10d_c_ms = european_value(
             s,
             t,
             k_10d_c_ms,
@@ -288,11 +288,9 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             OptionTypes.EUROPEAN_CALL.value,
         )
 
-        sigma_k_10d_p_ms = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_10d_p_ms, t
-        )
+        sigma_k_10d_p_ms = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_10d_p_ms, t)
 
-        v_10d_p_ms = bs_value(
+        v_10d_p_ms = european_value(
             s,
             t,
             k_10d_p_ms,
@@ -330,9 +328,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             gaps_null,
         )
 
-        sigma_k_10d_c = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_10d_c, t
-        )
+        sigma_k_10d_c = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_10d_c, t)
 
         k_10d_p = _solver_for_smile_strike(
             s,
@@ -349,9 +345,7 @@ def _obj(params: np.ndarray, *args: Any) -> float:
             gaps_null,
         )
 
-        sigma_k_10d_p = vol_function(
-            vol_type_value, params, strikes_null, gaps_null, f, k_10d_p, t
-        )
+        sigma_k_10d_p = vol_function(vol_type_value, params, strikes_null, gaps_null, f, k_10d_p, t)
 
         sigma_10d_rr = sigma_k_10d_c - sigma_k_10d_p
         term10d_2 = (sigma_10d_rr - target_10d_rr_vol) ** 2
@@ -424,13 +418,11 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
     # Match the market strangle value but this has to be at the MS 25d strikes
     ###########################################################################
 
-    sigma_k_25d_c_ms = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_25d_c_ms, t
-    )
+    sigma_k_25d_c_ms = vol_function(vol_type_value, params, strikes, gaps, f, k_25d_c_ms, t)
 
     print("sigma_k_25d_c_ms", sigma_k_25d_c_ms)
 
-    v_25d_c_ms = bs_value(
+    v_25d_c_ms = european_value(
         s,
         t,
         k_25d_c_ms,
@@ -440,13 +432,11 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
         OptionTypes.EUROPEAN_CALL.value,
     )
 
-    sigma_k_25d_p_ms = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_25d_p_ms, t
-    )
+    sigma_k_25d_p_ms = vol_function(vol_type_value, params, strikes, gaps, f, k_25d_p_ms, t)
 
     print("sigma_k_25d_p_ms", sigma_k_25d_p_ms)
 
-    v_25d_p_ms = bs_value(
+    v_25d_p_ms = european_value(
         s,
         t,
         k_25d_p_ms,
@@ -508,13 +498,11 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
     # Match the market strangle value but this has to be at the MS 10d strikes
     ###########################################################################
 
-    sigma_k_10d_c_ms = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_10d_c_ms, t
-    )
+    sigma_k_10d_c_ms = vol_function(vol_type_value, params, strikes, gaps, f, k_10d_c_ms, t)
 
     print("sigma_k_10d_c_ms", sigma_k_10d_c_ms)
 
-    v_10d_c_ms = bs_value(
+    v_10d_c_ms = european_value(
         s,
         t,
         k_10d_c_ms,
@@ -524,13 +512,11 @@ def _obj_gap(gaps: np.ndarray, *args: Any) -> float:
         OptionTypes.EUROPEAN_CALL.value,
     )
 
-    sigma_k_10d_p_ms = vol_function(
-        vol_type_value, params, strikes, gaps, f, k_10d_p_ms, t
-    )
+    sigma_k_10d_p_ms = vol_function(vol_type_value, params, strikes, gaps, f, k_10d_p_ms, t)
 
     print("sigma_k_10d_p_ms", sigma_k_10d_p_ms)
 
-    v_10d_p_ms = bs_value(
+    v_10d_p_ms = european_value(
         s,
         t,
         k_10d_p_ms,
@@ -678,7 +664,7 @@ def _solve_to_horizon(
         )
 
         # USE MARkkET STRANGLE VOL TO DETERMINE PRICE OF A MARkkET STRANGLE
-        v_25d_c_ms = bs_value(
+        v_25d_c_ms = european_value(
             s,
             t,
             k_25d_c_ms,
@@ -688,7 +674,7 @@ def _solve_to_horizon(
             OptionTypes.EUROPEAN_CALL.value,
         )
 
-        v_25d_p_ms = bs_value(
+        v_25d_p_ms = european_value(
             s,
             t,
             k_25d_p_ms,
@@ -739,7 +725,7 @@ def _solve_to_horizon(
         )
 
         # USE MARkkET STRANGLE VOL TO DETERMINE PRICE OF A MARkkET STRANGLE
-        v_10d_c_ms = bs_value(
+        v_10d_c_ms = european_value(
             s,
             t,
             k_10d_c_ms,
@@ -749,7 +735,7 @@ def _solve_to_horizon(
             OptionTypes.EUROPEAN_CALL.value,
         )
 
-        v_10d_p_ms = bs_value(
+        v_10d_p_ms = european_value(
             s,
             t,
             k_10d_p_ms,
@@ -814,19 +800,54 @@ def _solve_to_horizon(
                 tol_x=tol,
                 max_iter=1000,
             )
+
+            obj = _obj(xopt, *args)
+
+            if obj > 1e-8:
+                raise FinError(f"Numba Nelder-Mead failed. Objective={obj:.3e}")
+
         elif fin_solver_type == SolverTypes.NELDER_MEAD:
-            opt = minimize(_obj, x_inits, args, method="Nelder-Mead", tol=tol)
+            opt = minimize(
+                _obj,
+                x_inits,
+                args,
+                method="Nelder-Mead",
+                tol=tol,
+                options={"maxfev": 5000, "maxiter": 5000},
+            )
             xopt = opt.x
+
+            _check_optimizer_result(opt, "Nelder-Mead", accept_tol=1e-8)
+
         elif fin_solver_type == SolverTypes.CONJUGATE_GRADIENT:
             opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
             xopt = opt.x
-    except Exception:
-        # If convergence fails try again with CG if necessary
+
+            _check_optimizer_result(opt, "Conjugate-Gradient", accept_tol=1e-8)
+
+    except FinError:
         if fin_solver_type != SolverTypes.CONJUGATE_GRADIENT:
+
             print("Failed to converge, will try CG")
-            opt = minimize(_obj, x_inits, args, method="CG", tol=tol)
+
+            opt = minimize(
+                _obj,
+                x_inits,
+                args,
+                method="CG",
+                tol=tol,
+            )
+
+            _check_optimizer_result(
+                opt,
+                "CG fallback",
+                accept_tol=1e-8,
+            )
 
             xopt = opt.x
+
+        else:
+            raise
 
     params = np.array(xopt)
 
@@ -1148,7 +1169,7 @@ def solve_for_strike(
     # places. It should however agree to 6-7 decimal places. Which is Okk.
     # =========================================================================
 
-    if delta_method_value == FinFXDeltaMethod.SPOT_DELTA.value:
+    if delta_method_value == FXDeltaMethodTypes.SPOT_DELTA.value:
 
         dom_df = np.exp(-rd * t_del)
         for_df = np.exp(-rf * t_del)
@@ -1165,7 +1186,7 @@ def solve_for_strike(
         kk = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
         return kk
 
-    if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA.value:
+    if delta_method_value == FXDeltaMethodTypes.FORWARD_DELTA.value:
 
         dom_df = np.exp(-rd * t_del)
         for_df = np.exp(-rf * t_del)
@@ -1182,7 +1203,7 @@ def solve_for_strike(
         kk = fwd_fx_rate * np.exp(-vsqrtt * (phi * norminvdelta - vsqrtt / 2.0))
         return kk
 
-    if delta_method_value == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ.value:
+    if delta_method_value == FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ.value:
 
         argtuple = (
             spot_fx_rate,
@@ -1202,7 +1223,7 @@ def solve_for_strike(
 
         return kk
 
-    if delta_method_value == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ.value:
+    if delta_method_value == FXDeltaMethodTypes.FORWARD_DELTA_PREM_ADJ.value:
 
         argtuple = (
             spot_fx_rate,
@@ -1242,21 +1263,21 @@ class FXVolSurfacePlus:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         spot_fx_rate: float,
         currency_pair: str,
         notional_currency: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         tenors: List[Tenor],
-        atm_vols: np.ndarray,
-        ms_25_delta_vols: Union[np.ndarray, None],
-        rr_25_delta_vols: Union[np.ndarray, None],
-        ms_10_delta_vols: Union[np.ndarray, None],
-        rr_10_delta_vols: Union[np.ndarray, None],
+        atm_vols: Union[np.ndarray, List],
+        ms_25_delta_vols: Union[np.ndarray, List],
+        rr_25_delta_vols: Union[np.ndarray, List],
+        ms_10_delta_vols: Union[np.ndarray, List],
+        rr_10_delta_vols: Union[np.ndarray, List],
         alpha: float,
-        atm_method: FinFXATMMethod = FinFXATMMethod.FWD_DELTA_NEUTRAL,
-        delta_method: FinFXDeltaMethod = FinFXDeltaMethod.SPOT_DELTA,
+        atm_method: FXATMMethodTypes = FXATMMethodTypes.FWD_DELTA_NEUTRAL,
+        delta_method: FXDeltaMethodTypes = FXDeltaMethodTypes.SPOT_DELTA,
         vol_func_type: VolFuncTypes = VolFuncTypes.CLARK,
         fin_solver_type: SolverTypes = SolverTypes.NELDER_MEAD,
         tol: float = 1e-8,
@@ -1279,9 +1300,14 @@ class FXVolSurfacePlus:
         if rr_25_delta_vols is None:
             rr_25_delta_vols = np.array([])
 
+        ms_10_delta_vols = np.array(ms_10_delta_vols)
+        rr_10_delta_vols = np.array(rr_10_delta_vols)
+        ms_25_delta_vols = np.array(ms_25_delta_vols)
+        rr_25_delta_vols = np.array(rr_25_delta_vols)
+
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.spot_fx_rate = spot_fx_rate
         self.currency_pair = currency_pair
 
@@ -1362,13 +1388,13 @@ class FXVolSurfacePlus:
         self.atm_method = atm_method
         self.delta_method = delta_method
 
-        if self.delta_method == FinFXDeltaMethod.SPOT_DELTA:
+        if self.delta_method == FXDeltaMethodTypes.SPOT_DELTA:
             self.delta_method_string = "pips_spot_delta"
-        elif self.delta_method == FinFXDeltaMethod.FORWARD_DELTA:
+        elif self.delta_method == FXDeltaMethodTypes.FORWARD_DELTA:
             self.delta_method_string = "pips_fwd_delta"
-        elif self.delta_method == FinFXDeltaMethod.SPOT_DELTA_PREM_ADJ:
+        elif self.delta_method == FXDeltaMethodTypes.SPOT_DELTA_PREM_ADJ:
             self.delta_method_string = "pct_spot_delta_prem_adj"
-        elif self.delta_method == FinFXDeltaMethod.FORWARD_DELTA_PREM_ADJ:
+        elif self.delta_method == FXDeltaMethodTypes.FORWARD_DELTA_PREM_ADJ:
             self.delta_method_string = "pct_fwd_delta_prem_adj"
         else:
             raise FinError("Unknown Delta Type")
@@ -1378,7 +1404,7 @@ class FXVolSurfacePlus:
 
         self.expiry_dts = []
         for i in range(0, self.num_vol_curves):
-            expiry_dt = value_dt.add_tenor(tenors[i])
+            expiry_dt = anchor_dt.add_tenor(tenors[i])
             self.expiry_dts.append(expiry_dt)
 
         self._build_vol_surface(fin_solver_type=fin_solver_type, tol=tol)
@@ -1396,7 +1422,7 @@ class FXVolSurfacePlus:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         if t_exp <= 0.0:
             raise FinError("Expiry time must be positive.")
@@ -1486,13 +1512,11 @@ class FXVolSurfacePlus:
 
     ###########################################################################
 
-    def delta_to_strike(
-        self, call_delta: float, expiry_dt: Date, delta_method: Optional[Any]
-    ) -> float:
+    def delta_to_strike(self, call_delta: float, expiry_dt: Date, delta_method: Optional[Any]) -> float:
         """Interpolates the strike at a delta and expiry date. Linear
         time to expiry interpolation is used in strike."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1596,7 +1620,7 @@ class FXVolSurfacePlus:
         self,
         call_delta: float,
         expiry_dt: Date,
-        delta_method: Optional[FinFXDeltaMethod] = None,
+        delta_method: Optional[FXDeltaMethodTypes] = None,
     ) -> Tuple[float, float]:
         """Interpolates the Black-Scholes volatility from the volatility
         surface given a call option delta and expiry date. Linear interpolation
@@ -1608,7 +1632,7 @@ class FXVolSurfacePlus:
         interpolation is done in variance space and then converted back to a
         lognormal volatility."""
 
-        t_exp = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         vol_type_value = self.vol_func_type.value
 
@@ -1737,9 +1761,7 @@ class FXVolSurfacePlus:
 
     ###########################################################################
 
-    def _build_vol_surface(
-        self, fin_solver_type: Any = SolverTypes.NELDER_MEAD, tol: float = 1e-8
-    ) -> None:
+    def _build_vol_surface(self, fin_solver_type: Any = SolverTypes.NELDER_MEAD, tol: float = 1e-8) -> None:
         """Main function to construct the vol surface."""
 
         s = self.spot_fx_rate
@@ -1791,7 +1813,7 @@ class FXVolSurfacePlus:
         # TODO: ADD SPOT DAYS
         #######################################################################
 
-        spot_dt = self.value_dt
+        spot_dt = self.anchor_dt
 
         for i in range(0, num_vol_curves):
 
@@ -1810,13 +1832,13 @@ class FXVolSurfacePlus:
             atm_vol = self.atm_vols[i]
 
             # This follows exposition in Clarke Page 52
-            if self.atm_method == FinFXATMMethod.SPOT:
+            if self.atm_method == FXATMMethodTypes.SPOT:
                 self.k_atm[i] = s
-            elif self.atm_method == FinFXATMMethod.FWD:
+            elif self.atm_method == FXATMMethodTypes.FWD:
                 self.k_atm[i] = f
-            elif self.atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL:
+            elif self.atm_method == FXATMMethodTypes.FWD_DELTA_NEUTRAL:
                 self.k_atm[i] = f * np.exp(atm_vol * atm_vol * t_exp / 2.0)
-            elif self.atm_method == FinFXATMMethod.FWD_DELTA_NEUTRAL_PREM_ADJ:
+            elif self.atm_method == FXATMMethodTypes.FWD_DELTA_NEUTRAL_PREM_ADJ:
                 self.k_atm[i] = f * np.exp(-atm_vol * atm_vol * t_exp / 2.0)
             else:
                 raise FinError("Unknown Delta Type")
@@ -2016,7 +2038,7 @@ class FXVolSurfacePlus:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self.value_dt)
+            print("VALUE DATE:", self.anchor_dt)
             print("SPOT FX RATE:", self.spot_fx_rate)
             print("ALPHA WEIGHT:", self.alpha)
             print("ATM METHOD:", self.atm_method)
@@ -2035,20 +2057,12 @@ class FXVolSurfacePlus:
                 print(f"IN ATM VOL: {100.0 * self.atm_vols[i]:9.6f}%")
 
                 if self.use_ms_25d_vol:
-                    print(
-                        f"IN MKT STR 25d VOL: {100.0 * self.ms_25_delta_vols[i]:9.6f}%"
-                    )
-                    print(
-                        f"IN RSK REV 25d VOL: {100.0 * self.rr_25_delta_vols[i]:9.6f}%"
-                    )
+                    print(f"IN MKT STR 25d VOL: {100.0 * self.ms_25_delta_vols[i]:9.6f}%")
+                    print(f"IN RSK REV 25d VOL: {100.0 * self.rr_25_delta_vols[i]:9.6f}%")
 
                 if self.use_ms_10d_vol:
-                    print(
-                        f"IN MKT STR 10d VOL: {100.0 * self.ms_10_delta_vols[i]:9.6f}%"
-                    )
-                    print(
-                        f"IN RSK REV 10d VOL: {100.0 * self.rr_10_delta_vols[i]:9.6f}%"
-                    )
+                    print(f"IN MKT STR 10d VOL: {100.0 * self.ms_10_delta_vols[i]:9.6f}%")
+                    print(f"IN RSK REV 10d VOL: {100.0 * self.rr_10_delta_vols[i]:9.6f}%")
 
             call = FXVanillaOption(
                 expiry_dt,
@@ -2112,7 +2126,7 @@ class FXVolSurfacePlus:
             model = BlackScholes(sigma_atm_out)
 
             delta_call = call.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -2120,7 +2134,7 @@ class FXVolSurfacePlus:
             )[self.delta_method_string]
 
             delta_put = put.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -2145,10 +2159,7 @@ class FXVolSurfacePlus:
                 if verbose:
 
                     print("==================================================")
-                    print(
-                        "MkkT STRANGLE 25d VOL IN: %9.6f %%"
-                        % (100.0 * self.ms_25_delta_vols[i])
-                    )
+                    print("MkkT STRANGLE 25d VOL IN: %9.6f %%" % (100.0 * self.ms_25_delta_vols[i]))
 
                 call.strike_fx_rate = self.k_25d_c_ms[i]
                 put.strike_fx_rate = self.k_25d_p_ms[i]
@@ -2156,7 +2167,7 @@ class FXVolSurfacePlus:
                 model = BlackScholes(ms_vol)
 
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2164,7 +2175,7 @@ class FXVolSurfacePlus:
                 )[self.delta_method_string]
 
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2185,7 +2196,7 @@ class FXVolSurfacePlus:
                     )
 
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2193,7 +2204,7 @@ class FXVolSurfacePlus:
                 )["v"]
 
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2226,7 +2237,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_25d_c_ms)
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2235,7 +2246,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE 0.25 AS WE USED A DIFFERENT SkkEW VOL
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2255,7 +2266,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_25d_p_ms)
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2264,7 +2275,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE -0.25 AS WE USED A DIFFERENT SkkEW VOL
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2325,7 +2336,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE +0.25
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2346,7 +2357,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE -0.25
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2398,10 +2409,7 @@ class FXVolSurfacePlus:
                 if verbose:
 
                     print("==========================================================")
-                    print(
-                        "MkkT STRANGLE 10d VOL IN: %9.6f %%"
-                        % (100.0 * self.ms_10_delta_vols[i])
-                    )
+                    print("MkkT STRANGLE 10d VOL IN: %9.6f %%" % (100.0 * self.ms_10_delta_vols[i]))
 
                 call.strike_fx_rate = self.k_10d_c_ms[i]
                 put.strike_fx_rate = self.k_10d_p_ms[i]
@@ -2409,7 +2417,7 @@ class FXVolSurfacePlus:
                 model = BlackScholes(ms_vol)
 
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2417,7 +2425,7 @@ class FXVolSurfacePlus:
                 )[self.delta_method_string]
 
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2439,7 +2447,7 @@ class FXVolSurfacePlus:
                     )
 
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2447,7 +2455,7 @@ class FXVolSurfacePlus:
                 )["v"]
 
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2481,7 +2489,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_10d_c_ms)
                 call_value = call.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2490,7 +2498,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE 0.10 AS WE HAVE USED A DIFFERENT SkkEW VOL
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2510,7 +2518,7 @@ class FXVolSurfacePlus:
 
                 model = BlackScholes(sigma_k_10d_p_ms)
                 put_value = put.value(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2519,7 +2527,7 @@ class FXVolSurfacePlus:
 
                 # THIS IS NOT GOING TO BE -0.10 AS WE HAVE USED A DIFFERENT SkkEW VOL
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2577,7 +2585,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE +0.25
                 delta_call = call.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2598,7 +2606,7 @@ class FXVolSurfacePlus:
 
                 # THIS DELTA SHOULD BE -0.25
                 delta_put = put.delta(
-                    self.value_dt,
+                    self.anchor_dt,
                     self.spot_fx_rate,
                     self.domestic_curve,
                     self.foreign_curve,
@@ -2640,9 +2648,7 @@ class FXVolSurfacePlus:
 
     ###########################################################################
 
-    def implied_dbns(
-        self, low_fx: float, high_fx: float, num_intervals: int
-    ) -> List[FinDistribution]:
+    def implied_dbns(self, low_fx: float, high_fx: float, num_intervals: int) -> List[FinDistribution]:
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""
 
@@ -2726,9 +2732,7 @@ class FXVolSurfacePlus:
 
             for _ in range(0, num_intervals):
 
-                sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, k, t) * 100.0
-                )
+                sigma = vol_function(vol_type_val, params, strikes, gaps, f, k, t) * 100.0
                 ks.append(k)
                 vols.append(sigma)
                 k = k + dk
@@ -2752,9 +2756,7 @@ class FXVolSurfacePlus:
             key_vols = []
             for kk in key_strikes:
 
-                sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
-                )
+                sigma = vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
 
                 key_vols.append(sigma)
 
@@ -2769,9 +2771,7 @@ class FXVolSurfacePlus:
             key_vols = []
             for kk in key_strikes:
 
-                sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
-                )
+                sigma = vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
 
                 key_vols.append(sigma)
 
@@ -2785,9 +2785,7 @@ class FXVolSurfacePlus:
 
             key_vols = []
             for kk in key_strikes:
-                sigma = (
-                    vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
-                )
+                sigma = vol_function(vol_type_val, params, strikes, gaps, f, kk, t) * 100.0
                 key_vols.append(sigma)
 
             plt.plot(key_strikes, key_vols, "ro", markersize=4)
@@ -2799,8 +2797,8 @@ class FXVolSurfacePlus:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self.value_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("VALUE DATE", self.anchor_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
         s += label_to_string("CCY PAIR", self.currency_pair)
         s += label_to_string("NOTIONAL CCY", self.notional_currency)

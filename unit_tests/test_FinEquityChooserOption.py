@@ -3,15 +3,14 @@
 import numpy as np
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_chooser_option import EquityChooserOption
 
 
 def assert_close(value, expected, tol=2.0e-3):
     assert np.isclose(value, expected, atol=tol), (
-        f"value={value:.10f}, expected={expected:.10f}, "
-        f"diff={value - expected:.10f}"
+        f"value={value:.10f}, expected={expected:.10f}, " f"diff={value - expected:.10f}"
     )
 
 
@@ -33,26 +32,20 @@ def test_equity_chooser_option_haug():
     dividend_yield = 0.05
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
-    chooser_option = EquityChooserOption(
-        choose_dt, call_expiry_dt, put_expiry_dt, call_strike, put_strike
-    )
+    chooser_option = EquityChooserOption(choose_dt, call_expiry_dt, put_expiry_dt, call_strike, put_strike)
 
-    v = chooser_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    v = chooser_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    v_mc = chooser_option.value_mc(
-        value_dt, stock_price, discount_curve, dividend_curve, model, 20000
-    )
+    v_mc = chooser_option.value_mc(value_dt, stock_price, discount_curve, dividend_curve, model, 20000)
 
     v_haug = 6.0508
 
-    assert_close(v, 6.020)
+    assert_close(v, 6.034)
     assert_close(v_haug, 6.0508)
-    assert_close(v_mc, 6.0587)
+    assert_close(v_mc, 6.0320)
 
 
 ########################################################################################
@@ -74,26 +67,20 @@ def test_equity_chooser_option_matlab():
 
     model = BlackScholes(volatility)
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
-    chooser_option = EquityChooserOption(
-        choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike
-    )
+    chooser_option = EquityChooserOption(choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike)
 
-    v = chooser_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    v = chooser_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    v_mc = chooser_option.value_mc(
-        value_dt, stock_price, discount_curve, dividend_curve, model, 20000
-    )
+    v_mc = chooser_option.value_mc(value_dt, stock_price, discount_curve, dividend_curve, model, 20000)
 
     v_matlab = 8.9308
 
-    assert_close(v, 8.833)
+    assert_close(v, 8.931)
     assert_close(v_matlab, 8.931)
-    assert_close(v_mc, 8.936)
+    assert_close(v_mc, 8.927)
 
 
 ########################################################################################
@@ -114,23 +101,17 @@ def test_equity_chooser_option_derivicom():
     dividend_yield = 0.0625
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
-    chooser_option = EquityChooserOption(
-        choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike
-    )
+    chooser_option = EquityChooserOption(choose_date, call_expiry_dt, put_expiry_dt, call_strike, put_strike)
 
-    v = chooser_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model
-    )
+    v = chooser_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    v_mc = chooser_option.value_mc(
-        value_dt, stock_price, discount_curve, dividend_curve, model, 20000
-    )
+    v_mc = chooser_option.value_mc(value_dt, stock_price, discount_curve, dividend_curve, model, 20000)
 
     v_derivicom = 1.0989
 
-    assert round(v, 3) == 1.105
-    assert round(v_derivicom, 4) == 1.0989
-    assert round(v_mc, 4) == 1.1095
+    assert_close(v, 1.105)
+    assert_close(v_derivicom, 1.0989)
+    assert_close(v_mc, 1.1046)

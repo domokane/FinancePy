@@ -93,7 +93,7 @@ class BlackShifted:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         s += label_to_string("SHIFT", self.shift)
         s += label_to_string("IMPLEMENTATION", self.implementation)

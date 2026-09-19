@@ -1,4 +1,196 @@
 ## CHANGE LOG
+18 Sep 2026 Part 3
+- Global renaming of curve value date to anchor date for better clarity
+
+18 Sep 2026 Part 2
+List of changes
+- Small change to indep_loss_dbn_hetero_adj_binomial using floor - see change in file
+- AsianOptionValuationMethods changed to AsianOptionValuationTypes
+- Cleaned up unused imports
+
+18 Sep 2026 Part 1
+List of changes
+- Moved DIRTY and CLEAN indices to global vars
+- Added dc_type to CDS curve
+- Added curve_years function to discount_curve
+- Global enforcement of value_dt removing valuation_date
+- Ensure all swap calibration is based on value_dt
+- Move calculation of r and q to curve.zero_rate_cc
+- Migrated several valuation models from products to models folder
+- Added checks for curve anchor dates - check_curve_dt
+- Added checks for stock prices
+- Added function option_years
+- Enforced use of t_exp in options as much as possible
+
+16 Sep 2026
+List of changes
+- Added check_values module to init to check values of specific input types in one place
+- Reordered inputs to ZeroRatesDiscountCurve so dc_type is 5th not 6th input
+- Added format_graphs.py to utils to standardise plotting look
+- Renamed Svensson curve type to NelsonSiegelSvensson
+- Renamed Polynomial(3) curve type to CubicPolynomial
+- Renamed Polynomial(4) curve type to QuarticPolynomial
+- Renamed Polynomial(5) curve type to QuinticPolynomial
+- Renamed Svensson curve types to NelsonSiegelSvensson
+- BondParametricYieldCurve now takes a CurveFitType rather than a stateful object
+- BondParametricDiscountCurve now takes a CurveFitType rather than a stateful object
+- black_scholes_analytic - fixed implied volatility stability
+- Added CEV model to models
+- Added Dupire model to models
+- Added forward pricers to models for FX, equity, rates, commodities
+- Enhance Heston model in models
+- Added implied_volatility_surface to models
+- Added lognormal mixture model to models
+- Added lognormal mixture surface model to models
+- Improved MertonFirm model function names
+- Improved MertonFirmMkt model function names
+- Added MertonJumpDiffusion model to models
+- Added dedicated SVI model to models
+- Added dedicated SVISurface model to models
+- Added dedicated SSVISurface model to models
+- Fixed bug in units in bond_zero
+- Updated regression tests
+- Updated unit tests
+- Updated notebooks
+
+21 August 2026 - RELEASE OF FINANCEPY V1.1.2
+List of changes
+- EquityChooserOption - enforced term structure for q and r
+- EquityChooserOption - handled t = t_c
+- EquityVolCurve - Amended constructor to hold all internal info
+- EquityVolCurve - Added new and improved interpolation schemes
+- EquityVolCurve - Added new and improved extrapolation schemes
+- black_scholes_analytic - Added fwd, d1, and d2 functions
+- black_scholes_analytic - fixed and vectorised American option analytic approximations
+- black_scholes_hedging_sim - added new numba BS delta hedging simulator
+- black_scholes_mc - moved option_type to last argument in line with black_scholes_analytic
+- option_implied_dbn - improved
+- EquityForwardStart - new product type
+- math.py - vectorisation of M function for bivariates
+- Fast solver in IborSingleCurve
+
+10 August 2026
+List of changes
+- Renaming changes
+    - FinCompoundingTypes renamed OISCompoundingTypes
+    - FinProcessSimulator renamed ProcessSimulator
+    - FinFXATMTypes renamed FXATMTypes
+    - FinFXDeltaMethodTypes renamed FXDeltaMethodTypes
+    - FinInflationIndexCurve renamed InflationIndexCurve
+    - FinInflationSwap renamed InflationSwap
+    - FinInflationBond renamed InflationBond
+- Migration of types to global_types file
+    - InterpTypes moved to global_types.py
+    - VolFuncTypes moved to global_types.py
+    - FXATMTypes moved to global_types.py
+    - FXDeltaMethodTypes moved to global_types.py
+    - BlackTypes moved to global_types.py
+    - BlackScholesTypes moved to global_types.py
+    - CIRNumericalSchemeTypes moved to global_types.py
+    - HestonNumericalSchemeTypes moved to global_types
+    - LMMModelTypes moved to global_types.py
+    - GBMNumericalSchemeTypes moved to global_types.py
+    - YTMCalcType moved to global_types.py
+    - ProcessTypes moved to global_types.py
+    - FXBarrierTypes moved to global_types.py
+    - OISCompoundingTypes moved to global_types.py
+    - HWEuropeanCalcTypes moved to global_types.py
+    - DigitalOptionTypes moved to global_types.py
+
+
+9 August 2026
+- Added more calendars
+    - AUSTRALIA_RITS
+    - SINGAPORE
+    - ZURICH
+    - TOKYO
+    - US GOVERNMENT SECURITIES
+    - US FEDERAL RESERVE
+    - TORONTO
+    - HONK KONG
+- Joint calendars are now possible for following classes
+    - CDS
+    - CDS_BASKET
+    - CDS_TRANCHE
+    - CDS_OPTION
+    - EQUITY_SWAP
+    - EQUITY_SWAP_LEG
+    - IBOR_BASIS_SWAP
+    - IBOR_FIXED_FLOAT_SWAP
+    - IBOR_SWAP
+    - IBOR_SWAPTION
+    - FinFixedFixedXCCySwap
+    - IborIborSwap
+    - fixed_fixed_cross_ccy
+    - fixed_float_cross_ccy_swap
+    - float_float_cross_ccy_swap
+    - Schedule
+- Upgraded Amount class for potential future use
+    - Amount now takes currency
+    - Added overloaded math functionality
+- Date changes
+    - Removed datelite class
+    - Moved date_arrays into date class
+- Removed singleton class
+
+6 August 2026
+RELEASE OF FINANCEPY  V1.1.0
+List of changes
+
+- This release renames a wide set of the Discount curves
+    - DiscountCurveFlat -> FlatDiscountCurve
+    - DiscountCurveNS -> NSDiscountCurve
+    - DiscountCurveNSS -> NSSDiscountCurve
+    - DiscountCurvePoly -> PolyDiscountCurve
+    - DiscountCurvePWFONF -> PWFONFDiscountCurve
+    - DiscountCurvePWF -> PWFDiscountCurve
+    - DiscountCurveZeros -> ZeroRatesDiscountCurve
+- This release moves some product-based curves from product folders to market->curves
+    - IborSingleCurve moves
+    - IborCurveRiskEngine moves
+    - IborSingleCurveParShocker moves
+    - IborSingleCurveSmoothingCalibrator moves
+    - IborDualCurve moves
+    - OISCurve moves
+    - CDSCurve moves
+- A number of changes in CDS valuation
+    - Renamed credit01 to spread dv01 like Bloomberg
+    - Renamed rate01 to ir dv01 like Bloomberg
+    - Renamed risky_pv01 function name rpv01
+    - Removed dicts and define pair returns to be (DIRTY, CLEAN)
+    - Improved accuracy of fast approximator
+- Tweaked solver1D to be more gentle on convergence
+- Added vectorised American pricers to black_scholes_analytic using numerical approximations
+- FXBarrierModel code moved to models folder
+- Renamed bond_callable.py to bond_embedded_option.py as this is what it contains
+- Removed UNITED_KINGDOM from Calendars as UK is England + Wales + Scotland
+- Added LONDON to Calendars for England to replace UNITED_KINGDOM
+- Repaired intraday date functionality in Date class
+- Updated all notebooks to ensure they work
+- Updated regression and unit tests
+
+###############################################################################
+
+15 June 2026
+
+- Added bond boostrap discount curve to do exact fit to bond prices
+- Added bond parametric discount curve to do parametric best fit to bond prices
+- Added bond parametric yield curve to do parametric best fit to yields
+- Removed BondFittedZeroCurve (replaced by BondParametricDiscountCurve)
+- Removed BondFittedYieldCurve (replaced by BondParametricYieldCurve)
+- Removed BondExactZeroCurve (replaced by BondBootstrapDiscountCurve)
+- Widespread switch to use times_from_dates to avoid G_DAYS_IN_YEAR to be completed
+- Removed LINEAR_FWD_RATE interpolation as incorrect
+- Added LINEAR_DISCOUNT interpolation
+- Fixed optimiser use in FXVolSurfaces to handle precision
+- Bond curve files all moved under market->curves
+
+26 May 2026
+- Cleaning up code in models folder - adding validation of inputs, type checking
+- Fixed minor bug in Compound Option on tree
+- Fixed bug in LSMC - I now regress on ITM paths only
+- Tidied up finite_difference module
+
 19 May 2026
 - Further tidying up of Discount Curves folder
 - Tidying up of vol curve and surfaces

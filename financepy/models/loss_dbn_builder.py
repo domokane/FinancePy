@@ -10,11 +10,10 @@ from ..utils.math import pair_gcd
 
 from typing import Sequence
 
+
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
 def indep_loss_dbn_hetero_adj_binomial(
-    num_credits: int,
-    cond_probs: Sequence[float],
-    loss_ratio: Sequence[float]
+    num_credits: int, cond_probs: Sequence[float], loss_ratio: Sequence[float]
 ) -> np.ndarray:
 
     # Algorithm due to D. O'Kane.
@@ -46,9 +45,21 @@ def indep_loss_dbn_hetero_adj_binomial(
         v_approx += loss_ratio2 * p * (1.0 - p)
         v_exact += loss_ratio2 * cond_probs[i_credit] * (1.0 - cond_probs[i_credit])
 
+    ####################################################################
+    # mean_loss = p * num_credits
+    # mean_above = round(mean_loss + 1)
+    # mean_below = round(mean_loss)
+
+    # See https://github.com/domokane/FinancePy/issues/265#issuecomment-5710467642
+
     mean_loss = p * num_credits
-    mean_above = round(mean_loss + 1)
-    mean_below = round(mean_loss)
+    mean_below = min(
+        int(np.floor(mean_loss)),
+        num_credits - 1,
+    )
+    mean_above = mean_below + 1
+
+    #####################################################################
 
     if mean_above > num_credits:
         mean_above = num_credits
@@ -57,10 +68,7 @@ def indep_loss_dbn_hetero_adj_binomial(
     diff_below = mean_below - mean_loss
 
     # DOK - TO DO - SIMPLIFY THIS CODE AS PER JOD PAPER
-    term = (
-        diff_above * diff_above
-        + (diff_below * diff_below - diff_above * diff_above) * diff_above
-    )
+    term = diff_above * diff_above + (diff_below * diff_below - diff_above * diff_above) * diff_above
 
     numer = v_exact - term
     denom = v_approx - term
@@ -84,9 +92,7 @@ def indep_loss_dbn_hetero_adj_binomial(
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def portfolio_gcd(
-    actual_losses: Sequence[float]
-) -> float:
+def portfolio_gcd(actual_losses: Sequence[float]) -> float:
 
     num_credits = len(actual_losses)
     scaling = 1000000
@@ -106,9 +112,7 @@ def portfolio_gcd(
 
 @njit(float64[:](int64, float64[:], float64[:]), fastmath=True, cache=True)
 def indep_loss_dbn_recursion_gcd(
-    num_credits: int,
-    cond_default_probs: Sequence[float],
-    loss_units: Sequence[float]
+    num_credits: int, cond_default_probs: Sequence[float], loss_units: Sequence[float]
 ) -> np.ndarray:
 
     num_loss_units = 1
@@ -130,9 +134,7 @@ def indep_loss_dbn_recursion_gcd(
             next_dbn[i_loss_unit] = prev_dbn[i_loss_unit] * (1.0 - p)
 
         for i_loss_unit in range(loss, num_loss_units):
-            next_dbn[i_loss_unit] = prev_dbn[i_loss_unit - loss] * p + prev_dbn[
-                i_loss_unit
-            ] * (1.0 - p)
+            next_dbn[i_loss_unit] = prev_dbn[i_loss_unit - loss] * p + prev_dbn[i_loss_unit] * (1.0 - p)
 
         for i_loss_unit in range(0, num_loss_units):
             prev_dbn[i_loss_unit] = next_dbn[i_loss_unit]

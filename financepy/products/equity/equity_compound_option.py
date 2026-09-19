@@ -4,18 +4,18 @@
 
 import numpy as np
 
-from financepy.models import equity_compound_option_bs
-
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 
 from ...products.equity.equity_option import EquityOption
-from ...market.curves.discount_curve_flat import DiscountCurve
+from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
-from ...models.equity_compound_option_bs import equity_compound_option_bs
 from ...models.equity_compound_option_bs import equity_compound_option_value_tree
+from ...models.equity_compound_option_bs import equity_compound_option_bs
+from ...utils.check_values import check_curve_dt
+from ...utils.helpers import option_years
 
 ########################################################################################
 # TODO: Vectorise pricer
@@ -32,15 +32,15 @@ class EquityCompoundOption(EquityOption):
     def __init__(
         self,
         c_expiry_dt: Date,  # Compound Option expiry date
-        c_opt_type: OptionTypes,  # Compound option type
+        c_opt_type: OptionTypes,  # Compound OPTION_TYPE
         c_strike_price: float,  # Compound option strike
         u_expiry_dt: Date,  # Underlying option expiry date
-        u_opt_type: OptionTypes,  # Underlying option type
+        u_opt_type: OptionTypes,  # Underlying OPTION_TYPE
         u_strike_price: float,
     ):  # Underlying option strike price
         """Create the EquityCompoundOption by passing in the first and
         second expiry dates as well as the corresponding strike prices and
-        option types."""
+        OPTION_TYPEs."""
 
         check_argument_types(self.__init__, locals())
 
@@ -61,9 +61,7 @@ class EquityCompoundOption(EquityOption):
             OptionTypes.EUROPEAN_PUT,
             OptionTypes.AMERICAN_PUT,
         ):
-            raise FinError(
-                "Underlying option must be European or American call or put."
-            )
+            raise FinError("Underlying option must be European or American call or put.")
 
         self.c_expiry_dt = c_expiry_dt
         self.c_strike_price = float(c_strike_price)
@@ -97,26 +95,16 @@ class EquityCompoundOption(EquityOption):
         if value_dt > self.u_expiry_dt:
             raise FinError("Valuation date after underlying expiry date.")
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
-
-        if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve valuation date not same as option value date"
-            )
-
         tc = (self.c_expiry_dt - value_dt) / G_DAYS_IN_YEAR
         tu = (self.u_expiry_dt - value_dt) / G_DAYS_IN_YEAR
         kc = self.c_strike_price
         ku = self.u_strike_price
 
-        df_u = discount_curve.df(self.u_expiry_dt)
-        ru = -np.log(df_u) / tu
+        tc = option_years(value_dt, self.c_expiry_dt)
+        tu = option_years(value_dt, self.u_expiry_dt)
 
-        dq_u = dividend_curve.df(self.u_expiry_dt)
-        qu = -np.log(dq_u) / tu
+        ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
+        qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)
 
         vol = np.maximum(model.volatility, G_SMALL)
 
@@ -138,9 +126,19 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132."""
 
-        tc, tu, kc, ku, ru, qu, vol = self._preprocess_inputs(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
+        ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
+        qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)
+
+        tc = option_years(value_dt, self.c_expiry_dt)
+        tu = option_years(value_dt, self.u_expiry_dt)
+
+        kc = self.c_strike_price
+        ku = self.u_strike_price
+
+        vol = np.maximum(model.volatility, G_SMALL)
 
         v = equity_compound_option_bs(
             self.c_opt_type.value,
@@ -173,9 +171,23 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132."""
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
         tc, tu, kc, ku, ru, qu, vol = self._preprocess_inputs(
             value_dt, stock_price, discount_curve, dividend_curve, model
         )
+
+        ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
+        qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)
+
+        tc = option_years(value_dt, self.c_expiry_dt)
+        tu = option_years(value_dt, self.u_expiry_dt)
+
+        kc = self.c_strike_price
+        ku = self.u_strike_price
+
+        vol = np.maximum(model.volatility, G_SMALL)
 
         v = equity_compound_option_value_tree(
             self.c_opt_type.value,
@@ -196,13 +208,13 @@ class EquityCompoundOption(EquityOption):
     ####################################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("CPD EXPIRY DATE", self.c_expiry_dt)
         s += label_to_string("CPD STRIKE PRICE", self.c_strike_price)
-        s += label_to_string("CPD OPTION TYPE", self.c_opt_type)
+        s += label_to_string("CPD OPTION_TYPE", self.c_opt_type)
         s += label_to_string("UND EXPIRY DATE", self.u_expiry_dt)
         s += label_to_string("UND STRIKE PRICE", self.u_strike_price)
-        s += label_to_string("UND OPTION TYPE", self.u_opt_type)
+        s += label_to_string("UND OPTION_TYPE", self.u_opt_type)
         return s
 
     ####################################################################################

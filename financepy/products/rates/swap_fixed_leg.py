@@ -22,6 +22,7 @@ from ...utils.helpers import (
 )
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 
@@ -140,13 +141,11 @@ class SwapFixedLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 
-            (year_frac, num, _) = day_counter.year_frac(prev_dt, next_dt)
+            year_frac, num, _ = day_counter.year_frac(prev_dt, next_dt)
 
             self.rates.append(self.cpn)
 
@@ -160,13 +159,13 @@ class SwapFixedLeg:
 
     ###########################################################################
 
-    def value(
-        self, value_dt: Date, discount_curve: DiscountCurve, pv_only=True
-    ):
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, pv_only=True):
 
         self.payment_dfs = []
         self.payment_pvs = []
         self.cumulative_pvs = []
+
+        check_curve_dt(value_dt, discount_curve)
 
         notional = self.notional
         df_value = discount_curve.df(value_dt)
@@ -334,16 +333,16 @@ class SwapFixedLeg:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.effective_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self.termination_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("PRINCIPAL", self.principal)
         s += label_to_string("LEG TYPE", self.leg_type)
         s += label_to_string("COUPON", self.cpn)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self.dg_type)

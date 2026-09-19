@@ -7,7 +7,7 @@ import add_fp_to_path
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_float_lookback_option import FXFloatLookbackOption
 from financepy.products.fx.fx_fixed_lookback_option import FXFixedLookbackOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -27,10 +27,10 @@ def test_equity_look_back_option():
     num_steps_per_year = 252
 
     domestic_rate = 0.05
-    domestic_curve = DiscountCurveFlat(value_dt, domestic_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, domestic_rate)
 
     foreign_rate = 0.02
-    foreign_curve = DiscountCurveFlat(value_dt, foreign_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, foreign_rate)
 
     test_cases.header(
         "NUMPATHS",

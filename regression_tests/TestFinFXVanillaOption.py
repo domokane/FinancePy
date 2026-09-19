@@ -9,10 +9,10 @@ from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.models.sabr import SABR
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -48,8 +48,8 @@ def test_fin_fx_vanilla_option_wystup_example1():
 
     notional = 1000000.0
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, ccy2_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 
@@ -119,8 +119,8 @@ def test_fin_fx_vanilla_option_wystup_example2():
 
     notional = 1000000.0
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, ccy2_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 
@@ -245,8 +245,8 @@ def test_fin_fx_vanilla_option_hull_example():
     dom_interest_rate = 0.08
     for_interest_rate = 0.11
     model = BlackScholes(volatility)
-    domestic_curve = DiscountCurveFlat(value_dt, dom_interest_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_interest_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
 
     num_paths_list = [10000, 20000, 40000, 80000, 160000, 320000]
 
@@ -468,8 +468,8 @@ def test_fin_fx_vanilla_option_sabr_example():
     dom_name = "JPY"
     for_cc_rate = 0.0381  # USD
     dom_cc_rate = 0.000396  # JPY
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
     currency_pair = for_name + dom_name
     spot_fx_rate = 131.32
     strike_price = 130

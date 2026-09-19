@@ -4,7 +4,7 @@ from math import sqrt
 import numpy as np
 
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.products.equity.equity_rainbow_option import (
     EquityRainbowOptionTypes,
@@ -26,7 +26,7 @@ value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 1, 2016)
 interest_rate = 0.05
 
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
 num_assets = 2
 volatilities = np.ones(num_assets) * 0.3
@@ -35,7 +35,7 @@ dividend_yields = np.ones(num_assets) * 0.01
 
 dividend_curves = []
 for q in dividend_yields:
-    dividend_curve = DiscountCurveFlat(value_dt, q)
+    dividend_curve = FlatDiscountCurve(value_dt, q)
     dividend_curves.append(dividend_curve)
 
 stock_prices = np.ones(num_assets) * 100
@@ -206,7 +206,7 @@ def test_call_on_nth():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     payoff_type = EquityRainbowOptionTypes.CALL_ON_NTH
@@ -251,7 +251,7 @@ def test_put_on_nth():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     payoff_type = EquityRainbowOptionTypes.PUT_ON_NTH

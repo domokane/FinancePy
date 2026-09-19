@@ -12,7 +12,7 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date
 from financepy.products.rates.swap_fixed_leg import SwapFixedLeg
 from financepy.products.rates.swap_float_leg import SwapFloatLeg
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -122,7 +122,7 @@ def test_fin_float_ibor_leg():
         dg_type,
     )
 
-    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
+    libor_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     first_fixing = 0.03
 
@@ -165,7 +165,7 @@ def test_fin_float_ois_leg():
         dg_type,
     )
 
-    libor_curve = DiscountCurveFlat(effective_dt, 0.05)
+    libor_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     first_fixing = 0.03
 
@@ -242,8 +242,8 @@ def test_swap_float_leg():
     fixedleg_2.generate_payments()
     floatleg_2.generate_payment_dts()
 
-    discount_curve = DiscountCurveFlat(effective_dt, 0.05)
-    index_curve = DiscountCurveFlat(effective_dt, 0.05)
+    discount_curve = FlatDiscountCurve(effective_dt, 0.05)
+    index_curve = FlatDiscountCurve(effective_dt, 0.05)
 
     floatleg_2.value(effective_dt, discount_curve, index_curve)
     # print("leg_2")

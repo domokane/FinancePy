@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 import matplotlib.pyplot as plt
@@ -11,9 +12,9 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_benchmarks_report import (
     dataframe_to_benchmarks,
 )
@@ -31,7 +32,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 def test_z_spread_flat_curve():
 
     settle_dt = Date(19, 9, 2012)
-    base_curve = DiscountCurveFlat(settle_dt, flat_rate=1 * G_PERCENT)
+    base_curve = FlatDiscountCurve(settle_dt, flat_rate=1 * G_PERCENT)
     return _test_z_spread_for_curve(base_curve)
 
 
@@ -43,27 +44,19 @@ def test_z_spread_actual_curve():
     path = os.path.join(os.path.dirname(__file__), "./data/GBP_OIS_20120919.csv")
     dfbm = pd.read_csv(path, index_col=0)
 
-    dfbm["base_date"] = pd.to_datetime(
-        dfbm["base_date"], errors="ignore", format="%d/%m/%Y"
-    )
-    dfbm["start_dt"] = pd.to_datetime(
-        dfbm["start_dt"], errors="ignore", format="%d/%m/%Y"
-    )  # allow tenors
-    dfbm["maturity_dt"] = pd.to_datetime(
-        dfbm["maturity_dt"], errors="ignore", format="%d/%m/%Y"
-    )  # allow tenors
+    dfbm["base_date"] = pd.to_datetime(dfbm["base_date"], errors="ignore", format="%d/%m/%Y")
+    dfbm["start_dt"] = pd.to_datetime(dfbm["start_dt"], errors="ignore", format="%d/%m/%Y")  # allow tenors
+    dfbm["maturity_dt"] = pd.to_datetime(dfbm["maturity_dt"], errors="ignore", format="%d/%m/%Y")  # allow tenors
 
-    valuation_date = from_datetime(dfbm.loc[0, "base_date"])
-    cal = CalendarTypes.UNITED_KINGDOM
-    bms = dataframe_to_benchmarks(dfbm, asof_date=valuation_date, calendar_type=cal)
+    value_dt = from_datetime(dfbm.loc[0, "base_date"])
+    cal = CalendarTypes.LONDON
+    bms = dataframe_to_benchmarks(dfbm, asof_date=value_dt, calendar_type=cal)
     depos = bms["IborDeposit"]
     fras = bms["IborFRA"]
     swaps = bms["IborSwap"]
 
     fras.sort(key=lambda fra: fra.maturity_dt)
-    libor_curve = IborSingleCurve(
-        valuation_date, depos, fras, swaps, InterpTypes.LINEAR_ZERO_RATES
-    )
+    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps, InterpTypes.LINEAR_ZERO_RATES)
 
     return _test_z_spread_for_curve(libor_curve)
 
@@ -77,9 +70,7 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
     bond_dataframe = pd.read_csv(path, sep="\t")
     bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
-    bond_dataframe["maturity"] = pd.to_datetime(
-        bond_dataframe["maturity"], format="%d-%b-%y"
-    )
+    bond_dataframe["maturity"] = pd.to_datetime(bond_dataframe["maturity"], format="%d-%b-%y")
     freq_type = FrequencyTypes.SEMI_ANNUAL
     accrual_type = DayCountTypes.ACT_ACT_ICMA
 
@@ -90,10 +81,8 @@ def _test_z_spread_for_curve(base_curve: DiscountCurve):
         coupon = bond_row["coupon"] / 100.0
         clean_price = bond_row["mid"]
         bond = Bond(issue_dt, maturity_dt, coupon, freq_type, accrual_type)
-        z_spread = bond.z_spread(base_curve.value_dt, clean_price, base_curve)
-        asset_swap_spread = bond.asset_swap_spread(
-            base_curve.value_dt, clean_price, base_curve
-        )
+        z_spread = bond.z_spread(base_curve.anchor_dt, clean_price, base_curve)
+        asset_swap_spread = bond.asset_swap_spread(base_curve.anchor_dt, clean_price, base_curve)
         bond_dataframe.loc[bdf_index, "z_spread"] = z_spread
         bond_dataframe.loc[bdf_index, "asset_swap_spread"] = asset_swap_spread
 

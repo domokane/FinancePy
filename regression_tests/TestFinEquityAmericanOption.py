@@ -6,7 +6,7 @@ import add_fp_to_path
 
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.utils.global_types import OptionTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -27,8 +27,8 @@ def test_equity_american_option():
     volatility = 0.40
     strike_price = 50.0
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     test_cases.banner("================== EUROPEAN PUT =======================")
 

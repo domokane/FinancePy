@@ -43,7 +43,7 @@ class IborBasisSwap:
         leg_2_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         leg_2_spread: float = 0.0,
         notional: float = ONE_MILLION,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):
@@ -126,6 +126,10 @@ class IborBasisSwap:
         if index_curve_leg_2 is None:
             index_curve_leg_2 = discount_curve
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve_leg_1)
+        check_curve_dt(value_dt, index_curve_leg_2)
+
         float_leg_1_value = self.float_leg_1.value(
             value_dt,
             discount_curve,
@@ -171,7 +175,7 @@ class IborBasisSwap:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += self.float_leg_1.__repr__()
         s += "\n"
         s += self.float_leg_2.__repr__()

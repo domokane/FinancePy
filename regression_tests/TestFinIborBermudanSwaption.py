@@ -15,7 +15,7 @@ from financepy.models.black import Black
 from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.bdt_tree import BDTTree
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from FinTestCases import FinTestCases, global_test_case_mode
 
 
@@ -37,7 +37,7 @@ def test_ibor_bermudan_swaptionbk_model():
     swap_fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
     swap_fixed_dc_type = DayCountTypes.ACT_365F
 
-    libor_curve = DiscountCurveFlat(
+    libor_curve = FlatDiscountCurve(
         value_dt, 0.0625, FrequencyTypes.SEMI_ANNUAL, DayCountTypes.ACT_365F
     )
 

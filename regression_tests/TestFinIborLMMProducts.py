@@ -10,7 +10,7 @@ from financepy.utils.global_types import CapFloorTypes
 from financepy.products.rates.ibor_swaption import IborSwaption
 from financepy.products.rates.ibor_swaption import SwapTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black import Black
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -35,7 +35,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 #     fixed_cpn = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
-#     discount_curve = FinDiscountCurveFlat(value_dt,
+#     discount_curve = FinFlatDiscountCurve(value_dt,
 #                                          0.04,
 #                                          FrequencyTypes.ANNUAL)
 
@@ -97,7 +97,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 #         swapVolSimNF = LMMSimSwaptionVol(a, b, fwd0, fwdsNF, taus)
 
 #         value_dt = Date(1, 1, 2010)
-#         libor_curve = FinDiscountCurveFlat(value_dt, r,
+#         libor_curve = FinFlatDiscountCurve(value_dt, r,
 #                                           FrequencyTypes.QUARTERLY)
 #         settle_dt = value_dt
 #         exercise_dt = settle_dt.add_months(a*3)
@@ -148,7 +148,7 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 #     capFloorRate = 0.04
 
 #     # DEFINE THE DISCOUNT CURVE
-#     discount_curve = FinDiscountCurveFlat(value_dt,
+#     discount_curve = FinFlatDiscountCurve(value_dt,
 #                                          0.04,
 #                                          FrequencyTypes.ANNUAL)
 

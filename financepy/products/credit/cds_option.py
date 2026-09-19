@@ -15,6 +15,10 @@ from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.error import FinError
+from ...utils.check_values import check_curve_dt
+
+DIRTY = 0
+CLEAN = 1
 
 ########################################################################################
 
@@ -53,7 +57,7 @@ class CDSOption:
         knockout_flag: bool = True,
         freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):
@@ -96,6 +100,8 @@ class CDSOption:
         if volatility < 0.0:
             raise FinError("Volatility must be greater than zero")
 
+        check_curve_dt(value_dt, issuer_curve)
+
         # The underlying is a forward starting option that steps in on
         # the expiry date and matures on the expiry date with a coupon
         # set equal to the option spread strike
@@ -114,7 +120,7 @@ class CDSOption:
 
         strike = self.strike_cpn
         forward_spread = cds.par_spread(value_dt, issuer_curve)
-        forward_rpv01 = cds.risky_pv01(value_dt, issuer_curve)["dirty_rpv01"]
+        forward_rpv01 = cds.rpv01(value_dt, issuer_curve)[DIRTY]
 
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         log_moneyness = log(forward_spread / strike)

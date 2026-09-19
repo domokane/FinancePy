@@ -37,6 +37,8 @@ from ...utils.global_types import OptionTypes
 from ...utils.global_types import SwapTypes
 from ...utils.global_types import ExerciseTypes
 
+from ...utils.check_values import check_curve_dt
+
 ########################################################################################
 
 
@@ -57,7 +59,7 @@ class IborSwaption:
         notional: float = ONE_MILLION,
         float_freq_type: FrequencyTypes = FrequencyTypes.QUARTERLY,
         float_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
-        cal_type: CalendarTypes = CalendarTypes.WEEKEND,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ):
@@ -127,6 +129,8 @@ class IborSwaption:
         )
 
         k = self.fixed_cpn
+
+        check_curve_dt(value_dt, discount_curve)
 
         # The pv01 is the value of the swap cash flows as of the curve date
         pv01 = swap.pv01(value_dt, discount_curve)
@@ -219,9 +223,9 @@ class IborSwaption:
             )
 
             if self.fixed_leg_type == SwapTypes.PAY:
-                swaption_price = swaption_px[0]
-            elif self.fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = swaption_px[1]
+            elif self.fixed_leg_type == SwapTypes.RECEIVE:
+                swaption_price = swaption_px[0]
             else:
                 raise FinError("Unknown swaption option type" + str(self.swap_type))
 
@@ -284,9 +288,7 @@ class IborSwaption:
 
     ###########################################################################
 
-    def cash_settled_value(
-        self, value_dt: Date, discount_curve, swap_rate: float, model
-    ):
+    def cash_settled_value(self, value_dt: Date, discount_curve, swap_rate: float, model):
         """Valuation of a Ibor European-style swaption using a cash settled
         approach which is a market convention that used Black's model and that
         discounts all of the future payments at a flat swap rate. Note that the
@@ -294,6 +296,8 @@ class IborSwaption:
         Black volatility for the standard arbitrage-free valuation."""
 
         float_spread = 0.0
+
+        check_curve_dt(value_dt, discount_curve)
 
         swap = IborSwap(
             self.exercise_dt,
@@ -329,9 +333,7 @@ class IborSwaption:
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
         else:
-            raise FinError(
-                "Cash settled swaptions must be priced using" + " Black's model."
-            )
+            raise FinError("Cash settled swaptions must be priced using" + " Black's model.")
 
         self.fwd_swap_rate = swap_rate
         self.forward_df = discount_curve.df(self.exercise_dt)
@@ -369,7 +371,7 @@ class IborSwaption:
     def __repr__(self):
         """Function to allow us to print the swaption details."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("SETTLEMENT DATE", self.settle_dt)
         s += label_to_string("EXERCISE DATE", self.exercise_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", str(self.fixed_leg_type))

@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 
 import add_fp_to_path
 
+import inspect
+
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -13,15 +15,15 @@ from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ois import OIS
+
 from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.ois_curve import OISCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_dual_curve import IborDualCurve
 
 from financepy.utils.math import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
-
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.dual_curve import IborDualCurve
-from financepy.products.rates.ois_curve import OISCurve
-from financepy.products.rates.ois import OIS
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -462,6 +464,7 @@ def test_bloomberg_pricing_example():
 
     ois_curve = build_ois(value_dt)
     #    print(ois_curve)
+
 
     libor_dual_curve = IborDualCurve(
         value_dt,

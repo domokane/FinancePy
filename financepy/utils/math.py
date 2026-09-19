@@ -4,16 +4,18 @@
 
 
 # from math import exp, sqrt, fabs, log
-from numba import njit, boolean, int64, float64, vectorize
+from numba import njit, boolean, int64, float64, vectorize, types
+from numba.extending import overload
+
 import numpy as np
 from .error import FinError
 
 PI = 3.14159265358979323846
 INV_ROOT_2_PI = 0.3989422804014327
 
-ONE_MILLION = 1000000
-TEN_MILLION = 10000000
-ONE_BILLION = 1000000000
+ONE_MILLION = 1_000_000
+TEN_MILLION = 10_000_000
+ONE_BILLION = 1000_000_000
 
 ########################################################################################
 # TODO: Move this somewhere else.
@@ -549,16 +551,6 @@ def norminvcdf(p):
 
 
 ########################################################################################
-# This is named for consistency with Haug and its conciseness. Consider renaming
-# phi2 to M
-
-
-@njit(fastmath=True, cache=True)
-def M(a, b, c):
-    return phi2(a, b, c)
-
-
-########################################################################################
 
 
 @njit(float64(float64, float64, float64), fastmath=True, cache=True)
@@ -613,18 +605,13 @@ def phi2(h1, hk, r):
             h6 = h6 / r3
             aa = 0.5 - h3 * 0.125
             ab = 3.0 - 2.0 * aa * h5
-            bv = (
-                0.13298076 * h6 * ab * normcdf(-h6)
-                - np.exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
-            )
+            bv = 0.13298076 * h6 * ab * normcdf(-h6) - np.exp(-h5 / r2) * (ab + aa * r2) * 0.053051647
 
             for i in range(0, 5):
                 r1 = r3 * x[i]
                 rr = r1 * r1
                 r2 = np.sqrt(1.0 - rr)
-                bv = bv - w[i] * np.exp(-h5 / rr) * (
-                    np.exp(-h3 / (1.0 + r2)) / r2 / h7 - 1.0 - aa * rr
-                )
+                bv = bv - w[i] * np.exp(-h5 / rr) * (np.exp(-h3 / (1.0 + r2)) / r2 / h7 - 1.0 - aa * rr)
 
         if r > 0.0:
             bv = bv * r3 * h7 + normcdf(min(h1, h2))
@@ -635,6 +622,23 @@ def phi2(h1, hk, r):
                 bv = -bv * r3 * h7 + normcdf(h1) + normcdf(hk) - 1.0
 
     return bv
+
+
+########################################################################################
+# This is named for consistency with Haug and its conciseness. Consider renaming
+# phi2 to M
+
+
+# @njit(fastmath=True, cache=True)
+
+
+@vectorize(
+    [float64(float64, float64, float64)],
+    fastmath=True,
+    cache=True,
+)
+def M(a, b, c):
+    return phi2(a, b, c)
 
 
 ########################################################################################
@@ -732,10 +736,7 @@ def solve_tridiagonal_matrix(a_matrix, r):
         gam[j] = c[j - 1] / bet
         bet = b[j] - a[j] * gam[j]
         if bet == 0:
-            raise ValueError(
-                "Variable bet should be non-zero. "
-                "Perhaps this algorithm is not suited to the problem"
-            )
+            raise ValueError("Variable bet should be non-zero. " "Perhaps this algorithm is not suited to the problem")
         u[j] = (r[j] - a[j] * u[j - 1]) / bet
 
     for j in range(n - 2, -1, -1):

@@ -16,7 +16,7 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -37,8 +37,8 @@ def test_fin_binomial_tree():
     expiry_dt = Date(1, 1, 2017)
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, risk_free_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, risk_free_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     num_steps_list = [100, 500, 1000]
 

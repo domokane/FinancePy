@@ -10,7 +10,7 @@ from financepy.utils.global_types import CapFloorTypes
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -18,16 +18,15 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.global_types import SwapTypes
-from financepy.market.curves.discount_curve_zeros import DiscountCurveZeros
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black import Black
 from financepy.models.bachelier import Bachelier
 from financepy.models.black_shifted import BlackShifted
 from financepy.models.sabr import SABR
 from financepy.models.sabr_shifted import SABRShifted
 from financepy.models.hw_tree import HWTree
-from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -62,15 +61,9 @@ def test_ibor_deposits_and_swaps(value_dt):
     fixed_leg_type = SwapTypes.PAY
 
     swap_rate = 0.05
-    swap1 = IborSwap(
-        settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
-    )
-    swap2 = IborSwap(
-        settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
-    )
-    swap3 = IborSwap(
-        settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis
-    )
+    swap1 = IborSwap(settle_dt, "1Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis)
+    swap2 = IborSwap(settle_dt, "3Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis)
+    swap3 = IborSwap(settle_dt, "5Y", fixed_leg_type, swap_rate, fixed_freq, fixed_basis)
 
     swaps.append(swap1)
     swaps.append(swap2)
@@ -126,9 +119,7 @@ def test_ibor_cap_floor():
         cvalue4 = capfloor.value(value_dt, libor_curve, model4)
         cvalue5 = capfloor.value(value_dt, libor_curve, model5)
         cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6
-        )
+        test_cases.print("CAP", k, cvalue1, cvalue2, cvalue3, cvalue4, cvalue5, cvalue6)
 
     test_cases.header(
         "LABEL",
@@ -150,9 +141,7 @@ def test_ibor_cap_floor():
         fvalue4 = capfloor.value(value_dt, libor_curve, model4)
         fvalue5 = capfloor.value(value_dt, libor_curve, model5)
         fvalue6 = capfloor.value(value_dt, libor_curve, model6)
-        test_cases.print(
-            "FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6
-        )
+        test_cases.print("FLR", k, fvalue1, fvalue2, fvalue3, fvalue4, fvalue5, fvalue6)
 
     # PUT CALL CHECK
 
@@ -232,14 +221,10 @@ def test_ibor_cap_floor_vol_curve():
         accrual_dc_type,
     )
 
-    cap_vol_dates = Schedule(
-        value_dt, value_dt.add_tenor("10Y"), frequency
-    ).generate()
+    cap_vol_dates = Schedule(value_dt, value_dt.add_tenor("10Y"), frequency).generate()
 
     flat_rate = 0.04
-    libor_curve = DiscountCurveFlat(
-        value_dt, flat_rate, frequency, accrual_dc_type
-    )
+    libor_curve = FlatDiscountCurve(value_dt, flat_rate, frequency, accrual_dc_type)
 
     flat = False
     if flat is True:
@@ -278,9 +263,7 @@ def test_ibor_cap_floor_vol_curve():
     for caplet_end_dt in cap_floor.caplet_floorlet_dates[2:]:
         vol = vol_curve.caplet_vol(caplet_end_dt)
         model_caplet = Black(vol)
-        v_caplet = cap_floor.value_caplet_floor_let(
-            value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model_caplet
-        )
+        v_caplet = cap_floor.value_caplet_floor_let(value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model_caplet)
 
         v_caplets += v_caplet
         test_cases.print(
@@ -305,9 +288,7 @@ def test_ibor_caplet_hull():
     today_date = Date(20, 6, 2019)
     value_dt = today_date
     maturity_dt = value_dt.add_tenor("2Y")
-    libor_curve = DiscountCurveFlat(
-        value_dt, 0.070, FrequencyTypes.QUARTERLY, DayCountTypes.THIRTY_E_360
-    )
+    libor_curve = FlatDiscountCurve(value_dt, 0.070, FrequencyTypes.QUARTERLY, DayCountTypes.THIRTY_E_360)
 
     k = 0.08
     cap_floor_type = CapFloorTypes.CAP
@@ -330,9 +311,7 @@ def test_ibor_caplet_hull():
     capletstart_dt = value_dt.add_tenor("1Y")
     caplet_end_dt = capletstart_dt.add_tenor("3M")
 
-    v_caplet = cap_floor.value_caplet_floor_let(
-        value_dt, capletstart_dt, caplet_end_dt, libor_curve, model
-    )
+    v_caplet = cap_floor.value_caplet_floor_let(value_dt, capletstart_dt, caplet_end_dt, libor_curve, model)
 
     # Cannot match Hull due to dates being adjusted
     test_cases.header("CORRECT PRICE", "MODEL_PRICE")
@@ -347,7 +326,6 @@ def test_ibor_cap_floor_ql_example():
     value_dt = Date(14, 6, 2016)
 
     dates = [
-        Date(14, 6, 2016),
         Date(14, 9, 2016),
         Date(14, 12, 2016),
         Date(14, 6, 2017),
@@ -360,7 +338,6 @@ def test_ibor_cap_floor_ql_example():
     ]
 
     rates = [
-        0.000000,
         0.006616,
         0.007049,
         0.007795,
@@ -375,9 +352,7 @@ def test_ibor_cap_floor_ql_example():
     freq_type = FrequencyTypes.ANNUAL
     dc_type = DayCountTypes.ACT_ACT_ISDA
 
-    discount_curve = DiscountCurveZeros(
-        value_dt, dates, rates, freq_type, InterpTypes.LINEAR_ZERO_RATES
-    )
+    discount_curve = ZeroRatesDiscountCurve(value_dt, dates, rates, freq_type, dc_type, InterpTypes.LINEAR_ZERO_RATES)
 
     start_dt = Date(14, 6, 2016)
     end_dt = Date(14, 6, 2026)

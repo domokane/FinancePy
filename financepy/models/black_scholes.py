@@ -1,10 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 from typing import Union
-from enum import Enum
 import numpy as np
 
-from ..utils.global_types import OptionTypes
+from ..utils.global_types import OptionTypes, BlackScholesTypes
 from ..utils.error import FinError
 from ..utils.helpers import check_argument_types
 from .model import Model
@@ -16,28 +15,15 @@ from .equity_lsmc import equity_lsmc, BoundaryFitTypes
 # both European and American equity options.
 
 from .black_scholes_analytic import (
-    bs_value,
+    european_value,
     baw_value,
     bjerksund_stensland_value,
 )
-
 
 from .finite_difference import black_scholes_fd
 from .finite_difference_psor import black_scholes_fd_psor
 
 ########################################################################################
-
-
-class BlackScholesTypes(Enum):
-
-    DEFAULT = 0
-    ANALYTICAL = 1
-    CRR_TREE = 2
-    BARONE_ADESI = 3
-    LSMC = 4
-    BJERKSUND_STENSLAND = 5
-    FINITE_DIFFERENCE = 6
-    PSOR = 7
 
 
 ########################################################################################
@@ -130,7 +116,7 @@ class BlackScholes(Model):
     ) -> float:
 
         if bs_type is BlackScholesTypes.ANALYTICAL:
-            return bs_value(
+            return european_value(
                 spot_price,
                 time_to_expiry,
                 strike_price,
@@ -194,15 +180,14 @@ class BlackScholes(Model):
     ) -> float:
 
         if bs_type is BlackScholesTypes.BARONE_ADESI:
-            phi = 1 if opt_type is OptionTypes.AMERICAN_CALL else -1
-            return baw_value(
+             return baw_value(
                 spot_price,
                 time_to_expiry,
                 strike_price,
                 risk_free_rate,
                 dividend_rate,
                 self.volatility,
-                phi,
+                opt_type.value,
             )
 
         if bs_type is BlackScholesTypes.BJERKSUND_STENSLAND:

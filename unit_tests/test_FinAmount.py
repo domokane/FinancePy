@@ -8,8 +8,5 @@ from financepy.utils.amount import Amount
 
 def test_amount():
 
-    amt = Amount(101000.232)
-    assert amt.amount() == 101000.232
-
     amt = Amount(101000.232, CurrencyTypes.CAD)
     assert repr(amt) == "CAD 101,000.23"

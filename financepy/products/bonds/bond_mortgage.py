@@ -3,6 +3,7 @@
 ##############################################################################
 
 from enum import Enum
+from math import exp, expm1, log1p
 
 from ...utils.error import FinError
 from ...utils.frequency import annual_frequency, FrequencyTypes
@@ -80,11 +81,21 @@ class BondMortgage:
 
         frequency = annual_frequency(self.freq_type)
 
-        num_flows = len(self.schedule.adjusted_dts)
-        p = (1.0 + zero_rate / frequency) ** (num_flows - 1)
-        m = zero_rate * p / (p - 1.0) / frequency
-        m = m * self.principal
-        return m
+        num_payments = len(self.schedule.adjusted_dts) - 1
+        rate = zero_rate / frequency
+        if rate == 0.0:
+            return self.principal / num_payments
+        if rate <= -1.0:
+            raise FinError("Periodic mortgage rate must be greater than -1.")
+
+        # Preserve the small rate and the small difference from one. Choose
+        # the sign of the exponent to avoid unnecessary exponential overflow.
+        exponent = num_payments * log1p(rate)
+        if rate > 0.0:
+            payment_factor = rate / -expm1(-exponent)
+        else:
+            payment_factor = rate * exp(exponent) / expm1(exponent)
+        return self.principal * payment_factor
 
     ###########################################################################
 
@@ -126,7 +137,7 @@ class BondMortgage:
         print("MATURITY DATE:", self.end_dt)
         print("MORTGAGE TYPE:", self.mortgage_type)
         print("FREQUENCY:", self.freq_type)
-        print("ACCRUAL DAY COUNT TYPE:", self.accrual_dc_type)
+        print("DC_TYPE:", self.accrual_dc_type)
         print("CALENDAR:", self.cal_type)
         print("BUS DAY RULE:", self.bd_type)
         print("DATE GEN RULE:", self.dg_type)
@@ -154,15 +165,15 @@ class BondMortgage:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START DATE", self.start_dt)
-        s += label_to_string("MATURITY DATE", self.end_dt)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("START_DATE", self.start_dt)
+        s += label_to_string("MATURITY_DATE", self.end_dt)
         s += label_to_string("MORTGAGE TYPE", self.mortgage_type)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUSDAYRULE", self.bd_type)
-        s += label_to_string("DATEGENRULE", self.dg_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
         return s
 
     ###########################################################################

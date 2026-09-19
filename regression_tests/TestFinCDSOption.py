@@ -5,11 +5,12 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.global_types import SwapTypes
+from financepy.utils.global_vars import CLEAN, DIRTY
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.cds_curve import CDSCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
@@ -223,7 +224,7 @@ def test_dirty_price_cd_swaption():
     trade_dt = Date(5, 2, 2014)
     _, issuer_curve = build_full_issuer_curve(trade_dt)
     step_in_dt = trade_dt.add_days(1)
-    value_dt = step_in_dt
+    value_dt = trade_dt
     expiry_dt = Date(20, 3, 2014)
     maturity_dt = Date(20, 6, 2019)
 
@@ -234,9 +235,7 @@ def test_dirty_price_cd_swaption():
 
     cds_contract = CDS(step_in_dt, maturity_dt, cds_cpn, notional, long_protection)
 
-    test_cases.banner(
-        "=============================== CDS ==============================="
-    )
+    test_cases.banner("=============================== CDS ===============================")
     #    cds_contract.print(value_dt)
 
     test_cases.header("LABEL", "VALUE")
@@ -244,8 +243,8 @@ def test_dirty_price_cd_swaption():
     test_cases.print("PAR SPREAD:", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    test_cases.print("DIRTY VALUE", v["dirty_pv"])
-    test_cases.print("CLEAN VALUE", v["clean_pv"])
+    test_cases.print("DIRTY VALUE", v[DIRTY])
+    test_cases.print("CLEAN VALUE", v[CLEAN])
 
     p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     test_cases.print("CLEAN PRICE", p)
@@ -262,15 +261,13 @@ def test_dirty_price_cd_swaption():
     prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PREMIUM LEG PV", prem_pv)
 
-    full_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
+    full_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
     test_cases.print("FULL  RPV01", full_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
 
     #    cds_contract.print_payments(issuer_curve)
 
-    test_cases.banner(
-        "=========================== FORWARD CDS ==========================="
-    )
+    test_cases.banner("=========================== FORWARD CDS ===========================")
 
     cds_contract = CDS(expiry_dt, maturity_dt, cds_cpn, notional, long_protection)
 
@@ -280,8 +277,8 @@ def test_dirty_price_cd_swaption():
     test_cases.print("PAR SPREAD", spd)
 
     v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-    test_cases.print("DIRTY VALUE", v["dirty_pv"])
-    test_cases.print("CLEAN VALUE", v["clean_pv"])
+    test_cases.print("DIRTY VALUE", v[DIRTY])
+    test_cases.print("CLEAN VALUE", v[CLEAN])
 
     prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
@@ -289,15 +286,13 @@ def test_dirty_price_cd_swaption():
     prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PREMIUM LEG PV", prem_pv)
 
-    dirty_rpv01, clean_rpv01 = cds_contract.risky_pv01(value_dt, issuer_curve)
+    dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
     test_cases.print("DIRTY RPV01", dirty_rpv01)
     test_cases.print("CLEAN RPV01", clean_rpv01)
 
     #    cds_contract.print_payments(issuer_curve)
 
-    test_cases.banner(
-        "========================== CDS OPTIONS ============================"
-    )
+    test_cases.banner("========================== CDS OPTIONS ============================")
 
     cds_cpn = 0.01
     volatility = 0.3
@@ -311,9 +306,7 @@ def test_dirty_price_cd_swaption():
 
         long_protection = True  # long protection
 
-        cds_option = CDSOption(
-            expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection
-        )
+        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
 
         v = cds_option.value(value_dt, issuer_curve, volatility)
 
@@ -325,9 +318,7 @@ def test_dirty_price_cd_swaption():
 
         long_protection = False  # long protection
 
-        cds_option = CDSOption(
-            expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection
-        )
+        cds_option = CDSOption(expiry_dt, maturity_dt, strike / 10000.0, notional, long_protection)
 
         v = cds_option.value(value_dt, issuer_curve, volatility)
 

@@ -13,10 +13,13 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.products.rates.ois import OIS
-from financepy.products.rates.ois_curve import OISCurve
+
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.calendar import BusDayAdjustTypes
+
+from financepy.market.curves.ois_curve import OISCurve
 from financepy.market.curves.interpolator import InterpTypes
+
 from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode

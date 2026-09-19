@@ -4,8 +4,8 @@ import add_fp_to_path
 
 from financepy.products.equity.equity_forward import EquityForward
 from financepy.utils.date import Date
-from financepy.utils.global_types import FinLongShort
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.utils.global_types import LongShortTypes
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -26,22 +26,16 @@ def test_equity_forward():
     expiry_dt = value_dt.add_months(12)
     notional = 100.0
 
-    discount_curve = DiscountCurveFlat(value_dt, discount_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_rate)
+    discount_curve = FlatDiscountCurve(value_dt, discount_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_rate)
 
-    equity_forward = EquityForward(
-        expiry_dt, forward_price, notional, FinLongShort.LONG
-    )
+    equity_forward = EquityForward(expiry_dt, forward_price, notional, LongShortTypes.LONG)
 
     test_cases.header("SPOT FX", "FX FWD", "VALUE_BS")
 
-    fwd_price = equity_forward.forward(
-        value_dt, stock_price, discount_curve, dividend_curve
-    )
+    fwd_price = equity_forward.forward(value_dt, stock_price, discount_curve, dividend_curve)
 
-    fwd_value = equity_forward.value(
-        value_dt, stock_price, discount_curve, dividend_curve
-    )
+    fwd_value = equity_forward.value(value_dt, stock_price, discount_curve, dividend_curve)
 
     #    print(stock_price, fwd_price, fwd_value)
     test_cases.print(stock_price, fwd_price, fwd_value)

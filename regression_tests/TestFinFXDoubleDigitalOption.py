@@ -6,7 +6,7 @@ import add_fp_to_path
 
 from financepy.products.fx.fx_double_digital_option import FXDoubleDigitalOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -29,8 +29,8 @@ def test_fin_fx_double_digital_option():
     currency_pair = for_name + dom_name  # Always FORDOM
     spot_fx_rate = 1.20
 
-    domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
     volatility = 0.20
 

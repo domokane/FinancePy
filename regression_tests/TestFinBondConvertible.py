@@ -3,7 +3,7 @@
 import time
 import numpy as np
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
@@ -71,7 +71,7 @@ def test_bond_convertible():
     stock_price = 28.5
     stock_volatility = 0.370
     rate = 0.04
-    discount_curve = DiscountCurveFlat(settle_dt, rate, FrequencyTypes.CONTINUOUS)
+    discount_curve = FlatDiscountCurve(settle_dt, rate, FrequencyTypes.CONTINUOUS)
     credit_spread = 0.00
     recovery_rate = 0.40
     num_steps_per_year = 20

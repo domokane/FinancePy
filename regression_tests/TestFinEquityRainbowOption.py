@@ -11,7 +11,7 @@ from financepy.products.equity.equity_rainbow_option import (
     EquityRainbowOptionTypes,
 )
 from financepy.utils.helpers import beta_vector_to_corr_matrix
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -29,7 +29,7 @@ def test_equity_rainbow_option():
     expiry_dt = Date(1, 1, 2016)
     interest_rate = 0.05
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
     num_assets = 2
     volatilities = np.ones(num_assets) * 0.3
@@ -38,7 +38,7 @@ def test_equity_rainbow_option():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     stock_prices = np.ones(num_assets) * 100
@@ -437,7 +437,7 @@ def test_equity_rainbow_option():
 
     dividend_curves = []
     for q in dividend_yields:
-        dividend_curve = DiscountCurveFlat(value_dt, q)
+        dividend_curve = FlatDiscountCurve(value_dt, q)
         dividend_curves.append(dividend_curve)
 
     #    plt.figure(figsize=(10,8))

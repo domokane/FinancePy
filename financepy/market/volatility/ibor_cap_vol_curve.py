@@ -187,7 +187,7 @@ class IborCapVolCurve:
     def __repr__(self) -> str:
         """Output the contents of the FinCapVolCurve class object."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         num_times = len(self._times)
         s += " TIME     TAU    CAP VOL    CAPLET VOL"
         for i in range(0, num_times):

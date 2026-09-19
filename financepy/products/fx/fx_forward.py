@@ -9,6 +9,7 @@ from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 # ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
@@ -84,13 +85,8 @@ class FXForward:
         if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve.value_dt != value_dt:
-            raise FinError(
-                "Domestic Curve valuation date not same as option value date"
-            )
-
-        if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as option value date")
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         if isinstance(value_dt, Date):
             t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
@@ -105,9 +101,7 @@ class FXForward:
 
         t = np.maximum(t, 1e-10)
 
-        new_fwd_fx_rate = self.forward(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve
-        )
+        new_fwd_fx_rate = self.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
         if self.notional_currency == self.dom_name:
             self.notional_dom = self.notional
@@ -173,7 +167,7 @@ class FXForward:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)

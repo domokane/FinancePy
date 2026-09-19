@@ -2,7 +2,7 @@
 
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_american_option import (
     EquityAmericanOption,
@@ -18,8 +18,8 @@ volatility = 0.40
 strike_price = 50.0
 num_steps = 100
 
-discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
 

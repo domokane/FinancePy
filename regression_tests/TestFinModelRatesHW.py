@@ -6,8 +6,9 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.date import Date
-from financepy.models.hw_tree import HWTree, FinHWEuropeanCalcType
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.models.hw_tree import HWTree
+from financepy.utils.global_types import HWEuropeanCalcTypes
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
@@ -236,7 +237,7 @@ def test_hull_white_bond_option():
     for num_time_steps in num_steps_list:
 
         start = time.time()
-        model = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_ONLY)
+        model = HWTree(sigma, a, num_time_steps, HWEuropeanCalcTypes.EXPIRY_ONLY)
         model.build_tree(t_exp, times, dfs)
 
         exercise_type = ExerciseTypes.EUROPEAN
@@ -245,7 +246,7 @@ def test_hull_white_bond_option():
             t_exp, strike_price, face, cpn_times, cpn_flows, exercise_type
         )
 
-        model = HWTree(sigma, a, num_time_steps, FinHWEuropeanCalcType.EXPIRY_TREE)
+        model = HWTree(sigma, a, num_time_steps, HWEuropeanCalcTypes.EXPIRY_TREE)
         model.build_tree(t_exp, times, dfs)
 
         v2 = model.bond_option(
@@ -346,7 +347,7 @@ def test_hull_white_callable_bond():
         put_times.append(t)
 
     t_mat = (maturity_dt - settle_dt) / G_DAYS_IN_YEAR
-    curve = DiscountCurveFlat(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
+    curve = FlatDiscountCurve(settle_dt, 0.05, FrequencyTypes.CONTINUOUS)
 
     dfs = []
     times = []

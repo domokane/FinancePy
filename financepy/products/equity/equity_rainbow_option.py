@@ -17,6 +17,7 @@ from ...products.equity.equity_option import EquityOption
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
+from ...utils.check_values import check_curve_dt
 
 
 class EquityRainbowOptionTypes(Enum):
@@ -75,8 +76,8 @@ def payoff_value(s, payoff_type_value, payoff_params):
 def value_mc_fast(
     t,
     stock_prices,
-    discount_curve,
-    dividend_curves,
+    r,
+    qs,
     volatilities,
     betas,
     num_assets,
@@ -87,17 +88,6 @@ def value_mc_fast(
 ):
 
     np.random.seed(seed)
-
-    df = discount_curve.df_t(t)
-    r = -log(df) / t
-
-    qs = []
-    for curve in dividend_curves:
-        dq = curve.df_t(t)
-        q = -np.log(dq) / t
-        qs.append(q)
-
-    qs = np.array(qs)
 
     mus = r - qs
 
@@ -145,19 +135,13 @@ class EquityRainbowOption(EquityOption):
     def _validate(self, stock_prices, dividend_curves, volatilities, betas):
 
         if len(stock_prices) != self.num_assets:
-            raise FinError(
-                "Stock prices must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Stock prices must be a vector of length " + str(self.num_assets))
 
         if len(dividend_curves) != self.num_assets:
-            raise FinError(
-                "Dividend discount must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Dividend discount must be a vector of length " + str(self.num_assets))
 
         if len(volatilities) != self.num_assets:
-            raise FinError(
-                "Volatilities must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Volatilities must be a vector of length " + str(self.num_assets))
 
         if len(betas) != self.num_assets:
             raise FinError("Betas must be a vector of length " + str(self.num_assets))
@@ -184,17 +168,9 @@ class EquityRainbowOption(EquityOption):
             raise FinError("Unknown payoff type")
 
         if len(payoff_params) != num_params:
-            raise FinError(
-                "Number of parameters required for "
-                + str(payoff_type)
-                + " must be "
-                + str(num_params)
-            )
+            raise FinError("Number of parameters required for " + str(payoff_type) + " must be " + str(num_params))
 
-        if (
-            payoff_type == EquityRainbowOptionTypes.CALL_ON_NTH
-            or payoff_type == EquityRainbowOptionTypes.PUT_ON_NTH
-        ):
+        if payoff_type == EquityRainbowOptionTypes.CALL_ON_NTH or payoff_type == EquityRainbowOptionTypes.PUT_ON_NTH:
             n = payoff_params[0]
             if n < 1 or n > num_assets:
                 raise FinError("Nth parameter must be 1 to " + str(num_assets))
@@ -217,10 +193,8 @@ class EquityRainbowOption(EquityOption):
         if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, *dividend_curves)
 
         if self.num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -283,9 +257,7 @@ class EquityRainbowOption(EquityOption):
                 - k * df * M(y1 - v1 * sqrt(t), y2 - v2 * sqrt(t), rho)
             )
         elif self.payoff_type == EquityRainbowOptionTypes.PUT_ON_MAXIMUM:
-            cmax1 = (
-                s2 * dq2 + s1 * dq1 * normcdf(d) - s2 * dq2 * normcdf(d - v * sqrt(t))
-            )
+            cmax1 = s2 * dq2 + s1 * dq1 * normcdf(d) - s2 * dq2 * normcdf(d - v * sqrt(t))
             cmax2 = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrt(t), rho2)
@@ -293,9 +265,7 @@ class EquityRainbowOption(EquityOption):
             )
             v = k * df - cmax1 + cmax2
         elif self.payoff_type == EquityRainbowOptionTypes.PUT_ON_MINIMUM:
-            cmin1 = (
-                s1 * dq1 - s1 * dq1 * normcdf(d) + s2 * dq2 * normcdf(d - v * sqrt(t))
-            )
+            cmin1 = s1 * dq1 - s1 * dq1 * normcdf(d) + s2 * dq2 * normcdf(d - v * sqrt(t))
             cmin2 = (
                 s1 * dq1 * M(y1, -d, -rho1)
                 + s2 * dq2 * M(y2, d - v * sqrt(t), -rho2)
@@ -321,6 +291,9 @@ class EquityRainbowOption(EquityOption):
         seed=4242,
     ):
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, *dividend_curves)
+
         self._validate(stock_prices, dividend_curves, volatilities, corr_matrix)
 
         if value_dt > self.expiry_dt:
@@ -328,11 +301,20 @@ class EquityRainbowOption(EquityOption):
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+
+        qs = []
+        for curve in dividend_curves:
+            q = curve.zero_rate_cc(self.expiry_dt)
+            qs.append(q)
+
+        qs = np.array(qs)
+
         v = value_mc_fast(
             t,
             stock_prices,
-            discount_curve,
-            dividend_curves,
+            r,
+            qs,
             volatilities,
             corr_matrix,
             self.num_assets,
@@ -348,7 +330,7 @@ class EquityRainbowOption(EquityOption):
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("PAYOFF TYPE", self.payoff_type)
         s += label_to_string("PAYOFF PARAMS", self.payoff_params)

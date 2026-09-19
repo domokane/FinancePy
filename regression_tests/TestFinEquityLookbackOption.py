@@ -10,7 +10,7 @@ from financepy.products.equity.equity_fixed_lookback_option import (
     EquityFixedLookbackOption,
 )
 from financepy.utils.global_types import OptionTypes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -32,8 +32,8 @@ def test_equity_look_back_option():
     stock_price_range = range(90, 110, 10)
     num_steps_per_year = 252
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     test_cases.header(
         "NUMPATHS",
@@ -563,8 +563,8 @@ def test_example():
     dividend_yield = 0.0
     stock_min_max = 100.0
 
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
-    dividend_curve = DiscountCurveFlat(value_dt, dividend_yield)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
     volatilities = [0.30]
 

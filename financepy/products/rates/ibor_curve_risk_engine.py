@@ -9,7 +9,7 @@ from ...utils.compounding import CompoundingTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.global_vars import G_BASIS_POINT
 from ...market.curves.discount_curve import DiscountCurve
-from ...market.curves.discount_curve_pwf_onf import DiscountCurvePWFONF
+from ...market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 
 from ...products.rates.ibor_single_curve import IborSingleCurve
@@ -54,26 +54,22 @@ def par_rate_risk_report(
     n_benchmarks = curve_shocker.n_benchmarks()
     n_trades = len(trades)
 
-    risk_report = benchmarks_report[
-        ["type", "start_dt", "maturity_dt", "market_rate"]
-    ].copy()
+    risk_report = benchmarks_report[["type", "start_dt", "maturity_dt", "market_rate"]].copy()
 
     if trade_labels is None:
         trade_labels = [f"trade_{n:03d}" for n in range(n_trades)]
 
     base_values = {}
     for trade, trade_label in zip(trades, trade_labels):
-        base_values[trade_label] = trade.value(base_curve.value_dt, base_curve)
+        base_values[trade_label] = trade.value(base_curve.anchor_dt, base_curve)
 
     for benchmark_idx in range(n_benchmarks):
-        bumped_curve = curve_shocker.apply_bump_to_benchmark(
-            benchmark_idx, bump_size
-        )
+        bumped_curve = curve_shocker.apply_bump_to_benchmark(benchmark_idx, bump_size)
 
         for trade_idx, trade in enumerate(trades):
             trade_label = trade_labels[trade_idx]
             base_value = base_values[trade_label]
-            bumped_value = trade.value(bumped_curve.value_dt, bumped_curve)
+            bumped_value = trade.value(bumped_curve.anchor_dt, bumped_curve)
             par_delta = (bumped_value - base_value) / bump_size * G_BASIS_POINT
             risk_report.loc[benchmark_idx, trade_label] = par_delta
 
@@ -92,7 +88,7 @@ def forward_rate_risk_report(
     """Generate forward rate deltas (forward delta ladder) risk report, which
     is the sensitivity of trades to bucketed shocks of the instantaneous (ON)
     forward rates. Here shock_i is applied to the ON forward rates over
-    [t_i, t_{i+1}] where {t_i} is a time grid from base_curve.valuation_date
+    [t_i, t_{i+1}] where {t_i} is a time grid from base_curve.value_date
     to grid_last_date with buckets of size grid_bucket_tenor
 
     Args:
@@ -114,10 +110,8 @@ def forward_rate_risk_report(
             column of forward rate deltas per trade, and a total for all trades
 
     """
-    valuation_date = base_curve.value_dt
-    grid, grid_labels = _grid_from_dates_tenor(
-        grid_last_date, grid_bucket_tenor, valuation_date
-    )
+    value_date = base_curve.anchor_dt
+    grid, grid_labels = _grid_from_dates_tenor(grid_last_date, grid_bucket_tenor, value_date)
 
     base_values, risk_report, *_ = forward_rate_risk_report_custom_grid(
         base_curve, grid, trades, grid_labels, trade_labels, bump_size
@@ -141,7 +135,7 @@ def forward_rate_risk_report_custom_grid(
     Args:
         base_curve (DiscountCurve): base curve to apply bumps to
         grid: Date grid that defines ON forward rate bumps. Note that
-        curve.valuation_date must be explictly included (if so desired)
+        curve.value_date must be explictly included (if so desired)
         trades (list): a list of trades to calculate deltas of
         trade_labels (list, optional): trade labels to identify trades in the
         output. Defaults to None in which case these are auto generted
@@ -162,18 +156,11 @@ def forward_rate_risk_report_custom_grid(
     risk_report["maturity_dt"] = grid[1:]
     risk_report["type"] = "IborFRA"
 
-    asof = base_curve.value_dt
+    asof = base_curve.anchor_dt
     if grid_labels is None:
         start_in_days = [datediff(asof, d) for d in risk_report["start_dt"]]
-        tenor_in_days = [
-            datediff(s, m)
-            for s, m in zip(
-                risk_report["start_dt"], risk_report["maturity_dt"]
-            )
-        ]
-        grid_labels = [
-            f"{sd}Dx{td}D" for sd, td in zip(start_in_days, tenor_in_days)
-        ]
+        tenor_in_days = [datediff(s, m) for s, m in zip(risk_report["start_dt"], risk_report["maturity_dt"])]
+        grid_labels = [f"{sd}Dx{td}D" for sd, td in zip(start_in_days, tenor_in_days)]
     risk_report["bucket_label"] = grid_labels
 
     n_trades = len(trades)
@@ -188,12 +175,9 @@ def forward_rate_risk_report_custom_grid(
 
         cf_report = val_res[1]
         cf_report_first_period = cf_report[
-            (cf_report["payment_date"] > grid[0])
-            & (cf_report["payment_date"] <= grid[1])
+            (cf_report["payment_date"] > grid[0]) & (cf_report["payment_date"] <= grid[1])
         ]
-        first_period_carry[trade_label] = cf_report_first_period[
-            "payment_pv"
-        ].sum()
+        first_period_carry[trade_label] = cf_report_first_period["payment_pv"].sum()
 
     for fwdrate_idx in range(len(risk_report)):
         start_dt = risk_report.loc[fwdrate_idx, "start_dt"]
@@ -206,21 +190,17 @@ def forward_rate_risk_report_custom_grid(
         )
         risk_report.loc[fwdrate_idx, "market_rate"] = base_rate
 
-        fwd_rate_shock = DiscountCurvePWFONF.brick_wall_curve(
-            base_curve.value_dt, start_dt, maturity_dt, bump_size
-        )
+        fwd_rate_shock = PWFONFDiscountCurve.brick_wall_curve(base_curve.anchor_dt, start_dt, maturity_dt, bump_size)
         bumped_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
         for trade_idx, trade in enumerate(trades):
             trade_label = trade_labels[trade_idx]
             base_value = base_values[trade_label]
-            bumped_value = trade.value(bumped_curve.value_dt, bumped_curve)
+            bumped_value = trade.value(bumped_curve.anchor_dt, bumped_curve)
             par_delta = (bumped_value - base_value) / bump_size * G_BASIS_POINT
             risk_report.loc[fwdrate_idx, DV01_PREFIX + trade_label] = par_delta
 
-    risk_report[DV01_PREFIX + "total"] = risk_report[
-        [DV01_PREFIX + l for l in trade_labels]
-    ].sum(axis=1)
+    risk_report[DV01_PREFIX + "total"] = risk_report[[DV01_PREFIX + l for l in trade_labels]].sum(axis=1)
     return base_values, risk_report, first_period_carry
 
 
@@ -235,7 +215,7 @@ def carry_rolldown_report(
     """Generate carry and rolldown risk report based on the sensitivity of
     trades to bucketed shocks of the instantaneous (ON) forward rates. Here
     shock_i is applied to the ON forward rates over [t_i, t_{i+1}] where {t_i}
-    is a time grid from base_curve.valuation_date to grid_last_date with
+    is a time grid from base_curve.value_date to grid_last_date with
     buckets of size grid_bucket_tenor
 
     Args:
@@ -260,15 +240,11 @@ def carry_rolldown_report(
             first row and rolldown in all the others
 
     """
-    valuation_date = base_curve.value_dt
-    grid, grid_labels = _grid_from_dates_tenor(
-        grid_last_date, grid_bucket_tenor, valuation_date
-    )
+    value_date = base_curve.anchor_dt
+    grid, grid_labels = _grid_from_dates_tenor(grid_last_date, grid_bucket_tenor, value_date)
 
-    base_values, risk_report, first_period_carry = (
-        forward_rate_risk_report_custom_grid(
-            base_curve, grid, trades, grid_labels, trade_labels, bump_size
-        )
+    base_values, risk_report, first_period_carry = forward_rate_risk_report_custom_grid(
+        base_curve, grid, trades, grid_labels, trade_labels, bump_size
     )
 
     trade_labels = list(base_values.keys())
@@ -276,14 +252,10 @@ def carry_rolldown_report(
         risk_report.loc[0, ROLL_PREFIX + label] = first_period_carry[label]
         rate_change = -risk_report["market_rate"].diff()
         risk_report.loc[1:, ROLL_PREFIX + label] = (
-            risk_report.loc[1:, DV01_PREFIX + label]
-            * rate_change[1:]
-            / G_BASIS_POINT
+            risk_report.loc[1:, DV01_PREFIX + label] * rate_change[1:] / G_BASIS_POINT
         )
 
-    risk_report[ROLL_PREFIX + "total"] = risk_report[
-        [ROLL_PREFIX + l for l in trade_labels]
-    ].sum(axis=1)
+    risk_report[ROLL_PREFIX + "total"] = risk_report[[ROLL_PREFIX + l for l in trade_labels]].sum(axis=1)
 
     return base_values, risk_report, first_period_carry
 
@@ -310,31 +282,25 @@ def parallel_shift_ladder_report(
 
     base_values = {}
     for trade, trade_label in zip(trades, trade_labels):
-        base_values[trade_label] = trade.value(base_curve.value_dt, base_curve)
+        base_values[trade_label] = trade.value(base_curve.anchor_dt, base_curve)
 
     for shift_idx, shift in enumerate(curve_shifts):
-        fwd_rate_shock = DiscountCurvePWFONF.flat_curve(
-            base_curve.value_dt, shift
-        )
+        fwd_rate_shock = PWFONFDiscountCurve.flat_curve(base_curve.anchor_dt, shift)
         bumped_curve = CompositeDiscountCurve([base_curve, fwd_rate_shock])
 
         for trade_idx, trade in enumerate(trades):
             trade_label = trade_labels[trade_idx]
-            bumped_value = trade.value(bumped_curve.value_dt, bumped_curve)
+            bumped_value = trade.value(bumped_curve.anchor_dt, bumped_curve)
             risk_report.loc[shift_idx, PV_PREFIX + trade_label] = bumped_value
 
-    risk_report[PV_PREFIX + "total"] = risk_report[
-        [PV_PREFIX + t for t in trade_labels]
-    ].sum(axis=1)
+    risk_report[PV_PREFIX + "total"] = risk_report[[PV_PREFIX + t for t in trade_labels]].sum(axis=1)
     return base_values, risk_report
 
 
-def _grid_from_dates_tenor(
-    grid_last_date, grid_bucket_tenor: Union[str, Tenor], valuation_date
-):
+def _grid_from_dates_tenor(grid_last_date, grid_bucket_tenor: Union[str, Tenor], value_date):
     bucket_tenor = Tenor.as_tenor(grid_bucket_tenor)
 
-    grid = [valuation_date]
+    grid = [value_date]
     grid_labels = []
 
     # TODO: hardcoded stuff, revisit

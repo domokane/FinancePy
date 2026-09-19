@@ -22,6 +22,8 @@ INTERP = InterpTypes.FLAT_FWD_RATES.value
 # (c) Dominic O'Kane - December-2019
 # Fergal O'Kane - search root function - 16-12-2019
 
+J_MAX_COEFFICIENT = 1.0 - np.sqrt(2.0 / 3.0) + 1.0e-12
+
 ########################################################################################
 
 
@@ -216,7 +218,7 @@ def bermudan_swaption_tree_fast(
     cash flows through time."""
 
     num_time_steps, num_nodes = _rt.shape
-    j_max = ceil(0.1835 / (_a * _dt))
+    j_max = ceil(J_MAX_COEFFICIENT  / (_a * _dt))
     expiry_step = int(t_exp / _dt + 0.50)
     maturity_step = int(t_mat / _dt + 0.50)
 
@@ -455,7 +457,7 @@ def american_bond_option_tree_fast(
     debug = False
 
     num_time_steps, num_nodes = _rt.shape
-    j_max = ceil(0.1835 / (_a * _dt))
+    j_max = ceil(J_MAX_COEFFICIENT  / (_a * _dt))
     expiry_step = int(t_exp / _dt + 0.50)
     maturity_step = int(t_mat / _dt + 0.50)
 
@@ -690,7 +692,7 @@ def callable_puttable_bond_tree_fast(
 
     num_time_steps, num_nodes = _rt.shape
     dt = _dt
-    j_max = ceil(0.1835 / (_a * _dt))
+    j_max = ceil(J_MAX_COEFFICIENT  / (_a * _dt))
     t_mat = cpn_times[-1]
     maturity_step = int(t_mat / dt + 0.50)
 
@@ -852,7 +854,7 @@ def build_tree_fast(
     tree_maturity = tree_times[-1]
     dt = tree_maturity / (num_time_steps + 1)
     dx = sigma * np.sqrt(3.0 * dt)
-    j_max = ceil(0.1835 / (a * dt))
+    j_max = ceil(J_MAX_COEFFICIENT  / (a * dt))
 
     if j_max > 1000:
         raise FinError("j_max > 1000. Increase a or dt.")

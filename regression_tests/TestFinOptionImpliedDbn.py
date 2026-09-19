@@ -4,12 +4,12 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.volatility.fx_vol_surface import FinFXDeltaMethod
-from financepy.market.volatility.fx_vol_surface import FinFXATMMethod
+from financepy.utils.global_types import FXDeltaMethodTypes
+from financepy.utils.global_types import FXATMMethodTypes
 from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.models.volatility_fns import vol_function_clark
 from financepy.utils.date import Date
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -33,8 +33,8 @@ def test_fin_option_implied_dbn():
         for_cc_rate = 0.03460  # EUR
         dom_cc_rate = 0.02940  # USD
 
-        domestic_curve = DiscountCurveFlat(value_dt, dom_cc_rate)
-        foreign_curve = DiscountCurveFlat(value_dt, for_cc_rate)
+        domestic_curve = FlatDiscountCurve(value_dt, dom_cc_rate)
+        foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
 
         currency_pair = for_name + dom_name
         spot_fx_rate = 1.3465
@@ -46,8 +46,8 @@ def test_fin_option_implied_dbn():
 
         notional_currency = for_name
 
-        atm_method = FinFXATMMethod.FWD_DELTA_NEUTRAL
-        delta_method = FinFXDeltaMethod.SPOT_DELTA
+        atm_method = FXATMMethodTypes.FWD_DELTA_NEUTRAL
+        delta_method = FXDeltaMethodTypes.SPOT_DELTA
 
         fx_market = FXVolSurface(
             value_dt,
@@ -64,8 +64,6 @@ def test_fin_option_implied_dbn():
             delta_method,
         )
 
-        #        fx_market.check_calibration(True)
-
         if PLOT_GRAPHS:
             fx_market.plot_vol_curves()
 
@@ -79,11 +77,6 @@ def test_fin_option_implied_dbn():
 
             num_steps = 10000
             d_fx = (end_fx - start_fx) / num_steps
-
-            #            dom_df = domestic_curve.df_t(t_exp)
-            #            for_df = foreign_curve.df_t(t_exp)
-            #            r_d = -np.log(dom_df) / t_exp
-            #            r_f = -np.log(for_df) / t_exp
 
             params = fx_market.parameters[i_tenor]
 
@@ -101,11 +94,6 @@ def test_fin_option_implied_dbn():
 
 
 ########################################################################################
-
-#            dbn = optionImpliedDbn(spot_fx_rate, t_exp, rd, rf, strikes, vols)
-#            print("SUM:", dbn.sum())
-#            plt.figure()
-#            plt.plot(dbn._x, dbn._densitydx)
 
 
 test_fin_option_implied_dbn()

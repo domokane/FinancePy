@@ -5,7 +5,7 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.utils.math import scale
-from financepy.market.curves.discount_curve_nss import DiscountCurveNSS
+from financepy.market.curves.nss_discount_curve import NSSDiscountCurve
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -25,13 +25,13 @@ def test_fin_nelson_siegel_svensson_curve():
     start_dt = Date(1, 1, 2020)
     dates = start_dt.add_years(times)
 
-    curve1 = DiscountCurveNSS(start_dt, 1.0, 0.0, 0.0, 0.0, tau_1, tau_2)
+    curve1 = NSSDiscountCurve(start_dt, 1.0, 0.0, 0.0, 0.0, tau_1, tau_2)
     factor1loading = curve1.zero_rate(dates)
-    curve2 = DiscountCurveNSS(start_dt, 0.0, 1.0, 0.0, 0.0, tau_1, tau_2)
+    curve2 = NSSDiscountCurve(start_dt, 0.0, 1.0, 0.0, 0.0, tau_1, tau_2)
     factor2loading = curve2.zero_rate(dates)
-    curve3 = DiscountCurveNSS(start_dt, 0.0, 0.0, 1.0, 0.0, tau_1, tau_2)
+    curve3 = NSSDiscountCurve(start_dt, 0.0, 0.0, 1.0, 0.0, tau_1, tau_2)
     factor3loading = curve3.zero_rate(dates)
-    curve4 = DiscountCurveNSS(start_dt, 0.0, 0.0, 0.0, 1.0, tau_1, tau_2)
+    curve4 = NSSDiscountCurve(start_dt, 0.0, 0.0, 0.0, 1.0, tau_1, tau_2)
     factor4loading = curve4.zero_rate(dates)
 
     test_cases.header("FACTOR LOADING ON ZERO RATES")
@@ -56,7 +56,7 @@ def test_fin_nelson_siegel_svensson_curve():
     beta_2 = -0.02
     beta_3 = -0.02
     beta_4 = 0.08
-    curve1 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
+    curve1 = NSSDiscountCurve(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates1 = curve1.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, beta_4, zero_rates1)
 
@@ -64,7 +64,7 @@ def test_fin_nelson_siegel_svensson_curve():
     beta_2 = -0.02
     beta_3 = -0.02
     beta_4 = 0.08
-    curve2 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
+    curve2 = NSSDiscountCurve(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates2 = curve2.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, beta_4, zero_rates2)
 
@@ -72,7 +72,7 @@ def test_fin_nelson_siegel_svensson_curve():
     beta_2 = -0.02
     beta_3 = -0.02
     beta_4 = 0.08
-    curve3 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
+    curve3 = NSSDiscountCurve(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates3 = curve3.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, beta_4, zero_rates3)
 
@@ -80,7 +80,7 @@ def test_fin_nelson_siegel_svensson_curve():
     beta_2 = -0.02
     beta_3 = -0.02
     beta_4 = 0.08
-    curve4 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
+    curve4 = NSSDiscountCurve(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates4 = curve4.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, beta_4, zero_rates4)
 
@@ -88,7 +88,7 @@ def test_fin_nelson_siegel_svensson_curve():
     beta_2 = -0.02
     beta_3 = -0.02
     beta_4 = 0.08
-    curve5 = DiscountCurveNSS(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
+    curve5 = NSSDiscountCurve(start_dt, beta_1, beta_2, beta_3, beta_4, tau_1, tau_2)
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, beta_4, zero_rates5)
 

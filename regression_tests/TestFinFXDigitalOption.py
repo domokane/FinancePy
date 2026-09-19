@@ -1,6 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import time
 import numpy as np
 
 import add_fp_to_path
@@ -8,11 +7,7 @@ import add_fp_to_path
 from financepy.utils.global_types import OptionTypes
 from financepy.products.fx.fx_digital_option import FXDigitalOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -43,8 +38,8 @@ def test_fin_fx_digital_option():
 
     notional = 1.0
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, ccy2_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 
@@ -59,9 +54,7 @@ def test_fin_fx_digital_option():
 
     spot_fx_rate = np.linspace(0.01, 2.0, 10)
 
-    value = digital_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-    )
+    value = digital_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
 
 ########################################################################################

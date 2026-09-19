@@ -4,7 +4,7 @@ import numpy as np
 
 from ..utils.error import FinError
 from ..utils.global_types import BarrierTypes
-from ..models.process_simulator import FinProcessSimulator
+from ..models.process_simulator import ProcessSimulator
 
 
 def value_equity_barrier_option_mc(
@@ -50,7 +50,7 @@ def value_equity_barrier_option_mc(
     t = max(t, 1e-6)
     num_time_steps = max(1, int(np.ceil(t * num_obs_per_year)))
 
-    process = FinProcessSimulator()
+    process = ProcessSimulator()
 
     #######################################################################
 

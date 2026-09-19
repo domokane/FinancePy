@@ -8,7 +8,7 @@ import add_fp_to_path
 
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 
@@ -30,7 +30,7 @@ def test_fin_numba_numpy_speed(use_sobol):
     seed = 1999
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
     use_sobol_int = int(use_sobol)
 
@@ -38,9 +38,7 @@ def test_fin_numba_numpy_speed(use_sobol):
 
     call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(
-        value_dt, stock_price, discount_curve, dividend_yield, model
-    )
+    value = call_option.value(value_dt, stock_price, discount_curve, dividend_yield, model)
 
     num_points = 20
     v_exact = [value] * num_points
@@ -109,7 +107,7 @@ def test_fin_numba_numpy_speed(use_sobol):
     else:
         title = "PSEUDORANDOM: PURE PYTHON VS NUMPY"
 
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     plt.plot(num_paths_list, nonumba_nonumpy_t, "o-", label="PURE PYTHON")
     plt.plot(num_paths_list, numpy_only_t, "o-", label="NUMPY ONLY")
     plt.xlabel("Number of Paths")
@@ -117,7 +115,7 @@ def test_fin_numba_numpy_speed(use_sobol):
     plt.legend()
     plt.title(title)
 
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     plt.plot(num_paths_list, v_exact, label="EXACT")
     plt.plot(num_paths_list, nonumba_nonumpy_v, "o-", label="PURE PYTHON")
     plt.plot(num_paths_list, numpy_only_v, "o-", label="NUMPY ONLY")
@@ -291,7 +289,7 @@ def test_fin_numba_numpy_speed(use_sobol):
     else:
         title = "PSEUDORANDOM: COMPARING OPTIMISATIONS"
 
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     plt.plot(num_paths_list, numpy_only_t, "o-", label="NUMPY ONLY")
     plt.plot(num_paths_list, numba_numpy_t, "o-", label="NUMBA + NUMPY")
 
@@ -319,7 +317,7 @@ def test_fin_numba_numpy_speed(use_sobol):
     plt.legend()
     plt.title(title)
 
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     plt.plot(num_paths_list, v_exact, label="EXACT")
     plt.plot(num_paths_list, numba_only_v, "o-", label="NUMBA ONLY")
     plt.plot(num_paths_list, cpp_v, "o-", label="C++")
@@ -344,7 +342,7 @@ def test_fin_numba_numba_parallel(use_sobol):
     seed = 2021
 
     model = BlackScholes(volatility)
-    discount_curve = DiscountCurveFlat(value_dt, interest_rate)
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 
     use_sobol_int = int(use_sobol)
 
@@ -352,9 +350,7 @@ def test_fin_numba_numba_parallel(use_sobol):
 
     call_option = EquityVanillaOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
 
-    value = call_option.value(
-        value_dt, stock_price, discount_curve, dividend_yield, model
-    )
+    value = call_option.value(value_dt, stock_price, discount_curve, dividend_yield, model)
 
     num_points = 20
     v_exact = [value] * num_points
@@ -418,7 +414,7 @@ def test_fin_numba_numba_parallel(use_sobol):
     else:
         title = "PSEUDORANDOM: NUMBA VS NUMBA + PARALLEL"
 
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     plt.plot(num_paths_list, numba_only_t, "o-", label="NUMBA ONLY")
     plt.plot(num_paths_list, numba_parallel_t, "o-", label="NUMBA PARALLEL")
     plt.xlabel("Number of Paths")
@@ -426,7 +422,7 @@ def test_fin_numba_numba_parallel(use_sobol):
     plt.legend()
     plt.title(title)
 
-    plt.figure(figsize=(8, 6))
+    plt.figure()
     plt.plot(num_paths_list, v_exact, label="EXACT")
     plt.plot(num_paths_list, numba_only_v, "o-", label="NUMBA ONLY")
     plt.plot(num_paths_list, numba_parallel_v, "o-", label="NUMBA PARALLEL")

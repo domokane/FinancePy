@@ -2,16 +2,16 @@
 
 from math import ceil
 
-from enum import Enum
 import numpy as np
 from scipy import optimize
 from numba import njit
 
 from ..utils.error import FinError
+
 from ..utils.math import normcdf, accrued_interpolator
 from ..market.curves.interpolator import InterpTypes, _uinterpolate
 from ..utils.helpers import label_to_string
-from ..utils.global_types import ExerciseTypes
+from ..utils.global_types import ExerciseTypes, HWEuropeanCalcTypes
 from ..utils.global_vars import G_SMALL
 
 INTERP_TYPE_VALUE = InterpTypes.FLAT_FWD_RATES.value
@@ -24,12 +24,6 @@ J_MAX_LIMIT = 0.184
 
 ########################################################################################
 
-
-class FinHWEuropeanCalcType(Enum):
-
-    JAMSHIDIAN = 1
-    EXPIRY_ONLY = 2
-    EXPIRY_TREE = 3
 
 
 ########################################################################################
@@ -915,7 +909,7 @@ class HWTree:
         sigma: float,
         a: float,
         num_time_steps: int = 100,
-        european_calc_type: FinHWEuropeanCalcType = FinHWEuropeanCalcType.EXPIRY_TREE,
+        european_calc_type: HWEuropeanCalcTypes = HWEuropeanCalcTypes.EXPIRY_TREE,
     ) -> None:
         """Constructs the Hull-White rate model. The speed of mean reversion
         a and volatility are passed in. The short rate process is given by
@@ -1080,6 +1074,9 @@ class HWTree:
         call_value += call * face
         put_value += put * face
 
+        # payer swaption   -> put on coupon bond
+        # receiver swaption -> call on coupon bond
+        # receiver, payer
         return (call_value, put_value)
 
     ####################################################################################
@@ -1291,7 +1288,7 @@ class HWTree:
 
         if exercise_type_int == 1:
 
-            if self.european_calc_type == FinHWEuropeanCalcType.JAMSHIDIAN:
+            if self.european_calc_type == HWEuropeanCalcTypes.JAMSHIDIAN:
 
                 v = self.european_bond_option_jamshidian(
                     t_exp,
@@ -1306,7 +1303,7 @@ class HWTree:
                 call_value = v[0]
                 put_value = v[1]
 
-            elif self.european_calc_type == FinHWEuropeanCalcType.EXPIRY_ONLY:
+            elif self.european_calc_type == HWEuropeanCalcTypes.EXPIRY_ONLY:
 
                 v = self.european_bond_option_expiry_only(
                     t_exp, strike_price, face_amount, cpn_times, cpn_flows
@@ -1315,7 +1312,7 @@ class HWTree:
                 call_value = v[0]
                 put_value = v[1]
 
-            elif self.european_calc_type == FinHWEuropeanCalcType.EXPIRY_TREE:
+            elif self.european_calc_type == HWEuropeanCalcTypes.EXPIRY_TREE:
 
                 call_value, put_value = american_bond_option_tree_fast(
                     t_exp,
@@ -1483,7 +1480,7 @@ class HWTree:
     def __repr__(self) -> str:
         """Return string with class details."""
 
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("Sigma", self.sigma)
         s += label_to_string("a", self.a)
         s += label_to_string("num_time_steps", self.num_time_steps)

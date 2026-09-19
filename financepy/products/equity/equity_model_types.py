@@ -29,7 +29,7 @@ class EquityModel:
 #         self.parameters = parameters
 
 #     def __repr__(self):
-#         s = label_to_string("OBJECT TYPE", type(self).__name__)
+#         s = label_to_string("OBJECT_TYPE", type(self).__name__)
 #         s += label_to_string("VOLATILITY", self.volatility)
 #         s += label_to_string("IMPLEMENTATION", self.implementation)
 #         s += label_to_string("PARAMETERS", self.parameters)
@@ -46,7 +46,7 @@ class EquityModelHeston(EquityModel):
         self.implementation = 0
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         s += label_to_string("MEAN REVERSION", self.mean_reversion)
         s += label_to_string("IMPLEMENTATION", self.implementation)

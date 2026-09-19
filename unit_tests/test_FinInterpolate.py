@@ -95,7 +95,7 @@ def test_flat_fwd_rates():
 
 def test_linear_fwd_rates():
 
-    interp_type = InterpTypes.LINEAR_FWD_RATES
+    interp_type = InterpTypes.LINEAR_ONFWD_RATES
 
     interpolator = Interpolator(interp_type)
     interpolator.fit(x_values, y_values)
@@ -104,13 +104,13 @@ def test_linear_fwd_rates():
     x = x_interpolate_values[index]
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 1.5789
-    assert round(y_int, 4) == 0.8581
+    assert round(y_int, 4) == 0.8583
 
     index = 15
     x = x_interpolate_values[index]
     y_int = interpolator.interpolate(x)
     assert round(x, 4) == 7.8947
-    assert round(y_int, 4) == 0.5119
+    assert round(y_int, 4) == 0.5141
 
     index = 19
     x = x_interpolate_values[index]

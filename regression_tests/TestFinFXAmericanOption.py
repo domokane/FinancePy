@@ -4,7 +4,7 @@ import numpy as np
 
 import add_fp_to_path
 
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.global_types import OptionTypes
@@ -38,8 +38,8 @@ def test_fin_fx_american_option():
     strike_fx_rate = 1.250
     volatility = 0.10
 
-    domestic_curve = DiscountCurveFlat(value_dt, ccy2_cc_rate)
-    foreign_curve = DiscountCurveFlat(value_dt, ccy1_cc_rate)
+    domestic_curve = FlatDiscountCurve(value_dt, ccy2_cc_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, ccy1_cc_rate)
 
     model = BlackScholes(volatility)
 

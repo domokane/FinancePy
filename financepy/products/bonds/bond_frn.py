@@ -456,14 +456,14 @@ class BondFRN:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
-        s += label_to_string("MATURITY DATE", self.maturity_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string(
             "QUOTED MARGIN (bp)", self.quoted_margin * 10000.0
         )
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("ACCRUAL DAY COUNT TYPE", self.accrual_dc_type)
+        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         return s
 
     ###########################################################################

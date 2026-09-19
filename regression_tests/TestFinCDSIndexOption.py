@@ -2,7 +2,6 @@
 
 import os
 import time
-import numpy as np
 
 import add_fp_to_path
 
@@ -10,15 +9,14 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.credit.cds_curve import CDSCurve
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.cds_curve import CDSCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_option import CDSIndexOption
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 from FinTestCases import FinTestCases, global_test_case_mode
-from financepy.utils.global_vars import G_BASIS_POINT
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -42,33 +40,23 @@ def build_ibor_curve(trade_dt):
     settle_dt = value_dt
 
     maturity_dt = settle_dt.add_months(12)
-    swap1 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap1 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap1)
 
     maturity_dt = settle_dt.add_months(24)
-    swap2 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap2 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap2)
 
     maturity_dt = settle_dt.add_months(36)
-    swap3 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap3 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap3)
 
     maturity_dt = settle_dt.add_months(48)
-    swap4 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type
-    )
+    swap4 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
     swaps.append(swap4)
 
     maturity_dt = settle_dt.add_months(60)
-    swap5 = IborSwap(
-        settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type
-    )
+    swap5 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
     swaps.append(swap5)
 
     libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
@@ -89,9 +77,7 @@ def build_flat_issuer_curve(trade_dt, libor_curve, spread, recovery_rate):
     cds = CDS(value_dt, maturity_dt, spread)
     cds_mkt_contracts.append(cds)
 
-    issuer_curve = CDSCurve(
-        value_dt, cds_mkt_contracts, libor_curve, recovery_rate
-    )
+    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
 
     return issuer_curve
 
@@ -112,9 +98,7 @@ def test_dirty_price_cds_index_option():
     maturity_7yr = trade_dt.next_cds_date(84)
     maturity_10yr = trade_dt.next_cds_date(120)
 
-    path = os.path.join(
-        os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv"
-    )
+    path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
     f = open(path, "r")
     data = f.readlines()
     f.close()
@@ -136,9 +120,7 @@ def test_dirty_price_cds_index_option():
         cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
         cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
 
-        issuer_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, recovery_rate
-        )
+        issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
 
         issuer_curves.append(issuer_curve)
 
@@ -151,9 +133,7 @@ def test_dirty_price_cds_index_option():
     ]
     index_recovery = 0.40
 
-    test_cases.banner(
-        "======================= CDS INDEX OPTION =========================="
-    )
+    test_cases.banner("======================= CDS INDEX OPTION ==========================")
 
     index_cpn = 0.004
     volatility = 0.50
@@ -188,9 +168,7 @@ def test_dirty_price_cds_index_option():
             cds = CDS(value_dt, dt, index / 10000.0)
             cds_contracts.append(cds)
 
-        index_curve = CDSCurve(
-            value_dt, cds_contracts, libor_curve, index_recovery
-        )
+        index_curve = CDSCurve(value_dt, cds_contracts, libor_curve, index_recovery)
 
         if True:
 
@@ -200,16 +178,14 @@ def test_dirty_price_cds_index_option():
 
             start = time.time()
 
-            adjusted_issuer_curves = (
-                index_portfolio.hazard_rate_adjust_intrinsic(
-                    value_dt,
-                    issuer_curves,
-                    index_spreads,
-                    index_upfronts,
-                    index_maturity_dts,
-                    index_recovery,
-                    tolerance,
-                )
+            adjusted_issuer_curves = index_portfolio.hazard_rate_adjust_intrinsic(
+                value_dt,
+                issuer_curves,
+                index_spreads,
+                index_upfronts,
+                index_maturity_dts,
+                index_recovery,
+                tolerance,
             )
 
             end = time.time()
@@ -219,9 +195,7 @@ def test_dirty_price_cds_index_option():
 
             index_spread = index / 10000.0
 
-            issuer_curve = build_flat_issuer_curve(
-                trade_dt, libor_curve, index_spread, index_recovery
-            )
+            issuer_curve = build_flat_issuer_curve(trade_dt, libor_curve, index_spread, index_recovery)
 
             adjusted_issuer_curves = []
             for _ in range(0, 125):
@@ -235,9 +209,7 @@ def test_dirty_price_cds_index_option():
 
             start = time.time()
 
-            option = CDSIndexOption(
-                expiry_dt, maturity_dt, index_cpn, strike, notional
-            )
+            option = CDSIndexOption(expiry_dt, maturity_dt, index_cpn, strike, notional)
 
             v_pay_1, v_rec_1, strike_value, mu, exp_h = option.value_anderson(
                 value_dt, adjusted_issuer_curves, index_recovery, volatility

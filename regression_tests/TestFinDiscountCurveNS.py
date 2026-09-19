@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import add_fp_to_path
 
 from financepy.utils.math import scale
-from financepy.market.curves.discount_curve_ns import DiscountCurveNS
+from financepy.market.curves.ns_discount_curve import NSDiscountCurve
 from financepy.utils.date import Date
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -25,11 +25,11 @@ def test_fin_nelson_siegel_curve():
     curve_dt = Date(6, 6, 2019)
     dates = curve_dt.add_years(times)
 
-    curve1 = DiscountCurveNS(curve_dt, 1, 0, 0, tau)
+    curve1 = NSDiscountCurve(curve_dt, 1, 0, 0, tau)
     factor1loading = curve1.zero_rate(dates)
-    curve2 = DiscountCurveNS(curve_dt, 0, 1, 0, tau)
+    curve2 = NSDiscountCurve(curve_dt, 0, 1, 0, tau)
     factor2loading = curve2.zero_rate(dates)
-    curve3 = DiscountCurveNS(curve_dt, 0, 0, 1, tau)
+    curve3 = NSDiscountCurve(curve_dt, 0, 0, 1, tau)
     factor3loading = curve3.zero_rate(dates)
 
     test_cases.header("FACTOR LOADING ON ZERO RATES")
@@ -54,35 +54,35 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.03
     beta_2 = -0.02
     beta_3 = 0.02
-    curve1 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve1 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates1 = curve1.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates1)
 
     beta_1 = 0.04
     beta_2 = -0.02
     beta_3 = 0.02
-    curve2 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve2 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates2 = curve2.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates2)
 
     beta_1 = 0.05
     beta_2 = -0.02
     beta_3 = 0.02
-    curve3 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve3 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates3 = curve3.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates3)
 
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = 0.02
-    curve4 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve4 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates4 = curve4.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates4)
 
     beta_1 = 0.07
     beta_2 = -0.02
     beta_3 = 0.02
-    curve5 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve5 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
@@ -103,35 +103,35 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.06
     beta_2 = -0.04
     beta_3 = 0.02
-    curve1 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve1 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates1 = curve1.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates1)
 
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = 0.02
-    curve2 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve2 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates2 = curve2.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates2)
 
     beta_1 = 0.06
     beta_2 = 0.00
     beta_3 = 0.02
-    curve3 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve3 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates3 = curve3.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates3)
 
     beta_1 = 0.06
     beta_2 = 0.02
     beta_3 = 0.02
-    curve4 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve4 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates4 = curve4.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates4)
 
     beta_1 = 0.06
     beta_2 = 0.04
     beta_3 = 0.02
-    curve5 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve5 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates5 = curve5.zero_rate(dates)
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)
 
@@ -152,7 +152,7 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = -0.02
-    curve1 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve1 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates1 = curve1.zero_rate(dates)
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates1)
@@ -160,7 +160,7 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = 0.00
-    curve2 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve2 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates2 = curve2.zero_rate(dates)
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates2)
@@ -168,7 +168,7 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = 0.02
-    curve3 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve3 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates3 = curve3.zero_rate(dates)
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates3)
@@ -176,7 +176,7 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = 0.04
-    curve4 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve4 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates4 = curve4.zero_rate(dates)
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates4)
@@ -184,7 +184,7 @@ def test_fin_nelson_siegel_curve():
     beta_1 = 0.06
     beta_2 = -0.02
     beta_3 = 0.06
-    curve5 = DiscountCurveNS(curve_dt, beta_1, beta_2, beta_3, tau)
+    curve5 = NSDiscountCurve(curve_dt, beta_1, beta_2, beta_3, tau)
     zero_rates5 = curve5.zero_rate(dates)
 
     test_cases.print(beta_1, beta_2, beta_3, zero_rates5)

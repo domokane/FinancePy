@@ -10,10 +10,10 @@ import add_fp_to_path
 
 from financepy.models.bk_tree import BKTree
 from financepy.utils.global_types import SwapTypes
-from financepy.products.bonds.bond_callable import BondEmbeddedOption
+from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption
 from financepy.products.bonds.bond import Bond
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -120,7 +120,7 @@ def test_bond_embedded_option_quantlib():
     value_dt = Date(16, 8, 2016)
     settle_dt = value_dt.add_weekdays(3)
 
-    discount_curve = DiscountCurveFlat(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
+    discount_curve = FlatDiscountCurve(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
 
     issue_dt = Date(15, 9, 2010)
     maturity_dt = Date(15, 9, 2022)

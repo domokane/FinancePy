@@ -4,7 +4,7 @@ import add_fp_to_path
 
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ois import OIS
-from financepy.market.curves.discount_curve_flat import DiscountCurveFlat
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
@@ -54,7 +54,7 @@ def test_fin_fixed_ois():
 
     value_dt = effective_dt
     market_rate = 0.05
-    ois_curve = DiscountCurveFlat(value_dt, market_rate, FrequencyTypes.ANNUAL)
+    ois_curve = FlatDiscountCurve(value_dt, market_rate, FrequencyTypes.ANNUAL)
 
     v = ois.value(effective_dt, ois_curve)
 
