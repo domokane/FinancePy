@@ -8,6 +8,17 @@ from ...utils.error import FinError
 from ...utils.helpers import label_to_string
 from ...utils.global_vars import G_SMALL
 from scipy.interpolate import BSpline
+from enum import Enum, auto
+
+
+class CurveFitTypes(Enum):
+    CUBIC_POLYNOMIAL = auto()
+    QUARTIC_POLYNOMIAL = auto()
+    QUINTIC_POLYNOMIAL = auto()
+    NELSON_SIEGEL = auto()
+    NELSON_SIEGEL_SVENSSON = auto()
+    BSPLINE = auto()
+
 
 ###############################################################################
 
@@ -34,12 +45,13 @@ class CurveFitMethod:
     def bounds(self):
         return (-np.inf, np.inf)
 
+
 ###############################################################################
 # These are parametric curve fitters that can be used in a number of cases
 ###############################################################################
 
 
-class CurveFitPolynomial(CurveFitMethod):
+class CurveFitCubicPolynomial(CurveFitMethod):
     """Polynomial curve fitting."""
 
     def __init__(self, power=3, t_scale=1.0):
@@ -78,7 +90,95 @@ class CurveFitPolynomial(CurveFitMethod):
 
         return s
 
+
 ###############################################################################
+
+
+class CurveFitQuarticPolynomial(CurveFitMethod):
+    """Polynomial curve fitting."""
+
+    def __init__(self, power=4, t_scale=1.0):
+        self.name = "Polynomial (" + str(power) + ")"
+        self.power = power
+        self.t_scale = t_scale
+        n_coeffs = power + 1
+        self.coeffs = np.full(n_coeffs, 0.03)
+        self._bounds = (-np.inf, np.inf)
+
+    def interp_rate(self, t):
+        # I store coefficients with lowest power first but numpy wants
+        # the highest power first so I need to reverse the order
+        x = np.asarray(t, dtype=float) / self.t_scale
+        coeffs = self.coeffs[::-1]
+        yld = np.polyval(coeffs, x)
+        return yld
+
+    def get_params(self):
+        return np.array(self.coeffs, dtype=float)
+
+    def set_params(self, params):
+        self.coeffs = np.array(params, dtype=float)
+
+    @property
+    def bounds(self):
+        return self._bounds
+
+    def __repr__(self):
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("Power", self.power)
+        s += label_to_string("t_scale", self.t_scale)
+
+        for c in self.coeffs:
+            s += label_to_string("Coefficient", c)
+
+        return s
+
+
+###############################################################################
+
+
+class CurveFitQuinticPolynomial(CurveFitMethod):
+    """Polynomial curve fitting."""
+
+    def __init__(self, power=5, t_scale=1.0):
+        self.name = "Polynomial (" + str(power) + ")"
+        self.power = power
+        self.t_scale = t_scale
+        n_coeffs = power + 1
+        self.coeffs = np.full(n_coeffs, 0.03)
+        self._bounds = (-np.inf, np.inf)
+
+    def interp_rate(self, t):
+        # I store coefficients with lowest power first but numpy wants
+        # the highest power first so I need to reverse the order
+        x = np.asarray(t, dtype=float) / self.t_scale
+        coeffs = self.coeffs[::-1]
+        yld = np.polyval(coeffs, x)
+        return yld
+
+    def get_params(self):
+        return np.array(self.coeffs, dtype=float)
+
+    def set_params(self, params):
+        self.coeffs = np.array(params, dtype=float)
+
+    @property
+    def bounds(self):
+        return self._bounds
+
+    def __repr__(self):
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("Power", self.power)
+        s += label_to_string("t_scale", self.t_scale)
+
+        for c in self.coeffs:
+            s += label_to_string("Coefficient", c)
+
+        return s
+
+
+###############################################################################
+
 
 class CurveFitNelsonSiegel(CurveFitMethod):
     """Nelson-Siegel parametric fit."""
@@ -92,8 +192,7 @@ class CurveFitNelsonSiegel(CurveFitMethod):
 
         # Fairly permissive bounds. Only tau is restricted to 0.5-100.
         if bounds is None:
-            bounds = [(-5.0, -5.0, -5.0, 0.01),
-                      (10.0, 10.0, 10.0, 100.0)]
+            bounds = [(-5.0, -5.0, -5.0, 0.01), (10.0, 10.0, 10.0, 100.0)]
 
         self._bounds = bounds
 
@@ -113,10 +212,14 @@ class CurveFitNelsonSiegel(CurveFitMethod):
         t = np.asarray(t, dtype=float)
         t = np.maximum(t, 1e-10)
 
-        if beta_1 is None: beta_1 = self.beta_1
-        if beta_2 is None: beta_2 = self.beta_2
-        if beta_3 is None: beta_3 = self.beta_3
-        if tau is None:    tau = self.tau
+        if beta_1 is None:
+            beta_1 = self.beta_1
+        if beta_2 is None:
+            beta_2 = self.beta_2
+        if beta_3 is None:
+            beta_3 = self.beta_3
+        if tau is None:
+            tau = self.tau
 
         if tau <= G_SMALL:
             raise FinError("tau must be positive")
@@ -136,9 +239,11 @@ class CurveFitNelsonSiegel(CurveFitMethod):
         s += label_to_string("tau", self.tau)
         return s
 
+
 ###############################################################################
 
-class CurveFitSvensson(CurveFitMethod):
+
+class CurveFitNelsonSiegelSvensson(CurveFitMethod):
     """Svensson (extended Nelson-Siegel) parametric fit."""
 
     def __init__(
@@ -150,7 +255,7 @@ class CurveFitSvensson(CurveFitMethod):
         tau1=2.0,
         tau2=5.0,
         bounds=None,
-        ):
+    ):
 
         self.name = "Svensson"
         self.beta_1 = beta1
@@ -161,18 +266,12 @@ class CurveFitSvensson(CurveFitMethod):
         self.tau_2 = tau2
 
         if bounds is None:
-            bounds = [(-5.0, -5.0, -5.0, -5.0, 0.01, 0.1),
-                      (10.0, 10.0, 10.0, 10.0, 10.0, 100.0)]
+            bounds = [(-5.0, -5.0, -5.0, -5.0, 0.01, 0.1), (10.0, 10.0, 10.0, 10.0, 10.0, 100.0)]
         self._bounds = bounds
 
     def get_params(self):
         return np.array(
-            [self.beta_1,
-             self.beta_2,
-             self.beta_3,
-             self.beta_4,
-             self.tau_1,
-             self.tau_2],
+            [self.beta_1, self.beta_2, self.beta_3, self.beta_4, self.tau_1, self.tau_2],
             dtype=float,
         )
 
@@ -207,12 +306,18 @@ class CurveFitSvensson(CurveFitMethod):
         t = np.asarray(t, dtype=float)
         t = np.maximum(t, 1e-10)
 
-        if beta_1 is None: beta_1 = self.beta_1
-        if beta_2 is None: beta_2 = self.beta_2
-        if beta_3 is None: beta_3 = self.beta_3
-        if beta_4 is None: beta_4 = self.beta_4
-        if tau_1 is None: tau_1 = self.tau_1
-        if tau_2 is None: tau_2 = self.tau_2
+        if beta_1 is None:
+            beta_1 = self.beta_1
+        if beta_2 is None:
+            beta_2 = self.beta_2
+        if beta_3 is None:
+            beta_3 = self.beta_3
+        if beta_4 is None:
+            beta_4 = self.beta_4
+        if tau_1 is None:
+            tau_1 = self.tau_1
+        if tau_2 is None:
+            tau_2 = self.tau_2
 
         if tau_1 <= G_SMALL or tau_2 <= G_SMALL:
             raise FinError("tau1 and tau2 must be positive")
@@ -240,6 +345,7 @@ class CurveFitSvensson(CurveFitMethod):
 
 ###############################################################################
 
+
 class CurveFitBSpline(CurveFitMethod):
     """B-Spline curve fitting."""
 
@@ -265,11 +371,13 @@ class CurveFitBSpline(CurveFitMethod):
 
         k = power
 
-        self.t = np.concatenate((
-            np.full(k + 1, 0.0),
-            self.knots,
-            np.full(k + 1, 1.0),
-        ))
+        self.t = np.concatenate(
+            (
+                np.full(k + 1, 0.0),
+                self.knots,
+                np.full(k + 1, 1.0),
+            )
+        )
 
         n_coeffs = len(self.t) - k - 1
         self.coeffs = np.full(n_coeffs, 0.03)
@@ -301,5 +409,6 @@ class CurveFitBSpline(CurveFitMethod):
         for i, c in enumerate(self.coeffs):
             s += label_to_string(f"Coefficient {i}", c)
         return s
+
 
 ###############################################################################

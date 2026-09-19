@@ -3,9 +3,8 @@
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.products.equity.equity_asian_option import (
-    AsianOptionValuationMethods,
-)
+from financepy.utils.global_types import AsianOptionValuationTypes
+
 from financepy.products.equity.equity_asian_option import EquityAsianOption
 from financepy.utils.global_types import OptionTypes
 
@@ -45,7 +44,7 @@ def test_geometric():
         discount_curve,
         dividend_curve,
         model,
-        AsianOptionValuationMethods.GEOMETRIC,
+        AsianOptionValuationTypes.GEOMETRIC,
         accrued_avg,
     )
 
@@ -63,7 +62,7 @@ def test_turnbull_wakeman():
         discount_curve,
         dividend_curve,
         model,
-        AsianOptionValuationMethods.TURNBULL_WAKEMAN,
+        AsianOptionValuationTypes.TURNBULL_WAKEMAN,
         accrued_avg,
     )
 
@@ -81,7 +80,7 @@ def test_curran():
         discount_curve,
         dividend_curve,
         model,
-        AsianOptionValuationMethods.CURRAN,
+        AsianOptionValuationTypes.CURRAN,
         accrued_avg,
     )
 

@@ -118,7 +118,6 @@ class FixedFixedXCcySwap:
         self._fixed_total_pv = []
 
         self._first_fixing_rate = None
-        self.value_dt = None
         self._fixed_start_index = None
 
         self._calc_fixed_leg_flows()
@@ -138,9 +137,7 @@ class FixedFixedXCcySwap:
 
         fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
-        float_leg_value = self.float_leg_value(
-            value_dt, discount_curve, index_curve, first_fixing_rate, principal
-        )
+        float_leg_value = self.float_leg_value(value_dt, discount_curve, index_curve, first_fixing_rate, principal)
 
         value = fixed_leg_value - float_leg_value
 
@@ -233,7 +230,7 @@ class FixedFixedXCcySwap:
 
     def fixed_leg_value(self, value_dt, discount_curve, principal=0.0):
         """Calculate the present value of the fixed leg cash flows."""
-        self.value_dt = value_dt
+
         self._fixed_year_fracs = []
         self._fixed_flows = []
         self._fixed_dfs = []
@@ -357,7 +354,6 @@ class FixedFixedXCcySwap:
         case if we set the valuation date to be the swap's actual settlement
         date."""
 
-        self.value_dt = value_dt
         self._float_year_fracs = []
         self._float_flows = []
         self._float_rates = []
@@ -459,7 +455,6 @@ class FixedFixedXCcySwap:
         print("cpn (%):", self._fixed_cpn * 100)
         print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
         print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
-        print("VALUATION DATE", self.value_dt)
 
         if len(self._fixed_flows) == 0:
             print("Fixed Flows not calculated.")
@@ -548,10 +543,7 @@ class FixedFixedXCcySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
 
-        print(
-            "%15s %10s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", "-", 1.0, "-", "-")
-        )
+        print("%15s %10s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for PAYMENT_DT in self._adjusted_float_dts[start_index:]:

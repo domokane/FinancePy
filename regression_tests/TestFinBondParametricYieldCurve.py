@@ -2,7 +2,6 @@
 
 import os
 import datetime as dt
-import numpy as np
 import pandas as pd
 
 import add_fp_to_path
@@ -12,12 +11,8 @@ from financepy.products.bonds.bond import Bond
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
-from financepy.market.curves import CurveFitSvensson
-from financepy.market.curves import CurveFitNelsonSiegel
-from financepy.market.curves import CurveFitBSpline
-from financepy.market.curves import CurveFitPolynomial
+from financepy.market.curves import CurveFitTypes
 from financepy.market.curves import BondParametricYieldCurve
-
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -53,37 +48,37 @@ def test_bond_parametric_yield_curve():
         bonds.append(bond)
         ylds.append(yld)
 
-    curve_fitter = CurveFitPolynomial()
-    fitted_curve1 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    fit_type = CurveFitTypes.CUBIC_POLYNOMIAL
+    fitted_curve1 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
     # print(fitted_curve1.errors())
 
     if SHOW_PLOTS:
         fitted_curve1.plot("GBP Yield Curve")
 
-    curve_fitter = CurveFitPolynomial(5)
-    fitted_curve2 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    fit_type = CurveFitTypes.QUINTIC_POLYNOMIAL
+    fitted_curve2 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
     if SHOW_PLOTS:
         fitted_curve2.plot("GBP Yield Curve")
 
     # print(fitted_curve2.errors())
 
-    curve_fitter = CurveFitNelsonSiegel()
-    fitted_curve3 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    fit_type = CurveFitTypes.NELSON_SIEGEL
+    fitted_curve3 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
     if SHOW_PLOTS:
         fitted_curve3.plot("GBP Yield Curve")
 
     # print(fitted_curve3.errors())
 
-    curve_fitter = CurveFitSvensson()
-    fitted_curve4 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    fit_type = CurveFitTypes.NELSON_SIEGEL_SVENSSON
+    fitted_curve4 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
     if SHOW_PLOTS:
         fitted_curve4.plot("GBP Yield Curve")
 
     # print(fitted_curve4.errors())
 
-    curve_fitter = CurveFitBSpline()
-    fitted_curve5 = BondParametricYieldCurve(settle_dt, bonds, ylds, curve_fitter)
+    fit_type = CurveFitTypes.BSPLINE
+    fitted_curve5 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
     # print(fitted_curve5.errors())
 

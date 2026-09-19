@@ -15,6 +15,7 @@ from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.swap_float_leg import SwapFloatLeg
 from ...products.equity.equity_swap_leg import EquitySwapLeg
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -133,6 +134,9 @@ class EquitySwap:
     ):
         """Value the Equity swap on a valuation date."""
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
         self.equity_leg_value = self.equity_leg.value(
             value_dt,
             discount_curve,
@@ -142,9 +146,7 @@ class EquitySwap:
         )
         self._fill_rate_notional_array()
 
-        self.rate_leg_value = self.rate_leg.value(
-            value_dt, discount_curve, index_curve, first_fixing_rate
-        )
+        self.rate_leg_value = self.rate_leg.value(value_dt, discount_curve, index_curve, first_fixing_rate)
 
         return self.equity_leg_value + self.rate_leg_value
 

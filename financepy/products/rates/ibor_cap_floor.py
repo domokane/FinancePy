@@ -31,6 +31,7 @@ from ...models.sabr import SABR
 from ...models.sabr_shifted import SABRShifted
 from ...models.hw_tree import HWTree
 from ...utils.global_types import CapFloorTypes, OptionTypes
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 
@@ -128,6 +129,8 @@ class IborCapFloor:
         """Value the cap or floor using the chosen model which specifies
         the volatility of the Ibor rate to the cap start date."""
 
+        check_curve_dt(value_dt, libor_curve)
+
         num_options = len(self.caplet_floorlet_dates)
         strike_rate = self.strike_rate
 
@@ -192,9 +195,7 @@ class IborCapFloor:
 
             intrinsic_value *= self.notional
 
-            caplet_floorlet_value = self.value_caplet_floor_let(
-                value_dt, start_dt, end_dt, libor_curve, model
-            )
+            caplet_floorlet_value = self.value_caplet_floor_let(value_dt, start_dt, end_dt, libor_curve, model)
 
             cap_floor_value += caplet_floorlet_value
 
@@ -209,14 +210,14 @@ class IborCapFloor:
 
     ###########################################################################
 
-    def value_caplet_floor_let(
-        self, value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model
-    ):
+    def value_caplet_floor_let(self, value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model):
         """Value the caplet or floorlet using a specific model."""
+
+        check_curve_dt(value_dt, libor_curve)
 
         time_dc_type = libor_curve.time_dc_type
         t_exp = times_from_dates(self.start_dt, caplet_start_dt, time_dc_type)
-#        t_exp = (caplet_start_dt - self.start_dt) / G_DAYS_IN_YEAR
+        #        t_exp = (caplet_start_dt - self.start_dt) / G_DAYS_IN_YEAR
 
         dc_counter = DayCount(self.accrual_dc_type)
         alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
@@ -234,63 +235,43 @@ class IborCapFloor:
         if isinstance(model, Black):
 
             if self.opt_type == CapFloorTypes.CAP:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.opt_type == CapFloorTypes.FLOOR:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, BlackShifted):
 
             if self.opt_type == CapFloorTypes.CAP:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.opt_type == CapFloorTypes.FLOOR:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, Bachelier):
 
             if self.opt_type == CapFloorTypes.CAP:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.opt_type == CapFloorTypes.FLOOR:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABR):
 
             if self.opt_type == CapFloorTypes.CAP:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.opt_type == CapFloorTypes.FLOOR:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, SABRShifted):
 
             if self.opt_type == CapFloorTypes.CAP:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
             elif self.opt_type == CapFloorTypes.FLOOR:
-                caplet_floorlet_value = model.value(
-                    fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT
-                )
+                caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
         elif isinstance(model, HWTree):
 
             time_dc_type = libor_curve.time_dc_type
             t_mat = times_from_dates(value_dt, caplet_end_dt, time_dc_type)
-#            t_mat = (caplet_end_dt - value_dt) / G_DAYS_IN_YEAR
+            #            t_mat = (caplet_end_dt - value_dt) / G_DAYS_IN_YEAR
             alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
             strike_price = 1.0 / (1.0 + alpha * self.strike_rate)
             notional_adj = 1.0 + self.strike_rate * alpha
@@ -299,9 +280,7 @@ class IborCapFloor:
             df_times = libor_curve._times
             df_values = libor_curve._dfs
 
-            v = model.option_on_zcb(
-                t_exp, t_mat, strike_price, face_amount, df_times, df_values
-            )
+            v = model.option_on_zcb(t_exp, t_mat, strike_price, face_amount, df_times, df_values)
 
             # we divide by alpha to offset the multiplication above
             if self.opt_type == CapFloorTypes.CAP:

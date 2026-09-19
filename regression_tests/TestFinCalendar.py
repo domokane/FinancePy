@@ -82,6 +82,7 @@ def test_target():
     assert cal.is_business_day(Date(24, 12, 2026))
     assert cal.is_business_day(Date(28, 12, 2026))
 
+
 def test_target_not_national_holidays():
     cal = Calendar(CalendarTypes.TARGET)
 
@@ -99,24 +100,58 @@ def test_target_not_national_holidays():
     # Armistice Day is not a TARGET holiday.
     assert cal.is_business_day(Date(11, 11, 2026))
 
+
 def test_fast_adjust():
+
+    years = [
+        2000,
+        2001,
+        2004,
+        2010,
+        2020,
+        2024,
+        2025,
+        2026,
+        2030,
+        2050,
+        2080,
+    ]
+
+    months = range(1, 13)
+
+    days = [
+        1,
+        2,
+        3,
+        14,
+        15,
+        16,
+        27,
+        28,
+    ]
+
     for cal_type in CalendarTypes:
+
         cal = Calendar(cal_type)
-        for y in range(2000, 2081):  # DO NOT NEED ENTIRE 200 YEAR RANGE
-            dt = Date(1, 1, y)
-            end_dt = Date(1, 1, y + 1)
 
-            while dt < end_dt:
-                for bd_type in BusDayAdjustTypes:
-                    a = cal.adjust(dt, bd_type)
-                    b = cal.fast_adjust(dt, bd_type)
+        for y in years:
 
-                    if a != b:
-                        print(
-                            f"Mismatch: {cal_type}, {bd_type}, {dt}, {a}, {b}"
-                        )
+            for m in months:
 
-                dt = dt.add_days(1)
+                for d in days:
+
+                    try:
+                        dt = Date(d, m, y)
+                    except Exception:
+                        continue
+
+                    for bd_type in BusDayAdjustTypes:
+
+                        a = cal.adjust(dt, bd_type)
+                        b = cal.fast_adjust(dt, bd_type)
+
+                        assert a == b, f"Mismatch: {cal_type}, " f"{bd_type}, {dt}, {a}, {b}"
+
 
 ########################################################################################
 
@@ -229,18 +264,20 @@ def test_joint_str_and_repr():
     assert str(joint) == "JOINT(UNITED_STATES,UNITED_KINGDOM)"
     assert repr(joint) == str(joint)
 
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################
+
 
 def test_weekend():
     cal = Calendar(CalendarTypes.WEEKEND)
 
-    assert not cal.is_business_day(Date(8, 8, 2026))   # Saturday
-    assert not cal.is_business_day(Date(9, 8, 2026))   # Sunday
-    assert cal.is_business_day(Date(10, 8, 2026))       # Monday
+    assert not cal.is_business_day(Date(8, 8, 2026))  # Saturday
+    assert not cal.is_business_day(Date(9, 8, 2026))  # Sunday
+    assert cal.is_business_day(Date(10, 8, 2026))  # Monday
 
 
 def test_australia():
@@ -248,9 +285,9 @@ def test_australia():
 
     assert not cal.is_business_day(Date(1, 1, 2026))
     assert not cal.is_business_day(Date(26, 1, 2026))
-    assert not cal.is_business_day(Date(3, 4, 2026))    # Good Friday
-    assert not cal.is_business_day(Date(6, 4, 2026))    # Easter Monday
-    assert not cal.is_business_day(Date(25, 4, 2026))   # ANZAC
+    assert not cal.is_business_day(Date(3, 4, 2026))  # Good Friday
+    assert not cal.is_business_day(Date(6, 4, 2026))  # Easter Monday
+    assert not cal.is_business_day(Date(25, 4, 2026))  # ANZAC
     assert not cal.is_business_day(Date(25, 12, 2026))
 
 
@@ -258,11 +295,11 @@ def test_canada():
     cal = Calendar(CalendarTypes.CANADA)
 
     assert not cal.is_business_day(Date(1, 1, 2026))
-    assert not cal.is_business_day(Date(16, 2, 2026))   # Family Day
-    assert not cal.is_business_day(Date(3, 4, 2026))    # Good Friday
-    assert not cal.is_business_day(Date(18, 5, 2026))   # Victoria Day
-    assert not cal.is_business_day(Date(1, 7, 2026))    # Canada Day
-    assert not cal.is_business_day(Date(7, 9, 2026))    # Labour Day
+    assert not cal.is_business_day(Date(16, 2, 2026))  # Family Day
+    assert not cal.is_business_day(Date(3, 4, 2026))  # Good Friday
+    assert not cal.is_business_day(Date(18, 5, 2026))  # Victoria Day
+    assert not cal.is_business_day(Date(1, 7, 2026))  # Canada Day
+    assert not cal.is_business_day(Date(7, 9, 2026))  # Labour Day
     assert not cal.is_business_day(Date(12, 10, 2026))  # Thanksgiving
     assert not cal.is_business_day(Date(25, 12, 2026))
 
@@ -271,7 +308,7 @@ def test_france():
     cal = Calendar(CalendarTypes.FRANCE)
 
     assert not cal.is_business_day(Date(1, 1, 2026))
-    assert not cal.is_business_day(Date(6, 4, 2026))    # Easter Monday
+    assert not cal.is_business_day(Date(6, 4, 2026))  # Easter Monday
     assert not cal.is_business_day(Date(1, 5, 2026))
     assert not cal.is_business_day(Date(8, 5, 2026))
     assert not cal.is_business_day(Date(14, 7, 2026))
@@ -286,8 +323,8 @@ def test_germany():
     assert not cal.is_business_day(Date(3, 4, 2026))
     assert not cal.is_business_day(Date(6, 4, 2026))
     assert not cal.is_business_day(Date(1, 5, 2026))
-    assert not cal.is_business_day(Date(14, 5, 2026))   # Ascension
-    assert not cal.is_business_day(Date(3, 10, 2025))   # Unity Day
+    assert not cal.is_business_day(Date(14, 5, 2026))  # Ascension
+    assert not cal.is_business_day(Date(3, 10, 2025))  # Unity Day
     assert not cal.is_business_day(Date(25, 12, 2026))
 
 
@@ -321,8 +358,8 @@ def test_norway():
     cal = Calendar(CalendarTypes.NORWAY)
 
     assert not cal.is_business_day(Date(1, 1, 2026))
-    assert not cal.is_business_day(Date(2, 4, 2026))    # Maundy Thursday
-    assert not cal.is_business_day(Date(3, 4, 2026))    # Good Friday
+    assert not cal.is_business_day(Date(2, 4, 2026))  # Maundy Thursday
+    assert not cal.is_business_day(Date(3, 4, 2026))  # Good Friday
     assert not cal.is_business_day(Date(6, 4, 2026))
     assert not cal.is_business_day(Date(1, 5, 2026))
     assert not cal.is_business_day(Date(14, 5, 2026))
@@ -388,9 +425,9 @@ def test_london():
     assert not cal.is_business_day(Date(1, 1, 2026))
     assert not cal.is_business_day(Date(3, 4, 2026))
     assert not cal.is_business_day(Date(6, 4, 2026))
-    assert not cal.is_business_day(Date(4, 5, 2026))    # Early May
-    assert not cal.is_business_day(Date(25, 5, 2026))   # Spring
-    assert not cal.is_business_day(Date(31, 8, 2026))   # Summer
+    assert not cal.is_business_day(Date(4, 5, 2026))  # Early May
+    assert not cal.is_business_day(Date(25, 5, 2026))  # Spring
+    assert not cal.is_business_day(Date(31, 8, 2026))  # Summer
     assert not cal.is_business_day(Date(25, 12, 2026))
     assert not cal.is_business_day(Date(28, 12, 2026))  # Boxing observed
 
@@ -404,10 +441,9 @@ def test_united_kingdom():
     end = Date(1, 1, 2031)
 
     while dt < end:
-        assert uk.is_business_day(dt) == london.is_business_day(dt), (
-            f"UK/London mismatch on {dt}"
-        )
+        assert uk.is_business_day(dt) == london.is_business_day(dt), f"UK/London mismatch on {dt}"
         dt = dt.add_days(1)
+
 
 def test_japan():
 
@@ -450,6 +486,7 @@ def test_japan():
     # Dec 31 is not a statutory Japanese public holiday
     assert cal.is_business_day(Date(31, 12, 2026))
 
+
 def test_japan_emperors_birthday_history():
 
     cal = Calendar(CalendarTypes.JAPAN)
@@ -463,184 +500,152 @@ def test_japan_emperors_birthday_history():
     # Current Emperor
     assert not cal.is_business_day(Date(23, 2, 2026))
 
+
 def test_us_government_securities():
 
-    cal = Calendar(
-        CalendarTypes.US_GOVERNMENT_SECURITIES
-    )
-    
+    cal = Calendar(CalendarTypes.US_GOVERNMENT_SECURITIES)
+
     # MLK
-    assert not cal.is_business_day(
-        Date(19, 1, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(19, 1, 2026))
+
     # Presidents Day
-    assert not cal.is_business_day(
-        Date(16, 2, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(16, 2, 2026))
+
     # Good Friday / no SOFR in 2026
-    assert not cal.is_business_day(
-        Date(3, 4, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(3, 4, 2026))
+
     # Memorial Day
-    assert not cal.is_business_day(
-        Date(25, 5, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(25, 5, 2026))
+
     # Juneteenth
-    assert not cal.is_business_day(
-        Date(19, 6, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(19, 6, 2026))
+
     # July 3 special 2026 closure / no SOFR
-    assert not cal.is_business_day(
-        Date(3, 7, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(3, 7, 2026))
+
     # July 4 is Saturday anyway
-    assert not cal.is_business_day(
-        Date(4, 7, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(4, 7, 2026))
+
     # Labor Day
-    assert not cal.is_business_day(
-        Date(7, 9, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(7, 9, 2026))
+
     # Columbus Day
-    assert not cal.is_business_day(
-        Date(12, 10, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(12, 10, 2026))
+
     # Veterans Day
-    assert not cal.is_business_day(
-        Date(11, 11, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(11, 11, 2026))
+
     # Thanksgiving
-    assert not cal.is_business_day(
-        Date(26, 11, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(26, 11, 2026))
+
     # Christmas
-    assert not cal.is_business_day(
-        Date(25, 12, 2026)
-    )
-    
+    assert not cal.is_business_day(Date(25, 12, 2026))
+
     # Ordinary Treasury / SOFR business day
-    assert cal.is_business_day(
-        Date(6, 7, 2026)
-    )
+    assert cal.is_business_day(Date(6, 7, 2026))
 
 
 def test_us_federal_reserve():
 
     fed = Calendar(CalendarTypes.US_FEDERAL_RESERVE)
     ust = Calendar(CalendarTypes.US_GOVERNMENT_SECURITIES)
-    
+
     # Federal Reserve Banks / EFFR calendar:
     assert fed.is_business_day(Date(3, 7, 2026)) is True
-    
+
     # Government securities / SOFR calendar:
     assert ust.is_business_day(Date(3, 7, 2026)) is False
 
     cal = Calendar(CalendarTypes.US_FEDERAL_RESERVE)
-    
+
     # July 4, 2026 is Saturday.
     # Fed Banks are open Friday July 3.
     assert cal.is_business_day(Date(3, 7, 2026)) is True
-    
+
     # July 4 itself is weekend anyway.
     assert cal.is_business_day(Date(4, 7, 2026)) is False
-    
+
     # July 4, 2027 is Sunday -> Monday July 5 observed.
     assert cal.is_business_day(Date(5, 7, 2027)) is False
+
 
 def test_sydney():
 
     cal = Calendar(CalendarTypes.SYDNEY)
-    
+
     # Australia Day
     assert not cal.is_business_day(Date(26, 1, 2026))
-    
+
     # Good Friday
     assert not cal.is_business_day(Date(3, 4, 2026))
-    
+
     # NSW additional ANZAC holiday
     assert not cal.is_business_day(Date(27, 4, 2026))
-    
+
     # King's Birthday
     assert not cal.is_business_day(Date(8, 6, 2026))
-    
+
     # NSW Bank Holiday
     assert not cal.is_business_day(Date(3, 8, 2026))
-    
+
     # Labour Day
     assert not cal.is_business_day(Date(5, 10, 2026))
-    
+
     # Christmas
     assert not cal.is_business_day(Date(25, 12, 2026))
-    
+
     # Boxing Day additional holiday
     assert not cal.is_business_day(Date(28, 12, 2026))
+
 
 def test_rits():
 
     rits = Calendar(CalendarTypes.AUSTRALIA_RITS)
     sydney = Calendar(CalendarTypes.SYDNEY)
-    
+
     dt = Date(27, 4, 2026)
-    
+
     assert rits.is_business_day(dt) is True
     assert sydney.is_business_day(dt) is False
 
     # NSW Bank Holiday
-    assert Calendar(CalendarTypes.AUSTRALIA_RITS).is_business_day(
-        Date(3, 8, 2026)
-    ) is True
-    
-    assert Calendar(CalendarTypes.SYDNEY).is_business_day(
-        Date(3, 8, 2026)
-    ) is False
-    
+    assert Calendar(CalendarTypes.AUSTRALIA_RITS).is_business_day(Date(3, 8, 2026)) is True
+
+    assert Calendar(CalendarTypes.SYDNEY).is_business_day(Date(3, 8, 2026)) is False
+
     # NSW Labour Day
-    assert Calendar(CalendarTypes.AUSTRALIA_RITS).is_business_day(
-        Date(5, 10, 2026)
-    ) is True
-    
-    assert Calendar(CalendarTypes.SYDNEY).is_business_day(
-        Date(5, 10, 2026)
-    ) is False
+    assert Calendar(CalendarTypes.AUSTRALIA_RITS).is_business_day(Date(5, 10, 2026)) is True
+
+    assert Calendar(CalendarTypes.SYDNEY).is_business_day(Date(5, 10, 2026)) is False
 
 
 def test_toronto():
     cal = Calendar(CalendarTypes.TORONTO)
-    
+
     # Family Day
     assert not cal.is_business_day(Date(16, 2, 2026))
-    
+
     # Good Friday
     assert not cal.is_business_day(Date(3, 4, 2026))
-    
+
     # Victoria Day
     assert not cal.is_business_day(Date(18, 5, 2026))
-    
+
     # Canada Day
     assert not cal.is_business_day(Date(1, 7, 2026))
-    
+
     # Civic Holiday
     assert not cal.is_business_day(Date(3, 8, 2026))
-    
+
     # Labour Day
     assert not cal.is_business_day(Date(7, 9, 2026))
-    
+
     # Thanksgiving
     assert not cal.is_business_day(Date(12, 10, 2026))
-    
+
     # Christmas
     assert not cal.is_business_day(Date(25, 12, 2026))
+
 
 def test_zurich():
 
@@ -657,41 +662,43 @@ def test_zurich():
     assert not cal.is_business_day(Date(25, 12, 2026))
     assert not cal.is_business_day(Date(26, 12, 2026))
 
+
 def test_hong_kong():
 
     cal = Calendar(CalendarTypes.HONG_KONG)
-    
+
     assert not cal.is_business_day(Date(1, 1, 2026))
-    
+
     # Lunar New Year
     assert not cal.is_business_day(Date(17, 2, 2026))
     assert not cal.is_business_day(Date(18, 2, 2026))
     assert not cal.is_business_day(Date(19, 2, 2026))
-    
+
     # Good Friday
     assert not cal.is_business_day(Date(3, 4, 2026))
-    
+
     # Ching Ming / Easter substitution sequence
     assert not cal.is_business_day(Date(6, 4, 2026))
     assert not cal.is_business_day(Date(7, 4, 2026))
-    
+
     # Buddha's Birthday substitute
     assert not cal.is_business_day(Date(25, 5, 2026))
-    
+
     # Dragon Boat / Tuen Ng
     assert not cal.is_business_day(Date(19, 6, 2026))
-    
+
     # HKSAR Establishment Day
     assert not cal.is_business_day(Date(1, 7, 2026))
-    
+
     # National Day
     assert not cal.is_business_day(Date(1, 10, 2026))
-    
+
     # Chung Yeung substitute
     assert not cal.is_business_day(Date(19, 10, 2026))
-    
+
     # Christmas
     assert not cal.is_business_day(Date(25, 12, 2026))
+
 
 def test_tokyo():
 
@@ -732,6 +739,7 @@ def test_aud_fx_settlement():
     assert not syd.is_business_day(dt)
     assert rits.is_business_day(dt)
 
+
 def test_new_zealand_matariki_range():
 
     cal = Calendar(CalendarTypes.NEW_ZEALAND)
@@ -748,33 +756,34 @@ def test_new_zealand_matariki_range():
 
 def test_singapore():
     cal = Calendar(CalendarTypes.SINGAPORE)
-    
+
     assert not cal.is_business_day(Date(1, 1, 2026))
-    
+
     # Chinese New Year
     assert not cal.is_business_day(Date(17, 2, 2026))
     assert not cal.is_business_day(Date(18, 2, 2026))
-    
+
     # Good Friday
     assert not cal.is_business_day(Date(3, 4, 2026))
-    
+
     # Labour Day
     assert not cal.is_business_day(Date(1, 5, 2026))
-    
+
     # Hari Raya Haji
     assert not cal.is_business_day(Date(27, 5, 2026))
-    
+
     # Vesak observed Monday
     assert not cal.is_business_day(Date(1, 6, 2026))
-    
+
     # National Day observed Monday
     assert not cal.is_business_day(Date(10, 8, 2026))
-    
+
     # Deepavali observed Monday
     assert not cal.is_business_day(Date(9, 11, 2026))
-    
+
     # Christmas
     assert not cal.is_business_day(Date(25, 12, 2026))
+
 
 def test_new_york_historical_juneteenth():
 
@@ -785,6 +794,7 @@ def test_new_york_historical_juneteenth():
 
     # After introduction
     assert not cal.is_business_day(Date(19, 6, 2023))
+
 
 ###############################################################################
 

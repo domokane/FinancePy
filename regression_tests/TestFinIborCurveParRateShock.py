@@ -26,13 +26,13 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 
 def test_ibor_curve_par_rate_shocker():
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
@@ -84,7 +84,7 @@ def test_ibor_curve_par_rate_shocker():
     swaps.append(swap)
 
     base_curve = IborSingleCurve(
-        valuation_date,
+        value_dt,
         depos,
         fras,
         swaps,
@@ -111,9 +111,7 @@ def test_ibor_curve_par_rate_shocker():
     # - the 2Y swap
     benchmark_idxs = [1, 2, 4]
     for benchmark_idx in benchmark_idxs:
-        bumped_curve = curve_shocker.apply_bump_to_benchmark(
-            benchmark_idx, par_rate_bump
-        )
+        bumped_curve = curve_shocker.apply_bump_to_benchmark(benchmark_idx, par_rate_bump)
 
         d1 = mat_dates[benchmark_idx - 1]
         d2 = mat_dates[benchmark_idx]
@@ -129,12 +127,8 @@ def test_ibor_curve_par_rate_shocker():
             (bumped_fwd_after - base_fwd_after) / G_BASIS_POINT,
         )
 
-        assert round(actual_fwd_rate_changes[0], 3) == round(
-            expected_fwd_rate_changes[benchmark_idx][0], 3
-        )
-        assert round(actual_fwd_rate_changes[1], 3) == round(
-            expected_fwd_rate_changes[benchmark_idx][1], 3
-        )
+        assert round(actual_fwd_rate_changes[0], 3) == round(expected_fwd_rate_changes[benchmark_idx][0], 3)
+        assert round(actual_fwd_rate_changes[1], 3) == round(expected_fwd_rate_changes[benchmark_idx][1], 3)
 
 
 ########################################################################################

@@ -548,7 +548,7 @@ def implied_volatility(
 
     # Corrado mmiller from Hallerbach equation (7)
 
-    cmsigma = 0.0
+    # cmsigma = 0.0
     # arg = (C - 0.5*(ss-xx))**2 - ((ss-xx)**2)/ pi
 
     # if arg < 0.0:
@@ -571,44 +571,46 @@ def implied_volatility(
 
     sigma0 = hsigma
 
+    if not np.isfinite(sigma0) or sigma0 <= 0.0:
+        sigma0 = 0.20
+
     arglist = [s, t, k, r, q, price, opt_type_value]
     argsv = np.array(arglist)
 
     tol = 1e-6
-    sigma = newton(_f, sigma0, _fvega, argsv, tol=tol)
 
-    if sigma is None:
-        sigma = bisection(_f, 1e-4, 10.0, argsv, xtol=tol)
-        if sigma is None:
-            method = "Failed"
-        else:
-            method = "Bisection"
-    else:
-        method = "Newton"
+    sigma = newton(
+        _f,
+        sigma0,
+        _fvega,
+        argsv,
+        tol=tol,
+    )
 
-    debug = False
-    if debug:
-        print(
-            "ss: %7.2f kk: %7.3f tt :%5.3f V:%10.7f ssig0: %7.5f Cmm: %7.5f hh L: %7.5f Nww: %7.5f %10s"
-            % (
-                s,
-                k,
-                t,
-                price,
-                sigma0 * 100.0,
-                cmsigma * 100.0,
-                hsigma * 100.0,
-                sigma * 100.0,
-                method,
-            )
+    if sigma is None or not np.isfinite(sigma) or sigma <= 0.0:
+        sigma = bisection(
+            _f,
+            1e-4,
+            10.0,
+            argsv,
+            xtol=tol,
         )
 
     return sigma
 
 
-# This module contains a number of analytical approximations for the price of
-# an American style option starting with Barone-Adesi-Whaley
-# https://deriscope.com/docs/Barone_Adesi_Whaley_1987.pdf
+########################################################################################
+
+
+@njit(fastmath=True, cache=True)
+def _baw_mm_over_kk(r, t, v2):
+    """Evaluate (2r/v^2) / (1-exp(-rt)), including its r=0 limit."""
+
+    if r == 0.0:
+        return 2.0 / (v2 * t)
+
+    return 2.0 * r / (v2 * -np.expm1(-r * t))
+
 
 ########################################################################################
 
@@ -626,11 +628,10 @@ def _fcall(si, *args):
     b = r - q
     v2 = v * v
 
-    mm = 2.0 * r / v2
     ww = 2.0 * b / v2
-    kk = 1.0 - np.exp(-r * t)
+    mm_over_kk = _baw_mm_over_kk(r, t, v2)
 
-    q2 = (1.0 - ww + np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
+    q2 = (1.0 - ww + np.sqrt((ww - 1.0) ** 2 + 4.0 * mm_over_kk)) / 2.0
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
 
     obj_fn = si - k
@@ -655,11 +656,10 @@ def _fput(si, *args):
     b = r - q
     v2 = v * v
 
-    mm = 2.0 * r / v2
     ww = 2.0 * b / v2
-    kk = 1.0 - np.exp(-r * t)
+    mm_over_kk = _baw_mm_over_kk(r, t, v2)
 
-    q1 = (1.0 - ww - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
+    q1 = (1.0 - ww - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm_over_kk)) / 2.0
     d1 = (np.log(si / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
     obj_fn = si - k
     obj_fn = obj_fn + european_value(
@@ -699,11 +699,14 @@ def baw_value(s, t, k, r, q, v, opt_type_value):
 
         sstar = newton_secant(_fcall, x0=s, args=argtuple, tol=1e-7, maxiter=50)
 
-        mm = 2.0 * r / (v * v)
-        ww = 2.0 * b / (v * v)
-        kk = 1.0 - np.exp(-r * t)
+        v2 = v * v
+        ww = 2.0 * b / v2
+        mm_over_kk = _baw_mm_over_kk(r, t, v2)
         d1 = (np.log(sstar / k) + (b + v * v / 2.0) * t) / (v * np.sqrt(t))
-        q2 = (-1.0 * (ww - 1.0) + np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
+        q2 = (
+            -1.0 * (ww - 1.0)
+            + np.sqrt((ww - 1.0) ** 2 + 4.0 * mm_over_kk)
+        ) / 2.0
         a2 = (sstar / q2) * (1.0 - np.exp(-q * t) * normcdf_vect(d1))
 
         if s < sstar:
@@ -718,17 +721,24 @@ def baw_value(s, t, k, r, q, v, opt_type_value):
 
         euro_type = OptionTypes.EUROPEAN_PUT.value
 
+        # With zero carry on the strike and a non-negative dividend yield,
+        # the European put already dominates immediate exercise.
+        if r == 0.0 and q >= 0.0:
+            return european_value(s, t, k, r, q, v, euro_type)
+
         argtuple = (t, k, r, q, v)
 
-        sstar = newton_secant(_fput, x0=k, args=argtuple, tol=1e-7, maxiter=50)
+        sstar = newton_secant(_fput, x0=k, args=argtuple, tol=1e-7, maxiter=100)
 
         v2 = v * v
 
-        mm = 2.0 * r / v2
         ww = 2.0 * b / v2
-        kk = 1.0 - np.exp(-r * t)
+        mm_over_kk = _baw_mm_over_kk(r, t, v2)
         d1 = (np.log(sstar / k) + (b + v2 / 2.0) * t) / (v * np.sqrt(t))
-        q1 = (-1.0 * (ww - 1.0) - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm / kk)) / 2.0
+        q1 = (
+            -1.0 * (ww - 1.0)
+            - np.sqrt((ww - 1.0) ** 2 + 4.0 * mm_over_kk)
+        ) / 2.0
         a1 = -(sstar / q1) * (1 - np.exp(-q * t) * normcdf_vect(-d1))
 
         if s > sstar:

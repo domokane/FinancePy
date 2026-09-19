@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import optimize
 
+from ...utils.format_graphs import *
 from ...utils.date import Date
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import times_from_dates
@@ -71,7 +72,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         bonds: list,
         clean_prices: list | np.ndarray,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
@@ -95,7 +96,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type)
         self.is_built = False
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
 
         self._validate_inputs(bonds)
 
@@ -111,7 +112,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
 
         self._t_mats = []
         for bond in bonds:
-            t_mat = times_from_dates(self.value_dt, bond.maturity_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, bond.maturity_dt, self.time_dc_type)
             self._t_mats.append(t_mat)
 
         if do_build:
@@ -167,7 +168,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
         self._accrued = []
 
         for bond in self.used_bonds:
-            bond.accrued_interest(self.value_dt, bond.par)
+            bond.accrued_interest(self.anchor_dt, bond.par)
             self._accrued.append(bond.accrued_int)
 
             times = []
@@ -178,13 +179,13 @@ class BondBootstrapDiscountCurve(DiscountCurve):
                 bond.payment_dts,
                 bond.flow_amounts,
             ):
-                if cpn_dt > self.value_dt:
+                if cpn_dt > self.anchor_dt:
                     amt = flow
                     if pmt_dt == bond.payment_dts[-1]:
                         amt += 1.0
 
                     t = times_from_dates(
-                        self.value_dt,
+                        self.anchor_dt,
                         pmt_dt,
                         self.time_dc_type,
                     )
@@ -219,7 +220,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
             maturity_dt = bond.payment_dts[-1]
 
             t_mat = times_from_dates(
-                self.value_dt,
+                self.anchor_dt,
                 maturity_dt,
                 self.time_dc_type,
             )
@@ -241,7 +242,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
                 )
 
             else:
-                argtuple = (self, self.value_dt, bond, clean_price)
+                argtuple = (self, self.anchor_dt, bond, clean_price)
 
                 self._times = np.append(self._times, t_mat)
                 self._dfs = np.append(self._dfs, df_mat)
@@ -280,7 +281,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
             """
 
             bond_curve = self
-            value_dt = bond_curve.value_dt
+            anchor_dt = bond_curve.anchor_dt
             bond_curve._dfs[1:] = dfs
 
             bond_curve.fit(bond_curve._times, bond_curve._dfs)
@@ -290,7 +291,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
             idx = 0
 
             for i in range(0, n_bonds):
-                p_fit = self.used_bonds[i].clean_price_from_discount_curve(value_dt, bond_curve)
+                p_fit = self.used_bonds[i].clean_price_from_discount_curve(anchor_dt, bond_curve)
                 p_mkt = self.clean_prices[i]
                 out[idx] = p_fit - p_mkt
                 idx = idx + 1
@@ -371,7 +372,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
 
         for i, bond in enumerate(self.used_bonds):
             # We value it as of the start date of the swap
-            p_mod = bond.clean_price_from_discount_curve(self.value_dt, self)
+            p_mod = bond.clean_price_from_discount_curve(self.anchor_dt, self)
             p_mkt = self.clean_prices[i]
             diff = p_mod - p_mkt
 
@@ -390,7 +391,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
     def plot_zero_rates(self, title: str):
         """Display yield curve."""
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel("Zero Rate (%)")
@@ -408,7 +409,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
     def plot_fwd_rates(self, title: str):
         """Display yield curve."""
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel("Forward Rate (%)")

@@ -33,7 +33,7 @@ class DiscountCurve:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         df_dates: list = None,
         df_values: Union[list, np.ndarray] = None,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
@@ -47,6 +47,8 @@ class DiscountCurve:
         convention for interpolating the discount factors in time."""
         check_argument_types(self.__init__, locals())
 
+        self.anchor_dt = anchor_dt
+
         if not isinstance(time_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
@@ -54,7 +56,7 @@ class DiscountCurve:
 
         # Validate curve
         if df_dates is None:
-            df_dates = [value_dt]
+            df_dates = [anchor_dt]
 
         if df_values is None:
             df_values = np.array([1.0], dtype=float)
@@ -71,19 +73,19 @@ class DiscountCurve:
         # access is controlled using getters and setters
         self._times = [0.0]
         self._dfs = [1.0]
-        self._df_dates = [value_dt]
+        self._df_dates = [anchor_dt]
 
         num_points = len(df_dates)
         start_index = 0
 
-        if num_points > 0 and df_dates[0] == value_dt:
+        if num_points > 0 and df_dates[0] == anchor_dt:
             if np.abs(df_values[0] - 1.0) > 1e-6:
                 raise FinError("Value date discount factor should equal 1.0")
             self._dfs[0] = df_values[0]
             start_index = 1
 
         for i in range(start_index, num_points):
-            t = times_from_dates(value_dt, df_dates[i], time_dc_type)
+            t = times_from_dates(anchor_dt, df_dates[i], time_dc_type)
             self._times.append(t)
             self._dfs.append(df_values[i])
             self._df_dates.append(df_dates[i])
@@ -95,7 +97,6 @@ class DiscountCurve:
             print(self._times)
             raise FinError("Times are not sorted in increasing order")
 
-        self.value_dt = value_dt
         self.freq_type = FrequencyTypes.CONTINUOUS
 
         self._interp_type = interp_type
@@ -192,25 +193,20 @@ class DiscountCurve:
             end_dts = date_or_tenor
 
         else:
-            raise FinError(
-                "date_or_tenor must be a Date, tenor string, or list of Dates."
-            )
+            raise FinError("date_or_tenor must be a Date, tenor string, or list of Dates.")
 
         day_counter = DayCount(accrual_dc_type)
 
         accruals = np.array(
-            [
-                day_counter.year_frac(dt1, dt2)[0]
-                for dt1, dt2 in zip(start_dts, end_dts)
-            ],
+            [day_counter.year_frac(dt1, dt2)[0] for dt1, dt2 in zip(start_dts, end_dts)],
             dtype=float,
         )
 
         if np.any(accruals <= 0.0):
             raise FinError("Forward end date must be after start date.")
 
-        t1 = times_from_dates(self.value_dt, start_dts, self.time_dc_type)
-        t2 = times_from_dates(self.value_dt, end_dts, self.time_dc_type)
+        t1 = times_from_dates(self.anchor_dt, start_dts, self.time_dc_type)
+        t2 = times_from_dates(self.anchor_dt, end_dts, self.time_dc_type)
 
         rates = self.fwd_rate_t(t1, t2, accruals, comp_type, freq_type)
 
@@ -286,7 +282,7 @@ class DiscountCurve:
 
     def fwd_rate_inst(self, dts: Union[Date, list], dt: float = 1.0e-6):
         """Instantaneous continuously compounded forward rate at date(s)."""
-        times = times_from_dates(self.value_dt, dts, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, dts, self.time_dc_type)
         return self.fwd_rate_inst_t(times, dt)
 
     ###########################################################################
@@ -330,16 +326,40 @@ class DiscountCurve:
         if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
 
-        times = times_from_dates(self.value_dt, maturity_dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
         zero_rates = self.zero_rate_t(times, freq_type)
         return zero_rates
+
+    ###########################################################################
+
+    def curve_years(self, maturity_dt: Union[list, Date]):
+        """Calculate zero rates with continuous compounding."""
+
+        times = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
+        return times
+
+    ###########################################################################
+
+    def fwd_zero_rate_cc(self, start_dt: Date, end_dt: Date):
+        """Calculate fwd zero rates with continuous compounding."""
+
+        df_start = self.df(start_dt)
+        df_end = self.df(end_dt)
+        df_fwd = df_end / df_start
+
+        start_t = times_from_dates(self.anchor_dt, start_dt, self.time_dc_type)
+        end_t = times_from_dates(self.anchor_dt, end_dt, self.time_dc_type)
+        t_fwd = end_t - start_t
+
+        fwd_zero_cc = -np.log(df_fwd) / t_fwd
+        return fwd_zero_cc
 
     ###########################################################################
 
     def zero_rate_cc(self, maturity_dt: Union[list, Date]):
         """Calculate zero rates with continuous compounding."""
 
-        times = times_from_dates(self.value_dt, maturity_dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
         zero_rates_cc = self.zero_rate_t(times, FrequencyTypes.CONTINUOUS)
         return zero_rates_cc
 
@@ -407,7 +427,7 @@ class DiscountCurve:
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 
-        if effective_dt < self.value_dt:
+        if effective_dt < self.anchor_dt:
             raise FinError("Swap starts before the curve valuation date.")
 
         if isinstance(freq_type, FrequencyTypes) is False:
@@ -481,7 +501,7 @@ class DiscountCurve:
         # calculate the swap rate since that will create a circular dependency.
         # I therefore recreate the actual calculation of the swap rate here.
 
-        if effective_dt < self.value_dt:
+        if effective_dt < self.anchor_dt:
             raise FinError("Swap starts before the curve valuation date.")
 
         if isinstance(freq_type, FrequencyTypes) is False:
@@ -505,7 +525,7 @@ class DiscountCurve:
 
         acc_day_counter = DayCount(accrual_dc_type)
 
-        t_start = times_from_dates(self.value_dt, effective_dt, self.time_dc_type)
+        t_start = times_from_dates(self.anchor_dt, effective_dt, self.time_dc_type)
 
         par_rates = []
 
@@ -517,12 +537,7 @@ class DiscountCurve:
             schedule = Schedule(effective_dt, mat_dt, freq_type)
             flow_dts = schedule.generate()
 
-            payment_times = np.array(
-                [
-                    times_from_dates(self.value_dt, dt, self.time_dc_type)
-                    for dt in flow_dts[1:]
-                ]
-            )
+            payment_times = np.array([times_from_dates(self.anchor_dt, dt, self.time_dc_type) for dt in flow_dts[1:]])
 
             accrual_factors = []
             for prev_dt, next_dt in zip(flow_dts[:-1], flow_dts[1:]):
@@ -597,7 +612,7 @@ class DiscountCurve:
         vector of dates. The time day count determines how dates get converted
         to years."""
 
-        times = times_from_dates(self.value_dt, dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, dt, self.time_dc_type)
         dfs = self.df_t(times)
 
         if isinstance(dt, Date):
@@ -641,7 +656,7 @@ class DiscountCurve:
         bumped_dfs[0] = self._dfs[0]
 
         bumped_disc_curve = DiscountCurve(
-            self.value_dt,
+            self.anchor_dt,
             self._df_dates,
             bumped_dfs,
             self._interp_type,
@@ -682,7 +697,7 @@ class DiscountCurve:
 
         # Build new curve
         bumped_curve = DiscountCurve(
-            value_dt=self.value_dt,
+            value_dt=self.anchor_dt,
             df_dates=self._df_dates,
             df_values=dfs,
             interp_type=interp_type,
@@ -770,7 +785,7 @@ class DiscountCurve:
             }
         )
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
         plt.title(title)
 
         if times is None:
@@ -801,7 +816,7 @@ class DiscountCurve:
             plt.ylim(ymin, ymax)
 
         plt.grid(True, alpha=0.3)
-#        plt.tight_layout()
+        #        plt.tight_layout()
 
         if filename is not None:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
@@ -814,7 +829,7 @@ class DiscountCurve:
 
         # Hardcode this as we want this not parent class
         s = label_to_string("OBJECT_TYPE", "DiscountCurve")
-        s += label_to_string("VALUE DATE", (self.value_dt))
+        s += label_to_string("VALUE DATE", (self.anchor_dt))
 
         s += "    DATES      TIMES(YRS) DISC FACTORS\n"
         for dt, t, df in zip(self._df_dates, self._times, self._dfs):

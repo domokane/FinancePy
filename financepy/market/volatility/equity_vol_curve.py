@@ -54,23 +54,12 @@ class EquityVolCurveDeltaTypes(Enum):
 
 
 class EquityVolCurve:
-    """Manage a volatility smile/skew to a single maturity."""
 
-    ####################################################################################
-
-    def __init__(
-        self,
-        strikes: np.ndarray,
-        volatilities: np.ndarray,
-        s: float,
-        t_exp: float,
-        r: float,
-        q: float,
+    def __init__(self, strikes: np.ndarray, volatilities: np.ndarray,
+        s: float, t_exp: float, r: float, q: float,
         interp: EquityVolCurveInterpTypes = (EquityVolCurveInterpTypes.CUBIC_SPLINE),
         extrap: EquityVolCurveExtrapTypes = (EquityVolCurveExtrapTypes.TANGENT),
-        smoothing: float = 1.0e-4,
-        derivative_bump: float = 1.0e-4,
-    ) -> None:
+        smoothing: float = 1.0e-4, derivative_bump: float = 1.0e-4):
 
         strikes = np.asarray(
             strikes,

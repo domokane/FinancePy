@@ -54,41 +54,26 @@ def test_homogeneous():
     spd_10yr = 0.0046
     num_points = 40
 
-    issuer_curves = load_homogeneous_cds_curves(
-        value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits
-    )
+    issuer_curves = load_homogeneous_cds_curves(value_dt, libor_curve, spd_3yr, spd_5yr, spd_7yr, spd_10yr, num_credits)
 
-    intrinsic_spd = (
-        cds_index.intrinsic_spread(
-            value_dt, step_in_dt, tranche_maturity, issuer_curves
-        )
-        * 10000.0
-    )
+    intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
 
     assert round(intrinsic_spd, 3) == 23.977
 
     method = FinLossDistributionBuilder.RECURSION
-    v = tranche1.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 582.505
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
-    v = tranche3.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche3.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 29.980
 
     method = FinLossDistributionBuilder.GAUSSIAN
-    v = tranche5.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche5.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 4.583
 
     method = FinLossDistributionBuilder.LHP
-    v = tranche7.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche7.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 2) == 39.96
 
 
@@ -101,35 +86,22 @@ def test_heterogeneous():
 
     issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
 
-    intrinsic_spd = (
-        cds_index.intrinsic_spread(
-            value_dt, step_in_dt, tranche_maturity, issuer_curves
-        )
-        * 10000.0
-    )
+    intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
 
     assert round(intrinsic_spd, 4) == 34.331
 
     method = FinLossDistributionBuilder.RECURSION
-    v = tranche1.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 868.479
 
     method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
-    v = tranche2.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
-    assert round(v[3] * 10000, 2) == 173.46
+    v = tranche2.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
+    assert round(v[3] * 10000, 2) == 173.47
 
     method = FinLossDistributionBuilder.GAUSSIAN
-    v = tranche4.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche4.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 4) == 16.1757
 
     method = FinLossDistributionBuilder.LHP
-    v = tranche6.value_bc(
-        value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method
-    )
+    v = tranche6.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 0.338

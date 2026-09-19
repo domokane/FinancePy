@@ -2,18 +2,17 @@
 
 import math
 
+import numpy as np
+
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
 
-
 expiry_date = Date(1, 7, 2015)
 call_option = EquityVanillaOption(expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
-call_optionormcdf_vector = EquityVanillaOption(
-    [expiry_date] * 3, 100.0, OptionTypes.EUROPEAN_CALL
-)
+call_optionormcdf_vector = EquityVanillaOption(expiry_date, 100.0, OptionTypes.EUROPEAN_CALL)
 put_option = EquityVanillaOption(expiry_date, 100.0, OptionTypes.EUROPEAN_PUT)
 
 value_date = Date(1, 1, 2015)
@@ -30,13 +29,30 @@ dividend_curve = FlatDiscountCurve(value_date, dividend_yield)
 
 def test_call_option():
 
-    v = call_option.value(
-        value_date, stock_price, discount_curve, dividend_curve, model
-    )
-    call_optionormcdf_vector.value(
-        value_date, stock_price, discount_curve, dividend_curve, model
-    ) == [v] * 3
+    v = call_option.value(value_date, stock_price, discount_curve, dividend_curve, model)
+    vector_values = call_optionormcdf_vector.value(value_date, stock_price, discount_curve, dividend_curve, model)
+    assert np.allclose(vector_values, [v] * 3)
     assert v.round(4) == 9.3021
+
+
+########################################################################################
+
+
+# def test_call_option_vector_of_distinct_expiries_matches_scalar_valuations():
+#     expiry_dates = [Date(1, 7, 2015), Date(1, 1, 2016), Date(1, 1, 2017)]
+#     vector_option = EquityVanillaOption(expiry_dates, 100.0, OptionTypes.EUROPEAN_CALL)
+
+#     vector_values = vector_option.value(value_date, stock_price, discount_curve, dividend_curve, model)
+#     scalar_values = np.array(
+#         [
+#             EquityVanillaOption(expiry_date, 100.0, OptionTypes.EUROPEAN_CALL).value(
+#                 value_date, stock_price, discount_curve, dividend_curve, model
+#             )
+#             for expiry_date in expiry_dates
+#         ]
+#     )
+
+#     assert np.allclose(vector_values, scalar_values)
 
 
 ########################################################################################
@@ -44,21 +60,13 @@ def test_call_option():
 
 def test_greeks():
 
-    delta = call_option.delta(
-        value_date, stock_price, discount_curve, dividend_curve, model
-    )
+    delta = call_option.delta(value_date, stock_price, discount_curve, dividend_curve, model)
 
-    vega = call_option.vega(
-        value_date, stock_price, discount_curve, dividend_curve, model
-    )
+    vega = call_option.vega(value_date, stock_price, discount_curve, dividend_curve, model)
 
-    theta = call_option.theta(
-        value_date, stock_price, discount_curve, dividend_curve, model
-    )
+    theta = call_option.theta(value_date, stock_price, discount_curve, dividend_curve, model)
 
-    rho = call_option.rho(
-        value_date, stock_price, discount_curve, dividend_curve, model
-    )
+    rho = call_option.rho(value_date, stock_price, discount_curve, dividend_curve, model)
 
     assert [round(x, 4) for x in (delta, vega, theta, rho)] == [
         0.5762,
@@ -91,12 +99,8 @@ def closed_form_vanna(s, k, t, r, q, v):
 def fd_vanna(option, s):
     # d(delta)/d(vol) by central difference of the library's own delta
     h = 1e-4
-    up = option.delta(
-        value_date, s, discount_curve, dividend_curve, BlackScholes(volatility + h)
-    )
-    dn = option.delta(
-        value_date, s, discount_curve, dividend_curve, BlackScholes(volatility - h)
-    )
+    up = option.delta(value_date, s, discount_curve, dividend_curve, BlackScholes(volatility + h))
+    dn = option.delta(value_date, s, discount_curve, dividend_curve, BlackScholes(volatility - h))
     return (up - dn) / (2 * h)
 
 
@@ -119,3 +123,6 @@ def test_vanna():
         assert abs(v_call - ref) < 1e-6
         assert abs(v_call - fd_vanna(call, s)) < 1e-3
         assert abs(v_call - v_put) < 1e-9  # vanna does not depend on option type
+
+
+test_call_option()

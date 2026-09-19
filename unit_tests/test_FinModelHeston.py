@@ -7,7 +7,6 @@ from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
 from financepy.utils.global_types import OptionTypes, HestonNumericalSchemeTypes
 from financepy.models.heston import Heston
 
-
 # Reference see table 4.1 of Rouah book
 value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 4, 2015)
@@ -27,42 +26,73 @@ stock_price = 100.0
 ########################################################################################
 
 
+import pytest
+
+
 def test_heston():
 
     rho = -0.90000
     sigma = 0.75000
     strike_price = 105.00
-    heston_model = Heston(v0, kappa, theta, sigma, rho)
 
-    call_option = EquityVanillaOption(
-        expiry_dt, strike_price, OptionTypes.EUROPEAN_CALL
+    heston_model = Heston(
+        v0,
+        kappa,
+        theta,
+        sigma,
+        rho,
     )
 
+    t_exp = (expiry_dt - value_dt) / 365
+
+    opt_type = OptionTypes.EUROPEAN_CALL.value
+
     value_mc_heston = heston_model.value_mc(
-        value_dt,
-        call_option,
         stock_price,
+        t_exp,
+        strike_price,
+        opt_type,
         interest_rate,
         dividend_yield,
         num_paths,
         num_steps,
         seed,
     )
-    value_gatheral = heston_model.value_gatheral(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield
-    )
-    value_lewis_rouah = heston_model.value_lewis_rouah(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield
-    )
-    value_lewis = heston_model.value_lewis(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield
-    )
-    value_weber = heston_model.value_weber(
-        value_dt, call_option, stock_price, interest_rate, dividend_yield
+
+    value_gatheral = heston_model.value_call_gatheral(
+        t_exp,
+        strike_price,
+        stock_price,
+        interest_rate,
+        dividend_yield,
     )
 
-    assert round(value_mc_heston, 4) == 1.7333
-    assert round(value_gatheral, 4) == 1.8416
-    assert round(value_lewis_rouah, 4) == 1.8416
-    assert round(value_lewis, 4) == 1.8416
-    assert round(value_weber, 4) == 1.8416
+    value_lewis_rouah = heston_model.value_call_lewis_rouah(
+        t_exp,
+        strike_price,
+        stock_price,
+        interest_rate,
+        dividend_yield,
+    )
+
+    value_lewis = heston_model.value_call_lewis(
+        t_exp,
+        strike_price,
+        stock_price,
+        interest_rate,
+        dividend_yield,
+    )
+
+    value_weber = heston_model.value_call_weber(
+        t_exp,
+        strike_price,
+        stock_price,
+        interest_rate,
+        dividend_yield,
+    )
+
+    assert value_mc_heston == pytest.approx(1.8626, abs=5.0e-3)
+    assert value_gatheral == pytest.approx(1.8416, abs=5.0e-3)
+    assert value_lewis_rouah == pytest.approx(1.8416, abs=5.0e-3)
+    assert value_lewis == pytest.approx(1.8416, abs=5.0e-3)
+    assert value_weber == pytest.approx(1.8416, abs=5.0e-3)

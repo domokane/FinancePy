@@ -40,7 +40,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         c = self._curve
 
         dates = []
-        dates.append(self._curve.value_dt)
+        dates.append(self._curve.anchor_dt)
 
         for depo in c.used_deposits:
             dates.append(depo.start_dt)
@@ -67,33 +67,27 @@ class IborSingleCurveSmoothingCalibrator(object):
         else:
             curve = self._curve
 
-        valuation_date = curve.value_dt
-        out = np.zeros(
-            len(curve.used_deposits) + len(curve.used_fras) + len(curve.used_swaps)
-        )
+        value_date = curve.anchor_dt
+        out = np.zeros(len(curve.used_deposits) + len(curve.used_fras) + len(curve.used_swaps))
 
         idx = 0
         for depo in curve.used_deposits:
             # do not need to be too exact here
             acc_factor = datediff(depo.start_dt, depo.maturity_dt)
             # as rate
-            r = -np.log(depo.value(valuation_date, curve) / depo.notional) / acc_factor
+            r = -np.log(depo.value(value_date, curve) / depo.notional) / acc_factor
             out[idx] = r
             idx = idx + 1
 
         for fra in curve.used_fras:
             # do not need to be too exact here
             acc_factor = datediff(fra.start_dt, fra.maturity_dt)
-            v = fra.value(valuation_date, curve) / fra.notional / acc_factor
+            v = fra.value(value_date, curve) / fra.notional / acc_factor
             out[idx] = v
             idx = idx + 1
 
         for swap in curve.used_swaps:
-            v = (
-                swap.value(valuation_date, curve)
-                / swap.fixed_leg.notional
-                / swap.pv01(valuation_date, curve)
-            )
+            v = swap.value(value_date, curve) / swap.fixed_leg.notional / swap.pv01(value_date, curve)
             out[idx] = v
             idx = idx + 1
 
@@ -115,9 +109,7 @@ class IborSingleCurveSmoothingCalibrator(object):
 
         # forward cc rates -- first derivative of the yields
         fcc_rates = -np.log(fdfs) / tenors
-        fcc_rate_derivs = (
-            np.diff(fcc_rates) / tenors[1:]
-        )  # some qs about which tenor we should divide this by
+        fcc_rate_derivs = np.diff(fcc_rates) / tenors[1:]  # some qs about which tenor we should divide this by
 
         return fcc_rate_derivs
 
@@ -154,9 +146,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         else:
             init_curve = copy.deepcopy(self._curve)
             init_curve.check_refit_flag = False
-            init_curve._build_curve_using_1d_solver(
-                **init_curve._optional_interp_params
-            )
+            init_curve._build_curve_using_1d_solver(**init_curve._optional_interp_params)
 
         dfs0 = init_curve.df(self._knot_dts)
 
@@ -164,9 +154,7 @@ class IborSingleCurveSmoothingCalibrator(object):
         self._curve.set_dfs(np.ones_like(self._knot_times, dtype=float))
         self._curve.is_built = True
 
-        res = optimize.least_squares(
-            _obj_f, dfs0[1:], bounds=(0, np.inf), ftol=1e-4, xtol=1e-6
-        )
+        res = optimize.least_squares(_obj_f, dfs0[1:], bounds=(0, np.inf), ftol=1e-4, xtol=1e-6)
 
         self._curve._dfs[1:] = np.array(res.x)
         self._curve.fit(self._curve._times, self._curve._dfs)

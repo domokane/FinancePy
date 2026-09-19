@@ -45,9 +45,7 @@ def test_cds_fast_approximation():
     discount_factors = np.power((1.0 + r), -times)
     dates = value_dt.add_years(times)
 
-    libor_curve = DiscountCurve(
-        value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES
-    )
+    libor_curve = DiscountCurve(value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES)
 
     maturity_dt = value_dt.next_cds_date(120)
     t = (maturity_dt - value_dt) / 365.242
@@ -72,9 +70,7 @@ def test_cds_fast_approximation():
 
         cds_contract = CDS(value_dt, maturity_dt, contract_cpn)
         v_exact = cds_contract.value(value_dt, issuer_curve, recovery_rate)[DIRTY]
-        v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_cpn, recovery_rate)[
-            0
-        ]
+        v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_cpn, recovery_rate)[0]
         pct_diff = (v_exact - v_approx) / ONE_MILLION * 100.0
         test_cases.print(mkt_cpn * 10000, v_exact, v_approx, pct_diff)
 
@@ -125,9 +121,7 @@ def test_issuer_curve_build():
     r = 0.05
     discount_factors = np.power((1.0 + r), -times)
     dates = value_dt.add_years(times)
-    libor_curve = DiscountCurve(
-        value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES
-    )
+    libor_curve = DiscountCurve(value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES)
     recovery_rate = 0.40
 
     cds_contracts = []
@@ -467,8 +461,8 @@ def build_full_issuer_curve2(mkt_spd_bump, ir_bump):
 
     m = 1.0
 
-    value_dt = Date(24, 8, 2020)
-    settle_dt = Date(24, 8, 2020)
+    value_dt = Date(20, 8, 2020)
+    settle_dt = Date(20, 8, 2020)
     dc_type = DayCountTypes.ACT_360
     depos = []
 
@@ -644,8 +638,8 @@ def test_dirty_price_cds_model_check():
     recovery_dv01 = cds_contract.recovery_dv01(value_dt, issuer_curve, cds_recovery)
     test_cases.print("RECOVERY DV01", recovery_dv01)
 
-#    csa = cds_contract.cash_settlement_amount(value_dt, value_dt, issuer_curve, cds_recovery)
-#    test_cases.print("CSA", csa)
+    #    csa = cds_contract.cash_settlement_amount(value_dt, value_dt, issuer_curve, cds_recovery)
+    #    test_cases.print("CSA", csa)
 
     # Consider fast approximation
     t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
@@ -654,7 +648,6 @@ def test_dirty_price_cds_model_check():
 
     mkt_spd = 0.01
     v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
-
 
     test_cases.header("FAST VALUATIONS", "VALUE")
 
@@ -685,9 +678,7 @@ def test_dirty_price_cds_convergence():
 
     test_cases.header("NumSteps", "Value")
     for n in [10, 50, 100, 500, 1000]:
-        v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[
-            DIRTY
-        ]
+        v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[DIRTY]
         test_cases.print(n, v_dirty)
 
 

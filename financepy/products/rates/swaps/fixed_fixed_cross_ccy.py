@@ -104,7 +104,7 @@ class FixedFixedCrossCurrencySwap:
         if self._adjusted_float_dts[-1] > self._last_PAYMENT_DT:
             self._last_PAYMENT_DT = self._adjusted_float_dts[-1]
 
-        self.value_dt = None
+        # self.value_dt = None
 
         # NOT TO BE PRINTED
         self._float_year_fracs = []
@@ -141,9 +141,7 @@ class FixedFixedCrossCurrencySwap:
 
         fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
-        float_leg_value = self.float_leg_value(
-            value_dt, discount_curve, index_curve, first_fixing_rate, principal
-        )
+        float_leg_value = self.float_leg_value(value_dt, discount_curve, index_curve, first_fixing_rate, principal)
 
         value = fixed_leg_value - float_leg_value
 
@@ -236,7 +234,6 @@ class FixedFixedCrossCurrencySwap:
 
     def fixed_leg_value(self, value_dt, discount_curve, principal=0.0):
         """Calculate the present value of the fixed leg cash flows."""
-        self.value_dt = value_dt
         self._fixed_year_fracs = []
         self._fixed_flows = []
         self._fixed_dfs = []
@@ -360,7 +357,6 @@ class FixedFixedCrossCurrencySwap:
         case if we set the valuation date to be the swap's actual settlement
         date."""
 
-        self.value_dt = value_dt
         self._float_year_fracs = []
         self._float_flows = []
         self._float_rates = []
@@ -462,7 +458,6 @@ class FixedFixedCrossCurrencySwap:
         print("cpn (%):", self._fixed_cpn * 100)
         print("FIXED LEG FREQUENCY:", str(self._fixed_freq_type))
         print("FIXED LEG DAY COUNT:", str(self._fixed_dc_type))
-        print("VALUATION DATE", self.value_dt)
 
         if len(self._fixed_flows) == 0:
             print("Fixed Flows not calculated.")
@@ -478,9 +473,7 @@ class FixedFixedCrossCurrencySwap:
         start_index = self._fixed_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
-        print(
-            "%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-")
-        )
+        print("%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for PAYMENT_DT in self._adjusted_fixed_dts[start_index:]:
@@ -544,7 +537,6 @@ class FixedFixedCrossCurrencySwap:
         print("SPREAD cpn (%):", self._float_spread * 100)
         print("FLOAT LEG FREQUENCY:", str(self._float_freq_type))
         print("FLOAT LEG DAY COUNT:", str(self._float_dc_type))
-        print("VALUATION DATE", self.value_dt)
 
         if len(self._float_flows) == 0:
             print("Floating Flows not calculated.")
@@ -561,10 +553,7 @@ class FixedFixedCrossCurrencySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
 
-        print(
-            "%15s %10s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", "-", 1.0, "-", "-")
-        )
+        print("%15s %10s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for PAYMENT_DT in self._adjusted_float_dts[start_index:]:

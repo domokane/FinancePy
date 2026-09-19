@@ -1,56 +1,69 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+
 from typing import Union, Any
 
 import numpy as np
 from scipy import optimize
 
-from ..utils.math import normcdf
-from ..utils.helpers import label_to_string, check_argument_types
 from ..utils.error import FinError
+from ..utils.helpers import check_argument_types, label_to_string
+from ..utils.math import normcdf
 from .merton_firm import MertonFirm
 
-########################################################################################
 
+def _merton_equations(
+    x: np.ndarray,
+    equity_value: float,
+    equity_volatility: float,
+    bond_face: float,
+    years_to_maturity: float,
+    risk_free_rate: float,
+) -> np.ndarray:
+    """
+    Equations used to infer asset value and asset volatility from
+    observed equity value and equity volatility.
+    """
 
-def _fobj(x: Any, *args: Any) -> float:
-    """Find value of asset value and vol that fit equity value and vol"""
+    asset_value, asset_volatility = x
 
-    a, v_a = x
+    if asset_value <= 0.0 or asset_volatility <= 0.0:
+        return np.array([1.0e10, 1.0e10])
 
-    e = args[0]
-    v_e = args[1]
-    l = args[2]
-    t = args[3]
-    r = args[4]
+    sigma_root_t = asset_volatility * np.sqrt(years_to_maturity)
 
-    lvg = a / l
-    sigma_root_t = v_a * np.sqrt(t)
-    d1 = np.log(lvg) + (r + 0.5 * v_a**2) * t
-    d1 = d1 / sigma_root_t
+    d1 = (
+        np.log(asset_value / bond_face) + (risk_free_rate + 0.5 * asset_volatility**2) * years_to_maturity
+    ) / sigma_root_t
+
     d2 = d1 - sigma_root_t
 
-    v_e_lhs = (a / e) * normcdf(d1) * v_a
-    e_lhs = a * normcdf(d1) - l * np.exp(-r * t) * normcdf(d2)
-    obj = (e - e_lhs) ** 2 + (v_e - v_e_lhs) ** 2
+    model_equity_value = asset_value * normcdf(d1) - bond_face * np.exp(-risk_free_rate * years_to_maturity) * normcdf(
+        d2
+    )
 
-    return obj
+    model_equity_volatility = asset_value / equity_value * normcdf(d1) * asset_volatility
 
-
-########################################################################################
+    return np.array(
+        [
+            model_equity_value - equity_value,
+            model_equity_volatility - equity_volatility,
+        ]
+    )
 
 
 class MertonFirmMkt(MertonFirm):
     """
-    Market Extension of the Merton Firm Model according to the original
-    formulation by Merton with the inputs being the equity value of the firm,
-    the liabilities (bond face), the time to maturity in years, the risk-free
-    rate, the asset growth rate and the equity volatility. The asset value and
-    asset volatility are computed internally by solving two non-linear
-    simultaneous equations.
-    """
+    Market implementation of the Merton firm-value model.
 
-    ####################################################################################
+    The observable inputs are equity value and equity volatility. The firm's
+    asset value and asset volatility are inferred by solving the Merton equity
+    value and equity volatility equations simultaneously.
+
+    Parameters may be scalars or NumPy arrays. NumPy broadcasting rules are
+    applied across inputs.
+    """
 
     def __init__(
         self,
@@ -60,123 +73,185 @@ class MertonFirmMkt(MertonFirm):
         risk_free_rate: Union[float, np.ndarray],
         asset_growth_rate: Union[float, np.ndarray],
         equity_volatility: Union[float, np.ndarray],
-    ):
-        """Create an object that holds all of the model parameters. These
-        parameters may be vectorised."""
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 
-        if isinstance(equity_value, float):
-            equity_value = [equity_value]
+        equity_value = np.asarray(equity_value, dtype=float)
+        bond_face = np.asarray(bond_face, dtype=float)
+        years_to_maturity = np.asarray(years_to_maturity, dtype=float)
+        risk_free_rate = np.asarray(risk_free_rate, dtype=float)
+        asset_growth_rate = np.asarray(asset_growth_rate, dtype=float)
+        equity_volatility = np.asarray(equity_volatility, dtype=float)
 
-        if isinstance(bond_face, float):
-            bond_face = [bond_face]
-
-        if isinstance(years_to_maturity, float):
-            years_to_maturity = [years_to_maturity]
-
-        if isinstance(risk_free_rate, float):
-            risk_free_rate = [risk_free_rate]
-
-        if isinstance(asset_growth_rate, float):
-            asset_growth_rate = [asset_growth_rate]
-
-        if isinstance(equity_volatility, float):
-            equity_volatility = [equity_volatility]
-
-        self._e = np.array(equity_value)
-        self._l = np.array(bond_face)
-        self._t = np.array(years_to_maturity)
-        self._r = np.array(risk_free_rate)
-        self._mu = np.array(asset_growth_rate)
-        self._ve = np.array(equity_volatility)
-
-        nmax = max(
-            len(self._e),
-            len(self._l),
-            len(self._t),
-            len(self._r),
-            len(self._mu),
-            len(self._ve),
+        self._validate_market_inputs(
+            equity_value,
+            bond_face,
+            years_to_maturity,
+            equity_volatility,
         )
 
-        if len(self._e) != nmax and len(self._e) > 1:
-            raise FinError("Len e must be 1 or maximum length of arrays")
+        try:
+            (
+                self._e,
+                self._l,
+                self._t,
+                self._r,
+                self._mu,
+                self._ve,
+            ) = np.broadcast_arrays(
+                equity_value,
+                bond_face,
+                years_to_maturity,
+                risk_free_rate,
+                asset_growth_rate,
+                equity_volatility,
+            )
+        except ValueError as exc:
+            raise FinError("MertonFirmMkt inputs are not broadcast-compatible.") from exc
 
-        if len(self._l) != nmax and len(self._l) > 1:
-            raise FinError("Len l must be 1 or maximum length of arrays")
+        asset_value, asset_volatility = self._solve_for_asset_value_and_volatility()
 
-        if len(self._t) != nmax and len(self._t) > 1:
-            raise FinError("Len T must be 1 or maximum length of arrays")
+        # Preserve observed market quantities before initialising parent.
+        market_equity_value = self._e.copy()
+        market_equity_volatility = self._ve.copy()
 
-        if len(self._r) != nmax and len(self._r) > 1:
-            raise FinError("Len r must be 1 or maximum length of arrays")
+        # Initialise the parent class with the inferred asset quantities.
+        super().__init__(
+            asset_value=asset_value,
+            debt_face_value=self._l,
+            time_to_maturity=self._t,
+            risk_free_rate=self._r,
+            asset_drift=self._mu,
+            asset_volatility=asset_volatility,
+        )
 
-        if len(self._mu) != nmax and len(self._mu) > 1:
-            raise FinError("Len mu must be 1 or maximum length of arrays")
+        # Store the observed market quantities separately.
+        self._market_equity_value = market_equity_value
+        self._market_equity_volatility = market_equity_volatility
 
-        if len(self._ve) != nmax and len(self._ve) > 1:
-            raise FinError("Len mu must be 1 or maximum length of arrays")
+    @staticmethod
+    def _validate_market_inputs(
+        equity_value: np.ndarray,
+        bond_face: np.ndarray,
+        years_to_maturity: np.ndarray,
+        equity_volatility: np.ndarray,
+    ) -> None:
+        """Validate observable market inputs."""
 
-        self._nmax = nmax
-        self._solve_for_asset_value_and_vol()
-        self._d = self.debt_value()
+        if np.any(equity_value <= 0.0):
+            raise FinError("Equity value must be positive.")
 
-    ####################################################################################
+        if np.any(bond_face <= 0.0):
+            raise FinError("Bond face value must be positive.")
 
-    def _solve_for_asset_value_and_vol(self) -> None:
+        if np.any(years_to_maturity <= 0.0):
+            raise FinError("Years to maturity must be positive.")
 
-        self._a = []
-        self._va = []
+        if np.any(equity_volatility <= 0.0):
+            raise FinError("Equity volatility must be positive.")
 
-        for i in range(0, self._nmax):
+    def _solve_for_asset_value_and_volatility(
+        self,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Infer asset value and asset volatility point by point."""
 
-            argtuple = ()
+        shape = self._e.shape
 
-            if len(self._e) == self._nmax:
-                argtuple += (self._e[i],)
-            else:
-                argtuple += (self._e[0],)
+        asset_values = np.empty(shape, dtype=float)
+        asset_volatilities = np.empty(shape, dtype=float)
 
-            if len(self._ve) == self._nmax:
-                argtuple += (self._ve[i],)
-            else:
-                argtuple += (self._ve[0],)
+        iterator = np.ndindex(shape)
 
-            if len(self._l) == self._nmax:
-                argtuple += (self._l[i],)
-            else:
-                argtuple += (self._l[0],)
+        for idx in iterator:
 
-            if len(self._t) == self._nmax:
-                argtuple += (self._t[i],)
-            else:
-                argtuple += (self._t[0],)
+            e = float(self._e[idx])
+            ve = float(self._ve[idx])
+            l = float(self._l[idx])
+            t = float(self._t[idx])
+            r = float(self._r[idx])
 
-            if len(self._r) == self._nmax:
-                argtuple += (self._r[i],)
-            else:
-                argtuple += (self._r[0],)
+            # Natural initial approximation:
+            # assets ~= equity + present value of debt.
+            asset_value_0 = e + l * np.exp(-r * t)
 
-            # I initialise asset value and vol to equity value and vol
-            x0 = np.array([argtuple[0], argtuple[1]])
+            # Approximate asset volatility using the equity-to-asset ratio.
+            asset_volatility_0 = ve * e / asset_value_0
 
-            result = optimize.minimize(_fobj, x0, args=argtuple, tol=1e-9)
+            x0 = np.array(
+                [
+                    asset_value_0,
+                    asset_volatility_0,
+                ]
+            )
 
-            self._a.append(result.x[0])
-            self._va.append(result.x[1])
+            result = optimize.root(
+                _merton_equations,
+                x0,
+                args=(e, ve, l, t, r),
+            )
 
-        self._a = np.array(self._a)
-        self._va = np.array(self._va)
+            if not result.success:
+                raise FinError("Unable to solve for Merton asset value and volatility: " f"{result.message}")
 
-    ####################################################################################
+            asset_value = result.x[0]
+            asset_volatility = result.x[1]
+
+            if asset_value <= 0.0:
+                raise FinError("Solved Merton asset value is not positive.")
+
+            if asset_volatility <= 0.0:
+                raise FinError("Solved Merton asset volatility is not positive.")
+
+            asset_values[idx] = asset_value
+            asset_volatilities[idx] = asset_volatility
+
+        return asset_values, asset_volatilities
+
+    def market_equity_value(self) -> np.ndarray:
+        """Return the observed market equity value."""
+
+        return self._market_equity_value
+
+    def market_equity_volatility(self) -> np.ndarray:
+        """Return the observed market equity volatility."""
+
+        return self._market_equity_volatility
 
     def __repr__(self) -> str:
 
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("EQUITY VALUE", self._e)
-        s += label_to_string("BOND FACE", self._l)
-        s += label_to_string("YEARS TO MATURITY", self._t)
-        s += label_to_string("ASSET GROWTH", self._mu)
-        s += label_to_string("EQUITY VOLATILITY", self._ve)
+        s += label_to_string(
+            "EQUITY VALUE",
+            self._market_equity_value,
+        )
+        s += label_to_string(
+            "BOND FACE",
+            self._l,
+        )
+        s += label_to_string(
+            "YEARS TO MATURITY",
+            self._t,
+        )
+        s += label_to_string(
+            "RISK FREE RATE",
+            self._r,
+        )
+        s += label_to_string(
+            "ASSET GROWTH",
+            self._mu,
+        )
+        s += label_to_string(
+            "EQUITY VOLATILITY",
+            self._market_equity_volatility,
+        )
+        s += label_to_string(
+            "IMPLIED ASSET VALUE",
+            self._a,
+        )
+        s += label_to_string(
+            "IMPLIED ASSET VOLATILITY",
+            self._va,
+        )
+
         return s

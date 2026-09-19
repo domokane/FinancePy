@@ -1,4 +1,58 @@
 ## CHANGE LOG
+18 Sep 2026 Part 3
+- Global renaming of curve value date to anchor date for better clarity
+
+18 Sep 2026 Part 2
+List of changes
+- Small change to indep_loss_dbn_hetero_adj_binomial using floor - see change in file
+- AsianOptionValuationMethods changed to AsianOptionValuationTypes
+- Cleaned up unused imports
+
+18 Sep 2026 Part 1
+List of changes
+- Moved DIRTY and CLEAN indices to global vars
+- Added dc_type to CDS curve
+- Added curve_years function to discount_curve
+- Global enforcement of value_dt removing valuation_date
+- Ensure all swap calibration is based on value_dt
+- Move calculation of r and q to curve.zero_rate_cc
+- Migrated several valuation models from products to models folder
+- Added checks for curve anchor dates - check_curve_dt
+- Added checks for stock prices
+- Added function option_years
+- Enforced use of t_exp in options as much as possible
+
+16 Sep 2026
+List of changes
+- Added check_values module to init to check values of specific input types in one place
+- Reordered inputs to ZeroRatesDiscountCurve so dc_type is 5th not 6th input
+- Added format_graphs.py to utils to standardise plotting look
+- Renamed Svensson curve type to NelsonSiegelSvensson
+- Renamed Polynomial(3) curve type to CubicPolynomial
+- Renamed Polynomial(4) curve type to QuarticPolynomial
+- Renamed Polynomial(5) curve type to QuinticPolynomial
+- Renamed Svensson curve types to NelsonSiegelSvensson
+- BondParametricYieldCurve now takes a CurveFitType rather than a stateful object
+- BondParametricDiscountCurve now takes a CurveFitType rather than a stateful object
+- black_scholes_analytic - fixed implied volatility stability
+- Added CEV model to models
+- Added Dupire model to models
+- Added forward pricers to models for FX, equity, rates, commodities
+- Enhance Heston model in models
+- Added implied_volatility_surface to models
+- Added lognormal mixture model to models
+- Added lognormal mixture surface model to models
+- Improved MertonFirm model function names
+- Improved MertonFirmMkt model function names
+- Added MertonJumpDiffusion model to models
+- Added dedicated SVI model to models
+- Added dedicated SVISurface model to models
+- Added dedicated SSVISurface model to models
+- Fixed bug in units in bond_zero
+- Updated regression tests
+- Updated unit tests
+- Updated notebooks
+
 21 August 2026 - RELEASE OF FINANCEPY V1.1.2
 List of changes
 - EquityChooserOption - enforced term structure for q and r

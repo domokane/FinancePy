@@ -18,10 +18,10 @@ from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
+from ...utils.check_values import check_curve_dt
+from ...utils.global_vars import CLEAN
 
 RPV01_INDEX = 1
-DIRTY = 0
-CLEAN = 1
 
 ########################################################################################
 
@@ -87,11 +87,12 @@ class CDSIndexOption:
 
     ###########################################################################
 
-    def value_adjusted_black(
-        self, value_dt, index_curve, index_recovery, libor_curve, sigma
-    ):
+    def value_adjusted_black(self, value_dt, index_curve, index_recovery, libor_curve, sigma):
         """This approach uses two adjustments to black's option pricing
         model to value an option on a CDS index."""
+
+        check_curve_dt(value_dt, libor_curve)
+        check_curve_dt(value_dt, index_curve)
 
         k = self.strike_cpn
         c = self.index_cpn
@@ -99,7 +100,7 @@ class CDSIndexOption:
         time_dc_type = libor_curve.time_dc_type
         t_exp = times_from_dates(value_dt, self.expiry_dt, time_dc_type)
 
-#        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        #        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         df = libor_curve.df(self.expiry_dt)
         q_expiry_index = index_curve.survival_prob(t_exp)
 
@@ -107,12 +108,8 @@ class CDSIndexOption:
         strike_curve = CDSCurve(value_dt, [cds], libor_curve, index_recovery)
         #        qExpiryStrike = strike_curve.surv_prob(time_to_expiry)
 
-        strike_rpv01 = self.cds_contract.rpv01(value_dt, strike_curve)[
-            CLEAN
-        ]
-        index_rpv01 = self.cds_contract.rpv01(value_dt, index_curve)[
-            CLEAN
-        ]
+        strike_rpv01 = self.cds_contract.rpv01(value_dt, strike_curve)[CLEAN]
+        index_rpv01 = self.cds_contract.rpv01(value_dt, index_curve)[CLEAN]
 
         s = self.cds_contract.par_spread(value_dt, index_curve)
 
@@ -126,12 +123,8 @@ class CDSIndexOption:
         d1 /= denom
         d2 /= denom
 
-        v_pay = (
-            adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)
-        ) * index_rpv01
-        v_rec = (
-            adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)
-        ) * index_rpv01
+        v_pay = (adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)) * index_rpv01
+        v_rec = (adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)) * index_rpv01
 
         v_pay *= self.notional
         v_rec *= self.notional
@@ -147,13 +140,15 @@ class CDSIndexOption:
         the forward spread as a log-normally distributed quantity and uses the
         credit triangle to compute the forward RPV01."""
 
+        check_curve_dt(value_dt, *issuer_curves)
+
         if len(issuer_curves) > 0:
             time_dc_type = issuer_curves[0].libor_curve.time_dc_type
         else:
             raise FinError("Need at least one issuer curve")
 
         num_credits = len(issuer_curves)
-#        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        #        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         t_exp = times_from_dates(value_dt, self.expiry_dt, time_dc_type)
         #        timeToMaturity = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
         df_to_expiry = issuer_curves[0].df(t_exp)
@@ -162,13 +157,9 @@ class CDSIndexOption:
         k = self.strike_cpn
         c = self.index_cpn
 
-        strike_cds = CDS(
-            self.expiry_dt, self.maturity_dt, self.strike_cpn, 1.0
-        )
+        strike_cds = CDS(self.expiry_dt, self.maturity_dt, self.strike_cpn, 1.0)
 
-        strike_curve = CDSCurve(
-            value_dt, [strike_cds], libor_curve, index_recovery
-        )
+        strike_curve = CDSCurve(value_dt, [strike_cds], libor_curve, index_recovery)
         strike_rpv01s = strike_cds.rpv01(value_dt, strike_curve)
         q_to_expiry = strike_curve.survival_prob(t_exp)
         strike_value = (k - c) * strike_rpv01s[CLEAN]
@@ -193,13 +184,9 @@ class CDSIndexOption:
 
         exp_h = (h1 + h2) / num_credits
 
-        x = self._solve_for_x(
-            value_dt, sigma, c, index_recovery, libor_curve, exp_h
-        )
+        x = self._solve_for_x(value_dt, sigma, c, index_recovery, libor_curve, exp_h)
 
-        v = self._calc_index_payer_option_price(
-            value_dt, x, sigma, c, strike_value, libor_curve, index_recovery
-        )
+        v = self._calc_index_payer_option_price(value_dt, x, sigma, c, strike_value, libor_curve, index_recovery)
 
         v = v[1]
         v_pay = v * self.notional
@@ -211,9 +198,7 @@ class CDSIndexOption:
 
     ###########################################################################
 
-    def _solve_for_x(
-        self, value_dt, sigma, index_cpn, index_recovery, libor_curve, exp_h
-    ):
+    def _solve_for_x(self, value_dt, sigma, index_cpn, index_recovery, libor_curve, exp_h):
         """Function to solve for the arbitrage free"""
         x1 = 0.0
         x2 = 0.9999
@@ -222,19 +207,9 @@ class CDSIndexOption:
         xacc = 0.000000001
         rtb = 999999
 
-        f = (
-            self._calc_obj_func(
-                x1, value_dt, sigma, index_cpn, index_recovery, libor_curve
-            )
-            - exp_h
-        )
+        f = self._calc_obj_func(x1, value_dt, sigma, index_cpn, index_recovery, libor_curve) - exp_h
 
-        fmid = (
-            self._calc_obj_func(
-                x2, value_dt, sigma, index_cpn, index_recovery, libor_curve
-            )
-            - exp_h
-        )
+        fmid = self._calc_obj_func(x2, value_dt, sigma, index_cpn, index_recovery, libor_curve) - exp_h
 
         if f * fmid >= 0.0:
             raise FinError("Solution not bracketed.")
@@ -320,7 +295,7 @@ class CDSIndexOption:
 
         flow_dts = self.cds_contract.payment_dts
         num_flows = len(flow_dts)
-#        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        #        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         t_exp = times_from_dates(value_dt, self.expiry_dt, time_dc_type)
 
         df_to_expiry = libor_curve.df(self.expiry_dt)
@@ -331,11 +306,9 @@ class CDSIndexOption:
 
         for i_flow in range(0, num_flows):
 
-#            expiry_to_flow_times[i_flow] = (flow_dts[i_flow] - self.expiry_dt) / G_DAYS_IN_YEAR
+            #            expiry_to_flow_times[i_flow] = (flow_dts[i_flow] - self.expiry_dt) / G_DAYS_IN_YEAR
 
-            expiry_to_flow_times[i_flow] = times_from_dates(self.expiry_dt,
-                                                            flow_dts[i_flow],
-                                                            time_dc_type)
+            expiry_to_flow_times[i_flow] = times_from_dates(self.expiry_dt, flow_dts[i_flow], time_dc_type)
 
             fwd_dfs[i_flow] = libor_curve.df(flow_dts[i_flow]) / df_to_expiry
 

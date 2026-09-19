@@ -6,7 +6,7 @@ import numpy as np
 
 
 from ...utils.math import normcdf
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
+from ...utils.global_vars import G_SMALL
 from ...utils.error import FinError
 from ...utils.date import Date
 
@@ -15,7 +15,8 @@ from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes
-from ...utils.frequency import FrequencyTypes
+from ...utils.helpers import option_years
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -73,23 +74,13 @@ class EquityFloatLookbackOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self.expiry_dt:
-            raise FinError("Valuation date after expiry date.")
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve valuation date not same as option value date"
-            )
-
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
-        r = discount_curve.zero_rate_cc_t(t_exp)
-        q = dividend_curve.zero_rate_cc_t(t_exp)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         v = volatility
         s0 = stock_price
@@ -122,15 +113,11 @@ class EquityFloatLookbackOption(EquityOption):
             a2 = a1 - v * np.sqrt(t_exp)
 
             if smin == s0:
-                term = normcdf(-a1 + 2.0 * b * np.sqrt(t_exp) / v) - expbt * normcdf(
-                    -a1
-                )
+                term = normcdf(-a1 + 2.0 * b * np.sqrt(t_exp) / v) - expbt * normcdf(-a1)
             elif s0 < smin and w < -100:
                 term = -expbt * normcdf(-a1)
             else:
-                term = ((s0 / smin) ** (-w)) * normcdf(
-                    -a1 + 2.0 * b * np.sqrt(t_exp) / v
-                ) - expbt * normcdf(-a1)
+                term = ((s0 / smin) ** (-w)) * normcdf(-a1 + 2.0 * b * np.sqrt(t_exp) / v) - expbt * normcdf(-a1)
 
             v = s0 * dq * normcdf(a1) - smin * df * normcdf(a2) + s0 * df * u * term
 
@@ -144,9 +131,7 @@ class EquityFloatLookbackOption(EquityOption):
             elif s0 < smax and w > 100:
                 term = expbt * normcdf(b1)
             else:
-                term = (-((s0 / smax) ** (-w))) * normcdf(
-                    b1 - 2.0 * b * np.sqrt(t_exp) / v
-                ) + expbt * normcdf(b1)
+                term = (-((s0 / smax) ** (-w))) * normcdf(b1 - 2.0 * b * np.sqrt(t_exp) / v) + expbt * normcdf(b1)
 
             v = smax * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
 
@@ -172,12 +157,16 @@ class EquityFloatLookbackOption(EquityOption):
         """Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        num_time_steps = int(t * num_steps_per_year)
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
 
-        df = discount_curve.df(self.expiry_dt)
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
+        df = discount_curve.df(self.expiry_dt)
+
+        t_exp = option_years(value_dt, self.expiry_dt)
+        num_time_steps = int(t_exp * num_steps_per_year)
+
         mu = r - q
 
         opt_type = self.opt_type
@@ -193,9 +182,7 @@ class EquityFloatLookbackOption(EquityOption):
             if smax < stock_price:
                 raise FinError("Smax must be greater than or equal to the stock price.")
 
-        t_all, s_all = get_paths_times(
-            num_paths, num_time_steps, t, mu, stock_price, volatility, seed
-        )
+        t_all, s_all = get_paths_times(num_paths, num_time_steps, t_exp, mu, stock_price, volatility, seed)
 
         # Due to antithetics we have doubled the number of paths
         payoff = np.zeros(num_paths)

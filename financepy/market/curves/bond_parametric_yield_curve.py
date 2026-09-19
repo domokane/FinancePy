@@ -11,6 +11,7 @@ import numpy as np
 import scipy
 from scipy.optimize import least_squares
 
+from ...utils.format_graphs import *
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
@@ -18,151 +19,246 @@ from ...utils.math import scale
 from ...utils.helpers import label_to_string
 from ...utils.helpers import times_from_dates
 
-from .curve_fits import CurveFitMethod
-from .curve_fits import CurveFitPolynomial
+from .curve_fits import CurveFitTypes
+from .curve_fits import CurveFitCubicPolynomial
+from .curve_fits import CurveFitQuarticPolynomial
+from .curve_fits import CurveFitQuinticPolynomial
 from .curve_fits import CurveFitNelsonSiegel
-from .curve_fits import CurveFitSvensson
+from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
 
 
 class BondParametricYieldCurve:
-    """Class to do fitting of the yield curve and to enable interpolation of
-    yields. Because yields assume a flat term structure for each bond, this
-    class does not allow discounting to be done and so does not inherit from
-    DiscountCurve. It should only be used for visualisation and simple
-    interpolation but not for full term-structure-consistent pricing."""
+    """Fit and interpolate a bond yield curve."""
 
     def __init__(
         self,
         settle_dt: Date,
         bonds: list,
         ylds: Union[np.ndarray, list],
-        curve_fit: CurveFitMethod,
+        curve_fit_type: CurveFitTypes,
         time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
-        """Fit the curve to a set of bond yields using the type of curve
-        specified. Bounds can be provided if you wish to enforce lower and
-        upper limits on the respective model parameters."""
 
         self.settle_dt = settle_dt
         self.bonds = bonds
-        self.ylds = np.array(ylds)
-        self.curve_fit = curve_fit
+        self.ylds = np.asarray(
+            ylds,
+            dtype=float,
+        )
+
+        if not isinstance(curve_fit_type, CurveFitTypes):
+            raise FinError("Invalid curve fit type.")
+
+        self.curve_fit_type = curve_fit_type
+
+        ######################################################################
+        # Create curve fitter
+        ######################################################################
+
+        if curve_fit_type == CurveFitTypes.CUBIC_POLYNOMIAL:
+            self.curve_fit = CurveFitCubicPolynomial()
+
+        elif curve_fit_type == CurveFitTypes.QUARTIC_POLYNOMIAL:
+            self.curve_fit = CurveFitQuarticPolynomial()
+
+        elif curve_fit_type == CurveFitTypes.QUINTIC_POLYNOMIAL:
+            self.curve_fit = CurveFitQuinticPolynomial()
+
+        elif curve_fit_type == CurveFitTypes.NELSON_SIEGEL:
+            self.curve_fit = CurveFitNelsonSiegel()
+
+        elif curve_fit_type == CurveFitTypes.NELSON_SIEGEL_SVENSSON:
+            self.curve_fit = CurveFitNelsonSiegelSvensson()
+
+        elif curve_fit_type == CurveFitTypes.BSPLINE:
+            self.curve_fit = CurveFitBSpline()
+
+        else:
+            raise FinError("Unrecognised curve fit type.")
+
+        ######################################################################
 
         if not isinstance(time_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
         self.time_dc_type = time_dc_type
 
+        ######################################################################
+        # Calculate times to maturity
+        ######################################################################
+
         years_to_maturities = []
+
         for bond in bonds:
-            t = times_from_dates(settle_dt, bond.maturity_dt, self.time_dc_type)
+
+            t = times_from_dates(
+                settle_dt,
+                bond.maturity_dt,
+                self.time_dc_type,
+            )
+
             years_to_maturities.append(t)
 
-        self.years_to_maturity = np.asarray(years_to_maturities, dtype=float)
-        self.t_max = max(np.max(self.years_to_maturity), 1.0e-8)
+        self.years_to_maturity = np.asarray(
+            years_to_maturities,
+            dtype=float,
+        )
+
+        self.t_max = max(
+            np.max(self.years_to_maturity),
+            1.0e-8,
+        )
 
         tdata = self.years_to_maturity
         ylds = self.ylds
 
-        fit_type = type(self.curve_fit)
+        ######################################################################
+        # Polynomial fit
+        ######################################################################
 
-        if fit_type is CurveFitPolynomial:
+        if curve_fit_type in (
+            CurveFitTypes.CUBIC_POLYNOMIAL,
+            CurveFitTypes.QUARTIC_POLYNOMIAL,
+            CurveFitTypes.QUINTIC_POLYNOMIAL,
+        ):
 
             self.curve_fit.t_scale = self.t_max
+
             xdata = tdata / self.curve_fit.t_scale
-            d = curve_fit.power
-            coeffs_high_first = np.polyfit(xdata, self.ylds, deg=d)
-            curve_fit.coeffs = coeffs_high_first[::-1]
 
-        elif fit_type is CurveFitNelsonSiegel:
+            degree = self.curve_fit.power
 
-            popt, _ = scipy.optimize.curve_fit(
-                curve_fit.interp_rate,
-                tdata,
+            coeffs_high_first = np.polyfit(
+                xdata,
                 ylds,
-                bounds=curve_fit.bounds
+                deg=degree,
             )
 
-            curve_fit.set_params(popt)
+            self.curve_fit.coeffs = coeffs_high_first[::-1]
 
-        elif fit_type is CurveFitSvensson:
+        ######################################################################
+        # Nelson-Siegel fit
+        ######################################################################
 
-            p0 = np.array([
-                0.03,    # beta_1 long rate
-                -0.03,   # beta_2 short slope
-                0.02,    # beta_3 medium curvature
-                0.01,    # beta_4 long curvature
-                1.0,     # tau_1
-                10.0,    # tau_2
-            ])
+        elif curve_fit_type == CurveFitTypes.NELSON_SIEGEL:
 
             popt, _ = scipy.optimize.curve_fit(
-                curve_fit.interp_rate,
+                self.curve_fit.interp_rate,
                 tdata,
                 ylds,
-                p0=p0,
-                bounds=curve_fit.bounds,
+                p0=self.curve_fit.get_params(),
+                bounds=self.curve_fit.bounds,
                 maxfev=10000,
             )
 
-            curve_fit.set_params(popt)
+            self.curve_fit.set_params(popt)
 
-        elif fit_type is CurveFitBSpline:
+        ######################################################################
+        # Svensson fit
+        ######################################################################
+
+        elif curve_fit_type == CurveFitTypes.NELSON_SIEGEL_SVENSSON:
+
+            popt, _ = scipy.optimize.curve_fit(
+                self.curve_fit.interp_rate,
+                tdata,
+                ylds,
+                p0=self.curve_fit.get_params(),
+                bounds=self.curve_fit.bounds,
+                maxfev=10000,
+            )
+
+            self.curve_fit.set_params(popt)
+
+        ######################################################################
+        # B-Spline fit
+        ######################################################################
+
+        elif curve_fit_type == CurveFitTypes.BSPLINE:
 
             def residuals(params):
-                curve_fit.set_params(params)
-                return curve_fit.interp_rate(tdata) - ylds
+
+                self.curve_fit.set_params(params)
+
+                return self.curve_fit.interp_rate(tdata) - ylds
 
             result = least_squares(
                 residuals,
-                curve_fit.get_params(),
-                xtol=1e-10,
-                ftol=1e-10,
-                gtol=1e-10,
-                max_nfev=1000)
+                self.curve_fit.get_params(),
+                bounds=self.curve_fit.bounds,
+                xtol=1.0e-10,
+                ftol=1.0e-10,
+                gtol=1.0e-10,
+                max_nfev=1000,
+            )
 
-            if result.success <= 0:
+            if not result.success:
                 raise FinError(result.message)
 
-            curve_fit.set_params(result.x)
+            self.curve_fit.set_params(result.x)
 
         else:
+
             raise FinError("Unrecognised curve fit type.")
 
-    ###########################################################################
+    ##########################################################################
 
     def interp_yield(self, maturity_dt):
         """Interpolate yield."""
 
         if isinstance(maturity_dt, Date):
+
             t = times_from_dates(
                 self.settle_dt,
                 maturity_dt,
                 self.time_dc_type,
             )
-        elif isinstance(maturity_dt, (list, np.ndarray, float, np.float64)):
+
+        elif isinstance(
+            maturity_dt,
+            (
+                list,
+                np.ndarray,
+                float,
+                int,
+                np.floating,
+                np.integer,
+            ),
+        ):
+
             t = maturity_dt
+
         else:
+
             raise FinError("Unknown date type.")
 
         return self.curve_fit.interp_rate(t)
 
-    ##############################################################################
+    ##########################################################################
 
     def errors(self):
+        """Return RMS and maximum fit errors in basis points."""
 
         ylds = self.ylds
         times = self.years_to_maturity
+
         y_fit = self.curve_fit.interp_rate(times)
 
-        res = (ylds - y_fit)
-        mean_err = np.sqrt(np.mean(res * res))
-        max_err = np.max(np.abs(res))
-        BP = 10000
-        return (mean_err*BP, max_err*BP)
+        res = ylds - y_fit
 
-    ###########################################################################
+        mean_err = np.sqrt(np.mean(res * res))
+
+        max_err = np.max(np.abs(res))
+
+        bp = 10000.0
+
+        return (
+            mean_err * bp,
+            max_err * bp,
+        )
+
+    ##########################################################################
 
     def plot(
         self,
@@ -184,62 +280,133 @@ class BondParametricYieldCurve:
             }
         )
 
-        plt.figure(figsize=(12, 6))
+        plt.figure()
 
-        title = title + " - " + self.curve_fit.name
-        plt.title(title)
+        plot_title = title + " - " + self.curve_fit.name
+
+        plt.title(plot_title)
 
         if times is None:
+
             tmax = np.max(self.years_to_maturity)
-            times = np.linspace(0.0, tmax, int(12 * tmax))
+
+            n_points = max(
+                int(12 * tmax),
+                2,
+            )
+
+            times = np.linspace(
+                0.0,
+                tmax,
+                n_points,
+            )
+
         else:
-            times = np.asarray(times, dtype=float)
+
+            times = np.asarray(
+                times,
+                dtype=float,
+            )
 
         if np.any(times < 0.0):
-            raise FinError("Plot times must be strictly positive.")
 
-        times = np.maximum(times, 1e-8)
+            raise FinError("Plot times must be non-negative.")
 
-        bond_ylds_scaled = scale(self.ylds, 100.0)
+        times = np.maximum(
+            times,
+            1.0e-8,
+        )
 
-        # Plot actual bond yields
-        plt.plot(self.years_to_maturity, bond_ylds_scaled, "o", label="Bond Yields")
+        bond_ylds_scaled = scale(
+            self.ylds,
+            100.0,
+        )
+
+        plt.plot(
+            self.years_to_maturity,
+            bond_ylds_scaled,
+            "o",
+            label="Bond Yields",
+        )
 
         ytm = self.interp_yield(times)
 
         plt.xlabel("Time to Maturity (years)")
+
         plt.ylabel("Yield (%)")
 
-        plt.plot(times, ytm * 100, label=str(self.curve_fit.name))
+        plt.plot(
+            times,
+            ytm * 100.0,
+            label=self.curve_fit.name,
+        )
+
         plt.legend(loc="lower right")
 
         if ymin is not None and ymax is not None:
-            plt.ylim(ymin, ymax)
 
-        plt.xlim(np.min(times), np.max(times))
-        plt.grid(True, alpha=0.3)
-#        plt.tight_layout()
+            plt.ylim(
+                ymin,
+                ymax,
+            )
+
+        plt.xlim(
+            np.min(times),
+            np.max(times),
+        )
+
+        plt.grid(
+            True,
+            alpha=0.3,
+        )
 
         if filename is not None:
-            plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
+
+            plt.savefig(
+                filename,
+                bbox_inches="tight",
+                pad_inches=0.02,
+            )
 
         plt.show()
         plt.close()
 
-    ###########################################################################
+    ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("SETTLEMENT DATE", self.settle_dt)
-#        s += label_to_string("BOND", self.bonds)
-        s += label_to_string("YIELDS", self.ylds)
-        s += label_to_string("CURVE FIT", self.curve_fit)
+
+        s = label_to_string(
+            "OBJECT TYPE",
+            type(self).__name__,
+        )
+
+        s += label_to_string(
+            "SETTLEMENT DATE",
+            self.settle_dt,
+        )
+
+        s += label_to_string(
+            "YIELDS",
+            self.ylds,
+        )
+
+        s += label_to_string(
+            "CURVE FIT TYPE",
+            self.curve_fit_type,
+        )
+
+        s += label_to_string(
+            "CURVE FIT",
+            self.curve_fit,
+        )
+
         return s
 
-    ###########################################################################
+    ##########################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""
+
         print(self)
 
 

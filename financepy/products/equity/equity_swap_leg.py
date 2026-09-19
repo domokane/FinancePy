@@ -19,6 +19,7 @@ from ...utils.helpers import (
 from ...utils.global_types import SwapTypes, ReturnTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.flat_discount_curve import FlatDiscountCurve
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 
@@ -75,9 +76,7 @@ class EquitySwapLeg:
             FrequencyTypes.SIMPLE_INTEREST,
         ):
             print(freq_type)
-            raise FinError(
-                "Cannot generate payment schedule for this frequency type"
-            )
+            raise FinError("Cannot generate payment schedule for this frequency type")
 
         self.effective_dt = effective_dt
         self.termination_dt = termination_dt
@@ -156,13 +155,11 @@ class EquitySwapLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 
-            (year_frac, num, _) = day_counter.year_frac(prev_dt, next_dt)
+            year_frac, num, _ = day_counter.year_frac(prev_dt, next_dt)
 
             self.year_fracs.append(year_frac)
             self.accrued_days.append(num)
@@ -177,7 +174,7 @@ class EquitySwapLeg:
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve,
         dividend_curve: DiscountCurve = None,
-        current_price: float = None
+        current_price: float = None,
     ):
         """Value the equity leg with payments from an equity price, quantity,
         an index curve and an [optional] dividend curve. Discounting is based
@@ -202,8 +199,8 @@ class EquitySwapLeg:
         if dividend_curve is None:
             dividend_curve = FlatDiscountCurve(value_dt, 0.0)
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError("Discount Curve valuation date not same as value date")
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
 
         self.current_price = current_price if current_price is not None else self.strike
 
@@ -269,9 +266,9 @@ class EquitySwapLeg:
 
                 # Convenience rates for reporting (from value_dt to period end)
                 index_alpha = self.year_fracs[i_pmnt]  # approximation; period may be partial
-                fwd_rate    = (df_idx_now / df_idx_end - 1.0) / index_alpha if index_alpha > 0 else 0.0
+                fwd_rate = (df_idx_now / df_idx_end - 1.0) / index_alpha if index_alpha > 0 else 0.0
                 div_fwd_rate = (df_div_now / df_div_end - 1.0) / index_alpha if index_alpha > 0 else 0.0
-                eq_fwd_rate  = (eq_growth - 1.0) / index_alpha if index_alpha > 0 else 0.0
+                eq_fwd_rate = (eq_growth - 1.0) / index_alpha if index_alpha > 0 else 0.0
 
             else:
                 # ----------------------------------------------------------------
@@ -288,9 +285,9 @@ class EquitySwapLeg:
                 #             * df_disc(0,t_i)                           [after cancellation]
                 # ----------------------------------------------------------------
                 df_idx_start = index_curve.df(start_accrued_dt)
-                df_idx_end   = index_curve.df(end_accrued_dt)
+                df_idx_end = index_curve.df(end_accrued_dt)
                 df_div_start = dividend_curve.df(start_accrued_dt)
-                df_div_end   = dividend_curve.df(end_accrued_dt)
+                df_div_end = dividend_curve.df(end_accrued_dt)
 
                 # Forward equity growth over the reset period
                 eq_growth = (df_idx_start / df_idx_end) * (df_div_start / df_div_end)
@@ -310,7 +307,7 @@ class EquitySwapLeg:
                 # where fwd_price_k = S_0 * df_idx(0,k) * df_div(0,k) / df_value [already in spot measure]
 
                 fwd_price_start = self.current_price * (df_idx_start / df_value) * (df_div_start / df_value)
-                fwd_price_end   = self.current_price * (df_idx_end   / df_value) * (df_div_end   / df_value)
+                fwd_price_end = self.current_price * (df_idx_end / df_value) * (df_div_end / df_value)
 
                 # *** Wait — cleaner canonical form (see note below) ***
                 # PV_i = Q * [F(0,t_{i-1}) * df(0,t_i) - F(0,t_i) * df(0,t_i)]  ... doesn't simplify
@@ -324,7 +321,7 @@ class EquitySwapLeg:
                     (df_idx_start * df_div_start) / (df_idx_end * df_div_end) - 1.0
                 )
 
-                index_alpha  = self.year_fracs[i_pmnt]
+                index_alpha = self.year_fracs[i_pmnt]
 
                 if index_alpha > 0:
                     fwd_rate = (df_idx_start / df_idx_end - 1.0) / index_alpha
@@ -371,7 +368,7 @@ class EquitySwapLeg:
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve,
         dividend_curve: DiscountCurve = None,
-        current_price: float = None
+        current_price: float = None,
     ):
         """Value the equity leg with payments from an equity price, quantity,
         an index curve and an [optional] dividend curve. Discounting is based
@@ -388,10 +385,8 @@ class EquitySwapLeg:
         if dividend_curve is None:
             dividend_curve = FlatDiscountCurve(value_dt, 0)
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as value date"
-            )
+        if discount_curve.anchor_dt != value_dt:
+            raise FinError("Discount Curve valuation date not same as value date")
 
         # Current price can't be different from strike at effective date
         if current_price is not None:
@@ -411,7 +406,7 @@ class EquitySwapLeg:
         df_value = discount_curve.df(value_dt)
         leg_pv = 0.0
         eq_term_rate = 0.0
-        last_notional = self.notional # self.current_price * self.quantity
+        last_notional = self.notional  # self.current_price * self.quantity
         next_notional = last_notional
         num_payments = len(self.payment_dts)
 
@@ -432,9 +427,7 @@ class EquitySwapLeg:
                 if start_accrued_dt > value_dt:
                     curve_start_dt = start_accrued_dt
 
-                index_alpha = index_day_counter.year_frac(
-                    curve_start_dt, end_accrued_dt
-                )[0]
+                index_alpha = index_day_counter.year_frac(curve_start_dt, end_accrued_dt)[0]
 
                 df_start = index_curve.df(curve_start_dt)
                 df_end = index_curve.df(end_accrued_dt)
@@ -445,18 +438,14 @@ class EquitySwapLeg:
                 div_fwd_rate = (div_start / div_end - 1.0) / index_alpha
 
                 # Equity discount derived from index and div curves
-                eq_fwd_rate = (
-                    (df_start / df_end) * (div_start / div_end) - 1
-                ) / index_alpha
+                eq_fwd_rate = ((df_start / df_end) * (div_start / div_end) - 1) / index_alpha
 
                 self.fwd_rates.append(fwd_rate)
                 self.div_fwd_rates.append(div_fwd_rate)
                 self.eq_fwd_rates.append(eq_fwd_rate)
 
                 # Iterative update of the term rate
-                eq_term_rate = (1 + eq_fwd_rate * self.year_fracs[i_pmnt]) * (
-                    1 + eq_term_rate
-                ) - 1
+                eq_term_rate = (1 + eq_fwd_rate * self.year_fracs[i_pmnt]) * (1 + eq_term_rate) - 1
 
                 next_price = self.current_price * (1 + eq_term_rate)
                 next_notional = next_price * self.quantity

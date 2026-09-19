@@ -69,10 +69,8 @@ class FinFXVarianceSwap:
         if value_dt > self.maturity_dt:
             raise FinError("Valuation date after maturity date.")
 
-        if libor_curve.value_dt != value_dt:
-            raise FinError(
-                "Domestic Curve valuation date not same as option value date"
-            )
+        if libor_curve.anchor_dt != value_dt:
+            raise FinError("Domestic Curve valuation date not same as option value date")
 
         t1 = (value_dt - self.effective_dt) / G_DAYS_IN_YEAR
         t2 = (self.maturity_dt - self.effective_dt) / G_DAYS_IN_YEAR
@@ -181,9 +179,7 @@ class FinFXVarianceSwap:
 
         self.call_strikes = call_k
 
-        option_total = (
-            2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
-        )
+        option_total = 2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
 
         self.call_wts = np.zeros(num_call_options)
         self.put_wts = np.zeros(num_put_options)

@@ -3,19 +3,18 @@
 ##############################################################################
 
 
-import numpy as np
-
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.helpers import option_years
 from ...utils.date import Date
-from ...utils.day_count import DayCountTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.schedule import Schedule
+from ...utils.check_values import check_curve_dt
+
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
 
@@ -40,7 +39,6 @@ class EquityCliquetOption(EquityOption):
         final_expiry_dt: Date,
         opt_type: OptionTypes,
         freq_type: FrequencyTypes,
-        accrual_dc_type: DayCountTypes = DayCountTypes.THIRTY_E_360,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
@@ -51,10 +49,7 @@ class EquityCliquetOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if (
-            opt_type != OptionTypes.EUROPEAN_CALL
-            and opt_type != OptionTypes.EUROPEAN_PUT
-        ):
+        if opt_type != OptionTypes.EUROPEAN_CALL and opt_type != OptionTypes.EUROPEAN_PUT:
             raise FinError("Unknown OPTION_TYPE" + str(opt_type))
 
         if final_expiry_dt < start_dt:
@@ -64,7 +59,6 @@ class EquityCliquetOption(EquityOption):
         self.final_expiry_dt = final_expiry_dt
         self.opt_type = opt_type
         self.freq_type = freq_type
-        self.accrual_dc_type = accrual_dc_type
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -98,75 +92,48 @@ class EquityCliquetOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
-
-        if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve valuation date not same as option value date"
-            )
-
         if value_dt > self.final_expiry_dt:
             raise FinError("Value date after final expiry date.")
 
-        s = stock_price
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
+        s0 = stock_price
         v_cliquet = 0.0
 
         self.v_options = []
-        self._dfs = []
+        self.dfs = []
         self.actual_dts = []
-
-        call_type = OptionTypes.EUROPEAN_CALL
-        put_type = OptionTypes.EUROPEAN_PUT
 
         if isinstance(model, BlackScholes):
 
-            v = model.volatility
-            v = max(v, 1e-6)
-            t_prev = 0.0
+            fwd_vol = model.volatility
+            fwd_vol = max(fwd_vol, 1e-6)
+
+            dt_prev = value_dt
 
             for dt in self.expiry_dts:
 
                 if dt > value_dt:
 
-                    df = discount_curve.df(dt)
-                    t_exp = (dt - value_dt) / G_DAYS_IN_YEAR
-                    r = -np.log(df) / t_exp
+                    t_vol = option_years(dt_prev, dt)
 
-                    # option life
-                    tau = t_exp - t_prev
+                    df_end = discount_curve.df(dt)
+                    dq_start = dividend_curve.df(dt_prev)
 
                     # The deflator is out to the option reset time
-                    dq = dividend_curve.df_t(t_prev)
+                    fwd_r = discount_curve.fwd_zero_rate_cc(dt_prev, dt)
+                    fwd_q = dividend_curve.fwd_zero_rate_cc(dt_prev, dt)
 
-                    # The option dividend is over the option life
-                    dq_mat = dividend_curve.df_t(t_exp)
+                    v = european_value(1.0, t_vol, 1.0, fwd_r, fwd_q, fwd_vol, self.opt_type.value)
+                    v_fwd_opt = s0 * dq_start * v
+                    v_cliquet += v_fwd_opt
 
-                    q = -np.log(dq_mat / dq) / tau
-
-                    if self.opt_type == call_type:
-                        v_call = european_value(
-                            1.0, tau, 1.0, r, q, v, call_type.value
-                        )
-                        v_fwd_opt = s * dq * v_call
-                        v_cliquet += v_fwd_opt
-                    elif self.opt_type == put_type:
-                        v_put = european_value(
-                            1.0, tau, 1.0, r, q, v, put_type.value
-                        )
-                        v_fwd_opt = s * dq * v_put
-                        v_cliquet += v_fwd_opt
-                    else:
-                        raise FinError("Unknown OPTION_TYPE")
-
-                    #  print(dt, r, df, q, v_fwd_opt, v_cliquet)
-
-                    self._dfs.append(df)
-                    self.v_options.append(v)
+                    self.dfs.append(df_end)
+                    self.v_options.append(v_fwd_opt)
                     self.actual_dts.append(dt)
-                    t_prev = t_exp
+
+                    dt_prev = dt
         else:
             raise FinError("Unknown Model Type")
 
@@ -175,9 +142,13 @@ class EquityCliquetOption(EquityOption):
     ###########################################################################
 
     def print_payments(self):
+
+        if self.v_options is None:
+            raise FinError("Options not created yet.")
+
         num_options = len(self.v_options)
         for i in range(0, num_options):
-            print(self.actual_dts[i], self._dfs[i], self.v_options[i])
+            print(self.actual_dts[i], self.dfs[i], self.v_options[i])
 
     ###########################################################################
 
@@ -187,7 +158,6 @@ class EquityCliquetOption(EquityOption):
         s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
         s += label_to_string("OPTION_TYPE", self.opt_type)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
-        s += label_to_string("DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
         s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         s += label_to_string("DATE GEN RULE TYPE", self.dg_type, "")

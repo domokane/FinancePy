@@ -6,16 +6,16 @@ import numpy as np
 from scipy import optimize
 
 from ...utils.date import Date
+from ...utils.day_count import DayCountTypes
 from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...market.curves import DiscountCurve
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, table_to_string
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
-
-DIRTY = 0
-CLEAN = 1
+from ...utils.global_vars import CLEAN
 
 # from numba import njit, float64
 
@@ -50,10 +50,11 @@ class CDSCurve:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         cds_contracts: list,
-        libor_curve,
-        recovery_rate,
+        libor_curve: DiscountCurve,
+        recovery_rate: float,
+        dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         interp_method: InterpTypes = InterpTypes.FLAT_FWD_RATES,
     ):
         """Construct a credit curve from a sequence of maturity-ordered CDS
@@ -62,16 +63,15 @@ class CDSCurve:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if value_dt != libor_curve.value_dt:
-            raise FinError(
-                "Curve does not have same valuation date as Issuer curve."
-            )
+        if anchor_dt != libor_curve.anchor_dt:
+            raise FinError("Curve does not have same anchor date as Issuer curve.")
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.cds_contracts = cds_contracts
         self.recovery_rate = recovery_rate
         self.libor_curve = libor_curve
         self.interp_method = interp_method
+        self.dc_type = dc_type
         self.built_ok = False
 
         self._times = []
@@ -86,27 +86,17 @@ class CDSCurve:
 
     ###########################################################################
 
-    # @property
-    # def times(self):
-    #     return self._times.copy()
-
-    # ###########################################################################
-
-    # @property
-    # def qs(self):
-    #     return self._qs.copy()
-
-    # @property
-    # def dfs(self):
-    #     return self.libor_curve.dfs
-
     def set_times(self, times: np.array):
         """Set the times vector"""
         self._times = times
 
+    ###########################################################################
+
     def set_qs(self, qvector: np.array):
         """Set the survival probability curve"""
         self._qs = qvector
+
+    ###########################################################################
 
     def set_q(self, index, q):
         """Set the survival probability at a specific index."""
@@ -117,6 +107,8 @@ class CDSCurve:
             raise IndexError("Index out of bounds")
 
         self._qs[index] = q
+
+    ###########################################################################
 
     def set_last_q(self, q):
         """Set the survival probability factor at last index."""
@@ -147,7 +139,7 @@ class CDSCurve:
         supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            t = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -160,14 +152,10 @@ class CDSCurve:
             n = len(t)
             qs = np.zeros(n)
             for i in range(0, n):
-                qs[i] = _uinterpolate(
-                    t[i], self._times, self._qs, self.interp_method.value
-                )
+                qs[i] = _uinterpolate(t[i], self._times, self._qs, self.interp_method.value)
             return qs
         elif np.isscalar(t):
-            q = _uinterpolate(
-                t, self._times, self._qs, self.interp_method.value
-            )
+            q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
             return q
 
         raise FinError("Unknown time type")
@@ -179,7 +167,7 @@ class CDSCurve:
         function supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.value_dt) / G_DAYS_IN_YEAR
+            t = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
         elif isinstance(dt, list):
             t = np.array(dt)
         else:
@@ -207,12 +195,12 @@ class CDSCurve:
 
             argtuple = (
                 self,
-                self.value_dt,
+                self.anchor_dt,
                 self.cds_contracts[i],
                 self.recovery_rate,
             )
 
-            t_mat = (maturity_dt - self.value_dt) / G_DAYS_IN_YEAR
+            t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             q = self._qs[i]
 
             self._times = np.append(self._times, t_mat)
@@ -259,7 +247,7 @@ class CDSCurve:
 
     #     print("WHY AM I USING THIS ???? fwd_rate cds_curve")
 
-    #     if date1 < self.value_dt:
+    #     if date1 < self.anchor_dt:
     #         raise FinError("Date1 before curve value date.")
 
     #     if date2 < date1:

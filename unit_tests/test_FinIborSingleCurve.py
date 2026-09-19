@@ -255,14 +255,14 @@ def test_bloomberg_pricing_example():
 
 def test_reprice_inputs_for_all_interp_choices(interp_type):
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
 
     cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
@@ -383,20 +383,10 @@ def test_reprice_inputs_for_all_interp_choices(interp_type):
     )
     swaps.append(swap)
 
-    optional_interp_params = {
-        "sigma": 5.0
-    }  # only relevant for interp_type == InterpTypes.TENSION_ZERO_RATES
+    optional_interp_params = {"sigma": 5.0}  # only relevant for interp_type == InterpTypes.TENSION_ZERO_RATES
 
     # this will throw if inputs are not repriced
-    IborSingleCurve(
-        valuation_date,
-        depos,
-        fras,
-        swaps,
-        interp_type,
-        check_refit_flag=True,
-        **optional_interp_params
-    )
+    IborSingleCurve(value_dt, depos, fras, swaps, interp_type, check_refit_flag=True, **optional_interp_params)
 
     # If no exception, we are good
     assert True

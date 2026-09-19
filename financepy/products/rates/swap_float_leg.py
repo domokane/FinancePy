@@ -21,8 +21,10 @@ from ...utils.helpers import (
     label_to_string,
     check_argument_types,
 )
+
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -137,13 +139,11 @@ class SwapFloatLeg:
             if self.payment_lag == 0:
                 payment_dt = next_dt
             else:
-                payment_dt = calendar.add_business_days(
-                    next_dt, self.payment_lag
-                )
+                payment_dt = calendar.add_business_days(next_dt, self.payment_lag)
 
             self.payment_dts.append(payment_dt)
 
-            (year_frac, num, _) = day_counter.year_frac(prev_dt, next_dt)
+            year_frac, num, _ = day_counter.year_frac(prev_dt, next_dt)
 
             self.year_fracs.append(year_frac)
             self.accrued_days.append(num)
@@ -170,6 +170,9 @@ class SwapFloatLeg:
 
         if index_curve is None:
             index_curve = discount_curve
+
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve)
 
         self.rates = []
         self.payments = []
@@ -198,9 +201,7 @@ class SwapFloatLeg:
                 end_accrued_dt = self.end_accrued_dts[i_pmnt]
                 pay_alpha = self.year_fracs[i_pmnt]
 
-                (index_alpha, _, _) = index_day_counter.year_frac(
-                    start_accrued_dt, end_accrued_dt
-                )
+                index_alpha, _, _ = index_day_counter.year_frac(start_accrued_dt, end_accrued_dt)
 
                 if first_payment is False and first_fixing_rate is not None:
 
@@ -213,11 +214,7 @@ class SwapFloatLeg:
                     df_end = index_curve.df(end_accrued_dt)
                     fwd_rate = (df_start / df_end - 1.0) / index_alpha
 
-                payment_amount = (
-                    (fwd_rate + self.spread)
-                    * pay_alpha
-                    * self.notional_array[i_pmnt]
-                )
+                payment_amount = (fwd_rate + self.spread) * pay_alpha * self.notional_array[i_pmnt]
 
                 df_payment = discount_curve.df(payment_dt) / df_value
                 payment_pv = payment_amount * df_payment

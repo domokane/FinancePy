@@ -9,20 +9,19 @@
 
 import numpy as np
 
-from ...utils.global_vars import G_DAYS_IN_YEAR
-
 from ...models.gbm_process_simulator import get_assets_paths
 
-from ...utils.frequency import FrequencyTypes
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.helpers import _func_name
 from ...utils.date import Date
+from ...utils.helpers import option_years
+
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.math import normcdf
-
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -53,37 +52,25 @@ class EquityBasketOption:
 
     ###########################################################################
 
-    def _validate(
-        self, stock_prices, dividend_yields, volatilities, correlations
-    ):
+    def _validate(self, stock_prices, dividend_yields, volatilities, correlations):
 
         if len(stock_prices) != self.num_assets:
-            raise FinError(
-                "Stock prices must have a length " + str(self.num_assets)
-            )
+            raise FinError("Stock prices must have a length " + str(self.num_assets))
 
         if len(dividend_yields) != self.num_assets:
-            raise FinError(
-                "Dividend yields must have a length " + str(self.num_assets)
-            )
+            raise FinError("Dividend yields must have a length " + str(self.num_assets))
 
         if len(volatilities) != self.num_assets:
-            raise FinError(
-                "Volatilities must have a length " + str(self.num_assets)
-            )
+            raise FinError("Volatilities must have a length " + str(self.num_assets))
 
         if correlations.ndim != 2:
             raise FinError("Correlation must be a 2D matrix ")
 
         if correlations.shape[0] != self.num_assets:
-            raise FinError(
-                "Correlation cols must have a length " + str(self.num_assets)
-            )
+            raise FinError("Correlation cols must have a length " + str(self.num_assets))
 
         if correlations.shape[1] != self.num_assets:
-            raise FinError(
-                "correlation rows must have a length " + str(self.num_assets)
-            )
+            raise FinError("correlation rows must have a length " + str(self.num_assets))
 
         for i in range(0, self.num_assets):
             if correlations[i, i] != 1.0:
@@ -115,15 +102,12 @@ class EquityBasketOption:
         able to handle a full rank correlation structure between the individual
         assets."""
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, *dividend_curves)
 
-        if value_dt > self.expiry_dt:
-            raise FinError("Value date after expiry date.")
-
-        freq_cc = FrequencyTypes.CONTINUOUS
         qs = []
         for curve in dividend_curves:
-            q = curve.zero_rate_t(t_exp, freq_cc)
+            q = curve.zero_rate_cc(self.expiry_dt)
             qs.append(q)
 
         v = volatilities
@@ -133,7 +117,8 @@ class EquityBasketOption:
 
         a = np.ones(self.num_assets) * (1.0 / self.num_assets)
 
-        r = discount_curve.zero_rate_t(t_exp, FrequencyTypes.CONTINUOUS)
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         smean = 0.0
         for ia in range(0, self.num_assets):
@@ -204,28 +189,25 @@ class EquityBasketOption:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if value_dt > self.expiry_dt:
-            raise FinError("Value date after expiry date.")
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, *dividend_curves)
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
-        dividend_yields = []
+        qs = []
         for curve in dividend_curves:
-            dq = curve.df(self.expiry_dt)
-            q = -np.log(dq) / t_exp
-            dividend_yields.append(q)
+            q = curve.zero_rate_cc(self.expiry_dt)
+            qs.append(q)
 
-        self._validate(
-            stock_prices, dividend_yields, volatilities, corr_matrix
-        )
+        qs = np.array(qs)
+
+        self._validate(stock_prices, qs, volatilities, corr_matrix)
 
         num_assets = len(stock_prices)
 
-        df = discount_curve.df(self.expiry_dt)
-        r = -np.log(df) / t_exp
-
-        mus = r - dividend_yields
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        mus = r - qs
         k = self.strike_price
+
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         np.random.seed(seed)
 

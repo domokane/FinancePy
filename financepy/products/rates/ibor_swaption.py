@@ -37,6 +37,8 @@ from ...utils.global_types import OptionTypes
 from ...utils.global_types import SwapTypes
 from ...utils.global_types import ExerciseTypes
 
+from ...utils.check_values import check_curve_dt
+
 ########################################################################################
 
 
@@ -127,6 +129,8 @@ class IborSwaption:
         )
 
         k = self.fixed_cpn
+
+        check_curve_dt(value_dt, discount_curve)
 
         # The pv01 is the value of the swap cash flows as of the curve date
         pv01 = swap.pv01(value_dt, discount_curve)
@@ -284,9 +288,7 @@ class IborSwaption:
 
     ###########################################################################
 
-    def cash_settled_value(
-        self, value_dt: Date, discount_curve, swap_rate: float, model
-    ):
+    def cash_settled_value(self, value_dt: Date, discount_curve, swap_rate: float, model):
         """Valuation of a Ibor European-style swaption using a cash settled
         approach which is a market convention that used Black's model and that
         discounts all of the future payments at a flat swap rate. Note that the
@@ -294,6 +296,8 @@ class IborSwaption:
         Black volatility for the standard arbitrage-free valuation."""
 
         float_spread = 0.0
+
+        check_curve_dt(value_dt, discount_curve)
 
         swap = IborSwap(
             self.exercise_dt,
@@ -329,9 +333,7 @@ class IborSwaption:
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
         else:
-            raise FinError(
-                "Cash settled swaptions must be priced using" + " Black's model."
-            )
+            raise FinError("Cash settled swaptions must be priced using" + " Black's model.")
 
         self.fwd_swap_rate = swap_rate
         self.forward_df = discount_curve.df(self.exercise_dt)

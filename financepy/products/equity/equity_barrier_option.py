@@ -10,15 +10,16 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import BarrierTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.frequency import FrequencyTypes
 from ...utils.global_types import GBMNumericalSchemeTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 from ...models.equity_barrier_option_bs import value_equity_barrier_option_bs
 from ...models.equity_barrier_option_mc import value_equity_barrier_option_mc
 from ...models.process_simulator import ProcessTypes
-
+from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_stock_price
+from ...utils.check_values import check_strike_price
+from ...utils.helpers import option_years
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 
@@ -44,6 +45,8 @@ class EquityBarrierOption(EquityOption):
         per year and the notional."""
 
         check_argument_types(self.__init__, locals())
+
+        check_strike_price(strike_price)
 
         self.expiry_dt = expiry_dt
         self.strike_price = float(strike_price)
@@ -73,46 +76,22 @@ class EquityBarrierOption(EquityOption):
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         """
 
-        if isinstance(value_dt, Date) is False:
-            raise FinError("Valuation date is not a Date")
-
-        if value_dt > self.expiry_dt:
-            raise FinError("Valuation date after expiry date.")
-
-        if discount_curve.value_dt != value_dt:
-            raise FinError(
-                "Discount Curve valuation date not same as option value date"
-            )
-
-        if dividend_curve.value_dt != value_dt:
-            raise FinError(
-                "Dividend Curve valuation date not same as option value date"
-            )
-
-        if isinstance(stock_price, int):
-            stock_price = float(stock_price)
-
-        if isinstance(stock_price, float):
-            stock_prices = [stock_price]
-        else:
-            stock_prices = stock_price
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_stock_price(stock_price)
 
         values = []
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        if t_exp < 0:
-            raise FinError("Option expires before value date.")
-
-        cc_freq = FrequencyTypes.CONTINUOUS
-        r = discount_curve.zero_rate_t(t_exp, cc_freq)
-        q = dividend_curve.zero_rate_t(t_exp, cc_freq)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         values = value_equity_barrier_option_bs(
             t_exp,
             self.strike_price,
             self.barrier_level,
-            stock_prices,
+            stock_price,
             r,
             q,
             model.volatility,
@@ -123,7 +102,7 @@ class EquityBarrierOption(EquityOption):
         values = values * self.notional
 
         if isinstance(stock_price, float):
-            return values[0]
+            return values
         else:
             return np.array(values)
 
@@ -150,20 +129,14 @@ class EquityBarrierOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if value_dt > self.expiry_dt:
-            raise FinError("Valuation date after expiry date.")
+        check_stock_price(stock_price)
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
 
-        if isinstance(stock_price, int):
-            stock_price = float(stock_price)
+        t_exp = option_years(value_dt, self.expiry_dt)
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
-        if t_exp < 0:
-            raise FinError("Option expires before value date.")
-
-        freq_cc = FrequencyTypes.CONTINUOUS
-        r = discount_curve.zero_rate_t(t_exp, freq_cc)
-        q = dividend_curve.zero_rate_t(t_exp, freq_cc)
         drift = r - q
 
         scheme = GBMNumericalSchemeTypes.NORMAL
@@ -188,11 +161,6 @@ class EquityBarrierOption(EquityOption):
         )
 
         value = value * self.notional
-
-        #        if isinstance(stock_price, float):
-        #            return values[0]
-        #        else:
-        #            return np.array(values)
 
         return value
 

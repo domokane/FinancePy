@@ -6,6 +6,7 @@
 from ...models.black_scholes import BlackScholes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.date import Date
+from ...utils.check_values import check_curve_dt
 
 ##########################################################################
 
@@ -36,11 +37,12 @@ class FXOption:
         """Calculate the option delta (FX rate sensitivity) by adding on a
         small bump and calculating the change in the option price."""
 
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
+
         v = self.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-        v_bumped = self.value(
-            value_dt, spot_fx_rate + BUMP, domestic_curve, foreign_curve, model
-        )
+        v_bumped = self.value(value_dt, spot_fx_rate + BUMP, domestic_curve, foreign_curve, model)
 
         if isinstance(v_bumped, dict):
             delta = (v_bumped["value"] - v["value"]) / BUMP
@@ -55,15 +57,14 @@ class FXOption:
         """Calculate the option gamma (delta sensitivity) by adding on a
         small bump and calculating the change in the option delta."""
 
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
+
         v = self.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-        v_bumped_dn = self.delta(
-            value_dt, spot_fx_rate + BUMP, domestic_curve, foreign_curve, model
-        )
+        v_bumped_dn = self.delta(value_dt, spot_fx_rate + BUMP, domestic_curve, foreign_curve, model)
 
-        v_bumped_up = self.delta(
-            value_dt, spot_fx_rate + BUMP, domestic_curve, foreign_curve, model
-        )
+        v_bumped_up = self.delta(value_dt, spot_fx_rate + BUMP, domestic_curve, foreign_curve, model)
 
         if isinstance(v, dict):
             num = v_bumped_up["value"] - 2.0 * v["value"] + v_bumped_dn["value"]
@@ -78,6 +79,9 @@ class FXOption:
     def vega(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
         """Calculate the option vega (volatility sensitivity) by adding on a
         small bump and calculating the change in the option price."""
+
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         bump = 0.01
 
@@ -104,16 +108,17 @@ class FXOption:
         """Calculate the option theta (calendar time sensitivity) by moving
         forward one day and calculating the change in the option price."""
 
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
+
         v = self.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
         next_dt = value_dt.add_days(1)
 
-        domestic_curve.value_dt = next_dt
-        foreign_curve.value_dt = next_dt
+        domestic_curve.anchor_dt = next_dt
+        foreign_curve.anchor_dt = next_dt
 
-        v_bumped = self.value(
-            next_dt, spot_fx_rate, domestic_curve, foreign_curve, model
-        )
+        v_bumped = self.value(next_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
         # Careful the bump here is not BUMP
         bump = 1.0 / G_DAYS_IN_YEAR
@@ -124,8 +129,8 @@ class FXOption:
             theta = (v_bumped - v) / bump
 
         # Don't forget to reset the value dates
-        domestic_curve.value_dt = value_dt
-        foreign_curve.value_dt = value_dt
+        domestic_curve.anchor_dt = value_dt
+        foreign_curve.anchor_dt = value_dt
 
         return theta
 
@@ -134,6 +139,9 @@ class FXOption:
     def rho(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
         """Calculate the option rho (interest rate sensitivity) by perturbing
         the discount curve and revaluing."""
+
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         v = self.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
         v_bumped = self.value(

@@ -14,6 +14,7 @@ from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.global_types import FXDeltaMethodTypes
+from ...utils.check_values import check_curve_dt
 
 # from ...products.fx.FinFXModelTypes import FinFXModel
 # from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
@@ -29,7 +30,6 @@ from ...models.black_scholes_analytic import european_value, delta
 from ...utils.helpers import check_argument_types, label_to_string
 
 from ...utils.math import normcdf
-
 
 ########################################################################################
 # TODO: Refactor code to use FinBlackScholesAnalytic
@@ -262,11 +262,8 @@ class FXVanillaOption:
         if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve.value_dt != value_dt:
-            raise FinError("Domestic Curve valuation date not same as valuation date")
-
-        if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as valuation date")
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -314,15 +311,11 @@ class FXVanillaOption:
 
             if self.opt_type == OptionTypes.EUROPEAN_CALL:
 
-                vdf = european_value(
-                    s0, t_exp, k, r_d, r_f, v, OptionTypes.EUROPEAN_CALL.value
-                )
+                vdf = european_value(s0, t_exp, k, r_d, r_f, v, OptionTypes.EUROPEAN_CALL.value)
 
             elif self.opt_type == OptionTypes.EUROPEAN_PUT:
 
-                vdf = european_value(
-                    s0, t_exp, k, r_d, r_f, v, OptionTypes.EUROPEAN_PUT.value
-                )
+                vdf = european_value(s0, t_exp, k, r_d, r_f, v, OptionTypes.EUROPEAN_PUT.value)
 
             elif self.opt_type == OptionTypes.AMERICAN_CALL:
 
@@ -406,11 +399,12 @@ class FXVanillaOption:
         1 cent of its value. This gives the FX spot delta. For speed we prefer
         to use the analytical calculation of the derivative given below."""
 
+        check_curve_dt(value_dt, ccy1_discount_curve)
+        check_curve_dt(value_dt, ccy2_discount_curve)
+
         bump = 0.0001 * spot_fx_rate
 
-        v = self.value(
-            value_dt, spot_fx_rate, ccy1_discount_curve, ccy2_discount_curve, model
-        )
+        v = self.value(value_dt, spot_fx_rate, ccy1_discount_curve, ccy2_discount_curve, model)
 
         v_bumped = self.value(
             value_dt,
@@ -434,6 +428,9 @@ class FXVanillaOption:
         of delta and so we are required to return a dictionary of values. The
         definitions can be found on Page 44 of Foreign Exchange Option Pricing
         by Iain Clark, published by Wiley Finance."""
+
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -539,6 +536,9 @@ class FXVanillaOption:
         else:
             t = value_dt
 
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
+
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("FX Rate must be greater than zero.")
 
@@ -594,6 +594,9 @@ class FXVanillaOption:
             t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         else:
             t = value_dt
+
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         if np.any(spot_fx_rate <= 0.0):
             raise FinError("Spot FX Rate must be greater than zero.")
@@ -702,9 +705,7 @@ class FXVanillaOption:
 
     ###########################################################################
 
-    def implied_volatility(
-        self, value_dt, stock_price, discount_curve, dividend_curve, price
-    ):
+    def implied_volatility(self, value_dt, stock_price, discount_curve, dividend_curve, price):
         """This function determines the implied volatility of an FX option
         given a price and the other option details. It uses a one-dimensional
         Newton root search algorith to determine the implied volatility."""

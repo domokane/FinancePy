@@ -19,12 +19,17 @@ def test_fin_discount_curve_zeros():
     zero_rates = np.linspace(5.0, 6.0, 10) / 100
     freq_type = FrequencyTypes.ANNUAL
 
+    time_dc_type = DayCountTypes.ACT_ACT_ISDA
+
+    interp_type = InterpTypes.FLAT_FWD_RATES
+
     curve = ZeroRatesDiscountCurve(
         start_dt,
         dates,
         zero_rates,
         freq_type,
-        InterpTypes.FLAT_FWD_RATES,
+        time_dc_type,
+        interp_type,
     )
 
     date = start_dt.add_years(0)
@@ -33,16 +38,16 @@ def test_fin_discount_curve_zeros():
 
     date = start_dt.add_years(2.5)
     df = curve.df(date)
-    assert round(df, 4) == 0.8815
+    assert round(df, 4) == 0.8816
 
     date = start_dt.add_years(5)
     df = curve.df(date)
-    assert round(df, 4) == 0.767
+    assert round(df, 4) == 0.7672
 
     date = start_dt.add_years(7.5)
     df = curve.df(date)
-    assert round(df, 4) == 0.6586
+    assert round(df, 4) == 0.6588
 
     date = start_dt.add_years(10)
     df = curve.df(date)
-    assert round(df, 4) == 0.5582
+    assert round(df, 4) == 0.5584

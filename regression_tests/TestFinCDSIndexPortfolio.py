@@ -18,9 +18,6 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-DIRTY = 0
-CLEAN = 1
-
 # TO DO
 
 ########################################################################################
@@ -130,25 +127,13 @@ def test_cds_index_portfolio():
 
     cds_index = CDSIndexPortfolio()
 
-    avg_spd_3yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves)
-        * 10000.0
-    )
+    avg_spd_3yr = cds_index.average_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
 
-    avg_spd_5yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves)
-        * 10000.0
-    )
+    avg_spd_5yr = cds_index.average_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
 
-    avg_spd_7yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves)
-        * 10000.0
-    )
+    avg_spd_7yr = cds_index.average_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
 
-    avg_spd_10yr = (
-        cds_index.average_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves)
-        * 10000.0
-    )
+    avg_spd_10yr = cds_index.average_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("AVERAGE SPD 3Y", avg_spd_3yr)
@@ -161,25 +146,13 @@ def test_cds_index_portfolio():
 
     cds_index = CDSIndexPortfolio()
 
-    intrinsic_spd_3yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves)
-        * 10000.0
-    )
+    intrinsic_spd_3yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
 
-    intrinsic_spd_5yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves)
-        * 10000.0
-    )
+    intrinsic_spd_5yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
 
-    intrinsic_spd_7yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves)
-        * 10000.0
-    )
+    intrinsic_spd_7yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
 
-    intrinsic_spd_10yr = (
-        cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves)
-        * 10000.0
-    )
+    intrinsic_spd_10yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
 
     test_cases.header("LABEL", "VALUE")
     test_cases.print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)

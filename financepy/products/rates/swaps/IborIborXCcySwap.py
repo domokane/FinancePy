@@ -114,7 +114,6 @@ class IborIborXCcySwap:
         self._fixed_flow_pvs = []
 
         self.first_fixing_rate = None
-        self.value_dt = None
         self.fixed_start_index = None
 
         self._calc_fixed_leg_flows()
@@ -134,9 +133,7 @@ class IborIborXCcySwap:
 
         fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
-        float_leg_value = self.float_leg_value(
-            value_dt, discount_curve, index_curve, first_fixing_rate, principal
-        )
+        float_leg_value = self.float_leg_value(value_dt, discount_curve, index_curve, first_fixing_rate, principal)
 
         value = fixed_leg_value - float_leg_value
 
@@ -471,9 +468,7 @@ class IborIborXCcySwap:
         start_index = self._fixed_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
-        print(
-            "%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-")
-        )
+        print("%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for PAYMENT_DT in self._adjusted_fixed_dts[start_index:]:
@@ -554,10 +549,7 @@ class IborIborXCcySwap:
 
         # By definition the discount factor is 1.0 on the valuation date
 
-        print(
-            "%15s %10s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", "-", 1.0, "-", "-")
-        )
+        print("%15s %10s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for PAYMENT_DT in self._adjusted_float_dts[start_index:]:

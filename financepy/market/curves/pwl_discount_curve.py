@@ -38,7 +38,7 @@ class PWLDiscountCurve(DiscountCurve):
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = value_dt
         self._interp_type = None
 
         if len(zero_dts) != len(zero_rates):
@@ -62,7 +62,7 @@ class PWLDiscountCurve(DiscountCurve):
 
         self.time_dc_type = time_dc_type
 
-        dc_times = times_from_dates(self.value_dt, zero_dts, self.time_dc_type)
+        dc_times = times_from_dates(self.anchor_dt, zero_dts, self.time_dc_type)
         self._times = np.array(dc_times)
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
@@ -140,7 +140,7 @@ class PWLDiscountCurve(DiscountCurve):
 
     def bump_parallel(self, bump_size: float):
         return PWLDiscountCurve(
-            self.value_dt,
+            self.anchor_dt,
             self._zero_dts.copy(),
             self._cc_zero_rates + bump_size,
             freq_type=FrequencyTypes.CONTINUOUS,

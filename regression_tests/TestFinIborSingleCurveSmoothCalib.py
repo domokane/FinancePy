@@ -28,13 +28,13 @@ REPORT_PROGRESS = False
 
 def test_smooth_fit_simple(interp_type):
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
@@ -78,7 +78,7 @@ def test_smooth_fit_simple(interp_type):
     # Create but do not build the initial curve
     do_build = False
     init_curve = IborSingleCurve(
-        valuation_date,
+        value_dt,
         depos,
         fras,
         swaps,
@@ -110,13 +110,13 @@ def test_smooth_fit_simple(interp_type):
 
 def test_smooth_fit(interp_type):
 
-    valuation_date = Date(6, 10, 2001)
+    value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []
     spot_days = 2
-    settle_dt = valuation_date.add_weekdays(spot_days)
+    settle_dt = value_dt.add_weekdays(spot_days)
     depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
     depos.append(depo)
 
@@ -237,14 +237,12 @@ def test_smooth_fit(interp_type):
     )
     swaps.append(swap)
 
-    optional_interp_params = {
-        "sigma": 5.0
-    }  # only relevant for interp_type == InterpTypes.TENSION_ZERO_RATES
+    optional_interp_params = {"sigma": 5.0}  # only relevant for interp_type == InterpTypes.TENSION_ZERO_RATES
 
     # Create but do not build the initial curve
     do_build = False
     init_curve = IborSingleCurve(
-        valuation_date,
+        value_dt,
         depos,
         fras,
         swaps,

@@ -6,18 +6,16 @@
 import numpy as np
 
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-from ...utils.day_count import DayCountTypes
-from ...utils.calendar import BusDayAdjustTypes
-from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.schedule import Schedule
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
+from ...utils.check_values import check_curve_dt
+from ...utils.helpers import option_years
 
 from ...models.black_scholes_analytic import european_value
 from ...models.black_scholes import BlackScholes
@@ -50,10 +48,6 @@ class EquityForwardStartOption(EquityOption):
         self.final_expiry_dt = final_expiry_dt
         self.opt_type = opt_type
         self.freq_type = freq_type
-        self.accrual_dc_type = accrual_dc_type
-        self.cal_type = cal_type
-        self.bd_type = bd_type
-        self.dg_type = dg_type
 
         self.v_options = None
         self._dfs = None
@@ -84,11 +78,8 @@ class EquityForwardStartOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        if discount_curve.value_dt != value_dt:
-            raise FinError("Discount Curve valuation date not same as option value date")
-
-        if dividend_curve.value_dt != value_dt:
-            raise FinError("Dividend Curve valuation date not same as option value date")
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
 
         if value_dt > self.final_expiry_dt:
             raise FinError("Value date after final expiry date.")
@@ -108,25 +99,28 @@ class EquityForwardStartOption(EquityOption):
             v = model.volatility
             v = max(v, 1e-6)
             t_prev = 0.0
+            dt_prev = None
 
             for dt in self.expiry_dts:
 
                 if dt > value_dt:
 
                     df = discount_curve.df(dt)
-                    t_exp = (dt - value_dt) / G_DAYS_IN_YEAR
-                    r = -np.log(df) / t_exp
+                    r = discount_curve.zero_rate_cc(dt)
+                    t_exp = option_years(value_dt, dt)
 
                     # option life
                     tau = t_exp - t_prev
 
                     # The deflator is out to the option reset time
-                    dq = dividend_curve.df_t(t_prev)
+                    dq = dividend_curve.df(dt_prev)
 
                     # The option dividend is over the option life
-                    dq_mat = dividend_curve.df_t(t_exp)
+                    dq_mat = dividend_curve.df(dt)
 
-                    q = -np.log(dq_mat / dq) / tau
+                    old_q = -np.log(dq_mat / dq) / tau
+                    q = dividend_curve.fwd_zero_rate_cc(dt_prev, dt)
+                    print("q old", old_q, q)
 
                     if self.opt_type == call_type:
                         v_call = european_value(1.0, tau, 1.0, r, q, v, call_type.value)
@@ -145,6 +139,7 @@ class EquityForwardStartOption(EquityOption):
                     self.v_options.append(v)
                     self.actual_dts.append(dt)
                     t_prev = t_exp
+                    dt_prev = dt
         else:
             raise FinError("Unknown Model Type")
 

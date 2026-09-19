@@ -23,7 +23,6 @@ from ...market.curves.discount_curve import DiscountCurve
 from .swap_fixed_leg import SwapFixedLeg
 from .swap_float_leg import SwapFloatLeg
 
-
 ##########################################################################
 
 
@@ -142,7 +141,7 @@ class IborFixedFloatSwap:
 
     def set_fixed_rate_to_atm(
         self,
-        valuation_date: Date,
+        value_date: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
         first_fixing: float = None,
@@ -150,9 +149,7 @@ class IborFixedFloatSwap:
         """
         Reset fixed rate to atm given curve(s). returns the new atm
         """
-        atm = self.swap_rate(
-            valuation_date, discount_curve, index_curve, first_fixing
-        )
+        atm = self.swap_rate(value_date, discount_curve, index_curve, first_fixing)
         self.set_fixed_rate(atm)
         return atm
 
@@ -172,9 +169,10 @@ class IborFixedFloatSwap:
         if index_curve is None:
             index_curve = discount_curve
 
-        fixed_leg_results = self.fixed_leg.value(
-            value_dt, discount_curve, pv_only=pv_only
-        )
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve)
+
+        fixed_leg_results = self.fixed_leg.value(value_dt, discount_curve, pv_only=pv_only)
 
         float_leg_results = self.float_leg.value(
             value_dt,
@@ -189,9 +187,7 @@ class IborFixedFloatSwap:
             return value
         else:
             value = fixed_leg_results[0] + float_leg_results[0]
-            cashflow_report = pd.concat(
-                [fixed_leg_results[1], float_leg_results[1]], ignore_index=True
-            )
+            cashflow_report = pd.concat([fixed_leg_results[1], float_leg_results[1]], ignore_index=True)
 
             return value, cashflow_report
 
@@ -199,7 +195,7 @@ class IborFixedFloatSwap:
 
     def valuation_details(
         self,
-        valuation_date: Date,
+        value_date: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
         first_fixing_rate=None,
@@ -216,33 +212,21 @@ class IborFixedFloatSwap:
         if index_curve is None:
             index_curve = discount_curve
 
-        fixed_leg_value = self.fixed_leg.value(valuation_date, discount_curve)
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve)
 
-        float_leg_value = self.float_leg.value(
-            valuation_date, discount_curve, index_curve, first_fixing_rate
-        )
+        fixed_leg_value = self.fixed_leg.value(value_date, discount_curve)
+
+        float_leg_value = self.float_leg.value(value_date, discount_curve, index_curve, first_fixing_rate)
 
         value = fixed_leg_value + float_leg_value
-        pv01 = np.abs(
-            fixed_leg_value / self.fixed_leg.cpn / self.fixed_leg.notional
-        )
-        pay_receive_float = (
-            -1 if self.float_leg.leg_type == SwapTypes.PAY else 1
-        )
-        swap_rate = (
-            float_leg_value
-            / self.float_leg.notional
-            / pv01
-            / pay_receive_float
-        )
+        pv01 = np.abs(fixed_leg_value / self.fixed_leg.cpn / self.fixed_leg.notional)
+        pay_receive_float = -1 if self.float_leg.leg_type == SwapTypes.PAY else 1
+        swap_rate = float_leg_value / self.float_leg.notional / pv01 / pay_receive_float
 
         # VP: There is significant amount of confusion here with swap_type vs notional.
-        is_payers = (
-            self.fixed_leg.leg_type == SwapTypes.PAY
-            and self.fixed_leg.notional > 0
-        ) or (
-            self.fixed_leg.leg_type == SwapTypes.RECEIVE
-            and self.fixed_leg.notional < 0
+        is_payers = (self.fixed_leg.leg_type == SwapTypes.PAY and self.fixed_leg.notional > 0) or (
+            self.fixed_leg.leg_type == SwapTypes.RECEIVE and self.fixed_leg.notional < 0
         )
 
         pvbp_sign = 1 if is_payers else -1
@@ -258,9 +242,7 @@ class IborFixedFloatSwap:
             "contract_rate": self.fixed_leg.cpn,
             "market_rate": swap_rate,
             "spot_pvbp": pv01 * pvbp_sign,
-            "fwd_pvbp": pv01
-            * pvbp_sign
-            / discount_curve.df(self.effective_dt),
+            "fwd_pvbp": pv01 * pvbp_sign / discount_curve.df(self.effective_dt),
             "unit_value": value / self.fixed_leg.notional,
             "value": value,
             # ignoring bus day adj type, calendar, etc for now
@@ -301,9 +283,7 @@ class IborFixedFloatSwap:
         if abs(pv01) < G_SMALL:
             raise FinError("PV01 is zero. Cannot compute swap rate.")
 
-        float_leg_pv = self.float_leg.value(
-            value_dt, discount_curve, index_curve, first_fixing
-        )
+        float_leg_pv = self.float_leg.value(value_dt, discount_curve, index_curve, first_fixing)
 
         float_leg_pv /= self.float_leg.notional
 

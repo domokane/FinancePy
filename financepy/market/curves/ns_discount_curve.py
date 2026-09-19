@@ -27,7 +27,7 @@ class NSDiscountCurve(DiscountCurve):
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         beta_0: float,
         beta_1: float,
         beta_2: float,
@@ -46,7 +46,7 @@ class NSDiscountCurve(DiscountCurve):
         if tau <= 0:
             raise FinError("Tau must be positive")
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self._beta_0 = beta_0
         self._beta_1 = beta_1
         self._beta_2 = beta_2
@@ -58,8 +58,8 @@ class NSDiscountCurve(DiscountCurve):
 
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 10.0, 11)
-        self._df_dates = self.value_dt.add_years(years)
-        self._times = times_from_dates( self.value_dt, self._df_dates,self.time_dc_type)
+        self._df_dates = self.anchor_dt.add_years(years)
+        self._times = times_from_dates(self.anchor_dt, self._df_dates, self.time_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################
@@ -98,7 +98,7 @@ class NSDiscountCurve(DiscountCurve):
     def bump_parallel(self, bump_size: float):
 
         discount_curve = NSDiscountCurve(
-            self.value_dt,
+            self.anchor_dt,
             self._beta_0 + bump_size,
             self._beta_1,
             self._beta_2,

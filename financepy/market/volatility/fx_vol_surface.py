@@ -77,9 +77,7 @@ def g(k: float, *args: Any) -> float:
     opt_type_value = args[6]
     delta_target = args[7]
 
-    delta_out = fast_delta(
-        s, t, k, r_d, r_f, volatility, delta_method_value, opt_type_value
-    )
+    delta_out = fast_delta(s, t, k, r_d, r_f, volatility, delta_method_value, opt_type_value)
 
     obj_fn = delta_target - delta_out
     return obj_fn
@@ -238,13 +236,9 @@ def solve_to_horizon_fast(
     )
 
     # USE MARKET STRANGLE VOL TO DETERMINE PRICE OF A MARKET STRANGLE
-    v_25d_c_ms = european_value(
-        s, t, k_25d_c_ms, rd, rf, vol_25d_ms, OptionTypes.EUROPEAN_CALL.value
-    )
+    v_25d_c_ms = european_value(s, t, k_25d_c_ms, rd, rf, vol_25d_ms, OptionTypes.EUROPEAN_CALL.value)
 
-    v_25d_p_ms = european_value(
-        s, t, k_25d_p_ms, rd, rf, vol_25d_ms, OptionTypes.EUROPEAN_PUT.value
-    )
+    v_25d_p_ms = european_value(s, t, k_25d_p_ms, rd, rf, vol_25d_ms, OptionTypes.EUROPEAN_PUT.value)
 
     # Market price of strangle in the domestic currency
     v_25d_ms = v_25d_c_ms + v_25d_p_ms
@@ -315,9 +309,7 @@ def solve_to_horizon_fast(
     cache=True,
     fastmath=True,
 )
-def vol_function(
-    vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float
-) -> float:
+def vol_function(vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -549,7 +541,7 @@ class FXVolSurface:
 
     def __init__(
         self,
-        value_dt: Date,
+        anchor_dt: Date,
         spot_fx_rate: float,
         currency_pair: str,
         notional_currency: str,
@@ -568,7 +560,7 @@ class FXVolSurface:
 
         check_argument_types(self.__init__, locals())
 
-        self.value_dt = value_dt
+        self.anchor_dt = anchor_dt
         self.spot_fx_rate = spot_fx_rate
         self.currency_pair = currency_pair
 
@@ -628,7 +620,7 @@ class FXVolSurface:
 
         self.expiry_dts = []
         for i in range(0, self.num_vol_curves):
-            expiry_dt = value_dt.add_tenor(tenors[i])
+            expiry_dt = anchor_dt.add_tenor(tenors[i])
             self.expiry_dts.append(expiry_dt)
 
         self.build_vol_surface()
@@ -645,7 +637,7 @@ class FXVolSurface:
         index0 = 0
         index1 = 0
 
-        t = (expiry_dt - self.value_dt) / G_DAYS_IN_YEAR
+        t = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
         num_curves = self.num_vol_curves
 
@@ -742,7 +734,7 @@ class FXVolSurface:
         #######################################################################
         # TODO: ADD SPOT DAYS
         #######################################################################
-        spot_dt = self.value_dt
+        spot_dt = self.anchor_dt
 
         for i in range(0, num_vol_curves):
 
@@ -928,9 +920,7 @@ class FXVolSurface:
             self.parameters[tenor_index],
         )
 
-        k = newton_secant(
-            delta_fit, x0=initial_value, args=argtuple, tol=1e-5, maxiter=50
-        )
+        k = newton_secant(delta_fit, x0=initial_value, args=argtuple, tol=1e-5, maxiter=50)
 
         if k <= 0.0:
             raise FinError("Non-positive strike.")
@@ -944,7 +934,7 @@ class FXVolSurface:
         if verbose:
 
             print("==========================================================")
-            print("VALUE DATE:", self.value_dt)
+            print("VALUE DATE:", self.anchor_dt)
             print("SPOT FX RATE:", self.spot_fx_rate)
             print("ATM METHOD:", self.atm_method)
             print("DELTA METHOD:", self.delta_method)
@@ -960,14 +950,8 @@ class FXVolSurface:
                 print(f"TENOR: {self.tenors[i]}")
                 print(f"EXPIRY DATE: {expiry_dt}")
                 print(f"IN ATM VOL: " f"{100.0 * self.atm_vols[i]:9.6f} %")
-                print(
-                    f"IN MKT STRANGLE 25d VOL: "
-                    f"{100.0 * self.ms_25_delta_vols[i]:9.6f} %"
-                )
-                print(
-                    f"IN RSK REVERSAL 25d VOL: "
-                    f"{100.0 * self.rr_25_delta_vols[i]:9.6f} %"
-                )
+                print(f"IN MKT STRANGLE 25d VOL: " f"{100.0 * self.ms_25_delta_vols[i]:9.6f} %")
+                print(f"IN RSK REVERSAL 25d VOL: " f"{100.0 * self.rr_25_delta_vols[i]:9.6f} %")
 
             call = FXVanillaOption(
                 expiry_dt,
@@ -1033,7 +1017,7 @@ class FXVolSurface:
             model = BlackScholes(sigma_atm_out)
 
             delta_call = call.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1041,7 +1025,7 @@ class FXVolSurface:
             )[self.delta_method_string]
 
             delta_put = put.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1064,9 +1048,7 @@ class FXVolSurface:
             if verbose:
 
                 print("======================================================")
-                print(
-                    "MKT STRANGLE VOL IN: %9.6f %%" % (100.0 * self.ms_25_delta_vols[i])
-                )
+                print("MKT STRANGLE VOL IN: %9.6f %%" % (100.0 * self.ms_25_delta_vols[i]))
 
             call.strike_fx_rate = self.k_25d_c_ms[i]
             put.strike_fx_rate = self.k_25d_p_ms[i]
@@ -1074,7 +1056,7 @@ class FXVolSurface:
             model = BlackScholes(ms_vol)
 
             delta_call = call.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1082,7 +1064,7 @@ class FXVolSurface:
             )[self.delta_method_string]
 
             delta_put = put.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1101,7 +1083,7 @@ class FXVolSurface:
                 )
 
             call_value = call.value(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1109,7 +1091,7 @@ class FXVolSurface:
             )["v"]
 
             put_value = put.value(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1140,7 +1122,7 @@ class FXVolSurface:
 
             model = BlackScholes(sigma_k_25d_c_ms)
             call_value = call.value(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1149,7 +1131,7 @@ class FXVolSurface:
 
             # THIS IS NOT GOING TO BE 0.25 AS WE HAVE USED A DIFFERENT SKEW VOL
             delta_call = call.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1167,7 +1149,7 @@ class FXVolSurface:
 
             model = BlackScholes(sigma_k_25d_p_ms)
             put_value = put.value(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1176,7 +1158,7 @@ class FXVolSurface:
 
             # THIS IS NOT GOING TO BE -0.25 AS WE USED A DIFFERENT SKEW VOL
             delta_put = put.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1231,7 +1213,7 @@ class FXVolSurface:
 
             # THIS DELTA SHOULD BE +0.25
             delta_call = call.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1250,7 +1232,7 @@ class FXVolSurface:
 
             # THIS DELTA SHOULD BE -0.25
             delta_put = put.delta(
-                self.value_dt,
+                self.anchor_dt,
                 self.spot_fx_rate,
                 self.domestic_curve,
                 self.foreign_curve,
@@ -1259,14 +1241,10 @@ class FXVolSurface:
 
             if verbose:
                 print(
-                    "k_25d_c: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
-                    % (self.k_25d_c[i], 100.0 * sigma_k_25d_c, delta_call)
+                    "k_25d_c: %9.7f  VOL: %9.6f  DELTA: % 9.6f" % (self.k_25d_c[i], 100.0 * sigma_k_25d_c, delta_call)
                 )
 
-                print(
-                    "k_25d_p: %9.7f  VOL: %9.6f  DELTA: % 9.6f"
-                    % (self.k_25d_p[i], 100.0 * sigma_k_25d_p, delta_put)
-                )
+                print("k_25d_p: %9.7f  VOL: %9.6f  DELTA: % 9.6f" % (self.k_25d_p[i], 100.0 * sigma_k_25d_p, delta_put))
 
             sigma_rr = sigma_k_25d_c - sigma_k_25d_p
 
@@ -1292,9 +1270,7 @@ class FXVolSurface:
 
     ###########################################################################
 
-    def implied_dbns(
-        self, low_fx: float, high_fx: float, num_intervals: int
-    ) -> List[FinDistribution]:
+    def implied_dbns(self, low_fx: float, high_fx: float, num_intervals: int) -> List[FinDistribution]:
         """Calculate the pdf for each tenor horizon. Returns a list of
         FinDistribution objects, one for each tenor horizon."""
 
@@ -1419,7 +1395,7 @@ class FXVolSurface:
 
     def __repr__(self) -> str:
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("VALUE DATE", self.value_dt)
+        s += label_to_string("VALUE DATE", self.anchor_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
         s += label_to_string("CCY PAIR", self.currency_pair)
         s += label_to_string("NOTIONAL CCY", self.notional_currency)

@@ -108,26 +108,18 @@ class FinTestCases:
             self._folders_exist = False
             return
 
-        self._golden_file_name = join(
-            self._golden_folder, self._module_name + "_GOLDEN.testLog"
-        )
+        self._golden_file_name = join(self._golden_folder, self._module_name + "_GOLDEN.testLog")
 
-        self._compare_file_name = join(
-            self._compare_folder, self._module_name + "_COMPARE.testLog"
-        )
+        self._compare_file_name = join(self._compare_folder, self._module_name + "_COMPARE.testLog")
 
-        self._differences_file_name = join(
-            self._differences_folder, self._module_name + "_DIFFS.testLog"
-        )
+        self._differences_file_name = join(self._differences_folder, self._module_name + "_DIFFS.testLog")
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
 
             print("GOLDEN Test Case Creation for module:", module_file_name)
 
             if exists(self._golden_file_name) and self._careful_mode:
-                overwrite = input(
-                    "File " + self._golden_file_name + " exists. Overwrite (Y/N) ?"
-                )
+                overwrite = input("File " + self._golden_file_name + " exists. Overwrite (Y/N) ?")
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
                     return
@@ -146,9 +138,7 @@ class FinTestCases:
             #                "FOR COMPARISON.")
 
             if exists(self._compare_file_name) and self._careful_mode:
-                overwrite = input(
-                    "File " + self._compare_file_name + " exists. Overwrite (Y/N) ?"
-                )
+                overwrite = input("File " + self._compare_file_name + " exists. Overwrite (Y/N) ?")
                 if overwrite == "N":
                     print("Not overwriting. Saving test cases failed.")
                     return
@@ -181,11 +171,7 @@ class FinTestCases:
             n1 = len(self._header_fields)
             n2 = len(args)
             raise FinError(
-                "ERROR: Number of data columns is "
-                + str(n1)
-                + " but must equal "
-                + str(n2)
-                + " to align with headers."
+                "ERROR: Number of data columns is " + str(n1) + " but must equal " + str(n2) + " to align with headers."
             )
 
         if self._mode == FinTestCaseMode.SAVE_TEST_CASES:
@@ -338,11 +324,7 @@ class FinTestCases:
                 compare_flag = compare_field.replace(".", "").isnumeric()
                 golden_flag = golden_field.replace(".", "").isnumeric()
 
-                if (
-                    compare_flag is True
-                    and golden_flag is True
-                    and time_column is False
-                ):
+                if compare_flag is True and golden_flag is True and time_column is False:
 
                     compare_value = float(compare_field)
                     golden_value = float(golden_field)
@@ -384,10 +366,7 @@ class FinTestCases:
             # Do nothing
             return
 
-        self.print_log(
-            "EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: "
-            + self._module_name
-        )
+        self.print_log("EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: " + self._module_name)
 
         total_num_warnings = 0
         total_num_errors = 0
@@ -406,7 +385,7 @@ class FinTestCases:
 
         num_golden_lines = len(golden_contents)
 
-        # open golden file and load it up
+        # open compare file and load it up
         with open(self._compare_file_name, "r", encoding="utf-8") as f:
             compare_contents = f.readlines()
 
@@ -426,9 +405,7 @@ class FinTestCases:
             golden_row = golden_contents[row_num]
             compare_row = compare_contents[row_num]
 
-            num_warnings, num_errors = self.compare_rows(
-                golden_row, compare_row, row_num
-            )
+            num_warnings, num_errors = self.compare_rows(golden_row, compare_row, row_num)
 
             if num_errors > 0:
                 self.print_log(

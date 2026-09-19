@@ -28,9 +28,9 @@ from ...utils.error import FinError
 
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
+from ...utils.check_values import check_curve_dt
 
-DIRTY = 0
-CLEAN = 1
+from ...utils.global_vars import CLEAN
 
 ########################################################################################
 
@@ -111,6 +111,8 @@ class CDSTranche:
         model=FinLossDistributionBuilder.RECURSION,
     ):
 
+        check_curve_dt(value_dt, *issuer_curves)
+
         num_credits = len(issuer_curves)
         k1 = self.k1
         k2 = self.k2
@@ -170,9 +172,7 @@ class CDSTranche:
                 v_times = issuer_curve._times
                 q_row = issuer_curve._qs
                 recovery_rates[j] = issuer_curve.recovery_rate
-                q_vector[j] = interpolate(
-                    t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value
-                )
+                q_vector[j] = interpolate(t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value)
 
             if model == FinLossDistributionBuilder.RECURSION:
 
@@ -242,28 +242,18 @@ class CDSTranche:
 
             elif model == FinLossDistributionBuilder.LHP:
 
-                qt1[i] = tr_surv_prob_lhp(
-                    0.0, k1, num_credits, q_vector, recovery_rates, beta_1
-                )
+                qt1[i] = tr_surv_prob_lhp(0.0, k1, num_credits, q_vector, recovery_rates, beta_1)
 
-                qt2[i] = tr_surv_prob_lhp(
-                    0.0, k2, num_credits, q_vector, recovery_rates, beta_2
-                )
+                qt2[i] = tr_surv_prob_lhp(0.0, k2, num_credits, q_vector, recovery_rates, beta_2)
 
             else:
-                raise FinError(
-                    "Unknown model type only full and AdjBinomial allowed"
-                )
+                raise FinError("Unknown model type only full and AdjBinomial allowed")
 
             if qt1[i] > qt1[i - 1]:
-                raise FinError(
-                    "Tranche k_1 survival probabilities not decreasing."
-                )
+                raise FinError("Tranche k_1 survival probabilities not decreasing.")
 
             if qt2[i] > qt2[i - 1]:
-                raise FinError(
-                    "Tranche k_2 survival probabilities not decreasing."
-                )
+                raise FinError("Tranche k_2 survival probabilities not decreasing.")
 
             tranche_surv_curve[i] = kappa * qt2[i] + (1.0 - kappa) * qt1[i]
             tranche_times[i] = t
@@ -274,16 +264,10 @@ class CDSTranche:
         tranche_curve.set_times(tranche_times)
         tranche_curve.set_qs(tranche_surv_curve)
 
-        prot_leg_pv = self.cds_contract.prot_leg_pv(
-            value_dt, tranche_curve, curve_recovery
-        )
-        risky_pv01 = self.cds_contract.rpv01(value_dt, tranche_curve)[
-            CLEAN
-        ]
+        prot_leg_pv = self.cds_contract.prot_leg_pv(value_dt, tranche_curve, curve_recovery)
+        risky_pv01 = self.cds_contract.rpv01(value_dt, tranche_curve)[CLEAN]
 
-        mtm = self.notional * (
-            prot_leg_pv - upfront - risky_pv01 * running_cpn
-        )
+        mtm = self.notional * (prot_leg_pv - upfront - risky_pv01 * running_cpn)
 
         if not self.long_protect:
             mtm *= -1.0
@@ -296,31 +280,29 @@ class CDSTranche:
 
         return tranche_output
 
-
-########################################################################################
+    ########################################################################################
 
     def __repr__(self):
-            """Print out details of the CDSTranche contract."""
-            s = label_to_string("OBJECT TYPE", type(self).__name__)
-            s += label_to_string("STEP-IN DATE", self.step_in_dt)
-            s += label_to_string("MATURITY_DATE", self.maturity_dt)
-            s += label_to_string("ATTACHMENT POINT (K1)", self.k1)
-            s += label_to_string("DETACHMENT POINT (K2)", self.k2)
-            s += label_to_string("NOTIONAL", self.notional)
-            s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
-            s += label_to_string("LONG PROTECTION", self.long_protect)
-            s += label_to_string("FREQUENCY", self.freq_type)
-            s += label_to_string("DAYCOUNT", self.dc_type)
-            s += label_to_string("CALENDAR", self.cal_type)
-            s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
-            s += label_to_string("DATE_GEN_RULE", self.dg_type)
-            return s
+        """Print out details of the CDSTranche contract."""
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("STEP-IN DATE", self.step_in_dt)
+        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("ATTACHMENT POINT (K1)", self.k1)
+        s += label_to_string("DETACHMENT POINT (K2)", self.k2)
+        s += label_to_string("NOTIONAL", self.notional)
+        s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
+        s += label_to_string("LONG PROTECTION", self.long_protect)
+        s += label_to_string("FREQUENCY", self.freq_type)
+        s += label_to_string("DAYCOUNT", self.dc_type)
+        s += label_to_string("CALENDAR", self.cal_type)
+        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+        s += label_to_string("DATE_GEN_RULE", self.dg_type)
+        return s
 
-        ####################################################################################
+    ####################################################################################
 
     def _print(self):
         """Simple print function for backward compatibility."""
         print(self)
-
 
     ########################################################################################

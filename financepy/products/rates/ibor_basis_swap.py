@@ -126,6 +126,10 @@ class IborBasisSwap:
         if index_curve_leg_2 is None:
             index_curve_leg_2 = discount_curve
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve_leg_1)
+        check_curve_dt(value_dt, index_curve_leg_2)
+
         float_leg_1_value = self.float_leg_1.value(
             value_dt,
             discount_curve,

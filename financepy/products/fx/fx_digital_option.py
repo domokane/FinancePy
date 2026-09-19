@@ -12,13 +12,12 @@ from ...utils.math import normcdf_vect  # normcdf_prime_vect
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 
-# from ...products.equity.EquityOption import FinOption
 from ...utils.date import Date
 
-# from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
 from ...utils.global_types import OptionTypes
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -101,11 +100,8 @@ class FXDigitalOption:
         if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve.value_dt != value_dt:
-            raise FinError("Domestic Curve valuation date not same as valuation date")
-
-        if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as valuation date")
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
@@ -141,25 +137,13 @@ class FXDigitalOption:
             mu = r_d - r_f
             d2 = (ln_s0_k + (mu - v2 / 2.0) * t_del) / den
 
-            if (
-                self.opt_type == OptionTypes.DIGITAL_CALL
-                and self.for_name == self.prem_currency
-            ):
+            if self.opt_type == OptionTypes.DIGITAL_CALL and self.for_name == self.prem_currency:
                 v = s0 * np.exp(-r_f * t_del) * normcdf_vect(d2)
-            elif (
-                self.opt_type == OptionTypes.DIGITAL_PUT
-                and self.for_name == self.prem_currency
-            ):
+            elif self.opt_type == OptionTypes.DIGITAL_PUT and self.for_name == self.prem_currency:
                 v = s0 * np.exp(-r_f * t_del) * normcdf_vect(-d2)
-            elif (
-                self.opt_type == OptionTypes.DIGITAL_CALL
-                and self.dom_name == self.prem_currency
-            ):
+            elif self.opt_type == OptionTypes.DIGITAL_CALL and self.dom_name == self.prem_currency:
                 v = np.exp(-r_d * t_del) * normcdf_vect(d2)
-            elif (
-                self.opt_type == OptionTypes.DIGITAL_PUT
-                and self.dom_name == self.prem_currency
-            ):
+            elif self.opt_type == OptionTypes.DIGITAL_PUT and self.dom_name == self.prem_currency:
                 v = np.exp(-r_d * t_del) * normcdf_vect(-d2)
             else:
                 raise FinError("Unknown option type")

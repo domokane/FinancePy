@@ -13,7 +13,6 @@ from .global_vars import G_DAYS_IN_YEAR, G_SMALL
 from .error import FinError
 from .day_count import DayCountTypes, DayCount
 
-
 ########################################################################################
 
 
@@ -22,6 +21,38 @@ def _func_name():
     advisable but calling inspect.stack is so slow it must be avoided."""
     ff = sys._getframe().f_back.f_code.co_name
     return ff
+
+
+########################################################################################
+
+
+def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
+
+    t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+
+    if t_exp < 0 and fail is True:
+        raise FinError("Option expires before value date.")
+
+    return t_exp
+
+    if isinstance(expiry_dt, Date):
+        t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        if t_exp < 0 and fail is True:
+            raise FinError("Option expires before value date.")
+
+    elif isinstance(expiry_dt, list):
+        t_exps = []
+        for exp_dt in expiry_dt:
+            t_exp = (exp_dt - value_dt) / G_DAYS_IN_YEAR
+            if t_exp < 0 and fail is True:
+                raise FinError("Option expires before value date.")
+
+            t_exps.append(t_exp)
+        t_exp = np.array(t_exps)
+
+    t_exp = np.maximum(t_exp, floor)
+
+    return t_exp
 
 
 ########################################################################################
@@ -178,21 +209,13 @@ def dump(obj):
 
     attrs = dir(obj)
 
-    non_function_attributes = [
-        attr for attr in attrs if not callable(getattr(obj, attr))
-    ]
+    non_function_attributes = [attr for attr in attrs if not callable(getattr(obj, attr))]
 
-    non_internal_attributes = [
-        attr for attr in non_function_attributes if not attr.startswith("__")
-    ]
+    non_internal_attributes = [attr for attr in non_function_attributes if not attr.startswith("__")]
 
-    private_attributes = [
-        attr for attr in non_internal_attributes if attr.startswith("_")
-    ]
+    private_attributes = [attr for attr in non_internal_attributes if attr.startswith("_")]
 
-    public_attributes = [
-        attr for attr in non_internal_attributes if not attr.startswith("_")
-    ]
+    public_attributes = [attr for attr in non_internal_attributes if not attr.startswith("_")]
 
     print("PRIVATE ATTRIBUTES")
     for attr in private_attributes:
@@ -236,12 +259,7 @@ def input_time(dt: Date, curve):
 
     def check(t):
         if t < 0.0:
-            raise FinError(
-                "Date "
-                + str(dt)
-                + " is before curve date "
-                + str(curve._curve_dt)
-            )
+            raise FinError("Date " + str(dt) + " is before curve date " + str(curve._curve_dt))
         elif t < small:
             t = small
         return t
@@ -250,7 +268,7 @@ def input_time(dt: Date, curve):
         t = dt
         return check(t)
     elif isinstance(dt, Date):
-        t = (dt - curve.value_dt) / G_DAYS_IN_YEAR
+        t = (dt - curve.anchor_dt) / G_DAYS_IN_YEAR
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt
@@ -414,10 +432,7 @@ def format_table(header, rows):
             raise ValueError("Header and row size must match!")
 
     # Compute max width of each column
-    col_widths = [
-        max(len(str(h)), *(len(str(r[i])) for r in rows))
-        for i, h in enumerate(header)
-    ]
+    col_widths = [max(len(str(h)), *(len(str(r[i])) for r in rows)) for i, h in enumerate(header)]
 
     def format_cell(val, width):
         if isinstance(val, Union[int, float]):
@@ -425,17 +440,13 @@ def format_table(header, rows):
         return f"{str(val):<{width}}"  # Left align
 
     # Build header
-    header_line = " | ".join(
-        format_cell(h, w) for h, w in zip(header, col_widths)
-    )
+    header_line = " | ".join(format_cell(h, w) for h, w in zip(header, col_widths))
     sep_line = "-+-".join("-" * w for w in col_widths)
 
     # Build rows
     row_lines = []
     for row in rows:
-        row_lines.append(
-            " | ".join(format_cell(val, w) for val, w in zip(row, col_widths))
-        )
+        row_lines.append(" | ".join(format_cell(val, w) for val, w in zip(row, col_widths)))
 
     return "\n".join([header_line, sep_line] + row_lines)
 
@@ -551,28 +562,68 @@ def accrued_tree(grid_times: np.ndarray, grid_flows: np.ndarray, face: float):
 
 
 def check_argument_types(func, values):
-    """Check that all values passed into a function are of the same type
-    as the function annotations. If a value has not been annotated, it
-    will not be checked."""
+    """Check function arguments against their type annotations.
 
-    value = None
-    usable_type = None
+    Parameters
+    ----------
+    func : callable
+        Function whose annotations are used for type checking.
+    values : dict
+        Mapping of argument names to supplied values, typically locals().
 
-    for value_name, annotation_type in func.__annotations__.items():
+    Raises
+    ------
+    FinError
+        If an argument does not match its annotated type.
+    """
 
-        if value_name in values:
-            value = values[value_name]
-            usable_type = to_usable_type(annotation_type)
+    if func is None:
+        raise FinError("Cannot check argument types: function is None.")
 
-        if not isinstance(value, usable_type):
+    annotations = getattr(func, "__annotations__", {})
 
-            print("ERROR with function arguments for", func.__name__)
-            print("This is in module", func.__module__)
-            print("Please check inputs for argument >>", value_name, "<<")
-            print("You have input an argument", value, "of type", type(value))
-            print("The allowed types are", usable_type)
-            print("It is none of these so FAILS. Please amend.")
-            raise FinError("Argument Type Error")
+    for name, annotation in annotations.items():
+
+        # Return annotations are not function arguments.
+        if name == "return":
+            continue
+
+        # Only check arguments actually supplied.
+        if name not in values:
+            continue
+
+        value = values[name]
+
+        try:
+            expected_type = to_usable_type(annotation)
+        except Exception as exc:
+            raise FinError(
+                f"Unable to interpret type annotation for " f"'{func.__qualname__}.{name}': {annotation!r}"
+            ) from exc
+
+        try:
+            valid = isinstance(value, expected_type)
+        except TypeError as exc:
+            raise FinError(
+                f"Invalid runtime type annotation for " f"'{func.__qualname__}.{name}': {annotation!r}"
+            ) from exc
+
+        if valid:
+            continue
+
+        value_repr = repr(value)
+
+        if len(value_repr) > 100:
+            value_repr = value_repr[:97] + "..."
+
+        module = getattr(func, "__module__", "<unknown>")
+        func_name = getattr(func, "__qualname__", func.__name__)
+
+        raise FinError(
+            f"{module}.{func_name}(): "
+            f"argument '{name}' expected {annotation!r}, "
+            f"got {type(value).__name__}: {value_repr}"
+        )
 
 
 ########################################################################################

@@ -4,8 +4,6 @@
 
 from enum import Enum
 
-from typing import List
-
 import numpy as np
 
 from ...utils.date import Date
@@ -16,7 +14,6 @@ from ...models.gbm_process_simulator import get_assets_paths_times
 from ...products.fx.fx_option import FXOption
 
 from ...utils.helpers import check_argument_types
-
 
 ########################################################################################
 
@@ -81,6 +78,9 @@ def value_mc_fast(
     seed=4242,
 ):
 
+    check_curve_dt(value_dt, domestic_curve)
+    check_curve_dt(value_dt, foreign_curve)
+
     np.random.seed(seed)
     df = discount_curve.df(t)
     r = -np.log(df) / t
@@ -132,19 +132,13 @@ class FXRainbowOption(FXOption):
     def validate(self, stock_prices, dividend_yields, volatilities, betas):
 
         if len(stock_prices) != self.num_assets:
-            raise FinError(
-                "Stock prices must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Stock prices must be a vector of length " + str(self.num_assets))
 
         if len(dividend_yields) != self.num_assets:
-            raise FinError(
-                "Dividend yields must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Dividend yields must be a vector of length " + str(self.num_assets))
 
         if len(volatilities) != self.num_assets:
-            raise FinError(
-                "Volatilities must be a vector of length " + str(self.num_assets)
-            )
+            raise FinError("Volatilities must be a vector of length " + str(self.num_assets))
 
         if len(betas) != self.num_assets:
             raise FinError("Betas must be a vector of length " + str(self.num_assets))
@@ -171,17 +165,9 @@ class FXRainbowOption(FXOption):
             raise FinError("Unknown payoff type")
 
         if len(payoff_params) != num_params:
-            raise FinError(
-                "Number of parameters required for "
-                + str(payoff_type)
-                + " must be "
-                + str(num_params)
-            )
+            raise FinError("Number of parameters required for " + str(payoff_type) + " must be " + str(num_params))
 
-        if (
-            payoff_type == FXRainbowOptionTypes.CALL_ON_NTH
-            or payoff_type == FXRainbowOptionTypes.PUT_ON_NTH
-        ):
+        if payoff_type == FXRainbowOptionTypes.CALL_ON_NTH or payoff_type == FXRainbowOptionTypes.PUT_ON_NTH:
             n = payoff_params[0]
             if n < 1 or n > num_assets:
                 raise FinError("Nth parameter must be 1 to " + str(num_assets))
@@ -204,13 +190,8 @@ class FXRainbowOption(FXOption):
         if value_dt > self.expiry_dt:
             raise FinError("Valuation date after expiry date.")
 
-        if domestic_curve.value_dt != value_dt:
-            raise FinError(
-                "Domestic Curve valuation date not same as option value date"
-            )
-
-        if foreign_curve.value_dt != value_dt:
-            raise FinError("Foreign Curve valuation date not same as option value date")
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         if self.num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -295,6 +276,9 @@ class FXRainbowOption(FXOption):
         num_paths=10000,
         seed=4242,
     ):
+
+        check_curve_dt(value_dt, domestic_curve)
+        check_curve_dt(value_dt, foreign_curve)
 
         self.validate(stock_prices, dividend_yields, volatilities, betas)
 

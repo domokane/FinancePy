@@ -16,6 +16,7 @@ from ...utils.global_types import ExerciseTypes
 from ...utils.global_types import SwapTypes
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.check_values import check_curve_dt
 
 from .ibor_swap import IborSwap
 
@@ -100,6 +101,8 @@ class IborBermudanSwaption:
         the Black-Karasinski model and the Black-Derman-Toy model."""
 
         float_spread = 0.0
+
+        check_curve_dt(value_dt, discount_curve)
 
         # The underlying is a swap in which we pay the fixed amount
         self.underlying_swap = IborSwap(

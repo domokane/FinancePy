@@ -126,6 +126,10 @@ class OISBasisSwap:
         if index_ois_curve is None:
             index_ois_curve = discount_curve
 
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, index_curve)
+        check_curve_dt(value_dt, index_curve)
+
         float_ibor_leg_value = self.float_ibor_leg.value(
             value_dt, discount_curve, index_ibor_curve, first_fixing_rate_leg_1
         )
