@@ -1,16 +1,5 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-
-import numpy as np
-
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.utils.global_types import SwapTypes
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.calendar import DateGenRuleTypes
-from financepy.utils.calendar import BusDayAdjustTypes
+from financepy.market.curves import InterpTypes
+from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.math import ONE_MILLION
 from financepy.products.rates.ibor_single_curve import IborSingleCurve
@@ -20,24 +9,41 @@ from .helpers import build_ibor_single_curve
 ########################################################################################
 
 
-def _load_test_swap_and_curve(start_dt, end_dt):
+def test_ibor_swap_end_of_month_aligns_coupon_grid():
+    valuation_date = Date(31, 5, 2023)
 
-    fixed_coupon = 0.015
-    fixed_freq_type = FrequencyTypes.ANNUAL
-    fixed_dc_type = DayCountTypes.THIRTY_E_360
+    swaps = []
+    for tenor in ["6M", "1Y"]:
+        swaps.append(
+            IborSwap(
+                effective_dt=valuation_date,
+                term_dt_or_tenor=tenor,
+                fixed_leg_type=SwapTypes.PAY,
+                fixed_cpn=0.01,
+                fixed_freq_type=FrequencyTypes.QUARTERLY,
+                fixed_dc_type=DayCountTypes.ACT_360,
+                float_dc_type=DayCountTypes.ACT_360,
+                bd_type=BusDayAdjustTypes.NONE,
+                end_of_month=True,
+            )
+        )
 
-    float_spread = 0.0
-    float_freq_type = FrequencyTypes.SEMI_ANNUAL
-    float_dc_type = DayCountTypes.ACT_360
-    first_fixing = -0.00268
+    assert swaps[0].fixed_leg.payment_dts == [
+        Date(31, 8, 2023),
+        Date(30, 11, 2023),
+    ]
+    assert swaps[1].fixed_leg.payment_dts[:2] == swaps[0].fixed_leg.payment_dts
 
-    swap_calendar_type = CalendarTypes.TARGET
-    bus_day_adjust_type = BusDayAdjustTypes.FOLLOWING
-    date_gen_rule_type = DateGenRuleTypes.BACKWARD
-    fixed_leg_type = SwapTypes.RECEIVE
+    IborSingleCurve(
+        value_dt=valuation_date,
+        ibor_deposits=[],
+        ibor_fras=[],
+        ibor_swaps=swaps,
+        interp_type=InterpTypes.FLAT_FWD_RATES,
+    )
 
-    notional = 10.0 * ONE_MILLION
 
+def test_ibor_swap_end_of_month_handles_non_eom_effective_date():
     swap = IborSwap(
         start_dt,
         end_dt,
@@ -132,38 +138,44 @@ def test_dp_example():
         fixed_dc_type=fixed_dc_type,
         float_freq_type=FrequencyTypes.SEMI_ANNUAL,
         float_dc_type=DayCountTypes.ACT_360,
-        notional=notional,
-        cal_type=swap_cal_type,
-        bd_type=bd_type,
-        dg_type=dg_type,
+        bd_type=BusDayAdjustTypes.NONE,
+        end_of_month=True,
     )
 
-    dts = [
-        Date(14, 11, 2011),
-        Date(14, 5, 2012),
-        Date(14, 11, 2012),
-        Date(14, 5, 2013),
-        Date(14, 11, 2013),
-        Date(14, 5, 2014),
-        Date(14, 11, 2014),
-        Date(14, 5, 2015),
-        Date(16, 11, 2015),
-        Date(16, 5, 2016),
-        Date(14, 11, 2016),
+    assert swap.fixed_leg.payment_dts == [
+        Date(31, 5, 2023),
+        Date(31, 8, 2023),
+        Date(30, 11, 2023),
+        Date(29, 2, 2024),
+        Date(15, 5, 2024),
     ]
 
-    dfs = [
-        1.0,
-        0.9966889,
-        0.9942107,
-        0.9911884,
-        0.9880738,
-        0.9836490,
-        0.9786276,
-        0.9710461,
-        0.9621778,
-        0.9514315,
-        0.9394919,
+
+def test_ibor_swap_end_of_month_applies_to_float_leg_schedule():
+    swap = IborSwap(
+        effective_dt=Date(31, 5, 2023),
+        term_dt_or_tenor="1Y",
+        fixed_leg_type=SwapTypes.PAY,
+        fixed_cpn=0.01,
+        fixed_freq_type=FrequencyTypes.ANNUAL,
+        fixed_dc_type=DayCountTypes.ACT_360,
+        float_freq_type=FrequencyTypes.QUARTERLY,
+        float_dc_type=DayCountTypes.ACT_360,
+        bd_type=BusDayAdjustTypes.NONE,
+        end_of_month=True,
+    )
+
+    assert swap.float_leg.payment_dts == [
+        Date(31, 8, 2023),
+        Date(30, 11, 2023),
+        Date(29, 2, 2024),
+        Date(31, 5, 2024),
+    ]
+    assert swap.float_leg.start_accrued_dts == [
+        Date(31, 5, 2023),
+        Date(31, 8, 2023),
+        Date(30, 11, 2023),
+        Date(29, 2, 2024),
     ]
 
     value_dt = start_dt
