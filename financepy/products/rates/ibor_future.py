@@ -2,14 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-# TODO: Add functionality around settlement
-# TODO: Write test function
-# TODO: Handle 1 month futures contracts
-
 import numpy as np
 
 from ...utils.error import FinError
-from ...utils.day_count import DayCountTypes
+from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import ONE_MILLION
 from ...utils.date import Date
@@ -30,7 +26,7 @@ class IborFuture:
         self,
         today_dt: Date,
         future_number: int,  # The number of the future after today_dt
-        future_tenor: str = "3M",  # '1M', '2M', '3M'
+        future_tenor: str = "3M",  # '1M', '3M'
         accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         contract_size: float = ONE_MILLION,
     ):
@@ -44,19 +40,65 @@ class IborFuture:
         if future_number < 1:
             raise FinError("Future number must be 1 or more")
 
-        if future_tenor not in ["3M", "3m"]:
-            raise FinError("Only 3M IMM futures handled currently.")
+        future_tenor = future_tenor.upper()
 
-        self.delivery_dt = today_dt.next_imm_date()
+        if future_tenor not in ["1M", "3M"]:
+            raise FinError("Only 1M and 3M IMM futures handled currently.")
+
+        self.future_tenor = future_tenor
+        self.delivery_dt = self._first_delivery_dt(today_dt, future_tenor)
 
         for _ in range(0, future_number - 1):
-            self.delivery_dt = self.delivery_dt.next_imm_date()
+            self.delivery_dt = self._next_delivery_dt(
+                self.delivery_dt, future_tenor
+            )
 
-        self.end_of_interest_period = self.delivery_dt.next_imm_date()
-
+        self.end_of_interest_period = self._next_delivery_dt(
+            self.delivery_dt, future_tenor
+        )
         self.last_trading_dt = self.delivery_dt.add_days(-2)
         self.accrual_dc_type = accrual_dc_type
         self.contract_size = contract_size
+
+    ###########################################################################
+
+    @staticmethod
+    def _next_monthly_imm_date(dt: Date):
+        """Return the next third Wednesday after dt, for any month."""
+
+        m_imm = dt.m
+        y_imm = dt.y
+        d_imm = dt.third_wednesday_of_month(m_imm, y_imm)
+
+        if dt.d >= d_imm:
+            next_month_dt = dt.add_months(1)
+            m_imm = next_month_dt.m
+            y_imm = next_month_dt.y
+            d_imm = next_month_dt.third_wednesday_of_month(m_imm, y_imm)
+
+        return Date(d_imm, m_imm, y_imm)
+
+    ###########################################################################
+
+    @staticmethod
+    def _first_delivery_dt(today_dt: Date, future_tenor: str):
+        """Return the first delivery date after today for the tenor."""
+
+        if future_tenor == "1M":
+            return IborFuture._next_monthly_imm_date(today_dt)
+
+        return today_dt.next_imm_date()
+
+    ###########################################################################
+
+    @staticmethod
+    def _next_delivery_dt(delivery_dt: Date, future_tenor: str):
+        """Return the next delivery date after an existing delivery date."""
+
+        if future_tenor == "1M":
+            return IborFuture._next_monthly_imm_date(delivery_dt)
+
+        return delivery_dt.next_imm_date()
 
     ###########################################################################
 
@@ -84,6 +126,47 @@ class IborFuture:
         """Calculate implied futures rate from the futures price."""
         futures_rate = (100.0 - futures_price) / 100.0
         return futures_rate
+
+    ###########################################################################
+
+    def accrual_factor(self):
+        """Return the accrual factor for the futures interest period."""
+
+        dc = DayCount(self.accrual_dc_type)
+        return dc.year_frac(
+            self.delivery_dt, self.end_of_interest_period
+        )[0]
+
+    ###########################################################################
+
+    def basis_point_value(self):
+        """Return the cash value of one basis point move in futures price."""
+
+        return self.contract_size * self.accrual_factor() / 10000.0
+
+    ###########################################################################
+
+    def settlement_amount(
+        self,
+        futures_price: float,
+        settlement_price: float,
+        num_contracts: float = 1.0,
+    ):
+        """Return the cash settlement amount for a futures price move.
+
+        The amount is for a long position. Use a negative number of contracts
+        for a short position. Prices are quoted in futures price points, for
+        example 97.50.
+        """
+
+        price_change = settlement_price - futures_price
+        return (
+            num_contracts
+            * self.contract_size
+            * self.accrual_factor()
+            * price_change
+            / 100.0
+        )
 
     ###########################################################################
 
