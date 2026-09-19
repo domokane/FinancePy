@@ -1,0 +1,136 @@
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+
+
+# Allow this example to run directly from its category folder.
+import sys as _sys
+from pathlib import Path as _Path
+_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
+if str(_EXAMPLES_CODE) not in _sys.path:
+    _sys.path.insert(0, str(_EXAMPLES_CODE))
+from double_click_pause import install_double_click_pause as _install_double_click_pause
+_install_double_click_pause()
+import add_fp_to_path
+
+from financepy.utils.global_types import OptionTypes
+from financepy.utils.global_types import DigitalOptionTypes
+from financepy.products.equity.equity_digital_option import EquityDigitalOption
+from financepy.models.black_scholes import BlackScholes
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.utils.date import Date
+
+
+
+########################################################################################
+
+
+def test_equity_digital_option():
+
+    underlying_type = DigitalOptionTypes.CASH_OR_NOTHING
+
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = Date(1, 1, 2016)
+    stock_price = 100.0
+    volatility = 0.30
+    interest_rate = 0.05
+    dividend_yield = 0.01
+    discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+    dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
+
+    model = BlackScholes(volatility)
+    import time
+
+    call_option_values = []
+    call_option_values_mc = []
+    num_paths_list = [10000, 20000, 40000, 80000]
+
+    #  [160000, 320000, 640000, 1280000, 2560000]
+
+    print("NumLoops", "ValueBS", "ValueMC", "TIME")
+
+    for num_paths in num_paths_list:
+
+        call_option = EquityDigitalOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type
+        )
+        value = call_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        start = time.time()
+        value_mc = call_option.value_mc(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            num_paths,
+        )
+        end = time.time()
+        duration = end - start
+        print(num_paths, value, value_mc, duration)
+
+        call_option_values.append(value)
+        call_option_values_mc.append(value_mc)
+
+    #    plt.figure(figsize=(10,8))
+    #    plt.plot(num_paths_list, call_option_values, color = 'b', label="Call Option")
+    #    plt.plot(num_paths_list, call_option_values_mc, color = 'r', label = "Call Option MC")
+    #    plt.xlabel("Num Loops")
+    #    plt.legend(loc='best')
+
+    stock_prices = range(50, 150, 50)
+    call_option_values = []
+    call_option_deltas = []
+    call_option_vegas = []
+    call_option_thetas = []
+
+    for stock_price in stock_prices:
+        call_option = EquityDigitalOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, underlying_type
+        )
+        value = call_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        delta = call_option.delta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        vega = call_option.vega(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        theta = call_option.theta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        call_option_values.append(value)
+        call_option_deltas.append(delta)
+        call_option_vegas.append(vega)
+        call_option_thetas.append(theta)
+
+    put_option_values = []
+    put_option_deltas = []
+    put_option_vegas = []
+    put_option_thetas = []
+
+    for stock_price in stock_prices:
+        put_option = EquityDigitalOption(
+            expiry_dt, 100.0, OptionTypes.EUROPEAN_PUT, underlying_type
+        )
+        value = put_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        delta = put_option.delta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        vega = put_option.vega(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        theta = put_option.theta(
+            value_dt, stock_price, discount_curve, dividend_curve, model
+        )
+        put_option_values.append(value)
+        put_option_deltas.append(delta)
+        put_option_vegas.append(vega)
+        put_option_thetas.append(theta)
+
+
+########################################################################################
+
+test_equity_digital_option()

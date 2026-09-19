@@ -1,0 +1,5 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: TestFinBondEmbeddedOptionBDT 
+Row#  4  WARNING: Calculation time has changed by -97.95  percent. 
+Row#  5  WARNING: Calculation time has changed by -51.89  percent. 
+Analysis of  TestFinBondEmbeddedOptionBDT  completed with  0  errors and  4  warnings. 
+NUM LINES: 11 ====> ERRORS: 0  WARNINGS: 4 

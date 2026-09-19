@@ -1,0 +1,4 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: TestFinBondEmbeddedOptionBK 
+Row#  4  WARNING: Calculation time has changed by -96.30  percent. 
+Analysis of  TestFinBondEmbeddedOptionBK  completed with  0  errors and  4  warnings. 
+NUM LINES: 11 ====> ERRORS: 0  WARNINGS: 4 

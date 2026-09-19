@@ -1,5 +1,9 @@
 ## CHANGE LOG
 19 Sep 2026
+- Split tests into multiple types - unit, regression and validation
+- created examples folder with scripts and notebooks
+
+19 Sep 2026
 List of changes
 - Renamed all camel case inflation modules to be snake case
 - Renamed all camel case swap modules to be snake case

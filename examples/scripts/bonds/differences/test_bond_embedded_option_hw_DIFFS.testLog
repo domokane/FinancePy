@@ -1,0 +1,6 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: TestFinBondEmbeddedOptionHW 
+Row#  4  WARNING: Calculation time has changed by -100.00  percent. 
+Row#  26  WARNING: Calculation time has changed by -94.21  percent. 
+Row#  27  WARNING: Calculation time has changed by 51.62  percent. 
+Analysis of  TestFinBondEmbeddedOptionHW  completed with  0  errors and  20  warnings. 
+NUM LINES: 28 ====> ERRORS: 0  WARNINGS: 20 

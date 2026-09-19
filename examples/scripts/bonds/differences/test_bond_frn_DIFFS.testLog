@@ -1,0 +1,18 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: TestFinBondFRN 
+Row#  8  ERROR -  1  DIFFERENCE(S) IN ROW  8 
+Row#  8  HEADER:  ==> ['HEADER', 'FIELD', 'VALUE'] 
+Row#  8  GOLDEN : ==> RESULTS,Dollar Principal = ,97.02428534 
+Row#  8  COMPARE: ==> RESULTS,Dollar Principal = ,96.79300000 
+ 
+Row#  22  ERROR -  1  DIFFERENCE(S) IN ROW  22 
+Row#  22  HEADER:  ==> ['HEADER', 'FIELD', 'VALUE'] 
+Row#  22  GOLDEN : ==> RESULTS,Dollar Principal = ,93.13097125 
+Row#  22  COMPARE: ==> RESULTS,Dollar Principal = ,93.08000000 
+ 
+Row#  27  ERROR -  1  DIFFERENCE(S) IN ROW  27 
+Row#  27  HEADER:  ==> ['HEADER', 'FIELD', 'VALUE'] 
+Row#  27  GOLDEN : ==> RESULTS,Principal = ,93.13097125 
+Row#  27  COMPARE: ==> RESULTS,Principal = ,93.08000000 
+ 
+Analysis of  TestFinBondFRN  completed with  3  errors and  0  warnings. 
+NUM LINES: 30 ====> ERRORS: 3  WARNINGS: 0 

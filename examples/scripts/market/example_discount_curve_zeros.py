@@ -1,0 +1,90 @@
+# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+
+
+# Allow this example to run directly from its category folder.
+import sys as _sys
+from pathlib import Path as _Path
+_EXAMPLES_CODE = _Path(__file__).resolve().parents[1]
+if str(_EXAMPLES_CODE) not in _sys.path:
+    _sys.path.insert(0, str(_EXAMPLES_CODE))
+from double_click_pause import install_double_click_pause as _install_double_click_pause
+_install_double_click_pause()
+import time
+import numpy as np
+
+import add_fp_to_path
+
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.utils.date import Date
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+
+
+
+
+########################################################################################
+
+
+def test_fin_discount_curve_zeros():
+
+    dates = [
+        Date(14, 9, 2016),
+        Date(14, 12, 2016),
+        Date(14, 6, 2017),
+        Date(14, 6, 2019),
+        Date(14, 6, 2021),
+        Date(15, 6, 2026),
+        Date(16, 6, 2031),
+        Date(16, 6, 2036),
+        Date(14, 6, 2046),
+    ]
+
+    zero_rates = [
+        0.006616,
+        0.007049,
+        0.007795,
+        0.009599,
+        0.011203,
+        0.015068,
+        0.017583,
+        0.018998,
+        0.020080,
+    ]
+
+    start_dt = Date(14, 6, 2016)
+
+    times = np.linspace(0.0, 30, 100)
+
+    print("Interp_type", "Time", "Zero_cc", "Fwd_cc", "TIME")
+
+    for interp_type in InterpTypes:
+
+        start = time.time()
+
+        freq_type = FrequencyTypes.ANNUAL
+        time_dc_type = DayCountTypes.ACT_ACT_ISDA
+
+        curve = ZeroRatesDiscountCurve(
+            start_dt,
+            dates,
+            zero_rates,
+            freq_type,
+            time_dc_type,
+            interp_type,
+        )
+
+        zeros_cc = curve.zero_rate_cc_t(times) * 100.0
+        fwd_cc = curve.fwd_rate_inst_t(times) * 100.0
+
+        end = time.time()
+        period = end - start
+
+        for t, z, f in zip(times, zeros_cc, fwd_cc):
+            print(interp_type, t, z, f, period)
+
+
+########################################################################################
+
+
+test_fin_discount_curve_zeros()
