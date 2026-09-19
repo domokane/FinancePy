@@ -102,8 +102,8 @@ class InflationBond(Bond):
 
         index_ratio = reference_cpi / self.base_cpi_value
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        principal = dirty_price * face / self.par
-        principal = principal - self.accrued_int
+        accrued = self.accrued_interest(settle_dt, face)
+        principal = dirty_price * face / self.par - accrued
         principal *= index_ratio
         return principal
 
