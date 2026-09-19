@@ -1,1 +1,1 @@
-from .InflationBond import *
+from .inflation_bond import *

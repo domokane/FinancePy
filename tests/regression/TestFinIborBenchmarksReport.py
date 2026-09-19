@@ -1,0 +1,208 @@
+import sys
+from os.path import dirname, join
+
+import pandas as pd
+
+import add_fp_to_path
+
+from financepy.utils.date import Date
+from financepy.utils.global_types import SwapTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_fra import IborFRA
+from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+
+from financepy.products.rates.ibor_benchmarks_report import (
+    ibor_benchmarks_report,
+    dataframe_to_benchmarks,
+)
+
+from FinTestCases import FinTestCases, global_test_case_mode
+
+test_cases = FinTestCases(__file__, global_test_case_mode)
+
+########################################################################################
+
+
+def test_ibor_benchmarks_report():
+
+    value_dt = Date(6, 10, 2001)
+    cal = CalendarTypes.LONDON
+    interp_type = InterpTypes.FLAT_FWD_RATES
+
+    depo_dcc_type = DayCountTypes.ACT_360
+    depos = []
+    spot_days = 2
+    settle_dt = value_dt.add_weekdays(spot_days)
+    depo = IborDeposit(settle_dt, "3M", 4.2 / 100.0, depo_dcc_type, cal_type=cal)
+    depos.append(depo)
+
+    fra_dcc_type = DayCountTypes.ACT_360
+    fras = []
+    fra = IborFRA(
+        settle_dt.add_tenor("3M"),
+        "3M",
+        4.20 / 100.0,
+        fra_dcc_type,
+        cal_type=cal,
+    )
+    fras.append(fra)
+
+    swaps = []
+    swap_type = SwapTypes.PAY
+    fixed_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
+    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
+
+    swap = IborSwap(
+        settle_dt,
+        "1Y",
+        swap_type,
+        4.20 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "2Y",
+        swap_type,
+        4.30 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "3Y",
+        swap_type,
+        4.70 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "5Y",
+        swap_type,
+        5.40 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "7Y",
+        swap_type,
+        5.70 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "10Y",
+        swap_type,
+        6.00 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "12Y",
+        swap_type,
+        6.10 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "15Y",
+        swap_type,
+        5.90 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "20Y",
+        swap_type,
+        5.60 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+    swap = IborSwap(
+        settle_dt,
+        "25Y",
+        swap_type,
+        5.55 / 100.0,
+        fixed_freq_type,
+        fixed_dcc_type,
+        cal_type=cal,
+    )
+    swaps.append(swap)
+
+    # Create but do not build the initial curve
+    do_build = True
+    curve = IborSingleCurve(
+        value_dt,
+        depos,
+        fras,
+        swaps,
+        interp_type,
+        check_refit=False,
+        do_build=do_build,
+    )
+
+    benchmarks_report = ibor_benchmarks_report(curve)
+
+    # print(benchmarks_report)
+
+    # Confirm that there are no NaNs. In particular this means that different types of benchmarks
+    # return exactly the same keys, just like we want it, with a couple of exceptions
+    assert (benchmarks_report.drop(columns=["fixed_freq_type", "fixed_leg_type"]).isnull().values.any()) == False
+
+
+########################################################################################
+
+
+def test_dataframe_to_benchmarks():
+
+    path = dirname(__file__)
+    filename = "ibor_benchmarks_example.csv"
+    full_filename_path = join(path, "data", filename)
+
+    asof = Date(6, 10, 2001)
+
+    df = pd.read_csv(full_filename_path, index_col=0)
+
+    df["start_dt"] = pd.to_datetime(df["start_dt"], format="%d-%b-%y")  # allow tenors
+    df["maturity_dt"] = pd.to_datetime(df["maturity_dt"], format="%d-%b-%y")  # allow tenors
+
+    benchmarks = dataframe_to_benchmarks(df, asof_date=asof, calendar_type=CalendarTypes.LONDON)
+
+    assert len(benchmarks["IborDeposit"]) == 2
+    assert len(benchmarks["IborFRA"]) == 1
+    assert len(benchmarks["IborSwap"]) == 10
+
+
+########################################################################################
+
+test_ibor_benchmarks_report()
+test_dataframe_to_benchmarks()

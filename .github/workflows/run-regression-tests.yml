@@ -26,10 +26,10 @@ jobs:
 
       - name: Run Regression tests
         run: |
-          python regression_tests/run_all_tests.py
+          python tests/regression/run_all_tests.py
 
       - name: Archive regression test result differences
         uses: actions/upload-artifact@v4
         with:
           name: result-differences-file-upload
-          path: regression_tests/differences/*.testLog
+          path: tests/regression/differences/*.testLog

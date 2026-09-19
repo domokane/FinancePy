@@ -43,7 +43,7 @@ class IborDeposit:
         start_dt: Date,  # When the interest starts to accrue
         maturity_dt_or_tenor: Union[Date, str],  # Repayment of interest
         deposit_rate: float,  # MM rate using simple interest
-        dc_type: DayCountTypes,  # How accrual year fraction is calculated
+        accrual_dc_type: DayCountTypes,  # How accrual year fraction is calculated
         notional: float = 100.0,  # Amount borrowed
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,  # Maturity date
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING,
@@ -76,7 +76,7 @@ class IborDeposit:
         self.start_dt = start_dt
         self.maturity_dt = maturity_dt
         self.deposit_rate = deposit_rate
-        self.dc_type = dc_type
+        self.accrual_dc_type = accrual_dc_type
         self.notional = notional
 
     #####################################################$###############################
@@ -86,7 +86,7 @@ class IborDeposit:
         Libor curve to reprice the contractual market deposit rate. Note that
         this is a forward discount factor that starts on settlement date."""
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df = 1.0 / (1.0 + acc_factor * self.deposit_rate)
         return df
@@ -101,7 +101,7 @@ class IborDeposit:
         if value_dt > self.maturity_dt:
             raise FinError("Start date after maturity date")
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df_settle = libor_curve.df(self.start_dt)
         df_maturity = libor_curve.df(self.maturity_dt)
@@ -140,7 +140,7 @@ class IborDeposit:
         if index_curve is not None:
             check_curve_dt(value_dt, index_curve)
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         df_settle = discount_curve.df(self.start_dt)
         df_maturity = discount_curve.df(self.maturity_dt)
@@ -156,7 +156,7 @@ class IborDeposit:
             "type": type(self).__name__,
             "start_dt": self.start_dt,
             "maturity_dt": self.maturity_dt,
-            "dc_type": self.dc_type.name,
+            "accrual_dc_type": self.accrual_dc_type.name,
             "notional": self.notional,
             "contract_rate": self.deposit_rate,
             "market_rate": (df_settle / df_maturity - 1) / acc_factor,
@@ -175,7 +175,7 @@ class IborDeposit:
     def print_payments(self, value_dt: Date):
         """Print the date and size of the future repayment."""
 
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.accrual_dc_type)
         acc_factor = dc.year_frac(self.start_dt, self.maturity_dt)[0]
         flow = (1.0 + acc_factor * self.deposit_rate) * self.notional
         print(self.maturity_dt, flow)
@@ -189,7 +189,7 @@ class IborDeposit:
         s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("DEPOSIT RATE", self.deposit_rate)
-        s += label_to_string("DC_TYPE", self.dc_type)
+        s += label_to_string("ACCRUAL_DC_TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         return s
