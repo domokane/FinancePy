@@ -165,12 +165,13 @@ class BondFRN:
         amount from its discount margin and making assumptions about the
         future Ibor rates."""
 
+        accrued = self.accrued_interest(settle_dt, next_cpn) * face
         dirty_price = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
         )
 
-        self.accrued = self.accrual_factor * next_cpn * 1.0
-        principal = dirty_price * face / self.par - self.accrued
+        self.accrued = accrued
+        principal = dirty_price * face / self.par - accrued
         return principal
 
     ###########################################################################
@@ -359,11 +360,10 @@ class BondFRN:
         if dm > 10.0:
             raise FinError("Discount margin exceeds 100000bp")
 
+        self.accrued_interest(settle_dt, next_cpn)
         dirty_price = self.dirty_price_from_dm(
             settle_dt, next_cpn, current_ibor, future_ibor, dm
         )
-
-        self.accrued_interest(settle_dt, next_cpn)
 
         self.accrued = self.accrual_factor * next_cpn * self.par
 
