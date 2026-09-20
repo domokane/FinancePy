@@ -320,10 +320,8 @@ class IborSwap:
         while self.fixed_leg.payment_dts[start_index] < value_dt:
             start_index += 1
 
-        # If the swap has yet to settle then we do not include the
-        # start date of the swap as a cpn payment date.
-        if value_dt <= self.effective_dt:
-            start_index = 1
+        # payment_dts contains coupon dates only; the effective date is
+        # not a payment to skip for a forward-starting swap.
 
         # Now PV fixed leg flows.
         flat_pv01 = 0.0
